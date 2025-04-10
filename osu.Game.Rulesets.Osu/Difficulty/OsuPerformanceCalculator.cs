@@ -54,6 +54,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private double overallDifficulty;
         private double approachRate;
 
+        /// <summary>
+        /// The estimated number of sliderbreaks from aim difficulty.
+        /// </summary>
+        private double estimatedAimSliderbreaks;
+
+        /// <summary>
+        /// The estimated number of sliderbreaks from speed difficulty.
+        /// </summary>
+        private double estimatedSpeedSliderbreaks;
+
         private double? speedDeviation;
 
         public OsuPerformanceCalculator()
@@ -126,6 +136,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             effectiveMissCount = Math.Max(countMiss, effectiveMissCount);
             effectiveMissCount = Math.Min(totalHits, effectiveMissCount);
 
+            estimatedAimSliderbreaks = calculateEstimatedSliderbreaks(osuAttributes.AimTopWeightedSliderFactor, osuAttributes);
+            estimatedSpeedSliderbreaks = calculateEstimatedSliderbreaks(osuAttributes.SpeedTopWeightedSliderFactor, osuAttributes);
+
             double multiplier = PERFORMANCE_BASE_MULTIPLIER;
 
             if (score.Mods.Any(m => m is OsuModNoFail))
@@ -169,6 +182,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 Flashlight = flashlightValue,
                 EffectiveMissCount = effectiveMissCount,
                 SpeedDeviation = speedDeviation,
+                EstimatedAimSliderbreaks = estimatedAimSliderbreaks,
+                EstimatedSpeedSliderbreaks = estimatedSpeedSliderbreaks,
                 Total = totalValue
             };
         }
@@ -208,7 +223,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             aimValue *= lengthBonus;
 
             if (effectiveMissCount > 0)
-                aimValue *= calculateMissPenalty(effectiveMissCount, attributes.AimDifficultStrainCount);
+                aimValue *= calculateMissPenalty(effectiveMissCount + estimatedAimSliderbreaks, attributes.AimDifficultStrainCount);
 
             double approachRateFactor = 0.0;
             if (approachRate > 10.33)
@@ -248,7 +263,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             speedValue *= lengthBonus;
 
             if (effectiveMissCount > 0)
-                speedValue *= calculateMissPenalty(effectiveMissCount, attributes.SpeedDifficultStrainCount);
+                speedValue *= calculateMissPenalty(effectiveMissCount + estimatedSpeedSliderbreaks, attributes.SpeedDifficultStrainCount);
 
             double approachRateFactor = 0.0;
             if (approachRate > 10.33)
@@ -446,6 +461,22 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             adjustedSpeedValue = double.Lerp(adjustedSpeedValue, speedValue, lerp);
 
             return adjustedSpeedValue / speedValue;
+        }
+
+        private double calculateEstimatedSliderbreaks(double topWeightedSliderFactor, OsuDifficultyAttributes attributes)
+        {
+            // If we're not using classic slider accuracy then we already have an accurate number of sliderbreaks.
+            // If we did not get any Oks, further breaks are not possible.
+            if (!usingClassicSliderAccuracy || countOk == 0)
+                return 0;
+
+            double missedComboPercent = 1.0 - (double)scoreMaxCombo / attributes.MaxCombo;
+            double estimatedSliderbreaks = Math.Min(countOk, effectiveMissCount * topWeightedSliderFactor);
+
+            // Scores with more oks are more likely to have sliderbreaks
+            double okAdjustment = ((countOk - estimatedSliderbreaks) + 0.5) / countOk;
+
+            return estimatedSliderbreaks * okAdjustment * DifficultyCalculationUtils.Logistic(missedComboPercent, 0.33, 15);
         }
 
         // Miss penalty assumes that a player will miss on the hardest parts of a map,

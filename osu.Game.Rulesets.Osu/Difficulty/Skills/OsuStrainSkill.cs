@@ -7,6 +7,7 @@ using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
 using System.Linq;
 using osu.Framework.Utils;
+using osu.Game.Rulesets.Difficulty.Utils;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
@@ -22,6 +23,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// The baseline multiplier applied to the section with the biggest strain.
         /// </summary>
         protected virtual double ReducedStrainBaseline => 0.75;
+
+        protected readonly List<double> SliderStrains = new List<double>();
 
         protected OsuStrainSkill(Mod[] mods)
             : base(mods)
@@ -55,6 +58,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             }
 
             return difficulty;
+        }
+
+        public double CountTopWeightedSliders()
+        {
+            if (SliderStrains.Count == 0)
+                return 0;
+
+            double consistentTopStrain = DifficultyValue() / 10; // What would the top strain be if all strain values were identical
+
+            if (consistentTopStrain == 0)
+                return 0;
+
+            // Use a weighted sum of all strains. Constants are arbitrary and give nice values
+            return SliderStrains.Sum(s => DifficultyCalculationUtils.Logistic(s / consistentTopStrain, 0.88, 10, 1.1));
         }
 
         public static double DifficultyToPerformance(double difficulty) => Math.Pow(5.0 * Math.Max(1.0, difficulty / 0.0675) - 4.0, 3.0) / 100000.0;

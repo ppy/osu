@@ -27,6 +27,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         [JsonProperty("speed_deviation")]
         public double? SpeedDeviation { get; set; }
 
+        [JsonProperty("estimated_aim_sliderbreaks")]
+        public double EstimatedAimSliderbreaks { get; set; }
+
+        [JsonProperty("estimated_speed_sliderbreaks")]
+        public double EstimatedSpeedSliderbreaks { get; set; }
+
         public override IEnumerable<PerformanceDisplayAttribute> GetAttributesForDisplay()
         {
             foreach (var attribute in base.GetAttributesForDisplay())
