@@ -30,9 +30,9 @@ namespace osu.Game.Screens.SelectV2
     {
         private const float logo_scale = 0.4f;
 
-        public const float WEDGE_CONTENT_MARGIN = corner_radius_hide_offset + OsuGame.SCREEN_EDGE_MARGIN;
+        public const float WEDGE_CONTENT_MARGIN = CORNER_RADIUS_HIDE_OFFSET + OsuGame.SCREEN_EDGE_MARGIN;
 
-        private const float corner_radius_hide_offset = 20f;
+        public const float CORNER_RADIUS_HIDE_OFFSET = 20f;
 
         public const double ENTER_DURATION = 600;
 
@@ -106,7 +106,11 @@ namespace osu.Game.Screens.SelectV2
                                         wedgesContainer = new FillFlowContainer
                                         {
                                             RelativeSizeAxes = Axes.Both,
-                                            Margin = new MarginPadding { Left = -corner_radius_hide_offset },
+                                            Margin = new MarginPadding
+                                            {
+                                                Top = -CORNER_RADIUS_HIDE_OFFSET,
+                                                Left = -CORNER_RADIUS_HIDE_OFFSET
+                                            },
                                             Spacing = new Vector2(0f, 4f),
                                             Direction = FillDirection.Vertical,
                                             Children = new Drawable[]

@@ -83,9 +83,6 @@ namespace osu.Game.Screens.SelectV2
             Masking = true;
             CornerRadius = corner_radius;
 
-            // Hide the top edge of the wedge off-screen (so we don't see the corner).
-            Margin = new MarginPadding { Top = -corner_radius };
-
             InternalChildren = new Drawable[]
             {
                 new WedgeBackground(),
@@ -94,28 +91,26 @@ namespace osu.Game.Screens.SelectV2
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Direction = FillDirection.Vertical,
-                    Padding = new MarginPadding { Left = SongSelect.WEDGE_CONTENT_MARGIN },
+                    Padding = new MarginPadding
+                    {
+                        Top = SongSelect.WEDGE_CONTENT_MARGIN,
+                        Left = SongSelect.WEDGE_CONTENT_MARGIN
+                    },
                     Spacing = new Vector2(0f, 4f),
                     Shear = -shear,
                     Children = new Drawable[]
                     {
-                        new ShearAlignedDrawable(shear, new Container
+                        new ShearAlignedDrawable(shear, statusPill = new BeatmapSetOnlineStatusPill
                         {
-                            RelativeSizeAxes = Axes.X,
-                            Height = 35,
-                            Child = statusPill = new BeatmapSetOnlineStatusPill
-                            {
-                                AutoSizeAxes = Axes.Both,
-                                Margin = new MarginPadding { Right = 20f, Top = 20f },
-                                TextSize = OsuFont.Caption.Size,
-                                TextPadding = new MarginPadding { Horizontal = 6, Vertical = 1 },
-                            }
+                            ShowUnknownStatus = true,
+                            TextSize = OsuFont.Caption.Size,
+                            TextPadding = new MarginPadding { Horizontal = 6, Vertical = 1 },
                         }),
                         new ShearAlignedDrawable(shear, titleContainer = new Container
                         {
                             RelativeSizeAxes = Axes.X,
-                            Height = OsuFont.Title.Size + 2,
-                            Margin = new MarginPadding { Bottom = -5f },
+                            Height = OsuFont.Title.Size,
+                            Margin = new MarginPadding { Bottom = -4f },
                             Child = titleLink = new OsuHoverContainer
                             {
                                 AutoSizeAxes = Axes.Both,
