@@ -25,7 +25,7 @@ namespace osu.Game.Online.Rooms
         /// <summary>
         /// Whether the user has a passing score on the playlist item.
         /// </summary>
-        [JsonProperty("completed")]
-        public bool Completed { get; set; }
+        [JsonProperty("passed")]
+        public bool Passed { get; set; }
     }
 }

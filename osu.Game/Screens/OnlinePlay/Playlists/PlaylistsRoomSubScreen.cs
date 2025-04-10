@@ -533,7 +533,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
             foreach (var item in room.UserScore.PlaylistItemAttempts)
             {
-                if (item.Completed)
+                if (item.Passed)
                     drawablePlaylist.Items.Single(i => i.ID == item.PlaylistItemID).MarkCompleted();
             }
         }
