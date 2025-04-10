@@ -19,7 +19,7 @@ namespace osu.Game.Screens.SelectV2
 {
     public partial class BeatmapFilterControl : OverlayContainer
     {
-        public const float HEIGHT = 142;
+        public const float HEIGHT = 160;
 
         private ShearedToggleButton showConvertedBeatmapsButton = null!;
         private ShearedDifficultyRangeSlider difficultyRangeSlider = null!;
@@ -30,18 +30,25 @@ namespace osu.Game.Screens.SelectV2
         [BackgroundDependencyLoader]
         private void load()
         {
+            const float corner_radius = 8;
+
             Height = HEIGHT;
 
             Shear = new Vector2(OsuGame.SHEAR, 0);
-            Margin = new MarginPadding { Right = -30 };
+            Margin = new MarginPadding { Top = -corner_radius, Right = -40 };
 
             InternalChildren = new Drawable[]
             {
-                new WedgeBackground
+                new Container
                 {
-                    Anchor = Anchor.TopRight,
-                    Scale = new Vector2(-1, 1),
-                    FinalAlpha = 0,
+                    RelativeSizeAxes = Axes.Both,
+                    CornerRadius = corner_radius,
+                    Masking = true,
+                    Child = new WedgeBackground
+                    {
+                        Anchor = Anchor.TopRight,
+                        Scale = new Vector2(-1, 1),
+                    }
                 },
                 new ReverseChildIDFillFlowContainer<Drawable>
                 {
@@ -49,7 +56,7 @@ namespace osu.Game.Screens.SelectV2
                     AutoSizeAxes = Axes.Y,
                     Direction = FillDirection.Vertical,
                     Spacing = new Vector2(0f, 8f),
-                    Padding = new MarginPadding { Vertical = 5f, Right = 30f },
+                    Padding = new MarginPadding { Top = corner_radius + 10f, Bottom = 5f, Right = 40f, Left = 10f },
                     Children = new Drawable[]
                     {
                         new Container
