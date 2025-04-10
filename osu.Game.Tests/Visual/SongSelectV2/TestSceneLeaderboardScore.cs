@@ -7,8 +7,10 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
+using osu.Game;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -44,18 +46,23 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         {
             AddStep("create content", () =>
             {
-                Children = new Drawable[]
+                Child = new PopoverContainer
                 {
-                    fillFlow = new FillFlowContainer
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Children = new Drawable[]
                     {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Spacing = new Vector2(0f, 2f),
-                        Shear = OsuGame.SHEAR,
-                    },
-                    drawWidthText = new OsuSpriteText(),
+                        fillFlow = new FillFlowContainer
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Spacing = new Vector2(0f, 2f),
+                            Shear = OsuGame.SHEAR,
+                        },
+                        drawWidthText = new OsuSpriteText(),
+                    }
                 };
 
                 foreach (var scoreInfo in getTestScores())
@@ -78,17 +85,22 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         {
             AddStep("create content", () =>
             {
-                Children = new Drawable[]
+                Child = new PopoverContainer
                 {
-                    fillFlow = new FillFlowContainer
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Children = new Drawable[]
                     {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Spacing = new Vector2(0f, 2f),
-                    },
-                    drawWidthText = new OsuSpriteText(),
+                        fillFlow = new FillFlowContainer
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Spacing = new Vector2(0f, 2f),
+                        },
+                        drawWidthText = new OsuSpriteText(),
+                    }
                 };
 
                 foreach (var scoreInfo in getTestScores())
@@ -112,18 +124,23 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             AddStep("create content", () =>
             {
-                Children = new Drawable[]
+                Child = new PopoverContainer
                 {
-                    fillFlow = new FillFlowContainer
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Children = new Drawable[]
                     {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Spacing = new Vector2(0f, 2f),
-                        Shear = OsuGame.SHEAR,
-                    },
-                    drawWidthText = new OsuSpriteText(),
+                        fillFlow = new FillFlowContainer
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Spacing = new Vector2(0f, 2f),
+                            Shear = OsuGame.SHEAR,
+                        },
+                        drawWidthText = new OsuSpriteText(),
+                    }
                 };
 
                 var scoreInfo = new ScoreInfo
