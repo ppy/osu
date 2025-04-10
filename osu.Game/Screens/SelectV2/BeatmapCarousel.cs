@@ -22,6 +22,7 @@ namespace osu.Game.Screens.SelectV2
     [Cached]
     public partial class BeatmapCarousel : Carousel<BeatmapInfo>
     {
+        public Action<BeatmapInfo>? RequestSelectBeatmap { private get; init; }
         public Action<BeatmapInfo>? RequestPresentBeatmap { private get; init; }
 
         public const float SPACING = 3f;
@@ -160,6 +161,8 @@ namespace osu.Game.Screens.SelectV2
                     if (containingGroup != null)
                         setExpandedGroup(containingGroup);
                     setExpandedSet(beatmapInfo);
+
+                    RequestSelectBeatmap?.Invoke(beatmapInfo);
                     break;
             }
         }
