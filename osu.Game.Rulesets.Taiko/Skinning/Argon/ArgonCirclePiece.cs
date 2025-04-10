@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Shapes;
@@ -111,6 +112,14 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
                     .Then()
                     .FadeOut(timingPoint.BeatLength * 0.75, Easing.OutSine);
             }
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (drawableHitObject.IsNotNull())
+                drawableHitObject.ApplyCustomUpdateState -= updateStateTransforms;
         }
     }
 }
