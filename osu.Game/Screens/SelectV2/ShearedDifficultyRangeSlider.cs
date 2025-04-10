@@ -64,8 +64,6 @@ namespace osu.Game.Screens.SelectV2
                     Depth = -1,
                     RelativePositionAxes = Axes.X,
                     RelativeSizeAxes = Axes.Both,
-                    Y = -1f,
-                    Padding = new MarginPadding { Bottom = -2f },
                     Child = new Container
                     {
                         RelativeSizeAxes = Axes.Both,

@@ -83,7 +83,7 @@ namespace osu.Game.Screens.SelectV2
                             ColumnDimensions = new[]
                             {
                                 new Dimension(),
-                                new Dimension(GridSizeMode.Absolute, 0),
+                                new Dimension(GridSizeMode.Absolute), // can probably be removed?
                                 new Dimension(GridSizeMode.AutoSize),
                             },
                             Content = new[]

@@ -72,7 +72,6 @@ namespace osu.Game.Graphics.UserInterface
         private float minRange = 0.1f;
 
         protected Container SliderContainer { get; private set; } = null!;
-        protected Container LabelContainer { get; private set; } = null!;
         protected BoundSliderBar LowerBoundSlider { get; private set; } = null!;
         protected BoundSliderBar UpperBoundSlider { get; private set; } = null!;
 
@@ -98,41 +97,35 @@ namespace osu.Game.Graphics.UserInterface
                 {
                     new[]
                     {
-                        LabelContainer = new Container
+                        new Container
                         {
                             AutoSizeAxes = Axes.X,
                             RelativeSizeAxes = Axes.Y,
-                            Padding = new MarginPadding { Vertical = -1f },
-                            Child = new Container
+                            Masking = true,
+                            CornerRadius = 5f,
+                            Shear = new Vector2(OsuGame.SHEAR, 0),
+                            Children = new Drawable[]
                             {
-                                AutoSizeAxes = Axes.X,
-                                RelativeSizeAxes = Axes.Y,
-                                Masking = true,
-                                CornerRadius = 5f,
-                                Shear = new Vector2(OsuGame.SHEAR, 0),
-                                Children = new Drawable[]
+                                new Box
                                 {
-                                    new Box
-                                    {
-                                        RelativeSizeAxes = Axes.Both,
-                                        Colour = colourProvider.Background3,
-                                    },
-                                    new OsuSpriteText
-                                    {
-                                        Anchor = Anchor.Centre,
-                                        Origin = Anchor.Centre,
-                                        Text = label,
-                                        Shear = new Vector2(-OsuGame.SHEAR, 0),
-                                        Margin = new MarginPadding { Horizontal = 12, Vertical = 6 },
-                                        Font = OsuFont.Body.With(weight: FontWeight.SemiBold),
-                                    },
+                                    RelativeSizeAxes = Axes.Both,
+                                    Colour = colourProvider.Background3,
+                                },
+                                new OsuSpriteText
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    Text = label,
+                                    Shear = new Vector2(-OsuGame.SHEAR, 0),
+                                    Margin = new MarginPadding { Horizontal = 12, Vertical = 5 },
+                                    Font = OsuFont.Body.With(weight: FontWeight.SemiBold),
                                 },
                             },
                         },
                         SliderContainer = new Container
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Padding = new MarginPadding { Left = 5 },
+                            Padding = new MarginPadding { Left = -10 },
                             Children = new[]
                             {
                                 UpperBoundSlider = CreateBoundSlider(true).With(d =>
@@ -162,8 +155,6 @@ namespace osu.Game.Graphics.UserInterface
                     },
                 },
             };
-
-            AddInternal(LabelContainer.CreateProxy());
         }
 
         protected override void LoadComplete()
