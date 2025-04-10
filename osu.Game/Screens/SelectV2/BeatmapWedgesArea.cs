@@ -74,8 +74,7 @@ namespace osu.Game.Screens.SelectV2
         {
             if (currentContent != null)
             {
-                currentContent.MoveToX(-100f, 300, Easing.OutQuint);
-                currentContent.FadeOut(300, Easing.OutQuint);
+                currentContent.Hide();
                 currentContent.Expire();
             }
 
@@ -85,11 +84,19 @@ namespace osu.Game.Screens.SelectV2
                 case BeatmapWedgesHeader.Selection.Details:
                     currentContent = new BeatmapDetailsWedge();
                     break;
+
+                case BeatmapWedgesHeader.Selection.Ranking:
+                    currentContent = new BeatmapRankingsWedge
+                    {
+                        Scope = { BindTarget = header.Scope },
+                        FilterBySelectedMods = { BindTarget = header.FilterBySelectedMods },
+                    };
+
+                    break;
             }
 
             contentContainer.Add(currentContent);
-            currentContent.MoveToX(-100f).MoveToX(0f, 300, Easing.OutQuint);
-            currentContent.FadeInFromZero(300, Easing.OutQuint);
+            currentContent.Show();
         }
     }
 }
