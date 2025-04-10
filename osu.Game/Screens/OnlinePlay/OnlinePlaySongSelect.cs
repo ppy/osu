@@ -225,22 +225,18 @@ namespace osu.Game.Screens.OnlinePlay
         /// </summary>
         /// <param name="mod">The <see cref="Mod"/> to check.</param>
         /// <returns>Whether <paramref name="mod"/> is a valid mod for online play.</returns>
-        private bool isValidGlobalMod(Mod mod) => ModUtils.IsValidModForMatchType(mod, room.Type)
-                                                  // Mod must be valid in the current freestyle mode.
-                                                  && ModUtils.IsValidModForFreestyleMode(mod, Freestyle.Value);
+        private bool isValidGlobalMod(Mod mod) => ModUtils.IsValidModForMatch(mod, room.Type, true, Freestyle.Value);
 
         /// <summary>
         /// Checks whether a given <see cref="Mod"/> is valid for per-player free-mod selection.
         /// </summary>
         /// <param name="mod">The <see cref="Mod"/> to check.</param>
         /// <returns>Whether <paramref name="mod"/> is a selectable free-mod.</returns>
-        private bool isValidFreeMod(Mod mod) => ModUtils.IsValidFreeModForMatchType(mod, room.Type)
+        private bool isValidFreeMod(Mod mod) => ModUtils.IsValidModForMatch(mod, room.Type, false, Freestyle.Value)
                                                 // Mod must not be contained in the required mods.
                                                 && Mods.Value.All(m => m.Acronym != mod.Acronym)
                                                 // Mod must be compatible with all the required mods.
-                                                && ModUtils.CheckCompatibleSet(Mods.Value.Append(mod).ToArray())
-                                                // Mod must be valid in the current freestyle mode.
-                                                && ModUtils.IsValidModForFreestyleMode(mod, Freestyle.Value);
+                                                && ModUtils.CheckCompatibleSet(Mods.Value.Append(mod).ToArray());
 
         protected override void Dispose(bool isDisposing)
         {

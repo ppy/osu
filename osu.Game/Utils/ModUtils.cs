@@ -304,56 +304,29 @@ namespace osu.Game.Utils
         }
 
         /// <summary>
-        /// Determines whether a mod can be applied to playlist items in the given match type.
+        /// Determines whether a mod can be applied to playlist items in the match type.
         /// </summary>
         /// <param name="mod">The mod to test.</param>
-        /// <param name="type">The match type.</param>
-        public static bool IsValidModForMatchType(Mod mod, MatchType type)
+        /// <param name="matchType">The room match type.</param>
+        /// <param name="isRequired">Whether the mod is intended as a "required" (room-global) mod.</param>
+        /// <param name="isFreestyle">Whether freestyle is enabled for the playlist item.</param>
+        /// <seealso href="https://github.com/ppy/osu-web/blob/40936b514c6485b874f6c6496d55d9e8b1b88fd4/app/Singletons/Mods.php#L95-L113">Related osu!web function.</seealso>
+        public static bool IsValidModForMatch(Mod mod, MatchType matchType, bool isRequired, bool isFreestyle)
         {
             if (mod.Type == ModType.System || !mod.UserPlayable || !mod.HasImplementation)
                 return false;
 
-            switch (type)
+            if (isFreestyle && !mod.ValidForFreestyle)
+                return false;
+
+            switch (matchType)
             {
                 case MatchType.Playlists:
                     return true;
 
                 default:
-                    return mod.ValidForMultiplayer;
+                    return isRequired ? mod.ValidForMultiplayer : mod.ValidForMultiplayerAsFreeMod;
             }
-        }
-
-        /// <summary>
-        /// Determines whether a mod can be applied as a free mod to playlist items in the given match type.
-        /// </summary>
-        /// <param name="mod">The mod to test.</param>
-        /// <param name="type">The match type.</param>
-        public static bool IsValidFreeModForMatchType(Mod mod, MatchType type)
-        {
-            if (mod.Type == ModType.System || !mod.UserPlayable || !mod.HasImplementation)
-                return false;
-
-            switch (type)
-            {
-                case MatchType.Playlists:
-                    return true;
-
-                default:
-                    return mod.ValidForMultiplayerAsFreeMod;
-            }
-        }
-
-        /// <summary>
-        /// Determines whether a mod can be applied in the given freestyle mode.
-        /// </summary>
-        /// <param name="mod">The mod to test.</param>
-        /// <param name="freestyle">Whether freestyle is enabled.</param>
-        public static bool IsValidModForFreestyleMode(Mod mod, bool freestyle)
-        {
-            if (mod.Type == ModType.System || !mod.UserPlayable || !mod.HasImplementation)
-                return false;
-
-            return !freestyle || mod.ValidForFreestyle;
         }
     }
 }

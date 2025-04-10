@@ -392,44 +392,50 @@ namespace osu.Game.Tests.Mods
         [Test]
         public void TestRoomModValidity()
         {
-            Assert.IsTrue(ModUtils.IsValidModForMatchType(new OsuModHardRock(), MatchType.Playlists));
-            Assert.IsTrue(ModUtils.IsValidModForMatchType(new OsuModDoubleTime(), MatchType.Playlists));
-            Assert.IsTrue(ModUtils.IsValidModForMatchType(new ModAdaptiveSpeed(), MatchType.Playlists));
-            Assert.IsFalse(ModUtils.IsValidModForMatchType(new OsuModAutoplay(), MatchType.Playlists));
-            Assert.IsFalse(ModUtils.IsValidModForMatchType(new OsuModTouchDevice(), MatchType.Playlists));
+            Assert.IsTrue(ModUtils.IsValidModForMatch(new OsuModHardRock(), MatchType.Playlists, true, false));
+            Assert.IsTrue(ModUtils.IsValidModForMatch(new OsuModDoubleTime(), MatchType.Playlists, true, false));
+            Assert.IsTrue(ModUtils.IsValidModForMatch(new ModAdaptiveSpeed(), MatchType.Playlists, true, false));
+            Assert.IsFalse(ModUtils.IsValidModForMatch(new OsuModAutoplay(), MatchType.Playlists, true, false));
+            Assert.IsFalse(ModUtils.IsValidModForMatch(new OsuModTouchDevice(), MatchType.Playlists, true, false));
 
-            Assert.IsTrue(ModUtils.IsValidModForMatchType(new OsuModHardRock(), MatchType.HeadToHead));
-            Assert.IsTrue(ModUtils.IsValidModForMatchType(new OsuModDoubleTime(), MatchType.HeadToHead));
+            Assert.IsTrue(ModUtils.IsValidModForMatch(new OsuModHardRock(), MatchType.HeadToHead, true, false));
+            Assert.IsTrue(ModUtils.IsValidModForMatch(new OsuModDoubleTime(), MatchType.HeadToHead, true, false));
             // For now, adaptive speed isn't allowed in multiplayer because it's a per-user rate adjustment.
-            Assert.IsFalse(ModUtils.IsValidModForMatchType(new ModAdaptiveSpeed(), MatchType.HeadToHead));
-            Assert.IsFalse(ModUtils.IsValidModForMatchType(new OsuModAutoplay(), MatchType.HeadToHead));
-            Assert.IsFalse(ModUtils.IsValidModForMatchType(new OsuModTouchDevice(), MatchType.HeadToHead));
+            Assert.IsFalse(ModUtils.IsValidModForMatch(new ModAdaptiveSpeed(), MatchType.HeadToHead, true, false));
+            Assert.IsFalse(ModUtils.IsValidModForMatch(new OsuModAutoplay(), MatchType.HeadToHead, true, false));
+            Assert.IsFalse(ModUtils.IsValidModForMatch(new OsuModTouchDevice(), MatchType.HeadToHead, true, false));
         }
 
         [Test]
         public void TestRoomFreeModValidity()
         {
-            Assert.IsTrue(ModUtils.IsValidFreeModForMatchType(new OsuModHardRock(), MatchType.Playlists));
-            Assert.IsTrue(ModUtils.IsValidFreeModForMatchType(new OsuModDoubleTime(), MatchType.Playlists));
-            Assert.IsTrue(ModUtils.IsValidFreeModForMatchType(new ModAdaptiveSpeed(), MatchType.Playlists));
-            Assert.IsFalse(ModUtils.IsValidFreeModForMatchType(new OsuModAutoplay(), MatchType.Playlists));
-            Assert.IsFalse(ModUtils.IsValidFreeModForMatchType(new OsuModTouchDevice(), MatchType.Playlists));
+            Assert.IsTrue(ModUtils.IsValidModForMatch(new OsuModHardRock(), MatchType.Playlists, false, false));
+            Assert.IsTrue(ModUtils.IsValidModForMatch(new OsuModDoubleTime(), MatchType.Playlists, false, false));
+            Assert.IsTrue(ModUtils.IsValidModForMatch(new ModAdaptiveSpeed(), MatchType.Playlists, false, false));
+            Assert.IsFalse(ModUtils.IsValidModForMatch(new OsuModAutoplay(), MatchType.Playlists, false, false));
+            Assert.IsFalse(ModUtils.IsValidModForMatch(new OsuModTouchDevice(), MatchType.Playlists, false, false));
 
-            Assert.IsTrue(ModUtils.IsValidFreeModForMatchType(new OsuModHardRock(), MatchType.HeadToHead));
+            Assert.IsTrue(ModUtils.IsValidModForMatch(new OsuModHardRock(), MatchType.HeadToHead, false, false));
             // For now, all rate adjustment mods aren't allowed as free mods in multiplayer.
-            Assert.IsFalse(ModUtils.IsValidFreeModForMatchType(new OsuModDoubleTime(), MatchType.HeadToHead));
-            Assert.IsFalse(ModUtils.IsValidFreeModForMatchType(new ModAdaptiveSpeed(), MatchType.HeadToHead));
-            Assert.IsFalse(ModUtils.IsValidFreeModForMatchType(new OsuModAutoplay(), MatchType.HeadToHead));
-            Assert.IsFalse(ModUtils.IsValidFreeModForMatchType(new OsuModTouchDevice(), MatchType.HeadToHead));
+            Assert.IsFalse(ModUtils.IsValidModForMatch(new OsuModDoubleTime(), MatchType.HeadToHead, false, false));
+            Assert.IsFalse(ModUtils.IsValidModForMatch(new ModAdaptiveSpeed(), MatchType.HeadToHead, false, false));
+            Assert.IsFalse(ModUtils.IsValidModForMatch(new OsuModAutoplay(), MatchType.HeadToHead, false, false));
+            Assert.IsFalse(ModUtils.IsValidModForMatch(new OsuModTouchDevice(), MatchType.HeadToHead, false, false));
         }
 
         [Test]
         public void TestFreestyleModValidity()
         {
-            Assert.IsTrue(ModUtils.IsValidModForFreestyleMode(new OsuModHardRock(), true));
-            Assert.IsTrue(ModUtils.IsValidModForFreestyleMode(new OsuModHardRock(), false));
-            Assert.IsTrue(ModUtils.IsValidModForFreestyleMode(new OsuModBarrelRoll(), false));
-            Assert.IsFalse(ModUtils.IsValidModForFreestyleMode(new OsuModBarrelRoll(), true));
+            foreach (MatchType type in new[] { MatchType.Playlists, MatchType.HeadToHead })
+            {
+                foreach (bool required in new[] { false, true })
+                {
+                    Assert.IsTrue(ModUtils.IsValidModForMatch(new OsuModHardRock(), type, required, true));
+                    Assert.IsTrue(ModUtils.IsValidModForMatch(new OsuModHardRock(), type, required, false));
+                    Assert.IsFalse(ModUtils.IsValidModForMatch(new OsuModBarrelRoll(), type, required, true));
+                    Assert.IsTrue(ModUtils.IsValidModForMatch(new OsuModBarrelRoll(), type, required, false));
+                }
+            }
         }
 
         [Test]
