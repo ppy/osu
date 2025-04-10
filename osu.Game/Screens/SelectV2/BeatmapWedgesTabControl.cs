@@ -108,12 +108,10 @@ namespace osu.Game.Screens.SelectV2
 
             private void updateDisplay()
             {
-                if (Active.Value)
+                if (Active.Value || IsHovered)
                     Text.FadeColour(colourProvider.Content1, 300, Easing.OutQuint);
-                else if (IsHovered)
-                    Text.FadeColour(colourProvider.Content2, 300, Easing.OutQuint);
                 else
-                    Text.FadeColour(colourProvider.Foreground1, 300, Easing.OutQuint);
+                    Text.FadeColour(colourProvider.Content2, 300, Easing.OutQuint);
 
                 Text.Font = Text.Font.With(weight: Active.Value ? FontWeight.SemiBold : FontWeight.Regular);
             }
