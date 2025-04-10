@@ -9,6 +9,7 @@ using System.Linq;
 using osu.Game.Beatmaps.ControlPoints;
 using Newtonsoft.Json;
 using osu.Framework.Lists;
+using osu.Game.Beatmaps.Formats;
 using osu.Game.IO.Serialization.Converters;
 
 namespace osu.Game.Beatmaps
@@ -114,6 +115,34 @@ namespace osu.Game.Beatmaps
 
             return mostCommon.beatLength;
         }
+
+        public double AudioLeadIn { get; set; }
+
+        public float StackLeniency { get; set; } = 0.7f;
+
+        public bool SpecialStyle { get; set; }
+
+        public bool LetterboxInBreaks { get; set; }
+
+        public bool WidescreenStoryboard { get; set; } = true;
+
+        public bool EpilepsyWarning { get; set; }
+
+        public bool SamplesMatchPlaybackRate { get; set; }
+
+        public double DistanceSpacing { get; set; } = 1.0;
+
+        public int GridSize { get; set; }
+
+        public double TimelineZoom { get; set; } = 1.0;
+
+        public CountdownType Countdown { get; set; } = CountdownType.None;
+
+        public int CountdownOffset { get; set; }
+
+        public int[] Bookmarks { get; set; } = Array.Empty<int>();
+
+        public int BeatmapVersion { get; set; } = LegacyBeatmapEncoder.FIRST_LAZER_VERSION;
 
         IBeatmap IBeatmap.Clone() => Clone();
 

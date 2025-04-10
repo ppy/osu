@@ -7,11 +7,13 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Threading;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.Legacy;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Mania.Beatmaps.Patterns;
 using osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Scoring.Legacy;
 using osu.Game.Utils;
 using osuTK;
@@ -124,16 +126,109 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
         protected override IEnumerable<ManiaHitObject> ConvertHitObject(HitObject original, IBeatmap beatmap, CancellationToken cancellationToken)
         {
-            if (original is ManiaHitObject maniaOriginal)
-            {
-                yield return maniaOriginal;
+            LegacyHitObjectType legacyType;
 
-                yield break;
+            switch (original)
+            {
+                case ManiaHitObject maniaObj:
+                {
+                    yield return maniaObj;
+
+                    yield break;
+                }
+
+                case IHasLegacyHitObjectType legacy:
+                    legacyType = legacy.LegacyType & LegacyHitObjectType.ObjectTypes;
+                    break;
+
+                case IHasPath:
+                    legacyType = LegacyHitObjectType.Slider;
+                    break;
+
+                case IHasDuration:
+                    legacyType = LegacyHitObjectType.Hold;
+                    break;
+
+                default:
+                    legacyType = LegacyHitObjectType.Circle;
+                    break;
             }
 
-            var objects = IsForCurrentRuleset ? generateSpecific(original, beatmap) : generateConverted(original, beatmap);
-            foreach (ManiaHitObject obj in objects)
-                yield return obj;
+            double startTime = original.StartTime;
+            double endTime = (original as IHasDuration)?.EndTime ?? startTime;
+            Vector2 position = (original as IHasPosition)?.Position ?? Vector2.Zero;
+
+            PatternGenerator conversion;
+
+            switch (legacyType)
+            {
+                case LegacyHitObjectType.Circle:
+                    if (IsForCurrentRuleset)
+                    {
+                        conversion = new PassThroughPatternGenerator(Random, original, beatmap, TotalColumns, lastPattern);
+                        recordNote(startTime, position);
+                    }
+                    else
+                    {
+                        // Note: The density is used during the pattern generator constructor, and intentionally computed first.
+                        computeDensity(startTime);
+                        conversion = new HitCirclePatternGenerator(Random, original, beatmap, TotalColumns, lastPattern, lastTime, lastPosition, density, lastStair);
+                        recordNote(startTime, position);
+                    }
+
+                    break;
+
+                case LegacyHitObjectType.Slider:
+                    if (IsForCurrentRuleset)
+                    {
+                        conversion = new PassThroughPatternGenerator(Random, original, beatmap, TotalColumns, lastPattern);
+                        recordNote(original.StartTime, position);
+                    }
+                    else
+                    {
+                        var generator = new SliderPatternGenerator(Random, original, beatmap, TotalColumns, lastPattern);
+                        conversion = generator;
+
+                        for (int i = 0; i <= generator.SpanCount; i++)
+                        {
+                            double time = original.StartTime + generator.SegmentDuration * i;
+
+                            recordNote(time, position);
+                            computeDensity(time);
+                        }
+                    }
+
+                    break;
+
+                case LegacyHitObjectType.Spinner:
+                    // Note: Some older mania-specific beatmaps can have spinners that are converted rather than passed through.
+                    //       Newer beatmaps will usually use the "hold" hitobject type below.
+                    conversion = new SpinnerPatternGenerator(Random, original, beatmap, TotalColumns, lastPattern);
+                    recordNote(endTime, new Vector2(256, 192));
+                    computeDensity(endTime);
+                    break;
+
+                case LegacyHitObjectType.Hold:
+                    conversion = new PassThroughPatternGenerator(Random, original, beatmap, TotalColumns, lastPattern);
+                    recordNote(endTime, position);
+                    computeDensity(endTime);
+                    break;
+
+                default:
+                    throw new ArgumentException($"Invalid legacy object type: {legacyType}", nameof(original));
+            }
+
+            foreach (var newPattern in conversion.Generate())
+            {
+                if (conversion is HitCirclePatternGenerator circleGenerator)
+                    lastStair = circleGenerator.StairType;
+
+                if (conversion is HitCirclePatternGenerator || conversion is SliderPatternGenerator)
+                    lastPattern = newPattern;
+
+                foreach (var obj in newPattern.HitObjects)
+                    yield return obj;
+            }
         }
 
         private readonly LimitedCapacityQueue<double> prevNoteTimes = new LimitedCapacityQueue<double>(max_notes_for_density);
@@ -155,136 +250,6 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         {
             lastTime = time;
             lastPosition = position;
-        }
-
-        /// <summary>
-        /// Method that generates hit objects for osu!mania specific beatmaps.
-        /// </summary>
-        /// <param name="original">The original hit object.</param>
-        /// <param name="originalBeatmap">The original beatmap. This is used to look-up any values dependent on a fully-loaded beatmap.</param>
-        /// <returns>The hit objects generated.</returns>
-        private IEnumerable<ManiaHitObject> generateSpecific(HitObject original, IBeatmap originalBeatmap)
-        {
-            var generator = new SpecificBeatmapPatternGenerator(Random, original, originalBeatmap, TotalColumns, lastPattern);
-
-            foreach (var newPattern in generator.Generate())
-            {
-                lastPattern = newPattern;
-
-                foreach (var obj in newPattern.HitObjects)
-                    yield return obj;
-            }
-        }
-
-        /// <summary>
-        /// Method that generates hit objects for non-osu!mania beatmaps.
-        /// </summary>
-        /// <param name="original">The original hit object.</param>
-        /// <param name="originalBeatmap">The original beatmap. This is used to look-up any values dependent on a fully-loaded beatmap.</param>
-        /// <returns>The hit objects generated.</returns>
-        private IEnumerable<ManiaHitObject> generateConverted(HitObject original, IBeatmap originalBeatmap)
-        {
-            Patterns.PatternGenerator? conversion = null;
-
-            switch (original)
-            {
-                case IHasPath:
-                {
-                    var generator = new PathObjectPatternGenerator(Random, original, originalBeatmap, TotalColumns, lastPattern);
-                    conversion = generator;
-
-                    var positionData = original as IHasPosition;
-
-                    for (int i = 0; i <= generator.SpanCount; i++)
-                    {
-                        double time = original.StartTime + generator.SegmentDuration * i;
-
-                        recordNote(time, positionData?.Position ?? Vector2.Zero);
-                        computeDensity(time);
-                    }
-
-                    break;
-                }
-
-                case IHasDuration endTimeData:
-                {
-                    conversion = new EndTimeObjectPatternGenerator(Random, original, originalBeatmap, TotalColumns, lastPattern);
-
-                    recordNote(endTimeData.EndTime, new Vector2(256, 192));
-                    computeDensity(endTimeData.EndTime);
-                    break;
-                }
-
-                case IHasPosition positionData:
-                {
-                    computeDensity(original.StartTime);
-
-                    conversion = new HitObjectPatternGenerator(Random, original, originalBeatmap, TotalColumns, lastPattern, lastTime, lastPosition, density, lastStair);
-
-                    recordNote(original.StartTime, positionData.Position);
-                    break;
-                }
-            }
-
-            if (conversion == null)
-                yield break;
-
-            foreach (var newPattern in conversion.Generate())
-            {
-                lastPattern = conversion is EndTimeObjectPatternGenerator ? lastPattern : newPattern;
-                lastStair = (conversion as HitObjectPatternGenerator)?.StairType ?? lastStair;
-
-                foreach (var obj in newPattern.HitObjects)
-                    yield return obj;
-            }
-        }
-
-        /// <summary>
-        /// A pattern generator for osu!mania-specific beatmaps.
-        /// </summary>
-        private class SpecificBeatmapPatternGenerator : Patterns.Legacy.PatternGenerator
-        {
-            public SpecificBeatmapPatternGenerator(LegacyRandom random, HitObject hitObject, IBeatmap beatmap, int totalColumns, Pattern previousPattern)
-                : base(random, hitObject, beatmap, previousPattern, totalColumns)
-            {
-            }
-
-            public override IEnumerable<Pattern> Generate()
-            {
-                yield return generate();
-            }
-
-            private Pattern generate()
-            {
-                var positionData = HitObject as IHasXPosition;
-
-                int column = GetColumn(positionData?.X ?? 0);
-
-                var pattern = new Pattern();
-
-                if (HitObject is IHasDuration endTimeData)
-                {
-                    pattern.Add(new HoldNote
-                    {
-                        StartTime = HitObject.StartTime,
-                        Duration = endTimeData.Duration,
-                        Column = column,
-                        Samples = HitObject.Samples,
-                        NodeSamples = (HitObject as IHasRepeats)?.NodeSamples ?? HoldNote.CreateDefaultNodeSamples(HitObject)
-                    });
-                }
-                else if (HitObject is IHasXPosition)
-                {
-                    pattern.Add(new Note
-                    {
-                        StartTime = HitObject.StartTime,
-                        Samples = HitObject.Samples,
-                        Column = column
-                    });
-                }
-
-                return pattern;
-            }
         }
     }
 }

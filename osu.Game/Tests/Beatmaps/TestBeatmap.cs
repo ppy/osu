@@ -27,6 +27,17 @@ namespace osu.Game.Tests.Beatmaps
             BeatmapInfo = baseBeatmap.BeatmapInfo;
             ControlPointInfo = baseBeatmap.ControlPointInfo;
             UnhandledEventLines = baseBeatmap.UnhandledEventLines;
+            AudioLeadIn = baseBeatmap.AudioLeadIn;
+            StackLeniency = baseBeatmap.StackLeniency;
+            SpecialStyle = baseBeatmap.SpecialStyle;
+            LetterboxInBreaks = baseBeatmap.LetterboxInBreaks;
+            WidescreenStoryboard = baseBeatmap.WidescreenStoryboard;
+            EpilepsyWarning = baseBeatmap.EpilepsyWarning;
+            SamplesMatchPlaybackRate = baseBeatmap.SamplesMatchPlaybackRate;
+            DistanceSpacing = baseBeatmap.DistanceSpacing;
+            GridSize = baseBeatmap.GridSize;
+            TimelineZoom = baseBeatmap.TimelineZoom;
+            CountdownOffset = baseBeatmap.CountdownOffset;
 
             if (withHitObjects)
             {
@@ -57,6 +68,7 @@ namespace osu.Game.Tests.Beatmaps
                     var b = Decoder.GetDecoder<Beatmap>(reader).Decode(reader);
 
                     b.BeatmapInfo.MD5Hash = test_beatmap_hash.Value.md5;
+                    b.BeatmapInfo.OnlineMD5Hash = test_beatmap_hash.Value.md5;
                     b.BeatmapInfo.Hash = test_beatmap_hash.Value.sha2;
 
                     return b;

@@ -11,6 +11,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Extensions;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
@@ -32,6 +33,10 @@ using osu.Game.Overlays.BeatmapListing;
 using osu.Game.Overlays.Mods;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Overlays.Toolbar;
+using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mania;
+using osu.Game.Rulesets.Mania.Configuration;
+using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Scoring;
@@ -41,16 +46,17 @@ using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Screens.OnlinePlay.Playlists;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
+using osu.Game.Screens.Play.PlayerSettings;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Carousel;
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Screens.Select.Options;
 using osu.Game.Tests.Beatmaps.IO;
+using osu.Game.Tests.Resources;
 using osu.Game.Utils;
 using osuTK;
 using osuTK.Input;
-using SharpCompress;
 
 namespace osu.Game.Tests.Visual.Navigation
 {
@@ -202,6 +208,38 @@ namespace osu.Game.Tests.Visual.Navigation
         }
 
         [Test]
+        public void TestSongSelectRandomRewindButton()
+        {
+            Guid? originalSelection = null;
+            TestPlaySongSelect songSelect = null;
+
+            PushAndConfirm(() => songSelect = new TestPlaySongSelect());
+            AddUntilStep("wait for song select", () => songSelect.BeatmapSetsLoaded);
+
+            AddStep("Add two beatmaps", () =>
+            {
+                Game.BeatmapManager.Import(TestResources.CreateTestBeatmapSetInfo(8));
+                Game.BeatmapManager.Import(TestResources.CreateTestBeatmapSetInfo(8));
+            });
+
+            AddUntilStep("wait for selected", () =>
+            {
+                originalSelection = Game.Beatmap.Value.BeatmapInfo.ID;
+                return !Game.Beatmap.IsDefault;
+            });
+
+            AddStep("hit random", () =>
+            {
+                InputManager.MoveMouseTo(Game.ChildrenOfType<FooterButtonRandom>().Single());
+                InputManager.Click(MouseButton.Left);
+            });
+            AddUntilStep("wait for selection changed", () => Game.Beatmap.Value.BeatmapInfo.ID, () => Is.Not.EqualTo(originalSelection));
+
+            AddStep("hit random rewind", () => InputManager.Click(MouseButton.Right));
+            AddUntilStep("wait for selection reverted", () => Game.Beatmap.Value.BeatmapInfo.ID, () => Is.EqualTo(originalSelection));
+        }
+
+        [Test]
         public void TestSongSelectScrollHandling()
         {
             TestPlaySongSelect songSelect = null;
@@ -318,6 +356,146 @@ namespace osu.Game.Tests.Visual.Navigation
         }
 
         [Test]
+        public void TestOffsetAdjustDuringPause()
+        {
+            Player player = null;
+
+            Screens.Select.SongSelect songSelect = null;
+            PushAndConfirm(() => songSelect = new TestPlaySongSelect());
+            AddUntilStep("wait for song select", () => songSelect.BeatmapSetsLoaded);
+
+            AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
+
+            AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
+
+            AddStep("set mods", () => Game.SelectedMods.Value = new Mod[] { new OsuModNoFail() });
+            AddStep("press enter", () => InputManager.Key(Key.Enter));
+
+            AddUntilStep("wait for player", () =>
+            {
+                DismissAnyNotifications();
+                player = Game.ScreenStack.CurrentScreen as Player;
+                return player?.IsLoaded == true;
+            });
+
+            AddUntilStep("wait for track playing", () => Game.Beatmap.Value.Track.IsRunning);
+            checkOffset(0);
+
+            AddStep("adjust offset via keyboard", () => InputManager.Key(Key.Minus));
+            checkOffset(-1);
+
+            AddStep("pause", () => player.ChildrenOfType<GameplayClockContainer>().First().Stop());
+            AddUntilStep("wait for pause", () => player.ChildrenOfType<GameplayClockContainer>().First().IsPaused.Value, () => Is.True);
+            AddStep("attempt adjust offset via keyboard", () => InputManager.Key(Key.Minus));
+            checkOffset(-1);
+
+            void checkOffset(double offset)
+            {
+                AddUntilStep($"control offset is {offset}", () => this.ChildrenOfType<GameplayOffsetControl>().Single().ChildrenOfType<BeatmapOffsetControl>().Single().Current.Value,
+                    () => Is.EqualTo(offset));
+                AddUntilStep($"database offset is {offset}", () => Game.BeatmapManager.QueryBeatmap(b => b.ID == Game.Beatmap.Value.BeatmapInfo.ID)!.UserSettings.Offset,
+                    () => Is.EqualTo(offset));
+            }
+        }
+
+        [Test]
+        public void TestScrollSpeedAdjustDuringGameplay()
+        {
+            Player player = null;
+
+            Screens.Select.SongSelect songSelect = null;
+            PushAndConfirm(() => songSelect = new TestPlaySongSelect());
+            AddUntilStep("wait for song select", () => songSelect.BeatmapSetsLoaded);
+
+            AddStep("import beatmap", () => BeatmapImportHelper.LoadOszIntoOsu(Game).WaitSafely());
+
+            AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
+
+            AddStep("switch to mania ruleset", () =>
+            {
+                InputManager.PressKey(Key.LControl);
+                InputManager.Key(Key.Number4);
+                InputManager.ReleaseKey(Key.LControl);
+            });
+
+            AddStep("set mods", () => Game.SelectedMods.Value = new Mod[] { new OsuModNoFail() });
+            AddStep("press enter", () => InputManager.Key(Key.Enter));
+
+            AddUntilStep("wait for player", () =>
+            {
+                DismissAnyNotifications();
+                player = Game.ScreenStack.CurrentScreen as Player;
+                return player?.IsLoaded == true;
+            });
+
+            AddUntilStep("wait for track playing", () => Game.Beatmap.Value.Track.IsRunning);
+            checkScrollSpeed(8, 8);
+
+            AddStep("adjust scroll speed via keyboard", () => InputManager.Key(Key.F4));
+            checkScrollSpeed(9, 9);
+
+            AddStep("seek beyond 10 seconds", () => player.ChildrenOfType<GameplayClockContainer>().First().Seek(10500));
+            AddUntilStep("wait for seek", () => player.ChildrenOfType<GameplayClockContainer>().First().CurrentTime, () => Is.GreaterThan(10600));
+            AddStep("attempt adjust offset via keyboard", () => InputManager.Key(Key.F4));
+            checkScrollSpeed(9, 9);
+
+            AddStep("attempt adjust offset via config change", () => getConfigManager().SetValue(ManiaRulesetSetting.ScrollSpeed, 10.0));
+            checkScrollSpeed(10, 9);
+
+            void checkScrollSpeed(double configValue, double gameplayValue)
+            {
+                AddUntilStep($"config value is {configValue}", () => getConfigManager().Get<double>(ManiaRulesetSetting.ScrollSpeed), () => Is.EqualTo(configValue));
+                AddUntilStep($"gameplay value is {gameplayValue}", () => this.ChildrenOfType<DrawableManiaRuleset>().Single().TargetTimeRange,
+                    () => Is.EqualTo(DrawableManiaRuleset.ComputeScrollTime(gameplayValue)));
+            }
+
+            ManiaRulesetConfigManager getConfigManager() => ((ManiaRulesetConfigManager)Game.Dependencies.Get<IRulesetConfigCache>().GetConfigFor(new ManiaRuleset())!);
+        }
+
+        [Test]
+        public void TestOffsetAdjustDuringGameplay()
+        {
+            Player player = null;
+
+            Screens.Select.SongSelect songSelect = null;
+            PushAndConfirm(() => songSelect = new TestPlaySongSelect());
+            AddUntilStep("wait for song select", () => songSelect.BeatmapSetsLoaded);
+
+            AddStep("import beatmap", () => BeatmapImportHelper.LoadOszIntoOsu(Game).WaitSafely());
+
+            AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
+
+            AddStep("set mods", () => Game.SelectedMods.Value = new Mod[] { new OsuModNoFail() });
+            AddStep("press enter", () => InputManager.Key(Key.Enter));
+
+            AddUntilStep("wait for player", () =>
+            {
+                DismissAnyNotifications();
+                player = Game.ScreenStack.CurrentScreen as Player;
+                return player?.IsLoaded == true;
+            });
+
+            AddUntilStep("wait for track playing", () => Game.Beatmap.Value.Track.IsRunning);
+            checkOffset(0);
+
+            AddStep("adjust offset via keyboard", () => InputManager.Key(Key.Minus));
+            checkOffset(-1);
+
+            AddStep("seek beyond 10 seconds", () => player.ChildrenOfType<GameplayClockContainer>().First().Seek(10500));
+            AddUntilStep("wait for seek", () => player.ChildrenOfType<GameplayClockContainer>().First().CurrentTime, () => Is.GreaterThan(10600));
+            AddStep("attempt adjust offset via keyboard", () => InputManager.Key(Key.Minus));
+            checkOffset(-1);
+
+            void checkOffset(double offset)
+            {
+                AddUntilStep($"control offset is {offset}", () => this.ChildrenOfType<GameplayOffsetControl>().Single().ChildrenOfType<BeatmapOffsetControl>().Single().Current.Value,
+                    () => Is.EqualTo(offset));
+                AddUntilStep($"database offset is {offset}", () => Game.BeatmapManager.QueryBeatmap(b => b.ID == Game.Beatmap.Value.BeatmapInfo.ID)!.UserSettings.Offset,
+                    () => Is.EqualTo(offset));
+            }
+        }
+
+        [Test]
         public void TestRetryCountIncrements()
         {
             Player player = null;
@@ -352,6 +530,23 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddUntilStep("get new player", () => (player = Game.ScreenStack.CurrentScreen as Player) != null);
             AddAssert("retry count is 1", () => player.RestartCount == 1);
+        }
+
+        [Test]
+        public void TestLastScoreNotNullAfterExitingPlayer()
+        {
+            AddUntilStep("last play null", getLastPlay, () => Is.Null);
+
+            var getOriginalPlayer = playToCompletion();
+
+            AddStep("attempt to retry", () => getOriginalPlayer().ChildrenOfType<HotkeyRetryOverlay>().First().Action());
+            AddUntilStep("last play matches player", getLastPlay, () => Is.EqualTo(getOriginalPlayer().Score.ScoreInfo));
+
+            AddUntilStep("wait for player", () => Game.ScreenStack.CurrentScreen != getOriginalPlayer() && Game.ScreenStack.CurrentScreen is Player);
+            AddStep("exit player", () => (Game.ScreenStack.CurrentScreen as Player)?.Exit());
+            AddUntilStep("last play not null", getLastPlay, () => Is.Not.Null);
+
+            ScoreInfo getLastPlay() => Game.Dependencies.Get<SessionStatics>().Get<ScoreInfo>(Static.LastLocalUserScore);
         }
 
         [Test]

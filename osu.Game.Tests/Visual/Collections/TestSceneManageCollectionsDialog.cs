@@ -376,6 +376,6 @@ namespace osu.Game.Tests.Visual.Collections
 
         private void assertCollectionName(int index, string name)
             => AddUntilStep($"item {index + 1} has correct name",
-                () => dialog.ChildrenOfType<DrawableCollectionList>().Single().OrderedItems.ElementAt(index).ChildrenOfType<TextBox>().First().Text == name);
+                () => dialog.ChildrenOfType<DrawableCollectionList>().Single().OrderedItems.ElementAtOrDefault(index)?.ChildrenOfType<TextBox>().First().Text == name);
     }
 }

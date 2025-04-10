@@ -2,27 +2,32 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions;
-using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Dashboard.Friends
 {
-    public partial class FriendsOnlineStatusItem : OverlayStreamItem<FriendStream>
+    public partial class FriendsOnlineStatusItem : OverlayStreamItem<OnlineStatus>
     {
-        public FriendsOnlineStatusItem(FriendStream value)
+        public readonly IBindable<int> UserCount = new Bindable<int>();
+
+        public FriendsOnlineStatusItem(OnlineStatus value)
             : base(value)
         {
+            MainText = value.GetLocalisableDescription();
         }
 
-        protected override LocalisableString MainText => Value.Status.GetLocalisableDescription();
-
-        protected override LocalisableString AdditionalText => Value.Count.ToString();
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            UserCount.BindValueChanged(count => AdditionalText = count.NewValue.ToString(), true);
+        }
 
         protected override Color4 GetBarColour(OsuColour colours)
         {
-            switch (Value.Status)
+            switch (Value)
             {
                 case OnlineStatus.All:
                     return Color4.White;
@@ -34,7 +39,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
                     return Color4.Black;
 
                 default:
-                    throw new ArgumentException($@"{Value.Status} status does not provide a colour in {nameof(GetBarColour)}.");
+                    throw new ArgumentException($@"{Value} status does not provide a colour in {nameof(GetBarColour)}.");
             }
         }
     }

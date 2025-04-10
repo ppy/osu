@@ -57,11 +57,25 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         [BackgroundDependencyLoader]
         private void load()
         {
+            const string base_lookup = @"hitcircle";
+
             var drawableOsuObject = (DrawableOsuHitObject?)drawableObject;
+
+            // As a precondition, prefer that any *prefix* lookups are run against the skin which is providing "hitcircle".
+            // This is to correctly handle a case such as:
+            //
+            // - Beatmap provides `hitcircle`
+            // - User skin provides `sliderstartcircle`
+            //
+            // In such a case, the `hitcircle` should be used for slider start circles rather than the user's skin override.
+            //
+            // Of note, this consideration should only be used to decide whether to continue looking up the prefixed name or not.
+            // The final lookups must still run on the full skin hierarchy as per usual in order to correctly handle fallback cases.
+            var provider = skin.FindProvider(s => s.GetTexture(base_lookup) != null) ?? skin;
 
             // if a base texture for the specified prefix exists, continue using it for subsequent lookups.
             // otherwise fall back to the default prefix "hitcircle".
-            string circleName = (priorityLookupPrefix != null && skin.GetTexture(priorityLookupPrefix) != null) ? priorityLookupPrefix : @"hitcircle";
+            string circleName = (priorityLookupPrefix != null && provider.GetTexture(priorityLookupPrefix) != null) ? priorityLookupPrefix : base_lookup;
 
             Vector2 maxSize = OsuHitObject.OBJECT_DIMENSIONS * 2;
 

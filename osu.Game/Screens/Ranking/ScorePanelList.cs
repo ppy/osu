@@ -334,7 +334,7 @@ namespace osu.Game.Screens.Ranking
 
         private partial class Scroll : OsuScrollContainer
         {
-            public new float Target => base.Target;
+            public new double Target => base.Target;
 
             public Scroll()
                 : base(Direction.Horizontal)
@@ -344,7 +344,7 @@ namespace osu.Game.Screens.Ranking
             /// <summary>
             /// The target that will be scrolled to instantaneously next frame.
             /// </summary>
-            public float? InstantScrollTarget;
+            public double? InstantScrollTarget;
 
             protected override void UpdateAfterChildren()
             {
