@@ -8,6 +8,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Objects;
+using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Rulesets.Mania.Edit.Blueprints
@@ -35,15 +36,17 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
             };
         }
 
-        public override void UpdateTimeAndPosition(SnapResult result)
+        public override SnapResult UpdateTimeAndPosition(Vector2 screenSpacePosition, double referenceTime)
         {
-            base.UpdateTimeAndPosition(result);
+            var result = base.UpdateTimeAndPosition(screenSpacePosition, referenceTime);
 
             if (result.Playfield != null)
             {
                 piece.Width = result.Playfield.DrawWidth;
                 piece.Position = ToLocalSpace(result.ScreenSpacePosition);
             }
+
+            return result;
         }
 
         protected override bool OnMouseDown(MouseDownEvent e)

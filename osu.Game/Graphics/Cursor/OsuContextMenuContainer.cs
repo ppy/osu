@@ -11,15 +11,7 @@ namespace osu.Game.Graphics.Cursor
     [Cached(typeof(OsuContextMenuContainer))]
     public partial class OsuContextMenuContainer : ContextMenuContainer
     {
-        [Cached]
-        private OsuContextMenuSamples samples = new OsuContextMenuSamples();
-
         private OsuContextMenu menu = null!;
-
-        public OsuContextMenuContainer()
-        {
-            AddInternal(samples);
-        }
 
         protected override Menu CreateMenu() => menu = new OsuContextMenu(true);
 

@@ -136,7 +136,7 @@ namespace osu.Game.Overlays
         {
             base.UpdateAfterChildren();
             sidebarContainer.Height = DrawHeight;
-            sidebarContainer.Y = Math.Clamp(ScrollFlow.Current - Header.DrawHeight, 0, Math.Max(ScrollFlow.ScrollContent.DrawHeight - DrawHeight - Header.DrawHeight, 0));
+            sidebarContainer.Y = (float)Math.Clamp(ScrollFlow.Current - Header.DrawHeight, 0, Math.Max(ScrollFlow.ScrollContent.DrawHeight - DrawHeight - Header.DrawHeight, 0));
         }
 
         private void loadListing(int? year = null)

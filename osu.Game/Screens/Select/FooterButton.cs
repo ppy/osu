@@ -25,6 +25,11 @@ namespace osu.Game.Screens.Select
 
         protected static readonly Vector2 SHEAR = new Vector2(SHEAR_WIDTH / Footer.HEIGHT, 0);
 
+        /// <summary>
+        /// Used to show an initial animation hinting at the enabled state.
+        /// </summary>
+        protected virtual bool IsActive => false;
+
         public LocalisableString Text
         {
             get => SpriteText?.Text ?? default;
@@ -124,6 +129,18 @@ namespace osu.Game.Screens.Select
         {
             base.LoadComplete();
             Enabled.BindValueChanged(_ => updateDisplay(), true);
+
+            if (IsActive)
+            {
+                box.ClearTransforms();
+
+                using (box.BeginDelayedSequence(200))
+                {
+                    box.FadeIn(200)
+                       .Then()
+                       .FadeOut(1500, Easing.OutQuint);
+                }
+            }
         }
 
         public Action Hovered;

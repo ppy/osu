@@ -59,6 +59,25 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString DailyChallenge => new TranslatableString(getKey(@"daily_challenge"), @"daily challenge");
 
+        /// <summary>
+        /// "A few important words from your dev team!"
+        /// </summary>
+        public static LocalisableString MobileDisclaimerHeader => new TranslatableString(getKey(@"mobile_disclaimer_header"), @"A few important words from your dev team!");
+
+        /// <summary>
+        /// "While we have released osu! on mobile platforms to maximise the number of people that can enjoy the game, our focus is still on the PC version.
+        ///
+        /// Your experience will not be perfect, and may even feel subpar compared to games which are made mobile-first.
+        ///
+        /// Please bear with us as we continue to improve the game for you!"
+        /// </summary>
+        public static LocalisableString MobileDisclaimerBody => new TranslatableString(getKey(@"mobile_disclaimer_body"),
+            @"While we have released osu! on mobile platforms to maximise the number of people that can enjoy the game, our focus is still on the PC version.
+
+Your experience will not be perfect, and may even feel subpar compared to games which are made mobile-first.
+
+Please bear with us as we continue to improve the game for you!");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

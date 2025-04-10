@@ -26,7 +26,7 @@ namespace osu.Game.Tests.Visual.Editing
             beatmap.ControlPointInfo.Add(50000, new DifficultyControlPoint { SliderVelocity = 2 });
             beatmap.ControlPointInfo.Add(80000, new EffectControlPoint { KiaiMode = true });
             beatmap.ControlPointInfo.Add(110000, new EffectControlPoint { KiaiMode = false });
-            beatmap.BeatmapInfo.Bookmarks = new[] { 75000, 125000 };
+            beatmap.Bookmarks = new[] { 75000, 125000 };
             beatmap.Breaks.Add(new ManualBreakPeriod(90000, 120000));
 
             editorBeatmap = new EditorBeatmap(beatmap);

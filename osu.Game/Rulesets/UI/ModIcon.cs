@@ -10,11 +10,11 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Overlays;
 using osu.Game.Rulesets.Mods;
 using osuTK;
 using osuTK.Graphics;
@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.UI
     /// <summary>
     /// Display the specified mod at a fixed size.
     /// </summary>
-    public partial class ModIcon : Container, IHasTooltip
+    public partial class ModIcon : Container, IHasCustomTooltip<Mod>
     {
         public readonly BindableBool Selected = new BindableBool();
 
@@ -34,12 +34,23 @@ namespace osu.Game.Rulesets.UI
 
         public static readonly Vector2 MOD_ICON_SIZE = new Vector2(80);
 
-        public virtual LocalisableString TooltipText => showTooltip ? ((mod as Mod)?.IconTooltip ?? mod.Name) : string.Empty;
+        public Mod? TooltipContent { get; private set; }
 
         private IMod mod;
 
         private readonly bool showTooltip;
-        private readonly bool showExtendedInformation;
+
+        private bool showExtendedInformation;
+
+        public bool ShowExtendedInformation
+        {
+            get => showExtendedInformation;
+            set
+            {
+                showExtendedInformation = value;
+                updateExtendedInformation();
+            }
+        }
 
         public IMod Mod
         {
@@ -58,6 +69,9 @@ namespace osu.Game.Rulesets.UI
 
         [Resolved]
         private OsuColour colours { get; set; } = null!;
+
+        [Resolved]
+        private OverlayColourProvider? colourProvider { get; set; }
 
         private Color4 backgroundColour;
 
@@ -177,6 +191,7 @@ namespace osu.Game.Rulesets.UI
 
             modAcronym.Text = value.Acronym;
             modIcon.Icon = value.Icon ?? FontAwesome.Solid.Question;
+            TooltipContent = showTooltip ? value as Mod : null;
 
             if (value.Icon == null)
             {
@@ -216,5 +231,7 @@ namespace osu.Game.Rulesets.UI
             base.Dispose(isDisposing);
             modSettingsChangeTracker?.Dispose();
         }
+
+        public ITooltip<Mod> GetCustomTooltip() => new ModTooltip(colourProvider);
     }
 }

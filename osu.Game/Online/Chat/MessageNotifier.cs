@@ -38,6 +38,9 @@ namespace osu.Game.Online.Chat
         private ChannelManager channelManager { get; set; }
 
         [Resolved]
+        private IAPIProvider api { get; set; }
+
+        [Resolved]
         private GameHost host { get; set; }
 
         private Bindable<bool> notifyOnUsername;
@@ -47,19 +50,19 @@ namespace osu.Game.Online.Chat
         private readonly IBindableList<Channel> joinedChannels = new BindableList<Channel>();
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config, IAPIProvider api)
+        private void load(OsuConfigManager config)
         {
             notifyOnUsername = config.GetBindable<bool>(OsuSetting.NotifyOnUsernameMentioned);
             notifyOnPrivateMessage = config.GetBindable<bool>(OsuSetting.NotifyOnPrivateMessage);
-
-            localUser.BindTo(api.LocalUser);
-            joinedChannels.BindTo(channelManager.JoinedChannels);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
             joinedChannels.BindCollectionChanged(channelsChanged, true);
+
+            localUser.BindTo(api.LocalUser);
+            joinedChannels.BindTo(channelManager.JoinedChannels);
         }
 
         private void channelsChanged(object sender, NotifyCollectionChangedEventArgs e)

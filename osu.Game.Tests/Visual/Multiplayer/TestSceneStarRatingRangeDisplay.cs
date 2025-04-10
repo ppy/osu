@@ -3,29 +3,71 @@
 
 using NUnit.Framework;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Components;
-using osu.Game.Tests.Visual.OnlinePlay;
+using osu.Game.Tests.Resources;
+using osuTK;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public partial class TestSceneStarRatingRangeDisplay : OnlinePlayTestScene
+    public partial class TestSceneStarRatingRangeDisplay : OsuTestScene
     {
-        public override void SetUpSteps()
+        private readonly Room room = new Room();
+
+        protected override void LoadComplete()
         {
-            base.SetUpSteps();
+            base.LoadComplete();
 
-            AddStep("create display", () =>
+            Child = new FillFlowContainer
             {
-                SelectedRoom.Value = new Room();
-
-                Child = new StarRatingRangeDisplay(SelectedRoom.Value)
+                RelativeSizeAxes = Axes.Both,
+                Direction = FillDirection.Vertical,
+                Spacing = new Vector2(10),
+                Children = new Drawable[]
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre
-                };
-            });
+                    new StarRatingRangeDisplay(room)
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Scale = new Vector2(5),
+                    },
+                    new StarRatingRangeDisplay(room)
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Scale = new Vector2(2),
+                    },
+                    new StarRatingRangeDisplay(room)
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Scale = new Vector2(1),
+                    },
+                    new StarRatingRangeDisplay(room)
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Alpha = 0.2f,
+                        Scale = new Vector2(5),
+                    },
+                    new StarRatingRangeDisplay(room)
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Alpha = 0.2f,
+                        Scale = new Vector2(2),
+                    },
+                    new StarRatingRangeDisplay(room)
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Alpha = 0.2f,
+                        Scale = new Vector2(1),
+                    },
+                }
+            };
         }
 
         [Test]
@@ -33,10 +75,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("set playlist", () =>
             {
-                SelectedRoom.Value!.Playlist =
+                room.Playlist =
                 [
-                    new PlaylistItem(new BeatmapInfo { StarRating = min }),
-                    new PlaylistItem(new BeatmapInfo { StarRating = max }),
+                    new PlaylistItem(new BeatmapInfo { StarRating = min }) { ID = TestResources.GetNextTestID() },
+                    new PlaylistItem(new BeatmapInfo { StarRating = max }) { ID = TestResources.GetNextTestID() },
                 ];
             });
         }

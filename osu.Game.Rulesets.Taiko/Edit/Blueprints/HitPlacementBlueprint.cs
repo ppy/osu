@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Allocation;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Taiko.Objects;
@@ -15,6 +16,9 @@ namespace osu.Game.Rulesets.Taiko.Edit.Blueprints
         private readonly HitPiece piece;
 
         public new Hit HitObject => (Hit)base.HitObject;
+
+        [Resolved]
+        private TaikoHitObjectComposer? composer { get; set; }
 
         public HitPlacementBlueprint()
             : base(new Hit())
@@ -40,10 +44,12 @@ namespace osu.Game.Rulesets.Taiko.Edit.Blueprints
             return true;
         }
 
-        public override void UpdateTimeAndPosition(SnapResult result)
+        public override SnapResult UpdateTimeAndPosition(Vector2 screenSpacePosition, double fallbackTime)
         {
+            var result = composer?.FindSnappedPositionAndTime(screenSpacePosition) ?? new SnapResult(screenSpacePosition, fallbackTime);
             piece.Position = ToLocalSpace(result.ScreenSpacePosition);
-            base.UpdateTimeAndPosition(result);
+            base.UpdateTimeAndPosition(result.ScreenSpacePosition, result.Time ?? fallbackTime);
+            return result;
         }
     }
 }

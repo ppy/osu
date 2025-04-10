@@ -2,9 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Overlays.Settings;
@@ -34,7 +36,13 @@ namespace osu.Game.Rulesets.Mods
 
         public override Type[] IncompatibleMods => new[] { typeof(ModRateAdjust), typeof(ModAdaptiveSpeed) };
 
-        public override string SettingDescription => $"{InitialRate.Value:N2}x to {FinalRate.Value:N2}x";
+        public override IEnumerable<(LocalisableString setting, LocalisableString value)> SettingDescription
+        {
+            get
+            {
+                yield return ("Speed change", $"{InitialRate.Value:N2}x to {FinalRate.Value:N2}x");
+            }
+        }
 
         private double finalRateTime;
         private double beginRampTime;

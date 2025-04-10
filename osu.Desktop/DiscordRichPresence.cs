@@ -15,6 +15,7 @@ using osu.Framework.Threading;
 using osu.Game;
 using osu.Game.Configuration;
 using osu.Game.Extensions;
+using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
@@ -48,11 +49,11 @@ namespace osu.Desktop
         private MultiplayerClient multiplayerClient { get; set; } = null!;
 
         [Resolved]
-        private OsuConfigManager config { get; set; } = null!;
+        private LocalUserStatisticsProvider statisticsProvider { get; set; } = null!;
 
-        private readonly IBindable<UserStatus?> status = new Bindable<UserStatus?>();
-        private readonly IBindable<UserActivity> activity = new Bindable<UserActivity>();
-        private readonly Bindable<DiscordRichPresenceMode> privacyMode = new Bindable<DiscordRichPresenceMode>();
+        private IBindable<DiscordRichPresenceMode> privacyMode = null!;
+        private IBindable<UserStatus> userStatus = null!;
+        private IBindable<UserActivity?> userActivity = null!;
 
         private readonly RichPresence presence = new RichPresence
         {
@@ -67,8 +68,12 @@ namespace osu.Desktop
         private IBindable<APIUser>? user;
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuConfigManager config, SessionStatics session)
         {
+            privacyMode = config.GetBindable<DiscordRichPresenceMode>(OsuSetting.DiscordRichPresence);
+            userStatus = config.GetBindable<UserStatus>(OsuSetting.UserOnlineStatus);
+            userActivity = session.GetBindable<UserActivity?>(Static.UserOnlineActivity);
+
             client = new DiscordRpcClient(client_id)
             {
                 // SkipIdenticalPresence allows us to fire SetPresence at any point and leave it to the underlying implementation
@@ -77,7 +82,7 @@ namespace osu.Desktop
             };
 
             client.OnReady += onReady;
-            client.OnError += (_, e) => Logger.Log($"An error occurred with Discord RPC Client: {e.Message} ({e.Code})", LoggingTarget.Network, LogLevel.Error);
+            client.OnError += (_, e) => Logger.Log($"An error occurred with Discord RPC Client: {e.Message} ({e.Code})", LoggingTarget.Network);
 
             try
             {
@@ -101,23 +106,15 @@ namespace osu.Desktop
         {
             base.LoadComplete();
 
-            config.BindWith(OsuSetting.DiscordRichPresence, privacyMode);
-
             user = api.LocalUser.GetBoundCopy();
-            user.BindValueChanged(u =>
-            {
-                status.UnbindBindings();
-                status.BindTo(u.NewValue.Status);
-
-                activity.UnbindBindings();
-                activity.BindTo(u.NewValue.Activity);
-            }, true);
 
             ruleset.BindValueChanged(_ => schedulePresenceUpdate());
-            status.BindValueChanged(_ => schedulePresenceUpdate());
-            activity.BindValueChanged(_ => schedulePresenceUpdate());
+            userStatus.BindValueChanged(_ => schedulePresenceUpdate());
+            userActivity.BindValueChanged(_ => schedulePresenceUpdate());
             privacyMode.BindValueChanged(_ => schedulePresenceUpdate());
+
             multiplayerClient.RoomUpdated += onRoomUpdated;
+            statisticsProvider.StatisticsUpdated += onStatisticsUpdated;
         }
 
         private void onReady(object _, ReadyMessage __)
@@ -133,6 +130,8 @@ namespace osu.Desktop
 
         private void onRoomUpdated() => schedulePresenceUpdate();
 
+        private void onStatisticsUpdated(UserStatisticsUpdate _) => schedulePresenceUpdate();
+
         private ScheduledDelegate? presenceUpdateDelegate;
 
         private void schedulePresenceUpdate()
@@ -143,13 +142,13 @@ namespace osu.Desktop
                 if (!client.IsInitialized)
                     return;
 
-                if (status.Value == UserStatus.Offline || privacyMode.Value == DiscordRichPresenceMode.Off)
+                if (!api.IsLoggedIn || userStatus.Value == UserStatus.Offline || privacyMode.Value == DiscordRichPresenceMode.Off)
                 {
                     client.ClearPresence();
                     return;
                 }
 
-                bool hideIdentifiableInformation = privacyMode.Value == DiscordRichPresenceMode.Limited || status.Value == UserStatus.DoNotDisturb;
+                bool hideIdentifiableInformation = privacyMode.Value == DiscordRichPresenceMode.Limited || userStatus.Value == UserStatus.DoNotDisturb;
 
                 updatePresence(hideIdentifiableInformation);
                 client.SetPresence(presence);
@@ -162,19 +161,19 @@ namespace osu.Desktop
                 return;
 
             // user activity
-            if (activity.Value != null)
+            if (userActivity.Value != null)
             {
-                presence.State = clampLength(activity.Value.GetStatus(hideIdentifiableInformation));
-                presence.Details = clampLength(activity.Value.GetDetails(hideIdentifiableInformation) ?? string.Empty);
+                presence.State = clampLength(userActivity.Value.GetStatus(hideIdentifiableInformation));
+                presence.Details = clampLength(userActivity.Value.GetDetails(hideIdentifiableInformation) ?? string.Empty);
 
-                if (getBeatmapID(activity.Value) is int beatmapId && beatmapId > 0)
+                if (userActivity.Value.GetBeatmapID(hideIdentifiableInformation) is int beatmapId && beatmapId > 0)
                 {
                     presence.Buttons = new[]
                     {
                         new Button
                         {
                             Label = "View beatmap",
-                            Url = $@"{api.WebsiteRootUrl}/beatmaps/{beatmapId}?mode={ruleset.Value.ShortName}"
+                            Url = $@"{api.Endpoints.WebsiteUrl}/beatmaps/{beatmapId}?mode={ruleset.Value.ShortName}"
                         }
                     };
                 }
@@ -229,10 +228,8 @@ namespace osu.Desktop
                 presence.Assets.LargeImageText = string.Empty;
             else
             {
-                if (user.Value.RulesetsStatistics != null && user.Value.RulesetsStatistics.TryGetValue(ruleset.Value.ShortName, out UserStatistics? statistics))
-                    presence.Assets.LargeImageText = $"{user.Value.Username}" + (statistics.GlobalRank > 0 ? $" (rank #{statistics.GlobalRank:N0})" : string.Empty);
-                else
-                    presence.Assets.LargeImageText = $"{user.Value.Username}" + (user.Value.Statistics?.GlobalRank > 0 ? $" (rank #{user.Value.Statistics.GlobalRank:N0})" : string.Empty);
+                var statistics = statisticsProvider.GetStatisticsFor(ruleset.Value);
+                presence.Assets.LargeImageText = $"{user.Value.Username}" + (statistics?.GlobalRank > 0 ? $" (rank #{statistics.GlobalRank:N0})" : string.Empty);
             }
 
             // small image
@@ -327,24 +324,13 @@ namespace osu.Desktop
             return true;
         }
 
-        private static int? getBeatmapID(UserActivity activity)
-        {
-            switch (activity)
-            {
-                case UserActivity.InGame game:
-                    return game.BeatmapID;
-
-                case UserActivity.EditingBeatmap edit:
-                    return edit.BeatmapID;
-            }
-
-            return null;
-        }
-
         protected override void Dispose(bool isDisposing)
         {
             if (multiplayerClient.IsNotNull())
                 multiplayerClient.RoomUpdated -= onRoomUpdated;
+
+            if (statisticsProvider.IsNotNull())
+                statisticsProvider.StatisticsUpdated -= onStatisticsUpdated;
 
             client.Dispose();
             base.Dispose(isDisposing);

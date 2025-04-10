@@ -6,12 +6,10 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using osu.Game.IO.Serialization.Converters;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
-using osu.Game.Online.Rooms.RoomStatuses;
 
 namespace osu.Game.Online.Rooms
 {
@@ -244,11 +242,11 @@ namespace osu.Game.Online.Rooms
         public int ChannelId
         {
             get => channelId;
-            private set => SetField(ref channelId, value);
+            set => SetField(ref channelId, value);
         }
 
         /// <summary>
-        /// The current room status.
+        /// The current status of the room.
         /// </summary>
         public RoomStatus Status
         {
@@ -263,18 +261,6 @@ namespace osu.Game.Online.Rooms
         {
             get => availability;
             set => SetField(ref availability, value);
-        }
-
-        [OnDeserialized]
-        private void onDeserialised(StreamingContext context)
-        {
-            // API doesn't populate status so let's do it here.
-            if (EndDate != null && DateTimeOffset.Now >= EndDate)
-                Status = new RoomStatusEnded();
-            else if (HasPassword)
-                Status = new RoomStatusOpenPrivate();
-            else
-                Status = new RoomStatusOpen();
         }
 
         [JsonProperty("id")]
@@ -349,11 +335,29 @@ namespace osu.Game.Online.Rooms
         [JsonProperty("channel_id")]
         private int channelId;
 
-        // Not serialised (see: GetRoomsRequest).
-        private RoomStatus status = new RoomStatusOpen();
+        [JsonProperty("status")]
+        [JsonConverter(typeof(SnakeCaseStringEnumConverter))]
+        private RoomStatus status;
 
         // Not yet serialised (not implemented).
         private RoomAvailability availability;
+
+        public Room()
+        {
+        }
+
+        public Room(MultiplayerRoom room)
+        {
+            RoomID = room.RoomID;
+            Name = room.Settings.Name;
+            Password = room.Settings.Password;
+            Type = room.Settings.MatchType;
+            QueueMode = room.Settings.QueueMode;
+            AutoStartDuration = room.Settings.AutoStartDuration;
+            AutoSkip = room.Settings.AutoSkip;
+            Host = room.Host != null ? new APIUser { Id = room.Host.UserID } : null;
+            Playlist = room.Playlist.Select(p => new PlaylistItem(p)).ToArray();
+        }
 
         /// <summary>
         /// Copies values from another <see cref="Room"/> into this one.
@@ -366,12 +370,8 @@ namespace osu.Game.Online.Rooms
         {
             RoomID = other.RoomID;
             Name = other.Name;
-
             Category = other.Category;
-
-            if (other.Host != null && Host?.Id != other.Host.Id)
-                Host = other.Host;
-
+            Host = other.Host;
             ChannelId = other.ChannelId;
             Status = other.Status;
             Availability = other.Availability;
@@ -379,6 +379,7 @@ namespace osu.Game.Online.Rooms
             Type = other.Type;
             MaxParticipants = other.MaxParticipants;
             ParticipantCount = other.ParticipantCount;
+            StartDate = other.StartDate;
             EndDate = other.EndDate;
             UserScore = other.UserScore;
             QueueMode = other.QueueMode;
@@ -387,21 +388,18 @@ namespace osu.Game.Online.Rooms
             PlaylistItemStats = other.PlaylistItemStats;
             CurrentPlaylistItem = other.CurrentPlaylistItem;
             AutoSkip = other.AutoSkip;
-
-            other.RemoveExpiredPlaylistItems();
-
             Playlist = other.Playlist;
             RecentParticipants = other.RecentParticipants;
         }
 
-        public void RemoveExpiredPlaylistItems()
-        {
-            // Todo: This is not the best way/place to do this, but the intention is to display all playlist items when the room has ended,
-            // and display only the non-expired playlist items while the room is still active. In order to achieve this, all expired items are removed from the source Room.
-            // More refactoring is required before this can be done locally instead - DrawableRoomPlaylist is currently directly bound to the playlist to display items in the room.
-            if (Status is not RoomStatusEnded)
-                Playlist = Playlist.Where(i => !i.Expired).ToArray();
-        }
+        /// <summary>
+        /// Whether the room is no longer available.
+        /// </summary>
+        /// <remarks>
+        /// This property does not update in real-time and needs to be queried periodically.
+        /// Subscribe to <see cref="EndDate"/> to be notified of any immediate changes.
+        /// </remarks>
+        public bool HasEnded => DateTimeOffset.Now >= EndDate;
 
         [JsonObject(MemberSerialization.OptIn)]
         public class RoomPlaylistItemStats

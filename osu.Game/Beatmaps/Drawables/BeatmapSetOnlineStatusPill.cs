@@ -86,7 +86,7 @@ namespace osu.Game.Beatmaps.Drawables
             };
 
             Status = BeatmapOnlineStatus.None;
-            TextPadding = new MarginPadding { Horizontal = 5, Bottom = 1 };
+            TextPadding = new MarginPadding { Horizontal = 4, Bottom = 1 };
         }
 
         protected override void LoadComplete()
@@ -101,7 +101,7 @@ namespace osu.Game.Beatmaps.Drawables
         {
             if (Status == BeatmapOnlineStatus.None)
             {
-                this.FadeOut(animation_duration, Easing.OutQuint);
+                Hide();
                 return;
             }
 

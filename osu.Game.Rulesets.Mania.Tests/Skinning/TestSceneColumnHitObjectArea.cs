@@ -28,18 +28,20 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
                     {
                         RelativeSizeAxes = Axes.Both,
                         Width = 0.5f,
-                        Child = new ColumnHitObjectArea(new HitObjectContainer())
+                        Child = new ColumnHitObjectArea
                         {
-                            RelativeSizeAxes = Axes.Both
+                            RelativeSizeAxes = Axes.Both,
+                            Child = new HitObjectContainer(),
                         }
                     },
                     new ColumnTestContainer(1, ManiaAction.Key2)
                     {
                         RelativeSizeAxes = Axes.Both,
                         Width = 0.5f,
-                        Child = new ColumnHitObjectArea(new HitObjectContainer())
+                        Child = new ColumnHitObjectArea
                         {
-                            RelativeSizeAxes = Axes.Both
+                            RelativeSizeAxes = Axes.Both,
+                            Child = new HitObjectContainer(),
                         }
                     }
                 }

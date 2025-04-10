@@ -138,9 +138,15 @@ namespace osu.Game.Screens.Select.Leaderboards
                 return null;
             }
 
-            if (!api.LocalUser.Value.IsSupporter && (Scope != BeatmapLeaderboardScope.Global || filterMods))
+            if (Scope.RequiresSupporter(filterMods) && !api.LocalUser.Value.IsSupporter)
             {
                 SetErrorState(LeaderboardState.NotSupporter);
+                return null;
+            }
+
+            if (Scope == BeatmapLeaderboardScope.Team && api.LocalUser.Value.Team == null)
+            {
+                SetErrorState(LeaderboardState.NoTeam);
                 return null;
             }
 
@@ -169,12 +175,12 @@ namespace osu.Game.Screens.Select.Leaderboards
             return scoreRetrievalRequest = newRequest;
         }
 
-        protected override LeaderboardScore CreateDrawableScore(ScoreInfo model, int index) => new LeaderboardScore(model, index, IsOnlineScope)
+        protected override LeaderboardScore CreateDrawableScore(ScoreInfo model, int index) => new LeaderboardScore(model, index, IsOnlineScope, Scope != BeatmapLeaderboardScope.Friend)
         {
             Action = () => ScoreSelected?.Invoke(model)
         };
 
-        protected override LeaderboardScore CreateDrawableTopScore(ScoreInfo model) => new LeaderboardScore(model, model.Position, false)
+        protected override LeaderboardScore CreateDrawableTopScore(ScoreInfo model) => new LeaderboardScore(model, model.Position, false, Scope != BeatmapLeaderboardScope.Friend)
         {
             Action = () => ScoreSelected?.Invoke(model)
         };

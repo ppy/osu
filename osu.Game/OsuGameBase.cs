@@ -41,6 +41,7 @@ using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Cursor;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.IO;
@@ -73,8 +74,6 @@ namespace osu.Game
     [Cached(typeof(OsuGameBase))]
     public partial class OsuGameBase : Framework.Game, ICanAcceptFiles, IBeatSyncProvider
     {
-        public static readonly string[] VIDEO_EXTENSIONS = { ".mp4", ".mov", ".avi", ".flv", ".mpg", ".wmv", ".m4v" };
-
 #if DEBUG
         public const string GAME_NAME = "osu! (development)";
 #else
@@ -108,6 +107,8 @@ namespace osu.Game
 
         public virtual EndpointConfiguration CreateEndpoints() =>
             UseDevelopmentServer ? new DevelopmentEndpointConfiguration() : new ProductionEndpointConfiguration();
+
+        protected override OnlineStore CreateOnlineStore() => new TrustedDomainOnlineStore();
 
         public virtual Version AssemblyVersion => Assembly.GetEntryAssembly()?.GetName().Version ?? new Version();
 
@@ -279,7 +280,7 @@ namespace osu.Game
             dependencies.CacheAs(Storage);
 
             var largeStore = new LargeTextureStore(Host.Renderer, Host.CreateTextureLoaderStore(new NamespacedResourceStore<byte[]>(Resources, @"Textures")));
-            largeStore.AddTextureSource(Host.CreateTextureLoaderStore(new OnlineStore()));
+            largeStore.AddTextureSource(Host.CreateTextureLoaderStore(CreateOnlineStore()));
             dependencies.Cache(largeStore);
 
             dependencies.CacheAs(LocalConfig);
@@ -296,7 +297,7 @@ namespace osu.Game
 
             EndpointConfiguration endpoints = CreateEndpoints();
 
-            MessageFormatter.WebsiteRootUrl = endpoints.WebsiteRootUrl;
+            MessageFormatter.WebsiteRootUrl = endpoints.WebsiteUrl;
 
             frameworkLocale = frameworkConfig.GetBindable<string>(FrameworkSetting.Locale);
             frameworkLocale.BindValueChanged(_ => updateLanguage());
@@ -316,6 +317,7 @@ namespace osu.Game
             dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Storage, realm, API, LocalConfig));
 
             dependencies.Cache(BeatmapManager = new BeatmapManager(Storage, realm, API, Audio, Resources, Host, defaultBeatmap, difficultyCache, performOnlineLookups: true));
+            dependencies.CacheAs<IWorkingBeatmapCache>(BeatmapManager);
 
             dependencies.Cache(BeatmapDownloader = new BeatmapModelDownloader(BeatmapManager, API));
             dependencies.Cache(ScoreDownloader = new ScoreModelDownloader(ScoreManager, API));
@@ -385,6 +387,10 @@ namespace osu.Game
 
             GlobalActionContainer globalBindings;
 
+            OsuMenuSamples menuSamples;
+            dependencies.Cache(menuSamples = new OsuMenuSamples());
+            base.Content.Add(menuSamples);
+
             base.Content.Add(SafeAreaContainer = new SafeAreaContainer
             {
                 SafeAreaOverrideEdges = SafeAreaOverrideEdges,
@@ -415,6 +421,11 @@ namespace osu.Game
 
             Ruleset.BindValueChanged(onRulesetChanged);
             Beatmap.BindValueChanged(onBeatmapChanged);
+
+            // make config aware of how to lookup skins for on-screen display purposes.
+            // if this becomes a more common thing, tracked settings should be reconsidered to allow local DI.
+            LocalConfig.LookupSkinName = id => SkinManager.Query(s => s.ID == id)?.ToString() ?? "Unknown";
+            LocalConfig.LookupKeyBindings = l => KeyBindingStore.GetBindingsStringFor(l);
         }
 
         private void updateLanguage() => CurrentLanguage.Value = LanguageExtensions.GetLanguageFor(frameworkLocale.Value, localisationParameters.Value);

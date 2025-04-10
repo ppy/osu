@@ -18,6 +18,8 @@ namespace osu.Game.Rulesets.Mania.UI
     /// </summary>
     public partial class ManiaTouchInputArea : VisibilityContainer
     {
+        private readonly DrawableManiaRuleset drawableRuleset;
+
         // visibility state affects our child. we always want to handle input.
         public override bool PropagatePositionalInputSubTree => true;
         public override bool PropagateNonPositionalInputSubTree => true;
@@ -38,13 +40,12 @@ namespace osu.Game.Rulesets.Mania.UI
             MaxValue = 1
         };
 
-        [Resolved]
-        private DrawableManiaRuleset drawableRuleset { get; set; } = null!;
-
         private GridContainer gridContainer = null!;
 
-        public ManiaTouchInputArea()
+        public ManiaTouchInputArea(DrawableManiaRuleset drawableRuleset)
         {
+            this.drawableRuleset = drawableRuleset;
+
             Anchor = Anchor.BottomCentre;
             Origin = Anchor.BottomCentre;
 
@@ -70,7 +71,10 @@ namespace osu.Game.Rulesets.Mania.UI
                         receptorGridDimensions.Add(new Dimension(GridSizeMode.AutoSize));
                     }
 
-                    receptorGridContent.Add(new ColumnInputReceptor { Action = { BindTarget = column.Action } });
+                    receptorGridContent.Add(new ColumnInputReceptor
+                    {
+                        Action = { BindTarget = column.Action },
+                    });
                     receptorGridDimensions.Add(new Dimension());
 
                     first = false;

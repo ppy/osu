@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.ObjectExtensions;
@@ -20,50 +19,20 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
     /// </summary>
     public partial class MultiplayerQueueList : DrawableRoomPlaylist
     {
-        private readonly Room room;
-
-        private QueueFillFlowContainer flow = null!;
-
-        public MultiplayerQueueList(Room room)
+        public MultiplayerQueueList()
         {
-            this.room = room;
             ShowItemOwners = true;
         }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            room.PropertyChanged += onRoomPropertyChanged;
-            updateRoomPlaylist();
-        }
-
-        private void onRoomPropertyChanged(object? sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == nameof(Room.Playlist))
-                updateRoomPlaylist();
-        }
-
-        private void updateRoomPlaylist()
-            => flow.InvalidateLayout();
-
-        protected override FillFlowContainer<RearrangeableListItem<PlaylistItem>> CreateListFillFlowContainer() => flow = new QueueFillFlowContainer
+        protected override FillFlowContainer<RearrangeableListItem<PlaylistItem>> CreateListFillFlowContainer() => new QueueFillFlowContainer
         {
             Spacing = new Vector2(0, 2)
         };
 
         protected override DrawableRoomPlaylistItem CreateDrawablePlaylistItem(PlaylistItem item) => new QueuePlaylistItem(item);
 
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-            room.PropertyChanged -= onRoomPropertyChanged;
-        }
-
         private partial class QueueFillFlowContainer : FillFlowContainer<RearrangeableListItem<PlaylistItem>>
         {
-            public new void InvalidateLayout() => base.InvalidateLayout();
-
             public override IEnumerable<Drawable> FlowingChildren => base.FlowingChildren.OfType<RearrangeableListItem<PlaylistItem>>().OrderBy(item => item.Model.PlaylistOrder);
         }
 

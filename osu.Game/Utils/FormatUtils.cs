@@ -33,6 +33,12 @@ namespace osu.Game.Utils
         public static string FormatRank(this int rank) => rank.ToMetric(decimals: rank < 100_000 ? 1 : 0);
 
         /// <summary>
+        /// Formats the supplied star rating in a consistent, simplified way.
+        /// </summary>
+        /// <param name="starRating">The star rating to be formatted.</param>
+        public static LocalisableString FormatStarRating(this double starRating) => starRating.ToLocalisableString("0.00");
+
+        /// <summary>
         /// Finds the number of digits after the decimal.
         /// </summary>
         /// <param name="d">The value to find the number of decimal digits for.</param>

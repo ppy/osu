@@ -21,7 +21,7 @@ namespace osu.Game.Overlays.Toolbar
 {
     public partial class TransientUserStatisticsUpdateDisplay : CompositeDrawable
     {
-        public Bindable<UserStatisticsUpdate?> LatestUpdate { get; } = new Bindable<UserStatisticsUpdate?>();
+        public Bindable<ScoreBasedUserStatisticsUpdate?> LatestUpdate { get; } = new Bindable<ScoreBasedUserStatisticsUpdate?>();
 
         private Statistic<int> globalRank = null!;
         private Statistic<int> pp = null!;
@@ -48,7 +48,7 @@ namespace osu.Game.Overlays.Toolbar
             };
 
             if (userStatisticsWatcher != null)
-                ((IBindable<UserStatisticsUpdate?>)LatestUpdate).BindTo(userStatisticsWatcher.LatestUpdate);
+                ((IBindable<ScoreBasedUserStatisticsUpdate?>)LatestUpdate).BindTo(userStatisticsWatcher.LatestUpdate);
         }
 
         protected override void LoadComplete()

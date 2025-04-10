@@ -80,7 +80,7 @@ namespace osu.Game.Overlays.Rankings.Tables
 
         protected abstract CountryCode GetCountryCode(TModel item);
 
-        protected abstract Drawable CreateFlagContent(TModel item);
+        protected abstract Drawable[] CreateFlagContent(TModel item);
 
         private OsuSpriteText createIndexDrawable(int index) => new RowText
         {
@@ -92,16 +92,13 @@ namespace osu.Game.Overlays.Rankings.Tables
         {
             AutoSizeAxes = Axes.Both,
             Direction = FillDirection.Horizontal,
-            Spacing = new Vector2(10, 0),
+            Spacing = new Vector2(5, 0),
             Margin = new MarginPadding { Bottom = row_spacing },
-            Children = new[]
-            {
-                new UpdateableFlag(GetCountryCode(item))
-                {
-                    Size = new Vector2(28, 20),
-                },
-                CreateFlagContent(item)
-            }
+            Children =
+            [
+                new UpdateableFlag(GetCountryCode(item)) { Size = new Vector2(28, 20) },
+                ..CreateFlagContent(item)
+            ]
         };
 
         protected class RankingsTableColumn : TableColumn
