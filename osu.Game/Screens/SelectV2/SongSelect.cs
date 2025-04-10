@@ -51,6 +51,8 @@ namespace osu.Game.Screens.SelectV2
         private BeatmapCarousel carousel = null!;
 
         private BeatmapInfoWedge infoWedge = null!;
+        private BeatmapWedgesArea wedgesArea = null!;
+        private FillFlowContainer wedgesContainer = null!;
 
         public override bool ShowFooter => true;
 
@@ -100,7 +102,7 @@ namespace osu.Game.Screens.SelectV2
                                 {
                                     new[]
                                     {
-                                        new FillFlowContainer
+                                        wedgesContainer = new FillFlowContainer
                                         {
                                             RelativeSizeAxes = Axes.Both,
                                             Margin = new MarginPadding { Left = -20 },
@@ -109,6 +111,7 @@ namespace osu.Game.Screens.SelectV2
                                             Children = new Drawable[]
                                             {
                                                 new ShearAlignedDrawable(shear, infoWedge = new BeatmapInfoWedge()),
+                                                new ShearAlignedDrawable(shear, wedgesArea = new BeatmapWedgesArea()),
                                             },
                                         },
                                         Empty(),
@@ -160,6 +163,7 @@ namespace osu.Game.Screens.SelectV2
             Beatmap.BindValueChanged(onBeatmapChanged, true);
 
             infoWedge.Show();
+            wedgesArea.Show();
 
             modSelectOverlay.State.BindValueChanged(onModSelectStateChanged, true);
             modSelectOverlay.SelectedMods.BindTo(Mods);
@@ -176,6 +180,7 @@ namespace osu.Game.Screens.SelectV2
             carousel.VisuallyFocusSelected = false;
 
             infoWedge.Show();
+            wedgesArea.Show();
 
             // required due to https://github.com/ppy/osu-framework/issues/3218
             modSelectOverlay.SelectedMods.Disabled = false;
@@ -191,6 +196,7 @@ namespace osu.Game.Screens.SelectV2
             modSelectOverlay.SelectedMods.UnbindFrom(Mods);
 
             infoWedge.Hide();
+            wedgesArea.Hide();
 
             carousel.VisuallyFocusSelected = true;
 
@@ -202,6 +208,7 @@ namespace osu.Game.Screens.SelectV2
             this.FadeOut(fade_duration, Easing.OutQuint);
 
             infoWedge.Hide();
+            wedgesArea.Hide();
 
             return base.OnExiting(e);
         }
@@ -267,6 +274,12 @@ namespace osu.Game.Screens.SelectV2
                 logo?.ScaleTo(0f, 400, Easing.OutQuint).FadeTo(0f, 200, Easing.OutQuint);
             else
                 logo?.ScaleTo(logo_scale, 400, Easing.OutQuint).FadeTo(1f, 200, Easing.OutQuint);
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+            wedgesArea.Height = wedgesContainer.DrawHeight - infoWedge.LayoutSize.Y - 4;
         }
     }
 }
