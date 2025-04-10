@@ -204,7 +204,7 @@ namespace osu.Game
 
         private UserLookupCache userCache;
         private BeatmapLookupCache beatmapCache;
-        private LeaderboardManager leaderboardManager;
+        protected LeaderboardManager LeaderboardManager { get; private set; }
 
         private RulesetConfigCache rulesetConfigCache;
 
@@ -367,8 +367,8 @@ namespace osu.Game
             dependencies.CacheAs<IBindable<WorkingBeatmap>>(Beatmap);
             dependencies.CacheAs(Beatmap);
 
-            dependencies.Cache(leaderboardManager = new LeaderboardManager());
-            base.Content.Add(leaderboardManager);
+            dependencies.Cache(LeaderboardManager = new LeaderboardManager());
+            base.Content.Add(LeaderboardManager);
 
             // add api components to hierarchy.
             if (API is APIAccess apiAccess)

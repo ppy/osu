@@ -27,7 +27,7 @@ namespace osu.Game.Online.Leaderboards
         public IBindable<LeaderboardScores?> Scores => scores;
         private readonly Bindable<LeaderboardScores?> scores = new Bindable<LeaderboardScores?>();
 
-        private LeaderboardCriteria? criteria;
+        public LeaderboardCriteria? CurrentCriteria { get; private set; }
 
         private IDisposable? localScoreSubscription;
         private TaskCompletionSource<LeaderboardScores?>? localFetchCompletionSource;
@@ -45,10 +45,10 @@ namespace osu.Game.Online.Leaderboards
 
         public Task<LeaderboardScores?> FetchWithCriteriaAsync(LeaderboardCriteria newCriteria)
         {
-            if (criteria?.Equals(newCriteria) == true && lastFetchCompletionSource?.Task.IsFaulted == false)
+            if (CurrentCriteria?.Equals(newCriteria) == true && lastFetchCompletionSource?.Task.IsFaulted == false)
                 return lastFetchCompletionSource?.Task ?? Task.FromResult(Scores.Value);
 
-            criteria = newCriteria;
+            CurrentCriteria = newCriteria;
             localScoreSubscription?.Dispose();
             inFlightOnlineRequest?.Cancel();
             lastFetchCompletionSource?.TrySetCanceled();
@@ -110,7 +110,7 @@ namespace osu.Game.Online.Leaderboards
 
         private void localScoresChanged(IRealmCollection<ScoreInfo> sender, ChangeSet? changes)
         {
-            Debug.Assert(criteria != null);
+            Debug.Assert(CurrentCriteria != null);
 
             // This subscription may fire from changes to linked beatmaps, which we don't care about.
             // It's currently not possible for a score to be modified after insertion, so we can safely ignore callbacks with only modifications.
@@ -119,9 +119,9 @@ namespace osu.Game.Online.Leaderboards
 
             var newScores = sender.AsEnumerable();
 
-            if (criteria.ExactMods != null)
+            if (CurrentCriteria.ExactMods != null)
             {
-                if (!criteria.ExactMods.Any())
+                if (!CurrentCriteria.ExactMods.Any())
                 {
                     // we need to filter out all scores that have any mods to get all local nomod scores
                     newScores = newScores.Where(s => !s.Mods.Any());
@@ -130,7 +130,7 @@ namespace osu.Game.Online.Leaderboards
                 {
                     // otherwise find all the scores that have all of the currently selected mods (similar to how web applies mod filters)
                     // we're creating and using a string HashSet representation of selected mods so that it can be translated into the DB query itself
-                    var selectedMods = criteria.ExactMods.Select(m => m.Acronym).ToHashSet();
+                    var selectedMods = CurrentCriteria.ExactMods.Select(m => m.Acronym).ToHashSet();
 
                     newScores = newScores.Where(s => selectedMods.SetEquals(s.Mods.Select(m => m.Acronym)));
                 }
