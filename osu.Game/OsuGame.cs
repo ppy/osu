@@ -47,6 +47,7 @@ using osu.Game.IO;
 using osu.Game.Localisation;
 using osu.Game.Online;
 using osu.Game.Online.Chat;
+using osu.Game.Online.Leaderboards;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapListing;
@@ -67,6 +68,7 @@ using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Select;
+using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Seasonal;
 using osu.Game.Skinning;
 using osu.Game.Updater;
@@ -783,6 +785,24 @@ namespace osu.Game
 
                 if (!Beatmap.Value.BeatmapInfo.Equals(databasedBeatmap))
                     Beatmap.Value = BeatmapManager.GetWorkingBeatmap(databasedBeatmap);
+
+                var currentLeaderboard = LeaderboardManager.CurrentCriteria;
+
+                bool leaderboardBeatmapMatches = currentLeaderboard != null && databasedBeatmap.Equals(currentLeaderboard.Beatmap);
+                bool leaderboardRulesetMatches = currentLeaderboard != null && databasedScore.ScoreInfo.Ruleset.Equals(currentLeaderboard.Ruleset);
+
+                if (!leaderboardBeatmapMatches || !leaderboardRulesetMatches)
+                {
+                    var newLeaderboard = currentLeaderboard != null
+                        ? currentLeaderboard with { Beatmap = databasedBeatmap, Ruleset = databasedScore.ScoreInfo.Ruleset }
+                        : new LeaderboardCriteria(databasedBeatmap, databasedScore.ScoreInfo.Ruleset, BeatmapLeaderboardScope.Global, null);
+                    LeaderboardManager.FetchWithCriteriaAsync(newLeaderboard)
+                                      .ContinueWith(t =>
+                                      {
+                                          if (t.Exception != null)
+                                              Logger.Log($@"Failed to fetch leaderboards when displaying results: {t.Exception}", LoggingTarget.Network);
+                                      });
+                }
 
                 switch (presentType)
                 {
