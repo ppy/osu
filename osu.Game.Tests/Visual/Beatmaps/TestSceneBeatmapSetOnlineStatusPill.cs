@@ -28,7 +28,6 @@ namespace osu.Game.Tests.Visual.Beatmaps
             Spacing = new Vector2(0, 10),
             ChildrenEnumerable = Enum.GetValues(typeof(BeatmapOnlineStatus)).Cast<BeatmapOnlineStatus>().Select(status => new BeatmapSetOnlineStatusPill
             {
-                AutoSizeAxes = Axes.Both,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Status = status
