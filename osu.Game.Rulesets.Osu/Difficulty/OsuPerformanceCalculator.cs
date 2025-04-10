@@ -31,6 +31,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private int countOk;
         private int countMeh;
         private int countMiss;
+        private int totalPlayableHits;
 
         /// <summary>
         /// Missed slider ticks that includes missed reverse arrows. Will only be correct on non-classic scores
@@ -76,6 +77,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             countSliderEndsDropped = osuAttributes.SliderCount - score.Statistics.GetValueOrDefault(HitResult.SliderTailHit);
             countSliderTickMiss = score.Statistics.GetValueOrDefault(HitResult.LargeTickMiss);
             effectiveMissCount = countMiss;
+            totalPlayableHits = score.MaximumStatistics.Where(x => x.Key.IsBasic()).Sum(x => x.Value);
 
             var difficulty = score.BeatmapInfo!.Difficulty.Clone();
 
@@ -131,8 +133,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (score.Mods.Any(m => m is OsuModNoFail))
                 multiplier *= Math.Max(0.90, 1.0 - 0.02 * effectiveMissCount);
 
-            if (score.Mods.Any(m => m is OsuModSpunOut) && totalHits > 0)
-                multiplier *= 1.0 - Math.Pow((double)osuAttributes.SpinnerCount / totalHits, 0.85);
+            if (score.Mods.Any(m => m is OsuModSpunOut) && totalPlayableHits > 0)
+                multiplier *= 1.0 - Math.Pow((double)osuAttributes.SpinnerCount / totalPlayableHits, 0.85);
 
             if (score.Mods.Any(h => h is OsuModRelax))
             {
@@ -274,7 +276,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             speedValue *= speedHighDeviationMultiplier;
 
             // Calculate accuracy assuming the worst case scenario
-            double relevantTotalDiff = Math.Max(0, totalHits - attributes.SpeedNoteCount);
+            double relevantTotalDiff = totalPlayableHits - attributes.SpeedNoteCount;
             double relevantCountGreat = Math.Max(0, countGreat - relevantTotalDiff);
             double relevantCountOk = Math.Max(0, countOk - Math.Max(0, relevantTotalDiff - countGreat));
             double relevantCountMeh = Math.Max(0, countMeh - Math.Max(0, relevantTotalDiff - countGreat - countOk));
@@ -298,7 +300,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 amountHitObjectsWithAccuracy += attributes.SliderCount;
 
             if (amountHitObjectsWithAccuracy > 0)
-                betterAccuracyPercentage = ((countGreat - Math.Max(totalHits - amountHitObjectsWithAccuracy, 0)) * 6 + countOk * 2 + countMeh) / (double)(amountHitObjectsWithAccuracy * 6);
+                betterAccuracyPercentage = ((countGreat - (totalPlayableHits - amountHitObjectsWithAccuracy)) * 6 + countOk * 2 + countMeh) / (double)(amountHitObjectsWithAccuracy * 6);
             else
                 betterAccuracyPercentage = 0;
 
@@ -361,7 +363,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // Calculate accuracy assuming the worst case scenario
             double speedNoteCount = attributes.SpeedNoteCount;
-            speedNoteCount += (totalHits - attributes.SpeedNoteCount) * 0.1;
+            speedNoteCount += (totalPlayableHits - attributes.SpeedNoteCount) * 0.1;
 
             // Assume worst case: all mistakes were on speed notes
             double relevantCountMiss = Math.Min(countMiss, speedNoteCount);
@@ -369,7 +371,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double relevantCountOk = Math.Min(countOk, speedNoteCount - relevantCountMiss - relevantCountMeh);
             double relevantCountGreat = Math.Max(0, speedNoteCount - relevantCountMiss - relevantCountMeh - relevantCountOk);
 
-            return calculateDeviation(attributes, relevantCountGreat, relevantCountOk, relevantCountMeh, relevantCountMiss);
+            return calculateDeviation(relevantCountGreat, relevantCountOk, relevantCountMeh, relevantCountMiss);
         }
 
         /// <summary>
@@ -378,7 +380,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         /// will always return the same deviation. Misses are ignored because they are usually due to misaiming.
         /// Greats and oks are assumed to follow a normal distribution, whereas mehs are assumed to follow a uniform distribution.
         /// </summary>
-        private double? calculateDeviation(OsuDifficultyAttributes attributes, double relevantCountGreat, double relevantCountOk, double relevantCountMeh, double relevantCountMiss)
+        private double? calculateDeviation(double relevantCountGreat, double relevantCountOk, double relevantCountMeh, double relevantCountMiss)
         {
             if (relevantCountGreat + relevantCountOk + relevantCountMeh <= 0)
                 return null;
