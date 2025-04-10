@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -38,8 +37,6 @@ namespace osu.Game.Beatmaps.Drawables
         }
 
         private readonly Bindable<double> displayedStars = new BindableDouble();
-
-        private readonly Container textContainer;
 
         /// <summary>
         /// The currently displayed stars of this display wrapped in a bindable.
