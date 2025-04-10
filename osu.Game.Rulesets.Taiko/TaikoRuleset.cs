@@ -130,7 +130,7 @@ namespace osu.Game.Rulesets.Taiko
                         new TaikoModEasy(),
                         new TaikoModNoFail(),
                         new MultiMod(new TaikoModHalfTime(), new TaikoModDaycore()),
-                        new TaikoModQuarterize(),
+                        new TaikoModSimplifiedRhythm(),
                     };
 
                 case ModType.DifficultyIncrease:
