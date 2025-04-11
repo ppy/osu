@@ -38,12 +38,12 @@ namespace osu.Game.Screens.SelectV2
         /// <summary>
         /// Height of the area above the carousel that should be treated as visible due to transparency of elements in front of it.
         /// </summary>
-        public float BleedTop { get; set; } = 0;
+        public float BleedTop { get; set; }
 
         /// <summary>
         /// Height of the area below the carousel that should be treated as visible due to transparency of elements in front of it.
         /// </summary>
-        public float BleedBottom { get; set; } = 0;
+        public float BleedBottom { get; set; }
 
         /// <summary>
         /// The number of pixels outside the carousel's vertical bounds to manifest drawables.
