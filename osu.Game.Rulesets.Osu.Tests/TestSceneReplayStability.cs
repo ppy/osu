@@ -1,33 +1,21 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Replays;
-using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Scoring;
-using osu.Game.Scoring.Legacy;
-using osu.Game.Screens.Play;
 using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
-    [TestFixture]
     [Ignore("These tests are expected to fail until an acceptable solution for various replay playback issues concerning rounding of replay frame times & hit windows is found.")]
-    public partial class TestSceneReplayStability : RateAdjustedBeatmapTestScene
+    public partial class TestSceneReplayStability : ReplayStabilityTestScene
     {
-        private ReplayPlayer currentPlayer = null!;
-        private readonly List<JudgementResult> results = new List<JudgementResult>();
-
         private static readonly object[][] test_cases = new[]
         {
             // OD = 5 test cases.
@@ -88,100 +76,34 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             const double hit_circle_time = 100;
 
-            Score originalScore = null!;
-            Score decodedScore = null!;
-            IBeatmap beatmap = null!;
-
-            AddStep("create beatmap", () =>
+            var beatmap = new OsuBeatmap
             {
-                Beatmap.Value = CreateWorkingBeatmap(beatmap = new OsuBeatmap
+                HitObjects =
                 {
-                    HitObjects =
+                    new HitCircle
                     {
-                        new HitCircle
-                        {
-                            StartTime = hit_circle_time,
-                            Position = OsuPlayfield.BASE_SIZE / 2
-                        }
-                    },
-                    Difficulty = new BeatmapDifficulty { OverallDifficulty = overallDifficulty },
-                    BeatmapInfo =
-                    {
-                        Ruleset = new OsuRuleset().RulesetInfo,
-                    },
-                });
-            });
-            AddStep("create replay", () =>
-            {
-                originalScore = new Score
-                {
-                    Replay = new Replay
-                    {
-                        Frames =
-                        {
-                            new OsuReplayFrame(0, OsuPlayfield.BASE_SIZE / 2),
-                            new OsuReplayFrame(hit_circle_time + hitOffset, OsuPlayfield.BASE_SIZE / 2, OsuAction.LeftButton),
-                            new OsuReplayFrame(hit_circle_time + hitOffset + 20, OsuPlayfield.BASE_SIZE / 2),
-                        }
+                        StartTime = hit_circle_time,
+                        Position = OsuPlayfield.BASE_SIZE / 2
                     }
-                };
-            });
-
-            AddStep("push player", () => pushNewPlayer(originalScore));
-
-            AddUntilStep("Wait until player is loaded", () => currentPlayer.IsCurrentScreen());
-            AddUntilStep("Wait for completion", () => currentPlayer.GameplayState.HasCompleted);
-            AddAssert("Collected one judgement result", () => results, () => Has.Count.EqualTo(1));
-            AddAssert("Judgement result is correct", () => results.Single().Type, () => Is.EqualTo(expectedResult));
-
-            AddStep("exit player", () => currentPlayer.Exit());
-
-            AddStep("encode and decode score", () =>
-            {
-                var encoder = new LegacyScoreEncoder(originalScore, beatmap);
-
-                using (var stream = new MemoryStream())
+                },
+                Difficulty = new BeatmapDifficulty { OverallDifficulty = overallDifficulty },
+                BeatmapInfo =
                 {
-                    encoder.Encode(stream, leaveOpen: true);
-                    stream.Position = 0;
-                    decodedScore = new TestScoreDecoder(Beatmap.Value).Parse(stream);
-                }
-            });
-
-            AddStep("push player", () => pushNewPlayer(decodedScore));
-
-            AddUntilStep("Wait until player is loaded", () => currentPlayer.IsCurrentScreen());
-            AddUntilStep("Wait for completion", () => currentPlayer.GameplayState.HasCompleted);
-            AddAssert("Collected one judgement result", () => results, () => Has.Count.EqualTo(1));
-            AddAssert("Judgement result is correct", () => results.Single().Type, () => Is.EqualTo(expectedResult));
-        }
-
-        private void pushNewPlayer(Score score)
-        {
-            var player = new ReplayPlayer(score);
-            player.OnLoadComplete += _ =>
-            {
-                player.GameplayState.ScoreProcessor.NewJudgement += result =>
-                {
-                    if (currentPlayer == player)
-                        results.Add(result);
-                };
+                    Ruleset = new OsuRuleset().RulesetInfo,
+                },
             };
-            LoadScreen(currentPlayer = player);
-            results.Clear();
-        }
 
-        private class TestScoreDecoder : LegacyScoreDecoder
-        {
-            private readonly WorkingBeatmap beatmap;
-
-            public TestScoreDecoder(WorkingBeatmap beatmap)
+            var replay = new Replay
             {
-                this.beatmap = beatmap;
-            }
+                Frames =
+                {
+                    new OsuReplayFrame(0, OsuPlayfield.BASE_SIZE / 2),
+                    new OsuReplayFrame(hit_circle_time + hitOffset, OsuPlayfield.BASE_SIZE / 2, OsuAction.LeftButton),
+                    new OsuReplayFrame(hit_circle_time + hitOffset + 20, OsuPlayfield.BASE_SIZE / 2),
+                }
+            };
 
-            protected override Ruleset GetRuleset(int rulesetId) => new OsuRuleset();
-            protected override WorkingBeatmap GetBeatmap(string md5Hash) => beatmap;
+            RunTest(beatmap, replay, [expectedResult]);
         }
     }
 }
