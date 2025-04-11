@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Mania.Tests
     [Ignore("These tests are expected to fail until an acceptable solution for various replay playback issues concerning rounding of replay frame times & hit windows is found.")]
     public partial class TestSceneReplayStability : ReplayStabilityTestScene
     {
-        private static readonly object[][] test_cases = new[]
+        private static readonly object[][] test_cases =
         {
             // OD = 5 test cases.
             // PERFECT hit window is [ -19.4ms,  19.4ms]
@@ -110,7 +110,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             {
                 HitObjects =
                 {
-                    new Note()
+                    new Note
                     {
                         StartTime = note_time,
                         Column = 0,
