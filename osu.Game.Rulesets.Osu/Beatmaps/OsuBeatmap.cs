@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
             int circles = HitObjects.Count(c => c is HitCircle);
             int sliders = HitObjects.Count(s => s is Slider);
             int spinners = HitObjects.Count(s => s is Spinner);
-            int maximum = circles + sliders + spinners;
+            int sum = Math.Max(1, circles + sliders + spinners);
 
             return new[]
             {
@@ -24,25 +24,22 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                 {
                     Name = "Circles",
                     Content = circles.ToString(),
-                    Value = circles,
-                    Maximum = maximum,
                     CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Circles),
+                    Ratio = circles / (float)sum,
                 },
                 new BeatmapStatistic
                 {
                     Name = "Sliders",
                     Content = sliders.ToString(),
-                    Value = sliders,
-                    Maximum = maximum,
                     CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Sliders),
+                    Ratio = sliders / (float)sum,
                 },
                 new BeatmapStatistic
                 {
                     Name = @"Spinners",
                     Content = spinners.ToString(),
-                    Value = spinners,
-                    Maximum = Math.Max(spinners, 10),
                     CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Spinners),
+                    Ratio = Math.Min(spinners / 10f, 1),
                 }
             };
         }

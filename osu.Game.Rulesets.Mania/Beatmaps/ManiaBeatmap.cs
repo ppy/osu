@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         {
             int notes = HitObjects.Count(s => s is Note);
             int holdNotes = HitObjects.Count(s => s is HoldNote);
-            int maximum = notes + holdNotes;
+            int sum = Math.Max(1, notes + holdNotes);
 
             return new[]
             {
@@ -45,16 +45,14 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                     Name = @"Notes",
                     CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Circles),
                     Content = notes.ToString(),
-                    Value = notes,
-                    Maximum = maximum,
+                    Ratio = notes / (float)sum,
                 },
                 new BeatmapStatistic
                 {
                     Name = @"Hold Notes",
                     CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Sliders),
                     Content = holdNotes.ToString(),
-                    Value = holdNotes,
-                    Maximum = maximum,
+                    Ratio = holdNotes / (float)sum,
                 },
             };
         }

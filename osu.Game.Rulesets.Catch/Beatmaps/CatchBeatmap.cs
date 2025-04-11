@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
             int fruits = HitObjects.Count(s => s is Fruit);
             int juiceStreams = HitObjects.Count(s => s is JuiceStream);
             int bananaShowers = HitObjects.Count(s => s is BananaShower);
-            int maximum = fruits + juiceStreams + bananaShowers;
+            int sum = Math.Max(1, fruits + juiceStreams + bananaShowers);
 
             return new[]
             {
@@ -25,25 +25,22 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                 {
                     Name = @"Fruits",
                     Content = fruits.ToString(),
-                    Value = fruits,
-                    Maximum = maximum,
                     CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Circles),
+                    Ratio = fruits / (float)sum,
                 },
                 new BeatmapStatistic
                 {
                     Name = @"Juice Streams",
                     Content = juiceStreams.ToString(),
-                    Value = juiceStreams,
-                    Maximum = maximum,
                     CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Sliders),
+                    Ratio = juiceStreams / (float)sum,
                 },
                 new BeatmapStatistic
                 {
                     Name = @"Banana Showers",
                     Content = bananaShowers.ToString(),
-                    Value = bananaShowers,
-                    Maximum = Math.Max(bananaShowers, 10),
                     CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Spinners),
+                    Ratio = Math.Min(bananaShowers / 10f, 1),
                 }
             };
         }

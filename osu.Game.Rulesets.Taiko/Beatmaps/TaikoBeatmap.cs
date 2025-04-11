@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
             int hits = HitObjects.Count(s => s is Hit);
             int drumRolls = HitObjects.Count(s => s is DrumRoll);
             int swells = HitObjects.Count(s => s is Swell);
-            int maximum = hits + drumRolls + swells;
+            int sum = Math.Max(1, hits + drumRolls + swells);
 
             return new[]
             {
@@ -25,24 +25,21 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
                     Name = @"Hits",
                     CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Circles),
                     Content = hits.ToString(),
-                    Value = hits,
-                    Maximum = maximum,
+                    Ratio = hits / (float)sum,
                 },
                 new BeatmapStatistic
                 {
                     Name = @"Drumrolls",
                     CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Sliders),
                     Content = drumRolls.ToString(),
-                    Value = drumRolls,
-                    Maximum = maximum,
+                    Ratio = drumRolls / (float)sum,
                 },
                 new BeatmapStatistic
                 {
                     Name = @"Swells",
                     CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Spinners),
                     Content = swells.ToString(),
-                    Value = swells,
-                    Maximum = Math.Max(swells, 10),
+                    Ratio = Math.Min(swells / 10f, 1),
                 }
             };
         }
