@@ -13,7 +13,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
-using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.Drawables
@@ -116,6 +115,10 @@ namespace osu.Game.Beatmaps.Drawables
 
             this.FadeIn(animation_duration, Easing.OutQuint);
 
+            // Handle the case where transition from hidden to non-hidden may cause
+            // a fade from a colour that doesn't make sense (due to not being able to see the previous colour).
+            double duration = Alpha > 0 ? animation_duration : 0;
+
             Color4 statusTextColour;
 
             if (colourProvider != null)
@@ -123,8 +126,8 @@ namespace osu.Game.Beatmaps.Drawables
             else
                 statusTextColour = status == BeatmapOnlineStatus.Graveyard ? colours.GreySeaFoamLight : Color4.Black;
 
-            statusText.FadeColour(statusTextColour, animation_duration, Easing.OutQuint);
-            background.FadeColour(OsuColour.ForBeatmapSetOnlineStatus(Status) ?? colourProvider?.Light1 ?? colours.GreySeaFoamLighter, animation_duration, Easing.OutQuint);
+            statusText.FadeColour(statusTextColour, duration, Easing.OutQuint);
+            background.FadeColour(OsuColour.ForBeatmapSetOnlineStatus(Status) ?? colourProvider?.Light1 ?? colours.GreySeaFoamLighter, duration, Easing.OutQuint);
 
             statusText.Text = Status.GetLocalisableDescription().ToUpper();
         }
