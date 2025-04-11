@@ -2,14 +2,20 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Moq;
 using NUnit.Framework;
+using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Localisation;
 using osu.Game.Online.Rooms;
+using osu.Game.Rulesets;
+using osu.Game.Rulesets.Catch;
+using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Rulesets.Taiko;
 using osu.Game.Rulesets.Taiko.Mods;
 using osu.Game.Utils;
 
@@ -274,6 +280,34 @@ namespace osu.Game.Tests.Mods
             },
         };
 
+        private static readonly object[] invalid_freestyle_mod_test_scenarios =
+        {
+            // system mod.
+            new object[]
+            {
+                new Mod[] { new OsuModHidden(), new OsuModTouchDevice() },
+                new[] { typeof(OsuModTouchDevice) }
+            },
+            // multi mod.
+            new object[]
+            {
+                new Mod[] { new MultiMod(new OsuModSuddenDeath(), new OsuModPerfect()) },
+                new[] { typeof(MultiMod) }
+            },
+            // invalid freestyle mod.
+            new object[]
+            {
+                new Mod[] { new OsuModHidden(), new OsuModNoScope(), new InvalidFreestyleMod() },
+                new[] { typeof(OsuModNoScope), typeof(InvalidFreestyleMod) }
+            },
+            // valid pair.
+            new object[]
+            {
+                new Mod[] { new OsuModHidden(), new OsuModHardRock() },
+                Array.Empty<Type>()
+            },
+        };
+
         [TestCaseSource(nameof(invalid_mod_test_scenarios))]
         public void TestInvalidModScenarios(Mod[] inputMods, Type[] expectedInvalid)
         {
@@ -291,6 +325,19 @@ namespace osu.Game.Tests.Mods
         public void TestInvalidMultiplayerModScenarios(Mod[] inputMods, Type[] expectedInvalid)
         {
             bool isValid = ModUtils.CheckValidRequiredModsForMultiplayer(inputMods, out var invalid);
+
+            Assert.That(isValid, Is.EqualTo(expectedInvalid.Length == 0));
+
+            if (isValid)
+                Assert.IsNull(invalid);
+            else
+                Assert.That(invalid?.Select(t => t.GetType()), Is.EquivalentTo(expectedInvalid));
+        }
+
+        [TestCaseSource(nameof(invalid_freestyle_mod_test_scenarios))]
+        public void TestInvalidFreestyleModScenarios(Mod[] inputMods, Type[] expectedInvalid)
+        {
+            bool isValid = ModUtils.CheckValidModsForFreestyle(inputMods, out var invalid);
 
             Assert.That(isValid, Is.EqualTo(expectedInvalid.Length == 0));
 
@@ -346,35 +393,75 @@ namespace osu.Game.Tests.Mods
         [Test]
         public void TestRoomModValidity()
         {
-            Assert.IsTrue(ModUtils.IsValidModForMatchType(new OsuModHardRock(), MatchType.Playlists));
-            Assert.IsTrue(ModUtils.IsValidModForMatchType(new OsuModDoubleTime(), MatchType.Playlists));
-            Assert.IsTrue(ModUtils.IsValidModForMatchType(new ModAdaptiveSpeed(), MatchType.Playlists));
-            Assert.IsFalse(ModUtils.IsValidModForMatchType(new OsuModAutoplay(), MatchType.Playlists));
-            Assert.IsFalse(ModUtils.IsValidModForMatchType(new OsuModTouchDevice(), MatchType.Playlists));
+            Assert.IsTrue(ModUtils.IsValidModForMatch(new OsuModHardRock(), MatchType.Playlists, true, false));
+            Assert.IsTrue(ModUtils.IsValidModForMatch(new OsuModDoubleTime(), MatchType.Playlists, true, false));
+            Assert.IsTrue(ModUtils.IsValidModForMatch(new ModAdaptiveSpeed(), MatchType.Playlists, true, false));
+            Assert.IsFalse(ModUtils.IsValidModForMatch(new OsuModAutoplay(), MatchType.Playlists, true, false));
+            Assert.IsFalse(ModUtils.IsValidModForMatch(new OsuModTouchDevice(), MatchType.Playlists, true, false));
 
-            Assert.IsTrue(ModUtils.IsValidModForMatchType(new OsuModHardRock(), MatchType.HeadToHead));
-            Assert.IsTrue(ModUtils.IsValidModForMatchType(new OsuModDoubleTime(), MatchType.HeadToHead));
+            Assert.IsTrue(ModUtils.IsValidModForMatch(new OsuModHardRock(), MatchType.HeadToHead, true, false));
+            Assert.IsTrue(ModUtils.IsValidModForMatch(new OsuModDoubleTime(), MatchType.HeadToHead, true, false));
             // For now, adaptive speed isn't allowed in multiplayer because it's a per-user rate adjustment.
-            Assert.IsFalse(ModUtils.IsValidModForMatchType(new ModAdaptiveSpeed(), MatchType.HeadToHead));
-            Assert.IsFalse(ModUtils.IsValidModForMatchType(new OsuModAutoplay(), MatchType.HeadToHead));
-            Assert.IsFalse(ModUtils.IsValidModForMatchType(new OsuModTouchDevice(), MatchType.HeadToHead));
+            Assert.IsFalse(ModUtils.IsValidModForMatch(new ModAdaptiveSpeed(), MatchType.HeadToHead, true, false));
+            Assert.IsFalse(ModUtils.IsValidModForMatch(new OsuModAutoplay(), MatchType.HeadToHead, true, false));
+            Assert.IsFalse(ModUtils.IsValidModForMatch(new OsuModTouchDevice(), MatchType.HeadToHead, true, false));
         }
 
         [Test]
         public void TestRoomFreeModValidity()
         {
-            Assert.IsTrue(ModUtils.IsValidFreeModForMatchType(new OsuModHardRock(), MatchType.Playlists));
-            Assert.IsTrue(ModUtils.IsValidFreeModForMatchType(new OsuModDoubleTime(), MatchType.Playlists));
-            Assert.IsTrue(ModUtils.IsValidFreeModForMatchType(new ModAdaptiveSpeed(), MatchType.Playlists));
-            Assert.IsFalse(ModUtils.IsValidFreeModForMatchType(new OsuModAutoplay(), MatchType.Playlists));
-            Assert.IsFalse(ModUtils.IsValidFreeModForMatchType(new OsuModTouchDevice(), MatchType.Playlists));
+            Assert.IsTrue(ModUtils.IsValidModForMatch(new OsuModHardRock(), MatchType.Playlists, false, false));
+            Assert.IsTrue(ModUtils.IsValidModForMatch(new OsuModDoubleTime(), MatchType.Playlists, false, false));
+            Assert.IsTrue(ModUtils.IsValidModForMatch(new ModAdaptiveSpeed(), MatchType.Playlists, false, false));
+            Assert.IsFalse(ModUtils.IsValidModForMatch(new OsuModAutoplay(), MatchType.Playlists, false, false));
+            Assert.IsFalse(ModUtils.IsValidModForMatch(new OsuModTouchDevice(), MatchType.Playlists, false, false));
 
-            Assert.IsTrue(ModUtils.IsValidFreeModForMatchType(new OsuModHardRock(), MatchType.HeadToHead));
+            Assert.IsTrue(ModUtils.IsValidModForMatch(new OsuModHardRock(), MatchType.HeadToHead, false, false));
             // For now, all rate adjustment mods aren't allowed as free mods in multiplayer.
-            Assert.IsFalse(ModUtils.IsValidFreeModForMatchType(new OsuModDoubleTime(), MatchType.HeadToHead));
-            Assert.IsFalse(ModUtils.IsValidFreeModForMatchType(new ModAdaptiveSpeed(), MatchType.HeadToHead));
-            Assert.IsFalse(ModUtils.IsValidFreeModForMatchType(new OsuModAutoplay(), MatchType.HeadToHead));
-            Assert.IsFalse(ModUtils.IsValidFreeModForMatchType(new OsuModTouchDevice(), MatchType.HeadToHead));
+            Assert.IsFalse(ModUtils.IsValidModForMatch(new OsuModDoubleTime(), MatchType.HeadToHead, false, false));
+            Assert.IsFalse(ModUtils.IsValidModForMatch(new ModAdaptiveSpeed(), MatchType.HeadToHead, false, false));
+            Assert.IsFalse(ModUtils.IsValidModForMatch(new OsuModAutoplay(), MatchType.HeadToHead, false, false));
+            Assert.IsFalse(ModUtils.IsValidModForMatch(new OsuModTouchDevice(), MatchType.HeadToHead, false, false));
+        }
+
+        [Test]
+        public void TestFreestyleModValidity()
+        {
+            foreach (MatchType type in new[] { MatchType.Playlists, MatchType.HeadToHead })
+            {
+                foreach (bool required in new[] { false, true })
+                {
+                    Assert.IsTrue(ModUtils.IsValidModForMatch(new OsuModHardRock(), type, required, true));
+                    Assert.IsTrue(ModUtils.IsValidModForMatch(new OsuModHardRock(), type, required, false));
+                    Assert.IsFalse(ModUtils.IsValidModForMatch(new OsuModBarrelRoll(), type, required, true));
+                    Assert.IsTrue(ModUtils.IsValidModForMatch(new OsuModBarrelRoll(), type, required, false));
+                }
+            }
+        }
+
+        [Test]
+        public void TestFreestyleRulesetCompatibility()
+        {
+            HashSet<string> commonAcronyms = new HashSet<string>();
+
+            commonAcronyms.UnionWith(new OsuRuleset().CreateAllMods().Select(m => m.Acronym));
+            commonAcronyms.IntersectWith(new TaikoRuleset().CreateAllMods().Select(m => m.Acronym));
+            commonAcronyms.IntersectWith(new CatchRuleset().CreateAllMods().Select(m => m.Acronym));
+            commonAcronyms.IntersectWith(new ManiaRuleset().CreateAllMods().Select(m => m.Acronym));
+
+            Assert.Multiple(() =>
+            {
+                foreach (var ruleset in new Ruleset[] { new OsuRuleset(), new TaikoRuleset(), new CatchRuleset(), new ManiaRuleset() })
+                {
+                    foreach (var mod in ruleset.CreateAllMods())
+                    {
+                        if (mod.ValidForFreestyle && mod.UserPlayable && !commonAcronyms.Contains(mod.Acronym))
+                            Assert.Fail($"{mod.GetType().ReadableName()} declares {nameof(Mod.ValidForFreestyle)} but does not exist in all four basic rulesets!");
+                        if (!mod.ValidForFreestyle && mod.UserPlayable && commonAcronyms.Contains(mod.Acronym))
+                            Assert.Fail($"{mod.GetType().ReadableName()} does not declare {nameof(Mod.ValidForFreestyle)} but exists in all four basic rulesets!");
+                    }
+                }
+            });
         }
 
         public abstract class CustomMod1 : Mod, IModCompatibilitySpecification
@@ -385,7 +472,7 @@ namespace osu.Game.Tests.Mods
         {
         }
 
-        public class InvalidMultiplayerMod : Mod
+        private class InvalidMultiplayerMod : Mod
         {
             public override string Name => string.Empty;
             public override LocalisableString Description => string.Empty;
@@ -406,14 +493,14 @@ namespace osu.Game.Tests.Mods
             public override bool ValidForMultiplayerAsFreeMod => false;
         }
 
-        public class EditableMod : Mod
+        public class InvalidFreestyleMod : Mod
         {
             public override string Name => string.Empty;
             public override LocalisableString Description => string.Empty;
+            public override double ScoreMultiplier => 1;
             public override string Acronym => string.Empty;
-            public override double ScoreMultiplier => Multiplier;
-
-            public double Multiplier = 1;
+            public override bool HasImplementation => true;
+            public override bool ValidForFreestyle => false;
         }
 
         public interface IModCompatibilitySpecification

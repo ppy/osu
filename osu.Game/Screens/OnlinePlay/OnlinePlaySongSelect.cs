@@ -47,7 +47,6 @@ namespace osu.Game.Screens.OnlinePlay
         private readonly Room room;
         private readonly PlaylistItem? initialItem;
         private readonly FreeModSelectOverlay freeModSelect;
-        private FooterButton freeModsFooterButton = null!;
 
         private IDisposable? freeModSelectOverlayRegistration;
 
@@ -115,45 +114,47 @@ namespace osu.Game.Screens.OnlinePlay
                 Freestyle.Value = initialItem.Freestyle;
             }
 
-            Mods.BindValueChanged(onModsChanged);
+            Mods.BindValueChanged(onGlobalModsChanged);
             Ruleset.BindValueChanged(onRulesetChanged);
             Freestyle.BindValueChanged(onFreestyleChanged, true);
+
+            if (initialItem == null)
+            {
+                // Enable all free mods if we're creating a new playlist item.
+                // Todo: This needs to be scheduled because mods aren't available until the nested LoadComplete(). Can we do this any better?
+                SchedulerAfterChildren.Add(() => FreeMods.Value = freeModSelect.AllAvailableMods.Where(state => state.ValidForSelection.Value).Select(state => state.Mod).ToArray());
+            }
 
             freeModSelectOverlayRegistration = OverlayManager?.RegisterBlockingOverlay(freeModSelect);
         }
 
         private void onFreestyleChanged(ValueChangedEvent<bool> enabled)
         {
-            if (enabled.NewValue)
-            {
-                freeModsFooterButton.Enabled.Value = false;
-                freeModsFooterButton.Enabled.Value = false;
-                ModsFooterButton.Enabled.Value = false;
+            // If all free mods were previously selected, we'll need to reselect what may now be a larger selection.
+            bool allFreeModsSelected = FreeMods.Value.Count > 0 && freeModSelect.AllAvailableMods.Count(state => state.ValidForSelection.Value) == FreeMods.Value.Count;
 
-                ModSelect.Hide();
-                freeModSelect.Hide();
+            // Remove invalid mods and display the newly available mod panels.
+            Mods.Value = Mods.Value.Where(isValidGlobalMod).ToArray();
+            ModSelect.IsValidMod = isValidGlobalMod;
+            FreeMods.Value = FreeMods.Value.Where(isValidFreeMod).ToArray();
+            freeModSelect.IsValidMod = isValidFreeMod;
 
-                Mods.Value = [];
-                FreeMods.Value = [];
-            }
-            else
-            {
-                freeModsFooterButton.Enabled.Value = true;
-                ModsFooterButton.Enabled.Value = true;
-            }
+            // Reselect all free mods if they were all previously selected (prefer keeping free mods enabled).
+            if (allFreeModsSelected)
+                FreeMods.Value = freeModSelect.AllAvailableMods.Where(state => state.ValidForSelection.Value).Select(state => state.Mod).ToArray();
         }
 
-        private void onModsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
+        private void onGlobalModsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
         {
-            FreeMods.Value = FreeMods.Value.Where(isValidFreeMod).ToList();
-
-            // Reset the validity delegate to update the overlay's display.
+            // Remove incompatible free mods and display the newly available mod panels.
+            FreeMods.Value = FreeMods.Value.Where(isValidFreeMod).ToArray();
             freeModSelect.IsValidMod = isValidFreeMod;
         }
 
         private void onRulesetChanged(ValueChangedEvent<RulesetInfo> ruleset)
         {
-            FreeMods.Value = Array.Empty<Mod>();
+            // Todo: We can probably attempt to preserve across rulesets like the global mods do.
+            FreeMods.Value = [];
         }
 
         protected sealed override bool OnStart()
@@ -195,7 +196,7 @@ namespace osu.Game.Screens.OnlinePlay
 
         protected override ModSelectOverlay CreateModSelectOverlay() => new UserModSelectOverlay(OverlayColourScheme.Plum)
         {
-            IsValidMod = isValidMod
+            IsValidMod = isValidGlobalMod
         };
 
         protected override IEnumerable<(FooterButton button, OverlayContainer? overlay)> CreateSongSelectFooterButtons()
@@ -206,10 +207,9 @@ namespace osu.Game.Screens.OnlinePlay
 
             baseButtons.InsertRange(baseButtons.FindIndex(b => b.button is FooterButtonMods) + 1, new (FooterButton, OverlayContainer?)[]
             {
-                (freeModsFooterButton = new FooterButtonFreeMods(freeModSelect)
+                (new FooterButtonFreeMods(freeModSelect)
                 {
-                    FreeMods = { BindTarget = FreeMods },
-                    Freestyle = { BindTarget = Freestyle }
+                    FreeMods = { BindTarget = FreeMods }
                 }, null),
                 (new FooterButtonFreestyle
                 {
@@ -225,14 +225,14 @@ namespace osu.Game.Screens.OnlinePlay
         /// </summary>
         /// <param name="mod">The <see cref="Mod"/> to check.</param>
         /// <returns>Whether <paramref name="mod"/> is a valid mod for online play.</returns>
-        private bool isValidMod(Mod mod) => ModUtils.IsValidModForMatchType(mod, room.Type);
+        private bool isValidGlobalMod(Mod mod) => ModUtils.IsValidModForMatch(mod, room.Type, true, Freestyle.Value);
 
         /// <summary>
         /// Checks whether a given <see cref="Mod"/> is valid for per-player free-mod selection.
         /// </summary>
         /// <param name="mod">The <see cref="Mod"/> to check.</param>
         /// <returns>Whether <paramref name="mod"/> is a selectable free-mod.</returns>
-        private bool isValidFreeMod(Mod mod) => ModUtils.IsValidFreeModForMatchType(mod, room.Type)
+        private bool isValidFreeMod(Mod mod) => ModUtils.IsValidModForMatch(mod, room.Type, false, Freestyle.Value)
                                                 // Mod must not be contained in the required mods.
                                                 && Mods.Value.All(m => m.Acronym != mod.Acronym)
                                                 // Mod must be compatible with all the required mods.
