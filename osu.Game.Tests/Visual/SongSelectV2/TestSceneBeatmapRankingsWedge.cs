@@ -26,7 +26,6 @@ using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Screens.SelectV2;
-using osu.Game.Screens.SelectV2.Leaderboards;
 using osu.Game.Tests.Resources;
 using osu.Game.Users;
 using osuTK.Input;
@@ -38,7 +37,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
 
-        private TestBeatmapRankingsWedge rankings = null!;
+        private TestBeatmapLeaderboardWedge leaderboard = null!;
         private ScoreManager scoreManager = null!;
         private RulesetStore rulesetStore = null!;
         private BeatmapManager beatmapManager = null!;
@@ -82,7 +81,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 Children = new Drawable[]
                 {
                     dialogOverlay,
-                    rankings = new TestBeatmapRankingsWedge
+                    leaderboard = new TestBeatmapLeaderboardWedge
                     {
                         RelativeSizeAxes = Axes.Both,
                         State = { Value = Visibility.Visible },
@@ -96,8 +95,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         {
             setScope(BeatmapLeaderboardScope.Global);
 
-            AddStep(@"New Scores", () => rankings.SetScores(generateSampleScores(new BeatmapInfo())));
-            AddStep(@"New Scores with teams", () => rankings.SetScores(generateSampleScores(new BeatmapInfo()).Select(s =>
+            AddStep(@"New Scores", () => leaderboard.SetScores(generateSampleScores(new BeatmapInfo())));
+            AddStep(@"New Scores with teams", () => leaderboard.SetScores(generateSampleScores(new BeatmapInfo()).Select(s =>
             {
                 s.User.Team = new APITeam();
                 return s;
@@ -119,21 +118,21 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [Test]
         public void TestPlaceholderStates()
         {
-            AddStep("ensure no scores displayed", () => rankings.SetScores(Array.Empty<ScoreInfo>()));
+            AddStep("ensure no scores displayed", () => leaderboard.SetScores(Array.Empty<ScoreInfo>()));
 
-            AddStep(@"Network failure", () => rankings.SetState(LeaderboardState.NetworkFailure));
-            AddStep(@"No team", () => rankings.SetState(LeaderboardState.NoTeam));
-            AddStep(@"No supporter", () => rankings.SetState(LeaderboardState.NotSupporter));
-            AddStep(@"Not logged in", () => rankings.SetState(LeaderboardState.NotLoggedIn));
-            AddStep(@"Ruleset unavailable", () => rankings.SetState(LeaderboardState.RulesetUnavailable));
-            AddStep(@"Beatmap unavailable", () => rankings.SetState(LeaderboardState.BeatmapUnavailable));
-            AddStep(@"None selected", () => rankings.SetState(LeaderboardState.NoneSelected));
+            AddStep(@"Network failure", () => leaderboard.SetState(LeaderboardState.NetworkFailure));
+            AddStep(@"No team", () => leaderboard.SetState(LeaderboardState.NoTeam));
+            AddStep(@"No supporter", () => leaderboard.SetState(LeaderboardState.NotSupporter));
+            AddStep(@"Not logged in", () => leaderboard.SetState(LeaderboardState.NotLoggedIn));
+            AddStep(@"Ruleset unavailable", () => leaderboard.SetState(LeaderboardState.RulesetUnavailable));
+            AddStep(@"Beatmap unavailable", () => leaderboard.SetState(LeaderboardState.BeatmapUnavailable));
+            AddStep(@"None selected", () => leaderboard.SetState(LeaderboardState.NoneSelected));
         }
 
         [Test]
         public void TestUseTheseModsDoesNotCopySystemMods()
         {
-            AddStep(@"set scores", () => rankings.SetScores(generateSampleScores(new BeatmapInfo()), new ScoreInfo
+            AddStep(@"set scores", () => leaderboard.SetScores(generateSampleScores(new BeatmapInfo()), new ScoreInfo
             {
                 Position = 999,
                 Rank = ScoreRank.XH,
@@ -149,10 +148,10 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                     CountryCode = CountryCode.ES,
                 }
             }));
-            AddUntilStep("wait for scores", () => this.ChildrenOfType<LeaderboardScoreV2>().Count(), () => Is.GreaterThan(0));
+            AddUntilStep("wait for scores", () => this.ChildrenOfType<BeatmapLeaderboardScore>().Count(), () => Is.GreaterThan(0));
             AddStep("right click panel", () =>
             {
-                InputManager.MoveMouseTo(this.ChildrenOfType<LeaderboardScoreV2>().Last());
+                InputManager.MoveMouseTo(this.ChildrenOfType<BeatmapLeaderboardScore>().Last());
                 InputManager.Click(MouseButton.Right);
             });
             AddStep("click use these mods", () =>
@@ -160,8 +159,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 InputManager.MoveMouseTo(this.ChildrenOfType<DrawableOsuMenuItem>().Last());
                 InputManager.Click(MouseButton.Left);
             });
-            AddAssert("received HD", () => this.ChildrenOfType<LeaderboardScoreV2>().Last().SelectedMods.Value.Any(m => m is OsuModHidden));
-            AddAssert("did not receive SV2", () => !this.ChildrenOfType<LeaderboardScoreV2>().Last().SelectedMods.Value.Any(m => m is ModScoreV2));
+            AddAssert("received HD", () => this.ChildrenOfType<BeatmapLeaderboardScore>().Last().SelectedMods.Value.Any(m => m is OsuModHidden));
+            AddAssert("did not receive SV2", () => !this.ChildrenOfType<BeatmapLeaderboardScore>().Last().SelectedMods.Value.Any(m => m is ModScoreV2));
         }
 
         [Test]
@@ -260,7 +259,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
         private void showPersonalBestWithNullPosition()
         {
-            rankings.SetScores(generateSampleScores(new BeatmapInfo()), new ScoreInfo
+            leaderboard.SetScores(generateSampleScores(new BeatmapInfo()), new ScoreInfo
             {
                 Rank = ScoreRank.XH,
                 Accuracy = 1,
@@ -279,7 +278,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
         private void showPersonalBest()
         {
-            rankings.SetScores(generateSampleScores(new BeatmapInfo()), new ScoreInfo
+            leaderboard.SetScores(generateSampleScores(new BeatmapInfo()), new ScoreInfo
             {
                 Position = 999,
                 Rank = ScoreRank.XH,
@@ -299,7 +298,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
         private void setScope(BeatmapLeaderboardScope scope)
         {
-            AddStep(@"Set scope", () => ((Bindable<BeatmapLeaderboardScope>)rankings.Scope).Value = scope);
+            AddStep(@"Set scope", () => ((Bindable<BeatmapLeaderboardScope>)leaderboard.Scope).Value = scope);
         }
 
         private void importMoreScores(Func<BeatmapInfo> beatmapInfo)
@@ -317,7 +316,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         }
 
         private void checkDisplayedCount(int expected) =>
-            AddUntilStep($"{expected} scores displayed", () => rankings.ChildrenOfType<LeaderboardScoreV2>().Count(), () => Is.EqualTo(expected));
+            AddUntilStep($"{expected} scores displayed", () => leaderboard.ChildrenOfType<BeatmapLeaderboardScore>().Count(), () => Is.EqualTo(expected));
 
         private void checkStoredCount(int expected) =>
             AddUntilStep($"Total scores stored is {expected}", () => Realm.Run(r => r.All<ScoreInfo>().Count(s => !s.DeletePending)), () => Is.EqualTo(expected));
@@ -546,7 +545,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             };
         }
 
-        private partial class TestBeatmapRankingsWedge : BeatmapRankingsWedge
+        private partial class TestBeatmapLeaderboardWedge : BeatmapLeaderboardWedge
         {
             public new void SetState(LeaderboardState state) => base.SetState(state);
             public new void SetScores(IEnumerable<ScoreInfo> scores, ScoreInfo? userScore = null) => base.SetScores(scores, userScore);

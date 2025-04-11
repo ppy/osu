@@ -17,7 +17,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
-                Child = new BeatmapFilterControl
+                Child = new FilterControl
                 {
                     State = { Value = Visibility.Visible },
                     RelativeSizeAxes = Axes.X,

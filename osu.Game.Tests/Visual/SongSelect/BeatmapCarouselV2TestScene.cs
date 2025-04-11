@@ -16,6 +16,7 @@ using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Carousel;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
 using osu.Game.Screens.Select;
@@ -191,7 +192,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                         .Where(p => ((ICarouselPanel)p).Item?.IsVisible == true)
                         .OrderBy(p => p.Y)
                         .ElementAt(index)
-                        .ChildrenOfType<PanelBase>().Single()
+                        .ChildrenOfType<Panel>().Single()
                         .TriggerClick();
             });
         }

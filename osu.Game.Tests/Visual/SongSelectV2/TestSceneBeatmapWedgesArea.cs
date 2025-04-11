@@ -17,7 +17,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 {
     public partial class TestSceneBeatmapWedgesArea : SongSelectComponentsTestScene
     {
-        private BeatmapWedgesArea wedgesArea = null!;
+        private BeatmapDetailsArea detailsArea = null!;
 
         [Resolved]
         private RulesetStore rulesets { get; set; } = null!;
@@ -37,7 +37,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                         Padding = new MarginPadding { Top = 20 },
                         Children = new Drawable[]
                         {
-                            wedgesArea = new BeatmapWedgesArea
+                            detailsArea = new BeatmapDetailsArea
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 State = { Value = Visibility.Visible },
@@ -67,12 +67,12 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [Test]
         public void TestWedgeVisibility()
         {
-            AddStep("hide", () => wedgesArea.Hide());
+            AddStep("hide", () => detailsArea.Hide());
             AddWaitStep("wait for hide", 3);
-            AddAssert("check visibility", () => wedgesArea.Alpha == 0);
-            AddStep("show", () => wedgesArea.Show());
+            AddAssert("check visibility", () => detailsArea.Alpha == 0);
+            AddStep("show", () => detailsArea.Show());
             AddWaitStep("wait for show", 1);
-            AddAssert("check visibility", () => wedgesArea.Alpha > 0);
+            AddAssert("check visibility", () => detailsArea.Alpha > 0);
         }
 
         [Test]

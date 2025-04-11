@@ -3,6 +3,7 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Graphics.Carousel;
 using osu.Game.Screens.SelectV2;
 using osu.Game.Tests.Visual.UserInterface;
 using osuTK;
