@@ -96,6 +96,8 @@ namespace osu.Game.Tests.Visual.SongSelect
                             {
                                 Carousel = new BeatmapCarousel
                                 {
+                                    BleedTop = 50,
+                                    BleedBottom = 50,
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
                                     Width = 800,
