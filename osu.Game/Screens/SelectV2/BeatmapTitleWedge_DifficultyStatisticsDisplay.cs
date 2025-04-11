@@ -199,7 +199,7 @@ namespace osu.Game.Screens.SelectV2
                     new OsuSpriteText
                     {
                         Font = OsuFont.Style.Caption2.With(weight: FontWeight.SemiBold),
-                        Text = s.Value.ToLocalisableString("0.##"),
+                        Text = s.Content ?? s.Value.ToLocalisableString("0.##"),
                         Colour = colourProvider.Content1,
                     },
                 }).ToArray();

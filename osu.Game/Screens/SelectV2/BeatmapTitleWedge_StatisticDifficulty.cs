@@ -151,7 +151,7 @@ namespace osu.Game.Screens.SelectV2
                 adjustedBar.ResizeWidthTo(value.Maximum == 0 ? 0 : Math.Clamp(value.AdjustedValue / value.Maximum, 0, 1), 300, Easing.OutQuint);
 
                 labelText.Text = value.Label;
-                valueText.Text = value.AdjustedValue.ToLocalisableString("0.##");
+                valueText.Text = value.Content ?? value.AdjustedValue.ToLocalisableString("0.##");
 
                 if (value.Value == value.AdjustedValue)
                 {
@@ -190,7 +190,7 @@ namespace osu.Game.Screens.SelectV2
                 }
             }
 
-            public record Data(LocalisableString Label, float Value, float AdjustedValue, float Maximum);
+            public record Data(LocalisableString Label, float Value, float AdjustedValue, float Maximum, string? Content = null);
         }
     }
 }
