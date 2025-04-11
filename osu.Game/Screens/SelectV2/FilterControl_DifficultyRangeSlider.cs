@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -13,6 +14,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
+using osu.Game.Utils;
 using osuTK;
 using osuTK.Graphics;
 
@@ -25,6 +27,10 @@ namespace osu.Game.Screens.SelectV2
             private Container borderContainer = null!;
 
             private readonly LayoutValue drawSizeLayout = new LayoutValue(Invalidation.DrawSize);
+
+            private static readonly (float, Color4)[] spectrum = OsuColour.STAR_DIFFICULTY_SPECTRUM
+                                                                          .Skip(1)
+                                                                          .Prepend((0.0f, OsuColour.STAR_DIFFICULTY_SPECTRUM.ElementAt(1).Item2)).ToArray();
 
             public DifficultyRangeSlider()
                 : base("Star Rating")
@@ -50,16 +56,15 @@ namespace osu.Game.Screens.SelectV2
                         Shear = new Vector2(OsuGame.SHEAR, 0),
                         CornerRadius = 5f,
                         Masking = true,
-                        ChildrenEnumerable = OsuColour.STAR_DIFFICULTY_SPECTRUM
-                                                      .Zip(OsuColour.STAR_DIFFICULTY_SPECTRUM.Skip(1))
-                                                      .Select(p => new Box
-                                                      {
-                                                          RelativePositionAxes = Axes.X,
-                                                          X = p.First.Item1 / 10f,
-                                                          RelativeSizeAxes = Axes.Both,
-                                                          Width = (p.Second.Item1 - p.First.Item1) / 10f,
-                                                          Colour = ColourInfo.GradientHorizontal(p.First.Item2, p.Second.Item2),
-                                                      }),
+                        ChildrenEnumerable = spectrum.Zip(spectrum.Skip(1))
+                                                     .Select(p => new Box
+                                                     {
+                                                         RelativePositionAxes = Axes.X,
+                                                         X = p.First.Item1 / 10f,
+                                                         RelativeSizeAxes = Axes.Both,
+                                                         Width = (p.Second.Item1 - p.First.Item1) / 10f,
+                                                         Colour = ColourInfo.GradientHorizontal(p.First.Item2, p.Second.Item2),
+                                                     }),
                     },
                     borderContainer = new Container
                     {
@@ -148,7 +153,7 @@ namespace osu.Game.Screens.SelectV2
 
                 protected override void UpdateDisplay(double value)
                 {
-                    Colour4 nubColour = colours.ForStarDifficulty(value, false);
+                    Colour4 nubColour = ColourUtils.SampleFromLinearGradient(spectrum, (float)Math.Round(value, 2, MidpointRounding.AwayFromZero));
                     nubColour = nubColour.Lighten(0.4f);
 
                     if (value >= 8.0)
