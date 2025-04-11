@@ -60,7 +60,7 @@ namespace osu.Game.Screens.SelectV2
                         new OsuSpriteText
                         {
                             Text = BeatmapsetsStrings.ShowInfoSuccessRate,
-                            Font = OsuFont.Caption.With(weight: FontWeight.SemiBold),
+                            Font = OsuFont.Style.Caption1.With(weight: FontWeight.SemiBold),
                         },
                         new Container
                         {
@@ -71,7 +71,7 @@ namespace osu.Game.Screens.SelectV2
                             {
                                 Origin = Anchor.TopCentre,
                                 RelativePositionAxes = Axes.X,
-                                Font = OsuFont.Caption,
+                                Font = OsuFont.Style.Caption1,
                             }
                         },
                         new Container

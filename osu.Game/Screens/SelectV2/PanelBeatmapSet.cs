@@ -80,7 +80,7 @@ namespace osu.Game.Screens.SelectV2
                         },
                         artistText = new OsuSpriteText
                         {
-                            Font = OsuFont.Body.With(weight: FontWeight.SemiBold),
+                            Font = OsuFont.Style.Body.With(weight: FontWeight.SemiBold),
                         },
                         new FillFlowContainer
                         {
@@ -99,7 +99,7 @@ namespace osu.Game.Screens.SelectV2
                                 {
                                     Origin = Anchor.CentreLeft,
                                     Anchor = Anchor.CentreLeft,
-                                    TextSize = OsuFont.Tiny.Size,
+                                    TextSize = OsuFont.Style.Caption2.Size,
                                     Margin = new MarginPadding { Right = 5f },
                                 },
                                 difficultiesDisplay = new DifficultySpectrumDisplay

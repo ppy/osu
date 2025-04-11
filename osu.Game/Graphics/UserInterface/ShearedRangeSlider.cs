@@ -118,7 +118,7 @@ namespace osu.Game.Graphics.UserInterface
                                     Text = label,
                                     Shear = new Vector2(-OsuGame.SHEAR, 0),
                                     Margin = new MarginPadding { Horizontal = 12, Vertical = 5 },
-                                    Font = OsuFont.Body.With(weight: FontWeight.SemiBold),
+                                    Font = OsuFont.Style.Body.With(weight: FontWeight.SemiBold),
                                 },
                             },
                         },
@@ -206,7 +206,7 @@ namespace osu.Game.Graphics.UserInterface
                     X = -3,
                     UseFullGlyphHeight = false,
                     Colour = OsuColour.ForegroundTextColourFor(colourProvider.Light1),
-                    Font = OsuFont.Body.With(weight: FontWeight.SemiBold),
+                    Font = OsuFont.Style.Body.With(weight: FontWeight.SemiBold),
                 });
 
                 AccentColour = colourProvider.Highlight1.Darken(0.1f);

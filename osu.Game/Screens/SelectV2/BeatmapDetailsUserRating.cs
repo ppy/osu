@@ -66,7 +66,7 @@ namespace osu.Game.Screens.SelectV2
                         new OsuSpriteText
                         {
                             Text = BeatmapsetsStrings.ShowStatsUserRating,
-                            Font = OsuFont.Caption.With(weight: FontWeight.SemiBold),
+                            Font = OsuFont.Style.Caption1.With(weight: FontWeight.SemiBold),
                         },
                         new Container
                         {
@@ -79,13 +79,13 @@ namespace osu.Game.Screens.SelectV2
                                 {
                                     Anchor = Anchor.TopLeft,
                                     Origin = Anchor.TopLeft,
-                                    Font = OsuFont.Caption,
+                                    Font = OsuFont.Style.Caption1,
                                 },
                                 positiveText = new OsuSpriteText
                                 {
                                     Anchor = Anchor.TopRight,
                                     Origin = Anchor.TopRight,
-                                    Font = OsuFont.Caption,
+                                    Font = OsuFont.Style.Caption1,
                                 },
                             },
                         },

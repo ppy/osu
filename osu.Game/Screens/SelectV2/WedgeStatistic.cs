@@ -96,7 +96,7 @@ namespace osu.Game.Screens.SelectV2
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                             Icon = icon,
-                            Size = new Vector2(OsuFont.Subheading.Size),
+                            Size = new Vector2(OsuFont.Style.Heading2.Size),
                             Colour = colourProvider.Content2,
                         },
                         new Container
@@ -131,7 +131,7 @@ namespace osu.Game.Screens.SelectV2
                                             {
                                                 Anchor = Anchor.Centre,
                                                 Origin = Anchor.Centre,
-                                                Font = OsuFont.Subheading,
+                                                Font = OsuFont.Style.Heading2,
                                                 Colour = colourProvider.Content2,
                                                 Margin = new MarginPadding { Bottom = 2f },
                                                 AlwaysPresent = true,

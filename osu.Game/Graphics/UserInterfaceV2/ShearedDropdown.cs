@@ -159,7 +159,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                                                 // Chosen specifically so the height of these dropdowns matches ShearedToggleButton (30).
                                                 Vertical = 7f
                                             },
-                                            Font = OsuFont.Body.With(weight: FontWeight.SemiBold),
+                                            Font = OsuFont.Style.Body.With(weight: FontWeight.SemiBold),
                                             Shear = -shear,
                                         },
                                     },
@@ -179,7 +179,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                                             Anchor = Anchor.CentreLeft,
                                             Origin = Anchor.CentreLeft,
                                             Padding = new MarginPadding { Right = 15f },
-                                            Font = OsuFont.Body,
+                                            Font = OsuFont.Style.Body,
                                             RelativeSizeAxes = Axes.X,
                                         },
                                         chevron = new SpriteIcon

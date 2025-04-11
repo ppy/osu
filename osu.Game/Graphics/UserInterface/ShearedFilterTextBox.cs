@@ -36,7 +36,7 @@ namespace osu.Game.Graphics.UserInterface
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.TopLeft,
-                    Font = OsuFont.Default.With(size: filter_text_size, weight: FontWeight.SemiBold),
+                    Font = OsuFont.Torus.With(size: filter_text_size, weight: FontWeight.SemiBold),
                     Margin = new MarginPadding { Top = 2, Left = -1 },
                     Colour = colours.Yellow
                 });

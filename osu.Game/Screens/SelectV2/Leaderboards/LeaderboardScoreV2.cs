@@ -378,7 +378,7 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
                                         RelativeSizeAxes = Axes.X,
                                         Shear = new Vector2(sheared ? -OsuGame.SHEAR : 0, 0),
                                         Text = user.Username,
-                                        Font = OsuFont.Subheading,
+                                        Font = OsuFont.Style.Heading2,
                                     }
                                 }
                             },
@@ -511,7 +511,7 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
                                             Shear = new Vector2(sheared ? -OsuGame.SHEAR : 0, 0),
                                             Current = scoreManager.GetBindableTotalScoreString(score),
                                             Spacing = new Vector2(-1.5f),
-                                            Font = OsuFont.Subtitle.With(weight: FontWeight.Light, fixedWidth: true),
+                                            Font = OsuFont.Style.Subtitle.With(weight: FontWeight.Light, fixedWidth: true),
                                         },
                                         new InputBlockingContainer
                                         {
@@ -712,7 +712,7 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
                             // since the accuracy is sometimes longer than its name.
                             BypassAutoSizeAxes = Axes.X,
                             Text = statisticInfo.Value,
-                            Font = OsuFont.Body,
+                            Font = OsuFont.Style.Body,
                         }
                     }
                 };
@@ -738,7 +738,7 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
                     Shear = new Vector2(sheared ? -OsuGame.SHEAR : 0, 0),
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Font = OsuFont.Subheading,
+                    Font = OsuFont.Style.Heading2,
                     Text = rank == null ? "-" : rank.Value.FormatRank().Insert(0, "#"),
                     Shadow = !darkText,
                 };

@@ -135,14 +135,14 @@ namespace osu.Game.Screens.SelectV2
                                             {
                                                 Anchor = Anchor.BottomLeft,
                                                 Origin = Anchor.BottomLeft,
-                                                Font = OsuFont.Body.With(weight: FontWeight.SemiBold),
+                                                Font = OsuFont.Style.Body.With(weight: FontWeight.SemiBold),
                                             },
                                             mappedByText = new OsuSpriteText
                                             {
                                                 Anchor = Anchor.BottomLeft,
                                                 Origin = Anchor.BottomLeft,
                                                 Text = " mapped by ",
-                                                Font = OsuFont.Body,
+                                                Font = OsuFont.Style.Body,
                                             },
                                             mapperLink = new MapperLinkContainer
                                             {
@@ -152,7 +152,7 @@ namespace osu.Game.Screens.SelectV2
                                                 Child = mapperText = new TruncatingSpriteText
                                                 {
                                                     Shadow = true,
-                                                    Font = OsuFont.Body.With(weight: FontWeight.SemiBold),
+                                                    Font = OsuFont.Style.Body.With(weight: FontWeight.SemiBold),
                                                 },
                                             },
                                         },

@@ -172,10 +172,10 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
                             {
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
-                                Font = OsuFont.Caption.With(weight: FontWeight.SemiBold),
+                                Font = OsuFont.Style.Caption1.With(weight: FontWeight.SemiBold),
                                 UseFullGlyphHeight = false,
                             },
-                            relativeDate = new DrawableDate(default, OsuFont.Caption.Size)
+                            relativeDate = new DrawableDate(default, OsuFont.Style.Caption1.Size)
                             {
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
@@ -226,7 +226,7 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
                     {
                         Text = label,
                         Colour = labelColour,
-                        Font = OsuFont.Tiny.With(weight: FontWeight.SemiBold),
+                        Font = OsuFont.Style.Caption2.With(weight: FontWeight.SemiBold),
                     },
                     new OsuSpriteText
                     {
@@ -234,7 +234,7 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
                         Origin = Anchor.TopRight,
                         Text = value,
                         Colour = Color4.White,
-                        Font = OsuFont.Tiny,
+                        Font = OsuFont.Style.Caption2,
                     },
                 };
             }
@@ -365,7 +365,7 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
                         Anchor = Anchor.BottomCentre,
                         Origin = Anchor.BottomCentre,
                         Margin = new MarginPadding { Bottom = 25f, Top = 10f + spacing },
-                        Font = OsuFont.Subtitle.With(weight: FontWeight.Light, fixedWidth: true),
+                        Font = OsuFont.Style.Subtitle.With(weight: FontWeight.Light, fixedWidth: true),
                         Spacing = new Vector2(-1.5f),
                         UseFullGlyphHeight = false,
                     },
