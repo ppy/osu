@@ -180,8 +180,6 @@ namespace osu.Game.Screens.SelectV2
 
             Debug.Assert(Item != null);
 
-            int starNumber = (int)((GroupDefinition)Item.Model).Data;
-
             iconContainer.ResizeWidthTo(Expanded.Value ? 20f : 5f, duration, Easing.OutQuint);
             iconContainer.FadeTo(Expanded.Value ? 1f : 0f, duration, Easing.OutQuint);
 
