@@ -20,7 +20,7 @@ namespace osu.Game.Screens.SelectV2
 {
     public partial class PanelGroup : PanelBase
     {
-        public const float HEIGHT = CarouselItem.DEFAULT_HEIGHT + 10;
+        public const float HEIGHT = CarouselItem.DEFAULT_HEIGHT * 1.2f;
 
         private Drawable iconContainer = null!;
         private OsuSpriteText titleText = null!;
