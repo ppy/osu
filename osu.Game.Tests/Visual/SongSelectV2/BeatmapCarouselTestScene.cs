@@ -28,9 +28,9 @@ using osuTK.Graphics;
 using osuTK.Input;
 using BeatmapCarousel = osu.Game.Screens.SelectV2.BeatmapCarousel;
 
-namespace osu.Game.Tests.Visual.SongSelect
+namespace osu.Game.Tests.Visual.SongSelectV2
 {
-    public abstract partial class BeatmapCarouselV2TestScene : OsuManualInputManagerTestScene
+    public abstract partial class BeatmapCarouselTestScene : OsuManualInputManagerTestScene
     {
         protected readonly BindableList<BeatmapSetInfo> BeatmapSets = new BindableList<BeatmapSetInfo>();
 
@@ -48,7 +48,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private int beatmapCount;
 
-        protected BeatmapCarouselV2TestScene()
+        protected BeatmapCarouselTestScene()
         {
             store = new TestBeatmapStore
             {

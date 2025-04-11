@@ -10,13 +10,13 @@ using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
 using osu.Game.Tests.Resources;
 
-namespace osu.Game.Tests.Visual.SongSelect
+namespace osu.Game.Tests.Visual.SongSelectV2
 {
     /// <summary>
     /// Covers common steps which can be used for manual testing.
     /// </summary>
     [TestFixture]
-    public partial class TestSceneBeatmapCarouselV2 : BeatmapCarouselV2TestScene
+    public partial class TestSceneBeatmapCarousel : BeatmapCarouselTestScene
     {
         [Test]
         [Explicit]

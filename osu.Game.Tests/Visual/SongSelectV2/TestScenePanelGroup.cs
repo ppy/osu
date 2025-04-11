@@ -10,9 +10,9 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.SongSelectV2
 {
-    public partial class TestSceneBeatmapCarouselV2GroupPanel : ThemeComparisonTestScene
+    public partial class TestScenePanelGroup : ThemeComparisonTestScene
     {
-        public TestSceneBeatmapCarouselV2GroupPanel()
+        public TestScenePanelGroup()
             : base(false)
         {
         }

@@ -19,14 +19,14 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.SongSelectV2
 {
-    public partial class TestSceneBeatmapCarouselV2DifficultyPanel : ThemeComparisonTestScene
+    public partial class TestScenePanelBeatmap : ThemeComparisonTestScene
     {
         [Resolved]
         private BeatmapManager beatmaps { get; set; } = null!;
 
         private BeatmapInfo beatmap = null!;
 
-        public TestSceneBeatmapCarouselV2DifficultyPanel()
+        public TestScenePanelBeatmap()
             : base(false)
         {
         }

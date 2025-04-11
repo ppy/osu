@@ -12,10 +12,10 @@ using osu.Game.Screens.SelectV2;
 using osuTK;
 using osuTK.Input;
 
-namespace osu.Game.Tests.Visual.SongSelect
+namespace osu.Game.Tests.Visual.SongSelectV2
 {
     [TestFixture]
-    public partial class TestSceneBeatmapCarouselV2NoGrouping : BeatmapCarouselV2TestScene
+    public partial class TestSceneBeatmapCarouselNoGrouping : BeatmapCarouselTestScene
     {
         [SetUpSteps]
         public void SetUpSteps()
