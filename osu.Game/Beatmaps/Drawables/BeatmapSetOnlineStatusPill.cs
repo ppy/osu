@@ -13,6 +13,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.Drawables
@@ -20,7 +21,7 @@ namespace osu.Game.Beatmaps.Drawables
     public partial class BeatmapSetOnlineStatusPill : CircularContainer, IHasTooltip
     {
         /// <summary>
-        /// Whether to show <see cref="BeatmapOnlineStatus.None"/> as "unknownn" instead of fading out.
+        /// Whether to show <see cref="BeatmapOnlineStatus.None"/> as "unknown" instead of fading out.
         /// </summary>
         public bool ShowUnknownStatus { get; init; }
 
@@ -104,9 +105,10 @@ namespace osu.Game.Beatmaps.Drawables
                 return;
             }
 
-            // Only animate resizing if we already have a size.
-            // This avoids animating height from zero.
-            if (Width > 0)
+            // The autosize animation on this component is intended to animate horizontal sizing only.
+            // To avoid vertical autosize animating from zero to non-zero, only apply the duration
+            // after we have a valid size.
+            if (Height > 0)
             {
                 AutoSizeDuration = (float)animation_duration;
                 AutoSizeEasing = Easing.OutQuint;
