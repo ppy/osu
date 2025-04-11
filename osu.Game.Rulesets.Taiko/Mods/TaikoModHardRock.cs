@@ -20,6 +20,8 @@ namespace osu.Game.Rulesets.Taiko.Mods
         /// </remarks>
         private const double slider_multiplier = 1.4 * 4 / 3;
 
+        public override bool Ranked => false;
+
         public override void ApplyToDifficulty(BeatmapDifficulty difficulty)
         {
             base.ApplyToDifficulty(difficulty);

@@ -18,6 +18,9 @@ namespace osu.Game.Rulesets.Taiko.Mods
     {
         public override LocalisableString Description => @"Beats fade out before you hit them!";
         public override double ScoreMultiplier => UsesDefaultConfiguration ? 1.06 : 1;
+        // HD playfield size is fixed to the equivalent of 4:3 in stable but adjusted based on
+        // screen resolution in lazer, making lazer HD difficulty impossible to evaluate.
+        public override bool Ranked => false;
 
         /// <summary>
         /// How far away from the hit target should hitobjects start to fade out.
