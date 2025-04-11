@@ -9,14 +9,18 @@ using osuTK;
 
 namespace osu.Game.Screens.SelectV2
 {
-    public partial class BeatmapWedgesArea : VisibilityContainer
+    /// <summary>
+    /// The left portion of the song select screen which houses the metadata or leaderboards wedge, along with controls
+    /// to switch between them and adjust specifics.
+    /// </summary>
+    public partial class BeatmapDetailsArea : VisibilityContainer
     {
         private static readonly Vector2 shear = new Vector2(OsuGame.SHEAR, 0);
 
-        private BeatmapWedgesHeader header = null!;
+        private Header header = null!;
         private Container contentContainer = null!;
 
-        public BeatmapWedgesArea()
+        public BeatmapDetailsArea()
         {
             RelativeSizeAxes = Axes.X;
         }
@@ -28,7 +32,7 @@ namespace osu.Game.Screens.SelectV2
 
             InternalChildren = new Drawable[]
             {
-                new ShearAlignedDrawable(shear, header = new BeatmapWedgesHeader
+                new ShearAlignedDrawable(shear, header = new Header
                 {
                     RelativeSizeAxes = Axes.X,
                     Height = header_height,
@@ -78,12 +82,12 @@ namespace osu.Game.Screens.SelectV2
             switch (header.Type.Value)
             {
                 default:
-                case BeatmapWedgesHeader.Selection.Details:
-                    currentContent = new BeatmapDetailsWedge();
+                case Header.Selection.Details:
+                    currentContent = new BeatmapMetadataWedge();
                     break;
 
-                case BeatmapWedgesHeader.Selection.Ranking:
-                    currentContent = new BeatmapRankingsWedge
+                case Header.Selection.Ranking:
+                    currentContent = new BeatmapLeaderboardWedge
                     {
                         Scope = { BindTarget = header.Scope },
                         FilterBySelectedMods = { BindTarget = header.FilterBySelectedMods },

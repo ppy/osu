@@ -14,7 +14,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.SongSelectV2
 {
-    public partial class TestSceneShearedDifficultyRangeSlider : ThemeComparisonTestScene
+    public partial class TestSceneDifficultyRangeSlider : ThemeComparisonTestScene
     {
         private readonly BindableNumber<double> customStart = new BindableNumber<double>
         {
@@ -30,7 +30,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             Precision = 0.1f
         };
 
-        public TestSceneShearedDifficultyRangeSlider()
+        public TestSceneDifficultyRangeSlider()
             : base(false)
         {
         }
@@ -51,7 +51,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4.Black.Opacity(0.5f),
                 },
-                new ShearedDifficultyRangeSlider
+                new FilterControl.DifficultyRangeSlider
                 {
                     Width = 600,
                     Anchor = Anchor.Centre,

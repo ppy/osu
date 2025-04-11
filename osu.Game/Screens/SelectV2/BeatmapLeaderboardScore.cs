@@ -122,7 +122,7 @@ namespace osu.Game.Screens.SelectV2
         private Container rankLabelStandalone = null!;
         private Container rankLabelOverlay = null!;
 
-        public ITooltip<ScoreInfo> GetCustomTooltip() => new LeaderboardScoreV2Tooltip(colourProvider);
+        public ITooltip<ScoreInfo> GetCustomTooltip() => new LeaderboardScoreTooltip(colourProvider);
         public virtual ScoreInfo TooltipContent => score;
 
         public BeatmapLeaderboardScore(ScoreInfo score, bool sheared = true)

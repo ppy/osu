@@ -13,30 +13,29 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
-using osu.Game.Overlays;
 using osuTK;
 
 namespace osu.Game.Screens.SelectV2
 {
-    public partial class BeatmapDetailsWedge : VisibilityContainer
+    public partial class BeatmapMetadataWedge : VisibilityContainer
     {
         private static readonly Vector2 shear = new Vector2(OsuGame.SHEAR, 0);
 
-        private BeatmapDetailsWedgeStatistic creator = null!;
-        private BeatmapDetailsWedgeStatistic source = null!;
-        private BeatmapDetailsWedgeStatistic genre = null!;
-        private BeatmapDetailsWedgeStatistic language = null!;
-        private BeatmapDetailsWedgeStatistic tag = null!;
-        private BeatmapDetailsWedgeStatistic submitted = null!;
-        private BeatmapDetailsWedgeStatistic ranked = null!;
+        private MetadataDisplay creator = null!;
+        private MetadataDisplay source = null!;
+        private MetadataDisplay genre = null!;
+        private MetadataDisplay language = null!;
+        private MetadataDisplay tag = null!;
+        private MetadataDisplay submitted = null!;
+        private MetadataDisplay ranked = null!;
 
         private Drawable ratingsWedge = null!;
-        private BeatmapDetailsSuccessRate successRate = null!;
-        private BeatmapDetailsUserRating userRating = null!;
-        private BeatmapDetailsRatingSpread ratingSpread = null!;
+        private SuccessRateDisplay successRateDisplay = null!;
+        private UserRatingDisplay userRatingDisplay = null!;
+        private RatingSpreadDisplay ratingSpreadDisplay = null!;
 
         private Drawable failRetryWedge = null!;
-        private BeatmapDetailsFailRetry failRetry = null!;
+        private FailRetryDisplay failRetryDisplay = null!;
 
         [Resolved]
         private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
@@ -53,7 +52,7 @@ namespace osu.Game.Screens.SelectV2
         private SongSelect? songSelect { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
+        private void load()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -118,8 +117,8 @@ namespace osu.Game.Screens.SelectV2
                                                             Spacing = new Vector2(0f, 10f),
                                                             Children = new[]
                                                             {
-                                                                creator = new BeatmapDetailsWedgeStatistic("Creator"),
-                                                                genre = new BeatmapDetailsWedgeStatistic("Genre"),
+                                                                creator = new MetadataDisplay("Creator"),
+                                                                genre = new MetadataDisplay("Genre"),
                                                             },
                                                         },
                                                         new FillFlowContainer
@@ -130,8 +129,8 @@ namespace osu.Game.Screens.SelectV2
                                                             Spacing = new Vector2(0f, 10f),
                                                             Children = new[]
                                                             {
-                                                                source = new BeatmapDetailsWedgeStatistic("Source"),
-                                                                language = new BeatmapDetailsWedgeStatistic("Language"),
+                                                                source = new MetadataDisplay("Source"),
+                                                                language = new MetadataDisplay("Language"),
                                                             },
                                                         },
                                                         new FillFlowContainer
@@ -142,14 +141,14 @@ namespace osu.Game.Screens.SelectV2
                                                             Spacing = new Vector2(0f, 10f),
                                                             Children = new[]
                                                             {
-                                                                submitted = new BeatmapDetailsWedgeStatistic("Submitted"),
-                                                                ranked = new BeatmapDetailsWedgeStatistic("Ranked"),
+                                                                submitted = new MetadataDisplay("Submitted"),
+                                                                ranked = new MetadataDisplay("Ranked"),
                                                             },
                                                         },
                                                     },
                                                 },
                                             },
-                                            tag = new BeatmapDetailsWedgeStatistic("Tags"),
+                                            tag = new MetadataDisplay("Tags"),
                                         },
                                     },
                                 },
@@ -186,11 +185,11 @@ namespace osu.Game.Screens.SelectV2
                                 {
                                     new[]
                                     {
-                                        successRate = new BeatmapDetailsSuccessRate(),
+                                        successRateDisplay = new SuccessRateDisplay(),
                                         Empty(),
-                                        userRating = new BeatmapDetailsUserRating(),
+                                        userRatingDisplay = new UserRatingDisplay(),
                                         Empty(),
-                                        ratingSpread = new BeatmapDetailsRatingSpread(),
+                                        ratingSpreadDisplay = new RatingSpreadDisplay(),
                                     },
                                 },
                             },
@@ -213,7 +212,7 @@ namespace osu.Game.Screens.SelectV2
                                 AutoSizeAxes = Axes.Y,
                                 Shear = -shear,
                                 Padding = new MarginPadding { Left = SongSelect.WEDGE_CONTENT_MARGIN, Right = 40f, Vertical = 16 },
-                                Child = failRetry = new BeatmapDetailsFailRetry(),
+                                Child = failRetryDisplay = new FailRetryDisplay(),
                             },
                         },
                     }),
@@ -324,10 +323,10 @@ namespace osu.Game.Screens.SelectV2
                     failRetryWedge.FadeIn(300, Easing.OutQuint);
                     failRetryWedge.MoveToX(0, 300, Easing.OutQuint);
 
-                    userRating.Data = onlineBeatmapSet.Ratings;
-                    ratingSpread.Data = onlineBeatmapSet.Ratings;
-                    successRate.Data = (onlineBeatmap.PassCount, onlineBeatmap.PlayCount);
-                    failRetry.Data = onlineBeatmap.FailTimes ?? new APIFailTimes();
+                    userRatingDisplay.Data = onlineBeatmapSet.Ratings;
+                    ratingSpreadDisplay.Data = onlineBeatmapSet.Ratings;
+                    successRateDisplay.Data = (onlineBeatmap.PassCount, onlineBeatmap.PlayCount);
+                    failRetryDisplay.Data = onlineBeatmap.FailTimes ?? new APIFailTimes();
                 }
                 else
                 {

@@ -17,7 +17,7 @@ using osuTK;
 
 namespace osu.Game.Screens.SelectV2
 {
-    public partial class BeatmapFilterControl : OverlayContainer
+    public partial class FilterControl : OverlayContainer
     {
         // taken from draw visualiser. used for carousel alignment purposes.
         public const float HEIGHT_FROM_SCREEN_TOP = 141 - corner_radius;
@@ -25,7 +25,7 @@ namespace osu.Game.Screens.SelectV2
         private const float corner_radius = 8;
 
         private ShearedToggleButton showConvertedBeatmapsButton = null!;
-        private ShearedDifficultyRangeSlider difficultyRangeSlider = null!;
+        private DifficultyRangeSlider difficultyRangeSlider = null!;
 
         [Resolved]
         private OsuConfigManager config { get; set; } = null!;
@@ -90,7 +90,7 @@ namespace osu.Game.Screens.SelectV2
                             {
                                 new[]
                                 {
-                                    difficultyRangeSlider = new ShearedDifficultyRangeSlider
+                                    difficultyRangeSlider = new DifficultyRangeSlider
                                     {
                                         RelativeSizeAxes = Axes.X,
                                         MinRange = 0.1f,

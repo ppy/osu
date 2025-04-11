@@ -28,7 +28,7 @@ using osuTK;
 
 namespace osu.Game.Screens.SelectV2
 {
-    public partial class BeatmapInfoWedge : VisibilityContainer
+    public partial class BeatmapTitleWedge : VisibilityContainer
     {
         private const float corner_radius = 10;
 
@@ -53,10 +53,10 @@ namespace osu.Game.Screens.SelectV2
         private OsuHoverContainer artistLink = null!;
         private OsuSpriteText artistLabel = null!;
 
-        private WedgeStatisticPlayCount playCount = null!;
-        private WedgeStatistic favouritesStatistic = null!;
-        private WedgeStatistic lengthStatistic = null!;
-        private WedgeStatistic bpmStatistic = null!;
+        private StatisticPlayCount playCount = null!;
+        private Statistic favouritesStatistic = null!;
+        private Statistic lengthStatistic = null!;
+        private Statistic bpmStatistic = null!;
 
         [Resolved]
         private SongSelect? songSelect { get; set; }
@@ -70,7 +70,7 @@ namespace osu.Game.Screens.SelectV2
         private APIBeatmapSet? currentOnlineBeatmapSet;
         private GetBeatmapSetRequest? currentRequest;
 
-        public BeatmapInfoWedge()
+        public BeatmapTitleWedge()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -145,16 +145,16 @@ namespace osu.Game.Screens.SelectV2
                             AutoSizeEasing = Easing.OutQuint,
                             Children = new Drawable[]
                             {
-                                playCount = new WedgeStatisticPlayCount(background: true, leftPadding: SongSelect.WEDGE_CONTENT_MARGIN, minSize: 50f)
+                                playCount = new StatisticPlayCount(background: true, leftPadding: SongSelect.WEDGE_CONTENT_MARGIN, minSize: 50f)
                                 {
                                     Margin = new MarginPadding { Left = -SongSelect.WEDGE_CONTENT_MARGIN },
                                 },
-                                favouritesStatistic = new WedgeStatistic(OsuIcon.Heart, background: true, minSize: 25f)
+                                favouritesStatistic = new Statistic(OsuIcon.Heart, background: true, minSize: 25f)
                                 {
                                     TooltipText = BeatmapsStrings.StatusFavourites,
                                 },
-                                lengthStatistic = new WedgeStatistic(OsuIcon.Clock),
-                                bpmStatistic = new WedgeStatistic(OsuIcon.Metronome)
+                                lengthStatistic = new Statistic(OsuIcon.Clock),
+                                bpmStatistic = new Statistic(OsuIcon.Metronome)
                                 {
                                     TooltipText = BeatmapsetsStrings.ShowStatsBpm,
                                     Margin = new MarginPadding { Left = 5f },
@@ -167,7 +167,7 @@ namespace osu.Game.Screens.SelectV2
                             AutoSizeAxes = Axes.Y,
                             Margin = new MarginPadding { Left = -SongSelect.WEDGE_CONTENT_MARGIN },
                             Padding = new MarginPadding { Right = -SongSelect.WEDGE_CONTENT_MARGIN },
-                            Child = new WedgeDifficultyDisplay(),
+                            Child = new DifficultyDisplay(),
                         }),
                     },
                 }
@@ -292,7 +292,7 @@ namespace osu.Game.Screens.SelectV2
             }
             else if (currentOnlineBeatmapSet == null)
             {
-                playCount.Value = new WedgeStatisticPlayCount.Data(-1, -1);
+                playCount.Value = new StatisticPlayCount.Data(-1, -1);
                 favouritesStatistic.Value = "-";
             }
             else
@@ -303,7 +303,7 @@ namespace osu.Game.Screens.SelectV2
                 if (onlineBeatmap != null)
                 {
                     playCount.FadeIn(300, Easing.OutQuint);
-                    playCount.Value = new WedgeStatisticPlayCount.Data(onlineBeatmap.PlayCount, onlineBeatmap.UserPlayCount);
+                    playCount.Value = new StatisticPlayCount.Data(onlineBeatmap.PlayCount, onlineBeatmap.UserPlayCount);
                 }
                 else
                 {

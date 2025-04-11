@@ -27,12 +27,11 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Select.Leaderboards;
-using osu.Game.Screens.SelectV2.Leaderboards;
 using osuTK;
 
 namespace osu.Game.Screens.SelectV2
 {
-    public partial class BeatmapRankingsWedge : VisibilityContainer
+    public partial class BeatmapLeaderboardWedge : VisibilityContainer
     {
         private static readonly Vector2 shear = new Vector2(OsuGame.SHEAR, 0);
 
@@ -40,7 +39,7 @@ namespace osu.Game.Screens.SelectV2
 
         private OsuScrollContainer scoresScroll = null!;
         private Container personalBestWedge = null!;
-        private Container<LeaderboardScoreV2> personalBestScoreContainer = null!;
+        private Container<BeatmapLeaderboardScore> personalBestScoreContainer = null!;
         private LoadingLayer loading = null!;
 
         private Container<Placeholder> placeholderContainer = null!;
@@ -130,7 +129,7 @@ namespace osu.Game.Screens.SelectV2
                                         Text = "Personal Best",
                                         Font = OsuFont.Style.Caption1.With(weight: FontWeight.SemiBold),
                                     },
-                                    personalBestScoreContainer = new Container<LeaderboardScoreV2>
+                                    personalBestScoreContainer = new Container<BeatmapLeaderboardScore>
                                     {
                                         RelativeSizeAxes = Axes.X,
                                         AutoSizeAxes = Axes.Y,
@@ -257,7 +256,7 @@ namespace osu.Game.Screens.SelectV2
                 return;
             }
 
-            LoadComponentsAsync(scores.Select((s, i) => new LeaderboardScoreV2(s)
+            LoadComponentsAsync(scores.Select((s, i) => new BeatmapLeaderboardScore(s)
             {
                 Rank = i + 1,
                 IsPersonalBest = s.OnlineID == userScore?.OnlineID,
@@ -275,7 +274,7 @@ namespace osu.Game.Screens.SelectV2
                     scoresContainer.Add(scoreDrawableContainer = new Container
                     {
                         Shear = -shear,
-                        Y = (LeaderboardScoreV2.HEIGHT + 4f) * i,
+                        Y = (BeatmapLeaderboardScore.HEIGHT + 4f) * i,
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         Alpha = 0f,
@@ -296,7 +295,7 @@ namespace osu.Game.Screens.SelectV2
             {
                 personalBestWedge.MoveToX(0, 600, Easing.OutQuint);
                 personalBestWedge.FadeIn(600, Easing.OutQuint);
-                personalBestScoreContainer.Child = new LeaderboardScoreV2(userScore)
+                personalBestScoreContainer.Child = new BeatmapLeaderboardScore(userScore)
                 {
                     IsPersonalBest = true,
                     Rank = userScore.Position,

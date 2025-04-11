@@ -19,6 +19,8 @@ using osu.Game.Screens.Footer;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Select;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.SelectV2
 {
@@ -50,9 +52,9 @@ namespace osu.Game.Screens.SelectV2
 
         private BeatmapCarousel carousel = null!;
 
-        private BeatmapFilterControl filterControl = null!;
-        private BeatmapInfoWedge infoWedge = null!;
-        private BeatmapWedgesArea wedgesArea = null!;
+        private FilterControl filterControl = null!;
+        private BeatmapTitleWedge titleWedge = null!;
+        private BeatmapDetailsArea detailsArea = null!;
         private FillFlowContainer wedgesContainer = null!;
 
         public override bool ShowFooter => true;
@@ -115,8 +117,8 @@ namespace osu.Game.Screens.SelectV2
                                             Direction = FillDirection.Vertical,
                                             Children = new Drawable[]
                                             {
-                                                new ShearAlignedDrawable(shear, infoWedge = new BeatmapInfoWedge()),
-                                                new ShearAlignedDrawable(shear, wedgesArea = new BeatmapWedgesArea()),
+                                                new ShearAlignedDrawable(shear, titleWedge = new BeatmapTitleWedge()),
+                                                new ShearAlignedDrawable(shear, detailsArea = new BeatmapDetailsArea()),
                                             },
                                         },
                                         Empty(),
@@ -130,14 +132,14 @@ namespace osu.Game.Screens.SelectV2
                                                     RelativeSizeAxes = Axes.Both,
                                                     Padding = new MarginPadding
                                                     {
-                                                        Top = BeatmapFilterControl.HEIGHT_FROM_SCREEN_TOP + 5,
+                                                        Top = FilterControl.HEIGHT_FROM_SCREEN_TOP + 5,
                                                         Bottom = 5,
                                                     },
                                                     Children = new Drawable[]
                                                     {
                                                         carousel = new BeatmapCarousel
                                                         {
-                                                            BleedTop = BeatmapFilterControl.HEIGHT_FROM_SCREEN_TOP + 5,
+                                                            BleedTop = FilterControl.HEIGHT_FROM_SCREEN_TOP + 5,
                                                             BleedBottom = ScreenFooter.HEIGHT + 5,
                                                             RequestSelectBeatmap = b => Beatmap.Value = beatmaps.GetWorkingBeatmap(b),
                                                             RequestPresentBeatmap = _ => OnStart(),
@@ -145,7 +147,7 @@ namespace osu.Game.Screens.SelectV2
                                                         },
                                                     }
                                                 },
-                                                filterControl = new BeatmapFilterControl
+                                                filterControl = new FilterControl
                                                 {
                                                     Anchor = Anchor.TopRight,
                                                     Origin = Anchor.TopRight,
@@ -190,8 +192,8 @@ namespace osu.Game.Screens.SelectV2
 
             Beatmap.BindValueChanged(onBeatmapChanged, true);
 
-            infoWedge.Show();
-            wedgesArea.Show();
+            titleWedge.Show();
+            detailsArea.Show();
             filterControl.Show();
 
             modSelectOverlay.State.BindValueChanged(onModSelectStateChanged, true);
@@ -208,8 +210,8 @@ namespace osu.Game.Screens.SelectV2
 
             carousel.VisuallyFocusSelected = false;
 
-            infoWedge.Show();
-            wedgesArea.Show();
+            titleWedge.Show();
+            detailsArea.Show();
             filterControl.Show();
 
             // required due to https://github.com/ppy/osu-framework/issues/3218
@@ -225,8 +227,8 @@ namespace osu.Game.Screens.SelectV2
 
             modSelectOverlay.SelectedMods.UnbindFrom(Mods);
 
-            infoWedge.Hide();
-            wedgesArea.Hide();
+            titleWedge.Hide();
+            detailsArea.Hide();
             filterControl.Hide();
 
             carousel.VisuallyFocusSelected = true;
@@ -238,8 +240,8 @@ namespace osu.Game.Screens.SelectV2
         {
             this.FadeOut(fade_duration, Easing.OutQuint);
 
-            infoWedge.Hide();
-            wedgesArea.Hide();
+            titleWedge.Hide();
+            detailsArea.Hide();
             filterControl.Hide();
 
             return base.OnExiting(e);
@@ -311,7 +313,7 @@ namespace osu.Game.Screens.SelectV2
         protected override void Update()
         {
             base.Update();
-            wedgesArea.Height = wedgesContainer.DrawHeight - infoWedge.LayoutSize.Y - 4;
+            detailsArea.Height = wedgesContainer.DrawHeight - titleWedge.LayoutSize.Y - 4;
         }
     }
 }

@@ -21,10 +21,10 @@ using osu.Game.Screens.SelectV2;
 
 namespace osu.Game.Tests.Visual.SongSelectV2
 {
-    public partial class TestSceneBeatmapInfoWedge : SongSelectComponentsTestScene
+    public partial class TestSceneBeatmapTitleWedge : SongSelectComponentsTestScene
     {
         private RulesetStore rulesets = null!;
-        private BeatmapInfoWedge infoWedge = null!;
+        private BeatmapTitleWedge titleWedge = null!;
 
         [BackgroundDependencyLoader]
         private void load(RulesetStore rulesets)
@@ -50,7 +50,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        infoWedge = new BeatmapInfoWedge
+                        titleWedge = new BeatmapTitleWedge
                         {
                             State = { Value = Visibility.Visible },
                         },
@@ -60,7 +60,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             AddSliderStep("change star difficulty", 0, 11.9, 4.18, v =>
             {
-                ((BindableDouble)infoWedge.ChildrenOfType<WedgeDifficultyDisplay>().Single().DisplayedStars).Value = v;
+                ((BindableDouble)titleWedge.ChildrenOfType<BeatmapTitleWedge.DifficultyDisplay>().Single().DisplayedStars).Value = v;
             });
         }
 
@@ -75,11 +75,11 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         {
             selectBeatmap(null);
             // TODO: add back assertions? need to make fields public again.
-            // AddAssert("check empty version", () => string.IsNullOrEmpty(infoWedge.Info.VersionLabel.Current.Value));
-            // AddAssert("check default title", () => infoWedge.Info.TitleLabel.Current.Value == Beatmap.Default.BeatmapInfo.Metadata.Title);
-            // AddAssert("check default artist", () => infoWedge.Info.ArtistLabel.Current.Value == Beatmap.Default.BeatmapInfo.Metadata.Artist);
-            // AddAssert("check empty author", () => !infoWedge.Info.MapperContainer.ChildrenOfType<OsuSpriteText>().Any());
-            // AddAssert("check no info labels", () => !infoWedge.Info.ChildrenOfType<BeatmapInfoWedge.WedgeInfoText.InfoLabel>().Any());
+            // AddAssert("check empty version", () => string.IsNullOrEmpty(titleWedge.Info.VersionLabel.Current.Value));
+            // AddAssert("check default title", () => titleWedge.Info.TitleLabel.Current.Value == Beatmap.Default.BeatmapInfo.Metadata.Title);
+            // AddAssert("check default artist", () => titleWedge.Info.ArtistLabel.Current.Value == Beatmap.Default.BeatmapInfo.Metadata.Artist);
+            // AddAssert("check empty author", () => !titleWedge.Info.MapperContainer.ChildrenOfType<OsuSpriteText>().Any());
+            // AddAssert("check no info labels", () => !titleWedge.Info.ChildrenOfType<BeatmapTitleWedge.WedgeInfoText.InfoLabel>().Any());
         }
 
         [Test]
@@ -123,12 +123,12 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [Test]
         public void TestWedgeVisibility()
         {
-            AddStep("hide", () => { infoWedge.Hide(); });
+            AddStep("hide", () => { titleWedge.Hide(); });
             AddWaitStep("wait for hide", 3);
-            AddAssert("check visibility", () => infoWedge.Alpha == 0);
-            AddStep("show", () => { infoWedge.Show(); });
+            AddAssert("check visibility", () => titleWedge.Alpha == 0);
+            AddStep("show", () => { titleWedge.Show(); });
             AddWaitStep("wait for show", 1);
-            AddAssert("check visibility", () => infoWedge.Alpha > 0);
+            AddAssert("check visibility", () => titleWedge.Alpha > 0);
         }
 
         [TestCase(120, 125, null, "120-125 (mostly 120)")]
@@ -167,7 +167,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         {
             AddUntilStep($"displayed bpm is {target}", () =>
             {
-                var label = infoWedge.ChildrenOfType<WedgeStatistic>().Single(l => l.TooltipText == BeatmapsetsStrings.ShowStatsBpm);
+                var label = titleWedge.ChildrenOfType<BeatmapTitleWedge.Statistic>().Single(l => l.TooltipText == BeatmapsetsStrings.ShowStatsBpm);
                 return label.Value == target;
             });
         }
