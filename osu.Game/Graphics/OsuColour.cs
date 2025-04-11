@@ -22,7 +22,7 @@ namespace osu.Game.Graphics
 
         public static readonly (float, Color4)[] STAR_DIFFICULTY_SPECTRUM =
         {
-            (0.0f, Color4Extensions.FromHex("4290fb")),
+            (0.1f, Color4Extensions.FromHex("aaaaaa")),
             (0.1f, Color4Extensions.FromHex("4290fb")),
             (1.25f, Color4Extensions.FromHex("4fc0ff")),
             (2.0f, Color4Extensions.FromHex("4fffd5")),
@@ -40,13 +40,7 @@ namespace osu.Game.Graphics
         /// <summary>
         /// Retrieves the colour for a given point in the star range.
         /// </summary>
-        public Color4 ForStarDifficulty(double starDifficulty, bool showGrayOnZero = true)
-        {
-            if (showGrayOnZero && starDifficulty < 0.1f)
-                return Color4Extensions.FromHex("aaaaaa");
-
-            return ColourUtils.SampleFromLinearGradient(STAR_DIFFICULTY_SPECTRUM, (float)Math.Round(starDifficulty, 2, MidpointRounding.AwayFromZero));
-        }
+        public Color4 ForStarDifficulty(double starDifficulty) => ColourUtils.SampleFromLinearGradient(STAR_DIFFICULTY_SPECTRUM, (float)Math.Round(starDifficulty, 2, MidpointRounding.AwayFromZero));
 
         /// <summary>
         /// Retrieves the colour for a <see cref="ScoreRank"/>.
