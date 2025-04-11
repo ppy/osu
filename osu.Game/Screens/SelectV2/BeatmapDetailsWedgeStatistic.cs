@@ -59,7 +59,7 @@ namespace osu.Game.Screens.SelectV2
                 valueText.Clear();
 
                 if (value != null)
-                    valueText.AddArbitraryDrawable(new DrawableDate(value.Value, textSize: OsuFont.Caption.Size, italic: false));
+                    valueText.AddArbitraryDrawable(new DrawableDate(value.Value, textSize: OsuFont.Style.Caption1.Size, italic: false));
                 else
                     valueText.AddText("-");
             }
@@ -102,12 +102,12 @@ namespace osu.Game.Screens.SelectV2
                 labelText = new OsuSpriteText
                 {
                     Text = label,
-                    Font = OsuFont.Caption.With(weight: FontWeight.SemiBold),
+                    Font = OsuFont.Style.Caption1.With(weight: FontWeight.SemiBold),
                 },
-                valueText = new LinkFlowContainer(t => t.Font = OsuFont.Caption)
+                valueText = new LinkFlowContainer(t => t.Font = OsuFont.Style.Caption1)
                 {
                     RelativeSizeAxes = Axes.X,
-                    Height = OsuFont.Caption.Size,
+                    Height = OsuFont.Style.Caption1.Size,
                 }
             };
         }

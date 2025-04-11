@@ -40,7 +40,7 @@ namespace osu.Game.Screens.SelectV2
         [BackgroundDependencyLoader]
         private void load()
         {
-            Size = new Vector2(OsuFont.Caption.Size);
+            Size = new Vector2(OsuFont.Style.Caption1.Size);
             CornerRadius = 1.5f;
             Masking = true;
 
@@ -58,7 +58,7 @@ namespace osu.Game.Screens.SelectV2
                     Origin = Anchor.TopCentre,
                     Text = "...",
                     Colour = colourProvider.Background4,
-                    Font = OsuFont.Caption.With(weight: FontWeight.Bold),
+                    Font = OsuFont.Style.Caption1.With(weight: FontWeight.Bold),
                 }
             };
         }

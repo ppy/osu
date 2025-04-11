@@ -99,7 +99,7 @@ namespace osu.Game.Screens.SelectV2
                     labelText = new OsuSpriteText
                     {
                         Margin = new MarginPadding { Top = 2f },
-                        Font = OsuFont.Caption.With(weight: FontWeight.SemiBold),
+                        Font = OsuFont.Style.Caption1.With(weight: FontWeight.SemiBold),
                     },
                     new FillFlowContainer
                     {
@@ -111,7 +111,7 @@ namespace osu.Game.Screens.SelectV2
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
-                                Font = OsuFont.Body,
+                                Font = OsuFont.Style.Body,
                             },
                             valueIcon = new SpriteIcon
                             {

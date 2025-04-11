@@ -25,7 +25,7 @@ namespace osu.Game.Screens.SelectV2
         {
             LinkFlowContainer textFlow;
 
-            Child = textFlow = new LinkFlowContainer(t => t.Font = OsuFont.Caption)
+            Child = textFlow = new LinkFlowContainer(t => t.Font = OsuFont.Style.Caption1)
             {
                 Width = 200,
                 AutoSizeAxes = Axes.Y,

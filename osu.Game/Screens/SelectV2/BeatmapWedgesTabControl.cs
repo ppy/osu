@@ -83,7 +83,7 @@ namespace osu.Game.Screens.SelectV2
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Text = value.ToString(),
-                        Font = OsuFont.Body,
+                        Font = OsuFont.Style.Body,
                     },
                 };
             }

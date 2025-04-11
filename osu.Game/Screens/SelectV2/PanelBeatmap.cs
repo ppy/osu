@@ -100,7 +100,7 @@ namespace osu.Game.Screens.SelectV2
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
-                                    Scale = new Vector2(OsuFont.Caption.Size / OsuFont.Body.Size),
+                                    Scale = new Vector2(OsuFont.Style.Caption1.Size / OsuFont.Style.Body.Size),
                                 },
                                 localRank = new PanelLocalRankDisplay
                                 {

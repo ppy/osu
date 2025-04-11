@@ -378,7 +378,7 @@ namespace osu.Game.Screens.SelectV2
                                         RelativeSizeAxes = Axes.X,
                                         Shear = sheared ? -OsuGame.SHEAR : Vector2.Zero,
                                         Text = user.Username,
-                                        Font = OsuFont.Subheading,
+                                        Font = OsuFont.Style.Heading2,
                                     }
                                 }
                             },
@@ -511,7 +511,7 @@ namespace osu.Game.Screens.SelectV2
                                             Shear = sheared ? -OsuGame.SHEAR : Vector2.Zero,
                                             Current = scoreManager.GetBindableTotalScoreString(score),
                                             Spacing = new Vector2(-1.5f),
-                                            Font = OsuFont.Subtitle.With(weight: FontWeight.Light, fixedWidth: true),
+                                            Font = OsuFont.Style.Subtitle.With(weight: FontWeight.Light, fixedWidth: true),
                                         },
                                         new InputBlockingContainer
                                         {
@@ -711,7 +711,7 @@ namespace osu.Game.Screens.SelectV2
                             // since the accuracy is sometimes longer than its name.
                             BypassAutoSizeAxes = Axes.X,
                             Text = statisticInfo.Value,
-                            Font = OsuFont.Body,
+                            Font = OsuFont.Style.Body,
                         }
                     }
                 };
@@ -737,7 +737,7 @@ namespace osu.Game.Screens.SelectV2
                     Shear = sheared ? -OsuGame.SHEAR : Vector2.Zero,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Font = OsuFont.Subheading,
+                    Font = OsuFont.Style.Heading2,
                     Text = rank == null ? "-" : rank.Value.FormatRank().Insert(0, "#"),
                     Shadow = !darkText,
                 };

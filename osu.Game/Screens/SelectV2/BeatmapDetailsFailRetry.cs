@@ -53,7 +53,7 @@ namespace osu.Game.Screens.SelectV2
                     new OsuSpriteText
                     {
                         Text = BeatmapsetsStrings.ShowInfoPointsOfFailure,
-                        Font = OsuFont.Caption.With(weight: FontWeight.SemiBold),
+                        Font = OsuFont.Style.Caption1.With(weight: FontWeight.SemiBold),
                         Margin = new MarginPadding { Bottom = 4f },
                     },
                     new Container

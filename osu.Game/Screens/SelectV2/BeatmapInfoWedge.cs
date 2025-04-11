@@ -103,13 +103,13 @@ namespace osu.Game.Screens.SelectV2
                         new ShearAlignedDrawable(shear, statusPill = new BeatmapSetOnlineStatusPill
                         {
                             ShowUnknownStatus = true,
-                            TextSize = OsuFont.Caption.Size,
+                            TextSize = OsuFont.Style.Caption1.Size,
                             TextPadding = new MarginPadding { Horizontal = 6, Vertical = 1 },
                         }),
                         new ShearAlignedDrawable(shear, titleContainer = new Container
                         {
                             RelativeSizeAxes = Axes.X,
-                            Height = OsuFont.Title.Size,
+                            Height = OsuFont.Style.Title.Size,
                             Margin = new MarginPadding { Bottom = -4f },
                             Child = titleLink = new OsuHoverContainer
                             {
@@ -117,14 +117,14 @@ namespace osu.Game.Screens.SelectV2
                                 Child = titleLabel = new TruncatingSpriteText
                                 {
                                     Shadow = true,
-                                    Font = OsuFont.Title,
+                                    Font = OsuFont.Style.Title,
                                 },
                             }
                         }),
                         new ShearAlignedDrawable(shear, artistContainer = new Container
                         {
                             RelativeSizeAxes = Axes.X,
-                            Height = OsuFont.Subheading.Size,
+                            Height = OsuFont.Style.Heading2.Size,
                             Margin = new MarginPadding { Left = 1f },
                             Child = artistLink = new OsuHoverContainer
                             {
@@ -132,7 +132,7 @@ namespace osu.Game.Screens.SelectV2
                                 Child = artistLabel = new TruncatingSpriteText
                                 {
                                     Shadow = true,
-                                    Font = OsuFont.Subheading,
+                                    Font = OsuFont.Style.Heading2,
                                 },
                             }
                         }),

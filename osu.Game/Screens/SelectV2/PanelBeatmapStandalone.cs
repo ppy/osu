@@ -99,7 +99,7 @@ namespace osu.Game.Screens.SelectV2
                     },
                     artistText = new OsuSpriteText
                     {
-                        Font = OsuFont.Body.With(weight: FontWeight.SemiBold),
+                        Font = OsuFont.Style.Body.With(weight: FontWeight.SemiBold),
                     },
                     new FillFlowContainer
                     {
@@ -117,7 +117,7 @@ namespace osu.Game.Screens.SelectV2
                             {
                                 Origin = Anchor.CentreLeft,
                                 Anchor = Anchor.CentreLeft,
-                                TextSize = OsuFont.Tiny.Size,
+                                TextSize = OsuFont.Style.Caption2.Size,
                                 Margin = new MarginPadding { Right = 5f },
                             },
                             difficultyLine = new FillFlowContainer
@@ -158,7 +158,7 @@ namespace osu.Game.Screens.SelectV2
                                     difficultyAuthor = new OsuSpriteText
                                     {
                                         Colour = colourProvider.Content2,
-                                        Font = OsuFont.Caption.With(weight: FontWeight.SemiBold),
+                                        Font = OsuFont.Style.Caption1.With(weight: FontWeight.SemiBold),
                                         Origin = Anchor.BottomLeft,
                                         Anchor = Anchor.BottomLeft,
                                         Margin = new MarginPadding { Right = 5f, Bottom = 2f },

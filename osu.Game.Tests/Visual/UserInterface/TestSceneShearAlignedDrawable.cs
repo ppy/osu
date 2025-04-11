@@ -126,7 +126,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                         Text = text,
                         Colour = Color4.White,
                         Shear = -new Vector2(OsuGame.SHEAR, 0),
-                        Font = OsuFont.Default.With(size: 24),
+                        Font = OsuFont.Torus.With(size: 24),
                         Margin = new MarginPadding { Left = 50 },
                     }
                 };
