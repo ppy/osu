@@ -25,6 +25,11 @@ namespace osu.Game.Localisation
         public static LocalisableString Playlists => new TranslatableString(getKey(@"playlists"), @"playlists");
 
         /// <summary>
+        /// "tournaments"
+        /// </summary>
+        public static LocalisableString Tournaments => new TranslatableString(getKey(@"tournaments"), @"tournaments");
+
+        /// <summary>
         /// "play"
         /// </summary>
         public static LocalisableString Play => new TranslatableString(getKey(@"play"), @"play");
