@@ -93,7 +93,7 @@ namespace osu.Game.Screens.SelectV2
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Font = OsuFont.Torus.With(size: 14.4f, weight: FontWeight.Bold),
+                            Font = OsuFont.Style.Caption1.With(weight: FontWeight.Bold),
                             // TODO: requires Carousel/CarouselItem-side implementation
                             Text = "43",
                             UseFullGlyphHeight = false,
