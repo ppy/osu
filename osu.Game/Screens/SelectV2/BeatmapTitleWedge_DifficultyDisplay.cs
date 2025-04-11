@@ -258,7 +258,7 @@ namespace osu.Game.Screens.SelectV2
                 var playableBeatmap = beatmap.Value.GetPlayableBeatmap(ruleset.Value);
 
                 countStatisticsDisplay.Statistics = playableBeatmap.GetStatistics()
-                                                                   .Select(s => new StatisticDifficulty.Data(s.Name, s.Value, s.Value, s.Maximum))
+                                                                   .Select(s => new StatisticDifficulty.Data(s.Name, s.Ratio ?? 0, s.Ratio ?? 0, 1, s.Content))
                                                                    .ToList();
 
                 updateDifficultyStatistics();
