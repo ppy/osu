@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Osu.Tests
     [Ignore("These tests are expected to fail until an acceptable solution for various replay playback issues concerning rounding of replay frame times & hit windows is found.")]
     public partial class TestSceneReplayStability : ReplayStabilityTestScene
     {
-        private static readonly object[][] test_cases = new[]
+        private static readonly object[][] test_cases =
         {
             // OD = 5 test cases.
             // GREAT hit window is [ -50ms,  50ms]
