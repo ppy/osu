@@ -30,7 +30,6 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                 {
                     new BeatmapSetOnlineStatusPill
                     {
-                        AutoSizeAxes = Axes.Both,
                         Status = beatmapSet.Status,
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,

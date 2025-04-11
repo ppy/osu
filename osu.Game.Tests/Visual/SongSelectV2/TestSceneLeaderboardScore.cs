@@ -7,6 +7,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Configuration;
@@ -20,7 +21,7 @@ using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
-using osu.Game.Screens.SelectV2.Leaderboards;
+using osu.Game.Screens.SelectV2;
 using osu.Game.Tests.Resources;
 using osu.Game.Users;
 using osuTK;
@@ -44,23 +45,28 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         {
             AddStep("create content", () =>
             {
-                Children = new Drawable[]
+                Child = new PopoverContainer
                 {
-                    fillFlow = new FillFlowContainer
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Children = new Drawable[]
                     {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Spacing = new Vector2(0f, 2f),
-                        Shear = new Vector2(OsuGame.SHEAR, 0)
-                    },
-                    drawWidthText = new OsuSpriteText(),
+                        fillFlow = new FillFlowContainer
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Spacing = new Vector2(0f, 2f),
+                            Shear = new Vector2(OsuGame.SHEAR, 0)
+                        },
+                        drawWidthText = new OsuSpriteText(),
+                    }
                 };
 
                 foreach (var scoreInfo in getTestScores())
                 {
-                    fillFlow.Add(new LeaderboardScoreV2(scoreInfo)
+                    fillFlow.Add(new BeatmapLeaderboardScore(scoreInfo)
                     {
                         Rank = scoreInfo.Position,
                         IsPersonalBest = scoreInfo.User.Id == 2,
@@ -78,22 +84,27 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         {
             AddStep("create content", () =>
             {
-                Children = new Drawable[]
+                Child = new PopoverContainer
                 {
-                    fillFlow = new FillFlowContainer
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Children = new Drawable[]
                     {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Spacing = new Vector2(0f, 2f),
-                    },
-                    drawWidthText = new OsuSpriteText(),
+                        fillFlow = new FillFlowContainer
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Spacing = new Vector2(0f, 2f),
+                        },
+                        drawWidthText = new OsuSpriteText(),
+                    }
                 };
 
                 foreach (var scoreInfo in getTestScores())
                 {
-                    fillFlow.Add(new LeaderboardScoreV2(scoreInfo)
+                    fillFlow.Add(new BeatmapLeaderboardScore(scoreInfo)
                     {
                         Rank = scoreInfo.Position,
                         IsPersonalBest = scoreInfo.User.Id == 2,
@@ -108,22 +119,27 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [Test]
         public void TestUseTheseModsDoesNotCopySystemMods()
         {
-            LeaderboardScoreV2 score = null!;
+            BeatmapLeaderboardScore score = null!;
 
             AddStep("create content", () =>
             {
-                Children = new Drawable[]
+                Child = new PopoverContainer
                 {
-                    fillFlow = new FillFlowContainer
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Children = new Drawable[]
                     {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Spacing = new Vector2(0f, 2f),
-                        Shear = new Vector2(OsuGame.SHEAR, 0)
-                    },
-                    drawWidthText = new OsuSpriteText(),
+                        fillFlow = new FillFlowContainer
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Spacing = new Vector2(0f, 2f),
+                            Shear = new Vector2(OsuGame.SHEAR, 0)
+                        },
+                        drawWidthText = new OsuSpriteText(),
+                    }
                 };
 
                 var scoreInfo = new ScoreInfo
@@ -146,7 +162,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                     Date = DateTimeOffset.Now.AddYears(-2),
                 };
 
-                fillFlow.Add(score = new LeaderboardScoreV2(scoreInfo)
+                fillFlow.Add(score = new BeatmapLeaderboardScore(scoreInfo)
                 {
                     Rank = scoreInfo.Position,
                     Shear = Vector2.Zero,

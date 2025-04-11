@@ -16,7 +16,22 @@ namespace osu.Game.Beatmaps
         /// </summary>
         public Func<Drawable> CreateIcon;
 
-        public string Content;
+        /// <summary>
+        /// The name of this statistic.
+        /// </summary>
         public LocalisableString Name;
+
+        /// <summary>
+        /// The text representing the value of this statistic.
+        /// </summary>
+        public string Content;
+
+        /// <summary>
+        /// The ratio of this statistic compared to other relevant statistics, or null if not applicable.
+        /// </summary>
+        /// <remarks>
+        /// This is used to display a bar on top of the statistic with the given ratio.
+        /// </remarks>
+        public float? Ratio;
     }
 }

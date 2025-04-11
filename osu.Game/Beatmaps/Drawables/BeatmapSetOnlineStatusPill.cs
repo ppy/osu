@@ -19,9 +19,10 @@ namespace osu.Game.Beatmaps.Drawables
 {
     public partial class BeatmapSetOnlineStatusPill : CircularContainer, IHasTooltip
     {
-        private const double animation_duration = 400;
-
-        private BeatmapOnlineStatus status;
+        /// <summary>
+        /// Whether to show <see cref="BeatmapOnlineStatus.None"/> as "unknownn" instead of fading out.
+        /// </summary>
+        public bool ShowUnknownStatus { get; init; }
 
         public BeatmapOnlineStatus Status
         {
@@ -34,29 +35,26 @@ namespace osu.Game.Beatmaps.Drawables
                 status = value;
 
                 if (IsLoaded)
-                {
-                    AutoSizeDuration = (float)animation_duration;
-                    AutoSizeEasing = Easing.OutQuint;
-
                     updateState();
-                }
             }
         }
 
+        private BeatmapOnlineStatus status;
+
         public float TextSize
         {
-            get => statusText.Font.Size;
-            set => statusText.Font = statusText.Font.With(size: value);
+            init => statusText.Font = statusText.Font.With(size: value);
         }
 
         public MarginPadding TextPadding
         {
-            get => statusText.Padding;
-            set => statusText.Padding = value;
+            init => statusText.Padding = value;
         }
 
         private readonly OsuSpriteText statusText;
         private readonly Box background;
+
+        private const double animation_duration = 400;
 
         [Resolved]
         private OsuColour colours { get; set; } = null!;
@@ -66,6 +64,7 @@ namespace osu.Game.Beatmaps.Drawables
 
         public BeatmapSetOnlineStatusPill()
         {
+            AutoSizeAxes = Axes.Both;
             Masking = true;
 
             Alpha = 0;
@@ -99,10 +98,18 @@ namespace osu.Game.Beatmaps.Drawables
 
         private void updateState()
         {
-            if (Status == BeatmapOnlineStatus.None)
+            if (Status == BeatmapOnlineStatus.None && !ShowUnknownStatus)
             {
-                Hide();
+                this.FadeOut(animation_duration, Easing.OutQuint);
                 return;
+            }
+
+            // Only animate resizing if we already have a size.
+            // This avoids animating height from zero.
+            if (Width > 0)
+            {
+                AutoSizeDuration = (float)animation_duration;
+                AutoSizeEasing = Easing.OutQuint;
             }
 
             this.FadeIn(animation_duration, Easing.OutQuint);
