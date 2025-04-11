@@ -42,6 +42,7 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.BeatmapDetailTab, PlayBeatmapDetailArea.TabType.Local);
             SetDefault(OsuSetting.BeatmapDetailModsFilter, false);
+            SetDefault(OsuSetting.BeatmapDetailScoresSortMode, ScoreSortMode.TotalScore);
 
             SetDefault(OsuSetting.ShowConvertedBeatmaps, true);
             SetDefault(OsuSetting.DisplayStarsMinimum, 0.0, 0, 10, 0.1);
@@ -378,6 +379,7 @@ namespace osu.Game.Configuration
         Prefer24HourTime,
         BeatmapDetailTab,
         BeatmapDetailModsFilter,
+        BeatmapDetailScoresSortMode,
         Username,
         ReleaseStream,
         SavePassword,
