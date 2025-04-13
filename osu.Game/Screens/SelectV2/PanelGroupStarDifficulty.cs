@@ -177,8 +177,6 @@ namespace osu.Game.Screens.SelectV2
         {
             const float duration = 500;
 
-            Debug.Assert(Item != null);
-
             iconContainer.ResizeWidthTo(Expanded.Value ? 20f : 5f, duration, Easing.OutQuint);
             iconContainer.FadeTo(Expanded.Value ? 1f : 0f, duration, Easing.OutQuint);
 
