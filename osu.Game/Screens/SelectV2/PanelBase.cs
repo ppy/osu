@@ -159,7 +159,7 @@ namespace osu.Game.Screens.SelectV2
                     keyboardSelectionLayer = new Box
                     {
                         Alpha = 0,
-                        Colour = colours.Yellow.Opacity(0.1f),
+                        Colour = colourProvider.Highlight1.Opacity(0.1f),
                         Blending = BlendingParameters.Additive,
                         RelativeSizeAxes = Axes.Both,
                     },
