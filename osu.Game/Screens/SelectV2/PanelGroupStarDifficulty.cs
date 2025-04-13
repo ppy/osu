@@ -15,7 +15,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using osuTK;
 using osuTK.Graphics;
-using osu.Game.Localisation;
 
 namespace osu.Game.Screens.SelectV2
 {
@@ -147,15 +146,15 @@ namespace osu.Game.Screens.SelectV2
             switch (starNumber)
             {
                 case 0:
-                    starRatingText.Text = SongSelectStrings.BelowStar;
+                    starRatingText.Text = @"Below 1 Star";
                     break;
 
                 case 1:
-                    starRatingText.Text = SongSelectStrings.Star;
+                    starRatingText.Text = @"1 Star";
                     break;
 
                 default:
-                    starRatingText.Text = SongSelectStrings.Stars(starNumber);
+                    starRatingText.Text = $"{starNumber} Stars";
                     break;
             }
 

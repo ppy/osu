@@ -54,21 +54,6 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString EditBeatmap => new TranslatableString(getKey(@"edit_beatmap"), @"Edit beatmap");
 
-        /// <summary>
-        /// "Below 1 Star"
-        /// </summary>
-        public static LocalisableString BelowStar => new TranslatableString(getKey(@"below_star"), @"Below 1 Star");
-
-        /// <summary>
-        /// "1 Star"
-        /// </summary>
-        public static LocalisableString Star => new TranslatableString(getKey(@"star"), @"1 Star");
-
-        /// <summary>
-        /// "{0} Stars"
-        /// </summary>
-        public static LocalisableString Stars(int starNumber) => new TranslatableString(getKey(@"stars"), @"{0} Stars", starNumber);
-
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
