@@ -215,7 +215,8 @@ namespace osu.Game.Screens.OnlinePlay
             {
                 (freeModsFooterButton = new FooterButtonFreeMods(freeModSelect)
                 {
-                    FreeMods = { BindTarget = FreeMods }
+                    FreeMods = { BindTarget = FreeMods },
+                    Freestyle = { BindTarget = Freestyle }
                 }, null),
                 (new FooterButtonFreestyle
                 {
