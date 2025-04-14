@@ -26,21 +26,21 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                     Name = @"Fruits",
                     Content = fruits.ToString(),
                     CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Circles),
-                    Ratio = fruits / (float)sum,
+                    BarDisplayLength = fruits / (float)sum,
                 },
                 new BeatmapStatistic
                 {
                     Name = @"Juice Streams",
                     Content = juiceStreams.ToString(),
                     CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Sliders),
-                    Ratio = juiceStreams / (float)sum,
+                    BarDisplayLength = juiceStreams / (float)sum,
                 },
                 new BeatmapStatistic
                 {
                     Name = @"Banana Showers",
                     Content = bananaShowers.ToString(),
                     CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Spinners),
-                    Ratio = Math.Min(bananaShowers / 10f, 1),
+                    BarDisplayLength = Math.Min(bananaShowers / 10f, 1),
                 }
             };
         }

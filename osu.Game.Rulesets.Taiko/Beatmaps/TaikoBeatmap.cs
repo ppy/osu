@@ -25,21 +25,21 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
                     Name = @"Hits",
                     CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Circles),
                     Content = hits.ToString(),
-                    Ratio = hits / (float)sum,
+                    BarDisplayLength = hits / (float)sum,
                 },
                 new BeatmapStatistic
                 {
                     Name = @"Drumrolls",
                     CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Sliders),
                     Content = drumRolls.ToString(),
-                    Ratio = drumRolls / (float)sum,
+                    BarDisplayLength = drumRolls / (float)sum,
                 },
                 new BeatmapStatistic
                 {
                     Name = @"Swells",
                     CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Spinners),
                     Content = swells.ToString(),
-                    Ratio = Math.Min(swells / 10f, 1),
+                    BarDisplayLength = Math.Min(swells / 10f, 1),
                 }
             };
         }
