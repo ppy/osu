@@ -55,10 +55,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             var currentReplayFrame = replayFrames[currentReplayFrameIndex];
             var nextReplayFrame = replayFrames[currentReplayFrameIndex + 1];
 
-            var closestUnjudgedHitObject = playfield.HitObjectContainer.AliveObjects
-                .OfType<DrawableOsuHitObject>()
-                .FirstOrDefault(x => !x.Judged);
-
+            var closestUnjudgedHitObject = playfield.HitObjectContainer.AliveObjects.OfType<DrawableOsuHitObject>().FirstOrDefault(x => !x.Judged);
             bool pauseMousePositionUpdates = closestUnjudgedHitObject switch
             {
                 DrawableHitCircle circle => isMouseDirectlyOverHitObject(playfield, circle),
