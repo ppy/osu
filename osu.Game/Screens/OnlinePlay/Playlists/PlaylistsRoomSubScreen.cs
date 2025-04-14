@@ -552,26 +552,17 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         }
 
         /// <summary>
-        /// Lists the <see cref="Mod"/>s that are valid to be selected for the user mod style.
-        /// </summary>
-        private Mod[] listAllowedMods()
-        {
-            if (SelectedItem.Value == null)
-                return [];
-
-            PlaylistItem item = SelectedItem.Value;
-            RulesetInfo gameplayRuleset = UserRuleset.Value ?? rulesets.GetRuleset(item.RulesetID)!;
-            Ruleset rulesetInstance = gameplayRuleset.CreateInstance();
-
-            return item.AllowedMods.Select(m => m.ToMod(rulesetInstance)).ToArray();
-        }
-
-        /// <summary>
         /// Validates the user mod style against the selected item and ruleset style.
         /// </summary>
         private void validateUserMods()
         {
-            Mod[] allowedMods = listAllowedMods();
+            if (SelectedItem.Value == null)
+                return;
+
+            PlaylistItem item = SelectedItem.Value;
+            RulesetInfo gameplayRuleset = UserRuleset.Value ?? rulesets.GetRuleset(item.RulesetID)!;
+            Mod[] allowedMods = ModUtils.ListUserSelectableFreeMods(MatchType.Playlists, item.RequiredMods, item.AllowedMods, item.Freestyle, gameplayRuleset.CreateInstance());
+
             UserMods.Value = UserMods.Value.Where(m => allowedMods.Any(a => m.GetType() == a.GetType())).ToArray();
         }
 
@@ -588,7 +579,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             IBeatmapInfo gameplayBeatmap = UserBeatmap.Value ?? item.Beatmap;
             RulesetInfo gameplayRuleset = UserRuleset.Value ?? rulesets.GetRuleset(item.RulesetID)!;
             Ruleset rulesetInstance = gameplayRuleset.CreateInstance();
-            Mod[] allowedMods = listAllowedMods();
+            Mod[] allowedMods = ModUtils.ListUserSelectableFreeMods(MatchType.Playlists, item.RequiredMods, item.AllowedMods, item.Freestyle, gameplayRuleset.CreateInstance());
 
             // Update global gameplay state to correspond to the new selection.
             // Retrieve the corresponding local beatmap, since we can't directly use the playlist's beatmap info
