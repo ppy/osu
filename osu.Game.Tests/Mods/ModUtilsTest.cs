@@ -464,10 +464,10 @@ namespace osu.Game.Tests.Mods
                 {
                     foreach (var mod in ruleset.CreateAllMods())
                     {
-                        if (mod.ValidForFreestyle && mod.UserPlayable && !commonAcronyms.Contains(mod.Acronym))
-                            Assert.Fail($"{mod.GetType().ReadableName()} declares {nameof(Mod.ValidForFreestyle)} but does not exist in all four basic rulesets!");
-                        if (!mod.ValidForFreestyle && mod.UserPlayable && commonAcronyms.Contains(mod.Acronym))
-                            Assert.Fail($"{mod.GetType().ReadableName()} does not declare {nameof(Mod.ValidForFreestyle)} but exists in all four basic rulesets!");
+                        if (mod.ValidForFreestyleAsRequiredMod && mod.UserPlayable && !commonAcronyms.Contains(mod.Acronym))
+                            Assert.Fail($"{mod.GetType().ReadableName()} declares {nameof(Mod.ValidForFreestyleAsRequiredMod)} but does not exist in all four basic rulesets!");
+                        if (!mod.ValidForFreestyleAsRequiredMod && mod.UserPlayable && commonAcronyms.Contains(mod.Acronym))
+                            Assert.Fail($"{mod.GetType().ReadableName()} does not declare {nameof(Mod.ValidForFreestyleAsRequiredMod)} but exists in all four basic rulesets!");
                     }
                 }
             });
@@ -509,7 +509,7 @@ namespace osu.Game.Tests.Mods
             public override double ScoreMultiplier => 1;
             public override string Acronym => string.Empty;
             public override bool HasImplementation => true;
-            public override bool ValidForFreestyle => false;
+            public override bool ValidForFreestyleAsRequiredMod => false;
         }
 
         public interface IModCompatibilitySpecification
