@@ -18,6 +18,7 @@ using osu.Game.Online.Chat;
 using osu.Game.Overlays.Chat.Listing;
 using osu.Game.Users.Drawables;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Overlays.Chat.ChannelList
 {
@@ -158,6 +159,17 @@ namespace osu.Game.Overlays.Chat.ChannelList
                 Margin = new MarginPadding { Right = 3 },
                 Mentions = { BindTarget = Mentions },
             };
+        }
+
+        protected override bool OnMouseDown(MouseDownEvent e)
+        {
+            if (e.Button == MouseButton.Middle)
+            {
+                close?.TriggerClick();
+                return true;
+            }
+
+            return base.OnMouseDown(e);
         }
 
         private ChannelListItemCloseButton? createCloseButton()
