@@ -21,11 +21,13 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
     {
         public override bool IsPresent => true; // handle input when hidden
 
+        private readonly Bindable<bool> isSpinning = new Bindable<bool>();
         private readonly DrawableSpinner drawableSpinner;
 
         private Vector2? mousePosition;
         private float? lastAngle;
 
+        private bool tracking;
         private float currentRotation;
         private bool rotationTransferred;
 
@@ -40,19 +42,26 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
             RelativeSizeAxes = Axes.Both;
         }
 
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
-
-        public bool Tracking { get; set; }
+        /// <summary>
+        /// Whether the user is currently providing motion input to this tracker.
+        /// </summary>
+        public bool Tracking
+        {
+            get => tracking;
+            set => tracking = IsSpinnableTime && value;
+        }
 
         /// <summary>
-        /// Whether the spinning is spinning at a reasonable speed to be considered visually spinning.
+        /// Whether the spinner is spinning at a reasonable speed to be considered visually spinning.
         /// </summary>
-        public readonly BindableBool IsSpinning = new BindableBool();
+        public IBindable<bool> IsSpinning => isSpinning;
 
         /// <summary>
         /// Whether currently in the correct time range to allow spinning.
         /// </summary>
         public bool IsSpinnableTime => drawableSpinner.HitObject.StartTime <= Time.Current && drawableSpinner.HitObject.EndTime > Time.Current;
+
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
@@ -79,7 +88,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                 lastAngle = thisAngle;
             }
 
-            IsSpinning.Value = IsSpinnableTime && Math.Abs(currentRotation - Rotation) > 10f;
+            isSpinning.Value = IsSpinnableTime && Math.Abs(currentRotation - Rotation) > 10f;
             Rotation = (float)Interpolation.Damp(Rotation, currentRotation, 0.99, Math.Abs(Time.Elapsed));
         }
 
@@ -113,7 +122,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         private void resetState(DrawableHitObject obj)
         {
             Tracking = false;
-            IsSpinning.Value = false;
+            isSpinning.Value = false;
             mousePosition = null;
             lastAngle = null;
             currentRotation = 0;

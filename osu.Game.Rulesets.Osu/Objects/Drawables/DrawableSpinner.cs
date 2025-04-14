@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private Container<DrawableSpinnerTick> ticks;
         private PausableSkinnableSound spinningSample;
 
-        private Bindable<bool> isSpinning;
+        private readonly IBindable<bool> isSpinning = new Bindable<bool>();
         private bool spinnerFrequencyModulate;
 
         private const float spinning_sample_initial_frequency = 1.0f;
@@ -127,8 +127,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.LoadComplete();
 
-            isSpinning = RotationTracker.IsSpinning.GetBoundCopy();
-            isSpinning.BindValueChanged(updateSpinningSample);
+            isSpinning.BindTo(RotationTracker.IsSpinning);
+            isSpinning.BindValueChanged(_ => updateSpinningSample());
         }
 
         protected override void OnFree()
@@ -149,9 +149,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             maxBonusSample.Samples = new ISampleInfo[] { new SpinnerBonusMaxSampleInfo(HitObject.CreateHitSampleInfo()) };
         }
 
-        private void updateSpinningSample(ValueChangedEvent<bool> tracking)
+        private void updateSpinningSample()
         {
-            if (tracking.NewValue)
+            if (isSpinning.Value)
             {
                 if (!spinningSample.RequestedPlaying)
                     spinningSample.Play();
@@ -197,7 +197,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Expire();
 
             // skin change does a rewind of transforms, which will stop the spinning sound from playing if it's currently in playback.
-            isSpinning?.TriggerChange();
+            updateSpinningSample();
         }
 
         protected override void ClearNestedHitObjects()
@@ -277,13 +277,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             base.Update();
 
             if (HandleUserInput)
-            {
-                bool isValidSpinningTime = Time.Current >= HitObject.StartTime && Time.Current <= HitObject.EndTime;
-
-                RotationTracker.Tracking = !Result.HasResult
-                                           && correctButtonPressed()
-                                           && isValidSpinningTime;
-            }
+                RotationTracker.Tracking = !Result.HasResult && correctButtonPressed();
 
             if (spinningSample != null && spinnerFrequencyModulate)
                 spinningSample.Frequency.Value = spinning_sample_modulated_base_frequency + Progress;
