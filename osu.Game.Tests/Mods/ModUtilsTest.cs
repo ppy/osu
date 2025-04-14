@@ -280,7 +280,7 @@ namespace osu.Game.Tests.Mods
             },
         };
 
-        private static readonly object[] invalid_freestyle_mod_test_scenarios =
+        private static readonly object[] invalid_freestyle_required_mod_test_scenarios =
         {
             // system mod.
             new object[]
@@ -308,6 +308,28 @@ namespace osu.Game.Tests.Mods
             },
         };
 
+        private static readonly object[] invalid_freestyle_allowed_mod_test_scenarios =
+        {
+            // system mod.
+            new object[]
+            {
+                new Mod[] { new OsuModHidden(), new OsuModTouchDevice() },
+                new[] { typeof(OsuModHidden), typeof(OsuModTouchDevice) }
+            },
+            // multi mod.
+            new object[]
+            {
+                new Mod[] { new MultiMod(new OsuModSuddenDeath(), new OsuModPerfect()) },
+                new[] { typeof(MultiMod) }
+            },
+            // invalid freestyle mod.
+            new object[]
+            {
+                new Mod[] { new OsuModHidden() },
+                new[] { typeof(OsuModHidden) }
+            },
+        };
+
         [TestCaseSource(nameof(invalid_mod_test_scenarios))]
         public void TestInvalidModScenarios(Mod[] inputMods, Type[] expectedInvalid)
         {
@@ -324,7 +346,7 @@ namespace osu.Game.Tests.Mods
         [TestCaseSource(nameof(invalid_multiplayer_mod_test_scenarios))]
         public void TestInvalidMultiplayerModScenarios(Mod[] inputMods, Type[] expectedInvalid)
         {
-            bool isValid = ModUtils.CheckValidRequiredModsForMultiplayer(inputMods, out var invalid);
+            bool isValid = ModUtils.CheckValidRequiredModsForMultiplayer(inputMods, false, out var invalid);
 
             Assert.That(isValid, Is.EqualTo(expectedInvalid.Length == 0));
 
@@ -334,23 +356,10 @@ namespace osu.Game.Tests.Mods
                 Assert.That(invalid?.Select(t => t.GetType()), Is.EquivalentTo(expectedInvalid));
         }
 
-        [TestCaseSource(nameof(invalid_freestyle_mod_test_scenarios))]
-        public void TestInvalidFreestyleModScenarios(Mod[] inputMods, Type[] expectedInvalid)
+        [TestCaseSource(nameof(invalid_freestyle_required_mod_test_scenarios))]
+        public void TestInvalidFreestyleRequiredModScenarios(Mod[] inputMods, Type[] expectedInvalid)
         {
-            bool isValid = ModUtils.CheckValidModsForFreestyle(inputMods, out var invalid);
-
-            Assert.That(isValid, Is.EqualTo(expectedInvalid.Length == 0));
-
-            if (isValid)
-                Assert.IsNull(invalid);
-            else
-                Assert.That(invalid?.Select(t => t.GetType()), Is.EquivalentTo(expectedInvalid));
-        }
-
-        [TestCaseSource(nameof(invalid_free_mod_test_scenarios))]
-        public void TestInvalidFreeModScenarios(Mod[] inputMods, Type[] expectedInvalid)
-        {
-            bool isValid = ModUtils.CheckValidFreeModsForMultiplayer(inputMods, out var invalid);
+            bool isValid = ModUtils.CheckValidRequiredModsForMultiplayer(inputMods, true, out var invalid);
 
             Assert.That(isValid, Is.EqualTo(expectedInvalid.Length == 0));
 
@@ -429,13 +438,13 @@ namespace osu.Game.Tests.Mods
         {
             foreach (MatchType type in new[] { MatchType.Playlists, MatchType.HeadToHead })
             {
-                foreach (bool required in new[] { false, true })
-                {
-                    Assert.IsTrue(ModUtils.IsValidModForMatch(new OsuModHardRock(), type, required, true));
-                    Assert.IsTrue(ModUtils.IsValidModForMatch(new OsuModHardRock(), type, required, false));
-                    Assert.IsFalse(ModUtils.IsValidModForMatch(new OsuModBarrelRoll(), type, required, true));
-                    Assert.IsTrue(ModUtils.IsValidModForMatch(new OsuModBarrelRoll(), type, required, false));
-                }
+                // Required mods
+                Assert.IsTrue(ModUtils.IsValidModForMatch(new OsuModHardRock(), type, true, true));
+                Assert.IsFalse(ModUtils.IsValidModForMatch(new OsuModBarrelRoll(), type, true, true));
+
+                // Allowed mods
+                Assert.IsTrue(ModUtils.IsValidModForMatch(new OsuModHardRock(), type, false, true));
+                Assert.IsTrue(ModUtils.IsValidModForMatch(new OsuModBarrelRoll(), type, false, true));
             }
         }
 
