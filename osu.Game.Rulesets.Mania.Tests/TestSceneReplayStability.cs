@@ -17,6 +17,10 @@ namespace osu.Game.Rulesets.Mania.Tests
     {
         private static readonly object[][] test_cases =
         {
+            // With respect to notation,
+            // square brackets `[]` represent *closed* or *inclusive* bounds,
+            // while round brackets `()` represent *open* or *exclusive* bounds.
+
             // OD = 5 test cases.
             // PERFECT hit window is [ -19.4ms,  19.4ms]
             // GREAT   hit window is [ -49.0ms,  49.0ms]

@@ -17,6 +17,10 @@ namespace osu.Game.Rulesets.Taiko.Tests
     {
         private static readonly object[][] test_cases =
         {
+            // With respect to notation,
+            // square brackets `[]` represent *closed* or *inclusive* bounds,
+            // while round brackets `()` represent *open* or *exclusive* bounds.
+
             // OD = 5 test cases.
             // GREAT hit window is [-35ms, 35ms]
             // OK    hit window is [-80ms, 80ms]
