@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
             int hits = HitObjects.Count(s => s is Hit);
             int drumRolls = HitObjects.Count(s => s is DrumRoll);
             int swells = HitObjects.Count(s => s is Swell);
-            int sum = Math.Max(1, hits + drumRolls + swells);
+            int sum = Math.Max(1, hits + drumRolls);
 
             return new[]
             {
