@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
             int circles = HitObjects.Count(c => c is HitCircle);
             int sliders = HitObjects.Count(s => s is Slider);
             int spinners = HitObjects.Count(s => s is Spinner);
-            int sum = Math.Max(1, circles + sliders + spinners);
+            int sum = Math.Max(1, circles + sliders);
 
             return new[]
             {

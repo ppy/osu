@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
             int fruits = HitObjects.Count(s => s is Fruit);
             int juiceStreams = HitObjects.Count(s => s is JuiceStream);
             int bananaShowers = HitObjects.Count(s => s is BananaShower);
-            int sum = Math.Max(1, fruits + juiceStreams + bananaShowers);
+            int sum = Math.Max(1, fruits + juiceStreams);
 
             return new[]
             {
