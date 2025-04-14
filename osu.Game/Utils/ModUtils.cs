@@ -320,5 +320,32 @@ namespace osu.Game.Utils
                     return isRequired ? mod.ValidForMultiplayer : mod.ValidForMultiplayerAsFreeMod;
             }
         }
+
+        /// <summary>
+        /// Given an online listing of mods and the user's preferred ruleset, gathers the mods which are selectable as free mods by the current user.
+        /// </summary>
+        /// <param name="matchType">The type of match being played.</param>
+        /// <param name="requiredMods">The required mods for the playlist item.</param>
+        /// <param name="allowedMods">The allowed mods for the playlist item.</param>
+        /// <param name="freestyle">Whether freestyle is enabled for the playlist item.</param>
+        /// <param name="userRuleset">The user's preferred ruleset, which may differ from the playlist item's selection on freestyle playlist items.</param>
+        public static Mod[] ListUserSelectableFreeMods(MatchType matchType, IEnumerable<APIMod> requiredMods, IEnumerable<APIMod> allowedMods, bool freestyle, Ruleset userRuleset)
+        {
+            if (freestyle)
+            {
+                Mod[] rulesetRequiredMods = requiredMods.Select(m => m.ToMod(userRuleset)).ToArray();
+
+                // In freestyle, the playlist item doesn't provide the allowed mods. Instead, all mods are unconditionally allowed by default.
+                return userRuleset.AllMods.OfType<Mod>()
+                                  // But the mods must still be compatible with the room...
+                                  .Where(m => IsValidModForMatch(m, matchType, false, true))
+                                  // ... And compatible with the required mods listing (this also handles de-duplication).
+                                  .Where(m => CheckCompatibleSet(rulesetRequiredMods.Append(m)))
+                                  .ToArray();
+            }
+
+            // Without freestyle, only the mods specified by the playlist item are valid.
+            return allowedMods.Select(m => m.ToMod(userRuleset)).ToArray();
+        }
     }
 }
