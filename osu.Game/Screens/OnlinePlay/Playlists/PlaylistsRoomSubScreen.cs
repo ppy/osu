@@ -598,7 +598,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             Mods.Value = UserMods.Value.Concat(item.RequiredMods.Select(m => m.ToMod(rulesetInstance))).ToArray();
 
             // Update UI elements to reflect the new selection.
-            bool freemods = allowedMods.Length > 0;
+            bool freemods = item.Freestyle || allowedMods.Length > 0;
             bool freestyle = item.Freestyle;
 
             if (freemods)

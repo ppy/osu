@@ -47,6 +47,7 @@ namespace osu.Game.Screens.OnlinePlay
         private readonly Room room;
         private readonly PlaylistItem? initialItem;
         private readonly FreeModSelectOverlay freeModSelect;
+        private FooterButton freeModsFooterButton = null!;
 
         private IDisposable? freeModSelectOverlayRegistration;
 
@@ -118,30 +119,35 @@ namespace osu.Game.Screens.OnlinePlay
             Ruleset.BindValueChanged(onRulesetChanged);
             Freestyle.BindValueChanged(onFreestyleChanged, true);
 
-            if (initialItem == null)
-            {
-                // Enable all free mods if we're creating a new playlist item.
-                // Todo: This needs to be scheduled because mods aren't available until the nested LoadComplete(). Can we do this any better?
-                SchedulerAfterChildren.Add(() => FreeMods.Value = freeModSelect.AllAvailableMods.Where(state => state.ValidForSelection.Value).Select(state => state.Mod).ToArray());
-            }
-
             freeModSelectOverlayRegistration = OverlayManager?.RegisterBlockingOverlay(freeModSelect);
         }
 
         private void onFreestyleChanged(ValueChangedEvent<bool> enabled)
         {
-            // If all free mods were previously selected, we'll need to reselect what may now be a larger selection.
-            bool allFreeModsSelected = FreeMods.Value.Count > 0 && freeModSelect.AllAvailableMods.Count(state => state.ValidForSelection.Value) == FreeMods.Value.Count;
-
             // Remove invalid mods and display the newly available mod panels.
             Mods.Value = Mods.Value.Where(isValidGlobalMod).ToArray();
             ModSelect.IsValidMod = isValidGlobalMod;
             FreeMods.Value = FreeMods.Value.Where(isValidFreeMod).ToArray();
             freeModSelect.IsValidMod = isValidFreeMod;
 
-            // Reselect all free mods if they were all previously selected (prefer keeping free mods enabled).
-            if (allFreeModsSelected)
+            if (enabled.NewValue)
+            {
+                freeModsFooterButton.Enabled.Value = false;
+                freeModSelect.Hide();
+
+                // Freestyle allows all mods to be selected as freemods. This does not play nicely for some components:
+                // - We probably don't want to store a gigantic list of acronyms to the database.
+                // - The mod select overlay isn't built to handle duplicate mods/mods from all rulesets being shoved into it.
+                // Instead, freestyle inherently assumes this list is empty, and must be empty for server-side validation to pass.
+                FreeMods.Value = [];
+            }
+            else
+            {
+                freeModsFooterButton.Enabled.Value = true;
+
+                // When disabling freestyle, enable freemods by default.
                 FreeMods.Value = freeModSelect.AllAvailableMods.Where(state => state.ValidForSelection.Value).Select(state => state.Mod).ToArray();
+            }
         }
 
         private void onGlobalModsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
@@ -207,7 +213,7 @@ namespace osu.Game.Screens.OnlinePlay
 
             baseButtons.InsertRange(baseButtons.FindIndex(b => b.button is FooterButtonMods) + 1, new (FooterButton, OverlayContainer?)[]
             {
-                (new FooterButtonFreeMods(freeModSelect)
+                (freeModsFooterButton = new FooterButtonFreeMods(freeModSelect)
                 {
                     FreeMods = { BindTarget = FreeMods }
                 }, null),
