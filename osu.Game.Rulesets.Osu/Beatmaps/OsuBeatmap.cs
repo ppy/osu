@@ -25,21 +25,21 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                     Name = "Circles",
                     Content = circles.ToString(),
                     CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Circles),
-                    Ratio = circles / (float)sum,
+                    BarDisplayLength = circles / (float)sum,
                 },
                 new BeatmapStatistic
                 {
                     Name = "Sliders",
                     Content = sliders.ToString(),
                     CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Sliders),
-                    Ratio = sliders / (float)sum,
+                    BarDisplayLength = sliders / (float)sum,
                 },
                 new BeatmapStatistic
                 {
                     Name = @"Spinners",
                     Content = spinners.ToString(),
                     CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Spinners),
-                    Ratio = Math.Min(spinners / 10f, 1),
+                    BarDisplayLength = Math.Min(spinners / 10f, 1),
                 }
             };
         }

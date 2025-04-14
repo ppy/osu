@@ -27,11 +27,8 @@ namespace osu.Game.Beatmaps
         public string Content;
 
         /// <summary>
-        /// The ratio of this statistic compared to other relevant statistics, or null if not applicable.
+        /// The length of a bar which visually represents this statistic's relevance in the beatmap.
         /// </summary>
-        /// <remarks>
-        /// This is used to display a bar on top of the statistic with the given ratio.
-        /// </remarks>
-        public float? Ratio;
+        public float? BarDisplayLength;
     }
 }

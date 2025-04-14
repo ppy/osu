@@ -45,14 +45,14 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                     Name = @"Notes",
                     CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Circles),
                     Content = notes.ToString(),
-                    Ratio = notes / (float)sum,
+                    BarDisplayLength = notes / (float)sum,
                 },
                 new BeatmapStatistic
                 {
                     Name = @"Hold Notes",
                     CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Sliders),
                     Content = holdNotes.ToString(),
-                    Ratio = holdNotes / (float)sum,
+                    BarDisplayLength = holdNotes / (float)sum,
                 },
             };
         }
