@@ -128,21 +128,13 @@ namespace osu.Game.Utils
         }
 
         /// <summary>
-        /// Checks that all <see cref="Mod"/>s in a combination are valid as "required mods" in a freestyle room.
-        /// </summary>
-        /// <param name="mods">The mods to check.</param>
-        /// <param name="invalidMods">Invalid mods, if any were found. Will be null if all mods were valid.</param>
-        /// <returns>Whether the input mods were all valid. If false, <paramref name="invalidMods"/> will contain all invalid entries.</returns>
-        public static bool CheckValidModsForFreestyle(IEnumerable<Mod> mods, [NotNullWhen(false)] out List<Mod>? invalidMods)
-            => checkValid(mods, m => m.Type != ModType.System && m.HasImplementation && m.ValidForFreestyle, out invalidMods);
-
-        /// <summary>
         /// Checks that all <see cref="Mod"/>s in a combination are valid as "required mods" in a multiplayer match session.
         /// </summary>
         /// <param name="mods">The mods to check.</param>
+        /// <param name="freestyle">Whether freestyle is enabled for the playlist item.</param>
         /// <param name="invalidMods">Invalid mods, if any were found. Will be null if all mods were valid.</param>
         /// <returns>Whether the input mods were all valid. If false, <paramref name="invalidMods"/> will contain all invalid entries.</returns>
-        public static bool CheckValidRequiredModsForMultiplayer(IEnumerable<Mod> mods, [NotNullWhen(false)] out List<Mod>? invalidMods)
+        public static bool CheckValidRequiredModsForMultiplayer(IEnumerable<Mod> mods, bool freestyle, [NotNullWhen(false)] out List<Mod>? invalidMods)
         {
             mods = mods.ToArray();
 
@@ -154,7 +146,7 @@ namespace osu.Game.Utils
             if (!CheckCompatibleSet(mods, out invalidMods))
                 return false;
 
-            return checkValid(mods, m => m.Type != ModType.System && m.HasImplementation && m.ValidForMultiplayer, out invalidMods);
+            return checkValid(mods, m => m.Type != ModType.System && m.HasImplementation && m.ValidForMultiplayer && (!freestyle || m.ValidForFreestyle), out invalidMods);
         }
 
         /// <summary>
@@ -316,7 +308,7 @@ namespace osu.Game.Utils
             if (mod.Type == ModType.System || !mod.UserPlayable || !mod.HasImplementation)
                 return false;
 
-            if (isFreestyle && !mod.ValidForFreestyle)
+            if (isFreestyle && isRequired && !mod.ValidForFreestyle)
                 return false;
 
             switch (matchType)

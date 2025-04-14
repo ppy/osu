@@ -121,15 +121,13 @@ namespace osu.Game.Rulesets.Mods
         public virtual bool ValidForMultiplayer => true;
 
         /// <summary>
-        /// Whether this mod can be specified as a mod (either "required" or "allowed") on freestyle playlist items,
-        /// indicating that all rulesets contain an implementation of this mod.
+        /// Whether this mod can be specified as a "required" mod on freestyle playlist items, indicating that all rulesets contain an implementation of this mod.
         /// </summary>
         /// <example>
         /// <list type="bullet">
-        /// <item><see cref="ModHardRock"/> <b>is</b> valid as a freestyle mod.</item>
+        /// <item><see cref="ModHardRock"/> <b>is</b> valid as a freestyle required-mod.</item>
         /// <item>
-        /// <c>OsuModNoScope</c> <b>is not</b> valid as a freestyle mod,
-        /// as it is only implemented in the osu! ruleset.
+        /// <c>OsuModNoScope</c> <b>is not</b> valid, as it is only implemented in the osu! ruleset.
         /// </item>
         /// </list>
         /// </example>
