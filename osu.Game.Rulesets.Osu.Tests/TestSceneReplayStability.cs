@@ -18,6 +18,10 @@ namespace osu.Game.Rulesets.Osu.Tests
     {
         private static readonly object[][] test_cases =
         {
+            // With respect to notation,
+            // square brackets `[]` represent *closed* or *inclusive* bounds,
+            // while round brackets `()` represent *open* or *exclusive* bounds.
+
             // OD = 5 test cases.
             // GREAT hit window is [ -50ms,  50ms]
             // OK    hit window is [-100ms, 100ms]
