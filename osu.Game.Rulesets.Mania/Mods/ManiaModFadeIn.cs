@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Mania.Mods
         public override double ScoreMultiplier => 1;
 
         // Ideally we'd allow this, but it's not easy to handle due to the change in acronym from the base class.
-        public override bool ValidForFreestyle => false;
+        public override bool ValidForFreestyleAsRequiredMod => false;
 
         public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[]
         {

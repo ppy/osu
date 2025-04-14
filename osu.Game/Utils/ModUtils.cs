@@ -146,7 +146,7 @@ namespace osu.Game.Utils
             if (!CheckCompatibleSet(mods, out invalidMods))
                 return false;
 
-            return checkValid(mods, m => m.Type != ModType.System && m.HasImplementation && m.ValidForMultiplayer && (!freestyle || m.ValidForFreestyle), out invalidMods);
+            return checkValid(mods, m => m.Type != ModType.System && m.HasImplementation && m.ValidForMultiplayer && (!freestyle || m.ValidForFreestyleAsRequiredMod), out invalidMods);
         }
 
         /// <summary>
@@ -308,7 +308,7 @@ namespace osu.Game.Utils
             if (mod.Type == ModType.System || !mod.UserPlayable || !mod.HasImplementation)
                 return false;
 
-            if (isFreestyle && isRequired && !mod.ValidForFreestyle)
+            if (isFreestyle && isRequired && !mod.ValidForFreestyleAsRequiredMod)
                 return false;
 
             switch (matchType)

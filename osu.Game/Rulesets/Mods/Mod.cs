@@ -131,7 +131,7 @@ namespace osu.Game.Rulesets.Mods
         /// </item>
         /// </list>
         /// </example>
-        public virtual bool ValidForFreestyle => false;
+        public virtual bool ValidForFreestyleAsRequiredMod => false;
 
         /// <summary>
         /// Whether this mod can be specified as a "free" or "allowed" mod in a multiplayer context.

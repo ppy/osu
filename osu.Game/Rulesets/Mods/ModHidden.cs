@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Mods
         public override IconUsage? Icon => OsuIcon.ModHidden;
         public override ModType Type => ModType.DifficultyIncrease;
         public override bool Ranked => UsesDefaultConfiguration;
-        public override bool ValidForFreestyle => true;
+        public override bool ValidForFreestyleAsRequiredMod => true;
 
         public virtual void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
         {
