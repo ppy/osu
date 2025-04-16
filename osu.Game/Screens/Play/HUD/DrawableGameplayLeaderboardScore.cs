@@ -22,7 +22,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public partial class GameplayLeaderboardScore : CompositeDrawable, ILeaderboardScore
+    public partial class DrawableGameplayLeaderboardScore : CompositeDrawable
     {
         public const float EXTENDED_WIDTH = regular_width + top_player_left_width_extension;
 
@@ -112,19 +112,27 @@ namespace osu.Game.Screens.Play.HUD
         private bool isFriend;
 
         /// <summary>
-        /// Creates a new <see cref="GameplayLeaderboardScore"/>.
+        /// Creates a new <see cref="DrawableGameplayLeaderboardScore"/>.
         /// </summary>
-        /// <param name="user">The score's player.</param>
-        /// <param name="tracked">Whether the player is the local user or a replay player.</param>
-        public GameplayLeaderboardScore(IUser? user, bool tracked)
+        public DrawableGameplayLeaderboardScore(IGameplayLeaderboardScore score)
         {
-            User = user;
-            Tracked = tracked;
+            User = score.User;
+            Tracked = score.Tracked;
+            TotalScore.BindTo(score.TotalScore);
+            Accuracy.BindTo(score.Accuracy);
+            Combo.BindTo(score.Combo);
+            HasQuit.BindTo(score.HasQuit);
+            DisplayOrder.BindTo(score.DisplayOrder);
+            GetDisplayScore = score.GetDisplayScore;
+
+            if (score.TeamColour != null)
+            {
+                BackgroundColour = score.TeamColour.Value;
+                TextColour = Color4.White;
+            }
 
             AutoSizeAxes = Axes.X;
             Height = PANEL_HEIGHT;
-
-            GetDisplayScore = _ => TotalScore.Value;
         }
 
         [BackgroundDependencyLoader]
