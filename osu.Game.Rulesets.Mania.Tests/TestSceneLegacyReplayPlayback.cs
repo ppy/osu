@@ -341,7 +341,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 Replay = replay,
                 ScoreInfo = new ScoreInfo
                 {
-                    Ruleset = CreateRuleset()!.RulesetInfo,
+                    Ruleset = CreateRuleset().RulesetInfo,
                     Mods = [new ModScoreV2()]
                 }
             };
@@ -393,7 +393,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 Replay = replay,
                 ScoreInfo = new ScoreInfo
                 {
-                    Ruleset = CreateRuleset()!.RulesetInfo,
+                    Ruleset = CreateRuleset().RulesetInfo,
                 }
             };
 
@@ -442,7 +442,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 Replay = replay,
                 ScoreInfo = new ScoreInfo
                 {
-                    Ruleset = CreateRuleset()!.RulesetInfo,
+                    Ruleset = CreateRuleset().RulesetInfo,
                     Mods = [new ManiaModKey1()],
                 }
             };
