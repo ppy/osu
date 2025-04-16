@@ -786,7 +786,7 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
                 // system mods should never be copied across regardless of anything.
                 var copyableMods = score.Mods.Where(m => IsValidMod.Invoke(m) && m.Type != ModType.System).ToArray();
 
-                if (copyableMods.Length > 0)
+                if (copyableMods.Length > 0 && ModUtils.CheckCompatibleSet(copyableMods))
                     items.Add(new OsuMenuItem("Use these mods", MenuItemType.Highlighted, () => SelectedMods.Value = copyableMods));
 
                 if (score.OnlineID > 0)

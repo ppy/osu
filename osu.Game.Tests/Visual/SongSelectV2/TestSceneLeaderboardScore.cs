@@ -168,6 +168,63 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddAssert("mods did not receive SV2", () => !score.SelectedMods.Value.Any(m => m is ModScoreV2));
         }
 
+        [Test]
+        public void TestUseTheseModsDoesNotCopyInvalidModCombinations()
+        {
+            LeaderboardScoreV2 score = null!;
+
+            AddStep("create content", () =>
+            {
+                Children = new Drawable[]
+                {
+                    fillFlow = new FillFlowContainer
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Spacing = new Vector2(0f, 2f),
+                        Shear = new Vector2(OsuGame.SHEAR, 0)
+                    },
+                    drawWidthText = new OsuSpriteText(),
+                };
+
+                var scoreInfo = new ScoreInfo
+                {
+                    Position = 999,
+                    Rank = ScoreRank.X,
+                    Accuracy = 1,
+                    MaxCombo = 244,
+                    TotalScore = RNG.Next(1_800_000, 2_000_000),
+                    MaximumStatistics = { { HitResult.Great, 3000 } },
+                    Mods = new Mod[] { new OsuModDoubleTime(), new OsuModHalfTime(), },
+                    Ruleset = new OsuRuleset().RulesetInfo,
+                    User = new APIUser
+                    {
+                        Id = 6602580,
+                        Username = @"waaiiru",
+                        CountryCode = CountryCode.ES,
+                        CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c1.jpg",
+                    },
+                    Date = DateTimeOffset.Now.AddYears(-2),
+                };
+
+                fillFlow.Add(score = new LeaderboardScoreV2(scoreInfo)
+                {
+                    Rank = scoreInfo.Position,
+                    Shear = Vector2.Zero,
+                });
+
+                score.Show();
+            });
+            AddStep("right click panel", () =>
+            {
+                InputManager.MoveMouseTo(score);
+                InputManager.Click(MouseButton.Right);
+            });
+            AddAssert("use these mods not available", () => !this.ChildrenOfType<DrawableOsuMenuItem>().Any());
+        }
+
         public override void SetUpSteps()
         {
             AddToggleStep("toggle scoring mode", v => config.SetValue(OsuSetting.ScoreDisplayMode, v ? ScoringMode.Classic : ScoringMode.Standardised));
