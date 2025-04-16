@@ -38,7 +38,6 @@ using osu.Game.Users.Drawables;
 using osuTK;
 using osuTK.Graphics;
 using osu.Game.Localisation;
-using WebLocalisation = osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Screens.OnlinePlay
 {
@@ -561,7 +560,7 @@ namespace osu.Game.Screens.OnlinePlay
                 Size = new Vector2(30, 30),
                 Alpha = AllowEditing ? 1 : 0,
                 Action = () => RequestEdit?.Invoke(Item),
-                TooltipText = WebLocalisation.CommonStrings.ButtonsEdit
+                TooltipText = Resources.Localisation.Web.CommonStrings.ButtonsEdit
             },
             removeButton = new PlaylistRemoveButton
             {
