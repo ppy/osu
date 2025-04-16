@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -45,8 +46,8 @@ namespace osu.Game.Screens.SelectV2
         private Container<Placeholder> placeholderContainer = null!;
         private Placeholder? placeholder;
 
-        // [Resolved]
-        // private LeaderboardManager leaderboards { get; set; } = null!;
+        [Resolved]
+        private LeaderboardManager leaderboards { get; set; } = null!;
 
         [Resolved]
         private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
@@ -68,8 +69,6 @@ namespace osu.Game.Screens.SelectV2
         private bool isOnlineScope => Scope.Value != BeatmapLeaderboardScope.Local;
 
         public IBindable<bool> FilterBySelectedMods { get; } = new BindableBool();
-
-        // private IBindable<LeaderboardScores?> fetchedScores = null!;
 
         private CancellationTokenSource? cancellationTokenSource;
 
@@ -160,8 +159,6 @@ namespace osu.Game.Screens.SelectV2
             ruleset.BindValueChanged(_ => refetchScores());
             mods.BindValueChanged(_ => refetchScoresFromMods());
 
-            // fetchedScores = leaderboards.Scores.GetBoundCopy();
-
             refetchScores();
         }
 
@@ -222,24 +219,36 @@ namespace osu.Game.Screens.SelectV2
             if (Scope.Value == BeatmapLeaderboardScope.Team && api.LocalUser.Value.Team == null)
             {
                 SetState(LeaderboardState.NoTeam);
-                // return;
+                return;
             }
 
-            // var criteria = new LeaderboardCriteria(fetchBeatmapInfo, fetchRuleset, Scope.Value, FilterBySelectedMods.Value ? mods.Value.ToArray() : null);
-            //
-            // leaderboards.FetchWithCriteriaAsync(criteria)
-            //             .ContinueWith(t =>
-            //             {
-            //                 if (t.Exception != null && !t.IsCanceled)
-            //                     Schedule(() => SetState(LeaderboardState.NetworkFailure));
-            //             });
-            //
-            // fetchedScores.UnbindEvents();
-            // fetchedScores.BindValueChanged(_ =>
-            // {
-            //     if (fetchedScores.Value != null)
-            //         Schedule(() => SetScores(fetchedScores.Value.TopScores, fetchedScores.Value.UserScore));
-            // }, true);
+            var criteria = new LeaderboardCriteria(fetchBeatmapInfo, fetchRuleset, Scope.Value, FilterBySelectedMods.Value ? mods.Value.ToArray() : null);
+
+            // TODO: this implementation is not vetted at all and may be incorrect.
+            // it was part of a design PR intended to only cover design work and may be completely wrong.
+            leaderboards.FetchWithCriteriaAsync(criteria)
+                        .ContinueWith(t =>
+                        {
+                            Schedule(() =>
+                            {
+                                if (t.Exception != null && !t.IsCanceled)
+                                    SetState(LeaderboardState.NetworkFailure);
+
+                                try
+                                {
+                                    LeaderboardScores? leaderboardScores = t.GetResultSafely();
+
+                                    if (leaderboardScores == null)
+                                        SetState(LeaderboardState.NoScores);
+                                    else
+                                        SetScores(leaderboardScores.TopScores, leaderboardScores.UserScore);
+                                }
+                                catch
+                                {
+                                    SetState(LeaderboardState.BeatmapUnavailable);
+                                }
+                            });
+                        });
         }
 
         protected void SetScores(IEnumerable<ScoreInfo> scores, ScoreInfo? userScore)

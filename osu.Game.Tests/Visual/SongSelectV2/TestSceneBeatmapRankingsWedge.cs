@@ -44,7 +44,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         private OsuContextMenuContainer? contentContainer;
         private DialogOverlay dialogOverlay = null!;
 
-        // private LeaderboardManager leaderboardManager = null!;
+        private LeaderboardManager leaderboardManager = null!;
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
@@ -53,8 +53,9 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             dependencies.Cache(rulesetStore = new RealmRulesetStore(Realm));
             dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, Realm, null, dependencies.Get<AudioManager>(), Resources, dependencies.Get<GameHost>(), Beatmap.Default));
             dependencies.Cache(scoreManager = new ScoreManager(rulesetStore, () => beatmapManager, LocalStorage, Realm, API));
+            dependencies.Cache(leaderboardManager = new LeaderboardManager());
+
             Dependencies.Cache(Realm);
-            // dependencies.Cache(leaderboardManager = new LeaderboardManager());
 
             return dependencies;
         }
@@ -66,7 +67,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             {
                 Depth = -1
             });
-            // LoadComponent(leaderboardManager);
+
+            LoadComponent(leaderboardManager);
         }
 
         [SetUp]
