@@ -15,9 +15,9 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osu.Game.Screens.Footer;
-using osu.Game.Screens.SelectV2.Footer;
+using osu.Game.Screens.SelectV2;
 
-namespace osu.Game.Tests.Visual.UserInterface
+namespace osu.Game.Tests.Visual.SongSelectV2
 {
     public partial class TestSceneScreenFooter : OsuManualInputManagerTestScene
     {
@@ -51,9 +51,9 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             screenFooter.SetButtons(new ScreenFooterButton[]
             {
-                new ScreenFooterButtonMods(modOverlay) { Current = SelectedMods },
-                new ScreenFooterButtonRandom(),
-                new ScreenFooterButtonOptions(),
+                new FooterButtonMods(modOverlay) { Current = SelectedMods },
+                new FooterButtonRandom(),
+                new FooterButtonOptions(),
             });
         });
 

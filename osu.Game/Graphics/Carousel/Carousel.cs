@@ -24,7 +24,7 @@ using osu.Game.Input.Bindings;
 using osuTK;
 using osuTK.Input;
 
-namespace osu.Game.Screens.SelectV2
+namespace osu.Game.Graphics.Carousel
 {
     /// <summary>
     /// A highly efficient vertical list display that is used primarily for the song select screen,

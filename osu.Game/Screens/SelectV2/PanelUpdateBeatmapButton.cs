@@ -22,7 +22,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.SelectV2
 {
-    public partial class UpdateBeatmapSetButton : OsuAnimatedButton
+    public partial class PanelUpdateBeatmapButton : OsuAnimatedButton
     {
         private BeatmapSetInfo? beatmapSet;
 
@@ -53,7 +53,7 @@ namespace osu.Game.Screens.SelectV2
         [Resolved]
         private IDialogOverlay? dialogOverlay { get; set; }
 
-        public UpdateBeatmapSetButton()
+        public PanelUpdateBeatmapButton()
         {
             Size = new Vector2(75f, 22f);
         }

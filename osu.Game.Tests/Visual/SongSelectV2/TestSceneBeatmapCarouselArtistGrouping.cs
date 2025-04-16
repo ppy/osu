@@ -9,10 +9,10 @@ using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
 using osu.Game.Screens.SelectV2;
 
-namespace osu.Game.Tests.Visual.SongSelect
+namespace osu.Game.Tests.Visual.SongSelectV2
 {
     [TestFixture]
-    public partial class TestSceneBeatmapCarouselV2ArtistGrouping : BeatmapCarouselV2TestScene
+    public partial class TestSceneBeatmapCarouselArtistGrouping : BeatmapCarouselTestScene
     {
         [SetUpSteps]
         public void SetUpSteps()
