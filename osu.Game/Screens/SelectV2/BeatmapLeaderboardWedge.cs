@@ -28,14 +28,11 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Select.Leaderboards;
-using osuTK;
 
 namespace osu.Game.Screens.SelectV2
 {
     public partial class BeatmapLeaderboardWedge : VisibilityContainer
     {
-        private static readonly Vector2 shear = new Vector2(OsuGame.SHEAR, 0);
-
         private Container scoresContainer = null!;
 
         private OsuScrollContainer scoresScroll = null!;
@@ -87,7 +84,7 @@ namespace osu.Game.Screens.SelectV2
                     {
                         RelativeSizeAxes = Axes.Both,
                         ScrollbarVisible = false,
-                        Shear = shear,
+                        Shear = OsuGame.SHEAR,
                         Child = scoresContainer = new Container
                         {
                             RelativeSizeAxes = Axes.X,
@@ -101,7 +98,7 @@ namespace osu.Game.Screens.SelectV2
                         Origin = Anchor.BottomLeft,
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        Shear = shear,
+                        Shear = OsuGame.SHEAR,
                         Margin = new MarginPadding { Left = -60f },
                         CornerRadius = 16f,
                         Masking = true,
@@ -118,7 +115,7 @@ namespace osu.Game.Screens.SelectV2
                             {
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
-                                Shear = -shear,
+                                Shear = -OsuGame.SHEAR,
                                 Padding = new MarginPadding { Top = 5f, Bottom = 30f, Left = 100f, Right = 30f },
                                 Children = new Drawable[]
                                 {
@@ -282,7 +279,7 @@ namespace osu.Game.Screens.SelectV2
 
                     scoresContainer.Add(scoreDrawableContainer = new Container
                     {
-                        Shear = -shear,
+                        Shear = -OsuGame.SHEAR,
                         Y = (BeatmapLeaderboardScore.HEIGHT + 4f) * i,
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,

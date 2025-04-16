@@ -518,8 +518,9 @@ namespace osu.Game.Screens.SelectV2
                                             Anchor = Anchor.TopRight,
                                             Origin = Anchor.TopRight,
                                             AutoSizeAxes = Axes.Both,
+                                            Child = modsContainer = new FillFlowContainer
                                             {
-                                                Shear = new Vector2(sheared ? -OsuGame.SHEAR : 0, 0),
+                                                Shear = sheared ? -OsuGame.SHEAR : Vector2.Zero,
                                                 AutoSizeAxes = Axes.Both,
                                                 Direction = FillDirection.Horizontal,
                                                 Spacing = new Vector2(2f, 0f),

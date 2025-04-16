@@ -41,7 +41,7 @@ namespace osu.Game.Graphics.UserInterface
             {
                 shadow = new Container
                 {
-                    Shear = SHEAR,
+                    Shear = OsuGame.SHEAR,
                     Masking = true,
                     CornerRadius = 5,
                     RelativeSizeAxes = Axes.Both,
@@ -59,7 +59,7 @@ namespace osu.Game.Graphics.UserInterface
                 },
                 main = new Container
                 {
-                    Shear = SHEAR,
+                    Shear = OsuGame.SHEAR,
                     BorderColour = Colour4.White,
                     BorderThickness = 8f,
                     Masking = true,

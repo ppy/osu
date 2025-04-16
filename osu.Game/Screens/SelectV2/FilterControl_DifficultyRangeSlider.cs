@@ -15,7 +15,6 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Utils;
-using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.SelectV2
@@ -53,7 +52,7 @@ namespace osu.Game.Screens.SelectV2
                     {
                         Depth = 1,
                         RelativeSizeAxes = Axes.Both,
-                        Shear = new Vector2(OsuGame.SHEAR, 0),
+                        Shear = OsuGame.SHEAR,
                         CornerRadius = 5f,
                         Masking = true,
                         ChildrenEnumerable = spectrum.Zip(spectrum.Skip(1))
@@ -77,7 +76,7 @@ namespace osu.Game.Screens.SelectV2
                             BorderColour = colourProvider.Highlight1,
                             BorderThickness = 2,
                             Masking = true,
-                            Shear = new Vector2(OsuGame.SHEAR, 0),
+                            Shear = OsuGame.SHEAR,
                             CornerRadius = 5f,
                             Child = new Box
                             {

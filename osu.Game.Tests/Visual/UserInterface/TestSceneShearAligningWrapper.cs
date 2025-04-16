@@ -17,10 +17,8 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public partial class TestSceneShearAlignedDrawable : OsuTestScene
+    public partial class TestSceneShearAligningWrapper : OsuTestScene
     {
-        private static readonly Vector2 shear = new Vector2(OsuGame.SHEAR, 0);
-
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
 
         private ShearedBox first = null!;
@@ -36,7 +34,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 Origin = Anchor.Centre,
                 Width = 200f,
                 AutoSizeAxes = Axes.Y,
-                Shear = shear,
+                Shear = OsuGame.SHEAR,
                 CornerRadius = 10f,
                 Masking = true,
                 Children = new Drawable[]
@@ -52,20 +50,20 @@ namespace osu.Game.Tests.Visual.UserInterface
                         AutoSizeAxes = Axes.Y,
                         Direction = FillDirection.Vertical,
                         Spacing = new Vector2(0f, 10f),
-                        Shear = -shear,
+                        Shear = -OsuGame.SHEAR,
                         Children = new Drawable[]
                         {
-                            new ShearAlignedDrawable(shear, first = new ShearedBox("Text 1", OsuColour.Gray(0.4f))
+                            new ShearAligningWrapper(first = new ShearedBox("Text 1", OsuColour.Gray(0.4f))
                             {
                                 RelativeSizeAxes = Axes.X,
                                 Height = 30,
                             }),
-                            new ShearAlignedDrawable(shear, second = new ShearedBox("Text 2", OsuColour.Gray(0.3f))
+                            new ShearAligningWrapper(second = new ShearedBox("Text 2", OsuColour.Gray(0.3f))
                             {
                                 RelativeSizeAxes = Axes.X,
                                 Height = 30,
                             }),
-                            new ShearAlignedDrawable(shear, third = new ShearedBox("Text 3", OsuColour.Gray(0.2f))
+                            new ShearAligningWrapper(third = new ShearedBox("Text 3", OsuColour.Gray(0.2f))
                             {
                                 RelativeSizeAxes = Axes.X,
                                 Height = 30,
@@ -110,7 +108,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             [BackgroundDependencyLoader]
             private void load()
             {
-                Shear = new Vector2(OsuGame.SHEAR, 0);
+                Shear = OsuGame.SHEAR;
                 CornerRadius = 10;
                 Masking = true;
 
@@ -125,7 +123,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     {
                         Text = text,
                         Colour = Color4.White,
-                        Shear = -new Vector2(OsuGame.SHEAR, 0),
+                        Shear = -OsuGame.SHEAR,
                         Font = OsuFont.Torus.With(size: 24),
                         Margin = new MarginPadding { Left = 50 },
                     }

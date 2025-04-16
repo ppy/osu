@@ -36,7 +36,7 @@ namespace osu.Game.Screens.SelectV2
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
-            Shear = new Vector2(OsuGame.SHEAR, 0);
+            Shear = OsuGame.SHEAR;
             Margin = new MarginPadding { Top = -corner_radius, Right = -40 };
 
             InternalChildren = new Drawable[]
@@ -65,7 +65,7 @@ namespace osu.Game.Screens.SelectV2
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            Shear = -new Vector2(OsuGame.SHEAR, 0),
+                            Shear = -OsuGame.SHEAR,
                             Child = new SongSelectSearchTextBox
                             {
                                 RelativeSizeAxes = Axes.X,
@@ -78,7 +78,7 @@ namespace osu.Game.Screens.SelectV2
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            Shear = -new Vector2(OsuGame.SHEAR, 0),
+                            Shear = -OsuGame.SHEAR,
                             RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
                             ColumnDimensions = new[]
                             {
@@ -110,7 +110,7 @@ namespace osu.Game.Screens.SelectV2
                         {
                             RelativeSizeAxes = Axes.X,
                             Height = 30,
-                            Shear = -new Vector2(OsuGame.SHEAR, 0),
+                            Shear = -OsuGame.SHEAR,
                             RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
                             ColumnDimensions = new[]
                             {

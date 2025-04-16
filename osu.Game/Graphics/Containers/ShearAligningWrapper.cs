@@ -8,15 +8,16 @@ using osuTK;
 
 namespace osu.Game.Graphics.Containers
 {
-    public partial class ShearAlignedDrawable : CompositeDrawable
+    /// <summary>
+    /// Adds padding based on direct parent to make sheared pieces "align properly".
+    /// TODO: get rid of this class or explain what it does here in great detail. hopefully the former.
+    /// </summary>
+    public partial class ShearAligningWrapper : CompositeDrawable
     {
-        private readonly Vector2 shear;
         private readonly LayoutValue layout = new LayoutValue(Invalidation.MiscGeometry);
 
-        public ShearAlignedDrawable(Vector2 shear, Drawable drawable)
+        public ShearAligningWrapper(Drawable drawable)
         {
-            this.shear = shear;
-
             RelativeSizeAxes = drawable.RelativeSizeAxes;
             AutoSizeAxes = Axes.Both & ~drawable.RelativeSizeAxes;
 
@@ -38,7 +39,7 @@ namespace osu.Game.Graphics.Containers
 
         private void updateLayout()
         {
-            float shearWidth = shear.X * Parent!.DrawHeight;
+            float shearWidth = OsuGame.SHEAR.X * Parent!.DrawHeight;
             float relativeY = Parent!.DrawHeight == 0 ? 0 : InternalChild.ToSpaceOfOtherDrawable(Vector2.Zero, Parent).Y / Parent!.DrawHeight;
             Padding = new MarginPadding { Right = shearWidth * relativeY };
         }

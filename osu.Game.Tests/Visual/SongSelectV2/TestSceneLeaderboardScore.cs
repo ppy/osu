@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
-using osu.Game;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;

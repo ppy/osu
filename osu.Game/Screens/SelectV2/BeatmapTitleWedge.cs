@@ -32,8 +32,6 @@ namespace osu.Game.Screens.SelectV2
     {
         private const float corner_radius = 10;
 
-        private static readonly Vector2 shear = new Vector2(OsuGame.SHEAR, 0);
-
         [Resolved]
         private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
 
@@ -79,7 +77,7 @@ namespace osu.Game.Screens.SelectV2
         [BackgroundDependencyLoader]
         private void load()
         {
-            Shear = shear;
+            Shear = OsuGame.SHEAR;
             Masking = true;
             CornerRadius = corner_radius;
 
@@ -97,16 +95,16 @@ namespace osu.Game.Screens.SelectV2
                         Left = SongSelect.WEDGE_CONTENT_MARGIN
                     },
                     Spacing = new Vector2(0f, 4f),
-                    Shear = -shear,
+                    Shear = -OsuGame.SHEAR,
                     Children = new Drawable[]
                     {
-                        new ShearAlignedDrawable(shear, statusPill = new BeatmapSetOnlineStatusPill
+                        new ShearAligningWrapper(statusPill = new BeatmapSetOnlineStatusPill
                         {
                             ShowUnknownStatus = true,
                             TextSize = OsuFont.Style.Caption1.Size,
                             TextPadding = new MarginPadding { Horizontal = 6, Vertical = 1 },
                         }),
-                        new ShearAlignedDrawable(shear, titleContainer = new Container
+                        new ShearAligningWrapper(titleContainer = new Container
                         {
                             RelativeSizeAxes = Axes.X,
                             Height = OsuFont.Style.Title.Size,
@@ -121,7 +119,7 @@ namespace osu.Game.Screens.SelectV2
                                 },
                             }
                         }),
-                        new ShearAlignedDrawable(shear, artistContainer = new Container
+                        new ShearAligningWrapper(artistContainer = new Container
                         {
                             RelativeSizeAxes = Axes.X,
                             Height = OsuFont.Style.Heading2.Size,
@@ -136,7 +134,7 @@ namespace osu.Game.Screens.SelectV2
                                 },
                             }
                         }),
-                        new ShearAlignedDrawable(shear, new FillFlowContainer
+                        new ShearAligningWrapper(new FillFlowContainer
                         {
                             AutoSizeAxes = Axes.Both,
                             Direction = FillDirection.Horizontal,
@@ -161,7 +159,7 @@ namespace osu.Game.Screens.SelectV2
                                 },
                             },
                         }),
-                        new ShearAlignedDrawable(shear, new Container
+                        new ShearAligningWrapper(new Container
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,

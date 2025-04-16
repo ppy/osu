@@ -19,8 +19,6 @@ namespace osu.Game.Screens.SelectV2
 {
     public partial class BeatmapMetadataWedge : VisibilityContainer
     {
-        private static readonly Vector2 shear = new Vector2(OsuGame.SHEAR, 0);
-
         private MetadataDisplay creator = null!;
         private MetadataDisplay source = null!;
         private MetadataDisplay genre = null!;
@@ -68,13 +66,13 @@ namespace osu.Game.Screens.SelectV2
                 Spacing = new Vector2(0f, 4f),
                 Children = new[]
                 {
-                    new ShearAlignedDrawable(shear, new Container
+                    new ShearAligningWrapper(new Container
                     {
                         CornerRadius = 10,
                         Masking = true,
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        Shear = shear,
+                        Shear = OsuGame.SHEAR,
                         Children = new Drawable[]
                         {
                             new WedgeBackground(),
@@ -82,7 +80,7 @@ namespace osu.Game.Screens.SelectV2
                             {
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
-                                Shear = -shear,
+                                Shear = -OsuGame.SHEAR,
                                 Padding = new MarginPadding { Left = SongSelect.WEDGE_CONTENT_MARGIN, Right = 35, Vertical = 16 },
                                 Children = new Drawable[]
                                 {
@@ -155,14 +153,14 @@ namespace osu.Game.Screens.SelectV2
                             },
                         },
                     }),
-                    new ShearAlignedDrawable(shear, ratingsWedge = new Container
+                    new ShearAligningWrapper(ratingsWedge = new Container
                     {
                         Alpha = 0f,
                         CornerRadius = 10,
                         Masking = true,
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        Shear = shear,
+                        Shear = OsuGame.SHEAR,
                         Children = new Drawable[]
                         {
                             new WedgeBackground(),
@@ -170,7 +168,7 @@ namespace osu.Game.Screens.SelectV2
                             {
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
-                                Shear = -shear,
+                                Shear = -OsuGame.SHEAR,
                                 RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
                                 ColumnDimensions = new[]
                                 {
@@ -195,14 +193,14 @@ namespace osu.Game.Screens.SelectV2
                             },
                         }
                     }),
-                    new ShearAlignedDrawable(shear, failRetryWedge = new Container
+                    new ShearAligningWrapper(failRetryWedge = new Container
                     {
                         Alpha = 0f,
                         CornerRadius = 10,
                         Masking = true,
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        Shear = shear,
+                        Shear = OsuGame.SHEAR,
                         Children = new Drawable[]
                         {
                             new WedgeBackground(),
@@ -210,7 +208,7 @@ namespace osu.Game.Screens.SelectV2
                             {
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
-                                Shear = -shear,
+                                Shear = -OsuGame.SHEAR,
                                 Padding = new MarginPadding { Left = SongSelect.WEDGE_CONTENT_MARGIN, Right = 40f, Vertical = 16 },
                                 Child = failRetryDisplay = new FailRetryDisplay(),
                             },

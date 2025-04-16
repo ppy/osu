@@ -103,7 +103,7 @@ namespace osu.Game.Graphics.UserInterface
                             RelativeSizeAxes = Axes.Y,
                             Masking = true,
                             CornerRadius = 5f,
-                            Shear = new Vector2(OsuGame.SHEAR, 0),
+                            Shear = OsuGame.SHEAR,
                             Children = new Drawable[]
                             {
                                 new Box
@@ -116,7 +116,7 @@ namespace osu.Game.Graphics.UserInterface
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
                                     Text = label,
-                                    Shear = new Vector2(-OsuGame.SHEAR, 0),
+                                    Shear = -OsuGame.SHEAR,
                                     Margin = new MarginPadding { Horizontal = 12, Vertical = 5 },
                                     Font = OsuFont.Style.Body.With(weight: FontWeight.SemiBold),
                                 },

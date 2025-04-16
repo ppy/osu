@@ -70,7 +70,7 @@ namespace osu.Game.Screens.SelectV2
             {
                 Masking = true;
                 CornerRadius = 5;
-                Shear = background ? shear : Vector2.Zero;
+                Shear = background ? OsuGame.SHEAR : Vector2.Zero;
 
                 InternalChildren = new Drawable[]
                 {
@@ -88,7 +88,7 @@ namespace osu.Game.Screens.SelectV2
                         Direction = FillDirection.Horizontal,
                         Margin = new MarginPadding { Left = background ? leftPadding : 0, Right = background ? 10f : 0f, Vertical = 5f },
                         Spacing = new Vector2(4f, 0f),
-                        Shear = background ? -shear : Vector2.Zero,
+                        Shear = background ? -OsuGame.SHEAR : Vector2.Zero,
                         Children = new Drawable[]
                         {
                             new SpriteIcon

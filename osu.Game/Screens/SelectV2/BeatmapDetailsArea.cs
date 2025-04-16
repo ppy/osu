@@ -5,7 +5,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Containers;
-using osuTK;
 
 namespace osu.Game.Screens.SelectV2
 {
@@ -15,8 +14,6 @@ namespace osu.Game.Screens.SelectV2
     /// </summary>
     public partial class BeatmapDetailsArea : VisibilityContainer
     {
-        private static readonly Vector2 shear = new Vector2(OsuGame.SHEAR, 0);
-
         private Header header = null!;
         private Container contentContainer = null!;
 
@@ -32,7 +29,7 @@ namespace osu.Game.Screens.SelectV2
 
             InternalChildren = new Drawable[]
             {
-                new ShearAlignedDrawable(shear, header = new Header
+                new ShearAligningWrapper(header = new Header
                 {
                     RelativeSizeAxes = Axes.X,
                     Height = header_height,
@@ -42,7 +39,7 @@ namespace osu.Game.Screens.SelectV2
                     Depth = 1f,
                     Padding = new MarginPadding { Top = header_height },
                     RelativeSizeAxes = Axes.Both,
-                    Child = new ShearAlignedDrawable(shear, contentContainer = new Container
+                    Child = new ShearAligningWrapper(contentContainer = new Container
                     {
                         RelativeSizeAxes = Axes.Both,
                     }),

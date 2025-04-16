@@ -83,7 +83,7 @@ namespace osu.Game.Screens.SelectV2
             {
                 Masking = true;
                 CornerRadius = 10;
-                Shear = shear;
+                Shear = OsuGame.SHEAR;
 
                 InternalChildren = new Drawable[]
                 {
@@ -93,10 +93,10 @@ namespace osu.Game.Screens.SelectV2
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         Direction = FillDirection.Vertical,
-                        Shear = -shear,
+                        Shear = -OsuGame.SHEAR,
                         Children = new Drawable[]
                         {
-                            new ShearAlignedDrawable(shear, ratingAndNameContainer = new GridContainer
+                            new ShearAligningWrapper(ratingAndNameContainer = new GridContainer
                             {
                                 AlwaysPresent = true,
                                 RelativeSizeAxes = Axes.X,
@@ -159,7 +159,7 @@ namespace osu.Game.Screens.SelectV2
                                     }
                                 },
                             }),
-                            new ShearAlignedDrawable(shear, new Container
+                            new ShearAligningWrapper(new Container
                             {
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
@@ -170,7 +170,7 @@ namespace osu.Game.Screens.SelectV2
                                     AutoSizeAxes = Axes.Y,
                                     Masking = true,
                                     CornerRadius = 10 - border_weight,
-                                    Shear = shear,
+                                    Shear = OsuGame.SHEAR,
                                     Children = new Drawable[]
                                     {
                                         new Box
@@ -183,7 +183,7 @@ namespace osu.Game.Screens.SelectV2
                                             RelativeSizeAxes = Axes.X,
                                             AutoSizeAxes = Axes.Y,
                                             Padding = new MarginPadding { Left = SongSelect.WEDGE_CONTENT_MARGIN, Right = 20f, Vertical = 7.5f },
-                                            Shear = -shear,
+                                            Shear = -OsuGame.SHEAR,
                                             RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
                                             ColumnDimensions = new[]
                                             {

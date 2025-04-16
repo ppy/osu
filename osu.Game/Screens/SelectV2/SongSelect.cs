@@ -40,8 +40,6 @@ namespace osu.Game.Screens.SelectV2
 
         private const double fade_duration = 300;
 
-        private static readonly Vector2 shear = new Vector2(OsuGame.SHEAR, 0);
-
         private readonly ModSelectOverlay modSelectOverlay = new UserModSelectOverlay(OverlayColourScheme.Aquamarine)
         {
             ShowPresets = true,
@@ -117,8 +115,8 @@ namespace osu.Game.Screens.SelectV2
                                             Direction = FillDirection.Vertical,
                                             Children = new Drawable[]
                                             {
-                                                new ShearAlignedDrawable(shear, titleWedge = new BeatmapTitleWedge()),
-                                                new ShearAlignedDrawable(shear, detailsArea = new BeatmapDetailsArea()),
+                                                new ShearAligningWrapper(titleWedge = new BeatmapTitleWedge()),
+                                                new ShearAligningWrapper(detailsArea = new BeatmapDetailsArea()),
                                             },
                                         },
                                         Empty(),

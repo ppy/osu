@@ -194,7 +194,7 @@ namespace osu.Game.Collections
                 {
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
-                    Shear = new Vector2(-OsuGame.SHEAR, 0),
+                    Shear = -OsuGame.SHEAR,
                     X = -OsuScrollContainer.SCROLL_BAR_WIDTH,
                     Scale = new Vector2(0.65f),
                     Action = addOrRemove,
