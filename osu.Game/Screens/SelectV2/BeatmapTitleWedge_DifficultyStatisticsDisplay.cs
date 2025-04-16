@@ -159,16 +159,18 @@ namespace osu.Game.Screens.SelectV2
 
             private void updateStatistics()
             {
+                // TODO: wrong
                 if (statistics == null)
                     return;
 
-                var newStatistics = statistics.Select(data => new StatisticDifficulty
+                StatisticDifficulty[] newStatistics = statistics.Select(data => new StatisticDifficulty
                 {
                     Value = data,
                 }).ToArray();
 
                 var currentStatistics = statisticsFlow.Children;
 
+                // TODO: inefficient
                 if (currentStatistics.Select(s => s.Value.Label).SequenceEqual(newStatistics.Select(s => s.Value.Label)))
                 {
                     for (int i = 0; i < newStatistics.Length; i++)
@@ -183,6 +185,7 @@ namespace osu.Game.Screens.SelectV2
 
             private void updateTinyStatistics()
             {
+                // TODO: wrong
                 if (statistics == null)
                     return;
 

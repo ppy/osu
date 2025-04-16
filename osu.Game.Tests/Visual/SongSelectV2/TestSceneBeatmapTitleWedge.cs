@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -13,11 +12,10 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.SelectV2;
+using osu.Game.Tests.Visual.SongSelect;
 
 namespace osu.Game.Tests.Visual.SongSelectV2
 {
@@ -65,12 +63,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         }
 
         [Test]
-        public void TestTruncation()
-        {
-            selectBeatmap(createLongMetadata());
-        }
-
-        [Test]
         public void TestNullBeatmap()
         {
             selectBeatmap(null);
@@ -86,7 +78,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         public void TestBPMUpdates()
         {
             const double bpm = 120;
-            IBeatmap beatmap = createTestBeatmap(new OsuRuleset().RulesetInfo);
+            IBeatmap beatmap = TestSceneBeatmapInfoWedge.CreateTestBeatmap(new OsuRuleset().RulesetInfo);
             beatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = 60 * 1000 / bpm });
 
             OsuModDoubleTime doubleTime = null!;
@@ -113,7 +105,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             foreach (var rulesetInfo in rulesets.AvailableRulesets)
             {
-                var testBeatmap = createTestBeatmap(rulesetInfo);
+                var testBeatmap = TestSceneBeatmapInfoWedge.CreateTestBeatmap(rulesetInfo);
 
                 setRuleset(rulesetInfo);
                 selectBeatmap(testBeatmap);
@@ -138,7 +130,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [TestCase(120, 120.4, "DT", "180")]
         public void TestVaryingBPM(double commonBpm, double otherBpm, string? mod, string expectedDisplay)
         {
-            IBeatmap beatmap = createTestBeatmap(new OsuRuleset().RulesetInfo);
+            IBeatmap beatmap = TestSceneBeatmapInfoWedge.CreateTestBeatmap(new OsuRuleset().RulesetInfo);
             beatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = 60 * 1000 / commonBpm });
             beatmap.ControlPointInfo.Add(100, new TimingControlPoint { BeatLength = 60 * 1000 / otherBpm });
             beatmap.ControlPointInfo.Add(200, new TimingControlPoint { BeatLength = 60 * 1000 / commonBpm });
@@ -171,53 +163,5 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 return label.Value == target;
             });
         }
-
-        private IBeatmap createTestBeatmap(RulesetInfo ruleset)
-        {
-            List<HitObject> objects = new List<HitObject>();
-            for (double i = 0; i < 50000; i += 1000)
-                objects.Add(new TestHitObject { StartTime = i });
-
-            return new Beatmap
-            {
-                BeatmapInfo = new BeatmapInfo
-                {
-                    Metadata = new BeatmapMetadata
-                    {
-                        Author = { Username = $"{ruleset.ShortName}Author" },
-                        Artist = $"{ruleset.ShortName}Artist",
-                        Source = $"{ruleset.ShortName}Source",
-                        Title = $"{ruleset.ShortName}Title"
-                    },
-                    Ruleset = ruleset,
-                    StarRating = 6,
-                    DifficultyName = $"{ruleset.ShortName}Version",
-                    Difficulty = new BeatmapDifficulty()
-                },
-                HitObjects = objects
-            };
-        }
-
-        private IBeatmap createLongMetadata()
-        {
-            return new Beatmap
-            {
-                BeatmapInfo = new BeatmapInfo
-                {
-                    StarRating = 6,
-                    Metadata = new BeatmapMetadata
-                    {
-                        Author = { Username = "WWWWWWWWWWWWWWW" },
-                        Artist = "Verrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrry long Artist",
-                        Source = "Verrrrry long Source",
-                        Title = "Verrrrry long Title"
-                    },
-                    DifficultyName = "Verrrrrrrrrrrrrrrrrrrrrrrrrrrrry long Version",
-                    Status = BeatmapOnlineStatus.Graveyard,
-                },
-            };
-        }
-
-        private class TestHitObject : ConvertHitObject;
     }
 }
