@@ -22,6 +22,10 @@ namespace osu.Game.Screens.SelectV2
     {
         private const float logo_scale = 0.4f;
 
+        public const float WEDGE_CONTENT_MARGIN = CORNER_RADIUS_HIDE_OFFSET + OsuGame.SCREEN_EDGE_MARGIN;
+        public const float CORNER_RADIUS_HIDE_OFFSET = 20f;
+        public const float ENTER_DURATION = 600;
+
         private readonly ModSelectOverlay modSelectOverlay = new ModSelectOverlay(OverlayColourScheme.Aquamarine)
         {
             ShowPresets = true,
