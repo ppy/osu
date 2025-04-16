@@ -103,7 +103,7 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             var fetchRuleset = ruleset.Value ?? fetchBeatmapInfo.Ruleset;
 
-            if (!api.IsLoggedIn)
+            if (!api.IsLoggedIn && IsOnlineScope)
             {
                 SetErrorState(LeaderboardState.NotLoggedIn);
                 return null;
