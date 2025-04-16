@@ -85,6 +85,11 @@ namespace osu.Game.Online.Rooms
 
         private readonly Bindable<bool> valid = new BindableBool(true);
 
+        [JsonIgnore]
+        public IBindable<bool> Completed => completed;
+
+        private readonly Bindable<bool> completed = new BindableBool(false);
+
         [JsonConstructor]
         private PlaylistItem()
             : this(new APIBeatmap())
@@ -117,6 +122,8 @@ namespace osu.Game.Online.Rooms
         }
 
         public void MarkInvalid() => valid.Value = false;
+
+        public void MarkCompleted() => completed.Value = true;
 
         #region Newtonsoft.Json implicit ShouldSerialize() methods
 
