@@ -54,6 +54,12 @@ namespace osu.Game.Rulesets.Mods
         bool ValidForMultiplayer { get; }
 
         /// <summary>
+        /// Whether this mod is valid as a required mod on freestyle online play items.
+        /// Should be <c>true</c> for mods that are guaranteed to be implemented across all rulesets.
+        /// </summary>
+        bool ValidForFreestyleAsRequiredMod { get; }
+
+        /// <summary>
         /// Whether this mod is valid as a free mod in multiplayer matches.
         /// Should be <c>false</c> for mods that affect the gameplay duration (e.g. <see cref="ModRateAdjust"/> and <see cref="ModTimeRamp"/>).
         /// </summary>
