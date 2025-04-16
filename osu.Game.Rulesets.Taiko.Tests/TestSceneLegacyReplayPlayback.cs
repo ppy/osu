@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
     {
         protected override string? ExportLocation => null;
 
-        protected override Ruleset? CreateRuleset() => new TaikoRuleset();
+        protected override Ruleset CreateRuleset() => new TaikoRuleset();
 
         private static readonly object[][] test_cases =
         {
@@ -92,7 +92,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
                 Replay = replay,
                 ScoreInfo = new ScoreInfo
                 {
-                    Ruleset = CreateRuleset()!.RulesetInfo,
+                    Ruleset = CreateRuleset().RulesetInfo,
                 }
             };
 

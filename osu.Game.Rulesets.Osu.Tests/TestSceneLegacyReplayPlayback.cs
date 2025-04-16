@@ -108,7 +108,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 Replay = replay,
                 ScoreInfo = new ScoreInfo
                 {
-                    Ruleset = CreateRuleset()!.RulesetInfo,
+                    Ruleset = CreateRuleset().RulesetInfo,
                 }
             };
 
