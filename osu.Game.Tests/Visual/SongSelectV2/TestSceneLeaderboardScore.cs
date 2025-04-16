@@ -53,7 +53,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         Spacing = new Vector2(0f, 2f),
-                        Shear = new Vector2(OsuGame.SHEAR, 0)
+                        Shear = OsuGame.SHEAR,
                     },
                     drawWidthText = new OsuSpriteText(),
                 };
@@ -121,7 +121,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         Spacing = new Vector2(0f, 2f),
-                        Shear = new Vector2(OsuGame.SHEAR, 0)
+                        Shear = OsuGame.SHEAR,
                     },
                     drawWidthText = new OsuSpriteText(),
                 };
