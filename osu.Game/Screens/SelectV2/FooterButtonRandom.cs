@@ -14,9 +14,9 @@ using osu.Game.Screens.Footer;
 using osuTK;
 using osuTK.Input;
 
-namespace osu.Game.Screens.SelectV2.Footer
+namespace osu.Game.Screens.SelectV2
 {
-    public partial class ScreenFooterButtonRandom : ScreenFooterButton
+    public partial class FooterButtonRandom : ScreenFooterButton
     {
         public Action? NextRandom { get; set; }
         public Action? PreviousRandom { get; set; }

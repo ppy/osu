@@ -15,7 +15,7 @@ using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets.Osu.Mods;
-using osu.Game.Screens.SelectV2.Leaderboards;
+using osu.Game.Screens.SelectV2;
 using osu.Game.Tests.Resources;
 using osu.Game.Tests.Visual.Metadata;
 using osu.Game.Tests.Visual.OnlinePlay;
@@ -85,7 +85,7 @@ namespace osu.Game.Tests.Visual.DailyChallenge
             AddStep("force transforms to finish", () => FinishTransforms(true));
             AddStep("right click second score", () =>
             {
-                InputManager.MoveMouseTo(this.ChildrenOfType<LeaderboardScoreV2>().ElementAt(1));
+                InputManager.MoveMouseTo(this.ChildrenOfType<BeatmapLeaderboardScore>().ElementAt(1));
                 InputManager.Click(MouseButton.Right);
             });
             AddAssert("use these mods not present",

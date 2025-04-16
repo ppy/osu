@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Pooling;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.Graphics.Carousel;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Select;
 

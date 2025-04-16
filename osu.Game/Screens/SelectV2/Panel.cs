@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Pooling;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Carousel;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osuTK;
@@ -19,7 +20,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.SelectV2
 {
-    public abstract partial class PanelBase : PoolableDrawable, ICarouselPanel
+    public abstract partial class Panel : PoolableDrawable, ICarouselPanel
     {
         private const float corner_radius = 10;
 

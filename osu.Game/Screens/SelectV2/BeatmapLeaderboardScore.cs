@@ -41,9 +41,9 @@ using osuTK;
 using osuTK.Graphics;
 using CommonStrings = osu.Game.Localisation.CommonStrings;
 
-namespace osu.Game.Screens.SelectV2.Leaderboards
+namespace osu.Game.Screens.SelectV2
 {
-    public partial class LeaderboardScoreV2 : OsuClickableContainer, IHasContextMenu, IHasCustomTooltip<ScoreInfo>
+    public partial class BeatmapLeaderboardScore : OsuClickableContainer, IHasContextMenu, IHasCustomTooltip<ScoreInfo>
     {
         public Bindable<IReadOnlyList<Mod>> SelectedMods = new Bindable<IReadOnlyList<Mod>>();
 
@@ -117,7 +117,7 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
         public ITooltip<ScoreInfo> GetCustomTooltip() => new LeaderboardScoreTooltip();
         public virtual ScoreInfo TooltipContent => score;
 
-        public LeaderboardScoreV2(ScoreInfo score, bool sheared = true)
+        public BeatmapLeaderboardScore(ScoreInfo score, bool sheared = true)
         {
             this.score = score;
             this.sheared = sheared;

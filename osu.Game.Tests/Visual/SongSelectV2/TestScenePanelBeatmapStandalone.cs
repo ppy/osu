@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.Carousel;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Osu;
@@ -18,14 +19,14 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.SongSelectV2
 {
-    public partial class TestSceneBeatmapCarouselV2StandalonePanel : ThemeComparisonTestScene
+    public partial class TestScenePanelBeatmapStandalone : ThemeComparisonTestScene
     {
         [Resolved]
         private BeatmapManager beatmaps { get; set; } = null!;
 
         private BeatmapInfo beatmap = null!;
 
-        public TestSceneBeatmapCarouselV2StandalonePanel()
+        public TestScenePanelBeatmapStandalone()
             : base(false)
         {
         }

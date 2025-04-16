@@ -18,7 +18,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.SelectV2
 {
-    public partial class PanelGroupStarDifficulty : PanelBase
+    public partial class PanelGroupStarDifficulty : Panel
     {
         [Resolved]
         private OsuColour colours { get; set; } = null!;
