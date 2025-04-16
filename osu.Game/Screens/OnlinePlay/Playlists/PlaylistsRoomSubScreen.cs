@@ -561,7 +561,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
             PlaylistItem item = SelectedItem.Value;
             RulesetInfo gameplayRuleset = UserRuleset.Value ?? rulesets.GetRuleset(item.RulesetID)!;
-            Mod[] allowedMods = ModUtils.ListUserSelectableFreeMods(MatchType.Playlists, item.RequiredMods, item.AllowedMods, item.Freestyle, gameplayRuleset.CreateInstance());
+            Mod[] allowedMods = ModUtils.EnumerateUserSelectableFreeMods(MatchType.Playlists, item.RequiredMods, item.AllowedMods, item.Freestyle, gameplayRuleset.CreateInstance());
 
             UserMods.Value = UserMods.Value.Where(m => allowedMods.Any(a => m.GetType() == a.GetType())).ToArray();
         }
@@ -579,7 +579,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             IBeatmapInfo gameplayBeatmap = UserBeatmap.Value ?? item.Beatmap;
             RulesetInfo gameplayRuleset = UserRuleset.Value ?? rulesets.GetRuleset(item.RulesetID)!;
             Ruleset rulesetInstance = gameplayRuleset.CreateInstance();
-            Mod[] allowedMods = ModUtils.ListUserSelectableFreeMods(MatchType.Playlists, item.RequiredMods, item.AllowedMods, item.Freestyle, gameplayRuleset.CreateInstance());
+            Mod[] allowedMods = ModUtils.EnumerateUserSelectableFreeMods(MatchType.Playlists, item.RequiredMods, item.AllowedMods, item.Freestyle, gameplayRuleset.CreateInstance());
 
             // Update global gameplay state to correspond to the new selection.
             // Retrieve the corresponding local beatmap, since we can't directly use the playlist's beatmap info
