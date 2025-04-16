@@ -128,7 +128,7 @@ namespace osu.Game.Utils
         }
 
         /// <summary>
-        /// Checks that all <see cref="Mod"/>s in a combination are valid as "required mods" in a multiplayer match session.
+        /// Checks whether the given combination of mods may be set as the <see cref="MultiplayerPlaylistItem.RequiredMods">required mods</see> of a multiplayer playlist item.
         /// </summary>
         /// <param name="mods">The mods to check.</param>
         /// <param name="freestyle">Whether freestyle is enabled for the playlist item.</param>
@@ -146,11 +146,11 @@ namespace osu.Game.Utils
             if (!CheckCompatibleSet(mods, out invalidMods))
                 return false;
 
-            return checkValid(mods, m => m.Type != ModType.System && m.HasImplementation && m.ValidForMultiplayer && (!freestyle || m.ValidForFreestyleAsRequiredMod), out invalidMods);
+            return checkValid(mods, m => IsValidModForMatch(m, MatchType.HeadToHead, true, freestyle), out invalidMods);
         }
 
         /// <summary>
-        /// Checks that all <see cref="Mod"/>s in a combination are valid as "free mods" in a multiplayer match session.
+        /// Checks whether the given mods are valid to appear as <see cref="MultiplayerPlaylistItem.AllowedMods">allowed mods</see> in a multiplayer playlist item.
         /// </summary>
         /// <remarks>
         /// Note that this does not check compatibility between mods,
@@ -158,10 +158,11 @@ namespace osu.Game.Utils
         /// not to be confused with the list of mods the user currently has selected for the multiplayer match.
         /// </remarks>
         /// <param name="mods">The mods to check.</param>
+        /// <param name="freestyle">Whether freestyle is enabled for the playlist item.</param>
         /// <param name="invalidMods">Invalid mods, if any were found. Will be null if all mods were valid.</param>
         /// <returns>Whether the input mods were all valid. If false, <paramref name="invalidMods"/> will contain all invalid entries.</returns>
-        public static bool CheckValidFreeModsForMultiplayer(IEnumerable<Mod> mods, [NotNullWhen(false)] out List<Mod>? invalidMods)
-            => checkValid(mods, m => m.Type != ModType.System && m.HasImplementation && m.ValidForMultiplayerAsFreeMod && !(m is MultiMod), out invalidMods);
+        public static bool CheckValidAllowedModsForMultiplayer(IEnumerable<Mod> mods, bool freestyle, [NotNullWhen(false)] out List<Mod>? invalidMods)
+            => checkValid(mods, m => IsValidModForMatch(m, MatchType.HeadToHead, false, freestyle), out invalidMods);
 
         private static bool checkValid(IEnumerable<Mod> mods, Predicate<Mod> valid, [NotNullWhen(false)] out List<Mod>? invalidMods)
         {
