@@ -58,7 +58,7 @@ namespace osu.Game.Graphics.UserInterface
 
         public ShearedSliderBar()
         {
-            Shear = SHEAR;
+            Shear = OsuGame.SHEAR;
             Height = HEIGHT;
             RangePadding = EXPANDED_SIZE / 2;
             Children = new Drawable[]
@@ -98,11 +98,11 @@ namespace osu.Game.Graphics.UserInterface
                 },
                 nubContainer = new Container
                 {
-                    Shear = -SHEAR,
+                    Shear = -OsuGame.SHEAR,
                     RelativeSizeAxes = Axes.Both,
                     Child = Nub = new ShearedNub
                     {
-                        X = -SHEAR.X * HEIGHT / 2f,
+                        X = -OsuGame.SHEAR.X * HEIGHT / 2f,
                         Origin = Anchor.TopCentre,
                         RelativePositionAxes = Axes.X,
                         Current = { Value = true },
