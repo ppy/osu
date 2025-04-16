@@ -19,7 +19,7 @@ using Realms;
 
 namespace osu.Game.Screens.SelectV2
 {
-    public partial class TopLocalRank : CompositeDrawable
+    public partial class PanelLocalRankDisplay : CompositeDrawable
     {
         private BeatmapInfo? beatmap;
 
@@ -48,7 +48,7 @@ namespace osu.Game.Screens.SelectV2
 
         private readonly UpdateableRank updateable;
 
-        public TopLocalRank(BeatmapInfo? beatmap = null)
+        public PanelLocalRankDisplay(BeatmapInfo? beatmap = null)
         {
             AutoSizeAxes = Axes.Both;
 

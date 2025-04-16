@@ -11,22 +11,23 @@ using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Carousel;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using osuTK;
 
 namespace osu.Game.Screens.SelectV2
 {
-    public partial class PanelBeatmapSet : PanelBase
+    public partial class PanelBeatmapSet : Panel
     {
         public const float HEIGHT = CarouselItem.DEFAULT_HEIGHT * 1.6f;
 
-        private BeatmapSetPanelBackground background = null!;
+        private PanelSetBackground background = null!;
 
         private OsuSpriteText titleText = null!;
         private OsuSpriteText artistText = null!;
         private Drawable chevronIcon = null!;
-        private UpdateBeatmapSetButton updateButton = null!;
+        private PanelUpdateBeatmapButton updateButton = null!;
         private BeatmapSetOnlineStatusPill statusPill = null!;
         private DifficultySpectrumDisplay difficultiesDisplay = null!;
 
@@ -60,7 +61,7 @@ namespace osu.Game.Screens.SelectV2
                 },
             };
 
-            Background = background = new BeatmapSetPanelBackground
+            Background = background = new PanelSetBackground
             {
                 RelativeSizeAxes = Axes.Both,
             };
@@ -89,7 +90,7 @@ namespace osu.Game.Screens.SelectV2
                             Margin = new MarginPadding { Top = 5f },
                             Children = new Drawable[]
                             {
-                                updateButton = new UpdateBeatmapSetButton
+                                updateButton = new PanelUpdateBeatmapButton
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,

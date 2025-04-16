@@ -8,10 +8,10 @@ using osu.Framework.Testing;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.SelectV2;
 
-namespace osu.Game.Tests.Visual.SongSelect
+namespace osu.Game.Tests.Visual.SongSelectV2
 {
     [TestFixture]
-    public partial class TestSceneBeatmapCarouselV2Scrolling : BeatmapCarouselV2TestScene
+    public partial class TestSceneBeatmapCarouselScrolling : BeatmapCarouselTestScene
     {
         [SetUpSteps]
         public void SetUpSteps()

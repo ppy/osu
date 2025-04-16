@@ -13,19 +13,19 @@ using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
-using osu.Game.Screens.SelectV2.Footer;
+using osu.Game.Screens.SelectV2;
 using osu.Game.Utils;
 
-namespace osu.Game.Tests.Visual.UserInterface
+namespace osu.Game.Tests.Visual.SongSelectV2
 {
-    public partial class TestSceneScreenFooterButtonMods : OsuTestScene
+    public partial class TestSceneFooterButtonMods : OsuTestScene
     {
         private readonly TestScreenFooterButtonMods footerButtonMods;
 
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
 
-        public TestSceneScreenFooterButtonMods()
+        public TestSceneFooterButtonMods()
         {
             Add(footerButtonMods = new TestScreenFooterButtonMods(new TestModSelectOverlay())
             {
@@ -98,9 +98,9 @@ namespace osu.Game.Tests.Visual.UserInterface
         public void TestUnrankedBadge()
         {
             AddStep(@"Add unranked mod", () => changeMods(new[] { new OsuModDeflate() }));
-            AddUntilStep("Unranked badge shown", () => footerButtonMods.ChildrenOfType<ScreenFooterButtonMods.UnrankedBadge>().Single().Alpha == 1);
+            AddUntilStep("Unranked badge shown", () => footerButtonMods.ChildrenOfType<FooterButtonMods.UnrankedBadge>().Single().Alpha == 1);
             AddStep(@"Clear selected mod", () => changeMods(Array.Empty<Mod>()));
-            AddUntilStep("Unranked badge not shown", () => footerButtonMods.ChildrenOfType<ScreenFooterButtonMods.UnrankedBadge>().Single().Alpha == 0);
+            AddUntilStep("Unranked badge not shown", () => footerButtonMods.ChildrenOfType<FooterButtonMods.UnrankedBadge>().Single().Alpha == 0);
         }
 
         private void changeMods(IReadOnlyList<Mod> mods) => footerButtonMods.Current.Value = mods;
@@ -122,7 +122,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             }
         }
 
-        private partial class TestScreenFooterButtonMods : ScreenFooterButtonMods
+        private partial class TestScreenFooterButtonMods : FooterButtonMods
         {
             public new OsuSpriteText MultiplierText => base.MultiplierText;
 
