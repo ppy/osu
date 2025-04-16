@@ -11,6 +11,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.ObjectExtensions;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Graphics;
@@ -20,20 +21,31 @@ using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
 using osu.Game.Online.Spectator;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Users;
+using osu.Game.Screens.Play.HUD;
 using osuTK.Graphics;
 
-namespace osu.Game.Screens.Play.HUD
+namespace osu.Game.Screens.Select.Leaderboards
 {
     [LongRunningLoad]
-    public partial class MultiplayerGameplayLeaderboard : GameplayLeaderboard
+    public partial class MultiplayerLeaderboardProvider : CompositeComponent, IGameplayLeaderboardProvider
     {
-        protected readonly Dictionary<int, TrackedUserData> UserScores = new Dictionary<int, TrackedUserData>();
+        public IBindableList<IGameplayLeaderboardScore> Scores => scores;
+        private readonly BindableList<IGameplayLeaderboardScore> scores = new BindableList<IGameplayLeaderboardScore>();
 
+        protected readonly Dictionary<int, TrackedUserData> UserScores = new Dictionary<int, TrackedUserData>();
         public readonly SortedDictionary<int, BindableLong> TeamScores = new SortedDictionary<int, BindableLong>();
 
+        public bool HasTeams => TeamScores.Count > 0;
+
+        public bool IsPartial => false;
+
+        private readonly MultiplayerRoomUser[] users;
+
+        private readonly Bindable<ScoringMode> scoringMode = new Bindable<ScoringMode>();
+        private readonly IBindableList<int> playingUserIds = new BindableList<int>();
+
         [Resolved]
-        private OsuColour colours { get; set; } = null!;
+        private UserLookupCache userLookupCache { get; set; } = null!;
 
         [Resolved]
         private SpectatorClient spectatorClient { get; set; } = null!;
@@ -42,31 +54,19 @@ namespace osu.Game.Screens.Play.HUD
         private MultiplayerClient multiplayerClient { get; set; } = null!;
 
         [Resolved]
-        private UserLookupCache userLookupCache { get; set; } = null!;
+        private OsuColour colours { get; set; } = null!;
 
-        private Bindable<ScoringMode> scoringMode = null!;
-
-        private readonly MultiplayerRoomUser[] playingUsers;
-
-        private readonly IBindableList<int> playingUserIds = new BindableList<int>();
-
-        private bool hasTeams => TeamScores.Count > 0;
-
-        /// <summary>
-        /// Construct a new leaderboard.
-        /// </summary>
-        /// <param name="users">IDs of all users in this match.</param>
-        public MultiplayerGameplayLeaderboard(MultiplayerRoomUser[] users)
+        public MultiplayerLeaderboardProvider(MultiplayerRoomUser[] users)
         {
-            playingUsers = users;
+            this.users = users;
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config, IAPIProvider api, CancellationToken cancellationToken)
         {
-            scoringMode = config.GetBindable<ScoringMode>(OsuSetting.ScoreDisplayMode);
+            config.BindWith(OsuSetting.ScoreDisplayMode, scoringMode);
 
-            foreach (var user in playingUsers)
+            foreach (var user in users)
             {
                 var scoreProcessor = new SpectatorScoreProcessor(user.UserID);
                 scoreProcessor.Mode.BindTo(scoringMode);
@@ -80,29 +80,29 @@ namespace osu.Game.Screens.Play.HUD
                     TeamScores.Add(team, new BindableLong());
             }
 
-            userLookupCache.GetUsersAsync(playingUsers.Select(u => u.UserID).ToArray(), cancellationToken)
+            userLookupCache.GetUsersAsync(users.Select(u => u.UserID).ToArray(), cancellationToken)
                            .ContinueWith(task =>
                            {
                                Schedule(() =>
                                {
-                                   var users = task.GetResultSafely();
+                                   var lookedUpUsers = task.GetResultSafely();
 
-                                   for (int i = 0; i < users.Length; i++)
+                                   for (int i = 0; i < lookedUpUsers.Length; i++)
                                    {
-                                       var user = users[i] ?? new APIUser
+                                       var user = lookedUpUsers[i] ?? new APIUser
                                        {
-                                           Id = playingUsers[i].UserID,
+                                           Id = users[i].UserID,
                                            Username = "Unknown user",
                                        };
 
                                        var trackedUser = UserScores[user.Id];
 
-                                       var leaderboardScore = Add(user, user.Id == api.LocalUser.Value.Id);
-                                       leaderboardScore.GetDisplayScore = trackedUser.ScoreProcessor.GetDisplayScore;
-                                       leaderboardScore.Accuracy.BindTo(trackedUser.ScoreProcessor.Accuracy);
-                                       leaderboardScore.TotalScore.BindTo(trackedUser.ScoreProcessor.TotalScore);
-                                       leaderboardScore.Combo.BindTo(trackedUser.ScoreProcessor.Combo);
-                                       leaderboardScore.HasQuit.BindTo(trackedUser.UserQuit);
+                                       var leaderboardScore = new GameplayLeaderboardScore(user, trackedUser.ScoreProcessor, user.Id == api.LocalUser.Value.Id)
+                                       {
+                                           HasQuit = { BindTarget = trackedUser.UserQuit },
+                                           TeamColour = UserScores[user.OnlineID].Team is int team ? getTeamColour(team) : null,
+                                       };
+                                       scores.Add(leaderboardScore);
                                    }
                                });
                            }, cancellationToken);
@@ -113,7 +113,7 @@ namespace osu.Game.Screens.Play.HUD
             base.LoadComplete();
 
             // BindableList handles binding in a really bad way (Clear then AddRange) so we need to do this manually..
-            foreach (var user in playingUsers)
+            foreach (var user in users)
             {
                 spectatorClient.WatchUser(user.UserID);
 
@@ -125,34 +125,6 @@ namespace osu.Game.Screens.Play.HUD
             // new players are not supported.
             playingUserIds.BindTo(multiplayerClient.CurrentMatchPlayingUserIds);
             playingUserIds.BindCollectionChanged(playingUsersChanged);
-        }
-
-        protected override GameplayLeaderboardScore CreateLeaderboardScoreDrawable(IUser? user, bool isTracked)
-        {
-            var leaderboardScore = base.CreateLeaderboardScoreDrawable(user, isTracked);
-
-            if (user != null)
-            {
-                if (UserScores[user.OnlineID].Team is int team)
-                {
-                    leaderboardScore.BackgroundColour = getTeamColour(team).Lighten(1.2f);
-                    leaderboardScore.TextColour = Color4.White;
-                }
-            }
-
-            return leaderboardScore;
-        }
-
-        private Color4 getTeamColour(int team)
-        {
-            switch (team)
-            {
-                case 0:
-                    return colours.TeamColourRed;
-
-                default:
-                    return colours.TeamColourBlue;
-            }
         }
 
         private void playingUsersChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -176,10 +148,10 @@ namespace osu.Game.Screens.Play.HUD
 
         private void updateTotals()
         {
-            if (!hasTeams)
+            if (!HasTeams)
                 return;
 
-            foreach (var scores in TeamScores.Values) scores.Value = 0;
+            foreach (var teamTotal in TeamScores.Values) teamTotal.Value = 0;
 
             foreach (var u in UserScores.Values)
             {
@@ -191,13 +163,25 @@ namespace osu.Game.Screens.Play.HUD
             }
         }
 
+        private Color4 getTeamColour(int team)
+        {
+            switch (team)
+            {
+                case 0:
+                    return colours.TeamColourRed.Lighten(1.2f);
+
+                default:
+                    return colours.TeamColourBlue.Lighten(1.2f);
+            }
+        }
+
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
 
             if (spectatorClient.IsNotNull())
             {
-                foreach (var user in playingUsers)
+                foreach (var user in users)
                     spectatorClient.StopWatchingUser(user.UserID);
             }
         }

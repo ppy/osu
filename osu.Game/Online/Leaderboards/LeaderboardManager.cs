@@ -94,7 +94,7 @@ namespace osu.Game.Online.Leaderboards
 
                         var result = new LeaderboardScores
                         (
-                            response.Scores.Select(s => s.ToScoreInfo(rulesets, newCriteria.Beatmap)).OrderByTotalScore(),
+                            response.Scores.Select(s => s.ToScoreInfo(rulesets, newCriteria.Beatmap)).OrderByTotalScore().ToArray(),
                             response.UserScore?.CreateScoreInfo(rulesets, newCriteria.Beatmap)
                         );
                         inFlightOnlineRequest = null;
@@ -138,7 +138,7 @@ namespace osu.Game.Online.Leaderboards
 
             newScores = newScores.Detach().OrderByTotalScore();
 
-            scores.Value = new LeaderboardScores(newScores, null);
+            scores.Value = new LeaderboardScores(newScores.ToArray(), null);
 
             if (localFetchCompletionSource != null && localFetchCompletionSource == lastFetchCompletionSource)
             {
@@ -155,7 +155,7 @@ namespace osu.Game.Online.Leaderboards
         Mod[]? ExactMods
     );
 
-    public record LeaderboardScores(IEnumerable<ScoreInfo> TopScores, ScoreInfo? UserScore)
+    public record LeaderboardScores(ICollection<ScoreInfo> TopScores, ScoreInfo? UserScore)
     {
         public IEnumerable<ScoreInfo> AllScores
         {

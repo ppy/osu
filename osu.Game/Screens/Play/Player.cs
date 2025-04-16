@@ -929,33 +929,29 @@ namespace osu.Game.Screens.Play
 
         #region Gameplay leaderboard
 
+        protected virtual bool ShowLeaderboard => false;
+
         protected readonly Bindable<bool> LeaderboardExpandedState = new BindableBool();
 
         private void loadLeaderboard()
         {
+            if (!ShowLeaderboard)
+                return;
+
             HUDOverlay.HoldingForHUD.BindValueChanged(_ => updateLeaderboardExpandedState());
             LocalUserPlaying.BindValueChanged(_ => updateLeaderboardExpandedState(), true);
 
-            var gameplayLeaderboard = CreateGameplayLeaderboard();
-
-            if (gameplayLeaderboard != null)
+            var gameplayLeaderboard = new DrawableGameplayLeaderboard();
+            LoadComponentAsync(gameplayLeaderboard, leaderboard =>
             {
-                LoadComponentAsync(gameplayLeaderboard, leaderboard =>
-                {
-                    if (!LoadedBeatmapSuccessfully)
-                        return;
+                if (!LoadedBeatmapSuccessfully)
+                    return;
 
-                    leaderboard.Expanded.BindTo(LeaderboardExpandedState);
+                leaderboard.Expanded.BindTo(LeaderboardExpandedState);
 
-                    AddLeaderboardToHUD(leaderboard);
-                });
-            }
+                HUDOverlay.LeaderboardFlow.Add(leaderboard);
+            });
         }
-
-        [CanBeNull]
-        protected virtual GameplayLeaderboard CreateGameplayLeaderboard() => null;
-
-        protected virtual void AddLeaderboardToHUD(GameplayLeaderboard leaderboard) => HUDOverlay.LeaderboardFlow.Add(leaderboard);
 
         private void updateLeaderboardExpandedState() =>
             LeaderboardExpandedState.Value = !LocalUserPlaying.Value || HUDOverlay.HoldingForHUD.Value;
