@@ -6,15 +6,16 @@ using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Overlays;
+using osu.Game.Graphics.Carousel;
 using osu.Game.Screens.SelectV2;
 using osu.Game.Tests.Visual.UserInterface;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.SongSelectV2
 {
-    public partial class TestSceneBeatmapCarouselV2GroupPanel : ThemeComparisonTestScene
+    public partial class TestScenePanelGroup : ThemeComparisonTestScene
     {
-        public TestSceneBeatmapCarouselV2GroupPanel()
+        public TestScenePanelGroup()
             : base(false)
         {
         }

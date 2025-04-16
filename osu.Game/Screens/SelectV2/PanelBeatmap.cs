@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Carousel;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -22,7 +23,7 @@ using osuTK;
 
 namespace osu.Game.Screens.SelectV2
 {
-    public partial class PanelBeatmap : PanelBase
+    public partial class PanelBeatmap : Panel
     {
         public const float HEIGHT = CarouselItem.DEFAULT_HEIGHT;
 
@@ -30,7 +31,7 @@ namespace osu.Game.Screens.SelectV2
         private ConstrainedIconContainer difficultyIcon = null!;
         private OsuSpriteText keyCountText = null!;
         private StarRatingDisplay starRatingDisplay = null!;
-        private TopLocalRank difficultyRank = null!;
+        private PanelLocalRankDisplay localRank = null!;
         private OsuSpriteText difficultyText = null!;
         private OsuSpriteText authorText = null!;
 
@@ -100,7 +101,7 @@ namespace osu.Game.Screens.SelectV2
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
                                 },
-                                difficultyRank = new TopLocalRank
+                                localRank = new PanelLocalRankDisplay
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
@@ -174,7 +175,7 @@ namespace osu.Game.Screens.SelectV2
 
             difficultyIcon.Icon = beatmap.Ruleset.CreateInstance().CreateIcon();
 
-            difficultyRank.Beatmap = beatmap;
+            localRank.Beatmap = beatmap;
             difficultyText.Text = beatmap.DifficultyName;
             authorText.Text = BeatmapsetsStrings.ShowDetailsMappedBy(beatmap.Metadata.Author.Username);
 
@@ -186,7 +187,7 @@ namespace osu.Game.Screens.SelectV2
         {
             base.FreeAfterUse();
 
-            difficultyRank.Beatmap = null;
+            localRank.Beatmap = null;
             starDifficultyBindable = null;
         }
 

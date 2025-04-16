@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
+using osu.Game.Graphics.Carousel;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using osuTK;
@@ -18,7 +19,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.SelectV2
 {
-    public partial class PanelGroup : PanelBase
+    public partial class PanelGroup : Panel
     {
         public const float HEIGHT = CarouselItem.DEFAULT_HEIGHT * 1.2f;
 

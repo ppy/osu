@@ -28,9 +28,9 @@ using osu.Game.Utils;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Screens.SelectV2.Footer
+namespace osu.Game.Screens.SelectV2
 {
-    public partial class ScreenFooterButtonMods : ScreenFooterButton, IHasCurrentValue<IReadOnlyList<Mod>>
+    public partial class FooterButtonMods : ScreenFooterButton, IHasCurrentValue<IReadOnlyList<Mod>>
     {
         private const float bar_height = 30f;
         private const float mod_display_portion = 0.65f;
@@ -58,7 +58,7 @@ namespace osu.Game.Screens.SelectV2.Footer
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
-        public ScreenFooterButtonMods(ModSelectOverlay overlay)
+        public FooterButtonMods(ModSelectOverlay overlay)
             : base(overlay)
         {
         }

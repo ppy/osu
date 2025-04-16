@@ -3,7 +3,7 @@
 
 using System;
 
-namespace osu.Game.Screens.SelectV2
+namespace osu.Game.Graphics.Carousel
 {
     /// <summary>
     /// Represents a single display item for display in a <see cref="Carousel{T}"/>.

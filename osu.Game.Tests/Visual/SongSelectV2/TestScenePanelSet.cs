@@ -8,9 +8,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.Carousel;
 using osu.Game.Overlays;
-using osu.Game.Rulesets.Mania;
-using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.SelectV2;
 using osu.Game.Tests.Resources;
 using osu.Game.Tests.Visual.UserInterface;
@@ -18,14 +17,14 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.SongSelectV2
 {
-    public partial class TestSceneBeatmapCarouselV2DifficultyPanel : ThemeComparisonTestScene
+    public partial class TestScenePanelSet : ThemeComparisonTestScene
     {
         [Resolved]
         private BeatmapManager beatmaps { get; set; } = null!;
 
-        private BeatmapInfo beatmap = null!;
+        private BeatmapSetInfo beatmapSet = null!;
 
-        public TestSceneBeatmapCarouselV2DifficultyPanel()
+        public TestScenePanelSet()
             : base(false)
         {
         }
@@ -33,11 +32,9 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
-            var beatmapSet = beatmaps.GetAllUsableBeatmapSets().FirstOrDefault(b => b.OnlineID == 241526)
-                             ?? beatmaps.GetAllUsableBeatmapSets().FirstOrDefault(b => !b.Protected)
-                             ?? TestResources.CreateTestBeatmapSetInfo();
-
-            beatmap = beatmapSet.Beatmaps.First();
+            beatmapSet = beatmaps.GetAllUsableBeatmapSets().FirstOrDefault(b => b.OnlineID == 241526)
+                         ?? beatmaps.GetAllUsableBeatmapSets().FirstOrDefault(b => !b.Protected)
+                         ?? TestResources.CreateTestBeatmapSetInfo();
         });
 
         [Test]
@@ -53,16 +50,10 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             {
                 var randomSet = beatmaps.GetAllUsableBeatmapSets().MinBy(_ => RNG.Next());
                 randomSet ??= TestResources.CreateTestBeatmapSetInfo();
-                beatmap = randomSet.Beatmaps.MinBy(_ => RNG.Next())!;
+                beatmapSet = randomSet;
 
                 CreateThemedContent(OverlayColourScheme.Aquamarine);
             });
-        }
-
-        [Test]
-        public void TestManiaRuleset()
-        {
-            AddToggleStep("mania ruleset", v => Ruleset.Value = v ? new ManiaRuleset().RulesetInfo : new OsuRuleset().RulesetInfo);
         }
 
         protected override Drawable CreateContent()
@@ -78,25 +69,25 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 Spacing = new Vector2(0f, 5f),
                 Children = new Drawable[]
                 {
-                    new PanelBeatmap
+                    new PanelBeatmapSet
                     {
-                        Item = new CarouselItem(beatmap)
+                        Item = new CarouselItem(beatmapSet)
                     },
-                    new PanelBeatmap
+                    new PanelBeatmapSet
                     {
-                        Item = new CarouselItem(beatmap),
+                        Item = new CarouselItem(beatmapSet),
                         KeyboardSelected = { Value = true }
                     },
-                    new PanelBeatmap
+                    new PanelBeatmapSet
                     {
-                        Item = new CarouselItem(beatmap),
-                        Selected = { Value = true }
+                        Item = new CarouselItem(beatmapSet),
+                        Expanded = { Value = true }
                     },
-                    new PanelBeatmap
+                    new PanelBeatmapSet
                     {
-                        Item = new CarouselItem(beatmap),
+                        Item = new CarouselItem(beatmapSet),
                         KeyboardSelected = { Value = true },
-                        Selected = { Value = true }
+                        Expanded = { Value = true }
                     },
                 }
             };

@@ -9,14 +9,14 @@ using osu.Game.Screens.SelectV2;
 
 namespace osu.Game.Tests.Visual.SongSelectV2
 {
-    public partial class TestSceneUpdateBeatmapSetButtonV2 : OsuTestScene
+    public partial class TestScenePanelUpdateBeatmapButton : OsuTestScene
     {
-        private UpdateBeatmapSetButton button = null!;
+        private PanelUpdateBeatmapButton button = null!;
 
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
-            Child = button = new UpdateBeatmapSetButton
+            Child = button = new PanelUpdateBeatmapButton
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,

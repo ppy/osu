@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace osu.Game.Screens.SelectV2
+namespace osu.Game.Graphics.Carousel
 {
     /// <summary>
     /// An interface representing a filter operation which can be run on a <see cref="Carousel{T}"/>.
