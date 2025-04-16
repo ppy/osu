@@ -62,8 +62,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         protected partial class ShearedDropdownMenu : OsuDropdown<T>.OsuDropdownMenu
         {
-            private readonly Vector2 shear = new Vector2(OsuGame.SHEAR, 0);
-
             public new MarginPadding Padding
             {
                 get => base.Padding;
@@ -72,7 +70,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             public ShearedDropdownMenu()
             {
-                Shear = shear;
+                Shear = OsuGame.SHEAR;
                 Margin = new MarginPadding { Top = 5f };
             }
 
@@ -84,12 +82,10 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             public partial class ShearedMenuItem : DrawableOsuDropdownMenuItem
             {
-                private readonly Vector2 shear = new Vector2(OsuGame.SHEAR, 0);
-
                 public ShearedMenuItem(MenuItem item)
                     : base(item)
                 {
-                    Foreground.Shear = -shear;
+                    Foreground.Shear = -OsuGame.SHEAR;
                 }
             }
         }
@@ -125,14 +121,12 @@ namespace osu.Game.Graphics.UserInterfaceV2
             public ShearedDropdown<T> Dropdown = null!;
             private ShearedDropdownSearchBar searchBar = null!;
 
-            private readonly Vector2 shear = new Vector2(OsuGame.SHEAR, 0);
-
             [Resolved]
             private OverlayColourProvider colourProvider { get; set; } = null!;
 
             public ShearedDropdownHeader()
             {
-                Shear = shear;
+                Shear = OsuGame.SHEAR;
                 CornerRadius = corner_radius;
                 Masking = true;
 
@@ -167,7 +161,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                                         {
                                             Margin = new MarginPadding { Horizontal = 10f, Vertical = 8f },
                                             Font = OsuFont.Torus.With(size: 16.8f, weight: FontWeight.SemiBold),
-                                            Shear = -shear,
+                                            Shear = -OsuGame.SHEAR,
                                         },
                                     },
                                 },
@@ -178,7 +172,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
                                     Padding = new MarginPadding { Horizontal = 10f },
-                                    Shear = -shear,
+                                    Shear = -OsuGame.SHEAR,
                                     Children = new Drawable[]
                                     {
                                         valueText = new TruncatingSpriteText
@@ -286,12 +280,10 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
                 private partial class DropdownSearchTextBox : OsuTextBox
                 {
-                    private readonly Vector2 shear = new Vector2(OsuGame.SHEAR, 0);
-
                     [BackgroundDependencyLoader]
                     private void load(OverlayColourProvider? colourProvider)
                     {
-                        TextContainer.Shear = -shear;
+                        TextContainer.Shear = -OsuGame.SHEAR;
                         BackgroundUnfocused = colourProvider?.Background5 ?? new Color4(10, 10, 10, 255);
                         BackgroundFocused = colourProvider?.Background5 ?? new Color4(10, 10, 10, 255);
                     }
