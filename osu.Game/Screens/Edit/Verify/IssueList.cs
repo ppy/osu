@@ -5,12 +5,15 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Edit;
@@ -36,6 +39,8 @@ namespace osu.Game.Screens.Edit.Verify
         private IBeatmapVerifier rulesetVerifier;
         private BeatmapVerifier generalVerifier;
         private BeatmapVerifierContext context;
+
+        private LoadingLayer loading;
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colours)
@@ -77,6 +82,7 @@ namespace osu.Game.Screens.Edit.Verify
                         },
                     }
                 },
+                loading = new LoadingLayer()
             };
         }
 
@@ -90,19 +96,36 @@ namespace osu.Game.Screens.Edit.Verify
             Refresh();
         }
 
+        [CanBeNull]
+        private Task refreshOperation;
+
         public void Refresh()
         {
-            var issues = generalVerifier.Run(context);
+            if (refreshOperation?.IsCompleted == false)
+                return;
 
-            if (rulesetVerifier != null)
-                issues = issues.Concat(rulesetVerifier.Run(context));
-
-            issues = filter(issues);
-
+            loading.Show();
             table.Issues.Clear();
-            table.Issues.AddRange(issues
-                                  .OrderBy(issue => issue.Template.Type)
-                                  .ThenBy(issue => issue.Check.Metadata.Category));
+
+            refreshOperation = Task.Run(() =>
+            {
+                IEnumerable<Issue> issues = generalVerifier.Run(context);
+
+                if (rulesetVerifier != null)
+                    issues = issues.Concat(rulesetVerifier.Run(context));
+
+                issues = filter(issues)
+                         .OrderBy(issue => issue.Template.Type)
+                         .ThenBy(issue => issue.Check.Metadata.Category)
+                         .ToArray();
+
+                Schedule(() =>
+                {
+                    table.Issues.AddRange(issues);
+                    loading.Hide();
+                    refreshOperation = null;
+                });
+            });
         }
 
         private IEnumerable<Issue> filter(IEnumerable<Issue> issues)
