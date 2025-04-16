@@ -102,7 +102,7 @@ namespace osu.Game
         /// <summary>
         /// A common shear factor applied to most components of the game.
         /// </summary>
-        public const float SHEAR = 0.2f;
+        public static readonly Vector2 SHEAR = new Vector2(0.2f, 0);
 
         public Toolbar Toolbar { get; private set; }
 
