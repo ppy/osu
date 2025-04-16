@@ -330,7 +330,7 @@ namespace osu.Game.Utils
         /// <param name="allowedMods">The allowed mods for the playlist item.</param>
         /// <param name="freestyle">Whether freestyle is enabled for the playlist item.</param>
         /// <param name="userRuleset">The user's preferred ruleset, which may differ from the playlist item's selection on freestyle playlist items.</param>
-        public static Mod[] ListUserSelectableFreeMods(MatchType matchType, IEnumerable<APIMod> requiredMods, IEnumerable<APIMod> allowedMods, bool freestyle, Ruleset userRuleset)
+        public static Mod[] EnumerateUserSelectableFreeMods(MatchType matchType, IEnumerable<APIMod> requiredMods, IEnumerable<APIMod> allowedMods, bool freestyle, Ruleset userRuleset)
         {
             if (freestyle)
             {
