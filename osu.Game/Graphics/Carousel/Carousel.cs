@@ -228,6 +228,7 @@ namespace osu.Game.Graphics.Carousel
         {
             InternalChild = Scroll = new CarouselScrollContainer
             {
+                Masking = false,
                 RelativeSizeAxes = Axes.Both,
             };
 

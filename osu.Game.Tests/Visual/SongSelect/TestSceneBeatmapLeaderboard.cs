@@ -42,6 +42,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         private RulesetStore rulesetStore = null!;
         private BeatmapManager beatmapManager = null!;
         private PlaySongSelect songSelect = null!;
+
         private LeaderboardManager leaderboardManager = null!;
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
@@ -52,8 +53,9 @@ namespace osu.Game.Tests.Visual.SongSelect
             dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, Realm, null, dependencies.Get<AudioManager>(), Resources, dependencies.Get<GameHost>(), Beatmap.Default));
             dependencies.Cache(scoreManager = new ScoreManager(rulesetStore, () => beatmapManager, LocalStorage, Realm, API));
             dependencies.CacheAs<Screens.Select.SongSelect>(songSelect = new PlaySongSelect());
-            Dependencies.Cache(Realm);
             dependencies.Cache(leaderboardManager = new LeaderboardManager());
+
+            Dependencies.Cache(Realm);
 
             return dependencies;
         }
@@ -204,8 +206,8 @@ namespace osu.Game.Tests.Visual.SongSelect
         public void TestGlobalScoresDisplay()
         {
             AddStep(@"Set scope", () => leaderboard.Scope = BeatmapLeaderboardScope.Global);
-            AddStep(@"New Scores", () => leaderboard.SetScores(generateSampleScores(new BeatmapInfo())));
-            AddStep(@"New Scores with teams", () => leaderboard.SetScores(generateSampleScores(new BeatmapInfo()).Select(s =>
+            AddStep(@"New Scores", () => leaderboard.SetScores(GenerateSampleScores(new BeatmapInfo())));
+            AddStep(@"New Scores with teams", () => leaderboard.SetScores(GenerateSampleScores(new BeatmapInfo()).Select(s =>
             {
                 s.User.Team = new APITeam();
                 return s;
@@ -310,7 +312,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             AddStep(@"Import new scores", () =>
             {
-                foreach (var score in generateSampleScores(beatmapInfo()))
+                foreach (var score in GenerateSampleScores(beatmapInfo()))
                     scoreManager.Import(score);
             });
         }
@@ -326,7 +328,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         private void checkStoredCount(int expected) =>
             AddUntilStep($"Total scores stored is {expected}", () => Realm.Run(r => r.All<ScoreInfo>().Count(s => !s.DeletePending)), () => Is.EqualTo(expected));
 
-        private static ScoreInfo[] generateSampleScores(BeatmapInfo beatmapInfo)
+        public static ScoreInfo[] GenerateSampleScores(BeatmapInfo beatmapInfo)
         {
             return new[]
             {
