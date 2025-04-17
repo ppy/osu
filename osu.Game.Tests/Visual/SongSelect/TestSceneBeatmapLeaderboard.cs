@@ -342,7 +342,6 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Mods = new Mod[]
                     {
                         new OsuModHidden(),
-                        new OsuModHardRock(),
                         new OsuModFlashlight
                         {
                             FollowDelay = { Value = 200 },
