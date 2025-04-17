@@ -467,7 +467,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
             if (settings.PlaylistItemId != lastPlaylistItemId)
             {
-                updateGameplayState();
+                Scheduler.AddOnce(updateGameplayState);
                 lastPlaylistItemId = settings.PlaylistItemId;
             }
 
@@ -480,7 +480,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         private void onItemChanged(MultiplayerPlaylistItem item)
         {
             if (item.ID == client.Room?.Settings.PlaylistItemId)
-                updateGameplayState();
+                Scheduler.AddOnce(updateGameplayState);
         }
 
         /// <summary>
@@ -489,7 +489,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         private void onUserStyleChanged(MultiplayerRoomUser user)
         {
             if (user.Equals(client.LocalUser))
-                updateGameplayState();
+                Scheduler.AddOnce(updateGameplayState);
         }
 
         /// <summary>
@@ -498,7 +498,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         private void onUserModsChanged(MultiplayerRoomUser user)
         {
             if (user.Equals(client.LocalUser))
-                updateGameplayState();
+                Scheduler.AddOnce(updateGameplayState);
         }
 
         /// <summary>
