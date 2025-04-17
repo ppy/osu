@@ -147,10 +147,19 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddUntilStep("wait for load", () => Leaderboard!.IsLoaded);
 
-            AddStep("check watch requests were sent", () =>
+            AddUntilStep("check watch requests were sent", () =>
             {
-                foreach (var user in MultiplayerUsers)
-                    spectatorClient.Verify(s => s.WatchUser(user.UserID), Times.Once);
+                try
+                {
+                    foreach (var user in MultiplayerUsers)
+                        spectatorClient.Verify(s => s.WatchUser(user.UserID), Times.Once);
+
+                    return true;
+                }
+                catch (MockException)
+                {
+                    return false;
+                }
             });
         }
 
@@ -181,7 +190,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         spectatorClient.Verify(s => s.StopWatchingUser(user.UserID), Times.Once);
                     return true;
                 }
-                catch
+                catch (MockException)
                 {
                     return false;
                 }
