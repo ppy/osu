@@ -17,6 +17,7 @@ using osu.Game.Scoring.Legacy;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Utils;
 using Realms;
 
 namespace osu.Game.Scoring
@@ -89,6 +90,9 @@ namespace osu.Game.Scoring
             // Under no circumstance do we want these to be written to realm as null.
             ArgumentNullException.ThrowIfNull(model.BeatmapInfo);
             ArgumentNullException.ThrowIfNull(model.Ruleset);
+
+            if (!ModUtils.CheckCompatibleSet(model.Mods))
+                throw new InvalidOperationException(@"The score specifies an incompatible set of mods!");
 
             if (string.IsNullOrEmpty(model.StatisticsJson))
                 model.StatisticsJson = JsonConvert.SerializeObject(model.Statistics);
