@@ -23,15 +23,12 @@ namespace osu.Game.Graphics.UserInterface
 
         public const int HEIGHT = 30;
         public const float EXPANDED_SIZE = 50;
+        public const float CORNER_RADIUS = 5;
 
         private readonly Box fill;
         private readonly Container main;
         private readonly Container shadow;
 
-        /// <summary>
-        ///  Implements the shape for the nub, allowing for any type of container to be used.
-        /// </summary>
-        /// <returns></returns>
         public ShearedNub()
         {
             Size = new Vector2(EXPANDED_SIZE, HEIGHT);
@@ -41,7 +38,7 @@ namespace osu.Game.Graphics.UserInterface
                 {
                     Shear = OsuGame.SHEAR,
                     Masking = true,
-                    CornerRadius = 5,
+                    CornerRadius = CORNER_RADIUS,
                     RelativeSizeAxes = Axes.Both,
                     EdgeEffect = new EdgeEffectParameters
                     {
@@ -61,7 +58,7 @@ namespace osu.Game.Graphics.UserInterface
                     BorderColour = Colour4.White,
                     BorderThickness = 8f,
                     Masking = true,
-                    CornerRadius = 5,
+                    CornerRadius = CORNER_RADIUS,
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
