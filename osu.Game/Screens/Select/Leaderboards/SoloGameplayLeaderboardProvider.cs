@@ -19,11 +19,11 @@ namespace osu.Game.Screens.Select.Leaderboards
         private readonly BindableList<IGameplayLeaderboardScore> scores = new BindableList<IGameplayLeaderboardScore>();
 
         [BackgroundDependencyLoader]
-        private void load(LeaderboardManager leaderboardManager, GameplayState gameplayState)
+        private void load(LeaderboardManager? leaderboardManager, GameplayState? gameplayState)
         {
-            var globalScores = leaderboardManager.Scores.Value;
+            var globalScores = leaderboardManager?.Scores.Value;
 
-            IsPartial = leaderboardManager.CurrentCriteria?.Scope != BeatmapLeaderboardScope.Local && globalScores?.TopScores.Count >= 50;
+            IsPartial = leaderboardManager?.CurrentCriteria?.Scope != BeatmapLeaderboardScope.Local && globalScores?.TopScores.Count >= 50;
 
             if (globalScores != null)
             {
@@ -31,11 +31,14 @@ namespace osu.Game.Screens.Select.Leaderboards
                     scores.Add(new GameplayLeaderboardScore(topScore, false));
             }
 
-            scores.Add(new GameplayLeaderboardScore(gameplayState.Score.ScoreInfo.User, gameplayState.ScoreProcessor, true)
+            if (gameplayState != null)
             {
-                // Local score should always show lower than any existing scores in cases of ties.
-                DisplayOrder = { Value = long.MaxValue }
-            });
+                scores.Add(new GameplayLeaderboardScore(gameplayState.Score.ScoreInfo.User, gameplayState.ScoreProcessor, true)
+                {
+                    // Local score should always show lower than any existing scores in cases of ties.
+                    DisplayOrder = { Value = long.MaxValue }
+                });
+            }
         }
     }
 }
