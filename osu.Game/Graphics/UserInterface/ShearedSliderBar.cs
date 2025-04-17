@@ -29,6 +29,8 @@ namespace osu.Game.Graphics.UserInterface
 
         private readonly Container mainContent;
 
+        protected virtual bool FocusIndicator => true;
+
         private Color4 accentColour;
 
         public Color4 AccentColour
@@ -152,13 +154,16 @@ namespace osu.Game.Graphics.UserInterface
         {
             base.OnFocus(e);
 
-            mainContent.EdgeEffect = new EdgeEffectParameters
+            if (FocusIndicator)
             {
-                Type = EdgeEffectType.Glow,
-                Colour = AccentColour.Darken(1),
-                Hollow = true,
-                Radius = 2,
-            };
+                mainContent.EdgeEffect = new EdgeEffectParameters
+                {
+                    Type = EdgeEffectType.Glow,
+                    Colour = AccentColour.Darken(1),
+                    Hollow = true,
+                    Radius = 2,
+                };
+            }
         }
 
         protected override void OnFocusLost(FocusLostEvent e)
