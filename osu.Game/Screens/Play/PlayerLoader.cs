@@ -3,12 +3,12 @@
 
 using System;
 using System.Diagnostics;
-using System.Threading;
 using System.Threading.Tasks;
 using ManagedBass.Fx;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
+using osu.Framework.Development;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -564,6 +564,8 @@ namespace osu.Game.Screens.Play
 
         private void pushWhenLoaded()
         {
+            Debug.Assert(ThreadSafety.IsUpdateThread);
+
             if (!this.IsCurrentScreen()) return;
 
             if (!readyForPush)
@@ -624,7 +626,13 @@ namespace osu.Game.Screens.Play
             scheduledPushPlayer = null;
         }
 
-        private void endHighPerformance() => Interlocked.Exchange(ref highPerformanceSession, null)?.Dispose();
+        private void endHighPerformance()
+        {
+            Debug.Assert(ThreadSafety.IsUpdateThread);
+
+            highPerformanceSession?.Dispose();
+            highPerformanceSession = null;
+        }
 
         #region Disposal
 
@@ -638,7 +646,8 @@ namespace osu.Game.Screens.Play
                 DisposalTask = LoadTask?.ContinueWith(_ => CurrentPlayer?.Dispose());
             }
 
-            endHighPerformance();
+            // This is only a failsafe; should be disposed more immediately by `endHighPerformance` call.
+            highPerformanceSession?.Dispose();
         }
 
         #endregion
