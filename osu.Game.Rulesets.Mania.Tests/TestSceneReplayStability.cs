@@ -27,6 +27,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             new object[] { 5f, -19d, HitResult.Perfect },
             new object[] { 5f, -19.2d, HitResult.Perfect },
             new object[] { 5f, -19.38d, HitResult.Perfect },
+            // new object[] { 5f, -19.4d, HitResult.Perfect }, <- in theory this should work, in practice it does not (fails even before encode & rounding due to floating point precision issues)
             new object[] { 5f, -19.44d, HitResult.Great },
             new object[] { 5f, -19.7d, HitResult.Great },
             new object[] { 5f, -20d, HitResult.Great },
@@ -69,6 +70,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             new object[] { 9.3f, 14d, HitResult.Perfect },
             new object[] { 9.3f, 14.2d, HitResult.Perfect },
             new object[] { 9.3f, 14.6d, HitResult.Perfect },
+            // new object[] { 9.3f, 14.67d, HitResult.Perfect }, <- in theory this should work, in practice it does not (fails even before encode & rounding due to floating point precision issues)
             new object[] { 9.3f, 14.7d, HitResult.Great },
             new object[] { 9.3f, 15d, HitResult.Great },
             new object[] { 9.3f, 35d, HitResult.Great },
