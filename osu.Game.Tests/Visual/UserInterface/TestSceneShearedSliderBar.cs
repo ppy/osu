@@ -33,6 +33,16 @@ namespace osu.Game.Tests.Visual.UserInterface
         };
 
         [Test]
+        public void TestNubShadow()
+        {
+            AddToggleStep("toggle nub shadow", v =>
+            {
+                if (slider.IsNotNull())
+                    slider.NubShadowColour = v ? Color4.Black.Opacity(0.2f) : Color4.Black.Opacity(0f);
+            });
+        }
+
+        [Test]
         public void TestNubDoubleClickRevertToDefault()
         {
             AddStep("set slider to 1", () => slider.Current.Value = 1);

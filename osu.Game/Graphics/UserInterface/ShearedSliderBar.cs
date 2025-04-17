@@ -56,6 +56,12 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
+        public Color4 NubShadowColour
+        {
+            get => Nub.ShadowColour;
+            set => Nub.ShadowColour = value;
+        }
+
         public ShearedSliderBar()
         {
             Shear = OsuGame.SHEAR;
