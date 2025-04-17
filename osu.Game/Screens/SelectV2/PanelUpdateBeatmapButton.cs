@@ -22,7 +22,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.SelectV2
 {
-    public partial class UpdateBeatmapSetButton : OsuAnimatedButton
+    public partial class PanelUpdateBeatmapButton : OsuAnimatedButton
     {
         private BeatmapSetInfo? beatmapSet;
 
@@ -53,7 +53,7 @@ namespace osu.Game.Screens.SelectV2
         [Resolved]
         private IDialogOverlay? dialogOverlay { get; set; }
 
-        public UpdateBeatmapSetButton()
+        public PanelUpdateBeatmapButton()
         {
             Size = new Vector2(75f, 22f);
         }
@@ -69,7 +69,7 @@ namespace osu.Game.Screens.SelectV2
 
             Content.Anchor = Anchor.Centre;
             Content.Origin = Anchor.Centre;
-            Content.Shear = new Vector2(OsuGame.SHEAR, 0);
+            Content.Shear = OsuGame.SHEAR;
 
             Content.AddRange(new Drawable[]
             {
@@ -87,7 +87,7 @@ namespace osu.Game.Screens.SelectV2
                     AutoSizeAxes = Axes.Both,
                     Direction = FillDirection.Horizontal,
                     Spacing = new Vector2(4),
-                    Shear = new Vector2(-OsuGame.SHEAR, 0),
+                    Shear = -OsuGame.SHEAR,
                     Children = new Drawable[]
                     {
                         new Container

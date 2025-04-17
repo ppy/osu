@@ -16,6 +16,7 @@ using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Carousel;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
 using osu.Game.Screens.Select;
@@ -27,9 +28,9 @@ using osuTK.Graphics;
 using osuTK.Input;
 using BeatmapCarousel = osu.Game.Screens.SelectV2.BeatmapCarousel;
 
-namespace osu.Game.Tests.Visual.SongSelect
+namespace osu.Game.Tests.Visual.SongSelectV2
 {
-    public abstract partial class BeatmapCarouselV2TestScene : OsuManualInputManagerTestScene
+    public abstract partial class BeatmapCarouselTestScene : OsuManualInputManagerTestScene
     {
         protected readonly BindableList<BeatmapSetInfo> BeatmapSets = new BindableList<BeatmapSetInfo>();
 
@@ -47,7 +48,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private int beatmapCount;
 
-        protected BeatmapCarouselV2TestScene()
+        protected BeatmapCarouselTestScene()
         {
             store = new TestBeatmapStore
             {
@@ -96,6 +97,8 @@ namespace osu.Game.Tests.Visual.SongSelect
                             {
                                 Carousel = new BeatmapCarousel
                                 {
+                                    BleedTop = 50,
+                                    BleedBottom = 50,
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
                                     Width = 800,
@@ -189,7 +192,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                         .Where(p => ((ICarouselPanel)p).Item?.IsVisible == true)
                         .OrderBy(p => p.Y)
                         .ElementAt(index)
-                        .ChildrenOfType<PanelBase>().Single()
+                        .ChildrenOfType<Panel>().Single()
                         .TriggerClick();
             });
         }

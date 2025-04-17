@@ -11,7 +11,6 @@ using osu.Game.Overlays.Mods;
 using osu.Game.Screens.Footer;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Select;
-using osu.Game.Screens.SelectV2.Footer;
 
 namespace osu.Game.Screens.SelectV2
 {
@@ -77,9 +76,9 @@ namespace osu.Game.Screens.SelectV2
 
         public override IReadOnlyList<ScreenFooterButton> CreateFooterButtons() => new ScreenFooterButton[]
         {
-            new ScreenFooterButtonMods(modSelectOverlay) { Current = Mods },
-            new ScreenFooterButtonRandom(),
-            new ScreenFooterButtonOptions(),
+            new FooterButtonMods(modSelectOverlay) { Current = Mods },
+            new FooterButtonRandom(),
+            new FooterButtonOptions(),
         };
 
         protected override void LoadComplete()

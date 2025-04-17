@@ -28,9 +28,9 @@ using osu.Game.Utils;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Screens.SelectV2.Footer
+namespace osu.Game.Screens.SelectV2
 {
-    public partial class ScreenFooterButtonMods : ScreenFooterButton, IHasCurrentValue<IReadOnlyList<Mod>>
+    public partial class FooterButtonMods : ScreenFooterButton, IHasCurrentValue<IReadOnlyList<Mod>>
     {
         private const float bar_height = 30f;
         private const float mod_display_portion = 0.65f;
@@ -58,7 +58,7 @@ namespace osu.Game.Screens.SelectV2.Footer
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
-        public ScreenFooterButtonMods(ModSelectOverlay overlay)
+        public FooterButtonMods(ModSelectOverlay overlay)
             : base(overlay)
         {
         }
@@ -78,7 +78,7 @@ namespace osu.Game.Screens.SelectV2.Footer
                     Y = -5f,
                     Depth = float.MaxValue,
                     Origin = Anchor.BottomLeft,
-                    Shear = BUTTON_SHEAR,
+                    Shear = OsuGame.SHEAR,
                     CornerRadius = CORNER_RADIUS,
                     Size = new Vector2(BUTTON_WIDTH, bar_height),
                     Masking = true,
@@ -108,7 +108,7 @@ namespace osu.Game.Screens.SelectV2.Footer
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                                Shear = -BUTTON_SHEAR,
+                                Shear = -OsuGame.SHEAR,
                                 UseFullGlyphHeight = false,
                                 Font = OsuFont.Torus.With(size: 14f, weight: FontWeight.Bold)
                             }
@@ -130,7 +130,7 @@ namespace osu.Game.Screens.SelectV2.Footer
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
-                                    Shear = -BUTTON_SHEAR,
+                                    Shear = -OsuGame.SHEAR,
                                     Scale = new Vector2(0.5f),
                                     Current = { BindTarget = Current },
                                     ExpansionMode = ExpansionMode.AlwaysContracted,
@@ -139,7 +139,7 @@ namespace osu.Game.Screens.SelectV2.Footer
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
-                                    Shear = -BUTTON_SHEAR,
+                                    Shear = -OsuGame.SHEAR,
                                     Font = OsuFont.Torus.With(size: 14f, weight: FontWeight.Bold),
                                     Mods = { BindTarget = Current },
                                 }
@@ -305,7 +305,7 @@ namespace osu.Game.Screens.SelectV2.Footer
                 Y = -5f;
                 Depth = float.MaxValue;
                 Origin = Anchor.BottomLeft;
-                Shear = BUTTON_SHEAR;
+                Shear = OsuGame.SHEAR;
                 CornerRadius = CORNER_RADIUS;
                 AutoSizeAxes = Axes.X;
                 Height = bar_height;
@@ -329,7 +329,7 @@ namespace osu.Game.Screens.SelectV2.Footer
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Shear = -BUTTON_SHEAR,
+                        Shear = -OsuGame.SHEAR,
                         Text = ModSelectOverlayStrings.Unranked.ToUpper(),
                         Margin = new MarginPadding { Horizontal = 15 },
                         UseFullGlyphHeight = false,
