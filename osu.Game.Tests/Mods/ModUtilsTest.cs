@@ -321,12 +321,12 @@ namespace osu.Game.Tests.Mods
         public void TestPlaylistsModScenarios()
         {
             // The rest are tested by TestMultiplayerModScenarios.
-            Assert.IsTrue(ModUtils.IsValidModForMatch(new OsuModHardRock(), MatchType.Playlists, false, false));
-            Assert.IsTrue(ModUtils.IsValidModForMatch(new OsuModHardRock(), MatchType.Playlists, true, false));
-            Assert.IsTrue(ModUtils.IsValidModForMatch(new OsuModDoubleTime(), MatchType.Playlists, false, false));
-            Assert.IsTrue(ModUtils.IsValidModForMatch(new OsuModDoubleTime(), MatchType.Playlists, true, false));
-            Assert.IsTrue(ModUtils.IsValidModForMatch(new ModAdaptiveSpeed(), MatchType.Playlists, false, false));
-            Assert.IsTrue(ModUtils.IsValidModForMatch(new ModAdaptiveSpeed(), MatchType.Playlists, true, false));
+            Assert.IsTrue(ModUtils.IsValidModForMatch(new OsuModHardRock(), false, MatchType.Playlists, false));
+            Assert.IsTrue(ModUtils.IsValidModForMatch(new OsuModHardRock(), true, MatchType.Playlists, false));
+            Assert.IsTrue(ModUtils.IsValidModForMatch(new OsuModDoubleTime(), false, MatchType.Playlists, false));
+            Assert.IsTrue(ModUtils.IsValidModForMatch(new OsuModDoubleTime(), true, MatchType.Playlists, false));
+            Assert.IsTrue(ModUtils.IsValidModForMatch(new ModAdaptiveSpeed(), false, MatchType.Playlists, false));
+            Assert.IsTrue(ModUtils.IsValidModForMatch(new ModAdaptiveSpeed(), true, MatchType.Playlists, false));
         }
 
         [Test]
@@ -395,7 +395,7 @@ namespace osu.Game.Tests.Mods
 
         public interface IModCompatibilitySpecification;
 
-        public readonly record struct MultiplayerTestScenario(bool IsRequired, bool IsFreestyle, Mod[] Mods, Type[] InvalidTypes, MatchType Type = MatchType.HeadToHead)
+        public readonly record struct MultiplayerTestScenario(bool IsRequired, bool IsFreestyle, Mod[] Mods, Type[] InvalidTypes)
         {
             public override string ToString()
                 => $"{IsRequired}, {IsFreestyle}, [{string.Join(',', Mods.Select(m => m.GetType().ReadableName()))}], [{string.Join(',', InvalidTypes.Select(t => t.ReadableName()))}]";

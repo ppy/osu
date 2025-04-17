@@ -232,14 +232,14 @@ namespace osu.Game.Screens.OnlinePlay
         /// </summary>
         /// <param name="mod">The <see cref="Mod"/> to check.</param>
         /// <returns>Whether <paramref name="mod"/> is a valid mod for online play.</returns>
-        private bool isValidGlobalMod(Mod mod) => ModUtils.IsValidModForMatch(mod, room.Type, true, Freestyle.Value);
+        private bool isValidGlobalMod(Mod mod) => ModUtils.IsValidModForMatch(mod, true, room.Type, Freestyle.Value);
 
         /// <summary>
         /// Checks whether a given <see cref="Mod"/> is valid for per-player free-mod selection.
         /// </summary>
         /// <param name="mod">The <see cref="Mod"/> to check.</param>
         /// <returns>Whether <paramref name="mod"/> is a selectable free-mod.</returns>
-        private bool isValidFreeMod(Mod mod) => ModUtils.IsValidModForMatch(mod, room.Type, false, Freestyle.Value)
+        private bool isValidFreeMod(Mod mod) => ModUtils.IsValidModForMatch(mod, false, room.Type, Freestyle.Value)
                                                 // Mod must not be contained in the required mods.
                                                 && Mods.Value.All(m => m.Acronym != mod.Acronym)
                                                 // Mod must be compatible with all the required mods.

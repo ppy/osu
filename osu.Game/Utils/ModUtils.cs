@@ -146,7 +146,7 @@ namespace osu.Game.Utils
             if (!CheckCompatibleSet(mods, out invalidMods))
                 return false;
 
-            return checkValid(mods, m => IsValidModForMatch(m, MatchType.HeadToHead, true, freestyle), out invalidMods);
+            return checkValid(mods, m => IsValidModForMatch(m, true, MatchType.HeadToHead, freestyle), out invalidMods);
         }
 
         /// <summary>
@@ -162,7 +162,7 @@ namespace osu.Game.Utils
         /// <param name="invalidMods">Invalid mods, if any were found. Will be null if all mods were valid.</param>
         /// <returns>Whether the input mods were all valid. If false, <paramref name="invalidMods"/> will contain all invalid entries.</returns>
         public static bool CheckValidAllowedModsForMultiplayer(IEnumerable<Mod> mods, bool freestyle, [NotNullWhen(false)] out List<Mod>? invalidMods)
-            => checkValid(mods, m => IsValidModForMatch(m, MatchType.HeadToHead, false, freestyle), out invalidMods);
+            => checkValid(mods, m => IsValidModForMatch(m, false, MatchType.HeadToHead, freestyle), out invalidMods);
 
         private static bool checkValid(IEnumerable<Mod> mods, Predicate<Mod> valid, [NotNullWhen(false)] out List<Mod>? invalidMods)
         {
@@ -297,19 +297,22 @@ namespace osu.Game.Utils
         }
 
         /// <summary>
-        /// Determines whether a mod can be applied to playlist items in the match type.
+        /// Determines whether a given mod is valid on a playlist item.
         /// </summary>
         /// <param name="mod">The mod to test.</param>
-        /// <param name="matchType">The room match type.</param>
-        /// <param name="isRequired">Whether the mod is intended as a "required" (room-global) mod.</param>
-        /// <param name="isFreestyle">Whether freestyle is enabled for the playlist item.</param>
+        /// <param name="required">
+        /// <c>true</c> if the mod is intended as a <see cref="MultiplayerPlaylistItem.RequiredMods">required mod</see> on the target playlist item.
+        /// <c>false</c> if it is intended as an <see cref="MultiplayerPlaylistItem.AllowedMods">allowed mod</see>.
+        /// </param>
+        /// <param name="matchType">The type of match being played.</param>
+        /// <param name="freestyle">Whether the target playlist item enables <see cref="MultiplayerPlaylistItem.Freestyle">freestyle</see> mode.</param>
         /// <seealso href="https://github.com/ppy/osu-web/blob/40936b514c6485b874f6c6496d55d9e8b1b88fd4/app/Singletons/Mods.php#L95-L113">Related osu!web function.</seealso>
-        public static bool IsValidModForMatch(Mod mod, MatchType matchType, bool isRequired, bool isFreestyle)
+        public static bool IsValidModForMatch(Mod mod, bool required, MatchType matchType, bool freestyle)
         {
             if (mod.Type == ModType.System || !mod.UserPlayable || !mod.HasImplementation)
                 return false;
 
-            if (isFreestyle && isRequired && !mod.ValidForFreestyleAsRequiredMod)
+            if (freestyle && required && !mod.ValidForFreestyleAsRequiredMod)
                 return false;
 
             switch (matchType)
@@ -318,7 +321,7 @@ namespace osu.Game.Utils
                     return true;
 
                 default:
-                    return isRequired ? mod.ValidForMultiplayer : mod.ValidForMultiplayerAsFreeMod;
+                    return required ? mod.ValidForMultiplayer : mod.ValidForMultiplayerAsFreeMod;
             }
         }
 
@@ -339,7 +342,7 @@ namespace osu.Game.Utils
                 // In freestyle, the playlist item doesn't provide the allowed mods. Instead, all mods are unconditionally allowed by default.
                 return userRuleset.AllMods.OfType<Mod>()
                                   // But the mods must still be compatible with the room...
-                                  .Where(m => IsValidModForMatch(m, matchType, false, true))
+                                  .Where(m => IsValidModForMatch(m, false, matchType, true))
                                   // ... And compatible with the required mods listing (this also handles de-duplication).
                                   .Where(m => CheckCompatibleSet(rulesetRequiredMods.Append(m)))
                                   .ToArray();
