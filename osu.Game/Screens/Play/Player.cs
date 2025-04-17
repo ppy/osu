@@ -58,6 +58,11 @@ namespace osu.Game.Screens.Play
 
         public override bool AllowUserExit => false; // handled by HoldForMenuButton
 
+        /// <summary>
+        /// Raised after all gameplay has finished.
+        /// </summary>
+        public event Action OnShowingResults;
+
         protected override bool PlayExitSound => !isRestarting;
 
         protected override UserActivity InitialActivity => new UserActivity.InSoloGame(Beatmap.Value.BeatmapInfo, Ruleset.Value);
@@ -873,6 +878,7 @@ namespace osu.Game.Screens.Play
                     // This player instance may already be in the process of exiting.
                     return;
 
+                OnShowingResults?.Invoke();
                 this.Push(CreateResults(prepareScoreForDisplayTask.GetResultSafely()));
             }, Time.Current + delay, 50);
 
