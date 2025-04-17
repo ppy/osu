@@ -12,7 +12,6 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Overlays;
-using static osu.Game.Graphics.UserInterface.ShearedNub;
 using Vector2 = osuTK.Vector2;
 
 namespace osu.Game.Graphics.UserInterface
@@ -67,8 +66,8 @@ namespace osu.Game.Graphics.UserInterface
         public ShearedSliderBar()
         {
             Shear = OsuGame.SHEAR;
-            Height = HEIGHT;
-            RangePadding = EXPANDED_SIZE / 2;
+            Height = ShearedNub.HEIGHT;
+            RangePadding = ShearedNub.EXPANDED_SIZE / 2;
             Children = new Drawable[]
             {
                 mainContent = new Container
@@ -110,7 +109,7 @@ namespace osu.Game.Graphics.UserInterface
                     RelativeSizeAxes = Axes.Both,
                     Child = Nub = new ShearedNub
                     {
-                        X = -OsuGame.SHEAR.X * HEIGHT / 2f,
+                        X = -OsuGame.SHEAR.X * ShearedNub.HEIGHT / 2f,
                         Origin = Anchor.TopCentre,
                         RelativePositionAxes = Axes.X,
                         Current = { Value = true },
@@ -202,8 +201,8 @@ namespace osu.Game.Graphics.UserInterface
         protected override void UpdateAfterChildren()
         {
             base.UpdateAfterChildren();
-            LeftBox.Scale = new Vector2(Math.Clamp(RangePadding + Nub.DrawPosition.X - Nub.DrawWidth / 2.3f, 0, Math.Max(0, DrawWidth)), 1);
-            RightBox.Scale = new Vector2(Math.Clamp(DrawWidth - Nub.DrawPosition.X - RangePadding - Nub.DrawWidth / 2.3f, 0, Math.Max(0, DrawWidth)), 1);
+            LeftBox.Scale = new Vector2(Math.Clamp(RangePadding + Nub.DrawPosition.X - Nub.DrawWidth / 2f + ShearedNub.CORNER_RADIUS - 0.5f, 0, Math.Max(0, DrawWidth)), 1);
+            RightBox.Scale = new Vector2(Math.Clamp(DrawWidth - RangePadding - Nub.DrawPosition.X - Nub.DrawWidth / 2f + ShearedNub.CORNER_RADIUS - 0.5f, 0, Math.Max(0, DrawWidth)), 1);
         }
 
         protected override void UpdateValue(float value)
