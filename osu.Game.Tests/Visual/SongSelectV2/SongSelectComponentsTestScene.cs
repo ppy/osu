@@ -25,6 +25,9 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         private Container? resizeContainer;
         private float relativeWidth;
 
+        protected virtual Anchor ComponentAnchor => Anchor.TopLeft;
+        protected virtual float InitialRelativeWidth => 0.5f;
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -33,6 +36,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 RelativeSizeAxes = Axes.Both,
                 Child = resizeContainer = new Container
                 {
+                    Anchor = ComponentAnchor,
+                    Origin = ComponentAnchor,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Width = relativeWidth,
@@ -40,7 +45,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 }
             };
 
-            AddSliderStep("change relative width", 0, 1f, 0.5f, v =>
+            AddSliderStep("change relative width", 0, 1f, InitialRelativeWidth, v =>
             {
                 if (resizeContainer != null)
                     resizeContainer.Width = v;
