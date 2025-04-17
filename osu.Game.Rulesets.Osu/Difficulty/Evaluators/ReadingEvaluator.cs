@@ -57,8 +57,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                 // Nerf preempt on most comfortable densities
                 // https://www.desmos.com/calculator/31mrv4rlfh
-                double densityDifficulty = retrievePastVisibleObjects(currObj).Count();
-                densityDifficulty = 1 + DifficultyCalculationUtils.BellCurve(densityDifficulty, 2, 1.5, 3.0);
+                double densityDifficulty = 1 + DifficultyCalculationUtils.BellCurve(retrievePastVisibleObjects(currObj).Count(), 2, 1.5, 3.0);
                 preemptDifficulty *= currVelocity / densityDifficulty;
                 preemptDifficulty *= angleNerfFactor;
             }
