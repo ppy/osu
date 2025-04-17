@@ -465,6 +465,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             });
 
             updateSetupState();
+            updateUserScore();
             updateGameplayState();
         }
 
@@ -479,6 +480,10 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             {
                 case nameof(Room.RoomID):
                     updateSetupState();
+                    break;
+
+                case nameof(Room.UserScore):
+                    updateUserScore();
                     break;
             }
         }
@@ -507,9 +512,29 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                     progressSection.Alpha = room.MaxAttempts != null ? 1 : 0;
                     drawablePlaylist.Items.ReplaceRange(0, drawablePlaylist.Items.Count, room.Playlist);
 
+                    updateUserScore();
+
                     // Select an initial item for the user to help them get into a playable state quicker.
                     SelectedItem.Value = room.Playlist.FirstOrDefault();
                 });
+            }
+        }
+
+        /// <summary>
+        /// Responds to changes in <see cref="Room.UserScore"/> to mark playlist items as completed.
+        /// </summary>
+        private void updateUserScore()
+        {
+            if (room.UserScore == null)
+                return;
+
+            if (drawablePlaylist.Items.Count == 0)
+                return;
+
+            foreach (var item in room.UserScore.PlaylistItemAttempts)
+            {
+                if (item.Passed)
+                    drawablePlaylist.Items.Single(i => i.ID == item.PlaylistItemID).MarkCompleted();
             }
         }
 

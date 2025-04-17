@@ -14,7 +14,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.SelectV2
 {
-    public partial class BeatmapSetPanelBackground : ModelBackedDrawable<WorkingBeatmap>
+    public partial class PanelSetBackground : ModelBackedDrawable<WorkingBeatmap>
     {
         protected override double TransformDuration => 400;
 

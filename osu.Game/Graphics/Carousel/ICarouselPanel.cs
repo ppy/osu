@@ -5,7 +5,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Pooling;
 
-namespace osu.Game.Screens.SelectV2
+namespace osu.Game.Graphics.Carousel
 {
     /// <summary>
     /// An interface to be attached to any <see cref="Drawable"/>s which are used for display inside a <see cref="Carousel{T}"/>.

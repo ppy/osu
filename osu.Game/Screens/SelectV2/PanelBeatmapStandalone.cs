@@ -13,6 +13,7 @@ using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Carousel;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
@@ -23,7 +24,7 @@ using osuTK;
 
 namespace osu.Game.Screens.SelectV2
 {
-    public partial class PanelBeatmapStandalone : PanelBase
+    public partial class PanelBeatmapStandalone : Panel
     {
         public const float HEIGHT = CarouselItem.DEFAULT_HEIGHT * 1.6f;
 
@@ -48,17 +49,17 @@ namespace osu.Game.Screens.SelectV2
         private IBindable<StarDifficulty?>? starDifficultyBindable;
         private CancellationTokenSource? starDifficultyCancellationSource;
 
-        private BeatmapSetPanelBackground background = null!;
+        private PanelSetBackground background = null!;
 
         private OsuSpriteText titleText = null!;
         private OsuSpriteText artistText = null!;
-        private UpdateBeatmapSetButton updateButton = null!;
+        private PanelUpdateBeatmapButton updateButton = null!;
         private BeatmapSetOnlineStatusPill statusPill = null!;
 
         private ConstrainedIconContainer difficultyIcon = null!;
         private FillFlowContainer difficultyLine = null!;
         private StarRatingDisplay difficultyStarRating = null!;
-        private TopLocalRank difficultyRank = null!;
+        private PanelLocalRankDisplay difficultyRank = null!;
         private OsuSpriteText difficultyKeyCountText = null!;
         private OsuSpriteText difficultyName = null!;
         private OsuSpriteText difficultyAuthor = null!;
@@ -80,7 +81,7 @@ namespace osu.Game.Screens.SelectV2
                 Colour = colourProvider.Background5,
             };
 
-            Background = background = new BeatmapSetPanelBackground
+            Background = background = new PanelSetBackground
             {
                 RelativeSizeAxes = Axes.Both,
             };
@@ -109,7 +110,7 @@ namespace osu.Game.Screens.SelectV2
                         Margin = new MarginPadding { Top = 5f },
                         Children = new Drawable[]
                         {
-                            updateButton = new UpdateBeatmapSetButton
+                            updateButton = new PanelUpdateBeatmapButton
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
@@ -117,7 +118,6 @@ namespace osu.Game.Screens.SelectV2
                             },
                             statusPill = new BeatmapSetOnlineStatusPill
                             {
-                                AutoSizeAxes = Axes.Both,
                                 Origin = Anchor.CentreLeft,
                                 Anchor = Anchor.CentreLeft,
                                 TextSize = 11,
@@ -137,7 +137,7 @@ namespace osu.Game.Screens.SelectV2
                                         Scale = new Vector2(8f / 9f),
                                         Margin = new MarginPadding { Right = 5f },
                                     },
-                                    difficultyRank = new TopLocalRank
+                                    difficultyRank = new PanelLocalRankDisplay
                                     {
                                         Scale = new Vector2(8f / 11),
                                         Origin = Anchor.CentreLeft,
