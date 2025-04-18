@@ -20,6 +20,9 @@ namespace osu.Game.Screens.Select.Leaderboards
         /// Whether this leaderboard is a partial leaderboard (e.g. contains only the top 50 of all scores),
         /// or is a full leaderboard (contains all scores that there will ever be).
         /// </summary>
+        /// <remarks>
+        /// If this is <see langword="true"/> and a tracked score is last on the leaderboard, it will show an "unknown" score position.
+        /// </remarks>
         bool IsPartial { get; }
     }
 }
