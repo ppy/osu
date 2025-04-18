@@ -182,8 +182,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         }
 
         [Test]
-        [Ignore("Pending implementation")]
-        // todo: add score fetch functionality to BeatmapLeaderboardWedge
         public void TestLocalScoresDisplay()
         {
             BeatmapInfo beatmapInfo = null!;
@@ -212,8 +210,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         }
 
         [Test]
-        [Ignore("Pending implementation")]
-        // todo: add score fetch functionality to BeatmapLeaderboardWedge
         public void TestLocalScoresDisplayOnBeatmapEdit()
         {
             BeatmapInfo beatmapInfo = null!;

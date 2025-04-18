@@ -7,7 +7,6 @@ using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -44,6 +43,9 @@ namespace osu.Game.Screens.SelectV2
         private Placeholder? placeholder;
 
         [Resolved]
+        private LeaderboardManager leaderboardManager { get; set; } = null!;
+
+        [Resolved]
         private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
 
         [Resolved]
@@ -65,6 +67,8 @@ namespace osu.Game.Screens.SelectV2
         public IBindable<bool> FilterBySelectedMods { get; } = new BindableBool();
 
         private CancellationTokenSource? cancellationTokenSource;
+
+        private readonly Bindable<LeaderboardScores?> fetchedScores = new Bindable<LeaderboardScores?>();
 
         [BackgroundDependencyLoader]
         private void load()
@@ -142,6 +146,8 @@ namespace osu.Game.Screens.SelectV2
                     loading = new LoadingLayer(),
                 }
             };
+
+            ((IBindable<LeaderboardScores?>)fetchedScores).BindTo(leaderboardManager.Scores);
         }
 
         protected override void LoadComplete()
@@ -217,8 +223,22 @@ namespace osu.Game.Screens.SelectV2
                 return;
             }
 
-            // todo: missing implementation
-            SetScores(Array.Empty<ScoreInfo>(), null);
+            leaderboardManager.FetchWithCriteriaAsync(new LeaderboardCriteria(fetchBeatmapInfo, fetchRuleset, Scope.Value, FilterBySelectedMods.Value ? mods.Value.ToArray() : null))
+                              .ContinueWith(t =>
+                              {
+                                  if (t.Exception != null && !t.IsCanceled)
+                                  {
+                                      Schedule(() => SetState(LeaderboardState.NetworkFailure));
+                                      return;
+                                  }
+
+                                  fetchedScores.UnbindEvents();
+                                  fetchedScores.BindValueChanged(scores =>
+                                  {
+                                      if (scores.NewValue != null)
+                                          Schedule(() => SetScores(scores.NewValue.TopScores, scores.NewValue.UserScore));
+                                  }, true);
+                              });
         }
 
         protected void SetScores(IEnumerable<ScoreInfo> scores, ScoreInfo? userScore)
