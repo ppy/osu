@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Bindables;
-using osu.Game.Screens.Play.HUD;
 
 namespace osu.Game.Screens.Select.Leaderboards
 {
@@ -14,7 +13,7 @@ namespace osu.Game.Screens.Select.Leaderboards
         /// <summary>
         /// List of all scores to display on the leaderboard.
         /// </summary>
-        public IBindableList<IGameplayLeaderboardScore> Scores { get; }
+        public IBindableList<GameplayLeaderboardScore> Scores { get; }
 
         /// <summary>
         /// Whether this leaderboard is a partial leaderboard (e.g. contains only the top 50 of all scores),

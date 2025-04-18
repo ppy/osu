@@ -33,7 +33,7 @@ namespace osu.Game.Screens.Play.HUD
         [Resolved]
         private IGameplayLeaderboardProvider? leaderboardProvider { get; set; }
 
-        private readonly IBindableList<IGameplayLeaderboardScore> scores = new BindableList<IGameplayLeaderboardScore>();
+        private readonly IBindableList<GameplayLeaderboardScore> scores = new BindableList<GameplayLeaderboardScore>();
 
         private const int max_panels = 8;
 
@@ -85,7 +85,7 @@ namespace osu.Game.Screens.Play.HUD
         /// <summary>
         /// Adds a player to the leaderboard.
         /// </summary>
-        public void Add(IGameplayLeaderboardScore score)
+        public void Add(GameplayLeaderboardScore score)
         {
             var drawable = CreateLeaderboardScoreDrawable(score);
 
@@ -115,7 +115,7 @@ namespace osu.Game.Screens.Play.HUD
             scroll.ScrollToStart(false);
         }
 
-        protected virtual DrawableGameplayLeaderboardScore CreateLeaderboardScoreDrawable(IGameplayLeaderboardScore score) =>
+        protected virtual DrawableGameplayLeaderboardScore CreateLeaderboardScoreDrawable(GameplayLeaderboardScore score) =>
             new DrawableGameplayLeaderboardScore(score);
 
         protected override void Update()

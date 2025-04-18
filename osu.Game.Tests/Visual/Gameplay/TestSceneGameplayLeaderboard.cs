@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -16,10 +15,8 @@ using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Select.Leaderboards;
-using osu.Game.Users;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.Gameplay
@@ -238,7 +235,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void createLeaderboardScore(BindableLong score, APIUser user, bool isTracked = false)
         {
-            var leaderboardScore = new TestDrawableGameplayLeaderboardScore(user, isTracked, score);
+            var leaderboardScore = new GameplayLeaderboardScore(user, isTracked, score);
             leaderboardProvider.Scores.Add(leaderboardScore);
         }
 
@@ -261,30 +258,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private class TestGameplayLeaderboardProvider : IGameplayLeaderboardProvider
         {
-            IBindableList<IGameplayLeaderboardScore> IGameplayLeaderboardProvider.Scores => Scores;
-            public BindableList<IGameplayLeaderboardScore> Scores { get; } = new BindableList<IGameplayLeaderboardScore>();
+            IBindableList<GameplayLeaderboardScore> IGameplayLeaderboardProvider.Scores => Scores;
+            public BindableList<GameplayLeaderboardScore> Scores { get; } = new BindableList<GameplayLeaderboardScore>();
             public bool IsPartial { get; set; }
-        }
-
-        private class TestDrawableGameplayLeaderboardScore : IGameplayLeaderboardScore
-        {
-            public IUser User { get; }
-            public bool Tracked { get; }
-            public BindableLong TotalScore { get; } = new BindableLong();
-            public BindableDouble Accuracy { get; } = new BindableDouble();
-            public BindableInt Combo { get; } = new BindableInt();
-            public BindableBool HasQuit { get; } = new BindableBool();
-            public Bindable<long> DisplayOrder { get; } = new BindableLong();
-            public Func<ScoringMode, long> GetDisplayScore { get; set; }
-            public Colour4? TeamColour => null;
-
-            public TestDrawableGameplayLeaderboardScore(IUser user, bool isTracked, Bindable<long> totalScore)
-            {
-                User = user;
-                Tracked = isTracked;
-                TotalScore.BindTo(totalScore);
-                GetDisplayScore = _ => TotalScore.Value;
-            }
         }
     }
 }
