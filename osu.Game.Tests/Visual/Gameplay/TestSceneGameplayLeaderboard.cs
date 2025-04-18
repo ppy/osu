@@ -205,6 +205,9 @@ namespace osu.Game.Tests.Visual.Gameplay
                 AddUntilStep("tracked player has null position", () => leaderboard.TrackedScore?.ScorePosition, () => Is.Null);
             else
                 AddUntilStep("tracked player is #50", () => leaderboard.TrackedScore?.ScorePosition, () => Is.EqualTo(50));
+
+            AddStep("move tracked player to top", () => leaderboard.TrackedScore!.TotalScore.Value = 8_000_000);
+            AddUntilStep("all players have non-null position", () => leaderboard.AllScores.Select(s => s.ScorePosition), () => Does.Not.Contain(null));
         }
 
         private void addLocalPlayer()
@@ -252,6 +255,8 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             public IEnumerable<DrawableGameplayLeaderboardScore> GetAllScoresForUsername(string username)
                 => Flow.Where(i => i.User?.Username == username);
+
+            public IEnumerable<DrawableGameplayLeaderboardScore> AllScores => Flow;
         }
 
         private class TestGameplayLeaderboardProvider : IGameplayLeaderboardProvider
