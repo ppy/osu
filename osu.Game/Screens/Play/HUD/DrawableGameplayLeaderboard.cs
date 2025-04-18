@@ -180,8 +180,9 @@ namespace osu.Game.Screens.Play.HUD
 
             for (int i = 0; i < Flow.Count; i++)
             {
-                Flow.SetLayoutPosition(orderedByScore[i], i);
-                orderedByScore[i].ScorePosition = i + 1 == Flow.Count && leaderboardProvider?.IsPartial == true ? null : i + 1;
+                var score = orderedByScore[i];
+                Flow.SetLayoutPosition(score, i);
+                score.ScorePosition = i + 1 == Flow.Count && leaderboardProvider?.IsPartial == true && score.Tracked ? null : i + 1;
             }
 
             sorting.Validate();
