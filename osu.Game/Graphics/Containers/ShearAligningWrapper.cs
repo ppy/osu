@@ -3,6 +3,7 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Layout;
 using osuTK;
 
@@ -17,6 +18,11 @@ namespace osu.Game.Graphics.Containers
     public partial class ShearAligningWrapper : CompositeDrawable
     {
         private readonly LayoutValue layout = new LayoutValue(Invalidation.MiscGeometry);
+
+        // the wrapped drawable may go off-screen as part of a transition, if it does so then this wrapper class becomes masked away as well
+        // and the wrapped drawable cannot transform itself back to screen anymore. work around by disabling IsMaskedAway in the wrapper class.
+        // this issue can be seen with BeatmapTitleWedge/BeatmapDetailsArea being unable to return back to screen after hiding from transition to gameplay.
+        protected override bool ComputeIsMaskedAway(RectangleF maskingBounds) => false;
 
         public ShearAligningWrapper(Drawable drawable)
         {
