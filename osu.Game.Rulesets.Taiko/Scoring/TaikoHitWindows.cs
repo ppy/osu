@@ -32,9 +32,9 @@ namespace osu.Game.Rulesets.Taiko.Scoring
 
         public override void SetDifficulty(double difficulty)
         {
-            great = IBeatmapDifficultyInfo.DifficultyRange(difficulty, GREAT_WINDOW_RANGE);
-            ok = IBeatmapDifficultyInfo.DifficultyRange(difficulty, OK_WINDOW_RANGE);
-            miss = IBeatmapDifficultyInfo.DifficultyRange(difficulty, MISS_WINDOW_RANGE);
+            great = Math.Floor(IBeatmapDifficultyInfo.DifficultyRange(difficulty, GREAT_WINDOW_RANGE)) - 0.5;
+            ok = Math.Floor(IBeatmapDifficultyInfo.DifficultyRange(difficulty, OK_WINDOW_RANGE)) - 0.5;
+            miss = Math.Floor(IBeatmapDifficultyInfo.DifficultyRange(difficulty, MISS_WINDOW_RANGE)) - 0.5;
         }
 
         public override double WindowFor(HitResult result)
