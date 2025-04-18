@@ -109,7 +109,6 @@ namespace osu.Game.Graphics.UserInterface
                     RelativeSizeAxes = Axes.Both,
                     Child = Nub = new ShearedNub
                     {
-                        X = -OsuGame.SHEAR.X * ShearedNub.HEIGHT / 2f,
                         Origin = Anchor.TopCentre,
                         RelativePositionAxes = Axes.X,
                         Current = { Value = true },
