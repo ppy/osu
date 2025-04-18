@@ -43,5 +43,12 @@ namespace osu.Game.Tests.Extensions
         {
             return input.ToStandardFormattedString(decimalDigits, percent);
         }
+
+        [Test]
+        [SetCulture("fr-FR")]
+        public void TestCultureInsensitivity()
+        {
+            Assert.That(0.4.ToStandardFormattedString(maxDecimalDigits: 2, asPercentage: true), Is.EqualTo("40%"));
+        }
     }
 }
