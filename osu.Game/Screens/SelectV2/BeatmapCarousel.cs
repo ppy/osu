@@ -132,7 +132,7 @@ namespace osu.Game.Screens.SelectV2
                     return;
 
                 case BeatmapInfo beatmapInfo:
-                    if (ReferenceEquals(CurrentSelection, beatmapInfo))
+                    if (CurrentSelection != null && CheckModelEquality(CurrentSelection, beatmapInfo))
                     {
                         RequestPresentBeatmap?.Invoke(beatmapInfo);
                         return;
@@ -155,7 +155,7 @@ namespace osu.Game.Screens.SelectV2
 
                 case BeatmapInfo beatmapInfo:
                     // Find any containing group. There should never be too many groups so iterating is efficient enough.
-                    GroupDefinition? containingGroup = grouping.GroupItems.SingleOrDefault(kvp => kvp.Value.Any(i => ReferenceEquals(i.Model, beatmapInfo))).Key;
+                    GroupDefinition? containingGroup = grouping.GroupItems.SingleOrDefault(kvp => kvp.Value.Any(i => CheckModelEquality(i.Model, beatmapInfo))).Key;
 
                     if (containingGroup != null)
                         setExpandedGroup(containingGroup);
@@ -309,6 +309,17 @@ namespace osu.Game.Screens.SelectV2
             AddInternal(groupPanelPool);
             AddInternal(beatmapPanelPool);
             AddInternal(setPanelPool);
+        }
+
+        protected override bool CheckModelEquality(object x, object y)
+        {
+            if (x is BeatmapSetInfo beatmapSetX && y is BeatmapSetInfo beatmapSetY)
+                return beatmapSetX.Equals(beatmapSetY);
+
+            if (x is BeatmapInfo beatmapX && y is BeatmapInfo beatmapY)
+                return beatmapX.Equals(beatmapY);
+
+            return base.CheckModelEquality(x, y);
         }
 
         protected override Drawable GetDrawableForDisplay(CarouselItem item)
