@@ -1,13 +1,17 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
+using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -21,6 +25,8 @@ namespace osu.Game.Screens.Edit.Submission
     {
         public LocalisableString StageDescription { get; init; }
 
+        public int StageIndex { get; init; }
+
         private Bindable<StageStatusType> status { get; } = new Bindable<StageStatusType>();
 
         private Bindable<float?> progress { get; } = new Bindable<float?>();
@@ -33,8 +39,19 @@ namespace osu.Game.Screens.Edit.Submission
         [Resolved]
         private OsuColour colours { get; set; } = null!;
 
+        private Sample progressSample = null!;
+
+        private const int stage_done_sample_count = 4;
+        private Sample stageDoneSample = null!;
+
+        private Sample errorSample = null!;
+        private Sample cancelSample = null!;
+
+        private double? lastSamplePlayback;
+        private float? previousPercent;
+
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
+        private void load(OverlayColourProvider colourProvider, AudioManager audio)
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -111,6 +128,13 @@ namespace osu.Game.Screens.Edit.Submission
                     }
                 }
             };
+
+            errorSample = audio.Samples.Get(@"UI/generic-error");
+            cancelSample = audio.Samples.Get(@"UI/notification-cancel");
+            progressSample = audio.Samples.Get(@"UI/bss-progress");
+
+            int stageSample = Math.Min(stage_done_sample_count - 1, StageIndex);
+            stageDoneSample = audio.Samples.Get(@$"UI/bss-stage-{stageSample}");
         }
 
         protected override void LoadComplete()
@@ -119,6 +143,25 @@ namespace osu.Game.Screens.Edit.Submission
 
             status.BindValueChanged(_ => Scheduler.AddOnce(updateStatus), true);
             progress.BindValueChanged(_ => Scheduler.AddOnce(updateProgress), true);
+
+            // Binding to `progressBar` updates instead of `progress` for more frequent/granular updates
+            progressBar.OnUpdate += playProgressSound;
+        }
+
+        private void playProgressSound(Drawable box)
+        {
+            float width = box.Width;
+            SampleChannel sampleChannel = progressSample.GetChannel();
+
+            if (Precision.AlmostEquals(previousPercent ?? 0f, width) || (lastSamplePlayback != null && Time.Current - lastSamplePlayback < 10))
+                return;
+
+            sampleChannel.Frequency.Value = 0.5f + (width * 1.5f);
+            sampleChannel.Volume.Value = 0.25f + (width / 2f) * .75f;
+            sampleChannel.Play();
+
+            lastSamplePlayback = Time.Current;
+            previousPercent = width;
         }
 
         public void SetNotStarted() => status.Value = StageStatusType.NotStarted;
@@ -176,6 +219,12 @@ namespace osu.Game.Screens.Edit.Submission
                     };
                     iconContainer.Colour = colours.Green1;
                     iconContainer.FlashColour(Colour4.White, 1000, Easing.OutQuint);
+
+                    // manually set progress value, as to trigger sample playback for the final section
+                    progress.Value = 1;
+
+                    stageDoneSample.Play();
+
                     break;
 
                 case StageStatusType.Failed:
@@ -186,6 +235,7 @@ namespace osu.Game.Screens.Edit.Submission
                     };
                     iconContainer.Colour = colours.Red1;
                     iconContainer.FlashColour(Colour4.White, 1000, Easing.OutQuint);
+                    errorSample.Play();
                     break;
 
                 case StageStatusType.Canceled:
@@ -196,6 +246,7 @@ namespace osu.Game.Screens.Edit.Submission
                     };
                     iconContainer.Colour = colours.Gray8;
                     iconContainer.FlashColour(Colour4.White, 1000, Easing.OutQuint);
+                    cancelSample.Play();
                     break;
             }
         }
