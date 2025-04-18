@@ -12,7 +12,6 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Containers;
 using osu.Game.Screens.Select.Leaderboards;
-using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
 

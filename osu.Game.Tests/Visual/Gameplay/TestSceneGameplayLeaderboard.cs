@@ -7,6 +7,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Extensions.PolygonExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -37,7 +38,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddStep("toggle expanded", () =>
             {
-                if (leaderboard != null)
+                if (leaderboard.IsNotNull())
                     leaderboard.Expanded.Value = !leaderboard.Expanded.Value;
             });
 
