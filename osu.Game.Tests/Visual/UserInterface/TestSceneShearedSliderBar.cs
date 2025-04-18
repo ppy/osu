@@ -16,9 +16,9 @@ namespace osu.Game.Tests.Visual.UserInterface
 {
     public partial class TestSceneShearedSliderBar : ThemeComparisonTestScene
     {
-        private ShearedSliderBar<double> slider = null!;
+        private TestSliderBar slider = null!;
 
-        protected override Drawable CreateContent() => slider = new ShearedSliderBar<double>
+        protected override Drawable CreateContent() => slider = new TestSliderBar
         {
             Anchor = Anchor.Centre,
             Origin = Anchor.Centre,
@@ -33,9 +33,17 @@ namespace osu.Game.Tests.Visual.UserInterface
         };
 
         [Test]
-        public void TestNubShadow()
+        public void TestNubDisplay()
         {
-            AddToggleStep("toggle nub shadow", v =>
+            AddSliderStep("nub width", 20, 80, 50, v =>
+            {
+                if (slider.IsNotNull())
+                {
+                    slider.Nub.Width = v;
+                    slider.RangePadding = v / 2f;
+                }
+            });
+            AddToggleStep("nub shadow", v =>
             {
                 if (slider.IsNotNull())
                     slider.NubShadowColour = v ? Color4.Black.Opacity(0.2f) : Color4.Black.Opacity(0f);
@@ -74,6 +82,11 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddAssert("slider is still at 1", () => slider.Current.Value, () => Is.EqualTo(1));
             AddStep("enable slider", () => slider.Current.Disabled = false);
+        }
+
+        public partial class TestSliderBar : ShearedSliderBar<double>
+        {
+            public new ShearedNub Nub => base.Nub;
         }
     }
 }
