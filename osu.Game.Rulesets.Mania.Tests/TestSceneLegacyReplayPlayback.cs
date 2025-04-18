@@ -9,7 +9,6 @@ using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Mods;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Replays;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
@@ -521,7 +520,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 ScoreInfo = new ScoreInfo
                 {
                     Ruleset = CreateRuleset().RulesetInfo,
-                    Mods = [new ModScoreV2()]
+                    Mods = [new ManiaModScoreV2()]
                 }
             };
 
