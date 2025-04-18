@@ -31,12 +31,12 @@ namespace osu.Game.Extensions
                 if (value is int)
                     floatValue /= 100;
 
-                return floatValue.ToString($@"P{Math.Max(0, significantDigits - 2)}");
+                return floatValue.ToString($@"0.{new string('0', Math.Max(0, significantDigits - 2))}%", CultureInfo.InvariantCulture);
             }
 
             string negativeSign = Math.Round(floatValue, significantDigits) < 0 ? "-" : string.Empty;
 
-            return $"{negativeSign}{Math.Abs(floatValue).ToString($"N{significantDigits}")}";
+            return FormattableString.Invariant($"{negativeSign}{Math.Abs(floatValue).ToString($"N{significantDigits}")}");
         }
 
         /// <summary>
