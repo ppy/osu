@@ -84,7 +84,6 @@ namespace osu.Game.Screens.SelectV2
         [BackgroundDependencyLoader]
         private void load()
         {
-            Shear = OsuGame.SHEAR;
             Masking = true;
             CornerRadius = corner_radius;
 
