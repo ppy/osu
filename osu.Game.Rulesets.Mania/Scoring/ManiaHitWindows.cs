@@ -53,12 +53,12 @@ namespace osu.Game.Rulesets.Mania.Scoring
 
         public override void SetDifficulty(double difficulty)
         {
-            perfect = IBeatmapDifficultyInfo.DifficultyRange(difficulty, perfect_window_range) * multiplier;
-            great = IBeatmapDifficultyInfo.DifficultyRange(difficulty, great_window_range) * multiplier;
-            good = IBeatmapDifficultyInfo.DifficultyRange(difficulty, good_window_range) * multiplier;
-            ok = IBeatmapDifficultyInfo.DifficultyRange(difficulty, ok_window_range) * multiplier;
-            meh = IBeatmapDifficultyInfo.DifficultyRange(difficulty, meh_window_range) * multiplier;
-            miss = IBeatmapDifficultyInfo.DifficultyRange(difficulty, miss_window_range) * multiplier;
+            perfect = Math.Floor(IBeatmapDifficultyInfo.DifficultyRange(difficulty, perfect_window_range) * multiplier) + 0.5;
+            great = Math.Floor(IBeatmapDifficultyInfo.DifficultyRange(difficulty, great_window_range) * multiplier) + 0.5;
+            good = Math.Floor(IBeatmapDifficultyInfo.DifficultyRange(difficulty, good_window_range) * multiplier) + 0.5;
+            ok = Math.Floor(IBeatmapDifficultyInfo.DifficultyRange(difficulty, ok_window_range) * multiplier) + 0.5;
+            meh = Math.Floor(IBeatmapDifficultyInfo.DifficultyRange(difficulty, meh_window_range) * multiplier) + 0.5;
+            miss = Math.Floor(IBeatmapDifficultyInfo.DifficultyRange(difficulty, miss_window_range) * multiplier) + 0.5;
         }
 
         public override double WindowFor(HitResult result)
