@@ -7,7 +7,6 @@ using osu.Framework.Graphics;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
-using osu.Game.Screens.Play.HUD;
 
 namespace osu.Game.Screens.Select.Leaderboards
 {
@@ -15,8 +14,8 @@ namespace osu.Game.Screens.Select.Leaderboards
     {
         public bool IsPartial { get; private set; }
 
-        public IBindableList<IGameplayLeaderboardScore> Scores => scores;
-        private readonly BindableList<IGameplayLeaderboardScore> scores = new BindableList<IGameplayLeaderboardScore>();
+        public IBindableList<GameplayLeaderboardScore> Scores => scores;
+        private readonly BindableList<GameplayLeaderboardScore> scores = new BindableList<GameplayLeaderboardScore>();
 
         [BackgroundDependencyLoader]
         private void load(LeaderboardManager? leaderboardManager, GameplayState? gameplayState)

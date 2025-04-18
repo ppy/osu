@@ -21,7 +21,6 @@ using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
 using osu.Game.Online.Spectator;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Screens.Play.HUD;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Select.Leaderboards
@@ -29,8 +28,8 @@ namespace osu.Game.Screens.Select.Leaderboards
     [LongRunningLoad]
     public partial class MultiplayerLeaderboardProvider : CompositeComponent, IGameplayLeaderboardProvider
     {
-        public IBindableList<IGameplayLeaderboardScore> Scores => scores;
-        private readonly BindableList<IGameplayLeaderboardScore> scores = new BindableList<IGameplayLeaderboardScore>();
+        public IBindableList<GameplayLeaderboardScore> Scores => scores;
+        private readonly BindableList<GameplayLeaderboardScore> scores = new BindableList<GameplayLeaderboardScore>();
 
         protected readonly Dictionary<int, TrackedUserData> UserScores = new Dictionary<int, TrackedUserData>();
         public readonly SortedDictionary<int, BindableLong> TeamScores = new SortedDictionary<int, BindableLong>();
