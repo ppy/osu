@@ -157,7 +157,7 @@ namespace osu.Game.Screens.Edit.Submission
                 return;
 
             sampleChannel.Frequency.Value = 0.5f + (width * 1.5f);
-            sampleChannel.Volume.Value = 0.25f + (width / 2f) * .75f;
+            sampleChannel.Volume.Value = 0.25f + ((width / 2f) * .75f);
             sampleChannel.Play();
 
             lastSamplePlayback = Time.Current;
