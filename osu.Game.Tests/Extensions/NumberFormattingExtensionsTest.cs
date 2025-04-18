@@ -27,6 +27,7 @@ namespace osu.Game.Tests.Extensions
         [TestCase(-1e-6, false, 6, ExpectedResult = "-0.000001")]
         [TestCase(0, false, 10, ExpectedResult = "0")]
         [TestCase(0, false, 0, ExpectedResult = "0")]
+        [TestCase(double.NegativeZero, false, 0, ExpectedResult = "0")]
         [TestCase(1e-6, false, 0, ExpectedResult = "0")]
         [TestCase(1e-6, false, 6, ExpectedResult = "0.000001")]
         [TestCase(1, false, 0, ExpectedResult = "1")]
