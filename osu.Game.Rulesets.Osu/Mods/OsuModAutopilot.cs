@@ -7,12 +7,14 @@ using System.Linq;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.StateChanges;
 using osu.Framework.Localisation;
+using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.UI;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
@@ -47,14 +49,28 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             double time = playfield.Clock.CurrentTime;
 
-            // Very naive implementation of autopilot based on proximity to replay frames.
-            // Special case for the first frame is required to ensure the mouse is in a sane position until the actual time of the first frame is hit.
-            // TODO: this needs to be based on user interactions to better match stable (pausing until judgement is registered).
-            if (currentFrame < 0 || Math.Abs(replayFrames[currentFrame + 1].Time - time) <= Math.Abs(replayFrames[currentFrame].Time - time))
+            while (currentFrame < replayFrames.Count - 1 && time > replayFrames[currentFrame + 1].Time)
             {
                 currentFrame++;
-                new MousePositionAbsoluteInput { Position = playfield.ToScreenSpace(replayFrames[currentFrame].Position) }.Apply(inputManager.CurrentState, inputManager);
             }
+
+            // Very naive implementation of autopilot based on interpolation between replay frames.
+            // Special case for the first frame is required to ensure the mouse is in a sane position until the actual time of the first frame is hit.
+            // TODO: this needs to be based on user interactions to better match stable (pausing until judgement is registered).
+            Vector2 position = Vector2.Zero;
+            if (currentFrame < 0)
+            {
+                position = replayFrames.First().Position;
+            }
+            else if (currentFrame == replayFrames.Count - 1)
+            {
+                position = replayFrames.Last().Position;
+            }
+            else
+            {
+                position = Interpolation.ValueAt(time, replayFrames[currentFrame].Position, replayFrames[currentFrame + 1].Position, replayFrames[currentFrame].Time, replayFrames[currentFrame + 1].Time);
+            }
+            new MousePositionAbsoluteInput { Position = playfield.ToScreenSpace(position) }.Apply(inputManager.CurrentState, inputManager);
 
             // TODO: Implement the functionality to automatically spin spinners
         }
