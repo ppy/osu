@@ -3,14 +3,24 @@
 
 using System.Collections.Generic;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Screens;
+using osu.Game.Beatmaps;
+using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osu.Game.Screens.Footer;
 using osu.Game.Screens.Menu;
+using osu.Game.Screens.Play;
 using osu.Game.Screens.Select;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.SelectV2
 {
@@ -18,11 +28,19 @@ namespace osu.Game.Screens.SelectV2
     /// This screen is intended to house all components introduced in the new song select design to add transitions and examine the overall look.
     /// This will be gradually built upon and ultimately replace <see cref="Select.SongSelect"/> once everything is in place.
     /// </summary>
-    public abstract partial class SongSelect : OsuScreen
+    public abstract partial class SongSelect : ScreenWithBeatmapBackground
     {
         private const float logo_scale = 0.4f;
 
-        private readonly ModSelectOverlay modSelectOverlay = new ModSelectOverlay(OverlayColourScheme.Aquamarine)
+        public const float WEDGE_CONTENT_MARGIN = CORNER_RADIUS_HIDE_OFFSET + OsuGame.SCREEN_EDGE_MARGIN;
+
+        public const float CORNER_RADIUS_HIDE_OFFSET = 20f;
+
+        public const double ENTER_DURATION = 600;
+
+        private const double fade_duration = 300;
+
+        private readonly ModSelectOverlay modSelectOverlay = new UserModSelectOverlay(OverlayColourScheme.Aquamarine)
         {
             ShowPresets = true,
         };
@@ -32,47 +50,18 @@ namespace osu.Game.Screens.SelectV2
 
         private BeatmapCarousel carousel = null!;
 
+        private FilterControl filterControl = null!;
+        private BeatmapTitleWedge titleWedge = null!;
+        private BeatmapDetailsArea detailsArea = null!;
+        private FillFlowContainer wedgesContainer = null!;
+
         public override bool ShowFooter => true;
 
         [Resolved]
-        private OsuLogo? logo { get; set; }
+        private BeatmapManager beatmaps { get; set; } = null!;
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            AddRangeInternal(new Drawable[]
-            {
-                new GridContainer // used for max width implementation
-                {
-                    Anchor = Anchor.TopRight,
-                    Origin = Anchor.TopRight,
-                    RelativeSizeAxes = Axes.Both,
-                    ColumnDimensions = new[]
-                    {
-                        new Dimension(),
-                        new Dimension(GridSizeMode.Relative, 0.5f, maxSize: 750),
-                    },
-                    Content = new[]
-                    {
-                        new[]
-                        {
-                            Empty(),
-                            new Container
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Padding = new MarginPadding { Bottom = ScreenFooter.HEIGHT },
-                                Child = carousel = new BeatmapCarousel
-                                {
-                                    RequestPresentBeatmap = _ => OnStart(),
-                                    RelativeSizeAxes = Axes.Both
-                                },
-                            },
-                        }
-                    }
-                },
-                modSelectOverlay,
-            });
-        }
+        [Resolved]
+        private OsuLogo? logo { get; set; }
 
         public override IReadOnlyList<ScreenFooterButton> CreateFooterButtons() => new ScreenFooterButton[]
         {
@@ -81,46 +70,164 @@ namespace osu.Game.Screens.SelectV2
             new FooterButtonOptions(),
         };
 
-        protected override void LoadComplete()
+        [BackgroundDependencyLoader]
+        private void load()
         {
-            base.LoadComplete();
-
-            modSelectOverlay.State.BindValueChanged(v =>
+            AddRangeInternal(new Drawable[]
             {
-                logo?.ScaleTo(v.NewValue == Visibility.Visible ? 0f : logo_scale, 400, Easing.OutQuint)
-                    .FadeTo(v.NewValue == Visibility.Visible ? 0f : 1f, 200, Easing.OutQuint);
-            }, true);
+                new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Width = 0.5f,
+                    Colour = ColourInfo.GradientHorizontal(Color4.Black.Opacity(0.5f), Color4.Black.Opacity(0f)),
+                },
+                new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Padding = new MarginPadding { Bottom = ScreenFooter.HEIGHT },
+                    Child = new PopoverContainer
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Children = new Drawable[]
+                        {
+                            new GridContainer // used for max width implementation
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                ColumnDimensions = new[]
+                                {
+                                    new Dimension(GridSizeMode.Relative, 0.5f, maxSize: 850),
+                                    new Dimension(),
+                                    new Dimension(GridSizeMode.Relative, 0.5f, maxSize: 750),
+                                },
+                                Content = new[]
+                                {
+                                    new[]
+                                    {
+                                        wedgesContainer = new FillFlowContainer
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            Margin = new MarginPadding
+                                            {
+                                                Top = -CORNER_RADIUS_HIDE_OFFSET,
+                                                Left = -CORNER_RADIUS_HIDE_OFFSET
+                                            },
+                                            Spacing = new Vector2(0f, 4f),
+                                            Direction = FillDirection.Vertical,
+                                            Children = new Drawable[]
+                                            {
+                                                new ShearAligningWrapper(titleWedge = new BeatmapTitleWedge()),
+                                                new ShearAligningWrapper(detailsArea = new BeatmapDetailsArea()),
+                                            },
+                                        },
+                                        Empty(),
+                                        new Container
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            Children = new CompositeDrawable[]
+                                            {
+                                                new Container
+                                                {
+                                                    RelativeSizeAxes = Axes.Both,
+                                                    Padding = new MarginPadding
+                                                    {
+                                                        Top = FilterControl.HEIGHT_FROM_SCREEN_TOP + 5,
+                                                        Bottom = 5,
+                                                    },
+                                                    Children = new Drawable[]
+                                                    {
+                                                        carousel = new BeatmapCarousel
+                                                        {
+                                                            BleedTop = FilterControl.HEIGHT_FROM_SCREEN_TOP + 5,
+                                                            BleedBottom = ScreenFooter.HEIGHT + 5,
+                                                            RequestSelectBeatmap = b => Beatmap.Value = beatmaps.GetWorkingBeatmap(b),
+                                                            RequestPresentBeatmap = _ => OnStart(),
+                                                            RelativeSizeAxes = Axes.Both,
+                                                        },
+                                                    }
+                                                },
+                                                filterControl = new FilterControl
+                                                {
+                                                    Anchor = Anchor.TopRight,
+                                                    Origin = Anchor.TopRight,
+                                                    RelativeSizeAxes = Axes.X,
+                                                },
+                                            }
+                                        },
+                                    },
+                                }
+                            },
+                        }
+                    },
+                },
+                modSelectOverlay,
+            });
         }
+
+        /// <summary>
+        /// Set the query to the search text box.
+        /// </summary>
+        /// <param name="query">The string to search.</param>
+        public void Search(string query)
+        {
+            carousel.Filter(new FilterCriteria
+            {
+                // TODO: this should only set the text of the current criteria, not use a completely new criteria.
+                SearchText = query,
+            });
+        }
+
+        /// <summary>
+        /// Called when a selection is made.
+        /// </summary>
+        /// <returns>If a resultant action occurred that takes the user away from SongSelect.</returns>
+        protected abstract bool OnStart();
 
         public override void OnEntering(ScreenTransitionEvent e)
         {
+            base.OnEntering(e);
+
             this.FadeIn();
 
+            Beatmap.BindValueChanged(onBeatmapChanged, true);
+
+            titleWedge.Show();
+            detailsArea.Show();
+            filterControl.Show();
+
+            modSelectOverlay.State.BindValueChanged(onModSelectStateChanged, true);
             modSelectOverlay.SelectedMods.BindTo(Mods);
 
-            base.OnEntering(e);
+            updateScreenBackground();
         }
-
-        private const double fade_duration = 300;
 
         public override void OnResuming(ScreenTransitionEvent e)
         {
+            base.OnResuming(e);
+
             this.FadeIn(fade_duration, Easing.OutQuint);
 
             carousel.VisuallyFocusSelected = false;
+
+            titleWedge.Show();
+            detailsArea.Show();
+            filterControl.Show();
 
             // required due to https://github.com/ppy/osu-framework/issues/3218
             modSelectOverlay.SelectedMods.Disabled = false;
             modSelectOverlay.SelectedMods.BindTo(Mods);
 
-            base.OnResuming(e);
+            updateScreenBackground();
         }
 
         public override void OnSuspending(ScreenTransitionEvent e)
         {
-            this.Delay(100).FadeOut(fade_duration, Easing.OutQuint);
+            this.FadeOut(fade_duration, Easing.OutQuint);
 
             modSelectOverlay.SelectedMods.UnbindFrom(Mods);
+
+            titleWedge.Hide();
+            detailsArea.Hide();
+            filterControl.Hide();
 
             carousel.VisuallyFocusSelected = true;
 
@@ -130,6 +237,11 @@ namespace osu.Game.Screens.SelectV2
         public override bool OnExiting(ScreenExitEvent e)
         {
             this.FadeOut(fade_duration, Easing.OutQuint);
+
+            titleWedge.Hide();
+            detailsArea.Hide();
+            filterControl.Hide();
+
             return base.OnExiting(e);
         }
 
@@ -156,12 +268,6 @@ namespace osu.Game.Screens.SelectV2
             };
         }
 
-        /// <summary>
-        /// Called when a selection is made.
-        /// </summary>
-        /// <returns>If a resultant action occurred that takes the user away from SongSelect.</returns>
-        protected abstract bool OnStart();
-
         protected override void LogoSuspending(OsuLogo logo)
         {
             base.LogoSuspending(logo);
@@ -176,17 +282,36 @@ namespace osu.Game.Screens.SelectV2
             logo.FadeOut(120, Easing.Out);
         }
 
-        /// <summary>
-        /// Set the query to the search text box.
-        /// </summary>
-        /// <param name="query">The string to search.</param>
-        public void Search(string query)
+        private void onBeatmapChanged(ValueChangedEvent<WorkingBeatmap> b)
         {
-            carousel.Filter(new FilterCriteria
+            if (this.IsCurrentScreen())
+                updateScreenBackground();
+        }
+
+        private void updateScreenBackground()
+        {
+            ApplyToBackground(backgroundModeBeatmap =>
             {
-                // TODO: this should only set the text of the current criteria, not use a completely new criteria.
-                SearchText = query,
+                backgroundModeBeatmap.Beatmap = Beatmap.Value;
+                backgroundModeBeatmap.DimWhenUserSettingsIgnored.Value = 0.25f;
+                backgroundModeBeatmap.BlurAmount.Value = 0f;
+                backgroundModeBeatmap.IgnoreUserSettings.Value = true;
+                backgroundModeBeatmap.FadeColour(Color4.White, 250);
             });
+        }
+
+        private void onModSelectStateChanged(ValueChangedEvent<Visibility> v)
+        {
+            if (v.NewValue == Visibility.Visible)
+                logo?.ScaleTo(0f, 400, Easing.OutQuint).FadeTo(0f, 200, Easing.OutQuint);
+            else
+                logo?.ScaleTo(logo_scale, 400, Easing.OutQuint).FadeTo(1f, 200, Easing.OutQuint);
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+            detailsArea.Height = wedgesContainer.DrawHeight - titleWedge.LayoutSize.Y - 4;
         }
     }
 }

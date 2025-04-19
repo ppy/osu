@@ -29,6 +29,8 @@ namespace osu.Game.Graphics.UserInterface
 
         private readonly Container mainContent;
 
+        protected virtual bool FocusIndicator => true;
+
         private Color4 accentColour;
 
         public Color4 AccentColour
@@ -102,7 +104,6 @@ namespace osu.Game.Graphics.UserInterface
                     RelativeSizeAxes = Axes.Both,
                     Child = Nub = new ShearedNub
                     {
-                        X = -OsuGame.SHEAR.X * HEIGHT / 2f,
                         Origin = Anchor.TopCentre,
                         RelativePositionAxes = Axes.X,
                         Current = { Value = true },
@@ -146,13 +147,16 @@ namespace osu.Game.Graphics.UserInterface
         {
             base.OnFocus(e);
 
-            mainContent.EdgeEffect = new EdgeEffectParameters
+            if (FocusIndicator)
             {
-                Type = EdgeEffectType.Glow,
-                Colour = AccentColour.Darken(1),
-                Hollow = true,
-                Radius = 2,
-            };
+                mainContent.EdgeEffect = new EdgeEffectParameters
+                {
+                    Type = EdgeEffectType.Glow,
+                    Colour = AccentColour.Darken(1),
+                    Hollow = true,
+                    Radius = 2,
+                };
+            }
         }
 
         protected override void OnFocusLost(FocusLostEvent e)
@@ -191,13 +195,16 @@ namespace osu.Game.Graphics.UserInterface
         protected override void UpdateAfterChildren()
         {
             base.UpdateAfterChildren();
-            LeftBox.Scale = new Vector2(Math.Clamp(RangePadding + Nub.DrawPosition.X - Nub.DrawWidth / 2.3f, 0, Math.Max(0, DrawWidth)), 1);
-            RightBox.Scale = new Vector2(Math.Clamp(DrawWidth - Nub.DrawPosition.X - RangePadding - Nub.DrawWidth / 2.3f, 0, Math.Max(0, DrawWidth)), 1);
+            LeftBox.Scale = new Vector2(Math.Clamp(RangePadding + Nub.DrawPosition.X - Nub.DrawWidth / 3f, 0, Math.Max(0, DrawWidth)), 1);
+            RightBox.Scale = new Vector2(Math.Clamp(DrawWidth - Nub.DrawPosition.X - RangePadding - Nub.DrawWidth / 3f, 0, Math.Max(0, DrawWidth)), 1);
         }
+
+        private bool firstValue = true;
 
         protected override void UpdateValue(float value)
         {
-            Nub.MoveToX(value, 250, Easing.OutQuint);
+            Nub.MoveToX(value, firstValue ? 0 : 250, Easing.OutQuint);
+            firstValue = false;
         }
     }
 }
