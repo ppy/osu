@@ -8,6 +8,8 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Development;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
@@ -81,8 +83,10 @@ namespace osu.Game.Screens.Edit.Submission
 
         private Live<BeatmapSetInfo>? importedSet;
 
+        private Sample completedSample = null!;
+
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(AudioManager audio)
         {
             AddRangeInternal(new Drawable[]
             {
@@ -118,24 +122,28 @@ namespace osu.Game.Screens.Edit.Submission
                                 createSetStep = new SubmissionStageProgress
                                 {
                                     StageDescription = BeatmapSubmissionStrings.Preparing,
+                                    StageIndex = 0,
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
                                 },
                                 exportStep = new SubmissionStageProgress
                                 {
                                     StageDescription = BeatmapSubmissionStrings.Exporting,
+                                    StageIndex = 1,
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
                                 },
                                 uploadStep = new SubmissionStageProgress
                                 {
                                     StageDescription = BeatmapSubmissionStrings.Uploading,
+                                    StageIndex = 2,
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
                                 },
                                 updateStep = new SubmissionStageProgress
                                 {
                                     StageDescription = BeatmapSubmissionStrings.Finishing,
+                                    StageIndex = 3,
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
                                 },
@@ -181,6 +189,8 @@ namespace osu.Game.Screens.Edit.Submission
                     }
                 }
             });
+
+            completedSample = audio.Samples.Get(@"UI/bss-complete");
         }
 
         private void createBeatmapSet()
@@ -382,6 +392,8 @@ namespace osu.Game.Screens.Edit.Submission
                     successContainer.Add(loaded);
                     flashLayer.FadeOutFromOne(2000, Easing.OutQuint);
                 });
+
+                completedSample.Play();
             };
 
             api.Queue(getBeatmapSetRequest);
