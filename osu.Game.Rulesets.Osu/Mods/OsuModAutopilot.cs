@@ -7,12 +7,15 @@ using System.Linq;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.StateChanges;
 using osu.Framework.Localisation;
+using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.UI;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
@@ -39,21 +42,36 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private List<OsuReplayFrame> replayFrames = null!;
 
-        private int currentFrame = -1;
+        private int currentReplayFrameIndex;
 
         public void Update(Playfield playfield)
         {
-            if (currentFrame == replayFrames.Count - 1) return;
-
-            double time = playfield.Clock.CurrentTime;
-
-            // Very naive implementation of autopilot based on proximity to replay frames.
-            // Special case for the first frame is required to ensure the mouse is in a sane position until the actual time of the first frame is hit.
-            // TODO: this needs to be based on user interactions to better match stable (pausing until judgement is registered).
-            if (currentFrame < 0 || Math.Abs(replayFrames[currentFrame + 1].Time - time) <= Math.Abs(replayFrames[currentFrame].Time - time))
+            if (currentReplayFrameIndex == replayFrames.Count - 1)
             {
-                currentFrame++;
-                new MousePositionAbsoluteInput { Position = playfield.ToScreenSpace(replayFrames[currentFrame].Position) }.Apply(inputManager.CurrentState, inputManager);
+                return;
+            }
+
+            double currentTime = playfield.Clock.CurrentTime;
+            var currentReplayFrame = replayFrames[currentReplayFrameIndex];
+            var nextReplayFrame = replayFrames[currentReplayFrameIndex + 1];
+
+            var closestUnjudgedHitObject = playfield.HitObjectContainer.AliveObjects.OfType<DrawableOsuHitObject>().FirstOrDefault(x => !x.Judged);
+            bool pauseMousePositionUpdates = closestUnjudgedHitObject switch
+            {
+                DrawableHitCircle circle => isMouseDirectlyOverHitObject(playfield, circle),
+                DrawableSlider slider => isMouseDirectlyOverHitObject(playfield, slider) && !slider.HeadCircle.Judged,
+                _ => false
+            };
+
+            if (!pauseMousePositionUpdates)
+            {
+                var mousePosition = Interpolation.ValueAt(currentTime, currentReplayFrame.Position, nextReplayFrame.Position, currentReplayFrame.Time, nextReplayFrame.Time);
+                new MousePositionAbsoluteInput { Position = playfield.ToScreenSpace(mousePosition) }.Apply(inputManager.CurrentState, inputManager);
+            }
+
+            if (currentTime >= nextReplayFrame.Time)
+            {
+                currentReplayFrameIndex++;
             }
 
             // TODO: Implement the functionality to automatically spin spinners
@@ -67,6 +85,12 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             // Generate the replay frames the cursor should follow
             replayFrames = new OsuAutoGenerator(drawableRuleset.Beatmap, drawableRuleset.Mods).Generate().Frames.Cast<OsuReplayFrame>().ToList();
+        }
+
+        private bool isMouseDirectlyOverHitObject(Playfield playfield, DrawableOsuHitObject hitObject)
+        {
+            var localSpaceMousePosition = playfield.ToLocalSpace(inputManager.CurrentState.Mouse.Position);
+            return Vector2.Distance(localSpaceMousePosition, hitObject.Position) < 1;
         }
     }
 }
