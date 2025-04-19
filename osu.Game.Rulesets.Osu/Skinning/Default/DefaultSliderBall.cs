@@ -27,13 +27,11 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         {
             RelativeSizeAxes = Axes.Both;
 
-            float radius = skin.GetConfig<OsuSkinConfiguration, float>(OsuSkinConfiguration.SliderPathRadius)?.Value ?? OsuHitObject.OBJECT_RADIUS;
-
             InternalChild = new CircularContainer
             {
                 Masking = true,
                 RelativeSizeAxes = Axes.Both,
-                Scale = new Vector2(radius / OsuHitObject.OBJECT_RADIUS),
+                Scale = new Vector2(OsuHitObject.VISUAL_OBJECT_RADIUS / OsuHitObject.OBJECT_RADIUS),
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Blending = BlendingParameters.Additive,
