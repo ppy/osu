@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Mods
         IconUsage? Icon { get; }
 
         /// <summary>
-        /// Whether this mod is playable by an end user.
+        /// Whether this mod is playable by a real human user.
         /// Should be <c>false</c> for cases where the user is not interacting with the game (so it can be excluded from multiplayer selection, for example).
         /// </summary>
         bool UserPlayable { get; }
@@ -52,6 +52,12 @@ namespace osu.Game.Rulesets.Mods
         /// Should be <c>false</c> for mods that make gameplay duration dependent on user input (e.g. <see cref="ModAdaptiveSpeed"/>).
         /// </summary>
         bool ValidForMultiplayer { get; }
+
+        /// <summary>
+        /// Whether this mod is valid as a required mod when freestyle is enabled.
+        /// Should be <c>true</c> for mods that are guaranteed to be implemented across all rulesets.
+        /// </summary>
+        bool ValidForFreestyleAsRequiredMod { get; }
 
         /// <summary>
         /// Whether this mod is valid as a free mod in multiplayer matches.

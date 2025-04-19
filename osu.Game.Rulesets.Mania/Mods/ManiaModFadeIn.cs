@@ -14,6 +14,7 @@ namespace osu.Game.Rulesets.Mania.Mods
         public override string Acronym => "FI";
         public override LocalisableString Description => @"Keys appear out of nowhere!";
         public override double ScoreMultiplier => 1;
+        public override bool ValidForFreestyleAsRequiredMod => false;
 
         public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[]
         {

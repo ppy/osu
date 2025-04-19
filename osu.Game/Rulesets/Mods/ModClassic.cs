@@ -30,5 +30,7 @@ namespace osu.Game.Rulesets.Mods
         ///  - Sliders always gives combo for slider end, even on miss (https://github.com/ppy/osu/issues/11769).
         /// </summary>
         public sealed override bool Ranked => false;
+
+        public sealed override bool ValidForFreestyleAsRequiredMod => true;
     }
 }

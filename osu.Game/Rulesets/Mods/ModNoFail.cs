@@ -21,6 +21,7 @@ namespace osu.Game.Rulesets.Mods
         public override double ScoreMultiplier => 0.5;
         public override Type[] IncompatibleMods => new[] { typeof(ModFailCondition), typeof(ModCinema) };
         public override bool Ranked => UsesDefaultConfiguration;
+        public override bool ValidForFreestyleAsRequiredMod => true;
 
         private readonly Bindable<bool> showHealthBar = new Bindable<bool>();
 

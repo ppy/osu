@@ -128,12 +128,13 @@ namespace osu.Game.Utils
         }
 
         /// <summary>
-        /// Checks that all <see cref="Mod"/>s in a combination are valid as "required mods" in a multiplayer match session.
+        /// Checks whether the given combination of mods may be set as the <see cref="MultiplayerPlaylistItem.RequiredMods">required mods</see> of a multiplayer playlist item.
         /// </summary>
         /// <param name="mods">The mods to check.</param>
+        /// <param name="freestyle">Whether freestyle is enabled for the playlist item.</param>
         /// <param name="invalidMods">Invalid mods, if any were found. Will be null if all mods were valid.</param>
         /// <returns>Whether the input mods were all valid. If false, <paramref name="invalidMods"/> will contain all invalid entries.</returns>
-        public static bool CheckValidRequiredModsForMultiplayer(IEnumerable<Mod> mods, [NotNullWhen(false)] out List<Mod>? invalidMods)
+        public static bool CheckValidRequiredModsForMultiplayer(IEnumerable<Mod> mods, bool freestyle, [NotNullWhen(false)] out List<Mod>? invalidMods)
         {
             mods = mods.ToArray();
 
@@ -145,11 +146,11 @@ namespace osu.Game.Utils
             if (!CheckCompatibleSet(mods, out invalidMods))
                 return false;
 
-            return checkValid(mods, m => m.Type != ModType.System && m.HasImplementation && m.ValidForMultiplayer, out invalidMods);
+            return checkValid(mods, m => IsValidModForMatch(m, true, MatchType.HeadToHead, freestyle), out invalidMods);
         }
 
         /// <summary>
-        /// Checks that all <see cref="Mod"/>s in a combination are valid as "free mods" in a multiplayer match session.
+        /// Checks whether the given mods are valid to appear as <see cref="MultiplayerPlaylistItem.AllowedMods">allowed mods</see> in a multiplayer playlist item.
         /// </summary>
         /// <remarks>
         /// Note that this does not check compatibility between mods,
@@ -157,10 +158,11 @@ namespace osu.Game.Utils
         /// not to be confused with the list of mods the user currently has selected for the multiplayer match.
         /// </remarks>
         /// <param name="mods">The mods to check.</param>
+        /// <param name="freestyle">Whether freestyle is enabled for the playlist item.</param>
         /// <param name="invalidMods">Invalid mods, if any were found. Will be null if all mods were valid.</param>
         /// <returns>Whether the input mods were all valid. If false, <paramref name="invalidMods"/> will contain all invalid entries.</returns>
-        public static bool CheckValidFreeModsForMultiplayer(IEnumerable<Mod> mods, [NotNullWhen(false)] out List<Mod>? invalidMods)
-            => checkValid(mods, m => m.Type != ModType.System && m.HasImplementation && m.ValidForMultiplayerAsFreeMod && !(m is MultiMod), out invalidMods);
+        public static bool CheckValidAllowedModsForMultiplayer(IEnumerable<Mod> mods, bool freestyle, [NotNullWhen(false)] out List<Mod>? invalidMods)
+            => checkValid(mods, m => IsValidModForMatch(m, false, MatchType.HeadToHead, freestyle), out invalidMods);
 
         private static bool checkValid(IEnumerable<Mod> mods, Predicate<Mod> valid, [NotNullWhen(false)] out List<Mod>? invalidMods)
         {
@@ -295,43 +297,59 @@ namespace osu.Game.Utils
         }
 
         /// <summary>
-        /// Determines whether a mod can be applied to playlist items in the given match type.
+        /// Determines whether a given mod is valid on a playlist item.
         /// </summary>
         /// <param name="mod">The mod to test.</param>
-        /// <param name="type">The match type.</param>
-        public static bool IsValidModForMatchType(Mod mod, MatchType type)
+        /// <param name="required">
+        /// <c>true</c> if the mod is intended as a <see cref="MultiplayerPlaylistItem.RequiredMods">required mod</see> on the target playlist item.
+        /// <c>false</c> if it is intended as an <see cref="MultiplayerPlaylistItem.AllowedMods">allowed mod</see>.
+        /// </param>
+        /// <param name="matchType">The type of match being played.</param>
+        /// <param name="freestyle">Whether the target playlist item enables <see cref="MultiplayerPlaylistItem.Freestyle">freestyle</see> mode.</param>
+        /// <seealso href="https://github.com/ppy/osu-web/blob/40936b514c6485b874f6c6496d55d9e8b1b88fd4/app/Singletons/Mods.php#L95-L113">Related osu!web function.</seealso>
+        public static bool IsValidModForMatch(Mod mod, bool required, MatchType matchType, bool freestyle)
         {
             if (mod.Type == ModType.System || !mod.UserPlayable || !mod.HasImplementation)
                 return false;
 
-            switch (type)
+            if (freestyle && required && !mod.ValidForFreestyleAsRequiredMod)
+                return false;
+
+            switch (matchType)
             {
                 case MatchType.Playlists:
                     return true;
 
                 default:
-                    return mod.ValidForMultiplayer;
+                    return required ? mod.ValidForMultiplayer : mod.ValidForMultiplayerAsFreeMod;
             }
         }
 
         /// <summary>
-        /// Determines whether a mod can be applied as a free mod to playlist items in the given match type.
+        /// Given an online listing of mods and the user's preferred ruleset, gathers the mods which are selectable as free mods by the current user.
         /// </summary>
-        /// <param name="mod">The mod to test.</param>
-        /// <param name="type">The match type.</param>
-        public static bool IsValidFreeModForMatchType(Mod mod, MatchType type)
+        /// <param name="matchType">The type of match being played.</param>
+        /// <param name="requiredMods">The required mods for the playlist item.</param>
+        /// <param name="allowedMods">The allowed mods for the playlist item.</param>
+        /// <param name="freestyle">Whether freestyle is enabled for the playlist item.</param>
+        /// <param name="userRuleset">The user's preferred ruleset, which may differ from the playlist item's selection on freestyle playlist items.</param>
+        public static Mod[] EnumerateUserSelectableFreeMods(MatchType matchType, IEnumerable<APIMod> requiredMods, IEnumerable<APIMod> allowedMods, bool freestyle, Ruleset userRuleset)
         {
-            if (mod.Type == ModType.System || !mod.UserPlayable || !mod.HasImplementation)
-                return false;
-
-            switch (type)
+            if (freestyle)
             {
-                case MatchType.Playlists:
-                    return true;
+                Mod[] rulesetRequiredMods = requiredMods.Select(m => m.ToMod(userRuleset)).ToArray();
 
-                default:
-                    return mod.ValidForMultiplayerAsFreeMod;
+                // In freestyle, the playlist item doesn't provide the allowed mods. Instead, all mods are unconditionally allowed by default.
+                return userRuleset.AllMods.OfType<Mod>()
+                                  // But the mods must still be compatible with the room...
+                                  .Where(m => IsValidModForMatch(m, false, matchType, true))
+                                  // ... And compatible with the required mods listing (this also handles de-duplication).
+                                  .Where(m => CheckCompatibleSet(rulesetRequiredMods.Append(m)))
+                                  .ToArray();
             }
+
+            // Without freestyle, only the mods specified by the playlist item are valid.
+            return allowedMods.Select(m => m.ToMod(userRuleset)).ToArray();
         }
     }
 }

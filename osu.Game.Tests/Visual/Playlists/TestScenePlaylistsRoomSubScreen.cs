@@ -362,12 +362,14 @@ namespace osu.Game.Tests.Visual.Playlists
                         new PlaylistItem(importedSet.Beatmaps[0])
                         {
                             RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
-                            Freestyle = true
+                            Freestyle = true,
+                            AllowedMods = [new APIMod(new OsuModDoubleTime())]
                         },
                         new PlaylistItem(importedSet.Beatmaps[0])
                         {
                             RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
-                            Freestyle = true
+                            Freestyle = true,
+                            AllowedMods = [new APIMod(new OsuModDoubleTime())]
                         },
                     ]
                 };
@@ -452,12 +454,14 @@ namespace osu.Game.Tests.Visual.Playlists
                         new PlaylistItem(importedSet.Beatmaps[0])
                         {
                             RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
-                            Freestyle = true
+                            Freestyle = true,
+                            AllowedMods = [new APIMod(new OsuModDoubleTime())]
                         },
                         new PlaylistItem(importedSet.Beatmaps[0])
                         {
                             RulesetID = new TaikoRuleset().RulesetInfo.OnlineID,
-                            Freestyle = true
+                            Freestyle = true,
+                            AllowedMods = [new APIMod(new TaikoModDoubleTime())]
                         },
                     ]
                 };

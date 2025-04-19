@@ -34,6 +34,8 @@ namespace osu.Game.Rulesets.Mods
 
         public override bool Ranked => true;
 
+        public override bool ValidForFreestyleAsRequiredMod => true;
+
         public override IEnumerable<(LocalisableString setting, LocalisableString value)> SettingDescription
         {
             get

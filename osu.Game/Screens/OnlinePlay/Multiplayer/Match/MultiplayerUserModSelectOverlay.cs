@@ -81,14 +81,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
             MultiplayerPlaylistItem currentItem = client.Room.CurrentPlaylistItem;
             Ruleset ruleset = rulesets.GetRuleset(client.LocalUser.RulesetId ?? currentItem.RulesetID)!.CreateInstance();
-            Mod[] allowedMods = currentItem.Freestyle
-                ? ruleset.AllMods.OfType<Mod>().Where(m => ModUtils.IsValidFreeModForMatchType(m, client.Room.Settings.MatchType)).ToArray()
-                : currentItem.AllowedMods.Select(m => m.ToMod(ruleset)).ToArray();
+            Mod[] allowedMods = ModUtils.EnumerateUserSelectableFreeMods(client.Room.Settings.MatchType, currentItem.RequiredMods, currentItem.AllowedMods, currentItem.Freestyle, ruleset);
 
             // Update the mod panels to reflect the ones which are valid for selection.
-            IsValidMod = allowedMods.Length > 0
-                ? m => allowedMods.Any(a => a.GetType() == m.GetType())
-                : _ => false;
+            IsValidMod = m => allowedMods.Any(a => a.GetType() == m.GetType());
 
             // Remove any mods that are no longer allowed.
             Mod[] newUserMods = SelectedMods.Value.Where(m => allowedMods.Any(a => m.GetType() == a.GetType())).ToArray();
