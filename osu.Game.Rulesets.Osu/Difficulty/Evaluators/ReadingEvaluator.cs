@@ -72,7 +72,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double timeDifficultyFactor = 9000 / pastObjectDifficultyInfluence;
 
                 // Cap objects because after a certain point hidden density is mainly memory
-                double visibleObjectFactor = Math.Min(retrieveCurrentVisibleObjects(currObj).Count, 9);
+                double visibleObjectFactor = Math.Min(retrieveCurrentVisibleObjects(currObj).Count, 8);
 
                 // The longer an object is hidden, the more velocity should matter
                 hiddenDifficulty += visibleObjectFactor * timeSpentInvisible * Math.Max(1, currVelocity) / timeDifficultyFactor;
