@@ -26,6 +26,7 @@ namespace osu.Game.Online.API
         });
 
         public BindableList<APIRelation> Friends { get; } = new BindableList<APIRelation>();
+        public BindableList<APIRelation> Blocks { get; } = new BindableList<APIRelation>();
 
         public DummyNotificationsClient NotificationsClient { get; } = new DummyNotificationsClient();
         INotificationsClient IAPIProvider.NotificationsClient => NotificationsClient;
@@ -180,6 +181,10 @@ namespace osu.Game.Online.API
         {
         }
 
+        public void UpdateLocalBlocks()
+        {
+        }
+
         public IHubClientConnector? GetHubConnector(string clientName, string endpoint, bool preferMessagePack) => null;
 
         public IChatClient GetChatClient() => new TestChatClientConnector(this);
@@ -194,6 +199,7 @@ namespace osu.Game.Online.API
 
         IBindable<APIUser> IAPIProvider.LocalUser => LocalUser;
         IBindableList<APIRelation> IAPIProvider.Friends => Friends;
+        IBindableList<APIRelation> IAPIProvider.Blocks => Blocks;
 
         /// <summary>
         /// Skip 2FA requirement for next login.
