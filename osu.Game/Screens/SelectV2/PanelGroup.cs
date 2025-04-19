@@ -26,6 +26,7 @@ namespace osu.Game.Screens.SelectV2
         private Drawable iconContainer = null!;
         private OsuSpriteText titleText = null!;
         private TrianglesV2 triangles = null!;
+        private OsuSpriteText countText = null!;
         private Box glow = null!;
 
         [Resolved]
@@ -99,13 +100,11 @@ namespace osu.Game.Screens.SelectV2
                             RelativeSizeAxes = Axes.Both,
                             Colour = Color4.Black.Opacity(0.7f),
                         },
-                        new OsuSpriteText
+                        countText = new OsuSpriteText
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Font = OsuFont.Style.Caption1.With(weight: FontWeight.Bold),
-                            // TODO: requires Carousel/CarouselItem-side implementation
-                            Text = "43",
                             UseFullGlyphHeight = false,
                         }
                     },
@@ -144,6 +143,7 @@ namespace osu.Game.Screens.SelectV2
             GroupDefinition group = (GroupDefinition)Item.Model;
 
             titleText.Text = group.Title;
+            countText.Text = Item.NestedItemCount.ToString("N0");
         }
     }
 }

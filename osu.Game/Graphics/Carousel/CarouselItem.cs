@@ -44,6 +44,11 @@ namespace osu.Game.Graphics.Carousel
         /// </summary>
         public bool IsExpanded { get; set; }
 
+        /// <summary>
+        /// The number of nested items underneath this header. Should only be used for headers of groups.
+        /// </summary>
+        public int NestedItemCount { get; set; }
+
         public CarouselItem(object model)
         {
             Model = model;
