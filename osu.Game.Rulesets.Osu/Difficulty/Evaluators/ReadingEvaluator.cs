@@ -11,6 +11,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 {
@@ -24,14 +25,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 return 0;
 
             var currObj = (OsuDifficultyHitObject)current;
+            Vector2 currPosition = currObj.Position;
             double currVelocity = currObj.LazyJumpDistance / currObj.StrainTime;
             double angleNerfFactor = getConstantAngleNerfFactor(currObj);
 
             double pastObjectDifficultyInfluence = 1.0;
+            double overlapness = 0;
+            double rhythmFactor = 1;
 
-            if (currObj.BaseObject is Slider slider)
+            if (currObj.BaseObject is Slider currSlider)
                 // Longer sliders are inherently denser objects
-                pastObjectDifficultyInfluence += 3 * Math.Log10(Math.Max(1, slider.Velocity * slider.SpanDuration / slider.Radius));
+                pastObjectDifficultyInfluence += 3 * Math.Log10(Math.Max(1, currSlider.Velocity * currSlider.SpanDuration / currSlider.Radius));
 
             foreach (var loopObj in retrievePastVisibleObjects(currObj))
             {
@@ -40,12 +44,37 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 // Small distances means objects may be cheesed, so it doesn't matter whether they are arranged confusingly.
                 loopDifficulty *= DifficultyCalculationUtils.Logistic(-(loopObj.MinimumJumpDistance - 80) / 15);
 
+                var loopLastObj = (OsuDifficultyHitObject)loopObj.Previous(0);
+
+                if (loopLastObj is not null && loopObj.StrainTime > loopLastObj.StrainTime)
+                {
+                    double rhythmSimilarity = getRhythmDifference(loopObj.StrainTime, loopLastObj.StrainTime);
+                    rhythmSimilarity *= Math.Pow(Math.Sin(rhythmSimilarity * 2 * Math.PI), 2);
+                    rhythmFactor += rhythmSimilarity;
+                }
+
+                var loopObjPosition = loopObj.Position;
+                float visibleDistance = ((currPosition - loopObjPosition) / OsuDifficultyHitObject.NORMALISED_DIAMETER).Length;
+
+                overlapness += DifficultyCalculationUtils.Logistic((0.5 - visibleDistance) / 0.1) - 0.2;
+
+                if (loopObj.BaseObject is Slider loopSlider)
+                    overlapness *= 1.5 * Math.Max(1, Math.Log10(Math.Max(1, loopSlider.Velocity * loopSlider.SpanDuration / loopSlider.Radius)));
+
+                overlapness = Math.Max(0, overlapness);
+
                 double timeBetweenCurrAndLoopObj = (currObj.BaseObject.StartTime - loopObj.BaseObject.StartTime) / currObj.ClockRate;
                 double timeNerfFactor = getTimeNerfFactor(timeBetweenCurrAndLoopObj);
 
                 loopDifficulty *= timeNerfFactor;
+                overlapness *= timeNerfFactor;
                 pastObjectDifficultyInfluence += loopDifficulty;
             }
+
+            overlapness *= Math.Pow(rhythmFactor, 3);
+            overlapness /= Math.Max(1, retrievePastVisibleObjects(currObj).Count());
+            overlapness *= angleNerfFactor;
+            overlapness *= 0.15;
 
             double preemptDifficulty = 0.0;
 
@@ -87,7 +116,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double noteDensityDifficulty = Math.Max(0, pastObjectDifficultyInfluence - 2.8);
             noteDensityDifficulty *= angleNerfFactor;
 
-            double difficulty = preemptDifficulty + hiddenDifficulty + noteDensityDifficulty;
+            double difficulty = preemptDifficulty + hiddenDifficulty + noteDensityDifficulty + overlapness;
 
             return difficulty;
         }
@@ -175,5 +204,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         {
             return Math.Clamp(2 - deltaTime / (reading_window_size / 2), 0, 1);
         }
+
+        private static double getRhythmDifference(double t1, double t2) => 1 - Math.Min(t1, t2) / Math.Max(t1, t2);
     }
 }
