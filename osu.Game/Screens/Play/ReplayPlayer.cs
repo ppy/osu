@@ -8,18 +8,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
-using osu.Game.Online.Leaderboards;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
-using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.PlayerSettings;
 using osu.Game.Screens.Ranking;
+using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Users;
 
 namespace osu.Game.Screens.Play
@@ -35,6 +33,9 @@ namespace osu.Game.Screens.Play
 
         private PlaybackSettings playbackSettings;
 
+        [Cached(typeof(IGameplayLeaderboardProvider))]
+        private readonly SoloGameplayLeaderboardProvider leaderboardProvider = new SoloGameplayLeaderboardProvider();
+
         protected override UserActivity InitialActivity => new UserActivity.WatchingReplay(Score.ScoreInfo);
 
         private bool isAutoplayPlayback => GameplayState.Mods.OfType<ModAutoplay>().Any();
@@ -48,6 +49,8 @@ namespace osu.Game.Screens.Play
             return base.CheckModsAllowFailure();
         }
 
+        protected override bool ShowLeaderboard => true;
+
         public ReplayPlayer(Score score, PlayerConfiguration configuration = null)
             : this((_, _) => score, configuration)
         {
@@ -59,12 +62,6 @@ namespace osu.Game.Screens.Play
         {
             this.createScore = createScore;
         }
-
-        [Resolved]
-        private LeaderboardManager leaderboardManager { get; set; } = null!;
-
-        private readonly IBindable<LeaderboardScores> globalScores = new Bindable<LeaderboardScores>();
-        private readonly BindableList<ScoreInfo> localScores = new BindableList<ScoreInfo>();
 
         /// <summary>
         /// Add a settings group to the HUD overlay. Intended to be used by rulesets to add replay-specific settings.
@@ -82,6 +79,8 @@ namespace osu.Game.Screens.Play
             if (!LoadedBeatmapSuccessfully)
                 return;
 
+            AddInternal(leaderboardProvider);
+
             playbackSettings = new PlaybackSettings
             {
                 Depth = float.MaxValue,
@@ -94,20 +93,6 @@ namespace osu.Game.Screens.Play
             HUDOverlay.PlayerSettingsOverlay.AddAtStart(playbackSettings);
         }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            globalScores.BindTo(leaderboardManager.Scores);
-            globalScores.BindValueChanged(_ =>
-            {
-                localScores.Clear();
-
-                if (globalScores.Value is LeaderboardScores g)
-                    localScores.AddRange(g.AllScores.OrderByTotalScore());
-            }, true);
-        }
-
         protected override void PrepareReplay()
         {
             DrawableRuleset?.SetReplayScore(Score);
@@ -117,12 +102,6 @@ namespace osu.Game.Screens.Play
 
         // Don't re-import replay scores as they're already present in the database.
         protected override Task ImportScore(Score score) => Task.CompletedTask;
-
-        protected override GameplayLeaderboard CreateGameplayLeaderboard() =>
-            new SoloGameplayLeaderboard(Score.ScoreInfo.User)
-            {
-                Scores = { BindTarget = localScores }
-            };
 
         protected override ResultsScreen CreateResults(ScoreInfo score) => new SoloResultsScreen(score)
         {

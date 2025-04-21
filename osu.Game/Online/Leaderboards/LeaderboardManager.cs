@@ -112,7 +112,7 @@ namespace osu.Game.Online.Leaderboards
 
                         var result = LeaderboardScores.Success
                         (
-                            response.Scores.Select(s => s.ToScoreInfo(rulesets, newCriteria.Beatmap)).OrderByTotalScore(),
+                            response.Scores.Select(s => s.ToScoreInfo(rulesets, newCriteria.Beatmap)).OrderByTotalScore().ToArray(),
                             response.UserScore?.CreateScoreInfo(rulesets, newCriteria.Beatmap)
                         );
                         inFlightOnlineRequest = null;
@@ -156,7 +156,7 @@ namespace osu.Game.Online.Leaderboards
 
             newScores = newScores.Detach().OrderByTotalScore();
 
-            scores.Value = LeaderboardScores.Success(newScores, null);
+            scores.Value = LeaderboardScores.Success(newScores.ToArray(), null);
 
             if (localFetchCompletionSource != null && localFetchCompletionSource == lastFetchCompletionSource)
             {
@@ -175,7 +175,7 @@ namespace osu.Game.Online.Leaderboards
 
     public record LeaderboardScores
     {
-        public IEnumerable<ScoreInfo> TopScores { get; }
+        public ICollection<ScoreInfo> TopScores { get; }
         public ScoreInfo? UserScore { get; }
         public LeaderboardFailState? FailState { get; }
 
@@ -191,14 +191,14 @@ namespace osu.Game.Online.Leaderboards
             }
         }
 
-        private LeaderboardScores(IEnumerable<ScoreInfo> topScores, ScoreInfo? userScore, LeaderboardFailState? failState)
+        private LeaderboardScores(ICollection<ScoreInfo> topScores, ScoreInfo? userScore, LeaderboardFailState? failState)
         {
             TopScores = topScores;
             UserScore = userScore;
             FailState = failState;
         }
 
-        public static LeaderboardScores Success(IEnumerable<ScoreInfo> topScores, ScoreInfo? userScore) => new LeaderboardScores(topScores, userScore, null);
+        public static LeaderboardScores Success(ICollection<ScoreInfo> topScores, ScoreInfo? userScore) => new LeaderboardScores(topScores, userScore, null);
         public static LeaderboardScores Failure(LeaderboardFailState failState) => new LeaderboardScores([], null, failState);
     }
 
