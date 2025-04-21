@@ -186,7 +186,7 @@ namespace osu.Game.Screens.Menu
 
                 shader = Source.shader;
                 texture = Source.texture;
-                size = Source.DrawSize.X;
+                size = Source.DrawSize.X + 3;
 
                 Source.frequencyAmplitudes.AsSpan().CopyTo(audioData);
             }
@@ -215,7 +215,8 @@ namespace osu.Game.Screens.Menu
                         float rotationCos = MathF.Cos(rotation);
                         float rotationSin = MathF.Sin(rotation);
                         // taking the cos and sin to the 0..1 range
-                        var barPosition = new Vector2(rotationCos / 2 + 0.5f, rotationSin / 2 + 0.5f) * size;
+                        //var barPosition = new Vector2(rotationCos / 2 + 0.5f, rotationSin / 2 + 0.5f) * size;
+                        var barPosition = new Vector2(rotationCos / 2 + 0.497f, rotationSin / 2 + 0.497f) * size;
 
                         var barSize = new Vector2(size * MathF.Sqrt(2 * (1 - MathF.Cos(float.DegreesToRadians(360f / bars_per_visualiser)))) / 2f, bar_length * audioData[i]);
                         // The distance between the position and the sides of the bar.
