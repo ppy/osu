@@ -68,7 +68,6 @@ namespace osu.Game.Screens.Play
         protected override GameplayLeaderboard CreateGameplayLeaderboard() =>
             new SoloGameplayLeaderboard(Score.ScoreInfo.User)
             {
-                AlwaysVisible = { Value = false },
                 Scores = { BindTarget = localScores }
             };
 
