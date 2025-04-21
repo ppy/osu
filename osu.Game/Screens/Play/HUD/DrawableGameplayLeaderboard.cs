@@ -10,6 +10,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Screens.Select.Leaderboards;
 using osuTK;
@@ -34,6 +35,7 @@ namespace osu.Game.Screens.Play.HUD
         private IGameplayLeaderboardProvider? leaderboardProvider { get; set; }
 
         private readonly IBindableList<GameplayLeaderboardScore> scores = new BindableList<GameplayLeaderboardScore>();
+        private readonly Bindable<bool> configVisibility = new Bindable<bool>();
 
         private const int max_panels = 8;
 
@@ -64,6 +66,12 @@ namespace osu.Game.Screens.Play.HUD
             };
         }
 
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+            config.BindWith(OsuSetting.GameplayLeaderboard, configVisibility);
+        }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -80,6 +88,7 @@ namespace osu.Game.Screens.Play.HUD
             }
 
             Scheduler.AddDelayed(sort, 1000, true);
+            configVisibility.BindValueChanged(_ => this.FadeTo(configVisibility.Value ? 1 : 0, 100, Easing.OutQuint), true);
         }
 
         /// <summary>
