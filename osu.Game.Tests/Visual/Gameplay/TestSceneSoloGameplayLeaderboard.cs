@@ -57,7 +57,6 @@ namespace osu.Game.Tests.Visual.Gameplay
                     Scores = { BindTarget = scores },
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    AlwaysVisible = { Value = false },
                     Expanded = { Value = true },
                 };
             });
@@ -101,12 +100,6 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("set config visible false", () => configVisibility.Value = false);
             AddUntilStep("leaderboard not visible", () => leaderboard.Alpha == 0);
-
-            AddStep("set always visible", () => leaderboard.AlwaysVisible.Value = true);
-            AddUntilStep("leaderboard visible", () => leaderboard.Alpha == 1);
-
-            AddStep("set config visible true", () => configVisibility.Value = true);
-            AddAssert("leaderboard still visible", () => leaderboard.Alpha == 1);
         }
 
         private static List<ScoreInfo> createSampleScores()
