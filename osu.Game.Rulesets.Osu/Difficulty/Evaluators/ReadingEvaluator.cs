@@ -71,7 +71,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 pastObjectDifficultyInfluence += loopDifficulty;
             }
 
-            overlapness *= Math.Pow(rhythmFactor, 3);
+            var prevObj = (OsuDifficultyHitObject)currObj.Previous(0);
+            double doubletapness = 1 - prevObj.GetDoubletapness(currObj) * 0.75;
+            overlapness *= Math.Pow(rhythmFactor * doubletapness, 3);
             overlapness /= Math.Max(1, retrievePastVisibleObjects(currObj).Count());
             overlapness *= angleNerfFactor;
             overlapness *= 0.15;
