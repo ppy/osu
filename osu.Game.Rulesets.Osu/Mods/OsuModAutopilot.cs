@@ -66,6 +66,8 @@ namespace osu.Game.Rulesets.Osu.Mods
             var pos = playfield.ToLocalSpace(inputManager.CurrentState.Mouse.Position);
             var target = active.Position;
 
+            var start = active.HitObject.StartTime;
+
             // Timing of the HitObject's hit window.
             double window = active is DrawableSlider sld
                 ? hitWindowLookup(sld.HeadCircle.HitObject.HitWindows)
@@ -74,7 +76,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             if (active is DrawableSpinner spinnerDrawable)
             {
                 var spinner = spinnerDrawable.HitObject;
-                double elapsed = currentTime - spinner.StartTime;
+                double elapsed = currentTime - start;
 
                 // Before spinner starts, move to position.
                 if (elapsed < 0)
@@ -83,8 +85,8 @@ namespace osu.Game.Rulesets.Osu.Mods
                         -(float)Math.Sin(0) * SpinnerRadius,
                         -(float)Math.Cos(0) * SpinnerRadius);
 
-                    double duration = currentTime >= spinner.StartTime - MinStart
-                    ? 1 + Math.Clamp(elapsed / ((spinner.Duration + spinner.StartTime) - spinner.StartTime), 0, 1) * (MinStart - 1)
+                    double duration = currentTime >= start - MinStart
+                    ? 1 + Math.Clamp(elapsed / spinner.Duration, 0, 1) * (MinStart - 1)
                     : -elapsed;
 
                     MoveTowards(pos, spinnerTargetPosition, duration, playfield);
@@ -107,7 +109,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             if (active is DrawableSlider sliderDrawable && sliderDrawable.HeadCircle.Judged)
             {
                 var slider = sliderDrawable.HitObject;
-                double elapsed = currentTime - slider.StartTime;
+                double elapsed = currentTime - start;
 
                 if (elapsed + window >= 0 && elapsed < slider.Duration)
                 {
@@ -124,13 +126,15 @@ namespace osu.Game.Rulesets.Osu.Mods
             }
 
             // Hit circle movement
-            double hitWindowStart = active.HitObject.StartTime - window - MinStart;
-            double hitWindowEnd = active.HitObject.StartTime + window - MinEnd;
+            double hitWindowStart = start - window - MinStart;
+            double hitWindowEnd = start + window - MinEnd;
             double availableTime = currentTime >= hitWindowStart
                     ? 1 + Math.Clamp((hitWindowEnd - currentTime) / (hitWindowEnd - hitWindowStart), 0, 1) * (MinStart - 1)
-                    : (active.HitObject.StartTime - window - currentTime);
+                    : (start - window - currentTime);
 
             MoveTowards(pos, target, availableTime, playfield);
+
+            // TODO: Implement the functionality to automatically spin spinners
         }
 
         private void MoveTowards(Vector2 current, Vector2 target, double timeMs, Playfield pf)
@@ -144,8 +148,6 @@ namespace osu.Game.Rulesets.Osu.Mods
                 : current + (target - current).Normalized() * displacement;
 
             ApplyCursor(newPos, pf);
-
-            // TODO: Implement the functionality to automatically spin spinners
         }
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
