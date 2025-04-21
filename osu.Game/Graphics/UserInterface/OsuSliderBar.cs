@@ -83,6 +83,6 @@ namespace osu.Game.Graphics.UserInterface
             channel.Play();
         }
 
-        public LocalisableString GetDisplayableValue(T value) => CurrentNumber.Value.ToStandardFormattedString(max_decimal_digits, DisplayAsPercentage);
+        public LocalisableString GetDisplayableValue(T value) => value.ToStandardFormattedString(max_decimal_digits, DisplayAsPercentage);
     }
 }
