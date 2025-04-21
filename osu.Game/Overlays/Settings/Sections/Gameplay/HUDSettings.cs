@@ -37,6 +37,12 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 },
                 new SettingsCheckbox
                 {
+                    LabelText = UserInterfaceStrings.KeyOverlayLayoutClassic,
+                    Current = config.GetBindable<bool>(OsuSetting.KeyOverlayLayoutClassic),
+                    Keywords = new[] { "counter" },
+                },
+                new SettingsCheckbox
+                {
                     LabelText = GameplaySettingsStrings.AlwaysShowGameplayLeaderboard,
                     Current = config.GetBindable<bool>(OsuSetting.GameplayLeaderboard),
                 },

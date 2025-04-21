@@ -45,6 +45,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.BeatmapDetailModsFilter, false);
 
             SetDefault(OsuSetting.ShowConvertedBeatmaps, true);
+            SetDefault(OsuSetting.ClassicRulesetFiltering, false); //show beatmap list such that other ruleset-specific maps are shown
             SetDefault(OsuSetting.DisplayStarsMinimum, 0.0, 0, 10, 0.1);
             SetDefault(OsuSetting.DisplayStarsMaximum, 10.1, 0, 10.1, 0.1);
 
@@ -100,14 +101,21 @@ namespace osu.Game.Configuration
 
             // Audio
             SetDefault(OsuSetting.VolumeInactive, 0.25, 0, 1, 0.01);
+            SetDefault(OsuSetting.AudioInactiveFilter, false); //low pass filter
 
             SetDefault(OsuSetting.MenuVoice, true);
+            SetDefault(OsuSetting.MenuVoiceFemale, false);
             SetDefault(OsuSetting.MenuMusic, true);
             SetDefault(OsuSetting.MenuTips, true);
+            SetDefault(OsuSetting.MenuNews, true); //toggle the news pane at bottom of menu
 
             SetDefault(OsuSetting.AudioOffset, 0, -500.0, 500.0, 1);
 
             // Input
+            SetDefault(OsuSetting.GameplayCursorInMenus, false); //use gameplay cursor instead of menu cursor
+            SetDefault(OsuSetting.ShowCursorTrail, true); //custom cursor trail
+            SetDefault(OsuSetting.ShowLazerCursorTrail, false); //windows-like cursor trail but it fades (default cursor)
+            SetDefault(OsuSetting.ShowCursorRipples, false); //cursor ripples (both cursors)
             SetDefault(OsuSetting.MenuCursorSize, 1.0f, 0.5f, 2f, 0.01f);
             SetDefault(OsuSetting.GameplayCursorSize, 1.0f, 0.1f, 2f, 0.01f);
             SetDefault(OsuSetting.GameplayCursorDuringTouch, false);
@@ -125,9 +133,11 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.ShowStoryboard, true);
             SetDefault(OsuSetting.BeatmapSkins, true);
             SetDefault(OsuSetting.BeatmapColours, true);
-            SetDefault(OsuSetting.BeatmapHitsounds, true);
+            SetDefault(OsuSetting.BeatmapHitsounds, true); //could change to dropdown and eliminate next option
+            SetDefault(OsuSetting.OverrideBeatmapHitsounds, false); //instead of disabling mapped hitsounds altogether, override the custom audio tracks with standard and unknown tracks with the default tap
 
             SetDefault(OsuSetting.CursorRotation, true);
+            SetDefault(OsuSetting.CursorTrailLength, 100, 0, 100, 1);
 
             SetDefault(OsuSetting.MenuParallax, true);
 
@@ -139,6 +149,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.DimLevel, 0.7, 0, 1, 0.01);
             SetDefault(OsuSetting.BlurLevel, 0, 0, 1, 0.01);
             SetDefault(OsuSetting.LightenDuringBreaks, true);
+            SetDefault(OsuSetting.BackgroundColour, new BindableColour4()); //background color when dimmed
 
             SetDefault(OsuSetting.HitLighting, true);
             SetDefault(OsuSetting.StarFountains, true);
@@ -147,9 +158,10 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.ShowHealthDisplayWhenCantFail, true);
             SetDefault(OsuSetting.FadePlayfieldWhenHealthLow, true);
             SetDefault(OsuSetting.KeyOverlay, false);
+            SetDefault(OsuSetting.KeyOverlayLayoutClassic, false); //true:k1 k2 m1 m2,false:k1 k2 k3
             SetDefault(OsuSetting.ReplaySettingsOverlay, true);
             SetDefault(OsuSetting.ReplayPlaybackControlsExpanded, true);
-            SetDefault(OsuSetting.GameplayLeaderboard, true);
+            SetDefault(OsuSetting.GameplayLeaderboard, true); //add thing to show during break
             SetDefault(OsuSetting.AlwaysPlayFirstComboBreak, true);
 
             SetDefault(OsuSetting.FloatingComments, false);
@@ -347,12 +359,19 @@ namespace osu.Game.Configuration
         GameplayCursorSize,
         AutoCursorSize,
         GameplayCursorDuringTouch,
+        GameplayCursorInMenus,
+        ShowCursorTrail,
+        CursorTrailLength,
+        ShowLazerCursorTrail,
+        ShowCursorRipples,
         DimLevel,
+        BackgroundColour,
         BlurLevel,
         EditorDim,
         LightenDuringBreaks,
         ShowStoryboard,
         KeyOverlay,
+        KeyOverlayLayoutClassic,
         GameplayLeaderboard,
         PositionalHitsoundsLevel,
         AlwaysPlayFirstComboBreak,
@@ -376,14 +395,18 @@ namespace osu.Game.Configuration
         AudioOffset,
 
         VolumeInactive,
+        AudioInactiveFilter,
         MenuMusic,
         MenuVoice,
+        MenuVoiceFemale,
         MenuTips,
+        MenuNews,
         CursorRotation,
         MenuParallax,
         Prefer24HourTime,
         BeatmapDetailTab,
         BeatmapDetailModsFilter,
+        ClassicRulesetFiltering,
         Username,
         ReleaseStream,
         SavePassword,
@@ -408,6 +431,7 @@ namespace osu.Game.Configuration
         BeatmapSkins,
         BeatmapColours,
         BeatmapHitsounds,
+        OverrideBeatmapHitsounds,
         IncreaseFirstObjectVisibility,
         ScoreDisplayMode,
         ExternalLinkWarning,

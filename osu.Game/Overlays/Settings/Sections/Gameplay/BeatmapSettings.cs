@@ -42,6 +42,12 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 },
                 new SettingsCheckbox
                 {
+                    Keywords = new[] { "samples", "override" },
+                    LabelText = UserInterfaceStrings.OverrideBeatmapHitsounds,
+                    Current = config.GetBindable<bool>(OsuSetting.OverrideBeatmapHitsounds)
+                },
+                new SettingsCheckbox
+                {
                     LabelText = GraphicsSettingsStrings.StoryboardVideo,
                     Current = config.GetBindable<bool>(OsuSetting.ShowStoryboard)
                 },

@@ -68,9 +68,10 @@ namespace osu.Game.Overlays.SkinEditor
                                     Origin = Anchor.CentreLeft,
                                     Margin = new MarginPadding(10),
                                 },
-                                new SceneButton
+                                new SceneButton //song select
                                 {
                                     Text = SkinEditorStrings.SongSelect,
+                                    Width = 100,
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
                                     Action = () => performer?.PerformFromScreen(screen =>
@@ -81,12 +82,38 @@ namespace osu.Game.Overlays.SkinEditor
                                         screen.Push(new PlaySongSelect());
                                     }, new[] { typeof(SongSelect) })
                                 },
-                                new SceneButton
+                                new SceneButton //gameplay
                                 {
                                     Text = SkinEditorStrings.Gameplay,
+                                    Width = 90,
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
                                     Action = () => skinEditorOverlay?.PresentGameplay(),
+                                },
+                                new SceneButton //gameplay elements
+                                {
+                                    Text = SkinEditorStrings.GameplayElements,
+                                    Width = 148,
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
+                                    Action = () => skinEditorOverlay?.PresentGameplay(),
+                                },
+                                new SceneButton //results
+                                {
+                                    Text = SkinEditorStrings.Results,
+                                    Width = 73,
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
+                                    Action = () => skinEditorOverlay?.PresentGameplay(),
+                                },
+                                new SceneButton //pause
+                                {
+                                    Text = SkinEditorStrings.Pause,
+                                    Width = 65,
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
+                                    Action = () => skinEditorOverlay?.PresentGameplay(),
+                                    //player?.PauseOverlay.Show(),
                                 },
                             }
                         },
@@ -107,6 +134,7 @@ namespace osu.Game.Overlays.SkinEditor
             private void load(OverlayColourProvider? overlayColourProvider, OsuColour colours)
             {
                 BackgroundColour = overlayColourProvider?.Background3 ?? colours.Blue3;
+                //BackgroundColour = colours.Blue1;
                 Content.CornerRadius = 5;
             }
         }

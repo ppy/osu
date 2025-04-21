@@ -32,6 +32,27 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
                 },
                 new SettingsCheckbox
                 {
+                    LabelText = UserInterfaceStrings.ShowLazerCursorTrail,
+                    Current = config.GetBindable<bool>(OsuSetting.ShowLazerCursorTrail),
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = UserInterfaceStrings.GameplayCursorInMenus,
+                    Current = config.GetBindable<bool>(OsuSetting.GameplayCursorInMenus),
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = UserInterfaceStrings.ShowCursorTrail,
+                    Current = config.GetBindable<bool>(OsuSetting.ShowCursorTrail),
+                },
+                new SettingsSlider<float, SizeSlider<float>>
+                {
+                    LabelText = UserInterfaceStrings.CursorTrailLength,
+                    Current = config.GetBindable<float>(OsuSetting.CursorTrailLength),
+                    KeyboardStep = 1f
+                },
+                new SettingsCheckbox
+                {
                     LabelText = UserInterfaceStrings.Parallax,
                     Current = config.GetBindable<bool>(OsuSetting.MenuParallax)
                 },

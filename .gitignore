@@ -344,3 +344,6 @@ FodyWeavers.xsd
 
 .idea/.idea.osu.Desktop/.idea/misc.xml
 .idea/.idea.osu.Android/.idea/deploymentTargetDropDown.xml
+
+# this piece of shit
+osu.Game\obj\Debug\net8.0\osu.Game.xml

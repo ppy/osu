@@ -24,6 +24,11 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
                     LabelText = UserInterfaceStrings.ShowConvertedBeatmaps,
                     Current = config.GetBindable<bool>(OsuSetting.ShowConvertedBeatmaps),
                 },
+                new SettingsCheckbox
+                {
+                    LabelText = UserInterfaceStrings.ClassicRulesetFiltering,
+                    Current = config.GetBindable<bool>(OsuSetting.ClassicRulesetFiltering),
+                },
                 new SettingsEnumDropdown<RandomSelectAlgorithm>
                 {
                     LabelText = UserInterfaceStrings.RandomSelectionAlgorithm,

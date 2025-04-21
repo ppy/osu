@@ -36,6 +36,17 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
                 },
                 new SettingsCheckbox
                 {
+                    LabelText = UserInterfaceStrings.ShowMenuNews,
+                    Current = config.GetBindable<bool>(OsuSetting.MenuNews)
+                },
+                new SettingsCheckbox
+                {
+                    Keywords = new[] { "intro", "welcome", "voice", "female" },
+                    LabelText = UserInterfaceStrings.MenuVoiceFemale,
+                    Current = config.GetBindable<bool>(OsuSetting.MenuVoiceFemale)
+                },
+                new SettingsCheckbox
+                {
                     Keywords = new[] { "intro", "welcome" },
                     LabelText = UserInterfaceStrings.InterfaceVoices,
                     Current = config.GetBindable<bool>(OsuSetting.MenuVoice)
@@ -60,7 +71,12 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
                 {
                     LabelText = UserInterfaceStrings.SeasonalBackgrounds,
                     Current = config.GetBindable<SeasonalBackgroundMode>(OsuSetting.SeasonalBackgroundMode),
-                }
+                }//,
+                //new SettingsColour
+                //{
+                //    LabelText = UserInterfaceStrings.BackgroundColour,
+                //    Current = config.GetBindable<Colour4>(OsuSetting.BackgroundColour),
+                //}
             };
         }
 

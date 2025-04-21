@@ -20,6 +20,11 @@ namespace osu.Game.Localisation
         public static LocalisableString CursorRotation => new TranslatableString(getKey(@"cursor_rotation"), @"Rotate cursor when dragging");
 
         /// <summary>
+        /// "Always use gameplay cursor"
+        /// </summary>
+        public static LocalisableString GameplayCursorInMenus => new TranslatableString(getKey(@"gameplay_cursor_in_menus"), @"Always use gameplay cursor");
+
+        /// <summary>
         /// "Menu cursor size"
         /// </summary>
         public static LocalisableString MenuCursorSize => new TranslatableString(getKey(@"menu_cursor_size"), @"Menu cursor size");
@@ -28,6 +33,11 @@ namespace osu.Game.Localisation
         /// "Menu tips"
         /// </summary>
         public static LocalisableString ShowMenuTips => new TranslatableString(getKey(@"show_menu_tips"), @"Menu tips");
+
+        /// <summary>
+        /// "Menu news"
+        /// </summary>
+        public static LocalisableString ShowMenuNews => new TranslatableString(getKey(@"show_menu_news"), @"Menu news");
 
         /// <summary>
         /// "Parallax"
@@ -48,6 +58,11 @@ namespace osu.Game.Localisation
         /// "Interface voices"
         /// </summary>
         public static LocalisableString InterfaceVoices => new TranslatableString(getKey(@"interface_voices"), @"Interface voices");
+
+        /// <summary>
+        /// "Female interface voices"
+        /// </summary>
+        public static LocalisableString MenuVoiceFemale => new TranslatableString(getKey(@"menu_voice_female"), @"Female interface voices");
 
         /// <summary>
         /// "osu! music theme"
@@ -88,6 +103,11 @@ namespace osu.Game.Localisation
         /// "Show converted beatmaps"
         /// </summary>
         public static LocalisableString ShowConvertedBeatmaps => new TranslatableString(getKey(@"show_converted_beatmaps"), @"Show converted beatmaps");
+
+        /// <summary>
+        /// "Show all possible rulesets"
+        /// </summary>
+        public static LocalisableString ClassicRulesetFiltering => new TranslatableString(getKey(@"classic_ruleset_filtering"), @"Show all possible rulesets");
 
         /// <summary>
         /// "Display beatmaps from"
@@ -158,6 +178,41 @@ namespace osu.Game.Localisation
         /// "True Random"
         /// </summary>
         public static LocalisableString TrueRandom => new TranslatableString(getKey(@"true_random"), @"True Random");
+
+        /// <summary>
+        /// "Apply audio filter when window is inactive"
+        /// </summary>
+        public static LocalisableString AudioInactiveFilter => new TranslatableString(getKey(@"audio_inactive_filter"), @"Apply audio filter when window is inactive");
+
+        /// <summary>
+        /// "Override beatmap hitsounds with default"
+        /// </summary>
+        public static LocalisableString OverrideBeatmapHitsounds => new TranslatableString(getKey(@"override_beatmap_hitsounds"), @"Override beatmap hitsounds with default");
+
+        /// <summary>
+        /// "Dimmed background color"
+        /// </summary>
+        public static LocalisableString BackgroundColour => new TranslatableString(getKey(@"background_colour"), @"Dimmed background color");
+
+        /// <summary>
+        /// "Use classic layout on key overlay"
+        /// </summary>
+        public static LocalisableString KeyOverlayLayoutClassic => new TranslatableString(getKey(@"key_overlay_layout_classic"), @"Use classic layout on key overlay");
+
+        /// <summary>
+        /// "Cursor trail length"
+        /// </summary>
+        public static LocalisableString CursorTrailLength => new TranslatableString(getKey(@"cursor_trail_length"), @"Cursor trail length");
+
+        /// <summary>
+        /// "Use trail on menu cursor"
+        /// </summary>
+        public static LocalisableString ShowLazerCursorTrail => new TranslatableString(getKey(@"show_lazer_cursor_trail"), @"Use trail on menu cursor");
+
+        /// <summary>
+        /// "Use trail on gameplay cursor"
+        /// </summary>
+        public static LocalisableString ShowCursorTrail => new TranslatableString(getKey(@"show_cursor_trail"), @"Use trail on gameplay cursor");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

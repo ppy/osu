@@ -1,4 +1,7 @@
-﻿<Project>
+<Project>
+  <ItemGroup>
+    <ProjectReference Include="$(MSBuildThisFileDirectory)..\osu-framework\osu.Framework.iOS\osu.Framework.iOS.csproj" />
+  </ItemGroup>
   <PropertyGroup>
     <CodesignKey>iPhone Developer</CodesignKey>
     <NullabilityInfoContextSupport>true</NullabilityInfoContextSupport>
@@ -16,7 +19,5 @@
     <UseInterpreter>false</UseInterpreter>
     <MtouchInterpreter>-all</MtouchInterpreter>
   </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="ppy.osu.Framework.iOS" Version="2025.321.0" />
-  </ItemGroup>
+  <Import Project="$(MSBuildThisFileDirectory)../osu-framework/osu.Framework.iOS.props"/>
 </Project>

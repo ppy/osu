@@ -35,6 +35,26 @@ namespace osu.Game.Localisation
         public static LocalisableString Gameplay => new TranslatableString(getKey(@"gameplay"), @"Gameplay");
 
         /// <summary>
+        /// "Gameplay Elements"
+        /// </summary>
+        public static LocalisableString GameplayElements => new TranslatableString(getKey(@"gameplay_elements"), @"Gameplay Elements");
+
+        /// <summary>
+        /// "Results"
+        /// </summary>
+        public static LocalisableString Results => new TranslatableString(getKey(@"results"), @"Results");
+
+        /// <summary>
+        /// "Pause"
+        /// </summary>
+        public static LocalisableString Pause => new TranslatableString(getKey(@"pause"), @"Pause");
+
+        /// <summary>
+        /// "Breaktime?"
+        /// </summary>
+        public static LocalisableString Breaktime => new TranslatableString(getKey(@"breaktime"), @"Breaktime?");
+
+        /// <summary>
         /// "Settings ({0})"
         /// </summary>
         public static LocalisableString Settings(string arg0) => new TranslatableString(getKey(@"settings"), @"Settings ({0})", arg0);
@@ -90,9 +110,9 @@ namespace osu.Game.Localisation
         public static LocalisableString SendToBack => new TranslatableString(getKey(@"send_to_back"), @"Send to back");
 
         /// <summary>
-        /// "Current working layer"
+        /// "Current layer"
         /// </summary>
-        public static LocalisableString CurrentWorkingLayer => new TranslatableString(getKey(@"current_working_layer"), @"Current working layer");
+        public static LocalisableString CurrentWorkingLayer => new TranslatableString(getKey(@"current_working_layer"), @"Current layer");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
