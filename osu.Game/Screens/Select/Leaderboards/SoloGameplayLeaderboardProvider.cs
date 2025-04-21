@@ -17,9 +17,16 @@ namespace osu.Game.Screens.Select.Leaderboards
         public IBindableList<GameplayLeaderboardScore> Scores => scores;
         private readonly BindableList<GameplayLeaderboardScore> scores = new BindableList<GameplayLeaderboardScore>();
 
-        [BackgroundDependencyLoader]
-        private void load(LeaderboardManager? leaderboardManager, GameplayState? gameplayState)
+        [Resolved]
+        private LeaderboardManager? leaderboardManager { get; set; }
+
+        [Resolved]
+        private GameplayState? gameplayState { get; set; }
+
+        protected override void LoadComplete()
         {
+            base.LoadComplete();
+
             var globalScores = leaderboardManager?.Scores.Value;
 
             IsPartial = leaderboardManager?.CurrentCriteria?.Scope != BeatmapLeaderboardScope.Local && globalScores?.TopScores.Count >= 50;
