@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double loopDifficulty = currObj.OpacityAt(loopObj.BaseObject.StartTime, false);
 
                 // Small distances means objects may be cheesed, so it doesn't matter whether they are arranged confusingly.
-                loopDifficulty *= DifficultyCalculationUtils.Logistic(-(loopObj.MinimumJumpDistance - 80) / 15);
+                loopDifficulty *= DifficultyCalculationUtils.Logistic(-(loopObj.MinimumJumpDistance - 65) / 15);
 
                 var loopLastObj = (OsuDifficultyHitObject)loopObj.Previous(0);
 
@@ -76,7 +76,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             overlapness *= Math.Pow(rhythmFactor * doubletapness, 3);
             overlapness /= Math.Max(1, retrievePastVisibleObjects(currObj).Count());
             overlapness *= angleNerfFactor;
-            overlapness *= 0.15;
+            overlapness *= 0.17;
 
             double preemptDifficulty = 0.0;
 
@@ -100,7 +100,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double timeSpentInvisible = getDurationSpentInvisible(currObj) / currObj.ClockRate;
 
                 // Nerf hidden difficulty less the more past object difficulty you have
-                double timeDifficultyFactor = 9000 / pastObjectDifficultyInfluence;
+                double timeDifficultyFactor = 10000 / pastObjectDifficultyInfluence;
 
                 // Cap objects because after a certain point hidden density is mainly memory
                 double visibleObjectFactor = Math.Min(retrieveCurrentVisibleObjects(currObj).Count, 8);
@@ -115,7 +115,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             }
 
             // Award only denser than average maps
-            double noteDensityDifficulty = Math.Max(0, pastObjectDifficultyInfluence - 2.8);
+            double noteDensityDifficulty = Math.Max(0, pastObjectDifficultyInfluence - 2.5);
             noteDensityDifficulty *= angleNerfFactor;
 
             double difficulty = preemptDifficulty + hiddenDifficulty + noteDensityDifficulty + overlapness;
