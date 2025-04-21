@@ -54,6 +54,9 @@ namespace osu.Game.Online.Leaderboards
             lastFetchCompletionSource?.TrySetCanceled();
             scores.Value = null;
 
+            if (newCriteria.Beatmap == null || newCriteria.Ruleset == null)
+                return Task.FromResult<LeaderboardScores?>(scores.Value = LeaderboardScores.Failure(LeaderboardFailState.NoneSelected));
+
             switch (newCriteria.Scope)
             {
                 case BeatmapLeaderboardScope.Local:
@@ -72,6 +75,21 @@ namespace osu.Game.Online.Leaderboards
 
                 default:
                 {
+                    if (!api.IsLoggedIn)
+                        return Task.FromResult<LeaderboardScores?>(scores.Value = LeaderboardScores.Failure(LeaderboardFailState.NotLoggedIn));
+
+                    if (!newCriteria.Ruleset.IsLegacyRuleset())
+                        return Task.FromResult<LeaderboardScores?>(scores.Value = LeaderboardScores.Failure(LeaderboardFailState.RulesetUnavailable));
+
+                    if (newCriteria.Beatmap.OnlineID <= 0 || newCriteria.Beatmap.Status <= BeatmapOnlineStatus.Pending)
+                        return Task.FromResult<LeaderboardScores?>(scores.Value = LeaderboardScores.Failure(LeaderboardFailState.BeatmapUnavailable));
+
+                    if ((newCriteria.Scope.RequiresSupporter(newCriteria.ExactMods != null)) && !api.LocalUser.Value.IsSupporter)
+                        return Task.FromResult<LeaderboardScores?>(scores.Value = LeaderboardScores.Failure(LeaderboardFailState.NotSupporter));
+
+                    if (newCriteria.Scope == BeatmapLeaderboardScope.Team && api.LocalUser.Value.Team == null)
+                        return Task.FromResult<LeaderboardScores?>(scores.Value = LeaderboardScores.Failure(LeaderboardFailState.NoTeam));
+
                     var onlineFetchCompletionSource = new TaskCompletionSource<LeaderboardScores?>();
                     lastFetchCompletionSource = onlineFetchCompletionSource;
 
@@ -92,7 +110,7 @@ namespace osu.Game.Online.Leaderboards
                         if (inFlightOnlineRequest != null && !newRequest.Equals(inFlightOnlineRequest))
                             return;
 
-                        var result = new LeaderboardScores
+                        var result = LeaderboardScores.Success
                         (
                             response.Scores.Select(s => s.ToScoreInfo(rulesets, newCriteria.Beatmap)).OrderByTotalScore().ToArray(),
                             response.UserScore?.CreateScoreInfo(rulesets, newCriteria.Beatmap)
@@ -101,7 +119,7 @@ namespace osu.Game.Online.Leaderboards
                         if (onlineFetchCompletionSource.TrySetResult(result))
                             scores.Value = result;
                     };
-                    newRequest.Failure += ex => onlineFetchCompletionSource.TrySetException(ex);
+                    newRequest.Failure += _ => onlineFetchCompletionSource.TrySetResult(LeaderboardScores.Failure(LeaderboardFailState.NetworkFailure));
                     api.Queue(inFlightOnlineRequest = newRequest);
                     return onlineFetchCompletionSource.Task;
                 }
@@ -138,7 +156,7 @@ namespace osu.Game.Online.Leaderboards
 
             newScores = newScores.Detach().OrderByTotalScore();
 
-            scores.Value = new LeaderboardScores(newScores.ToArray(), null);
+            scores.Value = LeaderboardScores.Success(newScores.ToArray(), null);
 
             if (localFetchCompletionSource != null && localFetchCompletionSource == lastFetchCompletionSource)
             {
@@ -149,14 +167,18 @@ namespace osu.Game.Online.Leaderboards
     }
 
     public record LeaderboardCriteria(
-        BeatmapInfo Beatmap,
-        RulesetInfo Ruleset,
+        BeatmapInfo? Beatmap,
+        RulesetInfo? Ruleset,
         BeatmapLeaderboardScope Scope,
         Mod[]? ExactMods
     );
 
-    public record LeaderboardScores(ICollection<ScoreInfo> TopScores, ScoreInfo? UserScore)
+    public record LeaderboardScores
     {
+        public ICollection<ScoreInfo> TopScores { get; }
+        public ScoreInfo? UserScore { get; }
+        public LeaderboardFailState? FailState { get; }
+
         public IEnumerable<ScoreInfo> AllScores
         {
             get
@@ -168,5 +190,26 @@ namespace osu.Game.Online.Leaderboards
                     yield return UserScore;
             }
         }
+
+        private LeaderboardScores(ICollection<ScoreInfo> topScores, ScoreInfo? userScore, LeaderboardFailState? failState)
+        {
+            TopScores = topScores;
+            UserScore = userScore;
+            FailState = failState;
+        }
+
+        public static LeaderboardScores Success(ICollection<ScoreInfo> topScores, ScoreInfo? userScore) => new LeaderboardScores(topScores, userScore, null);
+        public static LeaderboardScores Failure(LeaderboardFailState failState) => new LeaderboardScores([], null, failState);
+    }
+
+    public enum LeaderboardFailState
+    {
+        NetworkFailure = -1,
+        BeatmapUnavailable = -2,
+        RulesetUnavailable = -3,
+        NoneSelected = -4,
+        NotLoggedIn = -5,
+        NotSupporter = -6,
+        NoTeam = -7
     }
 }

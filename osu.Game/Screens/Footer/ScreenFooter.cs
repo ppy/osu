@@ -104,14 +104,14 @@ namespace osu.Game.Screens.Footer
                 },
                 BackButton = new ScreenBackButton
                 {
-                    Margin = new MarginPadding { Bottom = 15f, Left = 12f },
+                    Margin = new MarginPadding { Bottom = OsuGame.SCREEN_EDGE_MARGIN, Left = OsuGame.SCREEN_EDGE_MARGIN },
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                     Action = onBackPressed,
                 },
                 hiddenButtonsContainer = new Container<ScreenFooterButton>
                 {
-                    Margin = new MarginPadding { Left = 12f + ScreenBackButton.BUTTON_WIDTH + padding },
+                    Margin = new MarginPadding { Left = OsuGame.SCREEN_EDGE_MARGIN + ScreenBackButton.BUTTON_WIDTH + padding },
                     Y = 10f,
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,

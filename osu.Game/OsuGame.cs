@@ -104,6 +104,11 @@ namespace osu.Game
         /// </summary>
         public static readonly Vector2 SHEAR = new Vector2(0.2f, 0);
 
+        /// <summary>
+        /// For elements placed close to the screen edge, this is the margin to leave to the edge.
+        /// </summary>
+        public const float SCREEN_EDGE_MARGIN = 12f;
+
         public Toolbar Toolbar { get; private set; }
 
         private ChatOverlay chatOverlay;

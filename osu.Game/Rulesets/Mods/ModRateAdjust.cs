@@ -34,5 +34,7 @@ namespace osu.Game.Rulesets.Mods
                     yield return ("Speed change", $"{SpeedChange.Value:N2}x");
             }
         }
+
+        public override string ExtendedIconInformation => SpeedChange.IsDefault ? string.Empty : FormattableString.Invariant($"{SpeedChange.Value:N2}x");
     }
 }
