@@ -19,6 +19,8 @@ namespace osu.Game.Storyboards
 
         public override double StartTime { get; }
 
+        public override bool IsDrawable => true;
+
         public override Drawable CreateDrawable() => new DrawableStoryboardVideo(this);
     }
 }
