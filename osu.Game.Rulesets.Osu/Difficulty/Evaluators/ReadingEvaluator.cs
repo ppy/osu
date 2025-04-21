@@ -72,7 +72,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             }
 
             var prevObj = (OsuDifficultyHitObject)currObj.Previous(0);
-            double doubletapness = 1 - prevObj.GetDoubletapness(currObj) * 0.75;
+            double doubletapness = 1 - prevObj.GetDoubletapness(currObj);
             overlapness *= Math.Pow(rhythmFactor * doubletapness, 3);
             overlapness /= Math.Max(1, retrievePastVisibleObjects(currObj).Count());
             overlapness *= angleNerfFactor;
@@ -91,6 +91,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double densityDifficulty = 1 + DifficultyCalculationUtils.BellCurve(retrievePastVisibleObjects(currObj).Count(), 2, 1.5, 3.0);
                 preemptDifficulty *= currVelocity / densityDifficulty;
                 preemptDifficulty *= angleNerfFactor;
+                preemptDifficulty *= doubletapness; // Doubletaps raise the density without adding significant reading difficulty
             }
 
             double hiddenDifficulty = 0.0;
