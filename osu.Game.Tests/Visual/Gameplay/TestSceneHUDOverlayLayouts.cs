@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
+using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
@@ -51,6 +52,12 @@ namespace osu.Game.Tests.Visual.Gameplay
             skins["argon"] = new ArgonSkin(this);
             skins["triangles"] = new TrianglesSkin(this);
             skins["legacy"] = new DefaultLegacySkin(this);
+        }
+
+        [SetUpSteps]
+        public void SetUpSteps()
+        {
+            AddToggleStep("toggle leaderboard", b => configManager.SetValue(OsuSetting.GameplayLeaderboard, b));
         }
 
         [Test]

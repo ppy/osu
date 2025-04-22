@@ -25,8 +25,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
     {
         protected override bool PauseOnFocusLost => false;
 
-        protected override bool ShowLeaderboard => true;
-
         protected override UserActivity InitialActivity => new UserActivity.InMultiplayerGame(Beatmap.Value.BeatmapInfo, Ruleset.Value);
 
         [Resolved]
@@ -42,6 +40,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         private readonly MultiplayerLeaderboardProvider leaderboardProvider;
 
         private GameplayMatchScoreDisplay teamScoreDisplay = null!;
+        private GameplayChatDisplay chat;
 
         /// <summary>
         /// Construct a multiplayer player.
@@ -57,7 +56,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 AllowFailAnimation = false,
                 AllowSkipping = room.AutoSkip,
                 AutomaticallySkipIntro = room.AutoSkip,
-                AlwaysShowLeaderboard = true,
+                ShowLeaderboard = true,
             })
         {
             leaderboardProvider = new MultiplayerLeaderboardProvider(users);
@@ -71,10 +70,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             ScoreProcessor.ApplyNewJudgementsWhenFailed = true;
 
-            LoadComponentAsync(new GameplayChatDisplay(Room)
-            {
-                Expanded = { BindTarget = LeaderboardExpandedState },
-            }, chat => HUDOverlay.LeaderboardFlow.Insert(2, chat));
+            LoadComponentAsync(chat = new GameplayChatDisplay(Room), HUDOverlay.LeaderboardFlow.Add);
 
             LoadComponentAsync(teamScoreDisplay = new GameplayMatchScoreDisplay
             {
@@ -124,6 +120,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                     failAndBail();
                 }
             }), true);
+
+            LocalUserPlaying.BindValueChanged(_ => chat.Expanded.Value = !LocalUserPlaying.Value, true);
         }
 
         protected override void LoadComplete()

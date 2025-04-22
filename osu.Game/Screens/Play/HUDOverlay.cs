@@ -114,7 +114,7 @@ namespace osu.Game.Screens.Play
         /// </summary>
         internal readonly Drawable PlayfieldSkinLayer;
 
-        public HUDOverlay([CanBeNull] DrawableRuleset drawableRuleset, IReadOnlyList<Mod> mods, bool alwaysShowLeaderboard = true)
+        public HUDOverlay([CanBeNull] DrawableRuleset drawableRuleset, IReadOnlyList<Mod> mods)
         {
             Container rightSettings;
 
@@ -191,8 +191,7 @@ namespace osu.Game.Screens.Play
             if (rulesetComponents != null)
                 hideTargets.Add(rulesetComponents);
 
-            if (!alwaysShowLeaderboard)
-                hideTargets.Add(LeaderboardFlow);
+            hideTargets.Add(LeaderboardFlow);
         }
 
         [BackgroundDependencyLoader(true)]

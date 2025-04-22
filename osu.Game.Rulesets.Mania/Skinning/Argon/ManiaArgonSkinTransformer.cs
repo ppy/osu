@@ -40,8 +40,12 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                         case GlobalSkinnableContainers.MainHUDComponents:
                             return new DefaultSkinComponentsContainer(container =>
                             {
+                                var leaderboard = container.OfType<DrawableGameplayLeaderboard>().FirstOrDefault();
                                 var combo = container.ChildrenOfType<ArgonManiaComboCounter>().FirstOrDefault();
                                 var spectatorList = container.OfType<SpectatorList>().FirstOrDefault();
+
+                                if (leaderboard != null)
+                                    leaderboard.Position = new Vector2(36, 115);
 
                                 if (combo != null)
                                 {
@@ -55,6 +59,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                                     spectatorList.Position = new Vector2(36, -66);
                             })
                             {
+                                new DrawableGameplayLeaderboard(),
                                 new ArgonManiaComboCounter(),
                                 new SpectatorList
                                 {
