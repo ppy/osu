@@ -7,6 +7,7 @@ using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.Play.HUD;
+using osu.Game.Screens.Select.Leaderboards;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
@@ -24,8 +25,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
             return user;
         }
 
-        protected override MultiplayerGameplayLeaderboard CreateLeaderboard() =>
-            new MultiplayerGameplayLeaderboard(MultiplayerUsers.ToArray())
+        protected override MultiplayerLeaderboardProvider CreateLeaderboardProvider() =>
+            new MultiplayerLeaderboardProvider(MultiplayerUsers.ToArray())
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -39,17 +40,17 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 LoadComponentAsync(new MatchScoreDisplay
                 {
-                    Team1Score = { BindTarget = Leaderboard!.TeamScores[0] },
-                    Team2Score = { BindTarget = Leaderboard.TeamScores[1] }
+                    Team1Score = { BindTarget = LeaderboardProvider!.TeamScores[0] },
+                    Team2Score = { BindTarget = LeaderboardProvider.TeamScores[1] }
                 }, Add);
 
                 LoadComponentAsync(new GameplayMatchScoreDisplay
                 {
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
-                    Team1Score = { BindTarget = Leaderboard.TeamScores[0] },
-                    Team2Score = { BindTarget = Leaderboard.TeamScores[1] },
-                    Expanded = { BindTarget = Leaderboard.Expanded },
+                    Team1Score = { BindTarget = LeaderboardProvider.TeamScores[0] },
+                    Team2Score = { BindTarget = LeaderboardProvider.TeamScores[1] },
+                    Expanded = { BindTarget = Leaderboard!.Expanded },
                 }, Add);
             });
         }

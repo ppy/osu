@@ -4,13 +4,12 @@
 using System;
 using osu.Framework.Timing;
 using osu.Game.Online.Multiplayer;
-using osu.Game.Screens.Play.HUD;
 
-namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
+namespace osu.Game.Screens.Select.Leaderboards
 {
-    public partial class MultiSpectatorLeaderboard : MultiplayerGameplayLeaderboard
+    public partial class MultiSpectatorLeaderboardProvider : MultiplayerLeaderboardProvider
     {
-        public MultiSpectatorLeaderboard(MultiplayerRoomUser[] users)
+        public MultiSpectatorLeaderboardProvider(MultiplayerRoomUser[] users)
             : base(users)
         {
         }
