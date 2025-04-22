@@ -262,15 +262,14 @@ namespace osu.Game.Screens.SelectV2
                 SelectedMods = { BindTarget = mods },
             }), loadedScores =>
             {
-                int delay = 100;
-                int accumulation = 1;
+                int delay = 200;
                 int i = 0;
 
-                foreach (var scoreDrawable in loadedScores)
+                foreach (var d in loadedScores)
                 {
-                    Container scoreDrawableContainer;
+                    Container animContainer;
 
-                    scoresContainer.Add(scoreDrawableContainer = new Container
+                    scoresContainer.Add(animContainer = new Container
                     {
                         Shear = -OsuGame.SHEAR,
                         Y = (BeatmapLeaderboardScore.HEIGHT + 4f) * i,
@@ -278,14 +277,16 @@ namespace osu.Game.Screens.SelectV2
                         AutoSizeAxes = Axes.Y,
                         Alpha = 0f,
                         Padding = new MarginPadding { Left = 80f },
-                        Child = scoreDrawable,
+                        Child = d,
                     });
 
-                    scoreDrawableContainer.Delay(delay).FadeIn(300, Easing.OutQuint);
-                    scoreDrawableContainer.MoveToX(-100f).Delay(delay).MoveToX(0f, 300, Easing.OutQuint);
+                    animContainer
+                        .MoveToX(-20f)
+                        .Delay(delay)
+                        .FadeIn(300, Easing.OutQuint)
+                        .MoveToX(0f, 300, Easing.OutQuint);
 
-                    delay += Math.Max(0, 50 - accumulation);
-                    accumulation *= 2;
+                    delay += 30;
                     i++;
                 }
             }, cancellation: cancellationTokenSource.Token);
@@ -307,11 +308,20 @@ namespace osu.Game.Screens.SelectV2
 
         private void clearScores()
         {
-            foreach (var scoreDrawable in scoresContainer)
+            float delay = 0;
+
+            foreach (var d in scoresContainer)
             {
-                scoreDrawable.MoveToX(-50f, 200, Easing.OutQuint);
-                scoreDrawable.FadeOut(200, Easing.OutQuint);
-                scoreDrawable.Expire();
+                // Avoid applying animations a second time to drawables which are already fading out.
+                if (d.LifetimeEnd != double.MaxValue)
+                    continue;
+
+                d.Delay(delay)
+                 .MoveToX(-10f, 120, Easing.Out)
+                 .FadeOut(120, Easing.Out)
+                 .Expire();
+
+                delay += 20;
             }
 
             personalBestDisplay.MoveToX(-100, 300, Easing.OutQuint);
