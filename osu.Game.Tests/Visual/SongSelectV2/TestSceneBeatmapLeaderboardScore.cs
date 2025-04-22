@@ -104,7 +104,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
                 foreach (var scoreInfo in getTestScores())
                 {
-                    fillFlow.Add(new BeatmapLeaderboardScore(scoreInfo)
+                    fillFlow.Add(new BeatmapLeaderboardScore(scoreInfo, sheared: false)
                     {
                         Rank = scoreInfo.Position,
                         IsPersonalBest = scoreInfo.User.Id == 2,
