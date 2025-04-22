@@ -8,7 +8,6 @@ using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
-using osu.Game.Extensions;
 using osu.Game.Online.API;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Rulesets;
@@ -72,9 +71,6 @@ namespace osu.Game.Screens.Select.Leaderboards
         private IBindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
 
         [Resolved]
-        private IAPIProvider api { get; set; } = null!;
-
-        [Resolved]
         private LeaderboardManager leaderboardManager { get; set; } = null!;
 
         [BackgroundDependencyLoader]
@@ -94,44 +90,7 @@ namespace osu.Game.Screens.Select.Leaderboards
         protected override APIRequest? FetchScores(CancellationToken cancellationToken)
         {
             var fetchBeatmapInfo = BeatmapInfo;
-
-            if (fetchBeatmapInfo == null)
-            {
-                SetErrorState(LeaderboardState.NoneSelected);
-                return null;
-            }
-
-            var fetchRuleset = ruleset.Value ?? fetchBeatmapInfo.Ruleset;
-
-            if (!api.IsLoggedIn && IsOnlineScope)
-            {
-                SetErrorState(LeaderboardState.NotLoggedIn);
-                return null;
-            }
-
-            if (!fetchRuleset.IsLegacyRuleset())
-            {
-                SetErrorState(LeaderboardState.RulesetUnavailable);
-                return null;
-            }
-
-            if ((fetchBeatmapInfo.OnlineID <= 0 || fetchBeatmapInfo.Status <= BeatmapOnlineStatus.Pending) && IsOnlineScope)
-            {
-                SetErrorState(LeaderboardState.BeatmapUnavailable);
-                return null;
-            }
-
-            if (Scope.RequiresSupporter(filterMods) && !api.LocalUser.Value.IsSupporter)
-            {
-                SetErrorState(LeaderboardState.NotSupporter);
-                return null;
-            }
-
-            if (Scope == BeatmapLeaderboardScope.Team && api.LocalUser.Value.Team == null)
-            {
-                SetErrorState(LeaderboardState.NoTeam);
-                return null;
-            }
+            var fetchRuleset = ruleset.Value ?? fetchBeatmapInfo?.Ruleset;
 
             leaderboardManager.FetchWithCriteriaAsync(new LeaderboardCriteria(fetchBeatmapInfo, fetchRuleset, Scope, filterMods ? mods.Value.ToArray() : null))
                               .ContinueWith(t =>
@@ -145,8 +104,12 @@ namespace osu.Game.Screens.Select.Leaderboards
                                   fetchedScores.UnbindEvents();
                                   fetchedScores.BindValueChanged(scores =>
                                   {
-                                      if (scores.NewValue != null)
+                                      if (scores.NewValue == null) return;
+
+                                      if (scores.NewValue.FailState == null)
                                           Schedule(() => SetScores(scores.NewValue.TopScores, scores.NewValue.UserScore));
+                                      else
+                                          Schedule(() => SetErrorState((LeaderboardState)scores.NewValue.FailState));
                                   }, true);
                               }, cancellationToken);
 
