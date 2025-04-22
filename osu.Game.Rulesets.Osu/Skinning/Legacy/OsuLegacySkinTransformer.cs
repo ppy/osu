@@ -72,6 +72,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
                                 var combo = container.OfType<LegacyDefaultComboCounter>().FirstOrDefault();
                                 var spectatorList = container.OfType<SpectatorList>().FirstOrDefault();
+                                var leaderboard = container.OfType<DrawableGameplayLeaderboard>().FirstOrDefault();
 
                                 Vector2 pos = new Vector2();
 
@@ -89,6 +90,16 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                                     spectatorList.Anchor = Anchor.BottomLeft;
                                     spectatorList.Origin = Anchor.BottomLeft;
                                     spectatorList.Position = pos;
+
+                                    // maximum height of the spectator list is around ~172 units
+                                    pos += new Vector2(0, -185);
+                                }
+
+                                if (leaderboard != null)
+                                {
+                                    leaderboard.Anchor = Anchor.BottomLeft;
+                                    leaderboard.Origin = Anchor.BottomLeft;
+                                    leaderboard.Position = pos;
                                 }
                             })
                             {
@@ -97,6 +108,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                                     new LegacyDefaultComboCounter(),
                                     new LegacyKeyCounterDisplay(),
                                     new SpectatorList(),
+                                    new DrawableGameplayLeaderboard(),
                                 }
                             };
                     }
