@@ -26,7 +26,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddBeatmaps(1, 3);
             AddStep("generate and add test beatmap", () =>
             {
-                baseTestBeatmap = TestResources.CreateTestBeatmapSetInfo();
+                baseTestBeatmap = TestResources.CreateTestBeatmapSetInfo(3);
 
                 var metadata = new BeatmapMetadata
                 {
@@ -82,6 +82,22 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddAssert("drawables changed", () => Carousel.ChildrenOfType<Panel>(), () => Is.Not.EqualTo(originalDrawables));
         }
 
+        [Test]
+        public void TestSelectionHeld()
+        {
+            SelectPrevGroup();
+
+            WaitForSelection(1, 0);
+            AddAssert("selection is updateable beatmap", () => Carousel.CurrentSelection, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
+            AddAssert("visible panel is updateable beatmap", () => GetSelectedPanel()?.Item?.Model, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
+
+            updateBeatmap();
+            WaitForSorting();
+
+            AddAssert("selection is updateable beatmap", () => Carousel.CurrentSelection, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
+            AddAssert("visible panel is updateable beatmap", () => GetSelectedPanel()?.Item?.Model, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
+        }
+
         private void updateBeatmap(Action<BeatmapInfo>? updateBeatmap = null, Action<BeatmapSetInfo>? updateSet = null)
         {
             AddStep("update beatmap with different reference", () =>
@@ -89,7 +105,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 var updatedSet = new BeatmapSetInfo
                 {
                     ID = baseTestBeatmap.ID,
-                    OnlineID = baseTestBeatmap.OnlineID,
+                    OnlineID = 99999, // this is just for tracking / debug purposes at the moment.
                     DateAdded = baseTestBeatmap.DateAdded,
                     DateSubmitted = baseTestBeatmap.DateSubmitted,
                     DateRanked = baseTestBeatmap.DateRanked,

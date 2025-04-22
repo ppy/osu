@@ -117,6 +117,11 @@ namespace osu.Game.Screens.SelectV2
 
                         if (matchingNewBeatmap != null)
                         {
+                            // TODO: should this exist in song select instead of here?
+                            // we need to ensure the global beatmap is also updated alongside changes.
+                            if (CurrentSelection != null && CheckModelEquality(beatmap, CurrentSelection))
+                                CurrentSelection = matchingNewBeatmap;
+
                             Items.ReplaceRange(previousIndex, 1, [matchingNewBeatmap]);
                             newSetBeatmaps.Remove(matchingNewBeatmap);
                         }
@@ -348,6 +353,7 @@ namespace osu.Game.Screens.SelectV2
 
         protected override bool CheckModelEquality(object x, object y)
         {
+            // TODO: this doesn't check online ID. probably need to account for that.
             if (x is BeatmapSetInfo beatmapSetX && y is BeatmapSetInfo beatmapSetY)
                 return beatmapSetX.Equals(beatmapSetY);
 
