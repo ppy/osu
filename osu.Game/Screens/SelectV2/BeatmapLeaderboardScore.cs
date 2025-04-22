@@ -45,7 +45,7 @@ using CommonStrings = osu.Game.Localisation.CommonStrings;
 
 namespace osu.Game.Screens.SelectV2
 {
-    public partial class BeatmapLeaderboardScore : OsuClickableContainer, IHasContextMenu, IHasCustomTooltip<ScoreInfo>
+    public sealed partial class BeatmapLeaderboardScore : OsuClickableContainer, IHasContextMenu, IHasCustomTooltip<ScoreInfo>
     {
         public Bindable<IReadOnlyList<Mod>> SelectedMods = new Bindable<IReadOnlyList<Mod>>();
 
@@ -66,7 +66,6 @@ namespace osu.Game.Screens.SelectV2
         private const float statistics_compact_min_width = 90;
         private const float rank_label_width = 60;
 
-        private readonly ScoreInfo score;
         private readonly bool sheared;
 
         public const int HEIGHT = 50;
@@ -109,7 +108,6 @@ namespace osu.Game.Screens.SelectV2
 
         private Container rightContent = null!;
 
-        protected Container RankContainer { get; private set; } = null!;
         private FillFlowContainer flagBadgeAndDateContainer = null!;
         private FillFlowContainer modsContainer = null!;
 
@@ -123,11 +121,12 @@ namespace osu.Game.Screens.SelectV2
         private Container rankLabelOverlay = null!;
 
         public ITooltip<ScoreInfo> GetCustomTooltip() => new LeaderboardScoreTooltip(colourProvider);
-        public virtual ScoreInfo TooltipContent => score;
+
+        public ScoreInfo TooltipContent { get; }
 
         public BeatmapLeaderboardScore(ScoreInfo score, bool sheared = true)
         {
-            this.score = score;
+            TooltipContent = score;
             this.sheared = sheared;
 
             Shear = sheared ? OsuGame.SHEAR : Vector2.Zero;
@@ -138,14 +137,14 @@ namespace osu.Game.Screens.SelectV2
         [BackgroundDependencyLoader]
         private void load()
         {
-            var user = score.User;
+            var user = TooltipContent.User;
 
             foregroundColour = colourProvider.Background5;
             backgroundColour = colourProvider.Background3;
             totalScoreBackgroundGradient = ColourInfo.GradientHorizontal(backgroundColour.Opacity(0), backgroundColour);
             personalBestGradient = ColourInfo.GradientHorizontal(personal_best_gradient_left, personal_best_gradient_right);
 
-            statisticsLabels = GetStatistics(score).Select(s => new ScoreComponentLabel(s, score)
+            statisticsLabels = getStatistics(TooltipContent).Select(s => new ScoreComponentLabel(s, TooltipContent)
             {
                 // ensure statistics container is the correct width when invalidating
                 AlwaysPresent = true,
@@ -238,18 +237,18 @@ namespace osu.Game.Screens.SelectV2
         {
             int maxMods = scoringMode.Value == ScoringMode.Standardised ? 4 : 5;
 
-            if (score.Mods.Length > 0)
+            if (TooltipContent.Mods.Length > 0)
             {
                 modsContainer.Padding = new MarginPadding { Top = 4f };
-                modsContainer.ChildrenEnumerable = score.Mods.AsOrdered().Take(Math.Min(maxMods, score.Mods.Length)).Select(mod => new ColouredModSwitchTiny(mod)
+                modsContainer.ChildrenEnumerable = TooltipContent.Mods.AsOrdered().Take(Math.Min(maxMods, TooltipContent.Mods.Length)).Select(mod => new ColouredModSwitchTiny(mod)
                 {
                     Scale = new Vector2(0.3125f)
                 });
 
-                if (score.Mods.Length > maxMods)
+                if (TooltipContent.Mods.Length > maxMods)
                 {
                     modsContainer.Remove(modsContainer[^1], true);
-                    modsContainer.Add(new MoreModSwitchTiny(score.Mods)
+                    modsContainer.Add(new MoreModSwitchTiny(TooltipContent.Mods)
                     {
                         Scale = new Vector2(0.3125f),
                     });
@@ -273,7 +272,7 @@ namespace osu.Game.Screens.SelectV2
                 new UserCoverBackground
                 {
                     RelativeSizeAxes = Axes.Both,
-                    User = score.User,
+                    User = TooltipContent.User,
                     Shear = sheared ? -OsuGame.SHEAR : Vector2.Zero,
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
@@ -364,7 +363,7 @@ namespace osu.Game.Screens.SelectV2
                                                 Origin = Anchor.CentreLeft,
                                                 Size = new Vector2(30, 15),
                                             },
-                                            new DateLabel(score.Date)
+                                            new DateLabel(TooltipContent.Date)
                                             {
                                                 Anchor = Anchor.CentreLeft,
                                                 Origin = Anchor.CentreLeft,
@@ -428,7 +427,7 @@ namespace osu.Game.Screens.SelectV2
                         Child = new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = ColourInfo.GradientHorizontal(backgroundColour.Opacity(0), OsuColour.ForRank(score.Rank)),
+                            Colour = ColourInfo.GradientHorizontal(backgroundColour.Opacity(0), OsuColour.ForRank(TooltipContent.Rank)),
                         },
                     },
                     new Box
@@ -437,7 +436,7 @@ namespace osu.Game.Screens.SelectV2
                         Width = grade_width,
                         Anchor = Anchor.TopRight,
                         Origin = Anchor.TopRight,
-                        Colour = OsuColour.ForRank(score.Rank),
+                        Colour = OsuColour.ForRank(TooltipContent.Rank),
                     },
                     new TrianglesV2
                     {
@@ -446,9 +445,9 @@ namespace osu.Game.Screens.SelectV2
                         Origin = Anchor.TopRight,
                         SpawnRatio = 2,
                         Velocity = 0.7f,
-                        Colour = ColourInfo.GradientHorizontal(backgroundColour.Opacity(0), OsuColour.ForRank(score.Rank).Darken(0.2f)),
+                        Colour = ColourInfo.GradientHorizontal(backgroundColour.Opacity(0), OsuColour.ForRank(TooltipContent.Rank).Darken(0.2f)),
                     },
-                    RankContainer = new Container
+                    new Container
                     {
                         Shear = sheared ? -OsuGame.SHEAR : Vector2.Zero,
                         Anchor = Anchor.CentreRight,
@@ -460,9 +459,9 @@ namespace osu.Game.Screens.SelectV2
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Spacing = new Vector2(-2),
-                            Colour = DrawableRank.GetRankNameColour(score.Rank),
+                            Colour = DrawableRank.GetRankNameColour(TooltipContent.Rank),
                             Font = OsuFont.Numeric.With(size: 14),
-                            Text = DrawableRank.GetRankName(score.Rank),
+                            Text = DrawableRank.GetRankName(TooltipContent.Rank),
                             ShadowColour = Color4.Black.Opacity(0.3f),
                             ShadowOffset = new Vector2(0, 0.08f),
                             Shadow = true,
@@ -492,7 +491,7 @@ namespace osu.Game.Screens.SelectV2
                                 new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Colour = ColourInfo.GradientHorizontal(backgroundColour.Opacity(0), OsuColour.ForRank(score.Rank).Opacity(0.5f)),
+                                    Colour = ColourInfo.GradientHorizontal(backgroundColour.Opacity(0), OsuColour.ForRank(TooltipContent.Rank).Opacity(0.5f)),
                                 },
                                 new FillFlowContainer
                                 {
@@ -509,7 +508,7 @@ namespace osu.Game.Screens.SelectV2
                                             Origin = Anchor.TopRight,
                                             UseFullGlyphHeight = false,
                                             Shear = sheared ? -OsuGame.SHEAR : Vector2.Zero,
-                                            Current = scoreManager.GetBindableTotalScoreString(score),
+                                            Current = scoreManager.GetBindableTotalScoreString(TooltipContent),
                                             Spacing = new Vector2(-1.5f),
                                             Font = OsuFont.Style.Subtitle.With(weight: FontWeight.Light, fixedWidth: true),
                                         },
@@ -535,7 +534,7 @@ namespace osu.Game.Screens.SelectV2
             },
         };
 
-        protected (CaseTransformableString, LocalisableString DisplayAccuracy)[] GetStatistics(ScoreInfo model) => new[]
+        private (CaseTransformableString, LocalisableString DisplayAccuracy)[] getStatistics(ScoreInfo model) => new[]
         {
             (BeatmapsetsStrings.ShowScoreboardHeadersCombo.ToUpper(), model.MaxCombo.ToString().Insert(model.MaxCombo.ToString().Length, "x")),
             (BeatmapsetsStrings.ShowScoreboardHeadersAccuracy.ToUpper(), model.DisplayAccuracy),
@@ -854,18 +853,18 @@ namespace osu.Game.Screens.SelectV2
                 List<MenuItem> items = new List<MenuItem>();
 
                 // system mods should never be copied across regardless of anything.
-                var copyableMods = score.Mods.Where(m => IsValidMod.Invoke(m) && m.Type != ModType.System).ToArray();
+                var copyableMods = TooltipContent.Mods.Where(m => IsValidMod.Invoke(m) && m.Type != ModType.System).ToArray();
 
                 if (copyableMods.Length > 0)
                     items.Add(new OsuMenuItem("Use these mods", MenuItemType.Highlighted, () => SelectedMods.Value = copyableMods));
 
-                if (score.OnlineID > 0)
-                    items.Add(new OsuMenuItem(CommonStrings.CopyLink, MenuItemType.Standard, () => clipboard?.SetText($@"{api.Endpoints.WebsiteUrl}/scores/{score.OnlineID}")));
+                if (TooltipContent.OnlineID > 0)
+                    items.Add(new OsuMenuItem(CommonStrings.CopyLink, MenuItemType.Standard, () => clipboard?.SetText($@"{api.Endpoints.WebsiteUrl}/scores/{TooltipContent.OnlineID}")));
 
-                if (score.Files.Count <= 0) return items.ToArray();
+                if (TooltipContent.Files.Count <= 0) return items.ToArray();
 
-                items.Add(new OsuMenuItem(CommonStrings.Export, MenuItemType.Standard, () => scoreManager.Export(score)));
-                items.Add(new OsuMenuItem(Resources.Localisation.Web.CommonStrings.ButtonsDelete, MenuItemType.Destructive, () => dialogOverlay?.Push(new LocalScoreDeleteDialog(score))));
+                items.Add(new OsuMenuItem(CommonStrings.Export, MenuItemType.Standard, () => scoreManager.Export(TooltipContent)));
+                items.Add(new OsuMenuItem(Resources.Localisation.Web.CommonStrings.ButtonsDelete, MenuItemType.Destructive, () => dialogOverlay?.Push(new LocalScoreDeleteDialog(TooltipContent))));
 
                 return items.ToArray();
             }
