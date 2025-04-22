@@ -108,6 +108,12 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         }
 
         [Test]
+        public void TestPersonalBest()
+        {
+            AddStep(@"Show personal best", showPersonalBest);
+        }
+
+        [Test]
         public void TestGlobalScoresDisplay()
         {
             setScope(BeatmapLeaderboardScope.Global);
@@ -118,12 +124,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 s.User.Team = new APITeam();
                 return s;
             })));
-        }
-
-        [Test]
-        public void TestPersonalBest()
-        {
-            AddStep(@"Show personal best", showPersonalBest);
         }
 
         [Test]
