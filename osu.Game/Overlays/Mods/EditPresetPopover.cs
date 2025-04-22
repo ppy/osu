@@ -112,20 +112,24 @@ namespace osu.Game.Overlays.Mods
                         Spacing = new Vector2(7),
                         Children = new Drawable[]
                         {
-                            useCurrentModsButton = new ShearedButton
+                            useCurrentModsButton = new ShearedButton(0)
                             {
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
+                                RelativeSizeAxes = Axes.X,
+                                Width = 1,
                                 Text = ModSelectOverlayStrings.UseCurrentMods,
                                 DarkerColour = colours.Blue1,
                                 LighterColour = colours.Blue0,
                                 TextColour = colourProvider.Background6,
                                 Action = useCurrentMods,
                             },
-                            saveButton = new ShearedButton
+                            saveButton = new ShearedButton(0)
                             {
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
+                                RelativeSizeAxes = Axes.X,
+                                Width = 1,
                                 Text = Resources.Localisation.Web.CommonStrings.ButtonsSave,
                                 DarkerColour = colours.Orange1,
                                 LighterColour = colours.Orange0,

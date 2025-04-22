@@ -63,10 +63,12 @@ namespace osu.Game.Overlays.Mods
                         Label = CommonStrings.Description,
                         TabbableContentContainer = this
                     },
-                    createButton = new ShearedButton
+                    createButton = new ShearedButton(0)
                     {
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
+                        RelativeSizeAxes = Axes.X,
+                        Width = 1,
                         Text = ModSelectOverlayStrings.AddPreset,
                         Action = createPreset
                     }
