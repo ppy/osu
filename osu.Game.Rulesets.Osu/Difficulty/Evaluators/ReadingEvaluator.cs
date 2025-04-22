@@ -28,6 +28,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             Vector2 currPosition = currObj.Position;
             double currVelocity = currObj.LazyJumpDistance / currObj.StrainTime;
             double angleNerfFactor = getConstantAngleNerfFactor(currObj);
+            // Console.Out.WriteLine(angleNerfFactor);
 
             double pastObjectDifficultyInfluence = 1.0;
             double overlapness = 0;
@@ -84,7 +85,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             if (currApproachRate < 500)
             {
-                preemptDifficulty += Math.Pow(500 - currApproachRate, 2.5) / 130000;
+                preemptDifficulty += Math.Pow(500 - currApproachRate, 2.5) / 110000;
 
                 // Nerf preempt on most comfortable densities
                 // https://www.desmos.com/calculator/31mrv4rlfh
@@ -112,7 +113,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 hiddenDifficulty *= angleNerfFactor;
 
                 // Buff perfect stacks
-                hiddenDifficulty += currObj.LazyJumpDistance == 0 ? 2 : 0;
+                hiddenDifficulty += currObj.LazyJumpDistance == 0 ? 1.5 : 0;
             }
 
             // Award only denser than average maps
@@ -193,7 +194,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 if (loopObj.Angle.IsNotNull() && current.Angle.IsNotNull())
                 {
                     double angleDifference = Math.Abs(current.Angle.Value - loopObj.Angle.Value);
-                    constantAngleCount += Math.Cos(4 * Math.Min(Math.PI / 8, angleDifference)) * longIntervalFactor;
+                    constantAngleCount += Math.Cos(2 * Math.Min(Math.PI / 4, angleDifference)) * longIntervalFactor;
                 }
 
                 currentTimeGap = current.StartTime - loopObj.StartTime;

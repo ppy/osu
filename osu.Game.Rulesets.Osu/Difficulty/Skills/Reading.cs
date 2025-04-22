@@ -10,9 +10,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
     public class Reading : OsuStrainSkill
     {
-        private double skillMultiplier => 9.0;
+        private double skillMultiplier => 11.0;
         private double currentStrain;
-        private double strainDecayBase => 0.2;
+        private double strainDecayBase => 0.3;
 
         public Reading(Mod[] mods)
             : base(mods)
