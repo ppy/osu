@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
@@ -74,18 +75,17 @@ namespace osu.Game.Screens.SelectV2
         {
             // TODO: moving management of BeatmapInfo tracking to BeatmapStore might be something we want to consider.
             // right now we are managing this locally which is a bit of added overhead.
-            IEnumerable<BeatmapSetInfo>? newBeatmapSets = changed.NewItems?.Cast<BeatmapSetInfo>();
-            IEnumerable<BeatmapSetInfo>? beatmapSetInfos = changed.OldItems?.Cast<BeatmapSetInfo>();
+            IEnumerable<BeatmapSetInfo>? newItems = changed.NewItems?.Cast<BeatmapSetInfo>();
+            IEnumerable<BeatmapSetInfo>? oldItems = changed.OldItems?.Cast<BeatmapSetInfo>();
 
             switch (changed.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    Items.AddRange(newBeatmapSets!.SelectMany(s => s.Beatmaps));
+                    Items.AddRange(newItems!.SelectMany(s => s.Beatmaps));
                     break;
 
                 case NotifyCollectionChangedAction.Remove:
-
-                    foreach (var set in beatmapSetInfos!)
+                    foreach (var set in oldItems!)
                     {
                         foreach (var beatmap in set.Beatmaps)
                             Items.RemoveAll(i => i is BeatmapInfo bi && beatmap.Equals(bi));
@@ -94,8 +94,43 @@ namespace osu.Game.Screens.SelectV2
                     break;
 
                 case NotifyCollectionChangedAction.Move:
+                    // We can ignore move operations as we are applying our own sort in all cases.
+                    break;
+
                 case NotifyCollectionChangedAction.Replace:
-                    throw new NotImplementedException();
+                    var oldSetBeatmaps = oldItems!.Single().Beatmaps;
+                    var newSetBeatmaps = newItems!.Single().Beatmaps.ToList();
+
+                    // Handling replace operations is a touch manual, as we need to locally diff the beatmaps of each version of the beatmap set.
+                    // Matching is done based on difficulty names as these are the most stable thing between updates (which are usually triggered
+                    // by users editing the beatmap or by difficulty/metadata recomputation).
+                    //
+                    // In the case of difficulty reprocessing, this will trigger multiple times per beatmap as it's always triggering a set update.
+                    // We may want to look to improve this in the future either here or at the source (only trigger an update after all difficulties
+                    // have been processed) if it becomes an issue for animation or performance reasons.
+                    foreach (var beatmap in oldSetBeatmaps)
+                    {
+                        int previousIndex = Items.IndexOf(beatmap);
+                        Debug.Assert(previousIndex >= 0);
+
+                        BeatmapInfo? matchingNewBeatmap = newSetBeatmaps.SingleOrDefault(b => b.DifficultyName == beatmap.DifficultyName && b.Ruleset.Equals(beatmap.Ruleset));
+
+                        if (matchingNewBeatmap != null)
+                        {
+                            Items.ReplaceRange(previousIndex, 1, [matchingNewBeatmap]);
+                            newSetBeatmaps.Remove(matchingNewBeatmap);
+                        }
+                        else
+                        {
+                            Items.RemoveAt(previousIndex);
+                        }
+                    }
+
+                    // Add any items which weren't found in the previous pass (difficulty names didn't match).
+                    foreach (var beatmap in newSetBeatmaps)
+                        Items.Add(beatmap);
+
+                    break;
 
                 case NotifyCollectionChangedAction.Reset:
                     Items.Clear();
