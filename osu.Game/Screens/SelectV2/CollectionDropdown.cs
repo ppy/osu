@@ -13,6 +13,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
+using osu.Game.Collections;
 using osu.Game.Database;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
@@ -20,12 +21,12 @@ using osu.Game.Graphics.UserInterfaceV2;
 using osuTK;
 using Realms;
 
-namespace osu.Game.Collections
+namespace osu.Game.Screens.SelectV2
 {
     /// <summary>
     /// A dropdown to select the collection to be used to filter results.
     /// </summary>
-    public partial class ShearedCollectionDropdown : ShearedDropdown<CollectionFilterMenuItem>
+    public partial class CollectionDropdown : ShearedDropdown<CollectionFilterMenuItem> // TODO: partial class under FilterControl?
     {
         /// <summary>
         /// Whether to show the "manage collections..." menu item in the dropdown.
@@ -46,7 +47,7 @@ namespace osu.Game.Collections
 
         private readonly CollectionFilterMenuItem allBeatmapsItem = new AllBeatmapsCollectionFilterMenuItem();
 
-        public ShearedCollectionDropdown()
+        public CollectionDropdown()
             : base("Collection")
         {
             ItemSource = filters;

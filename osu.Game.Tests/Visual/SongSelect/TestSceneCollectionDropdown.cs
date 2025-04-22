@@ -22,12 +22,12 @@ using osu.Game.Tests.Resources;
 using osuTK.Input;
 using Realms;
 
-namespace osu.Game.Tests.Visual.Collections
+namespace osu.Game.Tests.Visual.SongSelect
 {
-    public partial class TestSceneShearedCollectionDropdown : OsuManualInputManagerTestScene
+    public partial class TestSceneCollectionDropdown : OsuManualInputManagerTestScene
     {
         private BeatmapManager beatmapManager = null!;
-        private ShearedCollectionDropdown dropdown = null!;
+        private CollectionDropdown dropdown = null!;
 
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
@@ -51,7 +51,7 @@ namespace osu.Game.Tests.Visual.Collections
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
-                Child = dropdown = new ShearedCollectionDropdown
+                Child = dropdown = new CollectionDropdown
                 {
                     Width = 300,
                     Y = 100,
@@ -84,11 +84,11 @@ namespace osu.Game.Tests.Visual.Collections
             AddStep("add collection", () => writeAndRefresh(r => r.Add(new BeatmapCollection(name: "2"))));
             AddStep("add collection", () => writeAndRefresh(r => r.Add(new BeatmapCollection(name: "3"))));
 
-            AddAssert("check count 5", () => dropdown.ChildrenOfType<ShearedCollectionDropdown>().Single().ChildrenOfType<Menu.DrawableMenuItem>().Count(), () => Is.EqualTo(5));
+            AddAssert("check count 5", () => dropdown.ChildrenOfType<CollectionDropdown>().Single().ChildrenOfType<Menu.DrawableMenuItem>().Count(), () => Is.EqualTo(5));
 
             AddStep("delete all collections", () => writeAndRefresh(r => r.RemoveAll<BeatmapCollection>()));
 
-            AddAssert("check count 2", () => dropdown.ChildrenOfType<ShearedCollectionDropdown>().Single().ChildrenOfType<Menu.DrawableMenuItem>().Count(), () => Is.EqualTo(2));
+            AddAssert("check count 2", () => dropdown.ChildrenOfType<CollectionDropdown>().Single().ChildrenOfType<Menu.DrawableMenuItem>().Count(), () => Is.EqualTo(2));
         }
 
         [Test]
@@ -212,12 +212,12 @@ namespace osu.Game.Tests.Visual.Collections
             AddStep("watch for filter requests", () =>
             {
                 received = false;
-                dropdown.ChildrenOfType<ShearedCollectionDropdown>().First().RequestFilter = () => received = true;
+                dropdown.ChildrenOfType<CollectionDropdown>().First().RequestFilter = () => received = true;
             });
 
             AddStep("click manage collections filter", () =>
             {
-                int lastItemIndex = dropdown.ChildrenOfType<ShearedCollectionDropdown>().Single().Items.Count() - 1;
+                int lastItemIndex = dropdown.ChildrenOfType<CollectionDropdown>().Single().Items.Count() - 1;
                 InputManager.MoveMouseTo(getCollectionDropdownItemAt(lastItemIndex));
                 InputManager.Click(MouseButton.Left);
             });
@@ -237,7 +237,7 @@ namespace osu.Game.Tests.Visual.Collections
 
         private void assertCollectionHeaderDisplays(string collectionName, bool shouldDisplay = true)
             => AddUntilStep($"collection dropdown header displays '{collectionName}'",
-                () => shouldDisplay == dropdown.ChildrenOfType<ShearedCollectionDropdown.ShearedDropdownHeader>().Any(h => h.ChildrenOfType<SpriteText>().Any(t => t.Text == collectionName)));
+                () => shouldDisplay == dropdown.ChildrenOfType<CollectionDropdown.OsuDropdownHeader>().Any(h => h.ChildrenOfType<SpriteText>().Any(t => t.Text == collectionName)));
 
         private void assertFirstButtonIs(IconUsage icon) => AddUntilStep($"button is {icon.Icon.ToString()}", () => getAddOrRemoveButton(1).Icon.Equals(icon));
 
@@ -251,7 +251,7 @@ namespace osu.Game.Tests.Visual.Collections
 
         private void addExpandHeaderStep() => AddStep("expand header", () =>
         {
-            InputManager.MoveMouseTo(dropdown.ChildrenOfType<ShearedCollectionDropdown.ShearedDropdownHeader>().Single());
+            InputManager.MoveMouseTo(dropdown.ChildrenOfType<CollectionDropdown.OsuDropdownHeader>().Single());
             InputManager.Click(MouseButton.Left);
         });
 
@@ -264,7 +264,7 @@ namespace osu.Game.Tests.Visual.Collections
         private Menu.DrawableMenuItem getCollectionDropdownItemAt(int index)
         {
             // todo: we should be able to use Items, but apparently that's not guaranteed to be ordered... see: https://github.com/ppy/osu-framework/pull/6079
-            CollectionFilterMenuItem item = dropdown.ChildrenOfType<ShearedCollectionDropdown>().Single().ItemSource.ElementAt(index);
+            CollectionFilterMenuItem item = dropdown.ChildrenOfType<CollectionDropdown>().Single().ItemSource.ElementAt(index);
             return dropdown.ChildrenOfType<Menu.DrawableMenuItem>().Single(i => i.Item.Text.Value == item.CollectionName);
         }
     }

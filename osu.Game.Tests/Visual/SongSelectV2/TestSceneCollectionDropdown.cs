@@ -21,8 +21,9 @@ using osu.Game.Rulesets;
 using osu.Game.Tests.Resources;
 using osuTK.Input;
 using Realms;
+using CollectionDropdown = osu.Game.Screens.SelectV2.CollectionDropdown;
 
-namespace osu.Game.Tests.Visual.Collections
+namespace osu.Game.Tests.Visual.SongSelectV2
 {
     public partial class TestSceneCollectionDropdown : OsuManualInputManagerTestScene
     {
@@ -237,7 +238,7 @@ namespace osu.Game.Tests.Visual.Collections
 
         private void assertCollectionHeaderDisplays(string collectionName, bool shouldDisplay = true)
             => AddUntilStep($"collection dropdown header displays '{collectionName}'",
-                () => shouldDisplay == dropdown.ChildrenOfType<CollectionDropdown.OsuDropdownHeader>().Any(h => h.ChildrenOfType<SpriteText>().Any(t => t.Text == collectionName)));
+                () => shouldDisplay == dropdown.ChildrenOfType<CollectionDropdown.ShearedDropdownHeader>().Any(h => h.ChildrenOfType<SpriteText>().Any(t => t.Text == collectionName)));
 
         private void assertFirstButtonIs(IconUsage icon) => AddUntilStep($"button is {icon.Icon.ToString()}", () => getAddOrRemoveButton(1).Icon.Equals(icon));
 
@@ -251,7 +252,7 @@ namespace osu.Game.Tests.Visual.Collections
 
         private void addExpandHeaderStep() => AddStep("expand header", () =>
         {
-            InputManager.MoveMouseTo(dropdown.ChildrenOfType<CollectionDropdown.OsuDropdownHeader>().Single());
+            InputManager.MoveMouseTo(dropdown.ChildrenOfType<CollectionDropdown.ShearedDropdownHeader>().Single());
             InputManager.Click(MouseButton.Left);
         });
 
