@@ -20,7 +20,7 @@ using osu.Game.Tests.Resources;
 using osuTK;
 using osuTK.Input;
 
-namespace osu.Game.Tests.Visual.Collections
+namespace osu.Game.Tests.Visual.SongSelect
 {
     public partial class TestSceneManageCollectionsDialog : OsuManualInputManagerTestScene
     {

@@ -11,7 +11,7 @@ namespace osu.Game.Graphics.Carousel
     /// </summary>
     public sealed class CarouselItem : IComparable<CarouselItem>
     {
-        public const float DEFAULT_HEIGHT = 50;
+        public const float DEFAULT_HEIGHT = 45;
 
         /// <summary>
         /// The model this item is representing.
@@ -43,6 +43,11 @@ namespace osu.Game.Graphics.Carousel
         /// Whether this item is expanded or not. Should only be used for headers of groups.
         /// </summary>
         public bool IsExpanded { get; set; }
+
+        /// <summary>
+        /// The number of nested items underneath this header. Should only be used for headers of groups.
+        /// </summary>
+        public int NestedItemCount { get; set; }
 
         public CarouselItem(object model)
         {
