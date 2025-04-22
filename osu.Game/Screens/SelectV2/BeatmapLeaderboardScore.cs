@@ -398,8 +398,6 @@ namespace osu.Game.Screens.SelectV2
                                     Direction = FillDirection.Horizontal,
                                     Children = statisticsLabels,
                                     Alpha = 0,
-                                    LayoutEasing = Easing.OutQuint,
-                                    LayoutDuration = transition_duration,
                                 }
                             }
                         }
@@ -615,25 +613,26 @@ namespace osu.Game.Screens.SelectV2
 
             if (currentMode != mode)
             {
+                double duration = currentMode == null ? 0 : transition_duration;
                 if (mode >= DisplayMode.Full)
-                    rankLabelStandalone.FadeIn(transition_duration, Easing.OutQuint).ResizeWidthTo(rank_label_width, transition_duration, Easing.OutQuint);
+                    rankLabelStandalone.FadeIn(duration, Easing.OutQuint).ResizeWidthTo(rank_label_width, duration, Easing.OutQuint);
                 else
-                    rankLabelStandalone.FadeOut(transition_duration, Easing.OutQuint).ResizeWidthTo(0, transition_duration, Easing.OutQuint);
+                    rankLabelStandalone.FadeOut(duration, Easing.OutQuint).ResizeWidthTo(0, duration, Easing.OutQuint);
 
                 if (mode >= DisplayMode.Regular)
                 {
-                    statisticsContainer.FadeIn(transition_duration, Easing.OutQuint).MoveToX(0, transition_duration, Easing.OutQuint);
+                    statisticsContainer.FadeIn(duration, Easing.OutQuint).MoveToX(0, duration, Easing.OutQuint);
                     statisticsContainer.Direction = FillDirection.Horizontal;
-                    statisticsContainer.ScaleTo(1, transition_duration, Easing.OutQuint);
+                    statisticsContainer.ScaleTo(1, duration, Easing.OutQuint);
                 }
                 else if (mode >= DisplayMode.Compact)
                 {
-                    statisticsContainer.FadeIn(transition_duration, Easing.OutQuint).MoveToX(0, transition_duration, Easing.OutQuint);
+                    statisticsContainer.FadeIn(duration, Easing.OutQuint).MoveToX(0, duration, Easing.OutQuint);
                     statisticsContainer.Direction = FillDirection.Vertical;
-                    statisticsContainer.ScaleTo(0.8f, transition_duration, Easing.OutQuint);
+                    statisticsContainer.ScaleTo(0.8f, duration, Easing.OutQuint);
                 }
                 else
-                    statisticsContainer.FadeOut(transition_duration, Easing.OutQuint).MoveToX(statisticsContainer.DrawWidth, transition_duration, Easing.OutQuint);
+                    statisticsContainer.FadeOut(duration, Easing.OutQuint).MoveToX(statisticsContainer.DrawWidth, duration, Easing.OutQuint);
 
                 currentMode = mode;
             }
