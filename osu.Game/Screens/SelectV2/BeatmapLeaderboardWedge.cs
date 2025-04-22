@@ -193,7 +193,7 @@ namespace osu.Game.Screens.SelectV2
             var fetchBeatmapInfo = beatmap.Value.BeatmapInfo;
             var fetchRuleset = ruleset.Value ?? fetchBeatmapInfo.Ruleset;
 
-            if (!api.IsLoggedIn)
+            if (!api.IsLoggedIn && isOnlineScope)
             {
                 SetState(LeaderboardState.NotLoggedIn);
                 return;

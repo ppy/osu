@@ -210,6 +210,27 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         }
 
         [Test]
+        public void TestLocalScoresDisplayWorksWhenStartingOffline()
+        {
+            BeatmapInfo beatmapInfo = null!;
+
+            AddStep("Log out", () => API.Logout());
+            setScope(BeatmapLeaderboardScope.Local);
+
+            AddStep(@"Import beatmap", () =>
+            {
+                beatmapManager.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
+                beatmapInfo = beatmapManager.GetAllUsableBeatmapSets().First().Beatmaps.First();
+
+                Beatmap.Value = beatmapManager.GetWorkingBeatmap(beatmapInfo);
+            });
+
+            clearScores();
+            importMoreScores(() => beatmapInfo);
+            checkDisplayedCount(10);
+        }
+
+        [Test]
         public void TestLocalScoresDisplayOnBeatmapEdit()
         {
             BeatmapInfo beatmapInfo = null!;
