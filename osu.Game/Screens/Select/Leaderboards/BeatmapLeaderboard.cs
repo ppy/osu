@@ -92,6 +92,10 @@ namespace osu.Game.Screens.Select.Leaderboards
             var fetchBeatmapInfo = BeatmapInfo;
             var fetchRuleset = ruleset.Value ?? fetchBeatmapInfo?.Ruleset;
 
+            // Without this check, an initial fetch will be performed and clear global cache.
+            if (fetchBeatmapInfo == null)
+                return null;
+
             leaderboardManager.FetchWithCriteriaAsync(new LeaderboardCriteria(fetchBeatmapInfo, fetchRuleset, Scope, filterMods ? mods.Value.ToArray() : null))
                               .ContinueWith(t =>
                               {
