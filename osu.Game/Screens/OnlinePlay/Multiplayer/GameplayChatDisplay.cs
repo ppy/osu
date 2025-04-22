@@ -31,14 +31,15 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         private readonly Bindable<bool> expandedFromTextBoxFocus = new Bindable<bool>();
 
         private const float height = 100;
+        private const float width = 260;
 
         public override bool PropagateNonPositionalInputSubTree => true;
 
         public GameplayChatDisplay(Room room)
             : base(room, leaveChannelOnDispose: false)
         {
-            RelativeSizeAxes = Axes.X;
             Background.Alpha = 0.2f;
+            Width = width;
         }
 
         [BackgroundDependencyLoader]
