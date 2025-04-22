@@ -80,6 +80,7 @@ namespace osu.Game.Screens.OnlinePlay
                     Origin = Anchor.Centre,
                     Scale = new Vector2(0.8f),
                     Icon = FontAwesome.Solid.Bars,
+                    Enabled = { BindTarget = Enabled },
                     Action = () => freeModSelectOverlay.ToggleVisibility()
                 }
             });
