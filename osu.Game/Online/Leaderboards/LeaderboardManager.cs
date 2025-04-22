@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -31,8 +30,6 @@ namespace osu.Game.Online.Leaderboards
         public LeaderboardCriteria? CurrentCriteria { get; private set; }
 
         private IDisposable? localScoreSubscription;
-        private TaskCompletionSource<LeaderboardScores?>? localFetchCompletionSource;
-        private TaskCompletionSource<LeaderboardScores?>? lastFetchCompletionSource;
         private GetScoresRequest? inFlightOnlineRequest;
 
         [Resolved]
@@ -50,13 +47,12 @@ namespace osu.Game.Online.Leaderboards
         /// </summary>
         public void FetchWithCriteria(LeaderboardCriteria newCriteria)
         {
-            if (CurrentCriteria?.Equals(newCriteria) == true && lastFetchCompletionSource?.Task.IsFaulted == false)
+            if (CurrentCriteria?.Equals(newCriteria) == true && scores.Value?.FailState == null)
                 return;
 
             CurrentCriteria = newCriteria;
             localScoreSubscription?.Dispose();
             inFlightOnlineRequest?.Cancel();
-            lastFetchCompletionSource?.TrySetCanceled();
             scores.Value = null;
 
             if (newCriteria.Beatmap == null || newCriteria.Ruleset == null)
@@ -69,9 +65,6 @@ namespace osu.Game.Online.Leaderboards
             {
                 case BeatmapLeaderboardScope.Local:
                 {
-                    // this task completion source will be marked completed in the `localScoresChanged()` below.
-                    // yes it's twisty, but such are the costs of trying to reconcile data-push / subscription and data-pull / explicit fetch flows.
-                    lastFetchCompletionSource = localFetchCompletionSource = new TaskCompletionSource<LeaderboardScores?>();
                     localScoreSubscription = realm.RegisterForNotifications(r =>
                         r.All<ScoreInfo>().Filter($"{nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.ID)} == $0"
                                                   + $" AND {nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.Hash)} == {nameof(ScoreInfo.BeatmapHash)}"
@@ -113,9 +106,6 @@ namespace osu.Game.Online.Leaderboards
                         return;
                     }
 
-                    var onlineFetchCompletionSource = new TaskCompletionSource<LeaderboardScores?>();
-                    lastFetchCompletionSource = onlineFetchCompletionSource;
-
                     IReadOnlyList<Mod>? requestMods = null;
 
                     if (newCriteria.ExactMods != null)
@@ -139,13 +129,13 @@ namespace osu.Game.Online.Leaderboards
                             response.UserScore?.CreateScoreInfo(rulesets, newCriteria.Beatmap)
                         );
                         inFlightOnlineRequest = null;
-                        if (onlineFetchCompletionSource.TrySetResult(result))
-                            scores.Value = result;
+                        scores.Value = result;
                     };
                     newRequest.Failure += ex =>
                     {
                         Logger.Log($@"Failed to fetch leaderboards when displaying results: {ex}", LoggingTarget.Network);
-                        onlineFetchCompletionSource.TrySetResult(LeaderboardScores.Failure(LeaderboardFailState.NetworkFailure));
+                        if (ex is not OperationCanceledException)
+                            scores.Value = LeaderboardScores.Failure(LeaderboardFailState.NetworkFailure);
                     };
 
                     api.Queue(inFlightOnlineRequest = newRequest);
@@ -185,12 +175,6 @@ namespace osu.Game.Online.Leaderboards
             newScores = newScores.Detach().OrderByTotalScore();
 
             scores.Value = LeaderboardScores.Success(newScores.ToArray(), null);
-
-            if (localFetchCompletionSource != null && localFetchCompletionSource == lastFetchCompletionSource)
-            {
-                localFetchCompletionSource.SetResult(scores.Value);
-                localFetchCompletionSource = lastFetchCompletionSource = null;
-            }
         }
     }
 
