@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Extensions;
@@ -43,10 +44,14 @@ namespace osu.Game.Online.Leaderboards
         [Resolved]
         private RulesetStore rulesets { get; set; } = null!;
 
-        public Task<LeaderboardScores?> FetchWithCriteriaAsync(LeaderboardCriteria newCriteria)
+        /// <summary>
+        /// Fetch leaderboard content with the new criteria specified in the background.
+        /// On completion, <see cref="Scores"/> will be updated with the results from this call (unless a more recent call with a different criteria has completed).
+        /// </summary>
+        public void FetchWithCriteria(LeaderboardCriteria newCriteria)
         {
             if (CurrentCriteria?.Equals(newCriteria) == true && lastFetchCompletionSource?.Task.IsFaulted == false)
-                return lastFetchCompletionSource?.Task ?? Task.FromResult(Scores.Value);
+                return;
 
             CurrentCriteria = newCriteria;
             localScoreSubscription?.Dispose();
@@ -55,7 +60,10 @@ namespace osu.Game.Online.Leaderboards
             scores.Value = null;
 
             if (newCriteria.Beatmap == null || newCriteria.Ruleset == null)
-                return Task.FromResult<LeaderboardScores?>(scores.Value = LeaderboardScores.Failure(LeaderboardFailState.NoneSelected));
+            {
+                scores.Value = LeaderboardScores.Failure(LeaderboardFailState.NoneSelected);
+                return;
+            }
 
             switch (newCriteria.Scope)
             {
@@ -70,25 +78,40 @@ namespace osu.Game.Online.Leaderboards
                                                   + $" AND {nameof(ScoreInfo.Ruleset)}.{nameof(RulesetInfo.ShortName)} == $1"
                                                   + $" AND {nameof(ScoreInfo.DeletePending)} == false"
                             , newCriteria.Beatmap.ID, newCriteria.Ruleset.ShortName), localScoresChanged);
-                    return localFetchCompletionSource.Task;
+                    return;
                 }
 
                 default:
                 {
                     if (!api.IsLoggedIn)
-                        return Task.FromResult<LeaderboardScores?>(scores.Value = LeaderboardScores.Failure(LeaderboardFailState.NotLoggedIn));
+                    {
+                        scores.Value = LeaderboardScores.Failure(LeaderboardFailState.NotLoggedIn);
+                        return;
+                    }
 
                     if (!newCriteria.Ruleset.IsLegacyRuleset())
-                        return Task.FromResult<LeaderboardScores?>(scores.Value = LeaderboardScores.Failure(LeaderboardFailState.RulesetUnavailable));
+                    {
+                        scores.Value = LeaderboardScores.Failure(LeaderboardFailState.RulesetUnavailable);
+                        return;
+                    }
 
                     if (newCriteria.Beatmap.OnlineID <= 0 || newCriteria.Beatmap.Status <= BeatmapOnlineStatus.Pending)
-                        return Task.FromResult<LeaderboardScores?>(scores.Value = LeaderboardScores.Failure(LeaderboardFailState.BeatmapUnavailable));
+                    {
+                        scores.Value = LeaderboardScores.Failure(LeaderboardFailState.BeatmapUnavailable);
+                        return;
+                    }
 
                     if ((newCriteria.Scope.RequiresSupporter(newCriteria.ExactMods != null)) && !api.LocalUser.Value.IsSupporter)
-                        return Task.FromResult<LeaderboardScores?>(scores.Value = LeaderboardScores.Failure(LeaderboardFailState.NotSupporter));
+                    {
+                        scores.Value = LeaderboardScores.Failure(LeaderboardFailState.NotSupporter);
+                        return;
+                    }
 
                     if (newCriteria.Scope == BeatmapLeaderboardScope.Team && api.LocalUser.Value.Team == null)
-                        return Task.FromResult<LeaderboardScores?>(scores.Value = LeaderboardScores.Failure(LeaderboardFailState.NoTeam));
+                    {
+                        scores.Value = LeaderboardScores.Failure(LeaderboardFailState.NoTeam);
+                        return;
+                    }
 
                     var onlineFetchCompletionSource = new TaskCompletionSource<LeaderboardScores?>();
                     lastFetchCompletionSource = onlineFetchCompletionSource;
@@ -119,9 +142,14 @@ namespace osu.Game.Online.Leaderboards
                         if (onlineFetchCompletionSource.TrySetResult(result))
                             scores.Value = result;
                     };
-                    newRequest.Failure += _ => onlineFetchCompletionSource.TrySetResult(LeaderboardScores.Failure(LeaderboardFailState.NetworkFailure));
+                    newRequest.Failure += ex =>
+                    {
+                        Logger.Log($@"Failed to fetch leaderboards when displaying results: {ex}", LoggingTarget.Network);
+                        onlineFetchCompletionSource.TrySetResult(LeaderboardScores.Failure(LeaderboardFailState.NetworkFailure));
+                    };
+
                     api.Queue(inFlightOnlineRequest = newRequest);
-                    return onlineFetchCompletionSource.Task;
+                    break;
                 }
             }
         }
