@@ -167,12 +167,21 @@ namespace osu.Game.Screens.OnlinePlay
                 freeModsFooterButton.Enabled.Value = true;
         }
 
+        /// <summary>
+        /// Removes invalid mods from <see cref="OsuScreen.Mods"/> and <see cref="FreeMods"/>,
+        /// and updates mod selection overlays to display the new mods valid for selection.
+        /// </summary>
         private void updateValidMods()
         {
-            // Remove invalid mods and display the newly available mod panels.
-            Mods.Value = Mods.Value.Where(isValidRequiredMod).ToArray();
+            Mod[] validMods = Mods.Value.Where(isValidRequiredMod).ToArray();
+            if (!validMods.SequenceEqual(Mods.Value))
+                Mods.Value = validMods;
+
+            Mod[] validFreeMods = FreeMods.Value.Where(isValidAllowedMod).ToArray();
+            if (!validFreeMods.SequenceEqual(FreeMods.Value))
+                FreeMods.Value = validFreeMods;
+
             ModSelect.IsValidMod = isValidRequiredMod;
-            FreeMods.Value = FreeMods.Value.Where(isValidAllowedMod).ToArray();
             freeModSelect.IsValidMod = isValidAllowedMod;
         }
 
