@@ -246,8 +246,6 @@ namespace osu.Game.Screens.SelectV2
                 if (beatmap.IsDefault)
                 {
                     ratingAndNameContainer.FadeOut(300, Easing.OutQuint);
-                    difficultyText.Text = string.Empty;
-                    mapperText.Text = string.Empty;
                     countStatisticsDisplay.Statistics = Array.Empty<StatisticDifficulty.Data>();
                 }
                 else
