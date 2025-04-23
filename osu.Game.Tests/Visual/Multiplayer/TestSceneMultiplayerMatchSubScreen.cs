@@ -426,6 +426,31 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("countdown started", () => MultiplayerClient.ServerRoom!.ActiveCountdowns.Any());
         }
 
+        [Test]
+        public void TestSettingsRemainsOpenOnRoomUpdate()
+        {
+            AddStep("set playlist", () =>
+            {
+                room.Playlist =
+                [
+                    new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First()).BeatmapInfo)
+                    {
+                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID
+                    }
+                ];
+            });
+
+            ClickButtonWhenEnabled<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>();
+
+            AddUntilStep("wait for room join", () => RoomJoined);
+
+            AddStep("open settings", () => this.ChildrenOfType<MultiplayerMatchSettingsOverlay>().Single().Show());
+            AddAssert("settings opened", () => this.ChildrenOfType<MultiplayerMatchSettingsOverlay>().Single().State.Value, () => Is.EqualTo(Visibility.Visible));
+
+            AddStep("trigger room update", () => MultiplayerClient.AddPlaylistItem(MultiplayerClient.ServerRoom!.Playlist[0].Clone()));
+            AddAssert("settings still open", () => this.ChildrenOfType<MultiplayerMatchSettingsOverlay>().Single().State.Value, () => Is.EqualTo(Visibility.Visible));
+        }
+
         private partial class TestMultiplayerMatchSubScreen : MultiplayerMatchSubScreen
         {
             [Resolved(canBeNull: true)]
