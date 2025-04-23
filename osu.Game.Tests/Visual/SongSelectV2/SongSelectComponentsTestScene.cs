@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Testing;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Overlays;
@@ -24,21 +25,27 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         private Container? resizeContainer;
         private float relativeWidth;
 
+        protected virtual Anchor ComponentAnchor => Anchor.TopLeft;
+        protected virtual float InitialRelativeWidth => 0.5f;
+
         [BackgroundDependencyLoader]
         private void load()
         {
-            base.Content.Child = resizeContainer = new Container
+            base.Content.Child = new PopoverContainer
             {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-                Width = relativeWidth,
-                Children = new Drawable[]
+                RelativeSizeAxes = Axes.Both,
+                Child = resizeContainer = new Container
                 {
-                    Content
+                    Anchor = ComponentAnchor,
+                    Origin = ComponentAnchor,
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Width = relativeWidth,
+                    Child = Content
                 }
             };
 
-            AddSliderStep("change relative width", 0, 1f, 1f, v =>
+            AddSliderStep("change relative width", 0, 1f, InitialRelativeWidth, v =>
             {
                 if (resizeContainer != null)
                     resizeContainer.Width = v;

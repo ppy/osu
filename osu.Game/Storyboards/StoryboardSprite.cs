@@ -17,7 +17,7 @@ namespace osu.Game.Storyboards
         private readonly List<StoryboardTriggerGroup> triggerGroups = new List<StoryboardTriggerGroup>();
 
         public string Path { get; }
-        public bool IsDrawable => HasCommands;
+        public virtual bool IsDrawable => HasCommands;
 
         public Anchor Origin;
         public Vector2 InitialPosition;
