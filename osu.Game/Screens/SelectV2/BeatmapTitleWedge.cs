@@ -41,6 +41,8 @@ namespace osu.Game.Screens.SelectV2
         [Resolved]
         private IBindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
 
+        protected override bool StartHidden => true;
+
         private ModSettingChangeTracker? settingChangeTracker;
 
         private BeatmapSetOnlineStatusPill statusPill = null!;
@@ -70,6 +72,8 @@ namespace osu.Game.Screens.SelectV2
 
         private APIBeatmapSet? currentOnlineBeatmapSet;
         private GetBeatmapSetRequest? currentRequest;
+
+        private FillFlowContainer statisticsFlow = null!;
 
         public BeatmapTitleWedge()
         {
@@ -139,14 +143,12 @@ namespace osu.Game.Screens.SelectV2
                                 },
                             }
                         }),
-                        new ShearAligningWrapper(new FillFlowContainer
+                        new ShearAligningWrapper(statisticsFlow = new FillFlowContainer
                         {
                             Shear = -OsuGame.SHEAR,
                             AutoSizeAxes = Axes.Both,
                             Direction = FillDirection.Horizontal,
                             Spacing = new Vector2(2f, 0f),
-                            AutoSizeDuration = 100,
-                            AutoSizeEasing = Easing.OutQuint,
                             Children = new Drawable[]
                             {
                                 playCount = new StatisticPlayCount(background: true, leftPadding: SongSelect.WEDGE_CONTENT_MARGIN, minSize: 50f)
@@ -198,7 +200,8 @@ namespace osu.Game.Screens.SelectV2
 
             updateDisplay();
 
-            FinishTransforms(true);
+            statisticsFlow.AutoSizeDuration = 100;
+            statisticsFlow.AutoSizeEasing = Easing.OutQuint;
         }
 
         protected override void PopIn()

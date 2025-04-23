@@ -231,8 +231,6 @@ namespace osu.Game.Screens.SelectV2
                 });
 
                 updateDisplay();
-
-                FinishTransforms(true);
             }
 
             [Resolved]
