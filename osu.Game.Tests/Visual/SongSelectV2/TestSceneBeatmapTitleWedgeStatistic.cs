@@ -29,14 +29,22 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         public void TestLoading()
         {
             AddStep("setup", () => CreateThemedContent(OverlayColourScheme.Aquamarine));
-            AddStep("set loading", () => this.ChildrenOfType<BeatmapTitleWedge.Statistic>().ForEach(s => s.Value = null));
+            AddStep("set loading", () => this.ChildrenOfType<BeatmapTitleWedge.Statistic>().ForEach(s => s.Text = null));
             AddWaitStep("wait", 3);
             AddStep("set values", () =>
             {
                 playCount.Value = new BeatmapTitleWedge.StatisticPlayCount.Data(1234, 12);
-                statistic2.Value = "3,234";
-                statistic3.Value = "12:34";
-                statistic4.Value = "123";
+                statistic2.Text = "3,234";
+                statistic3.Text = "12:34";
+                statistic4.Text = "123";
+            });
+
+            AddStep("set large values", () =>
+            {
+                playCount.Value = new BeatmapTitleWedge.StatisticPlayCount.Data(134587921, 502);
+                statistic2.Text = "1,048,576";
+                statistic3.Text = "2:50:23";
+                statistic4.Text = "1238014";
             });
         }
 
@@ -54,18 +62,18 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 },
                 statistic2 = new BeatmapTitleWedge.Statistic(OsuIcon.Clock, true, minSize: 30)
                 {
-                    Value = "3,234",
+                    Text = "3,234",
                     TooltipText = "Statistic 2",
                 },
                 statistic3 = new BeatmapTitleWedge.Statistic(OsuIcon.Metronome)
                 {
-                    Value = "12:34",
+                    Text = "12:34",
                     Margin = new MarginPadding { Right = 10f },
                     TooltipText = "Statistic 3",
                 },
                 statistic4 = new BeatmapTitleWedge.Statistic(OsuIcon.Graphics)
                 {
-                    Value = "123",
+                    Text = "123",
                     TooltipText = "Statistic 4",
                 },
             },

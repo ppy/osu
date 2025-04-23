@@ -29,27 +29,15 @@ namespace osu.Game.Screens.SelectV2
             private OsuSpriteText valueText = null!;
             private LoadingSpinner loading = null!;
 
-            private LocalisableString? value;
+            private LocalisableString? text;
 
-            public LocalisableString? Value
+            public LocalisableString? Text
             {
-                get => value;
+                get => text;
                 set
                 {
-                    this.value = value;
-
-                    Schedule(() =>
-                    {
-                        loading.State.Value = value != null ? Visibility.Hidden : Visibility.Visible;
-
-                        if (value != null)
-                        {
-                            valueText.Text = value.Value;
-                            valueText.FadeIn(120, Easing.OutQuint);
-                        }
-                        else
-                            valueText.FadeOut(120, Easing.OutQuint);
-                    });
+                    text = value;
+                    Scheduler.AddOnce(updateDisplay);
                 }
             }
 
@@ -145,6 +133,25 @@ namespace osu.Game.Screens.SelectV2
                         },
                     }
                 };
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                Scheduler.AddOnce(updateDisplay);
+            }
+
+            private void updateDisplay()
+            {
+                loading.State.Value = text != null ? Visibility.Hidden : Visibility.Visible;
+
+                if (text != null)
+                {
+                    valueText.Text = text.Value;
+                    valueText.FadeIn(120, Easing.OutQuint);
+                }
+                else
+                    valueText.FadeOut(120, Easing.OutQuint);
             }
         }
     }
