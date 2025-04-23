@@ -139,8 +139,6 @@ namespace osu.Game.Screens.SelectV2
                     loading = new LoadingLayer(),
                 }
             };
-
-            fetchedScores.BindTo(leaderboardManager.Scores);
         }
 
         protected override void LoadComplete()
