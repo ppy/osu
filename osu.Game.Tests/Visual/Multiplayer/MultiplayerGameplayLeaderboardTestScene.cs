@@ -10,6 +10,7 @@ using Moq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Configuration;
@@ -20,6 +21,7 @@ using osu.Game.Online.Spectator;
 using osu.Game.Replays.Legacy;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play.HUD;
+using osu.Game.Screens.Select.Leaderboards;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
@@ -29,11 +31,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         protected readonly BindableList<MultiplayerRoomUser> MultiplayerUsers = new BindableList<MultiplayerRoomUser>();
 
-        protected MultiplayerGameplayLeaderboard? Leaderboard { get; private set; }
+        protected MultiplayerLeaderboardProvider? LeaderboardProvider { get; private set; }
+
+        protected DrawableGameplayLeaderboard? Leaderboard { get; private set; }
 
         protected virtual MultiplayerRoomUser CreateUser(int userId) => new MultiplayerRoomUser(userId);
 
-        protected abstract MultiplayerGameplayLeaderboard CreateLeaderboard();
+        protected abstract MultiplayerLeaderboardProvider CreateLeaderboardProvider();
 
         private readonly BindableList<int> multiplayerUserIds = new BindableList<int>();
         private readonly BindableDictionary<int, SpectatorState> watchedUserStates = new BindableDictionary<int, SpectatorState>();
@@ -124,19 +128,38 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("create leaderboard", () =>
             {
-                Leaderboard?.Expire();
+                Clear(true);
 
                 Beatmap.Value = CreateWorkingBeatmap(Ruleset.Value);
 
-                LoadComponentAsync(Leaderboard = CreateLeaderboard(), Add);
+                LoadComponentAsync(LeaderboardProvider = CreateLeaderboardProvider(), Add);
+                Add(new DependencyProvidingContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    CachedDependencies = [(typeof(IGameplayLeaderboardProvider), LeaderboardProvider)],
+                    Child = Leaderboard = new DrawableGameplayLeaderboard
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                    }
+                });
             });
 
             AddUntilStep("wait for load", () => Leaderboard!.IsLoaded);
 
-            AddStep("check watch requests were sent", () =>
+            AddUntilStep("check watch requests were sent", () =>
             {
-                foreach (var user in MultiplayerUsers)
-                    spectatorClient.Verify(s => s.WatchUser(user.UserID), Times.Once);
+                try
+                {
+                    foreach (var user in MultiplayerUsers)
+                        spectatorClient.Verify(s => s.WatchUser(user.UserID), Times.Once);
+
+                    return true;
+                }
+                catch (MockException)
+                {
+                    return false;
+                }
             });
         }
 
@@ -159,10 +182,18 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 return false;
             });
 
-            AddStep("check stop watching requests were sent", () =>
+            AddUntilStep("check stop watching requests were sent", () =>
             {
-                foreach (var user in MultiplayerUsers)
-                    spectatorClient.Verify(s => s.StopWatchingUser(user.UserID), Times.Once);
+                try
+                {
+                    foreach (var user in MultiplayerUsers)
+                        spectatorClient.Verify(s => s.StopWatchingUser(user.UserID), Times.Once);
+                    return true;
+                }
+                catch (MockException)
+                {
+                    return false;
+                }
             });
         }
 
@@ -204,12 +235,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         header.Combo++;
                         header.MaxCombo = Math.Max(header.MaxCombo, header.Combo);
                         header.Statistics[HitResult.Meh]++;
+                        header.TotalScore += 50;
                         break;
 
                     default:
                         header.Combo++;
                         header.MaxCombo = Math.Max(header.MaxCombo, header.Combo);
                         header.Statistics[HitResult.Great]++;
+                        header.TotalScore += 300;
                         break;
                 }
 
@@ -218,3 +251,4 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
     }
 }
+

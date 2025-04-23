@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -24,6 +23,8 @@ namespace osu.Game.Beatmaps.Drawables
     /// </summary>
     public partial class StarRatingDisplay : CompositeDrawable, IHasCurrentValue<StarDifficulty>
     {
+        public const double TRANSFORM_DURATION = 750;
+
         private readonly bool animated;
         private readonly Box background;
         private readonly SpriteIcon starIcon;
@@ -37,9 +38,13 @@ namespace osu.Game.Beatmaps.Drawables
             set => current.Current = value;
         }
 
-        private readonly Bindable<double> displayedStars = new BindableDouble();
+        /// <summary>
+        /// The difficulty colour currently displayed.
+        /// Can be used to have other components match the spectrum animation.
+        /// </summary>
+        public Color4 DisplayedDifficultyColour => background.Colour;
 
-        private readonly Container textContainer;
+        private readonly Bindable<double> displayedStars = new BindableDouble();
 
         /// <summary>
         /// The currently displayed stars of this display wrapped in a bindable.
@@ -119,19 +124,14 @@ namespace osu.Game.Beatmaps.Drawables
                                     Size = new Vector2(8f),
                                 },
                                 Empty(),
-                                textContainer = new Container
+                                starsText = new OsuSpriteText
                                 {
-                                    AutoSizeAxes = Axes.Y,
-                                    Child = starsText = new OsuSpriteText
-                                    {
-                                        Anchor = Anchor.Centre,
-                                        Origin = Anchor.Centre,
-                                        Margin = new MarginPadding { Bottom = 1.5f },
-                                        // todo: this should be size: 12f, but to match up with the design, it needs to be 14.4f
-                                        // see https://github.com/ppy/osu-framework/issues/3271.
-                                        Font = OsuFont.Torus.With(size: 14.4f, weight: FontWeight.Bold),
-                                        Shadow = false,
-                                    },
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    Margin = new MarginPadding { Bottom = 1.5f },
+                                    Spacing = new Vector2(-1.4f),
+                                    Font = OsuFont.Torus.With(size: 14.4f, weight: FontWeight.Bold, fixedWidth: true),
+                                    Shadow = false,
                                 },
                             }
                         }
@@ -147,7 +147,7 @@ namespace osu.Game.Beatmaps.Drawables
             Current.BindValueChanged(c =>
             {
                 if (animated)
-                    this.TransformBindableTo(displayedStars, c.NewValue.Stars, 750, Easing.OutQuint);
+                    this.TransformBindableTo(displayedStars, c.NewValue.Stars, TRANSFORM_DURATION, Easing.OutQuint);
                 else
                     displayedStars.Value = c.NewValue.Stars;
             });
@@ -160,13 +160,8 @@ namespace osu.Game.Beatmaps.Drawables
 
                 background.Colour = colours.ForStarDifficulty(s.NewValue);
 
-                starIcon.Colour = s.NewValue >= 6.5 ? colours.Orange1 : colourProvider?.Background5 ?? Color4Extensions.FromHex("303d47");
-                starsText.Colour = s.NewValue >= 6.5 ? colours.Orange1 : colourProvider?.Background5 ?? Color4.Black.Opacity(0.75f);
-
-                // In order to avoid autosize throwing the width of these displays all over the place,
-                // let's lock in some sane defaults for the text width based on how many digits we're
-                // displaying.
-                textContainer.Width = 24 + Math.Max(starsText.Text.ToString().Length - 4, 0) * 6;
+                starIcon.Colour = s.NewValue >= OsuColour.STAR_DIFFICULTY_DEFINED_COLOUR_CUTOFF ? colours.Orange1 : colourProvider?.Background5 ?? Color4Extensions.FromHex("303d47");
+                starsText.Colour = s.NewValue >= OsuColour.STAR_DIFFICULTY_DEFINED_COLOUR_CUTOFF ? colours.Orange1 : colourProvider?.Background5 ?? Color4.Black.Opacity(0.75f);
             }, true);
         }
     }

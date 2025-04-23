@@ -22,7 +22,7 @@ using osu.Game.Rulesets.Taiko;
 using osu.Game.Screens;
 using osu.Game.Screens.Footer;
 using osu.Game.Screens.Menu;
-using osu.Game.Screens.SelectV2.Footer;
+using osu.Game.Screens.SelectV2;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.SongSelectV2
@@ -78,7 +78,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         {
             base.SetUpSteps();
 
-            AddStep("load screen", () => Stack.Push(new Screens.SelectV2.SoloSongSelect()));
+            AddStep("load screen", () => Stack.Push(new SoloSongSelect()));
             AddUntilStep("wait for load", () => Stack.CurrentScreen is Screens.SelectV2.SongSelect songSelect && songSelect.IsLoaded);
         }
 
@@ -199,7 +199,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         {
             AddStep("Press F1", () =>
             {
-                InputManager.MoveMouseTo(this.ChildrenOfType<ScreenFooterButtonMods>().Single());
+                InputManager.MoveMouseTo(this.ChildrenOfType<FooterButtonMods>().Single());
                 InputManager.Click(MouseButton.Left);
             });
             AddAssert("Overlay visible", () => this.ChildrenOfType<ModSelectOverlay>().Single().State.Value == Visibility.Visible);

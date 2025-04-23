@@ -218,7 +218,7 @@ namespace osu.Game.Tests.Visual.Online
         }
 
         private void waitForLoad()
-            => AddUntilStep("wait for panels to load", () => this.ChildrenOfType<LoadingSpinner>().Single().State.Value, () => Is.EqualTo(Visibility.Hidden));
+            => AddUntilStep("wait for panels to load", () => this.ChildrenOfType<LoadingSpinner>().First().State.Value, () => Is.EqualTo(Visibility.Hidden));
 
         private void assertVisiblePanelCount<T>(int expectedVisible)
             where T : UserPanel

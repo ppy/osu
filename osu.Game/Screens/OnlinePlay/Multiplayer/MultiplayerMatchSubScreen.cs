@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -35,6 +34,7 @@ using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Participants;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Spectate;
+using osu.Game.Screens.OnlinePlay.Playlists;
 using osu.Game.Users;
 using osu.Game.Utils;
 using osuTK;
@@ -276,7 +276,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                                                             new MultiplayerPlaylist
                                                                             {
                                                                                 RelativeSizeAxes = Axes.Both,
-                                                                                RequestEdit = ShowSongSelect
+                                                                                RequestEdit = ShowSongSelect,
+                                                                                RequestResults = showResults
                                                                             }
                                                                         },
                                                                         new Drawable[]
@@ -429,14 +430,25 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         /// </summary>
         private void onRoomUpdated() => Scheduler.AddOnce(() =>
         {
-            bool newIsRoomJoined = client.Room != null;
+            bool wasRoomJoined = isRoomJoined;
+            isRoomJoined = client.Room != null;
 
-            if (newIsRoomJoined)
+            // Creating a room.
+            if (!wasRoomJoined && !isRoomJoined)
+            {
+                roomContent.Hide();
+                settingsOverlay.Show();
+            }
+
+            // Joining a room.
+            if (!wasRoomJoined && isRoomJoined)
             {
                 roomContent.Show();
                 settingsOverlay.Hide();
             }
-            else if (isRoomJoined)
+
+            // Leaving a room.
+            if (wasRoomJoined && !isRoomJoined)
             {
                 Logger.Log($"{this} exiting due to loss of room or connection");
 
@@ -445,17 +457,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 else
                     ValidForResume = false;
             }
-            else
-            {
-                Debug.Assert(!isRoomJoined && !newIsRoomJoined);
-
-                // A new room is being created.
-                // The main content should be hidden until the settings overlay is hidden, signaling the room is ready to be displayed.
-                roomContent.Hide();
-                settingsOverlay.Show();
-            }
-
-            isRoomJoined = newIsRoomJoined;
         });
 
         /// <summary>
@@ -465,7 +466,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
             if (settings.PlaylistItemId != lastPlaylistItemId)
             {
-                updateGameplayState();
+                Scheduler.AddOnce(updateGameplayState);
                 lastPlaylistItemId = settings.PlaylistItemId;
             }
 
@@ -478,7 +479,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         private void onItemChanged(MultiplayerPlaylistItem item)
         {
             if (item.ID == client.Room?.Settings.PlaylistItemId)
-                updateGameplayState();
+                Scheduler.AddOnce(updateGameplayState);
         }
 
         /// <summary>
@@ -487,7 +488,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         private void onUserStyleChanged(MultiplayerRoomUser user)
         {
             if (user.Equals(client.LocalUser))
-                updateGameplayState();
+                Scheduler.AddOnce(updateGameplayState);
         }
 
         /// <summary>
@@ -496,7 +497,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         private void onUserModsChanged(MultiplayerRoomUser user)
         {
             if (user.Equals(client.LocalUser))
-                updateGameplayState();
+                Scheduler.AddOnce(updateGameplayState);
         }
 
         /// <summary>
@@ -683,6 +684,19 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             MultiplayerPlaylistItem item = client.Room.CurrentPlaylistItem;
             this.Push(new MultiplayerMatchFreestyleSelect(room, new PlaylistItem(item)));
+        }
+
+        /// <summary>
+        /// Shows the results screen for a playlist item.
+        /// </summary>
+        private void showResults(PlaylistItem item)
+        {
+            if (!this.IsCurrentScreen() || client.Room == null || client.LocalUser == null)
+                return;
+
+            // fallback is to allow this class to operate when there is no parent OnlineScreen (testing purposes).
+            var targetScreen = (Screen?)parentScreen ?? this;
+            targetScreen.Push(new PlaylistItemUserBestResultsScreen(client.Room.RoomID, item, client.LocalUser.UserID));
         }
 
         public override void OnEntering(ScreenTransitionEvent e)

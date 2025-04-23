@@ -192,7 +192,7 @@ namespace osu.Game.Screens.Edit.Setup
                     // note that this triggers a full save flow, including triggering a difficulty calculation.
                     // this is not a cheap operation and should be reconsidered in the future.
                     var beatmapWorking = beatmaps.GetWorkingBeatmap(b);
-                    beatmaps.Save(b, beatmapWorking.Beatmap, beatmapWorking.GetSkin());
+                    beatmaps.Save(b, beatmapWorking.GetPlayableBeatmap(b.Ruleset), beatmapWorking.GetSkin());
                 }
             }
 

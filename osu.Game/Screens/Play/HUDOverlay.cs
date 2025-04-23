@@ -14,6 +14,7 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Configuration;
+using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
@@ -195,7 +196,7 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuConfigManager config, INotificationOverlay notificationOverlay)
+        private void load(OsuConfigManager config, RealmKeyBindingStore keyBindingStore, INotificationOverlay notificationOverlay)
         {
             if (drawableRuleset != null)
             {
@@ -214,7 +215,7 @@ namespace osu.Game.Screens.Play
 
                 notificationOverlay?.Post(new SimpleNotification
                 {
-                    Text = NotificationsStrings.ScoreOverlayDisabled(config.LookupKeyBindings(GlobalAction.ToggleInGameInterface))
+                    Text = NotificationsStrings.ScoreOverlayDisabled(keyBindingStore.GetBindingsStringFor(GlobalAction.ToggleInGameInterface))
                 });
             }
 
