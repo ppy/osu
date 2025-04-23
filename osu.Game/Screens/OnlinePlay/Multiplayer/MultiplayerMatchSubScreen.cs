@@ -433,10 +433,17 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
             bool newIsRoomJoined = client.Room != null;
 
+            bool wasSettingsVisible = settingsOverlay.State.Value == Visibility.Visible;
+            bool isStillHost = client.Room?.Host?.User?.Id == client.LocalUser?.User?.Id;
+
             if (newIsRoomJoined)
             {
                 roomContent.Show();
-                settingsOverlay.Hide();
+
+                if (!isStillHost || !wasSettingsVisible)
+                    settingsOverlay.Hide();
+                else
+                    settingsOverlay.Show();
             }
             else if (isRoomJoined)
             {
