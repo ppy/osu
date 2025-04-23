@@ -5,7 +5,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
@@ -16,7 +15,6 @@ using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Lists;
-using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Audio;
 using osu.Game.Configuration;
@@ -62,6 +60,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
         public readonly Bindable<Color4> AccentColour = new Bindable<Color4>(Color4.Gray);
 
         protected PausableSkinnableSound Samples { get; private set; }
+
+        private bool samplesLoaded;
 
         public virtual IEnumerable<HitSampleInfo> GetSamples() => HitObject.Samples;
 
@@ -227,6 +227,12 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             comboColourBrightness.BindValueChanged(_ => UpdateComboColour());
 
+            samplesBindable.BindCollectionChanged((_, _) =>
+            {
+                if (samplesLoaded)
+                    LoadSamples();
+            });
+
             // Apply transforms
             updateStateFromResult();
         }
@@ -293,8 +299,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
             }
 
             samplesBindable.BindTo(HitObject.SamplesBindable);
-            samplesBindable.BindCollectionChanged(onSamplesChanged, true);
-
             HitObject.DefaultsApplied += onDefaultsApplied;
 
             OnApply();
@@ -335,11 +339,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             samplesBindable.UnbindFrom(HitObject.SamplesBindable);
 
-            // When a new hitobject is applied, the samples will be cleared before re-populating.
-            // In order to stop this needless update, the event is unbound and re-bound as late as possible in Apply().
-            samplesBindable.CollectionChanged -= onSamplesChanged;
-
             // Release the samples for other hitobjects to use.
+            samplesLoaded = false;
             Samples?.ClearSamples();
 
             foreach (var obj in nestedHitObjects)
@@ -395,8 +396,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             Samples.Samples = samples.Cast<ISampleInfo>().ToArray();
         }
-
-        private void onSamplesChanged(object sender, NotifyCollectionChangedEventArgs e) => LoadSamples();
 
         private void onNewResult(DrawableHitObject drawableHitObject, JudgementResult result) => OnNewResult?.Invoke(drawableHitObject, result);
 
@@ -631,6 +630,33 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         #endregion
 
+        protected override void Update()
+        {
+            // We use a flag here to load samples only when they are required to be played.
+            // Why in Update and not PlaySamples? Because some hit object implementations may expect LoadSamples to be called to load custom samples
+            // (slider slide sound as an example).
+            //
+            // This is best effort optimisation (over previous method of loading and de-pooling in `OnApply`) due to requiring knowledge of
+            // hitobjects' metadata. For cases like sliders with many repeats, there can be a sudden request to de-pool (ie slider with many repeats)
+            // hundreds of samples, causing a gameplay stutter.
+            //
+            // Note that we already have optimisations in OsuPlayfield for this but it applies to DrawableHitObjects and not samples.
+            //
+            // This is definitely not the end of optimisation of sample loading, but the structure of gameplay samples is going to take some
+            // time to dismantle and optimise. Optimally:
+            //
+            // - we would want to remove as much of the drawable overheads from samples as possible (currently two drawables per sample worst case)
+            // - pool the rawest representation of samples possible (if required at that point).
+            // - infer metadata at beatmap load to asynchronously preload the samples (into memory / bass).
+            if (!samplesLoaded)
+            {
+                samplesLoaded = true;
+                LoadSamples();
+            }
+
+            base.Update();
+        }
+
         public override bool UpdateSubTreeMasking() => false;
 
         protected override void UpdateAfterChildren()
@@ -639,14 +665,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             UpdateResult(false);
         }
-
-        /// <summary>
-        /// Schedules an <see cref="Action"/> to this <see cref="DrawableHitObject"/>.
-        /// </summary>
-        /// <remarks>
-        /// Only provided temporarily until hitobject pooling is implemented.
-        /// </remarks>
-        protected internal new ScheduledDelegate Schedule(Action action) => base.Schedule(action);
 
         /// <summary>
         /// An offset prior to the start time of <see cref="HitObject"/> at which this <see cref="DrawableHitObject"/> may begin displaying contents.
@@ -688,9 +706,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
         protected void ApplyMinResult() => ApplyResult((r, _) => r.Type = r.Judgement.MinResult);
 
         protected void ApplyResult(HitResult type) => ApplyResult(static (result, state) => result.Type = state, type);
-
-        [Obsolete("Use overload with state, preferrably with static delegates to avoid allocation overhead.")] // Can be removed 2024-07-26
-        protected void ApplyResult(Action<JudgementResult> application) => ApplyResult((r, _) => application(r), this);
 
         protected void ApplyResult(Action<JudgementResult, DrawableHitObject> application) => ApplyResult(application, this);
 

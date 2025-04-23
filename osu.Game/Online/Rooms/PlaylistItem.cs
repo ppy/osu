@@ -85,6 +85,11 @@ namespace osu.Game.Online.Rooms
 
         private readonly Bindable<bool> valid = new BindableBool(true);
 
+        [JsonIgnore]
+        public IBindable<bool> Completed => completed;
+
+        private readonly Bindable<bool> completed = new BindableBool(false);
+
         [JsonConstructor]
         private PlaylistItem()
             : this(new APIBeatmap())
@@ -96,8 +101,14 @@ namespace osu.Game.Online.Rooms
             Beatmap = beatmap;
         }
 
+        /// <summary>
+        /// Creates a new <see cref="PlaylistItem"/> from a <see cref="MultiplayerPlaylistItem"/>.
+        /// </summary>
+        /// <remarks>
+        /// This will create unique instances of the <see cref="RequiredMods"/> and <see cref="AllowedMods"/> arrays but NOT unique instances of the contained <see cref="APIMod"/>s.
+        /// </remarks>
         public PlaylistItem(MultiplayerPlaylistItem item)
-            : this(new APIBeatmap { OnlineID = item.BeatmapID, StarRating = item.StarRating })
+            : this(new APIBeatmap { OnlineID = item.BeatmapID, StarRating = item.StarRating, Checksum = item.BeatmapChecksum })
         {
             ID = item.ID;
             OwnerID = item.OwnerID;
@@ -111,6 +122,8 @@ namespace osu.Game.Online.Rooms
         }
 
         public void MarkInvalid() => valid.Value = false;
+
+        public void MarkCompleted() => completed.Value = true;
 
         #region Newtonsoft.Json implicit ShouldSerialize() methods
 

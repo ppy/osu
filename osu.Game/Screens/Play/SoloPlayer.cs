@@ -5,28 +5,34 @@
 
 using System;
 using System.Diagnostics;
-using System.Threading.Tasks;
-using osu.Framework.Bindables;
+using JetBrains.Annotations;
+using osu.Framework.Allocation;
 using osu.Game.Beatmaps;
 using osu.Game.Extensions;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Online.Solo;
 using osu.Game.Scoring;
-using osu.Game.Screens.Play.HUD;
+using osu.Game.Screens.Select.Leaderboards;
 
 namespace osu.Game.Screens.Play
 {
     public partial class SoloPlayer : SubmittingPlayer
     {
-        public SoloPlayer()
-            : this(null)
+        protected override bool ShowLeaderboard => true;
+
+        [Cached(typeof(IGameplayLeaderboardProvider))]
+        private readonly SoloGameplayLeaderboardProvider leaderboardProvider = new SoloGameplayLeaderboardProvider();
+
+        public SoloPlayer([CanBeNull] PlayerConfiguration configuration = null)
+            : base(configuration)
         {
         }
 
-        protected SoloPlayer(PlayerConfiguration configuration = null)
-            : base(configuration)
+        [BackgroundDependencyLoader]
+        private void load()
         {
+            AddInternal(leaderboardProvider);
         }
 
         protected override APIRequest<APIScoreToken> CreateTokenRequest()
@@ -43,32 +49,13 @@ namespace osu.Game.Screens.Play
             return new CreateSoloScoreRequest(Beatmap.Value.BeatmapInfo, rulesetId, Game.VersionHash);
         }
 
-        public readonly BindableList<ScoreInfo> LeaderboardScores = new BindableList<ScoreInfo>();
-
-        protected override GameplayLeaderboard CreateGameplayLeaderboard() =>
-            new SoloGameplayLeaderboard(Score.ScoreInfo.User)
-            {
-                AlwaysVisible = { Value = false },
-                Scores = { BindTarget = LeaderboardScores }
-            };
-
         protected override bool ShouldExitOnTokenRetrievalFailure(Exception exception) => false;
-
-        protected override Task ImportScore(Score score)
-        {
-            // Before importing a score, stop binding the leaderboard with its score source.
-            // This avoids a case where the imported score may cause a leaderboard refresh
-            // (if the leaderboard's source is local).
-            LeaderboardScores.UnbindBindings();
-
-            return base.ImportScore(score);
-        }
 
         protected override APIRequest<MultiplayerScore> CreateSubmissionRequest(Score score, long token)
         {
-            IBeatmapInfo beatmap = score.ScoreInfo.BeatmapInfo;
+            IBeatmapInfo beatmap = score.ScoreInfo.BeatmapInfo!;
 
-            Debug.Assert(beatmap!.OnlineID > 0);
+            Debug.Assert(beatmap.OnlineID > 0);
 
             return new SubmitSoloScoreRequest(score.ScoreInfo, token, beatmap.OnlineID);
         }

@@ -26,8 +26,6 @@ namespace osu.Game.Graphics.UserInterface
         public const int HEIGHT = 30;
         public const float EXPANDED_SIZE = 50;
 
-        public static readonly Vector2 SHEAR = new Vector2(0.15f, 0);
-
         private readonly Box fill;
         private readonly Container main;
 
@@ -40,7 +38,7 @@ namespace osu.Game.Graphics.UserInterface
             Size = new Vector2(EXPANDED_SIZE, HEIGHT);
             InternalChild = main = new Container
             {
-                Shear = SHEAR,
+                Shear = OsuGame.SHEAR,
                 BorderColour = Colour4.White,
                 BorderThickness = BORDER_WIDTH,
                 Masking = true,

@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,6 +19,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Timing;
 using osu.Game.Rulesets.UI.Scrolling.Algorithms;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Rulesets.UI.Scrolling
 {
@@ -70,6 +69,12 @@ namespace osu.Game.Rulesets.UI.Scrolling
         protected virtual bool UserScrollSpeedAdjustment => true;
 
         /// <summary>
+        /// Whether at the current point in time, whether scroll speed adjustments should be applied to gameplay.
+        /// This can potentially become false at some point during gameplay for game balance reasons.
+        /// </summary>
+        protected bool AllowScrollSpeedAdjustment => UserScrollSpeedAdjustment && player?.AllowCriticalSettingsAdjustment != false;
+
+        /// <summary>
         /// Whether <see cref="TimingControlPoint"/> beat lengths should scale relative to the most common beat length in the <see cref="Beatmap"/>.
         /// </summary>
         protected virtual bool RelativeScaleBeatLengths => false;
@@ -84,7 +89,10 @@ namespace osu.Game.Rulesets.UI.Scrolling
         [Cached(Type = typeof(IScrollingInfo))]
         private readonly LocalScrollingInfo scrollingInfo;
 
-        protected DrawableScrollingRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
+        [Resolved]
+        private Player? player { get; set; }
+
+        protected DrawableScrollingRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod>? mods = null)
             : base(ruleset, beatmap, mods)
         {
             scrollingInfo = new LocalScrollingInfo();
@@ -195,28 +203,30 @@ namespace osu.Game.Rulesets.UI.Scrolling
         /// Adjusts the scroll speed of <see cref="HitObject"/>s.
         /// </summary>
         /// <param name="amount">The amount to adjust by. Greater than 0 if the scroll speed should be increased, less than 0 if it should be decreased.</param>
-        protected virtual void AdjustScrollSpeed(int amount) => this.TransformBindableTo(TimeRange, TimeRange.Value - amount * time_span_step, 200, Easing.OutQuint);
+        protected virtual void AdjustScrollSpeed(int amount)
+        {
+            this.TransformBindableTo(TimeRange, TimeRange.Value - amount * time_span_step, 200, Easing.OutQuint);
+        }
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-            if (!UserScrollSpeedAdjustment)
-                return false;
-
             switch (e.Action)
             {
                 case GlobalAction.IncreaseScrollSpeed:
-                    AdjustScrollSpeed(1);
+                    if (AllowScrollSpeedAdjustment)
+                        AdjustScrollSpeed(1);
                     return true;
 
                 case GlobalAction.DecreaseScrollSpeed:
-                    AdjustScrollSpeed(-1);
+                    if (AllowScrollSpeedAdjustment)
+                        AdjustScrollSpeed(-1);
                     return true;
             }
 
             return false;
         }
 
-        private ScheduledDelegate scheduledScrollSpeedAdjustment;
+        private ScheduledDelegate? scheduledScrollSpeedAdjustment;
 
         public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
