@@ -20,6 +20,11 @@ namespace osu.Game.Graphics
         public static Color4 Gray(float amt) => new Color4(amt, amt, amt, 1f);
         public static Color4 Gray(byte amt) => new Color4(amt, amt, amt, 255);
 
+        /// <summary>
+        /// The maximum star rating colour which can be distinguished against a black background.
+        /// </summary>
+        public const float STAR_DIFFICULTY_DEFINED_COLOUR_CUTOFF = 6.5f;
+
         public static readonly (float, Color4)[] STAR_DIFFICULTY_SPECTRUM =
         {
             (0.1f, Color4Extensions.FromHex("aaaaaa")),
