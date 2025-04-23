@@ -45,9 +45,9 @@ namespace osu.Game.Online.Leaderboards
         /// Fetch leaderboard content with the new criteria specified in the background.
         /// On completion, <see cref="Scores"/> will be updated with the results from this call (unless a more recent call with a different criteria has completed).
         /// </summary>
-        public void FetchWithCriteria(LeaderboardCriteria newCriteria)
+        public void FetchWithCriteria(LeaderboardCriteria newCriteria, bool forceRefresh = false)
         {
-            if (CurrentCriteria?.Equals(newCriteria) == true && scores.Value?.FailState == null)
+            if (!forceRefresh && CurrentCriteria?.Equals(newCriteria) == true && scores.Value?.FailState == null)
                 return;
 
             CurrentCriteria = newCriteria;
