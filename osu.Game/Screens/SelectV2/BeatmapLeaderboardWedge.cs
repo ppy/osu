@@ -12,14 +12,12 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
-using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
-using osu.Game.Online.API;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Online.Placeholders;
 using osu.Game.Overlays;
@@ -55,20 +53,15 @@ namespace osu.Game.Screens.SelectV2
         private IBindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
 
         [Resolved]
-        private IAPIProvider api { get; set; } = null!;
-
-        [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
         public IBindable<BeatmapLeaderboardScope> Scope { get; } = new Bindable<BeatmapLeaderboardScope>();
-
-        private bool isOnlineScope => Scope.Value != BeatmapLeaderboardScope.Local;
 
         public IBindable<bool> FilterBySelectedMods { get; } = new BindableBool();
 
         private CancellationTokenSource? cancellationTokenSource;
 
-        private readonly Bindable<LeaderboardScores?> fetchedScores = new Bindable<LeaderboardScores?>();
+        private readonly IBindable<LeaderboardScores?> fetchedScores = new Bindable<LeaderboardScores?>();
 
         [BackgroundDependencyLoader]
         private void load()
@@ -147,7 +140,7 @@ namespace osu.Game.Screens.SelectV2
                 }
             };
 
-            ((IBindable<LeaderboardScores?>)fetchedScores).BindTo(leaderboardManager.Scores);
+            fetchedScores.BindTo(leaderboardManager.Scores);
         }
 
         protected override void LoadComplete()
@@ -179,10 +172,11 @@ namespace osu.Game.Screens.SelectV2
                 refetchScores();
         }
 
+        private bool initialFetchComplete;
+
         private void refetchScores()
         {
             SetScores(Array.Empty<ScoreInfo>(), null);
-            SetState(LeaderboardState.Retrieving);
 
             if (beatmap.IsDefault)
             {
@@ -190,55 +184,35 @@ namespace osu.Game.Screens.SelectV2
                 return;
             }
 
+            SetState(LeaderboardState.Retrieving);
+
             var fetchBeatmapInfo = beatmap.Value.BeatmapInfo;
             var fetchRuleset = ruleset.Value ?? fetchBeatmapInfo.Ruleset;
 
-            if (!api.IsLoggedIn && isOnlineScope)
+            // For now, we forcefully refresh to keep things simple.
+            // In the future, removing this requirement may be deemed useful, but will need ample testing of edge case scenarios
+            // (like returning from gameplay after setting a new score, returning to song select after main menu).
+            leaderboardManager.FetchWithCriteria(new LeaderboardCriteria(fetchBeatmapInfo, fetchRuleset, Scope.Value, FilterBySelectedMods.Value ? mods.Value.ToArray() : null), forceRefresh: true);
+
+            if (!initialFetchComplete)
             {
-                SetState(LeaderboardState.NotLoggedIn);
-                return;
+                // only bind this after the first fetch to avoid reading stale scores.
+                fetchedScores.BindTo(leaderboardManager.Scores);
+                fetchedScores.BindValueChanged(_ => updateScores(), true);
+                initialFetchComplete = true;
             }
+        }
 
-            if (!fetchRuleset.IsLegacyRuleset())
-            {
-                SetState(LeaderboardState.RulesetUnavailable);
-                return;
-            }
+        private void updateScores()
+        {
+            var scores = fetchedScores.Value;
 
-            if ((fetchBeatmapInfo.OnlineID <= 0 || fetchBeatmapInfo.Status <= BeatmapOnlineStatus.Pending) && isOnlineScope)
-            {
-                SetState(LeaderboardState.BeatmapUnavailable);
-                return;
-            }
+            if (scores == null) return;
 
-            if (Scope.Value.RequiresSupporter(FilterBySelectedMods.Value) && !api.LocalUser.Value.IsSupporter)
-            {
-                SetState(LeaderboardState.NotSupporter);
-                return;
-            }
-
-            if (Scope.Value == BeatmapLeaderboardScope.Team && api.LocalUser.Value.Team == null)
-            {
-                SetState(LeaderboardState.NoTeam);
-                return;
-            }
-
-            leaderboardManager.FetchWithCriteriaAsync(new LeaderboardCriteria(fetchBeatmapInfo, fetchRuleset, Scope.Value, FilterBySelectedMods.Value ? mods.Value.ToArray() : null))
-                              .ContinueWith(t =>
-                              {
-                                  if (t.Exception != null && !t.IsCanceled)
-                                  {
-                                      Schedule(() => SetState(LeaderboardState.NetworkFailure));
-                                      return;
-                                  }
-
-                                  fetchedScores.UnbindEvents();
-                                  fetchedScores.BindValueChanged(scores =>
-                                  {
-                                      if (scores.NewValue != null)
-                                          Schedule(() => SetScores(scores.NewValue.TopScores, scores.NewValue.UserScore));
-                                  }, true);
-                              });
+            if (scores.FailState != null)
+                SetState((LeaderboardState)scores.FailState);
+            else
+                SetScores(scores.TopScores, scores.UserScore);
         }
 
         protected void SetScores(IEnumerable<ScoreInfo> scores, ScoreInfo? userScore)
@@ -348,6 +322,8 @@ namespace osu.Game.Screens.SelectV2
 
             if (placeholder == null)
                 return;
+
+            clearScores();
 
             placeholderContainer.Child = placeholder;
 
