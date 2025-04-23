@@ -102,7 +102,7 @@ namespace osu.Game.Screens.SelectV2
                     var newSetBeatmaps = newItems!.Single().Beatmaps.ToList();
 
                     // Handling replace operations is a touch manual, as we need to locally diff the beatmaps of each version of the beatmap set.
-                    // Matching is done based on difficulty names as these are the most stable thing between updates (which are usually triggered
+                    // Matching is done based on online IDs, then difficulty names as these are the most stable thing between updates (which are usually triggered
                     // by users editing the beatmap or by difficulty/metadata recomputation).
                     //
                     // In the case of difficulty reprocessing, this will trigger multiple times per beatmap as it's always triggering a set update.
@@ -113,7 +113,9 @@ namespace osu.Game.Screens.SelectV2
                         int previousIndex = Items.IndexOf(beatmap);
                         Debug.Assert(previousIndex >= 0);
 
-                        BeatmapInfo? matchingNewBeatmap = newSetBeatmaps.SingleOrDefault(b => b.DifficultyName == beatmap.DifficultyName && b.Ruleset.Equals(beatmap.Ruleset));
+                        BeatmapInfo? matchingNewBeatmap =
+                            newSetBeatmaps.SingleOrDefault(b => b.OnlineID == beatmap.OnlineID) ??
+                            newSetBeatmaps.SingleOrDefault(b => b.DifficultyName == beatmap.DifficultyName && b.Ruleset.Equals(beatmap.Ruleset));
 
                         if (matchingNewBeatmap != null)
                         {

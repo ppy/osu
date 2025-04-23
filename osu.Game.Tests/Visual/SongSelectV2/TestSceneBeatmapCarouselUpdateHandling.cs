@@ -98,6 +98,38 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddAssert("visible panel is updateable beatmap", () => GetSelectedPanel()?.Item?.Model, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
         }
 
+        [Test] // Checks that we keep selection based on online ID where possible.
+        public void TestSelectionHeldDifficultyNameChanged()
+        {
+            SelectPrevGroup();
+
+            WaitForSelection(1, 0);
+            AddAssert("selection is updateable beatmap", () => Carousel.CurrentSelection, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
+            AddAssert("visible panel is updateable beatmap", () => GetSelectedPanel()?.Item?.Model, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
+
+            updateBeatmap(b => b.DifficultyName = "new name");
+            WaitForSorting();
+
+            AddAssert("selection is updateable beatmap", () => Carousel.CurrentSelection, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
+            AddAssert("visible panel is updateable beatmap", () => GetSelectedPanel()?.Item?.Model, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
+        }
+
+        [Test] // Checks that we fallback to keeping selection based on difficulty name.
+        public void TestSelectionHeldDifficultyOnlineIDChanged()
+        {
+            SelectPrevGroup();
+
+            WaitForSelection(1, 0);
+            AddAssert("selection is updateable beatmap", () => Carousel.CurrentSelection, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
+            AddAssert("visible panel is updateable beatmap", () => GetSelectedPanel()?.Item?.Model, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
+
+            updateBeatmap(b => b.OnlineID = b.OnlineID + 1);
+            WaitForSorting();
+
+            AddAssert("selection is updateable beatmap", () => Carousel.CurrentSelection, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
+            AddAssert("visible panel is updateable beatmap", () => GetSelectedPanel()?.Item?.Model, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
+        }
+
         private void updateBeatmap(Action<BeatmapInfo>? updateBeatmap = null, Action<BeatmapSetInfo>? updateSet = null)
         {
             AddStep("update beatmap with different reference", () =>
@@ -105,7 +137,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 var updatedSet = new BeatmapSetInfo
                 {
                     ID = baseTestBeatmap.ID,
-                    OnlineID = 99999, // this is just for tracking / debug purposes at the moment.
+                    OnlineID = baseTestBeatmap.OnlineID,
                     DateAdded = baseTestBeatmap.DateAdded,
                     DateSubmitted = baseTestBeatmap.DateSubmitted,
                     DateRanked = baseTestBeatmap.DateRanked,
