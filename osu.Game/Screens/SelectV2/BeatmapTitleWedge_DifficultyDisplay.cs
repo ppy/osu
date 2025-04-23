@@ -236,7 +236,10 @@ namespace osu.Game.Screens.SelectV2
 
                 updateDisplay();
 
-                displayedStars.BindValueChanged(_ => updateStars(), true);
+                displayedStars.BindValueChanged(_ =>
+                {
+                    starRatingDisplay.Current.Value = new StarDifficulty(displayedStars.Value, 0);
+                }, true);
                 FinishTransforms(true);
             }
 
@@ -330,17 +333,6 @@ namespace osu.Game.Screens.SelectV2
                 };
             });
 
-            private void updateStars()
-            {
-                starRatingDisplay.Current.Value = new StarDifficulty(displayedStars.Value, 0);
-
-                Color4 colour = displayedStars.Value >= 6.5f ? colours.Orange1 : colours.ForStarDifficulty(displayedStars.Value);
-                difficultyText.FadeColour(colour, 300, Easing.OutQuint);
-                mappedByText.FadeColour(colour, 300, Easing.OutQuint);
-                countStatisticsDisplay.TransformTo(nameof(countStatisticsDisplay.AccentColour), colour, 300, Easing.OutQuint);
-                difficultyStatisticsDisplay.TransformTo(nameof(difficultyStatisticsDisplay.AccentColour), colour, 300, Easing.OutQuint);
-            }
-
             private void computeStarDifficulty(CancellationToken cancellationToken)
             {
                 difficultyCache.GetDifficultyAsync(beatmap.Value.BeatmapInfo, ruleset.Value, mods.Value, cancellationToken)
@@ -360,7 +352,16 @@ namespace osu.Game.Screens.SelectV2
             protected override void Update()
             {
                 base.Update();
+
                 difficultyText.MaxWidth = Math.Max(nameLine.DrawWidth - mappedByText.DrawWidth - mapperText.DrawWidth - 20, 0);
+
+                // Use difficulty colour until it gets too dark to be visible against dark backgrounds.
+                Color4 col = starRatingDisplay.DisplayedStars.Value >= OsuColour.STAR_DIFFICULTY_DEFINED_COLOUR_CUTOFF ? colours.Orange1 : starRatingDisplay.DisplayedDifficultyColour;
+
+                difficultyText.Colour = col;
+                mappedByText.Colour = col;
+                countStatisticsDisplay.AccentColour = col;
+                difficultyStatisticsDisplay.AccentColour = col;
             }
 
             private partial class MapperLinkContainer : OsuHoverContainer

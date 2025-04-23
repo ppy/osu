@@ -23,6 +23,8 @@ namespace osu.Game.Beatmaps.Drawables
     /// </summary>
     public partial class StarRatingDisplay : CompositeDrawable, IHasCurrentValue<StarDifficulty>
     {
+        public const double TRANSFORM_DURATION = 750;
+
         private readonly bool animated;
         private readonly Box background;
         private readonly SpriteIcon starIcon;
@@ -35,6 +37,12 @@ namespace osu.Game.Beatmaps.Drawables
             get => current.Current;
             set => current.Current = value;
         }
+
+        /// <summary>
+        /// The difficulty colour currently displayed.
+        /// Can be used to have other components match the spectrum animation.
+        /// </summary>
+        public Color4 DisplayedDifficultyColour => background.Colour;
 
         private readonly Bindable<double> displayedStars = new BindableDouble();
 
@@ -139,7 +147,7 @@ namespace osu.Game.Beatmaps.Drawables
             Current.BindValueChanged(c =>
             {
                 if (animated)
-                    this.TransformBindableTo(displayedStars, c.NewValue.Stars, 750, Easing.OutQuint);
+                    this.TransformBindableTo(displayedStars, c.NewValue.Stars, TRANSFORM_DURATION, Easing.OutQuint);
                 else
                     displayedStars.Value = c.NewValue.Stars;
             });

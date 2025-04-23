@@ -58,6 +58,22 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         }
 
         [Test]
+        public void TestRulesetChange()
+        {
+            selectBeatmap(Beatmap.Value.Beatmap);
+
+            AddWaitStep("wait for select", 3);
+
+            foreach (var rulesetInfo in rulesets.AvailableRulesets)
+            {
+                var testBeatmap = TestSceneBeatmapInfoWedge.CreateTestBeatmap(rulesetInfo);
+
+                setRuleset(rulesetInfo);
+                selectBeatmap(testBeatmap);
+            }
+        }
+
+        [Test]
         public void TestNullBeatmap()
         {
             selectBeatmap(null);
@@ -88,22 +104,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             AddStep("select HT", () => SelectedMods.Value = new[] { new OsuModHalfTime() });
             checkDisplayedBPM($"{bpm * 0.75f}");
-        }
-
-        [Test]
-        public void TestRulesetChange()
-        {
-            selectBeatmap(Beatmap.Value.Beatmap);
-
-            AddWaitStep("wait for select", 3);
-
-            foreach (var rulesetInfo in rulesets.AvailableRulesets)
-            {
-                var testBeatmap = TestSceneBeatmapInfoWedge.CreateTestBeatmap(rulesetInfo);
-
-                setRuleset(rulesetInfo);
-                selectBeatmap(testBeatmap);
-            }
         }
 
         [Test]
