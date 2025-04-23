@@ -86,8 +86,6 @@ namespace osu.Game.Users
         [Resolved]
         private INotificationOverlay? notifications { get; set; }
 
-        private LoadingLayer loading { get; set; } = null!;
-
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -104,7 +102,6 @@ namespace osu.Game.Users
                 Add(background);
 
             Add(CreateLayout());
-            Add(loading = new LoadingLayer(true));
 
             base.Action = ViewProfile = () =>
             {
@@ -167,8 +164,8 @@ namespace osu.Game.Users
                 }));
 
                 items.Add(isUserBlocked()
-                    ? new OsuMenuItem(UsersStrings.BlocksButtonUnblock, MenuItemType.Standard, () => blockUser(false))
-                    : new OsuMenuItem(UsersStrings.BlocksButtonBlock, MenuItemType.Destructive, () => blockUser(true)));
+                    ? new OsuMenuItem(UsersStrings.BlocksButtonUnblock, MenuItemType.Standard, () => toggleBlock(false))
+                    : new OsuMenuItem(UsersStrings.BlocksButtonBlock, MenuItemType.Destructive, () => toggleBlock(true)));
 
                 if (isUserOnline())
                 {
@@ -196,15 +193,13 @@ namespace osu.Game.Users
             }
         }
 
-        private void blockUser(bool block)
+        private void toggleBlock(bool block)
         {
-            loading.Show();
             APIRequest req = block ? new BlockUserRequest(User.OnlineID) : new UnblockUserRequest(User.OnlineID);
 
             req.Success += () =>
             {
                 api.UpdateLocalBlocks();
-                loading.Hide();
             };
 
             req.Failure += e =>
@@ -214,7 +209,6 @@ namespace osu.Game.Users
                     Text = e.Message,
                     Icon = FontAwesome.Solid.Times,
                 });
-                loading.Hide();
             };
 
             api.Queue(req);
