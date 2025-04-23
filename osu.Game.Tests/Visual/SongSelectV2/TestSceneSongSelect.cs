@@ -11,13 +11,18 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
+using osu.Game.Database;
 using osu.Game.Overlays.Mods;
+using osu.Game.Rulesets.Catch;
+using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Rulesets.Taiko;
 using osu.Game.Screens;
 using osu.Game.Screens.Footer;
 using osu.Game.Screens.Menu;
-using osu.Game.Screens.SelectV2.Footer;
+using osu.Game.Screens.SelectV2;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.SongSelectV2
@@ -29,6 +34,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
         [Cached]
         private readonly OsuLogo logo;
+
+        protected override bool UseOnlineAPI => true;
 
         public TestSceneSongSelect()
         {
@@ -49,6 +56,15 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             };
         }
 
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            RealmDetachedBeatmapStore beatmapStore;
+
+            Dependencies.CacheAs<BeatmapStore>(beatmapStore = new RealmDetachedBeatmapStore());
+            Add(beatmapStore);
+        }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -62,8 +78,17 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         {
             base.SetUpSteps();
 
-            AddStep("load screen", () => Stack.Push(new Screens.SelectV2.SongSelectV2()));
-            AddUntilStep("wait for load", () => Stack.CurrentScreen is Screens.SelectV2.SongSelectV2 songSelect && songSelect.IsLoaded);
+            AddStep("load screen", () => Stack.Push(new SoloSongSelect()));
+            AddUntilStep("wait for load", () => Stack.CurrentScreen is Screens.SelectV2.SongSelect songSelect && songSelect.IsLoaded);
+        }
+
+        [Test]
+        public void TestRulesets()
+        {
+            AddStep("set osu ruleset", () => Ruleset.Value = new OsuRuleset().RulesetInfo);
+            AddStep("set taiko ruleset", () => Ruleset.Value = new TaikoRuleset().RulesetInfo);
+            AddStep("set catch ruleset", () => Ruleset.Value = new CatchRuleset().RulesetInfo);
+            AddStep("set mania ruleset", () => Ruleset.Value = new ManiaRuleset().RulesetInfo);
         }
 
         #region Footer
@@ -80,8 +105,11 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddStep("modified", () => SelectedMods.Value = new List<Mod> { new OsuModDoubleTime { SpeedChange = { Value = 1.2 } } });
             AddStep("modified + one", () => SelectedMods.Value = new List<Mod> { new OsuModHidden(), new OsuModDoubleTime { SpeedChange = { Value = 1.2 } } });
             AddStep("modified + two", () => SelectedMods.Value = new List<Mod> { new OsuModHidden(), new OsuModHardRock(), new OsuModDoubleTime { SpeedChange = { Value = 1.2 } } });
-            AddStep("modified + three", () => SelectedMods.Value = new List<Mod> { new OsuModHidden(), new OsuModHardRock(), new OsuModClassic(), new OsuModDoubleTime { SpeedChange = { Value = 1.2 } } });
-            AddStep("modified + four", () => SelectedMods.Value = new List<Mod> { new OsuModHidden(), new OsuModHardRock(), new OsuModClassic(), new OsuModDifficultyAdjust(), new OsuModDoubleTime { SpeedChange = { Value = 1.2 } } });
+            AddStep("modified + three",
+                () => SelectedMods.Value = new List<Mod> { new OsuModHidden(), new OsuModHardRock(), new OsuModClassic(), new OsuModDoubleTime { SpeedChange = { Value = 1.2 } } });
+            AddStep("modified + four",
+                () => SelectedMods.Value = new List<Mod>
+                    { new OsuModHidden(), new OsuModHardRock(), new OsuModClassic(), new OsuModDifficultyAdjust(), new OsuModDoubleTime { SpeedChange = { Value = 1.2 } } });
 
             AddStep("clear mods", () => SelectedMods.Value = Array.Empty<Mod>());
             AddWaitStep("wait", 3);
@@ -171,7 +199,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         {
             AddStep("Press F1", () =>
             {
-                InputManager.MoveMouseTo(this.ChildrenOfType<ScreenFooterButtonMods>().Single());
+                InputManager.MoveMouseTo(this.ChildrenOfType<FooterButtonMods>().Single());
                 InputManager.Click(MouseButton.Left);
             });
             AddAssert("Overlay visible", () => this.ChildrenOfType<ModSelectOverlay>().Single().State.Value == Visibility.Visible);

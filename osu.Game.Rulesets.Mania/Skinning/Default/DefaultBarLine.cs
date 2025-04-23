@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Default
         [BackgroundDependencyLoader]
         private void load(DrawableHitObject drawableHitObject)
         {
-            RelativeSizeAxes = Axes.Both;
+            RelativeSizeAxes = Axes.X;
 
             // Avoid flickering due to no anti-aliasing of boxes by default.
             var edgeSmoothness = new Vector2(0.3f);
@@ -75,6 +75,8 @@ namespace osu.Game.Rulesets.Mania.Skinning.Default
 
         private void updateMajor(ValueChangedEvent<bool> major)
         {
+            Height = major.NewValue ? 1.7f : 1.2f;
+
             mainLine.Alpha = major.NewValue ? 0.5f : 0.2f;
             leftAnchor.Alpha = rightAnchor.Alpha = major.NewValue ? mainLine.Alpha * 0.3f : 0;
         }

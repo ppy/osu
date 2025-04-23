@@ -4,54 +4,60 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Testing;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Overlays;
 
 namespace osu.Game.Tests.Visual.SongSelectV2
 {
-    public abstract partial class SongSelectComponentsTestScene : OsuTestScene
+    public abstract partial class SongSelectComponentsTestScene : OsuManualInputManagerTestScene
     {
         [Cached]
         protected readonly OverlayColourProvider ColourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
 
-        protected override Container<Drawable> Content { get; } = new Container
+        protected override Container<Drawable> Content { get; } = new OsuContextMenuContainer
         {
             RelativeSizeAxes = Axes.X,
             AutoSizeAxes = Axes.Y,
-            Padding = new MarginPadding(10),
         };
 
         private Container? resizeContainer;
         private float relativeWidth;
 
+        protected virtual Anchor ComponentAnchor => Anchor.TopLeft;
+        protected virtual float InitialRelativeWidth => 0.5f;
+
         [BackgroundDependencyLoader]
         private void load()
         {
-            base.Content.Child = resizeContainer = new Container
+            base.Content.Child = new PopoverContainer
             {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-                Padding = new MarginPadding(10),
-                Width = relativeWidth,
-                Children = new Drawable[]
+                RelativeSizeAxes = Axes.Both,
+                Child = resizeContainer = new Container
                 {
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = ColourProvider.Background5,
-                    },
-                    Content
+                    Anchor = ComponentAnchor,
+                    Origin = ComponentAnchor,
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Width = relativeWidth,
+                    Child = Content
                 }
             };
 
-            AddSliderStep("change relative width", 0, 1f, 1f, v =>
+            AddSliderStep("change relative width", 0, 1f, InitialRelativeWidth, v =>
             {
                 if (resizeContainer != null)
                     resizeContainer.Width = v;
 
                 relativeWidth = v;
             });
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            ChangeBackgroundColour(ColourProvider.Background6);
         }
 
         [SetUpSteps]

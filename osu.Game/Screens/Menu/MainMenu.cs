@@ -13,11 +13,14 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
+using osu.Framework.Threading;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
@@ -39,10 +42,11 @@ using osu.Game.Screens.Select;
 using osu.Game.Seasonal;
 using osuTK;
 using osuTK.Graphics;
+using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Menu
 {
-    public partial class MainMenu : OsuScreen, IHandlePresentBeatmap, IKeyBindingHandler<GlobalAction>
+    public partial class MainMenu : OsuScreen, IHandlePresentBeatmap, IKeyBindingHandler<GlobalAction>, ISamplePlaybackDisabler
     {
         public const float FADE_IN_DURATION = 300;
 
@@ -81,12 +85,17 @@ namespace osu.Game.Screens.Menu
         [Resolved(canBeNull: true)]
         private IDialogOverlay dialogOverlay { get; set; }
 
+        // used to stop kiai fountain samples when navigating to other screens
+        IBindable<bool> ISamplePlaybackDisabler.SamplePlaybackDisabled => samplePlaybackDisabled;
+        private readonly Bindable<bool> samplePlaybackDisabled = new Bindable<bool>();
+
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenDefault();
 
         protected override bool PlayExitSound => false;
 
         private Bindable<double> holdDelay;
         private Bindable<bool> loginDisplayed;
+        private Bindable<bool> showMobileDisclaimer;
 
         private HoldToExitGameOverlay holdToExitGameOverlay;
 
@@ -97,7 +106,7 @@ namespace osu.Game.Screens.Menu
         private SongTicker songTicker;
         private Container logoTarget;
         private OnlineMenuBanner onlineMenuBanner;
-        private MenuTip menuTip;
+        private MenuTipDisplay menuTipDisplay;
         private FillFlowContainer bottomElementsFlow;
         private SupporterDisplay supporterDisplay;
 
@@ -111,6 +120,7 @@ namespace osu.Game.Screens.Menu
         {
             holdDelay = config.GetBindable<double>(OsuSetting.UIHoldActivationDelay);
             loginDisplayed = statics.GetBindable<bool>(Static.LoginOverlayDisplayed);
+            showMobileDisclaimer = config.GetBindable<bool>(OsuSetting.ShowMobileDisclaimer);
 
             if (host.CanExit)
             {
@@ -181,7 +191,7 @@ namespace osu.Game.Screens.Menu
                     Spacing = new Vector2(5),
                     Children = new Drawable[]
                     {
-                        menuTip = new MenuTip
+                        menuTipDisplay = new MenuTipDisplay
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
@@ -196,8 +206,8 @@ namespace osu.Game.Screens.Menu
                 supporterDisplay = new SupporterDisplay
                 {
                     Margin = new MarginPadding(5),
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
+                    Anchor = Anchor.TopLeft,
+                    Origin = Anchor.TopLeft,
                 },
                 holdToExitGameOverlay?.CreateProxy() ?? Empty()
             });
@@ -255,6 +265,9 @@ namespace osu.Game.Screens.Menu
         [CanBeNull]
         private Drawable proxiedLogo;
 
+        [CanBeNull]
+        private ScheduledDelegate mobileDisclaimerSchedule;
+
         protected override void LogoArriving(OsuLogo logo, bool resuming)
         {
             base.LogoArriving(logo, resuming);
@@ -275,26 +288,46 @@ namespace osu.Game.Screens.Menu
 
                 sideFlashes.Delay(FADE_IN_DURATION).FadeIn(64, Easing.InQuint);
             }
-            else if (!api.IsLoggedIn || api.State.Value == APIState.RequiresSecondFactorAuth)
+            else
             {
                 // copy out old action to avoid accidentally capturing logo.Action in closure, causing a self-reference loop.
                 var previousAction = logo.Action;
 
-                // we want to hook into logo.Action to display the login overlay, but also preserve the return value of the old action.
+                // we want to hook into logo.Action to display certain overlays, but also preserve the return value of the old action.
                 // therefore pass the old action to displayLogin, so that it can return that value.
                 // this ensures that the OsuLogo sample does not play when it is not desired.
-                logo.Action = () => displayLogin(previousAction);
+                logo.Action = () => onLogoClick(previousAction);
             }
+        }
 
-            bool displayLogin(Func<bool> originalAction)
+        private bool onLogoClick(Func<bool> originalAction)
+        {
+            if (showMobileDisclaimer.Value)
             {
-                if (!loginDisplayed.Value)
+                mobileDisclaimerSchedule?.Cancel();
+                mobileDisclaimerSchedule = Scheduler.AddDelayed(() =>
                 {
-                    Scheduler.AddDelayed(() => login?.Show(), 500);
-                    loginDisplayed.Value = true;
-                }
+                    dialogOverlay.Push(new MobileDisclaimerDialog(() =>
+                    {
+                        showMobileDisclaimer.Value = false;
+                        displayLoginIfApplicable();
+                    }));
+                }, 500);
+            }
+            else
+                displayLoginIfApplicable();
 
-                return originalAction.Invoke();
+            return originalAction.Invoke();
+        }
+
+        private void displayLoginIfApplicable()
+        {
+            if (loginDisplayed.Value) return;
+
+            if (!api.IsLoggedIn || api.State.Value == APIState.RequiresSecondFactorAuth)
+            {
+                Scheduler.AddDelayed(() => login?.Show(), 500);
+                loginDisplayed.Value = true;
             }
         }
 
@@ -341,6 +374,8 @@ namespace osu.Game.Screens.Menu
 
             supporterDisplay
                 .FadeOut(500, Easing.OutQuint);
+
+            samplePlaybackDisabled.Value = true;
         }
 
         public override void OnResuming(ScreenTransitionEvent e)
@@ -356,11 +391,13 @@ namespace osu.Game.Screens.Menu
             musicController.EnsurePlayingSomething();
 
             // Cycle tip on resuming
-            menuTip.ShowNextTip();
+            menuTipDisplay.ShowNextTip();
 
             bottomElementsFlow
                 .ScaleTo(1, 1000, Easing.OutQuint)
                 .FadeIn(1000, Easing.OutQuint);
+
+            samplePlaybackDisabled.Value = false;
         }
 
         public override bool OnExiting(ScreenExitEvent e)
@@ -442,6 +479,26 @@ namespace osu.Game.Screens.Menu
 
         public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
+        }
+
+        private partial class MobileDisclaimerDialog : PopupDialog
+        {
+            public MobileDisclaimerDialog(Action confirmed)
+            {
+                HeaderText = ButtonSystemStrings.MobileDisclaimerHeader;
+                BodyText = ButtonSystemStrings.MobileDisclaimerBody;
+
+                Icon = FontAwesome.Solid.SmileBeam;
+
+                Buttons = new PopupDialogButton[]
+                {
+                    new PopupDialogOkButton
+                    {
+                        Text = "Understood",
+                        Action = confirmed,
+                    },
+                };
+            }
         }
     }
 }

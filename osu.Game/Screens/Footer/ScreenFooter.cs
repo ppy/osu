@@ -33,7 +33,8 @@ namespace osu.Game.Screens.Footer
 
         private Box background = null!;
         private FillFlowContainer<ScreenFooterButton> buttonsFlow = null!;
-        private Container<ScreenFooterButton> removedButtonsContainer = null!;
+        private Container footerContentContainer = null!;
+        private Container<ScreenFooterButton> hiddenButtonsContainer = null!;
         private LogoTrackingContainer logoTrackingContainer = null!;
 
         [Cached]
@@ -71,26 +72,46 @@ namespace osu.Game.Screens.Footer
                     RelativeSizeAxes = Axes.Both,
                     Colour = colourProvider.Background5
                 },
-                buttonsFlow = new FillFlowContainer<ScreenFooterButton>
+                new GridContainer
                 {
-                    Margin = new MarginPadding { Left = 12f + ScreenBackButton.BUTTON_WIDTH + padding },
-                    Y = 10f,
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
-                    Direction = FillDirection.Horizontal,
-                    Spacing = new Vector2(7, 0),
-                    AutoSizeAxes = Axes.Both
+                    RelativeSizeAxes = Axes.Both,
+                    Padding = new MarginPadding { Left = 12f + ScreenBackButton.BUTTON_WIDTH + padding },
+                    ColumnDimensions = new[]
+                    {
+                        new Dimension(GridSizeMode.AutoSize),
+                        new Dimension(),
+                    },
+                    Content = new[]
+                    {
+                        new Drawable[]
+                        {
+                            buttonsFlow = new FillFlowContainer<ScreenFooterButton>
+                            {
+                                Anchor = Anchor.BottomLeft,
+                                Origin = Anchor.BottomLeft,
+                                Y = 10f,
+                                Direction = FillDirection.Horizontal,
+                                Spacing = new Vector2(7, 0),
+                                AutoSizeAxes = Axes.Both,
+                            },
+                            footerContentContainer = new Container
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Y = -15f,
+                            },
+                        },
+                    }
                 },
                 BackButton = new ScreenBackButton
                 {
-                    Margin = new MarginPadding { Bottom = 15f, Left = 12f },
+                    Margin = new MarginPadding { Bottom = OsuGame.SCREEN_EDGE_MARGIN, Left = OsuGame.SCREEN_EDGE_MARGIN },
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                     Action = onBackPressed,
                 },
-                removedButtonsContainer = new Container<ScreenFooterButton>
+                hiddenButtonsContainer = new Container<ScreenFooterButton>
                 {
-                    Margin = new MarginPadding { Left = 12f + ScreenBackButton.BUTTON_WIDTH + padding },
+                    Margin = new MarginPadding { Left = OsuGame.SCREEN_EDGE_MARGIN + ScreenBackButton.BUTTON_WIDTH + padding },
                     Y = 10f,
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
@@ -153,7 +174,7 @@ namespace osu.Game.Screens.Footer
                 var oldButton = oldButtons[i];
 
                 buttonsFlow.Remove(oldButton, false);
-                removedButtonsContainer.Add(oldButton);
+                hiddenButtonsContainer.Add(oldButton);
 
                 if (buttons.Count > 0)
                     makeButtonDisappearToRight(oldButton, i, oldButtons.Length, true);
@@ -188,7 +209,7 @@ namespace osu.Game.Screens.Footer
         }
 
         private ShearedOverlayContainer? activeOverlay;
-        private Container? contentContainer;
+        private VisibilityContainer? activeFooterContent;
 
         private readonly List<ScreenFooterButton> temporarilyHiddenButtons = new List<ScreenFooterButton>();
 
@@ -210,33 +231,28 @@ namespace osu.Game.Screens.Footer
                 ? buttonsFlow.SkipWhile(b => b != targetButton).Skip(1)
                 : buttonsFlow);
 
-            for (int i = 0; i < temporarilyHiddenButtons.Count; i++)
-                makeButtonDisappearToBottom(temporarilyHiddenButtons[i], 0, 0, false);
+            for (int i = temporarilyHiddenButtons.Count - 1; i >= 0; i--)
+            {
+                var button = temporarilyHiddenButtons[i];
+                buttonsFlow.Remove(button, false);
+                hiddenButtonsContainer.Add(button);
 
-            var fallbackPosition = buttonsFlow.Any()
-                ? buttonsFlow.ToSpaceOfOtherDrawable(Vector2.Zero, this)
-                : BackButton.ToSpaceOfOtherDrawable(BackButton.LayoutRectangle.TopRight + new Vector2(5f, 0f), this);
-
-            var targetPosition = targetButton?.ToSpaceOfOtherDrawable(targetButton.LayoutRectangle.TopRight, this) ?? fallbackPosition;
+                makeButtonDisappearToBottom(button, 0, 0, false);
+            }
 
             updateColourScheme(overlay.ColourProvider.Hue);
 
             footerContent = overlay.CreateFooterContent();
+            activeFooterContent = footerContent;
+            var content = footerContent;
 
-            var content = footerContent ?? Empty();
-
-            Add(contentContainer = new Container
-            {
-                Y = -15f,
-                RelativeSizeAxes = Axes.Both,
-                Padding = new MarginPadding { Left = targetPosition.X },
-                Child = content,
-            });
+            if (content != null)
+                footerContentContainer.Child = content;
 
             if (temporarilyHiddenButtons.Count > 0)
-                this.Delay(60).Schedule(() => content.Show());
+                this.Delay(60).Schedule(() => content?.Show());
             else
-                content.Show();
+                content?.Show();
 
             return new InvokeOnDisposal(clearActiveOverlayContainer);
         }
@@ -246,20 +262,26 @@ namespace osu.Game.Screens.Footer
             if (activeOverlay == null)
                 return;
 
-            Debug.Assert(contentContainer != null);
-            contentContainer.Child.Hide();
+            Debug.Assert(activeFooterContent != null);
+            activeFooterContent.Hide();
 
-            double timeUntilRun = contentContainer.Child.LatestTransformEndTime - Time.Current;
+            double timeUntilRun = activeFooterContent.LatestTransformEndTime - Time.Current;
 
             for (int i = 0; i < temporarilyHiddenButtons.Count; i++)
-                makeButtonAppearFromBottom(temporarilyHiddenButtons[i], 0);
+            {
+                var button = temporarilyHiddenButtons[i];
+                hiddenButtonsContainer.Remove(button, false);
+                buttonsFlow.Add(button);
+
+                makeButtonAppearFromBottom(button, 0);
+            }
 
             temporarilyHiddenButtons.Clear();
 
             updateColourScheme(OverlayColourScheme.Aquamarine.GetHue());
 
-            contentContainer.Delay(timeUntilRun).Expire();
-            contentContainer = null;
+            activeFooterContent.Delay(timeUntilRun).Expire();
+            activeFooterContent = null;
             activeOverlay = null;
         }
 

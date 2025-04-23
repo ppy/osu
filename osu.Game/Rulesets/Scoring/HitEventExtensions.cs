@@ -28,11 +28,12 @@ namespace osu.Game.Rulesets.Scoring
             result ??= new UnstableRateCalculationResult();
 
             // Handle rewinding in the simplest way possible.
-            if (hitEvents.Count < result.EventCount + 1)
+            if (hitEvents.Count < result.LastProcessedIndex + 1)
                 result = new UnstableRateCalculationResult();
 
-            for (int i = result.EventCount; i < hitEvents.Count; i++)
+            for (int i = result.LastProcessedIndex + 1; i < hitEvents.Count; i++)
             {
+                result.LastProcessedIndex = i;
                 HitEvent e = hitEvents[i];
 
                 if (!AffectsUnstableRate(e))
@@ -70,6 +71,26 @@ namespace osu.Game.Rulesets.Scoring
             return timeOffsets.Average();
         }
 
+        /// <summary>
+        /// Calculates the median hit offset/error for a sequence of <see cref="HitEvent"/>s, where negative numbers mean the user hit too early on average.
+        /// </summary>
+        /// <returns>
+        /// A non-null <see langword="double"/> value if unstable rate could be calculated,
+        /// and <see langword="null"/> if unstable rate cannot be calculated due to <paramref name="hitEvents"/> being empty.
+        /// </returns>
+        public static double? CalculateMedianHitError(this IEnumerable<HitEvent> hitEvents)
+        {
+            double[] timeOffsets = hitEvents.Where(AffectsUnstableRate).Select(ev => ev.TimeOffset).OrderBy(x => x).ToArray();
+
+            if (timeOffsets.Length == 0)
+                return null;
+
+            int center = timeOffsets.Length / 2;
+
+            // Use average of the 2 central values if length is even
+            return timeOffsets.Length % 2 == 0 ? (timeOffsets[center - 1] + timeOffsets[center]) / 2 : timeOffsets[center];
+        }
+
         public static bool AffectsUnstableRate(HitEvent e) => AffectsUnstableRate(e.HitObject, e.Result);
         public static bool AffectsUnstableRate(HitObject hitObject, HitResult result) => hitObject.HitWindows != HitWindows.Empty && result.IsHit();
 
@@ -84,6 +105,11 @@ namespace osu.Game.Rulesets.Scoring
         /// </remarks>
         public class UnstableRateCalculationResult
         {
+            /// <summary>
+            /// The last result index processed. For internal incremental calculation use.
+            /// </summary>
+            public int LastProcessedIndex = -1;
+
             /// <summary>
             /// Total events processed. For internal incremental calculation use.
             /// </summary>

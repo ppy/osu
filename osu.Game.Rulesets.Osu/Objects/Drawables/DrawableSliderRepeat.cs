@@ -14,6 +14,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Skinning.Default;
 using osu.Game.Skinning;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -25,8 +26,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public Slider Slider => DrawableSlider?.HitObject;
 
         public DrawableSlider DrawableSlider => (DrawableSlider)ParentHitObject;
-
-        private double animDuration;
 
         public SkinnableDrawable CirclePiece { get; private set; }
 
@@ -86,20 +85,17 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override void UpdateInitialTransforms()
         {
-            // When snaking in is enabled, the first end circle needs to be delayed until the snaking completes.
-            bool delayFadeIn = DrawableSlider.SliderBody?.SnakingIn.Value == true && HitObject.RepeatIndex == 0;
+            base.UpdateInitialTransforms();
 
-            animDuration = Math.Min(300, HitObject.SpanDuration);
-
-            this
-                .FadeOut()
-                .Delay(delayFadeIn ? (Slider?.TimePreempt ?? 0) / 3 : 0)
-                .FadeIn(HitObject.RepeatIndex == 0 ? HitObject.TimeFadeIn : animDuration);
+            ApplyRepeatFadeIn(CirclePiece, HitObject.TimeFadeIn);
+            ApplyRepeatFadeIn(Arrow, 150);
         }
 
         protected override void UpdateHitStateTransforms(ArmedState state)
         {
             base.UpdateHitStateTransforms(state);
+
+            double animDuration = Math.Min(300, HitObject.SpanDuration);
 
             switch (state)
             {
@@ -163,5 +159,36 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 Arrow.Rotation = Interpolation.ValueAt(Math.Clamp(Clock.ElapsedFrameTime, 0, 100), Arrow.Rotation, aimRotation, 0, 50, Easing.OutQuint);
             }
         }
+
+        #region FOR EDITOR USE ONLY, DO NOT USE FOR ANY OTHER PURPOSE
+
+        internal void SuppressHitAnimations()
+        {
+            UpdateState(ArmedState.Idle);
+            UpdateComboColour();
+
+            // This method is called every frame in editor contexts, thus the lack of need for transforms.
+
+            bool hit = Time.Current >= HitStateUpdateTime;
+
+            if (hit)
+            {
+                // More or less matches stable (see https://github.com/peppy/osu-stable-reference/blob/bb57924c1552adbed11ee3d96cdcde47cf96f2b6/osu!/GameplayElements/HitObjects/Osu/HitCircleOsu.cs#L336-L338)
+                AccentColour.Value = Color4.White;
+                Alpha = Interpolation.ValueAt(Time.Current, 1f, 0f, HitStateUpdateTime, HitStateUpdateTime + 700);
+                Arrow.Alpha = 0;
+            }
+
+            LifetimeEnd = HitStateUpdateTime + 700;
+        }
+
+        internal void RestoreHitAnimations()
+        {
+            UpdateState(ArmedState.Hit);
+            UpdateComboColour();
+            Arrow.Alpha = 1;
+        }
+
+        #endregion
     }
 }
