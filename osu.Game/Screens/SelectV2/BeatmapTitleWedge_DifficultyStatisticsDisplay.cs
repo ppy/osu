@@ -21,7 +21,7 @@ namespace osu.Game.Screens.SelectV2
 {
     public partial class BeatmapTitleWedge
     {
-        public partial class DifficultyStatisticsDisplay : CompositeDrawable, IHasAccentColour
+        public partial class DifficultyStatisticsDisplay : CompositeDrawable
         {
             private readonly bool autoSize;
             private readonly FillFlowContainer<StatisticDifficulty> statisticsFlow;
@@ -51,6 +51,9 @@ namespace osu.Game.Screens.SelectV2
                 get => accentColour;
                 set
                 {
+                    if (accentColour == value)
+                        return;
+
                     accentColour = value;
 
                     foreach (var statistic in statisticsFlow)
