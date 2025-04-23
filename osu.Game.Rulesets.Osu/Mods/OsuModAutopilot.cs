@@ -39,6 +39,8 @@ namespace osu.Game.Rulesets.Osu.Mods
         };
 
         // Values to make cursor movement seem more natural.
+        // Assuming people cant tap within (MinStart) ms within an interval.
+        // Most likely needs a review.
         private const double MinStart = 20;
         private const double MinEnd = 5;
 
