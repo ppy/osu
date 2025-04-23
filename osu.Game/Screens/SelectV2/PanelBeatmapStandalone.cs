@@ -270,7 +270,7 @@ namespace osu.Game.Screens.SelectV2
             var starDifficulty = starDifficultyBindable?.Value ?? default;
 
             AccentColour = colours.ForStarDifficulty(starDifficulty.Stars);
-            difficultyIcon.FadeColour(starDifficulty.Stars > 6.5f ? colours.Orange1 : colourProvider.Background5, duration, Easing.OutQuint);
+            difficultyIcon.FadeColour(starDifficulty.Stars > OsuColour.STAR_DIFFICULTY_DEFINED_COLOUR_CUTOFF ? colours.Orange1 : colourProvider.Background5, duration, Easing.OutQuint);
             difficultyStarRating.Current.Value = starDifficulty;
         }
     }
