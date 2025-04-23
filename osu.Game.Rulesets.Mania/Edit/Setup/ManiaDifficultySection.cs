@@ -89,6 +89,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Setup
                 {
                     Caption = EditorSetupStrings.BaseVelocity,
                     HintText = EditorSetupStrings.BaseVelocityDescription,
+                    KeyboardStep = 0.1f,
                     Current = new BindableDouble(Beatmap.Difficulty.SliderMultiplier)
                     {
                         Default = 1.4,
@@ -103,6 +104,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Setup
                 {
                     Caption = EditorSetupStrings.TickRate,
                     HintText = EditorSetupStrings.TickRateDescription,
+                    KeyboardStep = 1,
                     Current = new BindableDouble(Beatmap.Difficulty.SliderTickRate)
                     {
                         Default = 1,

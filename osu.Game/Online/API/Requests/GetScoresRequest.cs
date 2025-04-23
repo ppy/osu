@@ -36,7 +36,7 @@ namespace osu.Game.Online.API.Requests
             this.mods = mods ?? Array.Empty<IMod>();
         }
 
-        protected override string Target => $@"beatmaps/{beatmapInfo.OnlineID}/solo-scores{createQueryParameters()}";
+        protected override string Target => $@"beatmaps/{beatmapInfo.OnlineID}/scores{createQueryParameters()}";
 
         private string createQueryParameters()
         {

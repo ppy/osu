@@ -27,8 +27,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public DrawableSlider DrawableSlider => (DrawableSlider)ParentHitObject;
 
-        private double animDuration;
-
         public SkinnableDrawable CirclePiece { get; private set; }
 
         public SkinnableDrawable Arrow { get; private set; }
@@ -87,20 +85,17 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override void UpdateInitialTransforms()
         {
-            // When snaking in is enabled, the first end circle needs to be delayed until the snaking completes.
-            bool delayFadeIn = DrawableSlider.SliderBody?.SnakingIn.Value == true && HitObject.RepeatIndex == 0;
+            base.UpdateInitialTransforms();
 
-            animDuration = Math.Min(300, HitObject.SpanDuration);
-
-            this
-                .FadeOut()
-                .Delay(delayFadeIn ? (Slider?.TimePreempt ?? 0) / 3 : 0)
-                .FadeIn(HitObject.RepeatIndex == 0 ? HitObject.TimeFadeIn : animDuration);
+            ApplyRepeatFadeIn(CirclePiece, HitObject.TimeFadeIn);
+            ApplyRepeatFadeIn(Arrow, 150);
         }
 
         protected override void UpdateHitStateTransforms(ArmedState state)
         {
             base.UpdateHitStateTransforms(state);
+
+            double animDuration = Math.Min(300, HitObject.SpanDuration);
 
             switch (state)
             {
@@ -181,9 +176,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 // More or less matches stable (see https://github.com/peppy/osu-stable-reference/blob/bb57924c1552adbed11ee3d96cdcde47cf96f2b6/osu!/GameplayElements/HitObjects/Osu/HitCircleOsu.cs#L336-L338)
                 AccentColour.Value = Color4.White;
                 Alpha = Interpolation.ValueAt(Time.Current, 1f, 0f, HitStateUpdateTime, HitStateUpdateTime + 700);
+                Arrow.Alpha = 0;
             }
-
-            Arrow.Alpha = hit ? 0 : 1;
 
             LifetimeEnd = HitStateUpdateTime + 700;
         }

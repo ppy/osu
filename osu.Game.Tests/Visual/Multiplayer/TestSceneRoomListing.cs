@@ -201,6 +201,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private bool checkRoomSelected(Room? room) => selectedRoom.Value == room;
 
         private Room? getRoomInFlow(int index) =>
-            (container.ChildrenOfType<FillFlowContainer<DrawableLoungeRoom>>().First().FlowingChildren.ElementAt(index) as DrawableRoom)?.Room;
+            (container.ChildrenOfType<FillFlowContainer<LoungeRoomPanel>>().First().FlowingChildren.ElementAt(index) as RoomPanel)?.Room;
     }
 }

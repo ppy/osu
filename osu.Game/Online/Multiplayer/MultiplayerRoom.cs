@@ -85,6 +85,7 @@ namespace osu.Game.Online.Multiplayer
         /// Retrieves the active <see cref="MultiplayerPlaylistItem"/> as determined by the room's current settings.
         /// </summary>
         [IgnoreMember]
+        [JsonIgnore]
         public MultiplayerPlaylistItem CurrentPlaylistItem => Playlist.Single(item => item.ID == Settings.PlaylistItemId);
 
         /// <summary>

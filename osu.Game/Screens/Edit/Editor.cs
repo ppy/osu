@@ -573,6 +573,9 @@ namespace osu.Game.Screens.Edit
             return true;
         }
 
+        [CanBeNull]
+        internal event Action Saved;
+
         /// <summary>
         /// Saves the currently edited beatmap.
         /// </summary>
@@ -601,6 +604,7 @@ namespace osu.Game.Screens.Edit
             isNewBeatmap = false;
             updateLastSavedHash();
             onScreenDisplay?.Display(new BeatmapEditorToast(ToastStrings.BeatmapSaved, editorBeatmap.BeatmapInfo.GetDisplayTitle()));
+            Saved?.Invoke();
             return true;
         }
 
@@ -1262,7 +1266,7 @@ namespace osu.Game.Screens.Edit
             yield return createDifficultyCreationMenu();
             yield return createDifficultySwitchMenu();
             yield return new OsuMenuItemSpacer();
-            yield return new EditorMenuItem(EditorStrings.DeleteDifficulty, MenuItemType.Standard, deleteDifficulty) { Action = { Disabled = Beatmap.Value.BeatmapSetInfo.Beatmaps.Count < 2 } };
+            yield return new EditorMenuItem(EditorStrings.DeleteDifficulty, MenuItemType.Destructive, deleteDifficulty) { Action = { Disabled = Beatmap.Value.BeatmapSetInfo.Beatmaps.Count < 2 } };
             yield return new OsuMenuItemSpacer();
 
             var save = new EditorMenuItem(WebCommonStrings.ButtonsSave, MenuItemType.Standard, () => attemptMutationOperation(Save)) { Hotkey = new Hotkey(PlatformAction.Save) };

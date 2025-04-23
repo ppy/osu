@@ -6,6 +6,7 @@ using MessagePack;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Online;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
@@ -269,6 +270,12 @@ namespace osu.Game.Users
             {
                 RoomID = room.RoomID ?? -1;
                 RoomName = room.Name;
+            }
+
+            public InLobby(MultiplayerRoom room)
+            {
+                RoomID = room.RoomID;
+                RoomName = room.Settings.Name;
             }
 
             [SerializationConstructor]
