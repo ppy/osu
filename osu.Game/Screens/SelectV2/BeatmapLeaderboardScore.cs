@@ -122,11 +122,11 @@ namespace osu.Game.Screens.SelectV2
 
         public ITooltip<ScoreInfo> GetCustomTooltip() => new LeaderboardScoreTooltip(colourProvider);
 
-        public ScoreInfo TooltipContent { get; }
+        private readonly ScoreInfo score;
 
         public BeatmapLeaderboardScore(ScoreInfo score, bool sheared = true)
         {
-            TooltipContent = score;
+            this.score = score;
             this.sheared = sheared;
 
             Shear = sheared ? OsuGame.SHEAR : Vector2.Zero;
@@ -137,14 +137,14 @@ namespace osu.Game.Screens.SelectV2
         [BackgroundDependencyLoader]
         private void load()
         {
-            var user = TooltipContent.User;
+            var user = score.User;
 
             foregroundColour = colourProvider.Background5;
             backgroundColour = colourProvider.Background3;
             totalScoreBackgroundGradient = ColourInfo.GradientHorizontal(backgroundColour.Opacity(0), backgroundColour);
             personalBestGradient = ColourInfo.GradientHorizontal(personal_best_gradient_left, personal_best_gradient_right);
 
-            statisticsLabels = getStatistics(TooltipContent).Select(s => new ScoreComponentLabel(s, TooltipContent)
+            statisticsLabels = getStatistics(score).Select(s => new ScoreComponentLabel(s, score)
             {
                 // ensure statistics container is the correct width when invalidating
                 AlwaysPresent = true,
@@ -237,18 +237,18 @@ namespace osu.Game.Screens.SelectV2
         {
             int maxMods = scoringMode.Value == ScoringMode.Standardised ? 4 : 5;
 
-            if (TooltipContent.Mods.Length > 0)
+            if (score.Mods.Length > 0)
             {
                 modsContainer.Padding = new MarginPadding { Top = 4f };
-                modsContainer.ChildrenEnumerable = TooltipContent.Mods.AsOrdered().Take(Math.Min(maxMods, TooltipContent.Mods.Length)).Select(mod => new ColouredModSwitchTiny(mod)
+                modsContainer.ChildrenEnumerable = score.Mods.AsOrdered().Take(Math.Min(maxMods, score.Mods.Length)).Select(mod => new ColouredModSwitchTiny(mod)
                 {
                     Scale = new Vector2(0.3125f)
                 });
 
-                if (TooltipContent.Mods.Length > maxMods)
+                if (score.Mods.Length > maxMods)
                 {
                     modsContainer.Remove(modsContainer[^1], true);
-                    modsContainer.Add(new MoreModSwitchTiny(TooltipContent.Mods)
+                    modsContainer.Add(new MoreModSwitchTiny(score.Mods)
                     {
                         Scale = new Vector2(0.3125f),
                     });
@@ -272,7 +272,7 @@ namespace osu.Game.Screens.SelectV2
                 new UserCoverBackground
                 {
                     RelativeSizeAxes = Axes.Both,
-                    User = TooltipContent.User,
+                    User = score.User,
                     Shear = sheared ? -OsuGame.SHEAR : Vector2.Zero,
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
@@ -363,7 +363,7 @@ namespace osu.Game.Screens.SelectV2
                                                 Origin = Anchor.CentreLeft,
                                                 Size = new Vector2(30, 15),
                                             },
-                                            new DateLabel(TooltipContent.Date)
+                                            new DateLabel(score.Date)
                                             {
                                                 Anchor = Anchor.CentreLeft,
                                                 Origin = Anchor.CentreLeft,
@@ -425,7 +425,7 @@ namespace osu.Game.Screens.SelectV2
                         Child = new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = ColourInfo.GradientHorizontal(backgroundColour.Opacity(0), OsuColour.ForRank(TooltipContent.Rank)),
+                            Colour = ColourInfo.GradientHorizontal(backgroundColour.Opacity(0), OsuColour.ForRank(score.Rank)),
                         },
                     },
                     new Box
@@ -434,7 +434,7 @@ namespace osu.Game.Screens.SelectV2
                         Width = grade_width,
                         Anchor = Anchor.TopRight,
                         Origin = Anchor.TopRight,
-                        Colour = OsuColour.ForRank(TooltipContent.Rank),
+                        Colour = OsuColour.ForRank(score.Rank),
                     },
                     new TrianglesV2
                     {
@@ -443,7 +443,7 @@ namespace osu.Game.Screens.SelectV2
                         Origin = Anchor.TopRight,
                         SpawnRatio = 2,
                         Velocity = 0.7f,
-                        Colour = ColourInfo.GradientHorizontal(backgroundColour.Opacity(0), OsuColour.ForRank(TooltipContent.Rank).Darken(0.2f)),
+                        Colour = ColourInfo.GradientHorizontal(backgroundColour.Opacity(0), OsuColour.ForRank(score.Rank).Darken(0.2f)),
                     },
                     new Container
                     {
@@ -457,9 +457,9 @@ namespace osu.Game.Screens.SelectV2
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Spacing = new Vector2(-2),
-                            Colour = DrawableRank.GetRankNameColour(TooltipContent.Rank),
+                            Colour = DrawableRank.GetRankNameColour(score.Rank),
                             Font = OsuFont.Numeric.With(size: 14),
-                            Text = DrawableRank.GetRankName(TooltipContent.Rank),
+                            Text = DrawableRank.GetRankName(score.Rank),
                             ShadowColour = Color4.Black.Opacity(0.3f),
                             ShadowOffset = new Vector2(0, 0.08f),
                             Shadow = true,
@@ -489,7 +489,7 @@ namespace osu.Game.Screens.SelectV2
                                 new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Colour = ColourInfo.GradientHorizontal(backgroundColour.Opacity(0), OsuColour.ForRank(TooltipContent.Rank).Opacity(0.5f)),
+                                    Colour = ColourInfo.GradientHorizontal(backgroundColour.Opacity(0), OsuColour.ForRank(score.Rank).Opacity(0.5f)),
                                 },
                                 new FillFlowContainer
                                 {
@@ -506,7 +506,7 @@ namespace osu.Game.Screens.SelectV2
                                             Origin = Anchor.TopRight,
                                             UseFullGlyphHeight = false,
                                             Shear = sheared ? -OsuGame.SHEAR : Vector2.Zero,
-                                            Current = scoreManager.GetBindableTotalScoreString(TooltipContent),
+                                            Current = scoreManager.GetBindableTotalScoreString(score),
                                             Spacing = new Vector2(-1.5f),
                                             Font = OsuFont.Style.Subtitle.With(weight: FontWeight.Light, fixedWidth: true),
                                         },
@@ -652,7 +652,31 @@ namespace osu.Game.Screens.SelectV2
             return DisplayMode.Minimal;
         }
 
-        #region Subclasses
+        ScoreInfo IHasCustomTooltip<ScoreInfo>.TooltipContent => score;
+
+        MenuItem[] IHasContextMenu.ContextMenuItems
+        {
+            get
+            {
+                List<MenuItem> items = new List<MenuItem>();
+
+                // system mods should never be copied across regardless of anything.
+                var copyableMods = score.Mods.Where(m => IsValidMod.Invoke(m) && m.Type != ModType.System).ToArray();
+
+                if (copyableMods.Length > 0)
+                    items.Add(new OsuMenuItem("Use these mods", MenuItemType.Highlighted, () => SelectedMods.Value = copyableMods));
+
+                if (score.OnlineID > 0)
+                    items.Add(new OsuMenuItem(CommonStrings.CopyLink, MenuItemType.Standard, () => clipboard?.SetText($@"{api.Endpoints.WebsiteUrl}/scores/{score.OnlineID}")));
+
+                if (score.Files.Count <= 0) return items.ToArray();
+
+                items.Add(new OsuMenuItem(CommonStrings.Export, MenuItemType.Standard, () => scoreManager.Export(score)));
+                items.Add(new OsuMenuItem(Resources.Localisation.Web.CommonStrings.ButtonsDelete, MenuItemType.Destructive, () => dialogOverlay?.Push(new LocalScoreDeleteDialog(score))));
+
+                return items.ToArray();
+            }
+        }
 
         private enum DisplayMode
         {
@@ -753,19 +777,18 @@ namespace osu.Game.Screens.SelectV2
 
         private sealed partial class ColouredModSwitchTiny : ModSwitchTiny, IHasCustomTooltip<Mod>
         {
-            public Mod? TooltipContent { get; }
-
             [Resolved]
             private OverlayColourProvider colourProvider { get; set; } = null!;
 
             public ColouredModSwitchTiny(Mod mod)
                 : base(mod)
             {
-                TooltipContent = mod;
                 Active.Value = true;
             }
 
             public ITooltip<Mod> GetCustomTooltip() => new ModTooltip(colourProvider);
+
+            Mod? IHasCustomTooltip<Mod>.TooltipContent => (Mod)Mod;
         }
 
         private sealed partial class MoreModSwitchTiny : CompositeDrawable, IHasPopover
@@ -820,52 +843,26 @@ namespace osu.Game.Screens.SelectV2
             protected override bool OnHover(HoverEvent e) => true;
 
             public Popover GetPopover() => new MoreModsPopover(mods);
-        }
 
-        public partial class MoreModsPopover : OsuPopover
-        {
-            public MoreModsPopover(IReadOnlyList<Mod> mods)
+            public partial class MoreModsPopover : OsuPopover
             {
-                AutoSizeAxes = Axes.Both;
-                AllowableAnchors = new[] { Anchor.CentreLeft, Anchor.CentreRight };
-
-                Child = new FillFlowContainer
+                public MoreModsPopover(IReadOnlyList<Mod> mods)
                 {
-                    Width = 125f,
-                    AutoSizeAxes = Axes.Y,
-                    Direction = FillDirection.Full,
-                    Spacing = new Vector2(2.5f),
-                    ChildrenEnumerable = mods.AsOrdered().Select(m => new ColouredModSwitchTiny(m)
+                    AutoSizeAxes = Axes.Both;
+                    AllowableAnchors = new[] { Anchor.CentreLeft, Anchor.CentreRight };
+
+                    Child = new FillFlowContainer
                     {
-                        Scale = new Vector2(0.3125f),
-                    })
-                };
-            }
-        }
-
-        #endregion
-
-        public MenuItem[] ContextMenuItems
-        {
-            get
-            {
-                List<MenuItem> items = new List<MenuItem>();
-
-                // system mods should never be copied across regardless of anything.
-                var copyableMods = TooltipContent.Mods.Where(m => IsValidMod.Invoke(m) && m.Type != ModType.System).ToArray();
-
-                if (copyableMods.Length > 0)
-                    items.Add(new OsuMenuItem("Use these mods", MenuItemType.Highlighted, () => SelectedMods.Value = copyableMods));
-
-                if (TooltipContent.OnlineID > 0)
-                    items.Add(new OsuMenuItem(CommonStrings.CopyLink, MenuItemType.Standard, () => clipboard?.SetText($@"{api.Endpoints.WebsiteUrl}/scores/{TooltipContent.OnlineID}")));
-
-                if (TooltipContent.Files.Count <= 0) return items.ToArray();
-
-                items.Add(new OsuMenuItem(CommonStrings.Export, MenuItemType.Standard, () => scoreManager.Export(TooltipContent)));
-                items.Add(new OsuMenuItem(Resources.Localisation.Web.CommonStrings.ButtonsDelete, MenuItemType.Destructive, () => dialogOverlay?.Push(new LocalScoreDeleteDialog(TooltipContent))));
-
-                return items.ToArray();
+                        Width = 125f,
+                        AutoSizeAxes = Axes.Y,
+                        Direction = FillDirection.Full,
+                        Spacing = new Vector2(2.5f),
+                        ChildrenEnumerable = mods.AsOrdered().Select(m => new ColouredModSwitchTiny(m)
+                        {
+                            Scale = new Vector2(0.3125f),
+                        })
+                    };
+                }
             }
         }
     }
