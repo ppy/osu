@@ -137,6 +137,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         {
             AddStep("ensure no scores displayed", () => leaderboard.SetScores(Array.Empty<ScoreInfo>()));
 
+            AddStep(@"Retrieving", () => leaderboard.SetState(LeaderboardState.Retrieving));
             AddStep(@"Network failure", () => leaderboard.SetState(LeaderboardState.NetworkFailure));
             AddStep(@"No team", () => leaderboard.SetState(LeaderboardState.NoTeam));
             AddStep(@"No supporter", () => leaderboard.SetState(LeaderboardState.NotSupporter));
