@@ -260,10 +260,10 @@ namespace osu.Game.Screens.SelectV2
             double drainLength = Math.Round(beatmap.Value.Beatmap.CalculateDrainLength() / rate);
             double hitLength = Math.Round(beatmapInfo.Length / rate);
 
-            lengthStatistic.Value = hitLength.ToFormattedDuration();
+            lengthStatistic.Text = hitLength.ToFormattedDuration();
             lengthStatistic.TooltipText = BeatmapsetsStrings.ShowStatsTotalLength(drainLength.ToFormattedDuration());
 
-            bpmStatistic.Value = bpmMin == bpmMax
+            bpmStatistic.Text = bpmMin == bpmMax
                 ? $"{bpmMin}"
                 : $"{bpmMin}-{bpmMax} (mostly {mostCommonBPM})";
         }
@@ -296,12 +296,12 @@ namespace osu.Game.Screens.SelectV2
             if (currentRequest?.CompletionState == APIRequestCompletionState.Waiting)
             {
                 playCount.Value = null;
-                favouritesStatistic.Value = null;
+                favouritesStatistic.Text = null;
             }
             else if (currentOnlineBeatmapSet == null)
             {
                 playCount.Value = new StatisticPlayCount.Data(-1, -1);
-                favouritesStatistic.Value = "-";
+                favouritesStatistic.Text = "-";
             }
             else
             {
@@ -320,7 +320,7 @@ namespace osu.Game.Screens.SelectV2
                 }
 
                 favouritesStatistic.FadeIn(300, Easing.OutQuint);
-                favouritesStatistic.Value = onlineBeatmapSet.FavouriteCount.ToLocalisableString(@"N0");
+                favouritesStatistic.Text = onlineBeatmapSet.FavouriteCount.ToLocalisableString(@"N0");
             }
         }
     }

@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.LocalisationExtensions;
@@ -9,6 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
@@ -21,13 +23,18 @@ namespace osu.Game.Screens.SelectV2
     {
         public partial class StatisticPlayCount : Statistic, IHasCustomTooltip<StatisticPlayCount.Data>
         {
-            public new Data? Value
+            public Data? Value
             {
                 set
                 {
-                    base.Value = value?.Total < 0 ? "-" : value?.Total.ToLocalisableString("N0");
+                    base.Text = value?.Total < 0 ? "-" : value?.Total.ToLocalisableString("N0");
                     TooltipContent = value;
                 }
+            }
+
+            public new LocalisableString? Text
+            {
+                set => throw new InvalidOperationException($"Use {nameof(Value)} instead.");
             }
 
             public Data? TooltipContent { get; private set; }
