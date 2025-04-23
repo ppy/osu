@@ -117,24 +117,21 @@ namespace osu.Game.Screens.OnlinePlay
 
             Mods.BindValueChanged(onGlobalModsChanged);
             Ruleset.BindValueChanged(onRulesetChanged);
-            Freestyle.BindValueChanged(onFreestyleChanged, true);
+            Freestyle.BindValueChanged(onFreestyleChanged);
 
             freeModSelectOverlayRegistration = OverlayManager?.RegisterBlockingOverlay(freeModSelect);
+
+            updateFooterButtons();
+            updateValidMods();
         }
 
         private void onFreestyleChanged(ValueChangedEvent<bool> enabled)
         {
-            // Remove invalid mods and display the newly available mod panels.
-            Mods.Value = Mods.Value.Where(isValidRequiredMod).ToArray();
-            ModSelect.IsValidMod = isValidRequiredMod;
-            FreeMods.Value = FreeMods.Value.Where(isValidAllowedMod).ToArray();
-            freeModSelect.IsValidMod = isValidAllowedMod;
+            updateFooterButtons();
+            updateValidMods();
 
             if (enabled.NewValue)
             {
-                freeModsFooterButton.Enabled.Value = false;
-                freeModSelect.Hide();
-
                 // Freestyle allows all mods to be selected as freemods. This does not play nicely for some components:
                 // - We probably don't want to store a gigantic list of acronyms to the database.
                 // - The mod select overlay isn't built to handle duplicate mods/mods from all rulesets being shoved into it.
@@ -143,8 +140,6 @@ namespace osu.Game.Screens.OnlinePlay
             }
             else
             {
-                freeModsFooterButton.Enabled.Value = true;
-
                 // When disabling freestyle, enable freemods by default.
                 FreeMods.Value = freeModSelect.AllAvailableMods.Where(state => state.ValidForSelection.Value).Select(state => state.Mod).ToArray();
             }
@@ -152,15 +147,33 @@ namespace osu.Game.Screens.OnlinePlay
 
         private void onGlobalModsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
         {
-            // Remove incompatible free mods and display the newly available mod panels.
-            FreeMods.Value = FreeMods.Value.Where(isValidAllowedMod).ToArray();
-            freeModSelect.IsValidMod = isValidAllowedMod;
+            updateValidMods();
         }
 
         private void onRulesetChanged(ValueChangedEvent<RulesetInfo> ruleset)
         {
             // Todo: We can probably attempt to preserve across rulesets like the global mods do.
             FreeMods.Value = [];
+        }
+
+        private void updateFooterButtons()
+        {
+            if (Freestyle.Value)
+            {
+                freeModsFooterButton.Enabled.Value = false;
+                freeModSelect.Hide();
+            }
+            else
+                freeModsFooterButton.Enabled.Value = true;
+        }
+
+        private void updateValidMods()
+        {
+            // Remove invalid mods and display the newly available mod panels.
+            Mods.Value = Mods.Value.Where(isValidRequiredMod).ToArray();
+            ModSelect.IsValidMod = isValidRequiredMod;
+            FreeMods.Value = FreeMods.Value.Where(isValidAllowedMod).ToArray();
+            freeModSelect.IsValidMod = isValidAllowedMod;
         }
 
         protected sealed override bool OnStart()
