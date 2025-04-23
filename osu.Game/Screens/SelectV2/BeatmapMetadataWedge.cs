@@ -35,6 +35,8 @@ namespace osu.Game.Screens.SelectV2
         private Drawable failRetryWedge = null!;
         private FailRetryDisplay failRetryDisplay = null!;
 
+        protected override bool StartHidden => true;
+
         [Resolved]
         private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
 
@@ -225,16 +227,47 @@ namespace osu.Game.Screens.SelectV2
             apiState.BindValueChanged(_ => Scheduler.AddOnce(updateDisplay), true);
         }
 
+        private const double transition_duration = 300;
+
         protected override void PopIn()
         {
-            this.FadeIn(300, Easing.OutQuint)
-                .MoveToX(0, 300, Easing.OutQuint);
+            this.FadeIn(transition_duration, Easing.OutQuint)
+                .MoveToX(0, transition_duration, Easing.OutQuint);
+
+            updateSubWedgeVisibility();
         }
 
         protected override void PopOut()
         {
-            this.FadeOut(300, Easing.OutQuint)
-                .MoveToX(-100, 300, Easing.OutQuint);
+            this.FadeOut(transition_duration, Easing.OutQuint)
+                .MoveToX(-100, transition_duration, Easing.OutQuint);
+
+            updateSubWedgeVisibility();
+        }
+
+        private void updateSubWedgeVisibility()
+        {
+            // We could consider hiding individual wedges based on zero data in the future.
+            // Needs some experimentation on what looks good.
+
+            if (State.Value == Visibility.Visible && currentOnlineBeatmapSet != null)
+            {
+                ratingsWedge.FadeIn(transition_duration, Easing.OutQuint)
+                            .MoveToX(0, transition_duration, Easing.OutQuint);
+
+                failRetryWedge.Delay(100)
+                              .FadeIn(transition_duration, Easing.OutQuint)
+                              .MoveToX(0, transition_duration, Easing.OutQuint);
+            }
+            else
+            {
+                ratingsWedge.FadeOut(transition_duration, Easing.OutQuint)
+                            .MoveToX(-50, transition_duration, Easing.OutQuint);
+
+                failRetryWedge.Delay(100)
+                              .FadeOut(transition_duration, Easing.OutQuint)
+                              .MoveToX(-50, transition_duration, Easing.OutQuint);
+            }
         }
 
         private void updateDisplay()
@@ -291,16 +324,13 @@ namespace osu.Game.Screens.SelectV2
             {
                 genre.Data = null;
                 language.Data = null;
+                return;
             }
-            else if (currentOnlineBeatmapSet == null)
+
+            if (currentOnlineBeatmapSet == null)
             {
                 genre.Data = ("-", null);
                 language.Data = ("-", null);
-
-                ratingsWedge.FadeOut(300, Easing.OutQuint);
-                ratingsWedge.MoveToX(-50, 300, Easing.OutQuint);
-                failRetryWedge.FadeOut(300, Easing.OutQuint);
-                failRetryWedge.MoveToX(-50, 300, Easing.OutQuint);
             }
             else
             {
@@ -314,24 +344,14 @@ namespace osu.Game.Screens.SelectV2
 
                 if (onlineBeatmap != null)
                 {
-                    ratingsWedge.FadeIn(300, Easing.OutQuint);
-                    ratingsWedge.MoveToX(0, 300, Easing.OutQuint);
-                    failRetryWedge.FadeIn(300, Easing.OutQuint);
-                    failRetryWedge.MoveToX(0, 300, Easing.OutQuint);
-
                     userRatingDisplay.Data = onlineBeatmapSet.Ratings;
                     ratingSpreadDisplay.Data = onlineBeatmapSet.Ratings;
                     successRateDisplay.Data = (onlineBeatmap.PassCount, onlineBeatmap.PlayCount);
                     failRetryDisplay.Data = onlineBeatmap.FailTimes ?? new APIFailTimes();
                 }
-                else
-                {
-                    ratingsWedge.FadeOut(300, Easing.OutQuint);
-                    ratingsWedge.MoveToX(-50, 300, Easing.OutQuint);
-                    failRetryWedge.FadeOut(300, Easing.OutQuint);
-                    failRetryWedge.MoveToX(-50, 300, Easing.OutQuint);
-                }
             }
+
+            updateSubWedgeVisibility();
         }
     }
 }

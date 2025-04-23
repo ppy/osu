@@ -18,6 +18,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
     {
         private APIBeatmapSet? currentOnlineSet;
 
+        private BeatmapMetadataWedge wedge = null!;
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -40,22 +42,36 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 }
             };
 
-            Child = new BeatmapMetadataWedge
+            Child = wedge = new BeatmapMetadataWedge
             {
                 State = { Value = Visibility.Visible },
             };
         }
 
         [Test]
-        public void TestDisplay()
+        public void TestShowHide()
         {
-            AddStep("null beatmap", () => Beatmap.SetDefault());
             AddStep("all metrics", () =>
             {
                 var (working, onlineSet) = createTestBeatmap();
                 currentOnlineSet = onlineSet;
                 Beatmap.Value = working;
             });
+
+            AddStep("hide wedge", () => wedge.Hide());
+            AddStep("show wedge", () => wedge.Show());
+        }
+
+        [Test]
+        public void TestVariousMetrics()
+        {
+            AddStep("all metrics", () =>
+            {
+                var (working, onlineSet) = createTestBeatmap();
+                currentOnlineSet = onlineSet;
+                Beatmap.Value = working;
+            });
+            AddStep("null beatmap", () => Beatmap.SetDefault());
             AddStep("no source", () =>
             {
                 var (working, onlineSet) = createTestBeatmap();
