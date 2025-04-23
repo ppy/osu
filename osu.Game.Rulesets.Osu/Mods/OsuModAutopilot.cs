@@ -2,12 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.StateChanges;
 using osu.Framework.Localisation;
-using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Objects;
@@ -41,12 +39,11 @@ namespace osu.Game.Rulesets.Osu.Mods
         // Values to make cursor movement seem more natural.
         // Assuming people cant tap within (MinStart) ms within an interval.
         // Most likely needs a review.
-        private const double MinStart = 20;
-        private const double MinEnd = 5;
+        private const double min_start = 20;
+        private const double min_end = 5;
 
         // The spinner radius value from OsuAutoGeneratorBase
-        private const float SpinnerRadius = 50;
-        private const double BaseRps = 500 / 60;
+        private const float spinner_radius = 50;
 
         private OsuInputManager inputManager = null!;
         private Func<HitWindows, double> hitWindowLookup = null!;
@@ -90,35 +87,37 @@ namespace osu.Game.Rulesets.Osu.Mods
                 if (elapsed < 0)
                 {
                     Vector2 spinnerTargetPosition = spinner.Position + new Vector2(
-                        -(float)Math.Sin(0) * SpinnerRadius,
-                        -(float)Math.Cos(0) * SpinnerRadius);
+                        -(float)Math.Sin(0) * spinner_radius,
+                        -(float)Math.Cos(0) * spinner_radius);
 
-                    double duration = currentTime >= start - MinStart
-                    ? 1 + Math.Clamp((elapsed) / (spinner.Duration - MinEnd), 0, 1) * (MinStart - 1)
+                    double duration = currentTime >= start - min_start
+                    ? 1 + Math.Clamp((elapsed - min_start) / (spinner.Duration - min_end), 0, 1) * (min_start - 1)
                     : -elapsed;
 
-                    MoveTowards(pos, spinnerTargetPosition, duration, playfield);
+                    moveTowards(pos, spinnerTargetPosition, duration, playfield);
 
                     return;
                 }
 
+                double calculatedSpeed = 1.01 * (spinner.MaximumBonusSpins + spinner.SpinsRequiredForBonus) / spinner.Duration;
+
                 // Rotate around centre
-                double rate = BaseRps / (playfield.Clock.Rate * 1000);
+                double rate = calculatedSpeed / playfield.Clock.Rate;
 
                 if (rate <= 0)
                     return;
 
                 double angle = 2 * Math.PI * (elapsed * rate);
                 Vector2 circPos = spinner.Position + new Vector2(
-                    -(float)Math.Sin(angle) * SpinnerRadius,
-                    -(float)Math.Cos(angle) * SpinnerRadius);
+                    -(float)Math.Sin(angle) * spinner_radius,
+                    -(float)Math.Cos(angle) * spinner_radius);
 
                 double rateElapsedTime = playfield.Clock.ElapsedFrameTime;
 
                 // Automatically spin spinner.
-                spinnerDrawable.RotationTracker.AddRotation(float.RadiansToDegrees((float)rateElapsedTime * (float)rate * MathF.PI * 2.0f));
+                spinnerDrawable.RotationTracker.AddRotation(float.RadiansToDegrees((float)rateElapsedTime * (float)calculatedSpeed * MathF.PI * 2.0f));
 
-                ApplyCursor(circPos, playfield);
+                applyCursor(circPos, playfield);
 
                 return;
             }
@@ -136,23 +135,23 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                     Vector2 pathPos = sliderDrawable.Position + slider.Path.PositionAt(spans) * sliderDrawable.Scale;
 
-                    ApplyCursor(pathPos, playfield);
+                    applyCursor(pathPos, playfield);
                 }
 
                 return;
             }
 
             // Hit circle movement
-            double hitWindowStart = start - window - MinStart;
-            double hitWindowEnd = start + window - MinEnd;
+            double hitWindowStart = start - window - min_start;
+            double hitWindowEnd = start + window - min_end;
             double availableTime = currentTime >= hitWindowStart
-                    ? 1 + Math.Clamp((hitWindowEnd - currentTime) / (hitWindowEnd - hitWindowStart), 0, 1) * (MinStart - 1)
+                    ? 1 + Math.Clamp((hitWindowEnd - currentTime) / (hitWindowEnd - hitWindowStart), 0, 1) * (min_start - 1)
                     : (start - window - currentTime);
 
-            MoveTowards(pos, target, availableTime, playfield);
+            moveTowards(pos, target, availableTime, playfield);
         }
 
-        private void MoveTowards(Vector2 current, Vector2 target, double timeMs, Playfield pf)
+        private void moveTowards(Vector2 current, Vector2 target, double timeMs, Playfield pf)
         {
             float distance = Vector2.Distance(current, target);
             float velocity = distance / (float)timeMs;
@@ -162,7 +161,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 ? target
                 : current + (target - current).Normalized() * displacement;
 
-            ApplyCursor(newPos, pf);
+            applyCursor(newPos, pf);
         }
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
@@ -183,7 +182,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             hitWindowLookup = hw => hw.WindowFor(HitResult.Meh);
         }
 
-        private void ApplyCursor(Vector2 playfieldPosition, Playfield playfield)
+        private void applyCursor(Vector2 playfieldPosition, Playfield playfield)
         {
             new MousePositionAbsoluteInput
             {
