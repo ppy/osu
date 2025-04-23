@@ -44,6 +44,8 @@ namespace osu.Game.Overlays.Profile.Header.Components
         {
             AutoSizeAxes = Axes.Both;
 
+            OsuTextFlowContainer label;
+
             InternalChildren = new Drawable[]
             {
                 content = new Container
@@ -69,12 +71,9 @@ namespace osu.Game.Overlays.Profile.Header.Components
                             Direction = FillDirection.Horizontal,
                             Children = new Drawable[]
                             {
-                                new OsuTextFlowContainer(s => s.Font = OsuFont.GetFont(size: 12))
+                                label = new OsuTextFlowContainer(s => s.Font = OsuFont.GetFont(size: 12))
                                 {
                                     AutoSizeAxes = Axes.Both,
-                                    // can't use this because osu-web does weird stuff with \\n.
-                                    // Text = UsersStrings.ShowDailyChallengeTitle.,
-                                    Text = "Daily\nChallenge",
                                     Margin = new MarginPadding { Horizontal = 5f, Bottom = 2f },
                                 },
                                 new Container
@@ -129,6 +128,10 @@ namespace osu.Game.Overlays.Profile.Header.Components
                     }
                 },
             };
+
+            // can't use this because osu-web does weird stuff with \\n.
+            // Text = UsersStrings.ShowDailyChallengeTitle.,
+            label.AddParagraph("Daily\nChallenge");
         }
 
         protected override void LoadComplete()
