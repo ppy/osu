@@ -167,6 +167,11 @@ namespace osu.Game.Graphics.Carousel
         protected virtual Task FilterAsync() => filterTask = performFilter();
 
         /// <summary>
+        /// Check whether two models are the same for display purposes.
+        /// </summary>
+        protected virtual bool CheckModelEquality(object x, object y) => ReferenceEquals(x, y);
+
+        /// <summary>
         /// Create a drawable for the given carousel item so it can be displayed.
         /// </summary>
         /// <remarks>
@@ -490,11 +495,11 @@ namespace osu.Game.Graphics.Carousel
 
                 updateItemYPosition(item, ref lastVisible, ref yPos);
 
-                if (ReferenceEquals(item.Model, currentKeyboardSelection.Model))
-                    currentKeyboardSelection = new Selection(item.Model, item, item.CarouselYPosition, i);
+                if (CheckModelEquality(item.Model, currentKeyboardSelection.Model!))
+                    currentKeyboardSelection = new Selection(currentKeyboardSelection.Model, item, item.CarouselYPosition, i);
 
-                if (ReferenceEquals(item.Model, currentSelection.Model))
-                    currentSelection = new Selection(item.Model, item, item.CarouselYPosition, i);
+                if (CheckModelEquality(item.Model, currentSelection.Model!))
+                    currentSelection = new Selection(currentSelection.Model, item, item.CarouselYPosition, i);
             }
 
             // If a keyboard selection is currently made, we want to keep the view stable around the selection.
@@ -578,7 +583,7 @@ namespace osu.Game.Graphics.Carousel
 
                 panel.X = GetPanelXOffset(panel);
 
-                c.Selected.Value = c.Item == currentSelection?.CarouselItem;
+                c.Selected.Value = currentSelection?.CarouselItem != null && CheckModelEquality(c.Item, currentSelection.CarouselItem);
                 c.KeyboardSelected.Value = c.Item == currentKeyboardSelection?.CarouselItem;
                 c.Expanded.Value = c.Item.IsExpanded;
             }
@@ -644,7 +649,10 @@ namespace osu.Game.Graphics.Carousel
 
                 // The case where we're intending to display this panel, but it's already displayed.
                 // Note that we **must compare the model here** as the CarouselItems may be fresh instances due to a filter operation.
-                var existing = toDisplay.FirstOrDefault(i => i.Model == carouselPanel.Item!.Model);
+                //
+                // Reference equality is used here instead of CheckModelEquality intentionally. In order to switch to `CheckModelEquality`,
+                // we need a way to signal to the drawable panels that there is an update.
+                var existing = toDisplay.FirstOrDefault(i => ReferenceEquals(i.Model, carouselPanel.Item!.Model));
 
                 if (existing != null)
                 {
