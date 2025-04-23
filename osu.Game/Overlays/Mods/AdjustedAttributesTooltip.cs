@@ -18,6 +18,7 @@ namespace osu.Game.Overlays.Mods
 {
     public partial class AdjustedAttributesTooltip : VisibilityContainer, ITooltip<AdjustedAttributesTooltip.Data?>
     {
+        private readonly OverlayColourProvider? colourProvider;
         private FillFlowContainer attributesFillFlow = null!;
 
         private Container content = null!;
@@ -26,6 +27,11 @@ namespace osu.Game.Overlays.Mods
 
         [Resolved]
         private OsuColour colours { get; set; } = null!;
+
+        public AdjustedAttributesTooltip(OverlayColourProvider? colourProvider = null)
+        {
+            this.colourProvider = colourProvider;
+        }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -45,7 +51,7 @@ namespace osu.Game.Overlays.Mods
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = colours.Gray3,
+                            Colour = colourProvider?.Background4 ?? colours.Gray3,
                         },
                         new FillFlowContainer
                         {

@@ -801,12 +801,7 @@ namespace osu.Game
                     var newLeaderboard = currentLeaderboard != null
                         ? currentLeaderboard with { Beatmap = databasedBeatmap, Ruleset = databasedScore.ScoreInfo.Ruleset }
                         : new LeaderboardCriteria(databasedBeatmap, databasedScore.ScoreInfo.Ruleset, BeatmapLeaderboardScope.Global, null);
-                    LeaderboardManager.FetchWithCriteriaAsync(newLeaderboard)
-                                      .ContinueWith(t =>
-                                      {
-                                          if (t.Exception != null)
-                                              Logger.Log($@"Failed to fetch leaderboards when displaying results: {t.Exception}", LoggingTarget.Network);
-                                      });
+                    LeaderboardManager.FetchWithCriteria(newLeaderboard);
                 }
 
                 switch (presentType)
