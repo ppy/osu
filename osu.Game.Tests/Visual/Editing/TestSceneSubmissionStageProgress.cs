@@ -122,11 +122,12 @@ namespace osu.Game.Tests.Visual.Editing
                 int step = i;
                 AddStep($"{step}: not started", () => stages[step].SetNotStarted());
                 AddStep($"{step}: indeterminate progress", () => stages[step].SetInProgress());
-                AddStep($"{step}: 70% progress", () => stages[step].SetInProgress(0.25f));
+                AddStep($"{step}: 25% progress", () => stages[step].SetInProgress(0.25f));
+                AddStep($"{step}: 70% progress", () => stages[step].SetInProgress(0.7f));
                 AddStep($"{step}: completed", () => stages[step].SetCompleted());
             }
 
-            AddStep("pause for timing", () => { });
+            AddWaitStep("pause for timing", 1);
 
             AddStep("Sequence Complete", () =>
             {
