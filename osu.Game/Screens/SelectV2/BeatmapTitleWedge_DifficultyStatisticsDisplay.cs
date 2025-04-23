@@ -88,6 +88,8 @@ namespace osu.Game.Screens.SelectV2
                     {
                         Alpha = 0f,
                         AutoSizeAxes = Axes.Both,
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
                         ColumnDimensions = new[]
                         {
                             new Dimension(GridSizeMode.AutoSize),
@@ -169,9 +171,8 @@ namespace osu.Game.Screens.SelectV2
 
             private void updateStatistics()
             {
-                var oldStatistics = statisticsFlow.Select(s => s.Value).ToArray();
-
-                if (oldStatistics.Select(s => s.Label).SequenceEqual(statistics.Select(s => s.Label)))
+                if (statisticsFlow.Select(s => s.Value.Label)
+                                  .SequenceEqual(statistics.Select(s => s.Label)))
                 {
                     for (int i = 0; i < statistics.Count; i++)
                         statisticsFlow[i].Value = statistics[i];
