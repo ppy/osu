@@ -114,7 +114,7 @@ namespace osu.Game.Screens.SelectV2
                         Debug.Assert(previousIndex >= 0);
 
                         BeatmapInfo? matchingNewBeatmap =
-                            newSetBeatmaps.SingleOrDefault(b => b.OnlineID == beatmap.OnlineID) ??
+                            newSetBeatmaps.SingleOrDefault(b => b.OnlineID > 0 && b.OnlineID == beatmap.OnlineID) ??
                             newSetBeatmaps.SingleOrDefault(b => b.DifficultyName == beatmap.DifficultyName && b.Ruleset.Equals(beatmap.Ruleset));
 
                         if (matchingNewBeatmap != null)
