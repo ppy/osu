@@ -355,7 +355,13 @@ namespace osu.Game.Screens.SelectV2
 
         protected override bool CheckModelEquality(object x, object y)
         {
-            // TODO: this doesn't check online ID. probably need to account for that.
+            // In the confines of the carousel logic, we assume that CurrentSelection (and all items) are using non-stale
+            // BeatmapInfo reference, and that we can match based on beatmap / beatmapset (GU)IDs.
+            //
+            // If there's a case where updates don't come in as expected, diagnosis should start from BeatmapStore, ensuring
+            // it is doing a Replace operation on the list. If it is, then check the local handling in beatmapSetsChanged
+            // before changing matching requirements here.
+
             if (x is BeatmapSetInfo beatmapSetX && y is BeatmapSetInfo beatmapSetY)
                 return beatmapSetX.Equals(beatmapSetY);
 
