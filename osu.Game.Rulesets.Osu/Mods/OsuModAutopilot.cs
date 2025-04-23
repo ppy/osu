@@ -12,7 +12,6 @@ using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
-using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.Scoring;
@@ -39,10 +38,13 @@ namespace osu.Game.Rulesets.Osu.Mods
             typeof(ModTouchDevice)
         };
 
+        // Values to make cursor movement seem more natural.
         private const double MinStart = 20;
         private const double MinEnd = 5;
-        private const float SpinnerRadius = 40;
-        private const double BaseRps = 480d / 60d;
+
+        // The spinner radius value from OsuAutoGeneratorBase
+        private const float SpinnerRadius = 50;
+        private const double BaseRps = 500 / 60;
 
         private OsuInputManager inputManager = null!;
         private Func<HitWindows, double> hitWindowLookup = null!;
@@ -76,6 +78,10 @@ namespace osu.Game.Rulesets.Osu.Mods
             if (active is DrawableSpinner spinnerDrawable)
             {
                 var spinner = spinnerDrawable.HitObject;
+
+                spinnerDrawable.RotationTracker.Tracking = spinnerDrawable.RotationTracker.IsSpinnableTime;
+                spinnerDrawable.HandleUserInput = false;
+
                 double elapsed = currentTime - start;
 
                 // Before spinner starts, move to position.
@@ -86,7 +92,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                         -(float)Math.Cos(0) * SpinnerRadius);
 
                     double duration = currentTime >= start - MinStart
-                    ? 1 + Math.Clamp(elapsed / spinner.Duration, 0, 1) * (MinStart - 1)
+                    ? 1 + Math.Clamp((elapsed) / (spinner.Duration - MinEnd), 0, 1) * (MinStart - 1)
                     : -elapsed;
 
                     MoveTowards(pos, spinnerTargetPosition, duration, playfield);
@@ -95,11 +101,20 @@ namespace osu.Game.Rulesets.Osu.Mods
                 }
 
                 // Rotate around centre
-                double rate = BaseRps / playfield.Clock.Rate;
-                double angle = 2 * Math.PI * (elapsed * rate / 1000);
+                double rate = BaseRps / (playfield.Clock.Rate * 1000);
+
+                if (rate <= 0)
+                    return;
+
+                double angle = 2 * Math.PI * (elapsed * rate);
                 Vector2 circPos = spinner.Position + new Vector2(
                     -(float)Math.Sin(angle) * SpinnerRadius,
                     -(float)Math.Cos(angle) * SpinnerRadius);
+
+                double rateElapsedTime = playfield.Clock.ElapsedFrameTime;
+
+                // Automatically spin spinner.
+                spinnerDrawable.RotationTracker.AddRotation(float.RadiansToDegrees((float)rateElapsedTime * (float)rate * MathF.PI * 2.0f));
 
                 ApplyCursor(circPos, playfield);
 
@@ -133,8 +148,6 @@ namespace osu.Game.Rulesets.Osu.Mods
                     : (start - window - currentTime);
 
             MoveTowards(pos, target, availableTime, playfield);
-
-            // TODO: Implement the functionality to automatically spin spinners
         }
 
         private void MoveTowards(Vector2 current, Vector2 target, double timeMs, Playfield pf)
