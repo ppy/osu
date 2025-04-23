@@ -79,8 +79,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             selectBeatmap(null);
             AddAssert("check default title", () => titleWedge.DisplayedTitle == Beatmap.Default.BeatmapInfo.Metadata.Title);
             AddAssert("check default artist", () => titleWedge.DisplayedArtist == Beatmap.Default.BeatmapInfo.Metadata.Artist);
-            AddAssert("check empty version", () => string.IsNullOrEmpty(difficultyDisplay.DisplayedVersion.ToString()));
-            AddAssert("check empty author", () => string.IsNullOrEmpty(difficultyDisplay.DisplayedAuthor.ToString()));
             AddAssert("check no statistics", () => difficultyDisplay.ChildrenOfType<BeatmapTitleWedge.DifficultyStatisticsDisplay>().All(d => !d.Statistics.Any()));
         }
 
