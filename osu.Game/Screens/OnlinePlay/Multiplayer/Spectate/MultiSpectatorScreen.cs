@@ -15,6 +15,7 @@ using osu.Game.Online.Rooms;
 using osu.Game.Online.Spectator;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
+using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Screens.Spectate;
 using osu.Game.Users;
 using osuTK;
@@ -47,17 +48,18 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         [Resolved]
         private MultiplayerClient multiplayerClient { get; set; } = null!;
 
+        [Cached(typeof(IGameplayLeaderboardProvider))]
+        private MultiSpectatorLeaderboardProvider leaderboardProvider { get; set; }
+
         private IAggregateAudioAdjustment? boundAdjustments;
 
         private readonly PlayerArea[] instances;
         private MasterGameplayClockContainer masterClockContainer = null!;
         private SpectatorSyncManager syncManager = null!;
         private PlayerGrid grid = null!;
-        private MultiSpectatorLeaderboard leaderboard = null!;
         private PlayerArea? currentAudioSource;
 
         private readonly Room room;
-        private readonly MultiplayerRoomUser[] users;
 
         /// <summary>
         /// Creates a new <see cref="MultiSpectatorScreen"/>.
@@ -68,9 +70,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             : base(users.Select(u => u.UserID).ToArray())
         {
             this.room = room;
-            this.users = users;
 
             instances = new PlayerArea[Users.Count];
+            leaderboardProvider = new MultiSpectatorLeaderboardProvider(users);
         }
 
         [BackgroundDependencyLoader]
@@ -133,24 +135,24 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             for (int i = 0; i < Users.Count; i++)
                 grid.Add(instances[i] = new PlayerArea(Users[i], syncManager.CreateManagedClock()));
 
-            LoadComponentAsync(leaderboard = new MultiSpectatorLeaderboard(users)
+            LoadComponentAsync(leaderboardProvider, _ =>
             {
-                Expanded = { Value = true },
-            }, _ =>
-            {
+                AddInternal(leaderboardProvider);
                 foreach (var instance in instances)
-                    leaderboard.AddClock(instance.UserId, instance.SpectatorPlayerClock);
+                    leaderboardProvider.AddClock(instance.UserId, instance.SpectatorPlayerClock);
 
-                leaderboardFlow.Insert(0, leaderboard);
-
-                if (leaderboard.TeamScores.Count == 2)
+                if (leaderboardProvider.TeamScores.Count == 2)
                 {
                     LoadComponentAsync(new MatchScoreDisplay
                     {
-                        Team1Score = { BindTarget = leaderboard.TeamScores.First().Value },
-                        Team2Score = { BindTarget = leaderboard.TeamScores.Last().Value },
+                        Team1Score = { BindTarget = leaderboardProvider.TeamScores.First().Value },
+                        Team2Score = { BindTarget = leaderboardProvider.TeamScores.Last().Value },
                     }, scoreDisplayContainer.Add);
                 }
+            });
+            leaderboardFlow.Insert(0, new DrawableGameplayLeaderboard
+            {
+                Expanded = { Value = true }
             });
 
             LoadComponentAsync(new GameplayChatDisplay(room)

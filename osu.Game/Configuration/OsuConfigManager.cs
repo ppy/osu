@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Diagnostics;
 using osu.Framework;
 using osu.Framework.Bindables;
 using osu.Framework.Configuration;
@@ -263,10 +262,6 @@ namespace osu.Game.Configuration
 
         public override TrackedSettings CreateTrackedSettings()
         {
-            // these need to be assigned in normal game startup scenarios.
-            Debug.Assert(LookupKeyBindings != null);
-            Debug.Assert(LookupSkinName != null);
-
             return new TrackedSettings
             {
                 new TrackedSetting<bool>(OsuSetting.ShowFpsDisplay, state => new SettingDescription(
@@ -330,8 +325,7 @@ namespace osu.Game.Configuration
         }
 
         public Func<Guid, string> LookupSkinName { private get; set; } = _ => @"unknown";
-
-        public Func<GlobalAction, LocalisableString> LookupKeyBindings { get; set; } = _ => @"unknown";
+        public Func<GlobalAction, LocalisableString> LookupKeyBindings { private get; set; } = _ => @"unknown";
 
         IBindable<float> IGameplaySettings.ComboColourNormalisationAmount => GetOriginalBindable<float>(OsuSetting.ComboColourNormalisationAmount);
         IBindable<float> IGameplaySettings.PositionalHitsoundsLevel => GetOriginalBindable<float>(OsuSetting.PositionalHitsoundsLevel);

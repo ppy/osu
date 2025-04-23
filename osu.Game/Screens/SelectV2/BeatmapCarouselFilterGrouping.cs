@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.Carousel;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
 
@@ -46,7 +47,9 @@ namespace osu.Game.Screens.SelectV2
                 var newItems = new List<CarouselItem>();
 
                 BeatmapInfo? lastBeatmap = null;
+
                 GroupDefinition? lastGroup = null;
+                CarouselItem? lastGroupItem = null;
 
                 HashSet<CarouselItem>? currentGroupItems = null;
                 HashSet<CarouselItem>? currentSetItems = null;
@@ -68,7 +71,7 @@ namespace osu.Game.Screens.SelectV2
                         groupItems[newGroup] = currentGroupItems = new HashSet<CarouselItem>();
                         lastGroup = newGroup;
 
-                        addItem(new CarouselItem(newGroup)
+                        addItem(lastGroupItem = new CarouselItem(newGroup)
                         {
                             DrawHeight = PanelGroup.HEIGHT,
                             DepthLayer = -2,
@@ -83,12 +86,20 @@ namespace osu.Game.Screens.SelectV2
                         {
                             setItems[beatmap.BeatmapSet!] = currentSetItems = new HashSet<CarouselItem>();
 
+                            if (lastGroupItem != null)
+                                lastGroupItem.NestedItemCount++;
+
                             addItem(new CarouselItem(beatmap.BeatmapSet!)
                             {
                                 DrawHeight = PanelBeatmapSet.HEIGHT,
                                 DepthLayer = -1
                             });
                         }
+                    }
+                    else
+                    {
+                        if (lastGroupItem != null)
+                            lastGroupItem.NestedItemCount++;
                     }
 
                     addItem(item);

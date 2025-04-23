@@ -20,7 +20,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
 
@@ -87,7 +86,7 @@ namespace osu.Game.Overlays.Mods
             Content.CornerRadius = CORNER_RADIUS;
             Content.BorderThickness = 2;
 
-            Shear = new Vector2(OsuGame.SHEAR, 0);
+            Shear = OsuGame.SHEAR;
 
             Children = new Drawable[]
             {
@@ -128,10 +127,10 @@ namespace osu.Game.Overlays.Mods
                                     {
                                         Font = OsuFont.TorusAlternate.With(size: 18, weight: FontWeight.SemiBold),
                                         RelativeSizeAxes = Axes.X,
-                                        Shear = new Vector2(-OsuGame.SHEAR, 0),
+                                        Shear = -OsuGame.SHEAR,
                                         Margin = new MarginPadding
                                         {
-                                            Left = -18 * OsuGame.SHEAR
+                                            Left = -18 * OsuGame.SHEAR.X
                                         },
                                         ShowTooltip = false, // Tooltip is handled by `IncompatibilityDisplayingModPanel`.
                                     },
@@ -139,7 +138,7 @@ namespace osu.Game.Overlays.Mods
                                     {
                                         Font = OsuFont.Default.With(size: 12),
                                         RelativeSizeAxes = Axes.X,
-                                        Shear = new Vector2(-OsuGame.SHEAR, 0),
+                                        Shear = -OsuGame.SHEAR,
                                         ShowTooltip = false, // Tooltip is handled by `IncompatibilityDisplayingModPanel`.
                                     }
                                 }
