@@ -72,10 +72,6 @@ namespace osu.Game.Screens.SelectV2
 
             private CancellationTokenSource? cancellationSource;
 
-            public IBindable<double> DisplayedStars => displayedStars;
-
-            private readonly Bindable<double> displayedStars = new BindableDouble();
-
             public DifficultyDisplay()
             {
                 RelativeSizeAxes = Axes.X;
@@ -236,10 +232,6 @@ namespace osu.Game.Screens.SelectV2
 
                 updateDisplay();
 
-                displayedStars.BindValueChanged(_ =>
-                {
-                    starRatingDisplay.Current.Value = new StarDifficulty(displayedStars.Value, 0);
-                }, true);
                 FinishTransforms(true);
             }
 
@@ -343,8 +335,7 @@ namespace osu.Game.Screens.SelectV2
                                        if (cancellationToken.IsCancellationRequested)
                                            return;
 
-                                       var result = task.GetResultSafely() ?? default;
-                                       displayedStars.Value = result.Stars;
+                                       starRatingDisplay.Current.Value = task.GetResultSafely() ?? default;
                                    });
                                }, cancellationToken);
             }

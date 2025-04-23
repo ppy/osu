@@ -4,12 +4,12 @@
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Beatmaps.Drawables;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
@@ -53,7 +53,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             AddSliderStep("change star difficulty", 0, 11.9, 4.18, v =>
             {
-                ((BindableDouble)difficultyDisplay.DisplayedStars).Value = v;
+                difficultyDisplay.ChildrenOfType<StarRatingDisplay>().Single().Current.Value = new StarDifficulty(v, 0);
             });
         }
 
