@@ -7,9 +7,11 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Skinning.Default;
@@ -35,6 +37,10 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         }
 
         private bool validActionPressed;
+
+        private Bindable<HUDVisibilityMode> configVisibilityMode;
+
+        private OsuConfigManager config;
 
         private double? lastPressHandleTime;
 
@@ -142,9 +148,16 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             base.OnReleased(e);
         }
 
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+            this.config = config;
+        }
+
         protected override void UpdateHitStateTransforms(ArmedState state)
         {
             Debug.Assert(HitObject.HitWindows != null);
+            configVisibilityMode = config.GetBindable<HUDVisibilityMode>(OsuSetting.HUDVisibilityMode);
 
             switch (state)
             {
@@ -159,22 +172,23 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                     break;
 
                 case ArmedState.Hit:
-                    // If we're far enough away from the left stage, we should bring ourselves in front of it
-                    ProxyContent();
+                    if (configVisibilityMode.Value == HUDVisibilityMode.Always)
+                    {
+                        // If we're far enough away from the left stage, we should bring ourselves in front of it
+                        ProxyContent();
 
-                    const float gravity_time = 300;
-                    const float gravity_travel_height = 200;
+                        const float gravity_time = 300;
+                        const float gravity_travel_height = 200;
 
-                    if (SnapJudgementLocation)
-                        MainPiece.MoveToX(-X);
+                        if (SnapJudgementLocation)
+                            MainPiece.MoveToX(-X);
 
-                    this.ScaleTo(0.8f, gravity_time * 2, Easing.OutQuad);
+                        this.ScaleTo(0.8f, gravity_time * 2, Easing.OutQuad);
 
-                    this.MoveToY(-gravity_travel_height, gravity_time, Easing.Out)
-                        .Then()
-                        .MoveToY(gravity_travel_height * 2, gravity_time * 2, Easing.In);
-
-                    this.FadeOut(800);
+                        this.MoveToY(-gravity_travel_height, gravity_time, Easing.Out)
+                            .Then()
+                            .MoveToY(gravity_travel_height * 2, gravity_time * 2, Easing.In);
+                    }
                     break;
             }
         }
