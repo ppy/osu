@@ -143,18 +143,21 @@ namespace osu.Game.Screens.Edit.Submission
 
             status.BindValueChanged(_ => Scheduler.AddOnce(updateStatus), true);
             progress.BindValueChanged(_ => Scheduler.AddOnce(updateProgress), true);
-
-            // Binding to `progressBar` updates instead of `progress` for more frequent/granular updates
-            progressBar.OnUpdate += playProgressSound;
         }
 
-        private void playProgressSound(Drawable box)
+        protected override void Update()
         {
-            float width = box.Width;
-            SampleChannel sampleChannel = progressSample.GetChannel();
+            base.Update();
+
+            if (!(progressBarContainer.Alpha > 0))
+                return;
+
+            float width = progressBar.Width;
 
             if (Precision.AlmostEquals(previousPercent ?? 0f, width) || (lastSamplePlayback != null && Time.Current - lastSamplePlayback < 10))
                 return;
+
+            SampleChannel sampleChannel = progressSample.GetChannel();
 
             sampleChannel.Frequency.Value = 0.5f + (width * 1.5f);
             sampleChannel.Volume.Value = 0.25f + ((width / 2f) * .75f);
