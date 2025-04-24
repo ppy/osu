@@ -39,13 +39,13 @@ namespace osu.Game.Screens.Edit.Submission
         [Resolved]
         private OsuColour colours { get; set; } = null!;
 
-        private Sample progressSample = null!;
+        private Sample? progressSample;
 
         private const int stage_done_sample_count = 4;
-        private Sample stageDoneSample = null!;
+        private Sample? stageDoneSample;
 
-        private Sample errorSample = null!;
-        private Sample cancelSample = null!;
+        private Sample? errorSample;
+        private Sample? cancelSample;
 
         private double? lastSamplePlayback;
         private float? previousPercent;
@@ -157,7 +157,10 @@ namespace osu.Game.Screens.Edit.Submission
             if (Precision.AlmostEquals(previousPercent ?? 0f, width) || (lastSamplePlayback != null && Time.Current - lastSamplePlayback < 10))
                 return;
 
-            SampleChannel sampleChannel = progressSample.GetChannel();
+            SampleChannel? sampleChannel = progressSample?.GetChannel();
+
+            if (sampleChannel == null)
+                return;
 
             sampleChannel.Frequency.Value = 0.5f + (width * 1.5f);
             sampleChannel.Volume.Value = 0.25f + ((width / 2f) * .75f);
@@ -226,7 +229,7 @@ namespace osu.Game.Screens.Edit.Submission
                     // manually set progress value, as to trigger sample playback for the final section
                     progress.Value = 1;
 
-                    stageDoneSample.Play();
+                    stageDoneSample?.Play();
 
                     break;
 
@@ -238,7 +241,7 @@ namespace osu.Game.Screens.Edit.Submission
                     };
                     iconContainer.Colour = colours.Red1;
                     iconContainer.FlashColour(Colour4.White, 1000, Easing.OutQuint);
-                    errorSample.Play();
+                    errorSample?.Play();
                     break;
 
                 case StageStatusType.Canceled:
@@ -249,7 +252,7 @@ namespace osu.Game.Screens.Edit.Submission
                     };
                     iconContainer.Colour = colours.Gray8;
                     iconContainer.FlashColour(Colour4.White, 1000, Easing.OutQuint);
-                    cancelSample.Play();
+                    cancelSample?.Play();
                     break;
             }
         }
