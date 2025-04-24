@@ -58,8 +58,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             // First alive, unjudged object.
             var active = playfield.HitObjectContainer.AliveObjects
-                        .OfType<DrawableOsuHitObject>()
-                        .FirstOrDefault(d => !d.Judged);
+                                  .OfType<DrawableOsuHitObject>()
+                                  .FirstOrDefault(d => !d.Judged);
 
             if (active == null)
                 return;
@@ -67,7 +67,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             var pos = playfield.ToLocalSpace(inputManager.CurrentState.Mouse.Position);
             var target = active.Position;
 
-            var start = active.HitObject.StartTime;
+            double start = active.HitObject.StartTime;
 
             // Timing of the HitObject's hit window.
             double window = active is DrawableSlider sld
@@ -91,8 +91,8 @@ namespace osu.Game.Rulesets.Osu.Mods
                         -(float)Math.Cos(0) * spinner_radius);
 
                     double duration = currentTime >= start - min_start
-                    ? 1 + Math.Clamp((elapsed - min_start) / (spinner.Duration - min_end), 0, 1) * (min_start - 1)
-                    : -elapsed;
+                        ? 1 + (Math.Clamp(((spinner.Duration - min_end) - (elapsed + min_start)) / (spinner.Duration - min_end), 0, 1) * (min_start - 1))
+                        : -elapsed;
 
                     moveTowards(pos, spinnerTargetPosition, duration, playfield);
 
@@ -131,9 +131,9 @@ namespace osu.Game.Rulesets.Osu.Mods
                 {
                     double prog = Math.Clamp(elapsed / slider.Duration, 0, 1);
                     double spans = (prog * (slider.RepeatCount + 1));
-                    spans = (spans > 1 && spans % 2 > 1) ? 1 - spans % 1 : spans % 1;
+                    spans = (spans > 1 && spans % 2 > 1) ? 1 - (spans % 1) : spans % 1;
 
-                    Vector2 pathPos = sliderDrawable.Position + slider.Path.PositionAt(spans) * sliderDrawable.Scale;
+                    Vector2 pathPos = sliderDrawable.Position + (slider.Path.PositionAt(spans) * sliderDrawable.Scale);
 
                     applyCursor(pathPos, playfield);
                 }
@@ -145,8 +145,8 @@ namespace osu.Game.Rulesets.Osu.Mods
             double hitWindowStart = start - window - min_start;
             double hitWindowEnd = start + window - min_end;
             double availableTime = currentTime >= hitWindowStart
-                    ? 1 + Math.Clamp((hitWindowEnd - currentTime) / (hitWindowEnd - hitWindowStart), 0, 1) * (min_start - 1)
-                    : (start - window - currentTime);
+                ? 1 + (Math.Clamp((hitWindowEnd - currentTime) / (hitWindowEnd - hitWindowStart), 0, 1) * (min_start - 1))
+                : (start - window - currentTime);
 
             moveTowards(pos, target, availableTime, playfield);
         }
@@ -159,7 +159,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             Vector2 newPos = displacement >= distance
                 ? target
-                : current + (target - current).Normalized() * displacement;
+                : current + ((target - current).Normalized() * displacement);
 
             applyCursor(newPos, pf);
         }
