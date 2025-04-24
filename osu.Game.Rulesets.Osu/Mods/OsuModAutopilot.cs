@@ -114,10 +114,10 @@ namespace osu.Game.Rulesets.Osu.Mods
             double hitWindowStart = start - mehWindow - hitwindow_start_offset;
             double hitWindowEnd = start + mehWindow - hitwindow_end_offset;
 
-            // Compute how many ms remain for cursor movement toward the hit-object:
+            // Compute how many ms remain for cursor movement toward the hit-object
             // If we’re already inside the hit-window, scale remaining time from hitwindow_start_offset to 1 ms
             // proportionally to the fraction of window left (clamped to [0,1]) to prevent extremely fast cursor movement.
-            // Otherwise, use the time until the window opens so movement only begins at hitWindowStart.
+            // Otherwise, use the time until the window opens so the cursor reaches the HitObject at hitWindowStart.
             double availableTime = currentTime >= hitWindowStart
                 ? 1 + (Math.Clamp((hitWindowEnd - currentTime) / (hitWindowEnd - hitWindowStart), 0, 1) * (hitwindow_start_offset - 1))
                 : (start - mehWindow - currentTime);
