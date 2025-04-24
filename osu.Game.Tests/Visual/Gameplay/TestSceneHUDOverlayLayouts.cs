@@ -14,7 +14,6 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
-using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.IO;
 using osu.Game.Online.API.Requests.Responses;
@@ -41,9 +40,6 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         [Resolved]
         private RulesetStore rulesets { get; set; } = null!;
-
-        [Resolved]
-        private OsuConfigManager configManager { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load()
