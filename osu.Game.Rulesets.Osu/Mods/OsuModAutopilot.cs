@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             typeof(ModTouchDevice)
         };
 
-        // When currentTime equals the start of the hitwindow minus the start offset, we start reducing availableTime 
+        // When currentTime equals the start of the hitwindow minus the start offset, we start reducing availableTime
         // from this value down to 1 when currentTime equals the end of the hitwindow minus the end offset.
         // This ensures that, if we enter the window late, we still have some room for natural cursor movement.
         private const double hitwindow_start_offset = 20;
@@ -64,9 +64,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void Update(Playfield playfield)
         {
-            if (hasReplayLoaded.Value)
-                return;
-
             double currentTime = playfield.Clock.CurrentTime;
 
             var nextObject = playfield.HitObjectContainer.AliveObjects.FirstOrDefault(d => !d.Judged);
@@ -91,7 +88,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                     return;
 
                 case DrawableSlider sliderDrawable:
-                    if (!sliderDrawable.HeadCircle.Judged)
+                    if (!sliderDrawable.HeadCircle.Judged && hasReplayLoaded.Value)
                         break;
 
                     var slider = sliderDrawable.HitObject;
@@ -110,6 +107,9 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                     return;
             }
+
+            if (hasReplayLoaded.Value)
+                return;
 
             double hitWindowStart = start - mehWindow - hitwindow_start_offset;
             double hitWindowEnd = start + mehWindow - hitwindow_end_offset;
@@ -135,7 +135,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             double elapsed = currentTime - start;
 
             // Before spinner starts, move to position.
-            if (elapsed < 0)
+            if (elapsed < 0 || !hasReplayLoaded.Value)
             {
                 Vector2 spinnerTargetPosition = spinner.Position + new Vector2(
                     -(float)Math.Sin(0) * spinner_radius,
@@ -151,22 +151,19 @@ namespace osu.Game.Rulesets.Osu.Mods
             }
 
             double calculatedSpeed = 1.01 * (spinner.MaximumBonusSpins + spinner.SpinsRequiredForBonus) / spinner.Duration;
-
-            // Rotate around centre
             double rate = calculatedSpeed / playfield.Clock.Rate;
+            double rateElapsedTime = playfield.Clock.ElapsedFrameTime;
 
-            if (rate <= 0)
+            // Automatically spin spinner.
+            spinnerDrawable.RotationTracker.AddRotation(float.RadiansToDegrees((float)rateElapsedTime * (float)rate * MathF.PI * 2.0f));
+
+            if (rate <= 0 || hasReplayLoaded.Value)
                 return;
 
             double angle = 2 * Math.PI * (elapsed * rate);
             Vector2 circPos = spinner.Position + new Vector2(
                 -(float)Math.Sin(angle) * spinner_radius,
                 -(float)Math.Cos(angle) * spinner_radius);
-
-            double rateElapsedTime = playfield.Clock.ElapsedFrameTime;
-
-            // Automatically spin spinner.
-            spinnerDrawable.RotationTracker.AddRotation(float.RadiansToDegrees((float)rateElapsedTime * (float)rate * MathF.PI * 2.0f));
 
             applyCursor(circPos);
         }
