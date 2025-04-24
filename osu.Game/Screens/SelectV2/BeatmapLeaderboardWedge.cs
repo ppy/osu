@@ -25,20 +25,15 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Select.Leaderboards;
+using osuTK;
 
 namespace osu.Game.Screens.SelectV2
 {
     public partial class BeatmapLeaderboardWedge : VisibilityContainer
     {
-        private Container scoresContainer = null!;
+        public IBindable<BeatmapLeaderboardScope> Scope { get; } = new Bindable<BeatmapLeaderboardScope>();
 
-        private OsuScrollContainer scoresScroll = null!;
-        private Container personalBestDisplay = null!;
-        private Container<BeatmapLeaderboardScore> personalBestScoreContainer = null!;
-        private LoadingLayer loading = null!;
-
-        private Container<Placeholder> placeholderContainer = null!;
-        private Placeholder? placeholder;
+        public IBindable<bool> FilterBySelectedMods { get; } = new BindableBool();
 
         [Resolved]
         private LeaderboardManager leaderboardManager { get; set; } = null!;
@@ -55,13 +50,22 @@ namespace osu.Game.Screens.SelectV2
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
-        public IBindable<BeatmapLeaderboardScope> Scope { get; } = new Bindable<BeatmapLeaderboardScope>();
+        private Container<Placeholder> placeholderContainer = null!;
+        private Placeholder? placeholder;
 
-        public IBindable<bool> FilterBySelectedMods { get; } = new BindableBool();
+        private Container scoresContainer = null!;
+
+        private OsuScrollContainer scoresScroll = null!;
+        private Container personalBestDisplay = null!;
+
+        private Container<BeatmapLeaderboardScore> personalBestScoreContainer = null!;
+        private LoadingLayer loading = null!;
 
         private CancellationTokenSource? cancellationTokenSource;
 
         private readonly IBindable<LeaderboardScores?> fetchedScores = new Bindable<LeaderboardScores?>();
+
+        private const float personal_best_height = 80;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -82,7 +86,15 @@ namespace osu.Game.Screens.SelectV2
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            Margin = new MarginPadding { Top = 4f, Bottom = 180f },
+                            Padding = new MarginPadding
+                            {
+                                Top = 5,
+                                // Left padding offsets the shear to create a visually appealing list display.
+                                Left = 80f,
+                                // Bottom padding ensures the last entry's full width is displayed
+                                // (ie it is fully on screen after shear is considered).
+                                Bottom = BeatmapLeaderboardScore.HEIGHT * 3
+                            },
                         },
                     },
                     personalBestDisplay = new Container
@@ -90,9 +102,9 @@ namespace osu.Game.Screens.SelectV2
                         Anchor = Anchor.BottomLeft,
                         Origin = Anchor.BottomLeft,
                         RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
+                        Height = personal_best_height,
                         Shear = OsuGame.SHEAR,
-                        Margin = new MarginPadding { Left = -60f },
+                        Margin = new MarginPadding { Left = -40f },
                         CornerRadius = 10f,
                         Masking = true,
                         // push the personal best 1px down to hide masking issues
@@ -111,7 +123,7 @@ namespace osu.Game.Screens.SelectV2
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
                                 Shear = -OsuGame.SHEAR,
-                                Padding = new MarginPadding { Top = 5f, Bottom = 30f, Left = 100f, Right = 30f },
+                                Padding = new MarginPadding { Top = 5f, Bottom = 5f, Left = 70f, Right = 10f },
                                 Children = new Drawable[]
                                 {
                                     new OsuSpriteText
@@ -239,24 +251,19 @@ namespace osu.Game.Screens.SelectV2
 
                 foreach (var d in loadedScores)
                 {
-                    Container animContainer;
+                    d.Y = (BeatmapLeaderboardScore.HEIGHT + 4f) * i;
 
-                    scoresContainer.Add(animContainer = new Container
-                    {
-                        Shear = -OsuGame.SHEAR,
-                        Y = (BeatmapLeaderboardScore.HEIGHT + 4f) * i,
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Alpha = 0f,
-                        Padding = new MarginPadding { Left = 80f },
-                        Child = d,
-                    });
+                    // This is a bit of a weird one. We're already in a sheared state and don't want top-level
+                    // shear applied, but still need the `BeatmapLeadeboardScore` to be in "sheared" mode (see ctor).
+                    d.Shear = Vector2.Zero;
 
-                    animContainer
-                        .MoveToX(-20f)
-                        .Delay(delay)
-                        .FadeIn(300, Easing.OutQuint)
-                        .MoveToX(0f, 300, Easing.OutQuint);
+                    scoresContainer.Add(d);
+
+                    d.FadeOut()
+                     .MoveToX(-20f)
+                     .Delay(delay)
+                     .FadeIn(300, Easing.OutQuint)
+                     .MoveToX(0f, 300, Easing.OutQuint);
 
                     delay += 30;
                     i++;
@@ -274,7 +281,7 @@ namespace osu.Game.Screens.SelectV2
                     SelectedMods = { BindTarget = mods },
                 };
 
-                scoresScroll.TransformTo(nameof(scoresScroll.Padding), new MarginPadding { Bottom = 100 }, 300, Easing.OutQuint);
+                scoresScroll.TransformTo(nameof(scoresScroll.Padding), new MarginPadding { Bottom = personal_best_height }, 300, Easing.OutQuint);
             }
         }
 
