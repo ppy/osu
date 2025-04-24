@@ -135,7 +135,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             double elapsed = currentTime - start;
 
             // Before spinner starts, move to position.
-            if (elapsed < 0 || !hasReplayLoaded.Value)
+            if (elapsed < 0 && !hasReplayLoaded.Value)
             {
                 Vector2 spinnerTargetPosition = spinner.Position + new Vector2(
                     -(float)Math.Sin(0) * spinner_radius,
