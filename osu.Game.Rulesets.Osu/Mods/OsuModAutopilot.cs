@@ -152,12 +152,12 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             double calculatedSpeed = 1.01 * (spinner.MaximumBonusSpins + spinner.SpinsRequiredForBonus) / spinner.Duration;
             double rate = calculatedSpeed / playfield.Clock.Rate;
-            double rateElapsedTime = playfield.Clock.ElapsedFrameTime;
+            double elapsedTime = playfield.Clock.ElapsedFrameTime;
 
             // Automatically spin spinner.
-            spinnerDrawable.RotationTracker.AddRotation(float.RadiansToDegrees((float)rateElapsedTime * (float)rate * MathF.PI * 2.0f));
+            spinnerDrawable.RotationTracker.AddRotation(float.RadiansToDegrees((float)elapsedTime * (float)rate * MathF.PI * 2.0f));
 
-            if (rate <= 0 || hasReplayLoaded.Value)
+            if (hasReplayLoaded.Value)
                 return;
 
             double angle = 2 * Math.PI * (elapsed * rate);
