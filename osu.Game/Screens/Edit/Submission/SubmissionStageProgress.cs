@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
+using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -47,8 +48,11 @@ namespace osu.Game.Screens.Edit.Submission
         private Sample? errorSample;
         private Sample? cancelSample;
 
-        private double? lastSamplePlayback;
-        private float? previousPercent;
+        private SampleChannel? progressSampleChannel;
+
+        private const int fadeout_duration = 100;
+        private ScheduledDelegate? progressSampleFadeDelegate;
+        private ScheduledDelegate? progressSampleStopDelegate;
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider, AudioManager audio)
@@ -143,31 +147,8 @@ namespace osu.Game.Screens.Edit.Submission
 
             status.BindValueChanged(_ => Scheduler.AddOnce(updateStatus), true);
             progress.BindValueChanged(_ => Scheduler.AddOnce(updateProgress), true);
-        }
 
-        protected override void Update()
-        {
-            base.Update();
-
-            if (!(progressBarContainer.Alpha > 0))
-                return;
-
-            float width = progressBar.Width;
-
-            if (Precision.AlmostEquals(previousPercent ?? 0f, width) || (lastSamplePlayback != null && Time.Current - lastSamplePlayback < 10))
-                return;
-
-            SampleChannel? sampleChannel = progressSample?.GetChannel();
-
-            if (sampleChannel == null)
-                return;
-
-            sampleChannel.Frequency.Value = 0.5f + (width * 1.5f);
-            sampleChannel.Volume.Value = 0.25f + ((width / 2f) * .75f);
-            sampleChannel.Play();
-
-            lastSamplePlayback = Time.Current;
-            previousPercent = width;
+            progressSampleChannel = progressSample?.GetChannel();
         }
 
         public void SetNotStarted() => status.Value = StageStatusType.NotStarted;
@@ -176,6 +157,13 @@ namespace osu.Game.Screens.Edit.Submission
         {
             this.progress.Value = progress;
             status.Value = StageStatusType.InProgress;
+
+            if (progressSampleChannel == null)
+                return;
+
+            progressSampleChannel.Frequency.Value = 0.5f;
+            progressSampleChannel.Volume.Value = 0.25f;
+            progressSampleChannel.Looping = true;
         }
 
         public void SetCompleted() => status.Value = StageStatusType.Completed;
@@ -188,14 +176,51 @@ namespace osu.Game.Screens.Edit.Submission
 
         public void SetCanceled() => status.Value = StageStatusType.Canceled;
 
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            progressSampleChannel?.Stop();
+        }
+
         private const float transition_duration = 200;
+        private const Easing transition_easing = Easing.OutQuint;
 
         private void updateProgress()
         {
-            if (progress.Value != null)
-                progressBar.ResizeWidthTo(progress.Value.Value, transition_duration, Easing.OutQuint);
+            progressSampleFadeDelegate?.Cancel();
+            progressSampleStopDelegate?.Cancel();
 
-            progressBarContainer.FadeTo(status.Value == StageStatusType.InProgress && progress.Value != null ? 1 : 0, transition_duration, Easing.OutQuint);
+            try
+            {
+                if (progress.Value == null)
+                    return;
+
+                float progressValue = progress.Value.Value;
+
+                progressBar.ResizeWidthTo(progressValue, transition_duration, transition_easing);
+
+                if (progressSampleChannel == null || Precision.AlmostEquals(progressValue, 0f))
+                    return;
+
+                // Don't restart the looping sample if already playing
+                if (!progressSampleChannel.Playing)
+                    progressSampleChannel.Play();
+
+                this.TransformBindableTo(progressSampleChannel.Frequency, 0.5f + (progressValue * 1.5f), transition_duration, transition_easing);
+                this.TransformBindableTo(progressSampleChannel.Volume, 0.25f + (progressValue * .75f), transition_duration, transition_easing);
+
+                progressSampleFadeDelegate = Scheduler.AddDelayed(() =>
+                {
+                    // Perform a fade-out before stopping the sample to prevent clicking.
+                    this.TransformBindableTo(progressSampleChannel.Volume, 0, fadeout_duration);
+                    progressSampleStopDelegate = Scheduler.AddDelayed(() => { progressSampleChannel.Stop(); }, fadeout_duration);
+                }, transition_duration - fadeout_duration);
+            }
+            finally
+            {
+                progressBarContainer.FadeTo(status.Value == StageStatusType.InProgress && progress.Value != null ? 1 : 0, transition_duration, transition_easing);
+            }
         }
 
         private void updateStatus()
