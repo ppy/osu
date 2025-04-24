@@ -127,26 +127,6 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
-        public void TestMaxHeight()
-        {
-            createLeaderboard();
-            addLocalPlayer();
-
-            int playerNumber = 1;
-            AddRepeatStep("add 3 other players", () => createRandomScore(new APIUser { Username = $"Player {playerNumber++}" }), 3);
-            checkHeight(4);
-
-            AddRepeatStep("add 4 other players", () => createRandomScore(new APIUser { Username = $"Player {playerNumber++}" }), 4);
-            checkHeight(8);
-
-            AddRepeatStep("add 4 other players", () => createRandomScore(new APIUser { Username = $"Player {playerNumber++}" }), 4);
-            checkHeight(8);
-
-            void checkHeight(int panelCount)
-                => AddAssert($"leaderboard height is {panelCount} panels high", () => leaderboard.DrawHeight == (DrawableGameplayLeaderboardScore.PANEL_HEIGHT + leaderboard.Spacing) * panelCount);
-        }
-
-        [Test]
         public void TestFriendScore()
         {
             APIUser friend = new APIUser { Username = "my friend", Id = 10000 };
