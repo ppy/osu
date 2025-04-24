@@ -91,6 +91,8 @@ namespace osu.Game.Screens.Play.HUD
             }
         }
 
+        public int? InitialPosition { get; }
+
         public IUser? User { get; }
 
         /// <summary>
@@ -125,6 +127,7 @@ namespace osu.Game.Screens.Play.HUD
             HasQuit.BindTo(score.HasQuit);
             DisplayOrder.BindTo(score.DisplayOrder);
             GetDisplayScore = score.GetDisplayScore;
+            InitialPosition = score.InitialPosition;
 
             if (score.TeamColour != null)
             {

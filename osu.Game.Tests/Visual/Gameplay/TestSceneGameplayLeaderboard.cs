@@ -184,27 +184,48 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
-        public void TestTrackedScorePosition([Values] bool partial)
+        public void TestPositionAutomaticallyFillsIfNotFixed()
         {
-            createLeaderboard(partial);
+            createLeaderboard(hasFixedScorePositions: false);
 
             AddStep("add many scores in one go", () =>
             {
-                for (int i = 0; i < 49; i++)
-                    createRandomScore(new APIUser { Username = $"Player {i + 1}" });
+                for (int i = 0; i < 50; i++)
+                    createLeaderboardScore(new BindableLong(10_000 * (50 - i)), new APIUser { Username = $"Player {i + 1}" });
 
                 // Add player at end to force an animation down the whole list.
                 playerScore.Value = 0;
                 createLeaderboardScore(playerScore, new APIUser { Username = "You", Id = 3 }, true);
             });
 
-            if (partial)
-                AddUntilStep("tracked player has null position", () => leaderboard.TrackedScore?.ScorePosition, () => Is.Null);
-            else
-                AddUntilStep("tracked player is #50", () => leaderboard.TrackedScore?.ScorePosition, () => Is.EqualTo(50));
+            AddUntilStep("tracked player is #51", () => leaderboard.TrackedScore?.ScorePosition, () => Is.EqualTo(51));
+            AddStep("move tracked player to top", () => leaderboard.TrackedScore!.TotalScore.Value = 1_000_000);
+            AddUntilStep("tracked player is #1", () => leaderboard.TrackedScore?.ScorePosition, () => Is.EqualTo(1));
+        }
 
-            AddStep("move tracked player to top", () => leaderboard.TrackedScore!.TotalScore.Value = 8_000_000);
-            AddUntilStep("all players have non-null position", () => leaderboard.AllScores.Select(s => s.ScorePosition), () => Does.Not.Contain(null));
+        [Test]
+        public void TestPositionDisplaysCorrectlyIfFixed()
+        {
+            createLeaderboard(hasFixedScorePositions: true);
+
+            AddStep("add many scores in one go", () =>
+            {
+                for (int i = 0; i < 50; i++)
+                    createLeaderboardScore(new BindableLong(500_000 + 10_000 * (50 - i)), new APIUser { Username = $"Player {i + 1}" }, scorePosition: i + 1);
+
+                createLeaderboardScore(new BindableLong(300_000), new APIUser { Username = "You" }, scorePosition: 12345);
+
+                playerScore.Value = 0;
+                createLeaderboardScore(playerScore, new APIUser { Username = "You", Id = 3 }, true);
+            });
+
+            AddUntilStep("tracked player has no position", () => leaderboard.TrackedScore?.ScorePosition, () => Is.Null);
+            AddStep("move tracked player between own best and #50", () => leaderboard.TrackedScore!.TotalScore.Value = 400_000);
+            AddUntilStep("tracked player has no position", () => leaderboard.TrackedScore?.ScorePosition, () => Is.Null);
+            AddStep("move tracked player to #21", () => leaderboard.TrackedScore!.TotalScore.Value = 801_000);
+            AddUntilStep("tracked player is #21", () => leaderboard.TrackedScore?.ScorePosition, () => Is.EqualTo(21));
+            AddStep("move tracked player to top", () => leaderboard.TrackedScore!.TotalScore.Value = 1_000_001);
+            AddUntilStep("tracked player is #1", () => leaderboard.TrackedScore?.ScorePosition, () => Is.EqualTo(1));
         }
 
         private void addLocalPlayer()
@@ -216,12 +237,12 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
         }
 
-        private void createLeaderboard(bool partial = false)
+        private void createLeaderboard(bool hasFixedScorePositions = false)
         {
             AddStep("create leaderboard", () =>
             {
                 leaderboardProvider.Scores.Clear();
-                leaderboardProvider.IsPartial = partial;
+                leaderboardProvider.HasInitialScorePositions = hasFixedScorePositions;
                 Child = leaderboard = new TestDrawableGameplayLeaderboard
                 {
                     Anchor = Anchor.Centre,
@@ -233,9 +254,12 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void createRandomScore(APIUser user) => createLeaderboardScore(new BindableLong(RNG.Next(0, 5_000_000)), user);
 
-        private void createLeaderboardScore(BindableLong score, APIUser user, bool isTracked = false)
+        private void createLeaderboardScore(BindableLong score, APIUser user, bool isTracked = false, int? scorePosition = null)
         {
-            var leaderboardScore = new GameplayLeaderboardScore(user, isTracked, score);
+            var leaderboardScore = new GameplayLeaderboardScore(user, isTracked, score)
+            {
+                InitialPosition = scorePosition,
+            };
             leaderboardProvider.Scores.Add(leaderboardScore);
         }
 
@@ -260,7 +284,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             IBindableList<GameplayLeaderboardScore> IGameplayLeaderboardProvider.Scores => Scores;
             public BindableList<GameplayLeaderboardScore> Scores { get; } = new BindableList<GameplayLeaderboardScore>();
-            public bool IsPartial { get; set; }
+            public bool HasInitialScorePositions { get; set; }
         }
     }
 }

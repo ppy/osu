@@ -16,12 +16,13 @@ namespace osu.Game.Screens.Select.Leaderboards
         public IBindableList<GameplayLeaderboardScore> Scores { get; }
 
         /// <summary>
-        /// Whether this leaderboard is a partial leaderboard (e.g. contains only the top 50 of all scores),
-        /// or is a full leaderboard (contains all scores that there will ever be).
+        /// Whether the scores on this leaderboard have pre-existing initial positions.
+        /// This will be <see langword="true"/> if the scores have been fetched from online beatmap leaderboards.
         /// </summary>
         /// <remarks>
-        /// If this is <see langword="true"/> and a tracked score is last on the leaderboard, it will show an "unknown" score position.
+        /// If this is <see langword="true"/> and a tracked score is not precisely between two subsequent scores with respect to initial position (e.g. #3 and #4),
+        /// it will show an "unknown" score position.
         /// </remarks>
-        bool IsPartial { get; }
+        bool HasInitialScorePositions { get; }
     }
 }

@@ -68,6 +68,12 @@ namespace osu.Game.Screens.Select.Leaderboards
         /// </summary>
         public Colour4? TeamColour { get; init; }
 
+        /// <summary>
+        /// The "initial" position of this score on the leaderboard.
+        /// Generally represents the position of this score on a global beatmap leaderboard at the point of starting play.
+        /// </summary>
+        public int? InitialPosition { get; init; }
+
         public GameplayLeaderboardScore(IUser user, ScoreProcessor scoreProcessor, bool tracked)
         {
             User = user;
@@ -97,6 +103,7 @@ namespace osu.Game.Screens.Select.Leaderboards
             Combo.Value = scoreInfo.Combo;
             DisplayOrder.Value = scoreInfo.OnlineID > 0 ? scoreInfo.OnlineID : scoreInfo.Date.ToUnixTimeSeconds();
             GetDisplayScore = scoreInfo.GetDisplayScore;
+            InitialPosition = scoreInfo.Position;
         }
 
         /// <remarks>

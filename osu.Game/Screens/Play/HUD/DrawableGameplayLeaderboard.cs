@@ -187,11 +187,43 @@ namespace osu.Game.Screens.Play.HUD
                                  .ThenBy(i => i.DisplayOrder.Value)
                                  .ToList();
 
+            int delta = 0;
+
             for (int i = 0; i < Flow.Count; i++)
             {
                 var score = orderedByScore[i];
                 Flow.SetLayoutPosition(score, i);
-                score.ScorePosition = i + 1 == Flow.Count && leaderboardProvider?.IsPartial == true && score.Tracked ? null : i + 1;
+
+                // if the leaderboard provider doesn't have score positions, we can number scores as we want.
+                if (leaderboardProvider?.HasInitialScorePositions != true)
+                    score.ScorePosition = i + 1;
+                else
+                {
+                    // the leaderboard provider has initial score positions which were valid at the point of starting play.
+                    // the implication here is that non-tracked scores here cannot move around, only tracked ones can.
+                    if (score.Tracked)
+                    {
+                        int? previousScorePosition = i > 0 ? orderedByScore[i - 1].InitialPosition : 0;
+                        int? nextScorePosition = i < orderedByScore.Count - 1 ? orderedByScore[i + 1].InitialPosition : null;
+
+                        // if the tracked score is ideally between two scores which have known neighbouring initial positions,
+                        // we can assign it the position of the previous score plus one...
+                        if (previousScorePosition != null && nextScorePosition != null && previousScorePosition + 1 == nextScorePosition)
+                        {
+                            score.ScorePosition = previousScorePosition + 1;
+                            // but we also need to ensure all subsequent scores get shifted down one position, too.
+                            delta++;
+                        }
+                        // conversely, if the tracked score is not between neighbouring two scores,
+                        // we can't really assign a valid position at all. it could be any number between the two neighbours.
+                        else
+                            score.ScorePosition = null;
+                    }
+                    // for non-tracked scores, we just need to apply any delta that might have come from the tracked scores
+                    // which might have been encountered and assigned a position earlier.
+                    else
+                        score.ScorePosition = score.InitialPosition + delta;
+                }
             }
 
             sorting.Validate();

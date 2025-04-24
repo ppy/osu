@@ -12,7 +12,7 @@ namespace osu.Game.Screens.Select.Leaderboards
 {
     public partial class SoloGameplayLeaderboardProvider : Component, IGameplayLeaderboardProvider
     {
-        public bool IsPartial { get; private set; }
+        public bool HasInitialScorePositions { get; private set; }
 
         public IBindableList<GameplayLeaderboardScore> Scores => scores;
         private readonly BindableList<GameplayLeaderboardScore> scores = new BindableList<GameplayLeaderboardScore>();
@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             var globalScores = leaderboardManager?.Scores.Value;
 
-            IsPartial = leaderboardManager?.CurrentCriteria?.Scope != BeatmapLeaderboardScope.Local && globalScores?.TopScores.Count >= 50;
+            HasInitialScorePositions = leaderboardManager?.CurrentCriteria?.Scope != BeatmapLeaderboardScope.Local;
 
             if (globalScores != null)
             {
