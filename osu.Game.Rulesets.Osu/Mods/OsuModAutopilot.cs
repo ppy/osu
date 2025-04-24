@@ -115,7 +115,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 double rateElapsedTime = playfield.Clock.ElapsedFrameTime;
 
                 // Automatically spin spinner.
-                spinnerDrawable.RotationTracker.AddRotation(float.RadiansToDegrees((float)rateElapsedTime * (float)calculatedSpeed * MathF.PI * 2.0f));
+                spinnerDrawable.RotationTracker.AddRotation(float.RadiansToDegrees((float)rateElapsedTime * (float)rate * MathF.PI * 2.0f));
 
                 applyCursor(circPos, playfield);
 
