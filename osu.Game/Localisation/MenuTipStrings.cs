@@ -12,12 +12,12 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Press Ctrl-T anywhere in the game to toggle the toolbar!"
         /// </summary>
-        public static LocalisableString ToggleToolbarShortcut => new TranslatableString(getKey(@"toggle_toolbar_shortcut"), @"Press Ctrl-T anywhere in the game to toggle the toolbar!");
+        public static LocalisableString ToggleToolbarShortcut => new TranslatableString(getKey(@"toggle_toolbar_shortcut"), @"Press Ctrl-T anywhere in the game to toggle the toolbar by default!");
 
         /// <summary>
         /// "Press Ctrl-O anywhere in the game to access settings!"
         /// </summary>
-        public static LocalisableString GameSettingsShortcut => new TranslatableString(getKey(@"game_settings_shortcut"), @"Press Ctrl-O anywhere in the game to access settings!");
+        public static LocalisableString GameSettingsShortcut => new TranslatableString(getKey(@"game_settings_shortcut"), @"Press Ctrl-O anywhere in the game to access settings by default!");
 
         /// <summary>
         /// "All settings are dynamic and take effect in real-time. Try changing the skin while watching autoplay!"
@@ -42,12 +42,12 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "What used to be &quot;osu!direct&quot; is available to all users just like on the website. You can access it anywhere using Ctrl-B!"
         /// </summary>
-        public static LocalisableString FreeOsuDirect => new TranslatableString(getKey(@"free_osu_direct"), @"What used to be ""osu!direct"" is available to all users just like on the website. You can access it anywhere using Ctrl-B!");
+        public static LocalisableString FreeOsuDirect => new TranslatableString(getKey(@"free_osu_direct"), @"What used to be ""osu!direct"" is available to all users just like on the website. You can access it anywhere using Ctrl-B by default!");
 
         /// <summary>
         /// "Seeking in replays is available by dragging on the progress bar at the bottom of the screen or by using the left and right arrow keys!"
         /// </summary>
-        public static LocalisableString ReplaySeeking => new TranslatableString(getKey(@"replay_seeking"), @"Seeking in replays is available by dragging on the progress bar at the bottom of the screen or by using the left and right arrow keys!");
+        public static LocalisableString ReplaySeeking => new TranslatableString(getKey(@"replay_seeking"), @"Seeking in replays is available by dragging on the progress bar at the bottom of the screen or by using the left and right arrow keys by default!");
 
         /// <summary>
         /// "Try scrolling right in mod select to find a bunch of new fun mods!"
@@ -72,12 +72,12 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Toggle advanced frame / thread statistics with Ctrl-F11!"
         /// </summary>
-        public static LocalisableString ToggleAdvancedFPSCounter => new TranslatableString(getKey(@"toggle_advanced_fps_counter"), @"Toggle advanced frame / thread statistics with Ctrl-F11!");
+        public static LocalisableString ToggleAdvancedFPSCounter => new TranslatableString(getKey(@"toggle_advanced_fps_counter"), @"Toggle advanced frame / thread statistics with Ctrl-F11 by default!");
 
         /// <summary>
         /// "You can pause during a replay by pressing Space!"
         /// </summary>
-        public static LocalisableString ReplayPausing => new TranslatableString(getKey(@"replay_pausing"), @"You can pause during a replay by pressing Space!");
+        public static LocalisableString ReplayPausing => new TranslatableString(getKey(@"replay_pausing"), @"You can pause during a replay by pressing Space by default!");
 
         /// <summary>
         /// "Most of the hotkeys in the game are configurable and can be changed to anything you want. Check the bindings panel under input settings!"
@@ -87,7 +87,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Your gameplay HUD can be customised by using the skin layout editor. Open it at any time via Ctrl-Shift-S!"
         /// </summary>
-        public static LocalisableString SkinEditor => new TranslatableString(getKey(@"skin_editor"), @"Your gameplay HUD can be customised by using the skin layout editor. Open it at any time via Ctrl-Shift-S!");
+        public static LocalisableString SkinEditor => new TranslatableString(getKey(@"skin_editor"), @"Your gameplay HUD can be customised by using the skin layout editor. Open it at any time via Ctrl-Shift-S by default!");
 
         /// <summary>
         /// "You can create mod presets to make toggling your favourite mod combinations easier!"
@@ -102,12 +102,12 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Press Ctrl-Shift-R to switch to a random skin!"
         /// </summary>
-        public static LocalisableString RandomSkinShortcut => new TranslatableString(getKey(@"random_skin_shortcut"), @"Press Ctrl-Shift-R to switch to a random skin!");
+        public static LocalisableString RandomSkinShortcut => new TranslatableString(getKey(@"random_skin_shortcut"), @"Press Ctrl-Shift-R to switch to a random skin by default!");
 
         /// <summary>
         /// "While watching a replay, press Ctrl-H to toggle replay settings!"
         /// </summary>
-        public static LocalisableString ToggleReplaySettingsShortcut => new TranslatableString(getKey(@"toggle_replay_settings_shortcut"), @"While watching a replay, press Ctrl-H to toggle replay settings!");
+        public static LocalisableString ToggleReplaySettingsShortcut => new TranslatableString(getKey(@"toggle_replay_settings_shortcut"), @"While watching a replay, press Ctrl-H to toggle replay settings by default!");
 
         /// <summary>
         /// "You can easily copy the mods from scores on a leaderboard by right-clicking on them!"
@@ -137,7 +137,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Take a look under the hood at performance counters and enable verbose performance logging with Ctrl-F2!"
         /// </summary>
-        public static LocalisableString GlobalStatisticsShortcut => new TranslatableString(getKey(@"global_statistics_shortcut"), @"Take a look under the hood at performance counters and enable verbose performance logging with Ctrl-F2!");
+        public static LocalisableString GlobalStatisticsShortcut => new TranslatableString(getKey(@"global_statistics_shortcut"), @"Take a look under the hood at performance counters and enable verbose performance logging with Ctrl-F2 by default!");
 
         /// <summary>
         /// "When your gameplay HUD is hidden, you can press and hold Ctrl to view it temporarily!"
