@@ -37,11 +37,11 @@ namespace osu.Game.Rulesets.Osu.Mods
             typeof(ModTouchDevice)
         };
 
-        // Values to make cursor movement seem more natural.
-        // Assuming people cant tap within (MinStart) ms within an interval.
-        // Most likely needs a review.
-        private const double min_start = 20;
-        private const double min_end = 5;
+        // When currentTime equals the start of the hitwindow minus the start offset, we start reducing availableTime 
+        // from this value down to 1 when currentTime equals the end of the hitwindow minus the end offset.
+        // This ensures that, if we enter the window late, we still have some room for natural cursor movement.
+        private const double hitwindow_start_offset = 20;
+        private const double hitwindow_end_offset = 5;
 
         // The spinner radius value from OsuAutoGeneratorBase
         private const float spinner_radius = 50;
@@ -74,7 +74,10 @@ namespace osu.Game.Rulesets.Osu.Mods
             if (nextObject == null)
                 return;
 
-            double mehWindow = nextObject.HitObject.HitWindows.WindowFor(HitResult.Meh);
+            // Sliders do not have windows except for the HeadCircle, so we need to check for sliders.
+            double mehWindow = nextObject is DrawableSlider checkForSld
+                ? checkForSld.HeadCircle.HitObject.HitWindows.WindowFor(HitResult.Meh)
+                : nextObject.HitObject.HitWindows.WindowFor(HitResult.Meh);
 
             var pos = playfield.ToLocalSpace(inputManager.CurrentState.Mouse.Position);
             var target = nextObject.Position;
@@ -94,8 +97,6 @@ namespace osu.Game.Rulesets.Osu.Mods
                     var slider = sliderDrawable.HitObject;
                     double elapsed = currentTime - start;
 
-                    mehWindow = slider.HitWindows.WindowFor(HitResult.Meh);
-
                     if (elapsed + mehWindow >= 0 && elapsed < slider.Duration)
                     {
                         double prog = Math.Clamp(elapsed / slider.Duration, 0, 1);
@@ -110,10 +111,15 @@ namespace osu.Game.Rulesets.Osu.Mods
                     return;
             }
 
-            double hitWindowStart = start - mehWindow - min_start;
-            double hitWindowEnd = start + mehWindow - min_end;
+            double hitWindowStart = start - mehWindow - hitwindow_start_offset;
+            double hitWindowEnd = start + mehWindow - hitwindow_end_offset;
+
+            // Compute how many ms remain for cursor movement toward the hit-object:
+            // If we’re already inside the hit-window, scale remaining time from hitwindow_start_offset to 1 ms
+            // proportionally to the fraction of window left (clamped to [0,1]) to prevent extremely fast cursor movement.
+            // Otherwise, use the time until the window opens so movement only begins at hitWindowStart.
             double availableTime = currentTime >= hitWindowStart
-                ? 1 + (Math.Clamp((hitWindowEnd - currentTime) / (hitWindowEnd - hitWindowStart), 0, 1) * (min_start - 1))
+                ? 1 + (Math.Clamp((hitWindowEnd - currentTime) / (hitWindowEnd - hitWindowStart), 0, 1) * (hitwindow_start_offset - 1))
                 : (start - mehWindow - currentTime);
 
             moveTowards(pos, target, availableTime);
@@ -135,8 +141,8 @@ namespace osu.Game.Rulesets.Osu.Mods
                     -(float)Math.Sin(0) * spinner_radius,
                     -(float)Math.Cos(0) * spinner_radius);
 
-                double duration = currentTime >= start - min_start
-                    ? 1 + (Math.Clamp(((spinner.Duration - min_end) - (elapsed + min_start)) / (spinner.Duration - min_end), 0, 1) * (min_start - 1))
+                double duration = currentTime >= start - hitwindow_start_offset
+                    ? 1 + (Math.Clamp(((spinner.Duration - hitwindow_end_offset) - (elapsed + hitwindow_start_offset)) / (spinner.Duration - hitwindow_end_offset), 0, 1) * (hitwindow_start_offset - 1))
                     : -elapsed;
 
                 moveTowards(pos, spinnerTargetPosition, duration);
@@ -167,10 +173,14 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private void moveTowards(Vector2 current, Vector2 target, double timeMs)
         {
+            // Calculate the straight-line distance between current and target positions,
+            // then compute the constant velocity (units per ms) needed to cover that distance.
+            // Convert to per-frame displacement: velocity × elapsed frame time.
             float distance = Vector2.Distance(current, target);
             float velocity = distance / (float)timeMs;
             float displacement = velocity * (float)playfield.Clock.ElapsedFrameTime;
 
+            // If we'd overshoot, snap exactly to target; otherwise move along the unit (normalized) direction.
             Vector2 newPos = displacement >= distance
                 ? target
                 : current + ((target - current).Normalized() * displacement);
