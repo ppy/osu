@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.StateChanges;
 using osu.Framework.Localisation;
@@ -46,123 +47,9 @@ namespace osu.Game.Rulesets.Osu.Mods
         private const float spinner_radius = 50;
 
         private OsuInputManager inputManager = null!;
-        private Func<HitWindows, double> hitWindowLookup = null!;
-        private bool ifReplay;
+        private Playfield playfield = null!;
 
-        public void Update(Playfield playfield)
-        {
-            if (ifReplay)
-                return;
-
-            double currentTime = playfield.Clock.CurrentTime;
-
-            // First alive, unjudged object.
-            var active = playfield.HitObjectContainer.AliveObjects
-                                  .OfType<DrawableOsuHitObject>()
-                                  .FirstOrDefault(d => !d.Judged);
-
-            if (active == null)
-                return;
-
-            var pos = playfield.ToLocalSpace(inputManager.CurrentState.Mouse.Position);
-            var target = active.Position;
-
-            double start = active.HitObject.StartTime;
-
-            // Timing of the HitObject's hit window.
-            double window = active is DrawableSlider sld
-                ? hitWindowLookup(sld.HeadCircle.HitObject.HitWindows)
-                : hitWindowLookup(active.HitObject.HitWindows);
-
-            if (active is DrawableSpinner spinnerDrawable)
-            {
-                var spinner = spinnerDrawable.HitObject;
-
-                spinnerDrawable.RotationTracker.Tracking = spinnerDrawable.RotationTracker.IsSpinnableTime;
-                spinnerDrawable.HandleUserInput = false;
-
-                double elapsed = currentTime - start;
-
-                // Before spinner starts, move to position.
-                if (elapsed < 0)
-                {
-                    Vector2 spinnerTargetPosition = spinner.Position + new Vector2(
-                        -(float)Math.Sin(0) * spinner_radius,
-                        -(float)Math.Cos(0) * spinner_radius);
-
-                    double duration = currentTime >= start - min_start
-                        ? 1 + (Math.Clamp(((spinner.Duration - min_end) - (elapsed + min_start)) / (spinner.Duration - min_end), 0, 1) * (min_start - 1))
-                        : -elapsed;
-
-                    moveTowards(pos, spinnerTargetPosition, duration, playfield);
-
-                    return;
-                }
-
-                double calculatedSpeed = 1.01 * (spinner.MaximumBonusSpins + spinner.SpinsRequiredForBonus) / spinner.Duration;
-
-                // Rotate around centre
-                double rate = calculatedSpeed / playfield.Clock.Rate;
-
-                if (rate <= 0)
-                    return;
-
-                double angle = 2 * Math.PI * (elapsed * rate);
-                Vector2 circPos = spinner.Position + new Vector2(
-                    -(float)Math.Sin(angle) * spinner_radius,
-                    -(float)Math.Cos(angle) * spinner_radius);
-
-                double rateElapsedTime = playfield.Clock.ElapsedFrameTime;
-
-                // Automatically spin spinner.
-                spinnerDrawable.RotationTracker.AddRotation(float.RadiansToDegrees((float)rateElapsedTime * (float)rate * MathF.PI * 2.0f));
-
-                applyCursor(circPos, playfield);
-
-                return;
-            }
-
-            if (active is DrawableSlider sliderDrawable && sliderDrawable.HeadCircle.Judged)
-            {
-                var slider = sliderDrawable.HitObject;
-                double elapsed = currentTime - start;
-
-                if (elapsed + window >= 0 && elapsed < slider.Duration)
-                {
-                    double prog = Math.Clamp(elapsed / slider.Duration, 0, 1);
-                    double spans = (prog * (slider.RepeatCount + 1));
-                    spans = (spans > 1 && spans % 2 > 1) ? 1 - (spans % 1) : spans % 1;
-
-                    Vector2 pathPos = sliderDrawable.Position + (slider.Path.PositionAt(spans) * sliderDrawable.Scale);
-
-                    applyCursor(pathPos, playfield);
-                }
-
-                return;
-            }
-
-            // Hit circle movement
-            double hitWindowStart = start - window - min_start;
-            double hitWindowEnd = start + window - min_end;
-            double availableTime = currentTime >= hitWindowStart
-                ? 1 + (Math.Clamp((hitWindowEnd - currentTime) / (hitWindowEnd - hitWindowStart), 0, 1) * (min_start - 1))
-                : (start - window - currentTime);
-
-            moveTowards(pos, target, availableTime, playfield);
-        }
-
-        private void moveTowards(Vector2 current, Vector2 target, double timeMs, Playfield pf)
-        {
-            float distance = Vector2.Distance(current, target);
-            float velocity = distance / (float)timeMs;
-            float displacement = velocity * (float)pf.Clock.ElapsedFrameTime;
-
-            Vector2 newPos = displacement >= distance
-                ? target
-                : current + ((target - current).Normalized() * displacement);
-
-            applyCursor(newPos, pf);
-        }
+        private readonly IBindable<bool> hasReplayLoaded = new Bindable<bool>();
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
@@ -170,24 +57,130 @@ namespace osu.Game.Rulesets.Osu.Mods
             inputManager = ((DrawableOsuRuleset)drawableRuleset).KeyBindingInputManager;
             inputManager.AllowUserCursorMovement = false;
 
-            // Without this, replay starts having a little seizure when rewinding
-            // due to how Update calculates mouse positions.
-            ifReplay = drawableRuleset.HasReplayLoaded.Value;
-            drawableRuleset.HasReplayLoaded.BindValueChanged(
-                e => ifReplay = e.NewValue,
-                runOnceImmediately: true
-            );
+            playfield = drawableRuleset.Playfield;
 
-            // HitWindow lookup setup for future HitObjects.
-            hitWindowLookup = hw => hw.WindowFor(HitResult.Meh);
+            hasReplayLoaded.BindTo(drawableRuleset.HasReplayLoaded);
         }
 
-        private void applyCursor(Vector2 playfieldPosition, Playfield playfield)
+        public void Update(Playfield playfield)
         {
-            new MousePositionAbsoluteInput
+            if (hasReplayLoaded.Value)
+                return;
+
+            double currentTime = playfield.Clock.CurrentTime;
+
+            var nextObject = playfield.HitObjectContainer.AliveObjects.FirstOrDefault(d => !d.Judged);
+
+            if (nextObject == null)
+                return;
+
+            double mehWindow = nextObject.HitObject.HitWindows.WindowFor(HitResult.Meh);
+
+            var pos = playfield.ToLocalSpace(inputManager.CurrentState.Mouse.Position);
+            var target = nextObject.Position;
+
+            double start = nextObject.HitObject.StartTime;
+
+            switch (nextObject)
             {
-                Position = playfield.ToScreenSpace(playfieldPosition)
-            }.Apply(inputManager.CurrentState, inputManager);
+                case DrawableSpinner spinnerDrawable:
+                    handleSpinner(spinnerDrawable, currentTime, start, pos);
+                    return;
+
+                case DrawableSlider sliderDrawable:
+                    if (!sliderDrawable.HeadCircle.Judged)
+                        break;
+
+                    var slider = sliderDrawable.HitObject;
+                    double elapsed = currentTime - start;
+
+                    mehWindow = slider.HitWindows.WindowFor(HitResult.Meh);
+
+                    if (elapsed + mehWindow >= 0 && elapsed < slider.Duration)
+                    {
+                        double prog = Math.Clamp(elapsed / slider.Duration, 0, 1);
+                        double spans = (prog * (slider.RepeatCount + 1));
+                        spans = (spans > 1 && spans % 2 > 1) ? 1 - (spans % 1) : spans % 1;
+
+                        Vector2 pathPos = sliderDrawable.Position + (slider.Path.PositionAt(spans) * sliderDrawable.Scale);
+
+                        applyCursor(pathPos);
+                    }
+
+                    return;
+            }
+
+            double hitWindowStart = start - mehWindow - min_start;
+            double hitWindowEnd = start + mehWindow - min_end;
+            double availableTime = currentTime >= hitWindowStart
+                ? 1 + (Math.Clamp((hitWindowEnd - currentTime) / (hitWindowEnd - hitWindowStart), 0, 1) * (min_start - 1))
+                : (start - mehWindow - currentTime);
+
+            moveTowards(pos, target, availableTime);
+        }
+
+        private void handleSpinner(DrawableSpinner spinnerDrawable, double currentTime, double start, Vector2 pos)
+        {
+            var spinner = spinnerDrawable.HitObject;
+
+            spinnerDrawable.RotationTracker.Tracking = spinnerDrawable.RotationTracker.IsSpinnableTime;
+            spinnerDrawable.HandleUserInput = false;
+
+            double elapsed = currentTime - start;
+
+            // Before spinner starts, move to position.
+            if (elapsed < 0)
+            {
+                Vector2 spinnerTargetPosition = spinner.Position + new Vector2(
+                    -(float)Math.Sin(0) * spinner_radius,
+                    -(float)Math.Cos(0) * spinner_radius);
+
+                double duration = currentTime >= start - min_start
+                    ? 1 + (Math.Clamp(((spinner.Duration - min_end) - (elapsed + min_start)) / (spinner.Duration - min_end), 0, 1) * (min_start - 1))
+                    : -elapsed;
+
+                moveTowards(pos, spinnerTargetPosition, duration);
+
+                return;
+            }
+
+            double calculatedSpeed = 1.01 * (spinner.MaximumBonusSpins + spinner.SpinsRequiredForBonus) / spinner.Duration;
+
+            // Rotate around centre
+            double rate = calculatedSpeed / playfield.Clock.Rate;
+
+            if (rate <= 0)
+                return;
+
+            double angle = 2 * Math.PI * (elapsed * rate);
+            Vector2 circPos = spinner.Position + new Vector2(
+                -(float)Math.Sin(angle) * spinner_radius,
+                -(float)Math.Cos(angle) * spinner_radius);
+
+            double rateElapsedTime = playfield.Clock.ElapsedFrameTime;
+
+            // Automatically spin spinner.
+            spinnerDrawable.RotationTracker.AddRotation(float.RadiansToDegrees((float)rateElapsedTime * (float)rate * MathF.PI * 2.0f));
+
+            applyCursor(circPos);
+        }
+
+        private void moveTowards(Vector2 current, Vector2 target, double timeMs)
+        {
+            float distance = Vector2.Distance(current, target);
+            float velocity = distance / (float)timeMs;
+            float displacement = velocity * (float)playfield.Clock.ElapsedFrameTime;
+
+            Vector2 newPos = displacement >= distance
+                ? target
+                : current + ((target - current).Normalized() * displacement);
+
+            applyCursor(newPos);
+        }
+
+        private void applyCursor(Vector2 playfieldPosition)
+        {
+            new MousePositionAbsoluteInput { Position = playfield.ToScreenSpace(playfieldPosition) }.Apply(inputManager.CurrentState, inputManager);
         }
     }
 }
