@@ -40,7 +40,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         private readonly MultiplayerLeaderboardProvider leaderboardProvider;
 
         private GameplayMatchScoreDisplay teamScoreDisplay = null!;
-        private GameplayChatDisplay chat;
+        private GameplayChatDisplay chat = null!;
 
         /// <summary>
         /// Construct a multiplayer player.
