@@ -46,6 +46,7 @@ using osu.Game.Input.Bindings;
 using osu.Game.IO;
 using osu.Game.Localisation;
 using osu.Game.Online;
+using osu.Game.Online.API.Requests;
 using osu.Game.Online.Chat;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Online.Rooms;
@@ -59,6 +60,7 @@ using osu.Game.Overlays.SkinEditor;
 using osu.Game.Overlays.Toolbar;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
+using osu.Game.Scoring.Legacy;
 using osu.Game.Screens;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Footer;
@@ -742,23 +744,33 @@ namespace osu.Game
         {
             Logger.Log($"Beginning {nameof(PresentScore)} with score {score}");
 
-            var databasedScore = ScoreManager.GetScore(score);
+            Score databasedScore = null;
+
+            try
+            {
+                databasedScore = ScoreManager.GetScore(score);
+            }
+            catch (LegacyScoreDecoder.BeatmapNotFoundException notFound)
+            {
+                Logger.Log("The replay cannot be played because the beatmap is missing.", LoggingTarget.Information);
+
+                var req = new GetBeatmapRequest(new BeatmapInfo { MD5Hash = notFound.Hash });
+                req.Success += res => Notifications.Post(new MissingBeatmapNotification(res, notFound.Hash, null));
+                API.Queue(req);
+
+                return;
+            }
 
             if (databasedScore == null) return;
 
             if (databasedScore.Replay == null)
             {
-                Logger.Log("The loaded score has no replay data.", LoggingTarget.Information);
+                Logger.Log("The loaded score has no replay data.", LoggingTarget.Information, LogLevel.Important);
                 return;
             }
 
-            var databasedBeatmap = BeatmapManager.QueryBeatmap(b => b.ID == databasedScore.ScoreInfo.BeatmapInfo.ID);
-
-            if (databasedBeatmap == null)
-            {
-                Logger.Log("Tried to load a score for a beatmap we don't have!", LoggingTarget.Information);
-                return;
-            }
+            var databasedBeatmap = databasedScore.ScoreInfo.BeatmapInfo;
+            Debug.Assert(databasedBeatmap != null);
 
             // This should be able to be performed from song select always, but that is disabled for now
             // due to the weird decoupled ruleset logic (which can cause a crash in certain filter scenarios).

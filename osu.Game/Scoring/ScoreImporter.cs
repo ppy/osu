@@ -59,7 +59,7 @@ namespace osu.Game.Scoring
                     {
                         // In the case of a missing beatmap, let's attempt to resolve it and show a prompt to the user to download the required beatmap.
                         var req = new GetBeatmapRequest(new BeatmapInfo { MD5Hash = notFound.Hash });
-                        req.Success += res => PostNotification?.Invoke(new MissingBeatmapNotification(res, archive, notFound.Hash));
+                        req.Success += res => PostNotification?.Invoke(new MissingBeatmapNotification(res, notFound.Hash, archive));
                         api.Queue(req);
                     }
 
