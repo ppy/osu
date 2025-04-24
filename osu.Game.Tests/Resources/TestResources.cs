@@ -29,6 +29,11 @@ namespace osu.Game.Tests.Resources
     {
         public const double QUICK_BEATMAP_LENGTH = 10000;
 
+        public const string COVER_IMAGE_1 = "https://assets.ppy.sh/user-cover-presets/1/df28696b58541a9e67f6755918951d542d93bdf1da41720fcca2fd2c1ea8cf51.jpeg";
+        public const string COVER_IMAGE_2 = "https://assets.ppy.sh/user-cover-presets/7/4a0ccb7b7fdd5c4238b11f0e7c686760fe2c99c6472b19400e82d1a8ff503e31.jpeg";
+        public const string COVER_IMAGE_3 = "https://assets.ppy.sh/user-cover-presets/12/6e8d3402c8080c2d9549a98321e1bff111dd9c94603ccdb237597479cab6e8a7.jpeg";
+        public const string COVER_IMAGE_4 = "https://assets.ppy.sh/user-cover-presets/17/80f82e4c2b27d8d6eed3ce89708ec27343e5ac63389cba6b5fb4550776562d08.jpeg";
+
         private static readonly TemporaryNativeStorage temp_storage = new TemporaryNativeStorage("TestResources");
 
         public static DllResourceStore GetStore() => new DllResourceStore(typeof(TestResources).Assembly);
@@ -178,7 +183,7 @@ namespace osu.Game.Tests.Resources
             {
                 Id = 2,
                 Username = "peppy",
-                CoverUrl = "https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
+                CoverUrl = COVER_IMAGE_3,
             },
             BeatmapInfo = beatmap,
             BeatmapHash = beatmap.Hash,
