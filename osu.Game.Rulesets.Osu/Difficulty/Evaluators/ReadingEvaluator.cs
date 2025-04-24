@@ -32,7 +32,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             double pastObjectDifficultyInfluence = 1.0;
             double overlapness = 0;
-            double rhythmFactor = 1;
 
             if (currObj.BaseObject is Slider currSlider)
                 // Longer sliders are inherently denser objects
@@ -44,15 +43,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                 // Small distances means objects may be cheesed, so it doesn't matter whether they are arranged confusingly.
                 loopDifficulty *= DifficultyCalculationUtils.Logistic(-(loopObj.MinimumJumpDistance - 65) / 15);
-
-                var loopLastObj = (OsuDifficultyHitObject)loopObj.Previous(0);
-
-                if (loopLastObj is not null && loopObj.StrainTime > loopLastObj.StrainTime)
-                {
-                    double rhythmSimilarity = getRhythmDifference(loopObj.StrainTime, loopLastObj.StrainTime);
-                    rhythmSimilarity *= Math.Pow(Math.Sin(rhythmSimilarity * 2 * Math.PI), 2);
-                    rhythmFactor += rhythmSimilarity;
-                }
 
                 var loopObjPosition = loopObj.Position;
                 float visibleDistance = ((currPosition - loopObjPosition) / OsuDifficultyHitObject.NORMALISED_DIAMETER).Length;
@@ -78,8 +68,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 pastObjectDifficultyInfluence += loopDifficulty;
             }
 
-            overlapness *= rhythmFactor;
-
             double preemptDifficulty = 0.0;
 
             double currApproachRate = currObj.Preempt; // Approach rate in milliseconds
@@ -93,6 +81,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double densityDifficulty = 1 + DifficultyCalculationUtils.BellCurve(retrievePastVisibleObjects(currObj).Count(), 2, 1.5, 3.0);
                 preemptDifficulty *= currVelocity / densityDifficulty;
                 preemptDifficulty *= angleNerfFactor;
+
                 var prevObj = (OsuDifficultyHitObject)currObj.Previous(0);
                 double doubletapness = 1 - prevObj.GetDoubletapness(currObj);
                 preemptDifficulty *= doubletapness; // Doubletaps raise the density without adding significant reading difficulty
