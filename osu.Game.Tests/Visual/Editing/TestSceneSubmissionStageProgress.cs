@@ -127,7 +127,7 @@ namespace osu.Game.Tests.Visual.Editing
                 AddStep($"{step}: completed", () => stages[step].SetCompleted());
             }
 
-            AddWaitStep("pause for timing", 1);
+            AddWaitStep("pause for timing", 2);
 
             AddStep("Sequence Complete", () =>
             {
