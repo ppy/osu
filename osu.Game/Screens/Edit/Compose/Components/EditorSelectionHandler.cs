@@ -318,7 +318,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private void onSelectedItemsChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             // Reset the ternary states when the selection is cleared.
-            if (e.OldStartingIndex >= 0 && e.NewStartingIndex < 0)
+            if (SelectedItems.Count == 0)
                 Scheduler.AddOnce(resetTernaryStates);
             else
                 Scheduler.AddOnce(UpdateTernaryStates);
