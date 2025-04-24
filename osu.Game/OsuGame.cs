@@ -744,7 +744,7 @@ namespace osu.Game
         {
             Logger.Log($"Beginning {nameof(PresentScore)} with score {score}");
 
-            Score databasedScore = null;
+            Score databasedScore;
 
             try
             {
