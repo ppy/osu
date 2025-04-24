@@ -88,7 +88,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                     return;
 
                 case DrawableSlider sliderDrawable:
-                    if (!sliderDrawable.HeadCircle.Judged && hasReplayLoaded.Value)
+                    if (!sliderDrawable.HeadCircle.Judged || hasReplayLoaded.Value)
                         break;
 
                     var slider = sliderDrawable.HitObject;
