@@ -30,7 +30,7 @@ using osu.Game.Tests.Visual.Spectator;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    [System.ComponentModel.Description(@"Exercises the appearance of the HUD overlay on various skin and ruleset combinations.")]
+    [Description(@"Exercises the appearance of the HUD overlay on various skin and ruleset combinations.")]
     public partial class TestSceneHUDOverlayRulesetLayouts : OsuTestScene, IStorageResourceProvider
     {
         private readonly Dictionary<string, ISkin> skins = new Dictionary<string, ISkin>();
