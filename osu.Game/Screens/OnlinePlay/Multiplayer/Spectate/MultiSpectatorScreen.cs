@@ -40,6 +40,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         /// </summary>
         public bool AllPlayersLoaded => instances.All(p => p.PlayerLoaded);
 
+        internal DrawableGameplayLeaderboard Leaderboard { get; private set; }
+
         protected override UserActivity InitialActivity => new UserActivity.SpectatingMultiplayerGame(Beatmap.Value.BeatmapInfo, Ruleset.Value);
 
         [Resolved]
@@ -150,7 +152,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                     }, scoreDisplayContainer.Add);
                 }
             });
-            leaderboardFlow.Insert(0, new DrawableGameplayLeaderboard
+            leaderboardFlow.Insert(0, Leaderboard = new DrawableGameplayLeaderboard
             {
                 Expanded = { Value = true }
             });
