@@ -8,6 +8,8 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Threading;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps.Drawables.Cards;
 using osu.Game.Overlays;
 using osu.Game.Screens.Edit.Submission;
@@ -28,6 +30,8 @@ namespace osu.Game.Tests.Visual.Editing
         [Test]
         public void TestAppearance()
         {
+            float incrementingProgress = 0;
+
             SubmissionStageProgress progress = null!;
 
             AddStep("create content", () => Child = new Container
@@ -45,8 +49,27 @@ namespace osu.Game.Tests.Visual.Editing
             });
             AddStep("not started", () => progress.SetNotStarted());
             AddStep("indeterminate progress", () => progress.SetInProgress());
-            AddStep("30% progress", () => progress.SetInProgress(0.3f));
-            AddStep("70% progress", () => progress.SetInProgress(0.7f));
+            AddStep("increase progress to 100", () =>
+            {
+                incrementingProgress = 0;
+
+                ScheduledDelegate? task = null;
+
+                task = Scheduler.AddDelayed(() =>
+                {
+                    if (incrementingProgress >= 1)
+                    {
+                        // ReSharper disable once AccessToModifiedClosure
+                        task?.Cancel();
+                        return;
+                    }
+
+                    if (RNG.NextDouble() < 0.01)
+                        progress.SetInProgress(incrementingProgress += RNG.NextSingle(0.08f));
+                }, 0, true);
+            });
+
+            AddUntilStep("wait for completed", () => incrementingProgress >= 1);
             AddStep("completed", () => progress.SetCompleted());
             AddStep("failed", () => progress.SetFailed("the foobarator has defrobnicated"));
             AddStep("failed with long message", () => progress.SetFailed("this is a very very very very VERY VEEEEEEEEEEEEEEEEEEEEEEEEERY long error message like you would never believe"));
