@@ -191,13 +191,10 @@ namespace osu.Game.Screens.Edit.Submission
             progressSampleFadeDelegate?.Cancel();
             progressSampleStopDelegate?.Cancel();
 
-            try
+            progressBarContainer.FadeTo(status.Value == StageStatusType.InProgress && progress.Value != null ? 1 : 0, transition_duration, transition_easing);
+
+            if (progress.Value is float progressValue)
             {
-                if (progress.Value == null)
-                    return;
-
-                float progressValue = progress.Value.Value;
-
                 progressBar.ResizeWidthTo(progressValue, transition_duration, transition_easing);
 
                 if (progressSampleChannel == null || Precision.AlmostEquals(progressValue, 0f))
@@ -216,10 +213,6 @@ namespace osu.Game.Screens.Edit.Submission
                     this.TransformBindableTo(progressSampleChannel.Volume, 0, fadeout_duration);
                     progressSampleStopDelegate = Scheduler.AddDelayed(() => { progressSampleChannel.Stop(); }, fadeout_duration);
                 }, transition_duration - fadeout_duration);
-            }
-            finally
-            {
-                progressBarContainer.FadeTo(status.Value == StageStatusType.InProgress && progress.Value != null ? 1 : 0, transition_duration, transition_easing);
             }
         }
 
