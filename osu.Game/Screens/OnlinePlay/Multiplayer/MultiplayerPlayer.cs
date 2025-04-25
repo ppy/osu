@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Graphics.UserInterface;
@@ -18,6 +20,7 @@ using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Users;
+using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
@@ -70,13 +73,22 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             ScoreProcessor.ApplyNewJudgementsWhenFailed = true;
 
-            LoadComponentAsync(chat = new GameplayChatDisplay(Room), HUDOverlay.LeaderboardFlow.Add);
-
-            LoadComponentAsync(teamScoreDisplay = new GameplayMatchScoreDisplay
+            LoadComponentAsync(new FillFlowContainer
             {
-                Expanded = { BindTarget = HUDOverlay.ShowHud },
-                Alpha = 0,
-            }, scoreDisplay => HUDOverlay.LeaderboardFlow.Insert(1, scoreDisplay));
+                Width = 260,
+                Direction = FillDirection.Vertical,
+                Spacing = new Vector2(5),
+                Children = new Drawable[]
+                {
+                    chat = new GameplayChatDisplay(Room),
+                    teamScoreDisplay = new GameplayMatchScoreDisplay
+                    {
+                        Expanded = { BindTarget = HUDOverlay.ShowHud },
+                        Alpha = 0,
+                    }
+                }
+            }, HUDOverlay.TopLeftElements.Add);
+
             LoadComponentAsync(leaderboardProvider, loaded =>
             {
                 AddInternal(loaded);
