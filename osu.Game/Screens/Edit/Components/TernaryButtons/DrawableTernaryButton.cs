@@ -47,7 +47,7 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
         private Color4 selectedBackgroundColour;
         private Color4 selectedIconColour;
 
-        protected Drawable Icon { get; private set; } = null!;
+        public Drawable Icon { get; private set; } = null!;
 
         public DrawableTernaryButton()
         {
