@@ -88,7 +88,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                     return;
 
                 case DrawableSlider sliderDrawable:
-                    if (!sliderDrawable.HeadCircle.Judged || hasReplayLoaded.Value)
+                    if (!sliderDrawable.HeadCircle.Judged)
                         break;
 
                     var slider = sliderDrawable.HitObject;
@@ -107,9 +107,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                     return;
             }
-
-            if (hasReplayLoaded.Value)
-                return;
 
             double hitWindowStart = start - mehWindow - hitwindow_start_offset;
             double hitWindowEnd = start + mehWindow - hitwindow_end_offset;
@@ -135,7 +132,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             double elapsed = currentTime - start;
 
             // Before spinner starts, move to position.
-            if (elapsed < 0 && !hasReplayLoaded.Value)
+            if (elapsed < 0)
             {
                 Vector2 spinnerTargetPosition = spinner.Position + new Vector2(
                     -(float)Math.Sin(0) * spinner_radius,
@@ -156,9 +153,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             // Automatically spin spinner.
             spinnerDrawable.RotationTracker.AddRotation(float.RadiansToDegrees((float)elapsedTime * (float)rate * MathF.PI * 2.0f));
-
-            if (hasReplayLoaded.Value)
-                return;
 
             double angle = 2 * Math.PI * (elapsed * rate);
             Vector2 circPos = spinner.Position + new Vector2(
@@ -187,6 +181,9 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private void applyCursor(Vector2 playfieldPosition)
         {
+            if (hasReplayLoaded.Value)
+                return;
+
             new MousePositionAbsoluteInput { Position = playfield.ToScreenSpace(playfieldPosition) }.Apply(inputManager.CurrentState, inputManager);
         }
     }
