@@ -63,8 +63,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 var beatmap = ruleset.CreateBeatmapConverter(new Beatmap()).Convert();
                 var drawableRuleset = ruleset.CreateDrawableRulesetWith(beatmap);
 
-                var skin = skins[skinName];
-                ISkin provider = ruleset.CreateSkinTransformer(skin, beatmap) ?? skin;
+                ISkin provider = ruleset.CreateSkinTransformer(skins[skinName], beatmap)!;
 
                 var gameplayState = TestGameplayState.Create(ruleset);
                 ((Bindable<LocalUserPlayingState>)gameplayState.PlayingState).Value = LocalUserPlayingState.Playing;
