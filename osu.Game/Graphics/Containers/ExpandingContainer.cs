@@ -14,6 +14,8 @@ namespace osu.Game.Graphics.Containers
     /// </summary>
     public partial class ExpandingContainer : Container, IExpandingContainer
     {
+        public const double TRANSITION_DURATION = 500;
+
         private readonly float contractedWidth;
         private readonly float expandedWidth;
 
@@ -61,7 +63,7 @@ namespace osu.Game.Graphics.Containers
 
             Expanded.BindValueChanged(v =>
             {
-                this.ResizeWidthTo(v.NewValue ? expandedWidth : contractedWidth, 500, Easing.OutQuint);
+                this.ResizeWidthTo(v.NewValue ? expandedWidth : contractedWidth, TRANSITION_DURATION, Easing.OutQuint);
             }, true);
         }
 
