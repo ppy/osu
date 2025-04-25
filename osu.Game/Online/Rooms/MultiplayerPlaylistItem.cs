@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using MessagePack;
 using osu.Game.Online.API;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Utils;
 
 namespace osu.Game.Online.Rooms
 {
@@ -28,9 +30,20 @@ namespace osu.Game.Online.Rooms
         [Key(4)]
         public int RulesetID { get; set; }
 
+        /// <summary>
+        /// Mods that should be applied for every participant in the room.
+        /// </summary>
         [Key(5)]
         public IEnumerable<APIMod> RequiredMods { get; set; } = Enumerable.Empty<APIMod>();
 
+        /// <summary>
+        /// Mods that participants are allowed to apply at their own discretion.
+        /// </summary>
+        /// <remarks>
+        /// This will be empty when <see cref="Freestyle"/> is <c>true</c>, but participants may still select any mods from their choice of ruleset,
+        /// provided the mod <see cref="IMod.ValidForMultiplayerAsFreeMod">implementation</see> indicates free-mod validity
+        /// and is <see cref="ModUtils.CheckCompatibleSet(IEnumerable{Mod})">compatible</see> with the rest of the user's selection.
+        /// </remarks>
         [Key(6)]
         public IEnumerable<APIMod> AllowedMods { get; set; } = Enumerable.Empty<APIMod>();
 
@@ -57,7 +70,7 @@ namespace osu.Game.Online.Rooms
         public double StarRating { get; set; }
 
         /// <summary>
-        /// Indicates whether participants in the room are able to pick their own choice of beatmap difficulty and ruleset.
+        /// Indicates whether participants in the room are able to pick their own choice of beatmap difficulty, ruleset, and mods.
         /// </summary>
         [Key(11)]
         public bool Freestyle { get; set; }
