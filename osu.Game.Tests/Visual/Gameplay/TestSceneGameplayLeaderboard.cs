@@ -183,30 +183,6 @@ namespace osu.Game.Tests.Visual.Gameplay
                 () => Does.Contain("#FF549A"));
         }
 
-        [Test]
-        public void TestTrackedScorePosition([Values] bool partial)
-        {
-            createLeaderboard(partial);
-
-            AddStep("add many scores in one go", () =>
-            {
-                for (int i = 0; i < 49; i++)
-                    createRandomScore(new APIUser { Username = $"Player {i + 1}" });
-
-                // Add player at end to force an animation down the whole list.
-                playerScore.Value = 0;
-                createLeaderboardScore(playerScore, new APIUser { Username = "You", Id = 3 }, true);
-            });
-
-            if (partial)
-                AddUntilStep("tracked player has null position", () => leaderboard.TrackedScore?.ScorePosition, () => Is.Null);
-            else
-                AddUntilStep("tracked player is #50", () => leaderboard.TrackedScore?.ScorePosition, () => Is.EqualTo(50));
-
-            AddStep("move tracked player to top", () => leaderboard.TrackedScore!.TotalScore.Value = 8_000_000);
-            AddUntilStep("all players have non-null position", () => leaderboard.AllScores.Select(s => s.ScorePosition), () => Does.Not.Contain(null));
-        }
-
         private void addLocalPlayer()
         {
             AddStep("add local player", () =>
@@ -216,12 +192,11 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
         }
 
-        private void createLeaderboard(bool partial = false)
+        private void createLeaderboard()
         {
             AddStep("create leaderboard", () =>
             {
                 leaderboardProvider.Scores.Clear();
-                leaderboardProvider.IsPartial = partial;
                 Child = leaderboard = new TestDrawableGameplayLeaderboard
                 {
                     Anchor = Anchor.Centre,
@@ -247,7 +222,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 var scoreItem = Flow.FirstOrDefault(i => i.User?.Username == username);
 
-                return scoreItem != null && scoreItem.ScorePosition == expectedPosition;
+                return scoreItem != null && scoreItem.ScorePosition.Value == expectedPosition;
             }
 
             public IEnumerable<DrawableGameplayLeaderboardScore> GetAllScoresForUsername(string username)
@@ -260,7 +235,6 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             IBindableList<GameplayLeaderboardScore> IGameplayLeaderboardProvider.Scores => Scores;
             public BindableList<GameplayLeaderboardScore> Scores { get; } = new BindableList<GameplayLeaderboardScore>();
-            public bool IsPartial { get; set; }
         }
     }
 }

@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Caching;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.ObjectExtensions;
@@ -55,6 +56,8 @@ namespace osu.Game.Screens.Select.Leaderboards
         [Resolved]
         private OsuColour colours { get; set; } = null!;
 
+        private readonly Cached sorting = new Cached();
+
         public MultiplayerLeaderboardProvider(MultiplayerRoomUser[] users)
         {
             this.users = users;
@@ -101,6 +104,8 @@ namespace osu.Game.Screens.Select.Leaderboards
                                            HasQuit = { BindTarget = trackedUser.UserQuit },
                                            TeamColour = UserScores[user.OnlineID].Team is int team ? getTeamColour(team) : null,
                                        };
+                                       leaderboardScore.TotalScore.BindValueChanged(_ => sorting.Invalidate());
+                                       leaderboardScore.DisplayOrder.BindValueChanged(_ => sorting.Invalidate(), true);
                                        scores.Add(leaderboardScore);
                                    }
                                });
@@ -124,6 +129,8 @@ namespace osu.Game.Screens.Select.Leaderboards
             // new players are not supported.
             playingUserIds.BindTo(multiplayerClient.CurrentMatchPlayingUserIds);
             playingUserIds.BindCollectionChanged(playingUsersChanged);
+
+            Scheduler.AddDelayed(sort, 1000, true);
         }
 
         private void playingUsersChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -172,6 +179,26 @@ namespace osu.Game.Screens.Select.Leaderboards
                 default:
                     return colours.TeamColourBlue.Lighten(1.2f);
             }
+        }
+
+        private void sort()
+        {
+            if (sorting.IsValid)
+                return;
+
+            var orderedByScore = scores
+                                 .OrderByDescending(i => i.TotalScore.Value)
+                                 .ThenBy(i => i.TotalScoreTiebreaker)
+                                 .ToList();
+
+            for (int i = 0; i < orderedByScore.Count; i++)
+            {
+                var score = orderedByScore[i];
+                score.DisplayOrder.Value = i;
+                score.Position.Value = i + 1;
+            }
+
+            sorting.Validate();
         }
 
         protected override void Dispose(bool isDisposing)

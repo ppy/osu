@@ -5,7 +5,6 @@ using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Caching;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -20,8 +19,6 @@ namespace osu.Game.Screens.Play.HUD
 {
     public partial class DrawableGameplayLeaderboard : CompositeDrawable
     {
-        private readonly Cached sorting = new Cached();
-
         public Bindable<bool> Expanded = new Bindable<bool>();
 
         protected readonly FillFlowContainer<DrawableGameplayLeaderboardScore> Flow;
@@ -87,7 +84,6 @@ namespace osu.Game.Screens.Play.HUD
                 }, true);
             }
 
-            Scheduler.AddDelayed(sort, 1000, true);
             configVisibility.BindValueChanged(_ => this.FadeTo(configVisibility.Value ? 1 : 0, 100, Easing.OutQuint), true);
         }
 
@@ -109,8 +105,8 @@ namespace osu.Game.Screens.Play.HUD
             drawable.Expanded.BindTo(Expanded);
 
             Flow.Add(drawable);
-            drawable.TotalScore.BindValueChanged(_ => sorting.Invalidate(), true);
-            drawable.DisplayOrder.BindValueChanged(_ => sorting.Invalidate(), true);
+            drawable.ScorePosition.BindValueChanged(_ => Scheduler.AddOnce(sort));
+            drawable.DisplayOrder.BindValueChanged(_ => Scheduler.AddOnce(sort), true);
 
             int displayCount = Math.Min(Flow.Count, max_panels);
             Height = displayCount * (DrawableGameplayLeaderboardScore.PANEL_HEIGHT + Flow.Spacing.Y);
@@ -179,22 +175,8 @@ namespace osu.Game.Screens.Play.HUD
 
         private void sort()
         {
-            if (sorting.IsValid)
-                return;
-
-            var orderedByScore = Flow
-                                 .OrderByDescending(i => i.TotalScore.Value)
-                                 .ThenBy(i => i.DisplayOrder.Value)
-                                 .ToList();
-
-            for (int i = 0; i < Flow.Count; i++)
-            {
-                var score = orderedByScore[i];
-                Flow.SetLayoutPosition(score, i);
-                score.ScorePosition = i + 1 == Flow.Count && leaderboardProvider?.IsPartial == true && score.Tracked ? null : i + 1;
-            }
-
-            sorting.Validate();
+            foreach (var score in Flow.ToArray())
+                Flow.SetLayoutPosition(score, score.DisplayOrder.Value);
         }
 
         private partial class InputDisabledScrollContainer : OsuScrollContainer
