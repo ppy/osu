@@ -28,7 +28,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             Vector2 currPosition = currObj.Position;
             double currVelocity = currObj.LazyJumpDistance / currObj.StrainTime;
             double angleNerfFactor = getConstantAngleNerfFactor(currObj);
-            // Console.Out.WriteLine(angleNerfFactor);
 
             double pastObjectDifficultyInfluence = 1.0;
             double overlapness = 0;
@@ -109,7 +108,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             }
 
             // Award only denser than average maps
-            double noteDensityDifficulty = Math.Max(0, pastObjectDifficultyInfluence - 2.7);
+            double noteDensityDifficulty = Math.Max(0, pastObjectDifficultyInfluence - 2.5);
             noteDensityDifficulty *= angleNerfFactor;
 
             double difficulty = preemptDifficulty + hiddenDifficulty + noteDensityDifficulty + overlapness;
