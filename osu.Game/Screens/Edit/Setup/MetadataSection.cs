@@ -44,7 +44,7 @@ namespace osu.Game.Screens.Edit.Setup
                 creatorTextBox = createTextBox<FormTextBox>(EditorSetupStrings.Creator),
                 difficultyTextBox = createTextBox<FormTextBox>(EditorSetupStrings.DifficultyName),
                 sourceTextBox = createTextBox<FormTextBox>(BeatmapsetsStrings.ShowInfoSource),
-                tagsTextBox = createTextBox<FormTextBox>(BeatmapsetsStrings.ShowInfoTags)
+                tagsTextBox = createTextBox<FormTextBox>(BeatmapsetsStrings.ShowInfoMapperTags)
             };
 
             if (setupScreen != null)

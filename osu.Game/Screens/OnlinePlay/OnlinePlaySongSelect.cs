@@ -67,7 +67,7 @@ namespace osu.Game.Screens.OnlinePlay
             freeModSelect = new FreeModSelectOverlay
             {
                 SelectedMods = { BindTarget = FreeMods },
-                IsValidMod = isValidFreeMod,
+                IsValidMod = isValidAllowedMod,
             };
         }
 
@@ -115,45 +115,74 @@ namespace osu.Game.Screens.OnlinePlay
                 Freestyle.Value = initialItem.Freestyle;
             }
 
-            Mods.BindValueChanged(onModsChanged);
+            Mods.BindValueChanged(onGlobalModsChanged);
             Ruleset.BindValueChanged(onRulesetChanged);
-            Freestyle.BindValueChanged(onFreestyleChanged, true);
+            Freestyle.BindValueChanged(onFreestyleChanged);
 
             freeModSelectOverlayRegistration = OverlayManager?.RegisterBlockingOverlay(freeModSelect);
+
+            updateFooterButtons();
+            updateValidMods();
         }
 
         private void onFreestyleChanged(ValueChangedEvent<bool> enabled)
         {
+            updateFooterButtons();
+            updateValidMods();
+
             if (enabled.NewValue)
             {
-                freeModsFooterButton.Enabled.Value = false;
-                freeModsFooterButton.Enabled.Value = false;
-                ModsFooterButton.Enabled.Value = false;
-
-                ModSelect.Hide();
-                freeModSelect.Hide();
-
-                Mods.Value = [];
+                // Freestyle allows all mods to be selected as freemods. This does not play nicely for some components:
+                // - We probably don't want to store a gigantic list of acronyms to the database.
+                // - The mod select overlay isn't built to handle duplicate mods/mods from all rulesets being shoved into it.
+                // Instead, freestyle inherently assumes this list is empty, and must be empty for server-side validation to pass.
                 FreeMods.Value = [];
             }
             else
             {
-                freeModsFooterButton.Enabled.Value = true;
-                ModsFooterButton.Enabled.Value = true;
+                // When disabling freestyle, enable freemods by default.
+                FreeMods.Value = freeModSelect.AllAvailableMods.Where(state => state.ValidForSelection.Value).Select(state => state.Mod).ToArray();
             }
         }
 
-        private void onModsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
+        private void onGlobalModsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
         {
-            FreeMods.Value = FreeMods.Value.Where(isValidFreeMod).ToList();
-
-            // Reset the validity delegate to update the overlay's display.
-            freeModSelect.IsValidMod = isValidFreeMod;
+            updateValidMods();
         }
 
         private void onRulesetChanged(ValueChangedEvent<RulesetInfo> ruleset)
         {
-            FreeMods.Value = Array.Empty<Mod>();
+            // Todo: We can probably attempt to preserve across rulesets like the global mods do.
+            FreeMods.Value = [];
+        }
+
+        private void updateFooterButtons()
+        {
+            if (Freestyle.Value)
+            {
+                freeModsFooterButton.Enabled.Value = false;
+                freeModSelect.Hide();
+            }
+            else
+                freeModsFooterButton.Enabled.Value = true;
+        }
+
+        /// <summary>
+        /// Removes invalid mods from <see cref="OsuScreen.Mods"/> and <see cref="FreeMods"/>,
+        /// and updates mod selection overlays to display the new mods valid for selection.
+        /// </summary>
+        private void updateValidMods()
+        {
+            Mod[] validMods = Mods.Value.Where(isValidRequiredMod).ToArray();
+            if (!validMods.SequenceEqual(Mods.Value))
+                Mods.Value = validMods;
+
+            Mod[] validFreeMods = FreeMods.Value.Where(isValidAllowedMod).ToArray();
+            if (!validFreeMods.SequenceEqual(FreeMods.Value))
+                FreeMods.Value = validFreeMods;
+
+            ModSelect.IsValidMod = isValidRequiredMod;
+            freeModSelect.IsValidMod = isValidAllowedMod;
         }
 
         protected sealed override bool OnStart()
@@ -195,7 +224,7 @@ namespace osu.Game.Screens.OnlinePlay
 
         protected override ModSelectOverlay CreateModSelectOverlay() => new UserModSelectOverlay(OverlayColourScheme.Plum)
         {
-            IsValidMod = isValidMod
+            IsValidMod = isValidRequiredMod
         };
 
         protected override IEnumerable<(FooterButton button, OverlayContainer? overlay)> CreateSongSelectFooterButtons()
@@ -221,22 +250,20 @@ namespace osu.Game.Screens.OnlinePlay
         }
 
         /// <summary>
-        /// Checks whether a given <see cref="Mod"/> is valid for global selection.
+        /// Checks whether a given <see cref="Mod"/> is valid to be selected as a required mod.
         /// </summary>
         /// <param name="mod">The <see cref="Mod"/> to check.</param>
-        /// <returns>Whether <paramref name="mod"/> is a valid mod for online play.</returns>
-        private bool isValidMod(Mod mod) => ModUtils.IsValidModForMatchType(mod, room.Type);
+        private bool isValidRequiredMod(Mod mod) => ModUtils.IsValidModForMatch(mod, true, room.Type, Freestyle.Value);
 
         /// <summary>
-        /// Checks whether a given <see cref="Mod"/> is valid for per-player free-mod selection.
+        /// Checks whether a given <see cref="Mod"/> is valid to be selected as an allowed mod.
         /// </summary>
         /// <param name="mod">The <see cref="Mod"/> to check.</param>
-        /// <returns>Whether <paramref name="mod"/> is a selectable free-mod.</returns>
-        private bool isValidFreeMod(Mod mod) => ModUtils.IsValidFreeModForMatchType(mod, room.Type)
-                                                // Mod must not be contained in the required mods.
-                                                && Mods.Value.All(m => m.Acronym != mod.Acronym)
-                                                // Mod must be compatible with all the required mods.
-                                                && ModUtils.CheckCompatibleSet(Mods.Value.Append(mod).ToArray());
+        private bool isValidAllowedMod(Mod mod) => ModUtils.IsValidModForMatch(mod, false, room.Type, Freestyle.Value)
+                                                   // Mod must not be contained in the required mods.
+                                                   && Mods.Value.All(m => m.Acronym != mod.Acronym)
+                                                   // Mod must be compatible with all the required mods.
+                                                   && ModUtils.CheckCompatibleSet(Mods.Value.Append(mod).ToArray());
 
         protected override void Dispose(bool isDisposing)
         {
