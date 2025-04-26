@@ -9,16 +9,10 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
-using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
-using osu.Game.Beatmaps;
-using osu.Game.Configuration;
 using osu.Game.Database;
-using osu.Game.Online.API;
-using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
-using osu.Game.Rulesets;
 using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Mods;
@@ -29,7 +23,6 @@ using osu.Game.Screens;
 using osu.Game.Screens.Footer;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.SelectV2.Footer;
-using osu.Game.Tests.Resources;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.SongSelectV2
@@ -41,8 +34,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
         [Cached]
         private readonly OsuLogo logo;
-
-        private BeatmapManager beatmapManager = null!;
 
         protected override bool UseOnlineAPI => true;
 
@@ -66,32 +57,12 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         }
 
         [BackgroundDependencyLoader]
-        private void load(GameHost host, IAPIProvider onlineAPI)
+        private void load()
         {
-            BeatmapStore beatmapStore;
-            BeatmapUpdater beatmapUpdater;
-            BeatmapDifficultyCache difficultyCache;
+            RealmDetachedBeatmapStore beatmapStore;
 
-            // These DI caches are required to ensure for interactive runs this test scene doesn't nuke all user beatmaps in the local install.
-            // At a point we have isolated interactive test runs enough, this can likely be removed.
-            Dependencies.Cache(new RealmRulesetStore(Realm));
-            Dependencies.Cache(Realm);
-            Dependencies.Cache(difficultyCache = new BeatmapDifficultyCache());
-            Dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, Realm, onlineAPI, Audio, Resources, host, Beatmap.Default, difficultyCache));
-            Dependencies.CacheAs(beatmapUpdater = new BeatmapUpdater(beatmapManager, difficultyCache, onlineAPI, LocalStorage));
-            Dependencies.CacheAs(beatmapStore = new RealmDetachedBeatmapStore());
-
-            beatmapManager.ProcessBeatmap = (set, scope) => beatmapUpdater.Process(set, scope);
-
-            MusicController music;
-            Dependencies.Cache(music = new MusicController());
-
-            // required to get bindables attached
-            Add(difficultyCache);
-            Add(music);
+            Dependencies.CacheAs<BeatmapStore>(beatmapStore = new RealmDetachedBeatmapStore());
             Add(beatmapStore);
-
-            Dependencies.Cache(new OsuConfigManager(LocalStorage));
         }
 
         protected override void LoadComplete()
@@ -107,9 +78,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         {
             base.SetUpSteps();
 
-            AddStep("load screen", () => Stack.Push(new Screens.SelectV2.SongSelectV2()));
-            AddUntilStep("wait for load", () => Stack.CurrentScreen is Screens.SelectV2.SongSelectV2 songSelect && songSelect.IsLoaded);
-            AddStep("import test beatmap", () => beatmapManager.Import(TestResources.GetTestBeatmapForImport()));
+            AddStep("load screen", () => Stack.Push(new Screens.SelectV2.SoloSongSelect()));
+            AddUntilStep("wait for load", () => Stack.CurrentScreen is Screens.SelectV2.SongSelect songSelect && songSelect.IsLoaded);
         }
 
         [Test]

@@ -9,6 +9,7 @@ using System.Linq;
 using osu.Game.Beatmaps.ControlPoints;
 using Newtonsoft.Json;
 using osu.Framework.Lists;
+using osu.Game.Beatmaps.Formats;
 using osu.Game.IO.Serialization.Converters;
 
 namespace osu.Game.Beatmaps
@@ -140,6 +141,8 @@ namespace osu.Game.Beatmaps
         public int CountdownOffset { get; set; }
 
         public int[] Bookmarks { get; set; } = Array.Empty<int>();
+
+        public int BeatmapVersion { get; set; } = LegacyBeatmapEncoder.FIRST_LAZER_VERSION;
 
         IBeatmap IBeatmap.Clone() => Clone();
 
