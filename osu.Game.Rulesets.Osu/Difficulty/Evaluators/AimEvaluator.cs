@@ -115,12 +115,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             if (osuCurrObj.Angle != null && osuLastObj.Angle != null)
             {
-                // Buff wide only rhythms are the same
+                // Buff wide only if rhythms are the same
                 double maxStrainTime = Math.Max(osuCurrObj.StrainTime, osuLastObj.StrainTime);
                 double minStrainTime = Math.Min(osuCurrObj.StrainTime, osuLastObj.StrainTime);
                 double differentRhythmMultiplier = DifficultyCalculationUtils.Smoothstep(maxStrainTime, 1.25 * minStrainTime, minStrainTime);
 
-                // Buff high bpm aim only if rhythm is the same or slower
+                // Buff high bpm and wiggles only if rhythm is the same or getting slower (burst -> jump)
                 double fasterRhythmMultiplier = DifficultyCalculationUtils.Smoothstep(osuLastObj.StrainTime, osuCurrObj.StrainTime * 1.25, osuCurrObj.StrainTime);
 
                 double currAngle = osuCurrObj.Angle.Value;
