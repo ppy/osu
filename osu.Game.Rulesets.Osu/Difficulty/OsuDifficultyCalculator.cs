@@ -29,19 +29,27 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
         }
 
+        // Increasing this multiplier buffs versatile aim+flow maps
+        public static double AimVersatilityBonus = 0.08;
+
+        // Increasing this multiplier nerfs mixed aim+speed map (but not snapaim + flowaim!)
+        public static double MechanicsAdditionPortion => 0.13;
+
         protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
         {
             if (beatmap.HitObjects.Count == 0)
                 return new OsuDifficultyAttributes { Mods = mods };
 
-            var aim = skills.OfType<Aim>().Single(a => a.IncludeSliders);
+            var aim = skills.OfType<TotalAim>().Single(a => a.IncludeSliders);
             double aimRating = Math.Sqrt(aim.DifficultyValue()) * difficulty_multiplier;
             double aimDifficultyStrainCount = aim.CountTopWeightedStrains();
             double difficultSliders = aim.GetDifficultSliders();
 
-            var aimWithoutSliders = skills.OfType<Aim>().Single(a => !a.IncludeSliders);
+            double snapAimRating = Math.Sqrt(skills.OfType<SnapAim>().Single().DifficultyValue()) * difficulty_multiplier;
+            double flowAimRating = Math.Sqrt(skills.OfType<FlowAim>().Single().DifficultyValue()) * difficulty_multiplier;
+
+            var aimWithoutSliders = skills.OfType<TotalAim>().Single(a => !a.IncludeSliders);
             double aimRatingNoSliders = Math.Sqrt(aimWithoutSliders.DifficultyValue()) * difficulty_multiplier;
-            double sliderFactor = aimRating > 0 ? aimRatingNoSliders / aimRating : 1;
 
             var speed = skills.OfType<Speed>().Single();
             double speedRating = Math.Sqrt(speed.DifficultyValue()) * difficulty_multiplier;
@@ -53,22 +61,38 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (mods.Any(m => m is OsuModTouchDevice))
             {
-                aimRating = Math.Pow(aimRating, 0.8);
+                aimRating = Math.Pow(aimRating, 0.83);
+                aimRatingNoSliders = Math.Pow(aimRatingNoSliders, 0.83);
+                snapAimRating = Math.Pow(snapAimRating, 0.83);
+
                 flashlightRating = Math.Pow(flashlightRating, 0.8);
             }
-
             if (mods.Any(h => h is OsuModRelax))
             {
-                aimRating *= 0.9;
+                // Don't punish slideraim as much
+                double slideraim = aimRating - aimRatingNoSliders;
+                aimRatingNoSliders *= 0.88;
+                aimRating = aimRatingNoSliders + slideraim;
+                flowAimRating = 0.0; // Additional flow bonus should be 0
+
                 speedRating = 0.0;
                 flashlightRating *= 0.7;
             }
             else if (mods.Any(h => h is OsuModAutopilot))
             {
-                speedRating *= 0.5;
                 aimRating = 0.0;
+                aimRatingNoSliders = 0.0;
+                snapAimRating = 0.0;
+                flowAimRating = 0.0;
+
+                speedRating *= 0.5;
                 flashlightRating *= 0.4;
             }
+
+            // Adjust aim to reward more versatile maps
+            aimRating = aimRating * (1 - AimVersatilityBonus) + (snapAimRating + flowAimRating) * AimVersatilityBonus;
+            aimRatingNoSliders = aimRatingNoSliders * (1 - AimVersatilityBonus) + (snapAimRating + flowAimRating) * AimVersatilityBonus;
+            double sliderFactor = aimRating > 0 ? aimRatingNoSliders / aimRating : 1;
 
             double baseAimPerformance = OsuStrainSkill.DifficultyToPerformance(aimRating);
             double baseSpeedPerformance = OsuStrainSkill.DifficultyToPerformance(speedRating);
@@ -76,6 +100,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (mods.Any(h => h is OsuModFlashlight))
                 baseFlashlightPerformance = Flashlight.DifficultyToPerformance(flashlightRating);
+
+            // Adjust aim and speed summation to nerf mixed maps
+            if (baseAimPerformance > baseSpeedPerformance)
+                baseSpeedPerformance += (baseAimPerformance - baseSpeedPerformance) * MechanicsAdditionPortion;
+            else
+                baseAimPerformance += (baseSpeedPerformance - baseAimPerformance) * MechanicsAdditionPortion;
 
             double basePerformance =
                 Math.Pow(
@@ -111,6 +141,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 HitCircleCount = hitCirclesCount,
                 SliderCount = sliderCount,
                 SpinnerCount = spinnerCount,
+                SnapAimDifficulty = snapAimRating,
+                FlowAimDifficulty = flowAimRating
             };
 
             return attributes;
@@ -134,9 +166,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
             var skills = new List<Skill>
             {
-                new Aim(mods, true),
-                new Aim(mods, false),
-                new Speed(mods)
+                new TotalAim(mods, true),
+                new TotalAim(mods, false),
+                new Speed(mods),
+                new SnapAim(mods),
+                new FlowAim(mods),
             };
 
             if (mods.Any(h => h is OsuModFlashlight))
