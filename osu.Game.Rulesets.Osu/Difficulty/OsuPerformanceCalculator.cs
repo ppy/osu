@@ -133,7 +133,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             }
 
             double oldEffectiveMissCount = effectiveMissCount;
-            if (usingClassicSliderAccuracy) effectiveMissCount = scoreBasedMisscount(score, osuAttributes);
+
+            if (usingClassicSliderAccuracy && score.LegacyTotalScore != null)
+                effectiveMissCount = scoreBasedMisscount(score, osuAttributes);
 
             effectiveMissCount = Math.Max(countMiss, effectiveMissCount);
             effectiveMissCount = Math.Min(totalHits, effectiveMissCount);
@@ -436,9 +438,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // Use this to match FC threshold of current misscount
             double minimalMissCount = Math.Min(effectiveMissCount, 1);
-
-            if (score.LegacyTotalScore == null)
-                return minimalMissCount;
 
             double scoreObtainedDuringMaxCombo = calculateScoreForCombo(score, attributes, score.MaxCombo);
             double remainingScore = score.LegacyTotalScore.Value - scoreObtainedDuringMaxCombo;
