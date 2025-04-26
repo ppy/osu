@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double loopDifficulty = currObj.OpacityAt(loopObj.BaseObject.StartTime, false);
 
                 // Small distances means objects may be cheesed, so it doesn't matter whether they are arranged confusingly.
-                loopDifficulty *= DifficultyCalculationUtils.Logistic(-(loopObj.MinimumJumpDistance - 65) / 15);
+                loopDifficulty *= DifficultyCalculationUtils.Logistic(-(loopObj.LazyJumpDistance - 65) / 15);
 
                 var loopObjPosition = loopObj.Position;
                 float visibleDistance = ((currPosition - loopObjPosition) / OsuDifficultyHitObject.NORMALISED_DIAMETER).Length;
@@ -58,9 +58,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 // This effectively awards overlap bonus only if there are spacing changes between current object and loop object
                 // Ignore if current object is a slider because sliders in bursts add difficulty
                 // Ignore for perfect stacks
-                overlapness *= prevLoopObj.BaseObject.StartTime.Equals(currObj.BaseObject.StartTime) || loopObj.BaseObject is not Slider || prevLoopObj.MinimumJumpDistance != 0
-                    ? DifficultyCalculationUtils.Logistic(-(prevLoopObj.MinimumJumpDistance - 70) / 15)
-                    : DifficultyCalculationUtils.Logistic(-prevLoopObj.MinimumJumpDistance);
+                overlapness *= prevLoopObj.BaseObject.StartTime.Equals(currObj.BaseObject.StartTime) || loopObj.BaseObject is not Slider || prevLoopObj.LazyJumpDistance != 0
+                    ? DifficultyCalculationUtils.Logistic(-(prevLoopObj.LazyJumpDistance - 70) / 15)
+                    : DifficultyCalculationUtils.Logistic(-prevLoopObj.LazyJumpDistance);
 
                 double timeBetweenCurrAndLoopObj = (currObj.BaseObject.StartTime - loopObj.BaseObject.StartTime) / currObj.ClockRate;
                 double timeNerfFactor = getTimeNerfFactor(timeBetweenCurrAndLoopObj);
