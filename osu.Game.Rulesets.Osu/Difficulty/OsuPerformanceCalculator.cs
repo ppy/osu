@@ -432,6 +432,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return adjustedSpeedValue / speedValue;
         private double scoreBasedMisscount(ScoreInfo score, OsuDifficultyAttributes attributes)
         {
+            if (attributes.MaxCombo == 0) return 0;
+
             // Use this to match FC threshold of current misscount
             double minimalMissCount = Math.Min(effectiveMissCount, 1);
 
