@@ -9,12 +9,18 @@ using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects.Legacy;
+using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Difficulty.Skills;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Scoring.Legacy;
+using osu.Game.Scoring;
+using System.Xml.Linq;
 
 namespace osu.Game.Rulesets.Osu.Difficulty
 {
@@ -121,6 +127,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 HitCircleCount = hitCircleCount,
                 SliderCount = sliderCount,
                 SpinnerCount = spinnerCount,
+                SliderScorePerObject = calcSliderScore(beatmap, totalHits),
+                Scorev1ScoreMultiplier = calcScorev1Multiplier(beatmap, totalHits),
+                MaxScore = calcMaxScore(beatmap, mods)
             };
 
             return attributes;
@@ -288,5 +297,50 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             new OsuModHidden(),
             new OsuModSpunOut(),
         };
+
+        private long calcMaxScore(IBeatmap beatmap, Mod[] mods)
+        {
+            var simulator = new OsuLegacyScoreSimulator();
+            var attributes = simulator.Simulate(Working, beatmap);
+
+            double legacyModMultiplier = simulator.GetLegacyScoreMultiplier(mods, new LegacyBeatmapConversionDifficultyInfo());
+            int maximumLegacyAccuracyScore = attributes.AccuracyScore;
+            long maximumLegacyComboScore = (long)Math.Round(attributes.ComboScore * legacyModMultiplier);
+
+            return maximumLegacyAccuracyScore + maximumLegacyComboScore;
+        }
+
+        private double calcSliderScore(IBeatmap beatmap, int objectCount)
+        {
+            const double big_tick_score = 30;
+            const double small_tick_score = 10;
+
+            var sliders = beatmap.HitObjects.OfType<Slider>();
+
+            // 1 for head, 1 for tail
+            int amountOfBigTicks = sliders.Count() * 2;
+            int repeats = sliders.Select(s => s.RepeatCount).Sum();
+
+            amountOfBigTicks += repeats;
+
+            int amountOfSmallTicks = sliders.Select(s => s.NestedHitObjects.Count(s => s is SliderTick)).Sum();
+
+            double totalScore = amountOfBigTicks * big_tick_score + amountOfSmallTicks * small_tick_score;
+
+            return totalScore / objectCount;
+        }
+
+        private double calcScorev1Multiplier(IBeatmap beatmap, int objectCount)
+        {
+            int drainLength = 0;
+
+            if (beatmap.HitObjects.Count > 0)
+            {
+                int breakLength = beatmap.Breaks.Select(b => (int)Math.Round(b.EndTime) - (int)Math.Round(b.StartTime)).Sum();
+                drainLength = ((int)Math.Round(beatmap.HitObjects[^1].StartTime) - (int)Math.Round(beatmap.HitObjects[0].StartTime) - breakLength) / 1000;
+            }
+
+            return LegacyRulesetExtensions.CalculateDifficultyPeppyStars(beatmap.Difficulty, objectCount, drainLength);
+        }
     }
 }

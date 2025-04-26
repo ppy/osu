@@ -14,8 +14,16 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Skills;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Scoring;
+using System.Xml.Linq;
+using osu.Game.Rulesets.Difficulty;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Osu.Difficulty.Skills;
+using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Scoring.Legacy;
 using osu.Game.Scoring;
+using osu.Game.Screens.OnlinePlay.Multiplayer;
 
 namespace osu.Game.Rulesets.Osu.Difficulty
 {
@@ -123,6 +131,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 }
             }
 
+            double oldEffectiveMissCount = effectiveMissCount;
+            effectiveMissCount = scoreBasedMisscount(score, osuAttributes);
+
             effectiveMissCount = Math.Max(countMiss, effectiveMissCount);
             effectiveMissCount = Math.Min(totalHits, effectiveMissCount);
 
@@ -164,8 +175,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 Speed = speedValue,
                 Accuracy = accuracyValue,
                 Flashlight = flashlightValue,
-                EffectiveMissCount = effectiveMissCount,
                 SpeedDeviation = speedDeviation,
+                EffectiveMissCount = oldEffectiveMissCount,
+                Scorev1MissCount = effectiveMissCount,
                 Total = totalValue
             };
         }
@@ -417,6 +429,99 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             adjustedSpeedValue = double.Lerp(adjustedSpeedValue, speedValue, lerp);
 
             return adjustedSpeedValue / speedValue;
+        private double scoreBasedMisscount(ScoreInfo score, OsuDifficultyAttributes attributes)
+        {
+            if (score.LegacyTotalScore == null)
+                return 0;
+
+            double estimatedSliderEndMisses = Math.Min(0.02 * attributes.SliderCount, totalImperfectHits);
+            double lenientMaxCombo = score.MaxCombo + estimatedSliderEndMisses;
+            lenientMaxCombo = Math.Min(lenientMaxCombo, attributes.MaxCombo);
+
+            long scoreObtainedDuringMaxCombo = (long)calculateScoreForCombo(score, attributes, score.MaxCombo);
+            long scoreObtainedDuringMaxComboLenient = (long)calculateScoreForCombo(score, attributes, lenientMaxCombo);
+            //long fullComboThershold = (long)calculateScoreForCombo(score, attributes, attributes.MaxCombo - 0.1 * attributes.SliderCount);
+
+            //if (scoreObtainedDuringMaxCombo >= fullComboThershold)
+            //    return 0;
+
+            long remainingScore = score.LegacyTotalScore.Value - scoreObtainedDuringMaxCombo;
+
+            if (scoreObtainedDuringMaxComboLenient <= score.LegacyTotalScore.Value)
+                return 0;
+
+            double actualRemainingCombo = attributes.MaxCombo - score.MaxCombo;
+            double estimatedRemainingCombo = calculateComboForScore(score, attributes, remainingScore, actualRemainingCombo);
+
+            double result = actualRemainingCombo / estimatedRemainingCombo;
+
+            //if (result < 1)
+            //    return 0;
+
+            return result;
+        }
+
+        private double calculateComboForScore(ScoreInfo score, OsuDifficultyAttributes attributes, double scoreAmount, double remainingCombo)
+        {
+            double multiplier = attributes.Scorev1ScoreMultiplier;
+            multiplier *= new OsuLegacyScoreSimulator().GetLegacyScoreMultiplier(score.Mods, new LegacyBeatmapConversionDifficultyInfo());
+
+            double objectsHit = (totalHits - countMiss) * remainingCombo / attributes.MaxCombo;
+            double nonComboScore = 300 * accuracy * objectsHit;
+            nonComboScore += attributes.SliderScorePerObject * objectsHit;
+
+            double comboScore = scoreAmount - nonComboScore;
+            if (comboScore <= 0)
+                return 0;
+
+            comboScore /= accuracy * 300 / 25 * multiplier;
+
+            decimal a = (decimal)comboScore;
+            decimal b = (decimal)calculateScoreRelevantComboPerObject(attributes, multiplier);
+
+            decimal x = (8 * a - 4) * b + b * b + 4;
+            x = ((decimal)Math.Sqrt((double)x) + b + 2) / 2;
+
+            return (double)x;
+        }
+
+        private double calculateScoreForCombo(ScoreInfo score, OsuDifficultyAttributes attributes, double combo)
+        {
+            double multiplier = attributes.Scorev1ScoreMultiplier;
+            multiplier *= new OsuLegacyScoreSimulator().GetLegacyScoreMultiplier(score.Mods, new LegacyBeatmapConversionDifficultyInfo());
+
+            double scoreRelevantComboPerObject = calculateScoreRelevantComboPerObject(attributes, multiplier);
+
+            // Sum of arithmetic progression
+            double n = combo / scoreRelevantComboPerObject - 1;
+            double a = scoreRelevantComboPerObject - 1;
+            double d = scoreRelevantComboPerObject;
+
+            double comboScore = (2 * a + (n - 1) * d) * n / 2;
+            comboScore *= accuracy * 300 / 25 * multiplier;
+
+            double objectsHit = (totalHits - countMiss) * combo / attributes.MaxCombo;
+            double nonComboScore = 300 * accuracy * objectsHit;
+            nonComboScore += attributes.SliderScorePerObject * objectsHit;
+
+            double total = comboScore + nonComboScore;
+            return total;
+        }
+
+        private double calculateScoreRelevantComboPerObject(OsuDifficultyAttributes attributes, double multiplier)
+        {
+            double nonComboScore = (300 + attributes.SliderScorePerObject) * totalHits;
+
+            double comboScore = attributes.MaxScore - nonComboScore;
+            comboScore /= 300 / 25 * multiplier;
+
+            decimal a = attributes.MaxCombo;
+            decimal b = (decimal)comboScore;
+
+            decimal x = (a - 2) * a;
+            x /= a + 2 * (b - 1);
+
+            return (double)x;
         }
 
         // Miss penalty assumes that a player will miss on the hardest parts of a map,
