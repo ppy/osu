@@ -148,6 +148,40 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             });
         }
 
+        [Test]
+        public void TestOnlineAvailability()
+        {
+            AddStep("online beatmapset", () =>
+            {
+                var (working, onlineSet) = createTestBeatmap();
+
+                currentOnlineSet = onlineSet;
+                Beatmap.Value = working;
+            });
+            AddUntilStep("rating wedge visible", () => wedge.RatingsVisible);
+            AddUntilStep("fail time wedge visible", () => wedge.FailRetryVisible);
+            AddStep("online beatmapset with local diff", () =>
+            {
+                var (working, onlineSet) = createTestBeatmap();
+
+                working.BeatmapInfo.ResetOnlineInfo();
+
+                currentOnlineSet = onlineSet;
+                Beatmap.Value = working;
+            });
+            AddUntilStep("rating wedge hidden", () => !wedge.RatingsVisible);
+            AddUntilStep("fail time wedge hidden", () => !wedge.FailRetryVisible);
+            AddStep("local beatmap", () =>
+            {
+                var (working, _) = createTestBeatmap();
+
+                currentOnlineSet = null;
+                Beatmap.Value = working;
+            });
+            AddAssert("rating wedge still hidden", () => !wedge.RatingsVisible);
+            AddAssert("fail time wedge still hidden", () => !wedge.FailRetryVisible);
+        }
+
         private (WorkingBeatmap, APIBeatmapSet) createTestBeatmap()
         {
             var working = CreateWorkingBeatmap(Ruleset.Value);
