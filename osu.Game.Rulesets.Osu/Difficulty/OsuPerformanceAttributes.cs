@@ -33,6 +33,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         [JsonProperty("combo_based_miss_count")]
         public double ComboBasedMisscount { get; set; }
 
+        [JsonProperty("score_based_miss_count")]
+        public double ScoreBasedMisscount { get; set; }
+
         public override IEnumerable<PerformanceDisplayAttribute> GetAttributesForDisplay()
         {
             foreach (var attribute in base.GetAttributesForDisplay())

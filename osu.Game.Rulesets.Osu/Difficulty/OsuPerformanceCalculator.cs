@@ -133,9 +133,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             }
 
             double oldEffectiveMissCount = effectiveMissCount;
+            double scorev1Misscount = 0;
 
             if (usingClassicSliderAccuracy && score.LegacyTotalScore != null)
+            {
                 effectiveMissCount = scoreBasedMisscount(score, osuAttributes);
+                scorev1Misscount = effectiveMissCount;
+            }
 
             effectiveMissCount = Math.Max(countMiss, effectiveMissCount);
             effectiveMissCount = Math.Min(totalHits, effectiveMissCount);
@@ -180,6 +184,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 Flashlight = flashlightValue,
                 EffectiveMissCount = effectiveMissCount,
                 ComboBasedMisscount = oldEffectiveMissCount,
+                ScoreBasedMisscount = scorev1Misscount,
                 SpeedDeviation = speedDeviation,
                 Total = totalValue
             };
