@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -10,6 +11,9 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Drawables;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
@@ -26,6 +30,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         private BeatmapTitleWedge titleWedge = null!;
         private BeatmapTitleWedge.DifficultyDisplay difficultyDisplay => titleWedge.ChildrenOfType<BeatmapTitleWedge.DifficultyDisplay>().Single();
 
+        private APIBeatmapSet? currentOnlineSet;
+
         [BackgroundDependencyLoader]
         private void load(RulesetStore rulesets)
         {
@@ -35,6 +41,24 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            ((DummyAPIAccess)API).HandleRequest = request =>
+            {
+                switch (request)
+                {
+                    case GetBeatmapSetRequest set:
+                        if (set.ID == currentOnlineSet?.OnlineID)
+                        {
+                            set.TriggerSuccess(currentOnlineSet);
+                            return true;
+                        }
+
+                        return false;
+
+                    default:
+                        return false;
+                }
+            };
 
             AddRange(new Drawable[]
             {
@@ -115,6 +139,40 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddAssert("check visibility", () => titleWedge.Alpha > 0);
         }
 
+        [Test]
+        public void TestOnlineAvailability()
+        {
+            AddStep("online beatmapset", () =>
+            {
+                var (working, onlineSet) = createTestBeatmap();
+
+                currentOnlineSet = onlineSet;
+                Beatmap.Value = working;
+            });
+            AddAssert("play count = 10000", () => this.ChildrenOfType<BeatmapTitleWedge.Statistic>().ElementAt(0).Text.ToString() == "10,000");
+            AddAssert("favourites count = 2345", () => this.ChildrenOfType<BeatmapTitleWedge.Statistic>().ElementAt(1).Text.ToString() == "2,345");
+            AddStep("online beatmapset with local diff", () =>
+            {
+                var (working, onlineSet) = createTestBeatmap();
+
+                onlineSet.Beatmaps = Array.Empty<APIBeatmap>();
+
+                currentOnlineSet = onlineSet;
+                Beatmap.Value = working;
+            });
+            AddAssert("play count = -", () => this.ChildrenOfType<BeatmapTitleWedge.Statistic>().ElementAt(0).Text.ToString() == "-");
+            AddAssert("favourites count = 2345", () => this.ChildrenOfType<BeatmapTitleWedge.Statistic>().ElementAt(1).Text.ToString() == "2,345");
+            AddStep("local beatmapset", () =>
+            {
+                var (working, _) = createTestBeatmap();
+
+                currentOnlineSet = null;
+                Beatmap.Value = working;
+            });
+            AddAssert("play count = -", () => this.ChildrenOfType<BeatmapTitleWedge.Statistic>().ElementAt(0).Text.ToString() == "-");
+            AddAssert("favourites count = -", () => this.ChildrenOfType<BeatmapTitleWedge.Statistic>().ElementAt(1).Text.ToString() == "-");
+        }
+
         [TestCase(120, 125, null, "120-125 (mostly 120)")]
         [TestCase(120, 120.6, null, "120-121 (mostly 120)")]
         [TestCase(120, 120.4, null, "120")]
@@ -154,6 +212,30 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 var label = titleWedge.ChildrenOfType<BeatmapTitleWedge.Statistic>().Single(l => l.TooltipText == BeatmapsetsStrings.ShowStatsBpm);
                 return label.Text == target;
             });
+        }
+
+        private (WorkingBeatmap, APIBeatmapSet) createTestBeatmap()
+        {
+            var working = CreateWorkingBeatmap(Ruleset.Value);
+            var onlineSet = new APIBeatmapSet
+            {
+                OnlineID = working.BeatmapSetInfo.OnlineID,
+                FavouriteCount = 2345,
+                Beatmaps = new[]
+                {
+                    new APIBeatmap
+                    {
+                        OnlineID = working.BeatmapInfo.OnlineID,
+                        PlayCount = 10000,
+                        PassCount = 4567,
+                        UserPlayCount = 123,
+                    },
+                }
+            };
+
+            working.BeatmapSetInfo.DateSubmitted = DateTimeOffset.Now;
+            working.BeatmapSetInfo.DateRanked = DateTimeOffset.Now;
+            return (working, onlineSet);
         }
     }
 }
