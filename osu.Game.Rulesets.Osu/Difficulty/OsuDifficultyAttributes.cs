@@ -85,7 +85,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         [JsonProperty("scorev1_score_multiplier")]
         public double Scorev1ScoreMultiplier { get; set; }
 
-        [JsonProperty("max_scores")]
+        [JsonProperty("max_scorev1")]
         public long MaxScore { get; set; }
 
         public override IEnumerable<(int attributeId, object value)> ToDatabaseAttributes()
