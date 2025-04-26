@@ -178,9 +178,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 Speed = speedValue,
                 Accuracy = accuracyValue,
                 Flashlight = flashlightValue,
+                EffectiveMissCount = effectiveMissCount,
+                ComboBasedMisscount = oldEffectiveMissCount,
                 SpeedDeviation = speedDeviation,
-                EffectiveMissCount = oldEffectiveMissCount,
-                Scorev1MissCount = effectiveMissCount,
                 Total = totalValue
             };
         }
