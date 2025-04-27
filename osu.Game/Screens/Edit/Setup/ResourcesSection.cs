@@ -114,9 +114,8 @@ namespace osu.Game.Screens.Edit.Setup
                 Logger.Error(e, "The selected audio track appears to be corrupted. Please select another one.");
                 return false;
             }
-            finally {
-                System.Threading.Thread.CurrentThread.CurrentCulture = original;
-            }
+            System.Threading.Thread.CurrentThread.CurrentCulture = original;
+
 
             changeResource(source, applyToAllDifficulties, @"audio",
                 metadata => metadata.AudioFile,
