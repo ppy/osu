@@ -104,6 +104,7 @@ namespace osu.Game.Screens.Edit.Setup
             // had problems because of the 'th' value of CurrentCulture. Switch to InvariantCulture while parsing the data.
             // Alternatively: Provide MIME type of data in TagLib.File.Create()
             var original = System.Threading.Thread.CurrentThread.CurrentCulture;
+
             try
             {
                 System.Threading.Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
@@ -114,8 +115,8 @@ namespace osu.Game.Screens.Edit.Setup
                 Logger.Error(e, "The selected audio track appears to be corrupted. Please select another one.");
                 return false;
             }
-            System.Threading.Thread.CurrentThread.CurrentCulture = original;
 
+            System.Threading.Thread.CurrentThread.CurrentCulture = original;
 
             changeResource(source, applyToAllDifficulties, @"audio",
                 metadata => metadata.AudioFile,
