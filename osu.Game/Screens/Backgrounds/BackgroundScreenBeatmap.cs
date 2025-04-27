@@ -219,7 +219,7 @@ namespace osu.Game.Screens.Backgrounds
             {
                 get
                 {
-                    if (IgnoreUserSettings.Value || (ShowStoryboard.Value && StoryboardReplacesBackground.Value))
+                    if (IgnoreUserSettings.Value)
                         return Colour4.Black;
 
                     float grayscaleDimColour = (float)userDimColour.Value * DimLevel;

@@ -3,7 +3,10 @@
 
 #nullable disable
 
+using System.Collections.Generic;
+using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -13,8 +16,10 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Video;
 using osu.Framework.Input.Events;
 using osu.Framework.Input.States;
+using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Utils;
@@ -25,6 +30,7 @@ using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens;
@@ -33,6 +39,7 @@ using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.PlayerSettings;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Select;
+using osu.Game.Storyboards;
 using osu.Game.Tests.Resources;
 using osuTK;
 
@@ -46,6 +53,7 @@ namespace osu.Game.Tests.Visual.Background
         private LoadBlockingTestPlayer player;
         private BeatmapManager manager;
         private RulesetStore rulesets;
+        private TestStoryboard testStoryboard;
 
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
@@ -324,6 +332,44 @@ namespace osu.Game.Tests.Visual.Background
             AddUntilStep("Redraw wasn't required", () => !songSelect.RequiredRedraw);
         }
 
+        /// <summary>
+        /// Check if storyboard elements receive correct DrawColourOffset.
+        /// </summary>
+        [Test]
+        public void TestStoryboardElementsDimmedWithColourOffset()
+        {
+            performFullSetup();
+            createFakeStoryboardWithElements();
+
+            AddStep("Enable Storyboard", () =>
+            {
+                player.StoryboardEnabled.Value = true;
+            });
+
+            AddUntilStep("Screen is dimmed, blur applied and dim colour adjusted", () => songSelect.IsBackgroundDimmed() && songSelect.IsUserBlurApplied() && songSelect.IsBackgroundColourOffset());
+            verifyStoryboardColourOffset();
+            verifyAdditiveSpriteIsNotOffset();
+
+            AddStep("Replace background", () =>
+            {
+                player.StoryboardReplacesBackground.Value = true;
+            });
+
+            AddUntilStep("Background is fully dimmed and dim colour adjusted", () => songSelect.IsBackgroundFullyDimmed() && songSelect.IsBackgroundColourOffset());
+            verifyStoryboardColourOffset();
+            verifyAdditiveSpriteIsNotOffset();
+
+            AddStep("Ignore user settings", () =>
+            {
+                player.ApplyToBackground(b => b.IgnoreUserSettings.Value = true);
+                player.DimmableStoryboard.IgnoreUserSettings.Value = true;
+            });
+
+            AddUntilStep("Background is black", () => songSelect.IsBackgroundBlack());
+            verifyStoryboardColourNotOffset();
+            verifyAdditiveSpriteIsNotOffset();
+        }
+
         private void createFakeStoryboard() => AddStep("Create storyboard", () =>
         {
             player.StoryboardEnabled.Value = false;
@@ -338,6 +384,64 @@ namespace osu.Game.Tests.Visual.Background
                 Text = "THIS IS A STORYBOARD",
                 Font = new FontUsage(size: 50)
             });
+        });
+
+        private void createFakeStoryboardWithElements() => AddStep("Create storyboard with elements", () =>
+        {
+            player.StoryboardEnabled.Value = false;
+            player.StoryboardReplacesBackground.Value = false;
+
+            testStoryboard = new TestStoryboard();
+
+            DrawableStoryboard drawableStoryboard = testStoryboard.CreateDrawable();
+
+            player.DimmableStoryboard.Add(drawableStoryboard);
+            player.DimmableStoryboard.OverlayLayerContainer.Add(drawableStoryboard.OverlayLayer.CreateProxy());
+        });
+
+        private void verifyStoryboardColourOffset() => AddUntilStep("Storyboard elements colour is offset", () =>
+        {
+            Colour4? spriteColourOffset = testStoryboard?.GetSpriteColourOffset();
+            if (spriteColourOffset == null)
+                return false;
+
+            Colour4? animationColourOffset = testStoryboard?.GetAnimationColourOffset();
+            if (animationColourOffset == null)
+                return false;
+
+            Colour4? videoColourOffset = testStoryboard?.GetVideoColourOffset();
+            if (videoColourOffset == null)
+                return false;
+
+            Colour4 targetColourOffset = player.StoryboardTargetColourOffset();
+
+            return spriteColourOffset == targetColourOffset && animationColourOffset == targetColourOffset && videoColourOffset == targetColourOffset;
+        });
+
+        private void verifyStoryboardColourNotOffset() => AddUntilStep("Storyboard elements colour is not offset", () =>
+        {
+            Colour4? spriteColourOffset = testStoryboard?.GetSpriteColourOffset();
+            if (spriteColourOffset == null)
+                return false;
+
+            Colour4? animationColourOffset = testStoryboard?.GetAnimationColourOffset();
+            if (animationColourOffset == null)
+                return false;
+
+            Colour4? videoColourOffset = testStoryboard?.GetVideoColourOffset();
+            if (videoColourOffset == null)
+                return false;
+
+            return spriteColourOffset == Colour4.Black && animationColourOffset == Colour4.Black && videoColourOffset == Colour4.Black;
+        });
+
+        private void verifyAdditiveSpriteIsNotOffset() => AddUntilStep("Additive sprite is not offset", () =>
+        {
+            Colour4? additiveSpriteColourOffset = testStoryboard?.GetAdditiveSpriteColourOffset();
+            if (additiveSpriteColourOffset == null)
+                return false;
+
+            return additiveSpriteColourOffset == Colour4.Black;
         });
 
         private void performFullSetup(bool allowPause = false)
@@ -410,9 +514,13 @@ namespace osu.Game.Tests.Visual.Background
                 return background.CurrentColour == targetDrawColour;
             }
 
+            public bool IsBackgroundFullyDimmed() => background.CurrentColour == Colour4.Black;
+
             public bool IsBackgroundUndimmed() => background.CurrentColour == background.ParentDrawColour && background.CurrentColourOffset == Colour4.Black;
 
-            public bool IsBackgroundColourOffset() => background.CurrentColourOffset == background.ParentDrawColour * background.CurrentDimColour;
+            public Colour4 BackgroundTargetColourOffset() => background.ParentDrawColour * background.CurrentDimColour;
+
+            public bool IsBackgroundColourOffset() => background.CurrentColourOffset == BackgroundTargetColourOffset();
 
             public bool IsUserBlurApplied() => Precision.AlmostEquals(background.CurrentBlur, new Vector2((float)BlurLevel.Value * BackgroundScreenBeatmap.USER_BLUR_FACTOR), 0.1f);
 
@@ -470,7 +578,11 @@ namespace osu.Game.Tests.Visual.Background
 
             public new DimmableStoryboard DimmableStoryboard => base.DimmableStoryboard;
 
-            // Whether or not the player should be allowed to load.
+            private TestDimmableStoryboard testDimmableStoryboard;
+
+            protected override DimmableStoryboard CreateDimmableStoryboard(Storyboard storyboard, IReadOnlyList<Mod> mods) => testDimmableStoryboard = new TestDimmableStoryboard(storyboard, mods) { RelativeSizeAxes = Axes.Both };
+
+            // Whether the player should be allowed to load.
             public bool BlockLoad;
 
             public Bindable<bool> StoryboardEnabled;
@@ -483,6 +595,8 @@ namespace osu.Game.Tests.Visual.Background
             }
 
             public bool IsStoryboardVisible => DimmableStoryboard.ContentDisplayed;
+
+            public Colour4 StoryboardTargetColourOffset() => testDimmableStoryboard.TargetColourOffset();
 
             [BackgroundDependencyLoader]
             private void load(OsuConfigManager config, CancellationToken token)
@@ -655,6 +769,199 @@ namespace osu.Game.Tests.Visual.Background
                     return requiresChildrenUpdate;
                 }
             }
+        }
+
+        private partial class TestStoryboard : Storyboard
+        {
+            private readonly TestStoryboardSprite testStoryboardSprite;
+            private readonly TestStoryboardSprite testStoryboardAdditiveSprite;
+            private readonly TestStoryboardAnimation testStoryboardAnimation;
+            private readonly TestStoryboardVideo testStoryboardVideo;
+
+            public TestStoryboard()
+            {
+                GetLayer("Foreground").Add(testStoryboardSprite = new TestStoryboardSprite(
+                    path: "Resources/Textures/test-image.png",
+                    origin: Anchor.Centre,
+                    initialPosition: new Vector2(200, 200),
+                    additiveBlending: false
+                ));
+
+                GetLayer("Foreground").Add(testStoryboardAdditiveSprite = new TestStoryboardSprite(
+                    path: "Resources/Textures/test-image.png",
+                    origin: Anchor.Centre,
+                    initialPosition: new Vector2(500, 200),
+                    additiveBlending: true
+                ));
+
+                GetLayer("Foreground").Add(testStoryboardAnimation = new TestStoryboardAnimation(
+                    path: "Resources/Textures/test-image.png",
+                    origin: Anchor.Centre,
+                    initialPosition: new Vector2(0, 0),
+                    frameCount: 10000,
+                    frameDelay: 1000 / 60f,
+                    loopType: AnimationLoopType.LoopForever
+                ));
+
+                GetLayer("Video").Add(testStoryboardVideo = new TestStoryboardVideo(
+                    path: "Resources/Videos/test-video.mp4",
+                    offset: 0
+                ));
+            }
+
+            public Colour4? GetSpriteColourOffset() => testStoryboardSprite?.GetDrawColourOffset();
+            public Colour4? GetAdditiveSpriteColourOffset() => testStoryboardAdditiveSprite?.GetDrawColourOffset();
+            public Colour4? GetAnimationColourOffset() => testStoryboardAnimation?.GetDrawColourOffset();
+            public Colour4? GetVideoColourOffset() => testStoryboardVideo?.GetDrawColourOffset();
+
+            public override DrawableStoryboard CreateDrawable(IReadOnlyList<Mod>? mods = null)
+            {
+                return new TestDrawableStoryboard(this, mods);
+            }
+
+            private partial class TestDrawableStoryboard : DrawableStoryboard
+            {
+                public TestDrawableStoryboard(TestStoryboard storyboard, IReadOnlyList<Mod>? mods)
+                    : base(storyboard, mods)
+                {
+                }
+
+                protected override IResourceStore<byte[]> CreateResourceLookupStore() => new ResourcesTextureStore();
+
+                internal class ResourcesTextureStore : IResourceStore<byte[]>
+                {
+                    private readonly DllResourceStore store;
+
+                    public ResourcesTextureStore()
+                    {
+                        store = TestResources.GetStore();
+                    }
+
+                    public void Dispose() => store.Dispose();
+
+                    public byte[] Get(string name) => store.Get(name);
+
+                    public Task<byte[]> GetAsync(string name, CancellationToken cancellationToken = new CancellationToken()) => store.GetAsync(name, cancellationToken);
+
+                    public Stream GetStream(string name) => store.GetStream(name);
+
+                    public IEnumerable<string> GetAvailableResources() => store.GetAvailableResources();
+                }
+            }
+        }
+
+        private partial class TestStoryboardSprite : StoryboardSprite
+        {
+            private DrawableStoryboardSprite drawableStoryboardSprite;
+            private readonly bool additiveBlending;
+
+            public TestStoryboardSprite(string path, Anchor origin, Vector2 initialPosition, bool additiveBlending)
+                : base(path, origin, initialPosition)
+            {
+                this.additiveBlending = additiveBlending;
+                Commands.AddAlpha(Easing.InBounce, -3000, 1000, 0, 1);
+            }
+
+            public Colour4? GetDrawColourOffset() => (drawableStoryboardSprite as IColouredDimmable)?.DrawColourOffset;
+
+            public override Drawable CreateDrawable() => drawableStoryboardSprite = new DrawableStoryboardSprite(this)
+            {
+                Blending = additiveBlending ? BlendingParameters.Additive : BlendingParameters.None
+            };
+        }
+
+        private partial class TestStoryboardAnimation : StoryboardAnimation
+        {
+            private TestDrawableStoryboardAnimation testDrawableStoryboardAnimation;
+
+            public TestStoryboardAnimation(string path, Anchor origin, Vector2 initialPosition, int frameCount, double frameDelay, AnimationLoopType loopType)
+                : base(path, origin, initialPosition, frameCount, frameDelay, loopType)
+            {
+                Commands.AddAlpha(Easing.InBounce, -3000, 1000, 0, 1);
+            }
+
+            public Colour4? GetDrawColourOffset() => testDrawableStoryboardAnimation?.GetDrawColourOffset();
+
+            public override Drawable CreateDrawable() => testDrawableStoryboardAnimation = new TestDrawableStoryboardAnimation(this);
+
+            public partial class TestDrawableStoryboardAnimation : DrawableStoryboardAnimation
+            {
+                private BeatmapBackground.DimmableSprite dimmableSprite;
+
+                public TestDrawableStoryboardAnimation(StoryboardAnimation storyboardAnimation)
+                    : base(storyboardAnimation)
+                {
+                }
+
+                public Colour4? GetDrawColourOffset() => (dimmableSprite as IColouredDimmable)?.DrawColourOffset;
+
+                protected override Sprite CreateSprite() => dimmableSprite = new BeatmapBackground.DimmableSprite
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                };
+            }
+        }
+
+        private partial class TestStoryboardVideo : StoryboardVideo
+        {
+            private TestDrawableStoryboardVideo testDrawableStoryboardVideo;
+
+            public TestStoryboardVideo(string path, double offset)
+                : base(path, offset)
+            {
+                Commands.AddAlpha(Easing.InBounce, -3000, 1000, 0, 1);
+            }
+
+            public Colour4? GetDrawColourOffset() => testDrawableStoryboardVideo?.GetDrawColourOffset();
+
+            public override Drawable CreateDrawable() => testDrawableStoryboardVideo = new TestDrawableStoryboardVideo(this);
+
+            public partial class TestDrawableStoryboardVideo : DrawableStoryboardVideo
+            {
+                private TestDrawableVideo testDrawableVideo;
+
+                public TestDrawableStoryboardVideo(StoryboardVideo storyboardVideo)
+                    : base(storyboardVideo)
+                {
+                }
+
+                public Colour4? GetDrawColourOffset() => testDrawableVideo?.GetDrawColourOffset();
+
+                protected override DrawableVideo CreateDrawableVideo(Stream stream, bool startAtCurrentTime) => testDrawableVideo = new TestDrawableVideo(stream, startAtCurrentTime)
+                {
+                    RelativeSizeAxes = RelativeSizeAxes,
+                    FillMode = FillMode.Fill,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Alpha = 0,
+                };
+
+                protected partial class TestDrawableVideo : DrawableVideo
+                {
+                    private DrawableVideoSprite drawableVideoSprite;
+
+                    public TestDrawableVideo(Stream stream, bool startAtCurrentTime)
+                        : base(stream, startAtCurrentTime)
+                    {
+                    }
+
+                    public Colour4? GetDrawColourOffset() => (drawableVideoSprite as IColouredDimmable)?.DrawColourOffset;
+
+                    protected override VideoSprite CreateSprite() => drawableVideoSprite = new DrawableVideoSprite(this);
+                }
+            }
+        }
+
+        private partial class TestDimmableStoryboard : DimmableStoryboard
+        {
+            public TestDimmableStoryboard(Storyboard storyboard, IReadOnlyList<Mod> mods)
+                : base(storyboard, mods)
+            {
+            }
+
+            public Colour4 TargetColourOffset() => DimColour * DrawColourInfo.Colour;
         }
     }
 }

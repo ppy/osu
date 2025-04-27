@@ -55,14 +55,7 @@ namespace osu.Game.Storyboards.Drawables
             if (stream == null)
                 return;
 
-            InternalChild = drawableVideo = new DrawableVideo(stream, false)
-            {
-                RelativeSizeAxes = RelativeSizeAxes,
-                FillMode = FillMode.Fill,
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Alpha = 0,
-            };
+            InternalChild = drawableVideo = CreateDrawableVideo(stream, false);
 
             Video.ApplyTransforms(drawableVideo);
         }
@@ -84,7 +77,16 @@ namespace osu.Game.Storyboards.Drawables
             }
         }
 
-        private partial class DrawableVideo : Video, IFlippable, IVectorScalable, IColouredDimmable
+        protected virtual DrawableVideo CreateDrawableVideo(Stream stream, bool startAtCurrentTime) => new DrawableVideo(stream, startAtCurrentTime)
+        {
+            RelativeSizeAxes = RelativeSizeAxes,
+            FillMode = FillMode.Fill,
+            Anchor = Anchor.Centre,
+            Origin = Anchor.Centre,
+            Alpha = 0,
+        };
+
+        protected partial class DrawableVideo : Video, IFlippable, IVectorScalable, IColouredDimmable
         {
             private bool flipH;
 
@@ -145,7 +147,7 @@ namespace osu.Game.Storyboards.Drawables
             {
             }
 
-            private partial class DrawableVideoSprite : VideoSprite, IColouredDimmable
+            protected partial class DrawableVideoSprite : VideoSprite, IColouredDimmable
             {
                 private readonly Video video;
 
