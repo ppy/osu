@@ -100,14 +100,22 @@ namespace osu.Game.Screens.Edit.Setup
 
             TagLib.File? tagSource;
 
+            // Thai language users had trouble uploading songs because the automatic parsing of TagLib#
+            // had problems because of the 'th' value of CurrentCulture. Switch to InvariantCulture while parsing the data.
+            // Alternatively: Provide MIME type of data in TagLib.File.Create()
+            var original = System.Threading.Thread.CurrentThread.CurrentCulture;
             try
             {
+                System.Threading.Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
                 tagSource = TagLib.File.Create(source.FullName);
             }
             catch (Exception e)
             {
                 Logger.Error(e, "The selected audio track appears to be corrupted. Please select another one.");
                 return false;
+            }
+            finally {
+                System.Threading.Thread.CurrentThread.CurrentCulture = original;
             }
 
             changeResource(source, applyToAllDifficulties, @"audio",
