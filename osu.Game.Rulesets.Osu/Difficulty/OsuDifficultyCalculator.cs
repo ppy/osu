@@ -127,9 +127,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 HitCircleCount = hitCircleCount,
                 SliderCount = sliderCount,
                 SpinnerCount = spinnerCount,
-                SliderScorePerObject = calcSliderScore(beatmap, totalHits),
-                Scorev1ScoreMultiplier = calcScorev1Multiplier(beatmap, totalHits),
-                MaxScore = calcMaxScore(beatmap, mods)
+                SliderNestedScorePerObject = calculateSliderNestedScorePerObject(beatmap, objectCount),
+                Scorev1BaseMultiplier = calculateScorev1BaseMultiplier(beatmap, objectCount),
+                MaximumScorev1 = calculateMaximumScorev1(beatmap, mods)
             };
 
             return attributes;
@@ -298,7 +298,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             new OsuModSpunOut(),
         };
 
-        private long calcMaxScore(IBeatmap beatmap, Mod[] mods)
+        // Simulates SS on the map to get maximum score for NM SS
+        private long calculateMaximumScorev1(IBeatmap beatmap, Mod[] mods)
         {
             var simulator = new OsuLegacyScoreSimulator();
             var attributes = simulator.Simulate(Working, beatmap);
@@ -310,7 +311,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return maximumLegacyAccuracyScore + maximumLegacyComboScore;
         }
 
-        private double calcSliderScore(IBeatmap beatmap, int objectCount)
+        // Calculates average amount of score you're getting per object that's not affected by combo multiplier
+        // This includes stuff like sliderticks
+        private double calculateSliderNestedScorePerObject(IBeatmap beatmap, int objectCount)
         {
             const double big_tick_score = 30;
             const double small_tick_score = 10;
@@ -330,7 +333,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return totalScore / objectCount;
         }
 
-        private double calcScorev1Multiplier(IBeatmap beatmap, int objectCount)
+        // Uses very old difficulty calculation to get base multiplier for score
+        private double calculateScorev1BaseMultiplier(IBeatmap beatmap, int objectCount)
         {
             int drainLength = 0;
 
