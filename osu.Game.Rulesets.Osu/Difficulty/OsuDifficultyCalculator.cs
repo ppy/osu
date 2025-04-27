@@ -18,9 +18,6 @@ using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Rulesets.Scoring.Legacy;
-using osu.Game.Scoring;
-using System.Xml.Linq;
 
 namespace osu.Game.Rulesets.Osu.Difficulty
 {
@@ -148,12 +145,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (mods.Any(m => m is OsuModRelax))
                 aimRating *= 0.9;
 
-            if (mods.Any(m => m is OsuModMagnetised))
-            {
-                float magnetisedStrength = mods.OfType<OsuModMagnetised>().First().AttractionStrength.Value;
-                aimRating *= 1.0 - magnetisedStrength;
-            }
-
             double ratingMultiplier = 1.0;
 
             double approachRateLengthBonus = 0.95 + 0.4 * Math.Min(1.0, totalHits / 2000.0) +
@@ -191,13 +182,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (mods.Any(m => m is OsuModAutopilot))
                 speedRating *= 0.5;
-
-            if (mods.Any(m => m is OsuModMagnetised))
-            {
-                // reduce speed rating because of the speed distance scaling, with maximum reduction being 0.7x
-                float magnetisedStrength = mods.OfType<OsuModMagnetised>().First().AttractionStrength.Value;
-                speedRating *= 1.0 - magnetisedStrength * 0.3;
-            }
 
             double ratingMultiplier = 1.0;
 
@@ -238,12 +222,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 flashlightRating *= 0.7;
             else if (mods.Any(m => m is OsuModAutopilot))
                 flashlightRating *= 0.4;
-
-            if (mods.Any(m => m is OsuModMagnetised))
-            {
-                float magnetisedStrength = mods.OfType<OsuModMagnetised>().First().AttractionStrength.Value;
-                flashlightRating *= 1.0 - magnetisedStrength;
-            }
 
             double ratingMultiplier = 1.0;
 
