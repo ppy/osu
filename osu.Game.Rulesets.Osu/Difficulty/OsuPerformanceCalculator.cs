@@ -441,28 +441,43 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
             if (attributes.MaxCombo == 0 || score.LegacyTotalScore == null) return 0;
 
-            // Use this to match FC threshold of current misscount
-            double minimalMissCount = Math.Min(effectiveMissCount, 1);
+            double maximumMissCount = getMaximumMisscount(score, attributes);
 
             double scoreObtainedDuringMaxCombo = calculateScoreForCombo(score, attributes, score.MaxCombo);
             double remainingScore = score.LegacyTotalScore.Value - scoreObtainedDuringMaxCombo;
 
             if (remainingScore <= 0)
-                return minimalMissCount;
-
-            // WARNING: this line is very questionable but it's required to maintain stability of the algorithm
-            // Increase multiplier to increase stability, decrease multiplier to increase maximum misscount algorithm can output
-            remainingScore = Math.Max(remainingScore, 0.1 * scoreObtainedDuringMaxCombo * score.MaxCombo / attributes.MaxCombo);
+                return maximumMissCount;
 
             double remainingCombo = attributes.MaxCombo - score.MaxCombo;
             double expectedRemainingScore = calculateScoreForCombo(score, attributes, remainingCombo);
 
-            double result = expectedRemainingScore / remainingScore;
+            double scoreBasedMisscount = expectedRemainingScore / remainingScore;
 
-            // To match the behaviour of current effective miss count
-            if (result < 1) return minimalMissCount;
+            // If there's less then one miss detected - let combo-based misscount decide if this is FC or not
+            if (scoreBasedMisscount < 1) return Math.Min(maximumMissCount, 1);
 
-            return Math.Max(result, minimalMissCount);
+            // Cap result by very harsh version of combo-based misscount
+            return Math.Min(scoreBasedMisscount, maximumMissCount);
+        }
+
+        /// <summary>
+        /// This function is harsher version of current effective misscount, used to provide reasonable value for cases where score-based misscount can't do this.
+        /// </summary>
+
+        private double getMaximumMisscount(ScoreInfo score, OsuDifficultyAttributes attributes)
+        {
+            // Consider that full combo is maximum combo minus dropped slider tails since they don't contribute to combo but also don't break it
+            // In classic scores we can't know the amount of dropped sliders so we estimate to 10% of all sliders on the map
+            double fullComboThreshold = attributes.MaxCombo - 0.1 * attributes.SliderCount;
+
+            if (scoreMaxCombo < fullComboThreshold)
+                effectiveMissCount = Math.Pow(fullComboThreshold / Math.Max(1.0, scoreMaxCombo), 2.5);
+
+            // In classic scores there can't be more misses than a sum of all non-perfect judgements
+            effectiveMissCount = Math.Min(effectiveMissCount, totalImperfectHits);
+
+            return effectiveMissCount;
         }
 
         private double calculateScoreForCombo(ScoreInfo score, OsuDifficultyAttributes attributes, double combo)
