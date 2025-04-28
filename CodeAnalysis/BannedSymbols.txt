@@ -21,3 +21,7 @@ M:Humanizer.InflectorExtensions.Kebaberize(System.String);Humanizer's .Kebaberiz
 M:osuTK.MathHelper.Clamp(System.Int32,System.Int32,System.Int32)~System.Int32;Use Math.Clamp() instead.
 M:osuTK.MathHelper.Clamp(System.Single,System.Single,System.Single)~System.Single;This osuTK helper has unsafe semantics when one of the bounds provided is NaN. Use Math.Clamp() instead.
 M:osuTK.MathHelper.Clamp(System.Double,System.Double,System.Double)~System.Double;This osuTK helper has unsafe semantics when one of the bounds provided is NaN. Use Math.Clamp() instead.
+M:TagLib.File.Create(System.String);TagLib's MIME type detection changes behaviour depending on CultureInfo.CurrentCulture. Use TagLibUtils.GetTagLibFile() instead.
+M:TagLib.File.Create(TagLib.File.IFileAbstraction);TagLib's MIME type detection changes behaviour depending on CultureInfo.CurrentCulture. Use TagLibUtils.GetTagLibFile() instead.
+M:TagLib.File.Create(System.String,TagLib.ReadStyle);TagLib's MIME type detection changes behaviour depending on CultureInfo.CurrentCulture. Use TagLibUtils.GetTagLibFile() instead.
+M:TagLib.File.Create(TagLib.File.IFileAbstraction,TagLib.ReadStyle);TagLib's MIME type detection changes behaviour depending on CultureInfo.CurrentCulture. Use TagLibUtils.GetTagLibFile() instead.
