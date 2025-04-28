@@ -276,9 +276,10 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             scores[2].TotalScore = RNG.Next(120_000, 400_000);
             scores[2].MaximumStatistics[HitResult.Great] = 3000;
 
-            scores[1].Mods = new Mod[] { new OsuModHidden(), new OsuModDoubleTime(), new OsuModHardRock(), new OsuModFlashlight() };
+            scores[1].Mods = new Mod[] { new OsuModHidden(), new OsuModDoubleTime { SpeedChange = { Value = 2 } }, new OsuModHardRock(), new OsuModFlashlight() };
             scores[2].Mods = new Mod[] { new OsuModHidden(), new OsuModDoubleTime(), new OsuModHardRock(), new OsuModFlashlight(), new OsuModClassic() };
-            scores[3].Mods = new Mod[] { new OsuModHidden(), new OsuModDoubleTime(), new OsuModHardRock(), new OsuModFlashlight(), new OsuModClassic(), new OsuModDifficultyAdjust() };
+            scores[3].Mods = new Mod[]
+                { new OsuModHidden(), new OsuModDoubleTime(), new OsuModHardRock(), new OsuModFlashlight { ComboBasedSize = { Value = false } }, new OsuModClassic(), new OsuModDifficultyAdjust() };
             scores[4].Mods = new ManiaRuleset().CreateAllMods().ToArray();
 
             return scores;
