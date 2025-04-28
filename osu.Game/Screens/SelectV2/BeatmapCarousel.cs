@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
@@ -13,6 +14,7 @@ using osu.Framework.Graphics.Pooling;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.Graphics.Carousel;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Select;
 
@@ -73,18 +75,17 @@ namespace osu.Game.Screens.SelectV2
         {
             // TODO: moving management of BeatmapInfo tracking to BeatmapStore might be something we want to consider.
             // right now we are managing this locally which is a bit of added overhead.
-            IEnumerable<BeatmapSetInfo>? newBeatmapSets = changed.NewItems?.Cast<BeatmapSetInfo>();
-            IEnumerable<BeatmapSetInfo>? beatmapSetInfos = changed.OldItems?.Cast<BeatmapSetInfo>();
+            IEnumerable<BeatmapSetInfo>? newItems = changed.NewItems?.Cast<BeatmapSetInfo>();
+            IEnumerable<BeatmapSetInfo>? oldItems = changed.OldItems?.Cast<BeatmapSetInfo>();
 
             switch (changed.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    Items.AddRange(newBeatmapSets!.SelectMany(s => s.Beatmaps));
+                    Items.AddRange(newItems!.SelectMany(s => s.Beatmaps));
                     break;
 
                 case NotifyCollectionChangedAction.Remove:
-
-                    foreach (var set in beatmapSetInfos!)
+                    foreach (var set in oldItems!)
                     {
                         foreach (var beatmap in set.Beatmaps)
                             Items.RemoveAll(i => i is BeatmapInfo bi && beatmap.Equals(bi));
@@ -93,8 +94,50 @@ namespace osu.Game.Screens.SelectV2
                     break;
 
                 case NotifyCollectionChangedAction.Move:
+                    // We can ignore move operations as we are applying our own sort in all cases.
+                    break;
+
                 case NotifyCollectionChangedAction.Replace:
-                    throw new NotImplementedException();
+                    var oldSetBeatmaps = oldItems!.Single().Beatmaps;
+                    var newSetBeatmaps = newItems!.Single().Beatmaps.ToList();
+
+                    // Handling replace operations is a touch manual, as we need to locally diff the beatmaps of each version of the beatmap set.
+                    // Matching is done based on online IDs, then difficulty names as these are the most stable thing between updates (which are usually triggered
+                    // by users editing the beatmap or by difficulty/metadata recomputation).
+                    //
+                    // In the case of difficulty reprocessing, this will trigger multiple times per beatmap as it's always triggering a set update.
+                    // We may want to look to improve this in the future either here or at the source (only trigger an update after all difficulties
+                    // have been processed) if it becomes an issue for animation or performance reasons.
+                    foreach (var beatmap in oldSetBeatmaps)
+                    {
+                        int previousIndex = Items.IndexOf(beatmap);
+                        Debug.Assert(previousIndex >= 0);
+
+                        BeatmapInfo? matchingNewBeatmap =
+                            newSetBeatmaps.SingleOrDefault(b => b.OnlineID > 0 && b.OnlineID == beatmap.OnlineID) ??
+                            newSetBeatmaps.SingleOrDefault(b => b.DifficultyName == beatmap.DifficultyName && b.Ruleset.Equals(beatmap.Ruleset));
+
+                        if (matchingNewBeatmap != null)
+                        {
+                            // TODO: should this exist in song select instead of here?
+                            // we need to ensure the global beatmap is also updated alongside changes.
+                            if (CurrentSelection != null && CheckModelEquality(beatmap, CurrentSelection))
+                                CurrentSelection = matchingNewBeatmap;
+
+                            Items.ReplaceRange(previousIndex, 1, [matchingNewBeatmap]);
+                            newSetBeatmaps.Remove(matchingNewBeatmap);
+                        }
+                        else
+                        {
+                            Items.RemoveAt(previousIndex);
+                        }
+                    }
+
+                    // Add any items which weren't found in the previous pass (difficulty names didn't match).
+                    foreach (var beatmap in newSetBeatmaps)
+                        Items.Add(beatmap);
+
+                    break;
 
                 case NotifyCollectionChangedAction.Reset:
                     Items.Clear();
@@ -131,7 +174,7 @@ namespace osu.Game.Screens.SelectV2
                     return;
 
                 case BeatmapInfo beatmapInfo:
-                    if (ReferenceEquals(CurrentSelection, beatmapInfo))
+                    if (CurrentSelection != null && CheckModelEquality(CurrentSelection, beatmapInfo))
                     {
                         RequestPresentBeatmap?.Invoke(beatmapInfo);
                         return;
@@ -154,7 +197,7 @@ namespace osu.Game.Screens.SelectV2
 
                 case BeatmapInfo beatmapInfo:
                     // Find any containing group. There should never be too many groups so iterating is efficient enough.
-                    GroupDefinition? containingGroup = grouping.GroupItems.SingleOrDefault(kvp => kvp.Value.Any(i => ReferenceEquals(i.Model, beatmapInfo))).Key;
+                    GroupDefinition? containingGroup = grouping.GroupItems.SingleOrDefault(kvp => kvp.Value.Any(i => CheckModelEquality(i.Model, beatmapInfo))).Key;
 
                     if (containingGroup != null)
                         setExpandedGroup(containingGroup);
@@ -308,6 +351,24 @@ namespace osu.Game.Screens.SelectV2
             AddInternal(groupPanelPool);
             AddInternal(beatmapPanelPool);
             AddInternal(setPanelPool);
+        }
+
+        protected override bool CheckModelEquality(object x, object y)
+        {
+            // In the confines of the carousel logic, we assume that CurrentSelection (and all items) are using non-stale
+            // BeatmapInfo reference, and that we can match based on beatmap / beatmapset (GU)IDs.
+            //
+            // If there's a case where updates don't come in as expected, diagnosis should start from BeatmapStore, ensuring
+            // it is doing a Replace operation on the list. If it is, then check the local handling in beatmapSetsChanged
+            // before changing matching requirements here.
+
+            if (x is BeatmapSetInfo beatmapSetX && y is BeatmapSetInfo beatmapSetY)
+                return beatmapSetX.Equals(beatmapSetY);
+
+            if (x is BeatmapInfo beatmapX && y is BeatmapInfo beatmapY)
+                return beatmapX.Equals(beatmapY);
+
+            return base.CheckModelEquality(x, y);
         }
 
         protected override Drawable GetDrawableForDisplay(CarouselItem item)
