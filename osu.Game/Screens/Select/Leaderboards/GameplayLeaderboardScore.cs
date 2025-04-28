@@ -72,7 +72,7 @@ namespace osu.Game.Screens.Select.Leaderboards
         /// The initial position of the score on the leaderboard.
         /// Mostly used for cases like the local user's best score on the global leaderboard (which will not be contiguous with the other scores).
         /// </summary>
-        public int? InitialPosition { get; init; } = null;
+        public int? InitialPosition { get; init; }
 
         /// <summary>
         /// The displayed rank of the score on the leaderboard.
