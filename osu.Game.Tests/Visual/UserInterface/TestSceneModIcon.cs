@@ -71,7 +71,22 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             AddStep("create mod icons", () =>
             {
-                addRange(Ruleset.Value.CreateInstance().CreateAllMods());
+                addRange(Ruleset.Value.CreateInstance().CreateAllMods().Select(m =>
+                {
+                    if (m is OsuModFlashlight fl)
+                        fl.FollowDelay.Value = 1245;
+
+                    if (m is OsuModDaycore dc)
+                        dc.SpeedChange.Value = 0.74f;
+
+                    if (m is OsuModDifficultyAdjust da)
+                        da.CircleSize.Value = 8.2f;
+
+                    if (m is ModAdaptiveSpeed ad)
+                        ad.AdjustPitch.Value = false;
+
+                    return m;
+                }));
             });
 
             AddStep("toggle selected", () =>
