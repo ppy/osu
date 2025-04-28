@@ -261,12 +261,12 @@ namespace osu.Game.Screens.SelectV2
             }
             else
             {
-                ratingsWedge.FadeOut(transition_duration, Easing.OutQuint)
-                            .MoveToX(-50, transition_duration, Easing.OutQuint);
-
-                failRetryWedge.Delay(100)
-                              .FadeOut(transition_duration, Easing.OutQuint)
+                failRetryWedge.FadeOut(transition_duration, Easing.OutQuint)
                               .MoveToX(-50, transition_duration, Easing.OutQuint);
+
+                ratingsWedge.Delay(100)
+                            .FadeOut(transition_duration, Easing.OutQuint)
+                            .MoveToX(-50, transition_duration, Easing.OutQuint);
             }
         }
 

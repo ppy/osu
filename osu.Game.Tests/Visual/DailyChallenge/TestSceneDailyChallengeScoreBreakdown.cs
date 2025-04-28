@@ -13,6 +13,7 @@ using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Screens.OnlinePlay.DailyChallenge;
 using osu.Game.Screens.OnlinePlay.DailyChallenge.Events;
+using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests.Visual.DailyChallenge
 {
@@ -65,7 +66,7 @@ namespace osu.Game.Tests.Visual.DailyChallenge
                 {
                     Id = 2,
                     Username = "peppy",
-                    CoverUrl = "https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
+                    CoverUrl = TestResources.COVER_IMAGE_3,
                 }, RNG.Next(1_000_000), null);
 
                 breakdown.AddNewScore(ev);
@@ -85,7 +86,7 @@ namespace osu.Game.Tests.Visual.DailyChallenge
                     {
                         Id = 2,
                         Username = "peppy",
-                        CoverUrl = "https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
+                        CoverUrl = TestResources.COVER_IMAGE_3,
                     }, RNG.Next(1_000_000), null);
 
                     breakdown.AddNewScore(ev);
