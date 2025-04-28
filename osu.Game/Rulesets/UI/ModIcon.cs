@@ -8,6 +8,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Utils;
@@ -81,6 +82,8 @@ namespace osu.Game.Rulesets.UI
 
         private Container extendedContent = null!;
 
+        private Drawable adjustmentMarker = null!;
+
         private ModSettingChangeTracker? modSettingsChangeTracker;
 
         /// <summary>
@@ -139,7 +142,7 @@ namespace osu.Game.Rulesets.UI
                     Origin = Anchor.CentreLeft,
                     Name = "main content",
                     Size = MOD_ICON_SIZE,
-                    Children = new Drawable[]
+                    Children = new[]
                     {
                         background = new Sprite
                         {
@@ -164,6 +167,31 @@ namespace osu.Game.Rulesets.UI
                             Anchor = Anchor.Centre,
                             Size = new Vector2(45),
                             Icon = FontAwesome.Solid.Question
+                        },
+                        adjustmentMarker = new Container
+                        {
+                            Size = new Vector2(20),
+                            Origin = Anchor.Centre,
+                            Position = new Vector2(64, 14),
+                            Children = new Drawable[]
+                            {
+                                new Circle
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    Colour = colours.YellowLight,
+                                    RelativeSizeAxes = Axes.Both,
+                                },
+                                new SpriteIcon
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    Icon = FontAwesome.Solid.Cog,
+                                    Colour = colours.YellowDark,
+                                    RelativeSizeAxes = Axes.Both,
+                                    Size = new Vector2(0.7f),
+                                }
+                            }
                         },
                     }
                 },
@@ -206,6 +234,11 @@ namespace osu.Game.Rulesets.UI
 
             backgroundColour = colours.ForModType(value.Type);
             updateColour();
+
+            if (mod.HasNonDefaultSettings)
+                adjustmentMarker.Show();
+            else
+                adjustmentMarker.Hide();
 
             updateExtendedInformation();
         }
