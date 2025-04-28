@@ -105,7 +105,7 @@ namespace osu.Game.Screens.Edit.Setup
             {
                 using (var tagSource = TagLibUtils.GetTagLibFile(source.FullName))
                 {
-                    artist = tagSource.Tag.JoinedAlbumArtists;
+                    artist = tagSource.Tag.JoinedAlbumArtists ?? tagSource.Tag.JoinedPerformers;
                     title = tagSource.Tag.Title;
                 }
             }
