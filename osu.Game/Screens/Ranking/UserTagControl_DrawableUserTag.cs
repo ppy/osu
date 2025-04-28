@@ -41,6 +41,8 @@ namespace osu.Game.Screens.Ranking
 
             private LoadingLayer loadingLayer = null!;
 
+            private FillFlowContainer contentFlow = null!;
+
             [Resolved]
             private OsuColour colours { get; set; } = null!;
 
@@ -52,8 +54,6 @@ namespace osu.Game.Screens.Ranking
                 updating.BindTo(userTag.Updating);
                 voted.BindTo(userTag.Voted);
 
-                AutoSizeAxes = Axes.Both;
-
                 ScaleOnMouseDown = 0.95f;
             }
 
@@ -62,12 +62,14 @@ namespace osu.Game.Screens.Ranking
             {
                 CornerRadius = 5;
                 Masking = true;
+
                 EdgeEffect = new EdgeEffectParameters
                 {
                     Colour = colours.Lime1,
                     Radius = 6,
                     Type = EdgeEffectType.Glow,
                 };
+
                 Content.AddRange(new Drawable[]
                 {
                     MainBackground = new Box
@@ -75,7 +77,7 @@ namespace osu.Game.Screens.Ranking
                         RelativeSizeAxes = Axes.Both,
                         Depth = float.MaxValue,
                     },
-                    new FillFlowContainer
+                    contentFlow = new FillFlowContainer
                     {
                         AutoSizeAxes = Axes.Both,
                         Direction = FillDirection.Horizontal,
@@ -190,6 +192,15 @@ namespace osu.Game.Screens.Ranking
                 FinishTransforms(true);
 
                 Action = () => OnSelected?.Invoke(UserTag);
+            }
+
+            protected override void Update()
+            {
+                base.Update();
+
+                // Grab size from the actual flow. If we were to use AutoSize, the mouse down animation would cause
+                // our size to change, resulting in weird fill flow interactions.
+                Size = contentFlow.Size;
             }
 
             private partial class VoteCountText : CompositeDrawable
