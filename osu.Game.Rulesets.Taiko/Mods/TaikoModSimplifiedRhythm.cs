@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Bindables;
@@ -23,113 +24,95 @@ namespace osu.Game.Rulesets.Taiko.Mods
         public override ModType Type => ModType.DifficultyReduction;
 
         [SettingSource("1/3 to 1/2 conversion", "Converts 1/3 patterns to 1/2 rhythm.")]
-        public Bindable<bool> OneThirdConversion { get; } = new BindableBool(false);
+        public Bindable<bool> OneThirdConversion { get; } = new BindableBool();
 
         [SettingSource("1/6 to 1/4 conversion", "Converts 1/6 patterns to 1/4 rhythm.")]
         public Bindable<bool> OneSixthConversion { get; } = new BindableBool(true);
 
         [SettingSource("1/8 to 1/4 conversion", "Converts 1/8 patterns to 1/4 rhythm.")]
-        public Bindable<bool> OneEighthConversion { get; } = new BindableBool(false);
+        public Bindable<bool> OneEighthConversion { get; } = new BindableBool();
 
         public void ApplyToBeatmap(IBeatmap beatmap)
         {
             var taikoBeatmap = (TaikoBeatmap)beatmap;
             var controlPointInfo = taikoBeatmap.ControlPointInfo;
-            List<Hit> hits = taikoBeatmap.HitObjects.Where(obj => obj is Hit).Cast<Hit>().ToList();
-            List<Hit> toRemove = new List<Hit>();
 
-            // Snap conversions for rhythms
-            var snapConversions = new Dictionary<int, double>
-            {
-                { 8, 4.0 }, // 1/8 snap to 1/4 snap
-                { 6, 4.0 }, // 1/6 snap to 1/4 snap
-                { 3, 2.0 }, // 1/3 snap to 1/2 snap
-            };
+            Hit[] hits = taikoBeatmap.HitObjects.Where(obj => obj is Hit).Cast<Hit>().ToArray();
+
+            var conversions = new List<(int, int)>();
+
+            if (OneEighthConversion.Value) conversions.Add((8, 4));
+            if (OneSixthConversion.Value) conversions.Add((6, 4));
+            if (OneThirdConversion.Value) conversions.Add((3, 2));
 
             bool inPattern = false;
 
-            foreach (var snapConversion in snapConversions)
+            foreach ((int baseRhythm, int adjustedRhythm) in conversions)
             {
                 int patternStartIndex = 0;
 
-                // Skip processing if the corresponding conversion is disabled
-                if (!shouldProcessRhythm(snapConversion.Key))
-                    continue;
-
-                for (int i = 0; i < hits.Count; i++)
+                for (int i = 1; i < hits.Length; i++)
                 {
-                    double snapValue = i < hits.Count - 1
-                        ? getSnapBetweenNotes(controlPointInfo, hits[i], hits[i + 1])
-                        : 1; // No next note, default to a safe 1/1 snap
+                    double snapValue = getSnapBetweenNotes(controlPointInfo, hits[i - 1], hits[i]);
 
-                    if (snapValue == snapConversion.Key)
+                    if (inPattern)
                     {
-                        if (!inPattern)
-                        {
-                            patternStartIndex = i;
-                        }
+                        // pattern continues
+                        if (snapValue == baseRhythm) continue;
 
-                        inPattern = true;
-                    }
-
-                    // Check if end of pattern
-                    if (inPattern && snapValue != snapConversion.Key)
-                    {
-                        // End pattern
                         inPattern = false;
 
                         // Iterate through the pattern
-                        for (int j = patternStartIndex; j <= i; j++)
+                        for (int j = patternStartIndex; j < i; j++)
                         {
-                            int currentHitPosition = j - patternStartIndex;
+                            int indexInPattern = j - patternStartIndex;
 
-                            if (snapConversion.Key == 8)
+                            switch (baseRhythm)
                             {
-                                // 1/8: Remove the second note
-                                if (currentHitPosition % 2 == 1)
+                                // 1/8: Remove every second note
+                                case 8:
                                 {
-                                    toRemove.Add(hits[j]);
+                                    if (indexInPattern % 2 == 1)
+                                    {
+                                        taikoBeatmap.HitObjects.Remove(hits[j]);
+                                    }
+
+                                    break;
                                 }
-                            }
-                            else
-                            {
-                                // 1/6 and 1/3: Remove the second note and adjust the third
-                                if (currentHitPosition % 3 == 1)
+
+                                // 1/6 and 1/3: Remove every second note and adjust time of every third
+                                case 6:
+                                case 3:
                                 {
-                                    toRemove.Add(hits[j]);
+                                    if (indexInPattern % 3 == 1)
+                                        taikoBeatmap.HitObjects.Remove(hits[j]);
+                                    else if (indexInPattern % 3 == 2)
+                                        hits[j].StartTime = hits[j + 1].StartTime - controlPointInfo.TimingPointAt(hits[j].StartTime).BeatLength / adjustedRhythm;
+
+                                    break;
                                 }
-                                else if (currentHitPosition % 3 == 2 && j < hits.Count - 1)
-                                {
-                                    double offset = controlPointInfo.TimingPointAt(hits[j].StartTime).BeatLength / snapConversion.Value;
-                                    hits[j].StartTime = hits[j + 1].StartTime - offset;
-                                }
+
+                                default:
+                                    throw new ArgumentOutOfRangeException(nameof(baseRhythm));
                             }
                         }
                     }
+                    else
+                    {
+                        if (snapValue == baseRhythm)
+                        {
+                            patternStartIndex = i - 1;
+                            inPattern = true;
+                        }
+                    }
                 }
-
-                // Remove queued notes
-                taikoBeatmap.HitObjects.RemoveAll(obj => toRemove.Contains(obj));
             }
         }
 
         private int getSnapBetweenNotes(ControlPointInfo controlPointInfo, Hit currentNote, Hit nextNote)
         {
-            double gapMs = nextNote.StartTime - currentNote.StartTime;
             var currentTimingPoint = controlPointInfo.TimingPointAt(currentNote.StartTime);
-
-            return controlPointInfo.GetClosestBeatDivisor(gapMs + currentTimingPoint.Time);
-        }
-
-        private bool shouldProcessRhythm(int snap)
-        {
-            return snap switch
-            {
-                3 => OneThirdConversion.Value,
-                6 => OneSixthConversion.Value,
-                8 => OneEighthConversion.Value,
-                _ => false,
-            };
+            return controlPointInfo.GetClosestBeatDivisor(currentTimingPoint.Time + (nextNote.StartTime - currentNote.StartTime));
         }
     }
 }
