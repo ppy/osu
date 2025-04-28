@@ -141,5 +141,30 @@ namespace osu.Game.Tests.Visual.UserInterface
                     modIcon.Mod = ruleset.AllMods.First(m => m.Acronym == "EZ");
             });
         }
+
+        [Test]
+        public void TestDifficultyAdjust()
+        {
+            AddStep("create icons", () =>
+            {
+                addRange([
+                    new OsuModDifficultyAdjust
+                    {
+                        CircleSize = { Value = 8 }
+                    },
+                    new OsuModDifficultyAdjust
+                    {
+                        CircleSize = { Value = 5.5f }
+                    },
+                    new OsuModDifficultyAdjust
+                    {
+                        CircleSize = { Value = 8 },
+                        ApproachRate = { Value = 8 },
+                        OverallDifficulty = { Value = 8 },
+                        DrainRate = { Value = 8 },
+                    }
+                ]);
+            });
+        }
     }
 }
