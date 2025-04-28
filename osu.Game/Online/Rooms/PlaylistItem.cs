@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
@@ -9,6 +10,7 @@ using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Utils;
 
 namespace osu.Game.Online.Rooms
@@ -37,9 +39,19 @@ namespace osu.Game.Online.Rooms
         [JsonProperty("played_at")]
         public DateTimeOffset? PlayedAt { get; set; }
 
+        /// <summary>
+        /// Mods that participants are allowed to apply at their own discretion.
+        /// </summary>
+        /// <remarks>
+        /// This will be empty when <see cref="Freestyle"/> is <c>true</c>, but participants may still select any mods from their choice of ruleset,
+        /// provided the mod is <see cref="ModUtils.CheckCompatibleSet(IEnumerable{Mod})">compatible</see> with the rest of the user's selection.
+        /// </remarks>
         [JsonProperty("allowed_mods")]
         public APIMod[] AllowedMods { get; set; } = Array.Empty<APIMod>();
 
+        /// <summary>
+        /// Mods that should be applied for every participant in the room.
+        /// </summary>
         [JsonProperty("required_mods")]
         public APIMod[] RequiredMods { get; set; } = Array.Empty<APIMod>();
 
@@ -68,7 +80,7 @@ namespace osu.Game.Online.Rooms
         }
 
         /// <summary>
-        /// Indicates whether participants in the room are able to pick their own choice of beatmap difficulty and ruleset.
+        /// Indicates whether participants in the room are able to pick their own choice of beatmap difficulty, ruleset, and mods.
         /// </summary>
         [JsonProperty("freestyle")]
         public bool Freestyle { get; set; }
@@ -84,6 +96,11 @@ namespace osu.Game.Online.Rooms
         public IBindable<bool> Valid => valid;
 
         private readonly Bindable<bool> valid = new BindableBool(true);
+
+        [JsonIgnore]
+        public IBindable<bool> Completed => completed;
+
+        private readonly Bindable<bool> completed = new BindableBool(false);
 
         [JsonConstructor]
         private PlaylistItem()
@@ -117,6 +134,8 @@ namespace osu.Game.Online.Rooms
         }
 
         public void MarkInvalid() => valid.Value = false;
+
+        public void MarkCompleted() => completed.Value = true;
 
         #region Newtonsoft.Json implicit ShouldSerialize() methods
 

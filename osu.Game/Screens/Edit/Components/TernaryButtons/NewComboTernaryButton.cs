@@ -40,11 +40,14 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
         private readonly BindableList<HitObject> selectedHitObjects = new BindableList<HitObject>();
         private readonly BindableList<Colour4> comboColours = new BindableList<Colour4>();
 
+        private readonly Bindable<bool> expanded = new Bindable<bool>(true);
+
         private Container mainButtonContainer = null!;
         private ColourPickerButton pickerButton = null!;
+        private DrawableTernaryButton mainButton = null!;
 
         [BackgroundDependencyLoader]
-        private void load(EditorBeatmap editorBeatmap)
+        private void load(EditorBeatmap editorBeatmap, IExpandingContainer? expandableParent)
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -54,7 +57,7 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Child = new DrawableTernaryButton
+                    Child = mainButton = new DrawableTernaryButton
                     {
                         Current = Current,
                         Description = "New combo",
@@ -65,8 +68,6 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
                 {
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
-                    Alpha = 0,
-                    Width = 25,
                     ComboColours = { BindTarget = comboColours }
                 }
             };
@@ -74,6 +75,9 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
             selectedHitObjects.BindTo(editorBeatmap.SelectedHitObjects);
             if (editorBeatmap.BeatmapSkin != null)
                 comboColours.BindTo(editorBeatmap.BeatmapSkin.ComboColours);
+
+            if (expandableParent != null)
+                expanded.BindTo(expandableParent.Expanded);
         }
 
         protected override void LoadComplete()
@@ -82,6 +86,7 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
 
             selectedHitObjects.BindCollectionChanged((_, _) => updateState());
             comboColours.BindCollectionChanged((_, _) => updateState());
+            expanded.BindValueChanged(_ => updateState());
             Current.BindValueChanged(_ => updateState(), true);
         }
 
@@ -89,14 +94,21 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
         {
             if (Current.Value == TernaryState.True && selectedHitObjects.Count == 1 && selectedHitObjects.Single() is IHasComboInformation hasCombo && comboColours.Count > 1)
             {
-                mainButtonContainer.Padding = new MarginPadding { Right = 30 };
+                float targetPickerButtonWidth = expanded.Value ? 25 : 10;
+
+                pickerButton.ResizeWidthTo(targetPickerButtonWidth, ExpandingContainer.TRANSITION_DURATION, Easing.OutQuint);
                 pickerButton.SelectedHitObject.Value = hasCombo;
-                pickerButton.Alpha = 1;
+                pickerButton.Icon.Alpha = expanded.Value ? 1 : 0;
+
+                mainButtonContainer.TransformTo(nameof(mainButtonContainer.Padding), new MarginPadding { Right = targetPickerButtonWidth + 5 }, ExpandingContainer.TRANSITION_DURATION, Easing.OutQuint);
+                mainButton.Icon.MoveToX(expanded.Value ? 10 : 2.5f, ExpandingContainer.TRANSITION_DURATION, Easing.OutQuint);
             }
             else
             {
-                mainButtonContainer.Padding = new MarginPadding();
-                pickerButton.Alpha = 0;
+                pickerButton.ResizeWidthTo(0, ExpandingContainer.TRANSITION_DURATION, Easing.OutQuint);
+
+                mainButtonContainer.TransformTo(nameof(mainButtonContainer.Padding), new MarginPadding(), ExpandingContainer.TRANSITION_DURATION, Easing.OutQuint);
+                mainButton.Icon.MoveToX(10, ExpandingContainer.TRANSITION_DURATION, Easing.OutQuint);
             }
         }
 
@@ -111,12 +123,12 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
             [Resolved]
             private OverlayColourProvider colourProvider { get; set; } = null!;
 
-            private SpriteIcon icon = null!;
+            public SpriteIcon Icon { get; private set; } = null!;
 
             [BackgroundDependencyLoader]
             private void load()
             {
-                Add(icon = new SpriteIcon
+                Add(Icon = new SpriteIcon
                 {
                     Icon = FontAwesome.Solid.Palette,
                     Size = new Vector2(16),
@@ -149,17 +161,17 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
             {
                 Enabled.Value = SelectedHitObject.Value != null;
 
-                if (SelectedHitObject.Value == null || SelectedHitObject.Value.ComboOffset == 0 || ComboColours.Count <= 1)
+                if (SelectedHitObject.Value == null || SelectedHitObject.Value.ComboOffset == 0 || ComboColours.Count <= 1 || !SelectedHitObject.Value.NewCombo)
                 {
                     BackgroundColour = colourProvider.Background3;
-                    icon.Colour = BackgroundColour.Darken(0.5f);
-                    icon.Blending = BlendingParameters.Additive;
+                    Icon.Colour = BackgroundColour.Darken(0.5f);
+                    Icon.Blending = BlendingParameters.Additive;
                 }
                 else
                 {
                     BackgroundColour = ComboColours[comboIndexFor(SelectedHitObject.Value, ComboColours)];
-                    icon.Colour = OsuColour.ForegroundTextColourFor(BackgroundColour);
-                    icon.Blending = BlendingParameters.Inherit;
+                    Icon.Colour = OsuColour.ForegroundTextColourFor(BackgroundColour);
+                    Icon.Blending = BlendingParameters.Inherit;
                 }
             }
 

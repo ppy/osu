@@ -1,13 +1,18 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
+using osu.Framework.Threading;
+using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -21,6 +26,8 @@ namespace osu.Game.Screens.Edit.Submission
     {
         public LocalisableString StageDescription { get; init; }
 
+        public int StageIndex { get; init; }
+
         private Bindable<StageStatusType> status { get; } = new Bindable<StageStatusType>();
 
         private Bindable<float?> progress { get; } = new Bindable<float?>();
@@ -33,8 +40,22 @@ namespace osu.Game.Screens.Edit.Submission
         [Resolved]
         private OsuColour colours { get; set; } = null!;
 
+        private Sample? progressSample;
+
+        private const int stage_done_sample_count = 4;
+        private Sample? stageDoneSample;
+
+        private Sample? errorSample;
+        private Sample? cancelSample;
+
+        private SampleChannel? progressSampleChannel;
+
+        private const int fadeout_duration = 100;
+        private ScheduledDelegate? progressSampleFadeDelegate;
+        private ScheduledDelegate? progressSampleStopDelegate;
+
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
+        private void load(OverlayColourProvider colourProvider, AudioManager audio)
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -111,6 +132,13 @@ namespace osu.Game.Screens.Edit.Submission
                     }
                 }
             };
+
+            errorSample = audio.Samples.Get(@"UI/generic-error");
+            cancelSample = audio.Samples.Get(@"UI/notification-cancel");
+            progressSample = audio.Samples.Get(@"UI/bss-progress");
+
+            int stageSample = Math.Min(stage_done_sample_count - 1, StageIndex);
+            stageDoneSample = audio.Samples.Get(@$"UI/bss-stage-{stageSample}");
         }
 
         protected override void LoadComplete()
@@ -119,6 +147,8 @@ namespace osu.Game.Screens.Edit.Submission
 
             status.BindValueChanged(_ => Scheduler.AddOnce(updateStatus), true);
             progress.BindValueChanged(_ => Scheduler.AddOnce(updateProgress), true);
+
+            progressSampleChannel = progressSample?.GetChannel();
         }
 
         public void SetNotStarted() => status.Value = StageStatusType.NotStarted;
@@ -127,6 +157,13 @@ namespace osu.Game.Screens.Edit.Submission
         {
             this.progress.Value = progress;
             status.Value = StageStatusType.InProgress;
+
+            if (progressSampleChannel == null)
+                return;
+
+            progressSampleChannel.Frequency.Value = 0.5f;
+            progressSampleChannel.Volume.Value = 0.25f;
+            progressSampleChannel.Looping = true;
         }
 
         public void SetCompleted() => status.Value = StageStatusType.Completed;
@@ -139,14 +176,44 @@ namespace osu.Game.Screens.Edit.Submission
 
         public void SetCanceled() => status.Value = StageStatusType.Canceled;
 
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            progressSampleChannel?.Stop();
+        }
+
         private const float transition_duration = 200;
+        private const Easing transition_easing = Easing.OutQuint;
 
         private void updateProgress()
         {
-            if (progress.Value != null)
-                progressBar.ResizeWidthTo(progress.Value.Value, transition_duration, Easing.OutQuint);
+            progressSampleFadeDelegate?.Cancel();
+            progressSampleStopDelegate?.Cancel();
 
-            progressBarContainer.FadeTo(status.Value == StageStatusType.InProgress && progress.Value != null ? 1 : 0, transition_duration, Easing.OutQuint);
+            progressBarContainer.FadeTo(status.Value == StageStatusType.InProgress && progress.Value != null ? 1 : 0, transition_duration, transition_easing);
+
+            if (progress.Value is float progressValue)
+            {
+                progressBar.ResizeWidthTo(progressValue, transition_duration, transition_easing);
+
+                if (progressSampleChannel == null || Precision.AlmostEquals(progressValue, 0f))
+                    return;
+
+                // Don't restart the looping sample if already playing
+                if (!progressSampleChannel.Playing)
+                    progressSampleChannel.Play();
+
+                this.TransformBindableTo(progressSampleChannel.Frequency, 0.5f + (progressValue * 1.5f), transition_duration, transition_easing);
+                this.TransformBindableTo(progressSampleChannel.Volume, 0.25f + (progressValue * .75f), transition_duration, transition_easing);
+
+                progressSampleFadeDelegate = Scheduler.AddDelayed(() =>
+                {
+                    // Perform a fade-out before stopping the sample to prevent clicking.
+                    this.TransformBindableTo(progressSampleChannel.Volume, 0, fadeout_duration);
+                    progressSampleStopDelegate = Scheduler.AddDelayed(() => { progressSampleChannel.Stop(); }, fadeout_duration);
+                }, transition_duration - fadeout_duration);
+            }
         }
 
         private void updateStatus()
@@ -176,6 +243,12 @@ namespace osu.Game.Screens.Edit.Submission
                     };
                     iconContainer.Colour = colours.Green1;
                     iconContainer.FlashColour(Colour4.White, 1000, Easing.OutQuint);
+
+                    // manually set progress value, as to trigger sample playback for the final section
+                    progress.Value = 1;
+
+                    stageDoneSample?.Play();
+
                     break;
 
                 case StageStatusType.Failed:
@@ -186,6 +259,7 @@ namespace osu.Game.Screens.Edit.Submission
                     };
                     iconContainer.Colour = colours.Red1;
                     iconContainer.FlashColour(Colour4.White, 1000, Easing.OutQuint);
+                    errorSample?.Play();
                     break;
 
                 case StageStatusType.Canceled:
@@ -196,6 +270,7 @@ namespace osu.Game.Screens.Edit.Submission
                     };
                     iconContainer.Colour = colours.Gray8;
                     iconContainer.FlashColour(Colour4.White, 1000, Easing.OutQuint);
+                    cancelSample?.Play();
                     break;
             }
         }

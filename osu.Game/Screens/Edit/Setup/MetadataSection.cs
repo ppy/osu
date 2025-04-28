@@ -25,6 +25,7 @@ namespace osu.Game.Screens.Edit.Setup
         private FormTextBox sourceTextBox = null!;
         private FormTextBox tagsTextBox = null!;
 
+        private bool reloading;
         private bool dirty;
 
         public override LocalisableString Title => EditorSetupStrings.MetadataHeader;
@@ -44,7 +45,7 @@ namespace osu.Game.Screens.Edit.Setup
                 creatorTextBox = createTextBox<FormTextBox>(EditorSetupStrings.Creator),
                 difficultyTextBox = createTextBox<FormTextBox>(EditorSetupStrings.DifficultyName),
                 sourceTextBox = createTextBox<FormTextBox>(BeatmapsetsStrings.ShowInfoSource),
-                tagsTextBox = createTextBox<FormTextBox>(BeatmapsetsStrings.ShowInfoTags)
+                tagsTextBox = createTextBox<FormTextBox>(BeatmapsetsStrings.ShowInfoMapperTags)
             };
 
             if (setupScreen != null)
@@ -105,6 +106,8 @@ namespace osu.Game.Screens.Edit.Setup
 
         private void reloadMetadata()
         {
+            reloading = true;
+
             var metadata = Beatmap.Metadata;
 
             RomanisedArtistTextBox.ReadOnly = false;
@@ -120,10 +123,15 @@ namespace osu.Game.Screens.Edit.Setup
             tagsTextBox.Current.Value = metadata.Tags;
 
             updateReadOnlyState();
+
+            reloading = false;
         }
 
         private void applyMetadata()
         {
+            if (reloading)
+                return;
+
             Beatmap.Metadata.ArtistUnicode = ArtistTextBox.Current.Value;
             Beatmap.Metadata.Artist = RomanisedArtistTextBox.Current.Value;
             Beatmap.Metadata.TitleUnicode = TitleTextBox.Current.Value;

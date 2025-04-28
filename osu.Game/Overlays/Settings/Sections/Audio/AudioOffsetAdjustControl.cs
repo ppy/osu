@@ -8,13 +8,13 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
-using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
+using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
@@ -109,6 +109,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                 base.LoadComplete();
 
                 averageHitErrorHistory.BindCollectionChanged(updateDisplay, true);
+                current.BindValueChanged(_ => updateHintText());
                 SuggestedOffset.BindValueChanged(_ => updateHintText(), true);
             }
 
@@ -148,17 +149,28 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                         break;
                 }
 
-                SuggestedOffset.Value = averageHitErrorHistory.Any() ? averageHitErrorHistory.Average(dataPoint => dataPoint.SuggestedGlobalAudioOffset) : null;
+                SuggestedOffset.Value = averageHitErrorHistory.Any() ? Math.Round(averageHitErrorHistory.Average(dataPoint => dataPoint.SuggestedGlobalAudioOffset)) : null;
             }
 
             private float getXPositionForOffset(double offset) => (float)(Math.Clamp(offset, current.MinValue, current.MaxValue) / (2 * current.MaxValue));
 
             private void updateHintText()
             {
-                hintText.Text = SuggestedOffset.Value == null
-                    ? AudioSettingsStrings.SuggestedOffsetNote
-                    : AudioSettingsStrings.SuggestedOffsetValueReceived(averageHitErrorHistory.Count, SuggestedOffset.Value.ToLocalisableString(@"N0"));
-                applySuggestion.Enabled.Value = SuggestedOffset.Value != null;
+                if (SuggestedOffset.Value == null)
+                {
+                    applySuggestion.Enabled.Value = false;
+                    hintText.Text = AudioSettingsStrings.SuggestedOffsetNote;
+                }
+                else if (Math.Abs(SuggestedOffset.Value.Value - current.Value) < 1)
+                {
+                    applySuggestion.Enabled.Value = false;
+                    hintText.Text = AudioSettingsStrings.SuggestedOffsetCorrect(averageHitErrorHistory.Count);
+                }
+                else
+                {
+                    applySuggestion.Enabled.Value = true;
+                    hintText.Text = AudioSettingsStrings.SuggestedOffsetValueReceived(averageHitErrorHistory.Count, SuggestedOffset.Value.Value.ToStandardFormattedString(0, false));
+                }
             }
 
             private partial class OffsetSliderBar : RoundedSliderBar<double>

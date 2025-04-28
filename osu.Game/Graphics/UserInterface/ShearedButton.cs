@@ -11,7 +11,6 @@ using osu.Framework.Localisation;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
-using osuTK;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -66,8 +65,6 @@ namespace osu.Game.Graphics.UserInterface
         private readonly Box background;
         private readonly OsuSpriteText text;
 
-        private const float shear = OsuGame.SHEAR;
-
         private Colour4? darkerColour;
         private Colour4? lighterColour;
         private Colour4? textColour;
@@ -91,10 +88,10 @@ namespace osu.Game.Graphics.UserInterface
         public ShearedButton(float? width = null, float height = DEFAULT_HEIGHT)
         {
             Height = height;
-            Padding = new MarginPadding { Horizontal = shear * height };
+            Padding = new MarginPadding { Horizontal = OsuGame.SHEAR.X * height };
 
             Content.CornerRadius = CORNER_RADIUS;
-            Content.Shear = new Vector2(shear, 0);
+            Content.Shear = OsuGame.SHEAR;
             Content.Masking = true;
             Content.Anchor = Content.Origin = Anchor.Centre;
 
@@ -117,7 +114,7 @@ namespace osu.Game.Graphics.UserInterface
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             AutoSizeAxes = Axes.Both,
-                            Shear = new Vector2(-shear, 0),
+                            Shear = -OsuGame.SHEAR,
                             Child = text = new OsuSpriteText
                             {
                                 Font = OsuFont.TorusAlternate.With(size: 17),

@@ -11,6 +11,7 @@ namespace osu.Game.Rulesets.Mods
 {
     public abstract class ModRateAdjust : Mod, IApplicableToRate
     {
+        public sealed override bool ValidForFreestyleAsRequiredMod => true;
         public sealed override bool ValidForMultiplayerAsFreeMod => false;
 
         public abstract BindableNumber<double> SpeedChange { get; }
@@ -34,5 +35,7 @@ namespace osu.Game.Rulesets.Mods
                     yield return ("Speed change", $"{SpeedChange.Value:N2}x");
             }
         }
+
+        public override string ExtendedIconInformation => SpeedChange.IsDefault ? string.Empty : FormattableString.Invariant($"{SpeedChange.Value:N2}x");
     }
 }

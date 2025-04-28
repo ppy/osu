@@ -58,6 +58,11 @@ namespace osu.Game.Screens.Play
 
         public override bool AllowUserExit => false; // handled by HoldForMenuButton
 
+        /// <summary>
+        /// Raised after all gameplay has finished.
+        /// </summary>
+        public event Action OnShowingResults;
+
         protected override bool PlayExitSound => !isRestarting;
 
         protected override UserActivity InitialActivity => new UserActivity.InSoloGame(Beatmap.Value.BeatmapInfo, Ruleset.Value);
@@ -873,6 +878,7 @@ namespace osu.Game.Screens.Play
                     // This player instance may already be in the process of exiting.
                     return;
 
+                OnShowingResults?.Invoke();
                 this.Push(CreateResults(prepareScoreForDisplayTask.GetResultSafely()));
             }, Time.Current + delay, 50);
 
@@ -929,33 +935,29 @@ namespace osu.Game.Screens.Play
 
         #region Gameplay leaderboard
 
+        protected virtual bool ShowLeaderboard => false;
+
         protected readonly Bindable<bool> LeaderboardExpandedState = new BindableBool();
 
         private void loadLeaderboard()
         {
+            if (!ShowLeaderboard)
+                return;
+
             HUDOverlay.HoldingForHUD.BindValueChanged(_ => updateLeaderboardExpandedState());
             LocalUserPlaying.BindValueChanged(_ => updateLeaderboardExpandedState(), true);
 
-            var gameplayLeaderboard = CreateGameplayLeaderboard();
-
-            if (gameplayLeaderboard != null)
+            var gameplayLeaderboard = new DrawableGameplayLeaderboard();
+            LoadComponentAsync(gameplayLeaderboard, leaderboard =>
             {
-                LoadComponentAsync(gameplayLeaderboard, leaderboard =>
-                {
-                    if (!LoadedBeatmapSuccessfully)
-                        return;
+                if (!LoadedBeatmapSuccessfully)
+                    return;
 
-                    leaderboard.Expanded.BindTo(LeaderboardExpandedState);
+                leaderboard.Expanded.BindTo(LeaderboardExpandedState);
 
-                    AddLeaderboardToHUD(leaderboard);
-                });
-            }
+                HUDOverlay.LeaderboardFlow.Add(leaderboard);
+            });
         }
-
-        [CanBeNull]
-        protected virtual GameplayLeaderboard CreateGameplayLeaderboard() => null;
-
-        protected virtual void AddLeaderboardToHUD(GameplayLeaderboard leaderboard) => HUDOverlay.LeaderboardFlow.Add(leaderboard);
 
         private void updateLeaderboardExpandedState() =>
             LeaderboardExpandedState.Value = !LocalUserPlaying.Value || HUDOverlay.HoldingForHUD.Value;

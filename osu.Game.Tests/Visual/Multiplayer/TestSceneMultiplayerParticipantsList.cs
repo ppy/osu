@@ -21,6 +21,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Taiko.Mods;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Participants;
+using osu.Game.Tests.Resources;
 using osu.Game.Users;
 using osuTK;
 
@@ -46,7 +47,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 Id = 3,
                 Username = "Second",
-                CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
+                CoverUrl = TestResources.COVER_IMAGE_3,
             }));
 
             AddAssert("two unique panels", () => this.ChildrenOfType<ParticipantPanel>().Select(p => p.User).Distinct().Count() == 2);
@@ -79,7 +80,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 {
                     Id = 3,
                     Username = "Second",
-                    CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
+                    CoverUrl = TestResources.COVER_IMAGE_3,
                 });
             });
 
@@ -159,7 +160,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 Id = 3,
                 Username = "Second",
-                CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
+                CoverUrl = TestResources.COVER_IMAGE_3,
             }));
 
             AddUntilStep("first user crown visible", () => this.ChildrenOfType<ParticipantPanel>().ElementAt(0).ChildrenOfType<SpriteIcon>().First().Alpha == 1);
@@ -178,7 +179,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 Id = 3,
                 Username = "Second",
-                CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
+                CoverUrl = TestResources.COVER_IMAGE_3,
             }));
 
             AddStep("make second user host", () => MultiplayerClient.TransferHost(3));
@@ -197,7 +198,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 Id = 3,
                 Username = "Second",
-                CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
+                CoverUrl = TestResources.COVER_IMAGE_3,
             }));
 
             AddUntilStep("kick buttons visible", () => this.ChildrenOfType<ParticipantPanel.KickButton>().Count(d => d.IsPresent) == 1);
@@ -218,7 +219,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 Id = 3,
                 Username = "Second",
-                CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
+                CoverUrl = TestResources.COVER_IMAGE_3,
             }));
 
             AddStep("kick second user", () => this.ChildrenOfType<ParticipantPanel.KickButton>().Single(d => d.IsPresent).TriggerClick());
@@ -246,7 +247,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                                 new UserStatistics { GlobalRank = RNG.Next(1, 100000), }
                             }
                         },
-                        CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
+                        CoverUrl = TestResources.COVER_IMAGE_3,
                     });
 
                     MultiplayerClient.ChangeUserState(i, (MultiplayerUserState)RNG.Next(0, (int)MultiplayerUserState.Results + 1));
@@ -293,7 +294,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                             new UserStatistics { GlobalRank = RNG.Next(1, 100000), }
                         }
                     },
-                    CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
+                    CoverUrl = TestResources.COVER_IMAGE_3,
                 });
 
                 MultiplayerClient.ChangeUserMods(0, new Mod[]
@@ -330,7 +331,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                             new UserStatistics { GlobalRank = RNG.Next(1, 100000), }
                         }
                     },
-                    CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
+                    CoverUrl = TestResources.COVER_IMAGE_3,
                 });
 
                 MultiplayerClient.ChangeUserStyle(0, 259, 2);
@@ -366,7 +367,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                             new UserStatistics { GlobalRank = RNG.Next(1, 100000), }
                         }
                     },
-                    CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
+                    CoverUrl = TestResources.COVER_IMAGE_3,
                 });
                 MultiplayerClient.ChangeUserMods(0, new Mod[]
                 {
@@ -415,7 +416,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                             new UserStatistics { GlobalRank = RNG.Next(1, 100000), }
                         }
                     },
-                    CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
+                    CoverUrl = TestResources.COVER_IMAGE_3,
                 });
 
                 MultiplayerClient.ChangeUserBeatmapAvailability(0, BeatmapAvailability.LocallyAvailable());

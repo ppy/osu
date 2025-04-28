@@ -13,6 +13,7 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Taiko;
+using osu.Game.Tests.Resources;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Online
@@ -152,7 +153,7 @@ namespace osu.Game.Tests.Visual.Online
                             Username = $"Colorful #{hue}",
                             Id = 1,
                             CountryCode = CountryCode.JP,
-                            CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c2.jpg",
+                            CoverUrl = TestResources.COVER_IMAGE_2,
                             ProfileHue = hue,
                             PlayMode = "osu",
                         });
@@ -196,7 +197,7 @@ namespace osu.Game.Tests.Visual.Online
                 Username = $"Colorful #{hue}",
                 Id = 1,
                 CountryCode = CountryCode.JP,
-                CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c2.jpg",
+                CoverUrl = TestResources.COVER_IMAGE_2,
                 ProfileHue = hue,
                 PlayMode = "osu",
             }));
@@ -212,7 +213,7 @@ namespace osu.Game.Tests.Visual.Online
                 Username = $"Colorful #{hue2}",
                 Id = 2,
                 CountryCode = CountryCode.JP,
-                CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c2.jpg",
+                CoverUrl = TestResources.COVER_IMAGE_2,
                 ProfileHue = hue2,
                 PlayMode = "osu",
             }));
@@ -225,7 +226,7 @@ namespace osu.Game.Tests.Visual.Online
                 Username = $"Colorful #{hue2}",
                 Id = 2,
                 CountryCode = CountryCode.JP,
-                CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c2.jpg",
+                CoverUrl = TestResources.COVER_IMAGE_2,
                 ProfileHue = hue2,
                 PlayMode = "osu",
             }));
@@ -236,7 +237,7 @@ namespace osu.Game.Tests.Visual.Online
             Username = @"Somebody",
             Id = 1,
             CountryCode = CountryCode.JP,
-            CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c1.jpg",
+            CoverUrl = TestResources.COVER_IMAGE_1,
             JoinDate = DateTimeOffset.Now.AddDays(-1),
             LastVisit = DateTimeOffset.Now,
             Groups = new[]

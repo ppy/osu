@@ -11,7 +11,6 @@ using osu.Game.Overlays.Mods;
 using osu.Game.Screens.Footer;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Select;
-using osu.Game.Screens.SelectV2.Footer;
 
 namespace osu.Game.Screens.SelectV2
 {
@@ -22,6 +21,10 @@ namespace osu.Game.Screens.SelectV2
     public abstract partial class SongSelect : OsuScreen
     {
         private const float logo_scale = 0.4f;
+
+        public const float WEDGE_CONTENT_MARGIN = CORNER_RADIUS_HIDE_OFFSET + OsuGame.SCREEN_EDGE_MARGIN;
+        public const float CORNER_RADIUS_HIDE_OFFSET = 20f;
+        public const float ENTER_DURATION = 600;
 
         private readonly ModSelectOverlay modSelectOverlay = new ModSelectOverlay(OverlayColourScheme.Aquamarine)
         {
@@ -77,9 +80,9 @@ namespace osu.Game.Screens.SelectV2
 
         public override IReadOnlyList<ScreenFooterButton> CreateFooterButtons() => new ScreenFooterButton[]
         {
-            new ScreenFooterButtonMods(modSelectOverlay) { Current = Mods },
-            new ScreenFooterButtonRandom(),
-            new ScreenFooterButtonOptions(),
+            new FooterButtonMods(modSelectOverlay) { Current = Mods },
+            new FooterButtonRandom(),
+            new FooterButtonOptions(),
         };
 
         protected override void LoadComplete()
