@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Extensions;
 
 namespace osu.Game.Rulesets.Mods
 {
@@ -64,6 +65,33 @@ namespace osu.Game.Rulesets.Mods
             {
                 if (property.GetValue(this) is DifficultyBindable diffAdjustBindable)
                     diffAdjustBindable.ExtendedLimits.BindTo(ExtendedLimits);
+            }
+        }
+
+        public virtual int AdjustedSettingsCount
+        {
+            get
+            {
+                int count = 0;
+                if (!DrainRate.IsDefault) count++;
+                if (!OverallDifficulty.IsDefault) count++;
+                return count;
+            }
+        }
+
+        public override string ExtendedIconInformation
+        {
+            get
+            {
+                if (AdjustedSettingsCount != 1)
+                    return string.Empty;
+
+                if (!OverallDifficulty.IsDefault) return format("OD", OverallDifficulty);
+                if (!DrainRate.IsDefault) return format("HP", DrainRate);
+
+                return string.Empty;
+
+                string format(string acronym, DifficultyBindable bindable) => $"{acronym}{bindable.Value!.Value.ToStandardFormattedString(1)}";
             }
         }
 
