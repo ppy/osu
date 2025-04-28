@@ -18,6 +18,7 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Metadata;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Dashboard.Friends;
+using osu.Game.Tests.Resources;
 using osu.Game.Tests.Visual.Metadata;
 using osu.Game.Users;
 
@@ -237,7 +238,7 @@ namespace osu.Game.Tests.Visual.Online
                 WasRecentlyOnline = true,
                 Statistics = new UserStatistics { GlobalRank = 1111 },
                 CountryCode = CountryCode.JP,
-                CoverUrl = "https://osu.ppy.sh/images/headers/profile-covers/c6.jpg"
+                CoverUrl = TestResources.COVER_IMAGE_4
             },
             new APIUser
             {
@@ -246,7 +247,7 @@ namespace osu.Game.Tests.Visual.Online
                 WasRecentlyOnline = false,
                 Statistics = new UserStatistics { GlobalRank = 2222 },
                 CountryCode = CountryCode.AU,
-                CoverUrl = "https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
+                CoverUrl = TestResources.COVER_IMAGE_3,
                 IsSupporter = true,
                 SupportLevel = 3,
             },

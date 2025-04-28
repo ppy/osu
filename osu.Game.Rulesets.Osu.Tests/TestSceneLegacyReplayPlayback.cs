@@ -6,6 +6,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Osu.Beatmaps;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Osu.UI;
@@ -23,7 +24,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         protected override string? ExportLocation => null;
 
-        private static readonly object[][] test_cases =
+        private static readonly object[][] no_mod_test_cases =
         {
             // With respect to notation,
             // square brackets `[]` represent *closed* or *inclusive* bounds,
@@ -65,30 +66,73 @@ namespace osu.Game.Rulesets.Osu.Tests
             new object[] { 5.7f, 144d, HitResult.Miss },
         };
 
-        [TestCaseSource(nameof(test_cases))]
+        private static readonly object[][] hard_rock_test_cases =
+        {
+            // OD = 5 test cases.
+            // This leads to "effective" OD of 7.
+            // GREAT hit window is ( -38ms,  38ms)
+            // OK    hit window is ( -84ms,  84ms)
+            // MEH   hit window is (-130ms, 130ms)
+            new object[] { 5f, 36d, HitResult.Great },
+            new object[] { 5f, 37d, HitResult.Great },
+            new object[] { 5f, 38d, HitResult.Ok },
+            new object[] { 5f, 39d, HitResult.Ok },
+            new object[] { 5f, 82d, HitResult.Ok },
+            new object[] { 5f, 83d, HitResult.Ok },
+            new object[] { 5f, 84d, HitResult.Meh },
+            new object[] { 5f, 85d, HitResult.Meh },
+            new object[] { 5f, 128d, HitResult.Meh },
+            new object[] { 5f, 129d, HitResult.Meh },
+            new object[] { 5f, 130d, HitResult.Miss },
+            new object[] { 5f, 131d, HitResult.Miss },
+
+            // OD = 8 test cases.
+            // This would lead to "effective" OD of 11.2,
+            // but the effects are capped to OD 10.
+            // GREAT hit window is ( -20ms,  20ms)
+            // OK    hit window is ( -60ms,  60ms)
+            // MEH   hit window is (-100ms, 100ms)
+            new object[] { 8f, 18d, HitResult.Great },
+            new object[] { 8f, 19d, HitResult.Great },
+            new object[] { 8f, 20d, HitResult.Ok },
+            new object[] { 8f, 21d, HitResult.Ok },
+            new object[] { 8f, 58d, HitResult.Ok },
+            new object[] { 8f, 59d, HitResult.Ok },
+            new object[] { 8f, 60d, HitResult.Meh },
+            new object[] { 8f, 61d, HitResult.Meh },
+            new object[] { 8f, 98d, HitResult.Meh },
+            new object[] { 8f, 99d, HitResult.Meh },
+            new object[] { 8f, 100d, HitResult.Miss },
+            new object[] { 8f, 101d, HitResult.Miss },
+        };
+
+        private static readonly object[][] easy_test_cases =
+        {
+            // OD = 5 test cases.
+            // This leads to "effective" OD of 2.5.
+            // GREAT hit window is ( -65ms,  65ms)
+            // OK    hit window is (-120ms, 120ms)
+            // MEH   hit window is (-175ms, 175ms)
+            new object[] { 5f, 63d, HitResult.Great },
+            new object[] { 5f, 64d, HitResult.Great },
+            new object[] { 5f, 65d, HitResult.Ok },
+            new object[] { 5f, 66d, HitResult.Ok },
+            new object[] { 5f, 118d, HitResult.Ok },
+            new object[] { 5f, 119d, HitResult.Ok },
+            new object[] { 5f, 120d, HitResult.Meh },
+            new object[] { 5f, 121d, HitResult.Meh },
+            new object[] { 5f, 173d, HitResult.Meh },
+            new object[] { 5f, 174d, HitResult.Meh },
+            new object[] { 5f, 175d, HitResult.Miss },
+            new object[] { 5f, 176d, HitResult.Miss },
+        };
+
+        private const double hit_circle_time = 100;
+
+        [TestCaseSource(nameof(no_mod_test_cases))]
         public void TestHitWindowTreatment(float overallDifficulty, double hitOffset, HitResult expectedResult)
         {
-            const double hit_circle_time = 100;
-
-            var cpi = new ControlPointInfo();
-            cpi.Add(0, new TimingControlPoint { BeatLength = 1000 });
-            var beatmap = new OsuBeatmap
-            {
-                HitObjects =
-                {
-                    new HitCircle
-                    {
-                        StartTime = hit_circle_time,
-                        Position = OsuPlayfield.BASE_SIZE / 2
-                    }
-                },
-                Difficulty = new BeatmapDifficulty { OverallDifficulty = overallDifficulty },
-                BeatmapInfo =
-                {
-                    Ruleset = new OsuRuleset().RulesetInfo,
-                },
-                ControlPointInfo = cpi,
-            };
+            var beatmap = createBeatmap(overallDifficulty);
 
             var replay = new Replay
             {
@@ -113,6 +157,92 @@ namespace osu.Game.Rulesets.Osu.Tests
             };
 
             RunTest($@"single circle @ OD{overallDifficulty}", beatmap, $@"{hitOffset}ms @ OD{overallDifficulty} = {expectedResult}", score, [expectedResult]);
+        }
+
+        [TestCaseSource(nameof(hard_rock_test_cases))]
+        public void TestHitWindowTreatmentWithHardRock(float overallDifficulty, double hitOffset, HitResult expectedResult)
+        {
+            var beatmap = createBeatmap(overallDifficulty);
+
+            var replay = new Replay
+            {
+                Frames =
+                {
+                    // required for correct playback in stable
+                    new OsuReplayFrame(0, new Vector2(256, -500)),
+                    new OsuReplayFrame(0, new Vector2(256, -500)),
+                    new OsuReplayFrame(0, OsuPlayfield.BASE_SIZE / 2),
+                    new OsuReplayFrame(hit_circle_time + hitOffset, OsuPlayfield.BASE_SIZE / 2, OsuAction.LeftButton),
+                    new OsuReplayFrame(hit_circle_time + hitOffset + 20, OsuPlayfield.BASE_SIZE / 2),
+                }
+            };
+
+            var score = new Score
+            {
+                Replay = replay,
+                ScoreInfo = new ScoreInfo
+                {
+                    Ruleset = CreateRuleset().RulesetInfo,
+                    Mods = [new OsuModHardRock()]
+                }
+            };
+
+            RunTest($@"HR single circle @ OD{overallDifficulty}", beatmap, $@"HR {hitOffset}ms @ OD{overallDifficulty} = {expectedResult}", score, [expectedResult]);
+        }
+
+        [TestCaseSource(nameof(easy_test_cases))]
+        public void TestHitWindowTreatmentWithEasy(float overallDifficulty, double hitOffset, HitResult expectedResult)
+        {
+            var beatmap = createBeatmap(overallDifficulty);
+
+            var replay = new Replay
+            {
+                Frames =
+                {
+                    // required for correct playback in stable
+                    new OsuReplayFrame(0, new Vector2(256, -500)),
+                    new OsuReplayFrame(0, new Vector2(256, -500)),
+                    new OsuReplayFrame(0, OsuPlayfield.BASE_SIZE / 2),
+                    new OsuReplayFrame(hit_circle_time + hitOffset, OsuPlayfield.BASE_SIZE / 2, OsuAction.LeftButton),
+                    new OsuReplayFrame(hit_circle_time + hitOffset + 20, OsuPlayfield.BASE_SIZE / 2),
+                }
+            };
+
+            var score = new Score
+            {
+                Replay = replay,
+                ScoreInfo = new ScoreInfo
+                {
+                    Ruleset = CreateRuleset().RulesetInfo,
+                    Mods = [new OsuModEasy()]
+                }
+            };
+
+            RunTest($@"EZ single circle @ OD{overallDifficulty}", beatmap, $@"EZ {hitOffset}ms @ OD{overallDifficulty} = {expectedResult}", score, [expectedResult]);
+        }
+
+        private static OsuBeatmap createBeatmap(float overallDifficulty)
+        {
+            var cpi = new ControlPointInfo();
+            cpi.Add(0, new TimingControlPoint { BeatLength = 1000 });
+            var beatmap = new OsuBeatmap
+            {
+                HitObjects =
+                {
+                    new HitCircle
+                    {
+                        StartTime = hit_circle_time,
+                        Position = OsuPlayfield.BASE_SIZE / 2
+                    }
+                },
+                Difficulty = new BeatmapDifficulty { OverallDifficulty = overallDifficulty },
+                BeatmapInfo =
+                {
+                    Ruleset = new OsuRuleset().RulesetInfo,
+                },
+                ControlPointInfo = cpi,
+            };
+            return beatmap;
         }
     }
 }

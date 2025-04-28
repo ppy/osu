@@ -32,7 +32,7 @@ using osu.Game.Tests.Visual.Spectator;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    [System.ComponentModel.Description(@"Exercises the appearance of the HUD overlay on various skin and ruleset combinations.")]
+    [Description(@"Exercises the appearance of the HUD overlay on various skin and ruleset combinations.")]
     public partial class TestSceneHUDOverlayRulesetLayouts : OsuTestScene, IStorageResourceProvider
     {
         private readonly Dictionary<string, ISkin> skins = new Dictionary<string, ISkin>();
@@ -74,8 +74,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 var beatmap = ruleset.CreateBeatmapConverter(new Beatmap()).Convert();
                 var drawableRuleset = ruleset.CreateDrawableRulesetWith(beatmap);
 
-                var skin = skins[skinName];
-                ISkin provider = ruleset.CreateSkinTransformer(skin, beatmap) ?? skin;
+                ISkin provider = ruleset.CreateSkinTransformer(skins[skinName], beatmap)!;
 
                 var gameplayState = TestGameplayState.Create(ruleset);
                 ((Bindable<LocalUserPlayingState>)gameplayState.PlayingState).Value = LocalUserPlayingState.Playing;
