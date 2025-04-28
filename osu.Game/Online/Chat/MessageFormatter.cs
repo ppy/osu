@@ -193,6 +193,19 @@ namespace osu.Game.Online.Chat
                                 }
 
                                 break;
+
+                            case @"multiplayer":
+                                if (mainArg != @"rooms")
+                                    return new LinkDetails(LinkAction.External, url);
+
+                                if (args.Length == 5)
+                                {
+                                    // https://osu.ppy.sh/multiplayer/rooms/{id}
+                                    // route used for both multiplayer and playlists
+                                    return new LinkDetails(LinkAction.JoinRoom, args[4]);
+                                }
+
+                                break;
                         }
                     }
 
@@ -231,14 +244,15 @@ namespace osu.Game.Online.Chat
                         case @"u":
                             return getUserLink(args[2]);
 
+                        case @"room":
+                            linkType = LinkAction.JoinRoom;
+                            break;
+
                         default:
                             return new LinkDetails(LinkAction.External, url);
                     }
 
                     return new LinkDetails(linkType, HttpUtility.UrlDecode(args[2]));
-
-                case @"osump":
-                    return new LinkDetails(LinkAction.JoinMultiplayerMatch, args[1]);
             }
 
             return new LinkDetails(LinkAction.External, url);
@@ -337,7 +351,7 @@ namespace osu.Game.Online.Chat
         OpenBeatmapSet,
         OpenChannel,
         OpenEditorTimestamp,
-        JoinMultiplayerMatch,
+        JoinRoom,
         Spectate,
         OpenUserProfile,
         SearchBeatmapSet,
