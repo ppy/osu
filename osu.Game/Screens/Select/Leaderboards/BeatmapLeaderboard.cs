@@ -100,7 +100,7 @@ namespace osu.Game.Screens.Select.Leaderboards
             // For now, we forcefully refresh to keep things simple.
             // In the future, removing this requirement may be deemed useful, but will need ample testing of edge case scenarios
             // (like returning from gameplay after setting a new score, returning to song select after main menu).
-            leaderboardManager.FetchWithCriteria(new LeaderboardCriteria(fetchBeatmapInfo, fetchRuleset, Scope, filterMods ? mods.Value.ToArray() : null), forceRefresh: true);
+            leaderboardManager.FetchWithCriteria(new LeaderboardCriteria(fetchBeatmapInfo, fetchRuleset, Scope, filterMods ? mods.Value.Where(m => m.UserPlayable).ToArray() : null), forceRefresh: true);
 
             if (!initialFetchComplete)
             {
