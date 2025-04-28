@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.IO;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
-using osu.Game.IO.FileAbstraction;
 using osu.Game.Rulesets.Edit.Checks.Components;
 using osu.Game.Storyboards;
 using osu.Game.Utils;
@@ -46,7 +45,7 @@ namespace osu.Game.Rulesets.Edit.Checks
                 try
                 {
                     using (Stream data = context.WorkingBeatmap.GetStream(storagePath))
-                    using (File tagFile = TagLibUtils.CreateFile(new StreamFileAbstraction(filename, data)))
+                    using (File tagFile = TagLibUtils.GetTagLibFile(filename, data))
                     {
                         int height = tagFile.Properties.VideoHeight;
                         int width = tagFile.Properties.VideoWidth;
