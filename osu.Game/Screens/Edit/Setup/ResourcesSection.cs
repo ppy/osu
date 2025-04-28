@@ -102,7 +102,7 @@ namespace osu.Game.Screens.Edit.Setup
 
             try
             {
-                tagSource = TagLib.File.Create(source.FullName);
+                tagSource = TagLibUtils.CreateFile(source.FullName);
             }
             catch (Exception e)
             {
