@@ -129,8 +129,8 @@ namespace osu.Game.Online.Chat
 
             switch (args[0])
             {
-                case "http":
-                case "https":
+                case @"http":
+                case @"https":
                     // length > 3 since all these links need another argument to work
                     if (args.Length > 3 && args[1].EndsWith(WebsiteRootUrl, StringComparison.OrdinalIgnoreCase))
                     {
@@ -139,8 +139,8 @@ namespace osu.Game.Online.Chat
                         switch (args[2])
                         {
                             // old site only
-                            case "b":
-                            case "beatmaps":
+                            case @"b":
+                            case @"beatmaps":
                             {
                                 string trimmed = mainArg.Split('?').First();
                                 if (int.TryParse(trimmed, out int id))
@@ -149,11 +149,11 @@ namespace osu.Game.Online.Chat
                                 break;
                             }
 
-                            case "s":
-                            case "beatmapsets":
-                            case "d":
+                            case @"s":
+                            case @"beatmapsets":
+                            case @"d":
                             {
-                                if (mainArg == "discussions")
+                                if (mainArg == @"discussions")
                                     // handle discussion links externally for now
                                     return new LinkDetails(LinkAction.External, url);
 
@@ -169,15 +169,15 @@ namespace osu.Game.Online.Chat
                                 break;
                             }
 
-                            case "u":
-                            case "users":
+                            case @"u":
+                            case @"users":
                                 return getUserLink(mainArg);
 
-                            case "wiki":
+                            case @"wiki":
                                 return new LinkDetails(LinkAction.OpenWiki, string.Join('/', args.Skip(3)));
 
-                            case "home":
-                                if (mainArg != "changelog")
+                            case @"home":
+                                if (mainArg != @"changelog")
                                     // handle link other than changelog as external for now
                                     return new LinkDetails(LinkAction.External, url);
 
@@ -198,7 +198,7 @@ namespace osu.Game.Online.Chat
 
                     break;
 
-                case "osu":
+                case @"osu":
                     // every internal link also needs some kind of argument
                     if (args.Length < 3)
                         break;
@@ -207,28 +207,28 @@ namespace osu.Game.Online.Chat
 
                     switch (args[1])
                     {
-                        case "chan":
+                        case @"chan":
                             linkType = LinkAction.OpenChannel;
                             break;
 
-                        case "edit":
+                        case @"edit":
                             linkType = LinkAction.OpenEditorTimestamp;
                             break;
 
-                        case "b":
+                        case @"b":
                             linkType = LinkAction.OpenBeatmap;
                             break;
 
-                        case "s":
-                        case "dl":
+                        case @"s":
+                        case @"dl":
                             linkType = LinkAction.OpenBeatmapSet;
                             break;
 
-                        case "spectate":
+                        case @"spectate":
                             linkType = LinkAction.Spectate;
                             break;
 
-                        case "u":
+                        case @"u":
                             return getUserLink(args[2]);
 
                         default:
@@ -237,7 +237,7 @@ namespace osu.Game.Online.Chat
 
                     return new LinkDetails(linkType, HttpUtility.UrlDecode(args[2]));
 
-                case "osump":
+                case @"osump":
                     return new LinkDetails(LinkAction.JoinMultiplayerMatch, args[1]);
             }
 
