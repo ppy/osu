@@ -279,7 +279,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             scores[1].Mods = new Mod[] { new OsuModHidden(), new OsuModDoubleTime { SpeedChange = { Value = 2 } }, new OsuModHardRock(), new OsuModFlashlight() };
             scores[2].Mods = new Mod[] { new OsuModHidden(), new OsuModDoubleTime(), new OsuModHardRock(), new OsuModFlashlight(), new OsuModClassic() };
             scores[3].Mods = new Mod[]
-                { new OsuModHidden(), new OsuModDoubleTime(), new OsuModHardRock(), new OsuModFlashlight { ComboBasedSize = { Value = false } }, new OsuModClassic(), new OsuModDifficultyAdjust() };
+                { new OsuModHidden(), new OsuModDoubleTime(), new OsuModHardRock(), new OsuModFlashlight { ComboBasedSize = { Value = false } }, new OsuModClassic(), new OsuModDifficultyAdjust { CircleSize = { Value = 3.2f } } };
             scores[4].Mods = new ManiaRuleset().CreateAllMods().ToArray();
 
             return scores;
