@@ -89,11 +89,11 @@ namespace osu.Game.Graphics.UserInterface
         {
             Height = height;
 
-            CornerRadius = CORNER_RADIUS;
             Shear = OsuGame.SHEAR;
-            Masking = true;
 
             Content.Anchor = Content.Origin = Anchor.Centre;
+            Content.CornerRadius = CORNER_RADIUS;
+            Content.Masking = true;
 
             Children = new Drawable[]
             {
