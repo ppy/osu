@@ -97,7 +97,7 @@ namespace osu.Game.Screens.Footer
                             footerContentContainer = new Container
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Y = -15f,
+                                Y = -OsuGame.SCREEN_EDGE_MARGIN,
                             },
                         },
                     }
