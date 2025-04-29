@@ -125,7 +125,14 @@ namespace osu.Game.Online.Leaderboards
 
                         var result = LeaderboardScores.Success
                         (
-                            response.Scores.Select(s => s.ToScoreInfo(rulesets, newCriteria.Beatmap)).OrderByTotalScore().ToArray(),
+                            response.Scores.Select(s => s.ToScoreInfo(rulesets, newCriteria.Beatmap))
+                                    .OrderByTotalScore()
+                                    .Select((s, idx) =>
+                                    {
+                                        s.Position = idx + 1;
+                                        return s;
+                                    })
+                                    .ToArray(),
                             response.UserScore?.CreateScoreInfo(rulesets, newCriteria.Beatmap)
                         );
                         inFlightOnlineRequest = null;
