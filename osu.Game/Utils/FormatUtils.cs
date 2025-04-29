@@ -59,11 +59,8 @@ namespace osu.Game.Utils
         /// <summary>
         /// Applies rounding to the given BPM value.
         /// </summary>
-        /// <remarks>
-        /// Double-rounding is applied intentionally (see https://github.com/ppy/osu/pull/18345#issue-1243311382 for rationale).
-        /// </remarks>
         /// <param name="baseBpm">The base BPM to round.</param>
         /// <param name="rate">Rate adjustment, if applicable.</param>
-        public static int RoundBPM(double baseBpm, double rate = 1) => (int)Math.Round(Math.Round(baseBpm) * rate);
+        public static int RoundBPM(double baseBpm, double rate = 1) => (int)Math.Round(baseBpm * rate);
     }
 }
