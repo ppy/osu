@@ -63,30 +63,68 @@ namespace osu.Game.Screens.Ranking
                 return [];
             }
 
-            var toDisplay = new List<ScoreInfo>();
+            var clonedScores = result.AllScores.Select(s => s.DeepClone()).ToArray();
 
-            var scores = result.AllScores.Select(s => s.DeepClone()).ToList();
+            List<ScoreInfo> sortedScores = [];
 
-            for (int i = 0; i < scores.Count; ++i)
+            foreach (var clonedScore in clonedScores)
             {
-                var score = scores[i];
-                int position = i + 1;
-
-                if (score.MatchesOnlineID(Score))
+                // ensure that we do not double up on the score being presented here.
+                // additionally, ensure that the reference that ends up in `sortedScores` is the `Score` reference specifically.
+                // this simplifies handling later.
+                if (clonedScore.Equals(Score) || clonedScore.MatchesOnlineID(Score))
                 {
-                    // we don't want to add the same score twice, but also setting any properties of `Score` this late will have no visible effect,
-                    // so we have to fish out the actual drawable panel and set the position to it directly.
-                    var panel = ScorePanelList.GetPanelForScore(Score);
-                    Score.Position = panel.ScorePosition.Value = position;
+                    Score.Position = clonedScore.Position;
+                    sortedScores.Add(Score);
                 }
                 else
+                    sortedScores.Add(clonedScore);
+            }
+
+            // if we haven't encountered a match for the presented score, we still need to attach it.
+            // note that the above block ensuring that the `Score` reference makes it in here makes this valid to write in this way.
+            if (!sortedScores.Contains(Score))
+                sortedScores.Add(Score);
+
+            sortedScores = sortedScores.OrderByTotalScore().ToList();
+
+            int delta = 0;
+            bool isPartialLeaderboard = leaderboardManager.CurrentCriteria?.Scope != BeatmapLeaderboardScope.Local && result.TopScores.Count >= 50;
+
+            for (int i = 0; i < sortedScores.Count; i++)
+            {
+                var sortedScore = sortedScores[i];
+
+                if (!isPartialLeaderboard)
+                    sortedScore.Position = i + 1;
+                else
                 {
-                    score.Position = position;
-                    toDisplay.Add(score);
+                    if (ReferenceEquals(sortedScore, Score) && sortedScore.Position == null)
+                    {
+                        int? previousScorePosition = i > 0 ? sortedScores[i - 1].Position : 0;
+                        int? nextScorePosition = i < result.TopScores.Count - 1 ? sortedScores[i + 1].Position : null;
+
+                        if (previousScorePosition != null && nextScorePosition != null && previousScorePosition + 1 == nextScorePosition)
+                        {
+                            sortedScore.Position = previousScorePosition + 1;
+                            delta += 1;
+                        }
+                        else
+                            sortedScore.Position = null;
+                    }
+                    else
+                        sortedScore.Position += delta;
                 }
             }
 
-            return toDisplay.ToArray();
+            // there's a non-zero chance that the `Score`'s `ScorePosition` was mutated above,
+            // but the two are not actually coupled together in any way,
+            // so ensure that the drawable panel also receives the updated position.
+            // note that this is valid to do precisely because we ensured `Score` was in `sortedScores` earlier.
+            ScorePanelList.GetPanelForScore(Score).ScorePosition.Value = Score.Position;
+
+            sortedScores.Remove(Score);
+            return sortedScores.ToArray();
         }
     }
 }
