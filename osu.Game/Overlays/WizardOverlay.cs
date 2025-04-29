@@ -243,12 +243,10 @@ namespace osu.Game.Overlays
             {
                 RelativeSizeAxes = Axes.Both;
 
-                Padding = new MarginPadding { Horizontal = 20 };
+                Padding = new MarginPadding { Right = OsuGame.SCREEN_EDGE_MARGIN };
 
                 InternalChild = NextButton = new ShearedButton(0)
                 {
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
                     RelativeSizeAxes = Axes.X,
                     Width = 1,
                     Text = FirstRunSetupOverlayStrings.GetStarted,
