@@ -155,7 +155,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             {
                 var (working, onlineSet) = createTestBeatmap();
 
-                onlineSet.Beatmaps = Array.Empty<APIBeatmap>();
+                working.BeatmapInfo.ResetOnlineInfo();
 
                 currentOnlineSet = onlineSet;
                 Beatmap.Value = working;
