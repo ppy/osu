@@ -257,12 +257,11 @@ namespace osu.Game.Screens.SelectV2
                         {
                             Show();
 
-                            modsFlow.ChildrenEnumerable = mods.AsOrdered().Select(m => new ModSwitchTiny(m)
+                            modsFlow.ChildrenEnumerable = mods.AsOrdered().Select(m => new ModIcon(m)
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                                Scale = new Vector2(0.3125f),
-                                Active = { Value = true },
+                                Scale = new Vector2(0.3f),
                             });
                         }
                     }
@@ -301,7 +300,7 @@ namespace osu.Game.Screens.SelectV2
                             AutoSizeAxes = Axes.Y,
                             Margin = new MarginPadding { Bottom = 6f, Top = 6f + spacing },
                             Padding = new MarginPadding { Horizontal = 16f },
-                            Spacing = new Vector2(2.5f),
+                            Spacing = new Vector2(2f, -4f),
                         },
                     };
                 }

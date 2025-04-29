@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
@@ -25,7 +24,6 @@ using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Online.API;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays;
@@ -106,7 +104,7 @@ namespace osu.Game.Screens.SelectV2
 
         private Container rightContent = null!;
 
-        private FillFlowContainer modsContainer = null!;
+        private FillFlowContainer<Drawable> modsContainer = null!;
 
         private Box totalScoreBackground = null!;
 
@@ -422,6 +420,7 @@ namespace osu.Game.Screens.SelectV2
                                                             Origin = Anchor.CentreLeft,
                                                             Direction = FillDirection.Vertical,
                                                             Padding = new MarginPadding { Horizontal = corner_radius },
+                                                            Spacing = new Vector2(0f, -2f),
                                                             Children = new Drawable[]
                                                             {
                                                                 new OsuSpriteText
@@ -429,22 +428,22 @@ namespace osu.Game.Screens.SelectV2
                                                                     Anchor = Anchor.TopRight,
                                                                     Origin = Anchor.TopRight,
                                                                     UseFullGlyphHeight = false,
-                                                                    Shear = sheared ? -OsuGame.SHEAR : Vector2.Zero,
                                                                     Current = scoreManager.GetBindableTotalScoreString(score),
                                                                     Spacing = new Vector2(-1.5f),
                                                                     Font = OsuFont.Style.Subtitle.With(weight: FontWeight.Light, fixedWidth: true),
+                                                                    Shear = sheared ? -OsuGame.SHEAR : Vector2.Zero,
                                                                 },
                                                                 new InputBlockingContainer
                                                                 {
                                                                     Anchor = Anchor.TopRight,
                                                                     Origin = Anchor.TopRight,
                                                                     AutoSizeAxes = Axes.Both,
-                                                                    Child = modsContainer = new FillFlowContainer
+                                                                    Child = modsContainer = new FillFlowContainer<Drawable>
                                                                     {
-                                                                        Shear = sheared ? -OsuGame.SHEAR : Vector2.Zero,
                                                                         AutoSizeAxes = Axes.Both,
                                                                         Direction = FillDirection.Horizontal,
-                                                                        Spacing = new Vector2(2f, 0f),
+                                                                        Spacing = new Vector2(-10, 0),
+                                                                        Shear = sheared ? -OsuGame.SHEAR : Vector2.Zero,
                                                                     },
                                                                 },
                                                             }
@@ -488,24 +487,15 @@ namespace osu.Game.Screens.SelectV2
 
         private void updateModDisplay()
         {
-            int maxMods = scoringMode.Value == ScoringMode.Standardised ? 4 : 5;
-
             if (score.Mods.Length > 0)
             {
                 modsContainer.Padding = new MarginPadding { Top = 4f };
-                modsContainer.ChildrenEnumerable = score.Mods.AsOrdered().Take(Math.Min(maxMods, score.Mods.Length)).Select(mod => new ColouredModSwitchTiny(mod)
+                modsContainer.ChildrenEnumerable = score.Mods.AsOrdered().Select(mod => new ModIcon(mod)
                 {
-                    Scale = new Vector2(0.3125f)
+                    Scale = new Vector2(0.3f),
+                    // trim mod icon height down to its true height for alignment purposes.
+                    Height = ModIcon.MOD_ICON_SIZE.Y * 3 / 4f,
                 });
-
-                if (score.Mods.Length > maxMods)
-                {
-                    modsContainer.Remove(modsContainer[^1], true);
-                    modsContainer.Add(new MoreModSwitchTiny(score.Mods)
-                    {
-                        Scale = new Vector2(0.3125f),
-                    });
-                }
             }
         }
 
@@ -715,97 +705,6 @@ namespace osu.Game.Screens.SelectV2
             }
 
             public LocalisableString TooltipText { get; }
-        }
-
-        private sealed partial class ColouredModSwitchTiny : ModSwitchTiny, IHasCustomTooltip<Mod>
-        {
-            [Resolved]
-            private OverlayColourProvider colourProvider { get; set; } = null!;
-
-            public ColouredModSwitchTiny(Mod mod)
-                : base(mod)
-            {
-                Active.Value = true;
-            }
-
-            public ITooltip<Mod> GetCustomTooltip() => new ModTooltip(colourProvider);
-
-            Mod IHasCustomTooltip<Mod>.TooltipContent => (Mod)Mod;
-        }
-
-        private sealed partial class MoreModSwitchTiny : CompositeDrawable, IHasPopover
-        {
-            private readonly IReadOnlyList<Mod> mods;
-
-            public MoreModSwitchTiny(IReadOnlyList<Mod> mods)
-            {
-                this.mods = mods;
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OverlayColourProvider colourProvider)
-            {
-                Size = new Vector2(ModSwitchTiny.WIDTH, ModSwitchTiny.DEFAULT_HEIGHT);
-
-                InternalChild = new CircularContainer
-                {
-                    Masking = true,
-                    RelativeSizeAxes = Axes.Both,
-                    Children = new Drawable[]
-                    {
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = colourProvider.Background6,
-                        },
-                        new OsuSpriteText
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Shadow = false,
-                            Font = OsuFont.Torus.With(size: 24, weight: FontWeight.Bold),
-                            Text = ". . .",
-                            Colour = Color4.White,
-                            UseFullGlyphHeight = false,
-                            Margin = new MarginPadding
-                            {
-                                Top = 4
-                            }
-                        }
-                    }
-                };
-            }
-
-            protected override bool OnClick(ClickEvent e)
-            {
-                this.ShowPopover();
-                return true;
-            }
-
-            protected override bool OnHover(HoverEvent e) => true;
-
-            public Popover GetPopover() => new MoreModsPopover(mods);
-
-            public partial class MoreModsPopover : OsuPopover
-            {
-                public MoreModsPopover(IReadOnlyList<Mod> mods)
-                {
-                    AutoSizeAxes = Axes.Both;
-                    AllowableAnchors = new[] { Anchor.CentreLeft, Anchor.CentreRight };
-
-                    Child = new FillFlowContainer
-                    {
-                        Width = 125f,
-                        AutoSizeAxes = Axes.Y,
-                        Direction = FillDirection.Full,
-                        Spacing = new Vector2(2.5f),
-                        ChildrenEnumerable = mods.AsOrdered().Select(m => new ColouredModSwitchTiny(m)
-                        {
-                            Scale = new Vector2(0.3125f),
-                        })
-                    };
-                }
-            }
         }
     }
 }
