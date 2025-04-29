@@ -65,6 +65,8 @@ namespace osu.Game.Screens.Footer
         [BackgroundDependencyLoader]
         private void load()
         {
+            const float footer_button_y_offset = 10;
+
             InternalChildren = new Drawable[]
             {
                 background = new Box
@@ -75,7 +77,7 @@ namespace osu.Game.Screens.Footer
                 new GridContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Left = 12f + ScreenBackButton.BUTTON_WIDTH + padding },
+                    Padding = new MarginPadding { Left = OsuGame.SCREEN_EDGE_MARGIN + ScreenBackButton.BUTTON_WIDTH + padding },
                     ColumnDimensions = new[]
                     {
                         new Dimension(GridSizeMode.AutoSize),
@@ -89,7 +91,7 @@ namespace osu.Game.Screens.Footer
                             {
                                 Anchor = Anchor.BottomLeft,
                                 Origin = Anchor.BottomLeft,
-                                Y = 10f,
+                                Y = footer_button_y_offset,
                                 Direction = FillDirection.Horizontal,
                                 Spacing = new Vector2(7, 0),
                                 AutoSizeAxes = Axes.Both,
@@ -112,7 +114,7 @@ namespace osu.Game.Screens.Footer
                 hiddenButtonsContainer = new Container<ScreenFooterButton>
                 {
                     Margin = new MarginPadding { Left = OsuGame.SCREEN_EDGE_MARGIN + ScreenBackButton.BUTTON_WIDTH + padding },
-                    Y = 10f,
+                    Y = footer_button_y_offset,
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                     AutoSizeAxes = Axes.Both,
