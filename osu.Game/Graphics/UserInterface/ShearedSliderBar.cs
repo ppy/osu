@@ -73,33 +73,25 @@ namespace osu.Game.Graphics.UserInterface
                 mainContent = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Masking = true,
-                    CornerRadius = 5,
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
-                    Child = new Container
+                    Masking = true,
+                    CornerRadius = 5,
+                    Children = new Drawable[]
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                        Masking = true,
-                        CornerRadius = 5,
-                        Children = new Drawable[]
+                        LeftBox = new Box
                         {
-                            LeftBox = new Box
-                            {
-                                EdgeSmoothness = new Vector2(0, 0.5f),
-                                RelativeSizeAxes = Axes.Y,
-                                Anchor = Anchor.CentreLeft,
-                                Origin = Anchor.CentreLeft,
-                            },
-                            RightBox = new Box
-                            {
-                                EdgeSmoothness = new Vector2(0, 0.5f),
-                                RelativeSizeAxes = Axes.Y,
-                                Anchor = Anchor.CentreRight,
-                                Origin = Anchor.CentreRight,
-                            },
+                            EdgeSmoothness = new Vector2(0, 0.5f),
+                            RelativeSizeAxes = Axes.Y,
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                        },
+                        RightBox = new Box
+                        {
+                            EdgeSmoothness = new Vector2(0, 0.5f),
+                            RelativeSizeAxes = Axes.Y,
+                            Anchor = Anchor.CentreRight,
+                            Origin = Anchor.CentreRight,
                         },
                     },
                 },
@@ -200,8 +192,9 @@ namespace osu.Game.Graphics.UserInterface
         protected override void UpdateAfterChildren()
         {
             base.UpdateAfterChildren();
-            LeftBox.Scale = new Vector2(Math.Clamp(RangePadding + Nub.DrawPosition.X - Nub.DrawWidth / 2f + ShearedNub.CORNER_RADIUS - 0.5f, 0, Math.Max(0, DrawWidth)), 1);
-            RightBox.Scale = new Vector2(Math.Clamp(DrawWidth - RangePadding - Nub.DrawPosition.X - Nub.DrawWidth / 2f + ShearedNub.CORNER_RADIUS - 0.5f, 0, Math.Max(0, DrawWidth)), 1);
+
+            LeftBox.Size = new Vector2(Math.Clamp(RangePadding + Nub.DrawPosition.X - Nub.DrawWidth / 2f + ShearedNub.CORNER_RADIUS - 0.5f, 0, Math.Max(0, DrawWidth)), 1);
+            RightBox.Size = new Vector2(Math.Clamp(DrawWidth - RangePadding - Nub.DrawPosition.X - Nub.DrawWidth / 2f + ShearedNub.CORNER_RADIUS - 0.5f, 0, Math.Max(0, DrawWidth)), 1);
         }
 
         protected override void UpdateValue(float value)
