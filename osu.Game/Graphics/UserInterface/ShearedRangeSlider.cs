@@ -72,13 +72,29 @@ namespace osu.Game.Graphics.UserInterface
         private float minRange = 0.1f;
 
         protected Container SliderContainer { get; private set; } = null!;
+
         protected BoundSliderBar LowerBoundSlider { get; private set; } = null!;
         protected BoundSliderBar UpperBoundSlider { get; private set; } = null!;
+
+        protected Vector2 ScreenSpaceHalfwayPoint
+        {
+            get
+            {
+                var lowerSS = LowerBoundSlider.Nub.ScreenSpaceDrawQuad.TopLeft;
+                var upperSS = UpperBoundSlider.Nub.ScreenSpaceDrawQuad.TopLeft;
+
+                return lowerSS + (upperSS - lowerSS) / 2;
+            }
+        }
 
         public ShearedRangeSlider(LocalisableString label)
         {
             this.label = label;
         }
+
+        // Special case: we want to limit input to the bounds of this control but not enable masking (which would break with shear).
+        protected override bool ReceivePositionalInputAtSubTree(Vector2 screenSpacePos)
+            => ReceivePositionalInputAt(screenSpacePos);
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
@@ -165,10 +181,11 @@ namespace osu.Game.Graphics.UserInterface
             UpperBoundSlider.Current.ValueChanged += max => LowerBoundSlider.Current.Value = Math.Min(max.NewValue - minRange, LowerBoundSlider.Current.Value);
         }
 
-        protected virtual BoundSliderBar CreateBoundSlider(bool isUpper) => new BoundSliderBar(isUpper);
+        protected virtual BoundSliderBar CreateBoundSlider(bool isUpper) => new BoundSliderBar(this, isUpper);
 
         protected partial class BoundSliderBar : ShearedSliderBar<double>
         {
+            private readonly ShearedRangeSlider rangeSlider;
             private readonly bool isUpper;
 
             public new ShearedNub Nub => base.Nub;
@@ -188,8 +205,9 @@ namespace osu.Game.Graphics.UserInterface
 
             public override bool AcceptsFocus => false;
 
-            public BoundSliderBar(bool isUpper)
+            public BoundSliderBar(ShearedRangeSlider rangeSlider, bool isUpper)
             {
+                this.rangeSlider = rangeSlider;
                 this.isUpper = isUpper;
             }
 
@@ -238,9 +256,9 @@ namespace osu.Game.Graphics.UserInterface
             public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
             {
                 if (isUpper)
-                    return base.ReceivePositionalInputAt(screenSpacePos) && screenSpacePos.X >= Nub.ScreenSpaceDrawQuad.TopLeft.X;
+                    return screenSpacePos.X > rangeSlider.ScreenSpaceHalfwayPoint.X;
 
-                return base.ReceivePositionalInputAt(screenSpacePos) && screenSpacePos.X <= Nub.ScreenSpaceDrawQuad.TopRight.X;
+                return screenSpacePos.X <= rangeSlider.ScreenSpaceHalfwayPoint.X;
             }
 
             protected override bool OnHover(HoverEvent e)
