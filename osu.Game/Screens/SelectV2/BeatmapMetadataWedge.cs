@@ -35,6 +35,9 @@ namespace osu.Game.Screens.SelectV2
         private Drawable failRetryWedge = null!;
         private FailRetryDisplay failRetryDisplay = null!;
 
+        public bool RatingsVisible => ratingsWedge.Alpha > 0;
+        public bool FailRetryVisible => failRetryWedge.Alpha > 0;
+
         protected override bool StartHidden => true;
 
         [Resolved]
@@ -250,7 +253,10 @@ namespace osu.Game.Screens.SelectV2
             // We could consider hiding individual wedges based on zero data in the future.
             // Needs some experimentation on what looks good.
 
-            if (State.Value == Visibility.Visible && currentOnlineBeatmapSet != null)
+            var beatmapInfo = beatmap.Value.BeatmapInfo;
+            var currentOnlineBeatmap = currentOnlineBeatmapSet?.Beatmaps.SingleOrDefault(b => b.OnlineID == beatmapInfo.OnlineID);
+
+            if (State.Value == Visibility.Visible && currentOnlineBeatmap != null)
             {
                 ratingsWedge.FadeIn(transition_duration, Easing.OutQuint)
                             .MoveToX(0, transition_duration, Easing.OutQuint);
