@@ -87,6 +87,10 @@ namespace osu.Game.Rulesets.Mods
         /// <summary>
         /// Whether any user adjustable setting attached to this mod has a non-default value.
         /// </summary>
+        /// <remarks>
+        /// This returns the instantaneous state of this mod. It may change over time.
+        /// For tracking changes on a dynamic display, make sure to setup a <see cref="ModSettingChangeTracker"/>.
+        /// </remarks>
         bool HasNonDefaultSettings
         {
             get
