@@ -84,6 +84,9 @@ namespace osu.Game.Rulesets.UI
 
         private Drawable adjustmentMarker = null!;
 
+        private Circle cogBackground = null!;
+        private SpriteIcon cog = null!;
+
         private ModSettingChangeTracker? modSettingsChangeTracker;
 
         /// <summary>
@@ -175,21 +178,19 @@ namespace osu.Game.Rulesets.UI
                             Position = new Vector2(64, 14),
                             Children = new Drawable[]
                             {
-                                new Circle
+                                cogBackground = new Circle
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
-                                    Colour = colours.YellowLight,
                                     RelativeSizeAxes = Axes.Both,
                                 },
-                                new SpriteIcon
+                                cog = new SpriteIcon
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
                                     Icon = FontAwesome.Solid.Cog,
-                                    Colour = colours.YellowDark,
                                     RelativeSizeAxes = Axes.Both,
-                                    Size = new Vector2(0.7f),
+                                    Size = new Vector2(0.6f),
                                 }
                             }
                         },
@@ -254,6 +255,8 @@ namespace osu.Game.Rulesets.UI
         private void updateColour()
         {
             modAcronym.Colour = modIcon.Colour = Interpolation.ValueAt<Colour4>(0.1f, Colour4.Black, backgroundColour, 0, 1);
+            cogBackground.Colour = Interpolation.ValueAt<Colour4>(0.1f, Colour4.Black, backgroundColour, 0, 1);
+            cog.Colour = backgroundColour;
 
             extendedText.Colour = background.Colour = Selected.Value ? backgroundColour.Lighten(0.2f) : backgroundColour;
             extendedBackground.Colour = Selected.Value ? backgroundColour.Darken(2.4f) : backgroundColour.Darken(2.8f);
