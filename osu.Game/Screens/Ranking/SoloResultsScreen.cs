@@ -117,8 +117,8 @@ namespace osu.Game.Screens.Ranking
                 }
             }
 
-            // there's a non-zero chance that the `Score`'s `ScorePosition` was mutated above,
-            // but the two are not actually coupled together in any way,
+            // there's a non-zero chance that the `Score.Position` was mutated above,
+            // but that is not actually coupled to `ScorePosition` of the relevant score panel in any way,
             // so ensure that the drawable panel also receives the updated position.
             // note that this is valid to do precisely because we ensured `Score` was in `sortedScores` earlier.
             ScorePanelList.GetPanelForScore(Score).ScorePosition.Value = Score.Position;
