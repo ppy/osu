@@ -76,6 +76,27 @@ namespace osu.Game.Rulesets.Mods
         }
 
         /// <summary>
+        /// The number of settings on this mod instance which have been adjusted by the user from their default values.
+        /// </summary>
+        public int UserAdjustedSettingsCount
+        {
+            get
+            {
+                int count = 0;
+
+                foreach (var (_, property) in this.GetSettingsSourceProperties())
+                {
+                    var bindable = (IBindable)property.GetValue(this)!;
+
+                    if (!bindable.IsDefault)
+                        count++;
+                }
+
+                return count;
+            }
+        }
+
+        /// <summary>
         /// The score multiplier of this mod.
         /// </summary>
         [JsonIgnore]

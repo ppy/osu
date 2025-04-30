@@ -21,21 +21,11 @@ namespace osu.Game.Rulesets.Taiko.Mods
             ReadCurrentFromDifficulty = _ => 1,
         };
 
-        public override int AdjustedSettingsCount
-        {
-            get
-            {
-                int count = base.AdjustedSettingsCount;
-                if (!ScrollSpeed.IsDefault) count++;
-                return count;
-            }
-        }
-
         public override string ExtendedIconInformation
         {
             get
             {
-                if (AdjustedSettingsCount != 1)
+                if (UserAdjustedSettingsCount != 1)
                     return string.Empty;
 
                 if (!ScrollSpeed.IsDefault) return format("SC", ScrollSpeed);
