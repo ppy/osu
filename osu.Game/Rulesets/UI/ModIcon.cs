@@ -236,11 +236,6 @@ namespace osu.Game.Rulesets.UI
             backgroundColour = colours.ForModType(value.Type);
             updateColour();
 
-            if (mod.HasNonDefaultSettings)
-                adjustmentMarker.Show();
-            else
-                adjustmentMarker.Hide();
-
             updateExtendedInformation();
         }
 
@@ -250,6 +245,11 @@ namespace osu.Game.Rulesets.UI
 
             extendedContent.Alpha = showExtended ? 1 : 0;
             extendedText.Text = mod.ExtendedIconInformation;
+
+            if (mod.HasNonDefaultSettings)
+                adjustmentMarker.Show();
+            else
+                adjustmentMarker.Hide();
         }
 
         private void updateColour()
