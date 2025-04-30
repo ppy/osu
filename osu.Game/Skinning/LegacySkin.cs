@@ -148,10 +148,6 @@ namespace osu.Game.Skinning
                     Debug.Assert(maniaLookup.ColumnIndex != null);
                     return SkinUtils.As<TValue>(new Bindable<float>(existing.WidthForNoteHeightScale));
 
-                case LegacyManiaSkinConfigurationLookups.ColumnSpacing:
-                    Debug.Assert(maniaLookup.ColumnIndex != null);
-                    return SkinUtils.As<TValue>(new Bindable<float>(existing.ColumnSpacing[maniaLookup.ColumnIndex.Value]));
-
                 case LegacyManiaSkinConfigurationLookups.HitPosition:
                     return SkinUtils.As<TValue>(new Bindable<float>(existing.HitPosition));
 
@@ -277,6 +273,20 @@ namespace osu.Game.Skinning
                 case LegacyManiaSkinConfigurationLookups.RightLineWidth:
                     Debug.Assert(maniaLookup.ColumnIndex != null);
                     return SkinUtils.As<TValue>(new Bindable<float>(existing.ColumnLineWidth[maniaLookup.ColumnIndex.Value + 1]));
+
+                case LegacyManiaSkinConfigurationLookups.LeftColumnSpacing:
+                    Debug.Assert(maniaLookup.ColumnIndex != null);
+                    if (maniaLookup.ColumnIndex == 0)
+                        return SkinUtils.As<TValue>(new Bindable<float>());
+
+                    return SkinUtils.As<TValue>(new Bindable<float>(existing.ColumnSpacing[maniaLookup.ColumnIndex.Value - 1] / 2));
+
+                case LegacyManiaSkinConfigurationLookups.RightColumnSpacing:
+                    Debug.Assert(maniaLookup.ColumnIndex != null);
+                    if (maniaLookup.ColumnIndex == existing.ColumnSpacing.Length)
+                        return SkinUtils.As<TValue>(new Bindable<float>());
+
+                    return SkinUtils.As<TValue>(new Bindable<float>(existing.ColumnSpacing[maniaLookup.ColumnIndex.Value] / 2));
 
                 case LegacyManiaSkinConfigurationLookups.Hit0:
                 case LegacyManiaSkinConfigurationLookups.Hit50:

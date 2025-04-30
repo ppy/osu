@@ -37,7 +37,6 @@ namespace osu.Game.Skinning
     public enum LegacyManiaSkinConfigurationLookups
     {
         ColumnWidth,
-        ColumnSpacing,
         LightImage,
         LeftLineWidth,
         RightLineWidth,
@@ -83,6 +82,8 @@ namespace osu.Game.Skinning
         Hit0,
         KeysUnderNotes,
         NoteBodyStyle,
-        LightFramePerSecond
+        LightFramePerSecond,
+        LeftColumnSpacing,
+        RightColumnSpacing,
     }
 }
