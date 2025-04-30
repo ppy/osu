@@ -184,6 +184,8 @@ namespace osu.Game.Graphics.UserInterface
             private readonly ShearedRangeSlider rangeSlider;
             private readonly bool isUpper;
 
+            public new float NormalizedValue => base.NormalizedValue;
+
             public new ShearedNub Nub => base.Nub;
 
             public string? DefaultString;
