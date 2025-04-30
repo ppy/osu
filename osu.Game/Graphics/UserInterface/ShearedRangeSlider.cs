@@ -92,10 +92,6 @@ namespace osu.Game.Graphics.UserInterface
             this.label = label;
         }
 
-        // Special case: we want to limit input to the bounds of this control but not enable masking (which would break with shear).
-        protected override bool ReceivePositionalInputAtSubTree(Vector2 screenSpacePos)
-            => ReceivePositionalInputAt(screenSpacePos);
-
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
         {
@@ -254,9 +250,9 @@ namespace osu.Game.Graphics.UserInterface
             public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
             {
                 if (isUpper)
-                    return screenSpacePos.X > rangeSlider.ScreenSpaceHalfwayPoint.X;
+                    return base.ReceivePositionalInputAt(screenSpacePos) && screenSpacePos.X > rangeSlider.ScreenSpaceHalfwayPoint.X;
 
-                return screenSpacePos.X <= rangeSlider.ScreenSpaceHalfwayPoint.X;
+                return base.ReceivePositionalInputAt(screenSpacePos) && screenSpacePos.X <= rangeSlider.ScreenSpaceHalfwayPoint.X;
             }
 
             protected override void UpdateAfterChildren()
