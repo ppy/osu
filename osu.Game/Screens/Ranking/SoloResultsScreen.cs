@@ -95,6 +95,9 @@ namespace osu.Game.Screens.Ranking
             {
                 var sortedScore = sortedScores[i];
 
+                // see `SoloGameplayLeaderboardProvider.sort()` for another place that does the same thing with slight deviations
+                // if this code is changed, that code should probably be changed as well
+
                 if (!isPartialLeaderboard)
                     sortedScore.Position = i + 1;
                 else
