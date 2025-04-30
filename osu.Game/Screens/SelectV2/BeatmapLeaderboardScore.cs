@@ -334,8 +334,7 @@ namespace osu.Game.Screens.SelectV2
                                     RelativeSizeAxes = Axes.Y,
                                     Child = new Container
                                     {
-                                        AutoSizeAxes = Axes.X,
-                                        RelativeSizeAxes = Axes.Y,
+                                        RelativeSizeAxes = Axes.Both,
                                         Anchor = Anchor.TopRight,
                                         Origin = Anchor.TopRight,
                                         Children = new Drawable[]
@@ -390,15 +389,13 @@ namespace osu.Game.Screens.SelectV2
                                             },
                                             new Container
                                             {
-                                                AutoSizeAxes = Axes.X,
-                                                RelativeSizeAxes = Axes.Y,
+                                                RelativeSizeAxes = Axes.Both,
                                                 Anchor = Anchor.CentreLeft,
                                                 Origin = Anchor.CentreLeft,
                                                 Padding = new MarginPadding { Right = grade_width },
                                                 Child = new Container
                                                 {
-                                                    AutoSizeAxes = Axes.X,
-                                                    RelativeSizeAxes = Axes.Y,
+                                                    RelativeSizeAxes = Axes.Both,
                                                     Masking = true,
                                                     CornerRadius = corner_radius,
                                                     Children = new Drawable[]
@@ -416,8 +413,8 @@ namespace osu.Game.Screens.SelectV2
                                                         new FillFlowContainer
                                                         {
                                                             AutoSizeAxes = Axes.Both,
-                                                            Anchor = Anchor.CentreLeft,
-                                                            Origin = Anchor.CentreLeft,
+                                                            Anchor = Anchor.CentreRight,
+                                                            Origin = Anchor.CentreRight,
                                                             Direction = FillDirection.Vertical,
                                                             Padding = new MarginPadding { Horizontal = corner_radius },
                                                             Spacing = new Vector2(0f, -2f),
