@@ -23,7 +23,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         };
 
         private Container? resizeContainer;
-        private float relativeWidth;
 
         protected virtual Anchor ComponentAnchor => Anchor.TopLeft;
         protected virtual float InitialRelativeWidth => 0.5f;
@@ -40,7 +39,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                     Origin = ComponentAnchor,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Width = relativeWidth,
+                    Width = InitialRelativeWidth,
                     Child = Content
                 }
             };
@@ -49,8 +48,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             {
                 if (resizeContainer != null)
                     resizeContainer.Width = v;
-
-                relativeWidth = v;
             });
         }
 
