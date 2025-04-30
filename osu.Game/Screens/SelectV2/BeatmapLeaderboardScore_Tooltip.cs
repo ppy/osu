@@ -102,13 +102,7 @@ namespace osu.Game.Screens.SelectV2
                         relativeDate.Date = value.Date;
 
                         var judgementsStatistics = value.GetStatisticsForDisplay().Select(s =>
-                        {
-                            Colour4 colour = colours.ForHitResult(s.Result);
-                            var hsl = colour.ToHSL();
-
-                            Colour4 lightColour = Colour4.FromHSL(hsl.X, hsl.Y, 0.8f);
-                            return new StatisticRow(s.DisplayName.ToUpper(), lightColour, s.Count.ToLocalisableString("N0"));
-                        });
+                            new StatisticRow(s.DisplayName.ToUpper(), colours.ForHitResult(s.Result), s.Count.ToLocalisableString("N0")));
 
                         double multiplier = 1.0;
 
