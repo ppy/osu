@@ -62,7 +62,7 @@ namespace osu.Game.Overlays.Mods
                             {
                                 new OsuSpriteText
                                 {
-                                    Text = "One or more values are being adjusted by mods that change speed.",
+                                    Text = "One or more values are being adjusted by mods.",
                                 },
                                 attributesFillFlow = new FillFlowContainer
                                 {
