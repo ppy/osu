@@ -196,8 +196,6 @@ namespace osu.Game.Graphics.UserInterface
 
             public float NubWidth { get; set; } = ShearedNub.HEIGHT;
 
-            public new float NormalizedValue => base.NormalizedValue;
-
             public override LocalisableString TooltipText =>
                 (Current.IsDefault ? DefaultTooltip : Current.Value.ToString($@"0.## {TooltipSuffix}")) ?? Current.Value.ToString($@"0.## {TooltipSuffix}");
 
@@ -259,6 +257,18 @@ namespace osu.Game.Graphics.UserInterface
                     return screenSpacePos.X > rangeSlider.ScreenSpaceHalfwayPoint.X;
 
                 return screenSpacePos.X <= rangeSlider.ScreenSpaceHalfwayPoint.X;
+            }
+
+            protected override void UpdateAfterChildren()
+            {
+                base.UpdateAfterChildren();
+
+                if (isUpper)
+                {
+                    // Only draw left box where required to avoid masking bleed issues.
+                    LeftBox.X = ToParentSpace(ToLocalSpace(rangeSlider.LowerBoundSlider.Nub.ScreenSpaceDrawQuad.Centre)).X;
+                    LeftBox.Size -= new Vector2(LeftBox.X, 0);
+                }
             }
 
             protected override bool OnHover(HoverEvent e)
