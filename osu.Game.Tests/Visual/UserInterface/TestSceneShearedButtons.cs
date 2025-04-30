@@ -13,7 +13,6 @@ using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
-using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.UserInterface
@@ -183,32 +182,31 @@ namespace osu.Game.Tests.Visual.UserInterface
                     Origin = Anchor.Centre,
                     Direction = FillDirection.Horizontal,
                     AutoSizeAxes = Axes.Both,
-                    Scale = new Vector2(2.5f),
                     Children = new Drawable[]
                     {
-                        new ShearedButton(120)
+                        new ShearedButton
                         {
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
-                            Text = "Test",
+                            Text = "Button",
                             Action = () => { },
-                            Padding = new MarginPadding(),
+                            Height = 30,
                         },
-                        new ShearedButton(120, 40)
+                        new ShearedButton
                         {
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
-                            Text = "Test",
+                            Text = "Button",
                             Action = () => { },
-                            Padding = new MarginPadding { Left = -1f },
+                            Height = 30,
                         },
-                        new ShearedButton(120, 70)
+                        new ShearedButton
                         {
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
-                            Text = "Test",
+                            Text = "Button",
                             Action = () => { },
-                            Padding = new MarginPadding { Left = 3f },
+                            Height = 30,
                         },
                     }
                 }

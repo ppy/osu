@@ -17,7 +17,7 @@ namespace osu.Game.Extensions
         /// <param name="maxDecimalDigits">The maximum number of decimals to be considered in the original value.</param>
         /// <param name="asPercentage">Whether the output should be a percentage. For integer types, 0-100 is mapped to 0-100%; for other types 0-1 is mapped to 0-100%.</param>
         /// <returns>The formatted output.</returns>
-        public static string ToStandardFormattedString<T>(this T value, int maxDecimalDigits, bool asPercentage) where T : struct, INumber<T>, IMinMaxValue<T>
+        public static string ToStandardFormattedString<T>(this T value, int maxDecimalDigits, bool asPercentage = false) where T : struct, INumber<T>, IMinMaxValue<T>
         {
             double floatValue = double.CreateTruncating(value);
 

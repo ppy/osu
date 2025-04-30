@@ -308,18 +308,7 @@ namespace osu.Game.Screens.SelectV2
                 var onlineBeatmapSet = currentOnlineBeatmapSet;
                 var onlineBeatmap = currentOnlineBeatmapSet.Beatmaps.SingleOrDefault(b => b.OnlineID == beatmap.Value.BeatmapInfo.OnlineID);
 
-                if (onlineBeatmap != null)
-                {
-                    playCount.FadeIn(300, Easing.OutQuint);
-                    playCount.Value = new StatisticPlayCount.Data(onlineBeatmap.PlayCount, onlineBeatmap.UserPlayCount);
-                }
-                else
-                {
-                    playCount.FadeOut(300, Easing.OutQuint);
-                    playCount.Value = null;
-                }
-
-                favouritesStatistic.FadeIn(300, Easing.OutQuint);
+                playCount.Value = new StatisticPlayCount.Data(onlineBeatmap?.PlayCount ?? -1, onlineBeatmap?.UserPlayCount ?? -1);
                 favouritesStatistic.Text = onlineBeatmapSet.FavouriteCount.ToLocalisableString(@"N0");
             }
         }
