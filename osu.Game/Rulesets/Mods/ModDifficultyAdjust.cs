@@ -111,5 +111,26 @@ namespace osu.Game.Rulesets.Mods
             if (DrainRate.Value != null) difficulty.DrainRate = DrainRate.Value.Value;
             if (OverallDifficulty.Value != null) difficulty.OverallDifficulty = OverallDifficulty.Value.Value;
         }
+
+        /// <summary>
+        /// The number of settings on this mod instance which have been adjusted by the user from their default values.
+        /// </summary>
+        protected int UserAdjustedSettingsCount
+        {
+            get
+            {
+                int count = 0;
+
+                foreach (var (_, property) in this.GetSettingsSourceProperties())
+                {
+                    var bindable = (IBindable)property.GetValue(this)!;
+
+                    if (!bindable.IsDefault)
+                        count++;
+                }
+
+                return count;
+            }
+        }
     }
 }
