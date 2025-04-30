@@ -68,22 +68,11 @@ namespace osu.Game.Rulesets.Mods
             }
         }
 
-        public virtual int AdjustedSettingsCount
-        {
-            get
-            {
-                int count = 0;
-                if (!DrainRate.IsDefault) count++;
-                if (!OverallDifficulty.IsDefault) count++;
-                return count;
-            }
-        }
-
         public override string ExtendedIconInformation
         {
             get
             {
-                if (AdjustedSettingsCount != 1)
+                if (UserAdjustedSettingsCount != 1)
                     return string.Empty;
 
                 if (!OverallDifficulty.IsDefault) return format("OD", OverallDifficulty);

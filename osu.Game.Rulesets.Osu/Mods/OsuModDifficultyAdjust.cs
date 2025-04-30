@@ -37,22 +37,11 @@ namespace osu.Game.Rulesets.Osu.Mods
             ReadCurrentFromDifficulty = diff => diff.ApproachRate,
         };
 
-        public override int AdjustedSettingsCount
-        {
-            get
-            {
-                int count = base.AdjustedSettingsCount;
-                if (!ApproachRate.IsDefault) count++;
-                if (!CircleSize.IsDefault) count++;
-                return count;
-            }
-        }
-
         public override string ExtendedIconInformation
         {
             get
             {
-                if (AdjustedSettingsCount != 1)
+                if (UserAdjustedSettingsCount != 1)
                     return string.Empty;
 
                 if (!CircleSize.IsDefault) return format("CS", CircleSize);

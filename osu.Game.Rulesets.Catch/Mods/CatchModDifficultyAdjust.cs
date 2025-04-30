@@ -37,22 +37,11 @@ namespace osu.Game.Rulesets.Catch.Mods
         [SettingSource("Spicy Patterns", "Adjust the patterns as if Hard Rock is enabled.")]
         public BindableBool HardRockOffsets { get; } = new BindableBool();
 
-        public override int AdjustedSettingsCount
-        {
-            get
-            {
-                int count = base.AdjustedSettingsCount;
-                if (!ApproachRate.IsDefault) count++;
-                if (!CircleSize.IsDefault) count++;
-                return count;
-            }
-        }
-
         public override string ExtendedIconInformation
         {
             get
             {
-                if (AdjustedSettingsCount != 1)
+                if (UserAdjustedSettingsCount != 1)
                     return string.Empty;
 
                 if (!CircleSize.IsDefault) return format("CS", CircleSize);
