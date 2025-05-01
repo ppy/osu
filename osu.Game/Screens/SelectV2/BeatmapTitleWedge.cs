@@ -4,6 +4,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.LocalisationExtensions;
@@ -246,25 +248,41 @@ namespace osu.Game.Screens.SelectV2
             updateOnlineDisplay();
         }
 
+        private CancellationTokenSource? lengthBpmCancellationSource;
+
         private void updateLengthAndBpmStatistics()
         {
-            var beatmapInfo = beatmap.Value.BeatmapInfo;
+            lengthBpmCancellationSource?.Cancel();
+            lengthBpmCancellationSource = new CancellationTokenSource();
 
-            double rate = ModUtils.CalculateRateWithMods(mods.Value);
+            var token = lengthBpmCancellationSource.Token;
 
-            int bpmMax = FormatUtils.RoundBPM(beatmap.Value.Beatmap.ControlPointInfo.BPMMaximum, rate);
-            int bpmMin = FormatUtils.RoundBPM(beatmap.Value.Beatmap.ControlPointInfo.BPMMinimum, rate);
-            int mostCommonBPM = FormatUtils.RoundBPM(60000 / beatmap.Value.Beatmap.GetMostCommonBeatLength(), rate);
+            Task.Run(() =>
+            {
+                var beatmapInfo = beatmap.Value.BeatmapInfo;
 
-            double drainLength = Math.Round(beatmap.Value.Beatmap.CalculateDrainLength() / rate);
-            double hitLength = Math.Round(beatmapInfo.Length / rate);
+                double rate = ModUtils.CalculateRateWithMods(mods.Value);
 
-            lengthStatistic.Text = hitLength.ToFormattedDuration();
-            lengthStatistic.TooltipText = BeatmapsetsStrings.ShowStatsTotalLength(drainLength.ToFormattedDuration());
+                int bpmMax = FormatUtils.RoundBPM(beatmap.Value.Beatmap.ControlPointInfo.BPMMaximum, rate);
+                int bpmMin = FormatUtils.RoundBPM(beatmap.Value.Beatmap.ControlPointInfo.BPMMinimum, rate);
+                int mostCommonBPM = FormatUtils.RoundBPM(60000 / beatmap.Value.Beatmap.GetMostCommonBeatLength(), rate);
 
-            bpmStatistic.Text = bpmMin == bpmMax
-                ? $"{bpmMin}"
-                : $"{bpmMin}-{bpmMax} (mostly {mostCommonBPM})";
+                double drainLength = Math.Round(beatmap.Value.Beatmap.CalculateDrainLength() / rate);
+                double hitLength = Math.Round(beatmapInfo.Length / rate);
+
+                Schedule(() =>
+                {
+                    if (token.IsCancellationRequested)
+                        return;
+
+                    lengthStatistic.Text = hitLength.ToFormattedDuration();
+                    lengthStatistic.TooltipText = BeatmapsetsStrings.ShowStatsTotalLength(drainLength.ToFormattedDuration());
+
+                    bpmStatistic.Text = bpmMin == bpmMax
+                        ? $"{bpmMin}"
+                        : $"{bpmMin}-{bpmMax} (mostly {mostCommonBPM})";
+                });
+            }, token);
         }
 
         private void refetchBeatmapSet()
