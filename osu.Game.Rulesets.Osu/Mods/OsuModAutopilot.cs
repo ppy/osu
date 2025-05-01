@@ -50,6 +50,10 @@ namespace osu.Game.Rulesets.Osu.Mods
         private Playfield playfield = null!;
 
         private readonly IBindable<bool> hasReplayLoaded = new Bindable<bool>();
+        // Keep track of where we enter the HitWindow.
+        private double saved_currentTime = -1;
+        // Helps us see if it's a new HitObject within handleTime if its not equal to hitWindowStart.
+        private double saved_startTime = -1;
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
@@ -88,7 +92,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                     return;
 
                 case DrawableSlider sliderDrawable:
-                    if (!sliderDrawable.HeadCircle.Judged)
+                    if (!sliderDrawable.HeadCircle.Judged || hasReplayLoaded.Value)
                         break;
 
                     var slider = sliderDrawable.HitObject;
@@ -108,18 +112,46 @@ namespace osu.Game.Rulesets.Osu.Mods
                     return;
             }
 
-            double hitWindowStart = start - mehWindow - hitwindow_start_offset;
-            double hitWindowEnd = start + mehWindow - hitwindow_end_offset;
+            if (hasReplayLoaded.Value)
+                return;
+
+            double hitWindowStart = start - mehWindow;
+            double hitWindowEnd = start + mehWindow;
 
             // Compute how many ms remain for cursor movement toward the hit-object
-            // If we’re already inside the hit-window, scale remaining time from hitwindow_start_offset to 1 ms
-            // proportionally to the fraction of window left (clamped to [0,1]) to prevent extremely fast cursor movement.
-            // Otherwise, use the time until the window opens so the cursor reaches the HitObject at hitWindowStart.
-            double availableTime = currentTime >= hitWindowStart
-                ? 1 + (Math.Clamp((hitWindowEnd - currentTime) / (hitWindowEnd - hitWindowStart), 0, 1) * (hitwindow_start_offset - 1))
-                : (start - mehWindow - currentTime);
+            double availableTime = handleTime(hitWindowStart, hitWindowEnd);
 
             moveTowards(pos, target, availableTime);
+        }
+
+        private double handleTime(double hitWindowStart, double hitWindowEnd)
+        {
+            // We want the cursor to eventually reach the center of the HitCircle.
+            // However, when it's inside the HitWindow, we want to the cursor to be fast enough
+            // where the player can't tap it, but slow enough so it doesn't seem like the cursor is teleporting.
+
+            // We need to keep track of when the saved_currentTime aka the time we enter the hitWindow. By doing so, we can get the
+            // actual time left by clamping the saved_currentTime and subtracting currentTime minus saved_currentTime.
+            double currentTime = playfield.Clock.CurrentTime;
+
+            // On first entry into the window (or whenever the window start changes), update our values to calculate true time.
+            if ((saved_currentTime < hitWindowStart && currentTime >= hitWindowStart) || saved_startTime != hitWindowStart)
+            {
+                saved_currentTime = currentTime;
+                saved_startTime = hitWindowStart;
+            }
+
+            // Compute scale from 0 to 1, then multiply by an offset.
+            double scaledTime = 1 + (Math.Clamp((hitWindowEnd - hitwindow_end_offset - saved_currentTime) /  ((hitWindowEnd - hitWindowStart) - hitwindow_end_offset + hitwindow_start_offset), 0, 1) * (hitwindow_start_offset - 1));
+
+            // Subtract the actual elapsed time once
+            double elapsed = currentTime - saved_currentTime;
+            double timeLeft = currentTime >= hitWindowStart - hitwindow_start_offset
+                ? scaledTime - elapsed
+                : hitWindowStart - currentTime;        
+
+            // Don’t let it go below 1
+            return Math.Max(timeLeft, 1);
         }
 
         private void handleSpinner(DrawableSpinner spinnerDrawable, double currentTime, double start, Vector2 pos)
@@ -132,15 +164,16 @@ namespace osu.Game.Rulesets.Osu.Mods
             double elapsed = currentTime - start;
 
             // Before spinner starts, move to position.
-            if (elapsed < 0)
+            if (elapsed < 0 && !hasReplayLoaded.Value)
             {
                 Vector2 spinnerTargetPosition = spinner.Position + new Vector2(
                     -(float)Math.Sin(0) * spinner_radius,
                     -(float)Math.Cos(0) * spinner_radius);
 
-                double duration = currentTime >= start - hitwindow_start_offset
-                    ? 1 + (Math.Clamp(((spinner.Duration - hitwindow_end_offset) - (elapsed + hitwindow_start_offset)) / (spinner.Duration - hitwindow_end_offset), 0, 1) * (hitwindow_start_offset - 1))
-                    : -elapsed;
+                double hitWindowStart = start;
+                double hitWindowEnd = start + spinner.Duration;
+
+                double duration = handleTime(hitWindowStart, hitWindowEnd);
 
                 moveTowards(pos, spinnerTargetPosition, duration);
 
@@ -153,6 +186,9 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             // Automatically spin spinner.
             spinnerDrawable.RotationTracker.AddRotation(float.RadiansToDegrees((float)elapsedTime * (float)rate * MathF.PI * 2.0f));
+
+            if (hasReplayLoaded.Value)
+                return;
 
             double angle = 2 * Math.PI * (elapsed * rate);
             Vector2 circPos = spinner.Position + new Vector2(
@@ -181,9 +217,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private void applyCursor(Vector2 playfieldPosition)
         {
-            if (hasReplayLoaded.Value)
-                return;
-
             new MousePositionAbsoluteInput { Position = playfield.ToScreenSpace(playfieldPosition) }.Apply(inputManager.CurrentState, inputManager);
         }
     }
