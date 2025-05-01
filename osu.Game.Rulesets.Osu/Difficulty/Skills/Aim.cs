@@ -53,11 +53,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             if (SliderStrains.Count == 0)
                 return 0;
 
-            double maxSliderStrain = sliderStrains.Max();
+            double maxSliderStrain = SliderStrains.Max();
+
             if (maxSliderStrain == 0)
                 return 0;
 
-            return sliderStrains.Sum(strain => 1.0 / (1.0 + Math.Exp(-(strain / maxSliderStrain * 12.0 - 6.0))));
+            return SliderStrains.Sum(strain => 1.0 / (1.0 + Math.Exp(-(strain / maxSliderStrain * 12.0 - 6.0))));
         }
     }
 }
