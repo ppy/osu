@@ -115,8 +115,8 @@ namespace osu.Game.Rulesets.Osu.Mods
             if (hasReplayLoaded.Value)
                 return;
 
-            double hitWindowStart = start - mehWindow;
-            double hitWindowEnd = start + mehWindow;
+            double hitWindowStart = start - mehWindow - hitwindow_start_offset;
+            double hitWindowEnd = start + mehWindow - hitwindow_end_offset;
 
             // Compute how many ms remain for cursor movement toward the hit-object
             double availableTime = handleTime(hitWindowStart, hitWindowEnd);
@@ -142,13 +142,13 @@ namespace osu.Game.Rulesets.Osu.Mods
             }
 
             // Compute scale from 0 to 1, then multiply by an offset.
-            double scaledTime = 1 + (Math.Clamp((hitWindowEnd - hitwindow_end_offset - saved_currentTime) /  ((hitWindowEnd - hitWindowStart) - hitwindow_end_offset + hitwindow_start_offset), 0, 1) * (hitwindow_start_offset - 1));
+            double scaledTime = 1 + (Math.Clamp((hitWindowEnd - saved_currentTime) / ((hitWindowEnd - hitWindowStart)), 0, 1) * (hitwindow_start_offset - 1));
 
             // Subtract the actual elapsed time once
             double elapsed = currentTime - saved_currentTime;
-            double timeLeft = currentTime >= hitWindowStart - hitwindow_start_offset
+            double timeLeft = currentTime >= hitWindowStart
                 ? scaledTime - elapsed
-                : hitWindowStart - currentTime;        
+                : hitWindowStart - currentTime + hitwindow_start_offset;
 
             // Don’t let it go below 1
             return Math.Max(timeLeft, 1);
@@ -170,8 +170,8 @@ namespace osu.Game.Rulesets.Osu.Mods
                     -(float)Math.Sin(0) * spinner_radius,
                     -(float)Math.Cos(0) * spinner_radius);
 
-                double hitWindowStart = start;
-                double hitWindowEnd = start + spinner.Duration;
+                double hitWindowStart = start - hitwindow_start_offset;
+                double hitWindowEnd = start + spinner.Duration - hitwindow_end_offset;
 
                 double duration = handleTime(hitWindowStart, hitWindowEnd);
 
