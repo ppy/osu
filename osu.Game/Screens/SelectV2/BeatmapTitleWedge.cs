@@ -35,7 +35,7 @@ namespace osu.Game.Screens.SelectV2
         private const float corner_radius = 10;
 
         [Resolved]
-        private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
+        private IBindable<WorkingBeatmap> working { get; set; } = null!;
 
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; } = null!;
@@ -186,7 +186,7 @@ namespace osu.Game.Screens.SelectV2
         {
             base.LoadComplete();
 
-            beatmap.BindValueChanged(_ => updateDisplay());
+            working.BindValueChanged(_ => updateDisplay());
             ruleset.BindValueChanged(_ => updateDisplay());
 
             mods.BindValueChanged(m =>
@@ -226,9 +226,9 @@ namespace osu.Game.Screens.SelectV2
 
         private void updateDisplay()
         {
-            var metadata = beatmap.Value.Metadata;
-            var beatmapInfo = beatmap.Value.BeatmapInfo;
-            var beatmapSetInfo = beatmap.Value.BeatmapSetInfo;
+            var metadata = working.Value.Metadata;
+            var beatmapInfo = working.Value.BeatmapInfo;
+            var beatmapSetInfo = working.Value.BeatmapSetInfo;
 
             statusPill.Status = beatmapInfo.Status;
 
@@ -259,15 +259,17 @@ namespace osu.Game.Screens.SelectV2
 
             Task.Run(() =>
             {
-                var beatmapInfo = beatmap.Value.BeatmapInfo;
+                var beatmapInfo = working.Value.BeatmapInfo;
+                // This can take time as it is a synchronous task.
+                var beatmap = working.Value.Beatmap;
 
                 double rate = ModUtils.CalculateRateWithMods(mods.Value);
 
-                int bpmMax = FormatUtils.RoundBPM(beatmap.Value.Beatmap.ControlPointInfo.BPMMaximum, rate);
-                int bpmMin = FormatUtils.RoundBPM(beatmap.Value.Beatmap.ControlPointInfo.BPMMinimum, rate);
-                int mostCommonBPM = FormatUtils.RoundBPM(60000 / beatmap.Value.Beatmap.GetMostCommonBeatLength(), rate);
+                int bpmMax = FormatUtils.RoundBPM(beatmap.ControlPointInfo.BPMMaximum, rate);
+                int bpmMin = FormatUtils.RoundBPM(beatmap.ControlPointInfo.BPMMinimum, rate);
+                int mostCommonBPM = FormatUtils.RoundBPM(60000 / beatmap.GetMostCommonBeatLength(), rate);
 
-                double drainLength = Math.Round(beatmap.Value.Beatmap.CalculateDrainLength() / rate);
+                double drainLength = Math.Round(beatmap.CalculateDrainLength() / rate);
                 double hitLength = Math.Round(beatmapInfo.Length / rate);
 
                 Schedule(() =>
@@ -287,7 +289,7 @@ namespace osu.Game.Screens.SelectV2
 
         private void refetchBeatmapSet()
         {
-            var beatmapSetInfo = beatmap.Value.BeatmapSetInfo;
+            var beatmapSetInfo = working.Value.BeatmapSetInfo;
 
             currentRequest?.Cancel();
             currentRequest = null;
@@ -323,7 +325,7 @@ namespace osu.Game.Screens.SelectV2
             else
             {
                 var onlineBeatmapSet = currentOnlineBeatmapSet;
-                var onlineBeatmap = currentOnlineBeatmapSet.Beatmaps.SingleOrDefault(b => b.OnlineID == beatmap.Value.BeatmapInfo.OnlineID);
+                var onlineBeatmap = currentOnlineBeatmapSet.Beatmaps.SingleOrDefault(b => b.OnlineID == working.Value.BeatmapInfo.OnlineID);
 
                 playCount.Value = new StatisticPlayCount.Data(onlineBeatmap?.PlayCount ?? -1, onlineBeatmap?.UserPlayCount ?? -1);
                 favouritesStatistic.Text = onlineBeatmapSet.FavouriteCount.ToLocalisableString(@"N0");
