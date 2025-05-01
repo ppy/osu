@@ -179,7 +179,10 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.ScalingPositionX, 0.5f, 0f, 1f, 0.01f);
             SetDefault(OsuSetting.ScalingPositionY, 0.5f, 0f, 1f, 0.01f);
 
-            SetDefault(OsuSetting.UIScale, 1f, 0.8f, 1.6f, 0.01f);
+            if (RuntimeInfo.IsMobile)
+                SetDefault(OsuSetting.UIScale, 1f, 0.8f, 1.1f, 0.01f);
+            else
+                SetDefault(OsuSetting.UIScale, 1f, 0.8f, 1.6f, 0.01f);
 
             SetDefault(OsuSetting.UIHoldActivationDelay, 200.0, 0.0, 500.0, 50.0);
 
