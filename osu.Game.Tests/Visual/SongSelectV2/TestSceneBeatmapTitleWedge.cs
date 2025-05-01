@@ -2,11 +2,16 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Track;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Textures;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -16,9 +21,12 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.SelectV2;
+using osu.Game.Skinning;
 using osu.Game.Tests.Visual.SongSelect;
 
 namespace osu.Game.Tests.Visual.SongSelectV2
@@ -193,6 +201,16 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             checkDisplayedBPM(expectedDisplay);
         }
 
+        [Test]
+        [Explicit]
+        public void TestPerformanceWithLongBeatmap()
+        {
+            AddStep("select heavy beatmap", () => Beatmap.Value = new HeavyWorkingBeatmap(Audio));
+
+            foreach (var rulesetInfo in rulesets.AvailableRulesets)
+                setRuleset(rulesetInfo);
+        }
+
         private void setRuleset(RulesetInfo rulesetInfo)
         {
             AddStep("set ruleset", () => Ruleset.Value = rulesetInfo);
@@ -237,6 +255,50 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             working.BeatmapSetInfo.DateSubmitted = DateTimeOffset.Now;
             working.BeatmapSetInfo.DateRanked = DateTimeOffset.Now;
             return (working, onlineSet);
+        }
+
+        private class TestHitObject : ConvertHitObject;
+
+        private class HeavyWorkingBeatmap : WorkingBeatmap
+        {
+            private static readonly BeatmapInfo beatmap_info = new BeatmapInfo
+            {
+                Metadata = new BeatmapMetadata
+                {
+                    Author = { Username = "osuAuthor" },
+                    Artist = "osuArtist",
+                    Source = "osuSource",
+                    Title = "osuTitle"
+                },
+                Ruleset = new OsuRuleset().RulesetInfo,
+                StarRating = 6,
+                DifficultyName = "osuVersion",
+                Difficulty = new BeatmapDifficulty()
+            };
+
+            public HeavyWorkingBeatmap(AudioManager audioManager)
+                : base(beatmap_info, audioManager)
+            {
+            }
+
+            protected override IBeatmap GetBeatmap()
+            {
+                List<HitObject> objects = new List<HitObject>();
+
+                for (int i = 0; i < 200_000; i++)
+                    objects.Add(new TestHitObject { StartTime = i * 1000 });
+
+                return new Beatmap
+                {
+                    BeatmapInfo = beatmap_info,
+                    HitObjects = objects
+                };
+            }
+
+            public override Texture? GetBackground() => null;
+            public override Stream? GetStream(string storagePath) => null;
+            protected override Track? GetBeatmapTrack() => null;
+            protected internal override ISkin? GetSkin() => null;
         }
     }
 }
