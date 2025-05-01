@@ -56,6 +56,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double aimDifficultStrainCount = aim.CountTopWeightedStrains();
             double speedDifficultStrainCount = speed.CountTopWeightedStrains();
 
+            double aimNoSlidersTopWeightedSliderCount = aimWithoutSliders.CountTopWeightedSliders();
+            double aimNoSlidersDifficultStrainCount = aimWithoutSliders.CountTopWeightedStrains();
+
+            double aimTopWeightedSliderFactor = aimNoSlidersTopWeightedSliderCount / (aimNoSlidersDifficultStrainCount - aimNoSlidersTopWeightedSliderCount);
+
+            double speedTopWeightedSliderCount = speed.CountTopWeightedSliders();
+            double speedTopWeightedSliderFactor = speedTopWeightedSliderCount / (speedDifficultStrainCount - speedTopWeightedSliderCount);
+
             double difficultSliders = aim.GetDifficultSliders();
 
             double preempt = IBeatmapDifficultyInfo.DifficultyRange(beatmap.Difficulty.ApproachRate, 1800, 1200, 450) / clockRate;
@@ -87,28 +95,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double sliderFactor = aimRating > 0 ? aimRatingNoSliders / aimRating : 1;
 
-            double aimDifficultyStrainCount = ((OsuStrainSkill)skills[0]).CountTopWeightedStrains();
-            double speedDifficultyStrainCount = ((OsuStrainSkill)skills[2]).CountTopWeightedStrains();
-
-            double aimNoSlidersTopWeightedSliderCount = ((OsuStrainSkill)skills[1]).CountTopWeightedSliders();
-            double aimNoSlidersDifficultyStrainCount = ((OsuStrainSkill)skills[1]).CountTopWeightedStrains();
-            double aimTopWeightedSliderFactor = aimNoSlidersTopWeightedSliderCount / (aimNoSlidersDifficultyStrainCount - aimNoSlidersTopWeightedSliderCount);
-            double speedTopWeightedSliderCount = ((OsuStrainSkill)skills[2]).CountTopWeightedSliders();
-            double speedTopWeightedSliderFactor = speedTopWeightedSliderCount / (speedDifficultyStrainCount - speedTopWeightedSliderCount);
-
-            if (mods.Any(m => m is OsuModTouchDevice))
-            {
-                aimRating = Math.Pow(aimRating, 0.8);
-                flashlightRating = Math.Pow(flashlightRating, 0.8);
-            }
-
-            if (mods.Any(h => h is OsuModRelax))
-            {
-                aimRating *= 0.9;
-                speedRating = 0.0;
-                flashlightRating *= 0.7;
-            }
-
             double baseAimPerformance = OsuStrainSkill.DifficultyToPerformance(aimRating);
             double baseSpeedPerformance = OsuStrainSkill.DifficultyToPerformance(speedRating);
             double baseFlashlightPerformance = Flashlight.DifficultyToPerformance(flashlightRating);
@@ -136,10 +122,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 SpeedNoteCount = speedNotes,
                 FlashlightDifficulty = flashlightRating,
                 SliderFactor = sliderFactor,
-                AimDifficultStrainCount = aimDifficultyStrainCount,
-                SpeedDifficultStrainCount = speedDifficultyStrainCount,
-                ApproachRate = preempt > 1200 ? (1800 - preempt) / 120 : (1200 - preempt) / 150 + 5,
-                OverallDifficulty = (80 - hitWindowGreat) / 6,
+                AimDifficultStrainCount = aimDifficultStrainCount,
+                SpeedDifficultStrainCount = speedDifficultStrainCount,
+                AimTopWeightedSliderFactor = aimTopWeightedSliderFactor,
+                SpeedTopWeightedSliderFactor = speedTopWeightedSliderFactor,
                 DrainRate = drainRate,
                 MaxCombo = beatmap.GetMaxCombo(),
                 HitCircleCount = hitCircleCount,
