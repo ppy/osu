@@ -185,8 +185,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (mods.Any(m => m is OsuModMagnetised))
             {
-                // reduce speed rating because of the speed distance scaling
-                speedRating *= 0.9;
+                // reduce speed rating because of the speed distance scaling, with maximum reduction being 0.7x
+                float magnetisedStrength = mods.OfType<OsuModMagnetised>().First().AttractionStrength.Value;
+                speedRating *= 1.0 - magnetisedStrength * 0.3;
             }
 
             double ratingMultiplier = 1.0;
