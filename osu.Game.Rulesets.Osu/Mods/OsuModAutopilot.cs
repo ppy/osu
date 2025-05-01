@@ -147,7 +147,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             double scaledTime = 1 + (Math.Clamp((hitWindowEnd - savedCurrentTime) / ((hitWindowEnd - hitWindowStart)), 0, 1) * (hitwindow_start_offset - 1));
 
             // Subtract the actual elapsed time once
-            double elapsed = currentTime - savedStartTime;
+            double elapsed = currentTime - savedCurrentTime;
             double timeLeft = currentTime >= hitWindowStart
                 ? scaledTime - elapsed
                 : hitWindowStart - currentTime + hitwindow_start_offset;
