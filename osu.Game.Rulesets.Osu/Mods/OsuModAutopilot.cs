@@ -50,10 +50,12 @@ namespace osu.Game.Rulesets.Osu.Mods
         private Playfield playfield = null!;
 
         private readonly IBindable<bool> hasReplayLoaded = new Bindable<bool>();
+
         // Keep track of where we enter the HitWindow.
-        private double saved_currentTime = -1;
+        private double savedCurrentTime = -1;
+
         // Helps us see if it's a new HitObject within handleTime if its not equal to hitWindowStart.
-        private double saved_startTime = -1;
+        private double savedStartTime = -1;
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
@@ -135,17 +137,17 @@ namespace osu.Game.Rulesets.Osu.Mods
             double currentTime = playfield.Clock.CurrentTime;
 
             // On first entry into the window (or whenever the window start changes), update our values to calculate true time.
-            if ((saved_currentTime < hitWindowStart && currentTime >= hitWindowStart) || saved_startTime != hitWindowStart)
+            if ((savedCurrentTime < hitWindowStart && currentTime >= hitWindowStart) || savedStartTime != hitWindowStart)
             {
-                saved_currentTime = currentTime;
-                saved_startTime = hitWindowStart;
+                savedCurrentTime = currentTime;
+                savedStartTime = hitWindowStart;
             }
 
             // Compute scale from 0 to 1, then multiply by an offset.
-            double scaledTime = 1 + (Math.Clamp((hitWindowEnd - saved_currentTime) / ((hitWindowEnd - hitWindowStart)), 0, 1) * (hitwindow_start_offset - 1));
+            double scaledTime = 1 + (Math.Clamp((hitWindowEnd - savedCurrentTime) / ((hitWindowEnd - hitWindowStart)), 0, 1) * (hitwindow_start_offset - 1));
 
             // Subtract the actual elapsed time once
-            double elapsed = currentTime - saved_currentTime;
+            double elapsed = currentTime - savedStartTime;
             double timeLeft = currentTime >= hitWindowStart
                 ? scaledTime - elapsed
                 : hitWindowStart - currentTime + hitwindow_start_offset;
