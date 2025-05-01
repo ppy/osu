@@ -3,9 +3,13 @@
 
 #nullable disable
 
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
+using osu.Game.Rulesets.Mania.Skinning;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.UI.Scrolling;
+using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
 {
@@ -17,6 +21,18 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         protected override ManiaSkinComponents Component => ManiaSkinComponents.HoldNoteTail;
 
         protected internal DrawableHoldNote HoldNote => (DrawableHoldNote)ParentHitObject;
+
+        private HoldNoteTailOrigin tailOrigin = HoldNoteTailOrigin.Regular;
+
+        public HoldNoteTailOrigin TailOrigin
+        {
+            get => tailOrigin;
+            set
+            {
+                tailOrigin = value;
+                updateTailOrigin();
+            }
+        }
 
         public DrawableHoldNoteTail()
             : this(null)
@@ -51,6 +67,26 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         public override void OnReleased(KeyBindingReleaseEvent<ManiaAction> e)
         {
+        }
+
+        protected override void ApplySkin(ISkinSource skin, bool allowFallback)
+        {
+            base.ApplySkin(skin, allowFallback);
+            tailOrigin = skin.GetConfig<ManiaSkinConfigurationLookup, HoldNoteTailOrigin>(new ManiaSkinConfigurationLookup(LegacyManiaSkinConfigurationLookups.HoldNoteTailOrigin))?.Value ?? HoldNoteTailOrigin.Regular;
+        }
+
+        protected override void OnDirectionChanged(ValueChangedEvent<ScrollingDirection> e)
+        {
+            base.OnDirectionChanged(e);
+            updateTailOrigin();
+        }
+
+        private void updateTailOrigin()
+        {
+            if (Direction.Value == ScrollingDirection.Up)
+                Origin = tailOrigin == HoldNoteTailOrigin.Inverted ? Anchor.BottomCentre : Anchor.TopCentre;
+            else
+                Origin = tailOrigin == HoldNoteTailOrigin.Inverted ? Anchor.TopCentre : Anchor.BottomCentre;
         }
     }
 }
