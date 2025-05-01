@@ -65,6 +65,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,
+                    Shear = OsuGame.SHEAR,
                     Children = new Drawable[]
                     {
                         titleWedge = new BeatmapTitleWedge
