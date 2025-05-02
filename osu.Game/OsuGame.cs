@@ -682,8 +682,14 @@ namespace osu.Game
                 if (beatmaps.Count == 0)
                     beatmaps = detachedSet.Beatmaps.ToList();
 
-                // Prefer recommended beatmap if recommendations are available, else fallback to a sane selection.
-                var selection = difficultyRecommender.GetRecommendedBeatmap(beatmaps)
+                // Prefer a beatmap in the difficulty range if the difficulty range is set, else prefer recommended beatmap if recommendations are available.
+                // Fallback to a sane selection if the preferred selection is null.
+                var selection = (!LocalConfig.GetBindable<double>(OsuSetting.DisplayStarsMinimum).IsDefault ||
+                                 !LocalConfig.GetBindable<double>(OsuSetting.DisplayStarsMaximum).IsDefault
+                                    ? beatmaps.FirstOrDefault(b => (b.StarRating >= LocalConfig.Get<double>(OsuSetting.DisplayStarsMinimum)
+                                                                    && b.StarRating <= LocalConfig.Get<double>(OsuSetting.DisplayStarsMaximum)
+                                                                    && b.Ruleset.Equals(Ruleset.Value)))
+                                    : difficultyRecommender.GetRecommendedBeatmap(beatmaps))
                                 ?? beatmaps.FirstOrDefault(b => b.Ruleset.Equals(Ruleset.Value))
                                 ?? beatmaps.First();
 
