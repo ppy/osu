@@ -13,6 +13,7 @@ namespace osu.Game.Rulesets.Mania.Mods
     {
         [SettingSource("Only allow perfect hits")]
         public BindableBool PerfectScoreOnly { get; } = new BindableBool();
+
         protected override bool FailCondition(HealthProcessor healthProcessor, JudgementResult result)
         {
             if (!isRelevantResult(result.Judgement.MinResult) && !isRelevantResult(result.Judgement.MaxResult) && !isRelevantResult(result.Type))
