@@ -148,10 +148,6 @@ namespace osu.Game.Skinning
                     Debug.Assert(maniaLookup.ColumnIndex != null);
                     return SkinUtils.As<TValue>(new Bindable<float>(existing.WidthForNoteHeightScale));
 
-                case LegacyManiaSkinConfigurationLookups.ColumnSpacing:
-                    Debug.Assert(maniaLookup.ColumnIndex != null);
-                    return SkinUtils.As<TValue>(new Bindable<float>(existing.ColumnSpacing[maniaLookup.ColumnIndex.Value]));
-
                 case LegacyManiaSkinConfigurationLookups.HitPosition:
                     return SkinUtils.As<TValue>(new Bindable<float>(existing.HitPosition));
 
@@ -169,17 +165,6 @@ namespace osu.Game.Skinning
 
                 case LegacyManiaSkinConfigurationLookups.ExplosionImage:
                     return SkinUtils.As<TValue>(getManiaImage(existing, "LightingN"));
-
-                case LegacyManiaSkinConfigurationLookups.ExplosionScale:
-                    Debug.Assert(maniaLookup.ColumnIndex != null);
-
-                    if (GetConfig<SkinConfiguration.LegacySetting, decimal>(SkinConfiguration.LegacySetting.Version)?.Value < 2.5m)
-                        return SkinUtils.As<TValue>(new Bindable<float>(1));
-
-                    if (existing.ExplosionWidth[maniaLookup.ColumnIndex.Value] != 0)
-                        return SkinUtils.As<TValue>(new Bindable<float>(existing.ExplosionWidth[maniaLookup.ColumnIndex.Value] / LegacyManiaSkinConfiguration.DEFAULT_COLUMN_SIZE));
-
-                    return SkinUtils.As<TValue>(new Bindable<float>(existing.ColumnWidth[maniaLookup.ColumnIndex.Value] / LegacyManiaSkinConfiguration.DEFAULT_COLUMN_SIZE));
 
                 case LegacyManiaSkinConfigurationLookups.ColumnLineColour:
                     return SkinUtils.As<TValue>(getCustomColour(existing, "ColourColumnLine"));
@@ -236,17 +221,6 @@ namespace osu.Game.Skinning
                 case LegacyManiaSkinConfigurationLookups.HoldNoteLightImage:
                     return SkinUtils.As<TValue>(getManiaImage(existing, "LightingL"));
 
-                case LegacyManiaSkinConfigurationLookups.HoldNoteLightScale:
-                    Debug.Assert(maniaLookup.ColumnIndex != null);
-
-                    if (GetConfig<SkinConfiguration.LegacySetting, decimal>(SkinConfiguration.LegacySetting.Version)?.Value < 2.5m)
-                        return SkinUtils.As<TValue>(new Bindable<float>(1));
-
-                    if (existing.HoldNoteLightWidth[maniaLookup.ColumnIndex.Value] != 0)
-                        return SkinUtils.As<TValue>(new Bindable<float>(existing.HoldNoteLightWidth[maniaLookup.ColumnIndex.Value] / LegacyManiaSkinConfiguration.DEFAULT_COLUMN_SIZE));
-
-                    return SkinUtils.As<TValue>(new Bindable<float>(existing.ColumnWidth[maniaLookup.ColumnIndex.Value] / LegacyManiaSkinConfiguration.DEFAULT_COLUMN_SIZE));
-
                 case LegacyManiaSkinConfigurationLookups.KeyImage:
                     Debug.Assert(maniaLookup.ColumnIndex != null);
                     return SkinUtils.As<TValue>(getManiaImage(existing, $"KeyImage{maniaLookup.ColumnIndex}"));
@@ -270,14 +244,6 @@ namespace osu.Game.Skinning
                 case LegacyManiaSkinConfigurationLookups.HitTargetImage:
                     return SkinUtils.As<TValue>(getManiaImage(existing, "StageHint"));
 
-                case LegacyManiaSkinConfigurationLookups.LeftLineWidth:
-                    Debug.Assert(maniaLookup.ColumnIndex != null);
-                    return SkinUtils.As<TValue>(new Bindable<float>(existing.ColumnLineWidth[maniaLookup.ColumnIndex.Value]));
-
-                case LegacyManiaSkinConfigurationLookups.RightLineWidth:
-                    Debug.Assert(maniaLookup.ColumnIndex != null);
-                    return SkinUtils.As<TValue>(new Bindable<float>(existing.ColumnLineWidth[maniaLookup.ColumnIndex.Value + 1]));
-
                 case LegacyManiaSkinConfigurationLookups.Hit0:
                 case LegacyManiaSkinConfigurationLookups.Hit50:
                 case LegacyManiaSkinConfigurationLookups.Hit100:
@@ -291,6 +257,50 @@ namespace osu.Game.Skinning
 
                 case LegacyManiaSkinConfigurationLookups.LightFramePerSecond:
                     return SkinUtils.As<TValue>(new Bindable<int>(existing.LightFramePerSecond));
+
+                case LegacyManiaSkinConfigurationLookups.LeftColumnSpacing:
+                    Debug.Assert(maniaLookup.ColumnIndex != null);
+                    if (maniaLookup.ColumnIndex == 0)
+                        return SkinUtils.As<TValue>(new Bindable<float>());
+
+                    return SkinUtils.As<TValue>(new Bindable<float>(existing.ColumnSpacing[maniaLookup.ColumnIndex.Value - 1] / 2));
+
+                case LegacyManiaSkinConfigurationLookups.RightColumnSpacing:
+                    Debug.Assert(maniaLookup.ColumnIndex != null);
+                    if (maniaLookup.ColumnIndex == existing.ColumnSpacing.Length)
+                        return SkinUtils.As<TValue>(new Bindable<float>());
+
+                    return SkinUtils.As<TValue>(new Bindable<float>(existing.ColumnSpacing[maniaLookup.ColumnIndex.Value] / 2));
+
+                case LegacyManiaSkinConfigurationLookups.LeftLineWidth:
+                    Debug.Assert(maniaLookup.ColumnIndex != null);
+                    return SkinUtils.As<TValue>(new Bindable<float>(existing.ColumnLineWidth[maniaLookup.ColumnIndex.Value]));
+
+                case LegacyManiaSkinConfigurationLookups.RightLineWidth:
+                    Debug.Assert(maniaLookup.ColumnIndex != null);
+                    return SkinUtils.As<TValue>(new Bindable<float>(existing.ColumnLineWidth[maniaLookup.ColumnIndex.Value + 1]));
+
+                case LegacyManiaSkinConfigurationLookups.ExplosionScale:
+                    Debug.Assert(maniaLookup.ColumnIndex != null);
+
+                    if (GetConfig<SkinConfiguration.LegacySetting, decimal>(SkinConfiguration.LegacySetting.Version)?.Value < 2.5m)
+                        return SkinUtils.As<TValue>(new Bindable<float>(1));
+
+                    if (existing.ExplosionWidth[maniaLookup.ColumnIndex.Value] != 0)
+                        return SkinUtils.As<TValue>(new Bindable<float>(existing.ExplosionWidth[maniaLookup.ColumnIndex.Value] / LegacyManiaSkinConfiguration.DEFAULT_COLUMN_SIZE));
+
+                    return SkinUtils.As<TValue>(new Bindable<float>(existing.ColumnWidth[maniaLookup.ColumnIndex.Value] / LegacyManiaSkinConfiguration.DEFAULT_COLUMN_SIZE));
+
+                case LegacyManiaSkinConfigurationLookups.HoldNoteLightScale:
+                    Debug.Assert(maniaLookup.ColumnIndex != null);
+
+                    if (GetConfig<SkinConfiguration.LegacySetting, decimal>(SkinConfiguration.LegacySetting.Version)?.Value < 2.5m)
+                        return SkinUtils.As<TValue>(new Bindable<float>(1));
+
+                    if (existing.HoldNoteLightWidth[maniaLookup.ColumnIndex.Value] != 0)
+                        return SkinUtils.As<TValue>(new Bindable<float>(existing.HoldNoteLightWidth[maniaLookup.ColumnIndex.Value] / LegacyManiaSkinConfiguration.DEFAULT_COLUMN_SIZE));
+
+                    return SkinUtils.As<TValue>(new Bindable<float>(existing.ColumnWidth[maniaLookup.ColumnIndex.Value] / LegacyManiaSkinConfiguration.DEFAULT_COLUMN_SIZE));
             }
 
             return null;
