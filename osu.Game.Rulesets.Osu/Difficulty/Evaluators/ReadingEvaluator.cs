@@ -11,7 +11,6 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
-using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 {
@@ -25,13 +24,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 return 0;
 
             var currObj = (OsuDifficultyHitObject)current;
-            Vector2 currPosition = currObj.Position;
             double currVelocity = currObj.LazyJumpDistance / currObj.StrainTime;
             double angleNerfFactor = getConstantAngleNerfFactor(currObj);
 
             double pastObjectDifficultyInfluence = 1.0;
-            double overlapness = 0;
-            var prevLoopObj = currObj;
 
             if (currObj.BaseObject is Slider currSlider)
                 // Longer sliders are inherently denser objects
@@ -44,31 +40,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 // Small distances means objects may be cheesed, so it doesn't matter whether they are arranged confusingly.
                 loopDifficulty *= DifficultyCalculationUtils.Logistic(-(loopObj.LazyJumpDistance - 65) / 15);
 
-                var loopObjPosition = loopObj.Position;
-                float visibleDistance = ((currPosition - loopObjPosition) / OsuDifficultyHitObject.NORMALISED_DIAMETER).Length;
-
-                overlapness += DifficultyCalculationUtils.Logistic(-(0.5 - visibleDistance) / 0.1) - 0.2;
-
-                if (loopObj.BaseObject is Slider loopSlider)
-                    overlapness *= Math.Max(1, Math.Log10(Math.Max(1, loopSlider.Velocity * loopSlider.SpanDuration / loopSlider.Radius)));
-
-                overlapness = Math.Max(0, overlapness);
-
-                // Nerf overlapness if loop object that overlaps current object also overlaps previous loop object
-                // This effectively awards overlap bonus only if there are spacing changes between current object and loop object
-                // Ignore if current object is a slider because sliders in bursts add difficulty
-                // Ignore for perfect stacks
-                overlapness *= prevLoopObj.BaseObject.StartTime.Equals(currObj.BaseObject.StartTime) || loopObj.BaseObject is not Slider || prevLoopObj.LazyJumpDistance != 0
-                    ? DifficultyCalculationUtils.Logistic(-(prevLoopObj.LazyJumpDistance - 70) / 15)
-                    : DifficultyCalculationUtils.Logistic(-prevLoopObj.LazyJumpDistance);
-
                 double timeBetweenCurrAndLoopObj = (currObj.BaseObject.StartTime - loopObj.BaseObject.StartTime) / currObj.ClockRate;
                 double timeNerfFactor = getTimeNerfFactor(timeBetweenCurrAndLoopObj);
 
                 loopDifficulty *= timeNerfFactor;
-                overlapness *= timeNerfFactor;
                 pastObjectDifficultyInfluence += loopDifficulty;
-                prevLoopObj = loopObj;
             }
 
             double preemptDifficulty = 0.0;
@@ -115,7 +91,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double noteDensityDifficulty = Math.Max(0, pastObjectDifficultyInfluence - 2.5);
             noteDensityDifficulty *= angleNerfFactor;
 
-            double difficulty = preemptDifficulty + hiddenDifficulty + noteDensityDifficulty + overlapness;
+            double difficulty = preemptDifficulty + hiddenDifficulty + noteDensityDifficulty;
 
             return difficulty;
         }
