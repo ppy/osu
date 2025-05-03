@@ -687,7 +687,7 @@ namespace osu.Game
                 var selection = (!LocalConfig.GetBindable<double>(OsuSetting.DisplayStarsMinimum).IsDefault ||
                                  !LocalConfig.GetBindable<double>(OsuSetting.DisplayStarsMaximum).IsDefault
                                     ? beatmaps.FirstOrDefault(b => (b.StarRating >= LocalConfig.Get<double>(OsuSetting.DisplayStarsMinimum)
-                                                                    && b.StarRating <= LocalConfig.Get<double>(OsuSetting.DisplayStarsMaximum)
+                                                                    && b.StarRating < LocalConfig.Get<double>(OsuSetting.DisplayStarsMaximum)
                                                                     && b.Ruleset.Equals(Ruleset.Value)))
                                     : difficultyRecommender.GetRecommendedBeatmap(beatmaps))
                                 ?? beatmaps.FirstOrDefault(b => b.Ruleset.Equals(Ruleset.Value))
