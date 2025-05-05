@@ -6,7 +6,6 @@ using NUnit.Framework;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Carousel;
-using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
 using osu.Game.Screens.SelectV2;
 using osuTK;
@@ -21,7 +20,9 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         {
             RemoveAllBeatmaps();
             CreateCarousel();
-            SortBy(new FilterCriteria { Group = GroupMode.Difficulty, Sort = SortMode.Difficulty });
+
+            SortBy(SortMode.Difficulty);
+            GroupBy(GroupMode.Difficulty);
 
             AddBeatmaps(10, 3);
             WaitForDrawablePanels();

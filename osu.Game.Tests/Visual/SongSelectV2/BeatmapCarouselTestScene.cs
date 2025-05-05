@@ -20,6 +20,7 @@ using osu.Game.Graphics.Carousel;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
 using osu.Game.Screens.Select;
+using osu.Game.Screens.Select.Filter;
 using osu.Game.Screens.SelectV2;
 using osu.Game.Tests.Beatmaps;
 using osu.Game.Tests.Resources;
@@ -127,9 +128,23 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                     },
                 };
             });
+
+            // Prefer title sorting so that order of carousel panels match order of BeatmapSets bindable.
+            SortBy(SortMode.Title);
         }
 
-        protected void SortBy(FilterCriteria criteria) => AddStep($"sort:{criteria.Sort} group:{criteria.Group}", () => Carousel.Filter(criteria));
+        protected void SortBy(SortMode mode) => ApplyToFilter($"sort by {mode.ToString().ToLowerInvariant()}", c => c.Sort = mode);
+        protected void GroupBy(GroupMode mode) => ApplyToFilter($"group by {mode.ToString().ToLowerInvariant()}", c => c.Group = mode);
+
+        protected void ApplyToFilter(string description, Action<FilterCriteria>? apply)
+        {
+            AddStep(description, () =>
+            {
+                var criteria = Carousel.Criteria;
+                apply?.Invoke(criteria);
+                Carousel.Filter(criteria);
+            });
+        }
 
         protected void WaitForDrawablePanels() => AddUntilStep("drawable panels loaded", () => Carousel.ChildrenOfType<ICarouselPanel>().Count(), () => Is.GreaterThan(0));
         protected void WaitForFiltering() => AddUntilStep("filtering finished", () => Carousel.IsFiltering, () => Is.False);
