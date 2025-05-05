@@ -37,7 +37,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddStep("save selected screen position", () => positionBefore = Carousel.ChildrenOfType<PanelBeatmap>().FirstOrDefault(p => p.Selected.Value)!.ScreenSpaceDrawQuad);
 
             RemoveFirstBeatmap();
-            WaitForSorting();
+            WaitForFiltering();
 
             AddAssert("select screen position unchanged", () => Carousel.ChildrenOfType<PanelBeatmap>().Single(p => p.Selected.Value).ScreenSpaceDrawQuad,
                 () => Is.EqualTo(positionBefore));
@@ -57,7 +57,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddStep("save selected screen position", () => positionBefore = Carousel.ChildrenOfType<PanelBeatmap>().FirstOrDefault(p => p.Selected.Value)!.ScreenSpaceDrawQuad);
 
             RemoveFirstBeatmap();
-            WaitForSorting();
+            WaitForFiltering();
             AddAssert("select screen position unchanged", () => Carousel.ChildrenOfType<PanelBeatmap>().Single(p => p.Selected.Value).ScreenSpaceDrawQuad,
                 () => Is.EqualTo(positionBefore));
         }
