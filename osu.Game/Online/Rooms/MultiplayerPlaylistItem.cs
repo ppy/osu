@@ -66,5 +66,21 @@ namespace osu.Game.Online.Rooms
         public MultiplayerPlaylistItem()
         {
         }
+
+        public MultiplayerPlaylistItem(PlaylistItem item)
+        {
+            ID = item.ID;
+            OwnerID = item.OwnerID;
+            BeatmapID = item.Beatmap.OnlineID;
+            BeatmapChecksum = item.Beatmap.MD5Hash;
+            RulesetID = item.RulesetID;
+            RequiredMods = item.RequiredMods.ToArray();
+            AllowedMods = item.AllowedMods.ToArray();
+            Expired = item.Expired;
+            PlaylistOrder = item.PlaylistOrder ?? 0;
+            PlayedAt = item.PlayedAt;
+            StarRating = item.Beatmap.StarRating;
+            Freestyle = item.Freestyle;
+        }
     }
 }

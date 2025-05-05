@@ -75,7 +75,7 @@ namespace osu.Game.Screens.SelectV2
         /// <summary>
         /// The number of items currently actualised into drawables.
         /// </summary>
-        public int VisibleItems => scroll.Panels.Count;
+        public int VisibleItems => Scroll.Panels.Count;
 
         /// <summary>
         /// The currently selected model. Generally of type T.
@@ -185,7 +185,7 @@ namespace osu.Game.Screens.SelectV2
         /// <param name="item">The item to find a related drawable representation.</param>
         /// <returns>The drawable representation if it exists.</returns>
         protected Drawable? GetMaterialisedDrawableForItem(CarouselItem item) =>
-            scroll.Panels.SingleOrDefault(p => ((ICarouselPanel)p).Item == item);
+            Scroll.Panels.SingleOrDefault(p => ((ICarouselPanel)p).Item == item);
 
         /// <summary>
         /// When a user is traversing the carousel via group selection keys, assert whether the item provided is a valid target.
@@ -222,11 +222,11 @@ namespace osu.Game.Screens.SelectV2
 
         #region Initialisation
 
-        private readonly CarouselScrollContainer scroll;
+        protected readonly CarouselScrollContainer Scroll;
 
         protected Carousel()
         {
-            InternalChild = scroll = new CarouselScrollContainer
+            InternalChild = Scroll = new CarouselScrollContainer
             {
                 RelativeSizeAxes = Axes.Both,
             };
@@ -499,13 +499,13 @@ namespace osu.Game.Screens.SelectV2
             // If a keyboard selection is currently made, we want to keep the view stable around the selection.
             // That means that we should offset the immediate scroll position by any change in Y position for the selection.
             if (prevKeyboard.YPosition != null && currentKeyboardSelection.YPosition != prevKeyboard.YPosition)
-                scroll.OffsetScrollPosition((float)(currentKeyboardSelection.YPosition!.Value - prevKeyboard.YPosition.Value));
+                Scroll.OffsetScrollPosition((float)(currentKeyboardSelection.YPosition!.Value - prevKeyboard.YPosition.Value));
         }
 
         private void scrollToSelection()
         {
             if (currentKeyboardSelection.CarouselItem != null)
-                scroll.ScrollTo(currentKeyboardSelection.CarouselItem.CarouselYPosition - visibleHalfHeight);
+                Scroll.ScrollTo(currentKeyboardSelection.CarouselItem.CarouselYPosition - visibleHalfHeight);
         }
 
         #endregion
@@ -519,12 +519,12 @@ namespace osu.Game.Screens.SelectV2
         /// <summary>
         /// The position of the lower visible bound with respect to the current scroll position.
         /// </summary>
-        private float visibleBottomBound => (float)(scroll.Current + DrawHeight + BleedBottom);
+        private float visibleBottomBound => (float)(Scroll.Current + DrawHeight + BleedBottom);
 
         /// <summary>
         /// The position of the upper visible bound with respect to the current scroll position.
         /// </summary>
-        private float visibleUpperBound => (float)(scroll.Current - BleedTop);
+        private float visibleUpperBound => (float)(Scroll.Current - BleedTop);
 
         /// <summary>
         /// Half the height of the visible content.
@@ -557,7 +557,7 @@ namespace osu.Game.Screens.SelectV2
 
             double selectedYPos = currentSelection.CarouselItem?.CarouselYPosition ?? 0;
 
-            foreach (var panel in scroll.Panels)
+            foreach (var panel in Scroll.Panels)
             {
                 var c = (ICarouselPanel)panel;
 
@@ -566,20 +566,25 @@ namespace osu.Game.Screens.SelectV2
                     continue;
 
                 float normalisedDepth = (float)(Math.Abs(selectedYPos - c.DrawYPosition) / DrawHeight);
-                scroll.Panels.ChangeChildDepth(panel, c.Item.DepthLayer + normalisedDepth);
+                Scroll.Panels.ChangeChildDepth(panel, c.Item.DepthLayer + normalisedDepth);
 
                 if (c.DrawYPosition != c.Item.CarouselYPosition)
                     c.DrawYPosition = Interpolation.DampContinuously(c.DrawYPosition, c.Item.CarouselYPosition, 50, Time.Elapsed);
 
-                Vector2 posInScroll = scroll.ToLocalSpace(panel.ScreenSpaceDrawQuad.Centre);
-                float dist = Math.Abs(1f - posInScroll.Y / visibleHalfHeight);
-
-                panel.X = offsetX(dist, visibleHalfHeight);
+                panel.X = GetPanelXOffset(panel);
 
                 c.Selected.Value = c.Item == currentSelection?.CarouselItem;
                 c.KeyboardSelected.Value = c.Item == currentKeyboardSelection?.CarouselItem;
                 c.Expanded.Value = c.Item.IsExpanded;
             }
+        }
+
+        protected virtual float GetPanelXOffset(Drawable panel)
+        {
+            Vector2 posInScroll = Scroll.ToLocalSpace(panel.ScreenSpaceDrawQuad.Centre);
+            float dist = Math.Abs(1f - posInScroll.Y / visibleHalfHeight);
+
+            return offsetX(dist, visibleHalfHeight);
         }
 
         /// <summary>
@@ -628,7 +633,7 @@ namespace osu.Game.Screens.SelectV2
             toDisplay.RemoveAll(i => !i.IsVisible);
 
             // Iterate over all panels which are already displayed and figure which need to be displayed / removed.
-            foreach (var panel in scroll.Panels)
+            foreach (var panel in Scroll.Panels)
             {
                 var carouselPanel = (ICarouselPanel)panel;
 
@@ -658,7 +663,7 @@ namespace osu.Game.Screens.SelectV2
                 carouselPanel.DrawYPosition = item.CarouselYPosition;
                 carouselPanel.Item = item;
 
-                scroll.Add(drawable);
+                Scroll.Add(drawable);
             }
 
             // Update the total height of all items (to make the scroll container scrollable through the full height even though
@@ -666,10 +671,10 @@ namespace osu.Game.Screens.SelectV2
             if (carouselItems.Count > 0)
             {
                 var lastItem = carouselItems[^1];
-                scroll.SetLayoutHeight((float)(lastItem.CarouselYPosition + lastItem.DrawHeight + visibleHalfHeight));
+                Scroll.SetLayoutHeight((float)(lastItem.CarouselYPosition + lastItem.DrawHeight + visibleHalfHeight));
             }
             else
-                scroll.SetLayoutHeight(0);
+                Scroll.SetLayoutHeight(0);
         }
 
         private static void expirePanelImmediately(Drawable panel)
@@ -713,7 +718,7 @@ namespace osu.Game.Screens.SelectV2
         /// Implementation of scroll container which handles very large vertical lists by internally using <c>double</c> precision
         /// for pre-display Y values.
         /// </summary>
-        private partial class CarouselScrollContainer : UserTrackingScrollContainer, IKeyBindingHandler<GlobalAction>
+        protected partial class CarouselScrollContainer : UserTrackingScrollContainer, IKeyBindingHandler<GlobalAction>
         {
             public readonly Container Panels;
 
