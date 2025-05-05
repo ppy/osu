@@ -7,7 +7,6 @@ using System.Linq;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Utils;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
@@ -18,7 +17,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
     {
         private const double reading_window_size = 3000;
 
-        public static double EvaluateDifficultyOf(DifficultyHitObject current, IReadOnlyList<Mod> mods)
+        public static double EvaluateDifficultyOf(DifficultyHitObject current, double clockRate, bool hidden)
         {
             if (current.BaseObject is Spinner || current.Index == 0)
                 return 0;
@@ -40,7 +39,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 // Small distances means objects may be cheesed, so it doesn't matter whether they are arranged confusingly.
                 loopDifficulty *= DifficultyCalculationUtils.Logistic(-(loopObj.LazyJumpDistance - 65) / 15);
 
-                double timeBetweenCurrAndLoopObj = (currObj.BaseObject.StartTime - loopObj.BaseObject.StartTime) / currObj.ClockRate;
+                double timeBetweenCurrAndLoopObj = (currObj.BaseObject.StartTime - loopObj.BaseObject.StartTime) / clockRate;
                 double timeNerfFactor = getTimeNerfFactor(timeBetweenCurrAndLoopObj);
 
                 loopDifficulty *= timeNerfFactor;
@@ -49,11 +48,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             double preemptDifficulty = 0.0;
 
-            double currApproachRate = currObj.Preempt; // Approach rate in milliseconds
+            double currPreempt = currObj.Preempt; // Approach rate in milliseconds
 
-            if (currApproachRate < 500)
+            if (currPreempt < 500)
             {
-                preemptDifficulty += Math.Pow(500 - currApproachRate, 2.5) / 140000;
+                preemptDifficulty += Math.Pow(500 - currPreempt, 2.5) / 140000;
 
                 // Nerf preempt on most comfortable densities
                 // https://www.desmos.com/calculator/31mrv4rlfh
@@ -68,9 +67,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             double hiddenDifficulty = 0.0;
 
-            if (mods.OfType<OsuModHidden>().Any())
+            if (hidden)
             {
-                double timeSpentInvisible = getDurationSpentInvisible(currObj) / currObj.ClockRate;
+                double timeSpentInvisible = getDurationSpentInvisible(currObj) / clockRate;
 
                 // Nerf extremely high times as you begin to rely more on memory the longer a note is invisible
                 double timeSpentInvisibleFactor = Math.Min(timeSpentInvisible, 1000) + (timeSpentInvisible > 1000 ? 2000 * Math.Log10(timeSpentInvisible / 1000) : 0);

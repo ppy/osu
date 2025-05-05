@@ -21,8 +21,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 {
     public class OsuPerformanceCalculator : PerformanceCalculator
     {
-        public const double PERFORMANCE_BASE_MULTIPLIER = 1.115; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things.
-
         private bool usingClassicSliderAccuracy;
         private bool usingScoreV2;
 
@@ -332,8 +330,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // Scale the reading value with accuracy _harshly_.
             readingValue *= Math.Pow(accuracy, 3);
-            // It is important to also consider accuracy difficulty when doing that.
-            readingValue *= 0.75 + Math.Pow(Math.Max(0, overallDifficulty), 2.2) / 800;
 
             return readingValue;
         }

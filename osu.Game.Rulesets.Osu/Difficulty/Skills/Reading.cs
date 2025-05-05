@@ -2,21 +2,27 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Evaluators;
+using osu.Game.Rulesets.Osu.Mods;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
     public class Reading : OsuStrainSkill
     {
+        private readonly double ClockRate;
+        private readonly bool hasHiddenMod;
         private double skillMultiplier => 12.0;
         private double currentStrain;
         private double strainDecayBase => 0.3;
 
-        public Reading(Mod[] mods)
+        public Reading(Mod[] mods, double clockRate)
             : base(mods)
         {
+            ClockRate = clockRate;
+            hasHiddenMod = mods.Any(m => m is OsuModHidden);
         }
 
         private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
@@ -25,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         protected override double StrainValueAt(DifficultyHitObject current)
         {
             currentStrain *= strainDecay(current.DeltaTime);
-            currentStrain += ReadingEvaluator.EvaluateDifficultyOf(current, Mods) * skillMultiplier;
+            currentStrain += ReadingEvaluator.EvaluateDifficultyOf(current, ClockRate, hasHiddenMod) * skillMultiplier;
 
             return currentStrain;
         }
