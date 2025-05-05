@@ -182,7 +182,5 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         {
             return Math.Clamp(2 - deltaTime / (reading_window_size / 2), 0, 1);
         }
-
-        private static double getRhythmDifference(double t1, double t2) => 1 - Math.Min(t1, t2) / Math.Max(t1, t2);
     }
 }
