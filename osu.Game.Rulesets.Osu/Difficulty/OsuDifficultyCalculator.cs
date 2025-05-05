@@ -65,12 +65,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 readingRating = Math.Pow(readingRating, 0.8);
             }
 
-            if (mods.Any(m => m is OsuModFlashlight))
-            {
-                bool hasHidden = mods.Any(m => m is OsuModHidden);
-                readingRating *= hasHidden ? 0.8 : 0.5;
-            }
-
             if (mods.Any(h => h is OsuModRelax))
             {
                 aimRating *= 0.9;
