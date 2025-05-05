@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             if (currApproachRate < 500)
             {
-                preemptDifficulty += Math.Pow(500 - currApproachRate, 2.5) / 120000;
+                preemptDifficulty += Math.Pow(500 - currApproachRate, 2.5) / 140000;
 
                 // Nerf preempt on most comfortable densities
                 // https://www.desmos.com/calculator/31mrv4rlfh
@@ -72,6 +72,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             {
                 double timeSpentInvisible = getDurationSpentInvisible(currObj) / currObj.ClockRate;
 
+                // Nerf extremely high times as you begin to rely more on memory the longer a note is invisible
+                double timeSpentInvisibleFactor = Math.Min(timeSpentInvisible, 1000) + (timeSpentInvisible > 1000 ? 2000 * Math.Log10(timeSpentInvisible / 1000) : 0);
+
                 // Nerf hidden difficulty less the more past object difficulty you have
                 double timeDifficultyFactor = 9000 / pastObjectDifficultyInfluence;
 
@@ -79,7 +82,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double visibleObjectFactor = Math.Min(retrieveCurrentVisibleObjects(currObj).Count, 8);
 
                 // The longer an object is hidden, the more velocity should matter
-                hiddenDifficulty += visibleObjectFactor * timeSpentInvisible * Math.Max(1, currVelocity) / timeDifficultyFactor;
+                hiddenDifficulty += visibleObjectFactor * timeSpentInvisibleFactor * Math.Max(1, currVelocity) / timeDifficultyFactor;
 
                 hiddenDifficulty *= angleNerfFactor;
 
