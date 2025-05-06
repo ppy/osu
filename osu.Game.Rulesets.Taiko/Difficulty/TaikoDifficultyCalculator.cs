@@ -173,10 +173,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
             for (int i = 0; i < colourPeaks.Count; i++)
             {
-                double rhythmPeak = rhythmPeaks[i] * rhythm_skill_multiplier * patternMultiplier;
-                double readingPeak = readingPeaks[i] * reading_skill_multiplier;
-                double colourPeak = isRelax ? 0 : colourPeaks[i] * colour_skill_multiplier; // There is no colour difficulty in relax.
-                double staminaPeak = staminaPeaks[i] * stamina_skill_multiplier * strainLengthBonus;
+                double rhythmPeak = rhythmPeaks[i].Value * rhythm_skill_multiplier * patternMultiplier;
+                double readingPeak = readingPeaks[i].Value * reading_skill_multiplier;
+                double colourPeak = isRelax ? 0 : colourPeaks[i].Value * colour_skill_multiplier; // There is no colour difficulty in relax.
+                double staminaPeak = staminaPeaks[i].Value * stamina_skill_multiplier * strainLengthBonus;
                 staminaPeak /= isConvert || isRelax ? 1.5 : 1.0; // Available finger count is increased by 150%, thus we adjust accordingly.
 
                 double peak = DifficultyCalculationUtils.Norm(2, DifficultyCalculationUtils.Norm(1.5, colourPeak, staminaPeak), rhythmPeak, readingPeak);
