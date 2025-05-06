@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             // These sections will not contribute to the difficulty.
             var peaks = GetCurrentStrainPeaks().Where(p => p.Value > 0);
 
-            List<Strain> strains = peaks.OrderDescending().ToList();
+            List<Strain> strains = peaks.OrderByDescending(p => (p.Value, p.SectionLength)).ToList();
 
             // We are reducing the highest strains first to account for extreme difficulty spikes
             double time = 0;

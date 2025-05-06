@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         private double currentSectionPeak; // We also keep track of the peak strain level in the current section.
         private double currentSectionBegin;
 
-        public struct Strain : IComparable<Strain>
+        public struct Strain
         {
             public Strain(double value, double sectionLength)
             {
@@ -38,7 +38,6 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
             public double Value { get; set; }
             public double SectionLength { get; }
-            public int CompareTo(Strain other) => Value.CompareTo(other.Value);
         }
 
         private readonly List<Strain> strainPeaks = new List<Strain>();
@@ -153,7 +152,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
             // Difficulty is the weighted sum of the highest strains from every section.
             // We're sorting from highest to lowest strain.
-            foreach (Strain strain in peaks.OrderDescending())
+            foreach (Strain strain in peaks.OrderByDescending(p => (p.Value, p.SectionLength)))
             {
                 difficulty += strain.Value * weight;
                 weight *= DecayWeight;
