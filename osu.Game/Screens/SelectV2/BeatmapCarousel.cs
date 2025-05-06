@@ -81,14 +81,14 @@ namespace osu.Game.Screens.SelectV2
             switch (changed.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    Items.AddRange(newItems!.SelectMany(s => s.Beatmaps));
+                    Models.AddRange(newItems!.SelectMany(s => s.Beatmaps));
                     break;
 
                 case NotifyCollectionChangedAction.Remove:
                     foreach (var set in oldItems!)
                     {
                         foreach (var beatmap in set.Beatmaps)
-                            Items.RemoveAll(i => i is BeatmapInfo bi && beatmap.Equals(bi));
+                            Models.RemoveAll(i => i is BeatmapInfo bi && beatmap.Equals(bi));
                     }
 
                     break;
@@ -110,7 +110,7 @@ namespace osu.Game.Screens.SelectV2
                     // have been processed) if it becomes an issue for animation or performance reasons.
                     foreach (var beatmap in oldSetBeatmaps)
                     {
-                        int previousIndex = Items.IndexOf(beatmap);
+                        int previousIndex = Models.IndexOf(beatmap);
                         Debug.Assert(previousIndex >= 0);
 
                         BeatmapInfo? matchingNewBeatmap =
@@ -124,23 +124,23 @@ namespace osu.Game.Screens.SelectV2
                             if (CurrentSelection != null && CheckModelEquality(beatmap, CurrentSelection))
                                 CurrentSelection = matchingNewBeatmap;
 
-                            Items.ReplaceRange(previousIndex, 1, [matchingNewBeatmap]);
+                            Models.ReplaceRange(previousIndex, 1, [matchingNewBeatmap]);
                             newSetBeatmaps.Remove(matchingNewBeatmap);
                         }
                         else
                         {
-                            Items.RemoveAt(previousIndex);
+                            Models.RemoveAt(previousIndex);
                         }
                     }
 
                     // Add any items which weren't found in the previous pass (difficulty names didn't match).
                     foreach (var beatmap in newSetBeatmaps)
-                        Items.Add(beatmap);
+                        Models.Add(beatmap);
 
                     break;
 
                 case NotifyCollectionChangedAction.Reset:
-                    Items.Clear();
+                    Models.Clear();
                     break;
             }
         }

@@ -65,7 +65,7 @@ namespace osu.Game.Graphics.Carousel
         /// <summary>
         /// The number of displayable items currently being tracked (before filtering).
         /// </summary>
-        public int ItemsTracked => Items.Count;
+        public int ModelsTracked => Models.Count;
 
         /// <summary>
         /// The number of carousel items currently in rotation for display.
@@ -159,7 +159,7 @@ namespace osu.Game.Graphics.Carousel
         /// <remarks>
         /// Note that an <see cref="ICarouselFilter"/> may add new items which are displayed but not tracked in this list.
         /// </remarks>
-        protected readonly BindableList<T> Items = new BindableList<T>();
+        protected readonly BindableList<T> Models = new BindableList<T>();
 
         /// <summary>
         /// Queue an asynchronous filter operation.
@@ -237,7 +237,7 @@ namespace osu.Game.Graphics.Carousel
                 RelativeSizeAxes = Axes.Both,
             };
 
-            Items.BindCollectionChanged((_, _) => FilterAsync());
+            Models.BindCollectionChanged((_, _) => FilterAsync());
         }
 
         #endregion
@@ -265,7 +265,7 @@ namespace osu.Game.Graphics.Carousel
 
             // Copy must be performed on update thread for now (see ConfigureAwait above).
             // Could potentially be optimised in the future if it becomes an issue.
-            IEnumerable<CarouselItem> items = new List<CarouselItem>(Items.Select(m => new CarouselItem(m)));
+            IEnumerable<CarouselItem> items = new List<CarouselItem>(Models.Select(m => new CarouselItem(m)));
 
             await Task.Run(async () =>
             {
