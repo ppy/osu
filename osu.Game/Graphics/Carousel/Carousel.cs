@@ -70,7 +70,7 @@ namespace osu.Game.Graphics.Carousel
         /// <summary>
         /// The number of carousel items currently in rotation for display.
         /// </summary>
-        public int DisplayableItems => carouselItems?.Count ?? 0;
+        public int DisplayableItems => Items.Count;
 
         /// <summary>
         /// The number of items currently actualised into drawables.
@@ -162,6 +162,11 @@ namespace osu.Game.Graphics.Carousel
         protected readonly BindableList<T> Models = new BindableList<T>();
 
         /// <summary>
+        /// The list of displayable items with the active filter criteria.
+        /// </summary>
+        protected IReadOnlyList<CarouselItem> Items => carouselItems ?? (IReadOnlyList<CarouselItem>)Array.Empty<CarouselItem>();
+
+        /// <summary>
         /// Queue an asynchronous filter operation.
         /// </summary>
         protected virtual Task FilterAsync() => filterTask = performFilter();
@@ -222,6 +227,12 @@ namespace osu.Game.Graphics.Carousel
         /// </remarks>
         /// <param name="item">The carousel item which was activated.</param>
         protected virtual void HandleItemActivated(CarouselItem item) { }
+
+        /// <summary>
+        /// Called when the list of carousel items have changed as a result of a filter operation or change in <see cref="Models"/> bindable.
+        /// The new list of carousel items can be accessed through <see cref="Items"/>.
+        /// </summary>
+        protected virtual void HandleItemsChanged() { }
 
         #endregion
 
@@ -294,6 +305,8 @@ namespace osu.Game.Graphics.Carousel
                 log("Items ready for display");
                 carouselItems = items.ToList();
                 displayedRange = null;
+
+                HandleItemsChanged();
 
                 // Need to call this to ensure correct post-selection logic is handled on the new items list.
                 HandleItemSelected(currentSelection.Model);

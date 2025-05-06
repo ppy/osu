@@ -296,7 +296,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             createHeader("carousel");
             stats.AddParagraph($"""
                                 sorting: {Carousel.IsFiltering}
-                                tracked: {Carousel.ItemsTracked}
+                                tracked: {Carousel.ModelsTracked}
                                 displayable: {Carousel.DisplayableItems}
                                 displayed: {Carousel.VisibleItems}
                                 selected: {Carousel.CurrentSelection}

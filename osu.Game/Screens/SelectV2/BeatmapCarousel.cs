@@ -328,7 +328,7 @@ namespace osu.Game.Screens.SelectV2
 
         #endregion
 
-        #region Filtering
+        #region Filtering & items change
 
         public FilterCriteria Criteria { get; private set; } = new FilterCriteria();
 
@@ -337,6 +337,31 @@ namespace osu.Game.Screens.SelectV2
             Criteria = criteria;
             loading.Show();
             FilterAsync().ContinueWith(_ => Schedule(() => loading.Hide()));
+        }
+
+        protected override void HandleItemsChanged()
+        {
+            base.HandleItemsChanged();
+
+            var itemsBeatmapModels = Items.Select(i => i.Model).OfType<BeatmapInfo>();
+
+            if (CurrentSelection is BeatmapInfo selectedBeatmap
+                // Selected beatmap is still tracked in the database (i.e. not deleted).
+                && Models.Contains(selectedBeatmap)
+                // Selected beatmap is still valid for selection (i.e. matching ruleset or allowed conversion).
+                && BeatmapCarouselFilterMatching.IsValidForSelection(selectedBeatmap, Criteria)
+                // There is no beatmap available after filter, or there is more than one "beatmap" after filter
+                // (otherwise, we want to change selection to that single beatmap).
+                && itemsBeatmapModels.DistinctBy(i => i.BeatmapSet).Count() != 1)
+                return;
+
+            // TODO: replace with random selection when supported.
+            if (Items.FirstOrDefault(i => i.Model is BeatmapSetInfo) is CarouselItem setItem)
+                Activate(setItem);
+            else if (Items.FirstOrDefault(i => i.Model is BeatmapInfo) is CarouselItem beatmapItem)
+                Activate(beatmapItem);
+            else
+                CurrentSelection = null;
         }
 
         #endregion
