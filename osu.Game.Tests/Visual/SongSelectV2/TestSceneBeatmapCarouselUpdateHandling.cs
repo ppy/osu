@@ -23,7 +23,10 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         {
             RemoveAllBeatmaps();
             CreateCarousel();
+
             AddBeatmaps(1, 3);
+            WaitForSelection(0, 0);
+
             AddStep("generate and add test beatmap", () =>
             {
                 baseTestBeatmap = TestResources.CreateTestBeatmapSetInfo(3);
@@ -85,6 +88,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [Test]
         public void TestSelectionHeld()
         {
+            WaitForSelection(0, 0);
             SelectPrevGroup();
 
             WaitForSelection(1, 0);
@@ -101,6 +105,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [Test] // Checks that we keep selection based on online ID where possible.
         public void TestSelectionHeldDifficultyNameChanged()
         {
+            WaitForSelection(0, 0);
             SelectPrevGroup();
 
             WaitForSelection(1, 0);

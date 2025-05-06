@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Testing;
@@ -29,77 +30,57 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         }
 
         [Test]
-        public void TestOpenCloseGroupWithNoSelectionMouse()
+        public void TestOpenCloseGroupMouse()
         {
-            AddAssert("no beatmaps visible", () => Carousel.ChildrenOfType<PanelBeatmap>().Count(p => p.Alpha > 0), () => Is.Zero);
-            CheckNoSelection();
-
-            ClickVisiblePanel<PanelGroup>(0);
             AddUntilStep("some beatmaps visible", () => Carousel.ChildrenOfType<PanelBeatmap>().Count(p => p.Alpha > 0), () => Is.GreaterThan(0));
-            CheckNoSelection();
+            CheckHasSelection();
 
             ClickVisiblePanel<PanelGroup>(0);
+
             AddUntilStep("no beatmaps visible", () => Carousel.ChildrenOfType<PanelBeatmap>().Count(p => p.Alpha > 0), () => Is.Zero);
-            CheckNoSelection();
+            CheckHasSelection();
         }
 
         [Test]
-        public void TestOpenCloseGroupWithNoSelectionKeyboard()
+        public void TestOpenCloseGroupKeyboard()
         {
-            AddAssert("no beatmaps visible", () => Carousel.ChildrenOfType<PanelBeatmap>().Count(p => p.Alpha > 0), () => Is.Zero);
-            CheckNoSelection();
+            SelectPrevPanel();
 
-            SelectNextPanel();
-            Select();
             AddUntilStep("some beatmaps visible", () => Carousel.ChildrenOfType<PanelBeatmap>().Count(p => p.Alpha > 0), () => Is.GreaterThan(0));
             AddAssert("keyboard selected is expanded", () => GetKeyboardSelectedPanel()?.Expanded.Value, () => Is.True);
-            CheckNoSelection();
+            CheckHasSelection();
 
             Select();
+
             AddUntilStep("no beatmaps visible", () => Carousel.ChildrenOfType<PanelBeatmap>().Count(p => p.Alpha > 0), () => Is.Zero);
             AddAssert("keyboard selected is collapsed", () => GetKeyboardSelectedPanel()?.Expanded.Value, () => Is.False);
-            CheckNoSelection();
+            CheckHasSelection();
         }
 
         [Test]
         public void TestCarouselRemembersSelection()
         {
-            SelectNextGroup();
+            Guid selectedID = Guid.Empty;
 
-            object? selection = null;
-
-            AddStep("store drawable selection", () => selection = GetSelectedPanel()?.Item?.Model);
-
-            CheckHasSelection();
-            AddAssert("drawable selection non-null", () => selection, () => Is.Not.Null);
-            AddAssert("drawable selection matches carousel selection", () => selection, () => Is.EqualTo(Carousel.CurrentSelection));
-
-            RemoveAllBeatmaps();
-            AddUntilStep("no drawable selection", GetSelectedPanel, () => Is.Null);
-
-            AddBeatmaps(3);
+            AddBeatmaps(50, 3);
             WaitForDrawablePanels();
 
-            CheckHasSelection();
-            AddAssert("no drawable selection", GetSelectedPanel, () => Is.Null);
+            SelectNextGroup();
 
-            AddStep("add previous selection", () => BeatmapSets.Add(((BeatmapInfo)selection!).BeatmapSet!));
+            AddStep("record selection", () => selectedID = ((BeatmapInfo)Carousel.CurrentSelection!).ID);
 
-            AddAssert("selection matches original carousel selection", () => selection, () => Is.EqualTo(Carousel.CurrentSelection));
-            AddUntilStep("drawable selection restored", () => GetSelectedPanel()?.Item?.Model, () => Is.EqualTo(selection));
-            AddAssert("carousel item is visible", () => GetSelectedPanel()?.Item?.IsVisible, () => Is.True);
-
-            ClickVisiblePanel<PanelGroup>(0);
-            AddUntilStep("carousel item not visible", GetSelectedPanel, () => Is.Null);
-
-            ClickVisiblePanel<PanelGroup>(0);
-            AddUntilStep("carousel item is visible", () => GetSelectedPanel()?.Item?.IsVisible, () => Is.True);
+            for (int i = 0; i < 5; i++)
+            {
+                ApplyToFilter("filter all", c => c.SearchText = Guid.NewGuid().ToString());
+                AddAssert("selection not changed", () => ((BeatmapInfo)Carousel.CurrentSelection!).ID == selectedID);
+                ApplyToFilter("remove filter", c => c.SearchText = string.Empty);
+                AddAssert("selection not changed", () => ((BeatmapInfo)Carousel.CurrentSelection!).ID == selectedID);
+            }
         }
 
         [Test]
         public void TestGroupSelectionOnHeaderKeyboard()
         {
-            SelectNextGroup();
             WaitForGroupSelection(0, 0);
 
             SelectPrevPanel();
@@ -119,7 +100,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [Test]
         public void TestGroupSelectionOnHeaderMouse()
         {
-            SelectNextGroup();
             WaitForGroupSelection(0, 0);
 
             AddAssert("keyboard selected panel is beatmap", GetKeyboardSelectedPanel, Is.TypeOf<PanelBeatmap>);
@@ -139,15 +119,18 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [Test]
         public void TestKeyboardSelection()
         {
+            WaitForGroupSelection(0, 0);
+            SelectPrevPanel();
+            Select();
+
             SelectNextPanel();
             SelectNextPanel();
             SelectNextPanel();
-            SelectNextPanel();
-            CheckNoSelection();
+            WaitForGroupSelection(0, 0);
 
             // open first group
             Select();
-            CheckNoSelection();
+            WaitForGroupSelection(0, 0);
             AddUntilStep("some beatmaps visible", () => Carousel.ChildrenOfType<PanelBeatmap>().Count(p => p.Alpha > 0), () => Is.GreaterThan(0));
 
             SelectNextPanel();
@@ -173,17 +156,23 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [Test]
         public void TestInputHandlingWithinGaps()
         {
-            AddAssert("no beatmaps visible", () => !GetVisiblePanels<PanelBeatmap>().Any());
+            SelectNextPanel();
+            Select();
+            WaitForGroupSelection(0, 1);
+
+            SelectPrevPanel();
+            SelectPrevPanel();
+            Select();
 
             // Clicks just above the first group panel should not actuate any action.
             ClickVisiblePanelWithOffset<PanelGroup>(0, new Vector2(0, -(PanelGroup.HEIGHT / 2 + 1)));
+            AddAssert("group not expanded", () => GetVisiblePanels<PanelGroup>().First().Item!.IsExpanded, () => Is.False);
 
-            AddAssert("no beatmaps visible", () => !GetVisiblePanels<PanelBeatmap>().Any());
+            // minus one to avoid floating point inaccuracies when clicking at the direct edge of the panel.
+            ClickVisiblePanelWithOffset<PanelGroup>(0, new Vector2(0, -(PanelGroup.HEIGHT / 2 - 1)));
 
-            ClickVisiblePanelWithOffset<PanelGroup>(0, new Vector2(0, -(PanelGroup.HEIGHT / 2)));
-
-            AddUntilStep("wait for beatmaps visible", () => GetVisiblePanels<PanelBeatmap>().Any());
-            CheckNoSelection();
+            AddAssert("group expanded", () => GetVisiblePanels<PanelGroup>().First().Item!.IsExpanded, () => Is.True);
+            WaitForGroupSelection(0, 1);
 
             // Beatmap panels expand their selection area to cover holes from spacing.
             ClickVisiblePanelWithOffset<PanelBeatmap>(0, new Vector2(0, -(CarouselItem.DEFAULT_HEIGHT / 2 + 1)));
