@@ -24,7 +24,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             var currObj = (OsuDifficultyHitObject)current;
             double currVelocity = currObj.LazyJumpDistance / currObj.StrainTime;
-            double angleNerfFactor = getConstantAngleNerfFactor(currObj);
+            double constantAngleNerfFactor = getConstantAngleNerfFactor(currObj);
+            var prevObj = (OsuDifficultyHitObject)currObj.Previous(0);
+            double angularVelocityFactor = getAngularVelocityFactor(currObj, prevObj);
 
             double pastObjectDifficultyInfluence = 1.0;
 
@@ -52,15 +54,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             if (currPreempt < 500)
             {
-                preemptDifficulty += Math.Pow(500 - currPreempt, 2.5) / 140000;
+                preemptDifficulty += Math.Pow(500 - currPreempt, 2.5) / 120000;
 
                 // Nerf preempt on most comfortable densities
                 // https://www.desmos.com/calculator/31mrv4rlfh
                 double densityDifficulty = 1 + DifficultyCalculationUtils.BellCurve(retrievePastVisibleObjects(currObj).Count(), 2, 1.5, 3.0);
                 preemptDifficulty *= currVelocity / densityDifficulty;
-                preemptDifficulty *= angleNerfFactor;
+                preemptDifficulty *= constantAngleNerfFactor * angularVelocityFactor;
 
-                var prevObj = (OsuDifficultyHitObject)currObj.Previous(0);
                 double doubletapness = 1 - prevObj.GetDoubletapness(currObj);
                 preemptDifficulty *= doubletapness; // Doubletaps raise the density without adding significant reading difficulty
             }
@@ -75,7 +76,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double timeSpentInvisibleFactor = Math.Min(timeSpentInvisible, 1000) + (timeSpentInvisible > 1000 ? 2000 * Math.Log10(timeSpentInvisible / 1000) : 0);
 
                 // Nerf hidden difficulty less the more past object difficulty you have
-                double timeDifficultyFactor = 9000 / pastObjectDifficultyInfluence;
+                double timeDifficultyFactor = 9500 / pastObjectDifficultyInfluence;
 
                 // Cap objects because after a certain point hidden density is mainly memory
                 double visibleObjectFactor = Math.Min(retrieveCurrentVisibleObjects(currObj).Count, 8);
@@ -83,7 +84,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 // The longer an object is hidden, the more velocity should matter
                 hiddenDifficulty += visibleObjectFactor * timeSpentInvisibleFactor * Math.Max(1, currVelocity) / timeDifficultyFactor;
 
-                hiddenDifficulty *= angleNerfFactor;
+                hiddenDifficulty *= constantAngleNerfFactor * angularVelocityFactor;
 
                 // Buff perfect stacks
                 hiddenDifficulty += currObj.LazyJumpDistance == 0 ? 1.5 : 0;
@@ -91,7 +92,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             // Award only denser than average maps
             double noteDensityDifficulty = Math.Max(0, pastObjectDifficultyInfluence - 2.5);
-            noteDensityDifficulty *= angleNerfFactor;
+            noteDensityDifficulty *= constantAngleNerfFactor * angularVelocityFactor;
 
             double difficulty = preemptDifficulty + hiddenDifficulty + noteDensityDifficulty;
 
@@ -180,6 +181,21 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         private static double getTimeNerfFactor(double deltaTime)
         {
             return Math.Clamp(2 - deltaTime / (reading_window_size / 2), 0, 1);
+        }
+
+        private static double getAngularVelocityFactor(OsuDifficultyHitObject current, OsuDifficultyHitObject previous)
+        {
+            if (current.Angle.HasValue &&
+                previous?.Angle != null)
+            {
+                double angleDifference = Math.Abs(current.Angle.Value - previous.Angle.Value);
+                double angleDifferenceAdjusted = Math.Sin(angleDifference / 2) * 180.0;
+                double angularVelocity = angleDifferenceAdjusted / (0.1 * current.StrainTime);
+                double angularVelocityBonus = Math.Max(0.0, Math.Pow(angularVelocity, 0.4) - 1.0);
+                return 0.6 + angularVelocityBonus * 0.55;
+            }
+
+            return 1;
         }
     }
 }

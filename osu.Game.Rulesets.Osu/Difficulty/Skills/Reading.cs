@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     {
         private readonly double ClockRate;
         private readonly bool hasHiddenMod;
-        private double skillMultiplier => 12.0;
+        private double skillMultiplier => 10.0;
         private double currentStrain;
         private double strainDecayBase => 0.3;
 
