@@ -2,15 +2,23 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
 using osu.Game.Resources.Localisation.Web;
+using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
 using osuTK;
 
@@ -23,11 +31,31 @@ namespace osu.Game.Screens.SelectV2
 
         private const float corner_radius = 8;
 
+        private SongSelectSearchTextBox searchTextBox = null!;
         private ShearedToggleButton showConvertedBeatmapsButton = null!;
         private DifficultyRangeSlider difficultyRangeSlider = null!;
+        private ShearedDropdown<SortMode> sortDropdown = null!;
+        private ShearedDropdown<GroupMode> groupDropdown = null!;
+        private CollectionDropdown collectionDropdown = null!;
+
+        [Resolved]
+        private IBindable<RulesetInfo> ruleset { get; set; } = null!;
+
+        [Resolved]
+        private IBindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
 
         [Resolved]
         private OsuConfigManager config { get; set; } = null!;
+
+        public LocalisableString InformationalNote
+        {
+            get => searchTextBox.FilterText;
+            set => searchTextBox.FilterText = value;
+        }
+
+        public event Action<FilterCriteria>? CriteriaChanged;
+
+        private FilterCriteria currentCriteria = null!;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -65,12 +93,10 @@ namespace osu.Game.Screens.SelectV2
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
                             Shear = -OsuGame.SHEAR,
-                            Child = new SongSelectSearchTextBox
+                            Child = searchTextBox = new SongSelectSearchTextBox
                             {
                                 RelativeSizeAxes = Axes.X,
                                 HoldFocus = true,
-                                // TODO: pending implementation
-                                FilterText = "12345 matches",
                             },
                         },
                         new GridContainer
@@ -123,20 +149,20 @@ namespace osu.Game.Screens.SelectV2
                             {
                                 new[]
                                 {
-                                    new ShearedDropdown<SortMode>(SortStrings.Default)
+                                    sortDropdown = new ShearedDropdown<SortMode>(SortStrings.Default)
                                     {
                                         RelativeSizeAxes = Axes.X,
                                         Items = Enum.GetValues<SortMode>(),
                                     },
                                     Empty(),
                                     // todo: pending localisation
-                                    new ShearedDropdown<GroupMode>("Group by")
+                                    groupDropdown = new ShearedDropdown<GroupMode>("Group by")
                                     {
                                         RelativeSizeAxes = Axes.X,
                                         Items = Enum.GetValues<GroupMode>(),
                                     },
                                     Empty(),
-                                    new CollectionDropdown
+                                    collectionDropdown = new CollectionDropdown
                                     {
                                         RelativeSizeAxes = Axes.X,
                                     },
@@ -155,6 +181,78 @@ namespace osu.Game.Screens.SelectV2
             difficultyRangeSlider.LowerBound = config.GetBindable<double>(OsuSetting.DisplayStarsMinimum);
             difficultyRangeSlider.UpperBound = config.GetBindable<double>(OsuSetting.DisplayStarsMaximum);
             config.BindWith(OsuSetting.ShowConvertedBeatmaps, showConvertedBeatmapsButton.Active);
+            config.BindWith(OsuSetting.SongSelectSortingMode, sortDropdown.Current);
+            config.BindWith(OsuSetting.SongSelectGroupingMode, groupDropdown.Current);
+
+            ruleset.BindValueChanged(_ => updateCriteria());
+            mods.BindValueChanged(m =>
+            {
+                // The following is a note carried from old song select and may not be a valid reason anymore:
+                // // Mods are updated once by the mod select overlay when song select is entered,
+                // // regardless of if there are any mods or any changes have taken place.
+                // // Updating the criteria here so early triggers a re-ordering of panels on song select, via... some mechanism.
+                // // Todo: Investigate/fix and potentially remove this.
+                // TODO: this might be simply removable with the new song select & carousel code.
+                if (m.NewValue.SequenceEqual(m.OldValue))
+                    return;
+
+                var rulesetCriteria = currentCriteria.RulesetCriteria;
+                if (rulesetCriteria?.FilterMayChangeFromMods(m) == true)
+                    updateCriteria();
+            });
+
+            searchTextBox.Current.BindValueChanged(_ => updateCriteria());
+            difficultyRangeSlider.LowerBound.BindValueChanged(_ => updateCriteria());
+            difficultyRangeSlider.UpperBound.BindValueChanged(_ => updateCriteria());
+            showConvertedBeatmapsButton.Active.BindValueChanged(_ => updateCriteria());
+            sortDropdown.Current.BindValueChanged(_ => updateCriteria());
+            groupDropdown.Current.BindValueChanged(_ => updateCriteria());
+            collectionDropdown.Current.BindValueChanged(_ => updateCriteria());
+            updateCriteria();
+        }
+
+        /// <summary>
+        /// Creates a <see cref="FilterCriteria"/> based on the current state of the controls.
+        /// </summary>
+        public FilterCriteria CreateCriteria()
+        {
+            string query = searchTextBox.Current.Value;
+
+            var criteria = new FilterCriteria
+            {
+                Sort = sortDropdown.Current.Value,
+                Group = groupDropdown.Current.Value,
+                AllowConvertedBeatmaps = showConvertedBeatmapsButton.Active.Value,
+                Ruleset = ruleset.Value,
+                Mods = mods.Value,
+                CollectionBeatmapMD5Hashes = collectionDropdown.Current.Value?.Collection?.PerformRead(c => c.BeatmapMD5Hashes).ToImmutableHashSet()
+            };
+
+            if (!difficultyRangeSlider.LowerBound.IsDefault)
+                criteria.UserStarDifficulty.Min = difficultyRangeSlider.LowerBound.Value;
+
+            if (!difficultyRangeSlider.UpperBound.IsDefault)
+                criteria.UserStarDifficulty.Max = difficultyRangeSlider.UpperBound.Value;
+
+            criteria.RulesetCriteria = ruleset.Value.CreateInstance().CreateRulesetFilterCriteria();
+
+            FilterQueryParser.ApplyQueries(criteria, query);
+            return criteria;
+        }
+
+        private void updateCriteria()
+        {
+            currentCriteria = CreateCriteria();
+            CriteriaChanged?.Invoke(currentCriteria);
+        }
+
+        /// <summary>
+        /// Set the query to the search text box.
+        /// </summary>
+        /// <param name="query">The string to search.</param>
+        public void Search(string query)
+        {
+            searchTextBox.Current.Value = query;
         }
 
         protected override void PopIn()
