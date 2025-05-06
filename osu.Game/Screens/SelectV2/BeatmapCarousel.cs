@@ -170,8 +170,8 @@ namespace osu.Game.Screens.SelectV2
                     return;
 
                 case BeatmapSetInfo setInfo:
-                    // Selecting a set isn't valid – let's re-select the first difficulty.
-                    CurrentSelection = setInfo.Beatmaps.First();
+                    // Selecting a set isn't valid – let's re-select the first difficulty visible.
+                    CurrentSelection = grouping.SetItems[setInfo].ElementAt(1).Model;
                     return;
 
                 case BeatmapInfo beatmapInfo:
