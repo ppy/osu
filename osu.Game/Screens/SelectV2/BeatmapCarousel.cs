@@ -23,9 +23,26 @@ namespace osu.Game.Screens.SelectV2
     [Cached]
     public partial class BeatmapCarousel : Carousel<BeatmapInfo>
     {
-        public Action<BeatmapInfo>? RequestPresentBeatmap { private get; init; }
-
         public const float SPACING = 3f;
+
+        /// <summary>
+        /// The total number of beatmap difficulties selectable in this carousel.
+        /// </summary>
+        public int BeatmapsCount => Items.Count(i => i.Model is BeatmapInfo);
+
+        /// <summary>
+        /// The total number of beatmap sets displayed in this carousel.
+        /// This will be zero when the selected sorting/grouping combination disables set headers.
+        /// </summary>
+        public int BeatmapSetsCount => Items.Count(i => i.Model is BeatmapSetInfo);
+
+        /// <summary>
+        /// The total number of groups displayed in this carousel.
+        /// This will be zero when no grouping mode is selected.
+        /// </summary>
+        public int GroupsCount => Items.Count(i => i.Model is GroupDefinition);
+
+        public Action<BeatmapInfo>? RequestPresentBeatmap { private get; init; }
 
         private IBindableList<BeatmapSetInfo> detachedBeatmaps = null!;
 

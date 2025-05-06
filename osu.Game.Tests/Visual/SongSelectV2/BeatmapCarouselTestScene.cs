@@ -160,6 +160,10 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         protected void CheckNoSelection() => AddUntilStep("has no selection", () => Carousel.CurrentSelection, () => Is.Null);
         protected void CheckHasSelection() => AddUntilStep("has selection", () => Carousel.CurrentSelection, () => Is.Not.Null);
 
+        protected void CheckVisibleBeatmapsCount(int count) => AddUntilStep($"{count} diffs displayed", () => Carousel.BeatmapsCount, () => Is.EqualTo(count));
+        protected void CheckVisibleBeatmapSetsCount(int count) => AddUntilStep($"{count} sets displayed", () => Carousel.BeatmapSetsCount, () => Is.EqualTo(count));
+        protected void CheckVisibleGroupsCount(int count) => AddUntilStep($"{count} groups displayed", () => Carousel.GroupsCount, () => Is.EqualTo(count));
+
         protected ICarouselPanel? GetSelectedPanel() => Carousel.ChildrenOfType<ICarouselPanel>().SingleOrDefault(p => p.Selected.Value);
         protected ICarouselPanel? GetKeyboardSelectedPanel() => Carousel.ChildrenOfType<ICarouselPanel>().SingleOrDefault(p => p.KeyboardSelected.Value);
 
