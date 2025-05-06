@@ -158,5 +158,36 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             SelectNextGroup();
             WaitForGroupSelection(1, 1);
         }
+
+        [Test]
+        public void TestBasicFiltering()
+        {
+            SelectNextPanel();
+            Select();
+
+            ApplyToFilter("filter", c => c.SearchText = BeatmapSets[2].Metadata.Title);
+            WaitForFiltering();
+
+            CheckVisibleGroupsCount(1);
+            CheckVisibleBeatmapSetsCount(1);
+            CheckVisibleBeatmapsCount(3);
+            WaitForSelection(2, 0);
+
+            for (int i = 0; i < 5; i++)
+                SelectNextPanel();
+
+            Select();
+            SelectNextPanel();
+            Select();
+
+            WaitForSelection(2, 1);
+
+            ApplyToFilter("remove filter", c => c.SearchText = string.Empty);
+            WaitForFiltering();
+
+            CheckVisibleGroupsCount(5);
+            CheckVisibleBeatmapSetsCount(10);
+            CheckVisibleBeatmapsCount(30);
+        }
     }
 }

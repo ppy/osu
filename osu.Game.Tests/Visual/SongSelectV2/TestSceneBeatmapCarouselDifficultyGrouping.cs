@@ -181,5 +181,34 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             ClickVisiblePanelWithOffset<PanelBeatmap>(1, new Vector2(0, (CarouselItem.DEFAULT_HEIGHT / 2 + 1)));
             WaitForGroupSelection(0, 1);
         }
+
+        [Test]
+        public void TestBasicFiltering()
+        {
+            SelectNextPanel();
+            Select();
+
+            ApplyToFilter("filter", c => c.SearchText = BeatmapSets[2].Metadata.Title);
+            WaitForFiltering();
+
+            CheckVisibleGroupsCount(3);
+            CheckVisibleBeatmapsCount(3);
+            WaitForSelection(2, 0);
+
+            for (int i = 0; i < 5; i++)
+                SelectNextPanel();
+
+            Select();
+            SelectNextPanel();
+            Select();
+
+            WaitForSelection(2, 1);
+
+            ApplyToFilter("remove filter", c => c.SearchText = string.Empty);
+            WaitForFiltering();
+
+            CheckVisibleGroupsCount(3);
+            CheckVisibleBeatmapsCount(30);
+        }
     }
 }
