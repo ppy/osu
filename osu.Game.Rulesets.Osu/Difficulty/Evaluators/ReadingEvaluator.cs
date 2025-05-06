@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             if (currObj.BaseObject is Slider currSlider)
                 // Longer sliders are inherently denser objects
-                pastObjectDifficultyInfluence += 2 * Math.Log10(Math.Max(1, currSlider.Velocity * currSlider.SpanDuration / currSlider.Radius));
+                pastObjectDifficultyInfluence += Math.Log10(Math.Max(1, currSlider.Velocity * currSlider.SpanDuration / currSlider.Radius));
 
             foreach (var loopObj in retrievePastVisibleObjects(currObj))
             {
@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             if (currPreempt < 500)
             {
-                preemptDifficulty += Math.Pow(500 - currPreempt, 2.5) / 120000;
+                preemptDifficulty += Math.Pow(500 - currPreempt, 2.5) / 140000;
 
                 // Nerf preempt on most comfortable densities
                 // https://www.desmos.com/calculator/31mrv4rlfh
@@ -76,7 +76,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double timeSpentInvisibleFactor = Math.Min(timeSpentInvisible, 1000) + (timeSpentInvisible > 1000 ? 2000 * Math.Log10(timeSpentInvisible / 1000) : 0);
 
                 // Nerf hidden difficulty less the more past object difficulty you have
-                double timeDifficultyFactor = 9500 / pastObjectDifficultyInfluence;
+                double timeDifficultyFactor = 9000 / pastObjectDifficultyInfluence;
 
                 // Cap objects because after a certain point hidden density is mainly memory
                 double visibleObjectFactor = Math.Min(retrieveCurrentVisibleObjects(currObj).Count, 8);
@@ -91,8 +91,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             }
 
             // Award only denser than average maps
-            double noteDensityDifficulty = Math.Max(0, pastObjectDifficultyInfluence - 2.5);
-            noteDensityDifficulty *= constantAngleNerfFactor * angularVelocityFactor;
+            double noteDensityDifficulty = Math.Max(0, pastObjectDifficultyInfluence - 2.7);
+            noteDensityDifficulty *= constantAngleNerfFactor * angularVelocityFactor * currVelocity;
 
             double difficulty = preemptDifficulty + hiddenDifficulty + noteDensityDifficulty;
 
