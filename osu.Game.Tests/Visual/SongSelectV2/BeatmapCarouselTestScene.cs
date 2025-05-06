@@ -157,8 +157,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
         protected void Select() => AddStep("select", () => InputManager.Key(Key.Enter));
 
-        protected void CheckNoSelection() => AddAssert("has no selection", () => Carousel.CurrentSelection, () => Is.Null);
-        protected void CheckHasSelection() => AddAssert("has selection", () => Carousel.CurrentSelection, () => Is.Not.Null);
+        protected void CheckNoSelection() => AddUntilStep("has no selection", () => Carousel.CurrentSelection, () => Is.Null);
+        protected void CheckHasSelection() => AddUntilStep("has selection", () => Carousel.CurrentSelection, () => Is.Not.Null);
 
         protected ICarouselPanel? GetSelectedPanel() => Carousel.ChildrenOfType<ICarouselPanel>().SingleOrDefault(p => p.Selected.Value);
         protected ICarouselPanel? GetKeyboardSelectedPanel() => Carousel.ChildrenOfType<ICarouselPanel>().SingleOrDefault(p => p.KeyboardSelected.Value);
