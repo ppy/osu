@@ -142,6 +142,63 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 working.BeatmapInfo.Metadata.Tags = string.Join(' ', Enumerable.Repeat(working.BeatmapInfo.Metadata.Tags, 3));
                 onlineSet.Genre = new BeatmapSetOnlineGenre { Id = 12, Name = "Verrrrryyyy llooonngggggg genre" };
                 onlineSet.Language = new BeatmapSetOnlineLanguage { Id = 12, Name = "Verrrrryyyy llooonngggggg language" };
+                onlineSet.Beatmaps.Single().TopTags = Enumerable.Repeat(onlineSet.Beatmaps.Single().TopTags, 3).SelectMany(t => t!).ToArray();
+
+                currentOnlineSet = onlineSet;
+                Beatmap.Value = working;
+            });
+        }
+
+        [Test]
+        public void TestOnlineAvailability()
+        {
+            AddStep("online beatmapset", () =>
+            {
+                var (working, onlineSet) = createTestBeatmap();
+
+                currentOnlineSet = onlineSet;
+                Beatmap.Value = working;
+            });
+            AddUntilStep("rating wedge visible", () => wedge.RatingsVisible);
+            AddUntilStep("fail time wedge visible", () => wedge.FailRetryVisible);
+            AddStep("online beatmapset with local diff", () =>
+            {
+                var (working, onlineSet) = createTestBeatmap();
+
+                working.BeatmapInfo.ResetOnlineInfo();
+
+                currentOnlineSet = onlineSet;
+                Beatmap.Value = working;
+            });
+            AddUntilStep("rating wedge hidden", () => !wedge.RatingsVisible);
+            AddUntilStep("fail time wedge hidden", () => !wedge.FailRetryVisible);
+            AddStep("local beatmap", () =>
+            {
+                var (working, _) = createTestBeatmap();
+
+                currentOnlineSet = null;
+                Beatmap.Value = working;
+            });
+            AddAssert("rating wedge still hidden", () => !wedge.RatingsVisible);
+            AddAssert("fail time wedge still hidden", () => !wedge.FailRetryVisible);
+        }
+
+        [Test]
+        public void TestUserTags()
+        {
+            AddStep("user tags", () =>
+            {
+                var (working, onlineSet) = createTestBeatmap();
+
+                currentOnlineSet = onlineSet;
+                Beatmap.Value = working;
+            });
+            AddStep("no user tags", () =>
+            {
+                var (working, onlineSet) = createTestBeatmap();
+
+                onlineSet.Beatmaps.Single().TopTags = null;
+                onlineSet.RelatedTags = null;
 
                 currentOnlineSet = onlineSet;
                 Beatmap.Value = working;
@@ -164,13 +221,40 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                         OnlineID = working.BeatmapInfo.OnlineID,
                         PlayCount = 10000,
                         PassCount = 4567,
+                        TopTags =
+                        [
+                            new APIBeatmapTag { TagId = 4, VoteCount = 1 },
+                            new APIBeatmapTag { TagId = 2, VoteCount = 1 },
+                            new APIBeatmapTag { TagId = 23, VoteCount = 5 },
+                        ],
                         FailTimes = new APIFailTimes
                         {
                             Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
                             Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
                         },
                     },
-                }
+                },
+                RelatedTags =
+                [
+                    new APITag
+                    {
+                        Id = 2,
+                        Name = "song representation/simple",
+                        Description = "Accessible and straightforward map design."
+                    },
+                    new APITag
+                    {
+                        Id = 4,
+                        Name = "style/clean",
+                        Description = "Visually uncluttered and organised patterns, often involving few overlaps and equal visual spacing between objects."
+                    },
+                    new APITag
+                    {
+                        Id = 23,
+                        Name = "aim/aim control",
+                        Description = "Patterns with velocity or direction changes which strongly go against a player's natural movement pattern."
+                    }
+                ]
             };
 
             working.BeatmapSetInfo.DateSubmitted = DateTimeOffset.Now;

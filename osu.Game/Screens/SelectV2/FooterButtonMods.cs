@@ -79,7 +79,7 @@ namespace osu.Game.Screens.SelectV2
                     Depth = float.MaxValue,
                     Origin = Anchor.BottomLeft,
                     Shear = OsuGame.SHEAR,
-                    CornerRadius = CORNER_RADIUS,
+                    CornerRadius = Y_OFFSET,
                     Size = new Vector2(BUTTON_WIDTH, bar_height),
                     Masking = true,
                     EdgeEffect = new EdgeEffectParameters
@@ -115,7 +115,7 @@ namespace osu.Game.Screens.SelectV2
                         },
                         new Container
                         {
-                            CornerRadius = CORNER_RADIUS,
+                            CornerRadius = Y_OFFSET,
                             RelativeSizeAxes = Axes.Both,
                             Width = mod_display_portion,
                             Masking = true,
@@ -264,7 +264,7 @@ namespace osu.Game.Screens.SelectV2
                 private void load()
                 {
                     AutoSizeAxes = Axes.Both;
-                    CornerRadius = CORNER_RADIUS;
+                    CornerRadius = Y_OFFSET;
                     Masking = true;
 
                     InternalChildren = new Drawable[]
@@ -306,7 +306,7 @@ namespace osu.Game.Screens.SelectV2
                 Depth = float.MaxValue;
                 Origin = Anchor.BottomLeft;
                 Shear = OsuGame.SHEAR;
-                CornerRadius = CORNER_RADIUS;
+                CornerRadius = Y_OFFSET;
                 AutoSizeAxes = Axes.X;
                 Height = bar_height;
                 Masking = true;

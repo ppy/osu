@@ -3,6 +3,7 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Layout;
 using osuTK;
 
@@ -17,6 +18,10 @@ namespace osu.Game.Graphics.Containers
     public partial class ShearAligningWrapper : CompositeDrawable
     {
         private readonly LayoutValue layout = new LayoutValue(Invalidation.MiscGeometry);
+
+        // Sheared components regularly end up off the side of the screen due to padding considerations.
+        // If we use this class in places where performance is important, we should reconsider the handling of this.
+        protected override bool ComputeIsMaskedAway(RectangleF maskingBounds) => false;
 
         public ShearAligningWrapper(Drawable drawable)
         {

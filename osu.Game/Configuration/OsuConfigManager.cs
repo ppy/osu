@@ -179,7 +179,10 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.ScalingPositionX, 0.5f, 0f, 1f, 0.01f);
             SetDefault(OsuSetting.ScalingPositionY, 0.5f, 0f, 1f, 0.01f);
 
-            SetDefault(OsuSetting.UIScale, 1f, 0.8f, 1.6f, 0.01f);
+            if (RuntimeInfo.IsMobile)
+                SetDefault(OsuSetting.UIScale, 1f, 0.8f, 1.1f, 0.01f);
+            else
+                SetDefault(OsuSetting.UIScale, 1f, 0.8f, 1.6f, 0.01f);
 
             SetDefault(OsuSetting.UIHoldActivationDelay, 200.0, 0.0, 500.0, 50.0);
 
@@ -222,6 +225,8 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.EditorSubmissionNotifyOnDiscussionReplies, true);
             SetDefault(OsuSetting.EditorSubmissionLoadInBrowserAfterSubmission, true);
+
+            SetDefault(OsuSetting.WasSupporter, false);
         }
 
         protected override bool CheckLookupContainsPrivateInformation(OsuSetting lookup)
@@ -463,5 +468,11 @@ namespace osu.Game.Configuration
         EditorShowStoryboard,
         EditorSubmissionNotifyOnDiscussionReplies,
         EditorSubmissionLoadInBrowserAfterSubmission,
+
+        /// <summary>
+        /// Cached state of whether local user is a supporter.
+        /// Used to allow early checks (ie for startup samples) to be in the correct state, even if the API authentication process has not completed.
+        /// </summary>
+        WasSupporter
     }
 }
