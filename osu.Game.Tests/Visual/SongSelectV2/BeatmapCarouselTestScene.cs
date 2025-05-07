@@ -162,11 +162,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
         protected void CheckDisplayedBeatmapsCount(int expected)
         {
-            AddAssert($"{expected} diffs displayed", () =>
-            {
-                var matchingFilter = Carousel.Filters.OfType<BeatmapCarouselFilterMatching>().Single();
-                return matchingFilter.BeatmapItemsCount;
-            }, () => Is.EqualTo(expected));
+            AddAssert($"{expected} diffs displayed", () => Carousel.MatchedBeatmapsCount, () => Is.EqualTo(expected));
         }
 
         protected void CheckDisplayedBeatmapSetsCount(int expected)
