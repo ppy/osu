@@ -23,10 +23,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 return 0;
 
             var currObj = (OsuDifficultyHitObject)current;
-            double currVelocity = currObj.LazyJumpDistance / currObj.StrainTime;
             double constantAngleNerfFactor = getConstantAngleNerfFactor(currObj);
-            var prevObj = (OsuDifficultyHitObject)currObj.Previous(0);
-            double angularVelocityFactor = getAngularVelocityFactor(currObj, prevObj);
+            double angularVelocityFactor = getAngularVelocityFactor(currObj, (OsuDifficultyHitObject)currObj.Previous(0));
 
             double pastObjectDifficultyInfluence = 1.0;
 
@@ -39,7 +37,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double loopDifficulty = currObj.OpacityAt(loopObj.BaseObject.StartTime, false);
 
                 // Small distances means objects may be cheesed, so it doesn't matter whether they are arranged confusingly.
-                loopDifficulty *= DifficultyCalculationUtils.Logistic(-(loopObj.LazyJumpDistance - 65) / 15);
+                loopDifficulty *= DifficultyCalculationUtils.Logistic(-(loopObj.LazyJumpDistance - 75) / 15);
 
                 double timeBetweenCurrAndLoopObj = (currObj.BaseObject.StartTime - loopObj.BaseObject.StartTime) / clockRate;
                 double timeNerfFactor = getTimeNerfFactor(timeBetweenCurrAndLoopObj);
@@ -54,16 +52,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             if (currPreempt < 500)
             {
-                preemptDifficulty += Math.Pow(500 - currPreempt, 2.5) / 140000;
+                preemptDifficulty += Math.Pow(500 - currPreempt, 2.5) / 120000;
 
                 // Nerf preempt on most comfortable densities
                 // https://www.desmos.com/calculator/31mrv4rlfh
                 double densityDifficulty = 1 + DifficultyCalculationUtils.BellCurve(retrievePastVisibleObjects(currObj).Count(), 2, 1.5, 3.0);
-                preemptDifficulty *= currVelocity / densityDifficulty;
-                preemptDifficulty *= constantAngleNerfFactor * angularVelocityFactor;
-
-                double doubletapness = 1 - prevObj.GetDoubletapness(currObj);
-                preemptDifficulty *= doubletapness; // Doubletaps raise the density without adding significant reading difficulty
+                preemptDifficulty *= constantAngleNerfFactor * angularVelocityFactor / densityDifficulty;
             }
 
             double hiddenDifficulty = 0.0;
@@ -72,27 +66,23 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             {
                 double timeSpentInvisible = getDurationSpentInvisible(currObj) / clockRate;
 
-                // Nerf extremely high times as you begin to rely more on memory the longer a note is invisible
-                double timeSpentInvisibleFactor = Math.Min(timeSpentInvisible, 1000) + (timeSpentInvisible > 1000 ? 2000 * Math.Log10(timeSpentInvisible / 1000) : 0);
-
                 // Nerf hidden difficulty less the more past object difficulty you have
                 double timeDifficultyFactor = 9000 / pastObjectDifficultyInfluence;
 
                 // Cap objects because after a certain point hidden density is mainly memory
                 double visibleObjectFactor = Math.Min(retrieveCurrentVisibleObjects(currObj).Count, 8);
 
-                // The longer an object is hidden, the more velocity should matter
-                hiddenDifficulty += visibleObjectFactor * timeSpentInvisibleFactor * Math.Max(1, currVelocity) / timeDifficultyFactor;
+                hiddenDifficulty += visibleObjectFactor * timeSpentInvisible / timeDifficultyFactor;
 
                 hiddenDifficulty *= constantAngleNerfFactor * angularVelocityFactor;
 
                 // Buff perfect stacks
-                hiddenDifficulty += currObj.LazyJumpDistance == 0 ? 1.5 : 0;
+                hiddenDifficulty += currObj.LazyJumpDistance == 0 ? 2 : 0;
             }
 
             // Award only denser than average maps
             double noteDensityDifficulty = Math.Max(0, pastObjectDifficultyInfluence - 2.7);
-            noteDensityDifficulty *= constantAngleNerfFactor * angularVelocityFactor * currVelocity;
+            noteDensityDifficulty *= constantAngleNerfFactor * angularVelocityFactor;
 
             double difficulty = preemptDifficulty + hiddenDifficulty + noteDensityDifficulty;
 
@@ -175,7 +165,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 index++;
             }
 
-            return Math.Pow(Math.Min(1, 2 / constantAngleCount), 2);
+            return Math.Min(1, 2 / constantAngleCount);
         }
 
         private static double getTimeNerfFactor(double deltaTime)
@@ -186,16 +176,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         private static double getAngularVelocityFactor(OsuDifficultyHitObject current, OsuDifficultyHitObject previous)
         {
             if (current.Angle.HasValue &&
-                previous?.Angle != null)
+                previous?.Angle != null &&
+                Math.Abs(current.DeltaTime - previous.DeltaTime) < 10)
             {
                 double angleDifference = Math.Abs(current.Angle.Value - previous.Angle.Value);
                 double angleDifferenceAdjusted = Math.Sin(angleDifference / 2) * 180.0;
-                double angularVelocity = angleDifferenceAdjusted / (0.1 * current.StrainTime);
+                double angularVelocity = angleDifferenceAdjusted * (current.LazyJumpDistance / current.StrainTime);
                 double angularVelocityBonus = Math.Max(0.0, Math.Pow(angularVelocity, 0.4) - 1.0);
-                return 0.6 + angularVelocityBonus * 0.55;
+                return angularVelocityBonus * 0.35;
             }
 
-            return 1;
+            return current.LazyJumpDistance / current.StrainTime;
         }
     }
 }
