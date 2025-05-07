@@ -103,31 +103,50 @@ namespace osu.Game.Rulesets.Taiko.Tests.Mods
                 OneEighthConversion = { Value = true }
             },
             Autoplay = false,
-            CreateBeatmap = () => new Beatmap
+            CreateBeatmap = () =>
             {
-                HitObjects = new List<HitObject>
+                const double one_eighth_timing = 125;
+
+                return new Beatmap
                 {
-                    new Hit { StartTime = 1000, Type = HitType.Centre },
-                    new Hit { StartTime = 1250, Type = HitType.Centre },
-                    new Hit { StartTime = 1500, Type = HitType.Centre },
-                    new Hit { StartTime = 1625, Type = HitType.Rim }, // mod removes this
-                    new Hit { StartTime = 1750, Type = HitType.Centre },
-                    new Hit { StartTime = 2000, Type = HitType.Centre },
-                },
+                    HitObjects = new List<HitObject>
+                    {
+                        new Hit { StartTime = 1000, Type = HitType.Centre },
+                        new Hit { StartTime = 1250, Type = HitType.Centre },
+                        new Hit { StartTime = 1500, Type = HitType.Centre },
+                        new Hit { StartTime = 1500 + one_eighth_timing * 1, Type = HitType.Rim }, // mod removes this
+                        new Hit { StartTime = 1500 + one_eighth_timing * 2 },
+                        new Hit { StartTime = 2000, Type = HitType.Centre },
+                        new Hit { StartTime = 2000 + one_eighth_timing * 1, Type = HitType.Centre }, // mod removes this
+                        new Hit { StartTime = 2000 + one_eighth_timing * 2, Type = HitType.Centre },
+                        new Hit { StartTime = 2000 + one_eighth_timing * 3, Type = HitType.Centre }, // mod removes this
+                        new Hit { StartTime = 2000 + one_eighth_timing * 4, Type = HitType.Centre },
+                        new Hit { StartTime = 2000 + one_eighth_timing * 5, Type = HitType.Centre }, // mod removes this
+                        new Hit { StartTime = 2000 + one_eighth_timing * 6, Type = HitType.Centre },
+                        new Hit { StartTime = 2000 + one_eighth_timing * 7, Type = HitType.Centre }, // mod removes this
+                    },
+                };
             },
             ReplayFrames = new List<ReplayFrame>
             {
                 new TaikoReplayFrame(1000, TaikoAction.LeftCentre),
-                new TaikoReplayFrame(1200),
+                new TaikoReplayFrame(1000),
                 new TaikoReplayFrame(1250, TaikoAction.LeftCentre),
-                new TaikoReplayFrame(1450),
+                new TaikoReplayFrame(1250),
                 new TaikoReplayFrame(1500, TaikoAction.LeftCentre),
-                new TaikoReplayFrame(1700),
+                new TaikoReplayFrame(1500),
                 new TaikoReplayFrame(1750, TaikoAction.LeftCentre),
-                new TaikoReplayFrame(1900),
+                new TaikoReplayFrame(1750),
                 new TaikoReplayFrame(2000, TaikoAction.LeftCentre),
+                new TaikoReplayFrame(2000),
+                new TaikoReplayFrame(2250, TaikoAction.LeftCentre),
+                new TaikoReplayFrame(2250),
+                new TaikoReplayFrame(2500, TaikoAction.LeftCentre),
+                new TaikoReplayFrame(2500),
+                new TaikoReplayFrame(2750, TaikoAction.LeftCentre),
+                new TaikoReplayFrame(2750),
             },
-            PassCondition = () => Player.ScoreProcessor.Combo.Value == 5 && Player.ScoreProcessor.Accuracy.Value == 1
+            PassCondition = () => Player.ScoreProcessor.Combo.Value == 8 && Player.ScoreProcessor.Accuracy.Value == 1
         });
     }
 }

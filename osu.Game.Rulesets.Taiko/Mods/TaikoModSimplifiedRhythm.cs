@@ -39,6 +39,9 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
             Hit[] hits = taikoBeatmap.HitObjects.Where(obj => obj is Hit).Cast<Hit>().ToArray();
 
+            if (hits.Length == 0)
+                return;
+
             var conversions = new List<(int, int)>();
 
             if (OneEighthConversion.Value) conversions.Add((8, 4));
@@ -62,40 +65,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
                         inPattern = false;
 
-                        // Iterate through the pattern
-                        for (int j = patternStartIndex; j < i; j++)
-                        {
-                            int indexInPattern = j - patternStartIndex;
-
-                            switch (baseRhythm)
-                            {
-                                // 1/8: Remove every second note
-                                case 8:
-                                {
-                                    if (indexInPattern % 2 == 1)
-                                    {
-                                        taikoBeatmap.HitObjects.Remove(hits[j]);
-                                    }
-
-                                    break;
-                                }
-
-                                // 1/6 and 1/3: Remove every second note and adjust time of every third
-                                case 6:
-                                case 3:
-                                {
-                                    if (indexInPattern % 3 == 1)
-                                        taikoBeatmap.HitObjects.Remove(hits[j]);
-                                    else if (indexInPattern % 3 == 2)
-                                        hits[j].StartTime = hits[j + 1].StartTime - controlPointInfo.TimingPointAt(hits[j].StartTime).BeatLength / adjustedRhythm;
-
-                                    break;
-                                }
-
-                                default:
-                                    throw new ArgumentOutOfRangeException(nameof(baseRhythm));
-                            }
-                        }
+                        processPattern(i);
                     }
                     else
                     {
@@ -103,6 +73,48 @@ namespace osu.Game.Rulesets.Taiko.Mods
                         {
                             patternStartIndex = i - 1;
                             inPattern = true;
+                        }
+                    }
+                }
+
+                // Process the last pattern if we reached the end of the beatmap and are still in a pattern.
+                if (inPattern)
+                    processPattern(hits.Length);
+
+                void processPattern(int patternEndIndex)
+                {
+                    // Iterate through the pattern
+                    for (int j = patternStartIndex; j < patternEndIndex; j++)
+                    {
+                        int indexInPattern = j - patternStartIndex;
+
+                        switch (baseRhythm)
+                        {
+                            // 1/8: Remove every second note
+                            case 8:
+                            {
+                                if (indexInPattern % 2 == 1)
+                                {
+                                    taikoBeatmap.HitObjects.Remove(hits[j]);
+                                }
+
+                                break;
+                            }
+
+                            // 1/6 and 1/3: Remove every second note and adjust time of every third
+                            case 6:
+                            case 3:
+                            {
+                                if (indexInPattern % 3 == 1)
+                                    taikoBeatmap.HitObjects.Remove(hits[j]);
+                                else if (indexInPattern % 3 == 2)
+                                    hits[j].StartTime = hits[j + 1].StartTime - controlPointInfo.TimingPointAt(hits[j].StartTime).BeatLength / adjustedRhythm;
+
+                                break;
+                            }
+
+                            default:
+                                throw new ArgumentOutOfRangeException(nameof(baseRhythm));
                         }
                     }
                 }
