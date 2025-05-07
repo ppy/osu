@@ -5,6 +5,7 @@ using System;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Beatmaps;
 using osu.Game.Overlays;
 using osu.Game.Graphics.Carousel;
 using osu.Game.Screens.SelectV2;
@@ -55,21 +56,21 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                             {
                                 new PanelGroupStarDifficulty
                                 {
-                                    Item = new CarouselItem(new GroupDefinition(star, star.ToString()))
+                                    Item = new CarouselItem(new GroupDefinition(new StarDifficulty(star, 0), $"{star} Star(s)"))
                                 },
                                 new PanelGroupStarDifficulty
                                 {
-                                    Item = new CarouselItem(new GroupDefinition(star, star.ToString())),
+                                    Item = new CarouselItem(new GroupDefinition(new StarDifficulty(star, 0), $"{star} Star(s)")),
                                     KeyboardSelected = { Value = true },
                                 },
                                 new PanelGroupStarDifficulty
                                 {
-                                    Item = new CarouselItem(new GroupDefinition(star, star.ToString())),
+                                    Item = new CarouselItem(new GroupDefinition(new StarDifficulty(star, 0), $"{star} Star(s)")),
                                     Expanded = { Value = true },
                                 },
                                 new PanelGroupStarDifficulty
                                 {
-                                    Item = new CarouselItem(new GroupDefinition(star, star.ToString())),
+                                    Item = new CarouselItem(new GroupDefinition(new StarDifficulty(star, 0), $"{star} Star(s)")),
                                     Expanded = { Value = true },
                                     KeyboardSelected = { Value = true },
                                 },
