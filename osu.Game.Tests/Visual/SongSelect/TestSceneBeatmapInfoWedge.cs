@@ -163,8 +163,8 @@ namespace osu.Game.Tests.Visual.SongSelect
         [TestCase(120, 125, null, "120-125 (mostly 120)")]
         [TestCase(120, 120.6, null, "120-121 (mostly 120)")]
         [TestCase(120, 120.4, null, "120")]
-        [TestCase(120, 120.6, "DT", "180-182 (mostly 180)")]
-        [TestCase(120, 120.4, "DT", "180")]
+        [TestCase(120, 120.6, "DT", "180-181 (mostly 180)")]
+        [TestCase(120, 120.4, "DT", "180-181 (mostly 180)")]
         public void TestVaryingBPM(double commonBpm, double otherBpm, string? mod, string expectedDisplay)
         {
             IBeatmap beatmap = CreateTestBeatmap(new OsuRuleset().RulesetInfo);

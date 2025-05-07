@@ -8,6 +8,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Utils;
@@ -81,6 +82,11 @@ namespace osu.Game.Rulesets.UI
 
         private Container extendedContent = null!;
 
+        private Drawable adjustmentMarker = null!;
+
+        private Circle cogBackground = null!;
+        private SpriteIcon cog = null!;
+
         private ModSettingChangeTracker? modSettingsChangeTracker;
 
         /// <summary>
@@ -139,7 +145,7 @@ namespace osu.Game.Rulesets.UI
                     Origin = Anchor.CentreLeft,
                     Name = "main content",
                     Size = MOD_ICON_SIZE,
-                    Children = new Drawable[]
+                    Children = new[]
                     {
                         background = new Sprite
                         {
@@ -164,6 +170,29 @@ namespace osu.Game.Rulesets.UI
                             Anchor = Anchor.Centre,
                             Size = new Vector2(45),
                             Icon = FontAwesome.Solid.Question
+                        },
+                        adjustmentMarker = new Container
+                        {
+                            Size = new Vector2(20),
+                            Origin = Anchor.Centre,
+                            Position = new Vector2(64, 14),
+                            Children = new Drawable[]
+                            {
+                                cogBackground = new Circle
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    RelativeSizeAxes = Axes.Both,
+                                },
+                                cog = new SpriteIcon
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    Icon = FontAwesome.Solid.Cog,
+                                    RelativeSizeAxes = Axes.Both,
+                                    Size = new Vector2(0.6f),
+                                }
+                            }
                         },
                     }
                 },
@@ -216,11 +245,18 @@ namespace osu.Game.Rulesets.UI
 
             extendedContent.Alpha = showExtended ? 1 : 0;
             extendedText.Text = mod.ExtendedIconInformation;
+
+            if (mod.HasNonDefaultSettings)
+                adjustmentMarker.Show();
+            else
+                adjustmentMarker.Hide();
         }
 
         private void updateColour()
         {
             modAcronym.Colour = modIcon.Colour = Interpolation.ValueAt<Colour4>(0.1f, Colour4.Black, backgroundColour, 0, 1);
+            cogBackground.Colour = Interpolation.ValueAt<Colour4>(0.1f, Colour4.Black, backgroundColour, 0, 1);
+            cog.Colour = backgroundColour;
 
             extendedText.Colour = background.Colour = Selected.Value ? backgroundColour.Lighten(0.2f) : backgroundColour;
             extendedBackground.Colour = Selected.Value ? backgroundColour.Darken(2.4f) : backgroundColour.Darken(2.8f);

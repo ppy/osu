@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
-using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
 using osu.Game.Tests.Resources;
 
@@ -34,9 +33,9 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [Explicit]
         public void TestSorting()
         {
-            SortBy(new FilterCriteria { Sort = SortMode.Artist });
-            SortBy(new FilterCriteria { Group = GroupMode.Difficulty, Sort = SortMode.Difficulty });
-            SortBy(new FilterCriteria { Group = GroupMode.Artist, Sort = SortMode.Artist });
+            SortAndGroupBy(SortMode.Artist, GroupMode.All);
+            SortAndGroupBy(SortMode.Difficulty, GroupMode.Difficulty);
+            SortAndGroupBy(SortMode.Artist, GroupMode.Artist);
         }
 
         [Test]

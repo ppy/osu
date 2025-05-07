@@ -53,7 +53,7 @@ namespace osu.Game.Screens.Select.Leaderboards
         /// An optional value to guarantee stable ordering.
         /// Lower numbers will appear higher in cases of <see cref="TotalScore"/> ties.
         /// </summary>
-        public Bindable<long> DisplayOrder { get; } = new BindableLong();
+        public long TotalScoreTiebreaker { get; init; }
 
         /// <summary>
         /// A custom function which handles converting a score to a display score using a provided <see cref="ScoringMode"/>.
@@ -67,6 +67,25 @@ namespace osu.Game.Screens.Select.Leaderboards
         /// The colour of the team that the user playing is on, if any.
         /// </summary>
         public Colour4? TeamColour { get; init; }
+
+        /// <summary>
+        /// The initial position of the score on the leaderboard.
+        /// Mostly used for cases like the local user's best score on the global leaderboard (which will not be contiguous with the other scores).
+        /// </summary>
+        public int? InitialPosition { get; init; }
+
+        /// <summary>
+        /// The displayed rank of the score on the leaderboard.
+        /// </summary>
+        public Bindable<int?> Position { get; } = new Bindable<int?>();
+
+        /// <summary>
+        /// The index of the score on the leaderboard.
+        /// This differs from <see cref="Position"/> in that it is required (must always be known)
+        /// and that it doesn't represent the score's position on global leaderboards.
+        /// It's a property completely local to and relative to all scores provided by the managing <see cref="IGameplayLeaderboardProvider"/>.
+        /// </summary>
+        public Bindable<long> DisplayOrder { get; } = new BindableLong();
 
         public GameplayLeaderboardScore(IUser user, ScoreProcessor scoreProcessor, bool tracked)
         {
@@ -95,8 +114,9 @@ namespace osu.Game.Screens.Select.Leaderboards
             TotalScore.Value = scoreInfo.TotalScore;
             Accuracy.Value = scoreInfo.Accuracy;
             Combo.Value = scoreInfo.Combo;
-            DisplayOrder.Value = scoreInfo.OnlineID > 0 ? scoreInfo.OnlineID : scoreInfo.Date.ToUnixTimeSeconds();
+            TotalScoreTiebreaker = scoreInfo.OnlineID > 0 ? scoreInfo.OnlineID : scoreInfo.Date.ToUnixTimeSeconds();
             GetDisplayScore = scoreInfo.GetDisplayScore;
+            InitialPosition = scoreInfo.Position;
         }
 
         /// <remarks>
