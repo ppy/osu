@@ -265,7 +265,7 @@ namespace osu.Game.Graphics.Carousel
 
             // Copy must be performed on update thread for now (see ConfigureAwait above).
             // Could potentially be optimised in the future if it becomes an issue.
-            IEnumerable<CarouselItem> items = new List<CarouselItem>(Items.Select(m => new CarouselItem(m)));
+            List<CarouselItem> items = new List<CarouselItem>(Items.Select(m => new CarouselItem(m)));
 
             await Task.Run(async () =>
             {
@@ -274,7 +274,13 @@ namespace osu.Game.Graphics.Carousel
                     foreach (var filter in Filters)
                     {
                         log($"Performing {filter.GetType().ReadableName()}");
-                        items = await filter.Run(items, cts.Token).ConfigureAwait(false);
+                        var filteredItems = await filter.Run(items, cts.Token).ConfigureAwait(false);
+
+                        // To avoid shooting ourselves in the foot, ensure that we manifest a list after each filter.
+                        //
+                        // A future improvement may be passing a reference list through each filter rather than copying each time,
+                        // but this is the safest approach.
+                        items = filteredItems as List<CarouselItem> ?? filteredItems.ToList();
                     }
 
                     log("Updating Y positions");
@@ -292,7 +298,7 @@ namespace osu.Game.Graphics.Carousel
             Schedule(() =>
             {
                 log("Items ready for display");
-                carouselItems = items.ToList();
+                carouselItems = items;
                 displayedRange = null;
 
                 // Need to call this to ensure correct post-selection logic is handled on the new items list.
