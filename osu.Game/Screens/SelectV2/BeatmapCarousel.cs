@@ -11,6 +11,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Pooling;
+using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
@@ -338,11 +339,21 @@ namespace osu.Game.Screens.SelectV2
 
         public FilterCriteria Criteria { get; private set; } = new FilterCriteria();
 
+        private ScheduledDelegate? loadingDebounce;
+
         public void Filter(FilterCriteria criteria)
         {
             Criteria = criteria;
-            loading.Show();
-            FilterAsync().ContinueWith(_ => Schedule(() => loading.Hide()));
+
+            loadingDebounce ??= Scheduler.AddDelayed(() => loading.Show(), 250);
+
+            FilterAsync().ContinueWith(_ => Schedule(() =>
+            {
+                loadingDebounce?.Cancel();
+                loadingDebounce = null;
+
+                loading.Hide();
+            }));
         }
 
         #endregion
