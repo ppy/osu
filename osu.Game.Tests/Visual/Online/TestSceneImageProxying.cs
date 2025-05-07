@@ -12,6 +12,7 @@ using osu.Game.Overlays.Comments;
 
 namespace osu.Game.Tests.Visual.Online
 {
+    [Ignore("This test hits online resources (and online retrieval can fail at any time), and also performs network calls to the production instance of the website. Un-ignore this test when it's actually actively needed.")]
     public partial class TestSceneImageProxying : OsuTestScene
     {
         [Test]

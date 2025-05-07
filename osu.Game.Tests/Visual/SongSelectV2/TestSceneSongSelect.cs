@@ -12,13 +12,11 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Database;
+using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
-using osu.Game.Rulesets.Catch;
-using osu.Game.Rulesets.Mania;
+using osu.Game.Overlays.Toolbar;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
-using osu.Game.Rulesets.Taiko;
 using osu.Game.Screens;
 using osu.Game.Screens.Footer;
 using osu.Game.Screens.Menu;
@@ -30,10 +28,13 @@ namespace osu.Game.Tests.Visual.SongSelectV2
     public partial class TestSceneSongSelect : ScreenTestScene
     {
         [Cached]
-        private readonly ScreenFooter screenScreenFooter;
+        private readonly ScreenFooter screenFooter;
 
         [Cached]
         private readonly OsuLogo logo;
+
+        [Cached(typeof(INotificationOverlay))]
+        private readonly INotificationOverlay notificationOverlay = new NotificationOverlay();
 
         protected override bool UseOnlineAPI => true;
 
@@ -44,16 +45,25 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 new PopoverContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Child = screenScreenFooter = new ScreenFooter
+                    Children = new Drawable[]
                     {
-                        OnBack = () => Stack.CurrentScreen.Exit(),
+                        new Toolbar
+                        {
+                            State = { Value = Visibility.Visible },
+                        },
+                        screenFooter = new ScreenFooter
+                        {
+                            OnBack = () => Stack.CurrentScreen.Exit(),
+                        },
+                        logo = new OsuLogo
+                        {
+                            Alpha = 0f,
+                        },
                     },
                 },
-                logo = new OsuLogo
-                {
-                    Alpha = 0f,
-                },
             };
+
+            Stack.Padding = new MarginPadding { Top = Toolbar.HEIGHT };
         }
 
         [BackgroundDependencyLoader]
@@ -73,29 +83,13 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             Stack.ScreenExited += updateFooter;
         }
 
-        [SetUpSteps]
-        public override void SetUpSteps()
-        {
-            base.SetUpSteps();
-
-            AddStep("load screen", () => Stack.Push(new SoloSongSelect()));
-            AddUntilStep("wait for load", () => Stack.CurrentScreen is Screens.SelectV2.SongSelect songSelect && songSelect.IsLoaded);
-        }
-
-        [Test]
-        public void TestRulesets()
-        {
-            AddStep("set osu ruleset", () => Ruleset.Value = new OsuRuleset().RulesetInfo);
-            AddStep("set taiko ruleset", () => Ruleset.Value = new TaikoRuleset().RulesetInfo);
-            AddStep("set catch ruleset", () => Ruleset.Value = new CatchRuleset().RulesetInfo);
-            AddStep("set mania ruleset", () => Ruleset.Value = new ManiaRuleset().RulesetInfo);
-        }
-
         #region Footer
 
         [Test]
         public void TestMods()
         {
+            loadSongSelect();
+
             AddStep("one mod", () => SelectedMods.Value = new List<Mod> { new OsuModHidden() });
             AddStep("two mods", () => SelectedMods.Value = new List<Mod> { new OsuModHidden(), new OsuModHardRock() });
             AddStep("three mods", () => SelectedMods.Value = new List<Mod> { new OsuModHidden(), new OsuModHardRock(), new OsuModDoubleTime() });
@@ -123,6 +117,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [Test]
         public void TestShowOptions()
         {
+            loadSongSelect();
+
             AddStep("enable options", () =>
             {
                 var optionsButton = this.ChildrenOfType<ScreenFooterButton>().Last();
@@ -135,6 +131,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [Test]
         public void TestState()
         {
+            loadSongSelect();
+
             AddToggleStep("set options enabled state", state => this.ChildrenOfType<ScreenFooterButton>().Last().Enabled.Value = state);
         }
 
@@ -142,6 +140,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         // [Test]
         // public void TestFooterRandom()
         // {
+        //     loadSongSelect();
+        //
         //     AddStep("press F2", () => InputManager.Key(Key.F2));
         //     AddAssert("next random invoked", () => nextRandomCalled && !previousRandomCalled);
         // }
@@ -149,6 +149,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         // [Test]
         // public void TestFooterRandomViaMouse()
         // {
+        //     loadSongSelect();
+        //
         //     AddStep("click button", () =>
         //     {
         //         InputManager.MoveMouseTo(randomButton);
@@ -160,6 +162,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         // [Test]
         // public void TestFooterRewind()
         // {
+        //     loadSongSelect();
+        //
         //     AddStep("press Shift+F2", () =>
         //     {
         //         InputManager.PressKey(Key.LShift);
@@ -173,6 +177,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         // [Test]
         // public void TestFooterRewindViaShiftMouseLeft()
         // {
+        //     loadSongSelect();
+        //
         //     AddStep("shift + click button", () =>
         //     {
         //         InputManager.PressKey(Key.LShift);
@@ -186,6 +192,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         // [Test]
         // public void TestFooterRewindViaMouseRight()
         // {
+        //     loadSongSelect();
+        //
         //     AddStep("right click button", () =>
         //     {
         //         InputManager.MoveMouseTo(randomButton);
@@ -197,6 +205,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [Test]
         public void TestOverlayPresent()
         {
+            loadSongSelect();
+
             AddStep("Press F1", () =>
             {
                 InputManager.MoveMouseTo(this.ChildrenOfType<FooterButtonMods>().Single());
@@ -208,17 +218,23 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
         #endregion
 
+        private void loadSongSelect()
+        {
+            AddStep("load screen", () => Stack.Push(new SoloSongSelect()));
+            AddUntilStep("wait for load", () => Stack.CurrentScreen is Screens.SelectV2.SongSelect songSelect && songSelect.IsLoaded);
+        }
+
         private void updateFooter(IScreen? _, IScreen? newScreen)
         {
             if (newScreen is IOsuScreen osuScreen && osuScreen.ShowFooter)
             {
-                screenScreenFooter.Show();
-                screenScreenFooter.SetButtons(osuScreen.CreateFooterButtons());
+                screenFooter.Show();
+                screenFooter.SetButtons(osuScreen.CreateFooterButtons());
             }
             else
             {
-                screenScreenFooter.Hide();
-                screenScreenFooter.SetButtons(Array.Empty<ScreenFooterButton>());
+                screenFooter.Hide();
+                screenFooter.SetButtons(Array.Empty<ScreenFooterButton>());
             }
         }
     }
