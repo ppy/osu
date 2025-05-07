@@ -9,7 +9,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.Mods
 {
-    public class TaikoModMirror : Mod, IApplicableToDrawableRuleset<TaikoHitObject>
+    public class TaikoModFlip : Mod, IApplicableToDrawableRuleset<TaikoHitObject>
     {
         public override string Name => "Flip";
         public override string Acronym => "FP";
