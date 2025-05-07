@@ -30,11 +30,15 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
         [TestCase(true)]
         public void TestHoldNote(bool shouldMiss) => CreateHitObjectTest(new HitObjectTestData(new HoldNote { StartTime = 1000, EndTime = 3000 }), shouldMiss);
 
-        [Test]
-        public void TestGreatHit() => CreateModTest(new ModTestData
+        [TestCase(false)]
+        [TestCase(true)]
+        public void TestGreatHit(bool onlyPerfectHits) => CreateModTest(new ModTestData
         {
-            Mod = new ManiaModPerfect(),
-            PassCondition = () => ((ModFailConditionTestPlayer)Player).CheckFailed(false),
+            Mod = new ManiaModPerfect
+            {
+                PerfectScoreOnly = { Value = onlyPerfectHits }
+            },
+            PassCondition = () => ((ModFailConditionTestPlayer)Player).CheckFailed(onlyPerfectHits),
             Autoplay = false,
             CreateBeatmap = () => new Beatmap
             {
