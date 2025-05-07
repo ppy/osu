@@ -36,8 +36,10 @@ namespace osu.Game.Tests.Visual.SongSelectV2
     public partial class TestSceneSongSelectFiltering : ScreenTestScene
     {
         private BeatmapManager manager = null!;
-        private RulesetStore rulesets = null!;
-        private MusicController music = null!;
+
+        [Resolved]
+        private RulesetStore rulesets { get; set; } = null!;
+
         private OsuConfigManager config = null!;
 
         private SoloSongSelect songSelect = null!;
@@ -91,15 +93,9 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             // These DI caches are required to ensure for interactive runs this test scene doesn't nuke all user beatmaps in the local install.
             // At a point we have isolated interactive test runs enough, this can likely be removed.
-            Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
-            Dependencies.Cache(Realm);
             Dependencies.Cache(manager = new BeatmapManager(LocalStorage, Realm, null, Audio, Resources, host, Beatmap.Default));
             Dependencies.CacheAs<BeatmapStore>(beatmapStore = new RealmDetachedBeatmapStore());
 
-            Dependencies.Cache(music = new MusicController());
-
-            // required to get bindables attached
-            Add(music);
             Add(beatmapStore);
 
             Dependencies.Cache(config = new OsuConfigManager(LocalStorage));
