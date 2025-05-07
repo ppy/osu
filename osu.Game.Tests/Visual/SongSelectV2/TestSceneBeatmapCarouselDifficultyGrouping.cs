@@ -199,7 +199,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             ApplyToFilter("filter", c => c.SearchText = BeatmapSets[2].Metadata.Title);
             WaitForFiltering();
 
-            AddAssert("3 groups + 3 diffs displayed", () => Carousel.DisplayableItems == 6);
+            CheckDisplayedGroupsCount(3);
+            CheckDisplayedBeatmapsCount(3);
 
             CheckNoSelection();
             SelectNextPanel();
@@ -220,7 +221,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             ApplyToFilter("remove filter", c => c.SearchText = string.Empty);
             WaitForFiltering();
 
-            AddAssert("3 groups + 30 diffs displayed", () => Carousel.DisplayableItems == 33);
+            CheckDisplayedGroupsCount(3);
+            CheckDisplayedBeatmapsCount(30);
         }
     }
 }

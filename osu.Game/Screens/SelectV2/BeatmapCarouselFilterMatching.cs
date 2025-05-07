@@ -16,6 +16,11 @@ namespace osu.Game.Screens.SelectV2
     {
         private readonly Func<FilterCriteria> getCriteria;
 
+        /// <summary>
+        /// Counts total number of beatmap difficulties displayed post filter.
+        /// </summary>
+        public int BeatmapItemsCount { get; private set; }
+
         public BeatmapCarouselFilterMatching(Func<FilterCriteria> getCriteria)
         {
             this.getCriteria = getCriteria;
@@ -32,12 +37,17 @@ namespace osu.Game.Screens.SelectV2
 
         private IEnumerable<CarouselItem> matchItems(IEnumerable<CarouselItem> items, FilterCriteria criteria)
         {
+            BeatmapItemsCount = 0;
+
             foreach (var item in items)
             {
                 var beatmap = (BeatmapInfo)item.Model;
 
                 if (checkMatch(beatmap, criteria))
+                {
+                    BeatmapItemsCount++;
                     yield return item;
+                }
             }
         }
 

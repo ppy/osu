@@ -160,6 +160,36 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         protected void CheckNoSelection() => AddAssert("has no selection", () => Carousel.CurrentSelection, () => Is.Null);
         protected void CheckHasSelection() => AddAssert("has selection", () => Carousel.CurrentSelection, () => Is.Not.Null);
 
+        protected void CheckDisplayedBeatmapsCount(int expected)
+        {
+            AddAssert($"{expected} diffs displayed", () =>
+            {
+                var matchingFilter = Carousel.Filters.OfType<BeatmapCarouselFilterMatching>().Single();
+                return matchingFilter.BeatmapItemsCount;
+            }, () => Is.EqualTo(expected));
+        }
+
+        protected void CheckDisplayedBeatmapSetsCount(int expected)
+        {
+            AddAssert($"{expected} sets displayed", () =>
+            {
+                var groupingFilter = Carousel.Filters.OfType<BeatmapCarouselFilterGrouping>().Single();
+
+                // Using groupingFilter.SetItems.Count alone doesn't work.
+                // When sorting by difficulty, there can be more than one set panel for the same set displayed.
+                return groupingFilter.SetItems.Sum(s => s.Value.Count(i => i.Model is BeatmapSetInfo));
+            }, () => Is.EqualTo(expected));
+        }
+
+        protected void CheckDisplayedGroupsCount(int expected)
+        {
+            AddAssert($"{expected} groups displayed", () =>
+            {
+                var groupingFilter = Carousel.Filters.OfType<BeatmapCarouselFilterGrouping>().Single();
+                return groupingFilter.GroupItems.Count;
+            }, () => Is.EqualTo(expected));
+        }
+
         protected ICarouselPanel? GetSelectedPanel() => Carousel.ChildrenOfType<ICarouselPanel>().SingleOrDefault(p => p.Selected.Value);
         protected ICarouselPanel? GetKeyboardSelectedPanel() => Carousel.ChildrenOfType<ICarouselPanel>().SingleOrDefault(p => p.KeyboardSelected.Value);
 
