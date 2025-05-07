@@ -259,6 +259,10 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             var playfield = PlayfieldAtScreenSpacePosition(screenSpacePosition);
             (Vector2 pos, double time) = distanceSnapGrid.GetSnappedPosition(distanceSnapGrid.ToLocalSpace(screenSpacePosition), fixedTime);
+
+            if (pos.X < 0 || pos.X > OsuPlayfield.BASE_SIZE.X || pos.Y < 0 || pos.Y > OsuPlayfield.BASE_SIZE.Y)
+                return null;
+
             return new SnapResult(distanceSnapGrid.ToScreenSpace(pos), time, playfield);
         }
 
