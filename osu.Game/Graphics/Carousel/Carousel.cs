@@ -68,7 +68,7 @@ namespace osu.Game.Graphics.Carousel
         public int ItemsTracked => Items.Count;
 
         /// <summary>
-        /// The number of carousel items currently in rotation for display.
+        /// The items currently in rotation for display.
         /// </summary>
         public int DisplayableItems => carouselItems?.Count ?? 0;
 
