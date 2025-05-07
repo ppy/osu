@@ -1277,12 +1277,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("set filter text", () => songSelect!.FilterControl.ChildrenOfType<FilterControl.FilterControlTextBox>().First().Text = "nonono");
             AddStep("select all", () => InputManager.Keys(PlatformAction.SelectAll));
-            AddStep("press ctrl-x", () =>
-            {
-                InputManager.PressKey(Key.ControlLeft);
-                InputManager.Key(Key.X);
-                InputManager.ReleaseKey(Key.ControlLeft);
-            });
+            AddStep("press ctrl/cmd-x", () => InputManager.Keys(PlatformAction.Cut));
 
             AddAssert("filter text cleared", () => songSelect!.FilterControl.ChildrenOfType<FilterControl.FilterControlTextBox>().First().Text, () => Is.Empty);
         }
