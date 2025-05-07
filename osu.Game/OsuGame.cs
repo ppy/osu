@@ -755,7 +755,17 @@ namespace osu.Game
         {
             if (room.HasEnded)
             {
-                Notifications.Post(new SimpleNotification { Text = "This multiplayer room has ended." });
+                // TODO: Eventually it should be possible to display ended multiplayer rooms in game too,
+                // but it generally will require turning off the entirety of communication with spectator server which is currently embedded into multiplayer screens.
+                Notifications.Post(new SimpleNotification
+                {
+                    Text = NotificationsStrings.MultiplayerRoomEnded,
+                    Activated = () =>
+                    {
+                        OpenUrlExternally($@"/multiplayer/rooms/{room.RoomID}");
+                        return true;
+                    }
+                });
                 return;
             }
 
