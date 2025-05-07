@@ -28,7 +28,6 @@ namespace osu.Game.Screens.SelectV2
 
         public async Task<IEnumerable<CarouselItem>> Run(IEnumerable<CarouselItem> items, CancellationToken cancellationToken) => await Task.Run(() =>
         {
-            BeatmapItemsCount = 0;
             var criteria = getCriteria();
 
             return matchItems(items, criteria);
@@ -36,16 +35,20 @@ namespace osu.Game.Screens.SelectV2
 
         private IEnumerable<CarouselItem> matchItems(IEnumerable<CarouselItem> items, FilterCriteria criteria)
         {
+            int countMatching = 0;
+
             foreach (var item in items)
             {
                 var beatmap = (BeatmapInfo)item.Model;
 
                 if (checkMatch(beatmap, criteria))
                 {
-                    BeatmapItemsCount++;
+                    countMatching++;
                     yield return item;
                 }
             }
+
+            BeatmapItemsCount = countMatching;
         }
 
         private static bool checkMatch(BeatmapInfo beatmap, FilterCriteria criteria)
