@@ -5,7 +5,6 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
-using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
 using osu.Game.Screens.SelectV2;
 
@@ -19,7 +18,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         {
             RemoveAllBeatmaps();
             CreateCarousel();
-            SortBy(new FilterCriteria { Group = GroupMode.Artist, Sort = SortMode.Artist });
+
+            SortAndGroupBy(SortMode.Artist, GroupMode.Artist);
 
             AddBeatmaps(10, 3, true);
             WaitForDrawablePanels();
@@ -172,6 +172,38 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             SelectNextPanel();
             SelectNextGroup();
             WaitForGroupSelection(1, 1);
+        }
+
+        [Test]
+        public void TestBasicFiltering()
+        {
+            ApplyToFilter("filter", c => c.SearchText = BeatmapSets[2].Metadata.Title);
+            WaitForFiltering();
+
+            CheckDisplayedGroupsCount(1);
+            CheckDisplayedBeatmapSetsCount(1);
+            CheckDisplayedBeatmapsCount(3);
+
+            CheckNoSelection();
+            SelectNextPanel();
+            Select();
+            SelectNextPanel();
+            Select();
+            WaitForGroupSelection(0, 1);
+
+            for (int i = 0; i < 6; i++)
+                SelectNextPanel();
+
+            Select();
+
+            WaitForGroupSelection(0, 2);
+
+            ApplyToFilter("remove filter", c => c.SearchText = string.Empty);
+            WaitForFiltering();
+
+            CheckDisplayedGroupsCount(5);
+            CheckDisplayedBeatmapSetsCount(10);
+            CheckDisplayedBeatmapsCount(30);
         }
     }
 }
