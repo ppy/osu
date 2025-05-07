@@ -10,6 +10,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 {
     public partial class TestSceneBeatmapFilterControl : SongSelectComponentsTestScene
     {
+        private FilterControl filterControl = null!;
+
         protected override Anchor ComponentAnchor => Anchor.TopRight;
         protected override float InitialRelativeWidth => 0.7f;
 
@@ -20,12 +22,18 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
-                Child = new FilterControl
+                Child = filterControl = new FilterControl
                 {
                     State = { Value = Visibility.Visible },
                     RelativeSizeAxes = Axes.X,
                 },
             };
         });
+
+        [Test]
+        public void TestSearch()
+        {
+            AddStep("search for text", () => filterControl.Search("test search"));
+        }
     }
 }
