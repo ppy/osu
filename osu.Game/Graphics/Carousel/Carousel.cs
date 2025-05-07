@@ -68,7 +68,7 @@ namespace osu.Game.Graphics.Carousel
         public int ItemsTracked => Items.Count;
 
         /// <summary>
-        /// The number of carousel items currently in rotation for display.
+        /// The items currently in rotation for display.
         /// </summary>
         public int DisplayableItems => carouselItems?.Count ?? 0;
 
@@ -265,7 +265,7 @@ namespace osu.Game.Graphics.Carousel
 
             // Copy must be performed on update thread for now (see ConfigureAwait above).
             // Could potentially be optimised in the future if it becomes an issue.
-            IEnumerable<CarouselItem> items = new List<CarouselItem>(Items.Select(m => new CarouselItem(m)));
+            List<CarouselItem> items = new List<CarouselItem>(Items.Select(m => new CarouselItem(m)));
 
             await Task.Run(async () =>
             {
@@ -275,6 +275,11 @@ namespace osu.Game.Graphics.Carousel
                     {
                         log($"Performing {filter.GetType().ReadableName()}");
                         items = await filter.Run(items, cts.Token).ConfigureAwait(false);
+
+                        // To avoid shooting ourselves in the foot, ensure that we manifest a list after each filter.
+                        //
+                        // A future improvement may be passing a reference list through each filter rather than copying each time,
+                        // but this is the safest approach.
                     }
 
                     log("Updating Y positions");
@@ -292,7 +297,7 @@ namespace osu.Game.Graphics.Carousel
             Schedule(() =>
             {
                 log("Items ready for display");
-                carouselItems = items.ToList();
+                carouselItems = items;
                 displayedRange = null;
 
                 // Need to call this to ensure correct post-selection logic is handled on the new items list.
