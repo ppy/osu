@@ -31,7 +31,13 @@ namespace osu.Game.Screens.SelectV2
 
         private readonly LoadingLayer loading;
 
+        private readonly BeatmapCarouselFilterMatching matching;
         private readonly BeatmapCarouselFilterGrouping grouping;
+
+        /// <summary>
+        /// Total number of beatmap difficulties displayed with the filter.
+        /// </summary>
+        public int MatchedBeatmapsCount => matching.BeatmapItemsCount;
 
         protected override float GetSpacingBetweenPanels(CarouselItem top, CarouselItem bottom)
         {
@@ -49,7 +55,7 @@ namespace osu.Game.Screens.SelectV2
 
             Filters = new ICarouselFilter[]
             {
-                new BeatmapCarouselFilterMatching(() => Criteria),
+                matching = new BeatmapCarouselFilterMatching(() => Criteria),
                 new BeatmapCarouselFilterSorting(() => Criteria),
                 grouping = new BeatmapCarouselFilterGrouping(() => Criteria),
             };
