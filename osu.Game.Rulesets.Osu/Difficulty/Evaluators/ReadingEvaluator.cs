@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             if (currObj.BaseObject is Slider currSlider)
                 // Longer sliders are inherently denser objects
-                pastObjectDifficultyInfluence += Math.Log10(Math.Max(1, currSlider.Velocity * currSlider.SpanDuration / currSlider.Radius));
+                pastObjectDifficultyInfluence += 2 * Math.Log10(Math.Max(1, currSlider.Velocity * currSlider.SpanDuration / currSlider.Radius));
 
             foreach (var loopObj in retrievePastVisibleObjects(currObj))
             {
