@@ -17,7 +17,7 @@ namespace osu.Game.Screens.SelectV2
         private readonly Func<FilterCriteria> getCriteria;
 
         /// <summary>
-        /// Counts total number of beatmap difficulties displayed post filter.
+        /// The total number of beatmap difficulties displayed post filter.
         /// </summary>
         public int BeatmapItemsCount { get; private set; }
 
@@ -26,19 +26,16 @@ namespace osu.Game.Screens.SelectV2
             this.getCriteria = getCriteria;
         }
 
-        public async Task<IEnumerable<CarouselItem>> Run(IEnumerable<CarouselItem> items, CancellationToken cancellationToken)
+        public async Task<IEnumerable<CarouselItem>> Run(IEnumerable<CarouselItem> items, CancellationToken cancellationToken) => await Task.Run(() =>
         {
-            return await Task.Run(() =>
-            {
-                var criteria = getCriteria();
-                return matchItems(items, criteria);
-            }, cancellationToken).ConfigureAwait(false);
-        }
+            BeatmapItemsCount = 0;
+            var criteria = getCriteria();
+
+            return matchItems(items, criteria);
+        }, cancellationToken).ConfigureAwait(false);
 
         private IEnumerable<CarouselItem> matchItems(IEnumerable<CarouselItem> items, FilterCriteria criteria)
         {
-            BeatmapItemsCount = 0;
-
             foreach (var item in items)
             {
                 var beatmap = (BeatmapInfo)item.Model;
