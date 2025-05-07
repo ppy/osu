@@ -37,7 +37,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             ApplyToFilter("filter", c => c.SearchText = BeatmapSets[2].Metadata.Title);
             WaitForFiltering();
 
-            AddAssert("3 diffs + 1 set displayed", () => Carousel.DisplayableItems == 4);
+            CheckDisplayedBeatmapSetsCount(1);
+            CheckDisplayedBeatmapsCount(3);
 
             SelectNextPanel();
             Select();
@@ -53,7 +54,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             ApplyToFilter("remove filter", c => c.SearchText = string.Empty);
             WaitForFiltering();
 
-            AddAssert("30 diffs + 10 sets displayed", () => Carousel.DisplayableItems == 40);
+            CheckDisplayedBeatmapSetsCount(10);
+            CheckDisplayedBeatmapsCount(30);
         }
 
         [Test]
@@ -85,7 +87,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 c.UserStarDifficulty.Max = null;
             });
             WaitForFiltering();
-            AddAssert("1 set + 11 diffs displayed", () => Carousel.DisplayableItems == 12);
+            CheckDisplayedBeatmapsCount(11);
 
             ApplyToFilter("filter to [0..7]", c =>
             {
@@ -93,7 +95,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 c.UserStarDifficulty.Max = 7;
             });
             WaitForFiltering();
-            AddAssert("1 set + 7 diffs displayed", () => Carousel.DisplayableItems == 8);
+            CheckDisplayedBeatmapsCount(7);
 
             ApplyToFilter("filter to [5..7]", c =>
             {
@@ -102,7 +104,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             });
 
             WaitForFiltering();
-            AddAssert("1 set + 3 diffs displayed", () => Carousel.DisplayableItems == 4);
+            CheckDisplayedBeatmapsCount(3);
 
             ApplyToFilter("filter to [2..2]", c =>
             {
@@ -111,7 +113,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             });
 
             WaitForFiltering();
-            AddAssert("`1 set + 1 diff displayed", () => Carousel.DisplayableItems == 2);
+            CheckDisplayedBeatmapsCount(1);
 
             ApplyToFilter("filter to [0..]", c =>
             {
@@ -119,7 +121,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 c.UserStarDifficulty.Max = null;
             });
             WaitForFiltering();
-            AddAssert("1 set + 15 diffs displayed", () => Carousel.DisplayableItems == 16);
+            CheckDisplayedBeatmapsCount(15);
         }
 
         [Test]
@@ -269,16 +271,20 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             });
 
             SortBy(SortMode.Difficulty);
+            WaitForFiltering();
 
-            AddAssert($"3 sets + {local_set_count * diffs_per_set} diffs displayed", () => Carousel.DisplayableItems == 3 + local_set_count * diffs_per_set);
+            CheckDisplayedBeatmapSetsCount(3);
+            CheckDisplayedBeatmapsCount(local_set_count * diffs_per_set);
 
             ApplyToFilter("filter to normal", c => c.SearchText = "Normal");
 
-            AddAssert($"{local_set_count} sets + {local_set_count} diffs displayed", () => Carousel.DisplayableItems == local_set_count + local_set_count);
+            CheckDisplayedBeatmapSetsCount(local_set_count);
+            CheckDisplayedBeatmapsCount(local_set_count);
 
             ApplyToFilter("filter to insane", c => c.SearchText = "Insane");
 
-            AddAssert($"{local_set_count} sets + {local_set_count} diffs displayed", () => Carousel.DisplayableItems == local_set_count + local_set_count);
+            CheckDisplayedBeatmapSetsCount(local_set_count);
+            CheckDisplayedBeatmapsCount(local_set_count);
         }
     }
 }
