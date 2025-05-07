@@ -21,8 +21,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             RemoveAllBeatmaps();
             CreateCarousel();
 
-            SortBy(SortMode.Difficulty);
-            GroupBy(GroupMode.Difficulty);
+            SortAndGroupBy(SortMode.Difficulty, GroupMode.Difficulty);
 
             AddBeatmaps(10, 3);
             WaitForDrawablePanels();

@@ -136,6 +136,15 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         protected void SortBy(SortMode mode) => ApplyToFilter($"sort by {mode.ToString().ToLowerInvariant()}", c => c.Sort = mode);
         protected void GroupBy(GroupMode mode) => ApplyToFilter($"group by {mode.ToString().ToLowerInvariant()}", c => c.Group = mode);
 
+        protected void SortAndGroupBy(SortMode sort, GroupMode group)
+        {
+            ApplyToFilter($"sort by {sort.ToString().ToLowerInvariant()} & group by {group.ToString().ToLowerInvariant()}", c =>
+            {
+                c.Sort = sort;
+                c.Group = group;
+            });
+        }
+
         protected void ApplyToFilter(string description, Action<FilterCriteria>? apply)
         {
             AddStep(description, () =>
