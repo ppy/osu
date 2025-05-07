@@ -135,6 +135,11 @@ Click to see what's new!", version);
         /// </summary>
         public static LocalisableString DownloadingUpdate => new TranslatableString(getKey(@"downloading_update"), @"Downloading update...");
 
+        /// <summary>
+        /// "This multiplayer room has ended. Click to display room results."
+        /// </summary>
+        public static LocalisableString MultiplayerRoomEnded => new TranslatableString(getKey(@"multiplayer_room_ended"), @"This multiplayer room has ended. Click to display room results.");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
