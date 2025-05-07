@@ -5,12 +5,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
@@ -22,6 +24,7 @@ using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
 using osu.Game.Users;
 using osu.Game.Utils;
+using osu.Game.Online.Leaderboards;
 using osuTK.Input;
 
 namespace osu.Game.Screens.Select
@@ -46,11 +49,13 @@ namespace osu.Game.Screens.Select
         private PlayBeatmapDetailArea playBeatmapDetailArea = null!;
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, OsuConfigManager config)
         {
             BeatmapOptions.AddButton(ButtonSystemStrings.Edit.ToSentence(), @"beatmap", FontAwesome.Solid.PencilAlt, colours.Yellow, () => Edit());
 
             AddInternal(new SongSelectTouchInputDetector());
+
+            beatmapDetailTab = config.GetBindable<PlayBeatmapDetailArea.TabType>(OsuSetting.BeatmapDetailTab);
         }
 
         protected void PresentScore(ScoreInfo score) =>
@@ -88,6 +93,8 @@ namespace osu.Game.Screens.Select
 
         private ModAutoplay? getAutoplayMod() => Ruleset.Value.CreateInstance().GetAutoplayMod();
 
+        private Bindable<PlayBeatmapDetailArea.TabType> beatmapDetailTab = null!;
+
         protected override bool OnStart()
         {
             if (playerLoader != null) return false;
@@ -115,6 +122,12 @@ namespace osu.Game.Screens.Select
 
                 Mods.Value = mods;
             }
+
+            // Default to local leaderboard if the currently selected leaderboard doesn't have scores or is unavailable
+            // perhaps because it requires sign in, requires the beatmap to be ranked, etc.
+            // Also default to local if the details tab is selected so the leaderboard with the new score is visible after returning to song select.
+            if (playBeatmapDetailArea.Leaderboard.State != LeaderboardState.Success || beatmapDetailTab.Value == PlayBeatmapDetailArea.TabType.Details)
+                beatmapDetailTab.Value = PlayBeatmapDetailArea.TabType.Local;
 
             SampleConfirm?.Play();
 
