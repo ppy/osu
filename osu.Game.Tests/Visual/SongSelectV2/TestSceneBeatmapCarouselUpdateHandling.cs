@@ -85,7 +85,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [Test]
         public void TestSelectionHeld()
         {
-            SelectPrevGroup();
+            SelectNextGroup();
 
             WaitForSelection(1, 0);
             AddAssert("selection is updateable beatmap", () => Carousel.CurrentSelection, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
@@ -101,7 +101,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [Test] // Checks that we keep selection based on online ID where possible.
         public void TestSelectionHeldDifficultyNameChanged()
         {
-            SelectPrevGroup();
+            SelectNextGroup();
 
             WaitForSelection(1, 0);
             AddAssert("selection is updateable beatmap", () => Carousel.CurrentSelection, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
@@ -117,7 +117,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [Test] // Checks that we fallback to keeping selection based on difficulty name.
         public void TestSelectionHeldDifficultyOnlineIDChanged()
         {
-            SelectPrevGroup();
+            SelectNextGroup();
 
             WaitForSelection(1, 0);
             AddAssert("selection is updateable beatmap", () => Carousel.CurrentSelection, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
