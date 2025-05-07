@@ -33,14 +33,9 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [Explicit]
         public void TestSorting()
         {
-            SortBy(SortMode.Artist);
-            GroupBy(GroupMode.All);
-
-            SortBy(SortMode.Difficulty);
-            GroupBy(GroupMode.Difficulty);
-
-            SortBy(SortMode.Artist);
-            GroupBy(GroupMode.Artist);
+            SortAndGroupBy(SortMode.Artist, GroupMode.All);
+            SortAndGroupBy(SortMode.Difficulty, GroupMode.Difficulty);
+            SortAndGroupBy(SortMode.Artist, GroupMode.Artist);
         }
 
         [Test]
