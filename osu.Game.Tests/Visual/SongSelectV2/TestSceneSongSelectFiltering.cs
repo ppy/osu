@@ -18,6 +18,7 @@ using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Dialog;
 using osu.Game.Overlays.Toolbar;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mania.Mods;
@@ -27,9 +28,13 @@ using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens;
 using osu.Game.Screens.Footer;
 using osu.Game.Screens.Menu;
+using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
 using osu.Game.Screens.SelectV2;
 using osu.Game.Tests.Resources;
+using osuTK.Input;
+using BeatmapCarousel = osu.Game.Screens.SelectV2.BeatmapCarousel;
+using FilterControl = osu.Game.Screens.SelectV2.FilterControl;
 
 namespace osu.Game.Tests.Visual.SongSelectV2
 {
@@ -263,6 +268,57 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddStep("add filterable mod", () => SelectedMods.Value = new Mod[] { new ManiaModKey3() });
             AddAssert("filter count is 5", () => filterOperationsCount, () => Is.EqualTo(5));
         }
+
+        #region Matches count note
+
+        [Test]
+        public void TestTextBoxBeatmapDifficultyCount()
+        {
+            loadSongSelect();
+
+            AddAssert("0 matching shown", () => filterTextBox.FilterText == "0 matches");
+
+            importBeatmapForRuleset(0);
+
+            AddAssert("3 matching shown", () => filterTextBox.FilterText == "3 matches");
+            AddStep("delete all beatmaps", () => manager.Delete());
+            AddUntilStep("0 matching shown", () => filterTextBox.FilterText == "0 matches");
+        }
+
+        [Test]
+        [Ignore("Pending hotkey implementation")]
+        public void TestDeleteHotkey()
+        {
+            loadSongSelect();
+
+            importBeatmapForRuleset(0);
+            AddAssert("3 matching shown", () => filterTextBox.FilterText == "3 matches");
+
+            AddStep("press shift-delete", () =>
+            {
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.Key(Key.Delete);
+                InputManager.ReleaseKey(Key.ShiftLeft);
+            });
+            AddUntilStep("delete dialog shown", () => DialogOverlay.CurrentDialog, Is.InstanceOf<BeatmapDeleteDialog>);
+            AddStep("confirm deletion", () => DialogOverlay.CurrentDialog!.PerformAction<PopupDialogDangerousButton>());
+            AddAssert("0 matching shown", () => filterTextBox.FilterText == "0 matches");
+        }
+
+        [Test]
+        public void TestHardDeleteHandledCorrectly()
+        {
+            loadSongSelect();
+
+            importBeatmapForRuleset(0);
+            AddAssert("3 matching shown", () => filterTextBox.FilterText == "3 matches");
+
+            AddStep("hard delete beatmap", () => Realm.Write(r => r.RemoveRange(r.All<BeatmapSetInfo>().Where(s => !s.Protected))));
+
+            AddUntilStep("0 matching shown", () => filterTextBox.FilterText == "0 matches");
+        }
+
+        #endregion
 
         private void loadSongSelect()
         {

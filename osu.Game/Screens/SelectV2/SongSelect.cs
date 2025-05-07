@@ -285,12 +285,24 @@ namespace osu.Game.Screens.SelectV2
             filterDebounce = Scheduler.AddDelayed(() => carousel.Filter(criteria), filter_delay);
         }
 
+        private void updateMatchesNote()
+        {
+            int count = carousel.MatchedBeatmapsCount;
+
+            if (count == 1)
+                filterControl.InformationalNote = @"1 match";
+            else
+                filterControl.InformationalNote = $@"{count:#,0} matches";
+        }
+
         #endregion
 
         protected override void Update()
         {
             base.Update();
+
             detailsArea.Height = wedgesContainer.DrawHeight - titleWedge.LayoutSize.Y - 4;
+            updateMatchesNote();
         }
     }
 }
