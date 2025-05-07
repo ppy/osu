@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -23,7 +24,8 @@ namespace osu.Game.Screens.SelectV2
         private MetadataDisplay source = null!;
         private MetadataDisplay genre = null!;
         private MetadataDisplay language = null!;
-        private MetadataDisplay tag = null!;
+        private MetadataDisplay userTags = null!;
+        private MetadataDisplay mapperTags = null!;
         private MetadataDisplay submitted = null!;
         private MetadataDisplay ranked = null!;
 
@@ -34,6 +36,9 @@ namespace osu.Game.Screens.SelectV2
 
         private Drawable failRetryWedge = null!;
         private FailRetryDisplay failRetryDisplay = null!;
+
+        public bool RatingsVisible => ratingsWedge.Alpha > 0;
+        public bool FailRetryVisible => failRetryWedge.Alpha > 0;
 
         protected override bool StartHidden => true;
 
@@ -92,6 +97,8 @@ namespace osu.Game.Screens.SelectV2
                                         AutoSizeAxes = Axes.Y,
                                         Direction = FillDirection.Vertical,
                                         Spacing = new Vector2(0f, 10f),
+                                        AutoSizeDuration = (float)transition_duration / 3,
+                                        AutoSizeEasing = Easing.OutQuint,
                                         Children = new Drawable[]
                                         {
                                             new GridContainer
@@ -148,7 +155,11 @@ namespace osu.Game.Screens.SelectV2
                                                     },
                                                 },
                                             },
-                                            tag = new MetadataDisplay("Tags"),
+                                            userTags = new MetadataDisplay("User Tags")
+                                            {
+                                                Alpha = 0,
+                                            },
+                                            mapperTags = new MetadataDisplay("Mapper Tags"),
                                         },
                                     },
                                 },
@@ -250,7 +261,10 @@ namespace osu.Game.Screens.SelectV2
             // We could consider hiding individual wedges based on zero data in the future.
             // Needs some experimentation on what looks good.
 
-            if (State.Value == Visibility.Visible && currentOnlineBeatmapSet != null)
+            var beatmapInfo = beatmap.Value.BeatmapInfo;
+            var currentOnlineBeatmap = currentOnlineBeatmapSet?.Beatmaps.SingleOrDefault(b => b.OnlineID == beatmapInfo.OnlineID);
+
+            if (State.Value == Visibility.Visible && currentOnlineBeatmap != null)
             {
                 ratingsWedge.FadeIn(transition_duration, Easing.OutQuint)
                             .MoveToX(0, transition_duration, Easing.OutQuint);
@@ -282,7 +296,7 @@ namespace osu.Game.Screens.SelectV2
             else
                 source.Data = ("-", null);
 
-            tag.Tags = (metadata.Tags.Split(' '), t => songSelect?.Search(t));
+            mapperTags.Tags = (metadata.Tags.Split(' '), t => songSelect?.Search(t));
             submitted.Date = beatmapSetInfo.DateSubmitted;
             ranked.Date = beatmapSetInfo.DateRanked;
 
@@ -351,7 +365,34 @@ namespace osu.Game.Screens.SelectV2
                 }
             }
 
+            updateUserTags();
             updateSubWedgeVisibility();
+        }
+
+        private void updateUserTags()
+        {
+            var beatmapInfo = beatmap.Value.BeatmapInfo;
+            var onlineBeatmapSet = currentOnlineBeatmapSet;
+            var onlineBeatmap = onlineBeatmapSet?.Beatmaps.SingleOrDefault(b => b.OnlineID == beatmapInfo.OnlineID);
+
+            if (onlineBeatmap?.TopTags == null || onlineBeatmap.TopTags.Length == 0 || onlineBeatmapSet?.RelatedTags == null)
+            {
+                userTags.FadeOut(transition_duration, Easing.OutQuint);
+                return;
+            }
+
+            var tagsById = onlineBeatmapSet.RelatedTags.ToDictionary(t => t.Id);
+            string[] userTagsArray = onlineBeatmap.TopTags
+                                                  .Select(t => (topTag: t, relatedTag: tagsById.GetValueOrDefault(t.TagId)))
+                                                  .Where(t => t.relatedTag != null)
+                                                  // see https://github.com/ppy/osu-web/blob/bb3bd2e7c6f84f26066df5ea20a81c77ec9bb60a/resources/js/beatmapsets-show/controller.ts#L103-L106 for sort criteria
+                                                  .OrderByDescending(t => t.topTag.VoteCount)
+                                                  .ThenBy(t => t.relatedTag!.Name)
+                                                  .Select(t => t.relatedTag!.Name)
+                                                  .ToArray();
+
+            userTags.FadeIn(transition_duration, Easing.OutQuint);
+            userTags.Tags = (userTagsArray, t => songSelect?.Search(t));
         }
     }
 }

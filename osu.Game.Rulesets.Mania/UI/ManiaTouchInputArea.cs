@@ -74,6 +74,7 @@ namespace osu.Game.Rulesets.Mania.UI
                     receptorGridContent.Add(new ColumnInputReceptor
                     {
                         Action = { BindTarget = column.Action },
+                        Spacing = { BindTarget = Spacing },
                     });
                     receptorGridDimensions.Add(new Dimension());
 
@@ -122,6 +123,7 @@ namespace osu.Game.Rulesets.Mania.UI
         public partial class ColumnInputReceptor : CompositeDrawable
         {
             public readonly IBindable<ManiaAction> Action = new Bindable<ManiaAction>();
+            public readonly IBindable<float> Spacing = new BindableFloat();
 
             private readonly Box highlightOverlay;
 
@@ -158,6 +160,10 @@ namespace osu.Game.Rulesets.Mania.UI
                     }
                 };
             }
+
+            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
+                // Extend input coverage to the gaps close to this receptor.
+                => DrawRectangle.Inflate(new Vector2(Spacing.Value / 2, 0)).Contains(ToLocalSpace(screenSpacePos));
 
             protected override bool OnTouchDown(TouchDownEvent e)
             {

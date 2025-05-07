@@ -56,6 +56,7 @@ namespace osu.Game.Screens.Play.HUD
         public BindableDouble Accuracy { get; } = new BindableDouble(1);
         public BindableInt Combo { get; } = new BindableInt();
         public BindableBool HasQuit { get; } = new BindableBool();
+        public Bindable<int?> ScorePosition { get; } = new Bindable<int?>();
         public Bindable<long> DisplayOrder { get; } = new Bindable<long>();
 
         private Func<ScoringMode, long>? getDisplayScoreFunction;
@@ -68,28 +69,6 @@ namespace osu.Game.Screens.Play.HUD
         public Color4? BackgroundColour { get; set; }
 
         public Color4? TextColour { get; set; }
-
-        private int? scorePosition;
-
-        private bool scorePositionIsSet;
-
-        public int? ScorePosition
-        {
-            get => scorePosition;
-            set
-            {
-                // We always want to run once, as the incoming value may be null and require a visual update to "-".
-                if (value == scorePosition && scorePositionIsSet)
-                    return;
-
-                scorePosition = value;
-
-                positionText.Text = scorePosition.HasValue ? $"#{scorePosition.Value.FormatRank()}" : "-";
-                scorePositionIsSet = true;
-
-                updateState();
-            }
-        }
 
         public IUser? User { get; }
 
@@ -123,6 +102,7 @@ namespace osu.Game.Screens.Play.HUD
             Accuracy.BindTo(score.Accuracy);
             Combo.BindTo(score.Combo);
             HasQuit.BindTo(score.HasQuit);
+            ScorePosition.BindTo(score.Position);
             DisplayOrder.BindTo(score.DisplayOrder);
             GetDisplayScore = score.GetDisplayScore;
 
@@ -334,6 +314,7 @@ namespace osu.Game.Screens.Play.HUD
 
             updateState();
             Expanded.BindValueChanged(changeExpandedState, true);
+            ScorePosition.BindValueChanged(_ => updateState(), true);
 
             FinishTransforms(true);
         }
@@ -392,7 +373,9 @@ namespace osu.Game.Screens.Play.HUD
                 return;
             }
 
-            if (scorePosition == 1)
+            positionText.Text = ScorePosition.Value.HasValue ? $"#{ScorePosition.Value.Value.FormatRank()}" : "-";
+
+            if (ScorePosition.Value == 1)
             {
                 widthExtension = true;
                 panelColour = BackgroundColour ?? Color4Extensions.FromHex("7fcc33");
