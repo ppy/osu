@@ -18,6 +18,13 @@ namespace osu.Game.Screens.SelectV2
     {
         private readonly Func<FilterCriteria> getCriteria;
 
+        /// <summary>
+        /// Matched beatmaps arranged by the active sorting mode. Mainly for testing purposes.
+        /// </summary>
+        public IEnumerable<BeatmapInfo> SortedBeatmaps => sortedItems?.Select(i => i.Model).Cast<BeatmapInfo>() ?? Enumerable.Empty<BeatmapInfo>();
+
+        private List<CarouselItem>? sortedItems;
+
         public BeatmapCarouselFilterSorting(Func<FilterCriteria> getCriteria)
         {
             this.getCriteria = getCriteria;
@@ -27,7 +34,7 @@ namespace osu.Game.Screens.SelectV2
         {
             var criteria = getCriteria();
 
-            return items.Order(Comparer<CarouselItem>.Create((a, b) =>
+            return sortedItems = items.Order(Comparer<CarouselItem>.Create((a, b) =>
             {
                 int comparison;
 
