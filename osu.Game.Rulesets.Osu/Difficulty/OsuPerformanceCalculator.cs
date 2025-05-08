@@ -4,15 +4,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Game.Rulesets.Difficulty;
+using osu.Game.Rulesets.Osu.Difficulty.Skills;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Osu.Difficulty.Skills;
-using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Scoring;
 using System.Xml.Linq;
 using osu.Game.Rulesets.Difficulty;
@@ -23,8 +23,6 @@ using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Scoring.Legacy;
 using osu.Game.Scoring;
-using osu.Game.Screens.OnlinePlay.Multiplayer;
-using osu.Framework.Utils;
 
 namespace osu.Game.Rulesets.Osu.Difficulty
 {
@@ -132,13 +130,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 }
             }
 
-            double oldEffectiveMissCount = effectiveMissCount;
-            double scorev1Misscount = 0;
+            double comboBasedMissCount = effectiveMissCount;
+            double scoreBasedMisscount = 0;
 
             if (usingClassicSliderAccuracy && score.LegacyTotalScore != null)
             {
-                effectiveMissCount = scoreBasedMisscount(score, osuAttributes);
-                scorev1Misscount = effectiveMissCount;
+                effectiveMissCount = this.scoreBasedMisscount(score, osuAttributes);
+                scoreBasedMisscount = effectiveMissCount;
             }
 
             effectiveMissCount = Math.Max(countMiss, effectiveMissCount);
@@ -183,8 +181,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 Accuracy = accuracyValue,
                 Flashlight = flashlightValue,
                 EffectiveMissCount = effectiveMissCount,
-                ComboBasedMisscount = oldEffectiveMissCount,
-                ScoreBasedMisscount = scorev1Misscount,
+                ComboBasedMisscount = comboBasedMissCount,
+                ScoreBasedMisscount = scoreBasedMisscount,
                 SpeedDeviation = speedDeviation,
                 Total = totalValue
             };
@@ -348,7 +346,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
             if (attributes.MaxCombo == 0 || score.LegacyTotalScore == null) return 0;
 
-            scorev1Multiplier = attributes.Scorev1BaseMultiplier * new OsuLegacyScoreSimulator().GetLegacyScoreMultiplier(score.Mods, new LegacyBeatmapConversionDifficultyInfo());
+            scorev1Multiplier = attributes.LegacyScoreBaseMultiplier * new OsuLegacyScoreSimulator().GetLegacyScoreMultiplier(score.Mods, new LegacyBeatmapConversionDifficultyInfo());
             relevantComboPerObject = calculateScoreRelevantComboPerObject(attributes);
 
             double maximumMissCount = getMaximumMisscount(attributes);
@@ -411,7 +409,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
             double nonComboScore = (300 + attributes.SliderNestedScorePerObject) * totalHits;
 
-            double comboScore = attributes.MaximumScorev1 - nonComboScore;
+            double comboScore = attributes.MaximumLegacyScore - nonComboScore;
             comboScore /= 300 / 25 * scorev1Multiplier;
             if (Precision.AlmostEquals(scorev1Multiplier, 0)) comboScore = 0;
 

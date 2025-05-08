@@ -82,11 +82,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         [JsonProperty("slider_nested_score_per_object")]
         public double SliderNestedScorePerObject { get; set; }
 
-        [JsonProperty("scorev1_base_multiplier")]
-        public double Scorev1BaseMultiplier { get; set; }
+        [JsonProperty("legacy_score_base_multiplier")]
+        public double LegacyScoreBaseMultiplier { get; set; }
 
-        [JsonProperty("maximum_scorev1")]
-        public long MaximumScorev1 { get; set; }
+        [JsonProperty("maximum_legacy_score")]
+        public long MaximumLegacyScore { get; set; }
 
         public override IEnumerable<(int attributeId, object value)> ToDatabaseAttributes()
         {

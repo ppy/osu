@@ -10,14 +10,13 @@ using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Legacy;
-using osu.Game.Rulesets.Objects.Types;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Difficulty.Skills;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Scoring.Legacy;
 
 namespace osu.Game.Rulesets.Osu.Difficulty
 {
@@ -124,9 +123,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 HitCircleCount = hitCircleCount,
                 SliderCount = sliderCount,
                 SpinnerCount = spinnerCount,
-                SliderNestedScorePerObject = calculateSliderNestedScorePerObject(beatmap, objectCount),
-                Scorev1BaseMultiplier = calculateScorev1BaseMultiplier(beatmap, objectCount),
-                MaximumScorev1 = calculateMaximumScorev1(beatmap, mods)
+                SliderNestedScorePerObject = calculateSliderNestedScorePerObject(beatmap, totalHits),
+                LegacyScoreBaseMultiplier = calculateScorev1BaseMultiplier(beatmap, totalHits),
+                MaximumLegacyScore = calculateMaximumScorev1(beatmap, mods)
             };
 
             return attributes;
