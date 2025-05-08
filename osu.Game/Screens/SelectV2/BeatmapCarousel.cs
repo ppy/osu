@@ -42,8 +42,12 @@ namespace osu.Game.Screens.SelectV2
 
         protected override float GetSpacingBetweenPanels(CarouselItem top, CarouselItem bottom)
         {
+            // Group panels do not overlap with any other panel but should overlap with themselves.
+            if ((top.Model is GroupDefinition) ^ (bottom.Model is GroupDefinition))
+                return SPACING * 2;
+
+            // Beatmap difficulty panels do not overlap with themselves or any other panel.
             if (top.Model is BeatmapInfo || bottom.Model is BeatmapInfo)
-                // Beatmap difficulty panels do not overlap with themselves or any other panel.
                 return SPACING;
 
             return -SPACING;
