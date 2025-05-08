@@ -11,8 +11,8 @@ namespace osu.Game.Rulesets.Mania.Mods
 {
     public class ManiaModPerfect : ModPerfect
     {
-        [SettingSource("Only allow perfect hits")]
-        public BindableBool PerfectScoreOnly { get; } = new BindableBool();
+        [SettingSource("Require perfect hits")]
+        public BindableBool RequirePerfectHits { get; } = new BindableBool();
 
         protected override bool FailCondition(HealthProcessor healthProcessor, JudgementResult result)
         {
@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Mania.Mods
                 return false;
 
             // Mania allows imperfect "Great" hits without failing.
-            if (result.Judgement.MaxResult == HitResult.Perfect && !PerfectScoreOnly.Value)
+            if (result.Judgement.MaxResult == HitResult.Perfect && !RequirePerfectHits.Value)
                 return result.Type < HitResult.Great;
 
             return result.Type != result.Judgement.MaxResult;

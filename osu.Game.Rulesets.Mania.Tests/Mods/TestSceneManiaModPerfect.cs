@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
         {
             Mod = new ManiaModPerfect
             {
-                PerfectScoreOnly = { Value = requirePerfectHits }
+                RequirePerfectHits = { Value = requirePerfectHits }
             },
             PassCondition = () => ((ModFailConditionTestPlayer)Player).CheckFailed(false),
             Autoplay = false,
@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
         {
             Mod = new ManiaModPerfect
             {
-                PerfectScoreOnly = { Value = requirePerfectHits }
+                RequirePerfectHits = { Value = requirePerfectHits }
             },
             PassCondition = () => ((ModFailConditionTestPlayer)Player).CheckFailed(requirePerfectHits),
             Autoplay = false,
