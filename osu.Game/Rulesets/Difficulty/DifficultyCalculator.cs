@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Difficulty
         private double clockRate;
 
         private readonly IRulesetInfo ruleset;
-        private readonly IWorkingBeatmap beatmap;
+        protected readonly IWorkingBeatmap Working;
 
         /// <summary>
         /// A yymmdd version which is used to discern when reprocessing is required.
@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Difficulty
         protected DifficultyCalculator(IRulesetInfo ruleset, IWorkingBeatmap beatmap)
         {
             this.ruleset = ruleset;
-            this.beatmap = beatmap;
+            Working = beatmap;
         }
 
         /// <summary>
@@ -179,7 +179,7 @@ namespace osu.Game.Rulesets.Difficulty
         private void preProcess([NotNull] IEnumerable<Mod> mods, CancellationToken cancellationToken)
         {
             playableMods = mods.Select(m => m.DeepClone()).ToArray();
-            Beatmap = beatmap.GetPlayableBeatmap(ruleset, playableMods, cancellationToken);
+            Beatmap = Working.GetPlayableBeatmap(ruleset, playableMods, cancellationToken);
 
             var track = new TrackVirtual(10000);
             playableMods.OfType<IApplicableToTrack>().ForEach(m => m.ApplyToTrack(track));

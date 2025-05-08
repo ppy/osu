@@ -4,17 +4,24 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Game.Rulesets.Difficulty;
+using osu.Game.Rulesets.Osu.Difficulty.Skills;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu.Scoring;
+using System.Xml.Linq;
+using osu.Game.Rulesets.Difficulty;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Difficulty.Skills;
 using osu.Game.Rulesets.Osu.Mods;
-using osu.Game.Rulesets.Osu.Scoring;
+using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Scoring.Legacy;
 using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Difficulty
@@ -123,6 +130,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 }
             }
 
+            double comboBasedMissCount = effectiveMissCount;
+            double scoreBasedMisscount = 0;
+
+            if (usingClassicSliderAccuracy && score.LegacyTotalScore != null)
+            {
+                effectiveMissCount = this.scoreBasedMisscount(score, osuAttributes);
+                scoreBasedMisscount = effectiveMissCount;
+            }
+
             effectiveMissCount = Math.Max(countMiss, effectiveMissCount);
             effectiveMissCount = Math.Min(totalHits, effectiveMissCount);
 
@@ -165,6 +181,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 Accuracy = accuracyValue,
                 Flashlight = flashlightValue,
                 EffectiveMissCount = effectiveMissCount,
+                ComboBasedMisscount = comboBasedMissCount,
+                ScoreBasedMisscount = scoreBasedMisscount,
                 SpeedDeviation = speedDeviation,
                 Total = totalValue
             };
@@ -319,6 +337,89 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             flashlightValue *= 0.5 + accuracy / 2.0;
 
             return flashlightValue;
+        }
+
+        private double scorev1Multiplier;
+        private double relevantComboPerObject;
+
+        private double scoreBasedMisscount(ScoreInfo score, OsuDifficultyAttributes attributes)
+        {
+            if (attributes.MaxCombo == 0 || score.LegacyTotalScore == null) return 0;
+
+            scorev1Multiplier = attributes.LegacyScoreBaseMultiplier * new OsuLegacyScoreSimulator().GetLegacyScoreMultiplier(score.Mods, new LegacyBeatmapConversionDifficultyInfo());
+            relevantComboPerObject = calculateScoreRelevantComboPerObject(attributes);
+
+            double maximumMissCount = getMaximumMisscount(attributes);
+
+            double scoreObtainedDuringMaxCombo = calculateScoreForCombo(attributes, score.MaxCombo);
+            double remainingScore = score.LegacyTotalScore.Value - scoreObtainedDuringMaxCombo;
+
+            if (remainingScore <= 0)
+                return maximumMissCount;
+
+            double remainingCombo = attributes.MaxCombo - score.MaxCombo;
+            double expectedRemainingScore = calculateScoreForCombo(attributes, remainingCombo);
+
+            double scoreBasedMisscount = expectedRemainingScore / remainingScore;
+
+            // If there's less then one miss detected - let combo-based misscount decide if this is FC or not
+            scoreBasedMisscount = Math.Max(scoreBasedMisscount, 1);
+
+            // Cap result by very harsh version of combo-based misscount
+            return Math.Min(scoreBasedMisscount, maximumMissCount);
+        }
+
+        /// <summary>
+        /// This function is harsher version of current effective misscount, used to provide reasonable value for cases where score-based misscount can't do this.
+        /// </summary>
+
+        private double getMaximumMisscount(OsuDifficultyAttributes attributes)
+        {
+            // Consider that full combo is maximum combo minus dropped slider tails since they don't contribute to combo but also don't break it
+            // In classic scores we can't know the amount of dropped sliders so we estimate to 10% of all sliders on the map
+            double fullComboThreshold = attributes.MaxCombo - 0.1 * attributes.SliderCount;
+
+            if (scoreMaxCombo < fullComboThreshold)
+                effectiveMissCount = Math.Pow(fullComboThreshold / Math.Max(1.0, scoreMaxCombo), 2.5);
+
+            // In classic scores there can't be more misses than a sum of all non-perfect judgements
+            effectiveMissCount = Math.Min(effectiveMissCount, totalImperfectHits);
+
+            return effectiveMissCount;
+        }
+
+        private double calculateScoreForCombo(OsuDifficultyAttributes attributes, double combo)
+        {
+            // Sum of arithmetic progression
+            double n = combo / relevantComboPerObject - 1;
+            double a = relevantComboPerObject - 1;
+            double d = relevantComboPerObject;
+
+            double comboScore = relevantComboPerObject > 0 ? (2 * a + (n - 1) * d) * n / 2 : 0;
+            comboScore *= accuracy * 300 / 25 * scorev1Multiplier;
+
+            double objectsHit = (totalHits - countMiss) * combo / attributes.MaxCombo;
+            double nonComboScore = (300 + attributes.SliderNestedScorePerObject) * accuracy * objectsHit;
+
+            double total = comboScore + nonComboScore;
+            return total;
+        }
+
+        private double calculateScoreRelevantComboPerObject(OsuDifficultyAttributes attributes)
+        {
+            double nonComboScore = (300 + attributes.SliderNestedScorePerObject) * totalHits;
+
+            double comboScore = attributes.MaximumLegacyScore - nonComboScore;
+            comboScore /= 300 / 25 * scorev1Multiplier;
+            if (Precision.AlmostEquals(scorev1Multiplier, 0)) comboScore = 0;
+
+            decimal a = attributes.MaxCombo;
+            decimal b = (decimal)comboScore;
+
+            decimal x = (a - 2) * a;
+            x /= Math.Max(a + 2 * (b - 1), 1);
+
+            return (double)x;
         }
 
         /// <summary>

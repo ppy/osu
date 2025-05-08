@@ -79,6 +79,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         /// </summary>
         public int SpinnerCount { get; set; }
 
+        [JsonProperty("slider_nested_score_per_object")]
+        public double SliderNestedScorePerObject { get; set; }
+
+        [JsonProperty("legacy_score_base_multiplier")]
+        public double LegacyScoreBaseMultiplier { get; set; }
+
+        [JsonProperty("maximum_legacy_score")]
+        public long MaximumLegacyScore { get; set; }
+
         public override IEnumerable<(int attributeId, object value)> ToDatabaseAttributes()
         {
             foreach (var v in base.ToDatabaseAttributes())
