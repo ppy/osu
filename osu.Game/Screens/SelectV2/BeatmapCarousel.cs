@@ -42,7 +42,7 @@ namespace osu.Game.Screens.SelectV2
 
         protected override float GetSpacingBetweenPanels(CarouselItem top, CarouselItem bottom)
         {
-            if (top.Model is BeatmapInfo || bottom.Model is BeatmapInfo)
+            if (grouping.BeatmapSetsGroupedTogether && (top.Model is BeatmapInfo || bottom.Model is BeatmapInfo))
                 // Beatmap difficulty panels do not overlap with themselves or any other panel.
                 return SPACING;
 
@@ -361,6 +361,7 @@ namespace osu.Game.Screens.SelectV2
         #region Drawable pooling
 
         private readonly DrawablePool<PanelBeatmap> beatmapPanelPool = new DrawablePool<PanelBeatmap>(100);
+        private readonly DrawablePool<PanelBeatmapStandalone> standalonePanelPool = new DrawablePool<PanelBeatmapStandalone>(100);
         private readonly DrawablePool<PanelBeatmapSet> setPanelPool = new DrawablePool<PanelBeatmapSet>(100);
         private readonly DrawablePool<PanelGroup> groupPanelPool = new DrawablePool<PanelGroup>(100);
 
@@ -368,6 +369,7 @@ namespace osu.Game.Screens.SelectV2
         {
             AddInternal(groupPanelPool);
             AddInternal(beatmapPanelPool);
+            AddInternal(standalonePanelPool);
             AddInternal(setPanelPool);
         }
 
@@ -397,8 +399,9 @@ namespace osu.Game.Screens.SelectV2
                     return groupPanelPool.Get();
 
                 case BeatmapInfo:
-                    // TODO: if beatmap is a group selection target, it needs to be a different drawable
-                    // with more information attached.
+                    if (!grouping.BeatmapSetsGroupedTogether)
+                        return standalonePanelPool.Get();
+
                     return beatmapPanelPool.Get();
 
                 case BeatmapSetInfo:
