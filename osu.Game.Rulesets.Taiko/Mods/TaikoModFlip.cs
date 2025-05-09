@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
     {
         public override string Name => "Flip";
         public override string Acronym => "FP";
-        public override LocalisableString Description => "Notes come from the left instead of the right.";
+        public override LocalisableString Description => "The playfield is flipped horizontally!";
         public override double ScoreMultiplier => 1;
 
         public void ApplyToDrawableRuleset(DrawableRuleset<TaikoHitObject> drawableRuleset)
