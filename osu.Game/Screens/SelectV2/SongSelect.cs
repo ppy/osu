@@ -9,8 +9,10 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Events;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
@@ -19,6 +21,7 @@ using osu.Game.Screens.Menu;
 using osu.Game.Screens.Select;
 using osuTK;
 using osuTK.Graphics;
+using osuTK.Input;
 
 namespace osu.Game.Screens.SelectV2
 {
@@ -56,6 +59,9 @@ namespace osu.Game.Screens.SelectV2
 
         [Resolved]
         private OsuLogo? logo { get; set; }
+
+        [Resolved]
+        private IDialogOverlay? dialogs { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -313,6 +319,42 @@ namespace osu.Game.Screens.SelectV2
             // Intentionally not localised until we have proper support for this (see https://github.com/ppy/osu-framework/pull/4918
             // but also in this case we want support for formatting a number within a string).
             filterControl.StatusText = count != 1 ? $"{count:#,0} matches" : $"{count:#,0} match";
+        }
+
+        #endregion
+
+        #region Beatmap management
+
+        /// <summary>
+        /// Opens up <see cref="BeatmapDeleteDialog"/> with the given beatmap set.
+        /// </summary>
+        public void RequestDeleteBeatmap(BeatmapSetInfo set)
+        {
+            dialogs?.Push(new BeatmapDeleteDialog(set));
+        }
+
+        #endregion
+
+        #region Hotkeys
+
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            if (e.Repeat) return false;
+
+            switch (e.Key)
+            {
+                case Key.Delete:
+                    if (e.ShiftPressed)
+                    {
+                        if (!Beatmap.IsDefault)
+                            RequestDeleteBeatmap(Beatmap.Value.BeatmapSetInfo);
+                        return true;
+                    }
+
+                    break;
+            }
+
+            return base.OnKeyDown(e);
         }
 
         #endregion
