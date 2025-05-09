@@ -384,6 +384,7 @@ namespace osu.Game.Skinning
                                 {
                                     var combo = container.OfType<LegacyDefaultComboCounter>().FirstOrDefault();
                                     var spectatorList = container.OfType<SpectatorList>().FirstOrDefault();
+                                    var leaderboard = container.OfType<DrawableGameplayLeaderboard>().FirstOrDefault();
 
                                     Vector2 pos = new Vector2();
 
@@ -402,10 +403,18 @@ namespace osu.Game.Skinning
                                         spectatorList.Origin = Anchor.BottomLeft;
                                         spectatorList.Position = pos;
                                     }
+
+                                    if (leaderboard != null)
+                                    {
+                                        leaderboard.Anchor = Anchor.CentreLeft;
+                                        leaderboard.Origin = Anchor.CentreLeft;
+                                        leaderboard.X = 10;
+                                    }
                                 })
                                 {
                                     new LegacyDefaultComboCounter(),
                                     new SpectatorList(),
+                                    new DrawableGameplayLeaderboard(),
                                 };
                             }
 
