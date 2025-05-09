@@ -116,7 +116,7 @@ namespace osu.Game.Overlays.Profile.Sections
 
             CurrentPage = CurrentPage?.TakeNext(ItemsPerPage) ?? new PaginationParameters(InitialItemsCount);
 
-            retrievalRequest = CreateRequest(User.Value, new PaginationParameters(CurrentPage.Value.Offset, InitialItemsCount + 1));
+            retrievalRequest = CreateRequest(User.Value, new PaginationParameters(CurrentPage.Value.Offset, CurrentPage.Value.Limit + 1));
             retrievalRequest.Success += items => UpdateItems(items, loadCancellation);
 
             api.Queue(retrievalRequest);
