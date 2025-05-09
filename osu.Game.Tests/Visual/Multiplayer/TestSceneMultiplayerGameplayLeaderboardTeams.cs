@@ -50,7 +50,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     Origin = Anchor.BottomCentre,
                     Team1Score = { BindTarget = LeaderboardProvider.TeamScores[0] },
                     Team2Score = { BindTarget = LeaderboardProvider.TeamScores[1] },
-                    Expanded = { BindTarget = Leaderboard!.Expanded },
+                    Expanded = { BindTarget = Leaderboard!.ForceExpand },
                 }, Add);
             });
         }

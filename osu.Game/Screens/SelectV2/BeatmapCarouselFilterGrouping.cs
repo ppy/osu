@@ -36,7 +36,7 @@ namespace osu.Game.Screens.SelectV2
             this.getCriteria = getCriteria;
         }
 
-        public async Task<IEnumerable<CarouselItem>> Run(IEnumerable<CarouselItem> items, CancellationToken cancellationToken)
+        public async Task<List<CarouselItem>> Run(IEnumerable<CarouselItem> items, CancellationToken cancellationToken)
         {
             return await Task.Run(() =>
             {

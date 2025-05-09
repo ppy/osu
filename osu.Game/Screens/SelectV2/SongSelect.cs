@@ -3,14 +3,25 @@
 
 using System.Collections.Generic;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Events;
 using osu.Framework.Screens;
+using osu.Framework.Threading;
+using osu.Game.Beatmaps;
+using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osu.Game.Screens.Footer;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Select;
+using osuTK;
+using osuTK.Graphics;
+using osuTK.Input;
 
 namespace osu.Game.Screens.SelectV2
 {
@@ -21,12 +32,13 @@ namespace osu.Game.Screens.SelectV2
     public abstract partial class SongSelect : OsuScreen
     {
         private const float logo_scale = 0.4f;
+        private const double fade_duration = 300;
 
         public const float WEDGE_CONTENT_MARGIN = CORNER_RADIUS_HIDE_OFFSET + OsuGame.SCREEN_EDGE_MARGIN;
         public const float CORNER_RADIUS_HIDE_OFFSET = 20f;
         public const float ENTER_DURATION = 600;
 
-        private readonly ModSelectOverlay modSelectOverlay = new ModSelectOverlay(OverlayColourScheme.Aquamarine)
+        private readonly ModSelectOverlay modSelectOverlay = new UserModSelectOverlay(OverlayColourScheme.Aquamarine)
         {
             ShowPresets = true,
         };
@@ -36,47 +48,121 @@ namespace osu.Game.Screens.SelectV2
 
         private BeatmapCarousel carousel = null!;
 
+        private FilterControl filterControl = null!;
+        private BeatmapTitleWedge titleWedge = null!;
+        private BeatmapDetailsArea detailsArea = null!;
+        private FillFlowContainer wedgesContainer = null!;
+
+        private NoResultsPlaceholder noResultsPlaceholder = null!;
+
         public override bool ShowFooter => true;
 
         [Resolved]
         private OsuLogo? logo { get; set; }
+
+        [Resolved]
+        private IDialogOverlay? dialogs { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()
         {
             AddRangeInternal(new Drawable[]
             {
-                new GridContainer // used for max width implementation
+                new Box
                 {
-                    Anchor = Anchor.TopRight,
-                    Origin = Anchor.TopRight,
                     RelativeSizeAxes = Axes.Both,
-                    ColumnDimensions = new[]
+                    Width = 0.5f,
+                    Colour = ColourInfo.GradientHorizontal(Color4.Black.Opacity(0.5f), Color4.Black.Opacity(0f)),
+                },
+                new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Padding = new MarginPadding { Bottom = ScreenFooter.HEIGHT },
+                    Child = new PopoverContainer
                     {
-                        new Dimension(),
-                        new Dimension(GridSizeMode.Relative, 0.5f, maxSize: 750),
-                    },
-                    Content = new[]
-                    {
-                        new[]
+                        RelativeSizeAxes = Axes.Both,
+                        Children = new Drawable[]
                         {
-                            Empty(),
-                            new Container
+                            new GridContainer // used for max width implementation
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Padding = new MarginPadding { Bottom = ScreenFooter.HEIGHT },
-                                Child = carousel = new BeatmapCarousel
+                                ColumnDimensions = new[]
                                 {
-                                    RequestPresentBeatmap = _ => OnStart(),
-                                    RelativeSizeAxes = Axes.Both
+                                    new Dimension(GridSizeMode.Relative, 0.5f, maxSize: 850),
+                                    new Dimension(),
+                                    new Dimension(GridSizeMode.Relative, 0.5f, maxSize: 750),
                                 },
+                                Content = new[]
+                                {
+                                    new[]
+                                    {
+                                        wedgesContainer = new FillFlowContainer
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            Margin = new MarginPadding
+                                            {
+                                                Top = -CORNER_RADIUS_HIDE_OFFSET,
+                                                Left = -CORNER_RADIUS_HIDE_OFFSET
+                                            },
+                                            Spacing = new Vector2(0f, 4f),
+                                            Direction = FillDirection.Vertical,
+                                            Shear = OsuGame.SHEAR,
+                                            Children = new Drawable[]
+                                            {
+                                                new ShearAligningWrapper(titleWedge = new BeatmapTitleWedge()),
+                                                new ShearAligningWrapper(detailsArea = new BeatmapDetailsArea()),
+                                            },
+                                        },
+                                        Empty(),
+                                        new Container
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            Children = new CompositeDrawable[]
+                                            {
+                                                new Container
+                                                {
+                                                    RelativeSizeAxes = Axes.Both,
+                                                    Padding = new MarginPadding
+                                                    {
+                                                        Top = FilterControl.HEIGHT_FROM_SCREEN_TOP + 5,
+                                                        Bottom = 5,
+                                                    },
+                                                    Children = new Drawable[]
+                                                    {
+                                                        carousel = new BeatmapCarousel
+                                                        {
+                                                            BleedTop = FilterControl.HEIGHT_FROM_SCREEN_TOP + 5,
+                                                            BleedBottom = ScreenFooter.HEIGHT + 5,
+                                                            RequestPresentBeatmap = _ => OnStart(),
+                                                            NewItemsPresented = newItemsPresented,
+                                                            RelativeSizeAxes = Axes.Both,
+                                                        },
+                                                        noResultsPlaceholder = new NoResultsPlaceholder(),
+                                                    }
+                                                },
+                                                filterControl = new FilterControl
+                                                {
+                                                    Anchor = Anchor.TopRight,
+                                                    Origin = Anchor.TopRight,
+                                                    RelativeSizeAxes = Axes.X,
+                                                },
+                                            }
+                                        },
+                                    },
+                                }
                             },
                         }
-                    }
+                    },
                 },
                 modSelectOverlay,
             });
         }
+
+        /// <summary>
+        /// Called when a selection is made.
+        /// </summary>
+        /// <returns>If a resultant action occurred that takes the user away from SongSelect.</returns>
+        protected abstract bool OnStart();
 
         public override IReadOnlyList<ScreenFooterButton> CreateFooterButtons() => new ScreenFooterButton[]
         {
@@ -89,6 +175,8 @@ namespace osu.Game.Screens.SelectV2
         {
             base.LoadComplete();
 
+            filterControl.CriteriaChanged += criteriaChanged;
+
             modSelectOverlay.State.BindValueChanged(v =>
             {
                 logo?.ScaleTo(v.NewValue == Visibility.Visible ? 0f : logo_scale, 400, Easing.OutQuint)
@@ -96,35 +184,54 @@ namespace osu.Game.Screens.SelectV2
             }, true);
         }
 
-        public override void OnEntering(ScreenTransitionEvent e)
+        protected override void Update()
         {
-            this.FadeIn();
+            base.Update();
 
-            modSelectOverlay.SelectedMods.BindTo(Mods);
-
-            base.OnEntering(e);
+            detailsArea.Height = wedgesContainer.DrawHeight - titleWedge.LayoutSize.Y - 4;
         }
 
-        private const double fade_duration = 300;
+        #region Transitions
+
+        public override void OnEntering(ScreenTransitionEvent e)
+        {
+            base.OnEntering(e);
+
+            this.FadeIn();
+
+            titleWedge.Show();
+            detailsArea.Show();
+            filterControl.Show();
+
+            modSelectOverlay.SelectedMods.BindTo(Mods);
+        }
 
         public override void OnResuming(ScreenTransitionEvent e)
         {
+            base.OnResuming(e);
+
             this.FadeIn(fade_duration, Easing.OutQuint);
 
             carousel.VisuallyFocusSelected = false;
 
+            titleWedge.Show();
+            detailsArea.Show();
+            filterControl.Show();
+
             // required due to https://github.com/ppy/osu-framework/issues/3218
             modSelectOverlay.SelectedMods.Disabled = false;
             modSelectOverlay.SelectedMods.BindTo(Mods);
-
-            base.OnResuming(e);
         }
 
         public override void OnSuspending(ScreenTransitionEvent e)
         {
-            this.Delay(100).FadeOut(fade_duration, Easing.OutQuint);
+            this.FadeOut(fade_duration, Easing.OutQuint);
 
             modSelectOverlay.SelectedMods.UnbindFrom(Mods);
+
+            titleWedge.Hide();
+            detailsArea.Hide();
+            filterControl.Hide();
 
             carousel.VisuallyFocusSelected = true;
 
@@ -134,6 +241,11 @@ namespace osu.Game.Screens.SelectV2
         public override bool OnExiting(ScreenExitEvent e)
         {
             this.FadeOut(fade_duration, Easing.OutQuint);
+
+            titleWedge.Hide();
+            detailsArea.Hide();
+            filterControl.Hide();
+
             return base.OnExiting(e);
         }
 
@@ -160,12 +272,6 @@ namespace osu.Game.Screens.SelectV2
             };
         }
 
-        /// <summary>
-        /// Called when a selection is made.
-        /// </summary>
-        /// <returns>If a resultant action occurred that takes the user away from SongSelect.</returns>
-        protected abstract bool OnStart();
-
         protected override void LogoSuspending(OsuLogo logo)
         {
             base.LogoSuspending(logo);
@@ -180,17 +286,77 @@ namespace osu.Game.Screens.SelectV2
             logo.FadeOut(120, Easing.Out);
         }
 
+        #endregion
+
+        #region Filtering
+
+        private const double filter_delay = 250;
+
+        private ScheduledDelegate? filterDebounce;
+
         /// <summary>
         /// Set the query to the search text box.
         /// </summary>
         /// <param name="query">The string to search.</param>
-        public void Search(string query)
+        public void Search(string query) => filterControl.Search(query);
+
+        private void criteriaChanged(FilterCriteria criteria)
         {
-            carousel.Filter(new FilterCriteria
+            filterDebounce?.Cancel();
+            filterDebounce = Scheduler.AddDelayed(() =>
             {
-                // TODO: this should only set the text of the current criteria, not use a completely new criteria.
-                SearchText = query,
-            });
+                noResultsPlaceholder.Filter = criteria;
+                carousel.Filter(criteria);
+            }, filter_delay);
         }
+
+        private void newItemsPresented()
+        {
+            int count = carousel.MatchedBeatmapsCount;
+
+            noResultsPlaceholder.State.Value = count == 0 ? Visibility.Visible : Visibility.Hidden;
+
+            // Intentionally not localised until we have proper support for this (see https://github.com/ppy/osu-framework/pull/4918
+            // but also in this case we want support for formatting a number within a string).
+            filterControl.StatusText = count != 1 ? $"{count:#,0} matches" : $"{count:#,0} match";
+        }
+
+        #endregion
+
+        #region Beatmap management
+
+        /// <summary>
+        /// Opens up <see cref="BeatmapDeleteDialog"/> with the given beatmap set.
+        /// </summary>
+        public void RequestDeleteBeatmap(BeatmapSetInfo set)
+        {
+            dialogs?.Push(new BeatmapDeleteDialog(set));
+        }
+
+        #endregion
+
+        #region Hotkeys
+
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            if (e.Repeat) return false;
+
+            switch (e.Key)
+            {
+                case Key.Delete:
+                    if (e.ShiftPressed)
+                    {
+                        if (!Beatmap.IsDefault)
+                            RequestDeleteBeatmap(Beatmap.Value.BeatmapSetInfo);
+                        return true;
+                    }
+
+                    break;
+            }
+
+            return base.OnKeyDown(e);
+        }
+
+        #endregion
     }
 }

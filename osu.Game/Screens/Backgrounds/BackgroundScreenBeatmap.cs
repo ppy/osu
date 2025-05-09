@@ -108,12 +108,14 @@ namespace osu.Game.Screens.Backgrounds
             if (Background != null)
             {
                 newDepth = Background.Depth + 1;
-                Background.FinishTransforms();
                 Background.FadeOut(250);
                 Background.Expire();
             }
 
             b.Depth = newDepth;
+            b.Anchor = b.Origin = Anchor.Centre;
+            b.FadeInFromZero(500, Easing.OutQuint);
+            b.ScaleTo(1.02f).ScaleTo(1, 3500, Easing.OutQuint);
             dimmable.Background = Background = b;
         }
 
