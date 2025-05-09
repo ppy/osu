@@ -128,6 +128,7 @@ namespace osu.Game.Screens.SelectV2
                                                             BleedTop = FilterControl.HEIGHT_FROM_SCREEN_TOP + 5,
                                                             BleedBottom = ScreenFooter.HEIGHT + 5,
                                                             RequestPresentBeatmap = _ => OnStart(),
+                                                            NewItemsPresented = newItemsPresented,
                                                             RelativeSizeAxes = Axes.Both,
                                                         },
                                                         noResultsPlaceholder = new NoResultsPlaceholder(),
@@ -151,6 +152,12 @@ namespace osu.Game.Screens.SelectV2
             });
         }
 
+        /// <summary>
+        /// Called when a selection is made.
+        /// </summary>
+        /// <returns>If a resultant action occurred that takes the user away from SongSelect.</returns>
+        protected abstract bool OnStart();
+
         public override IReadOnlyList<ScreenFooterButton> CreateFooterButtons() => new ScreenFooterButton[]
         {
             new FooterButtonMods(modSelectOverlay) { Current = Mods },
@@ -170,6 +177,15 @@ namespace osu.Game.Screens.SelectV2
                     .FadeTo(v.NewValue == Visibility.Visible ? 0f : 1f, 200, Easing.OutQuint);
             }, true);
         }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            detailsArea.Height = wedgesContainer.DrawHeight - titleWedge.LayoutSize.Y - 4;
+        }
+
+        #region Transitions
 
         public override void OnEntering(ScreenTransitionEvent e)
         {
@@ -250,12 +266,6 @@ namespace osu.Game.Screens.SelectV2
             };
         }
 
-        /// <summary>
-        /// Called when a selection is made.
-        /// </summary>
-        /// <returns>If a resultant action occurred that takes the user away from SongSelect.</returns>
-        protected abstract bool OnStart();
-
         protected override void LogoSuspending(OsuLogo logo)
         {
             base.LogoSuspending(logo);
@@ -269,6 +279,8 @@ namespace osu.Game.Screens.SelectV2
             logo.ScaleTo(0.2f, 120, Easing.Out);
             logo.FadeOut(120, Easing.Out);
         }
+
+        #endregion
 
         #region Filtering
 
@@ -292,14 +304,17 @@ namespace osu.Game.Screens.SelectV2
             }, filter_delay);
         }
 
-        #endregion
-
-        protected override void Update()
+        private void newItemsPresented()
         {
-            base.Update();
+            int count = carousel.MatchedBeatmapsCount;
 
-            detailsArea.Height = wedgesContainer.DrawHeight - titleWedge.LayoutSize.Y - 4;
-            noResultsPlaceholder.State.Value = carousel.MatchedBeatmapsCount == 0 ? Visibility.Visible : Visibility.Hidden;
+            noResultsPlaceholder.State.Value = count == 0 ? Visibility.Visible : Visibility.Hidden;
+
+            // Intentionally not localised until we have proper support for this (see https://github.com/ppy/osu-framework/pull/4918
+            // but also in this case we want support for formatting a number within a string).
+            filterControl.StatusText = count != 1 ? $"{count:#,0} matches" : $"{count:#,0} match";
         }
+
+        #endregion
     }
 }
