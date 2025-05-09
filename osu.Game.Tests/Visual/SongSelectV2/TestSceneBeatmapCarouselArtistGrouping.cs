@@ -5,8 +5,10 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.Carousel;
 using osu.Game.Screens.Select.Filter;
 using osu.Game.Screens.SelectV2;
+using osuTK;
 
 namespace osu.Game.Tests.Visual.SongSelectV2
 {
@@ -172,6 +174,40 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             SelectNextPanel();
             SelectNextGroup();
             WaitForGroupSelection(1, 1);
+        }
+
+        [Test]
+        public void TestInputHandlingWithinGaps()
+        {
+            AddAssert("no beatmaps visible", () => !GetVisiblePanels<PanelBeatmap>().Any());
+
+            // Clicks just above the first group panel should not actuate any action.
+            ClickVisiblePanelWithOffset<PanelGroup>(0, new Vector2(0, -(PanelGroup.HEIGHT / 2 + 1)));
+
+            AddAssert("no sets visible", () => !GetVisiblePanels<PanelBeatmapSet>().Any());
+
+            // add lenience to avoid floating-point inaccuracies at edge.
+            ClickVisiblePanelWithOffset<PanelGroup>(0, new Vector2(0, -(PanelGroup.HEIGHT / 2 - 1)));
+
+            AddUntilStep("wait for sets visible", () => GetVisiblePanels<PanelBeatmapSet>().Any());
+            CheckNoSelection();
+
+            AddAssert("no beatmaps visible", () => !GetVisiblePanels<PanelBeatmap>().Any());
+
+            ClickVisiblePanelWithOffset<PanelBeatmapSet>(0, new Vector2(0, -(CarouselItem.DEFAULT_HEIGHT / 2 + 1)));
+            WaitForGroupSelection(0, 1);
+
+            AddUntilStep("wait for beatmaps visible", () => GetVisiblePanels<PanelBeatmap>().Any());
+
+            // Beatmap panels expand their selection area to cover holes from spacing.
+            ClickVisiblePanelWithOffset<PanelBeatmap>(0, new Vector2(0, -(CarouselItem.DEFAULT_HEIGHT / 2 + 1)));
+            WaitForGroupSelection(0, 1);
+
+            ClickVisiblePanelWithOffset<PanelBeatmap>(1, new Vector2(0, (CarouselItem.DEFAULT_HEIGHT / 2 + 1)));
+            WaitForGroupSelection(0, 2);
+
+            ClickVisiblePanelWithOffset<PanelBeatmapSet>(1, new Vector2(0, (CarouselItem.DEFAULT_HEIGHT / 2 + 1)));
+            WaitForGroupSelection(0, 5);
         }
 
         [Test]
