@@ -36,6 +36,11 @@ namespace osu.Game.Graphics.Carousel
         #region Properties and methods for external usage
 
         /// <summary>
+        /// Called after a filter operation or change in items results in the visible carousel items changing.
+        /// </summary>
+        public Action? NewItemsPresented { private get; init; }
+
+        /// <summary>
         /// Height of the area above the carousel that should be treated as visible due to transparency of elements in front of it.
         /// </summary>
         public float BleedTop { get; set; }
@@ -304,6 +309,8 @@ namespace osu.Game.Graphics.Carousel
                 HandleItemSelected(currentSelection.Model);
 
                 refreshAfterSelection();
+
+                NewItemsPresented?.Invoke();
             });
 
             void log(string text) => Logger.Log($"Carousel[op {cts.GetHashCode().ToString()}] {stopwatch.ElapsedMilliseconds} ms: {text}");
