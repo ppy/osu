@@ -49,6 +49,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
         private int beatmapCount;
 
+        protected int NewItemsPresentedInvocationCount;
+
         protected BeatmapCarouselTestScene()
         {
             store = new TestBeatmapStore
@@ -65,6 +67,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         {
             AddStep("create components", () =>
             {
+                NewItemsPresentedInvocationCount = 0;
+
                 Box topBox;
                 Children = new Drawable[]
                 {
@@ -98,6 +102,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                             {
                                 Carousel = new BeatmapCarousel
                                 {
+                                    NewItemsPresented = () => NewItemsPresentedInvocationCount++,
                                     BleedTop = 50,
                                     BleedBottom = 50,
                                     Anchor = Anchor.Centre,
