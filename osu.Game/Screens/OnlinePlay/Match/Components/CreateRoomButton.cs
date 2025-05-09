@@ -8,7 +8,7 @@ using osu.Framework.Input.Events;
 
 namespace osu.Game.Screens.OnlinePlay.Match.Components
 {
-    public abstract partial class CreateRoomButton : PurpleRoundedButton, IKeyBindingHandler<PlatformAction>
+    public partial class CreateRoomButton : PurpleRoundedButton, IKeyBindingHandler<PlatformAction>
     {
         [BackgroundDependencyLoader]
         private void load()
