@@ -135,7 +135,6 @@ namespace osu.Desktop
                 {
                     new RulesetStateBroadcaster(),
                     new BeatmapStateBroadcaster(),
-                    new UserActivityStateBroadcaster(),
                 });
 
                 Add(loaded);
