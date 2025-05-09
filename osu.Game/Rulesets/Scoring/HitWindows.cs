@@ -143,6 +143,9 @@ namespace osu.Game.Rulesets.Scoring
         /// <returns>One half of the hit window for <paramref name="result"/>.</returns>
         public double WindowFor(HitResult result)
         {
+            if (!IsHitResultAllowed(result))
+                throw new ArgumentOutOfRangeException(nameof(result), result, $@"{result} is not an allowed result.");
+
             switch (result)
             {
                 case HitResult.Perfect:
@@ -164,7 +167,7 @@ namespace osu.Game.Rulesets.Scoring
                     return miss;
 
                 default:
-                    throw new ArgumentException("Unknown enum member", nameof(result));
+                    throw new ArgumentOutOfRangeException(nameof(result), result, null);
             }
         }
 
