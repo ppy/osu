@@ -50,6 +50,8 @@ namespace osu.Game.Screens.SelectV2
         private BeatmapDetailsArea detailsArea = null!;
         private FillFlowContainer wedgesContainer = null!;
 
+        private NoResultsPlaceholder noResultsPlaceholder = null!;
+
         public override bool ShowFooter => true;
 
         [Resolved]
@@ -128,6 +130,7 @@ namespace osu.Game.Screens.SelectV2
                                                             RequestPresentBeatmap = _ => OnStart(),
                                                             RelativeSizeAxes = Axes.Both,
                                                         },
+                                                        noResultsPlaceholder = new NoResultsPlaceholder(),
                                                     }
                                                 },
                                                 filterControl = new FilterControl
@@ -282,7 +285,11 @@ namespace osu.Game.Screens.SelectV2
         private void criteriaChanged(FilterCriteria criteria)
         {
             filterDebounce?.Cancel();
-            filterDebounce = Scheduler.AddDelayed(() => carousel.Filter(criteria), filter_delay);
+            filterDebounce = Scheduler.AddDelayed(() =>
+            {
+                noResultsPlaceholder.Filter = criteria;
+                carousel.Filter(criteria);
+            }, filter_delay);
         }
 
         #endregion
@@ -290,7 +297,9 @@ namespace osu.Game.Screens.SelectV2
         protected override void Update()
         {
             base.Update();
+
             detailsArea.Height = wedgesContainer.DrawHeight - titleWedge.LayoutSize.Y - 4;
+            noResultsPlaceholder.State.Value = carousel.MatchedBeatmapsCount == 0 ? Visibility.Visible : Visibility.Hidden;
         }
     }
 }

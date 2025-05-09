@@ -4,18 +4,19 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Localisation;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays;
+using osu.Game.Screens.Select;
 using osuTK;
 
-namespace osu.Game.Screens.Select
+namespace osu.Game.Screens.SelectV2
 {
     public partial class NoResultsPlaceholder : VisibilityContainer
     {
@@ -32,6 +33,8 @@ namespace osu.Game.Screens.Select
         [Resolved]
         private OsuConfigManager config { get; set; } = null!;
 
+        protected override bool StartHidden => true;
+
         public FilterCriteria Filter
         {
             set
@@ -45,11 +48,8 @@ namespace osu.Game.Screens.Select
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
-            Masking = true;
-            CornerRadius = 10;
-
             Width = 400;
             AutoSizeAxes = Axes.Y;
 
@@ -58,27 +58,39 @@ namespace osu.Game.Screens.Select
 
             InternalChildren = new Drawable[]
             {
-                new Box
+                new FillFlowContainer
                 {
-                    Colour = colours.Gray2,
-                    RelativeSizeAxes = Axes.Both,
-                },
-                new SpriteIcon
-                {
-                    Icon = FontAwesome.Regular.SadTear,
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                    Margin = new MarginPadding(10),
-                    Size = new Vector2(50),
-                },
-                textFlow = new LinkFlowContainer
-                {
-                    Y = 60,
-                    Padding = new MarginPadding(10),
-                    TextAnchor = Anchor.TopCentre,
+                    Direction = FillDirection.Vertical,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                }
+                    Children = new Drawable[]
+                    {
+                        new SpriteIcon
+                        {
+                            Icon = FontAwesome.Solid.Ghost,
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            Margin = new MarginPadding(10),
+                            Size = new Vector2(50),
+                        },
+                        new OsuSpriteText
+                        {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            Font = OsuFont.Style.Title,
+                            Text = "No beatmaps found"
+                        },
+                        textFlow = new LinkFlowContainer
+                        {
+                            Alpha = 0,
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            Padding = new MarginPadding { Top = 20 },
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                        }
+                    }
+                },
             };
         }
 
@@ -100,16 +112,16 @@ namespace osu.Game.Screens.Select
 
             // Bounce should play every time the filter criteria is updated.
             this.ScaleTo(0.9f)
-                .ScaleTo(1f, 1000, Easing.OutElastic);
+                .ScaleTo(1f, 1000, Easing.OutQuint);
+
+            textFlow.FadeInFromZero(800, Easing.OutQuint);
 
             textFlow.Clear();
 
             if (beatmaps.QueryBeatmapSet(s => !s.Protected && !s.DeletePending) == null)
             {
-                textFlow.AddParagraph("No beatmaps found!");
-                textFlow.AddParagraph(string.Empty);
-
-                textFlow.AddParagraph("- Consider running the \"");
+                addBulletPoint();
+                textFlow.AddText("Consider running the \"");
                 textFlow.AddLink(FirstRunSetupOverlayStrings.FirstRunSetupTitle, () => firstRunSetupOverlay?.Show());
                 textFlow.AddText("\" to download or import some beatmaps!");
             }
@@ -120,7 +132,8 @@ namespace osu.Game.Screens.Select
 
                 if (filter?.UserStarDifficulty.HasFilter == true)
                 {
-                    textFlow.AddParagraph("- Try ");
+                    addBulletPoint();
+                    textFlow.AddText("Try ");
                     textFlow.AddLink("removing", () =>
                     {
                         config.SetValue(OsuSetting.DisplayStarsMinimum, 0.0);
@@ -137,7 +150,8 @@ namespace osu.Game.Screens.Select
                 // TODO: Make this message more certain by ensuring the osu! beatmaps exist before suggesting.
                 if (filter?.Ruleset?.OnlineID != 0 && filter?.AllowConvertedBeatmaps == false)
                 {
-                    textFlow.AddParagraph("- Try ");
+                    addBulletPoint();
+                    textFlow.AddText("Try ");
                     textFlow.AddLink("enabling ", () => config.SetValue(OsuSetting.ShowConvertedBeatmaps, true));
                     textFlow.AddText("automatic conversion!");
                 }
@@ -145,11 +159,22 @@ namespace osu.Game.Screens.Select
 
             if (!string.IsNullOrEmpty(filter?.SearchText))
             {
-                textFlow.AddParagraph("- Try ");
+                addBulletPoint();
+                textFlow.AddText("Try ");
                 textFlow.AddLink("searching online", LinkAction.SearchBeatmapSet, filter.SearchText);
                 textFlow.AddText($" for \"{filter.SearchText}\".");
             }
             // TODO: add clickable link to reset criteria.
+        }
+
+        private void addBulletPoint()
+        {
+            textFlow.NewLine();
+            textFlow.AddIcon(FontAwesome.Solid.Circle, i =>
+            {
+                i.Padding = new MarginPadding { Top = 24, Right = 15 };
+                i.Scale *= 0.3f;
+            });
         }
     }
 }
