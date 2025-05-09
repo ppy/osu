@@ -13,9 +13,12 @@ using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mania;
+using osu.Game.Rulesets.Mania.Replays;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Osu.UI;
+using osu.Game.Rulesets.Replays;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Skinning;
 using osu.Game.Storyboards;
@@ -81,34 +84,41 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             loadPlayer(() => new OsuRuleset());
             AddStep("get key counter", () => counter = this.ChildrenOfType<KeyCounter>().Single(k => k.Trigger is KeyCounterActionTrigger<OsuAction> actionTrigger && actionTrigger.Action == OsuAction.LeftButton));
-            checkKey(() => counter, 0, false);
+            checkKeyCounterState(() => counter, 0, false);
+            assertCountOfMatchingReplayFrames<OsuReplayFrame>("left button never pressed in replay", f => f.Actions.Contains(OsuAction.LeftButton), 0);
 
             AddStep("press Z", () => InputManager.PressKey(Key.Z));
-            checkKey(() => counter, 1, true);
+            checkKeyCounterState(() => counter, 1, true);
+            assertCountOfMatchingReplayFrames<OsuReplayFrame>("left button pressed once in replay", f => f.Actions.Contains(OsuAction.LeftButton), 1);
 
             AddStep("release Z", () => InputManager.ReleaseKey(Key.Z));
-            checkKey(() => counter, 1, false);
+            checkKeyCounterState(() => counter, 1, false);
 
             AddStep("pause", () => Player.Pause());
             AddStep("press Z", () => InputManager.PressKey(Key.Z));
-            checkKey(() => counter, 1, false);
+            checkKeyCounterState(() => counter, 1, false);
+            assertCountOfMatchingReplayFrames<OsuReplayFrame>("left button pressed once in replay", f => f.Actions.Contains(OsuAction.LeftButton), 1);
 
             AddStep("release Z", () => InputManager.ReleaseKey(Key.Z));
-            checkKey(() => counter, 1, false);
+            checkKeyCounterState(() => counter, 1, false);
 
             AddStep("resume", () => Player.Resume());
             AddStep("go to resume cursor", () => InputManager.MoveMouseTo(this.ChildrenOfType<OsuResumeOverlay.OsuClickToResumeCursor>().Single()));
             AddStep("press Z to resume", () => InputManager.PressKey(Key.Z));
-            checkKey(() => counter, 2, true);
+            checkKeyCounterState(() => counter, 2, true);
+            assertCountOfMatchingReplayFrames<OsuReplayFrame>("left button pressed twice in replay", f => f.Actions.Contains(OsuAction.LeftButton), 2);
 
             AddStep("release Z", () => InputManager.ReleaseKey(Key.Z));
-            checkKey(() => counter, 2, false);
+            checkKeyCounterState(() => counter, 2, false);
+            assertCountOfMatchingReplayFrames<OsuReplayFrame>("left button pressed twice in replay", f => f.Actions.Contains(OsuAction.LeftButton), 2);
 
             AddStep("press Z", () => InputManager.PressKey(Key.Z));
-            checkKey(() => counter, 3, true);
+            checkKeyCounterState(() => counter, 3, true);
+            assertCountOfMatchingReplayFrames<OsuReplayFrame>("left button pressed thrice in replay", f => f.Actions.Contains(OsuAction.LeftButton), 3);
 
             AddStep("release Z", () => InputManager.ReleaseKey(Key.Z));
-            checkKey(() => counter, 3, false);
+            checkKeyCounterState(() => counter, 3, false);
+            assertCountOfMatchingReplayFrames<OsuReplayFrame>("left button pressed thrice in replay", f => f.Actions.Contains(OsuAction.LeftButton), 3);
         }
 
         [Test]
@@ -118,29 +128,36 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             loadPlayer(() => new ManiaRuleset());
             AddStep("get key counter", () => counter = this.ChildrenOfType<KeyCounter>().Single(k => k.Trigger is KeyCounterActionTrigger<ManiaAction> actionTrigger && actionTrigger.Action == ManiaAction.Key4));
-            checkKey(() => counter, 0, false);
+            checkKeyCounterState(() => counter, 0, false);
+            assertCountOfMatchingReplayFrames<ManiaReplayFrame>("key4 never pressed in replay", f => f.Actions.Contains(ManiaAction.Key4), 0);
 
             AddStep("press space", () => InputManager.PressKey(Key.Space));
-            checkKey(() => counter, 1, true);
+            checkKeyCounterState(() => counter, 1, true);
+            assertCountOfMatchingReplayFrames<ManiaReplayFrame>("key4 pressed once in replay", f => f.Actions.Contains(ManiaAction.Key4), 1);
 
             AddStep("release space", () => InputManager.ReleaseKey(Key.Space));
-            checkKey(() => counter, 1, false);
+            checkKeyCounterState(() => counter, 1, false);
+            assertCountOfMatchingReplayFrames<ManiaReplayFrame>("key4 pressed once in replay", f => f.Actions.Contains(ManiaAction.Key4), 1);
 
             AddStep("pause", () => Player.Pause());
             AddStep("press space", () => InputManager.PressKey(Key.Space));
-            checkKey(() => counter, 1, false);
+            checkKeyCounterState(() => counter, 1, false);
+            assertCountOfMatchingReplayFrames<ManiaReplayFrame>("key4 pressed once in replay", f => f.Actions.Contains(ManiaAction.Key4), 1);
 
             AddStep("release space", () => InputManager.ReleaseKey(Key.Space));
-            checkKey(() => counter, 1, false);
+            checkKeyCounterState(() => counter, 1, false);
+            assertCountOfMatchingReplayFrames<ManiaReplayFrame>("key4 pressed once in replay", f => f.Actions.Contains(ManiaAction.Key4), 1);
 
             AddStep("resume", () => Player.Resume());
             AddUntilStep("wait for resume", () => Player.GameplayClockContainer.IsRunning);
 
             AddStep("press space", () => InputManager.PressKey(Key.Space));
-            checkKey(() => counter, 2, true);
+            checkKeyCounterState(() => counter, 2, true);
+            assertCountOfMatchingReplayFrames<ManiaReplayFrame>("key4 pressed twice in replay", f => f.Actions.Contains(ManiaAction.Key4), 2);
 
             AddStep("release space", () => InputManager.ReleaseKey(Key.Space));
-            checkKey(() => counter, 2, false);
+            checkKeyCounterState(() => counter, 2, false);
+            assertCountOfMatchingReplayFrames<ManiaReplayFrame>("key4 pressed twice in replay", f => f.Actions.Contains(ManiaAction.Key4), 2);
         }
 
         [Test]
@@ -161,21 +178,25 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("resume", () => Player.Resume());
             AddStep("go to resume cursor", () => InputManager.MoveMouseTo(this.ChildrenOfType<OsuResumeOverlay.OsuClickToResumeCursor>().Single()));
             AddStep("press and release Z", () => InputManager.Key(Key.Z));
-            checkKey(() => counterZ, 1, false);
+            checkKeyCounterState(() => counterZ, 1, false);
+            assertCountOfMatchingReplayFrames<OsuReplayFrame>("left button pressed once in replay", f => f.Actions.Contains(OsuAction.LeftButton), 1);
 
             AddStep("press X", () => InputManager.PressKey(Key.X));
             AddStep("pause", () => Player.Pause());
             AddStep("release X", () => InputManager.ReleaseKey(Key.X));
-            checkKey(() => counterX, 1, true);
+            checkKeyCounterState(() => counterX, 1, true);
+            assertCountOfMatchingReplayFrames<OsuReplayFrame>("right button pressed once in replay", f => f.Actions.Contains(OsuAction.RightButton), 1);
 
             AddStep("resume", () => Player.Resume());
             AddStep("go to resume cursor", () => InputManager.MoveMouseTo(this.ChildrenOfType<OsuResumeOverlay.OsuClickToResumeCursor>().Single()));
             AddStep("press Z to resume", () => InputManager.PressKey(Key.Z));
-            checkKey(() => counterZ, 2, true);
-            checkKey(() => counterX, 1, false);
+            checkKeyCounterState(() => counterZ, 2, true);
+            checkKeyCounterState(() => counterX, 1, false);
+            assertCountOfMatchingReplayFrames<OsuReplayFrame>("left button pressed twice in replay", f => f.Actions.Contains(OsuAction.LeftButton), 2);
+            assertCountOfMatchingReplayFrames<OsuReplayFrame>("right button pressed once in replay", f => f.Actions.Contains(OsuAction.RightButton), 1);
 
             AddStep("release Z", () => InputManager.ReleaseKey(Key.Z));
-            checkKey(() => counterZ, 2, false);
+            checkKeyCounterState(() => counterZ, 2, false);
         }
 
         [Test]
@@ -190,11 +211,11 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("pause", () => Player.Pause());
 
             AddStep("release space", () => InputManager.ReleaseKey(Key.Space));
-            checkKey(() => counter, 1, true);
+            checkKeyCounterState(() => counter, 1, true);
 
             AddStep("resume", () => Player.Resume());
             AddUntilStep("wait for resume", () => Player.GameplayClockContainer.IsRunning);
-            checkKey(() => counter, 1, false);
+            checkKeyCounterState(() => counter, 1, false);
         }
 
         [Test]
@@ -215,13 +236,13 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("resume", () => Player.Resume());
             AddStep("go to resume cursor", () => InputManager.MoveMouseTo(this.ChildrenOfType<OsuResumeOverlay.OsuClickToResumeCursor>().Single()));
             AddStep("press Z to resume", () => InputManager.PressKey(Key.Z));
-            checkKey(() => counterZ, 1, true);
+            checkKeyCounterState(() => counterZ, 1, true);
 
             AddStep("release Z", () => InputManager.ReleaseKey(Key.Z));
-            checkKey(() => counterZ, 1, false);
+            checkKeyCounterState(() => counterZ, 1, false);
 
             AddStep("press X", () => InputManager.PressKey(Key.X));
-            checkKey(() => counterX, 1, true);
+            checkKeyCounterState(() => counterX, 1, true);
 
             AddStep("pause", () => Player.Pause());
 
@@ -231,14 +252,14 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("resume", () => Player.Resume());
             AddStep("go to resume cursor", () => InputManager.MoveMouseTo(this.ChildrenOfType<OsuResumeOverlay.OsuClickToResumeCursor>().Single()));
             AddStep("press Z to resume", () => InputManager.PressKey(Key.Z));
-            checkKey(() => counterZ, 2, true);
-            checkKey(() => counterX, 1, true);
+            checkKeyCounterState(() => counterZ, 2, true);
+            checkKeyCounterState(() => counterX, 1, true);
 
             AddStep("release X", () => InputManager.ReleaseKey(Key.X));
-            checkKey(() => counterX, 1, false);
+            checkKeyCounterState(() => counterX, 1, false);
 
             AddStep("release Z", () => InputManager.ReleaseKey(Key.Z));
-            checkKey(() => counterZ, 2, false);
+            checkKeyCounterState(() => counterZ, 2, false);
         }
 
         [Test]
@@ -250,7 +271,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("get key counter", () => counter = this.ChildrenOfType<KeyCounter>().Single(k => k.Trigger is KeyCounterActionTrigger<ManiaAction> actionTrigger && actionTrigger.Action == ManiaAction.Key4));
 
             AddStep("press space", () => InputManager.PressKey(Key.Space));
-            checkKey(() => counter, 1, true);
+            checkKeyCounterState(() => counter, 1, true);
 
             AddStep("pause", () => Player.Pause());
 
@@ -259,10 +280,10 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("resume", () => Player.Resume());
             AddUntilStep("wait for resume", () => Player.GameplayClockContainer.IsRunning);
-            checkKey(() => counter, 1, true);
+            checkKeyCounterState(() => counter, 1, true);
 
             AddStep("release space", () => InputManager.ReleaseKey(Key.Space));
-            checkKey(() => counter, 1, false);
+            checkKeyCounterState(() => counter, 1, false);
         }
 
         [Test]
@@ -279,15 +300,16 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("press Z to resume", () => InputManager.PressKey(Key.Z));
 
             // ensure the input manager receives the Z button press...
-            checkKey(() => counter, 1, true);
+            checkKeyCounterState(() => counter, 1, true);
             AddAssert("button is pressed in kbc", () => Player.DrawableRuleset.Playfield.FindClosestParent<OsuInputManager>()!.PressedActions.Single() == OsuAction.LeftButton);
 
             // ...but also ensure the hit circle in front of the cursor isn't hit by checking max combo.
             AddAssert("circle not hit", () => Player.ScoreProcessor.HighestCombo.Value, () => Is.EqualTo(0));
+            assertCountOfMatchingReplayFrames<OsuReplayFrame>("left button never pressed in replay", f => f.Actions.Contains(OsuAction.LeftButton), 0);
 
             AddStep("release Z", () => InputManager.ReleaseKey(Key.Z));
 
-            checkKey(() => counter, 1, false);
+            checkKeyCounterState(() => counter, 1, false);
             AddAssert("button is released in kbc", () => !Player.DrawableRuleset.Playfield.FindClosestParent<OsuInputManager>()!.PressedActions.Any());
         }
 
@@ -301,6 +323,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("press Z", () => InputManager.PressKey(Key.Z));
             AddAssert("circle hit", () => Player.ScoreProcessor.HighestCombo.Value, () => Is.EqualTo(1));
+            assertCountOfMatchingReplayFrames<OsuReplayFrame>("left button pressed once in replay", f => f.Actions.Contains(OsuAction.LeftButton), 1);
 
             AddStep("pause", () => Player.Pause());
             AddStep("release Z", () => InputManager.ReleaseKey(Key.Z));
@@ -310,17 +333,19 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("press Z to resume", () => InputManager.PressKey(Key.Z));
             AddStep("release Z", () => InputManager.ReleaseKey(Key.Z));
 
-            checkKey(() => counter, 1, false);
+            checkKeyCounterState(() => counter, 1, false);
+            assertCountOfMatchingReplayFrames<OsuReplayFrame>("left button pressed once in replay", f => f.Actions.Contains(OsuAction.LeftButton), 1);
 
             seekTo(5000);
 
             AddStep("press Z", () => InputManager.PressKey(Key.Z));
 
-            checkKey(() => counter, 2, true);
+            checkKeyCounterState(() => counter, 2, true);
             AddAssert("circle hit", () => Player.ScoreProcessor.HighestCombo.Value, () => Is.EqualTo(2));
+            assertCountOfMatchingReplayFrames<OsuReplayFrame>("left button pressed twice in replay", f => f.Actions.Contains(OsuAction.LeftButton), 2);
 
             AddStep("release Z", () => InputManager.ReleaseKey(Key.Z));
-            checkKey(() => counter, 2, false);
+            checkKeyCounterState(() => counter, 2, false);
         }
 
         [Test]
@@ -330,6 +355,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("press X", () => InputManager.PressKey(Key.X));
             AddAssert("circle hit", () => Player.ScoreProcessor.HighestCombo.Value, () => Is.EqualTo(1));
+            assertCountOfMatchingReplayFrames<OsuReplayFrame>("right button pressed once in replay", f => f.Actions.Contains(OsuAction.RightButton), 1);
 
             seekTo(5000);
 
@@ -342,11 +368,13 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("release Z", () => InputManager.ReleaseKey(Key.Z));
 
             AddAssert("circle not hit", () => Player.ScoreProcessor.HighestCombo.Value, () => Is.EqualTo(1));
+            assertCountOfMatchingReplayFrames<OsuReplayFrame>("left button never pressed in replay", f => f.Actions.Contains(OsuAction.LeftButton), 0);
 
             AddStep("press X", () => InputManager.PressKey(Key.X));
             AddStep("release X", () => InputManager.ReleaseKey(Key.X));
 
             AddAssert("circle hit", () => Player.ScoreProcessor.HighestCombo.Value, () => Is.EqualTo(2));
+            assertCountOfMatchingReplayFrames<OsuReplayFrame>("right button pressed twice in replay", f => f.Actions.Contains(OsuAction.RightButton), 2);
         }
 
         private void loadPlayer(Func<Ruleset> createRuleset)
@@ -367,10 +395,16 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("wait for seek to finish", () => Player.DrawableRuleset.FrameStableClock.CurrentTime, () => Is.EqualTo(time).Within(500));
         }
 
-        private void checkKey(Func<KeyCounter> counter, int count, bool active)
+        private void checkKeyCounterState(Func<KeyCounter> counter, int count, bool active)
         {
             AddAssert($"key count = {count}", () => counter().CountPresses.Value, () => Is.EqualTo(count));
             AddAssert($"key active = {active}", () => counter().IsActive.Value, () => Is.EqualTo(active));
+        }
+
+        private void assertCountOfMatchingReplayFrames<TReplayFrame>(string description, Func<TReplayFrame, bool> predicate, int count)
+            where TReplayFrame : ReplayFrame
+        {
+            AddAssert(description, () => Player.Score.Replay.Frames.OfType<TReplayFrame>().Count(predicate), () => Is.EqualTo(count));
         }
 
         protected override TestPlayer CreatePlayer(Ruleset ruleset) => new PausePlayer();
