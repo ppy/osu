@@ -367,9 +367,11 @@ namespace osu.Game.Screens.SelectV2
         private readonly DrawablePool<PanelBeatmap> beatmapPanelPool = new DrawablePool<PanelBeatmap>(100);
         private readonly DrawablePool<PanelBeatmapSet> setPanelPool = new DrawablePool<PanelBeatmapSet>(100);
         private readonly DrawablePool<PanelGroup> groupPanelPool = new DrawablePool<PanelGroup>(100);
+        private readonly DrawablePool<PanelGroupStarDifficulty> starsGroupPanelPool = new DrawablePool<PanelGroupStarDifficulty>(11);
 
         private void setupPools()
         {
+            AddInternal(starsGroupPanelPool);
             AddInternal(groupPanelPool);
             AddInternal(beatmapPanelPool);
             AddInternal(setPanelPool);
@@ -397,7 +399,10 @@ namespace osu.Game.Screens.SelectV2
         {
             switch (item.Model)
             {
-                case GroupDefinition:
+                case GroupDefinition group:
+                    if (group.Data is StarDifficulty)
+                        return starsGroupPanelPool.Get();
+
                     return groupPanelPool.Get();
 
                 case BeatmapInfo:
