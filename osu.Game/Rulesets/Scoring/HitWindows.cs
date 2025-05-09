@@ -193,17 +193,7 @@ namespace osu.Game.Rulesets.Scoring
                 new DifficultyRange(HitResult.Miss, 0, 0, 0),
             };
 
-            public override bool IsHitResultAllowed(HitResult result)
-            {
-                switch (result)
-                {
-                    case HitResult.Perfect:
-                    case HitResult.Miss:
-                        return true;
-                }
-
-                return false;
-            }
+            public override bool IsHitResultAllowed(HitResult result) => true;
 
             protected override DifficultyRange[] GetRanges() => ranges;
         }
