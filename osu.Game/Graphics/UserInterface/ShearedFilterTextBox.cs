@@ -12,10 +12,10 @@ namespace osu.Game.Graphics.UserInterface
     {
         private const float filter_text_size = 12;
 
-        public LocalisableString FilterText
+        public LocalisableString StatusText
         {
-            get => ((InnerFilterTextBox)TextBox).FilterText.Text;
-            set => Schedule(() => ((InnerFilterTextBox)TextBox).FilterText.Text = value);
+            get => ((InnerFilterTextBox)TextBox).StatusText.Text;
+            set => Schedule(() => ((InnerFilterTextBox)TextBox).StatusText.Text = value);
         }
 
         public ShearedFilterTextBox()
@@ -27,12 +27,12 @@ namespace osu.Game.Graphics.UserInterface
 
         protected partial class InnerFilterTextBox : InnerSearchTextBox
         {
-            public OsuSpriteText FilterText { get; private set; } = null!;
+            public OsuSpriteText StatusText { get; private set; } = null!;
 
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
-                TextContainer.Add(FilterText = new OsuSpriteText
+                TextContainer.Add(StatusText = new OsuSpriteText
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.TopLeft,
