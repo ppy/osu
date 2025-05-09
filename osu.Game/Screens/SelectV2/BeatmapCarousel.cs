@@ -11,6 +11,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Pooling;
+using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
@@ -31,12 +32,22 @@ namespace osu.Game.Screens.SelectV2
 
         private readonly LoadingLayer loading;
 
+        private readonly BeatmapCarouselFilterMatching matching;
         private readonly BeatmapCarouselFilterGrouping grouping;
+
+        /// <summary>
+        /// Total number of beatmap difficulties displayed with the filter.
+        /// </summary>
+        public int MatchedBeatmapsCount => matching.BeatmapItemsCount;
 
         protected override float GetSpacingBetweenPanels(CarouselItem top, CarouselItem bottom)
         {
+            // Group panels do not overlap with any other panel but should overlap with themselves.
+            if ((top.Model is GroupDefinition) ^ (bottom.Model is GroupDefinition))
+                return SPACING * 2;
+
+            // Beatmap difficulty panels do not overlap with themselves or any other panel.
             if (top.Model is BeatmapInfo || bottom.Model is BeatmapInfo)
-                // Beatmap difficulty panels do not overlap with themselves or any other panel.
                 return SPACING;
 
             return -SPACING;
@@ -49,6 +60,7 @@ namespace osu.Game.Screens.SelectV2
 
             Filters = new ICarouselFilter[]
             {
+                matching = new BeatmapCarouselFilterMatching(() => Criteria),
                 new BeatmapCarouselFilterSorting(() => Criteria),
                 grouping = new BeatmapCarouselFilterGrouping(() => Criteria),
             };
@@ -331,11 +343,21 @@ namespace osu.Game.Screens.SelectV2
 
         public FilterCriteria Criteria { get; private set; } = new FilterCriteria();
 
+        private ScheduledDelegate? loadingDebounce;
+
         public void Filter(FilterCriteria criteria)
         {
             Criteria = criteria;
-            loading.Show();
-            FilterAsync().ContinueWith(_ => Schedule(() => loading.Hide()));
+
+            loadingDebounce ??= Scheduler.AddDelayed(() => loading.Show(), 250);
+
+            FilterAsync().ContinueWith(_ => Schedule(() =>
+            {
+                loadingDebounce?.Cancel();
+                loadingDebounce = null;
+
+                loading.Hide();
+            }));
         }
 
         #endregion

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
@@ -241,8 +242,6 @@ namespace osu.Game.Screens.SelectV2
                 cancellationSource?.Cancel();
                 cancellationSource = new CancellationTokenSource();
 
-                computeStarDifficulty(cancellationSource.Token);
-
                 if (beatmap.IsDefault)
                 {
                     ratingAndNameContainer.FadeOut(300, Easing.OutQuint);
@@ -254,15 +253,53 @@ namespace osu.Game.Screens.SelectV2
                     difficultyText.Text = beatmap.Value.BeatmapInfo.DifficultyName;
                     mapperLink.Action = () => linkHandler?.HandleLink(new LinkDetails(LinkAction.OpenUserProfile, beatmap.Value.Metadata.Author));
                     mapperText.Text = beatmap.Value.Metadata.Author.Username;
-
-                    var playableBeatmap = beatmap.Value.GetPlayableBeatmap(ruleset.Value);
-
-                    countStatisticsDisplay.Statistics = playableBeatmap.GetStatistics()
-                                                                       .Select(s => new StatisticDifficulty.Data(s.Name, s.BarDisplayLength ?? 0, s.BarDisplayLength ?? 0, 1, s.Content))
-                                                                       .ToList();
                 }
 
+                updateStarDifficulty(cancellationSource.Token);
+                updateCountStatistics(cancellationSource.Token);
                 updateDifficultyStatistics();
+            }
+
+            private void updateStarDifficulty(CancellationToken cancellationToken)
+            {
+                difficultyCache.GetDifficultyAsync(beatmap.Value.BeatmapInfo, ruleset.Value, mods.Value, cancellationToken)
+                               .ContinueWith(task =>
+                               {
+                                   Schedule(() =>
+                                   {
+                                       if (cancellationToken.IsCancellationRequested)
+                                           return;
+
+                                       starRatingDisplay.Current.Value = task.GetResultSafely() ?? default;
+                                   });
+                               }, cancellationToken);
+            }
+
+            private void updateCountStatistics(CancellationToken cancellationToken)
+            {
+                if (beatmap.IsDefault)
+                {
+                    countStatisticsDisplay.Statistics = Array.Empty<StatisticDifficulty.Data>();
+                    return;
+                }
+
+                Task.Run(() =>
+                {
+                    // This can take time as it is a synchronous task.
+                    // TODO: We're calling `GetPlayableBeatmap` multiple times every map load at song select.
+                    var playableBeatmap = beatmap.Value.GetPlayableBeatmap(ruleset.Value);
+                    var statistics = playableBeatmap.GetStatistics()
+                                                    .Select(s => new StatisticDifficulty.Data(s.Name, s.BarDisplayLength ?? 0, s.BarDisplayLength ?? 0, 1, s.Content))
+                                                    .ToList();
+
+                    Schedule(() =>
+                    {
+                        if (cancellationToken.IsCancellationRequested)
+                            return;
+
+                        countStatisticsDisplay.Statistics = statistics;
+                    });
+                }, cancellationToken);
             }
 
             private void updateDifficultyStatistics() => Scheduler.AddOnce(() =>
@@ -320,21 +357,6 @@ namespace osu.Game.Screens.SelectV2
                     new StatisticDifficulty.Data(BeatmapsetsStrings.ShowStatsAr, baseDifficulty.ApproachRate, rateAdjustedDifficulty.ApproachRate, 10),
                 };
             });
-
-            private void computeStarDifficulty(CancellationToken cancellationToken)
-            {
-                difficultyCache.GetDifficultyAsync(beatmap.Value.BeatmapInfo, ruleset.Value, mods.Value, cancellationToken)
-                               .ContinueWith(task =>
-                               {
-                                   Schedule(() =>
-                                   {
-                                       if (cancellationToken.IsCancellationRequested)
-                                           return;
-
-                                       starRatingDisplay.Current.Value = task.GetResultSafely() ?? default;
-                                   });
-                               }, cancellationToken);
-            }
 
             protected override void Update()
             {

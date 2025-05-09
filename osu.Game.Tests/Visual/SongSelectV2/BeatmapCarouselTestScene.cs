@@ -20,6 +20,7 @@ using osu.Game.Graphics.Carousel;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
 using osu.Game.Screens.Select;
+using osu.Game.Screens.Select.Filter;
 using osu.Game.Screens.SelectV2;
 using osu.Game.Tests.Beatmaps;
 using osu.Game.Tests.Resources;
@@ -48,6 +49,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
         private int beatmapCount;
 
+        protected int NewItemsPresentedInvocationCount;
+
         protected BeatmapCarouselTestScene()
         {
             store = new TestBeatmapStore
@@ -64,6 +67,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         {
             AddStep("create components", () =>
             {
+                NewItemsPresentedInvocationCount = 0;
+
                 Box topBox;
                 Children = new Drawable[]
                 {
@@ -97,6 +102,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                             {
                                 Carousel = new BeatmapCarousel
                                 {
+                                    NewItemsPresented = () => NewItemsPresentedInvocationCount++,
                                     BleedTop = 50,
                                     BleedBottom = 50,
                                     Anchor = Anchor.Centre,
@@ -127,12 +133,35 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                     },
                 };
             });
+
+            // Prefer title sorting so that order of carousel panels match order of BeatmapSets bindable.
+            SortBy(SortMode.Title);
         }
 
-        protected void SortBy(FilterCriteria criteria) => AddStep($"sort:{criteria.Sort} group:{criteria.Group}", () => Carousel.Filter(criteria));
+        protected void SortBy(SortMode mode) => ApplyToFilter($"sort by {mode.ToString().ToLowerInvariant()}", c => c.Sort = mode);
+        protected void GroupBy(GroupMode mode) => ApplyToFilter($"group by {mode.ToString().ToLowerInvariant()}", c => c.Group = mode);
+
+        protected void SortAndGroupBy(SortMode sort, GroupMode group)
+        {
+            ApplyToFilter($"sort by {sort.ToString().ToLowerInvariant()} & group by {group.ToString().ToLowerInvariant()}", c =>
+            {
+                c.Sort = sort;
+                c.Group = group;
+            });
+        }
+
+        protected void ApplyToFilter(string description, Action<FilterCriteria>? apply)
+        {
+            AddStep(description, () =>
+            {
+                var criteria = Carousel.Criteria;
+                apply?.Invoke(criteria);
+                Carousel.Filter(criteria);
+            });
+        }
 
         protected void WaitForDrawablePanels() => AddUntilStep("drawable panels loaded", () => Carousel.ChildrenOfType<ICarouselPanel>().Count(), () => Is.GreaterThan(0));
-        protected void WaitForSorting() => AddUntilStep("sorting finished", () => Carousel.IsFiltering, () => Is.False);
+        protected void WaitForFiltering() => AddUntilStep("filtering finished", () => Carousel.IsFiltering, () => Is.False);
         protected void WaitForScrolling() => AddUntilStep("scroll finished", () => Scroll.Current, () => Is.EqualTo(Scroll.Target));
 
         protected void SelectNextPanel() => AddStep("select next panel", () => InputManager.Key(Key.Down));
@@ -144,6 +173,32 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
         protected void CheckNoSelection() => AddAssert("has no selection", () => Carousel.CurrentSelection, () => Is.Null);
         protected void CheckHasSelection() => AddAssert("has selection", () => Carousel.CurrentSelection, () => Is.Not.Null);
+
+        protected void CheckDisplayedBeatmapsCount(int expected)
+        {
+            AddAssert($"{expected} diffs displayed", () => Carousel.MatchedBeatmapsCount, () => Is.EqualTo(expected));
+        }
+
+        protected void CheckDisplayedBeatmapSetsCount(int expected)
+        {
+            AddAssert($"{expected} sets displayed", () =>
+            {
+                var groupingFilter = Carousel.Filters.OfType<BeatmapCarouselFilterGrouping>().Single();
+
+                // Using groupingFilter.SetItems.Count alone doesn't work.
+                // When sorting by difficulty, there can be more than one set panel for the same set displayed.
+                return groupingFilter.SetItems.Sum(s => s.Value.Count(i => i.Model is BeatmapSetInfo));
+            }, () => Is.EqualTo(expected));
+        }
+
+        protected void CheckDisplayedGroupsCount(int expected)
+        {
+            AddAssert($"{expected} groups displayed", () =>
+            {
+                var groupingFilter = Carousel.Filters.OfType<BeatmapCarouselFilterGrouping>().Single();
+                return groupingFilter.GroupItems.Count;
+            }, () => Is.EqualTo(expected));
+        }
 
         protected ICarouselPanel? GetSelectedPanel() => Carousel.ChildrenOfType<ICarouselPanel>().SingleOrDefault(p => p.Selected.Value);
         protected ICarouselPanel? GetKeyboardSelectedPanel() => Carousel.ChildrenOfType<ICarouselPanel>().SingleOrDefault(p => p.KeyboardSelected.Value);

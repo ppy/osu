@@ -6,7 +6,6 @@ using NUnit.Framework;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Carousel;
-using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
 using osu.Game.Screens.SelectV2;
 using osuTK;
@@ -21,7 +20,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         {
             RemoveAllBeatmaps();
             CreateCarousel();
-            SortBy(new FilterCriteria { Group = GroupMode.Difficulty, Sort = SortMode.Difficulty });
+
+            SortAndGroupBy(SortMode.Difficulty, GroupMode.Difficulty);
 
             AddBeatmaps(10, 3);
             WaitForDrawablePanels();
@@ -179,7 +179,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             AddAssert("no beatmaps visible", () => !GetVisiblePanels<PanelBeatmap>().Any());
 
-            ClickVisiblePanelWithOffset<PanelGroup>(0, new Vector2(0, -(PanelGroup.HEIGHT / 2)));
+            // add lenience to avoid floating-point inaccuracies at edge.
+            ClickVisiblePanelWithOffset<PanelGroup>(0, new Vector2(0, -(PanelGroup.HEIGHT / 2 - 1)));
 
             AddUntilStep("wait for beatmaps visible", () => GetVisiblePanels<PanelBeatmap>().Any());
             CheckNoSelection();
@@ -190,6 +191,38 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             ClickVisiblePanelWithOffset<PanelBeatmap>(1, new Vector2(0, (CarouselItem.DEFAULT_HEIGHT / 2 + 1)));
             WaitForGroupSelection(0, 1);
+        }
+
+        [Test]
+        public void TestBasicFiltering()
+        {
+            ApplyToFilter("filter", c => c.SearchText = BeatmapSets[2].Metadata.Title);
+            WaitForFiltering();
+
+            CheckDisplayedGroupsCount(3);
+            CheckDisplayedBeatmapsCount(3);
+
+            CheckNoSelection();
+            SelectNextPanel();
+            Select();
+            SelectNextPanel();
+            Select();
+            WaitForGroupSelection(0, 0);
+
+            for (int i = 0; i < 5; i++)
+                SelectNextPanel();
+
+            Select();
+            SelectNextPanel();
+            Select();
+
+            WaitForGroupSelection(1, 0);
+
+            ApplyToFilter("remove filter", c => c.SearchText = string.Empty);
+            WaitForFiltering();
+
+            CheckDisplayedGroupsCount(3);
+            CheckDisplayedBeatmapsCount(30);
         }
     }
 }

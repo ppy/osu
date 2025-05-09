@@ -20,7 +20,7 @@ namespace osu.Game.Screens.Play.HUD
 {
     public partial class DrawableGameplayLeaderboard : CompositeDrawable, ISerialisableDrawable
     {
-        public Bindable<bool> Expanded = new Bindable<bool>();
+        public readonly Bindable<bool> ForceExpand = new Bindable<bool>();
 
         protected readonly FillFlowContainer<DrawableGameplayLeaderboardScore> Flow;
 
@@ -40,7 +40,7 @@ namespace osu.Game.Screens.Play.HUD
         private readonly IBindable<LocalUserPlayingState> userPlayingState = new Bindable<LocalUserPlayingState>();
         private readonly IBindable<bool> holdingForHUD = new Bindable<bool>();
 
-        private const int max_panels = 8;
+        private readonly Bindable<bool> expanded = new Bindable<bool>();
 
         /// <summary>
         /// Create a new leaderboard.
@@ -100,6 +100,7 @@ namespace osu.Game.Screens.Play.HUD
             configVisibility.BindValueChanged(_ => Scheduler.AddOnce(updateState));
             userPlayingState.BindValueChanged(_ => Scheduler.AddOnce(updateState));
             holdingForHUD.BindValueChanged(_ => Scheduler.AddOnce(updateState));
+            ForceExpand.BindValueChanged(_ => Scheduler.AddOnce(updateState));
             updateState();
         }
 
@@ -110,7 +111,7 @@ namespace osu.Game.Screens.Play.HUD
                 scroll.ScrollToStart(false);
 
             Flow.FadeTo(player?.Configuration.ShowLeaderboard != false && configVisibility.Value ? 1 : 0, 100, Easing.OutQuint);
-            Expanded.Value = userPlayingState.Value == LocalUserPlayingState.Playing || holdingForHUD.Value;
+            expanded.Value = ForceExpand.Value || userPlayingState.Value != LocalUserPlayingState.Playing || holdingForHUD.Value;
         }
 
         /// <summary>
@@ -128,7 +129,7 @@ namespace osu.Game.Screens.Play.HUD
                 TrackedScore = drawable;
             }
 
-            drawable.Expanded.BindTo(Expanded);
+            drawable.Expanded.BindTo(expanded);
 
             Flow.Add(drawable);
             drawable.ScorePosition.BindValueChanged(_ => Scheduler.AddOnce(sort));

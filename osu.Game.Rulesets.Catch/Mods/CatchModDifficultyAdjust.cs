@@ -6,6 +6,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Extensions;
 using osu.Game.Rulesets.Catch.Beatmaps;
 using osu.Game.Rulesets.Mods;
 
@@ -35,6 +36,24 @@ namespace osu.Game.Rulesets.Catch.Mods
 
         [SettingSource("Spicy Patterns", "Adjust the patterns as if Hard Rock is enabled.")]
         public BindableBool HardRockOffsets { get; } = new BindableBool();
+
+        public override string ExtendedIconInformation
+        {
+            get
+            {
+                if (UserAdjustedSettingsCount != 1)
+                    return string.Empty;
+
+                if (!CircleSize.IsDefault) return format("CS", CircleSize);
+                if (!ApproachRate.IsDefault) return format("AR", ApproachRate);
+                if (!OverallDifficulty.IsDefault) return format("OD", OverallDifficulty);
+                if (!DrainRate.IsDefault) return format("HP", DrainRate);
+
+                return string.Empty;
+
+                string format(string acronym, DifficultyBindable bindable) => $"{acronym}{bindable.Value!.Value.ToStandardFormattedString(1)}";
+            }
+        }
 
         public override IEnumerable<(LocalisableString setting, LocalisableString value)> SettingDescription
         {

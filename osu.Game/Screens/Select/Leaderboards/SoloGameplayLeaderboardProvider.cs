@@ -70,6 +70,9 @@ namespace osu.Game.Screens.Select.Leaderboards
             {
                 var score = orderedByScore[i];
 
+                // see `SoloResultsScreen.FetchScores()` for another place that does the same thing with slight deviations
+                // if this code is changed, that code should probably be changed as well
+
                 score.DisplayOrder.Value = i + 1;
 
                 // if we know we have all scores there can ever be, we can do the simple and obvious thing.

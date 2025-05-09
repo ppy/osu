@@ -113,7 +113,7 @@ namespace osu.Game.Screens.Select.Leaderboards
             Tracked = tracked;
             TotalScore.Value = scoreInfo.TotalScore;
             Accuracy.Value = scoreInfo.Accuracy;
-            Combo.Value = scoreInfo.Combo;
+            Combo.Value = scoreInfo.MaxCombo;
             TotalScoreTiebreaker = scoreInfo.OnlineID > 0 ? scoreInfo.OnlineID : scoreInfo.Date.ToUnixTimeSeconds();
             GetDisplayScore = scoreInfo.GetDisplayScore;
             InitialPosition = scoreInfo.Position;
