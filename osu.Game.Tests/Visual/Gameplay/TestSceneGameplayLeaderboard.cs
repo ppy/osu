@@ -36,7 +36,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("toggle expanded", () =>
             {
                 if (leaderboard.IsNotNull())
-                    leaderboard.Expanded.Value = !leaderboard.Expanded.Value;
+                    leaderboard.ForceExpand.Value = !leaderboard.ForceExpand.Value;
             });
 
             AddSliderStep("set player score", 50, 5000000, 1222333, v => playerScore.Value = v);
@@ -97,26 +97,6 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("add smoogipoo", () => createRandomScore(new APIUser { Username = "smoogipoo", Id = 1040328 }));
             AddStep("add flyte", () => createRandomScore(new APIUser { Username = "flyte", Id = 3103765 }));
             AddStep("add frenzibyte", () => createRandomScore(new APIUser { Username = "frenzibyte", Id = 14210502 }));
-        }
-
-        [Test]
-        public void TestMaxHeight()
-        {
-            createLeaderboard();
-            addLocalPlayer();
-
-            int playerNumber = 1;
-            AddRepeatStep("add 3 other players", () => createRandomScore(new APIUser { Username = $"Player {playerNumber++}" }), 3);
-            checkHeight(4);
-
-            AddRepeatStep("add 4 other players", () => createRandomScore(new APIUser { Username = $"Player {playerNumber++}" }), 4);
-            checkHeight(8);
-
-            AddRepeatStep("add 4 other players", () => createRandomScore(new APIUser { Username = $"Player {playerNumber++}" }), 4);
-            checkHeight(8);
-
-            void checkHeight(int panelCount)
-                => AddAssert($"leaderboard height is {panelCount} panels high", () => leaderboard.DrawHeight == (DrawableGameplayLeaderboardScore.PANEL_HEIGHT + leaderboard.Spacing) * panelCount);
         }
 
         [Test]

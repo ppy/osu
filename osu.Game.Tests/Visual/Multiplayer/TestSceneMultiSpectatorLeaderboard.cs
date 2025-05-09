@@ -58,7 +58,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Expanded = { Value = true }
+                        ForceExpand = { Value = true }
                     }
                 });
             });

@@ -38,8 +38,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         public GameplayChatDisplay(Room room)
             : base(room, leaveChannelOnDispose: false)
         {
+            RelativeSizeAxes = Axes.X;
             Background.Alpha = 0.2f;
-            Width = width;
         }
 
         [BackgroundDependencyLoader]

@@ -19,6 +19,7 @@ using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Dialog;
 using osu.Game.Overlays.Toolbar;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mania.Mods;
@@ -31,9 +32,11 @@ using osu.Game.Screens.Menu;
 using osu.Game.Screens.Select.Filter;
 using osu.Game.Screens.SelectV2;
 using osu.Game.Tests.Resources;
+using osuTK.Input;
 using BeatmapCarousel = osu.Game.Screens.SelectV2.BeatmapCarousel;
 using FilterControl = osu.Game.Screens.SelectV2.FilterControl;
 using NoResultsPlaceholder = osu.Game.Screens.SelectV2.NoResultsPlaceholder;
+using BeatmapDeleteDialog = osu.Game.Screens.Select.BeatmapDeleteDialog;
 
 namespace osu.Game.Tests.Visual.SongSelectV2
 {
@@ -266,6 +269,36 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             // Add filterable mod. Should re-filter.
             AddStep("add filterable mod", () => SelectedMods.Value = new Mod[] { new ManiaModKey3() });
             AddAssert("filter count is 5", () => filterOperationsCount, () => Is.EqualTo(5));
+        }
+
+        // This test should probably not be in this test class, it has nothing to do with filtering.
+        // TestSceneSongSelect is a better place, but doesn't have local storage isolation setup (yet).
+        [Test]
+        public void TestDeleteHotkey()
+        {
+            loadSongSelect();
+
+            importBeatmapForRuleset(0);
+
+            AddAssert("beatmap imported", () => manager.GetAllUsableBeatmapSets().Any(), () => Is.True);
+
+            // song select should automatically select the beatmap for us but this is not implemented yet.
+            // todo: remove when that's the case.
+            AddAssert("no beatmap selected", () => Beatmap.IsDefault);
+            AddStep("select beatmap", () => Beatmap.Value = manager.GetWorkingBeatmap(manager.GetAllUsableBeatmapSets().Single().Beatmaps.First()));
+            AddAssert("beatmap selected", () => !Beatmap.IsDefault);
+
+            AddStep("press shift-delete", () =>
+            {
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.Key(Key.Delete);
+                InputManager.ReleaseKey(Key.ShiftLeft);
+            });
+
+            AddUntilStep("delete dialog shown", () => DialogOverlay.CurrentDialog, Is.InstanceOf<BeatmapDeleteDialog>);
+            AddStep("confirm deletion", () => DialogOverlay.CurrentDialog!.PerformAction<PopupDialogDangerousButton>());
+
+            AddAssert("beatmap set deleted", () => manager.GetAllUsableBeatmapSets().Any(), () => Is.False);
         }
 
         [Test]
