@@ -15,7 +15,6 @@ using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Taiko.Tests
 {
-    [Ignore("These tests are expected to fail until an acceptable solution for various replay playback issues concerning rounding of replay frame times & hit windows is found.")]
     public partial class TestSceneLegacyReplayPlayback : LegacyReplayPlaybackTestScene
     {
         protected override string? ExportLocation => null;
@@ -177,7 +176,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
                 ScoreInfo = new ScoreInfo
                 {
                     Ruleset = CreateRuleset().RulesetInfo,
-                    Mods = [new TaikoModHardRock()]
+                    Mods = [new TaikoModEasy()]
                 }
             };
 
