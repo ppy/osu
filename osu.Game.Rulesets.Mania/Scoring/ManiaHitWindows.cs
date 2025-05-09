@@ -28,6 +28,20 @@ namespace osu.Game.Rulesets.Mania.Scoring
             }
         }
 
+        private double difficultyMultiplier = 1;
+
+        public double DifficultyMultiplier
+        {
+            get => difficultyMultiplier;
+            set
+            {
+                difficultyMultiplier = value;
+                updateWindows();
+            }
+        }
+
+        private double totalMultiplier => speedMultiplier * difficultyMultiplier;
+
         private double overallDifficulty;
 
         private bool useClassicWindows;
@@ -89,33 +103,33 @@ namespace osu.Game.Rulesets.Mania.Scoring
             {
                 if (IsConvert)
                 {
-                    perfect = Math.Floor(16 * speedMultiplier) + 0.5;
-                    great = Math.Floor((Math.Round(overallDifficulty) > 4 ? 34 : 47) * speedMultiplier) + 0.5;
-                    good = Math.Floor((Math.Round(overallDifficulty) > 4 ? 67 : 77) * speedMultiplier) + 0.5;
-                    ok = Math.Floor(97 * speedMultiplier) + 0.5;
-                    meh = Math.Floor(121 * speedMultiplier) + 0.5;
-                    miss = Math.Floor(158 * speedMultiplier) + 0.5;
+                    perfect = Math.Floor(16 * totalMultiplier) + 0.5;
+                    great = Math.Floor((Math.Round(overallDifficulty) > 4 ? 34 : 47) * totalMultiplier) + 0.5;
+                    good = Math.Floor((Math.Round(overallDifficulty) > 4 ? 67 : 77) * totalMultiplier) + 0.5;
+                    ok = Math.Floor(97 * totalMultiplier) + 0.5;
+                    meh = Math.Floor(121 * totalMultiplier) + 0.5;
+                    miss = Math.Floor(158 * totalMultiplier) + 0.5;
                 }
                 else
                 {
                     double invertedOd = Math.Clamp(10 - overallDifficulty, 0, 10);
 
-                    perfect = Math.Floor(16 * speedMultiplier) + 0.5;
-                    great = Math.Floor((34 + 3 * invertedOd) * speedMultiplier) + 0.5;
-                    good = Math.Floor((67 + 3 * invertedOd) * speedMultiplier) + 0.5;
-                    ok = Math.Floor((97 + 3 * invertedOd) * speedMultiplier) + 0.5;
-                    meh = Math.Floor((121 + 3 * invertedOd) * speedMultiplier) + 0.5;
-                    miss = Math.Floor((158 + 3 * invertedOd) * speedMultiplier) + 0.5;
+                    perfect = Math.Floor(16 * totalMultiplier) + 0.5;
+                    great = Math.Floor((34 + 3 * invertedOd) * totalMultiplier) + 0.5;
+                    good = Math.Floor((67 + 3 * invertedOd) * totalMultiplier) + 0.5;
+                    ok = Math.Floor((97 + 3 * invertedOd) * totalMultiplier) + 0.5;
+                    meh = Math.Floor((121 + 3 * invertedOd) * totalMultiplier) + 0.5;
+                    miss = Math.Floor((158 + 3 * invertedOd) * totalMultiplier) + 0.5;
                 }
             }
             else
             {
-                perfect = Math.Floor(IBeatmapDifficultyInfo.DifficultyRange(overallDifficulty, perfect_window_range) * speedMultiplier) + 0.5;
-                great = Math.Floor(IBeatmapDifficultyInfo.DifficultyRange(overallDifficulty, great_window_range) * speedMultiplier) + 0.5;
-                good = Math.Floor(IBeatmapDifficultyInfo.DifficultyRange(overallDifficulty, good_window_range) * speedMultiplier) + 0.5;
-                ok = Math.Floor(IBeatmapDifficultyInfo.DifficultyRange(overallDifficulty, ok_window_range) * speedMultiplier) + 0.5;
-                meh = Math.Floor(IBeatmapDifficultyInfo.DifficultyRange(overallDifficulty, meh_window_range) * speedMultiplier) + 0.5;
-                miss = Math.Floor(IBeatmapDifficultyInfo.DifficultyRange(overallDifficulty, miss_window_range) * speedMultiplier) + 0.5;
+                perfect = Math.Floor(IBeatmapDifficultyInfo.DifficultyRange(overallDifficulty, perfect_window_range) * totalMultiplier) + 0.5;
+                great = Math.Floor(IBeatmapDifficultyInfo.DifficultyRange(overallDifficulty, great_window_range) * totalMultiplier) + 0.5;
+                good = Math.Floor(IBeatmapDifficultyInfo.DifficultyRange(overallDifficulty, good_window_range) * totalMultiplier) + 0.5;
+                ok = Math.Floor(IBeatmapDifficultyInfo.DifficultyRange(overallDifficulty, ok_window_range) * totalMultiplier) + 0.5;
+                meh = Math.Floor(IBeatmapDifficultyInfo.DifficultyRange(overallDifficulty, meh_window_range) * totalMultiplier) + 0.5;
+                miss = Math.Floor(IBeatmapDifficultyInfo.DifficultyRange(overallDifficulty, miss_window_range) * totalMultiplier) + 0.5;
             }
         }
 

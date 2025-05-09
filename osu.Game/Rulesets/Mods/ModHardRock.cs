@@ -29,7 +29,6 @@ namespace osu.Game.Rulesets.Mods
         public virtual void ApplyToDifficulty(BeatmapDifficulty difficulty)
         {
             difficulty.DrainRate = Math.Min(difficulty.DrainRate * ADJUST_RATIO, 10.0f);
-            difficulty.OverallDifficulty = Math.Min(difficulty.OverallDifficulty * ADJUST_RATIO, 10.0f);
         }
     }
 }

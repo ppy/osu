@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
 
@@ -23,6 +24,8 @@ namespace osu.Game.Rulesets.Taiko.Mods
         public override void ApplyToDifficulty(BeatmapDifficulty difficulty)
         {
             base.ApplyToDifficulty(difficulty);
+
+            difficulty.OverallDifficulty = Math.Min(difficulty.OverallDifficulty * ADJUST_RATIO, 10.0f);
             difficulty.SliderMultiplier *= slider_multiplier;
         }
     }
