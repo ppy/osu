@@ -47,10 +47,10 @@ namespace osu.Game.Screens.SelectV2
         [Resolved]
         private OsuConfigManager config { get; set; } = null!;
 
-        public LocalisableString InformationalNote
+        public LocalisableString StatusText
         {
-            get => searchTextBox.FilterText;
-            set => searchTextBox.FilterText = value;
+            get => searchTextBox.StatusText;
+            set => searchTextBox.StatusText = value;
         }
 
         public event Action<FilterCriteria>? CriteriaChanged;

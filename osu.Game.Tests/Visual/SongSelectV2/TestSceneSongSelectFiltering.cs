@@ -31,6 +31,9 @@ using osu.Game.Screens.Menu;
 using osu.Game.Screens.Select.Filter;
 using osu.Game.Screens.SelectV2;
 using osu.Game.Tests.Resources;
+using BeatmapCarousel = osu.Game.Screens.SelectV2.BeatmapCarousel;
+using FilterControl = osu.Game.Screens.SelectV2.FilterControl;
+using NoResultsPlaceholder = osu.Game.Screens.SelectV2.NoResultsPlaceholder;
 
 namespace osu.Game.Tests.Visual.SongSelectV2
 {
@@ -266,7 +269,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         }
 
         [Test]
-        public void TestPlaceholderBeatmapPresence()
+        public void TestPlaceholderVisibleAfterDeleteAll()
         {
             loadSongSelect();
 
@@ -280,7 +283,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         }
 
         [Test]
-        public void TestPlaceholderStarDifficulty()
+        public void TestPlaceholderVisibleAfterStarDifficultyFilter()
         {
             importBeatmapForRuleset(0);
             AddStep("change star filter", () => config.SetValue(OsuSetting.DisplayStarsMinimum, 10.0));
@@ -296,7 +299,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         }
 
         [Test]
-        public void TestPlaceholderConvertSetting()
+        public void TestPlaceholderVisibleWithConvertSetting()
         {
             importBeatmapForRuleset(0);
             AddStep("change convert setting", () => config.SetValue(OsuSetting.ShowConvertedBeatmaps, false));
@@ -311,6 +314,32 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             AddUntilStep("convert setting changed", () => config.Get<bool>(OsuSetting.ShowConvertedBeatmaps));
             AddUntilStep("wait for placeholder visible", () => getPlaceholder()?.State.Value == Visibility.Hidden);
+        }
+
+        [Test]
+        public void TestCorrectMatchCountAfterDeleteAll()
+        {
+            loadSongSelect();
+            checkMatchedBeatmaps(0);
+
+            importBeatmapForRuleset(0);
+            checkMatchedBeatmaps(3);
+
+            AddStep("delete all beatmaps", () => manager.Delete());
+            checkMatchedBeatmaps(0);
+        }
+
+        [Test]
+        public void TestCorrectMatchCountAfterHardDelete()
+        {
+            loadSongSelect();
+            checkMatchedBeatmaps(0);
+
+            importBeatmapForRuleset(0);
+            checkMatchedBeatmaps(3);
+
+            AddStep("hard delete beatmap", () => Realm.Write(r => r.RemoveRange(r.All<BeatmapSetInfo>().Where(s => !s.Protected))));
+            checkMatchedBeatmaps(0);
         }
 
         private void loadSongSelect()
@@ -363,6 +392,9 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                     manager.Import(TestResources.CreateTestBeatmapSetInfo(difficultyCountPerSet, usableRulesets));
             });
         }
+
+        private void checkMatchedBeatmaps(int expected) =>
+            AddUntilStep($"{expected} matching shown", () => carousel.MatchedBeatmapsCount, () => Is.EqualTo(expected));
 
         private void waitForSuspension() => AddUntilStep("wait for not current", () => !songSelect.AsNonNull().IsCurrentScreen());
 
