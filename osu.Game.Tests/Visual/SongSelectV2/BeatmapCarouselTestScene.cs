@@ -7,6 +7,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -37,6 +38,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
         protected BeatmapCarousel Carousel = null!;
 
+        protected BeatmapCarouselFilterSorting Sorting => Carousel.Filters.OfType<BeatmapCarouselFilterSorting>().Single();
         protected OsuScrollContainer<Drawable> Scroll => Carousel.ChildrenOfType<OsuScrollContainer<Drawable>>().Single();
 
         [Cached(typeof(BeatmapStore))]
@@ -138,12 +140,12 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             SortBy(SortMode.Title);
         }
 
-        protected void SortBy(SortMode mode) => ApplyToFilter($"sort by {mode.ToString().ToLowerInvariant()}", c => c.Sort = mode);
-        protected void GroupBy(GroupMode mode) => ApplyToFilter($"group by {mode.ToString().ToLowerInvariant()}", c => c.Group = mode);
+        protected void SortBy(SortMode mode) => ApplyToFilter($"sort by {mode.GetDescription().ToLowerInvariant()}", c => c.Sort = mode);
+        protected void GroupBy(GroupMode mode) => ApplyToFilter($"group by {mode.GetDescription().ToLowerInvariant()}", c => c.Group = mode);
 
         protected void SortAndGroupBy(SortMode sort, GroupMode group)
         {
-            ApplyToFilter($"sort by {sort.ToString().ToLowerInvariant()} & group by {group.ToString().ToLowerInvariant()}", c =>
+            ApplyToFilter($"sort by {sort.GetDescription().ToLowerInvariant()} & group by {group.GetDescription().ToLowerInvariant()}", c =>
             {
                 c.Sort = sort;
                 c.Group = group;
