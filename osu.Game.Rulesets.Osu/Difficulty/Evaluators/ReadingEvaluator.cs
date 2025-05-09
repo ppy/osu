@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Utils;
@@ -56,7 +55,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                 // Nerf preempt on most comfortable densities
                 // https://www.desmos.com/calculator/31mrv4rlfh
-                double densityDifficulty = 1 + DifficultyCalculationUtils.BellCurve(retrievePastVisibleObjects(currObj).Count(), 2, 1.5, 3.0);
+                double densityDifficulty = 1 + DifficultyCalculationUtils.BellCurve(pastObjectDifficultyInfluence, 2.2, 1, 3.0);
                 preemptDifficulty *= constantAngleNerfFactor * angularVelocityFactor / densityDifficulty;
             }
 
@@ -66,13 +65,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             {
                 double timeSpentInvisible = getDurationSpentInvisible(currObj) / clockRate;
 
+                // Nerf extremely high times as you begin to rely more on memory the longer a note is invisible
+                double timeSpentInvisibleFactor = Math.Min(timeSpentInvisible, 1000) + (timeSpentInvisible > 1000 ? 2000 * Math.Log10(timeSpentInvisible / 1000) : 0);
+
                 // Nerf hidden difficulty less the more past object difficulty you have
                 double timeDifficultyFactor = 9000 / pastObjectDifficultyInfluence;
 
                 // Cap objects because after a certain point hidden density is mainly memory
                 double visibleObjectFactor = Math.Min(retrieveCurrentVisibleObjects(currObj).Count, 8);
 
-                hiddenDifficulty += visibleObjectFactor * timeSpentInvisible / timeDifficultyFactor;
+                hiddenDifficulty += visibleObjectFactor * timeSpentInvisibleFactor / timeDifficultyFactor;
 
                 hiddenDifficulty *= constantAngleNerfFactor * angularVelocityFactor;
 
