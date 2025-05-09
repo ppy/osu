@@ -230,6 +230,12 @@ namespace osu.Game.Rulesets.Mania
             return value;
         }
 
+        public override ModClassic GetClassicModForScore(ScoreInfo score)
+            => new ManiaModClassic
+            {
+                ClassicHitWindows = { Value = score.Mods.All(m => m.GetType() != typeof(ModScoreV2)) }
+            };
+
         public override IEnumerable<Mod> GetModsFor(ModType type)
         {
             switch (type)

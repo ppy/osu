@@ -18,7 +18,6 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Replays;
 using osu.Game.Replays.Legacy;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
 using osuTK;
@@ -90,7 +89,7 @@ namespace osu.Game.Scoring.Legacy
 
                 // lazer replays get a really high version number.
                 if (version < LegacyScoreEncoder.FIRST_LAZER_VERSION)
-                    scoreInfo.Mods = scoreInfo.Mods.Append(currentRuleset.CreateMod<ModClassic>()).ToArray();
+                    scoreInfo.Mods = scoreInfo.Mods.Append(currentRuleset.GetClassicModForScore(scoreInfo)).ToArray();
 
                 currentBeatmap = workingBeatmap.GetPlayableBeatmap(currentRuleset.RulesetInfo, scoreInfo.Mods);
                 scoreInfo.BeatmapInfo = currentBeatmap.BeatmapInfo;

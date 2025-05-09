@@ -23,13 +23,13 @@ namespace osu.Game.Rulesets.Mods
         {
         }
 
+        protected const float ADJUST_RATIO = 0.5f;
+
         public virtual void ApplyToDifficulty(BeatmapDifficulty difficulty)
         {
-            const float ratio = 0.5f;
-            difficulty.CircleSize *= ratio;
-            difficulty.ApproachRate *= ratio;
-            difficulty.DrainRate *= ratio;
-            difficulty.OverallDifficulty *= ratio;
+            difficulty.CircleSize *= ADJUST_RATIO;
+            difficulty.ApproachRate *= ADJUST_RATIO;
+            difficulty.DrainRate *= ADJUST_RATIO;
         }
     }
 }
