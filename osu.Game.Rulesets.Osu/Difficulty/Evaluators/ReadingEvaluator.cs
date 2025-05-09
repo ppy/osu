@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             var currObj = (OsuDifficultyHitObject)current;
             double constantAngleNerfFactor = getConstantAngleNerfFactor(currObj);
-            double angularVelocityFactor = getAngularVelocityFactor(currObj, (OsuDifficultyHitObject)currObj.Previous(0));
+            double angularVelocityFactor = getAngularVelocityFactor(currObj);
 
             double pastObjectDifficultyInfluence = 1.0;
 
@@ -173,20 +173,34 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             return Math.Clamp(2 - deltaTime / (reading_window_size / 2), 0, 1);
         }
 
-        private static double getAngularVelocityFactor(OsuDifficultyHitObject current, OsuDifficultyHitObject previous)
+        private static double getAngularVelocityFactor(OsuDifficultyHitObject current)
         {
-            if (current.Angle.HasValue &&
-                previous?.Angle != null &&
-                Math.Abs(current.DeltaTime - previous.DeltaTime) < 10)
+            var previous = (OsuDifficultyHitObject)current.Previous(0);
+            var previous2 = (OsuDifficultyHitObject)current.Previous(2);
+
+            if (!current.Angle.HasValue ||
+                previous?.Angle == null ||
+                !(Math.Abs(current.DeltaTime - previous.DeltaTime) < 10)) return current.MinimumJumpDistance / current.StrainTime;
+
+            double angleDifference = Math.Abs(current.Angle.Value - previous.Angle.Value);
+            double angleDifferenceAdjusted = Math.Sin(angleDifference / 2) * 180.0;
+            double angularVelocity = angleDifferenceAdjusted * (current.MinimumJumpDistance / current.StrainTime);
+            double angularVelocityBonus = Math.Max(0.0, Math.Pow(angularVelocity, 0.4) - 1.0) * 0.35;
+
+            if (previous2 == null) return angularVelocityBonus;
+            // If objects just go back and forth through a middle point - don't give as much bonus
+            // Use Previous(2) and Previous(0) because angles calculation is done prevprev-prev-curr, so any object's angle's center point is always the previous object
+            var lastBaseObject = (OsuHitObject)previous.BaseObject;
+            var last2BaseObject = (OsuHitObject)previous2.BaseObject;
+
+            float distance = (last2BaseObject.StackedPosition - lastBaseObject.StackedPosition).Length;
+
+            if (distance < 1)
             {
-                double angleDifference = Math.Abs(current.Angle.Value - previous.Angle.Value);
-                double angleDifferenceAdjusted = Math.Sin(angleDifference / 2) * 180.0;
-                double angularVelocity = angleDifferenceAdjusted * (current.LazyJumpDistance / current.StrainTime);
-                double angularVelocityBonus = Math.Max(0.0, Math.Pow(angularVelocity, 0.4) - 1.0);
-                return angularVelocityBonus * 0.35;
+                return angularVelocityBonus * (1 - 0.35 * (1 - distance));
             }
 
-            return current.LazyJumpDistance / current.StrainTime;
+            return angularVelocityBonus;
         }
     }
 }
