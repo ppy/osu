@@ -167,7 +167,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public void TestScoreUpdates()
         {
             AddRepeatStep("update state", UpdateUserStatesRandomly, 100);
-            AddToggleStep("switch compact mode", expanded => Leaderboard!.Expanded.Value = expanded);
+            AddToggleStep("switch compact mode", expanded => Leaderboard!.ForceExpand.Value = expanded);
         }
 
         [Test]

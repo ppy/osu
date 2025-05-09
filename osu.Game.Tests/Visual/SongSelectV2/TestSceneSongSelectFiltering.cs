@@ -17,7 +17,9 @@ using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.Chat;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Dialog;
 using osu.Game.Overlays.Toolbar;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mania.Mods;
@@ -30,15 +32,18 @@ using osu.Game.Screens.Menu;
 using osu.Game.Screens.Select.Filter;
 using osu.Game.Screens.SelectV2;
 using osu.Game.Tests.Resources;
+using osuTK.Input;
+using BeatmapCarousel = osu.Game.Screens.SelectV2.BeatmapCarousel;
+using FilterControl = osu.Game.Screens.SelectV2.FilterControl;
+using NoResultsPlaceholder = osu.Game.Screens.SelectV2.NoResultsPlaceholder;
+using BeatmapDeleteDialog = osu.Game.Screens.Select.BeatmapDeleteDialog;
 
 namespace osu.Game.Tests.Visual.SongSelectV2
 {
     public partial class TestSceneSongSelectFiltering : ScreenTestScene
     {
         private BeatmapManager manager = null!;
-
-        [Resolved]
-        private RulesetStore rulesets { get; set; } = null!;
+        private RealmRulesetStore rulesets = null!;
 
         private OsuConfigManager config = null!;
 
@@ -93,6 +98,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             // These DI caches are required to ensure for interactive runs this test scene doesn't nuke all user beatmaps in the local install.
             // At a point we have isolated interactive test runs enough, this can likely be removed.
+            Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
+            Dependencies.Cache(Realm);
             Dependencies.Cache(manager = new BeatmapManager(LocalStorage, Realm, null, Audio, Resources, host, Beatmap.Default));
             Dependencies.CacheAs<BeatmapStore>(beatmapStore = new RealmDetachedBeatmapStore());
 
@@ -264,6 +271,110 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddAssert("filter count is 5", () => filterOperationsCount, () => Is.EqualTo(5));
         }
 
+        // This test should probably not be in this test class, it has nothing to do with filtering.
+        // TestSceneSongSelect is a better place, but doesn't have local storage isolation setup (yet).
+        [Test]
+        public void TestDeleteHotkey()
+        {
+            loadSongSelect();
+
+            importBeatmapForRuleset(0);
+
+            AddAssert("beatmap imported", () => manager.GetAllUsableBeatmapSets().Any(), () => Is.True);
+
+            // song select should automatically select the beatmap for us but this is not implemented yet.
+            // todo: remove when that's the case.
+            AddAssert("no beatmap selected", () => Beatmap.IsDefault);
+            AddStep("select beatmap", () => Beatmap.Value = manager.GetWorkingBeatmap(manager.GetAllUsableBeatmapSets().Single().Beatmaps.First()));
+            AddAssert("beatmap selected", () => !Beatmap.IsDefault);
+
+            AddStep("press shift-delete", () =>
+            {
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.Key(Key.Delete);
+                InputManager.ReleaseKey(Key.ShiftLeft);
+            });
+
+            AddUntilStep("delete dialog shown", () => DialogOverlay.CurrentDialog, Is.InstanceOf<BeatmapDeleteDialog>);
+            AddStep("confirm deletion", () => DialogOverlay.CurrentDialog!.PerformAction<PopupDialogDangerousButton>());
+
+            AddAssert("beatmap set deleted", () => manager.GetAllUsableBeatmapSets().Any(), () => Is.False);
+        }
+
+        [Test]
+        public void TestPlaceholderVisibleAfterDeleteAll()
+        {
+            loadSongSelect();
+
+            AddUntilStep("wait for placeholder visible", () => getPlaceholder()?.State.Value == Visibility.Visible);
+
+            importBeatmapForRuleset(0);
+            AddUntilStep("wait for placeholder hidden", () => getPlaceholder()?.State.Value == Visibility.Hidden);
+
+            AddStep("delete all beatmaps", () => manager.Delete());
+            AddUntilStep("wait for placeholder visible", () => getPlaceholder()?.State.Value == Visibility.Visible);
+        }
+
+        [Test]
+        public void TestPlaceholderVisibleAfterStarDifficultyFilter()
+        {
+            importBeatmapForRuleset(0);
+            AddStep("change star filter", () => config.SetValue(OsuSetting.DisplayStarsMinimum, 10.0));
+
+            loadSongSelect();
+
+            AddUntilStep("wait for placeholder visible", () => getPlaceholder()?.State.Value == Visibility.Visible);
+
+            AddStep("click link in placeholder", () => getPlaceholder().ChildrenOfType<DrawableLinkCompiler>().First().TriggerClick());
+
+            AddUntilStep("star filter reset", () => config.Get<double>(OsuSetting.DisplayStarsMinimum) == 0.0);
+            AddUntilStep("wait for placeholder visible", () => getPlaceholder()?.State.Value == Visibility.Hidden);
+        }
+
+        [Test]
+        public void TestPlaceholderVisibleWithConvertSetting()
+        {
+            importBeatmapForRuleset(0);
+            AddStep("change convert setting", () => config.SetValue(OsuSetting.ShowConvertedBeatmaps, false));
+
+            loadSongSelect();
+
+            changeRuleset(2);
+
+            AddUntilStep("wait for placeholder visible", () => getPlaceholder()?.State.Value == Visibility.Visible);
+
+            AddStep("click link in placeholder", () => getPlaceholder().ChildrenOfType<DrawableLinkCompiler>().First().TriggerClick());
+
+            AddUntilStep("convert setting changed", () => config.Get<bool>(OsuSetting.ShowConvertedBeatmaps));
+            AddUntilStep("wait for placeholder visible", () => getPlaceholder()?.State.Value == Visibility.Hidden);
+        }
+
+        [Test]
+        public void TestCorrectMatchCountAfterDeleteAll()
+        {
+            loadSongSelect();
+            checkMatchedBeatmaps(0);
+
+            importBeatmapForRuleset(0);
+            checkMatchedBeatmaps(3);
+
+            AddStep("delete all beatmaps", () => manager.Delete());
+            checkMatchedBeatmaps(0);
+        }
+
+        [Test]
+        public void TestCorrectMatchCountAfterHardDelete()
+        {
+            loadSongSelect();
+            checkMatchedBeatmaps(0);
+
+            importBeatmapForRuleset(0);
+            checkMatchedBeatmaps(3);
+
+            AddStep("hard delete beatmap", () => Realm.Write(r => r.RemoveRange(r.All<BeatmapSetInfo>().Where(s => !s.Protected))));
+            checkMatchedBeatmaps(0);
+        }
+
         private void loadSongSelect()
         {
             AddStep("load screen", () => Stack.Push(songSelect = new SoloSongSelect()));
@@ -274,6 +385,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 filter.CriteriaChanged += _ => filterOperationsCount++;
             });
         }
+
+        private NoResultsPlaceholder? getPlaceholder() => songSelect.ChildrenOfType<NoResultsPlaceholder>().FirstOrDefault();
 
         private void importBeatmapForRuleset(int rulesetId)
         {
@@ -312,6 +425,9 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                     manager.Import(TestResources.CreateTestBeatmapSetInfo(difficultyCountPerSet, usableRulesets));
             });
         }
+
+        private void checkMatchedBeatmaps(int expected) =>
+            AddUntilStep($"{expected} matching shown", () => carousel.MatchedBeatmapsCount, () => Is.EqualTo(expected));
 
         private void waitForSuspension() => AddUntilStep("wait for not current", () => !songSelect.AsNonNull().IsCurrentScreen());
 

@@ -54,7 +54,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                             Anchor = Anchor.Centre,
                             RelativeSizeAxes = Axes.X,
                             Width = 0.5f,
-                            FilterText = "12345 matches",
+                            StatusText = "12345 matches",
                         },
                     }
                 },

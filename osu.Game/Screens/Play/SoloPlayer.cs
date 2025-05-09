@@ -19,14 +19,13 @@ namespace osu.Game.Screens.Play
 {
     public partial class SoloPlayer : SubmittingPlayer
     {
-        protected override bool ShowLeaderboard => true;
-
         [Cached(typeof(IGameplayLeaderboardProvider))]
         private readonly SoloGameplayLeaderboardProvider leaderboardProvider = new SoloGameplayLeaderboardProvider();
 
         public SoloPlayer([CanBeNull] PlayerConfiguration configuration = null)
             : base(configuration)
         {
+            Configuration.ShowLeaderboard = true;
         }
 
         [BackgroundDependencyLoader]

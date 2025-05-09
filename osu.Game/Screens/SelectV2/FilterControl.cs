@@ -9,6 +9,8 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input;
+using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
@@ -21,6 +23,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Screens.SelectV2
 {
@@ -47,10 +50,10 @@ namespace osu.Game.Screens.SelectV2
         [Resolved]
         private OsuConfigManager config { get; set; } = null!;
 
-        public LocalisableString InformationalNote
+        public LocalisableString StatusText
         {
-            get => searchTextBox.FilterText;
-            set => searchTextBox.FilterText = value;
+            get => searchTextBox.StatusText;
+            set => searchTextBox.StatusText = value;
         }
 
         public event Action<FilterCriteria>? CriteriaChanged;
@@ -274,6 +277,15 @@ namespace osu.Game.Screens.SelectV2
             private partial class InnerTextBox : InnerFilterTextBox
             {
                 public override bool HandleLeftRightArrows => false;
+
+                public override bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
+                {
+                    // the "cut" platform key binding (shift-delete) conflicts with the beatmap deletion action.
+                    if (e.Action == PlatformAction.Cut && e.ShiftPressed && e.CurrentState.Keyboard.Keys.IsPressed(Key.Delete))
+                        return false;
+
+                    return base.OnPressed(e);
+                }
             }
         }
     }
