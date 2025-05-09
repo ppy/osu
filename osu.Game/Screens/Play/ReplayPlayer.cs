@@ -49,8 +49,6 @@ namespace osu.Game.Screens.Play
             return base.CheckModsAllowFailure();
         }
 
-        protected override bool ShowLeaderboard => true;
-
         public ReplayPlayer(Score score, PlayerConfiguration configuration = null)
             : this((_, _) => score, configuration)
         {
@@ -61,6 +59,7 @@ namespace osu.Game.Screens.Play
             : base(configuration)
         {
             this.createScore = createScore;
+            Configuration.ShowLeaderboard = true;
         }
 
         /// <summary>

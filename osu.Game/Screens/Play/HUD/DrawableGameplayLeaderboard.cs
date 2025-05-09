@@ -12,14 +12,15 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Screens.Select.Leaderboards;
+using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public partial class DrawableGameplayLeaderboard : CompositeDrawable
+    public partial class DrawableGameplayLeaderboard : CompositeDrawable, ISerialisableDrawable
     {
-        public Bindable<bool> Expanded = new Bindable<bool>();
+        public readonly Bindable<bool> ForceExpand = new Bindable<bool>();
 
         protected readonly FillFlowContainer<DrawableGameplayLeaderboardScore> Flow;
 
@@ -29,12 +30,17 @@ namespace osu.Game.Screens.Play.HUD
         public DrawableGameplayLeaderboardScore? TrackedScore { get; private set; }
 
         [Resolved]
+        private Player? player { get; set; }
+
+        [Resolved]
         private IGameplayLeaderboardProvider? leaderboardProvider { get; set; }
 
         private readonly IBindableList<GameplayLeaderboardScore> scores = new BindableList<GameplayLeaderboardScore>();
         private readonly Bindable<bool> configVisibility = new Bindable<bool>();
+        private readonly IBindable<LocalUserPlayingState> userPlayingState = new Bindable<LocalUserPlayingState>();
+        private readonly IBindable<bool> holdingForHUD = new Bindable<bool>();
 
-        private const int max_panels = 8;
+        private readonly Bindable<bool> expanded = new Bindable<bool>();
 
         /// <summary>
         /// Create a new leaderboard.
@@ -42,6 +48,7 @@ namespace osu.Game.Screens.Play.HUD
         public DrawableGameplayLeaderboard()
         {
             Width = DrawableGameplayLeaderboardScore.EXTENDED_WIDTH + DrawableGameplayLeaderboardScore.SHEAR_WIDTH;
+            Height = 300;
 
             InternalChildren = new Drawable[]
             {
@@ -64,9 +71,15 @@ namespace osu.Game.Screens.Play.HUD
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(OsuConfigManager config, GameplayState? gameplayState, HUDOverlay? hudOverlay)
         {
             config.BindWith(OsuSetting.GameplayLeaderboard, configVisibility);
+
+            if (gameplayState != null)
+                userPlayingState.BindTo(gameplayState.PlayingState);
+
+            if (hudOverlay != null)
+                holdingForHUD.BindTo(hudOverlay.HoldingForHUD);
         }
 
         protected override void LoadComplete()
@@ -84,7 +97,21 @@ namespace osu.Game.Screens.Play.HUD
                 }, true);
             }
 
-            configVisibility.BindValueChanged(_ => this.FadeTo(configVisibility.Value ? 1 : 0, 100, Easing.OutQuint), true);
+            configVisibility.BindValueChanged(_ => Scheduler.AddOnce(updateState));
+            userPlayingState.BindValueChanged(_ => Scheduler.AddOnce(updateState));
+            holdingForHUD.BindValueChanged(_ => Scheduler.AddOnce(updateState));
+            ForceExpand.BindValueChanged(_ => Scheduler.AddOnce(updateState));
+            updateState();
+        }
+
+        private void updateState()
+        {
+            // prevents weird delay in the flow correctly appearing when toggling the leaderboard on.
+            if (Flow.Alpha < 1)
+                scroll.ScrollToStart(false);
+
+            Flow.FadeTo(player?.Configuration.ShowLeaderboard != false && configVisibility.Value ? 1 : 0, 100, Easing.OutQuint);
+            expanded.Value = ForceExpand.Value || userPlayingState.Value != LocalUserPlayingState.Playing || holdingForHUD.Value;
         }
 
         /// <summary>
@@ -102,15 +129,11 @@ namespace osu.Game.Screens.Play.HUD
                 TrackedScore = drawable;
             }
 
-            drawable.Expanded.BindTo(Expanded);
+            drawable.Expanded.BindTo(expanded);
 
             Flow.Add(drawable);
             drawable.ScorePosition.BindValueChanged(_ => Scheduler.AddOnce(sort));
             drawable.DisplayOrder.BindValueChanged(_ => Scheduler.AddOnce(sort), true);
-
-            int displayCount = Math.Min(Flow.Count, max_panels);
-            Height = displayCount * (DrawableGameplayLeaderboardScore.PANEL_HEIGHT + Flow.Spacing.Y);
-            requiresScroll = displayCount != Flow.Count;
         }
 
         public void Clear()
@@ -126,6 +149,8 @@ namespace osu.Game.Screens.Play.HUD
         protected override void Update()
         {
             base.Update();
+
+            requiresScroll = Flow.DrawHeight > Height;
 
             if (requiresScroll && TrackedScore != null)
             {
@@ -189,5 +214,7 @@ namespace osu.Game.Screens.Play.HUD
             public override bool HandlePositionalInput => false;
             public override bool HandleNonPositionalInput => false;
         }
+
+        public bool UsesFixedAnchor { get; set; }
     }
 }
