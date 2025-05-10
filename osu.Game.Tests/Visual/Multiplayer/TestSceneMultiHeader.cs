@@ -10,7 +10,7 @@ using osu.Game.Screens.OnlinePlay;
 namespace osu.Game.Tests.Visual.Multiplayer
 {
     [TestFixture]
-    public class TestSceneMultiHeader : OsuTestScene
+    public partial class TestSceneMultiHeader : OsuTestScene
     {
         public TestSceneMultiHeader()
         {
@@ -29,7 +29,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("push multi screen", () => screenStack.CurrentScreen.Push(new TestOnlinePlaySubScreen(++index)));
         }
 
-        private class TestOnlinePlaySubScreen : OsuScreen, IOnlinePlaySubScreen
+        private partial class TestOnlinePlaySubScreen : OsuScreen, IOnlinePlaySubScreen
         {
             private readonly int index;
 

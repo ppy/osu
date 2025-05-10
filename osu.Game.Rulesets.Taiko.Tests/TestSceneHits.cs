@@ -21,7 +21,7 @@ using osuTK;
 namespace osu.Game.Rulesets.Taiko.Tests
 {
     [TestFixture]
-    public class TestSceneHits : DrawableTaikoRulesetTestScene
+    public partial class TestSceneHits : DrawableTaikoRulesetTestScene
     {
         private const double default_duration = 3000;
         private const float scroll_time = 1000;

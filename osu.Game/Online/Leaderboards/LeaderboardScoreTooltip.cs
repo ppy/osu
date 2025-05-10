@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Containers;
@@ -10,20 +11,23 @@ using osuTK;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.LocalisationExtensions;
+using osu.Framework.Localisation;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
-
-#nullable enable
+using osu.Framework.Bindables;
+using osu.Game.Configuration;
 
 namespace osu.Game.Online.Leaderboards
 {
-    public class LeaderboardScoreTooltip : VisibilityContainer, ITooltip<ScoreInfo>
+    public partial class LeaderboardScoreTooltip : VisibilityContainer, ITooltip<ScoreInfo>
     {
         private OsuSpriteText timestampLabel = null!;
         private FillFlowContainer<HitResultCell> topScoreStatistics = null!;
         private FillFlowContainer<HitResultCell> bottomScoreStatistics = null!;
         private FillFlowContainer<ModCell> modStatistics = null!;
+        private readonly Bindable<bool> prefer24HourTime = new Bindable<bool>();
 
         public LeaderboardScoreTooltip()
         {
@@ -36,8 +40,9 @@ namespace osu.Game.Online.Leaderboards
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, OsuConfigManager configManager)
         {
+            configManager.BindWith(OsuSetting.Prefer24HourTime, prefer24HourTime);
             InternalChildren = new Drawable[]
             {
                 new Box
@@ -92,6 +97,13 @@ namespace osu.Game.Online.Leaderboards
             };
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            prefer24HourTime.BindValueChanged(_ => updateTimestampLabel(), true);
+        }
+
         private ScoreInfo? displayedScore;
 
         public void SetContent(ScoreInfo score)
@@ -101,13 +113,13 @@ namespace osu.Game.Online.Leaderboards
 
             displayedScore = score;
 
-            timestampLabel.Text = $"Played on {score.Date.ToLocalTime():d MMMM yyyy HH:mm}";
+            updateTimestampLabel();
 
             modStatistics.Clear();
             topScoreStatistics.Clear();
             bottomScoreStatistics.Clear();
 
-            foreach (var mod in score.Mods)
+            foreach (var mod in score.Mods.AsOrdered())
             {
                 modStatistics.Add(new ModCell(mod));
             }
@@ -121,14 +133,23 @@ namespace osu.Game.Online.Leaderboards
             }
         }
 
+        private void updateTimestampLabel()
+        {
+            if (displayedScore != null)
+            {
+                timestampLabel.Text = LocalisableString.Format("Played on {0}",
+                    displayedScore.Date.ToLocalTime().ToLocalisableString(prefer24HourTime.Value ? @"d MMMM yyyy HH:mm" : @"d MMMM yyyy h:mm tt"));
+            }
+        }
+
         protected override void PopIn() => this.FadeIn(20, Easing.OutQuint);
         protected override void PopOut() => this.FadeOut(80, Easing.OutQuint);
 
         public void Move(Vector2 pos) => Position = pos;
 
-        private class HitResultCell : CompositeDrawable
+        private partial class HitResultCell : CompositeDrawable
         {
-            private readonly string displayName;
+            private readonly LocalisableString displayName;
             private readonly HitResult result;
             private readonly int count;
 
@@ -136,7 +157,7 @@ namespace osu.Game.Online.Leaderboards
             {
                 AutoSizeAxes = Axes.Both;
 
-                displayName = stat.DisplayName;
+                displayName = stat.DisplayName.ToUpper();
                 result = stat.Result;
                 count = stat.Count;
             }
@@ -155,7 +176,7 @@ namespace osu.Game.Online.Leaderboards
                         new OsuSpriteText
                         {
                             Font = OsuFont.Torus.With(size: 12, weight: FontWeight.SemiBold),
-                            Text = displayName.ToUpperInvariant(),
+                            Text = displayName.ToUpper(),
                             Colour = colours.ForHitResult(result),
                         },
                         new OsuSpriteText
@@ -168,7 +189,7 @@ namespace osu.Game.Online.Leaderboards
             }
         }
 
-        private class ModCell : CompositeDrawable
+        private partial class ModCell : CompositeDrawable
         {
             private readonly Mod mod;
 
@@ -190,7 +211,7 @@ namespace osu.Game.Online.Leaderboards
                     Spacing = new Vector2(2f, 0f),
                     Children = new Drawable[]
                     {
-                        new ModIcon(mod, showTooltip: false).With(icon =>
+                        new ModIcon(mod, showTooltip: false, showExtendedInformation: false).With(icon =>
                         {
                             icon.Origin = Anchor.CentreLeft;
                             icon.Anchor = Anchor.CentreLeft;
@@ -199,7 +220,7 @@ namespace osu.Game.Online.Leaderboards
                     }
                 };
 
-                string description = mod.SettingDescription;
+                string description = string.Join(", ", mod.SettingDescription.Select(svp => $"{svp.setting}: {svp.value}"));
 
                 if (!string.IsNullOrEmpty(description))
                 {
@@ -207,7 +228,7 @@ namespace osu.Game.Online.Leaderboards
                     {
                         RelativeSizeAxes = Axes.Y,
                         Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
-                        Text = mod.SettingDescription,
+                        Text = description,
                         Origin = Anchor.CentreLeft,
                         Anchor = Anchor.CentreLeft,
                         Margin = new MarginPadding { Top = 1 },

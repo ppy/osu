@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +13,7 @@ using osu.Game.Online.Chat;
 
 namespace osu.Game.Overlays.Chat.Listing
 {
-    public class ChannelListing : VisibilityContainer
+    public partial class ChannelListing : VisibilityContainer
     {
         public event Action<Channel>? OnRequestJoin;
         public event Action<Channel>? OnRequestLeave;
@@ -65,7 +63,7 @@ namespace osu.Game.Overlays.Chat.Listing
             flow.ChildrenEnumerable = newChannels.Where(c => c.Type == ChannelType.Public)
                                                  .Select(c => new ChannelListingItem(c));
 
-            foreach (var item in flow.Children)
+            foreach (var item in flow)
             {
                 item.OnRequestJoin += channel => OnRequestJoin?.Invoke(channel);
                 item.OnRequestLeave += channel => OnRequestLeave?.Invoke(channel);
@@ -75,5 +73,14 @@ namespace osu.Game.Overlays.Chat.Listing
         protected override void PopIn() => this.FadeIn();
 
         protected override void PopOut() => this.FadeOut();
+
+        public class ChannelListingChannel : Channel
+        {
+            public ChannelListingChannel()
+            {
+                Name = "Add more channels";
+                Type = ChannelType.System;
+            }
+        }
     }
 }

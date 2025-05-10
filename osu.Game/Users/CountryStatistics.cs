@@ -7,11 +7,8 @@ namespace osu.Game.Users
 {
     public class CountryStatistics
     {
-        [JsonProperty]
-        public Country Country;
-
         [JsonProperty(@"code")]
-        public string FlagName;
+        public CountryCode Code;
 
         [JsonProperty(@"active_users")]
         public long ActiveUsers;

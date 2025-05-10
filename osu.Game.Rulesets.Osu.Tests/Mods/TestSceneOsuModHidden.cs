@@ -13,7 +13,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests.Mods
 {
-    public class TestSceneOsuModHidden : OsuModTestScene
+    public partial class TestSceneOsuModHidden : OsuModTestScene
     {
         [Test]
         public void TestDefaultBeatmapTest() => CreateModTest(new ModTestData
@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
         {
             Mod = new TestOsuModHidden(),
             Autoplay = true,
-            Beatmap = new Beatmap
+            CreateBeatmap = () => new Beatmap
             {
                 HitObjects = new List<HitObject>
                 {
@@ -63,7 +63,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
         {
             Mod = new TestOsuModHidden(),
             Autoplay = true,
-            Beatmap = new Beatmap
+            CreateBeatmap = () => new Beatmap
             {
                 HitObjects = new List<HitObject>
                 {
@@ -81,12 +81,12 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                     new Slider
                     {
                         StartTime = 3200,
-                        Path = new SliderPath(PathType.Linear, new[] { Vector2.Zero, new Vector2(100, 0), })
+                        Path = new SliderPath(PathType.LINEAR, new[] { Vector2.Zero, new Vector2(100, 0), })
                     },
                     new Slider
                     {
                         StartTime = 5200,
-                        Path = new SliderPath(PathType.Linear, new[] { Vector2.Zero, new Vector2(100, 0), })
+                        Path = new SliderPath(PathType.LINEAR, new[] { Vector2.Zero, new Vector2(100, 0), })
                     }
                 }
             },
@@ -98,19 +98,19 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
         {
             Mod = new TestOsuModHidden(),
             Autoplay = true,
-            Beatmap = new Beatmap
+            CreateBeatmap = () => new Beatmap
             {
                 HitObjects = new List<HitObject>
                 {
                     new Slider
                     {
                         StartTime = 1000,
-                        Path = new SliderPath(PathType.Linear, new[] { Vector2.Zero, new Vector2(100, 0), })
+                        Path = new SliderPath(PathType.LINEAR, new[] { Vector2.Zero, new Vector2(100, 0), })
                     },
                     new Slider
                     {
                         StartTime = 4000,
-                        Path = new SliderPath(PathType.Linear, new[] { Vector2.Zero, new Vector2(100, 0), })
+                        Path = new SliderPath(PathType.LINEAR, new[] { Vector2.Zero, new Vector2(100, 0), })
                     },
                 }
             },
@@ -122,7 +122,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
         {
             Mod = new OsuModHidden { OnlyFadeApproachCircles = { Value = true } },
             Autoplay = true,
-            Beatmap = new Beatmap
+            CreateBeatmap = () => new Beatmap
             {
                 HitObjects = new List<HitObject>
                 {
@@ -140,7 +140,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                     {
                         StartTime = 3000,
                         Position = new Vector2(156, 242),
-                        Path = new SliderPath(PathType.Linear, new[] { Vector2.Zero, new Vector2(200, 0), })
+                        Path = new SliderPath(PathType.LINEAR, new[] { Vector2.Zero, new Vector2(200, 0), })
                     },
                     new Spinner
                     {
@@ -160,7 +160,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
 
         private class TestOsuModHidden : OsuModHidden
         {
-            public new HitObject FirstObject => base.FirstObject;
+            public new HitObject? FirstObject => base.FirstObject;
         }
     }
 }

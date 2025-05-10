@@ -7,11 +7,14 @@ using System.Collections.Generic;
 
 namespace osu.Game.Rulesets.Mania.Edit
 {
-    public class ManiaEditorPlayfield : ManiaPlayfield
+    public partial class ManiaEditorPlayfield : ManiaPlayfield
     {
         public ManiaEditorPlayfield(List<StageDefinition> stages)
             : base(stages)
         {
         }
+
+        protected override Stage CreateStage(int firstColumnIndex, StageDefinition stageDefinition, ref ManiaAction columnAction)
+            => new EditorStage(firstColumnIndex, stageDefinition, ref columnAction);
     }
 }

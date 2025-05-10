@@ -1,17 +1,18 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Osu.Objects;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Editing
 {
-    public class TestSceneEditorSeeking : EditorTestScene
+    public partial class TestSceneEditorSeeking : EditorTestScene
     {
         protected override Ruleset CreateEditorRuleset() => new OsuRuleset();
 
@@ -24,8 +25,54 @@ namespace osu.Game.Tests.Visual.Editing
             beatmap.ControlPointInfo.Clear();
             beatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = 1000 });
             beatmap.ControlPointInfo.Add(2000, new TimingControlPoint { BeatLength = 500 });
+            beatmap.ControlPointInfo.Add(20000, new TimingControlPoint { BeatLength = 500 });
 
             return beatmap;
+        }
+
+        [Test]
+        public void TestSeekToFirst()
+        {
+            pressAndCheckTime(Key.Z, 2170);
+            pressAndCheckTime(Key.Z, 0);
+            pressAndCheckTime(Key.Z, 2170);
+
+            AddAssert("track not running", () => !EditorClock.IsRunning);
+        }
+
+        [Test]
+        public void TestRestart()
+        {
+            pressAndCheckTime(Key.V, 227170);
+
+            AddAssert("track not running", () => !EditorClock.IsRunning);
+
+            AddStep("press X", () => InputManager.Key(Key.X));
+
+            AddAssert("track running", () => EditorClock.IsRunning);
+            AddAssert("time restarted", () => EditorClock.CurrentTime < 100000);
+        }
+
+        [Test]
+        public void TestPauseResume()
+        {
+            AddAssert("track not running", () => !EditorClock.IsRunning);
+
+            AddStep("press C", () => InputManager.Key(Key.C));
+            AddAssert("track running", () => EditorClock.IsRunning);
+
+            AddStep("press C", () => InputManager.Key(Key.C));
+            AddAssert("track not running", () => !EditorClock.IsRunning);
+        }
+
+        [Test]
+        public void TestSeekToLast()
+        {
+            pressAndCheckTime(Key.V, 227170);
+            pressAndCheckTime(Key.V, 229170);
+            pressAndCheckTime(Key.V, 227170);
+
+            AddAssert("track not running", () => !EditorClock.IsRunning);
         }
 
         [Test]
@@ -70,10 +117,63 @@ namespace osu.Game.Tests.Visual.Editing
             pressAndCheckTime(Key.Right, 3000);
         }
 
-        private void pressAndCheckTime(Key key, double expectedTime)
+        [Test]
+        public void TestSeekBetweenControlPoints()
         {
-            AddStep($"press {key}", () => InputManager.Key(key));
-            AddUntilStep($"time is {expectedTime}", () => Precision.AlmostEquals(expectedTime, EditorClock.CurrentTime, 1));
+            AddStep("seek to 0", () => EditorClock.Seek(0));
+            AddAssert("time is 0", () => EditorClock.CurrentTime == 0);
+
+            // already at first control point, noop
+            pressAndCheckTime(Key.Up, 0);
+
+            pressAndCheckTime(Key.Down, 2000);
+
+            pressAndCheckTime(Key.Down, 20000);
+            // at last control point, noop
+            pressAndCheckTime(Key.Down, 20000);
+
+            pressAndCheckTime(Key.Up, 2000);
+            pressAndCheckTime(Key.Up, 0);
+            pressAndCheckTime(Key.Up, 0);
+        }
+
+        [Test]
+        public void TestSeekBetweenObjects()
+        {
+            AddStep("add objects", () =>
+            {
+                EditorBeatmap.Clear();
+                EditorBeatmap.AddRange(new[]
+                {
+                    new HitCircle { StartTime = 1000, },
+                    new HitCircle { StartTime = 2250, },
+                    new HitCircle { StartTime = 3600, },
+                });
+            });
+            AddStep("seek to 0", () => EditorClock.Seek(0));
+
+            pressAndCheckTime(Key.Right, 1000, Key.ControlLeft);
+            pressAndCheckTime(Key.Right, 2250, Key.ControlLeft);
+            pressAndCheckTime(Key.Right, 3600, Key.ControlLeft);
+            pressAndCheckTime(Key.Right, 3600, Key.ControlLeft);
+            pressAndCheckTime(Key.Left, 2250, Key.ControlLeft);
+            pressAndCheckTime(Key.Left, 1000, Key.ControlLeft);
+            pressAndCheckTime(Key.Left, 1000, Key.ControlLeft);
+        }
+
+        private void pressAndCheckTime(Key key, double expectedTime, params Key[] modifiers)
+        {
+            AddStep($"press {key} with {(modifiers.Any() ? string.Join(',', modifiers) : "no modifiers")}", () =>
+            {
+                foreach (var modifier in modifiers)
+                    InputManager.PressKey(modifier);
+
+                InputManager.Key(key);
+
+                foreach (var modifier in modifiers)
+                    InputManager.ReleaseKey(modifier);
+            });
+            AddUntilStep($"time is {expectedTime}", () => EditorClock.CurrentTime, () => Is.EqualTo(expectedTime).Within(1));
         }
     }
 }

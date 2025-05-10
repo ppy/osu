@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
     /// <summary>
     /// A single follow point positioned between two adjacent <see cref="DrawableOsuHitObject"/>s.
     /// </summary>
-    public class FollowPoint : PoolableDrawable, IAnimationTimeReference
+    public partial class FollowPoint : PoolableDrawable, IAnimationTimeReference
     {
         private const float width = 8;
 
@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
         {
             Origin = Anchor.Centre;
 
-            InternalChild = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.FollowPoint), _ => new CircularContainer
+            InternalChild = new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.FollowPoint), _ => new CircularContainer
             {
                 Masking = true,
                 AutoSizeAxes = Axes.Both,

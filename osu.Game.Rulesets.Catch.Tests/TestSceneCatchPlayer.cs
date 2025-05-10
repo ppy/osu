@@ -7,7 +7,7 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Rulesets.Catch.Tests
 {
     [TestFixture]
-    public class TestSceneCatchPlayer : PlayerTestScene
+    public partial class TestSceneCatchPlayer : PlayerTestScene
     {
         protected override Ruleset CreatePlayerRuleset() => new CatchRuleset();
     }

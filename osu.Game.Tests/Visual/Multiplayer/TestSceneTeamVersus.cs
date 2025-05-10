@@ -25,21 +25,20 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneTeamVersus : ScreenTestScene
+    public partial class TestSceneTeamVersus : ScreenTestScene
     {
-        private BeatmapManager beatmaps;
-        private RulesetStore rulesets;
-        private BeatmapSetInfo importedSet;
+        private BeatmapManager beatmaps = null!;
+        private BeatmapSetInfo importedSet = null!;
 
-        private TestMultiplayerComponents multiplayerComponents;
+        private TestMultiplayerComponents multiplayerComponents = null!;
 
         private TestMultiplayerClient multiplayerClient => multiplayerComponents.MultiplayerClient;
 
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
         {
-            Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
-            Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, Realm, rulesets, null, audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(new RealmRulesetStore(Realm));
+            Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, Realm, null, audio, Resources, host, Beatmap.Default));
             Dependencies.Cache(Realm);
         }
 
@@ -63,19 +62,19 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             createRoom(() => new Room
             {
-                Name = { Value = "Test Room" },
-                Type = { Value = MatchType.TeamVersus },
+                Name = "Test Room",
+                Type = MatchType.TeamVersus,
                 Playlist =
-                {
+                [
                     new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
                     {
                         RulesetID = new OsuRuleset().RulesetInfo.OnlineID
                     }
-                }
+                ]
             });
 
-            AddUntilStep("room type is team vs", () => multiplayerClient.Room?.Settings.MatchType == MatchType.TeamVersus);
-            AddAssert("user state arrived", () => multiplayerClient.Room?.Users.FirstOrDefault()?.MatchState is TeamVersusUserState);
+            AddUntilStep("room type is team vs", () => multiplayerClient.ClientRoom?.Settings.MatchType == MatchType.TeamVersus);
+            AddUntilStep("user state arrived", () => multiplayerClient.ClientRoom?.Users.FirstOrDefault()?.MatchState is TeamVersusUserState);
         }
 
         [Test]
@@ -83,18 +82,18 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             createRoom(() => new Room
             {
-                Name = { Value = "Test Room" },
-                Type = { Value = MatchType.TeamVersus },
+                Name = "Test Room",
+                Type = MatchType.TeamVersus,
                 Playlist =
-                {
+                [
                     new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
                     {
                         RulesetID = new OsuRuleset().RulesetInfo.OnlineID
                     }
-                }
+                ]
             });
 
-            AddAssert("user on team 0", () => (multiplayerClient.Room?.Users.FirstOrDefault()?.MatchState as TeamVersusUserState)?.TeamID == 0);
+            AddUntilStep("user on team 0", () => (multiplayerClient.ClientRoom?.Users.FirstOrDefault()?.MatchState as TeamVersusUserState)?.TeamID == 0);
             AddStep("add another user", () => multiplayerClient.AddUser(new APIUser { Username = "otheruser", Id = 44 }));
 
             AddStep("press own button", () =>
@@ -102,17 +101,17 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 InputManager.MoveMouseTo(multiplayerComponents.ChildrenOfType<TeamDisplay>().First());
                 InputManager.Click(MouseButton.Left);
             });
-            AddAssert("user on team 1", () => (multiplayerClient.Room?.Users.FirstOrDefault()?.MatchState as TeamVersusUserState)?.TeamID == 1);
+            AddUntilStep("user on team 1", () => (multiplayerClient.ClientRoom?.Users.FirstOrDefault()?.MatchState as TeamVersusUserState)?.TeamID == 1);
 
             AddStep("press own button again", () => InputManager.Click(MouseButton.Left));
-            AddAssert("user on team 0", () => (multiplayerClient.Room?.Users.FirstOrDefault()?.MatchState as TeamVersusUserState)?.TeamID == 0);
+            AddUntilStep("user on team 0", () => (multiplayerClient.ClientRoom?.Users.FirstOrDefault()?.MatchState as TeamVersusUserState)?.TeamID == 0);
 
             AddStep("press other user's button", () =>
             {
                 InputManager.MoveMouseTo(multiplayerComponents.ChildrenOfType<TeamDisplay>().ElementAt(1));
                 InputManager.Click(MouseButton.Left);
             });
-            AddAssert("user still on team 0", () => (multiplayerClient.Room?.Users.FirstOrDefault()?.MatchState as TeamVersusUserState)?.TeamID == 0);
+            AddUntilStep("user still on team 0", () => (multiplayerClient.ClientRoom?.Users.FirstOrDefault()?.MatchState as TeamVersusUserState)?.TeamID == 0);
         }
 
         [Test]
@@ -120,25 +119,25 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             createRoom(() => new Room
             {
-                Name = { Value = "Test Room" },
-                Type = { Value = MatchType.HeadToHead },
+                Name = "Test Room",
+                Type = MatchType.HeadToHead,
                 Playlist =
-                {
+                [
                     new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
                     {
                         RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
                     }
-                }
+                ]
             });
 
-            AddUntilStep("match type head to head", () => multiplayerClient.APIRoom?.Type.Value == MatchType.HeadToHead);
+            AddUntilStep("match type head to head", () => multiplayerClient.ClientAPIRoom?.Type == MatchType.HeadToHead);
 
             AddStep("change match type", () => multiplayerClient.ChangeSettings(new MultiplayerRoomSettings
             {
                 MatchType = MatchType.TeamVersus
             }).WaitSafely());
 
-            AddUntilStep("api room updated to team versus", () => multiplayerClient.APIRoom?.Type.Value == MatchType.TeamVersus);
+            AddUntilStep("api room updated to team versus", () => multiplayerClient.ClientAPIRoom?.Type == MatchType.TeamVersus);
         }
 
         [Test]
@@ -146,23 +145,23 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             createRoom(() => new Room
             {
-                Name = { Value = "Test Room" },
+                Name = "Test Room",
                 Playlist =
-                {
+                [
                     new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
                     {
                         RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
                     }
-                }
+                ]
             });
 
-            AddUntilStep("room type is head to head", () => multiplayerClient.Room?.Settings.MatchType == MatchType.HeadToHead);
+            AddUntilStep("room type is head to head", () => multiplayerClient.ClientRoom?.Settings.MatchType == MatchType.HeadToHead);
 
             AddUntilStep("team displays are not displaying teams", () => multiplayerComponents.ChildrenOfType<TeamDisplay>().All(d => d.DisplayedTeam == null));
 
             AddStep("change to team vs", () => multiplayerClient.ChangeSettings(matchType: MatchType.TeamVersus));
 
-            AddUntilStep("room type is team vs", () => multiplayerClient.Room?.Settings.MatchType == MatchType.TeamVersus);
+            AddUntilStep("room type is team vs", () => multiplayerClient.ClientRoom?.Settings.MatchType == MatchType.TeamVersus);
 
             AddUntilStep("team displays are displaying teams", () => multiplayerComponents.ChildrenOfType<TeamDisplay>().All(d => d.DisplayedTeam != null));
         }

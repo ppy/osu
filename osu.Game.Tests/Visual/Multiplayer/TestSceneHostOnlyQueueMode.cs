@@ -15,30 +15,14 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneHostOnlyQueueMode : QueueModeTestScene
+    public partial class TestSceneHostOnlyQueueMode : QueueModeTestScene
     {
         protected override QueueMode Mode => QueueMode.HostOnly;
 
         [Test]
         public void TestFirstItemSelectedByDefault()
         {
-            AddAssert("first item selected", () => MultiplayerClient.Room?.Settings.PlaylistItemId == MultiplayerClient.APIRoom?.Playlist[0].ID);
-        }
-
-        [Test]
-        public void TestItemStillSelectedAfterChangeToSameBeatmap()
-        {
-            selectNewItem(() => InitialBeatmap);
-
-            AddAssert("playlist item still selected", () => MultiplayerClient.Room?.Settings.PlaylistItemId == MultiplayerClient.APIRoom?.Playlist[0].ID);
-        }
-
-        [Test]
-        public void TestItemStillSelectedAfterChangeToOtherBeatmap()
-        {
-            selectNewItem(() => OtherBeatmap);
-
-            AddAssert("playlist item still selected", () => MultiplayerClient.Room?.Settings.PlaylistItemId == MultiplayerClient.APIRoom?.Playlist[0].ID);
+            AddUntilStep("first item selected", () => MultiplayerClient.ClientRoom?.Settings.PlaylistItemId == MultiplayerClient.ClientAPIRoom?.Playlist[0].ID);
         }
 
         [Test]
@@ -46,24 +30,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             RunGameplay();
 
-            AddAssert("playlist contains two items", () => MultiplayerClient.APIRoom?.Playlist.Count == 2);
-            AddAssert("first playlist item expired", () => MultiplayerClient.APIRoom?.Playlist[0].Expired == true);
-            AddAssert("second playlist item not expired", () => MultiplayerClient.APIRoom?.Playlist[1].Expired == false);
-            AddAssert("second playlist item selected", () => MultiplayerClient.Room?.Settings.PlaylistItemId == MultiplayerClient.APIRoom?.Playlist[1].ID);
-        }
-
-        [Test]
-        public void TestOnlyLastItemChangedAfterGameplayFinished()
-        {
-            RunGameplay();
-
-            IBeatmapInfo firstBeatmap = null;
-            AddStep("get first playlist item beatmap", () => firstBeatmap = MultiplayerClient.APIRoom?.Playlist[0].Beatmap);
-
-            selectNewItem(() => OtherBeatmap);
-
-            AddAssert("first playlist item hasn't changed", () => MultiplayerClient.APIRoom?.Playlist[0].Beatmap == firstBeatmap);
-            AddAssert("second playlist item changed", () => MultiplayerClient.APIRoom?.Playlist[1].Beatmap != firstBeatmap);
+            AddUntilStep("playlist contains two items", () => MultiplayerClient.ClientAPIRoom?.Playlist.Count == 2);
+            AddUntilStep("first playlist item expired", () => MultiplayerClient.ClientAPIRoom?.Playlist[0].Expired == true);
+            AddUntilStep("second playlist item not expired", () => MultiplayerClient.ClientAPIRoom?.Playlist[1].Expired == false);
+            AddUntilStep("second playlist item selected", () => MultiplayerClient.ClientRoom?.Settings.PlaylistItemId == MultiplayerClient.ClientAPIRoom?.Playlist[1].ID);
         }
 
         [Test]
@@ -74,7 +44,37 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 QueueMode = QueueMode.AllPlayers
             }).WaitSafely());
 
-            AddUntilStep("api room updated", () => MultiplayerClient.APIRoom?.QueueMode.Value == QueueMode.AllPlayers);
+            AddUntilStep("api room updated", () => MultiplayerClient.ClientAPIRoom?.QueueMode == QueueMode.AllPlayers);
+        }
+
+        [Test]
+        public void TestItemStillSelectedAfterChangeToSameBeatmap()
+        {
+            selectNewItem(() => InitialBeatmap);
+
+            AddUntilStep("playlist item still selected", () => MultiplayerClient.ClientRoom?.Settings.PlaylistItemId == MultiplayerClient.ClientAPIRoom?.Playlist[0].ID);
+        }
+
+        [Test]
+        public void TestItemStillSelectedAfterChangeToOtherBeatmap()
+        {
+            selectNewItem(() => OtherBeatmap);
+
+            AddUntilStep("playlist item still selected", () => MultiplayerClient.ClientRoom?.Settings.PlaylistItemId == MultiplayerClient.ClientAPIRoom?.Playlist[0].ID);
+        }
+
+        [Test]
+        public void TestOnlyLastItemChangedAfterGameplayFinished()
+        {
+            RunGameplay();
+
+            IBeatmapInfo firstBeatmap = null!;
+            AddStep("get first playlist item beatmap", () => firstBeatmap = MultiplayerClient.ServerAPIRoom!.Playlist[0].Beatmap);
+
+            selectNewItem(() => OtherBeatmap);
+
+            AddUntilStep("first playlist item hasn't changed", () => MultiplayerClient.ServerAPIRoom!.Playlist[0].Beatmap == firstBeatmap);
+            AddUntilStep("second playlist item changed", () => MultiplayerClient.ClientAPIRoom!.Playlist[1].Beatmap != firstBeatmap);
         }
 
         [Test]
@@ -82,7 +82,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             addItem(() => OtherBeatmap);
 
-            AddAssert("playlist contains two items", () => MultiplayerClient.APIRoom?.Playlist.Count == 2);
+            AddUntilStep("playlist contains two items", () => MultiplayerClient.ClientAPIRoom?.Playlist.Count == 2);
         }
 
         private void selectNewItem(Func<BeatmapInfo> beatmap)
@@ -101,11 +101,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddUntilStep("wait for song select", () => CurrentSubScreen is Screens.Select.SongSelect select && select.BeatmapSetsLoaded);
 
-            BeatmapInfo otherBeatmap = null;
+            BeatmapInfo otherBeatmap = null!;
             AddStep("select other beatmap", () => ((Screens.Select.SongSelect)CurrentSubScreen).FinaliseSelection(otherBeatmap = beatmap()));
 
             AddUntilStep("wait for return to match", () => CurrentSubScreen is MultiplayerMatchSubScreen);
-            AddUntilStep("selected item is new beatmap", () => (CurrentSubScreen as MultiplayerMatchSubScreen)?.SelectedItem.Value?.Beatmap.OnlineID == otherBeatmap.OnlineID);
+            AddUntilStep("selected item is new beatmap", () => Beatmap.Value.BeatmapInfo.OnlineID == otherBeatmap.OnlineID);
         }
 
         private void addItem(Func<BeatmapInfo> beatmap)

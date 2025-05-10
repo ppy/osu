@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
@@ -9,10 +9,10 @@ using osu.Game.Screens.Play;
 
 namespace osu.Game.Screens.Edit.GameplayTest
 {
-    public class EditorPlayerLoader : PlayerLoader
+    public partial class EditorPlayerLoader : PlayerLoader
     {
         [Resolved]
-        private OsuLogo osuLogo { get; set; }
+        private OsuLogo osuLogo { get; set; } = null!;
 
         public EditorPlayerLoader(Editor editor)
             : base(() => new EditorPlayer(editor))

@@ -12,14 +12,16 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
-    public abstract class PlaySliderBody : SnakingSliderBody
+    public abstract partial class PlaySliderBody : SnakingSliderBody
     {
-        private IBindable<float> scaleBindable;
-        private IBindable<int> pathVersion;
-        private IBindable<Color4> accentColour;
+        protected IBindable<float> ScaleBindable { get; private set; } = null!;
+
+        protected IBindable<Color4> AccentColourBindable { get; private set; } = null!;
+
+        private IBindable<int> pathVersion = null!;
 
         [Resolved(CanBeNull = true)]
-        private OsuRulesetConfigManager config { get; set; }
+        private OsuRulesetConfigManager? config { get; set; }
 
         private readonly Bindable<bool> configSnakingOut = new Bindable<bool>();
 
@@ -28,38 +30,21 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         {
             var drawableSlider = (DrawableSlider)drawableObject;
 
-            scaleBindable = drawableSlider.ScaleBindable.GetBoundCopy();
-            scaleBindable.BindValueChanged(scale => PathRadius = OsuHitObject.OBJECT_RADIUS * scale.NewValue, true);
+            ScaleBindable = drawableSlider.ScaleBindable.GetBoundCopy();
+            ScaleBindable.BindValueChanged(scale => PathRadius = OsuHitObject.OBJECT_RADIUS * scale.NewValue, true);
 
             pathVersion = drawableSlider.PathVersion.GetBoundCopy();
-            pathVersion.BindValueChanged(_ => Refresh());
+            pathVersion.BindValueChanged(_ => Scheduler.AddOnce(Refresh));
 
-            accentColour = drawableObject.AccentColour.GetBoundCopy();
-            accentColour.BindValueChanged(accent => AccentColour = GetBodyAccentColour(skin, accent.NewValue), true);
+            AccentColourBindable = drawableObject.AccentColour.GetBoundCopy();
+            AccentColourBindable.BindValueChanged(accent => AccentColour = GetBodyAccentColour(skin, accent.NewValue), true);
 
             config?.BindWith(OsuRulesetSetting.SnakingInSliders, SnakingIn);
             config?.BindWith(OsuRulesetSetting.SnakingOutSliders, configSnakingOut);
 
             SnakingOut.BindTo(configSnakingOut);
 
-            BorderSize = skin.GetConfig<OsuSkinConfiguration, float>(OsuSkinConfiguration.SliderBorderSize)?.Value ?? 1;
             BorderColour = skin.GetConfig<OsuSkinColour, Color4>(OsuSkinColour.SliderBorder)?.Value ?? Color4.White;
-
-            drawableObject.HitObjectApplied += onHitObjectApplied;
-        }
-
-        private void onHitObjectApplied(DrawableHitObject obj)
-        {
-            var drawableSlider = (DrawableSlider)obj;
-            if (drawableSlider.HitObject == null)
-                return;
-
-            // When not tracking the follow circle, unbind from the config and forcefully disable snaking out - it looks better that way.
-            if (!drawableSlider.HeadCircle.TrackFollowCircle)
-            {
-                SnakingOut.UnbindFrom(configSnakingOut);
-                SnakingOut.Value = false;
-            }
         }
 
         protected virtual Color4 GetBodyAccentColour(ISkinSource skin, Color4 hitObjectAccentColour) =>

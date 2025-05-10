@@ -1,17 +1,17 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Game.Extensions;
 
 namespace osu.Game.Beatmaps
 {
     /// <summary>
     /// A default implementation of an icon used to represent beatmap statistics.
     /// </summary>
-    public class BeatmapStatisticIcon : Sprite
+    public partial class BeatmapStatisticIcon : Sprite
     {
         private readonly BeatmapStatisticsIconType iconType;
 
@@ -23,7 +23,7 @@ namespace osu.Game.Beatmaps
         [BackgroundDependencyLoader]
         private void load(TextureStore textures)
         {
-            Texture = textures.Get($"Icons/BeatmapDetails/{iconType.ToString().Kebaberize()}");
+            Texture = textures.Get($"Icons/BeatmapDetails/{iconType.ToString().ToKebabCase()}");
         }
     }
 

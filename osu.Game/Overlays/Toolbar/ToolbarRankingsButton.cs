@@ -6,7 +6,7 @@ using osu.Framework.Graphics;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public class ToolbarRankingsButton : ToolbarOverlayToggleButton
+    public partial class ToolbarRankingsButton : ToolbarOverlayToggleButton
     {
         protected override Anchor TooltipAnchor => Anchor.TopRight;
 

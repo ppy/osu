@@ -10,7 +10,7 @@ using osu.Game.Tournament.Models;
 
 namespace osu.Game.Tournament.Screens.Ladder.Components
 {
-    public class DrawableTournamentRound : CompositeDrawable
+    public partial class DrawableTournamentRound : CompositeDrawable
     {
         [UsedImplicitly]
         private readonly Bindable<string> name;
@@ -47,10 +47,10 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             };
 
             name = round.Name.GetBoundCopy();
-            name.BindValueChanged(n => textName.Text = ((losers ? "Losers " : "") + round.Name).ToUpper(), true);
+            name.BindValueChanged(_ => textName.Text = ((losers ? "Losers " : "") + round.Name).ToUpperInvariant(), true);
 
             description = round.Description.GetBoundCopy();
-            description.BindValueChanged(n => textDescription.Text = round.Description.Value?.ToUpper(), true);
+            description.BindValueChanged(_ => textDescription.Text = round.Description.Value?.ToUpperInvariant() ?? string.Empty, true);
         }
     }
 }

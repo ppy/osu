@@ -7,7 +7,7 @@ using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Rankings
 {
-    public class RankingsSortTabControl : OverlaySortTabControl<RankingsSortCriteria>
+    public partial class RankingsSortTabControl : OverlaySortTabControl<RankingsSortCriteria>
     {
         public RankingsSortTabControl()
         {

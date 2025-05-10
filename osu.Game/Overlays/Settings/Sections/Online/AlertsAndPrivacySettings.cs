@@ -9,7 +9,7 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Online
 {
-    public class AlertsAndPrivacySettings : SettingsSubsection
+    public partial class AlertsAndPrivacySettings : SettingsSubsection
     {
         protected override LocalisableString Header => OnlineSettingsStrings.AlertsAndPrivacyHeader;
 
@@ -27,6 +27,17 @@ namespace osu.Game.Overlays.Settings.Sections.Online
                 {
                     LabelText = OnlineSettingsStrings.NotifyOnPrivateMessage,
                     Current = config.GetBindable<bool>(OsuSetting.NotifyOnPrivateMessage)
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = OnlineSettingsStrings.NotifyOnFriendPresenceChange,
+                    TooltipText = OnlineSettingsStrings.NotifyOnFriendPresenceChangeTooltip,
+                    Current = config.GetBindable<bool>(OsuSetting.NotifyOnFriendPresenceChange),
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = OnlineSettingsStrings.HideCountryFlags,
+                    Current = config.GetBindable<bool>(OsuSetting.HideCountryFlags)
                 },
             };
         }

@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Threading.Tasks;
@@ -10,6 +10,13 @@ namespace osu.Game.Online.Multiplayer
     /// </summary>
     public interface IMultiplayerLoungeServer
     {
+        /// <summary>
+        /// Request to create a multiplayer room.
+        /// </summary>
+        /// <param name="room">The room to create.</param>
+        /// <returns>The created multiplayer room.</returns>
+        Task<MultiplayerRoom> CreateRoom(MultiplayerRoom room);
+
         /// <summary>
         /// Request to join a multiplayer room.
         /// </summary>

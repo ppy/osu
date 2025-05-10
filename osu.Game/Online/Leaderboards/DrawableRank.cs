@@ -16,14 +16,10 @@ using osuTK.Graphics;
 
 namespace osu.Game.Online.Leaderboards
 {
-    public class DrawableRank : CompositeDrawable
+    public partial class DrawableRank : CompositeDrawable
     {
-        private readonly ScoreRank rank;
-
         public DrawableRank(ScoreRank rank)
         {
-            this.rank = rank;
-
             RelativeSizeAxes = Axes.Both;
             FillMode = FillMode.Fit;
             FillAspectRatio = 2;
@@ -57,7 +53,7 @@ namespace osu.Game.Online.Leaderboards
                             Origin = Anchor.Centre,
                             Spacing = new Vector2(-3, 0),
                             Padding = new MarginPadding { Top = 5 },
-                            Colour = getRankNameColour(),
+                            Colour = GetRankNameColour(rank),
                             Font = OsuFont.Numeric.With(size: 25),
                             Text = GetRankName(rank),
                             ShadowColour = Color4.Black.Opacity(0.3f),
@@ -74,7 +70,7 @@ namespace osu.Game.Online.Leaderboards
         /// <summary>
         ///  Retrieves the grade text colour.
         /// </summary>
-        private ColourInfo getRankNameColour()
+        public static ColourInfo GetRankNameColour(ScoreRank rank)
         {
             switch (rank)
             {
@@ -95,8 +91,12 @@ namespace osu.Game.Online.Leaderboards
                 case ScoreRank.C:
                     return Color4Extensions.FromHex(@"473625");
 
-                default:
+                case ScoreRank.D:
                     return Color4Extensions.FromHex(@"512525");
+
+                case ScoreRank.F:
+                default:
+                    return Color4Extensions.FromHex(@"CC3333");
             }
         }
     }

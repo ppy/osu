@@ -2,23 +2,23 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using osu.Framework.Audio;
-using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics.Audio;
+using osu.Framework.Localisation;
 
 namespace osu.Game.Rulesets.Mods
 {
     public abstract class ModRateAdjust : Mod, IApplicableToRate
     {
+        public sealed override bool ValidForFreestyleAsRequiredMod => true;
+        public sealed override bool ValidForMultiplayerAsFreeMod => false;
+
         public abstract BindableNumber<double> SpeedChange { get; }
 
-        public virtual void ApplyToTrack(ITrack track)
-        {
-            track.AddAdjustment(AdjustableProperty.Tempo, SpeedChange);
-        }
+        public abstract void ApplyToTrack(IAdjustableAudioComponent track);
 
-        public virtual void ApplyToSample(DrawableSample sample)
+        public virtual void ApplyToSample(IAdjustableAudioComponent sample)
         {
             sample.AddAdjustment(AdjustableProperty.Frequency, SpeedChange);
         }
@@ -27,6 +27,15 @@ namespace osu.Game.Rulesets.Mods
 
         public override Type[] IncompatibleMods => new[] { typeof(ModTimeRamp), typeof(ModAdaptiveSpeed), typeof(ModRateAdjust) };
 
-        public override string SettingDescription => SpeedChange.IsDefault ? string.Empty : $"{SpeedChange.Value:N2}x";
+        public override IEnumerable<(LocalisableString setting, LocalisableString value)> SettingDescription
+        {
+            get
+            {
+                if (!SpeedChange.IsDefault)
+                    yield return ("Speed change", $"{SpeedChange.Value:N2}x");
+            }
+        }
+
+        public override string ExtendedIconInformation => SpeedChange.IsDefault ? string.Empty : FormattableString.Invariant($"{SpeedChange.Value:N2}x");
     }
 }

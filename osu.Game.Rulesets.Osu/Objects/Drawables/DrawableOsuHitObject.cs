@@ -1,20 +1,28 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Judgements;
-using osu.Game.Graphics.Containers;
+using osu.Game.Rulesets.Osu.Scoring;
+using osu.Game.Rulesets.Osu.UI;
+using osu.Game.Rulesets.Scoring;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
-    public class DrawableOsuHitObject : DrawableHitObject<OsuHitObject>
+    public abstract partial class DrawableOsuHitObject : DrawableHitObject<OsuHitObject>
     {
         public readonly IBindable<Vector2> PositionBindable = new Bindable<Vector2>();
         public readonly IBindable<int> StackHeightBindable = new Bindable<int>();
@@ -27,12 +35,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         protected override float SamplePlaybackPosition => CalculateDrawableRelativePosition(this);
 
         /// <summary>
-        /// Whether this <see cref="DrawableOsuHitObject"/> can be hit, given a time value.
-        /// If non-null, judgements will be ignored (resulting in a shake) whilst the function returns false.
+        /// What action this <see cref="DrawableOsuHitObject"/> should take in response to a
+        /// click at the given time value.
+        /// If non-null, judgements will be ignored for return values of <see cref="ClickAction.Ignore"/>
+        /// and <see cref="ClickAction.Shake"/>, and this hit object will be shaken for return values of
+        /// <see cref="ClickAction.Shake"/>.
         /// </summary>
-        public Func<DrawableHitObject, double, bool> CheckHittable;
-
-        private ShakeContainer shakeContainer;
+        public Func<DrawableHitObject, double, HitResult, ClickAction> CheckHittable;
 
         protected DrawableOsuHitObject(OsuHitObject hitObject)
             : base(hitObject)
@@ -43,12 +52,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private void load()
         {
             Alpha = 0;
-
-            base.AddInternal(shakeContainer = new ShakeContainer
-            {
-                ShakeDuration = 30,
-                RelativeSizeAxes = Axes.Both
-            });
         }
 
         protected override void OnApply()
@@ -71,25 +74,74 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             ScaleBindable.UnbindFrom(HitObject.ScaleBindable);
         }
 
-        // Forward all internal management to shakeContainer.
-        // This is a bit ugly but we don't have the concept of InternalContent so it'll have to do for now. (https://github.com/ppy/osu-framework/issues/1690)
-        protected override void AddInternal(Drawable drawable) => shakeContainer.Add(drawable);
-        protected override void ClearInternal(bool disposeChildren = true) => shakeContainer.Clear(disposeChildren);
-        protected override bool RemoveInternal(Drawable drawable) => shakeContainer.Remove(drawable);
+        protected virtual IEnumerable<Drawable> DimmablePieces => Enumerable.Empty<Drawable>();
+
+        protected override void UpdateInitialTransforms()
+        {
+            base.UpdateInitialTransforms();
+
+            foreach (var piece in DimmablePieces)
+            {
+                // if the specified dimmable piece is a DHO, it is generally not safe to tack transforms onto it directly
+                // as they may be cleared via the `updateState()` DHO flow,
+                // so use `ApplyCustomUpdateState` instead. which does not have this pitfall.
+                if (piece is DrawableHitObject drawableObjectPiece)
+                {
+                    // this method can be called multiple times, and we don't want to subscribe to the event more than once,
+                    // so this is what it is going to have to be...
+                    drawableObjectPiece.ApplyCustomUpdateState -= applyDimToDrawableHitObject;
+                    drawableObjectPiece.ApplyCustomUpdateState += applyDimToDrawableHitObject;
+                }
+
+                // but at the end apply the transforms now regardless of whether this is a DHO or not.
+                // the above is just to ensure they don't get overwritten later.
+                applyDim(piece);
+            }
+        }
+
+        protected override void ClearNestedHitObjects()
+        {
+            base.ClearNestedHitObjects();
+
+            // any dimmable pieces that are DHOs will be pooled separately.
+            // `applyDimToDrawableHitObject` is a closure that implicitly captures `this`,
+            // and because of separate pooling of parent and child objects, there is no guarantee that the pieces will be associated with `this` again on re-use.
+            // therefore, clean up the subscription here to avoid crosstalk.
+            // not doing so can result in the callback attempting to read things from `this` when it is in a completely bogus state (not in use or similar).
+            foreach (var piece in DimmablePieces.OfType<DrawableHitObject>())
+                piece.ApplyCustomUpdateState -= applyDimToDrawableHitObject;
+        }
+
+        private void applyDim(Drawable piece)
+        {
+            piece.FadeColour(new Color4(195, 195, 195, 255));
+            using (piece.BeginDelayedSequence(InitialLifetimeOffset - OsuHitWindows.MISS_WINDOW))
+                piece.FadeColour(Color4.White, 100);
+        }
+
+        private void applyDimToDrawableHitObject(DrawableHitObject dho, ArmedState _) => applyDim(dho);
 
         protected sealed override double InitialLifetimeOffset => HitObject.TimePreempt;
 
         private OsuInputManager osuActionInputManager;
         internal OsuInputManager OsuActionInputManager => osuActionInputManager ??= GetContainingInputManager() as OsuInputManager;
 
-        public virtual void Shake(double maximumLength) => shakeContainer.Shake(maximumLength);
+        /// <summary>
+        /// Shake the hit object in case it was clicked far too early or late (aka "note lock").
+        /// </summary>
+        public virtual void Shake() { }
+
+        /// <summary>
+        /// Causes this <see cref="DrawableOsuHitObject"/> to get hit, disregarding all conditions in implementations of <see cref="DrawableHitObject.CheckForResult"/>.
+        /// </summary>
+        public void HitForcefully() => ApplyMaxResult();
 
         /// <summary>
         /// Causes this <see cref="DrawableOsuHitObject"/> to get missed, disregarding all conditions in implementations of <see cref="DrawableHitObject.CheckForResult"/>.
         /// </summary>
-        public void MissForcefully() => ApplyResult(r => r.Type = r.Judgement.MinResult);
+        public void MissForcefully() => ApplyMinResult();
 
-        private RectangleF parentScreenSpaceRectangle => ((DrawableOsuHitObject)ParentHitObject)?.parentScreenSpaceRectangle ?? Parent.ScreenSpaceDrawQuad.AABBFloat;
+        private RectangleF parentScreenSpaceRectangle => ((DrawableOsuHitObject)ParentHitObject)?.parentScreenSpaceRectangle ?? Parent!.ScreenSpaceDrawQuad.AABBFloat;
 
         /// <summary>
         /// Calculates the position of the given <paramref name="drawable"/> relative to the playfield area.
@@ -98,5 +150,24 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         protected float CalculateDrawableRelativePosition(Drawable drawable) => (drawable.ScreenSpaceDrawQuad.Centre.X - parentScreenSpaceRectangle.X) / parentScreenSpaceRectangle.Width;
 
         protected override JudgementResult CreateResult(Judgement judgement) => new OsuJudgementResult(HitObject, judgement);
+
+        protected void ApplyRepeatFadeIn(Drawable target, double fadeTime)
+        {
+            DrawableSlider slider = (DrawableSlider)ParentHitObject;
+            int repeatIndex = ((SliderEndCircle)HitObject).RepeatIndex;
+
+            Debug.Assert(slider != null);
+
+            // When snaking in is enabled, the first end circle needs to be delayed until the snaking completes.
+            bool delayFadeIn = slider.SliderBody?.SnakingIn.Value == true && repeatIndex == 0;
+
+            if (repeatIndex > 0)
+                fadeTime = Math.Min(slider.HitObject.SpanDuration, fadeTime);
+
+            target
+                .FadeOut()
+                .Delay(delayFadeIn ? (slider.HitObject.TimePreempt) / 3 : 0)
+                .FadeIn(fadeTime);
+        }
     }
 }

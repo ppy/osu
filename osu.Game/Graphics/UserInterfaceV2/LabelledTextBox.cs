@@ -1,16 +1,19 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
-    public class LabelledTextBox : LabelledComponent<OsuTextBox, string>
+    public partial class LabelledTextBox : LabelledComponent<OsuTextBox, string>
     {
         public event TextBox.OnCommitHandler OnCommit;
 
@@ -25,13 +28,20 @@ namespace osu.Game.Graphics.UserInterfaceV2
             set => Component.ReadOnly = value;
         }
 
-        public string PlaceholderText
+        public bool SelectAllOnFocus
+        {
+            get => Component.SelectAllOnFocus;
+            set => Component.SelectAllOnFocus = value;
+        }
+
+        public LocalisableString PlaceholderText
         {
             set => Component.PlaceholderText = value;
         }
 
         public string Text
         {
+            get => Component.Text;
             set => Component.Text = value;
         }
 
@@ -46,6 +56,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
             Component.BorderColour = colours.Blue;
         }
 
+        public bool SelectAll() => Component.SelectAll();
+
         protected virtual OsuTextBox CreateTextBox() => new OsuTextBox();
 
         public override bool AcceptsFocus => true;
@@ -53,7 +65,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
         protected override void OnFocus(FocusEvent e)
         {
             base.OnFocus(e);
-            GetContainingInputManager().ChangeFocus(Component);
+            GetContainingFocusManager()!.ChangeFocus(Component);
         }
 
         protected override OsuTextBox CreateComponent() => CreateTextBox().With(t =>

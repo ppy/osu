@@ -10,7 +10,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Ranking.Expanded.Statistics
 {
-    public class StatisticCounter : RollingCounter<int>
+    public partial class StatisticCounter : RollingCounter<int>
     {
         protected override double RollingDuration => AccuracyCircle.ACCURACY_TRANSFORM_DURATION;
 

@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -17,8 +17,10 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Beatmaps
 {
-    public class TestSceneBeatmapSetOnlineStatusPill : ThemeComparisonTestScene
+    public partial class TestSceneBeatmapSetOnlineStatusPill : ThemeComparisonTestScene
     {
+        private bool showUnknownStatus;
+
         protected override Drawable CreateContent() => new FillFlowContainer
         {
             AutoSizeAxes = Axes.Both,
@@ -26,12 +28,20 @@ namespace osu.Game.Tests.Visual.Beatmaps
             Origin = Anchor.Centre,
             Direction = FillDirection.Vertical,
             Spacing = new Vector2(0, 10),
-            ChildrenEnumerable = Enum.GetValues(typeof(BeatmapOnlineStatus)).Cast<BeatmapOnlineStatus>().Select(status => new BeatmapSetOnlineStatusPill
+            ChildrenEnumerable = Enum.GetValues(typeof(BeatmapOnlineStatus)).Cast<BeatmapOnlineStatus>().Select(status => new Container
             {
-                AutoSizeAxes = Axes.Both,
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Status = status
+                RelativeSizeAxes = Axes.X,
+                Height = 20,
+                Children = new Drawable[]
+                {
+                    new BeatmapSetOnlineStatusPill
+                    {
+                        ShowUnknownStatus = showUnknownStatus,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Status = status
+                    }
+                }
             })
         };
 
@@ -47,7 +57,36 @@ namespace osu.Game.Tests.Visual.Beatmaps
                 pill.AutoSizeAxes = Axes.Y;
                 pill.Width = 90;
             }));
+
+            AddStep("toggle show unknown", () =>
+            {
+                showUnknownStatus = !showUnknownStatus;
+                CreateThemedContent(OverlayColourScheme.Red);
+            });
+
             AddStep("unset fixed width", () => statusPills.ForEach(pill => pill.AutoSizeAxes = Axes.Both));
+        }
+
+        [Test]
+        public void TestChangeLabels()
+        {
+            AddStep("Change labels", () =>
+            {
+                foreach (var pill in this.ChildrenOfType<BeatmapSetOnlineStatusPill>())
+                {
+                    switch (pill.Status)
+                    {
+                        // cycle at end
+                        case BeatmapOnlineStatus.Loved:
+                            pill.Status = BeatmapOnlineStatus.LocallyModified;
+                            break;
+
+                        default:
+                            pill.Status = (pill.Status + 1);
+                            break;
+                    }
+                }
+            });
         }
     }
 }

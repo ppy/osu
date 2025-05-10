@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
@@ -6,16 +6,17 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Screens;
 
 namespace osu.Game.Screens.Edit
 {
     /// <summary>
     /// TODO: eventually make this inherit Screen and add a local screen stack inside the Editor.
     /// </summary>
-    public abstract class EditorScreen : VisibilityContainer
+    public abstract partial class EditorScreen : VisibilityContainer
     {
         [Resolved]
-        protected EditorBeatmap EditorBeatmap { get; private set; }
+        protected EditorBeatmap EditorBeatmap { get; private set; } = null!;
 
         protected override Container<Drawable> Content => content;
         private readonly Container content;
@@ -33,16 +34,12 @@ namespace osu.Game.Screens.Edit
             InternalChild = content = new PopoverContainer { RelativeSizeAxes = Axes.Both };
         }
 
-        protected override void PopIn()
-        {
-            this.ScaleTo(1f, 200, Easing.OutQuint)
-                .FadeIn(200, Easing.OutQuint);
-        }
+        protected override void PopIn() => this.FadeIn();
 
-        protected override void PopOut()
+        protected override void PopOut() => this.FadeOut();
+
+        public virtual void OnExiting(ScreenExitEvent e)
         {
-            this.ScaleTo(0.98f, 200, Easing.OutQuint)
-                .FadeOut(200, Easing.OutQuint);
         }
 
         #region Clipboard operations
@@ -52,14 +49,11 @@ namespace osu.Game.Screens.Edit
         /// <summary>
         /// Performs a "cut to clipboard" operation appropriate for the given screen.
         /// </summary>
-        protected virtual void PerformCut()
+        /// <remarks>
+        /// Implementors are responsible for checking <see cref="CanCut"/> themselves.
+        /// </remarks>
+        public virtual void Cut()
         {
-        }
-
-        public void Cut()
-        {
-            if (CanCut.Value)
-                PerformCut();
         }
 
         public BindableBool CanCopy { get; } = new BindableBool();
@@ -67,14 +61,11 @@ namespace osu.Game.Screens.Edit
         /// <summary>
         /// Performs a "copy to clipboard" operation appropriate for the given screen.
         /// </summary>
-        protected virtual void PerformCopy()
-        {
-        }
-
+        /// <remarks>
+        /// Implementors are responsible for checking <see cref="CanCopy"/> themselves.
+        /// </remarks>
         public virtual void Copy()
         {
-            if (CanCopy.Value)
-                PerformCopy();
         }
 
         public BindableBool CanPaste { get; } = new BindableBool();
@@ -82,14 +73,11 @@ namespace osu.Game.Screens.Edit
         /// <summary>
         /// Performs a "paste from clipboard" operation appropriate for the given screen.
         /// </summary>
-        protected virtual void PerformPaste()
-        {
-        }
-
+        /// <remarks>
+        /// Implementors are responsible for checking <see cref="CanPaste"/> themselves.
+        /// </remarks>
         public virtual void Paste()
         {
-            if (CanPaste.Value)
-                PerformPaste();
         }
 
         #endregion

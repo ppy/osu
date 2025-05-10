@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
@@ -10,24 +11,25 @@ using osu.Framework.Localisation;
 
 namespace osu.Game.Users.Drawables
 {
-    public class DrawableFlag : Sprite, IHasTooltip
+    public partial class DrawableFlag : Sprite, IHasTooltip
     {
-        private readonly Country country;
+        private readonly CountryCode countryCode;
 
-        public LocalisableString TooltipText => country?.FullName;
+        public LocalisableString TooltipText { get; }
 
-        public DrawableFlag(Country country)
+        public DrawableFlag(CountryCode countryCode)
         {
-            this.country = country;
+            this.countryCode = countryCode;
+            TooltipText = countryCode == CountryCode.Unknown ? string.Empty : countryCode.GetDescription();
         }
 
         [BackgroundDependencyLoader]
         private void load(TextureStore ts)
         {
-            if (ts == null)
-                throw new ArgumentNullException(nameof(ts));
+            ArgumentNullException.ThrowIfNull(ts);
 
-            Texture = ts.Get($@"Flags/{country?.FlagName ?? @"__"}") ?? ts.Get(@"Flags/__");
+            string textureName = countryCode == CountryCode.Unknown ? "__" : countryCode.ToString();
+            Texture = ts.Get($@"Flags/{textureName}") ?? ts.Get(@"Flags/__");
         }
     }
 }

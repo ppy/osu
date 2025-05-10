@@ -11,14 +11,17 @@ using osu.Game.Screens.Play;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
-    public class MultiplayerPlayerLoader : PlayerLoader
+    public partial class MultiplayerPlayerLoader : PlayerLoader
     {
         public bool GameplayPassed => player?.GameplayState.HasPassed == true;
 
         [Resolved]
-        private MultiplayerClient multiplayerClient { get; set; }
+        private MultiplayerClient multiplayerClient { get; set; } = null!;
 
-        private Player player;
+        [Resolved]
+        private OsuGame? game { get; set; }
+
+        private Player? player;
 
         public MultiplayerPlayerLoader(Func<Player> createPlayer)
             : base(createPlayer)
@@ -26,19 +29,26 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         }
 
         protected override bool ReadyForGameplay =>
-            base.ReadyForGameplay
-            // The server is forcefully starting gameplay.
+            (
+                // The user is ready to enter gameplay.
+                base.ReadyForGameplay
+                // And the server has received the message that we're loaded.
+                && multiplayerClient.LocalUser?.State == MultiplayerUserState.Loaded
+            )
+            // Or the server is forcefully starting gameplay.
             || multiplayerClient.LocalUser?.State == MultiplayerUserState.Playing;
 
         protected override void OnPlayerLoaded()
         {
             base.OnPlayerLoaded();
 
+            game?.Window?.Flash();
+
             multiplayerClient.ChangeState(MultiplayerUserState.Loaded)
                              .ContinueWith(task => failAndBail(task.Exception?.Message ?? "Server error"), TaskContinuationOptions.NotOnRanToCompletion);
         }
 
-        private void failAndBail(string message = null)
+        private void failAndBail(string? message = null)
         {
             if (!string.IsNullOrEmpty(message))
                 Logger.Log(message, LoggingTarget.Runtime, LogLevel.Important);

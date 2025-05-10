@@ -1,29 +1,37 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Database;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Taiko;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Carousel;
 using osu.Game.Screens.Select.Filter;
+using osu.Game.Tests.Beatmaps;
 using osu.Game.Tests.Resources;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.SongSelect
 {
     [TestFixture]
-    public class TestSceneBeatmapCarousel : OsuManualInputManagerTestScene
+    public partial class TestSceneBeatmapCarousel : OsuManualInputManagerTestScene
     {
         private TestBeatmapCarousel carousel;
         private RulesetStore rulesets;
@@ -34,6 +42,10 @@ namespace osu.Game.Tests.Visual.SongSelect
         private BeatmapInfo currentSelection => carousel.SelectedBeatmapInfo;
 
         private const int set_count = 5;
+        private const int diff_count = 3;
+
+        [Cached(typeof(BeatmapStore))]
+        private TestBeatmapStore beatmaps = new TestBeatmapStore();
 
         [BackgroundDependencyLoader]
         private void load(RulesetStore rulesets)
@@ -46,11 +58,11 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             createCarousel(new List<BeatmapSetInfo>());
 
-            AddStep("filter to ruleset 0", () => carousel.Filter(new FilterCriteria
+            AddStep("filter to ruleset 0", () => carousel.FilterImmediately(new FilterCriteria
             {
                 Ruleset = rulesets.AvailableRulesets.ElementAt(0),
                 AllowConvertedBeatmaps = true,
-            }, false));
+            }));
 
             AddStep("add mixed ruleset beatmapset", () =>
             {
@@ -69,44 +81,44 @@ namespace osu.Game.Tests.Visual.SongSelect
                 var visibleBeatmapPanels = carousel.Items.OfType<DrawableCarouselBeatmap>().Where(p => p.IsPresent).ToArray();
 
                 return visibleBeatmapPanels.Length == 1
-                       && visibleBeatmapPanels.Count(p => ((CarouselBeatmap)p.Item).BeatmapInfo.Ruleset.OnlineID == 0) == 1;
+                       && visibleBeatmapPanels.Count(p => ((CarouselBeatmap)p.Item)!.BeatmapInfo.Ruleset.OnlineID == 0) == 1;
             });
 
-            AddStep("filter to ruleset 1", () => carousel.Filter(new FilterCriteria
+            AddStep("filter to ruleset 1", () => carousel.FilterImmediately(new FilterCriteria
             {
                 Ruleset = rulesets.AvailableRulesets.ElementAt(1),
                 AllowConvertedBeatmaps = true,
-            }, false));
+            }));
 
             AddUntilStep("wait for filtered difficulties", () =>
             {
                 var visibleBeatmapPanels = carousel.Items.OfType<DrawableCarouselBeatmap>().Where(p => p.IsPresent).ToArray();
 
                 return visibleBeatmapPanels.Length == 2
-                       && visibleBeatmapPanels.Count(p => ((CarouselBeatmap)p.Item).BeatmapInfo.Ruleset.OnlineID == 0) == 1
-                       && visibleBeatmapPanels.Count(p => ((CarouselBeatmap)p.Item).BeatmapInfo.Ruleset.OnlineID == 1) == 1;
+                       && visibleBeatmapPanels.Count(p => ((CarouselBeatmap)p.Item)!.BeatmapInfo.Ruleset.OnlineID == 0) == 1
+                       && visibleBeatmapPanels.Count(p => ((CarouselBeatmap)p.Item)!.BeatmapInfo.Ruleset.OnlineID == 1) == 1;
             });
 
-            AddStep("filter to ruleset 2", () => carousel.Filter(new FilterCriteria
+            AddStep("filter to ruleset 2", () => carousel.FilterImmediately(new FilterCriteria
             {
                 Ruleset = rulesets.AvailableRulesets.ElementAt(2),
                 AllowConvertedBeatmaps = true,
-            }, false));
+            }));
 
             AddUntilStep("wait for filtered difficulties", () =>
             {
                 var visibleBeatmapPanels = carousel.Items.OfType<DrawableCarouselBeatmap>().Where(p => p.IsPresent).ToArray();
 
                 return visibleBeatmapPanels.Length == 2
-                       && visibleBeatmapPanels.Count(p => ((CarouselBeatmap)p.Item).BeatmapInfo.Ruleset.OnlineID == 0) == 1
-                       && visibleBeatmapPanels.Count(p => ((CarouselBeatmap)p.Item).BeatmapInfo.Ruleset.OnlineID == 2) == 1;
+                       && visibleBeatmapPanels.Count(p => ((CarouselBeatmap)p.Item!).BeatmapInfo.Ruleset.OnlineID == 0) == 1
+                       && visibleBeatmapPanels.Count(p => ((CarouselBeatmap)p.Item!).BeatmapInfo.Ruleset.OnlineID == 2) == 1;
             });
         }
 
         [Test]
         public void TestScrollPositionMaintainedOnAdd()
         {
-            loadBeatmaps(count: 1, randomDifficulties: false);
+            loadBeatmaps(setCount: 1);
 
             for (int i = 0; i < 10; i++)
             {
@@ -117,9 +129,18 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
+        public void TestDeletion()
+        {
+            loadBeatmaps(setCount: 5, randomDifficulties: true);
+
+            AddStep("remove first set", () => carousel.RemoveBeatmapSet(carousel.Items.Select(item => item.Item).OfType<CarouselBeatmapSet>().First().BeatmapSet));
+            AddUntilStep("4 beatmap sets visible", () => this.ChildrenOfType<DrawableCarouselBeatmapSet>().Count(set => set.Alpha > 0) == 4);
+        }
+
+        [Test]
         public void TestScrollPositionMaintainedOnDelete()
         {
-            loadBeatmaps(count: 50, randomDifficulties: false);
+            loadBeatmaps(setCount: 50);
 
             for (int i = 0; i < 10; i++)
             {
@@ -136,7 +157,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestManyPanels()
         {
-            loadBeatmaps(count: 5000, randomDifficulties: true);
+            loadBeatmaps(setCount: 5000, randomDifficulties: true);
         }
 
         [Test]
@@ -171,7 +192,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     if (isIterating)
                         AddUntilStep("selection changed", () => !carousel.SelectedBeatmapInfo?.Equals(selection) == true);
                     else
-                        AddUntilStep("selection not changed", () => carousel.SelectedBeatmapInfo.Equals(selection));
+                        AddUntilStep("selection not changed", () => carousel.SelectedBeatmapInfo?.Equals(selection) == true);
                 }
             }
         }
@@ -242,8 +263,12 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             const int total_set_count = 200;
 
-            for (int i = 0; i < total_set_count; i++)
-                sets.Add(TestResources.CreateTestBeatmapSetInfo());
+            AddStep("Populuate beatmap sets", () =>
+            {
+                sets.Clear();
+                for (int i = 0; i < total_set_count; i++)
+                    sets.Add(TestResources.CreateTestBeatmapSetInfo());
+            });
 
             loadBeatmaps(sets);
 
@@ -273,8 +298,12 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             const int total_set_count = 20;
 
-            for (int i = 0; i < total_set_count; i++)
-                sets.Add(TestResources.CreateTestBeatmapSetInfo(3));
+            AddStep("Populuate beatmap sets", () =>
+            {
+                sets.Clear();
+                for (int i = 0; i < total_set_count; i++)
+                    sets.Add(TestResources.CreateTestBeatmapSetInfo(3));
+            });
 
             loadBeatmaps(sets);
 
@@ -321,7 +350,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             // basic filtering
             setSelected(1, 1);
 
-            AddStep("Filter", () => carousel.Filter(new FilterCriteria { SearchText = carousel.BeatmapSets.ElementAt(2).Metadata.Title }, false));
+            AddStep("Filter", () => carousel.FilterImmediately(new FilterCriteria { SearchText = carousel.BeatmapSets.ElementAt(2).Metadata.Title }));
             checkVisibleItemCount(diff: false, count: 1);
             checkVisibleItemCount(diff: true, count: 3);
             waitForSelection(3, 1);
@@ -337,13 +366,13 @@ namespace osu.Game.Tests.Visual.SongSelect
             // test filtering some difficulties (and keeping current beatmap set selected).
 
             setSelected(1, 2);
-            AddStep("Filter some difficulties", () => carousel.Filter(new FilterCriteria { SearchText = "Normal" }, false));
+            AddStep("Filter some difficulties", () => carousel.FilterImmediately(new FilterCriteria { SearchText = "Normal" }));
             waitForSelection(1, 1);
 
-            AddStep("Un-filter", () => carousel.Filter(new FilterCriteria(), false));
+            AddStep("Un-filter", () => carousel.FilterImmediately(new FilterCriteria()));
             waitForSelection(1, 1);
 
-            AddStep("Filter all", () => carousel.Filter(new FilterCriteria { SearchText = "Dingo" }, false));
+            AddStep("Filter all", () => carousel.FilterImmediately(new FilterCriteria { SearchText = "Dingo" }));
 
             checkVisibleItemCount(false, 0);
             checkVisibleItemCount(true, 0);
@@ -355,7 +384,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             advanceSelection(false);
             AddAssert("Selection is null", () => currentSelection == null);
 
-            AddStep("Un-filter", () => carousel.Filter(new FilterCriteria(), false));
+            AddStep("Un-filter", () => carousel.FilterImmediately(new FilterCriteria()));
 
             AddAssert("Selection is non-null", () => currentSelection != null);
 
@@ -372,11 +401,11 @@ namespace osu.Game.Tests.Visual.SongSelect
             // buffer the selection
             setSelected(3, 2);
 
-            AddStep("get search text", () => searchText = carousel.SelectedBeatmapSet.Metadata.Title);
+            AddStep("get search text", () => searchText = carousel.SelectedBeatmapSet!.Metadata.Title);
 
             setSelected(1, 3);
 
-            AddStep("Apply a range filter", () => carousel.Filter(new FilterCriteria
+            AddStep("Apply a range filter", () => carousel.FilterImmediately(new FilterCriteria
             {
                 SearchText = searchText,
                 StarDifficulty = new FilterCriteria.OptionalRange<double>
@@ -385,7 +414,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Max = 5.5,
                     IsLowerInclusive = true
                 }
-            }, false));
+            }));
 
             // should reselect the buffered selection.
             waitForSelection(3, 2);
@@ -422,13 +451,49 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddAssert("ensure repeat", () => selectedSets.Contains(carousel.SelectedBeatmapSet));
 
             AddStep("Add set with 100 difficulties", () => carousel.UpdateBeatmapSet(TestResources.CreateTestBeatmapSetInfo(100, rulesets.AvailableRulesets.ToArray())));
-            AddStep("Filter Extra", () => carousel.Filter(new FilterCriteria { SearchText = "Extra 10" }, false));
+            AddStep("Filter Extra", () => carousel.FilterImmediately(new FilterCriteria { SearchText = "Extra 10" }));
             checkInvisibleDifficultiesUnselectable();
             checkInvisibleDifficultiesUnselectable();
             checkInvisibleDifficultiesUnselectable();
             checkInvisibleDifficultiesUnselectable();
             checkInvisibleDifficultiesUnselectable();
-            AddStep("Un-filter", () => carousel.Filter(new FilterCriteria(), false));
+            AddStep("Un-filter", () => carousel.FilterImmediately(new FilterCriteria()));
+        }
+
+        [Test]
+        public void TestRewind()
+        {
+            const int local_set_count = 3;
+            const int random_select_count = local_set_count * 3;
+            loadBeatmaps(setCount: local_set_count);
+
+            for (int i = 0; i < random_select_count; i++)
+                nextRandom();
+
+            for (int i = 0; i < random_select_count; i++)
+            {
+                prevRandom();
+                AddAssert("correct random last selected", () => selectedSets.Peek(), () => Is.EqualTo(carousel.SelectedBeatmapSet));
+            }
+        }
+
+        [Test]
+        public void TestRewindToDeletedBeatmap()
+        {
+            loadBeatmaps();
+
+            var firstAdded = TestResources.CreateTestBeatmapSetInfo();
+
+            AddStep("add new set", () => carousel.UpdateBeatmapSet(firstAdded));
+            AddStep("select set", () => carousel.SelectBeatmap(firstAdded.Beatmaps.First()));
+
+            nextRandom();
+
+            AddStep("delete set", () => carousel.RemoveBeatmapSet(firstAdded));
+
+            prevRandom();
+
+            AddAssert("deleted set not selected", () => carousel.SelectedBeatmapSet?.Equals(firstAdded) == false);
         }
 
         /// <summary>
@@ -461,6 +526,45 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
+        public void TestDifficultiesSplitOutOnLoad()
+        {
+            loadBeatmaps(new List<BeatmapSetInfo> { TestResources.CreateTestBeatmapSetInfo(diff_count) }, () => new FilterCriteria
+            {
+                Sort = SortMode.Difficulty,
+            });
+
+            checkVisibleItemCount(false, 3);
+        }
+
+        [Test]
+        public void TestAddRemoveDifficultySort()
+        {
+            const int local_set_count = 2;
+            const int local_diff_count = 2;
+
+            loadBeatmaps(setCount: local_set_count, diffCount: local_diff_count);
+
+            AddStep("Sort by difficulty", () => carousel.FilterImmediately(new FilterCriteria { Sort = SortMode.Difficulty }));
+
+            checkVisibleItemCount(false, local_set_count * local_diff_count);
+
+            var firstAdded = TestResources.CreateTestBeatmapSetInfo(local_diff_count);
+            firstAdded.Status = BeatmapOnlineStatus.Loved;
+
+            AddStep("Add new set", () => carousel.UpdateBeatmapSet(firstAdded));
+
+            checkVisibleItemCount(false, (local_set_count + 1) * local_diff_count);
+
+            AddStep("Remove set", () => carousel.RemoveBeatmapSet(firstAdded));
+
+            checkVisibleItemCount(false, (local_set_count) * local_diff_count);
+
+            setSelected(local_set_count, 1);
+
+            waitForSelection(local_set_count);
+        }
+
+        [Test]
         public void TestSelectionEnteringFromEmptyRuleset()
         {
             var sets = new List<BeatmapSetInfo>();
@@ -479,48 +583,279 @@ namespace osu.Game.Tests.Visual.SongSelect
             loadBeatmaps(sets, () => new FilterCriteria { Ruleset = rulesets.AvailableRulesets.ElementAt(0) });
 
             AddStep("Set non-empty mode filter", () =>
-                carousel.Filter(new FilterCriteria { Ruleset = rulesets.AvailableRulesets.ElementAt(1) }, false));
+                carousel.FilterImmediately(new FilterCriteria { Ruleset = rulesets.AvailableRulesets.ElementAt(1) }));
 
             AddAssert("Something is selected", () => carousel.SelectedBeatmapInfo != null);
         }
 
-        /// <summary>
-        /// Test sorting
-        /// </summary>
+        [Test]
+        public void TestSortingDateSubmitted()
+        {
+            var sets = new List<BeatmapSetInfo>();
+            const string zzz_string = "zzzzz";
+
+            AddStep("Populuate beatmap sets", () =>
+            {
+                sets.Clear();
+
+                for (int i = 0; i < 10; i++)
+                {
+                    var set = TestResources.CreateTestBeatmapSetInfo(5);
+
+                    // A total of 6 sets have date submitted (4 don't)
+                    // A total of 5 sets have artist string (3 of which also have date submitted)
+
+                    if (i >= 2 && i < 8) // i = 2, 3, 4, 5, 6, 7 have submitted date
+                        set.DateSubmitted = DateTimeOffset.Now.AddMinutes(i);
+                    if (i < 5) // i = 0, 1, 2, 3, 4 have matching string
+                        set.Beatmaps.ForEach(b => b.Metadata.Artist = zzz_string);
+
+                    set.Beatmaps.ForEach(b => b.Metadata.Title = $"submitted: {set.DateSubmitted}");
+
+                    sets.Add(set);
+                }
+            });
+
+            loadBeatmaps(sets);
+
+            AddStep("Sort by date submitted", () => carousel.FilterImmediately(new FilterCriteria { Sort = SortMode.DateSubmitted }));
+            checkVisibleItemCount(diff: false, count: 10);
+            checkVisibleItemCount(diff: true, count: 5);
+
+            AddAssert("missing date are at end",
+                () => carousel.Items.OfType<DrawableCarouselBeatmapSet>().Reverse().TakeWhile(i => i.Item is CarouselBeatmapSet s && s.BeatmapSet.DateSubmitted == null).Count(), () => Is.EqualTo(4));
+            AddAssert("rest are at start", () => carousel.Items.OfType<DrawableCarouselBeatmapSet>().TakeWhile(i => i.Item is CarouselBeatmapSet s && s.BeatmapSet.DateSubmitted != null).Count(),
+                () => Is.EqualTo(6));
+
+            AddStep("Sort by date submitted and string", () => carousel.FilterImmediately(new FilterCriteria
+            {
+                Sort = SortMode.DateSubmitted,
+                SearchText = zzz_string
+            }));
+            checkVisibleItemCount(diff: false, count: 5);
+            checkVisibleItemCount(diff: true, count: 5);
+
+            AddAssert("missing date are at end",
+                () => carousel.Items.OfType<DrawableCarouselBeatmapSet>().Reverse().TakeWhile(i => i.Item is CarouselBeatmapSet s && s.BeatmapSet.DateSubmitted == null).Count(), () => Is.EqualTo(2));
+            AddAssert("rest are at start", () => carousel.Items.OfType<DrawableCarouselBeatmapSet>().TakeWhile(i => i.Item is CarouselBeatmapSet s && s.BeatmapSet.DateSubmitted != null).Count(),
+                () => Is.EqualTo(3));
+        }
+
         [Test]
         public void TestSorting()
         {
             var sets = new List<BeatmapSetInfo>();
 
-            const string zzz_string = "zzzzz";
+            const string zzz_lowercase = "zzzzz";
+            const string zzz_uppercase = "ZZZZZ";
 
-            for (int i = 0; i < 20; i++)
+            AddStep("Populuate beatmap sets", () =>
             {
-                var set = TestResources.CreateTestBeatmapSetInfo();
+                sets.Clear();
 
-                if (i == 4)
-                    set.Beatmaps.ForEach(b => b.Metadata.Artist = zzz_string);
+                for (int i = 0; i < 20; i++)
+                {
+                    var set = TestResources.CreateTestBeatmapSetInfo();
 
-                if (i == 16)
-                    set.Beatmaps.ForEach(b => b.Metadata.Author.Username = zzz_string);
+                    if (i == 4)
+                        set.Beatmaps.ForEach(b => b.Metadata.Artist = zzz_uppercase);
 
-                sets.Add(set);
-            }
+                    if (i == 8)
+                        set.Beatmaps.ForEach(b => b.Metadata.Artist = zzz_lowercase);
+
+                    if (i == 12)
+                        set.Beatmaps.ForEach(b => b.Metadata.Author.Username = zzz_uppercase);
+
+                    if (i == 16)
+                        set.Beatmaps.ForEach(b => b.Metadata.Author.Username = zzz_lowercase);
+
+                    sets.Add(set);
+                }
+            });
 
             loadBeatmaps(sets);
 
-            AddStep("Sort by author", () => carousel.Filter(new FilterCriteria { Sort = SortMode.Author }, false));
-            AddAssert($"Check {zzz_string} is at bottom", () => carousel.BeatmapSets.Last().Metadata.Author.Username == zzz_string);
-            AddStep("Sort by artist", () => carousel.Filter(new FilterCriteria { Sort = SortMode.Artist }, false));
-            AddAssert($"Check {zzz_string} is at bottom", () => carousel.BeatmapSets.Last().Metadata.Artist == zzz_string);
+            AddStep("Sort by author", () => carousel.FilterImmediately(new FilterCriteria { Sort = SortMode.Author }));
+            AddAssert($"Check {zzz_uppercase} is last", () => carousel.BeatmapSets.Last().Metadata.Author.Username == zzz_uppercase);
+            AddAssert($"Check {zzz_lowercase} is second last", () => carousel.BeatmapSets.SkipLast(1).Last().Metadata.Author.Username == zzz_lowercase);
+            AddStep("Sort by artist", () => carousel.FilterImmediately(new FilterCriteria { Sort = SortMode.Artist }));
+            AddAssert($"Check {zzz_uppercase} is last", () => carousel.BeatmapSets.Last().Metadata.Artist == zzz_uppercase);
+            AddAssert($"Check {zzz_lowercase} is second last", () => carousel.BeatmapSets.SkipLast(1).Last().Metadata.Artist == zzz_lowercase);
         }
 
         [Test]
-        public void TestSortingStability()
+        public void TestSortByArtistUsesTitleAsTiebreaker()
         {
             var sets = new List<BeatmapSetInfo>();
 
-            for (int i = 0; i < 20; i++)
+            AddStep("Populuate beatmap sets", () =>
+            {
+                sets.Clear();
+
+                for (int i = 0; i < 20; i++)
+                {
+                    var set = TestResources.CreateTestBeatmapSetInfo();
+
+                    if (i == 4)
+                    {
+                        set.Beatmaps.ForEach(b =>
+                        {
+                            b.Metadata.Artist = "ZZZ";
+                            b.Metadata.Title = "AAA";
+                        });
+                    }
+
+                    if (i == 8)
+                    {
+                        set.Beatmaps.ForEach(b =>
+                        {
+                            b.Metadata.Artist = "ZZZ";
+                            b.Metadata.Title = "ZZZ";
+                        });
+                    }
+
+                    sets.Add(set);
+                }
+            });
+
+            loadBeatmaps(sets);
+
+            AddStep("Sort by artist", () => carousel.FilterImmediately(new FilterCriteria { Sort = SortMode.Artist }));
+            AddAssert("Check last item", () =>
+            {
+                var lastItem = carousel.BeatmapSets.Last();
+                return lastItem.Metadata.Artist == "ZZZ" && lastItem.Metadata.Title == "ZZZ";
+            });
+            AddAssert("Check second last item", () =>
+            {
+                var secondLastItem = carousel.BeatmapSets.SkipLast(1).Last();
+                return secondLastItem.Metadata.Artist == "ZZZ" && secondLastItem.Metadata.Title == "AAA";
+            });
+        }
+
+        /// <summary>
+        /// Ensures stability is maintained on different sort modes for items with equal properties.
+        /// </summary>
+        [Test]
+        public void TestSortingStabilityDateAdded()
+        {
+            var sets = new List<BeatmapSetInfo>();
+
+            AddStep("Populuate beatmap sets", () =>
+            {
+                sets.Clear();
+
+                for (int i = 0; i < 10; i++)
+                {
+                    var set = TestResources.CreateTestBeatmapSetInfo();
+
+                    set.DateAdded = DateTimeOffset.FromUnixTimeSeconds(i);
+
+                    // only need to set the first as they are a shared reference.
+                    var beatmap = set.Beatmaps.First();
+
+                    beatmap.Metadata.Artist = "a";
+                    beatmap.Metadata.Title = "b";
+
+                    sets.Add(set);
+                }
+            });
+
+            loadBeatmaps(sets);
+
+            AddStep("Sort by title", () => carousel.FilterImmediately(new FilterCriteria { Sort = SortMode.Title }));
+            AddAssert("Items remain in descending added order", () => carousel.BeatmapSets.Select(s => s.DateAdded), () => Is.Ordered.Descending);
+
+            AddStep("Sort by artist", () => carousel.FilterImmediately(new FilterCriteria { Sort = SortMode.Artist }));
+            AddAssert("Items remain in descending added order", () => carousel.BeatmapSets.Select(s => s.DateAdded), () => Is.Ordered.Descending);
+        }
+
+        /// <summary>
+        /// Ensures stability is maintained on different sort modes while a new item is added to the carousel.
+        /// </summary>
+        [Test]
+        public void TestSortingStabilityWithRemovedAndReaddedItem()
+        {
+            List<BeatmapSetInfo> sets = new List<BeatmapSetInfo>();
+
+            AddStep("Populuate beatmap sets", () =>
+            {
+                sets.Clear();
+
+                for (int i = 0; i < 3; i++)
+                {
+                    var set = TestResources.CreateTestBeatmapSetInfo(diff_count);
+
+                    // only need to set the first as they are a shared reference.
+                    var beatmap = set.Beatmaps.First();
+
+                    beatmap.Metadata.Artist = "same artist";
+                    beatmap.Metadata.Title = "same title";
+
+                    // testing the case where DateAdded happens to equal (quite rare).
+                    set.DateAdded = DateTimeOffset.UnixEpoch;
+
+                    sets.Add(set);
+                }
+            });
+
+            Guid[] originalOrder = null!;
+
+            loadBeatmaps(sets);
+
+            AddStep("Sort by artist", () => carousel.FilterImmediately(new FilterCriteria { Sort = SortMode.Artist }));
+
+            AddAssert("Items in descending added order", () => carousel.BeatmapSets.Select(s => s.DateAdded), () => Is.Ordered.Descending);
+            AddStep("Save order", () => originalOrder = carousel.BeatmapSets.Select(s => s.ID).ToArray());
+
+            AddStep("Remove item", () => carousel.RemoveBeatmapSet(sets[1]));
+            AddStep("Re-add item", () => carousel.UpdateBeatmapSet(sets[1]));
+
+            AddAssert("Order didn't change", () => carousel.BeatmapSets.Select(s => s.ID), () => Is.EqualTo(originalOrder));
+
+            AddStep("Sort by title", () => carousel.FilterImmediately(new FilterCriteria { Sort = SortMode.Title }));
+            AddAssert("Order didn't change", () => carousel.BeatmapSets.Select(s => s.ID), () => Is.EqualTo(originalOrder));
+        }
+
+        /// <summary>
+        /// Ensures stability is maintained on different sort modes while a new item is added to the carousel.
+        /// </summary>
+        [Test]
+        public void TestSortingStabilityWithNewItems()
+        {
+            List<BeatmapSetInfo> sets = new List<BeatmapSetInfo>();
+
+            AddStep("Populuate beatmap sets", () =>
+            {
+                sets.Clear();
+
+                for (int i = 0; i < 3; i++)
+                {
+                    var set = TestResources.CreateTestBeatmapSetInfo(diff_count);
+
+                    // only need to set the first as they are a shared reference.
+                    var beatmap = set.Beatmaps.First();
+
+                    beatmap.Metadata.Artist = "same artist";
+                    beatmap.Metadata.Title = "same title";
+
+                    // testing the case where DateAdded happens to equal (quite rare).
+                    set.DateAdded = DateTimeOffset.UnixEpoch;
+
+                    sets.Add(set);
+                }
+            });
+
+            Guid[] originalOrder = null!;
+
+            loadBeatmaps(sets);
+
+            AddStep("Sort by artist", () => carousel.FilterImmediately(new FilterCriteria { Sort = SortMode.Artist }));
+
+            AddAssert("Items in descending added order", () => carousel.BeatmapSets.Select(s => s.DateAdded), () => Is.Ordered.Descending);
+            AddStep("Save order", () => originalOrder = carousel.BeatmapSets.Select(s => s.ID).ToArray());
+
+            AddStep("Add new item", () =>
             {
                 var set = TestResources.CreateTestBeatmapSetInfo();
 
@@ -530,42 +865,69 @@ namespace osu.Game.Tests.Visual.SongSelect
                 beatmap.Metadata.Artist = "same artist";
                 beatmap.Metadata.Title = "same title";
 
-                sets.Add(set);
-            }
+                set.DateAdded = DateTimeOffset.FromUnixTimeSeconds(1);
 
-            int idOffset = sets.First().OnlineID;
+                carousel.UpdateBeatmapSet(set);
 
-            loadBeatmaps(sets);
+                // add set to expected ordering
+                originalOrder = originalOrder.Prepend(set.ID).ToArray();
+            });
 
-            AddStep("Sort by artist", () => carousel.Filter(new FilterCriteria { Sort = SortMode.Artist }, false));
-            AddAssert("Items remain in original order", () => carousel.BeatmapSets.Select((set, index) => set.OnlineID == index + idOffset).All(b => b));
+            AddAssert("Order didn't change", () => carousel.BeatmapSets.Select(s => s.ID), () => Is.EqualTo(originalOrder));
 
-            AddStep("Sort by title", () => carousel.Filter(new FilterCriteria { Sort = SortMode.Title }, false));
-            AddAssert("Items remain in original order", () => carousel.BeatmapSets.Select((set, index) => set.OnlineID == index + idOffset).All(b => b));
+            AddStep("Sort by title", () => carousel.FilterImmediately(new FilterCriteria { Sort = SortMode.Title }));
+            AddAssert("Order didn't change", () => carousel.BeatmapSets.Select(s => s.ID), () => Is.EqualTo(originalOrder));
         }
 
         [Test]
-        public void TestSortingWithFiltered()
+        public void TestSortingWithDifficultyFiltered()
         {
+            const int local_diff_count = 3;
+            const int local_set_count = 2;
+
             List<BeatmapSetInfo> sets = new List<BeatmapSetInfo>();
 
-            for (int i = 0; i < 3; i++)
+            AddStep("Populuate beatmap sets", () =>
             {
-                var set = TestResources.CreateTestBeatmapSetInfo(3);
-                set.Beatmaps[0].StarRating = 3 - i;
-                set.Beatmaps[2].StarRating = 6 + i;
-                sets.Add(set);
-            }
+                sets.Clear();
+
+                for (int i = 0; i < local_set_count; i++)
+                {
+                    var set = TestResources.CreateTestBeatmapSetInfo(local_diff_count);
+                    set.Beatmaps[0].StarRating = 3 - i;
+                    set.Beatmaps[1].StarRating = 6 + i;
+                    sets.Add(set);
+                }
+            });
 
             loadBeatmaps(sets);
 
-            AddStep("Filter to normal", () => carousel.Filter(new FilterCriteria { Sort = SortMode.Difficulty, SearchText = "Normal" }, false));
-            AddAssert("Check first set at end", () => carousel.BeatmapSets.First().Equals(sets.Last()));
-            AddAssert("Check last set at start", () => carousel.BeatmapSets.Last().Equals(sets.First()));
+            AddStep("Sort by difficulty", () => carousel.FilterImmediately(new FilterCriteria { Sort = SortMode.Difficulty }));
 
-            AddStep("Filter to insane", () => carousel.Filter(new FilterCriteria { Sort = SortMode.Difficulty, SearchText = "Insane" }, false));
-            AddAssert("Check first set at start", () => carousel.BeatmapSets.First().Equals(sets.First()));
-            AddAssert("Check last set at end", () => carousel.BeatmapSets.Last().Equals(sets.Last()));
+            checkVisibleItemCount(false, local_set_count * local_diff_count);
+            checkVisibleItemCount(true, 1);
+
+            AddStep("Filter to normal", () => carousel.FilterImmediately(new FilterCriteria { Sort = SortMode.Difficulty, SearchText = "Normal" }));
+            checkVisibleItemCount(false, local_set_count);
+            checkVisibleItemCount(true, 1);
+
+            AddUntilStep("Check all visible sets have one normal", () =>
+            {
+                return carousel.Items.OfType<DrawableCarouselBeatmapSet>()
+                               .Where(p => p.IsPresent)
+                               .Count(p => ((CarouselBeatmapSet)p.Item)!.Beatmaps.Single().BeatmapInfo.DifficultyName.StartsWith("Normal", StringComparison.Ordinal)) == local_set_count;
+            });
+
+            AddStep("Filter to insane", () => carousel.FilterImmediately(new FilterCriteria { Sort = SortMode.Difficulty, SearchText = "Insane" }));
+            checkVisibleItemCount(false, local_set_count);
+            checkVisibleItemCount(true, 1);
+
+            AddUntilStep("Check all visible sets have one insane", () =>
+            {
+                return carousel.Items.OfType<DrawableCarouselBeatmapSet>()
+                               .Where(p => p.IsPresent)
+                               .Count(p => ((CarouselBeatmapSet)p.Item)!.Beatmaps.Single().BeatmapInfo.DifficultyName.StartsWith("Insane", StringComparison.Ordinal)) == local_set_count;
+            });
         }
 
         [Test]
@@ -576,7 +938,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             setSelected(2, 1);
             AddAssert("Selection is non-null", () => currentSelection != null);
 
-            AddStep("Remove selected", () => carousel.RemoveBeatmapSet(carousel.SelectedBeatmapSet));
+            AddStep("Remove selected", () => carousel.RemoveBeatmapSet(carousel.SelectedBeatmapSet!));
             waitForSelection(2);
 
             AddStep("Remove first", () => carousel.RemoveBeatmapSet(carousel.BeatmapSets.First()));
@@ -620,7 +982,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("create hidden set", () =>
             {
-                hidingSet = TestResources.CreateTestBeatmapSetInfo(3);
+                hidingSet = TestResources.CreateTestBeatmapSetInfo(diff_count);
                 hidingSet.Beatmaps[1].Hidden = true;
 
                 hiddenList.Clear();
@@ -667,7 +1029,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("add mixed ruleset beatmapset", () =>
             {
-                testMixed = TestResources.CreateTestBeatmapSetInfo(3);
+                testMixed = TestResources.CreateTestBeatmapSetInfo(diff_count);
 
                 for (int i = 0; i <= 2; i++)
                 {
@@ -677,9 +1039,9 @@ namespace osu.Game.Tests.Visual.SongSelect
                 carousel.UpdateBeatmapSet(testMixed);
             });
             AddStep("filter to ruleset 0", () =>
-                carousel.Filter(new FilterCriteria { Ruleset = rulesets.AvailableRulesets.ElementAt(0) }, false));
+                carousel.FilterImmediately(new FilterCriteria { Ruleset = rulesets.AvailableRulesets.ElementAt(0) }));
             AddStep("select filtered map skipping filtered", () => carousel.SelectBeatmap(testMixed.Beatmaps[1], false));
-            AddAssert("unfiltered beatmap not selected", () => carousel.SelectedBeatmapInfo.Ruleset.OnlineID == 0);
+            AddAssert("unfiltered beatmap not selected", () => carousel.SelectedBeatmapInfo?.Ruleset.OnlineID == 0);
 
             AddStep("remove mixed set", () =>
             {
@@ -689,7 +1051,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             BeatmapSetInfo testSingle = null;
             AddStep("add single ruleset beatmapset", () =>
             {
-                testSingle = TestResources.CreateTestBeatmapSetInfo(3);
+                testSingle = TestResources.CreateTestBeatmapSetInfo(diff_count);
                 testSingle.Beatmaps.ForEach(b =>
                 {
                     b.Ruleset = rulesets.AvailableRulesets.ElementAt(1);
@@ -707,8 +1069,13 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             List<BeatmapSetInfo> manySets = new List<BeatmapSetInfo>();
 
-            for (int i = 1; i <= 50; i++)
-                manySets.Add(TestResources.CreateTestBeatmapSetInfo(3));
+            AddStep("Populuate beatmap sets", () =>
+            {
+                manySets.Clear();
+
+                for (int i = 1; i <= 50; i++)
+                    manySets.Add(TestResources.CreateTestBeatmapSetInfo(diff_count));
+            });
 
             loadBeatmaps(manySets);
 
@@ -718,13 +1085,13 @@ namespace osu.Game.Tests.Visual.SongSelect
             {
                 AddStep("Toggle non-matching filter", () =>
                 {
-                    carousel.Filter(new FilterCriteria { SearchText = Guid.NewGuid().ToString() }, false);
+                    carousel.FilterImmediately(new FilterCriteria { SearchText = Guid.NewGuid().ToString() });
                 });
 
                 AddStep("Restore no filter", () =>
                 {
-                    carousel.Filter(new FilterCriteria(), false);
-                    eagerSelectedIDs.Add(carousel.SelectedBeatmapSet.ID);
+                    carousel.FilterImmediately(new FilterCriteria());
+                    eagerSelectedIDs.Add(carousel.SelectedBeatmapSet!.ID);
                 });
             }
 
@@ -733,47 +1100,66 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
-        public void TestRandomFallbackOnNonMatchingPrevious()
+        public void TestCarouselRemembersSelectionDifficultySort()
         {
             List<BeatmapSetInfo> manySets = new List<BeatmapSetInfo>();
 
-            AddStep("populate maps", () =>
+            AddStep("Populate beatmap sets", () =>
             {
-                for (int i = 0; i < 10; i++)
-                {
-                    manySets.Add(TestResources.CreateTestBeatmapSetInfo(3, new[]
-                    {
-                        // all taiko except for first
-                        rulesets.GetRuleset(i > 0 ? 1 : 0)
-                    }));
-                }
+                manySets.Clear();
+
+                for (int i = 1; i <= 50; i++)
+                    manySets.Add(TestResources.CreateTestBeatmapSetInfo(diff_count));
             });
 
             loadBeatmaps(manySets);
 
-            for (int i = 0; i < 10; i++)
+            AddStep("Sort by difficulty", () => carousel.FilterImmediately(new FilterCriteria { Sort = SortMode.Difficulty }));
+
+            advanceSelection(direction: 1, diff: false);
+
+            for (int i = 0; i < 5; i++)
             {
-                AddStep("Reset filter", () => carousel.Filter(new FilterCriteria(), false));
-
-                AddStep("select first beatmap", () => carousel.SelectBeatmap(manySets.First().Beatmaps.First()));
-
                 AddStep("Toggle non-matching filter", () =>
                 {
-                    carousel.Filter(new FilterCriteria { SearchText = Guid.NewGuid().ToString() }, false);
+                    carousel.FilterImmediately(new FilterCriteria { SearchText = Guid.NewGuid().ToString() });
                 });
 
-                AddAssert("selection lost", () => carousel.SelectedBeatmapInfo == null);
-
-                AddStep("Restore different ruleset filter", () =>
+                AddStep("Restore no filter", () =>
                 {
-                    carousel.Filter(new FilterCriteria { Ruleset = rulesets.GetRuleset(1) }, false);
-                    eagerSelectedIDs.Add(carousel.SelectedBeatmapSet.ID);
+                    carousel.FilterImmediately(new FilterCriteria());
+                    eagerSelectedIDs.Add(carousel.SelectedBeatmapSet!.ID);
                 });
-
-                AddAssert("selection changed", () => !carousel.SelectedBeatmapInfo.Equals(manySets.First().Beatmaps.First()));
             }
 
-            AddAssert("Selection was random", () => eagerSelectedIDs.Count > 2);
+            // always returns to same selection as long as it's available.
+            AddAssert("Selection was remembered", () => eagerSelectedIDs.Count == 1);
+        }
+
+        [Test]
+        public void TestCarouselRetainsSelectionFromDifficultySort()
+        {
+            List<BeatmapSetInfo> manySets = new List<BeatmapSetInfo>();
+
+            AddStep("Populate beatmap sets", () =>
+            {
+                manySets.Clear();
+
+                for (int i = 1; i <= 50; i++)
+                    manySets.Add(TestResources.CreateTestBeatmapSetInfo(diff_count));
+            });
+
+            loadBeatmaps(manySets);
+
+            BeatmapInfo chosenBeatmap = null!;
+            AddStep("select given beatmap", () => carousel.SelectBeatmap(chosenBeatmap = manySets[20].Beatmaps[0]));
+            AddUntilStep("selection changed", () => carousel.SelectedBeatmapInfo, () => Is.EqualTo(chosenBeatmap));
+
+            AddStep("sort by difficulty", () => carousel.FilterImmediately(new FilterCriteria { Sort = SortMode.Difficulty }));
+            AddAssert("selection retained", () => carousel.SelectedBeatmapInfo, () => Is.EqualTo(chosenBeatmap));
+
+            AddStep("sort by title", () => carousel.FilterImmediately(new FilterCriteria { Sort = SortMode.Title }));
+            AddAssert("selection retained", () => carousel.SelectedBeatmapInfo, () => Is.EqualTo(chosenBeatmap));
         }
 
         [Test]
@@ -823,49 +1209,133 @@ namespace osu.Game.Tests.Visual.SongSelect
             checkVisibleItemCount(true, 15);
         }
 
-        private void loadBeatmaps(List<BeatmapSetInfo> beatmapSets = null, Func<FilterCriteria> initialCriteria = null, Action<BeatmapCarousel> carouselAdjust = null, int? count = null, bool randomDifficulties = false)
+        [Test]
+        public void TestCarouselSelectsNextWhenPreviousIsFiltered()
+        {
+            List<BeatmapSetInfo> sets = new List<BeatmapSetInfo>();
+
+            // 10 sets that go osu! -> taiko -> catch -> osu! -> ...
+            for (int i = 0; i < 10; i++)
+                sets.Add(TestResources.CreateTestBeatmapSetInfo(5, new[] { getRuleset(i) }));
+
+            // Sort mode is important to keep the ruleset order
+            loadBeatmaps(sets, () => new FilterCriteria { Sort = SortMode.Title });
+            setSelected(1, 1);
+
+            for (int i = 1; i < 10; i++)
+            {
+                var rulesetInfo = getRuleset(i % 3);
+
+                AddStep($"Set ruleset to {rulesetInfo.ShortName}", () =>
+                {
+                    carousel.FilterImmediately(new FilterCriteria { Ruleset = rulesetInfo, Sort = SortMode.Title });
+                });
+                waitForSelection(i + 1, 1);
+            }
+
+            static RulesetInfo getRuleset(int index)
+            {
+                switch (index % 3)
+                {
+                    default:
+                        return new OsuRuleset().RulesetInfo;
+
+                    case 1:
+                        return new TaikoRuleset().RulesetInfo;
+
+                    case 2:
+                        return new CatchRuleset().RulesetInfo;
+                }
+            }
+        }
+
+        [Test]
+        public void TestCarouselSelectsBackwardsWhenDistanceIsShorter()
+        {
+            List<BeatmapSetInfo> sets = new List<BeatmapSetInfo>();
+
+            // 10 sets that go taiko, osu!, osu!, osu!, taiko, osu!, osu!, osu!, ...
+            for (int i = 0; i < 10; i++)
+                sets.Add(TestResources.CreateTestBeatmapSetInfo(5, new[] { getRuleset(i) }));
+
+            // Sort mode is important to keep the ruleset order
+            loadBeatmaps(sets, () => new FilterCriteria { Sort = SortMode.Title });
+
+            for (int i = 2; i < 10; i += 4)
+            {
+                setSelected(i, 1);
+                AddStep("Set ruleset to taiko", () =>
+                {
+                    carousel.FilterImmediately(new FilterCriteria { Ruleset = rulesets.AvailableRulesets.ElementAt(1), Sort = SortMode.Title });
+                });
+                waitForSelection(i - 1, 1);
+                AddStep("Remove ruleset filter", () =>
+                {
+                    carousel.FilterImmediately(new FilterCriteria { Sort = SortMode.Title });
+                });
+            }
+
+            static RulesetInfo getRuleset(int index)
+            {
+                switch (index % 4)
+                {
+                    case 0:
+                        return new TaikoRuleset().RulesetInfo;
+
+                    default:
+                        return new OsuRuleset().RulesetInfo;
+                }
+            }
+        }
+
+        private void loadBeatmaps(List<BeatmapSetInfo> beatmapSets = null, Func<FilterCriteria> initialCriteria = null, Action<BeatmapCarousel> carouselAdjust = null,
+                                  int? setCount = null, int? diffCount = null, bool randomDifficulties = false)
         {
             bool changed = false;
 
             if (beatmapSets == null)
             {
                 beatmapSets = new List<BeatmapSetInfo>();
+                var statuses = Enum.GetValues<BeatmapOnlineStatus>()
+                                   .Except(new[] { BeatmapOnlineStatus.None }) // make sure a badge is always shown.
+                                   .ToArray();
 
-                for (int i = 1; i <= (count ?? set_count); i++)
+                for (int i = 1; i <= (setCount ?? set_count); i++)
                 {
-                    beatmapSets.Add(randomDifficulties
+                    var set = randomDifficulties
                         ? TestResources.CreateTestBeatmapSetInfo()
-                        : TestResources.CreateTestBeatmapSetInfo(3));
+                        : TestResources.CreateTestBeatmapSetInfo(diffCount ?? diff_count);
+                    set.Status = statuses[RNG.Next(statuses.Length)];
+
+                    beatmapSets.Add(set);
                 }
             }
 
-            createCarousel(beatmapSets, c =>
+            createCarousel(beatmapSets, initialCriteria, c =>
             {
-                carouselAdjust?.Invoke(c);
-
-                carousel.Filter(initialCriteria?.Invoke() ?? new FilterCriteria());
                 carousel.BeatmapSetsChanged = () => changed = true;
-                carousel.BeatmapSets = beatmapSets;
+                carouselAdjust?.Invoke(c);
             });
 
             AddUntilStep("Wait for load", () => changed);
         }
 
-        private void createCarousel(List<BeatmapSetInfo> beatmapSets, Action<BeatmapCarousel> carouselAdjust = null, Container target = null)
+        private void createCarousel(List<BeatmapSetInfo> beatmapSets, [CanBeNull] Func<FilterCriteria> initialCriteria = null, Action<BeatmapCarousel> carouselAdjust = null, Container target = null)
         {
             AddStep("Create carousel", () =>
             {
                 selectedSets.Clear();
                 eagerSelectedIDs.Clear();
 
-                carousel = new TestBeatmapCarousel
+                carousel = new TestBeatmapCarousel(initialCriteria?.Invoke() ?? new FilterCriteria())
                 {
                     RelativeSizeAxes = Axes.Both,
                 };
 
                 carouselAdjust?.Invoke(carousel);
 
-                carousel.BeatmapSets = beatmapSets;
+                beatmaps.BeatmapSets.Clear();
+                beatmaps.BeatmapSets.AddRange(beatmapSets);
 
                 (target ?? this).Child = carousel;
             });
@@ -905,7 +1375,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             // until step required as we are querying against alive items, which are loaded asynchronously inside DrawableCarouselBeatmapSet.
             AddUntilStep($"{count} {(diff ? "diffs" : "sets")} visible", () =>
-                carousel.Items.Count(s => (diff ? s.Item is CarouselBeatmap : s.Item is CarouselBeatmapSet) && s.Item.Visible) == count);
+                carousel.Items.Count(s => (diff ? s.Item is CarouselBeatmap : s.Item is CarouselBeatmapSet) && s.Item.Visible), () => Is.EqualTo(count));
         }
 
         private void checkSelectionIsCentered()
@@ -915,7 +1385,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 return Precision.AlmostEquals(
                     carousel.ScreenSpaceDrawQuad.Centre,
                     carousel.Items
-                            .First(i => i.Item.State.Value == CarouselItemState.Selected)
+                            .First(i => i.Item?.State.Value == CarouselItemState.Selected)
                             .ScreenSpaceDrawQuad.Centre, 100);
             });
         }
@@ -949,7 +1419,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             if (currentlySelected == null)
                 return true;
 
-            return currentlySelected.Item.Visible;
+            return currentlySelected.Item!.Visible;
         }
 
         private void checkInvisibleDifficultiesUnselectable()
@@ -958,16 +1428,24 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddAssert("Selection is visible", selectedBeatmapVisible);
         }
 
-        private class TestBeatmapCarousel : BeatmapCarousel
+        private partial class TestBeatmapCarousel : BeatmapCarousel
         {
+            public TestBeatmapCarousel(FilterCriteria criteria)
+                : base(criteria)
+            {
+            }
+
             public bool PendingFilterTask => PendingFilter != null;
 
             public IEnumerable<DrawableCarouselItem> Items
             {
                 get
                 {
-                    foreach (var item in Scroll.Children)
+                    foreach (var item in Scroll.Children.OrderBy(c => c.Y))
                     {
+                        if (item.Item?.Visible != true)
+                            continue;
+
                         yield return item;
 
                         if (item is DrawableCarouselBeatmapSet set)
@@ -977,6 +1455,12 @@ namespace osu.Game.Tests.Visual.SongSelect
                         }
                     }
                 }
+            }
+
+            public void FilterImmediately(FilterCriteria newCriteria)
+            {
+                Filter(newCriteria);
+                FlushPendingFilterOperations();
             }
         }
     }

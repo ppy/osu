@@ -20,6 +20,11 @@ namespace osu.Game.Localisation
         public static LocalisableString NoTabletDetected => new TranslatableString(getKey(@"no_tablet_detected"), @"No tablet detected!");
 
         /// <summary>
+        /// "If your tablet is not detected, please read [this FAQ]({0}) for troubleshooting steps."
+        /// </summary>
+        public static LocalisableString NoTabletDetectedDescription(string url) => new TranslatableString(getKey(@"no_tablet_detected_description"), @"If your tablet is not detected, please read [this FAQ]({0}) for troubleshooting steps.", url);
+
+        /// <summary>
         /// "Reset to full area"
         /// </summary>
         public static LocalisableString ResetToFullArea => new TranslatableString(getKey(@"reset_to_full_area"), @"Reset to full area");
@@ -53,6 +58,11 @@ namespace osu.Game.Localisation
         /// "Lock aspect ratio"
         /// </summary>
         public static LocalisableString LockAspectRatio => new TranslatableString(getKey(@"lock_aspect_ratio"), @"Lock aspect ratio");
+
+        /// <summary>
+        /// "Tip pressure for click"
+        /// </summary>
+        public static LocalisableString TipPressureForClick => new TranslatableString(getKey(@"tip_pressure_for_click"), "Tip pressure for click");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

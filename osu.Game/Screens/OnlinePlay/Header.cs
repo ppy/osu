@@ -2,10 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using Humanizer;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Localisation;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -14,14 +14,14 @@ using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay
 {
-    public class Header : Container
+    public partial class Header : Container
     {
         public const float HEIGHT = 80;
 
-        private readonly ScreenStack stack;
+        private readonly ScreenStack? stack;
         private readonly MultiHeaderTitle title;
 
-        public Header(string mainTitle, ScreenStack stack)
+        public Header(LocalisableString mainTitle, ScreenStack? stack)
         {
             this.stack = stack;
 
@@ -35,27 +35,33 @@ namespace osu.Game.Screens.OnlinePlay
                 Origin = Anchor.CentreLeft,
             };
 
-            // unnecessary to unbind these as this header has the same lifetime as the screen stack we are attaching to.
-            stack.ScreenPushed += (_, __) => updateSubScreenTitle();
-            stack.ScreenExited += (_, __) => updateSubScreenTitle();
+            if (stack != null)
+            {
+                // unnecessary to unbind these as this header has the same lifetime as the screen stack we are attaching to.
+                stack.ScreenPushed += (_, _) => updateSubScreenTitle();
+                stack.ScreenExited += (_, _) => updateSubScreenTitle();
+            }
         }
 
-        private void updateSubScreenTitle() => title.Screen = stack.CurrentScreen as IOnlinePlaySubScreen;
+        private void updateSubScreenTitle() => title.Screen = stack?.CurrentScreen as IOnlinePlaySubScreen;
 
-        private class MultiHeaderTitle : CompositeDrawable
+        private partial class MultiHeaderTitle : CompositeDrawable
         {
             private const float spacing = 6;
 
             private readonly OsuSpriteText dot;
             private readonly OsuSpriteText pageTitle;
 
-            [CanBeNull]
-            public IOnlinePlaySubScreen Screen
+            public IOnlinePlaySubScreen? Screen
             {
-                set => pageTitle.Text = value?.ShortTitle.Titleize() ?? string.Empty;
+                set
+                {
+                    pageTitle.Text = value?.ShortTitle.Titleize() ?? default(LocalisableString);
+                    dot.Alpha = pageTitle.Text == default ? 0 : 1;
+                }
             }
 
-            public MultiHeaderTitle(string mainTitle)
+            public MultiHeaderTitle(LocalisableString mainTitle)
             {
                 AutoSizeAxes = Axes.Both;
 
@@ -80,14 +86,14 @@ namespace osu.Game.Screens.OnlinePlay
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
                                 Font = OsuFont.TorusAlternate.With(size: 24),
-                                Text = "·"
+                                Text = "·",
+                                Alpha = 0,
                             },
                             pageTitle = new OsuSpriteText
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
                                 Font = OsuFont.TorusAlternate.With(size: 24),
-                                Text = "Lounge"
                             }
                         }
                     },

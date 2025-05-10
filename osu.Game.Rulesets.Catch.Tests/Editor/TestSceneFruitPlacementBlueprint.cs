@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
@@ -15,11 +15,11 @@ using osuTK.Input;
 
 namespace osu.Game.Rulesets.Catch.Tests.Editor
 {
-    public class TestSceneFruitPlacementBlueprint : CatchPlacementBlueprintTestScene
+    public partial class TestSceneFruitPlacementBlueprint : CatchPlacementBlueprintTestScene
     {
         protected override DrawableHitObject CreateHitObject(HitObject hitObject) => new DrawableFruit((Fruit)hitObject);
 
-        protected override PlacementBlueprint CreateBlueprint() => new FruitPlacementBlueprint();
+        protected override HitObjectPlacementBlueprint CreateBlueprint() => new FruitPlacementBlueprint();
 
         [Test]
         public void TestFruitPlacementPosition()

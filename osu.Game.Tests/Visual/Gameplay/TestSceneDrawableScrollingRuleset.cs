@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,7 +33,7 @@ using JetBrains.Annotations;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneDrawableScrollingRuleset : OsuTestScene
+    public partial class TestSceneDrawableScrollingRuleset : OsuTestScene
     {
         /// <summary>
         /// The amount of time visible by the "view window" of the playfield.
@@ -196,7 +198,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             var beatmap = createBeatmap();
             beatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = time_range });
-            beatmap.Difficulty.SliderMultiplier = 2;
+            beatmap.BeatmapInfo.Difficulty.SliderMultiplier = 2;
 
             createTest(beatmap);
             AddStep("adjust time range", () => drawableRuleset.TimeRange.Value = 2000);
@@ -235,7 +237,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         });
 
         private void assertPosition(int index, float relativeY) => AddAssert($"hitobject {index} at {relativeY}",
-            () => Precision.AlmostEquals(getDrawableHitObject(index)?.DrawPosition.Y ?? -1, yScale * relativeY));
+            () => getDrawableHitObject(index)?.DrawPosition.Y / yScale ?? -1, () => Is.EqualTo(relativeY).Within(Precision.FLOAT_EPSILON));
 
         private void setTime(double time)
         {
@@ -249,7 +251,17 @@ namespace osu.Game.Tests.Visual.Gameplay
         /// <returns>The <see cref="IBeatmap"/>.</returns>
         private IBeatmap createBeatmap(Func<int, TestHitObject> createAction = null)
         {
-            var beatmap = new Beatmap<TestHitObject> { BeatmapInfo = { Ruleset = new OsuRuleset().RulesetInfo } };
+            var beatmap = new Beatmap<TestHitObject>
+            {
+                BeatmapInfo =
+                {
+                    Difficulty = new BeatmapDifficulty
+                    {
+                        SliderMultiplier = 1
+                    },
+                    Ruleset = new OsuRuleset().RulesetInfo
+                }
+            };
 
             for (int i = 0; i < 10; i++)
             {
@@ -261,27 +273,30 @@ namespace osu.Game.Tests.Visual.Gameplay
             return beatmap;
         }
 
-        private void createTest(IBeatmap beatmap, Action<TestDrawableScrollingRuleset> overrideAction = null) => AddStep("create test", () =>
+        private void createTest(IBeatmap beatmap, Action<TestDrawableScrollingRuleset> overrideAction = null)
         {
-            var ruleset = new TestScrollingRuleset();
-
-            drawableRuleset = (TestDrawableScrollingRuleset)ruleset.CreateDrawableRulesetWith(CreateWorkingBeatmap(beatmap).GetPlayableBeatmap(ruleset.RulesetInfo));
-            drawableRuleset.FrameStablePlayback = false;
-
-            overrideAction?.Invoke(drawableRuleset);
-
-            Child = new Container
+            AddStep("create test", () =>
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                RelativeSizeAxes = Axes.Y,
-                Height = 0.75f,
-                Width = 400,
-                Masking = true,
-                Clock = new FramedClock(testClock),
-                Child = drawableRuleset
-            };
-        });
+                var ruleset = new TestScrollingRuleset();
+
+                drawableRuleset = (TestDrawableScrollingRuleset)ruleset.CreateDrawableRulesetWith(CreateWorkingBeatmap(beatmap).GetPlayableBeatmap(ruleset.RulesetInfo));
+                drawableRuleset.FrameStablePlayback = false;
+
+                overrideAction?.Invoke(drawableRuleset);
+
+                Child = new Container
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Y,
+                    Height = 0.75f,
+                    Width = 400,
+                    Masking = true,
+                    Clock = new FramedClock(testClock),
+                    Child = drawableRuleset
+                };
+            });
+        }
 
         #region Ruleset
 
@@ -300,13 +315,11 @@ namespace osu.Game.Tests.Visual.Gameplay
             public override string ShortName { get; } = string.Empty;
         }
 
-        private class TestDrawableScrollingRuleset : DrawableScrollingRuleset<TestHitObject>
+        private partial class TestDrawableScrollingRuleset : DrawableScrollingRuleset<TestHitObject>
         {
             public bool RelativeScaleBeatLengthsOverride { get; set; }
 
             protected override bool RelativeScaleBeatLengths => RelativeScaleBeatLengthsOverride;
-
-            protected override ScrollVisualisationMethod VisualisationMethod => ScrollVisualisationMethod.Overlapping;
 
             public new Bindable<double> TimeRange => base.TimeRange;
 
@@ -314,14 +327,15 @@ namespace osu.Game.Tests.Visual.Gameplay
                 : base(ruleset, beatmap, mods)
             {
                 TimeRange.Value = time_range;
+                VisualisationMethod = ScrollVisualisationMethod.Overlapping;
             }
 
             public override DrawableHitObject<TestHitObject> CreateDrawableRepresentation(TestHitObject h)
             {
                 switch (h)
                 {
-                    case TestPooledHitObject _:
-                    case TestPooledParentHitObject _:
+                    case TestPooledHitObject:
+                    case TestPooledParentHitObject:
                         return null;
 
                     case TestParentHitObject p:
@@ -337,7 +351,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             protected override Playfield CreatePlayfield() => new TestPlayfield();
         }
 
-        private class TestPlayfield : ScrollingPlayfield
+        private partial class TestPlayfield : ScrollingPlayfield
         {
             public TestPlayfield()
             {
@@ -422,7 +436,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             }
         }
 
-        private class DrawableTestHitObject : DrawableHitObject<TestHitObject>
+        private partial class DrawableTestHitObject : DrawableHitObject<TestHitObject>
         {
             public DrawableTestHitObject([CanBeNull] TestHitObject hitObject)
                 : base(hitObject)
@@ -452,7 +466,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             protected override void Update() => LifetimeEnd = HitObject.EndTime;
         }
 
-        private class DrawableTestPooledHitObject : DrawableTestHitObject
+        private partial class DrawableTestPooledHitObject : DrawableTestHitObject
         {
             public DrawableTestPooledHitObject()
                 : base(null)
@@ -462,7 +476,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             }
         }
 
-        private class DrawableTestParentHitObject : DrawableTestHitObject
+        private partial class DrawableTestParentHitObject : DrawableTestHitObject
         {
             private readonly Container<DrawableHitObject> container;
 
@@ -486,7 +500,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             protected override void ClearNestedHitObjects() => container.Clear(false);
         }
 
-        private class DrawableTestPooledParentHitObject : DrawableTestParentHitObject
+        private partial class DrawableTestPooledParentHitObject : DrawableTestParentHitObject
         {
             public DrawableTestPooledParentHitObject()
                 : base(null)

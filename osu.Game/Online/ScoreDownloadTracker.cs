@@ -9,11 +9,9 @@ using osu.Game.Extensions;
 using osu.Game.Online.API;
 using osu.Game.Scoring;
 
-#nullable enable
-
 namespace osu.Game.Online
 {
-    public class ScoreDownloadTracker : DownloadTracker<ScoreInfo>
+    public partial class ScoreDownloadTracker : DownloadTracker<ScoreInfo>
     {
         [Resolved(CanBeNull = true)]
         protected ScoreModelDownloader? Downloader { get; private set; }
@@ -41,16 +39,23 @@ namespace osu.Game.Online
             var scoreInfo = new ScoreInfo
             {
                 ID = TrackedItem.ID,
-                OnlineID = TrackedItem.OnlineID
+                OnlineID = TrackedItem.OnlineID,
+                LegacyOnlineID = TrackedItem.LegacyOnlineID
             };
 
             Downloader.DownloadBegan += downloadBegan;
             Downloader.DownloadFailed += downloadFailed;
 
+            // Required local for iOS. Will cause runtime crash if inlined.
+            long onlineId = TrackedItem.OnlineID;
+            long legacyOnlineId = TrackedItem.LegacyOnlineID;
+            string hash = TrackedItem.Hash;
+
             realmSubscription = realm.RegisterForNotifications(r => r.All<ScoreInfo>().Where(s =>
-                ((s.OnlineID > 0 && s.OnlineID == TrackedItem.OnlineID)
-                 || (!string.IsNullOrEmpty(s.Hash) && s.Hash == TrackedItem.Hash))
-                && !s.DeletePending), (items, changes, ___) =>
+                ((s.OnlineID > 0 && s.OnlineID == onlineId)
+                 || (s.LegacyOnlineID > 0 && s.LegacyOnlineID == legacyOnlineId)
+                 || (!string.IsNullOrEmpty(s.Hash) && s.Hash == hash))
+                && !s.DeletePending), (items, _) =>
             {
                 if (items.Any())
                     Schedule(() => UpdateState(DownloadState.LocallyAvailable));

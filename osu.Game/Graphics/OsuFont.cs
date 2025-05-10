@@ -1,6 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
+using System.ComponentModel;
 using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Graphics
@@ -13,14 +16,64 @@ namespace osu.Game.Graphics
         public const float DEFAULT_FONT_SIZE = 16;
 
         /// <summary>
+        /// Template font styles which should be preferred whenever possible for UI elements.
+        /// </summary>
+        public static class Style
+        {
+            /// <summary>
+            /// Equivalent to Torus with 32px size and semi-bold weight.
+            /// </summary>
+            public static FontUsage Title => GetFont(Typeface.TorusAlternate, size: 32, weight: FontWeight.Regular);
+
+            /// <summary>
+            /// Torus with 28px size and semi-bold weight.
+            /// </summary>
+            public static FontUsage Subtitle => GetFont(size: 28, weight: FontWeight.Regular);
+
+            /// <summary>
+            /// Torus with 22px size and bold weight.
+            /// </summary>
+            public static FontUsage Heading1 => GetFont(size: 22, weight: FontWeight.Bold);
+
+            /// <summary>
+            /// Torus with 18px size and semi-bold weight.
+            /// </summary>
+            public static FontUsage Heading2 => GetFont(size: 18, weight: FontWeight.SemiBold);
+
+            /// <summary>
+            /// Torus with 16px size and regular weight.
+            /// </summary>
+            public static FontUsage Body => GetFont(size: DEFAULT_FONT_SIZE, weight: FontWeight.Regular);
+
+            /// <summary>
+            /// Torus with 14px size and regular weight.
+            /// </summary>
+            public static FontUsage Caption1 => GetFont(size: 14, weight: FontWeight.Regular);
+
+            /// <summary>
+            /// Torus with 12px size and regular weight.
+            /// </summary>
+            public static FontUsage Caption2 => GetFont(size: 12, weight: FontWeight.Regular);
+        }
+
+        /// <summary>
         /// The default font.
         /// </summary>
-        public static FontUsage Default => GetFont();
+        public static FontUsage Default => GetFont(weight: FontWeight.Medium);
 
+        /// <summary>
+        /// Font face for numeric display.
+        /// </summary>
         public static FontUsage Numeric => GetFont(Typeface.Venera, weight: FontWeight.Bold);
 
+        /// <summary>
+        /// Default font face for UI and game elements.
+        /// </summary>
         public static FontUsage Torus => GetFont(Typeface.Torus, weight: FontWeight.Regular);
 
+        /// <summary>
+        /// Default font face with alternate character set for headings and flair text.
+        /// </summary>
         public static FontUsage TorusAlternate => GetFont(Typeface.TorusAlternate, weight: FontWeight.Regular);
 
         public static FontUsage Inter => GetFont(Typeface.Inter, weight: FontWeight.Regular);
@@ -35,7 +88,10 @@ namespace osu.Game.Graphics
         /// <param name="fixedWidth">Whether all characters should be spaced the same distance apart.</param>
         /// <returns>The <see cref="FontUsage"/>.</returns>
         public static FontUsage GetFont(Typeface typeface = Typeface.Torus, float size = DEFAULT_FONT_SIZE, FontWeight weight = FontWeight.Medium, bool italics = false, bool fixedWidth = false)
-            => new FontUsage(GetFamilyString(typeface), size, GetWeightString(typeface, weight), getItalics(italics), fixedWidth);
+        {
+            string familyString = GetFamilyString(typeface);
+            return new FontUsage(familyString, size, GetWeightString(familyString, weight), getItalics(italics), fixedWidth);
+        }
 
         private static bool getItalics(in bool italicsRequested)
         {
@@ -54,16 +110,16 @@ namespace osu.Game.Graphics
             switch (typeface)
             {
                 case Typeface.Venera:
-                    return "Venera";
+                    return @"Venera";
 
                 case Typeface.Torus:
-                    return "Torus";
+                    return @"Torus";
 
                 case Typeface.TorusAlternate:
-                    return "Torus-Alternate";
+                    return @"Torus-Alternate";
 
                 case Typeface.Inter:
-                    return "Inter";
+                    return @"Inter";
             }
 
             return null;
@@ -72,25 +128,17 @@ namespace osu.Game.Graphics
         /// <summary>
         /// Retrieves the string representation of a <see cref="FontWeight"/>.
         /// </summary>
-        /// <param name="typeface">The <see cref="Typeface"/>.</param>
-        /// <param name="weight">The <see cref="FontWeight"/>.</param>
-        /// <returns>The string representation of <paramref name="weight"/> in the specified <paramref name="typeface"/>.</returns>
-        public static string GetWeightString(Typeface typeface, FontWeight weight)
+        /// <param name="family">The font family.</param>
+        /// <param name="weight">The font weight.</param>
+        /// <returns>The string representation of <paramref name="weight"/> in the specified <paramref name="family"/>.</returns>
+        public static string GetWeightString(string family, FontWeight weight)
         {
-            if (typeface == Typeface.Torus && weight == FontWeight.Medium)
+            if ((family == GetFamilyString(Typeface.Torus) || family == GetFamilyString(Typeface.TorusAlternate)) && weight == FontWeight.Medium)
                 // torus doesn't have a medium; fallback to regular.
                 weight = FontWeight.Regular;
 
-            return GetWeightString(GetFamilyString(typeface), weight);
+            return weight.ToString();
         }
-
-        /// <summary>
-        /// Retrieves the string representation of a <see cref="FontWeight"/>.
-        /// </summary>
-        /// <param name="family">The family string.</param>
-        /// <param name="weight">The <see cref="FontWeight"/>.</param>
-        /// <returns>The string representation of <paramref name="weight"/> in the specified <paramref name="family"/>.</returns>
-        public static string GetWeightString(string family, FontWeight weight) => weight.ToString();
     }
 
     public static class OsuFontExtensions
@@ -118,6 +166,8 @@ namespace osu.Game.Graphics
     {
         Venera,
         Torus,
+
+        [Description("Torus (alternate)")]
         TorusAlternate,
         Inter,
     }

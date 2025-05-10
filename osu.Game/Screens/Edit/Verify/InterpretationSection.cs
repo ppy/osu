@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
@@ -8,7 +8,7 @@ using osu.Game.Overlays.Settings;
 
 namespace osu.Game.Screens.Edit.Verify
 {
-    internal class InterpretationSection : EditorRoundedScreenSettingsSection
+    internal partial class InterpretationSection : EditorRoundedScreenSettingsSection
     {
         protected override string HeaderText => "Interpretation";
 

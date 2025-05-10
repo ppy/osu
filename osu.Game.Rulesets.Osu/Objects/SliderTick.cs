@@ -13,6 +13,7 @@ namespace osu.Game.Rulesets.Osu.Objects
     {
         public int SpanIndex { get; set; }
         public double SpanStartTime { get; set; }
+        public double PathProgress { get; set; }
 
         protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, IBeatmapDifficultyInfo difficulty)
         {
@@ -25,7 +26,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                 // This is so on repeats ticks don't appear too late to be visually processed by the player.
                 offset = 200;
             else
-                offset = TimeFadeIn * 0.66f;
+                offset = TimePreempt * 0.66f;
 
             TimePreempt = (StartTime - SpanStartTime) / 2 + offset;
         }

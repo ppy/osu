@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Testing;
@@ -13,7 +15,7 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Tests.Online
 {
     [HeadlessTest]
-    public class TestSceneBeatmapDownloading : OsuTestScene
+    public partial class TestSceneBeatmapDownloading : OsuTestScene
     {
         private BeatmapModelDownloader beatmaps;
         private ProgressNotification recentNotification;
@@ -78,7 +80,7 @@ namespace osu.Game.Tests.Online
         {
             AddStep("download beatmap", () => beatmaps.Download(test_db_model));
 
-            AddStep("cancel download from request", () => beatmaps.GetExistingDownload(test_db_model).Cancel());
+            AddStep("cancel download from request", () => beatmaps.GetExistingDownload(test_db_model)!.Cancel());
 
             AddUntilStep("is removed from download list", () => beatmaps.GetExistingDownload(test_db_model) == null);
             AddAssert("is notification cancelled", () => recentNotification.State == ProgressNotificationState.Cancelled);
@@ -89,7 +91,7 @@ namespace osu.Game.Tests.Online
         {
             AddStep("download beatmap", () => beatmaps.Download(test_db_model));
 
-            AddStep("cancel download from notification", () => recentNotification.Close());
+            AddStep("cancel download from notification", () => recentNotification.Close(true));
 
             AddUntilStep("is removed from download list", () => beatmaps.GetExistingDownload(test_db_model) == null);
             AddAssert("is notification cancelled", () => recentNotification.State == ProgressNotificationState.Cancelled);

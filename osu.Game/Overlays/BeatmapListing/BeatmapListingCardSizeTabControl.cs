@@ -1,8 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -15,12 +19,16 @@ using osuTK;
 
 namespace osu.Game.Overlays.BeatmapListing
 {
-    public class BeatmapListingCardSizeTabControl : OsuTabControl<BeatmapCardSize>
+    public partial class BeatmapListingCardSizeTabControl : OsuTabControl<BeatmapCardSize>
     {
         public BeatmapListingCardSizeTabControl()
         {
             AutoSizeAxes = Axes.Both;
+
+            Items = new[] { BeatmapCardSize.Normal, BeatmapCardSize.Extra };
         }
+
+        protected override bool AddEnumEntriesAutomatically => false;
 
         protected override TabFillFlowContainer CreateTabFlow() => new TabFillFlowContainer
         {
@@ -33,7 +41,7 @@ namespace osu.Game.Overlays.BeatmapListing
 
         protected override TabItem<BeatmapCardSize> CreateTabItem(BeatmapCardSize value) => new TabItem(value);
 
-        private class TabItem : TabItem<BeatmapCardSize>
+        private partial class TabItem : TabItem<BeatmapCardSize>
         {
             private Box background;
             private SpriteIcon icon;
@@ -41,13 +49,15 @@ namespace osu.Game.Overlays.BeatmapListing
             [Resolved]
             private OverlayColourProvider colourProvider { get; set; }
 
+            private Sample selectSample = null!;
+
             public TabItem(BeatmapCardSize value)
                 : base(value)
             {
             }
 
             [BackgroundDependencyLoader]
-            private void load()
+            private void load(AudioManager audio)
             {
                 AutoSizeAxes = Axes.Both;
                 Masking = true;
@@ -73,8 +83,10 @@ namespace osu.Game.Overlays.BeatmapListing
                             Icon = getIconForCardSize(Value)
                         }
                     },
-                    new HoverClickSounds(HoverSampleSet.TabSelect)
+                    new HoverSounds(HoverSampleSet.TabSelect)
                 };
+
+                selectSample = audio.Samples.Get(@"UI/tabselect-select");
             }
 
             private static IconUsage getIconForCardSize(BeatmapCardSize cardSize)
@@ -104,6 +116,8 @@ namespace osu.Game.Overlays.BeatmapListing
                 if (IsLoaded)
                     updateState();
             }
+
+            protected override void OnActivatedByUser() => selectSample.Play();
 
             protected override void OnDeactivated()
             {

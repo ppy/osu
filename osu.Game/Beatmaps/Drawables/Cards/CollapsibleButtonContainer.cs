@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -16,7 +14,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Beatmaps.Drawables.Cards
 {
-    public class CollapsibleButtonContainer : Container
+    public partial class CollapsibleButtonContainer : Container
     {
         public Bindable<bool> ShowDetails = new Bindable<bool>();
         public Bindable<BeatmapSetFavouriteState> FavouriteState = new Bindable<BeatmapSetFavouriteState>();
@@ -50,12 +48,6 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             }
         }
 
-        public MarginPadding ButtonsPadding
-        {
-            get => buttons.Padding;
-            set => buttons.Padding = value;
-        }
-
         protected override Container<Drawable> Content => mainContent;
 
         private readonly Container background;
@@ -85,12 +77,9 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                 downloadTracker,
                 background = new Container
                 {
-                    RelativeSizeAxes = Axes.Both,
+                    RelativeSizeAxes = Axes.Y,
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
-                    // workaround for masking artifacts at the top & bottom of card,
-                    // which become especially visible on downloaded beatmaps (when the icon area has a lime background).
-                    Padding = new MarginPadding { Vertical = 1 },
                     Child = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
@@ -112,19 +101,25 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                             {
                                 Current = FavouriteState,
                                 Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre
+                                Origin = Anchor.TopCentre,
+                                RelativeSizeAxes = Axes.Both,
+                                Height = 0.5f,
                             },
                             new DownloadButton(beatmapSet)
                             {
                                 Anchor = Anchor.BottomCentre,
                                 Origin = Anchor.BottomCentre,
-                                State = { BindTarget = downloadTracker.State }
+                                State = { BindTarget = downloadTracker.State },
+                                RelativeSizeAxes = Axes.Both,
+                                Height = 0.5f,
                             },
                             new GoToBeatmapButton(beatmapSet)
                             {
                                 Anchor = Anchor.BottomCentre,
                                 Origin = Anchor.BottomCentre,
-                                State = { BindTarget = downloadTracker.State }
+                                State = { BindTarget = downloadTracker.State },
+                                RelativeSizeAxes = Axes.Both,
+                                Height = 0.5f,
                             }
                         }
                     }
@@ -167,9 +162,13 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 
         private void updateState()
         {
-            float targetWidth = Width - (ShowDetails.Value ? ButtonsExpandedWidth : ButtonsCollapsedWidth);
+            float buttonAreaWidth = ShowDetails.Value ? ButtonsExpandedWidth : ButtonsCollapsedWidth;
+            float mainAreaWidth = Width - buttonAreaWidth;
 
-            mainArea.ResizeWidthTo(targetWidth, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
+            mainArea.ResizeWidthTo(mainAreaWidth, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
+
+            // By limiting the width we avoid this box showing up as an outline around the drawables that are on top of it.
+            background.ResizeWidthTo(buttonAreaWidth + BeatmapCard.CORNER_RADIUS, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
 
             background.FadeColour(downloadTracker.State.Value == DownloadState.LocallyAvailable ? colours.Lime0 : colourProvider.Background3, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
             buttons.FadeTo(ShowDetails.Value ? 1 : 0, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);

@@ -12,24 +12,25 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Extensions;
 using osu.Game.Graphics;
-using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Models;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Menu;
+using osu.Game.Utils;
 using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Components
 {
-    public class SongBar : CompositeDrawable
+    public partial class SongBar : CompositeDrawable
     {
-        private APIBeatmap beatmap;
+        private IBeatmapInfo? beatmap;
 
         public const float HEIGHT = 145 / 2f;
 
         [Resolved]
-        private IBindable<RulesetInfo> ruleset { get; set; }
+        private IBindable<RulesetInfo> ruleset { get; set; } = null!;
 
-        public APIBeatmap Beatmap
+        public IBeatmapInfo? Beatmap
         {
             set
             {
@@ -37,7 +38,7 @@ namespace osu.Game.Tournament.Components
                     return;
 
                 beatmap = value;
-                update();
+                refreshContent();
             }
         }
 
@@ -49,11 +50,11 @@ namespace osu.Game.Tournament.Components
             set
             {
                 mods = value;
-                update();
+                refreshContent();
             }
         }
 
-        private FillFlowContainer flow;
+        private FillFlowContainer flow = null!;
 
         private bool expanded;
 
@@ -71,19 +72,26 @@ namespace osu.Game.Tournament.Components
         protected override bool ComputeIsMaskedAway(RectangleF maskingBounds) => false;
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuColour colours)
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
+            Masking = true;
+            CornerRadius = 5;
+
             InternalChildren = new Drawable[]
             {
+                new Box
+                {
+                    Colour = colours.Gray3,
+                    RelativeSizeAxes = Axes.Both,
+                    Alpha = 0.4f,
+                },
                 flow = new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    LayoutDuration = 500,
-                    LayoutEasing = Easing.OutQuint,
                     Direction = FillDirection.Full,
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,
@@ -93,13 +101,27 @@ namespace osu.Game.Tournament.Components
             Expanded = true;
         }
 
-        private void update()
+        private void refreshContent()
         {
-            if (beatmap == null)
+            beatmap ??= new BeatmapInfo
             {
-                flow.Clear();
-                return;
-            }
+                Metadata = new BeatmapMetadata
+                {
+                    Artist = "unknown",
+                    Title = "no beatmap selected",
+                    Author = new RealmUser { Username = "unknown" },
+                },
+                DifficultyName = "unknown",
+                BeatmapSet = new BeatmapSetInfo(),
+                StarRating = 0,
+                Difficulty = new BeatmapDifficulty
+                {
+                    CircleSize = 0,
+                    DrainRate = 0,
+                    OverallDifficulty = 0,
+                    ApproachRate = 0,
+                },
+            };
 
             double bpm = beatmap.BPM;
             double length = beatmap.Length;
@@ -186,7 +208,7 @@ namespace osu.Game.Tournament.Components
                                         Children = new Drawable[]
                                         {
                                             new DiffPiece(stats),
-                                            new DiffPiece(("Star Rating", $"{beatmap.StarRating:0.##}{srExtra}"))
+                                            new DiffPiece(("Star Rating", $"{beatmap.StarRating.FormatStarRating()}{srExtra}"))
                                         }
                                     },
                                     new FillFlowContainer
@@ -240,7 +262,7 @@ namespace osu.Game.Tournament.Components
             };
         }
 
-        public class DiffPiece : TextFlowContainer
+        public partial class DiffPiece : TextFlowContainer
         {
             public DiffPiece(params (string heading, string content)[] tuples)
             {

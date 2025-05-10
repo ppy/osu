@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
@@ -11,7 +11,7 @@ using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Taiko.Tests
 {
-    public class TestSceneTaikoSuddenDeath : TestSceneTaikoPlayer
+    public partial class TestSceneTaikoSuddenDeath : TestSceneTaikoPlayer
     {
         protected override bool AllowFail => true;
 
@@ -36,16 +36,16 @@ namespace osu.Game.Rulesets.Taiko.Tests
             };
 
         [Test]
-        public void TestSpinnerDoesFail()
+        public void TestSwellDoesNotFail()
         {
             bool judged = false;
             AddStep("Setup judgements", () =>
             {
                 judged = false;
-                Player.ScoreProcessor.NewJudgement += b => judged = true;
+                Player.ScoreProcessor.NewJudgement += _ => judged = true;
             });
             AddUntilStep("swell judged", () => judged);
-            AddAssert("failed", () => Player.GameplayState.HasFailed);
+            AddAssert("not failed", () => !Player.GameplayState.HasFailed);
         }
     }
 }

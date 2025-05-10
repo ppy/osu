@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -19,12 +21,16 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Skinning;
 using osuTK;
+using osu.Game.Rulesets.Objects.Pooling;
+using osu.Framework.Extensions.ObjectExtensions;
+using osu.Framework.Graphics.Primitives;
 
 namespace osu.Game.Rulesets.UI
 {
     [Cached(typeof(IPooledHitObjectProvider))]
     [Cached(typeof(IPooledSampleProvider))]
-    public abstract class Playfield : CompositeDrawable, IPooledHitObjectProvider, IPooledSampleProvider
+    [Cached]
+    public abstract partial class Playfield : CompositeDrawable, IPooledHitObjectProvider, IPooledSampleProvider
     {
         /// <summary>
         /// Invoked when a <see cref="DrawableHitObject"/> is judged.
@@ -32,9 +38,9 @@ namespace osu.Game.Rulesets.UI
         public event Action<DrawableHitObject, JudgementResult> NewResult;
 
         /// <summary>
-        /// Invoked when a <see cref="DrawableHitObject"/> judgement is reverted.
+        /// Invoked when a judgement result is reverted.
         /// </summary>
-        public event Action<DrawableHitObject, JudgementResult> RevertResult;
+        public event Action<JudgementResult> RevertResult;
 
         /// <summary>
         /// The <see cref="DrawableHitObject"/> contained in this Playfield.
@@ -89,8 +95,23 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         public readonly BindableBool DisplayJudgements = new BindableBool(true);
 
+        /// <summary>
+        /// A screen space draw quad which resembles the edges of the playfield for skinning purposes.
+        /// This will allow users / components to snap objects to the "edge" of the playfield.
+        /// </summary>
+        /// <remarks>
+        /// Rulesets which reduce the visible area further than the full relative playfield space itself
+        /// should retarget this to the ScreenSpaceDrawQuad of the appropriate container.
+        /// </remarks>
+        public virtual Quad SkinnableComponentScreenSpaceDrawQuad => ScreenSpaceDrawQuad;
+
         [Resolved(CanBeNull = true)]
-        private IReadOnlyList<Mod> mods { get; set; }
+        [CanBeNull]
+        protected IReadOnlyList<Mod> Mods { get; private set; }
+
+        private readonly HitObjectEntryManager entryManager = new HitObjectEntryManager();
+
+        private readonly Stack<HitObjectLifetimeEntry> judgedEntries;
 
         /// <summary>
         /// Creates a new <see cref="Playfield"/>.
@@ -101,11 +122,15 @@ namespace osu.Game.Rulesets.UI
 
             hitObjectContainerLazy = new Lazy<HitObjectContainer>(() => CreateHitObjectContainer().With(h =>
             {
-                h.NewResult += (d, r) => NewResult?.Invoke(d, r);
-                h.RevertResult += (d, r) => RevertResult?.Invoke(d, r);
+                h.NewResult += onNewResult;
                 h.HitObjectUsageBegan += o => HitObjectUsageBegan?.Invoke(o);
                 h.HitObjectUsageFinished += o => HitObjectUsageFinished?.Invoke(o);
             }));
+
+            entryManager.OnEntryAdded += onEntryAdded;
+            entryManager.OnEntryRemoved += onEntryRemoved;
+
+            judgedEntries = new Stack<HitObjectLifetimeEntry>();
         }
 
         [BackgroundDependencyLoader]
@@ -169,6 +194,7 @@ namespace osu.Game.Rulesets.UI
         /// <param name="hitObject">The added <see cref="HitObject"/>.</param>
         protected virtual void OnHitObjectAdded(HitObject hitObject)
         {
+            preloadSamples(hitObject);
         }
 
         /// <summary>
@@ -193,16 +219,14 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// The cursor currently being used by this <see cref="Playfield"/>. May be null if no cursor is provided.
         /// </summary>
+        [CanBeNull]
         public GameplayCursorContainer Cursor { get; private set; }
 
         /// <summary>
         /// Provide a cursor which is to be used for gameplay.
         /// </summary>
-        /// <remarks>
-        /// The default provided cursor is invisible when inside the bounds of the <see cref="Playfield"/>.
-        /// </remarks>
         /// <returns>The cursor, or null to show the menu cursor.</returns>
-        protected virtual GameplayCursorContainer CreateCursor() => new InvisibleCursorContainer();
+        protected virtual GameplayCursorContainer CreateCursor() => null;
 
         /// <summary>
         /// Registers a <see cref="Playfield"/> as a nested <see cref="Playfield"/>.
@@ -216,16 +240,20 @@ namespace osu.Game.Rulesets.UI
             otherPlayfield.DisplayJudgements.BindTo(DisplayJudgements);
 
             otherPlayfield.NewResult += (d, r) => NewResult?.Invoke(d, r);
-            otherPlayfield.RevertResult += (d, r) => RevertResult?.Invoke(d, r);
+            otherPlayfield.RevertResult += r => RevertResult?.Invoke(r);
             otherPlayfield.HitObjectUsageBegan += h => HitObjectUsageBegan?.Invoke(h);
             otherPlayfield.HitObjectUsageFinished += h => HitObjectUsageFinished?.Invoke(h);
 
             nestedPlayfields.Add(otherPlayfield);
         }
 
+        private Mod[] mods;
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            mods = Mods?.ToArray();
 
             // in the case a consumer forgets to add the HitObjectContainer, we will add it here.
             if (HitObjectContainer.Parent == null)
@@ -238,11 +266,23 @@ namespace osu.Game.Rulesets.UI
 
             if (!IsNested && mods != null)
             {
-                foreach (var mod in mods)
+                foreach (Mod mod in mods)
                 {
                     if (mod is IUpdatableByPlayfield updatable)
                         updatable.Update(this);
                 }
+            }
+
+            // When rewinding, revert future judgements in the reverse order.
+            while (judgedEntries.Count > 0)
+            {
+                var result = judgedEntries.Peek().Result;
+                Debug.Assert(result?.RawTime != null);
+
+                if (Time.Current >= result.RawTime.Value)
+                    break;
+
+                revertResult(judgedEntries.Pop());
             }
         }
 
@@ -262,22 +302,17 @@ namespace osu.Game.Rulesets.UI
         public virtual void Add(HitObject hitObject)
         {
             var entry = CreateLifetimeEntry(hitObject);
-            lifetimeEntryMap[entry.HitObject] = entry;
-
-            preloadSamples(hitObject);
-
-            HitObjectContainer.Add(entry);
-            OnHitObjectAdded(entry.HitObject);
+            entryManager.Add(entry, null);
         }
 
         private void preloadSamples(HitObject hitObject)
         {
             // prepare sample pools ahead of time so we're not initialising at runtime.
             foreach (var sample in hitObject.Samples)
-                prepareSamplePool(hitObject.SampleControlPoint.ApplyTo(sample));
+                prepareSamplePool(sample);
 
             foreach (var sample in hitObject.AuxiliarySamples)
-                prepareSamplePool(hitObject.SampleControlPoint.ApplyTo(sample));
+                prepareSamplePool(sample);
 
             foreach (var nestedObject in hitObject.NestedHitObjects)
                 preloadSamples(nestedObject);
@@ -290,14 +325,29 @@ namespace osu.Game.Rulesets.UI
         /// <returns>Whether the <see cref="HitObject"/> was successfully removed.</returns>
         public virtual bool Remove(HitObject hitObject)
         {
-            if (lifetimeEntryMap.Remove(hitObject, out var entry))
+            if (entryManager.TryGet(hitObject, out var entry))
             {
-                HitObjectContainer.Remove(entry);
-                OnHitObjectRemoved(hitObject);
+                entryManager.Remove(entry);
                 return true;
             }
 
             return nestedPlayfields.Any(p => p.Remove(hitObject));
+        }
+
+        private void onEntryAdded(HitObjectLifetimeEntry entry, [CanBeNull] HitObject parentHitObject)
+        {
+            if (parentHitObject != null) return;
+
+            HitObjectContainer.Add(entry);
+            OnHitObjectAdded(entry.HitObject);
+        }
+
+        private void onEntryRemoved(HitObjectLifetimeEntry entry, [CanBeNull] HitObject parentHitObject)
+        {
+            if (parentHitObject != null) return;
+
+            HitObjectContainer.Remove(entry);
+            OnHitObjectRemoved(entry.HitObject);
         }
 
         /// <summary>
@@ -359,13 +409,19 @@ namespace osu.Game.Rulesets.UI
                     // This is done before Apply() so that the state is updated once when the hitobject is applied.
                     if (mods != null)
                     {
-                        foreach (var m in mods.OfType<IApplicableToDrawableHitObject>())
-                            m.ApplyToDrawableHitObject(dho);
+                        foreach (Mod mod in mods)
+                        {
+                            if (mod is IApplicableToDrawableHitObject applicable)
+                                applicable.ApplyToDrawableHitObject(dho);
+                        }
                     }
                 }
 
-                if (!lifetimeEntryMap.TryGetValue(hitObject, out var entry))
-                    lifetimeEntryMap[hitObject] = entry = CreateLifetimeEntry(hitObject);
+                if (!entryManager.TryGet(hitObject, out var entry))
+                {
+                    entry = CreateLifetimeEntry(hitObject);
+                    entryManager.Add(entry, parent?.HitObject);
+                }
 
                 dho.ParentHitObject = parent;
                 dho.Apply(entry);
@@ -407,7 +463,7 @@ namespace osu.Game.Rulesets.UI
             return pool;
         }
 
-        private class DrawableSamplePool : DrawablePool<PoolableSkinnableSample>
+        private partial class DrawableSamplePool : DrawablePool<PoolableSkinnableSample>
         {
             private readonly ISampleInfo sampleInfo;
 
@@ -421,6 +477,25 @@ namespace osu.Game.Rulesets.UI
         }
 
         #endregion
+
+        private void onNewResult(DrawableHitObject drawable, JudgementResult result)
+        {
+            Debug.Assert(result != null && drawable.Entry?.Result == result && result.RawTime != null);
+            judgedEntries.Push(drawable.Entry.AsNonNull());
+
+            NewResult?.Invoke(drawable, result);
+        }
+
+        private void revertResult(HitObjectLifetimeEntry entry)
+        {
+            var result = entry.Result;
+            Debug.Assert(result != null);
+
+            RevertResult?.Invoke(result);
+            entry.OnRevertResult();
+
+            result.Reset();
+        }
 
         #region Editor logic
 
@@ -440,8 +515,6 @@ namespace osu.Game.Rulesets.UI
         /// </remarks>
         internal event Action<HitObject> HitObjectUsageFinished;
 
-        private readonly Dictionary<HitObject, HitObjectLifetimeEntry> lifetimeEntryMap = new Dictionary<HitObject, HitObjectLifetimeEntry>();
-
         /// <summary>
         /// Sets whether to keep a given <see cref="HitObject"/> always alive within this or any nested <see cref="Playfield"/>.
         /// </summary>
@@ -449,7 +522,7 @@ namespace osu.Game.Rulesets.UI
         /// <param name="keepAlive">Whether to keep <paramref name="hitObject"/> always alive.</param>
         internal void SetKeepAlive(HitObject hitObject, bool keepAlive)
         {
-            if (lifetimeEntryMap.TryGetValue(hitObject, out var entry))
+            if (entryManager.TryGet(hitObject, out var entry))
             {
                 entry.KeepAlive = keepAlive;
                 return;
@@ -464,7 +537,7 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         internal void KeepAllAlive()
         {
-            foreach (var (_, entry) in lifetimeEntryMap)
+            foreach (var entry in entryManager.AllEntries)
                 entry.KeepAlive = true;
 
             foreach (var p in nestedPlayfields)
@@ -502,14 +575,5 @@ namespace osu.Game.Rulesets.UI
         }
 
         #endregion
-
-        public class InvisibleCursorContainer : GameplayCursorContainer
-        {
-            protected override Drawable CreateCursor() => new InvisibleCursor();
-
-            private class InvisibleCursor : Drawable
-            {
-            }
-        }
     }
 }

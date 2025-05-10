@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Testing;
@@ -17,7 +19,7 @@ using osuTK.Input;
 namespace osu.Game.Rulesets.Osu.Tests.Editor
 {
     [TestFixture]
-    public class TestSceneSliderLengthValidity : TestSceneOsuEditor
+    public partial class TestSceneSliderLengthValidity : TestSceneOsuEditor
     {
         private OsuPlayfield playfield;
 
@@ -41,7 +43,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
                 PathControlPoint[] points =
                 {
-                    new PathControlPoint(new Vector2(0), PathType.Linear),
+                    new PathControlPoint(new Vector2(0), PathType.LINEAR),
                     new PathControlPoint(new Vector2(100, 0)),
                 };
 
@@ -80,7 +82,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
                 PathControlPoint[] points =
                 {
-                    new PathControlPoint(new Vector2(0), PathType.Linear),
+                    new PathControlPoint(new Vector2(0), PathType.LINEAR),
                     new PathControlPoint(new Vector2(100, 0)),
                 };
 
@@ -124,7 +126,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
                 PathControlPoint[] points =
                 {
-                    new PathControlPoint(new Vector2(0), PathType.PerfectCurve),
+                    new PathControlPoint(new Vector2(0), PathType.PERFECT_CURVE),
                     new PathControlPoint(new Vector2(100, 0)),
                     new PathControlPoint(new Vector2(0, 10))
                 };
@@ -163,7 +165,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
                 PathControlPoint[] points =
                 {
-                    new PathControlPoint(new Vector2(0), PathType.Linear),
+                    new PathControlPoint(new Vector2(0), PathType.LINEAR),
                     new PathControlPoint(new Vector2(0, 50)),
                     new PathControlPoint(new Vector2(0, 100))
                 };

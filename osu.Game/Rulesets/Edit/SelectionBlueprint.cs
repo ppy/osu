@@ -1,7 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
+using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -15,7 +19,7 @@ namespace osu.Game.Rulesets.Edit
     /// <summary>
     /// A blueprint placed above a displaying item adding editing functionality.
     /// </summary>
-    public abstract class SelectionBlueprint<T> : CompositeDrawable, IStateful<SelectionState>
+    public abstract partial class SelectionBlueprint<T> : CompositeDrawable, IStateful<SelectionState>
     {
         public readonly T Item;
 
@@ -29,7 +33,7 @@ namespace osu.Game.Rulesets.Edit
         /// </summary>
         public event Action<SelectionBlueprint<T>> Deselected;
 
-        public override bool HandlePositionalInput => ShouldBeAlive;
+        public override bool HandlePositionalInput => IsSelectable;
         public override bool RemoveWhenNotAlive => false;
 
         protected SelectionBlueprint(T item)
@@ -48,6 +52,7 @@ namespace osu.Game.Rulesets.Edit
 
         private SelectionState state;
 
+        [CanBeNull]
         public event Action<SelectionState> StateChanged;
 
         public SelectionState State
@@ -89,16 +94,12 @@ namespace osu.Game.Rulesets.Edit
             // set the body piece's alpha directly to avoid arbitrarily rendering frame buffers etc. of children.
             foreach (var d in InternalChildren)
                 d.Hide();
-
-            Hide();
         }
 
         protected virtual void OnSelected()
         {
             foreach (var d in InternalChildren)
                 d.Show();
-
-            Show();
         }
 
         // When not selected, input is only required for the blueprint itself to receive IsHovering
@@ -127,9 +128,25 @@ namespace osu.Game.Rulesets.Edit
         public virtual MenuItem[] ContextMenuItems => Array.Empty<MenuItem>();
 
         /// <summary>
-        /// The screen-space point that causes this <see cref="HitObjectSelectionBlueprint"/> to be selected via a drag.
+        /// Whether the <see cref="SelectionBlueprint{T}"/> can be currently selected via a click or a drag box.
+        /// </summary>
+        public virtual bool IsSelectable => ShouldBeAlive && IsPresent;
+
+        /// <summary>
+        /// The screen-space main point that causes this <see cref="HitObjectSelectionBlueprint"/> to be selected via a drag.
         /// </summary>
         public virtual Vector2 ScreenSpaceSelectionPoint => ScreenSpaceDrawQuad.Centre;
+
+        /// <summary>
+        /// Any points that should be used for snapping purposes in addition to <see cref="ScreenSpaceSelectionPoint"/>. Exposed via <see cref="ScreenSpaceSnapPoints"/>.
+        /// </summary>
+        protected virtual Vector2[] ScreenSpaceAdditionalNodes => Array.Empty<Vector2>();
+
+        /// <summary>
+        /// The screen-space collection of base points on this <see cref="HitObjectSelectionBlueprint"/> that other objects can be snapped to.
+        /// The first element of this collection is <see cref="ScreenSpaceSelectionPoint"/>
+        /// </summary>
+        public Vector2[] ScreenSpaceSnapPoints => ScreenSpaceAdditionalNodes.Prepend(ScreenSpaceSelectionPoint).ToArray();
 
         /// <summary>
         /// The screen-space quad that outlines this <see cref="HitObjectSelectionBlueprint"/> for selections.

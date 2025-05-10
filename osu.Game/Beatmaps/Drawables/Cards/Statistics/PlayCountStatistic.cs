@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using Humanizer;
@@ -11,7 +11,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Statistics
     /// <summary>
     /// Shows the number of times the given beatmap set has been played.
     /// </summary>
-    public class PlayCountStatistic : BeatmapCardStatistic
+    public partial class PlayCountStatistic : BeatmapCardStatistic
     {
         public PlayCountStatistic(IBeatmapSetOnlineInfo onlineInfo)
         {

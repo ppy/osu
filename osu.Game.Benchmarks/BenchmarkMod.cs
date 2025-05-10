@@ -9,7 +9,7 @@ namespace osu.Game.Benchmarks
 {
     public class BenchmarkMod : BenchmarkTest
     {
-        private OsuModDoubleTime mod;
+        private OsuModDoubleTime mod = null!;
 
         [Params(1, 10, 100)]
         public int Times { get; set; }

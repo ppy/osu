@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using NUnit.Framework;
@@ -15,7 +17,7 @@ using osuTK.Input;
 namespace osu.Game.Tests.Visual.UserInterface
 {
     [TestFixture]
-    public class TestSceneButtonSystem : OsuManualInputManagerTestScene
+    public partial class TestSceneButtonSystem : OsuManualInputManagerTestScene
     {
         private OsuLogo logo;
         private ButtonSystem buttons;
@@ -65,14 +67,15 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("Enter mode", performEnterMode);
         }
 
-        [TestCase(Key.P, true)]
-        [TestCase(Key.M, true)]
-        [TestCase(Key.L, true)]
-        [TestCase(Key.E, false)]
-        [TestCase(Key.D, false)]
-        [TestCase(Key.Q, false)]
-        [TestCase(Key.O, false)]
-        public void TestShortcutKeys(Key key, bool entersPlay)
+        [TestCase(Key.P, Key.P)]
+        [TestCase(Key.M, Key.P)]
+        [TestCase(Key.L, Key.P)]
+        [TestCase(Key.B, Key.E)]
+        [TestCase(Key.S, Key.E)]
+        [TestCase(Key.D, null)]
+        [TestCase(Key.Q, null)]
+        [TestCase(Key.O, null)]
+        public void TestShortcutKeys(Key key, Key? subMenuEnterKey)
         {
             int activationCount = -1;
             AddStep("set up action", () =>
@@ -94,8 +97,12 @@ namespace osu.Game.Tests.Visual.UserInterface
                         buttons.OnPlaylists = action;
                         break;
 
-                    case Key.E:
-                        buttons.OnEdit = action;
+                    case Key.B:
+                        buttons.OnEditBeatmap = action;
+                        break;
+
+                    case Key.S:
+                        buttons.OnEditSkin = action;
                         break;
 
                     case Key.D:
@@ -103,7 +110,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                         break;
 
                     case Key.Q:
-                        buttons.OnExit = action;
+                        buttons.OnExit = _ => action();
                         break;
 
                     case Key.O:
@@ -115,10 +122,10 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep($"press {key}", () => InputManager.Key(key));
             AddAssert("state is top level", () => buttons.State == ButtonSystemState.TopLevel);
 
-            if (entersPlay)
+            if (subMenuEnterKey != null)
             {
-                AddStep("press P", () => InputManager.Key(Key.P));
-                AddAssert("state is play", () => buttons.State == ButtonSystemState.Play);
+                AddStep($"press {subMenuEnterKey}", () => InputManager.Key(subMenuEnterKey.Value));
+                AddAssert("state is not top menu", () => buttons.State != ButtonSystemState.TopLevel);
             }
 
             AddStep($"press {key}", () => InputManager.Key(key));

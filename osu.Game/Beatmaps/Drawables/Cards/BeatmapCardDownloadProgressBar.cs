@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
@@ -12,7 +12,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Beatmaps.Drawables.Cards
 {
-    public class BeatmapCardDownloadProgressBar : CompositeDrawable
+    public partial class BeatmapCardDownloadProgressBar : CompositeDrawable
     {
         public IBindable<DownloadState> State => state;
         private readonly Bindable<DownloadState> state = new Bindable<DownloadState>();
@@ -22,35 +22,28 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 
         public override bool IsPresent => true;
 
-        private readonly CircularContainer foreground;
-
         private readonly Box backgroundFill;
         private readonly Box foregroundFill;
 
         [Resolved]
-        private OsuColour colours { get; set; }
+        private OsuColour colours { get; set; } = null!;
 
         [Resolved]
-        private OverlayColourProvider colourProvider { get; set; }
+        private OverlayColourProvider colourProvider { get; set; } = null!;
 
         public BeatmapCardDownloadProgressBar()
         {
-            InternalChildren = new Drawable[]
+            InternalChild = new CircularContainer
             {
-                new CircularContainer
+                RelativeSizeAxes = Axes.Both,
+                Masking = true,
+                Children = new Drawable[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Masking = true,
-                    Child = backgroundFill = new Box
+                    backgroundFill = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                    }
-                },
-                foreground = new CircularContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Masking = true,
-                    Child = foregroundFill = new Box
+                    },
+                    foregroundFill = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
                     }
@@ -89,7 +82,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 
         private void progressChanged()
         {
-            foreground.ResizeWidthTo((float)progress.Value, progress.Value > 0 ? BeatmapCard.TRANSITION_DURATION : 0, Easing.OutQuint);
+            foregroundFill.ResizeWidthTo((float)progress.Value, progress.Value > 0 ? BeatmapCard.TRANSITION_DURATION : 0, Easing.OutQuint);
         }
     }
 }

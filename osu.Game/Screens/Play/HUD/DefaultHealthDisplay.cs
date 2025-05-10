@@ -8,7 +8,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Game.Graphics;
-using osu.Game.Rulesets.Judgements;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
@@ -17,7 +16,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public class DefaultHealthDisplay : HealthDisplay, IHasAccentColour, ISkinnableDrawable
+    public partial class DefaultHealthDisplay : HealthDisplay, IHasAccentColour, ISerialisableDrawable
     {
         /// <summary>
         /// The base opacity of the glow.
@@ -76,31 +75,47 @@ namespace osu.Game.Screens.Play.HUD
 
         public DefaultHealthDisplay()
         {
-            Size = new Vector2(1, 5);
-            RelativeSizeAxes = Axes.X;
-            Margin = new MarginPadding { Top = 20 };
+            const float padding = 20;
+            const float bar_height = 5;
 
-            InternalChildren = new Drawable[]
+            Size = new Vector2(1, bar_height + padding * 2);
+            RelativeSizeAxes = Axes.X;
+
+            InternalChild = new Container
             {
-                new Box
+                Padding = new MarginPadding { Vertical = padding },
+                Anchor = Anchor.CentreLeft,
+                Origin = Anchor.CentreLeft,
+                RelativeSizeAxes = Axes.Both,
+                Children = new Drawable[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Black,
-                },
-                fill = new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Size = new Vector2(0, 1),
-                    Masking = true,
-                    Children = new[]
+                    new Box
                     {
-                        new Box
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = Color4.Black,
+                    },
+                    fill = new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Size = new Vector2(0, 1),
+                        Masking = true,
+                        Children = new[]
                         {
-                            RelativeSizeAxes = Axes.Both,
+                            new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                            }
                         }
-                    }
-                },
+                    },
+                }
             };
+        }
+
+        protected override void Flash()
+        {
+            fill.FadeEdgeEffectTo(Math.Min(1, fill.EdgeEffect.Colour.Linear.A + (1f - base_glow_opacity) / glow_max_hits), 50, Easing.OutQuint)
+                .Delay(glow_fade_delay)
+                .FadeEdgeEffectTo(base_glow_opacity, glow_fade_time, Easing.OutQuint);
         }
 
         [BackgroundDependencyLoader]
@@ -108,15 +123,6 @@ namespace osu.Game.Screens.Play.HUD
         {
             AccentColour = colours.BlueLighter;
             GlowColour = colours.BlueDarker;
-        }
-
-        protected override void Flash(JudgementResult result) => Scheduler.AddOnce(flash);
-
-        private void flash()
-        {
-            fill.FadeEdgeEffectTo(Math.Min(1, fill.EdgeEffect.Colour.Linear.A + (1f - base_glow_opacity) / glow_max_hits), 50, Easing.OutQuint)
-                .Delay(glow_fade_delay)
-                .FadeEdgeEffectTo(base_glow_opacity, glow_fade_time, Easing.OutQuint);
         }
 
         protected override void Update()

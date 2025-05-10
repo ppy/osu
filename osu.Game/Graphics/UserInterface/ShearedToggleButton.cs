@@ -1,9 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -11,10 +8,17 @@ using osu.Framework.Bindables;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class ShearedToggleButton : ShearedButton
+    public partial class ShearedToggleButton : ShearedButton
     {
+        private Sample? sampleClick;
         private Sample? sampleOff;
         private Sample? sampleOn;
+
+        /// <summary>
+        /// Sheared toggle buttons by default play two samples when toggled: a click and a toggle (on/off).
+        /// Sometimes this might be too much. Setting this to <c>false</c> will silence the toggle sound.
+        /// </summary>
+        protected virtual bool PlayToggleSamples => true;
 
         /// <summary>
         /// Whether this button is currently toggled to an active state.
@@ -39,26 +43,27 @@ namespace osu.Game.Graphics.UserInterface
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            sampleOn = audio.Samples.Get(@"UI/check-on");
-            sampleOff = audio.Samples.Get(@"UI/check-off");
+            sampleClick = audio.Samples.Get(@"UI/default-select");
+            sampleOn = audio.Samples.Get(@"UI/dropdown-open");
+            sampleOff = audio.Samples.Get(@"UI/dropdown-close");
         }
 
         protected override HoverSounds CreateHoverSounds(HoverSampleSet sampleSet) => new HoverSounds(sampleSet);
 
         protected override void LoadComplete()
         {
-            Active.BindDisabledChanged(disabled => Action = disabled ? (Action?)null : Active.Toggle, true);
+            Active.BindDisabledChanged(disabled => Action = disabled ? null : Active.Toggle, true);
             Active.BindValueChanged(_ =>
             {
-                updateActiveState();
+                UpdateActiveState();
                 playSample();
             });
 
-            updateActiveState();
+            UpdateActiveState();
             base.LoadComplete();
         }
 
-        private void updateActiveState()
+        protected virtual void UpdateActiveState()
         {
             DarkerColour = Active.Value ? ColourProvider.Highlight1 : ColourProvider.Background3;
             LighterColour = Active.Value ? ColourProvider.Colour0 : ColourProvider.Background1;
@@ -67,10 +72,15 @@ namespace osu.Game.Graphics.UserInterface
 
         private void playSample()
         {
-            if (Active.Value)
-                sampleOn?.Play();
-            else
-                sampleOff?.Play();
+            sampleClick?.Play();
+
+            if (PlayToggleSamples)
+            {
+                if (Active.Value)
+                    sampleOn?.Play();
+                else
+                    sampleOff?.Play();
+            }
         }
     }
 }

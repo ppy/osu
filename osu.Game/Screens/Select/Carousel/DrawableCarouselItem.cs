@@ -11,7 +11,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Select.Carousel
 {
-    public abstract class DrawableCarouselItem : PoolableDrawable
+    public abstract partial class DrawableCarouselItem : PoolableDrawable
     {
         public const float MAX_HEIGHT = 80;
 
@@ -32,9 +32,9 @@ namespace osu.Game.Screens.Select.Carousel
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
             Header.ReceivePositionalInputAt(screenSpacePos);
 
-        private CarouselItem item;
+        private CarouselItem? item;
 
-        public CarouselItem Item
+        public CarouselItem? Item
         {
             get => item;
             set
@@ -51,14 +51,14 @@ namespace osu.Game.Screens.Select.Carousel
 
                     if (item is CarouselGroup group)
                     {
-                        foreach (var c in group.Children)
+                        foreach (var c in group.Items)
                             c.Filtered.ValueChanged -= onStateChange;
                     }
                 }
 
                 item = value;
 
-                if (IsLoaded)
+                if (IsLoaded && !IsDisposed)
                     UpdateItem();
             }
         }
@@ -86,8 +86,6 @@ namespace osu.Game.Screens.Select.Carousel
             };
         }
 
-        public void SetMultiplicativeAlpha(float alpha) => Header.BorderContainer.Alpha = alpha;
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -103,7 +101,7 @@ namespace osu.Game.Screens.Select.Carousel
 
         protected virtual void UpdateItem()
         {
-            if (item == null)
+            if (Item == null)
                 return;
 
             Scheduler.AddOnce(ApplyState);
@@ -115,7 +113,7 @@ namespace osu.Game.Screens.Select.Carousel
 
             if (Item is CarouselGroup group)
             {
-                foreach (var c in group.Children)
+                foreach (var c in group.Items)
                     c.Filtered.ValueChanged += onStateChange;
             }
         }
@@ -126,11 +124,11 @@ namespace osu.Game.Screens.Select.Carousel
 
         protected virtual void ApplyState()
         {
+            Debug.Assert(Item != null);
+
             // Use the fact that we know the precise height of the item from the model to avoid the need for AutoSize overhead.
             // Additionally, AutoSize doesn't work well due to content starting off-screen and being masked away.
             Height = Item.TotalHeight;
-
-            Debug.Assert(Item != null);
 
             switch (Item.State.Value)
             {
@@ -144,9 +142,9 @@ namespace osu.Game.Screens.Select.Carousel
             }
 
             if (!Item.Visible)
-                this.FadeOut(300, Easing.OutQuint);
+                this.FadeOut(100, Easing.OutQuint);
             else
-                this.FadeIn(250);
+                this.FadeIn(400, Easing.OutQuint);
         }
 
         protected virtual void Selected()
@@ -160,8 +158,20 @@ namespace osu.Game.Screens.Select.Carousel
 
         protected override bool OnClick(ClickEvent e)
         {
+            Debug.Assert(Item != null);
+
             Item.State.Value = CarouselItemState.Selected;
             return true;
+        }
+
+        protected override bool OnHover(HoverEvent e) => true;
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            // This is important to clean up event subscriptions.
+            Item = null;
         }
     }
 }

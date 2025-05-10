@@ -21,21 +21,21 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests.Mods
 {
-    public class TestSceneOsuModSpunOut : OsuModTestScene
+    public partial class TestSceneOsuModSpunOut : OsuModTestScene
     {
         protected override bool AllowFail => true;
 
         [Test]
         public void TestSpinnerAutoCompleted()
         {
-            DrawableSpinner spinner = null;
-            JudgementResult lastResult = null;
+            DrawableSpinner? spinner = null;
+            JudgementResult? lastResult = null;
 
             CreateModTest(new ModTestData
             {
                 Mod = new OsuModSpunOut(),
                 Autoplay = false,
-                Beatmap = singleSpinnerBeatmap,
+                CreateBeatmap = singleSpinnerBeatmap,
                 PassCondition = () =>
                 {
                     // Bind to the first spinner's results for further tracking.
@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                         lastResult = null;
 
                         spinner = nextSpinner;
-                        spinner.OnNewResult += (o, result) => lastResult = result;
+                        spinner.OnNewResult += (_, result) => lastResult = result;
                     }
 
                     return lastResult?.Type == HitResult.Great;
@@ -61,17 +61,17 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
         [TestCase(null)]
         [TestCase(typeof(OsuModDoubleTime))]
         [TestCase(typeof(OsuModHalfTime))]
-        public void TestSpinRateUnaffectedByMods(Type additionalModType)
+        public void TestSpinRateUnaffectedByMods(Type? additionalModType)
         {
             var mods = new List<Mod> { new OsuModSpunOut() };
             if (additionalModType != null)
-                mods.Add((Mod)Activator.CreateInstance(additionalModType));
+                mods.Add((Mod)Activator.CreateInstance(additionalModType)!);
 
             CreateModTest(new ModTestData
             {
                 Mods = mods,
                 Autoplay = false,
-                Beatmap = singleSpinnerBeatmap,
+                CreateBeatmap = singleSpinnerBeatmap,
                 PassCondition = () =>
                 {
                     var counter = Player.ChildrenOfType<SpinnerSpmCalculator>().SingleOrDefault();
@@ -94,14 +94,14 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
         [Test]
         public void TestSpinnerGetsNoBonusScore()
         {
-            DrawableSpinner spinner = null;
+            DrawableSpinner? spinner = null;
             List<JudgementResult> results = new List<JudgementResult>();
 
             CreateModTest(new ModTestData
             {
                 Mod = new OsuModSpunOut(),
                 Autoplay = false,
-                Beatmap = singleSpinnerBeatmap,
+                CreateBeatmap = singleSpinnerBeatmap,
                 PassCondition = () =>
                 {
                     // Bind to the first spinner's results for further tracking.
@@ -114,7 +114,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                             return false;
 
                         spinner = nextSpinner;
-                        spinner.OnNewResult += (o, result) => results.Add(result);
+                        spinner.OnNewResult += (_, result) => results.Add(result);
 
                         results.Clear();
                     }
@@ -130,7 +130,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
             });
         }
 
-        private Beatmap singleSpinnerBeatmap => new Beatmap
+        private Beatmap singleSpinnerBeatmap() => new Beatmap
         {
             HitObjects = new List<HitObject>
             {

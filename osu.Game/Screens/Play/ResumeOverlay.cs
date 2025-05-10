@@ -1,13 +1,17 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Rulesets.UI;
 using osuTK;
 using osuTK.Graphics;
 
@@ -16,9 +20,9 @@ namespace osu.Game.Screens.Play
     /// <summary>
     /// An overlay which can be used to require further user actions before gameplay is resumed.
     /// </summary>
-    public abstract class ResumeOverlay : VisibilityContainer
+    public abstract partial class ResumeOverlay : VisibilityContainer
     {
-        public CursorContainer GameplayCursor { get; set; }
+        public GameplayCursorContainer GameplayCursor { get; set; }
 
         /// <summary>
         /// The action to be performed to complete resuming.
@@ -29,7 +33,7 @@ namespace osu.Game.Screens.Play
 
         protected const float TRANSITION_TIME = 500;
 
-        protected abstract string Message { get; }
+        protected abstract LocalisableString Message { get; }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 

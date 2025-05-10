@@ -8,7 +8,7 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Play.PlayerSettings
 {
-    public class DiscussionSettings : PlayerSettingsGroup
+    public partial class DiscussionSettings : PlayerSettingsGroup
     {
         public DiscussionSettings()
             : base("discussions")

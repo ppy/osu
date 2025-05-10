@@ -17,12 +17,12 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
     /// <summary>
     /// A statistic from the score to be displayed in the <see cref="ExpandedPanelMiddleContent"/>.
     /// </summary>
-    public abstract class StatisticDisplay : CompositeDrawable
+    public abstract partial class StatisticDisplay : CompositeDrawable
     {
-        protected SpriteText HeaderText { get; private set; }
+        protected SpriteText HeaderText { get; private set; } = null!;
 
         private readonly LocalisableString header;
-        private Drawable content;
+        private Drawable content = null!;
 
         /// <summary>
         /// Creates a new <see cref="StatisticDisplay"/>.

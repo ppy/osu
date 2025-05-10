@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
@@ -12,7 +14,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 {
-    public abstract class HitErrorMeter : CompositeDrawable, ISkinnableDrawable
+    public abstract partial class HitErrorMeter : CompositeDrawable, ISerialisableDrawable
     {
         protected HitWindows HitWindows { get; private set; }
 
@@ -31,6 +33,9 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         private void load(DrawableRuleset drawableRuleset)
         {
             HitWindows = drawableRuleset?.FirstAvailableHitWindows ?? HitWindows.Empty;
+
+            // This is to allow the visual state to be correct after HUD comes visible after being hidden.
+            AlwaysPresent = true;
         }
 
         protected override void LoadComplete()
@@ -54,30 +59,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
         protected Color4 GetColourForHitResult(HitResult result)
         {
-            switch (result)
-            {
-                case HitResult.SmallTickMiss:
-                case HitResult.LargeTickMiss:
-                case HitResult.Miss:
-                    return colours.Red;
-
-                case HitResult.Meh:
-                    return colours.Yellow;
-
-                case HitResult.Ok:
-                    return colours.Green;
-
-                case HitResult.Good:
-                    return colours.GreenLight;
-
-                case HitResult.SmallTickHit:
-                case HitResult.LargeTickHit:
-                case HitResult.Great:
-                    return colours.Blue;
-
-                default:
-                    return colours.BlueLight;
-            }
+            return colours.ForHitResult(result);
         }
 
         /// <summary>

@@ -8,7 +8,7 @@ using osuTK.Input;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class SearchTextBox : FocusedTextBox
+    public partial class SearchTextBox : FocusedTextBox
     {
         protected virtual bool AllowCommit => false;
 

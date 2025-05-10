@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
@@ -12,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneStarRatingDisplay : OsuTestScene
+    public partial class TestSceneStarRatingDisplay : OsuTestScene
     {
         [TestCase(StarRatingDisplaySize.Regular)]
         [TestCase(StarRatingDisplaySize.Small)]
@@ -27,7 +29,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     AutoSizeAxes = Axes.Both,
                     Spacing = new Vector2(2f),
                     Direction = FillDirection.Horizontal,
-                    ChildrenEnumerable = Enumerable.Range(0, 15).Select(i => new FillFlowContainer
+                    ChildrenEnumerable = Enumerable.Range(-1, 15).Select(i => new FillFlowContainer
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,

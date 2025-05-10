@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -20,7 +22,7 @@ using osuTK.Input;
 namespace osu.Game.Tests.Visual.UserInterface
 {
     [TestFixture]
-    public class TestSceneShearedOverlayContainer : OsuManualInputManagerTestScene
+    public partial class TestSceneShearedOverlayContainer : OsuManualInputManagerTestScene
     {
         private TestShearedOverlayContainer overlay;
 
@@ -64,9 +66,12 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("overlay dismissed", () => overlay.State.Value == Visibility.Hidden);
         }
 
-        public class TestShearedOverlayContainer : ShearedOverlayContainer
+        public partial class TestShearedOverlayContainer : ShearedOverlayContainer
         {
-            protected override OverlayColourScheme ColourScheme => OverlayColourScheme.Green;
+            public TestShearedOverlayContainer()
+                : base(OverlayColourScheme.Green)
+            {
+            }
 
             [BackgroundDependencyLoader]
             private void load()

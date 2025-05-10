@@ -13,26 +13,28 @@ using osu.Game.Configuration;
 using osu.Game.Screens;
 using osu.Game.Screens.Backgrounds;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Graphics.Containers
 {
     /// <summary>
     /// Handles user-defined scaling, allowing application at multiple levels defined by <see cref="ScalingMode"/>.
     /// </summary>
-    public class ScalingContainer : Container
+    public partial class ScalingContainer : Container
     {
-        private const float duration = 500;
+        internal const float TRANSITION_DURATION = 500;
 
-        private Bindable<float> sizeX;
-        private Bindable<float> sizeY;
-        private Bindable<float> posX;
-        private Bindable<float> posY;
+        private Bindable<float> sizeX = null!;
+        private Bindable<float> sizeY = null!;
+        private Bindable<float> posX = null!;
+        private Bindable<float> posY = null!;
+        private Bindable<bool> applySafeAreaPadding = null!;
 
-        private Bindable<MarginPadding> safeAreaPadding;
+        private Bindable<MarginPadding> safeAreaPadding = null!;
 
         private readonly ScalingMode? targetMode;
 
-        private Bindable<ScalingMode> scalingMode;
+        private Bindable<ScalingMode> scalingMode = null!;
 
         private readonly Container content;
         protected override Container<Drawable> Content => content;
@@ -41,7 +43,9 @@ namespace osu.Game.Graphics.Containers
 
         private readonly Container sizableContainer;
 
-        private BackgroundScreenStack backgroundStack;
+        private BackgroundScreenStack? backgroundStack;
+
+        private Bindable<float> scalingMenuBackgroundDim = null!;
 
         private RectangleF? customRect;
         private bool customRectIsRelativePosition;
@@ -79,10 +83,11 @@ namespace osu.Game.Graphics.Containers
             };
         }
 
-        public class ScalingDrawSizePreservingFillContainer : DrawSizePreservingFillContainer
+        public partial class ScalingDrawSizePreservingFillContainer : DrawSizePreservingFillContainer
         {
             private readonly bool applyUIScale;
-            private Bindable<float> uiScale;
+
+            private Bindable<float>? uiScale;
 
             protected float CurrentScale { get; private set; } = 1;
 
@@ -93,18 +98,23 @@ namespace osu.Game.Graphics.Containers
                 this.applyUIScale = applyUIScale;
             }
 
+            [Resolved(canBeNull: true)]
+            private OsuGame? game { get; set; }
+
             [BackgroundDependencyLoader]
             private void load(OsuConfigManager osuConfig)
             {
                 if (applyUIScale)
                 {
                     uiScale = osuConfig.GetBindable<float>(OsuSetting.UIScale);
-                    uiScale.BindValueChanged(args => this.TransformTo(nameof(CurrentScale), args.NewValue, duration, Easing.OutQuart), true);
+                    uiScale.BindValueChanged(args => this.TransformTo(nameof(CurrentScale), args.NewValue, TRANSITION_DURATION, Easing.OutQuart), true);
                 }
             }
 
             protected override void Update()
             {
+                if (game != null)
+                    TargetDrawSize = game.ScalingContainerTargetDrawSize;
                 Scale = new Vector2(CurrentScale);
                 Size = new Vector2(1 / CurrentScale);
 
@@ -130,8 +140,14 @@ namespace osu.Game.Graphics.Containers
             posY = config.GetBindable<float>(OsuSetting.ScalingPositionY);
             posY.ValueChanged += _ => Scheduler.AddOnce(updateSize);
 
+            applySafeAreaPadding = config.GetBindable<bool>(OsuSetting.SafeAreaConsiderations);
+            applySafeAreaPadding.BindValueChanged(_ => Scheduler.AddOnce(updateSize));
+
             safeAreaPadding = safeArea.SafeAreaPadding.GetBoundCopy();
             safeAreaPadding.BindValueChanged(_ => Scheduler.AddOnce(updateSize));
+
+            scalingMenuBackgroundDim = config.GetBindable<float>(OsuSetting.ScalingBackgroundDim);
+            scalingMenuBackgroundDim.ValueChanged += _ => Scheduler.AddOnce(updateSize);
         }
 
         protected override void LoadComplete()
@@ -142,7 +158,9 @@ namespace osu.Game.Graphics.Containers
             sizableContainer.FinishTransforms();
         }
 
-        private bool requiresBackgroundVisible => (scalingMode.Value == ScalingMode.Everything || scalingMode.Value == ScalingMode.ExcludeOverlays) && (sizeX.Value != 1 || sizeY.Value != 1);
+        private bool requiresBackgroundVisible => (scalingMode.Value == ScalingMode.Everything || scalingMode.Value == ScalingMode.ExcludeOverlays)
+                                                  && (sizeX.Value != 1 || sizeY.Value != 1)
+                                                  && scalingMenuBackgroundDim.Value < 1;
 
         private void updateSize()
         {
@@ -155,18 +173,19 @@ namespace osu.Game.Graphics.Containers
                     {
                         AddInternal(backgroundStack = new BackgroundScreenStack
                         {
-                            Colour = OsuColour.Gray(0.1f),
                             Alpha = 0,
+                            Colour = Color4.Black,
                             Depth = float.MaxValue
                         });
 
                         backgroundStack.Push(new ScalingBackgroundScreen());
                     }
 
-                    backgroundStack.FadeIn(duration);
+                    backgroundStack.FadeIn(TRANSITION_DURATION);
+                    backgroundStack.FadeColour(OsuColour.Gray(1.0f - scalingMenuBackgroundDim.Value), TRANSITION_DURATION, Easing.OutQuint);
                 }
                 else
-                    backgroundStack?.FadeOut(duration);
+                    backgroundStack?.FadeOut(TRANSITION_DURATION);
             }
 
             RectangleF targetRect = new RectangleF(Vector2.Zero, Vector2.One);
@@ -190,22 +209,22 @@ namespace osu.Game.Graphics.Containers
             bool requiresMasking = targetRect.Size != Vector2.One
                                    // For the top level scaling container, for now we apply masking if safe areas are in use.
                                    // In the future this can likely be removed as more of the actual UI supports overflowing into the safe areas.
-                                   || (targetMode == ScalingMode.Everything && safeAreaPadding.Value.Total != Vector2.Zero);
+                                   || (targetMode == ScalingMode.Everything && (applySafeAreaPadding.Value && safeAreaPadding.Value.Total != Vector2.Zero));
 
             if (requiresMasking)
                 sizableContainer.Masking = true;
 
-            sizableContainer.MoveTo(targetRect.Location, duration, Easing.OutQuart);
-            sizableContainer.ResizeTo(targetRect.Size, duration, Easing.OutQuart);
+            sizableContainer.MoveTo(targetRect.Location, TRANSITION_DURATION, Easing.OutQuart);
+            sizableContainer.ResizeTo(targetRect.Size, TRANSITION_DURATION, Easing.OutQuart);
 
             // Of note, this will not work great in the case of nested ScalingContainers where multiple are applying corner radius.
             // Masking and corner radius should likely only be applied at one point in the full game stack to fix this.
             // An example of how this can occur is when the skin editor is visible and the game screen scaling is set to "Everything".
-            sizableContainer.TransformTo(nameof(CornerRadius), requiresMasking ? corner_radius : 0, duration, requiresMasking ? Easing.OutQuart : Easing.None)
+            sizableContainer.TransformTo(nameof(CornerRadius), requiresMasking ? corner_radius : 0, TRANSITION_DURATION, requiresMasking ? Easing.OutQuart : Easing.None)
                             .OnComplete(_ => { sizableContainer.Masking = requiresMasking; });
         }
 
-        private class ScalingBackgroundScreen : BackgroundScreenDefault
+        private partial class ScalingBackgroundScreen : BackgroundScreenDefault
         {
             protected override bool AllowStoryboardBackground => false;
 
@@ -215,13 +234,16 @@ namespace osu.Game.Graphics.Containers
             }
         }
 
-        private class SizeableAlwaysInputContainer : Container
+        private partial class SizeableAlwaysInputContainer : Container
         {
             [Resolved]
-            private GameHost host { get; set; }
+            private GameHost host { get; set; } = null!;
 
             [Resolved]
-            private ISafeArea safeArea { get; set; }
+            private ISafeArea safeArea { get; set; } = null!;
+
+            [Resolved]
+            private OsuConfigManager config { get; set; } = null!;
 
             private readonly bool confineHostCursor;
             private readonly LayoutValue cursorRectCache = new LayoutValue(Invalidation.RequiredParentSizeToFit);
@@ -257,8 +279,8 @@ namespace osu.Game.Graphics.Containers
             {
                 if (host.Window == null) return;
 
-                bool coversWholeScreen = Size == Vector2.One && safeArea.SafeAreaPadding.Value.Total == Vector2.Zero;
-                host.Window.CursorConfineRect = coversWholeScreen ? (RectangleF?)null : ToScreenSpace(DrawRectangle).AABBFloat;
+                bool coversWholeScreen = Size == Vector2.One && (!config.Get<bool>(OsuSetting.SafeAreaConsiderations) || safeArea.SafeAreaPadding.Value.Total == Vector2.Zero);
+                host.Window.CursorConfineRect = coversWholeScreen ? null : ToScreenSpace(DrawRectangle).AABBFloat;
             }
         }
     }

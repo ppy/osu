@@ -8,14 +8,14 @@ using osu.Game.Tournament.Models;
 
 namespace osu.Game.Tournament.Components
 {
-    public class DrawableTeamTitle : TournamentSpriteTextWithBackground
+    public partial class DrawableTeamTitle : TournamentSpriteTextWithBackground
     {
-        private readonly TournamentTeam team;
+        private readonly TournamentTeam? team;
 
         [UsedImplicitly]
-        private Bindable<string> acronym;
+        private Bindable<string>? acronym;
 
-        public DrawableTeamTitle(TournamentTeam team)
+        public DrawableTeamTitle(TournamentTeam? team)
         {
             this.team = team;
         }
@@ -25,7 +25,7 @@ namespace osu.Game.Tournament.Components
         {
             if (team == null) return;
 
-            (acronym = team.Acronym.GetBoundCopy()).BindValueChanged(acronym => Text.Text = team?.FullName.Value ?? string.Empty, true);
+            (acronym = team.Acronym.GetBoundCopy()).BindValueChanged(_ => Text.Text = team?.FullName.Value ?? string.Empty, true);
         }
     }
 }

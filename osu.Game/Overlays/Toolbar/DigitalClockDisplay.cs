@@ -1,18 +1,25 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osuTK;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public class DigitalClockDisplay : ClockDisplay
+    public partial class DigitalClockDisplay : ClockDisplay
     {
         private OsuSpriteText realTime;
         private OsuSpriteText gameTime;
+
+        private FillFlowContainer runningText;
 
         private bool showRuntime = true;
 
@@ -49,17 +56,36 @@ namespace osu.Game.Overlays.Toolbar
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            AutoSizeAxes = Axes.Y;
+            AutoSizeAxes = Axes.Both;
 
             InternalChildren = new Drawable[]
             {
-                realTime = new OsuSpriteText(),
-                gameTime = new OsuSpriteText
+                realTime = new OsuSpriteText
+                {
+                    Font = OsuFont.Default.With(fixedWidth: true),
+                    Spacing = new Vector2(-1.5f, 0),
+                },
+                runningText = new FillFlowContainer
                 {
                     Y = 14,
                     Colour = colours.PinkLight,
-                    Font = OsuFont.Default.With(size: 10, weight: FontWeight.SemiBold),
-                }
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Horizontal,
+                    Spacing = new Vector2(2, 0),
+                    Children = new Drawable[]
+                    {
+                        new OsuSpriteText
+                        {
+                            Text = "running",
+                            Font = OsuFont.Default.With(size: 10, weight: FontWeight.SemiBold),
+                        },
+                        gameTime = new OsuSpriteText
+                        {
+                            Font = OsuFont.Default.With(size: 10, fixedWidth: true, weight: FontWeight.SemiBold),
+                            Spacing = new Vector2(-0.5f, 0),
+                        }
+                    }
+                },
             };
 
             updateMetrics();
@@ -67,15 +93,13 @@ namespace osu.Game.Overlays.Toolbar
 
         protected override void UpdateDisplay(DateTimeOffset now)
         {
-            realTime.Text = use24HourDisplay ? $"{now:HH:mm:ss}" : $"{now:h:mm:ss tt}";
-            gameTime.Text = $"running {new TimeSpan(TimeSpan.TicksPerSecond * (int)(Clock.CurrentTime / 1000)):c}";
+            realTime.Text = now.ToLocalisableString(use24HourDisplay ? @"HH:mm:ss" : @"h:mm:ss tt");
+            gameTime.Text = $"{new TimeSpan(TimeSpan.TicksPerSecond * (int)(Clock.CurrentTime / 1000)):c}";
         }
 
         private void updateMetrics()
         {
-            Width = showRuntime || !use24HourDisplay ? 66 : 45; // Allows for space for game time up to 99 days (in the padding area since this is quite rare).
-
-            gameTime.FadeTo(showRuntime ? 1 : 0);
+            runningText.FadeTo(showRuntime ? 1 : 0);
         }
     }
 }

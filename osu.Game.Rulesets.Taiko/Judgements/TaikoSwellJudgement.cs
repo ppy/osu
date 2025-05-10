@@ -7,11 +7,13 @@ namespace osu.Game.Rulesets.Taiko.Judgements
 {
     public class TaikoSwellJudgement : TaikoJudgement
     {
+        public override HitResult MaxResult => HitResult.LargeBonus;
+
         protected override double HealthIncreaseFor(HitResult result)
         {
             switch (result)
             {
-                case HitResult.Miss:
+                case HitResult.IgnoreMiss:
                     return -0.65;
 
                 default:

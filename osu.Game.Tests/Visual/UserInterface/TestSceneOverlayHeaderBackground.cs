@@ -8,7 +8,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneOverlayHeaderBackground : OsuTestScene
+    public partial class TestSceneOverlayHeaderBackground : OsuTestScene
     {
         public TestSceneOverlayHeaderBackground()
         {

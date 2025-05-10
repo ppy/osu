@@ -1,7 +1,7 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using NUnit.Framework;
+using System.Linq;
 using osu.Framework.Graphics;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
@@ -14,27 +14,31 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneMatchBeatmapDetailArea : OnlinePlayTestScene
+    public partial class TestSceneMatchBeatmapDetailArea : OnlinePlayTestScene
     {
-        [SetUp]
-        public new void Setup() => Schedule(() =>
-        {
-            SelectedRoom.Value = new Room();
+        private Room room = null!;
 
-            Child = new MatchBeatmapDetailArea
+        public override void SetUpSteps()
+        {
+            base.SetUpSteps();
+
+            AddStep("create area", () =>
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Size = new Vector2(500),
-                CreateNewItem = createNewItem
-            };
-        });
+                Child = new MatchBeatmapDetailArea(room = new Room())
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Size = new Vector2(500),
+                    CreateNewItem = createNewItem
+                };
+            });
+        }
 
         private void createNewItem()
         {
-            SelectedRoom.Value.Playlist.Add(new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
+            room.Playlist = room.Playlist.Append(new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
             {
-                ID = SelectedRoom.Value.Playlist.Count,
+                ID = room.Playlist.Count,
                 RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
                 RequiredMods = new[]
                 {
@@ -42,7 +46,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     new APIMod(new OsuModDoubleTime()),
                     new APIMod(new OsuModAutoplay())
                 }
-            });
+            }).ToArray();
         }
     }
 }

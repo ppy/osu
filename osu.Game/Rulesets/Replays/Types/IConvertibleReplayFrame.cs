@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Replays.Types
         /// <param name="currentFrame">The <see cref="LegacyReplayFrame"/> to extract values from.</param>
         /// <param name="beatmap">The beatmap.</param>
         /// <param name="lastFrame">The last post-conversion <see cref="ReplayFrame"/>, used to fill in missing delta information. May be null.</param>
-        void FromLegacy(LegacyReplayFrame currentFrame, IBeatmap beatmap, ReplayFrame lastFrame = null);
+        void FromLegacy(LegacyReplayFrame currentFrame, IBeatmap beatmap, ReplayFrame? lastFrame = null);
 
         /// <summary>
         /// Populates this <see cref="ReplayFrame"/> using values from a <see cref="LegacyReplayFrame"/>.

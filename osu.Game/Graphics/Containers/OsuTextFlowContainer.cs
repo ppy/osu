@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
@@ -10,7 +12,7 @@ using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Graphics.Containers
 {
-    public class OsuTextFlowContainer : TextFlowContainer
+    public partial class OsuTextFlowContainer : TextFlowContainer
     {
         public OsuTextFlowContainer(Action<SpriteText> defaultCreationParameters = null)
             : base(defaultCreationParameters)
@@ -19,8 +21,18 @@ namespace osu.Game.Graphics.Containers
 
         protected override SpriteText CreateSpriteText() => new OsuSpriteText();
 
-        public ITextPart AddArbitraryDrawable(Drawable drawable) => AddPart(new TextPartManual(drawable.Yield()));
+        public ITextPart AddArbitraryDrawable(Drawable drawable) => AddPart(new TextPartManual(new ArbitraryDrawableWrapper { Child = drawable }.Yield()));
 
         public ITextPart AddIcon(IconUsage icon, Action<SpriteText> creationParameters = null) => AddText(icon.Icon.ToString(), creationParameters);
+
+        private partial class ArbitraryDrawableWrapper : Container, IHasLineBaseHeight
+        {
+            public float LineBaseHeight => (Child as IHasLineBaseHeight)?.LineBaseHeight ?? DrawHeight;
+
+            public ArbitraryDrawableWrapper()
+            {
+                AutoSizeAxes = Axes.Both;
+            }
+        }
     }
 }

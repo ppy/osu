@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,16 +15,18 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Beatmaps.Drawables.Cards;
+using osu.Game.Beatmaps.Drawables.Cards.Buttons;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Beatmaps
 {
-    public class TestSceneBeatmapCard : OsuManualInputManagerTestScene
+    public partial class TestSceneBeatmapCard : OsuManualInputManagerTestScene
     {
         /// <summary>
         /// All cards on this scene use a common online ID to ensure that map download, preview tracks, etc. can be tested manually with online sources.
@@ -84,20 +88,26 @@ namespace osu.Game.Tests.Visual.Beatmaps
             explicitMap.Title = someDifficulties.TitleUnicode = "explicit beatmap";
             explicitMap.HasExplicitContent = true;
 
+            var spotlightMap = CreateAPIBeatmapSet(Ruleset.Value);
+            spotlightMap.Title = someDifficulties.TitleUnicode = "spotlight beatmap";
+            spotlightMap.FeaturedInSpotlight = true;
+
             var featuredMap = CreateAPIBeatmapSet(Ruleset.Value);
             featuredMap.Title = someDifficulties.TitleUnicode = "featured artist beatmap";
             featuredMap.TrackId = 1;
 
-            var explicitFeaturedMap = CreateAPIBeatmapSet(Ruleset.Value);
-            explicitFeaturedMap.Title = someDifficulties.TitleUnicode = "explicit featured artist";
-            explicitFeaturedMap.HasExplicitContent = true;
-            explicitFeaturedMap.TrackId = 2;
+            var allBadgesMap = CreateAPIBeatmapSet(Ruleset.Value);
+            allBadgesMap.Title = someDifficulties.TitleUnicode = "all-badges beatmap";
+            allBadgesMap.HasExplicitContent = true;
+            allBadgesMap.FeaturedInSpotlight = true;
+            allBadgesMap.TrackId = 2;
 
             var longName = CreateAPIBeatmapSet(Ruleset.Value);
             longName.Title = longName.TitleUnicode = "this track has an incredibly and implausibly long title";
             longName.Artist = longName.ArtistUnicode = "and this artist! who would have thunk it. it's really such a long name.";
             longName.Source = "wow. even the source field has an impossibly long string in it. this really takes the cake, doesn't it?";
             longName.HasExplicitContent = true;
+            longName.FeaturedInSpotlight = true;
             longName.TrackId = 444;
 
             testCases = new[]
@@ -108,8 +118,9 @@ namespace osu.Game.Tests.Visual.Beatmaps
                 someDifficulties,
                 manyDifficulties,
                 explicitMap,
+                spotlightMap,
                 featuredMap,
-                explicitFeaturedMap,
+                allBadgesMap,
                 longName
             };
 
@@ -250,6 +261,12 @@ namespace osu.Game.Tests.Visual.Beatmaps
         }
 
         [Test]
+        public void TestNano()
+        {
+            createTestCase(beatmapSetInfo => new BeatmapCardNano(beatmapSetInfo));
+        }
+
+        [Test]
         public void TestNormal()
         {
             createTestCase(beatmapSetInfo => new BeatmapCardNormal(beatmapSetInfo));
@@ -283,6 +300,23 @@ namespace osu.Game.Tests.Visual.Beatmaps
 
             AddStep("Hover away", () => InputManager.MoveMouseTo(this.ChildrenOfType<BeatmapCardNormal>().Last()));
             AddUntilStep("card is not expanded", () => !firstCard().Expanded.Value);
+
+            BeatmapCardNormal firstCard() => this.ChildrenOfType<BeatmapCardNormal>().First();
+        }
+
+        [Test]
+        public void TestPlayButtonByTouchInput()
+        {
+            AddStep("create cards", () => Child = createContent(OverlayColourScheme.Blue, beatmapSetInfo => new BeatmapCardNormal(beatmapSetInfo)));
+
+            // mimics touch input
+            AddStep("touch play button area on first card", () =>
+            {
+                InputManager.MoveMouseTo(firstCard().ChildrenOfType<PlayButton>().Single());
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddAssert("first card is playing", () => firstCard().ChildrenOfType<PlayButton>().Single().Playing.Value);
 
             BeatmapCardNormal firstCard() => this.ChildrenOfType<BeatmapCardNormal>().First();
         }

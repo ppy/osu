@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
@@ -14,13 +14,13 @@ namespace osu.Game.Rulesets.Taiko.Tests
     {
         protected override string ResourceAssembly => "osu.Game.Rulesets.Taiko";
 
-        [TestCase(2.2420075288523802d, 200, "diffcalc-test")]
-        [TestCase(2.2420075288523802d, 200, "diffcalc-test-strong")]
+        [TestCase(3.305554470092722d, 200, "diffcalc-test")]
+        [TestCase(3.305554470092722d, 200, "diffcalc-test-strong")]
         public void Test(double expectedStarRating, int expectedMaxCombo, string name)
             => base.Test(expectedStarRating, expectedMaxCombo, name);
 
-        [TestCase(3.134084469440479d, 200, "diffcalc-test")]
-        [TestCase(3.134084469440479d, 200, "diffcalc-test-strong")]
+        [TestCase(4.4472572672057815d, 200, "diffcalc-test")]
+        [TestCase(4.4472572672057815d, 200, "diffcalc-test-strong")]
         public void TestClockRateAdjusted(double expectedStarRating, int expectedMaxCombo, string name)
             => Test(expectedStarRating, expectedMaxCombo, name, new TaikoModDoubleTime());
 

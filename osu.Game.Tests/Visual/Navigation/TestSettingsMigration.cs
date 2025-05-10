@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
@@ -7,7 +7,7 @@ using osu.Game.Configuration;
 
 namespace osu.Game.Tests.Visual.Navigation
 {
-    public class TestSettingsMigration : OsuGameTestScene
+    public partial class TestSettingsMigration : OsuGameTestScene
     {
         public override void RecycleLocalStorage(bool isDisposing)
         {
@@ -32,7 +32,7 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddStep("force save config", () => Game.LocalConfig.Save());
 
-            AddStep("remove game", () => Remove(Game));
+            AddStep("remove game", () => Remove(Game, true));
 
             AddStep("create game again", CreateGame);
 

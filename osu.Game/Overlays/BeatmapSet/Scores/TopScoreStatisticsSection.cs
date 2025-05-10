@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -13,6 +15,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets.Mods;
@@ -22,7 +25,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
-    public class TopScoreStatisticsSection : CompositeDrawable
+    public partial class TopScoreStatisticsSection : CompositeDrawable
     {
         private const float margin = 10;
         private const float top_columns_min_width = 64;
@@ -31,7 +34,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private readonly FontUsage smallFont = OsuFont.GetFont(size: 16);
         private readonly FontUsage largeFont = OsuFont.GetFont(size: 22, weight: FontWeight.Light);
 
-        private readonly TextColumn totalScoreColumn;
+        private readonly TotalScoreColumn totalScoreColumn;
         private readonly TextColumn accuracyColumn;
         private readonly TextColumn maxComboColumn;
         private readonly TextColumn ppColumn;
@@ -63,7 +66,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                         Spacing = new Vector2(margin, 0),
                         Children = new Drawable[]
                         {
-                            totalScoreColumn = new TextColumn(BeatmapsetsStrings.ShowScoreboardHeadersScoreTotal, largeFont, top_columns_min_width),
+                            totalScoreColumn = new TotalScoreColumn(BeatmapsetsStrings.ShowScoreboardHeadersScoreTotal, largeFont, top_columns_min_width),
                             accuracyColumn = new TextColumn(BeatmapsetsStrings.ShowScoreboardHeadersAccuracy, largeFont, top_columns_min_width),
                             maxComboColumn = new TextColumn(BeatmapsetsStrings.ShowScoreboardHeadersCombo, largeFont, top_columns_min_width)
                         }
@@ -92,10 +95,17 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuColour colours)
         {
             if (score != null)
+            {
                 totalScoreColumn.Current = scoreManager.GetBindableTotalScoreString(score);
+
+                if (score.Accuracy == 1.0) accuracyColumn.TextColour = colours.GreenLight;
+#pragma warning disable CS0618
+                if (score.MaxCombo == score.BeatmapInfo!.MaxCombo) maxComboColumn.TextColour = colours.GreenLight;
+#pragma warning restore CS0618
+            }
         }
 
         private ScoreInfo score;
@@ -118,8 +128,28 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 accuracyColumn.Text = value.DisplayAccuracy;
                 maxComboColumn.Text = value.MaxCombo.ToLocalisableString(@"0\x");
 
-                ppColumn.Alpha = value.BeatmapInfo.Status.GrantsPerformancePoints() ? 1 : 0;
-                ppColumn.Text = value.PP?.ToLocalisableString(@"N0") ?? default(LocalisableString);
+                ppColumn.Alpha = value.BeatmapInfo!.Status.GrantsPerformancePoints() ? 1 : 0;
+
+                if (!value.Ranked)
+                {
+                    ppColumn.Drawable = new SpriteTextWithTooltip
+                    {
+                        Text = "-",
+                        Font = smallFont,
+                        TooltipText = ScoresStrings.StatusNoPp
+                    };
+                }
+                else if (value.PP is not double pp)
+                {
+                    ppColumn.Drawable = new SpriteIconWithTooltip
+                    {
+                        Icon = FontAwesome.Solid.Sync,
+                        Size = new Vector2(smallFont.Size),
+                        TooltipText = ScoresStrings.StatusProcessing,
+                    };
+                }
+                else
+                    ppColumn.Text = pp.ToLocalisableString(@"N0");
 
                 statisticsColumns.ChildrenEnumerable = value.GetStatisticsForDisplay().Select(createStatisticsColumn);
                 modsColumn.Mods = value.Mods;
@@ -134,7 +164,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             Text = stat.MaxCount == null ? stat.Count.ToLocalisableString(@"N0") : (LocalisableString)$"{stat.Count}/{stat.MaxCount}"
         };
 
-        private class InfoColumn : CompositeDrawable
+        private partial class InfoColumn : CompositeDrawable
         {
             private readonly Box separator;
             private readonly OsuSpriteText text;
@@ -195,34 +225,67 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             }
         }
 
-        private class TextColumn : InfoColumn
+        private partial class TextColumn : InfoColumn
         {
-            private readonly SpriteText text;
-
-            public TextColumn(LocalisableString title, FontUsage font, float? minWidth = null)
-                : this(title, new OsuSpriteText { Font = font }, minWidth)
-            {
-            }
-
-            private TextColumn(LocalisableString title, SpriteText text, float? minWidth = null)
-                : base(title, text, minWidth)
-            {
-                this.text = text;
-            }
+            private readonly OsuTextFlowContainer text;
 
             public LocalisableString Text
             {
                 set => text.Text = value;
             }
 
-            public Bindable<string> Current
+            public Colour4 TextColour
             {
-                get => text.Current;
-                set => text.Current = value;
+                set => text.Colour = value;
+            }
+
+            public Drawable Drawable
+            {
+                set
+                {
+                    text.Clear();
+                    text.AddArbitraryDrawable(value);
+                }
+            }
+
+            public TextColumn(LocalisableString title, FontUsage font, float? minWidth = null)
+                : this(title, new OsuTextFlowContainer(t => t.Font = font)
+                {
+                    AutoSizeAxes = Axes.Both
+                }, minWidth)
+            {
+            }
+
+            private TextColumn(LocalisableString title, OsuTextFlowContainer text, float? minWidth = null)
+                : base(title, text, minWidth)
+            {
+                this.text = text;
             }
         }
 
-        private class ModsInfoColumn : InfoColumn
+        private partial class TotalScoreColumn : TextColumn
+        {
+            private readonly BindableWithCurrent<string> current = new BindableWithCurrent<string>();
+
+            public TotalScoreColumn(LocalisableString title, FontUsage font, float? minWidth = null)
+                : base(title, font, minWidth)
+            {
+            }
+
+            public Bindable<string> Current
+            {
+                get => current;
+                set => current.Current = value;
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                Current.BindValueChanged(_ => Text = current.Value, true);
+            }
+        }
+
+        private partial class ModsInfoColumn : InfoColumn
         {
             private readonly FillFlowContainer modsContainer;
 
@@ -248,7 +311,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 set
                 {
                     modsContainer.Clear();
-                    modsContainer.Children = value.Select(mod => new ModIcon(mod)
+                    modsContainer.Children = value.AsOrdered().Select(mod => new ModIcon(mod)
                     {
                         AutoSizeAxes = Axes.Both,
                         Scale = new Vector2(0.25f),

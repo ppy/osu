@@ -20,20 +20,20 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
-    public class TestSceneDrawableJudgement : OsuSkinnableTestScene
+    public partial class TestSceneDrawableJudgement : OsuSkinnableTestScene
     {
         [Resolved]
-        private OsuConfigManager config { get; set; }
+        private OsuConfigManager config { get; set; } = null!;
 
-        private readonly List<DrawablePool<TestDrawableOsuJudgement>> pools;
+        private readonly List<DrawablePool<TestDrawableOsuJudgement>> pools = new List<DrawablePool<TestDrawableOsuJudgement>>();
 
-        public TestSceneDrawableJudgement()
+        [TestCaseSource(nameof(validResults))]
+        public void Test(HitResult result)
         {
-            pools = new List<DrawablePool<TestDrawableOsuJudgement>>();
-
-            foreach (HitResult result in Enum.GetValues(typeof(HitResult)).OfType<HitResult>().Skip(1))
-                showResult(result);
+            showResult(result);
         }
+
+        private static IEnumerable<HitResult> validResults => Enum.GetValues<HitResult>().Skip(1);
 
         [Test]
         public void TestHitLightingDisabled()
@@ -72,31 +72,32 @@ namespace osu.Game.Rulesets.Osu.Tests
                         pools.Add(pool = new DrawablePool<TestDrawableOsuJudgement>(1));
                     else
                     {
-                        pool = pools[poolIndex];
-
                         // We need to make sure neither the pool nor the judgement get disposed when new content is set, and they both share the same parent.
-                        ((Container)pool.Parent).Clear(false);
+                        pool = pools[poolIndex];
+                        ((Container)pool.Parent!).Clear(false);
                     }
 
                     var container = new Container
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Children = new Drawable[]
-                        {
-                            pool,
-                            pool.Get(j => j.Apply(new JudgementResult(new HitObject
-                            {
-                                StartTime = Time.Current
-                            }, new Judgement())
-                            {
-                                Type = result,
-                            }, null)).With(j =>
-                            {
-                                j.Anchor = Anchor.Centre;
-                                j.Origin = Anchor.Centre;
-                            })
-                        }
+                        Child = pool,
                     };
+
+                    // Must be scheduled so the pool is loaded before we try and retrieve from it.
+                    Schedule(() =>
+                    {
+                        container.Add(pool.Get(j => j.Apply(new JudgementResult(new HitObject
+                        {
+                            StartTime = Time.Current
+                        }, new Judgement())
+                        {
+                            Type = result,
+                        }, null)).With(j =>
+                        {
+                            j.Anchor = Anchor.Centre;
+                            j.Origin = Anchor.Centre;
+                        }));
+                    });
 
                     poolIndex++;
                     return container;
@@ -104,10 +105,10 @@ namespace osu.Game.Rulesets.Osu.Tests
             });
         }
 
-        private class TestDrawableOsuJudgement : DrawableOsuJudgement
+        private partial class TestDrawableOsuJudgement : DrawableOsuJudgement
         {
             public new SkinnableSprite Lighting => base.Lighting;
-            public new SkinnableDrawable JudgementBody => base.JudgementBody;
+            public new SkinnableDrawable? JudgementBody => base.JudgementBody;
         }
     }
 }

@@ -9,7 +9,7 @@ namespace osu.Game.Graphics.Containers
     /// <summary>
     /// A container that adds the ability to shake its contents.
     /// </summary>
-    public class ShakeContainer : Container
+    public partial class ShakeContainer : Container
     {
         /// <summary>
         /// The length of a single shake.

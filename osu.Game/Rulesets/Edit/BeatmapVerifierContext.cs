@@ -3,8 +3,6 @@
 
 using osu.Game.Beatmaps;
 
-#nullable enable
-
 namespace osu.Game.Rulesets.Edit
 {
     /// <summary>

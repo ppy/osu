@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -18,10 +19,10 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Screens.Drawings.Components
 {
-    public class ScrollingTeamContainer : Container
+    public partial class ScrollingTeamContainer : Container
     {
-        public event Action OnScrollStarted;
-        public event Action<TournamentTeam> OnSelected;
+        public event Action? OnScrollStarted;
+        public event Action<TournamentTeam>? OnSelected;
 
         private readonly List<TournamentTeam> availableTeams = new List<TournamentTeam>();
 
@@ -40,7 +41,7 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
 
         private double lastTime;
 
-        private ScheduledDelegate delayedStateChangeDelegate;
+        private ScheduledDelegate? delayedStateChangeDelegate;
 
         public ScrollingTeamContainer()
         {
@@ -115,7 +116,7 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
                     if (!Children.Any())
                         break;
 
-                    ScrollingTeam closest = null;
+                    ScrollingTeam? closest = null;
 
                     foreach (var c in Children)
                     {
@@ -135,9 +136,8 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
                             closest = stc;
                     }
 
-                    Trace.Assert(closest != null, "closest != null");
+                    Debug.Assert(closest != null, "closest != null");
 
-                    // ReSharper disable once PossibleNullReferenceException
                     offset += DrawWidth / 2f - (closest.Position.X + closest.DrawWidth / 2f);
 
                     ScrollingTeam st = closest;
@@ -145,7 +145,7 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
                     availableTeams.RemoveAll(at => at == st.Team);
 
                     st.Selected = true;
-                    OnSelected?.Invoke(st.Team);
+                    OnSelected?.Invoke(st.Team.AsNonNull());
 
                     delayedStateChangeDelegate = Scheduler.AddDelayed(() => setScrollState(ScrollState.Idle), 10000);
                     break;
@@ -168,11 +168,11 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
 
             availableTeams.Add(team);
 
-            RemoveAll(c => c is ScrollingTeam);
+            RemoveAll(c => c is ScrollingTeam, true);
             setScrollState(ScrollState.Idle);
         }
 
-        public void AddTeams(IEnumerable<TournamentTeam> teams)
+        public void AddTeams(IEnumerable<TournamentTeam>? teams)
         {
             if (teams == null)
                 return;
@@ -184,7 +184,7 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
         public void ClearTeams()
         {
             availableTeams.Clear();
-            RemoveAll(c => c is ScrollingTeam);
+            RemoveAll(c => c is ScrollingTeam, true);
             setScrollState(ScrollState.Idle);
         }
 
@@ -307,10 +307,12 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
             Scrolling
         }
 
-        public class ScrollingTeam : DrawableTournamentTeam
+        public partial class ScrollingTeam : DrawableTournamentTeam
         {
+            public new TournamentTeam Team => base.Team.AsNonNull();
+
             public const float WIDTH = 58;
-            public const float HEIGHT = 41;
+            public const float HEIGHT = 44;
 
             private readonly Box outline;
 

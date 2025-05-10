@@ -37,13 +37,13 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
                     {
                         while (sr.Peek() != -1)
                         {
-                            string line = sr.ReadLine()?.Trim();
+                            string? line = sr.ReadLine()?.Trim();
 
                             if (string.IsNullOrEmpty(line))
                                 continue;
 
                             // ReSharper disable once PossibleNullReferenceException
-                            string[] split = line.Split(':');
+                            string[] split = line.Split(':', StringSplitOptions.TrimEntries);
 
                             if (split.Length < 2)
                             {
@@ -53,9 +53,9 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
 
                             teams.Add(new TournamentTeam
                             {
-                                FullName = { Value = split[1].Trim(), },
-                                Acronym = { Value = split.Length >= 3 ? split[2].Trim() : null, },
-                                FlagName = { Value = split[0].Trim() }
+                                FullName = { Value = split[1], },
+                                Acronym = { Value = split.Length >= 3 ? split[2] : string.Empty, },
+                                FlagName = { Value = split[0] }
                             });
                         }
                     }

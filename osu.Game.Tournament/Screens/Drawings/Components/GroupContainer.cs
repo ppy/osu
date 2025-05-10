@@ -12,7 +12,7 @@ using osuTK;
 
 namespace osu.Game.Tournament.Screens.Drawings.Components
 {
-    public class GroupContainer : Container
+    public partial class GroupContainer : Container
     {
         private readonly List<Group> groups = new List<Group>();
 

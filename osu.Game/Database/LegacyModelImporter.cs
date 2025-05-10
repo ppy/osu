@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -24,8 +26,14 @@ namespace osu.Game.Database
         /// <summary>
         /// Select paths to import from stable where all paths should be absolute. Default implementation iterates all directories in <see cref="ImportFromStablePath"/>.
         /// </summary>
-        protected virtual IEnumerable<string> GetStableImportPaths(Storage storage) => storage.GetDirectories(ImportFromStablePath)
-                                                                                              .Select(path => storage.GetFullPath(path));
+        protected virtual IEnumerable<string> GetStableImportPaths(Storage storage)
+        {
+            if (!storage.ExistsDirectory(ImportFromStablePath))
+                return Enumerable.Empty<string>();
+
+            return storage.GetDirectories(ImportFromStablePath)
+                          .Select(path => storage.GetFullPath(path));
+        }
 
         protected readonly IModelImporter<TModel> Importer;
 
@@ -33,6 +41,8 @@ namespace osu.Game.Database
         {
             Importer = importer;
         }
+
+        public Task<int> GetAvailableCount(StableStorage stableStorage) => Task.Run(() => GetStableImportPaths(PrepareStableStorage(stableStorage)).Count());
 
         public Task ImportFromStableAsync(StableStorage stableStorage)
         {
@@ -47,7 +57,12 @@ namespace osu.Game.Database
                 return Task.CompletedTask;
             }
 
-            return Task.Run(async () => await Importer.Import(GetStableImportPaths(storage).ToArray()).ConfigureAwait(false));
+            return Task.Run(async () =>
+            {
+                var tasks = GetStableImportPaths(storage).Select(p => new ImportTask(p)).ToArray();
+
+                await Importer.Import(tasks, new ImportParameters { Batch = true, PreferHardLinks = true }).ConfigureAwait(false);
+            });
         }
 
         /// <summary>

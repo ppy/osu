@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
@@ -8,9 +8,10 @@ using osu.Game.Graphics;
 
 namespace osu.Game.Tournament.Components
 {
-    public class TournamentSpriteTextWithBackground : CompositeDrawable
+    public partial class TournamentSpriteTextWithBackground : CompositeDrawable
     {
-        protected readonly TournamentSpriteText Text;
+        public readonly TournamentSpriteText Text;
+
         protected readonly Box Background;
 
         public TournamentSpriteTextWithBackground(string text = "")
@@ -29,7 +30,7 @@ namespace osu.Game.Tournament.Components
                     Colour = TournamentGame.ELEMENT_FOREGROUND_COLOUR,
                     Font = OsuFont.Torus.With(weight: FontWeight.SemiBold, size: 50),
                     Padding = new MarginPadding { Left = 10, Right = 20 },
-                    Text = text
+                    Text = text,
                 }
             };
         }

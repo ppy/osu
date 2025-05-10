@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,12 +21,12 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.SongSelect
 {
-    public class TestSceneBeatmapMetadataDisplay : OsuTestScene
+    public partial class TestSceneBeatmapMetadataDisplay : OsuTestScene
     {
-        private BeatmapMetadataDisplay display;
+        private BeatmapMetadataDisplay display = null!;
 
         [Resolved]
-        private BeatmapManager manager { get; set; }
+        private BeatmapManager manager { get; set; } = null!;
 
         [Cached(typeof(BeatmapDifficultyCache))]
         private readonly TestBeatmapDifficultyCache testDifficultyCache = new TestBeatmapDifficultyCache();
@@ -96,7 +97,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
                 OsuLogo logo = new OsuLogo { Scale = new Vector2(0.15f) };
 
-                Remove(testDifficultyCache);
+                Remove(testDifficultyCache, false);
 
                 Children = new Drawable[]
                 {
@@ -117,9 +118,9 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("finish loading", () => display.Loading = false);
         }
 
-        private class TestBeatmapDifficultyCache : BeatmapDifficultyCache
+        private partial class TestBeatmapDifficultyCache : BeatmapDifficultyCache
         {
-            private TaskCompletionSource<bool> calculationBlocker;
+            private TaskCompletionSource<bool>? calculationBlocker;
 
             private bool blockCalculation;
 
@@ -140,10 +141,13 @@ namespace osu.Game.Tests.Visual.SongSelect
                 }
             }
 
-            public override async Task<StarDifficulty?> GetDifficultyAsync(IBeatmapInfo beatmapInfo, IRulesetInfo rulesetInfo = null, IEnumerable<Mod> mods = null, CancellationToken cancellationToken = default)
+            public override async Task<StarDifficulty?> GetDifficultyAsync(IBeatmapInfo beatmapInfo, IRulesetInfo? rulesetInfo = null, IEnumerable<Mod>? mods = null, CancellationToken cancellationToken = default)
             {
                 if (blockCalculation)
+                {
+                    Debug.Assert(calculationBlocker != null);
                     await calculationBlocker.Task.ConfigureAwait(false);
+                }
 
                 return await base.GetDifficultyAsync(beatmapInfo, rulesetInfo, mods, cancellationToken).ConfigureAwait(false);
             }

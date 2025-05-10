@@ -14,11 +14,12 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
-using osu.Framework.Utils;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osuTK;
 using osuTK.Input;
 
@@ -27,8 +28,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
     /// <summary>
     /// A component which outlines items and handles movement of selections.
     /// </summary>
-    public abstract class SelectionHandler<T> : CompositeDrawable, IKeyBindingHandler<PlatformAction>, IKeyBindingHandler<GlobalAction>, IHasContextMenu
+    public abstract partial class SelectionHandler<T> : CompositeDrawable, IKeyBindingHandler<PlatformAction>, IKeyBindingHandler<GlobalAction>, IHasContextMenu
     {
+        /// <summary>
+        /// How much padding around the selection area is added.
+        /// </summary>
+        public const float INFLATE_SIZE = 5;
+
         /// <summary>
         /// The currently selected blueprints.
         /// Should be used when operations are dealing directly with the visible blueprints.
@@ -43,10 +49,17 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private readonly List<SelectionBlueprint<T>> selectedBlueprints;
 
-        protected SelectionBox SelectionBox { get; private set; }
+        protected SelectionBox SelectionBox { get; private set; } = null!;
 
         [Resolved(CanBeNull = true)]
-        protected IEditorChangeHandler ChangeHandler { get; private set; }
+        protected IEditorChangeHandler? ChangeHandler { get; private set; }
+
+        public SelectionRotationHandler RotationHandler { get; private set; } = null!;
+
+        public SelectionScaleHandler ScaleHandler { get; private set; } = null!;
+
+        [Resolved(CanBeNull = true)]
+        protected OsuContextMenuContainer? ContextMenuContainer { get; private set; }
 
         protected SelectionHandler()
         {
@@ -56,15 +69,25 @@ namespace osu.Game.Screens.Edit.Compose.Components
             AlwaysPresent = true;
         }
 
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
+        {
+            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+            dependencies.CacheAs(RotationHandler = CreateRotationHandler());
+            dependencies.CacheAs(ScaleHandler = CreateScaleHandler());
+            return dependencies;
+        }
+
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChild = SelectionBox = CreateSelectionBox();
-
-            SelectedItems.CollectionChanged += (sender, args) =>
+            AddRangeInternal(new Drawable[]
             {
-                Scheduler.AddOnce(updateVisibility);
-            };
+                RotationHandler,
+                ScaleHandler,
+                SelectionBox = CreateSelectionBox(),
+            });
+
+            SelectedItems.BindCollectionChanged((_, _) => Scheduler.AddOnce(updateVisibility), true);
         }
 
         public SelectionBox CreateSelectionBox()
@@ -73,8 +96,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 OperationStarted = OnOperationBegan,
                 OperationEnded = OnOperationEnded,
 
-                OnRotation = HandleRotation,
-                OnScale = HandleScale,
                 OnFlip = HandleFlip,
                 OnReverse = HandleReverse,
             };
@@ -97,6 +118,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         #region User Input Handling
 
+        /// <remarks>
+        /// Positional input must be received outside the container's bounds,
+        /// in order to handle blueprints which are partially offscreen.
+        /// </remarks>
+        /// <seealso cref="ComposeBlueprintContainer.ReceivePositionalInputAt"/>
+        /// <seealso cref="TimelineBlueprintContainer.ReceivePositionalInputAt"/>
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
+
         /// <summary>
         /// Handles the selected items being moved.
         /// </summary>
@@ -118,12 +147,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
         public virtual bool HandleRotation(float angle) => false;
 
         /// <summary>
-        /// Handles the selected items being scaled.
+        /// Creates the handler to use for rotation operations.
         /// </summary>
-        /// <param name="scale">The delta scale to apply, in local coordinates.</param>
-        /// <param name="anchor">The point of reference where the scale is originating from.</param>
-        /// <returns>Whether any items could be scaled.</returns>
-        public virtual bool HandleScale(Vector2 scale, Anchor anchor) => false;
+        public virtual SelectionRotationHandler CreateRotationHandler() => new SelectionRotationHandler();
+
+        /// <summary>
+        /// Creates the handler to use for scale operations.
+        /// </summary>
+        public virtual SelectionScaleHandler CreateScaleHandler() => new SelectionScaleHandler();
 
         /// <summary>
         /// Handles the selected items being flipped.
@@ -144,13 +175,23 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (e.Repeat)
                 return false;
 
+            bool handled;
+
             switch (e.Action)
             {
                 case GlobalAction.EditorFlipHorizontally:
-                    return HandleFlip(Direction.Horizontal, true);
+                    ChangeHandler?.BeginChange();
+                    handled = HandleFlip(Direction.Horizontal, true);
+                    ChangeHandler?.EndChange();
+
+                    return handled;
 
                 case GlobalAction.EditorFlipVertically:
-                    return HandleFlip(Direction.Vertical, true);
+                    ChangeHandler?.BeginChange();
+                    handled = HandleFlip(Direction.Vertical, true);
+                    ChangeHandler?.EndChange();
+
+                    return handled;
             }
 
             return false;
@@ -181,9 +222,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
         #region Selection Handling
 
         /// <summary>
-        /// Bind an action to deselect all selected blueprints.
+        /// Deselect all selected items.
         /// </summary>
-        internal Action DeselectAll { private get; set; }
+        protected void DeselectAll()
+        {
+            SelectedItems.Clear();
+            ContextMenuContainer?.CloseMenu();
+        }
 
         /// <summary>
         /// Handle a blueprint becoming selected.
@@ -196,6 +241,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 SelectedItems.Add(blueprint.Item);
 
             selectedBlueprints.Add(blueprint);
+
+            ContextMenuContainer?.CloseMenu();
         }
 
         /// <summary>
@@ -208,15 +255,17 @@ namespace osu.Game.Screens.Edit.Compose.Components
             selectedBlueprints.Remove(blueprint);
         }
 
+        protected virtual bool ShouldQuickDelete(MouseButtonEvent e) => e.Button == MouseButton.Middle || (e.ShiftPressed && e.Button == MouseButton.Right);
+
         /// <summary>
         /// Handle a blueprint requesting selection.
         /// </summary>
         /// <param name="blueprint">The blueprint.</param>
         /// <param name="e">The mouse event responsible for selection.</param>
-        /// <returns>Whether a selection was performed.</returns>
+        /// <returns>Whether an action was performed.</returns>
         internal virtual bool MouseDownSelectionRequested(SelectionBlueprint<T> blueprint, MouseButtonEvent e)
         {
-            if (e.ShiftPressed && e.Button == MouseButton.Right)
+            if (ShouldQuickDelete(e))
             {
                 handleQuickDeletion(blueprint);
                 return true;
@@ -263,7 +312,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <summary>
         /// Given a selection target and a function of truth, retrieve the correct ternary state for display.
         /// </summary>
-        protected static TernaryState GetStateFromSelection<TObject>(IEnumerable<TObject> selection, Func<TObject, bool> func)
+        public static TernaryState GetStateFromSelection<TObject>(IEnumerable<TObject> selection, Func<TObject, bool> func)
         {
             if (selection.Any(func))
                 return selection.All(func) ? TernaryState.True : TernaryState.Indeterminate;
@@ -287,14 +336,15 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (blueprint.IsSelected)
                 return false;
 
-            DeselectAll?.Invoke();
+            DeselectAll();
             blueprint.Select();
             return true;
         }
 
         protected void DeleteSelected()
         {
-            DeleteItems(selectedBlueprints.Select(b => b.Item));
+            DeleteItems(SelectedItems.ToArray());
+            DeselectAll();
         }
 
         #endregion
@@ -335,7 +385,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             for (int i = 1; i < selectedBlueprints.Count; i++)
                 selectionRect = RectangleF.Union(selectionRect, ToLocalSpace(selectedBlueprints[i].SelectionQuad).AABBFloat);
 
-            selectionRect = selectionRect.Inflate(5f);
+            selectionRect = selectionRect.Inflate(INFLATE_SIZE);
 
             SelectionBox.Position = selectionRect.Location;
             SelectionBox.Size = selectionRect.Size;
@@ -359,7 +409,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 if (SelectedBlueprints.Count == 1)
                     items.AddRange(SelectedBlueprints[0].ContextMenuItems);
 
-                items.Add(new OsuMenuItem(CommonStrings.ButtonsDelete, MenuItemType.Destructive, DeleteSelected));
+                items.Add(new OsuMenuItem(CommonStrings.ButtonsDelete, MenuItemType.Destructive, DeleteSelected)
+                {
+                    Hotkey = new Hotkey { PlatformAction = PlatformAction.Delete, KeyCombinations = [new KeyCombination(InputKey.Shift, InputKey.MouseRight), new KeyCombination(InputKey.MouseMiddle)] }
+                });
 
                 return items.ToArray();
             }
@@ -372,99 +425,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <returns>The relevant menu items.</returns>
         protected virtual IEnumerable<MenuItem> GetContextMenuItemsForSelection(IEnumerable<SelectionBlueprint<T>> selection)
             => Enumerable.Empty<MenuItem>();
-
-        #endregion
-
-        #region Helper Methods
-
-        /// <summary>
-        /// Rotate a point around an arbitrary origin.
-        /// </summary>
-        /// <param name="point">The point.</param>
-        /// <param name="origin">The centre origin to rotate around.</param>
-        /// <param name="angle">The angle to rotate (in degrees).</param>
-        protected static Vector2 RotatePointAroundOrigin(Vector2 point, Vector2 origin, float angle)
-        {
-            angle = -angle;
-
-            point.X -= origin.X;
-            point.Y -= origin.Y;
-
-            Vector2 ret;
-            ret.X = point.X * MathF.Cos(MathUtils.DegreesToRadians(angle)) + point.Y * MathF.Sin(MathUtils.DegreesToRadians(angle));
-            ret.Y = point.X * -MathF.Sin(MathUtils.DegreesToRadians(angle)) + point.Y * MathF.Cos(MathUtils.DegreesToRadians(angle));
-
-            ret.X += origin.X;
-            ret.Y += origin.Y;
-
-            return ret;
-        }
-
-        /// <summary>
-        /// Given a flip direction, a surrounding quad for all selected objects, and a position,
-        /// will return the flipped position in screen space coordinates.
-        /// </summary>
-        protected static Vector2 GetFlippedPosition(Direction direction, Quad quad, Vector2 position)
-        {
-            var centre = quad.Centre;
-
-            switch (direction)
-            {
-                case Direction.Horizontal:
-                    position.X = centre.X - (position.X - centre.X);
-                    break;
-
-                case Direction.Vertical:
-                    position.Y = centre.Y - (position.Y - centre.Y);
-                    break;
-            }
-
-            return position;
-        }
-
-        /// <summary>
-        /// Given a scale vector, a surrounding quad for all selected objects, and a position,
-        /// will return the scaled position in screen space coordinates.
-        /// </summary>
-        protected static Vector2 GetScaledPosition(Anchor reference, Vector2 scale, Quad selectionQuad, Vector2 position)
-        {
-            // adjust the direction of scale depending on which side the user is dragging.
-            float xOffset = ((reference & Anchor.x0) > 0) ? -scale.X : 0;
-            float yOffset = ((reference & Anchor.y0) > 0) ? -scale.Y : 0;
-
-            // guard against no-ops and NaN.
-            if (scale.X != 0 && selectionQuad.Width > 0)
-                position.X = selectionQuad.TopLeft.X + xOffset + (position.X - selectionQuad.TopLeft.X) / selectionQuad.Width * (selectionQuad.Width + scale.X);
-
-            if (scale.Y != 0 && selectionQuad.Height > 0)
-                position.Y = selectionQuad.TopLeft.Y + yOffset + (position.Y - selectionQuad.TopLeft.Y) / selectionQuad.Height * (selectionQuad.Height + scale.Y);
-
-            return position;
-        }
-
-        /// <summary>
-        /// Returns a quad surrounding the provided points.
-        /// </summary>
-        /// <param name="points">The points to calculate a quad for.</param>
-        protected static Quad GetSurroundingQuad(IEnumerable<Vector2> points)
-        {
-            if (!points.Any())
-                return new Quad();
-
-            Vector2 minPosition = new Vector2(float.MaxValue, float.MaxValue);
-            Vector2 maxPosition = new Vector2(float.MinValue, float.MinValue);
-
-            // Go through all hitobjects to make sure they would remain in the bounds of the editor after movement, before any movement is attempted
-            foreach (var p in points)
-            {
-                minPosition = Vector2.ComponentMin(minPosition, p);
-                maxPosition = Vector2.ComponentMax(maxPosition, p);
-            }
-
-            Vector2 size = maxPosition - minPosition;
-
-            return new Quad(minPosition.X, minPosition.Y, size.X, size.Y);
-        }
 
         #endregion
     }

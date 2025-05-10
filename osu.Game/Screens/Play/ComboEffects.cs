@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
@@ -11,7 +13,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Play
 {
-    public class ComboEffects : CompositeDrawable
+    public partial class ComboEffects : CompositeDrawable
     {
         private readonly ScoreProcessor processor;
 
@@ -43,7 +45,7 @@ namespace osu.Game.Screens.Play
         private ISamplePlaybackDisabler samplePlaybackDisabler { get; set; }
 
         [Resolved]
-        private GameplayClock gameplayClock { get; set; }
+        private IGameplayClock gameplayClock { get; set; }
 
         private void onComboChange(ValueChangedEvent<int> combo)
         {
@@ -51,7 +53,7 @@ namespace osu.Game.Screens.Play
             if (gameplayClock.CurrentTime < firstBreakTime)
                 firstBreakTime = null;
 
-            if (gameplayClock.ElapsedFrameTime < 0)
+            if (gameplayClock.IsRewinding)
                 return;
 
             if (combo.NewValue == 0 && (combo.OldValue > 20 || (alwaysPlayFirst.Value && firstBreakTime == null)))

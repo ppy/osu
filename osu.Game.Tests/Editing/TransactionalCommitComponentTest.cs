@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using NUnit.Framework;
 using osu.Game.Screens.Edit;
@@ -8,7 +10,7 @@ using osu.Game.Screens.Edit;
 namespace osu.Game.Tests.Editing
 {
     [TestFixture]
-    public class TransactionalCommitComponentTest
+    public partial class TransactionalCommitComponentTest
     {
         private TestHandler handler;
 
@@ -87,7 +89,7 @@ namespace osu.Game.Tests.Editing
             Assert.That(() => handler.EndChange(), Throws.TypeOf<InvalidOperationException>());
         }
 
-        private class TestHandler : TransactionalCommitComponent
+        private partial class TestHandler : TransactionalCommitComponent
         {
             public int StateUpdateCount { get; private set; }
 

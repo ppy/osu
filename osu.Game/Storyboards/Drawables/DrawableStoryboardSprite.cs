@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
@@ -12,7 +13,7 @@ using osuTK;
 
 namespace osu.Game.Storyboards.Drawables
 {
-    public class DrawableStoryboardSprite : Sprite, IFlippable, IVectorScalable
+    public partial class DrawableStoryboardSprite : Sprite, IFlippable, IVectorScalable
     {
         public StoryboardSprite Sprite { get; }
 
@@ -53,11 +54,6 @@ namespace osu.Game.Storyboards.Drawables
             get => vectorScale;
             set
             {
-                if (Math.Abs(value.X) < Precision.FLOAT_EPSILON)
-                    value.X = Precision.FLOAT_EPSILON;
-                if (Math.Abs(value.Y) < Precision.FLOAT_EPSILON)
-                    value.Y = Precision.FLOAT_EPSILON;
-
                 if (vectorScale == value)
                     return;
 
@@ -78,40 +74,52 @@ namespace osu.Game.Storyboards.Drawables
         public override bool IsPresent
             => !float.IsNaN(DrawPosition.X) && !float.IsNaN(DrawPosition.Y) && base.IsPresent;
 
+        [Resolved]
+        private ISkinSource skin { get; set; } = null!;
+
+        [Resolved]
+        private TextureStore textureStore { get; set; } = null!;
+
         public DrawableStoryboardSprite(StoryboardSprite sprite)
         {
             Sprite = sprite;
             Origin = sprite.Origin;
             Position = sprite.InitialPosition;
+            Name = sprite.Path;
 
             LifetimeStart = sprite.StartTime;
-            LifetimeEnd = sprite.EndTime;
+            LifetimeEnd = sprite.EndTimeForDisplay;
         }
 
-        [Resolved]
-        private ISkinSource skin { get; set; }
-
         [BackgroundDependencyLoader]
-        private void load(TextureStore textureStore, Storyboard storyboard)
+        private void load(Storyboard storyboard)
         {
-            Texture = storyboard.GetTextureFromPath(Sprite.Path, textureStore);
-
-            if (Texture == null && storyboard.UseSkinSprites)
+            if (storyboard.UseSkinSprites)
             {
                 skin.SourceChanged += skinSourceChanged;
                 skinSourceChanged();
             }
+            else
+                Texture = textureStore.Get(Sprite.Path, WrapMode.ClampToEdge, WrapMode.ClampToEdge);
 
             Sprite.ApplyTransforms(this);
         }
 
-        private void skinSourceChanged() => Texture = skin.GetTexture(Sprite.Path);
+        private void skinSourceChanged()
+        {
+            Texture = skin.GetTexture(Sprite.Path, WrapMode.ClampToEdge, WrapMode.ClampToEdge) ??
+                      textureStore.Get(Sprite.Path, WrapMode.ClampToEdge, WrapMode.ClampToEdge);
+
+            // Setting texture will only update the size if it's zero.
+            // So let's force an explicit update.
+            Size = new Vector2(Texture?.DisplayWidth ?? 0, Texture?.DisplayHeight ?? 0);
+        }
 
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
 
-            if (skin != null)
+            if (skin.IsNotNull())
                 skin.SourceChanged -= skinSourceChanged;
         }
     }

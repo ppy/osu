@@ -2,21 +2,22 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.IO;
-using System.Linq;
+using System.Text.RegularExpressions;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.IO;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
+using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Users;
-
-#nullable enable
 
 namespace osu.Game.Extensions
 {
     public static class ModelExtensions
     {
+        private static readonly Regex invalid_filename_chars = new Regex(@"(?!$)[^A-Za-z0-9_()[\]. \-]", RegexOptions.Compiled);
+
         /// <summary>
         /// Get the relative path in osu! storage for this file.
         /// </summary>
@@ -114,8 +115,24 @@ namespace osu.Game.Extensions
         /// </summary>
         /// <param name="instance">The instance to compare.</param>
         /// <param name="other">The other instance to compare against.</param>
-        /// <returns>Whether online IDs match. If either instance is missing an online ID, this will return false.</returns>
-        public static bool MatchesOnlineID(this IScoreInfo? instance, IScoreInfo? other) => matchesOnlineID(instance, other);
+        /// <returns>
+        /// Whether online IDs match.
+        /// Both <see cref="IHasOnlineID{T}.OnlineID"/> and <see cref="IScoreInfo.LegacyOnlineID"/> are checked, in that order.
+        /// If either instance is missing an online ID, this will return false.
+        /// </returns>
+        public static bool MatchesOnlineID(this IScoreInfo? instance, IScoreInfo? other)
+        {
+            if (matchesOnlineID(instance, other))
+                return true;
+
+            if (instance == null || other == null)
+                return false;
+
+            if (instance.LegacyOnlineID < 0 || other.LegacyOnlineID < 0)
+                return false;
+
+            return instance.LegacyOnlineID.Equals(other.LegacyOnlineID);
+        }
 
         private static bool matchesOnlineID(this IHasOnlineID<long>? instance, IHasOnlineID<long>? other)
         {
@@ -139,20 +156,29 @@ namespace osu.Game.Extensions
             return instance.OnlineID.Equals(other.OnlineID);
         }
 
-        private static readonly char[] invalid_filename_characters = Path.GetInvalidFileNameChars()
-                                                                         // Backslash is added to avoid issues when exporting to zip.
-                                                                         // See SharpCompress filename normalisation https://github.com/adamhathcock/sharpcompress/blob/a1e7c0068db814c9aa78d86a94ccd1c761af74bd/src/SharpCompress/Writers/Zip/ZipWriter.cs#L143.
-                                                                         .Append('\\')
-                                                                         .ToArray();
-
         /// <summary>
-        /// Get a valid filename for use inside a zip file. Avoids backslashes being incorrectly converted to directories.
+        /// Create a valid filename which should work across all platforms.
         /// </summary>
-        public static string GetValidArchiveContentFilename(this string filename)
+        /// <remarks>
+        /// This function replaces all characters not included in a very pessimistic list which should be compatible
+        /// across all operating systems. We are using this in place of <see cref="Path.GetInvalidFileNameChars"/> as
+        /// that function does not have per-platform considerations (and is only made to work on windows).
+        /// </remarks>
+        public static string GetValidFilename(this string filename) => invalid_filename_chars.Replace(filename, "_");
+
+        public static bool RequiresSupporter(this BeatmapLeaderboardScope scope, bool filterMods)
         {
-            foreach (char c in invalid_filename_characters)
-                filename = filename.Replace(c, '_');
-            return filename;
+            switch (scope)
+            {
+                case BeatmapLeaderboardScope.Local:
+                    return false;
+
+                case BeatmapLeaderboardScope.Country:
+                case BeatmapLeaderboardScope.Friend:
+                    return true;
+            }
+
+            return filterMods;
         }
     }
 }

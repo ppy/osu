@@ -4,8 +4,6 @@
 using System;
 using MessagePack;
 
-#nullable enable
-
 namespace osu.Game.Online.Multiplayer.MatchTypes.TeamVersus
 {
     [Serializable]

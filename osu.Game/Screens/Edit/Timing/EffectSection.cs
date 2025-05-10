@@ -9,12 +9,11 @@ using osu.Game.Graphics.UserInterfaceV2;
 
 namespace osu.Game.Screens.Edit.Timing
 {
-    internal class EffectSection : Section<EffectControlPoint>
+    internal partial class EffectSection : Section<EffectControlPoint>
     {
-        private LabelledSwitchButton kiai;
-        private LabelledSwitchButton omitBarLine;
+        private LabelledSwitchButton kiai = null!;
 
-        private SliderWithTextBoxInput<double> scrollSpeedSlider;
+        private SliderWithTextBoxInput<double> scrollSpeedSlider = null!;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -22,7 +21,6 @@ namespace osu.Game.Screens.Edit.Timing
             Flow.AddRange(new Drawable[]
             {
                 kiai = new LabelledSwitchButton { Label = "Kiai Time" },
-                omitBarLine = new LabelledSwitchButton { Label = "Skip Bar Line" },
                 scrollSpeedSlider = new SliderWithTextBoxInput<double>("Scroll Speed")
                 {
                     Current = new EffectControlPoint().ScrollSpeedBindable,
@@ -31,19 +29,56 @@ namespace osu.Game.Screens.Edit.Timing
             });
         }
 
-        protected override void OnControlPointChanged(ValueChangedEvent<EffectControlPoint> point)
+        protected override void LoadComplete()
         {
-            if (point.NewValue != null)
+            base.LoadComplete();
+
+            kiai.Current.BindValueChanged(_ => saveChanges());
+            scrollSpeedSlider.Current.BindValueChanged(_ => saveChanges());
+
+            if (!Beatmap.BeatmapInfo.Ruleset.CreateInstance().EditorShowScrollSpeed)
+                scrollSpeedSlider.Hide();
+
+            void saveChanges()
             {
-                kiai.Current = point.NewValue.KiaiModeBindable;
-                kiai.Current.BindValueChanged(_ => ChangeHandler?.SaveState());
-
-                omitBarLine.Current = point.NewValue.OmitFirstBarLineBindable;
-                omitBarLine.Current.BindValueChanged(_ => ChangeHandler?.SaveState());
-
-                scrollSpeedSlider.Current = point.NewValue.ScrollSpeedBindable;
-                scrollSpeedSlider.Current.BindValueChanged(_ => ChangeHandler?.SaveState());
+                if (!isRebinding) ChangeHandler?.SaveState();
             }
+        }
+
+        private bool isRebinding;
+
+        protected override void OnControlPointChanged(ValueChangedEvent<EffectControlPoint?> point)
+        {
+            scrollSpeedSlider.Current.ValueChanged -= updateControlPointFromSlider;
+
+            if (point.NewValue is EffectControlPoint newEffectPoint)
+            {
+                isRebinding = true;
+
+                kiai.Current = newEffectPoint.KiaiModeBindable;
+                scrollSpeedSlider.Current = new BindableDouble(1)
+                {
+                    MinValue = 0.01,
+                    MaxValue = 10,
+                    Precision = 0.01,
+                    Value = newEffectPoint.ScrollSpeedBindable.Value
+                };
+                scrollSpeedSlider.Current.ValueChanged += updateControlPointFromSlider;
+                // at this point in time the above is enough to keep the slider control in sync with reality,
+                // since undo/redo causes `OnControlPointChanged()` to fire.
+                // whenever that stops being the case, or there is a possibility that the scroll speed could be changed
+                // by something else other than this control, this code should probably be revisited to have a binding in the other direction, too.
+
+                isRebinding = false;
+            }
+        }
+
+        private void updateControlPointFromSlider(ValueChangedEvent<double> scrollSpeed)
+        {
+            if (ControlPoint.Value is not EffectControlPoint effectPoint || isRebinding)
+                return;
+
+            effectPoint.ScrollSpeedBindable.Value = scrollSpeed.NewValue;
         }
 
         protected override EffectControlPoint CreatePoint()
@@ -53,7 +88,6 @@ namespace osu.Game.Screens.Edit.Timing
             return new EffectControlPoint
             {
                 KiaiMode = reference.KiaiMode,
-                OmitFirstBarLine = reference.OmitFirstBarLine,
                 ScrollSpeed = reference.ScrollSpeed,
             };
         }

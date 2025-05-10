@@ -9,6 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.UI;
@@ -21,10 +22,13 @@ using osuTK.Graphics;
 namespace osu.Game.Rulesets.Mania.Tests
 {
     [TestFixture]
-    public class TestSceneColumn : ManiaInputTestScene
+    public partial class TestSceneColumn : ManiaInputTestScene
     {
         [Cached(typeof(IReadOnlyList<Mod>))]
         private IReadOnlyList<Mod> mods { get; set; } = Array.Empty<Mod>();
+
+        [Cached]
+        private readonly StageDefinition stage = new StageDefinition(1);
 
         private readonly List<Column> columns = new List<Column>();
 
@@ -82,12 +86,12 @@ namespace osu.Game.Rulesets.Mania.Tests
 
         private Drawable createColumn(ScrollingDirection direction, ManiaAction action, int index)
         {
-            var column = new Column(index)
+            var column = new Column(index, false)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Height = 0.85f,
-                AccentColour = Color4.OrangeRed,
+                AccentColour = { Value = Color4.OrangeRed },
                 Action = { Value = action },
             };
 

@@ -7,7 +7,7 @@ using osu.Framework.iOS;
 namespace osu.Game.Tests.iOS
 {
     [Register("AppDelegate")]
-    public class AppDelegate : GameAppDelegate
+    public class AppDelegate : GameApplicationDelegate
     {
         protected override Framework.Game CreateGame() => new OsuTestBrowser();
     }

@@ -2,12 +2,15 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using JetBrains.Annotations;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
-using osu.Framework.Graphics.OpenGL.Textures;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Textures;
+using osu.Framework.Testing;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI.Scrolling;
@@ -16,9 +19,9 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 {
-    public class LegacyBodyPiece : LegacyManiaColumnElement
+    public partial class LegacyBodyPiece : LegacyManiaColumnElement
     {
-        private DrawableHoldNote holdNote;
+        private DrawableHoldNote holdNote = null!;
 
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
         private readonly IBindable<bool> isHitting = new Bindable<bool>();
@@ -29,14 +32,12 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
         /// </summary>
         private readonly Bindable<double?> missFadeTime = new Bindable<double?>();
 
-        [CanBeNull]
-        private Drawable bodySprite;
+        private Drawable? bodySprite;
 
-        [CanBeNull]
-        private Drawable lightContainer;
+        private Drawable? lightContainer;
 
-        [CanBeNull]
-        private Drawable light;
+        private Drawable? light;
+        private LegacyNoteBodyStyle? bodyStyle;
 
         public LegacyBodyPiece()
         {
@@ -64,11 +65,8 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
             if (tmp is IFramedAnimation tmpAnimation && tmpAnimation.FrameCount > 0)
                 frameLength = Math.Max(1000 / 60.0, 170.0 / tmpAnimation.FrameCount);
 
-            light = skin.GetAnimation(lightImage, true, true, frameLength: frameLength).With(d =>
+            light = skin.GetAnimation(lightImage, true, true, frameLength: frameLength)?.With(d =>
             {
-                if (d == null)
-                    return;
-
                 d.Origin = Anchor.Centre;
                 d.Blending = BlendingParameters.Additive;
                 d.Scale = new Vector2(lightScale);
@@ -83,26 +81,26 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                 };
             }
 
-            bodySprite = skin.GetAnimation(imageName, WrapMode.ClampToEdge, WrapMode.ClampToEdge, true, true).With(d =>
-            {
-                if (d == null)
-                    return;
+            bodyStyle = skin.GetConfig<ManiaSkinConfigurationLookup, LegacyNoteBodyStyle>(new ManiaSkinConfigurationLookup(LegacyManiaSkinConfigurationLookups.NoteBodyStyle))?.Value;
 
+            var wrapMode = bodyStyle == LegacyNoteBodyStyle.Stretch ? WrapMode.ClampToEdge : WrapMode.Repeat;
+
+            direction.BindTo(scrollingInfo.Direction);
+            isHitting.BindTo(holdNote.IsHitting);
+
+            bodySprite = skin.GetAnimation(imageName, wrapMode, wrapMode, true, true, frameLength: 30)?.With(d =>
+            {
                 if (d is TextureAnimation animation)
                     animation.IsPlaying = false;
 
                 d.Anchor = Anchor.TopCentre;
                 d.RelativeSizeAxes = Axes.Both;
                 d.Size = Vector2.One;
-                d.FillMode = FillMode.Stretch;
-                // Todo: Wrap
+                // Todo: Wrap?
             });
 
             if (bodySprite != null)
                 InternalChild = bodySprite;
-
-            direction.BindTo(scrollingInfo.Direction);
-            isHitting.BindTo(holdNote.IsHitting);
         }
 
         protected override void LoadComplete()
@@ -119,18 +117,24 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 
         private void applyCustomUpdateState(DrawableHitObject hitObject, ArmedState state)
         {
-            // ensure that the hold note is also faded out when the head/tail/any tick is missed.
-            if (state == ArmedState.Miss)
-                missFadeTime.Value ??= hitObject.HitStateUpdateTime;
+            switch (hitObject)
+            {
+                // Ensure that the hold note is also faded out when the head/tail/body is missed.
+                // Importantly, we filter out unrelated objects like DrawableNotePerfectBonus.
+                case DrawableHoldNoteTail:
+                case DrawableHoldNoteHead:
+                case DrawableHoldNoteBody:
+                    if (state == ArmedState.Miss)
+                        missFadeTime.Value ??= hitObject.HitStateUpdateTime;
+
+                    break;
+            }
         }
 
         private void onIsHittingChanged(ValueChangedEvent<bool> isHitting)
         {
             if (bodySprite is TextureAnimation bodyAnimation)
-            {
-                bodyAnimation.GotoFrame(0);
                 bodyAnimation.IsPlaying = isHitting.NewValue;
-            }
 
             if (lightContainer == null)
                 return;
@@ -153,7 +157,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
             else
             {
                 lightContainer.FadeOut(120)
-                              .OnComplete(d => Column.TopLevelContainer.Remove(d));
+                              .OnComplete(d => Column.TopLevelContainer.Remove(d, false));
             }
         }
 
@@ -163,8 +167,8 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
             {
                 if (bodySprite != null)
                 {
-                    bodySprite.Origin = Anchor.BottomCentre;
-                    bodySprite.Scale = new Vector2(1, -1);
+                    bodySprite.Origin = Anchor.TopCentre;
+                    bodySprite.Anchor = Anchor.BottomCentre; // needs to be flipped due to scale flip in Update.
                 }
 
                 if (light != null)
@@ -175,7 +179,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                 if (bodySprite != null)
                 {
                     bodySprite.Origin = Anchor.TopCentre;
-                    bodySprite.Scale = Vector2.One;
+                    bodySprite.Anchor = Anchor.TopCentre;
                 }
 
                 if (light != null)
@@ -205,14 +209,48 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
         protected override void Update()
         {
             base.Update();
-            missFadeTime.Value ??= holdNote.HoldBrokenTime;
+
+            if (!isHitting.Value)
+                (bodySprite as TextureAnimation)?.GotoFrame(0);
+
+            if (holdNote.Body.HasHoldBreak)
+                missFadeTime.Value = holdNote.Body.Result.TimeAbsolute;
+
+            int scaleDirection = (direction.Value == ScrollingDirection.Down ? 1 : -1);
+
+            // here we go...
+            switch (bodyStyle)
+            {
+                case LegacyNoteBodyStyle.Stretch:
+                    // this is how lazer works by default. nothing required.
+                    if (bodySprite != null)
+                        bodySprite.Scale = new Vector2(1, scaleDirection);
+                    break;
+
+                default:
+                    // this is where things get a bit messed up.
+                    // honestly there's three modes to handle here but they seem really pointless?
+                    // let's wait to see if anyone actually uses them in skins.
+                    if (bodySprite != null)
+                    {
+                        var sprite = bodySprite as Sprite ?? bodySprite.ChildrenOfType<Sprite>().Single();
+
+                        bodySprite.FillMode = FillMode.Stretch;
+                        // i dunno this looks about right??
+                        // the guard against zero draw height is intended for zero-length hold notes. yes, such cases have been spotted in the wild.
+                        if (sprite.DrawHeight > 0)
+                            bodySprite.Scale = new Vector2(1, scaleDirection * MathF.Max(1, 32800 / sprite.DrawHeight));
+                    }
+
+                    break;
+            }
         }
 
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
 
-            if (holdNote != null)
+            if (holdNote.IsNotNull())
                 holdNote.ApplyCustomUpdateState -= applyCustomUpdateState;
 
             lightContainer?.Expire();

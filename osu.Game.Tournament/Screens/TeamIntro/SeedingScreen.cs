@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -17,11 +18,14 @@ using osuTK;
 
 namespace osu.Game.Tournament.Screens.TeamIntro
 {
-    public class SeedingScreen : TournamentMatchScreen, IProvideVideo
+    public partial class SeedingScreen : TournamentMatchScreen
     {
-        private Container mainContainer;
+        private Container mainContainer = null!;
 
-        private readonly Bindable<TournamentTeam> currentTeam = new Bindable<TournamentTeam>();
+        private readonly Bindable<TournamentTeam?> currentTeam = new Bindable<TournamentTeam?>();
+
+        private TourneyButton showFirstTeamButton = null!;
+        private TourneyButton showSecondTeamButton = null!;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -43,17 +47,17 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                 {
                     Children = new Drawable[]
                     {
-                        new TourneyButton
+                        showFirstTeamButton = new TourneyButton
                         {
                             RelativeSizeAxes = Axes.X,
                             Text = "Show first team",
-                            Action = () => currentTeam.Value = CurrentMatch.Value.Team1.Value,
+                            Action = () => currentTeam.Value = CurrentMatch.Value?.Team1.Value,
                         },
-                        new TourneyButton
+                        showSecondTeamButton = new TourneyButton
                         {
                             RelativeSizeAxes = Axes.X,
                             Text = "Show second team",
-                            Action = () => currentTeam.Value = CurrentMatch.Value.Team2.Value,
+                            Action = () => currentTeam.Value = CurrentMatch.Value?.Team2.Value,
                         },
                         new SettingsTeamDropdown(LadderInfo.Teams)
                         {
@@ -67,37 +71,50 @@ namespace osu.Game.Tournament.Screens.TeamIntro
             currentTeam.BindValueChanged(teamChanged, true);
         }
 
-        private void teamChanged(ValueChangedEvent<TournamentTeam> team)
+        private void teamChanged(ValueChangedEvent<TournamentTeam?> team) => updateTeamDisplay();
+
+        public override void Show()
         {
-            if (team.NewValue == null)
+            base.Show();
+
+            // Changes could have been made on editor screen.
+            // Rather than trying to track all the possibilities (teams / players / scores) just force a full refresh.
+            updateTeamDisplay();
+        }
+
+        protected override void CurrentMatchChanged(ValueChangedEvent<TournamentMatch?> match)
+        {
+            base.CurrentMatchChanged(match);
+
+            if (match.NewValue == null)
+            {
+                showFirstTeamButton.Enabled.Value = false;
+                showSecondTeamButton.Enabled.Value = false;
+                return;
+            }
+
+            showFirstTeamButton.Enabled.Value = true;
+            showSecondTeamButton.Enabled.Value = true;
+
+            currentTeam.Value = match.NewValue.Team1.Value;
+        }
+
+        private void updateTeamDisplay() => Scheduler.AddOnce(() =>
+        {
+            if (currentTeam.Value == null)
             {
                 mainContainer.Clear();
                 return;
             }
 
-            showTeam(team.NewValue);
-        }
-
-        protected override void CurrentMatchChanged(ValueChangedEvent<TournamentMatch> match)
-        {
-            base.CurrentMatchChanged(match);
-
-            if (match.NewValue == null)
-                return;
-
-            currentTeam.Value = match.NewValue.Team1.Value;
-        }
-
-        private void showTeam(TournamentTeam team)
-        {
             mainContainer.Children = new Drawable[]
             {
-                new LeftInfo(team) { Position = new Vector2(55, 150), },
-                new RightInfo(team) { Position = new Vector2(500, 150), },
+                new LeftInfo(currentTeam.Value) { Position = new Vector2(55, 150), },
+                new RightInfo(currentTeam.Value) { Position = new Vector2(500, 150), },
             };
-        }
+        });
 
-        private class RightInfo : CompositeDrawable
+        private partial class RightInfo : CompositeDrawable
         {
             public RightInfo(TournamentTeam team)
             {
@@ -118,15 +135,23 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                 foreach (var seeding in team.SeedingResults)
                 {
                     fill.Add(new ModRow(seeding.Mod.Value, seeding.Seed.Value));
+
                     foreach (var beatmap in seeding.Beatmaps)
+                    {
+                        if (beatmap.Beatmap == null)
+                            continue;
+
                         fill.Add(new BeatmapScoreRow(beatmap));
+                    }
                 }
             }
 
-            private class BeatmapScoreRow : CompositeDrawable
+            private partial class BeatmapScoreRow : CompositeDrawable
             {
                 public BeatmapScoreRow(SeedingBeatmap beatmap)
                 {
+                    Debug.Assert(beatmap.Beatmap != null);
+
                     RelativeSizeAxes = Axes.X;
                     AutoSizeAxes = Axes.Y;
 
@@ -155,14 +180,15 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                             Children = new Drawable[]
                             {
                                 new TournamentSpriteText { Text = beatmap.Score.ToString("#,0"), Colour = TournamentGame.TEXT_COLOUR, Width = 80 },
-                                new TournamentSpriteText { Text = "#" + beatmap.Seed.Value.ToString("#,0"), Colour = TournamentGame.TEXT_COLOUR, Font = OsuFont.Torus.With(weight: FontWeight.Regular) },
+                                new TournamentSpriteText
+                                    { Text = "#" + beatmap.Seed.Value.ToString("#,0"), Colour = TournamentGame.TEXT_COLOUR, Font = OsuFont.Torus.With(weight: FontWeight.Regular) },
                             }
                         },
                     };
                 }
             }
 
-            private class ModRow : CompositeDrawable
+            private partial class ModRow : CompositeDrawable
             {
                 private readonly string mods;
                 private readonly int seeding;
@@ -196,7 +222,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                     {
                         row.Add(new Sprite
                         {
-                            Texture = textures.Get($"Mods/{mods.ToLower()}"),
+                            Texture = textures.Get($"Mods/{mods.ToLowerInvariant()}"),
                             Scale = new Vector2(0.5f)
                         });
                     }
@@ -226,9 +252,9 @@ namespace osu.Game.Tournament.Screens.TeamIntro
             }
         }
 
-        private class LeftInfo : CompositeDrawable
+        private partial class LeftInfo : CompositeDrawable
         {
-            public LeftInfo(TournamentTeam team)
+            public LeftInfo(TournamentTeam? team)
             {
                 FillFlowContainer fill;
 
@@ -248,17 +274,17 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                             new TeamDisplay(team) { Margin = new MarginPadding { Bottom = 30 } },
                             new RowDisplay("Average Rank:", $"#{team.AverageRank:#,0}"),
                             new RowDisplay("Seed:", team.Seed.Value),
-                            new RowDisplay("Last year's placing:", team.LastYearPlacing.Value > 0 ? $"#{team.LastYearPlacing:#,0}" : "0"),
+                            new RowDisplay("Last year's placing:", team.LastYearPlacing.Value > 0 ? $"#{team.LastYearPlacing:#,0}" : "N/A"),
                             new Container { Margin = new MarginPadding { Bottom = 30 } },
                         }
                     },
                 };
 
                 foreach (var p in team.Players)
-                    fill.Add(new RowDisplay(p.Username, p.Statistics?.GlobalRank?.ToString("\\##,0") ?? "-"));
+                    fill.Add(new RowDisplay(p.Username, p.Rank?.ToString("\\##,0") ?? "-"));
             }
 
-            internal class RowDisplay : CompositeDrawable
+            internal partial class RowDisplay : CompositeDrawable
             {
                 public RowDisplay(string left, string right)
                 {
@@ -285,9 +311,9 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                 }
             }
 
-            private class TeamDisplay : DrawableTournamentTeam
+            private partial class TeamDisplay : DrawableTournamentTeam
             {
-                public TeamDisplay(TournamentTeam team)
+                public TeamDisplay(TournamentTeam? team)
                     : base(team)
                 {
                     AutoSizeAxes = Axes.Both;

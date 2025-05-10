@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -11,7 +13,7 @@ using osu.Game.Rulesets.Edit.Checks.Components;
 namespace osu.Game.Screens.Edit.Verify
 {
     [Cached]
-    public class VerifyScreen : EditorRoundedScreen
+    public partial class VerifyScreen : EditorScreen
     {
         public readonly Bindable<Issue> SelectedIssue = new Bindable<Issue>();
 
@@ -29,31 +31,32 @@ namespace osu.Game.Screens.Edit.Verify
         [BackgroundDependencyLoader]
         private void load()
         {
-            InterpretedDifficulty.Default = BeatmapDifficultyCache.GetDifficultyRating(EditorBeatmap.BeatmapInfo.StarRating);
+            InterpretedDifficulty.Default = StarDifficulty.GetDifficultyRating(EditorBeatmap.BeatmapInfo.StarRating);
             InterpretedDifficulty.SetDefault();
 
-            IssueList = new IssueList();
-            Child = new Container
+            Child = new GridContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = new GridContainer
+                ColumnDimensions = new[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    ColumnDimensions = new[]
+                    new Dimension(),
+                    new Dimension(GridSizeMode.Absolute, 250),
+                },
+                Content = new[]
+                {
+                    new Drawable[]
                     {
-                        new Dimension(),
-                        new Dimension(GridSizeMode.Absolute, 200),
+                        IssueList = new IssueList(),
+                        new IssueSettings(),
                     },
-                    Content = new[]
-                    {
-                        new Drawable[]
-                        {
-                            IssueList,
-                            new IssueSettings(),
-                        },
-                    }
                 }
             };
+        }
+
+        protected override void PopIn()
+        {
+            base.PopIn();
+            IssueList.Refresh();
         }
     }
 }

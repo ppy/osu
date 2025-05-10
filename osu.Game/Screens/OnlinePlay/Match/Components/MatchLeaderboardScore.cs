@@ -11,11 +11,11 @@ using osu.Game.Scoring;
 
 namespace osu.Game.Screens.OnlinePlay.Match.Components
 {
-    public class MatchLeaderboardScore : LeaderboardScore
+    public partial class MatchLeaderboardScore : LeaderboardScore
     {
         private readonly APIUserScoreAggregate score;
 
-        public override ScoreInfo TooltipContent => null; // match aggregate scores can't show statistics that the custom tooltip displays.
+        public override ScoreInfo? TooltipContent => null; // match aggregate scores can't show statistics that the custom tooltip displays.
 
         public MatchLeaderboardScore(APIUserScoreAggregate score, int? rank, bool isOnlineScope = true)
             : base(score.CreateScoreInfo(), rank, isOnlineScope)

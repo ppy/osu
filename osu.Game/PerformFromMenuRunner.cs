@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +18,7 @@ using osu.Game.Screens.Menu;
 
 namespace osu.Game
 {
-    internal class PerformFromMenuRunner : Component
+    internal partial class PerformFromMenuRunner : Component
     {
         private readonly Action<IScreen> finalAction;
         private readonly Type[] validScreens;
@@ -87,6 +89,10 @@ namespace osu.Game
             // check if we are already at a valid target screen.
             if (validScreens.Any(t => t.IsAssignableFrom(type)))
             {
+                if (!((Drawable)current).IsLoaded)
+                    // wait until screen is loaded before invoking action.
+                    return true;
+
                 finalAction(current);
                 Cancel();
                 return true;

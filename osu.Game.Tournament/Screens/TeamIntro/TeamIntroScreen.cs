@@ -11,9 +11,9 @@ using osuTK;
 
 namespace osu.Game.Tournament.Screens.TeamIntro
 {
-    public class TeamIntroScreen : TournamentMatchScreen, IProvideVideo
+    public partial class TeamIntroScreen : TournamentMatchScreen
     {
-        private Container mainContainer;
+        private Container mainContainer = null!;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -34,7 +34,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
             };
         }
 
-        protected override void CurrentMatchChanged(ValueChangedEvent<TournamentMatch> match)
+        protected override void CurrentMatchChanged(ValueChangedEvent<TournamentMatch?> match)
         {
             base.CurrentMatchChanged(match);
 

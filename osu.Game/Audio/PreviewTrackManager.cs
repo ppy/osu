@@ -6,21 +6,21 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
+using osu.Game.Online;
 
 namespace osu.Game.Audio
 {
-    public class PreviewTrackManager : Component
+    public partial class PreviewTrackManager : Component
     {
         private readonly IAdjustableAudioComponent mainTrackAdjustments;
 
         private readonly BindableDouble muteBindable = new BindableDouble();
 
-        private ITrackStore trackStore;
+        private ITrackStore trackStore = null!;
 
-        protected TrackManagerPreviewTrack CurrentTrack;
+        protected TrackManagerPreviewTrack? CurrentTrack;
 
         public PreviewTrackManager(IAdjustableAudioComponent mainTrackAdjustments)
         {
@@ -30,7 +30,7 @@ namespace osu.Game.Audio
         [BackgroundDependencyLoader]
         private void load(AudioManager audioManager)
         {
-            trackStore = audioManager.GetTrackStore(new OnlineStore());
+            trackStore = audioManager.GetTrackStore(new TrustedDomainOnlineStore());
         }
 
         /// <summary>
@@ -85,10 +85,10 @@ namespace osu.Game.Audio
         protected virtual TrackManagerPreviewTrack CreatePreviewTrack(IBeatmapSetInfo beatmapSetInfo, ITrackStore trackStore) =>
             new TrackManagerPreviewTrack(beatmapSetInfo, trackStore);
 
-        public class TrackManagerPreviewTrack : PreviewTrack
+        public partial class TrackManagerPreviewTrack : PreviewTrack
         {
-            [Resolved(canBeNull: true)]
-            public IPreviewTrackOwner Owner { get; private set; }
+            [Resolved]
+            public IPreviewTrackOwner? Owner { get; private set; }
 
             private readonly IBeatmapSetInfo beatmapSetInfo;
             private readonly ITrackStore trackManager;

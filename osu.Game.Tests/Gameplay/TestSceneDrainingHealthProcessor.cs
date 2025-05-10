@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Threading;
 using NUnit.Framework;
 using osu.Framework.Graphics;
@@ -19,7 +21,7 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Tests.Gameplay
 {
     [HeadlessTest]
-    public class TestSceneDrainingHealthProcessor : OsuTestScene
+    public partial class TestSceneDrainingHealthProcessor : OsuTestScene
     {
         private HealthProcessor processor;
         private ManualClock clock;
@@ -190,7 +192,8 @@ namespace osu.Game.Tests.Gameplay
             AddStep("apply perfect hit result", () => processor.ApplyResult(new JudgementResult(beatmap.HitObjects[0], new Judgement()) { Type = HitResult.Perfect }));
             AddAssert("not failed", () => !processor.HasFailed);
 
-            AddStep($"apply {resultApplied.ToString().ToLower()} hit result", () => processor.ApplyResult(new JudgementResult(beatmap.HitObjects[0], new Judgement()) { Type = resultApplied }));
+            AddStep($"apply {resultApplied.ToString().ToLowerInvariant()} hit result",
+                () => processor.ApplyResult(new JudgementResult(beatmap.HitObjects[0], new Judgement()) { Type = resultApplied }));
             AddAssert("failed", () => processor.HasFailed);
         }
 
@@ -228,6 +231,84 @@ namespace osu.Game.Tests.Gameplay
 
             setTime(5000);
             assertHealthEqualTo(1);
+        }
+
+        [Test]
+        public void TestNoBreakDrainRate()
+        {
+            DrainingHealthProcessor hp = new DrainingHealthProcessor(-1000);
+            hp.ApplyBeatmap(new Beatmap<JudgeableHitObject>
+            {
+                HitObjects =
+                {
+                    new JudgeableHitObject { StartTime = 0 },
+                    new JudgeableHitObject { StartTime = 2000 }
+                }
+            });
+
+            Assert.That(hp.DrainRate, Is.EqualTo(4.5E-5).Within(0.1E-5));
+        }
+
+        [Test]
+        public void TestSingleBreakDrainRate()
+        {
+            DrainingHealthProcessor hp = new DrainingHealthProcessor(-1000);
+            hp.ApplyBeatmap(new Beatmap<JudgeableHitObject>
+            {
+                HitObjects =
+                {
+                    new JudgeableHitObject { StartTime = 0 },
+                    new JudgeableHitObject { StartTime = 2000 }
+                },
+                Breaks =
+                {
+                    new BreakPeriod(500, 1500)
+                }
+            });
+
+            Assert.That(hp.DrainRate, Is.EqualTo(9.1E-5).Within(0.1E-5));
+        }
+
+        [Test]
+        public void TestOverlappingBreakDrainRate()
+        {
+            DrainingHealthProcessor hp = new DrainingHealthProcessor(-1000);
+            hp.ApplyBeatmap(new Beatmap<JudgeableHitObject>
+            {
+                HitObjects =
+                {
+                    new JudgeableHitObject { StartTime = 0 },
+                    new JudgeableHitObject { StartTime = 2000 }
+                },
+                Breaks =
+                {
+                    new BreakPeriod(500, 1400),
+                    new BreakPeriod(750, 1500),
+                }
+            });
+
+            Assert.That(hp.DrainRate, Is.EqualTo(9.1E-5).Within(0.1E-5));
+        }
+
+        [Test]
+        public void TestSequentialBreakDrainRate()
+        {
+            DrainingHealthProcessor hp = new DrainingHealthProcessor(-1000);
+            hp.ApplyBeatmap(new Beatmap<JudgeableHitObject>
+            {
+                HitObjects =
+                {
+                    new JudgeableHitObject { StartTime = 0 },
+                    new JudgeableHitObject { StartTime = 2000 }
+                },
+                Breaks =
+                {
+                    new BreakPeriod(500, 1000),
+                    new BreakPeriod(1000, 1500),
+                }
+            });
+
+            Assert.That(hp.DrainRate, Is.EqualTo(9.1E-5).Within(0.1E-5));
         }
 
         private Beatmap createBeatmap(double startTime, double endTime, params BreakPeriod[] breaks)

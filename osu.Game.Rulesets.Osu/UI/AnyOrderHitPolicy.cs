@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Osu.UI
@@ -11,9 +12,9 @@ namespace osu.Game.Rulesets.Osu.UI
     /// </summary>
     public class AnyOrderHitPolicy : IHitPolicy
     {
-        public IHitObjectContainer HitObjectContainer { get; set; }
+        public IHitObjectContainer HitObjectContainer { get; set; } = null!;
 
-        public bool IsHittable(DrawableHitObject hitObject, double time) => true;
+        public ClickAction CheckHittable(DrawableHitObject hitObject, double time, HitResult result) => ClickAction.Hit;
 
         public void HandleHit(DrawableHitObject hitObject)
         {

@@ -1,20 +1,21 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using osuTK;
-using osuTK.Graphics;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Select
 {
-    public class Footer : Container
+    public partial class Footer : Container
     {
         private readonly Box modeLight;
 
@@ -55,7 +56,18 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private void updateModeLight() => modeLight.FadeColour(buttons.FirstOrDefault(b => b.IsHovered)?.SelectedColour ?? Color4.Transparent, TRANSITION_LENGTH, Easing.OutQuint);
+        private void updateModeLight()
+        {
+            var selectedButton = buttons.FirstOrDefault(b => b.Enabled.Value && b.IsHovered);
+
+            if (selectedButton != null)
+            {
+                modeLight.FadeIn(TRANSITION_LENGTH, Easing.OutQuint);
+                modeLight.FadeColour(selectedButton.SelectedColour, TRANSITION_LENGTH, Easing.OutQuint);
+            }
+            else
+                modeLight.FadeOut(TRANSITION_LENGTH, Easing.OutQuint);
+        }
 
         public Footer()
         {
@@ -69,13 +81,15 @@ namespace osu.Game.Screens.Select
                 {
                     RelativeSizeAxes = Axes.Both,
                     Size = Vector2.One,
-                    Colour = Color4.Black.Opacity(0.5f),
+                    Colour = OsuColour.Gray(0.1f),
+                    Alpha = 0.96f,
                 },
                 modeLight = new Box
                 {
                     RelativeSizeAxes = Axes.X,
                     Height = 3,
                     Position = new Vector2(0, -3),
+                    Colour = OsuColour.Gray(0.1f),
                 },
                 new FillFlowContainer
                 {

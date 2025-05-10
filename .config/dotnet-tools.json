@@ -2,32 +2,26 @@
   "version": 1,
   "isRoot": true,
   "tools": {
-    "dotnet-format": {
-      "version": "3.1.37601",
-      "commands": [
-        "dotnet-format"
-      ]
-    },
     "jetbrains.resharper.globaltools": {
-      "version": "2022.1.0-eap10",
+      "version": "2023.3.3",
       "commands": [
         "jb"
       ]
     },
     "nvika": {
-      "version": "2.2.0",
+      "version": "4.0.0",
       "commands": [
         "nvika"
       ]
     },
     "codefilesanity": {
-      "version": "0.0.36",
+      "version": "0.0.37",
       "commands": [
         "CodeFileSanity"
       ]
     },
     "ppy.localisationanalyser.tools": {
-      "version": "2022.417.0",
+      "version": "2024.802.0",
       "commands": [
         "localisation"
       ]

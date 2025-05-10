@@ -14,7 +14,7 @@ namespace osu.Game.Tournament.Components
     /// An element anchored to the right-hand area of a screen that provides streamer level controls.
     /// Should be off-screen.
     /// </summary>
-    public class ControlPanel : Container
+    public partial class ControlPanel : Container
     {
         private readonly FillFlowContainer buttons;
 
@@ -55,7 +55,7 @@ namespace osu.Game.Tournament.Components
             };
         }
 
-        public class Spacer : CompositeDrawable
+        public partial class Spacer : CompositeDrawable
         {
             public Spacer(float height = 20)
             {

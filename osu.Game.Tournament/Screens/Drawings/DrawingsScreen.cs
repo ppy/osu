@@ -7,11 +7,10 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Graphics;
@@ -24,32 +23,33 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Screens.Drawings
 {
-    public class DrawingsScreen : TournamentScreen
+    public partial class DrawingsScreen : TournamentScreen
     {
         private const string results_filename = "drawings_results.txt";
 
-        private ScrollingTeamContainer teamsContainer;
-        private GroupContainer groupsContainer;
-        private TournamentSpriteText fullTeamNameText;
+        private ScrollingTeamContainer teamsContainer = null!;
+        private GroupContainer groupsContainer = null!;
+        private TournamentSpriteText fullTeamNameText = null!;
 
         private readonly List<TournamentTeam> allTeams = new List<TournamentTeam>();
 
-        private DrawingsConfigManager drawingsConfig;
+        private DrawingsConfigManager drawingsConfig = null!;
 
-        private Task writeOp;
+        private Task? writeOp;
 
-        private Storage storage;
+        private Storage storage = null!;
 
-        public ITeamList TeamList;
+        public ITeamList TeamList = null!;
 
         [BackgroundDependencyLoader]
-        private void load(TextureStore textures, Storage storage)
+        private void load(Storage storage)
         {
-            RelativeSizeAxes = Axes.Both;
-
             this.storage = storage;
 
-            TeamList ??= new StorageBackedTeamList(storage);
+            RelativeSizeAxes = Axes.Both;
+
+            if (TeamList.IsNull())
+                TeamList = new StorageBackedTeamList(storage);
 
             if (!TeamList.Teams.Any())
             {
@@ -89,11 +89,10 @@ namespace osu.Game.Tournament.Screens.Drawings
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        new Sprite
+                        new TourneyVideo("drawings")
                         {
+                            Loop = true,
                             RelativeSizeAxes = Axes.Both,
-                            FillMode = FillMode.Fill,
-                            Texture = textures.Get(@"Backgrounds/Drawings/background.png")
                         },
                         // Visualiser
                         new VisualiserContainer
@@ -205,7 +204,7 @@ namespace osu.Game.Tournament.Screens.Drawings
                 try
                 {
                     // Write to drawings_results
-                    using (Stream stream = storage.GetStream(results_filename, FileAccess.Write, FileMode.Create))
+                    using (Stream stream = storage.CreateFileSafely(results_filename))
                     using (StreamWriter sw = new StreamWriter(stream))
                     {
                         sw.Write(text);
@@ -217,7 +216,7 @@ namespace osu.Game.Tournament.Screens.Drawings
                 }
             }
 
-            writeOp = writeOp?.ContinueWith(t => { writeAction(); }) ?? Task.Run(writeAction);
+            writeOp = writeOp?.ContinueWith(_ => { writeAction(); }) ?? Task.Run(writeAction);
         }
 
         private void reloadTeams()
@@ -252,7 +251,7 @@ namespace osu.Game.Tournament.Screens.Drawings
                     using (Stream stream = storage.GetStream(results_filename, FileAccess.Read, FileMode.Open))
                     using (StreamReader sr = new StreamReader(stream))
                     {
-                        string line;
+                        string? line;
 
                         while ((line = sr.ReadLine()?.Trim()) != null)
                         {
@@ -262,8 +261,7 @@ namespace osu.Game.Tournament.Screens.Drawings
                             if (line.ToUpperInvariant().StartsWith("GROUP", StringComparison.Ordinal))
                                 continue;
 
-                            // ReSharper disable once AccessToModifiedClosure
-                            TournamentTeam teamToAdd = allTeams.FirstOrDefault(t => t.FullName.Value == line);
+                            TournamentTeam? teamToAdd = allTeams.FirstOrDefault(t => t.FullName.Value == line);
 
                             if (teamToAdd == null)
                                 continue;

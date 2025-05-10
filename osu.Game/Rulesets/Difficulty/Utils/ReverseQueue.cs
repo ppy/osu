@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -25,8 +27,7 @@ namespace osu.Game.Rulesets.Difficulty.Utils
 
         public ReverseQueue(int initialCapacity)
         {
-            if (initialCapacity <= 0)
-                throw new ArgumentOutOfRangeException(nameof(initialCapacity));
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(initialCapacity);
 
             items = new T[initialCapacity];
             capacity = initialCapacity;

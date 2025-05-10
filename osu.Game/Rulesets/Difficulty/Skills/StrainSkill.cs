@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -26,10 +26,10 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         protected virtual int SectionLength => 400;
 
         private double currentSectionPeak; // We also keep track of the peak strain level in the current section.
-
         private double currentSectionEnd;
 
         private readonly List<double> strainPeaks = new List<double>();
+        protected readonly List<double> ObjectStrains = new List<double>(); // Store individual strains
 
         protected StrainSkill(Mod[] mods)
             : base(mods)
@@ -44,20 +44,42 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// <summary>
         /// Process a <see cref="DifficultyHitObject"/> and update current strain values accordingly.
         /// </summary>
-        protected sealed override void Process(DifficultyHitObject current)
+        public sealed override void Process(DifficultyHitObject current)
         {
             // The first object doesn't generate a strain, so we begin with an incremented section end
-            if (Previous.Count == 0)
+            if (current.Index == 0)
                 currentSectionEnd = Math.Ceiling(current.StartTime / SectionLength) * SectionLength;
 
             while (current.StartTime > currentSectionEnd)
             {
                 saveCurrentPeak();
-                startNewSectionFrom(currentSectionEnd);
+                startNewSectionFrom(currentSectionEnd, current);
                 currentSectionEnd += SectionLength;
             }
 
-            currentSectionPeak = Math.Max(StrainValueAt(current), currentSectionPeak);
+            double strain = StrainValueAt(current);
+            currentSectionPeak = Math.Max(strain, currentSectionPeak);
+
+            // Store the strain value for the object
+            ObjectStrains.Add(strain);
+        }
+
+        /// <summary>
+        /// Calculates the number of strains weighted against the top strain.
+        /// The result is scaled by clock rate as it affects the total number of strains.
+        /// </summary>
+        public virtual double CountTopWeightedStrains()
+        {
+            if (ObjectStrains.Count == 0)
+                return 0.0;
+
+            double consistentTopStrain = DifficultyValue() / 10; // What would the top strain be if all strain values were identical
+
+            if (consistentTopStrain == 0)
+                return ObjectStrains.Count;
+
+            // Use a weighted sum of all strains. Constants are arbitrary and give nice values
+            return ObjectStrains.Sum(s => 1.1 / (1 + Math.Exp(-10 * (s / consistentTopStrain - 0.88))));
         }
 
         /// <summary>
@@ -72,19 +94,21 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// Sets the initial strain level for a new section.
         /// </summary>
         /// <param name="time">The beginning of the new section in milliseconds.</param>
-        private void startNewSectionFrom(double time)
+        /// <param name="current">The current hit object.</param>
+        private void startNewSectionFrom(double time, DifficultyHitObject current)
         {
             // The maximum strain of the new section is not zero by default
             // This means we need to capture the strain level at the beginning of the new section, and use that as the initial peak level.
-            currentSectionPeak = CalculateInitialStrain(time);
+            currentSectionPeak = CalculateInitialStrain(time, current);
         }
 
         /// <summary>
         /// Retrieves the peak strain at a point in time.
         /// </summary>
         /// <param name="time">The time to retrieve the peak strain at.</param>
+        /// <param name="current">The current hit object.</param>
         /// <returns>The peak strain.</returns>
-        protected abstract double CalculateInitialStrain(double time);
+        protected abstract double CalculateInitialStrain(double time, DifficultyHitObject current);
 
         /// <summary>
         /// Returns a live enumerable of the peak strains for each <see cref="SectionLength"/> section of the beatmap,
@@ -106,7 +130,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
             // Difficulty is the weighted sum of the highest strains from every section.
             // We're sorting from highest to lowest strain.
-            foreach (double strain in peaks.OrderByDescending(d => d))
+            foreach (double strain in peaks.OrderDescending())
             {
                 difficulty += strain * weight;
                 weight *= DecayWeight;

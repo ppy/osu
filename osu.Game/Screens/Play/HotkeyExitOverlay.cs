@@ -8,7 +8,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Play
 {
-    public class HotkeyExitOverlay : HoldToConfirmOverlay, IKeyBindingHandler<GlobalAction>
+    public partial class HotkeyExitOverlay : HoldToConfirmOverlay, IKeyBindingHandler<GlobalAction>
     {
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {

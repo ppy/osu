@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 
 namespace osu.Game.Beatmaps.Timing
@@ -21,8 +23,7 @@ namespace osu.Game.Beatmaps.Timing
 
         public TimeSignature(int numerator)
         {
-            if (numerator < 1)
-                throw new ArgumentOutOfRangeException(nameof(numerator), numerator, "The numerator of a time signature must be positive.");
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(numerator);
 
             Numerator = numerator;
         }

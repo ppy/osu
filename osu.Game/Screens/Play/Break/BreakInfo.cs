@@ -11,7 +11,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Play.Break
 {
-    public class BreakInfo : Container
+    public partial class BreakInfo : Container
     {
         public PercentageBreakInfoLine AccuracyDisplay;
 

@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
@@ -14,14 +14,14 @@ using osuTK;
 
 namespace osu.Game.Overlays.Rankings
 {
-    public class CountryFilter : CompositeDrawable, IHasCurrentValue<Country>
+    public partial class CountryFilter : CompositeDrawable, IHasCurrentValue<CountryCode>
     {
         private const int duration = 200;
         private const int height = 70;
 
-        private readonly BindableWithCurrent<Country> current = new BindableWithCurrent<Country>();
+        private readonly BindableWithCurrent<CountryCode> current = new BindableWithCurrent<CountryCode>();
 
-        public Bindable<Country> Current
+        public Bindable<CountryCode> Current
         {
             get => current.Current;
             set => current.Current = value;
@@ -52,7 +52,7 @@ namespace osu.Game.Overlays.Rankings
                         Origin = Anchor.CentreLeft,
                         Direction = FillDirection.Horizontal,
                         Spacing = new Vector2(10, 0),
-                        Margin = new MarginPadding { Left = UserProfileOverlay.CONTENT_X_MARGIN },
+                        Margin = new MarginPadding { Left = WaveOverlayContainer.HORIZONTAL_PADDING },
                         Children = new Drawable[]
                         {
                             new OsuSpriteText
@@ -87,9 +87,9 @@ namespace osu.Game.Overlays.Rankings
             Current.BindValueChanged(onCountryChanged, true);
         }
 
-        private void onCountryChanged(ValueChangedEvent<Country> country)
+        private void onCountryChanged(ValueChangedEvent<CountryCode> country)
         {
-            if (country.NewValue == null)
+            if (Current.Value == CountryCode.Unknown)
             {
                 countryPill.Collapse();
                 this.ResizeHeightTo(0, duration, Easing.OutQuint);

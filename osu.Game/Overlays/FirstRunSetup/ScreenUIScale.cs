@@ -1,7 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -10,7 +13,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Localisation;
-using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
@@ -19,7 +21,9 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Screens;
+using osu.Game.Screens.Footer;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Select;
 using osu.Game.Tests.Visual;
@@ -28,14 +32,16 @@ using osuTK;
 namespace osu.Game.Overlays.FirstRunSetup
 {
     [LocalisableDescription(typeof(GraphicsSettingsStrings), nameof(GraphicsSettingsStrings.UIScaling))]
-    public class ScreenUIScale : FirstRunSetupScreen
+    public partial class ScreenUIScale : WizardScreen
     {
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
+            const float screen_width = 640;
+
             Content.Children = new Drawable[]
             {
-                new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: 24))
+                new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: CONTENT_FONT_SIZE))
                 {
                     Text = FirstRunSetupOverlayStrings.UIScaleDescription,
                     RelativeSizeAxes = Axes.X,
@@ -52,7 +58,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                     RelativeSizeAxes = Axes.None,
-                    Size = new Vector2(960, 960 / 16f * 9 / 2),
+                    Size = new Vector2(screen_width, screen_width / 16f * 9),
                     Children = new Drawable[]
                     {
                         new GridContainer
@@ -62,7 +68,6 @@ namespace osu.Game.Overlays.FirstRunSetup
                             {
                                 new Drawable[]
                                 {
-                                    new SampleScreenContainer(new PinnedMainMenu()),
                                     new SampleScreenContainer(new NestedSongSelect()),
                                 },
                                 // TODO: add more screens here in the future (gameplay / results)
@@ -74,7 +79,7 @@ namespace osu.Game.Overlays.FirstRunSetup
             };
         }
 
-        private class InverseScalingDrawSizePreservingFillContainer : ScalingContainer.ScalingDrawSizePreservingFillContainer
+        private partial class InverseScalingDrawSizePreservingFillContainer : ScalingContainer.ScalingDrawSizePreservingFillContainer
         {
             private Vector2 initialSize;
 
@@ -96,31 +101,22 @@ namespace osu.Game.Overlays.FirstRunSetup
             }
         }
 
-        private class NestedSongSelect : PlaySongSelect
+        private partial class NestedSongSelect : PlaySongSelect
         {
             protected override bool ControlGlobalMusic => false;
 
-            public override bool? AllowTrackAdjustments => false;
+            public override bool? ApplyModTrackAdjustments => false;
         }
 
-        private class PinnedMainMenu : MainMenu
-        {
-            public override void OnEntering(ScreenTransitionEvent e)
-            {
-                base.OnEntering(e);
-
-                Buttons.ReturnToTopOnIdle = false;
-                Buttons.State = ButtonSystemState.TopLevel;
-            }
-        }
-
-        private class UIScaleSlider : OsuSliderBar<float>
+        private partial class UIScaleSlider : RoundedSliderBar<float>
         {
             public override LocalisableString TooltipText => base.TooltipText + "x";
         }
 
-        private class SampleScreenContainer : CompositeDrawable
+        private partial class SampleScreenContainer : CompositeDrawable
         {
+            private readonly OsuScreen screen;
+
             // Minimal isolation from main game.
 
             [Cached]
@@ -131,26 +127,34 @@ namespace osu.Game.Overlays.FirstRunSetup
             [Cached(typeof(IBindable<WorkingBeatmap>))]
             protected Bindable<WorkingBeatmap> Beatmap { get; private set; } = new Bindable<WorkingBeatmap>();
 
+            [Cached]
+            [Cached(typeof(IBindable<IReadOnlyList<Mod>>))]
+            protected Bindable<IReadOnlyList<Mod>> SelectedMods { get; private set; } = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
+
             public override bool HandlePositionalInput => false;
             public override bool HandleNonPositionalInput => false;
             public override bool PropagatePositionalInputSubTree => false;
             public override bool PropagateNonPositionalInputSubTree => false;
 
+            public SampleScreenContainer(OsuScreen screen)
+            {
+                this.screen = screen;
+                RelativeSizeAxes = Axes.Both;
+            }
+
+            protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
+                new DependencyContainer(new DependencyIsolationContainer(base.CreateChildDependencies(parent)));
+
             [BackgroundDependencyLoader]
             private void load(AudioManager audio, TextureStore textures, RulesetStore rulesets)
             {
                 Beatmap.Value = new DummyWorkingBeatmap(audio, textures);
-                Beatmap.Value.LoadTrack();
 
                 Ruleset.Value = rulesets.AvailableRulesets.First();
-            }
 
-            public SampleScreenContainer(Screen screen)
-            {
                 OsuScreenStack stack;
-                RelativeSizeAxes = Axes.Both;
-
                 OsuLogo logo;
+                ScreenFooter footer;
 
                 Padding = new MarginPadding(5);
 
@@ -164,7 +168,8 @@ namespace osu.Game.Overlays.FirstRunSetup
                             {
                                 RelativePositionAxes = Axes.Both,
                                 Position = new Vector2(0.5f),
-                            })
+                            }),
+                            (typeof(ScreenFooter), footer = new ScreenFooter()),
                         },
                         RelativeSizeAxes = Axes.Both,
                         Children = new Drawable[]
@@ -176,14 +181,52 @@ namespace osu.Game.Overlays.FirstRunSetup
                                 Children = new Drawable[]
                                 {
                                     stack = new OsuScreenStack(),
-                                    logo
+                                    footer,
+                                    logo,
                                 },
                             },
                         }
                     },
                 };
 
-                stack.Push(screen);
+                // intentionally load synchronously so it is included in the initial load of the first run screen.
+                stack.PushSynchronously(screen);
+            }
+        }
+
+        private class DependencyIsolationContainer : IReadOnlyDependencyContainer
+        {
+            private readonly IReadOnlyDependencyContainer parentDependencies;
+
+            private readonly Type[] isolatedTypes =
+            {
+                typeof(OsuGame)
+            };
+
+            public DependencyIsolationContainer(IReadOnlyDependencyContainer parentDependencies)
+            {
+                this.parentDependencies = parentDependencies;
+            }
+
+            public object Get(Type type)
+            {
+                if (isolatedTypes.Contains(type))
+                    return null;
+
+                return parentDependencies.Get(type);
+            }
+
+            public object Get(Type type, CacheInfo info)
+            {
+                if (isolatedTypes.Contains(type))
+                    return null;
+
+                return parentDependencies.Get(type, info);
+            }
+
+            public void Inject<T>(T instance) where T : class, IDependencyInjectionCandidate
+            {
+                parentDependencies.Inject(instance);
             }
         }
     }

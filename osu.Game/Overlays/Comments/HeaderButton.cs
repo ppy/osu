@@ -9,7 +9,7 @@ using osu.Framework.Input.Events;
 
 namespace osu.Game.Overlays.Comments
 {
-    public class HeaderButton : Container
+    public partial class HeaderButton : Container
     {
         private const int transition_duration = 200;
 

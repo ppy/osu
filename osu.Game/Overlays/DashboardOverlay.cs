@@ -2,19 +2,31 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Framework.Graphics.Containers;
+using osu.Game.Online.Metadata;
 using osu.Game.Overlays.Dashboard;
 using osu.Game.Overlays.Dashboard.Friends;
 
 namespace osu.Game.Overlays
 {
-    public class DashboardOverlay : TabbableOnlineOverlay<DashboardOverlayHeader, DashboardOverlayTabs>
+    public partial class DashboardOverlay : TabbableOnlineOverlay<DashboardOverlayHeader, DashboardOverlayTabs>
     {
+        [Resolved]
+        private MetadataClient metadataClient { get; set; } = null!;
+
+        private IBindable<bool> metadataConnected = null!;
+        private IDisposable? userPresenceWatchToken;
+
         public DashboardOverlay()
             : base(OverlayColourScheme.Purple)
         {
         }
 
         protected override DashboardOverlayHeader CreateHeader() => new DashboardOverlayHeader();
+
+        public override bool AcceptsFocus => false;
 
         protected override void CreateDisplayToLoad(DashboardOverlayTabs tab)
         {
@@ -25,11 +37,35 @@ namespace osu.Game.Overlays
                     break;
 
                 case DashboardOverlayTabs.CurrentlyPlaying:
-                    LoadDisplay(new CurrentlyPlayingDisplay());
+                    LoadDisplay(new CurrentlyOnlineDisplay());
                     break;
 
                 default:
                     throw new NotImplementedException($"Display for {tab} tab is not implemented");
+            }
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            metadataConnected = metadataClient.IsConnected.GetBoundCopy();
+            metadataConnected.BindValueChanged(_ => updateUserPresenceState());
+            State.BindValueChanged(_ => updateUserPresenceState());
+            updateUserPresenceState();
+        }
+
+        private void updateUserPresenceState()
+        {
+            if (!metadataConnected.Value)
+                return;
+
+            if (State.Value == Visibility.Visible)
+                userPresenceWatchToken ??= metadataClient.BeginWatchingUserPresence();
+            else
+            {
+                userPresenceWatchToken?.Dispose();
+                userPresenceWatchToken = null;
             }
         }
     }

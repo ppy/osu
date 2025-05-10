@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Extensions;
@@ -11,7 +11,7 @@ namespace osu.Game.Tests.Visual
     /// An abstract test case which exposes small cells arranged in a grid.
     /// Useful for displaying multiple configurations of a tested component at a glance.
     /// </summary>
-    public abstract class OsuGridTestScene : OsuTestScene
+    public abstract partial class OsuGridTestScene : OsuTestScene
     {
         private readonly Drawable[,] cells;
 

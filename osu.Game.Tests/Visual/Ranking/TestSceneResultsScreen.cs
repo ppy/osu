@@ -1,8 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using NUnit.Framework;
@@ -15,16 +16,18 @@ using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.API;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
+using osu.Game.Screens.Ranking.Expanded.Accuracy;
 using osu.Game.Screens.Ranking.Expanded.Statistics;
 using osu.Game.Screens.Ranking.Statistics;
+using osu.Game.Skinning;
 using osu.Game.Tests.Resources;
 using osuTK;
 using osuTK.Input;
@@ -33,13 +36,16 @@ using Realms;
 namespace osu.Game.Tests.Visual.Ranking
 {
     [TestFixture]
-    public class TestSceneResultsScreen : OsuManualInputManagerTestScene
+    public partial class TestSceneResultsScreen : OsuManualInputManagerTestScene
     {
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
 
         [Resolved]
         private RealmAccess realm { get; set; }
+
+        [Resolved]
+        private SkinManager skins { get; set; }
 
         protected override void LoadComplete()
         {
@@ -56,6 +62,61 @@ namespace osu.Game.Tests.Visual.Ranking
             });
         }
 
+        [SetUp]
+        public void SetUp() => Schedule(() => skins.CurrentSkinInfo.SetDefault());
+
+        [Test]
+        public void TestScaling()
+        {
+            // scheduling is needed as scaling the content immediately causes the entire scene to shake badly, for some odd reason.
+            AddSliderStep("scale", 0.5f, 1.6f, 1f, v => Schedule(() =>
+            {
+                Content.Scale = new Vector2(v);
+                Content.Size = new Vector2(1f / v);
+            }));
+        }
+
+        [Test]
+        public void TestLegacySkin()
+        {
+            AddToggleStep("toggle legacy classic skin", v =>
+            {
+                if (skins != null)
+                    skins.CurrentSkinInfo.Value = v ? skins.DefaultClassicSkin.SkinInfo : skins.CurrentSkinInfo.Default;
+            });
+        }
+
+        private int onlineScoreID = 1;
+
+        [TestCase(1, ScoreRank.X, 0)]
+        [TestCase(0.9999, ScoreRank.S, 0)]
+        [TestCase(0.975, ScoreRank.S, 0)]
+        [TestCase(0.975, ScoreRank.A, 1)]
+        [TestCase(0.925, ScoreRank.A, 5)]
+        [TestCase(0.85, ScoreRank.B, 9)]
+        [TestCase(0.75, ScoreRank.C, 11)]
+        [TestCase(0.5, ScoreRank.D, 21)]
+        [TestCase(0.2, ScoreRank.D, 51)]
+        public void TestResultsWithPlayer(double accuracy, ScoreRank rank, int missCount)
+        {
+            TestResultsScreen screen = null;
+
+            loadResultsScreen(() =>
+            {
+                var score = TestResources.CreateTestScoreInfo();
+
+                score.OnlineID = onlineScoreID++;
+                score.HitEvents = TestSceneStatisticsPanel.CreatePositionDistributedHitEvents();
+                score.Accuracy = accuracy;
+                score.Rank = rank;
+                score.Statistics[HitResult.Miss] = missCount;
+
+                return screen = createResultsScreen(score);
+            });
+            AddUntilStep("wait for loaded", () => screen.IsLoaded);
+            AddAssert("retry overlay present", () => screen.RetryOverlay != null);
+        }
+
         [Test]
         public void TestResultsWithoutPlayer()
         {
@@ -69,32 +130,12 @@ namespace osu.Game.Tests.Visual.Ranking
                     RelativeSizeAxes = Axes.Both
                 };
 
-                stack.Push(screen = createResultsScreen());
+                var score = TestResources.CreateTestScoreInfo();
+
+                stack.Push(screen = createResultsScreen(score));
             });
             AddUntilStep("wait for loaded", () => screen.IsLoaded);
             AddAssert("retry overlay not present", () => screen.RetryOverlay == null);
-        }
-
-        [TestCase(0.2, ScoreRank.D)]
-        [TestCase(0.5, ScoreRank.D)]
-        [TestCase(0.75, ScoreRank.C)]
-        [TestCase(0.85, ScoreRank.B)]
-        [TestCase(0.925, ScoreRank.A)]
-        [TestCase(0.975, ScoreRank.S)]
-        [TestCase(0.9999, ScoreRank.S)]
-        [TestCase(1, ScoreRank.X)]
-        public void TestResultsWithPlayer(double accuracy, ScoreRank rank)
-        {
-            TestResultsScreen screen = null;
-
-            var score = TestResources.CreateTestScoreInfo();
-
-            score.Accuracy = accuracy;
-            score.Rank = rank;
-
-            AddStep("load results", () => Child = new TestResultsContainer(screen = createResultsScreen(score)));
-            AddUntilStep("wait for loaded", () => screen.IsLoaded);
-            AddAssert("retry overlay present", () => screen.RetryOverlay != null);
         }
 
         [Test]
@@ -102,9 +143,49 @@ namespace osu.Game.Tests.Visual.Ranking
         {
             UnrankedSoloResultsScreen screen = null;
 
-            AddStep("load results", () => Child = new TestResultsContainer(screen = createUnrankedSoloResultsScreen()));
+            loadResultsScreen(() => screen = createUnrankedSoloResultsScreen());
             AddUntilStep("wait for loaded", () => screen.IsLoaded);
             AddAssert("retry overlay present", () => screen.RetryOverlay != null);
+        }
+
+        [Test]
+        public void TestResultsWithFailingRank()
+        {
+            TestResultsScreen screen = null;
+
+            loadResultsScreen(() =>
+            {
+                var score = TestResources.CreateTestScoreInfo();
+
+                score.OnlineID = onlineScoreID++;
+                score.HitEvents = TestSceneStatisticsPanel.CreatePositionDistributedHitEvents();
+                score.Rank = ScoreRank.F;
+                return screen = createResultsScreen(score);
+            });
+            AddUntilStep("wait for loaded", () => screen.IsLoaded);
+            AddAssert("retry overlay present", () => screen.RetryOverlay != null);
+            AddAssert("no badges displayed", () => this.ChildrenOfType<RankBadge>().All(b => !b.IsPresent));
+        }
+
+        [Test]
+        public void TestResultsWithFailingRankOnLegacySkin()
+        {
+            TestResultsScreen screen = null;
+
+            AddStep("set legacy skin", () => skins.CurrentSkinInfo.Value = skins.DefaultClassicSkin.SkinInfo);
+
+            loadResultsScreen(() =>
+            {
+                var score = TestResources.CreateTestScoreInfo();
+
+                score.OnlineID = onlineScoreID++;
+                score.HitEvents = TestSceneStatisticsPanel.CreatePositionDistributedHitEvents();
+                score.Rank = ScoreRank.F;
+                return screen = createResultsScreen(score);
+            });
+            AddUntilStep("wait for loaded", () => screen.IsLoaded);
+            AddAssert("retry overlay present", () => screen.RetryOverlay != null);
+            AddAssert("no badges displayed", () => this.ChildrenOfType<RankBadge>().All(b => !b.IsPresent));
         }
 
         [Test]
@@ -112,7 +193,7 @@ namespace osu.Game.Tests.Visual.Ranking
         {
             TestResultsScreen screen = null;
 
-            AddStep("load results", () => Child = new TestResultsContainer(screen = createResultsScreen()));
+            loadResultsScreen(() => screen = createResultsScreen());
             AddUntilStep("wait for load", () => this.ChildrenOfType<ScorePanelList>().Single().AllPanelsVisible);
 
             AddStep("click expanded panel", () =>
@@ -151,7 +232,7 @@ namespace osu.Game.Tests.Visual.Ranking
         {
             TestResultsScreen screen = null;
 
-            AddStep("load results", () => Child = new TestResultsContainer(screen = createResultsScreen()));
+            loadResultsScreen(() => screen = createResultsScreen());
             AddUntilStep("wait for load", () => this.ChildrenOfType<ScorePanelList>().Single().AllPanelsVisible);
 
             AddStep("click expanded panel", () =>
@@ -190,7 +271,7 @@ namespace osu.Game.Tests.Visual.Ranking
         {
             TestResultsScreen screen = null;
 
-            AddStep("load results", () => Child = new TestResultsContainer(screen = createResultsScreen()));
+            loadResultsScreen(() => screen = createResultsScreen());
             AddUntilStep("wait for load", () => this.ChildrenOfType<ScorePanelList>().Single().AllPanelsVisible);
 
             ScorePanel expandedPanel = null;
@@ -220,7 +301,7 @@ namespace osu.Game.Tests.Visual.Ranking
 
             var tcs = new TaskCompletionSource<bool>();
 
-            AddStep("load results", () => Child = new TestResultsContainer(screen = new DelayedFetchResultsScreen(TestResources.CreateTestScoreInfo(), tcs.Task)));
+            loadResultsScreen(() => screen = new DelayedFetchResultsScreen(TestResources.CreateTestScoreInfo(), tcs.Task));
 
             AddUntilStep("wait for loaded", () => screen.IsLoaded);
 
@@ -244,7 +325,7 @@ namespace osu.Game.Tests.Visual.Ranking
         {
             TestResultsScreen screen = null;
 
-            AddStep("load results", () => Child = new TestResultsContainer(screen = createResultsScreen()));
+            loadResultsScreen(() => screen = createResultsScreen());
             AddUntilStep("wait for load", () => this.ChildrenOfType<ScorePanelList>().Single().AllPanelsVisible);
 
             AddAssert("download button is disabled", () => !screen.ChildrenOfType<DownloadButton>().Last().Enabled.Value);
@@ -265,7 +346,7 @@ namespace osu.Game.Tests.Visual.Ranking
             var ruleset = new RulesetWithNoPerformanceCalculator();
             var score = TestResources.CreateTestScoreInfo(ruleset.RulesetInfo);
 
-            AddStep("load results", () => Child = new TestResultsContainer(createResultsScreen(score)));
+            loadResultsScreen(() => createResultsScreen(score));
             AddUntilStep("wait for load", () => this.ChildrenOfType<ScorePanelList>().Single().AllPanelsVisible);
 
             AddAssert("PP displayed as 0", () =>
@@ -276,11 +357,27 @@ namespace osu.Game.Tests.Visual.Ranking
             });
         }
 
+        private void loadResultsScreen(Func<ResultsScreen> createResults)
+        {
+            ResultsScreen results = null;
+
+            AddStep("load results", () => Child = new TestResultsContainer(results = createResults()));
+
+            // expanded panel should be centered the moment results screen is loaded
+            // but can potentially be scrolled away on certain specific load scenarios.
+            // see: https://github.com/ppy/osu/issues/18226
+            AddUntilStep("expanded panel in centre of screen", () =>
+            {
+                var expandedPanel = this.ChildrenOfType<ScorePanel>().Single(p => p.State == PanelState.Expanded);
+                return Precision.AlmostEquals(expandedPanel.ScreenSpaceDrawQuad.Centre.X, results.ScreenSpaceDrawQuad.Centre.X, 1);
+            });
+        }
+
         private TestResultsScreen createResultsScreen(ScoreInfo score = null) => new TestResultsScreen(score ?? TestResources.CreateTestScoreInfo());
 
         private UnrankedSoloResultsScreen createUnrankedSoloResultsScreen() => new UnrankedSoloResultsScreen(TestResources.CreateTestScoreInfo());
 
-        private class TestResultsContainer : Container
+        private partial class TestResultsContainer : Container
         {
             [Cached(typeof(Player))]
             private readonly Player player = new TestPlayer();
@@ -299,13 +396,15 @@ namespace osu.Game.Tests.Visual.Ranking
             }
         }
 
-        private class TestResultsScreen : ResultsScreen
+        private partial class TestResultsScreen : SoloResultsScreen
         {
             public HotkeyRetryOverlay RetryOverlay;
 
             public TestResultsScreen(ScoreInfo score)
-                : base(score, true)
+                : base(score)
             {
+                AllowRetry = true;
+                IsLocalPlay = true;
             }
 
             protected override void LoadComplete()
@@ -315,25 +414,23 @@ namespace osu.Game.Tests.Visual.Ranking
                 RetryOverlay = InternalChildren.OfType<HotkeyRetryOverlay>().SingleOrDefault();
             }
 
-            protected override APIRequest FetchScores(Action<IEnumerable<ScoreInfo>> scoresCallback)
+            protected override Task<ScoreInfo[]> FetchScores()
             {
-                var scores = new List<ScoreInfo>();
+                var scores = new ScoreInfo[20];
 
-                for (int i = 0; i < 20; i++)
+                for (int i = 0; i < scores.Length; i++)
                 {
                     var score = TestResources.CreateTestScoreInfo();
                     score.TotalScore += 10 - i;
-                    score.Hash = $"test{i}";
-                    scores.Add(score);
+                    score.HasOnlineReplay = true;
+                    scores[i] = score;
                 }
 
-                scoresCallback?.Invoke(scores);
-
-                return null;
+                return Task.FromResult(scores);
             }
         }
 
-        private class DelayedFetchResultsScreen : TestResultsScreen
+        private partial class DelayedFetchResultsScreen : TestResultsScreen
         {
             private readonly Task fetchWaitTask;
 
@@ -345,38 +442,37 @@ namespace osu.Game.Tests.Visual.Ranking
                 this.fetchWaitTask = fetchWaitTask ?? Task.CompletedTask;
             }
 
-            protected override APIRequest FetchScores(Action<IEnumerable<ScoreInfo>> scoresCallback)
+            protected override Task<ScoreInfo[]> FetchScores()
             {
-                Task.Run(async () =>
+                return Task.Run(async () =>
                 {
                     await fetchWaitTask;
 
-                    var scores = new List<ScoreInfo>();
+                    var scores = new ScoreInfo[20];
 
-                    for (int i = 0; i < 20; i++)
+                    for (int i = 0; i < scores.Length; i++)
                     {
                         var score = TestResources.CreateTestScoreInfo();
                         score.TotalScore += 10 - i;
-                        scores.Add(score);
+                        scores[i] = score;
                     }
 
-                    scoresCallback?.Invoke(scores);
-
                     Schedule(() => FetchCompleted = true);
-                });
 
-                return null;
+                    return scores;
+                });
             }
         }
 
-        private class UnrankedSoloResultsScreen : SoloResultsScreen
+        private partial class UnrankedSoloResultsScreen : SoloResultsScreen
         {
             public HotkeyRetryOverlay RetryOverlay;
 
             public UnrankedSoloResultsScreen(ScoreInfo score)
-                : base(score, true)
+                : base(score)
             {
-                Score.BeatmapInfo.OnlineID = 0;
+                AllowRetry = true;
+                Score!.BeatmapInfo!.OnlineID = 0;
                 Score.BeatmapInfo.Status = BeatmapOnlineStatus.Pending;
             }
 
@@ -390,7 +486,7 @@ namespace osu.Game.Tests.Visual.Ranking
 
         private class RulesetWithNoPerformanceCalculator : OsuRuleset
         {
-            public override PerformanceCalculator CreatePerformanceCalculator() => null;
+            public override PerformanceCalculator CreatePerformanceCalculator() => null!;
         }
     }
 }

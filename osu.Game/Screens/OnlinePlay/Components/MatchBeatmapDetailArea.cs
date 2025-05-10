@@ -2,70 +2,64 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.ComponentModel;
 using System.Linq;
-using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Playlists;
 using osu.Game.Screens.Select;
 using osuTK;
+using Container = osu.Framework.Graphics.Containers.Container;
 
 namespace osu.Game.Screens.OnlinePlay.Components
 {
-    public class MatchBeatmapDetailArea : BeatmapDetailArea
+    public partial class MatchBeatmapDetailArea : BeatmapDetailArea
     {
-        public Action CreateNewItem;
+        public Action? CreateNewItem;
 
-        public readonly Bindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
-
-        [Resolved(typeof(Room))]
-        protected BindableList<PlaylistItem> Playlist { get; private set; }
-
-        private readonly Drawable playlistArea;
+        private readonly Room room;
+        private readonly GridContainer playlistArea;
         private readonly DrawableRoomPlaylist playlist;
 
-        public MatchBeatmapDetailArea()
+        public MatchBeatmapDetailArea(Room room)
         {
-            Add(playlistArea = new Container
+            this.room = room;
+
+            Add(playlistArea = new GridContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 Padding = new MarginPadding { Vertical = 10 },
-                Child = new GridContainer
+                Content = new[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Content = new[]
+                    new Drawable[]
                     {
-                        new Drawable[]
+                        new Container
                         {
-                            new Container
+                            RelativeSizeAxes = Axes.Both,
+                            Padding = new MarginPadding { Bottom = 10 },
+                            Child = playlist = new PlaylistsRoomSettingsPlaylist
                             {
-                                RelativeSizeAxes = Axes.Both,
-                                Padding = new MarginPadding { Bottom = 10 },
-                                Child = playlist = new PlaylistsRoomSettingsPlaylist
-                                {
-                                    RelativeSizeAxes = Axes.Both
-                                }
+                                RelativeSizeAxes = Axes.Both
                             }
-                        },
-                        new Drawable[]
-                        {
-                            new TriangleButton
-                            {
-                                Text = "Add new playlist entry",
-                                RelativeSizeAxes = Axes.Both,
-                                Size = Vector2.One,
-                                Action = () => CreateNewItem?.Invoke()
-                            }
-                        },
+                        }
                     },
-                    RowDimensions = new[]
+                    new Drawable[]
                     {
-                        new Dimension(),
-                        new Dimension(GridSizeMode.Absolute, 50),
-                    }
+                        new RoundedButton
+                        {
+                            Text = "Add new playlist entry",
+                            RelativeSizeAxes = Axes.Both,
+                            Size = Vector2.One,
+                            Action = () => CreateNewItem?.Invoke()
+                        }
+                    },
+                },
+                RowDimensions = new[]
+                {
+                    new Dimension(),
+                    new Dimension(GridSizeMode.Absolute, 50),
                 }
             });
         }
@@ -74,9 +68,20 @@ namespace osu.Game.Screens.OnlinePlay.Components
         {
             base.LoadComplete();
 
-            playlist.Items.BindTo(Playlist);
-            playlist.SelectedItem.BindTo(SelectedItem);
+            playlist.Items.BindCollectionChanged((_, __) => room.Playlist = playlist.Items.ToArray());
+
+            room.PropertyChanged += onRoomPropertyChanged;
+            updateRoomPlaylist();
         }
+
+        private void onRoomPropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(Room.Playlist))
+                updateRoomPlaylist();
+        }
+
+        private void updateRoomPlaylist()
+            => playlist.Items.ReplaceRange(0, playlist.Items.Count, room.Playlist);
 
         protected override void OnTabChanged(BeatmapDetailAreaTabItem tab, bool selectedMods)
         {
@@ -84,7 +89,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
 
             switch (tab)
             {
-                case BeatmapDetailAreaPlaylistTabItem _:
+                case BeatmapDetailAreaPlaylistTabItem:
                     playlistArea.Show();
                     break;
 
@@ -95,5 +100,11 @@ namespace osu.Game.Screens.OnlinePlay.Components
         }
 
         protected override BeatmapDetailAreaTabItem[] CreateTabItems() => base.CreateTabItems().Prepend(new BeatmapDetailAreaPlaylistTabItem()).ToArray();
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            room.PropertyChanged -= onRoomPropertyChanged;
+        }
     }
 }

@@ -9,7 +9,7 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Online
 {
-    public class WebSettings : SettingsSubsection
+    public partial class WebSettings : SettingsSubsection
     {
         protected override LocalisableString Header => OnlineSettingsStrings.WebHeader;
 
@@ -31,9 +31,9 @@ namespace osu.Game.Overlays.Settings.Sections.Online
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = OnlineSettingsStrings.AutomaticallyDownloadWhenSpectating,
-                    Keywords = new[] { "spectator" },
-                    Current = config.GetBindable<bool>(OsuSetting.AutomaticallyDownloadWhenSpectating),
+                    LabelText = OnlineSettingsStrings.AutomaticallyDownloadMissingBeatmaps,
+                    Keywords = new[] { "spectator", "replay" },
+                    Current = config.GetBindable<bool>(OsuSetting.AutomaticallyDownloadMissingBeatmaps),
                 },
                 new SettingsCheckbox
                 {

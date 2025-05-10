@@ -10,7 +10,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Overlays.Rankings.Tables
 {
-    public class ScoresTable : UserBasedTable
+    public partial class ScoresTable : UserBasedTable
     {
         public ScoresTable(int page, IReadOnlyList<UserStatistics> rankings)
             : base(page, rankings)

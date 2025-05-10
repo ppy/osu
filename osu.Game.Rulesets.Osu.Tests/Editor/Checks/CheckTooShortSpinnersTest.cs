@@ -17,8 +17,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
     [TestFixture]
     public class CheckTooShortSpinnersTest
     {
-        private CheckTooShortSpinners check;
-        private IBeatmapDifficultyInfo difficulty;
+        private CheckTooShortSpinners check = null!;
+        private IBeatmapDifficultyInfo difficulty = null!;
 
         [SetUp]
         public void Setup()

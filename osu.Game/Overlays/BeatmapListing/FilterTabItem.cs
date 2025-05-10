@@ -1,9 +1,14 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Extensions;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
@@ -15,12 +20,14 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.BeatmapListing
 {
-    public class FilterTabItem<T> : TabItem<T>
+    public partial class FilterTabItem<T> : TabItem<T>
     {
         [Resolved]
-        private OverlayColourProvider colourProvider { get; set; }
+        protected OverlayColourProvider ColourProvider { get; private set; }
 
-        private OsuSpriteText text;
+        protected OsuSpriteText Text;
+
+        protected Sample SelectSample { get; private set; } = null!;
 
         public FilterTabItem(T value)
             : base(value)
@@ -28,60 +35,70 @@ namespace osu.Game.Overlays.BeatmapListing
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(AudioManager audio)
         {
             AutoSizeAxes = Axes.Both;
-            Anchor = Anchor.BottomLeft;
-            Origin = Anchor.BottomLeft;
             AddRangeInternal(new Drawable[]
             {
-                text = new OsuSpriteText
+                Text = new OsuSpriteText
                 {
                     Font = OsuFont.GetFont(size: 13, weight: FontWeight.Regular),
                     Text = LabelFor(Value)
                 },
-                new HoverClickSounds()
+                new HoverSounds(HoverSampleSet.TabSelect)
             });
 
             Enabled.Value = true;
+
+            SelectSample = audio.Samples.Get(@"UI/tabselect-select");
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            updateState();
+            Enabled.BindValueChanged(_ => UpdateState());
+            UpdateState();
+
             FinishTransforms(true);
         }
 
         protected override bool OnHover(HoverEvent e)
         {
             base.OnHover(e);
-            updateState();
+            UpdateState();
             return true;
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
             base.OnHoverLost(e);
-            updateState();
+            UpdateState();
         }
 
-        protected override void OnActivated() => updateState();
+        protected override void OnActivated() => UpdateState();
 
-        protected override void OnDeactivated() => updateState();
+        protected override void OnDeactivated() => UpdateState();
+
+        protected override void OnActivatedByUser() => SelectSample.Play();
 
         /// <summary>
         /// Returns the label text to be used for the supplied <paramref name="value"/>.
         /// </summary>
         protected virtual LocalisableString LabelFor(T value) => (value as Enum)?.GetLocalisableDescription() ?? value.ToString();
 
-        private void updateState()
-        {
-            text.FadeColour(IsHovered ? colourProvider.Light1 : GetStateColour(), 200, Easing.OutQuint);
-            text.Font = text.Font.With(weight: Active.Value ? FontWeight.SemiBold : FontWeight.Regular);
-        }
+        protected virtual Color4 ColourActive => ColourProvider.Content1;
+        protected virtual Color4 ColourNormal => ColourProvider.Light2;
 
-        protected virtual Color4 GetStateColour() => Active.Value ? colourProvider.Content1 : colourProvider.Light2;
+        protected virtual void UpdateState()
+        {
+            Color4 colour = Active.Value ? ColourActive : ColourNormal;
+
+            if (IsHovered)
+                colour = colour.Lighten(0.2f);
+
+            Text.FadeColour(colour, 200, Easing.OutQuint);
+            Text.Font = Text.Font.With(weight: Active.Value ? FontWeight.Bold : FontWeight.Regular);
+        }
     }
 }

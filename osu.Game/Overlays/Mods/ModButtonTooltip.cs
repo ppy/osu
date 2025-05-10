@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
@@ -13,14 +12,13 @@ using osuTK;
 
 namespace osu.Game.Overlays.Mods
 {
-    public class ModButtonTooltip : VisibilityContainer, ITooltip<Mod>
+    public partial class ModButtonTooltip : VisibilityContainer, ITooltip<Mod>
     {
         private readonly OsuSpriteText descriptionText;
-        private readonly Box background;
 
         protected override Container<Drawable> Content { get; }
 
-        public ModButtonTooltip()
+        public ModButtonTooltip(OverlayColourProvider colourProvider)
         {
             AutoSizeAxes = Axes.Both;
             Masking = true;
@@ -28,9 +26,10 @@ namespace osu.Game.Overlays.Mods
 
             InternalChildren = new Drawable[]
             {
-                background = new Box
+                new Box
                 {
-                    RelativeSizeAxes = Axes.Both
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = colourProvider.Background6,
                 },
                 Content = new FillFlowContainer
                 {
@@ -41,6 +40,7 @@ namespace osu.Game.Overlays.Mods
                     {
                         descriptionText = new OsuSpriteText
                         {
+                            Colour = colourProvider.Content1,
                             Font = OsuFont.GetFont(weight: FontWeight.Regular),
                         },
                     }
@@ -48,17 +48,10 @@ namespace osu.Game.Overlays.Mods
             };
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            background.Colour = colours.Gray3;
-            descriptionText.Colour = colours.BlueLighter;
-        }
-
         protected override void PopIn() => this.FadeIn(200, Easing.OutQuint);
         protected override void PopOut() => this.FadeOut(200, Easing.OutQuint);
 
-        private Mod lastMod;
+        private Mod? lastMod;
 
         public void SetContent(Mod mod)
         {

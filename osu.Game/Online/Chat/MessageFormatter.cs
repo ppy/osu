@@ -5,8 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-
-#nullable enable
+using System.Web;
+using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Rulesets.Edit;
 
 namespace osu.Game.Online.Chat
 {
@@ -29,7 +30,7 @@ namespace osu.Game.Online.Chat
         //      http[s]://<domain>.<tld>[:port][/path][?query][#fragment]
         private static readonly Regex advanced_link_regex = new Regex(
             // protocol
-            @"(?<link>[a-z]*?:\/\/" +
+            @"(?<link>(https?|osu(mp)?):\/\/" +
             // domain + tld
             @"(?<domain>(?:[a-z0-9]\.|[a-z0-9][a-z0-9-]*[a-z0-9]\.)*[a-z0-9-]*[a-z0-9]" +
             // port (optional)
@@ -41,10 +42,6 @@ namespace osu.Game.Online.Chat
             // fragment (optional)
             @"(?:#(?:[a-z0-9$_\+!\*\',;:\(\)@&=\/~-]|%[0-9a-f]{2})*)?)?)",
             RegexOptions.IgnoreCase);
-
-        // 00:00:000 (1,2,3) - test
-        // regex from https://github.com/ppy/osu-web/blob/651a9bac2b60d031edd7e33b8073a469bf11edaa/resources/assets/coffee/_classes/beatmap-discussion-helper.coffee#L10
-        private static readonly Regex time_regex = new Regex(@"\b(((\d{2,}):([0-5]\d)[:.](\d{3}))(\s\((?:\d+[,|])*\d+\))?)");
 
         // #osu
         private static readonly Regex channel_regex = new Regex(@"(#[a-zA-Z]+[a-zA-Z0-9]+)");
@@ -73,7 +70,7 @@ namespace osu.Game.Online.Chat
             {
                 int index = m.Index - captureOffset;
 
-                string? displayText = string.Format(display,
+                string displayText = string.Format(display,
                     m.Groups[0],
                     m.Groups["text"].Value,
                     m.Groups["url"].Value).Trim();
@@ -89,8 +86,8 @@ namespace osu.Game.Online.Chat
                 if (escapeChars != null)
                     displayText = escapeChars.Aggregate(displayText, (current, c) => current.Replace($"\\{c}", c.ToString()));
 
-                // Check for encapsulated links
-                if (result.Links.Find(l => (l.Index <= index && l.Index + l.Length >= index + m.Length) || (index <= l.Index && index + m.Length >= l.Index + l.Length)) == null)
+                // Check for overlapping links
+                if (!result.Links.Exists(l => l.Overlaps(index, m.Length)))
                 {
                     result.Text = result.Text.Remove(index, m.Length).Insert(index, displayText);
 
@@ -111,7 +108,7 @@ namespace osu.Game.Online.Chat
             foreach (Match m in regex.Matches(result.Text, startIndex))
             {
                 int index = m.Index;
-                string? linkText = m.Groups["link"].Value;
+                string linkText = m.Groups["link"].Value;
                 int indexLength = linkText.Length;
 
                 var details = GetLinkDetails(linkText);
@@ -127,13 +124,13 @@ namespace osu.Game.Online.Chat
 
         public static LinkDetails GetLinkDetails(string url)
         {
-            string[]? args = url.Split('/', StringSplitOptions.RemoveEmptyEntries);
+            string[] args = url.Split('/', StringSplitOptions.RemoveEmptyEntries);
             args[0] = args[0].TrimEnd(':');
 
             switch (args[0])
             {
-                case "http":
-                case "https":
+                case @"http":
+                case @"https":
                     // length > 3 since all these links need another argument to work
                     if (args.Length > 3 && args[1].EndsWith(WebsiteRootUrl, StringComparison.OrdinalIgnoreCase))
                     {
@@ -142,8 +139,8 @@ namespace osu.Game.Online.Chat
                         switch (args[2])
                         {
                             // old site only
-                            case "b":
-                            case "beatmaps":
+                            case @"b":
+                            case @"beatmaps":
                             {
                                 string trimmed = mainArg.Split('?').First();
                                 if (int.TryParse(trimmed, out int id))
@@ -152,11 +149,11 @@ namespace osu.Game.Online.Chat
                                 break;
                             }
 
-                            case "s":
-                            case "beatmapsets":
-                            case "d":
+                            case @"s":
+                            case @"beatmapsets":
+                            case @"d":
                             {
-                                if (mainArg == "discussions")
+                                if (mainArg == @"discussions")
                                     // handle discussion links externally for now
                                     return new LinkDetails(LinkAction.External, url);
 
@@ -172,15 +169,15 @@ namespace osu.Game.Online.Chat
                                 break;
                             }
 
-                            case "u":
-                            case "users":
-                                return new LinkDetails(LinkAction.OpenUserProfile, mainArg);
+                            case @"u":
+                            case @"users":
+                                return getUserLink(mainArg);
 
-                            case "wiki":
+                            case @"wiki":
                                 return new LinkDetails(LinkAction.OpenWiki, string.Join('/', args.Skip(3)));
 
-                            case "home":
-                                if (mainArg != "changelog")
+                            case @"home":
+                                if (mainArg != @"changelog")
                                     // handle link other than changelog as external for now
                                     return new LinkDetails(LinkAction.External, url);
 
@@ -196,12 +193,25 @@ namespace osu.Game.Online.Chat
                                 }
 
                                 break;
+
+                            case @"multiplayer":
+                                if (mainArg != @"rooms")
+                                    return new LinkDetails(LinkAction.External, url);
+
+                                if (args.Length == 5)
+                                {
+                                    // https://osu.ppy.sh/multiplayer/rooms/{id}
+                                    // route used for both multiplayer and playlists
+                                    return new LinkDetails(LinkAction.JoinRoom, args[4]);
+                                }
+
+                                break;
                         }
                     }
 
                     break;
 
-                case "osu":
+                case @"osu":
                     // every internal link also needs some kind of argument
                     if (args.Length < 3)
                         break;
@@ -210,42 +220,50 @@ namespace osu.Game.Online.Chat
 
                     switch (args[1])
                     {
-                        case "chan":
+                        case @"chan":
                             linkType = LinkAction.OpenChannel;
                             break;
 
-                        case "edit":
+                        case @"edit":
                             linkType = LinkAction.OpenEditorTimestamp;
                             break;
 
-                        case "b":
+                        case @"b":
                             linkType = LinkAction.OpenBeatmap;
                             break;
 
-                        case "s":
-                        case "dl":
+                        case @"s":
+                        case @"dl":
                             linkType = LinkAction.OpenBeatmapSet;
                             break;
 
-                        case "spectate":
+                        case @"spectate":
                             linkType = LinkAction.Spectate;
                             break;
 
-                        case "u":
-                            linkType = LinkAction.OpenUserProfile;
+                        case @"u":
+                            return getUserLink(args[2]);
+
+                        case @"room":
+                            linkType = LinkAction.JoinRoom;
                             break;
 
                         default:
                             return new LinkDetails(LinkAction.External, url);
                     }
 
-                    return new LinkDetails(linkType, args[2]);
-
-                case "osump":
-                    return new LinkDetails(LinkAction.JoinMultiplayerMatch, args[1]);
+                    return new LinkDetails(linkType, HttpUtility.UrlDecode(args[2]));
             }
 
             return new LinkDetails(LinkAction.External, url);
+        }
+
+        private static LinkDetails getUserLink(string argument)
+        {
+            if (int.TryParse(argument, out int userId))
+                return new LinkDetails(LinkAction.OpenUserProfile, new APIUser { Id = userId });
+
+            return new LinkDetails(LinkAction.OpenUserProfile, new APIUser { Username = argument });
         }
 
         private static MessageFormatterResult format(string toFormat, int startIndex = 0, int space = 3)
@@ -268,16 +286,13 @@ namespace osu.Game.Online.Chat
             handleAdvanced(advanced_link_regex, result, startIndex);
 
             // handle editor times
-            handleMatches(time_regex, "{0}", $@"{OsuGameBase.OSU_PROTOCOL}edit/{{0}}", result, startIndex, LinkAction.OpenEditorTimestamp);
+            handleMatches(EditorTimestampParser.TIME_REGEX_STRICT, "{0}", $@"{OsuGameBase.OSU_PROTOCOL}edit/{{0}}", result, startIndex, LinkAction.OpenEditorTimestamp);
 
             // handle channels
             handleMatches(channel_regex, "{0}", $@"{OsuGameBase.OSU_PROTOCOL}chan/{{0}}", result, startIndex, LinkAction.OpenChannel);
 
-            string empty = "";
-            while (space-- > 0)
-                empty += "\0";
-
-            handleMatches(emoji_regex, empty, "{0}", result, startIndex);
+            // see: https://github.com/ppy/osu/pull/24190
+            result.Text = Regex.Replace(result.Text, emoji_regex.ToString(), "[emoji]");
 
             return result;
         }
@@ -336,13 +351,15 @@ namespace osu.Game.Online.Chat
         OpenBeatmapSet,
         OpenChannel,
         OpenEditorTimestamp,
-        JoinMultiplayerMatch,
+        JoinRoom,
         Spectate,
         OpenUserProfile,
         SearchBeatmapSet,
         OpenWiki,
         Custom,
         OpenChangelog,
+        FilterBeatmapSetGenre,
+        FilterBeatmapSetLanguage,
     }
 
     public class Link : IComparable<Link>
@@ -362,8 +379,10 @@ namespace osu.Game.Online.Chat
             Argument = argument;
         }
 
-        public bool Overlaps(Link otherLink) => Index < otherLink.Index + otherLink.Length && otherLink.Index < Index + Length;
+        public bool Overlaps(Link otherLink) => Overlaps(otherLink.Index, otherLink.Length);
 
-        public int CompareTo(Link otherLink) => Index > otherLink.Index ? 1 : -1;
+        public bool Overlaps(int otherIndex, int otherLength) => Index < otherIndex + otherLength && otherIndex < Index + Length;
+
+        public int CompareTo(Link? otherLink) => Index > otherLink?.Index ? 1 : -1;
     }
 }

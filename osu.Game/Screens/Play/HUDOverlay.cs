@@ -1,55 +1,77 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.EnumExtensions;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Configuration;
+using osu.Game.Input;
 using osu.Game.Input.Bindings;
+using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play.HUD;
+using osu.Game.Screens.Play.HUD.ClicksPerSecond;
+using osu.Game.Screens.Play.HUD.JudgementCounter;
 using osu.Game.Skinning;
 using osuTK;
 
 namespace osu.Game.Screens.Play
 {
     [Cached]
-    public class HUDOverlay : Container, IKeyBindingHandler<GlobalAction>
+    public partial class HUDOverlay : Container, IKeyBindingHandler<GlobalAction>
     {
         public const float FADE_DURATION = 300;
 
         public const Easing FADE_EASING = Easing.OutQuint;
 
         /// <summary>
-        /// The total height of all the top of screen scoring elements.
-        /// </summary>
-        public float TopScoringElementsHeight { get; private set; }
-
-        /// <summary>
         /// The total height of all the bottom of screen scoring elements.
         /// </summary>
         public float BottomScoringElementsHeight { get; private set; }
 
-        public readonly KeyCounterDisplay KeyCounter;
+        protected override bool ShouldBeConsideredForInput(Drawable child)
+        {
+            // HUD uses AlwaysVisible on child components so they can be in an updated state for next display.
+            // Without blocking input, this would also allow them to be interacted with in such a state.
+            if (ShowHud.Value)
+                return base.ShouldBeConsideredForInput(child);
+
+            // hold to quit button should always be interactive.
+            return child == bottomRightElements;
+        }
+
         public readonly ModDisplay ModDisplay;
         public readonly HoldForMenuButton HoldToQuit;
         public readonly PlayerSettingsOverlay PlayerSettingsOverlay;
 
+        [Cached]
+        private readonly ClicksPerSecondController clicksPerSecondController;
+
+        [Cached]
+        public readonly InputCountController InputCountController;
+
+        [Cached]
+        private readonly JudgementCountController judgementCountController;
+
         public Bindable<bool> ShowHealthBar = new Bindable<bool>(true);
 
+        [CanBeNull]
         private readonly DrawableRuleset drawableRuleset;
+
         private readonly IReadOnlyList<Mod> mods;
 
         /// <summary>
@@ -58,45 +80,77 @@ namespace osu.Game.Screens.Play
         public Bindable<bool> ShowHud { get; } = new BindableBool();
 
         private Bindable<HUDVisibilityMode> configVisibilityMode;
+        private Bindable<bool> configLeaderboardVisibility;
+        private Bindable<bool> configSettingsOverlay;
 
         private readonly BindableBool replayLoaded = new BindableBool();
 
         private static bool hasShownNotificationOnce;
 
+        // The following flows are used to attach fixed non-skinnable elements in particular implementations of the player
+        // (e.g. replay or multiplayer-specific controls).
+        // They will make a best-effort attempt to get out of the way of any other skinnable components.
+
+        public readonly FillFlowContainer TopLeftElements;
+        internal readonly FillFlowContainer TopRightElements;
         private readonly FillFlowContainer bottomRightElements;
-        private readonly FillFlowContainer topRightElements;
 
         internal readonly IBindable<bool> IsPlaying = new Bindable<bool>();
 
-        private bool holdingForHUD;
+        public IBindable<bool> HoldingForHUD => holdingForHUD;
 
-        private readonly SkinnableTargetContainer mainComponents;
+        private readonly BindableBool holdingForHUD = new BindableBool();
 
-        private IEnumerable<Drawable> hideTargets => new Drawable[] { mainComponents, KeyCounter, topRightElements };
+        private readonly SkinnableContainer mainComponents;
 
-        public HUDOverlay(DrawableRuleset drawableRuleset, IReadOnlyList<Mod> mods)
+        [CanBeNull]
+        private readonly SkinnableContainer rulesetComponents;
+
+        private readonly List<Drawable> hideTargets;
+
+        /// <summary>
+        /// The container for skin components attached to <see cref="GlobalSkinnableContainers.Playfield"/>
+        /// </summary>
+        internal readonly Drawable PlayfieldSkinLayer;
+
+        public HUDOverlay([CanBeNull] DrawableRuleset drawableRuleset, IReadOnlyList<Mod> mods)
         {
+            Container rightSettings;
+
             this.drawableRuleset = drawableRuleset;
             this.mods = mods;
 
             RelativeSizeAxes = Axes.Both;
 
-            Children = new Drawable[]
+            Children = new[]
             {
                 CreateFailingLayer(),
-                mainComponents = new MainComponentsContainer(),
-                topRightElements = new FillFlowContainer
+                //Needs to be initialized before skinnable drawables.
+                judgementCountController = new JudgementCountController(),
+                clicksPerSecondController = new ClicksPerSecondController(),
+                InputCountController = new InputCountController(),
+                mainComponents = new HUDComponentsContainer { AlwaysPresent = true, },
+                drawableRuleset != null
+                    ? (rulesetComponents = new HUDComponentsContainer(drawableRuleset.Ruleset.RulesetInfo) { AlwaysPresent = true, })
+                    : Empty(),
+                PlayfieldSkinLayer = drawableRuleset != null
+                    ? new SkinnableContainer(new GlobalSkinnableContainerLookup(GlobalSkinnableContainers.Playfield, drawableRuleset.Ruleset.RulesetInfo)) { AlwaysPresent = true, }
+                    : Empty(),
+                TopRightElements = new FillFlowContainer
                 {
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
+                    AlwaysPresent = true,
                     Margin = new MarginPadding(10),
                     Spacing = new Vector2(10),
                     AutoSizeAxes = Axes.Both,
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
+                        // This display is potentially a duplicate of users with a local ModDisplay in their skins.
+                        // It would be very nice to remove this, but the version here has special logic with regards to replays
+                        // and initial states, so needs a bit of thought before doing so.
                         ModDisplay = CreateModsContainer(),
-                        PlayerSettingsOverlay = CreatePlayerSettingsOverlay(),
                     }
                 },
                 bottomRightElements = new FillFlowContainer
@@ -111,15 +165,36 @@ namespace osu.Game.Screens.Play
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
-                        KeyCounter = CreateKeyCounter(),
                         HoldToQuit = CreateHoldForMenuButton(),
                     }
-                }
+                },
+                rightSettings = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Children = new Drawable[]
+                    {
+                        PlayerSettingsOverlay = new PlayerSettingsOverlay(),
+                    }
+                },
+                TopLeftElements = new FillFlowContainer
+                {
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Vertical,
+                    Padding = new MarginPadding(44), // enough margin to avoid the hit error display
+                    Spacing = new Vector2(5)
+                },
             };
+
+            hideTargets = new List<Drawable> { mainComponents, TopRightElements, rightSettings };
+
+            if (rulesetComponents != null)
+                hideTargets.Add(rulesetComponents);
+
+            hideTargets.Add(TopLeftElements);
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuConfigManager config, INotificationOverlay notificationOverlay)
+        private void load(OsuConfigManager config, RealmKeyBindingStore keyBindingStore, INotificationOverlay notificationOverlay)
         {
             if (drawableRuleset != null)
             {
@@ -129,6 +204,8 @@ namespace osu.Game.Screens.Play
             ModDisplay.Current.Value = mods;
 
             configVisibilityMode = config.GetBindable<HUDVisibilityMode>(OsuSetting.HUDVisibilityMode);
+            configLeaderboardVisibility = config.GetBindable<bool>(OsuSetting.GameplayLeaderboard);
+            configSettingsOverlay = config.GetBindable<bool>(OsuSetting.ReplaySettingsOverlay);
 
             if (configVisibilityMode.Value == HUDVisibilityMode.Never && !hasShownNotificationOnce)
             {
@@ -136,7 +213,7 @@ namespace osu.Game.Screens.Play
 
                 notificationOverlay?.Post(new SimpleNotification
                 {
-                    Text = $"The score overlay is currently disabled. You can toggle this by pressing {config.LookupKeyBindings(GlobalAction.ToggleInGameInterface)}."
+                    Text = NotificationsStrings.ScoreOverlayDisabled(keyBindingStore.GetBindingsStringFor(GlobalAction.ToggleInGameInterface))
                 });
             }
 
@@ -144,7 +221,8 @@ namespace osu.Game.Screens.Play
             hideTargets.ForEach(d => d.Hide());
         }
 
-        public override void Hide() => throw new InvalidOperationException($"{nameof(HUDOverlay)} should not be hidden as it will remove the ability of a user to quit. Use {nameof(ShowHud)} instead.");
+        public override void Hide() =>
+            throw new InvalidOperationException($"{nameof(HUDOverlay)} should not be hidden as it will remove the ability of a user to quit. Use {nameof(ShowHud)} instead.");
 
         protected override void LoadComplete()
         {
@@ -152,51 +230,116 @@ namespace osu.Game.Screens.Play
 
             ShowHud.BindValueChanged(visible => hideTargets.ForEach(d => d.FadeTo(visible.NewValue ? 1 : 0, FADE_DURATION, FADE_EASING)));
 
+            holdingForHUD.BindValueChanged(_ => updateVisibility());
             IsPlaying.BindValueChanged(_ => updateVisibility());
-            configVisibilityMode.BindValueChanged(_ => updateVisibility(), true);
+            configVisibilityMode.BindValueChanged(_ => updateVisibility());
+            configSettingsOverlay.BindValueChanged(_ => updateVisibility());
 
-            replayLoaded.BindValueChanged(replayLoadedValueChanged, true);
+            replayLoaded.BindValueChanged(e =>
+            {
+                if (e.NewValue)
+                {
+                    ModDisplay.FadeIn(1000, FADE_EASING);
+                    InputCountController.Margin = new MarginPadding(10) { Bottom = 30 };
+                }
+                else
+                {
+                    ModDisplay.Delay(2000).FadeOut(200);
+                    InputCountController.Margin = new MarginPadding(10);
+                }
+
+                updateVisibility();
+            }, true);
+
+            ModDisplay.ExpansionMode = ExpansionMode.AlwaysExpanded;
+            Scheduler.AddDelayed(() => ModDisplay.ExpansionMode = ExpansionMode.ExpandOnHover, 1200);
         }
 
         protected override void Update()
         {
             base.Update();
 
-            Vector2? lowestTopScreenSpace = null;
+            if (drawableRuleset != null)
+            {
+                Quad playfieldScreenSpaceDrawQuad = drawableRuleset.Playfield.SkinnableComponentScreenSpaceDrawQuad;
+
+                PlayfieldSkinLayer.Position = ToLocalSpace(playfieldScreenSpaceDrawQuad.TopLeft);
+                PlayfieldSkinLayer.Width = (ToLocalSpace(playfieldScreenSpaceDrawQuad.TopRight) - ToLocalSpace(playfieldScreenSpaceDrawQuad.TopLeft)).Length;
+                PlayfieldSkinLayer.Height = (ToLocalSpace(playfieldScreenSpaceDrawQuad.BottomLeft) - ToLocalSpace(playfieldScreenSpaceDrawQuad.TopLeft)).Length;
+                PlayfieldSkinLayer.Rotation = drawableRuleset.PlayfieldAdjustmentContainer.Rotation;
+            }
+
+            float? lowestTopScreenSpaceLeft = null;
+            float? lowestTopScreenSpaceRight = null;
+
             Vector2? highestBottomScreenSpace = null;
 
-            // LINQ cast can be removed when IDrawable interface includes Anchor / RelativeSizeAxes.
-            foreach (var element in mainComponents.Components.Cast<Drawable>())
+            processDrawables(mainComponents);
+
+            if (rulesetComponents != null)
+                processDrawables(rulesetComponents);
+
+            if (lowestTopScreenSpaceRight.HasValue && DrawHeight - TopRightElements.DrawHeight > 0)
+                TopRightElements.Y = Math.Clamp(ToLocalSpace(new Vector2(0, lowestTopScreenSpaceRight.Value)).Y, 0, DrawHeight - TopRightElements.DrawHeight);
+            else
+                TopRightElements.Y = 0;
+
+            if (lowestTopScreenSpaceLeft.HasValue && DrawHeight - TopLeftElements.DrawHeight > 0)
+                TopLeftElements.Y = Math.Clamp(ToLocalSpace(new Vector2(0, lowestTopScreenSpaceLeft.Value)).Y, 0, DrawHeight - TopLeftElements.DrawHeight);
+            else
+                TopLeftElements.Y = 0;
+
+            if (highestBottomScreenSpace.HasValue && DrawHeight - bottomRightElements.DrawHeight > 0)
+                bottomRightElements.Y = BottomScoringElementsHeight = -Math.Clamp(DrawHeight - ToLocalSpace(highestBottomScreenSpace.Value).Y, 0, DrawHeight - bottomRightElements.DrawHeight);
+            else
+                bottomRightElements.Y = 0;
+
+            void processDrawables(SkinnableContainer components)
             {
-                // for now align top-right components with the bottom-edge of the lowest top-anchored hud element.
-                if (element.Anchor.HasFlagFast(Anchor.TopRight) || (element.Anchor.HasFlagFast(Anchor.y0) && element.RelativeSizeAxes == Axes.X))
+                // Avoid using foreach due to missing GetEnumerator implementation.
+                // See https://github.com/ppy/osu-framework/blob/e10051e6643731e393b09de40a3a3d209a545031/osu.Framework/Bindables/IBindableList.cs#L41-L44.
+                for (int i = 0; i < components.Components.Count; i++)
+                    processDrawable(components.Components[i]);
+            }
+
+            void processDrawable(ISerialisableDrawable element)
+            {
+                // Cast can be removed when IDrawable interface includes Anchor / RelativeSizeAxes.
+                Drawable drawable = (Drawable)element;
+
+                // for now align some top components with the bottom-edge of the lowest top-anchored hud element.
+                if (drawable.Anchor.HasFlag(Anchor.y0))
                 {
                     // health bars are excluded for the sake of hacky legacy skins which extend the health bar to take up the full screen area.
                     if (element is LegacyHealthDisplay)
-                        continue;
+                        return;
 
-                    var bottomRight = element.ScreenSpaceDrawQuad.BottomRight;
-                    if (lowestTopScreenSpace == null || bottomRight.Y > lowestTopScreenSpace.Value.Y)
-                        lowestTopScreenSpace = bottomRight;
+                    // AABB is used here because the drawable can be flipped/rotated arbitrarily,
+                    // so the "bottom right" corner of the raw SSDQ might not necessarily be where one expects it to be.
+                    float bottom = drawable.ScreenSpaceDrawQuad.AABBFloat.BottomRight.Y;
+
+                    bool isRelativeX = drawable.RelativeSizeAxes == Axes.X;
+
+                    if (drawable.Anchor.HasFlag(Anchor.TopRight) || isRelativeX)
+                    {
+                        if (lowestTopScreenSpaceRight == null || bottom > lowestTopScreenSpaceRight.Value)
+                            lowestTopScreenSpaceRight = bottom;
+                    }
+
+                    if (drawable.Anchor.HasFlag(Anchor.TopLeft) || isRelativeX)
+                    {
+                        if (lowestTopScreenSpaceLeft == null || bottom > lowestTopScreenSpaceLeft.Value)
+                            lowestTopScreenSpaceLeft = bottom;
+                    }
                 }
                 // and align bottom-right components with the top-edge of the highest bottom-anchored hud element.
-                else if (element.Anchor.HasFlagFast(Anchor.BottomRight) || (element.Anchor.HasFlagFast(Anchor.y2) && element.RelativeSizeAxes == Axes.X))
+                else if (drawable.Anchor.HasFlag(Anchor.BottomRight) || (drawable.Anchor.HasFlag(Anchor.y2) && drawable.RelativeSizeAxes == Axes.X))
                 {
-                    var topLeft = element.ScreenSpaceDrawQuad.TopLeft;
+                    var topLeft = element.ScreenSpaceDrawQuad.AABBFloat.TopLeft;
                     if (highestBottomScreenSpace == null || topLeft.Y < highestBottomScreenSpace.Value.Y)
                         highestBottomScreenSpace = topLeft;
                 }
             }
-
-            if (lowestTopScreenSpace.HasValue)
-                topRightElements.Y = TopScoringElementsHeight = MathHelper.Clamp(ToLocalSpace(lowestTopScreenSpace.Value).Y, 0, DrawHeight - topRightElements.DrawHeight);
-            else
-                topRightElements.Y = 0;
-
-            if (highestBottomScreenSpace.HasValue)
-                bottomRightElements.Y = BottomScoringElementsHeight = -MathHelper.Clamp(DrawHeight - ToLocalSpace(highestBottomScreenSpace.Value).Y, 0, DrawHeight - bottomRightElements.DrawHeight);
-            else
-                bottomRightElements.Y = 0;
         }
 
         private void updateVisibility()
@@ -204,11 +347,16 @@ namespace osu.Game.Screens.Play
             if (ShowHud.Disabled)
                 return;
 
-            if (holdingForHUD)
+            if (holdingForHUD.Value)
             {
                 ShowHud.Value = true;
                 return;
             }
+
+            if (configSettingsOverlay.Value && replayLoaded.Value)
+                PlayerSettingsOverlay.Show();
+            else
+                PlayerSettingsOverlay.Hide();
 
             switch (configVisibilityMode.Value)
             {
@@ -227,29 +375,13 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        private void replayLoadedValueChanged(ValueChangedEvent<bool> e)
-        {
-            PlayerSettingsOverlay.ReplayLoaded = e.NewValue;
-
-            if (e.NewValue)
-            {
-                PlayerSettingsOverlay.Show();
-                ModDisplay.FadeIn(200);
-                KeyCounter.Margin = new MarginPadding(10) { Bottom = 30 };
-            }
-            else
-            {
-                PlayerSettingsOverlay.Hide();
-                ModDisplay.Delay(2000).FadeOut(200);
-                KeyCounter.Margin = new MarginPadding(10);
-            }
-
-            updateVisibility();
-        }
-
         protected virtual void BindDrawableRuleset(DrawableRuleset drawableRuleset)
         {
-            (drawableRuleset as ICanAttachKeyCounter)?.Attach(KeyCounter);
+            if (drawableRuleset is ICanAttachHUDPieces attachTarget)
+            {
+                attachTarget.Attach(InputCountController);
+                attachTarget.Attach(clicksPerSecondController);
+            }
 
             replayLoaded.BindTo(drawableRuleset.HasReplayLoaded);
         }
@@ -257,12 +389,6 @@ namespace osu.Game.Screens.Play
         protected FailingLayer CreateFailingLayer() => new FailingLayer
         {
             ShowHealth = { BindTarget = ShowHealthBar }
-        };
-
-        protected KeyCounterDisplay CreateKeyCounter() => new KeyCounterDisplay
-        {
-            Anchor = Anchor.BottomRight,
-            Origin = Anchor.BottomRight,
         };
 
         protected HoldForMenuButton CreateHoldForMenuButton() => new HoldForMenuButton
@@ -277,8 +403,6 @@ namespace osu.Game.Screens.Play
             Origin = Anchor.TopRight,
         };
 
-        protected PlayerSettingsOverlay CreatePlayerSettingsOverlay() => new PlayerSettingsOverlay();
-
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
             if (e.Repeat)
@@ -286,10 +410,13 @@ namespace osu.Game.Screens.Play
 
             switch (e.Action)
             {
-                case GlobalAction.HoldForHUD:
-                    holdingForHUD = true;
-                    updateVisibility();
+                case GlobalAction.ToggleReplaySettings:
+                    configSettingsOverlay.Value = !configSettingsOverlay.Value;
                     return true;
+
+                case GlobalAction.HoldForHUD:
+                    holdingForHUD.Value = true;
+                    return false;
 
                 case GlobalAction.ToggleInGameInterface:
                     switch (configVisibilityMode.Value)
@@ -308,6 +435,10 @@ namespace osu.Game.Screens.Play
                     }
 
                     return true;
+
+                case GlobalAction.ToggleInGameLeaderboard:
+                    configLeaderboardVisibility.Value = !configLeaderboardVisibility.Value;
+                    return true;
             }
 
             return false;
@@ -318,21 +449,20 @@ namespace osu.Game.Screens.Play
             switch (e.Action)
             {
                 case GlobalAction.HoldForHUD:
-                    holdingForHUD = false;
-                    updateVisibility();
+                    holdingForHUD.Value = false;
                     break;
             }
         }
 
-        private class MainComponentsContainer : SkinnableTargetContainer
+        private partial class HUDComponentsContainer : SkinnableContainer
         {
             private Bindable<ScoringMode> scoringMode;
 
             [Resolved]
             private OsuConfigManager config { get; set; }
 
-            public MainComponentsContainer()
-                : base(SkinnableTarget.MainHUDComponents)
+            public HUDComponentsContainer([CanBeNull] RulesetInfo ruleset = null)
+                : base(new GlobalSkinnableContainerLookup(GlobalSkinnableContainers.MainHUDComponents, ruleset))
             {
                 RelativeSizeAxes = Axes.Both;
             }
@@ -344,7 +474,7 @@ namespace osu.Game.Screens.Play
                 // When the scoring mode changes, relative positions of elements may change (see DefaultSkin.GetDrawableComponent).
                 // This is a best effort implementation for cases where users haven't customised layouts.
                 scoringMode = config.GetBindable<ScoringMode>(OsuSetting.ScoreDisplayMode);
-                scoringMode.BindValueChanged(val => Reload());
+                scoringMode.BindValueChanged(_ => Reload());
             }
         }
     }

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Graphics.Containers;
 using osu.Game.Overlays.Toolbar;
 using osu.Framework.Graphics;
@@ -12,7 +14,7 @@ using osu.Game.Rulesets;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneToolbarRulesetSelector : OsuTestScene
+    public partial class TestSceneToolbarRulesetSelector : OsuTestScene
     {
         [Resolved]
         private RulesetStore rulesets { get; set; }
@@ -63,7 +65,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("mode line has moved", () => selector.ModeButtonLine.DrawPosition.X > 0);
         }
 
-        private class TestSelector : ToolbarRulesetSelector
+        private partial class TestSelector : ToolbarRulesetSelector
         {
             public new Drawable ModeButtonLine => base.ModeButtonLine;
         }

@@ -16,11 +16,11 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
     /// <summary>
     /// A <see cref="StatisticDisplay"/> to display the player's combo.
     /// </summary>
-    public class ComboStatistic : CounterStatistic
+    public partial class ComboStatistic : CounterStatistic
     {
         private readonly bool isPerfect;
 
-        private Drawable perfectText;
+        private Drawable perfectText = null!;
 
         /// <summary>
         /// Creates a new <see cref="ComboStatistic"/>.
@@ -51,7 +51,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
             Spacing = new Vector2(10, 0),
             Children = new[]
             {
-                base.CreateContent().With(d =>
+                base.CreateContent().With(_ =>
                 {
                     Anchor = Anchor.CentreLeft;
                     Origin = Anchor.CentreLeft;

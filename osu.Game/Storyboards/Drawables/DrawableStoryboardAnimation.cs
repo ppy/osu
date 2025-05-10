@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.IO;
 using osu.Framework.Allocation;
@@ -8,12 +10,13 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Utils;
+using osu.Game.Beatmaps;
 using osu.Game.Skinning;
 using osuTK;
 
 namespace osu.Game.Storyboards.Drawables
 {
-    public class DrawableStoryboardAnimation : TextureAnimation, IFlippable, IVectorScalable
+    public partial class DrawableStoryboardAnimation : TextureAnimation, IFlippable, IVectorScalable
     {
         public StoryboardAnimation Animation { get; }
 
@@ -54,11 +57,6 @@ namespace osu.Game.Storyboards.Drawables
             get => vectorScale;
             set
             {
-                if (Math.Abs(value.X) < Precision.FLOAT_EPSILON)
-                    value.X = Precision.FLOAT_EPSILON;
-                if (Math.Abs(value.Y) < Precision.FLOAT_EPSILON)
-                    value.Y = Precision.FLOAT_EPSILON;
-
                 if (vectorScale == value)
                     return;
 
@@ -85,37 +83,45 @@ namespace osu.Game.Storyboards.Drawables
             Origin = animation.Origin;
             Position = animation.InitialPosition;
             Loop = animation.LoopType == AnimationLoopType.LoopForever;
+            Name = animation.Path;
 
             LifetimeStart = animation.StartTime;
-            LifetimeEnd = animation.EndTime;
+            LifetimeEnd = animation.EndTimeForDisplay;
         }
 
         [Resolved]
         private ISkinSource skin { get; set; }
 
+        [Resolved]
+        private IBeatSyncProvider beatSyncProvider { get; set; }
+
+        [Resolved]
+        private TextureStore textureStore { get; set; }
+
         [BackgroundDependencyLoader]
-        private void load(TextureStore textureStore, Storyboard storyboard)
+        private void load(Storyboard storyboard)
         {
-            int frameIndex = 0;
-
-            Texture frameTexture = storyboard.GetTextureFromPath(getFramePath(frameIndex), textureStore);
-
-            if (frameTexture != null)
+            if (storyboard.UseSkinSprites)
             {
-                // sourcing from storyboard.
-                for (frameIndex = 0; frameIndex < Animation.FrameCount; frameIndex++)
-                {
-                    AddFrame(storyboard.GetTextureFromPath(getFramePath(frameIndex), textureStore), Animation.FrameDelay);
-                }
-            }
-            else if (storyboard.UseSkinSprites)
-            {
-                // fallback to skin if required.
                 skin.SourceChanged += skinSourceChanged;
                 skinSourceChanged();
             }
+            else
+                addFramesFromStoryboardSource();
 
             Animation.ApplyTransforms(this);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            // Framework animation class tries its best to synchronise the animation at LoadComplete,
+            // but in some cases (such as fast forward) this results in an incorrect start offset.
+            //
+            // In the case of storyboard animations, we want to synchronise with game time perfectly
+            // so let's get a correct time based on gameplay clock and earliest transform.
+            PlaybackPosition = beatSyncProvider.Clock.CurrentTime - Animation.EarliestTransformTime;
         }
 
         private void skinSourceChanged()
@@ -124,11 +130,28 @@ namespace osu.Game.Storyboards.Drawables
 
             // When reading from a skin, we match stables weird behaviour where `FrameCount` is ignored
             // and resources are retrieved until the end of the animation.
-            foreach (var texture in skin.GetTextures(Path.GetFileNameWithoutExtension(Animation.Path), default, default, true, string.Empty, out _))
-                AddFrame(texture, Animation.FrameDelay);
+            var skinTextures = skin.GetTextures(Path.ChangeExtension(Animation.Path, null), default, default, true, string.Empty, null, out _);
+
+            if (skinTextures.Length > 0)
+            {
+                foreach (var texture in skinTextures)
+                    AddFrame(texture, Animation.FrameDelay);
+            }
+            else
+            {
+                addFramesFromStoryboardSource();
+            }
         }
 
-        private string getFramePath(int i) => Animation.Path.Replace(".", $"{i}.");
+        private void addFramesFromStoryboardSource()
+        {
+            int frameIndex;
+            // sourcing from storyboard.
+            for (frameIndex = 0; frameIndex < Animation.FrameCount; frameIndex++)
+                AddFrame(textureStore.Get(getFramePath(frameIndex)), Animation.FrameDelay);
+
+            string getFramePath(int i) => Animation.Path.Replace(".", $"{i}.");
+        }
 
         protected override void Dispose(bool isDisposing)
         {

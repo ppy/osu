@@ -10,7 +10,7 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays.Dashboard.Home.News
 {
-    public class NewsItemGroupPanel : HomePanel
+    public partial class NewsItemGroupPanel : HomePanel
     {
         private readonly List<APINewsPost> posts;
 

@@ -3,15 +3,21 @@
 
 using osu.Framework.Allocation;
 using osu.Game.Graphics;
+using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Dialog
 {
-    public class PopupDialogCancelButton : PopupDialogButton
+    public partial class PopupDialogCancelButton : PopupDialogButton
     {
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
             ButtonColour = colours.Blue;
+        }
+
+        public PopupDialogCancelButton()
+            : base(HoverSampleSet.DialogCancel)
+        {
         }
     }
 }

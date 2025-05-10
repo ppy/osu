@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Bindables;
+using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
@@ -22,13 +23,13 @@ namespace osu.Game.Rulesets.Osu.Mods
         [SettingSource("Only fade approach circles", "The main object body will not fade when enabled.")]
         public Bindable<bool> OnlyFadeApproachCircles { get; } = new BindableBool();
 
-        public override string Description => @"Play with no approach circles and fading circles/sliders.";
-        public override double ScoreMultiplier => 1.06;
+        public override LocalisableString Description => @"Play with no approach circles and fading circles/sliders.";
+        public override double ScoreMultiplier => UsesDefaultConfiguration ? 1.06 : 1;
 
-        public override Type[] IncompatibleMods => new[] { typeof(IRequiresApproachCircles), typeof(OsuModSpinIn) };
+        public override Type[] IncompatibleMods => new[] { typeof(IRequiresApproachCircles), typeof(OsuModSpinIn), typeof(OsuModDepth) };
 
-        private const double fade_in_duration_multiplier = 0.4;
-        private const double fade_out_duration_multiplier = 0.3;
+        public const double FADE_IN_DURATION_MULTIPLIER = 0.4;
+        public const double FADE_OUT_DURATION_MULTIPLIER = 0.3;
 
         protected override bool IsFirstAdjustableObject(HitObject hitObject) => !(hitObject is Spinner || hitObject is SpinnerTick);
 
@@ -41,7 +42,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             static void applyFadeInAdjustment(OsuHitObject osuObject)
             {
-                osuObject.TimeFadeIn = osuObject.TimePreempt * fade_in_duration_multiplier;
+                osuObject.TimeFadeIn = osuObject.TimePreempt * FADE_IN_DURATION_MULTIPLIER;
                 foreach (var nested in osuObject.NestedHitObjects.OfType<OsuHitObject>())
                     applyFadeInAdjustment(nested);
             }
@@ -86,7 +87,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             switch (drawableObject)
             {
-                case DrawableSliderTail _:
+                case DrawableSliderTail:
                     using (drawableObject.BeginAbsoluteSequence(fadeStartTime))
                         drawableObject.FadeOut(fadeDuration);
 
@@ -96,6 +97,9 @@ namespace osu.Game.Rulesets.Osu.Mods
                     using (drawableObject.BeginAbsoluteSequence(fadeStartTime))
                         // only apply to circle piece – reverse arrow is not affected by hidden.
                         sliderRepeat.CirclePiece.FadeOut(fadeDuration);
+
+                    using (drawableObject.BeginAbsoluteSequence(drawableObject.HitStateUpdateTime))
+                        sliderRepeat.FadeOut();
 
                     break;
 
@@ -156,21 +160,21 @@ namespace osu.Game.Rulesets.Osu.Mods
             static (double fadeStartTime, double fadeDuration) getParameters(OsuHitObject hitObject)
             {
                 double fadeOutStartTime = hitObject.StartTime - hitObject.TimePreempt + hitObject.TimeFadeIn;
-                double fadeOutDuration = hitObject.TimePreempt * fade_out_duration_multiplier;
+                double fadeOutDuration = hitObject.TimePreempt * FADE_OUT_DURATION_MULTIPLIER;
 
                 // new duration from completed fade in to end (before fading out)
                 double longFadeDuration = hitObject.GetEndTime() - fadeOutStartTime;
 
                 switch (hitObject)
                 {
-                    case Slider _:
+                    case Slider:
                         return (fadeOutStartTime, longFadeDuration);
 
-                    case SliderTick _:
+                    case SliderTick:
                         double tickFadeOutDuration = Math.Min(hitObject.TimePreempt - DrawableSliderTick.ANIM_DURATION, 1000);
                         return (hitObject.StartTime - tickFadeOutDuration, tickFadeOutDuration);
 
-                    case Spinner _:
+                    case Spinner:
                         return (fadeOutStartTime + longFadeDuration, fadeOutDuration);
 
                     default:

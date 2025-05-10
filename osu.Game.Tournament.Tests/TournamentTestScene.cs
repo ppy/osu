@@ -7,29 +7,31 @@ using osu.Framework.Allocation;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
-using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Beatmaps;
+using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Tests.Visual;
 using osu.Game.Tournament.IO;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Models;
-using osu.Game.Users;
-using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Tournament.Tests
 {
-    public abstract class TournamentTestScene : OsuTestScene
+    public abstract partial class TournamentTestScene : OsuManualInputManagerTestScene
     {
-        private TournamentMatch match;
+        [Cached(typeof(IDialogOverlay))]
+        protected readonly DialogOverlay DialogOverlay = new DialogOverlay { Depth = float.MinValue };
 
         [Cached]
         protected LadderInfo Ladder { get; private set; } = new LadderInfo();
 
-        [Resolved]
-        private RulesetStore rulesetStore { get; set; }
-
         [Cached]
         protected MatchIPCInfo IPCInfo { get; private set; } = new MatchIPCInfo();
+
+        [Resolved]
+        private RulesetStore rulesetStore { get; set; } = null!;
+
+        private TournamentMatch match = null!;
 
         [BackgroundDependencyLoader]
         private void load(TournamentStorage storage)
@@ -38,13 +40,15 @@ namespace osu.Game.Tournament.Tests
 
             match = CreateSampleMatch();
 
-            Ladder.Rounds.Add(match.Round.Value);
+            Ladder.Rounds.Add(match.Round.Value!);
             Ladder.Matches.Add(match);
-            Ladder.Teams.Add(match.Team1.Value);
-            Ladder.Teams.Add(match.Team2.Value);
+            Ladder.Teams.Add(match.Team1.Value!);
+            Ladder.Teams.Add(match.Team2.Value!);
 
             Ruleset.BindTo(Ladder.Ruleset);
             Dependencies.CacheAs(new StableInfo(storage));
+
+            Add(DialogOverlay);
         }
 
         [SetUpSteps]
@@ -63,7 +67,7 @@ namespace osu.Game.Tournament.Tests
                     FlagName = { Value = "JP" },
                     FullName = { Value = "Japan" },
                     LastYearPlacing = { Value = 10 },
-                    Seed = { Value = "Low" },
+                    Seed = { Value = "#12" },
                     SeedingResults =
                     {
                         new SeedingResult
@@ -121,11 +125,11 @@ namespace osu.Game.Tournament.Tests
                     },
                     Players =
                     {
-                        new APIUser { Username = "Hello", Statistics = new UserStatistics { GlobalRank = 12 } },
-                        new APIUser { Username = "Hello", Statistics = new UserStatistics { GlobalRank = 16 } },
-                        new APIUser { Username = "Hello", Statistics = new UserStatistics { GlobalRank = 20 } },
-                        new APIUser { Username = "Hello", Statistics = new UserStatistics { GlobalRank = 24 } },
-                        new APIUser { Username = "Hello", Statistics = new UserStatistics { GlobalRank = 30 } },
+                        new TournamentUser { Username = "Hello", Rank = 12 },
+                        new TournamentUser { Username = "Hello", Rank = 16 },
+                        new TournamentUser { Username = "Hello", Rank = 20 },
+                        new TournamentUser { Username = "Hello", Rank = 24 },
+                        new TournamentUser { Username = "Hello", Rank = 30 },
                     }
                 }
             },
@@ -136,26 +140,27 @@ namespace osu.Game.Tournament.Tests
                     Acronym = { Value = "USA" },
                     FlagName = { Value = "US" },
                     FullName = { Value = "United States" },
+                    Seed = { Value = "#3" },
                     Players =
                     {
-                        new APIUser { Username = "Hello" },
-                        new APIUser { Username = "Hello" },
-                        new APIUser { Username = "Hello" },
-                        new APIUser { Username = "Hello" },
-                        new APIUser { Username = "Hello" },
+                        new TournamentUser { Username = "Hello" },
+                        new TournamentUser { Username = "Hello" },
+                        new TournamentUser { Username = "Hello" },
+                        new TournamentUser { Username = "Hello" },
+                        new TournamentUser { Username = "Hello" },
                     }
                 }
             },
             Round =
             {
-                Value = new TournamentRound { Name = { Value = "Quarterfinals" } }
+                Value = new TournamentRound { Name = { Value = "Quarterfinals" } },
             }
         };
 
-        public static APIBeatmap CreateSampleBeatmap() =>
-            new APIBeatmap
+        public static TournamentBeatmap CreateSampleBeatmap() =>
+            new TournamentBeatmap
             {
-                BeatmapSet = new APIBeatmapSet
+                Metadata = new BeatmapMetadata
                 {
                     Title = "Test Title",
                     Artist = "Test Artist",
@@ -165,9 +170,9 @@ namespace osu.Game.Tournament.Tests
 
         protected override ITestSceneTestRunner CreateRunner() => new TournamentTestSceneTestRunner();
 
-        public class TournamentTestSceneTestRunner : TournamentGameBase, ITestSceneTestRunner
+        public partial class TournamentTestSceneTestRunner : TournamentGameBase, ITestSceneTestRunner
         {
-            private TestSceneTestRunner.TestRunner runner;
+            private TestSceneTestRunner.TestRunner runner = null!;
 
             protected override void LoadAsyncComplete()
             {

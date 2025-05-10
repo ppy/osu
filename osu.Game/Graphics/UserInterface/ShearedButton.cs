@@ -1,22 +1,25 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
-using osuTK;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class ShearedButton : OsuClickableContainer
+    public partial class ShearedButton : OsuClickableContainer
     {
+        public const float DEFAULT_HEIGHT = 50;
+        public const float CORNER_RADIUS = 7;
+        public const float BORDER_THICKNESS = 2;
+
         public LocalisableString Text
         {
             get => text.Text;
@@ -62,13 +65,14 @@ namespace osu.Game.Graphics.UserInterface
         private readonly Box background;
         private readonly OsuSpriteText text;
 
-        private const float shear = 0.2f;
-
         private Colour4? darkerColour;
         private Colour4? lighterColour;
         private Colour4? textColour;
 
+        private readonly Container backgroundLayer;
         private readonly Box flashLayer;
+
+        protected readonly Container ButtonContent;
 
         /// <summary>
         /// Creates a new <see cref="ShearedToggleButton"/>
@@ -80,29 +84,43 @@ namespace osu.Game.Graphics.UserInterface
         /// <item>If a <see langword="null"/> value is provided (or the argument is omitted entirely), the button will autosize in width to fit the text.</item>
         /// </list>
         /// </param>
-        public ShearedButton(float? width = null)
+        /// <param name="height">The height of the button.</param>
+        public ShearedButton(float? width = null, float height = DEFAULT_HEIGHT)
         {
-            Height = 50;
-            Padding = new MarginPadding { Horizontal = shear * 50 };
+            Height = height;
 
-            Content.CornerRadius = 7;
-            Content.Shear = new Vector2(shear, 0);
-            Content.Masking = true;
-            Content.BorderThickness = 2;
+            Shear = OsuGame.SHEAR;
+
             Content.Anchor = Content.Origin = Anchor.Centre;
+            Content.CornerRadius = CORNER_RADIUS;
+            Content.Masking = true;
 
             Children = new Drawable[]
             {
-                background = new Box
+                backgroundLayer = new Container
                 {
-                    RelativeSizeAxes = Axes.Both
-                },
-                text = new OsuSpriteText
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Font = OsuFont.TorusAlternate.With(size: 17),
-                    Shear = new Vector2(-shear, 0)
+                    RelativeSizeAxes = Axes.Y,
+                    CornerRadius = CORNER_RADIUS,
+                    Masking = true,
+                    BorderThickness = BORDER_THICKNESS,
+                    Children = new Drawable[]
+                    {
+                        background = new Box
+                        {
+                            RelativeSizeAxes = Axes.Both
+                        },
+                        ButtonContent = new Container
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            AutoSizeAxes = Axes.Both,
+                            Shear = -OsuGame.SHEAR,
+                            Child = text = new OsuSpriteText
+                            {
+                                Font = OsuFont.TorusAlternate.With(size: 17),
+                            }
+                        },
+                    }
                 },
                 flashLayer = new Box
                 {
@@ -116,15 +134,17 @@ namespace osu.Game.Graphics.UserInterface
             if (width != null)
             {
                 Width = width.Value;
+                backgroundLayer.RelativeSizeAxes = Axes.Both;
             }
             else
             {
                 AutoSizeAxes = Axes.X;
+                backgroundLayer.AutoSizeAxes = Axes.X;
                 text.Margin = new MarginPadding { Horizontal = 15 };
             }
         }
 
-        protected override HoverSounds CreateHoverSounds(HoverSampleSet sampleSet) => new HoverClickSounds(sampleSet);
+        protected override HoverSounds CreateHoverSounds(HoverSampleSet sampleSet) => new HoverClickSounds(sampleSet) { Enabled = { BindTarget = Enabled } };
 
         protected override void LoadComplete()
         {
@@ -172,7 +192,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             var colourDark = darkerColour ?? ColourProvider.Background3;
             var colourLight = lighterColour ?? ColourProvider.Background1;
-            var colourText = textColour ?? ColourProvider.Content1;
+            var colourContent = textColour ?? ColourProvider.Content1;
 
             if (!Enabled.Value)
             {
@@ -186,12 +206,12 @@ namespace osu.Game.Graphics.UserInterface
             }
 
             background.FadeColour(colourDark, 150, Easing.OutQuint);
-            Content.TransformTo(nameof(BorderColour), ColourInfo.GradientVertical(colourDark, colourLight), 150, Easing.OutQuint);
+            backgroundLayer.TransformTo(nameof(BorderColour), ColourInfo.GradientVertical(colourDark, colourLight), 150, Easing.OutQuint);
 
             if (!Enabled.Value)
-                colourText = colourText.Opacity(0.6f);
+                colourContent = colourContent.Opacity(0.6f);
 
-            text.FadeColour(colourText, 150, Easing.OutQuint);
+            ButtonContent.FadeColour(colourContent, 150, Easing.OutQuint);
         }
     }
 }

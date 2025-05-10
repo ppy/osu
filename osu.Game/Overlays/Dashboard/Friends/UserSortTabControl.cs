@@ -7,7 +7,7 @@ using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Dashboard.Friends
 {
-    public class UserSortTabControl : OverlaySortTabControl<UserSortCriteria>
+    public partial class UserSortTabControl : OverlaySortTabControl<UserSortCriteria>
     {
     }
 

@@ -130,6 +130,16 @@ namespace osu.Game.Localisation
         public static LocalisableString SelectNext => new TranslatableString(getKey(@"select_next"), @"Next selection");
 
         /// <summary>
+        /// "Select previous group"
+        /// </summary>
+        public static LocalisableString SelectPreviousGroup => new TranslatableString(getKey(@"select_previous_group"), @"Select previous group");
+
+        /// <summary>
+        /// "Select next group"
+        /// </summary>
+        public static LocalisableString SelectNextGroup => new TranslatableString(getKey(@"select_next_group"), @"Select next group");
+
+        /// <summary>
         /// "Home"
         /// </summary>
         public static LocalisableString Home => new TranslatableString(getKey(@"home"), @"Home");
@@ -140,9 +150,14 @@ namespace osu.Game.Localisation
         public static LocalisableString ToggleNotifications => new TranslatableString(getKey(@"toggle_notifications"), @"Toggle notifications");
 
         /// <summary>
-        /// "Pause gameplay"
+        /// "Toggle profile"
         /// </summary>
-        public static LocalisableString PauseGameplay => new TranslatableString(getKey(@"pause_gameplay"), @"Pause gameplay");
+        public static LocalisableString ToggleProfile => new TranslatableString(getKey(@"toggle_profile"), @"Toggle profile");
+
+        /// <summary>
+        /// "Pause / resume gameplay"
+        /// </summary>
+        public static LocalisableString PauseGameplay => new TranslatableString(getKey(@"pause_gameplay"), @"Pause / resume gameplay");
 
         /// <summary>
         /// "Setup mode"
@@ -165,9 +180,24 @@ namespace osu.Game.Localisation
         public static LocalisableString EditorTimingMode => new TranslatableString(getKey(@"editor_timing_mode"), @"Timing mode");
 
         /// <summary>
-        /// "Cycle grid display mode"
+        /// "Tap for BPM"
         /// </summary>
-        public static LocalisableString EditorCycleGridDisplayMode => new TranslatableString(getKey(@"editor_cycle_grid_display_mode"), @"Cycle grid display mode");
+        public static LocalisableString EditorTapForBPM => new TranslatableString(getKey(@"editor_tap_for_bpm"), @"Tap for BPM");
+
+        /// <summary>
+        /// "Clone selection"
+        /// </summary>
+        public static LocalisableString EditorCloneSelection => new TranslatableString(getKey(@"editor_clone_selection"), @"Clone selection");
+
+        /// <summary>
+        /// "Cycle grid spacing"
+        /// </summary>
+        public static LocalisableString EditorCycleGridSpacing => new TranslatableString(getKey(@"editor_cycle_grid_spacing"), @"Cycle grid spacing");
+
+        /// <summary>
+        /// "Cycle grid type"
+        /// </summary>
+        public static LocalisableString EditorCycleGridType => new TranslatableString(getKey(@"editor_cycle_grid_type"), @"Cycle grid type");
 
         /// <summary>
         /// "Test gameplay"
@@ -195,9 +225,19 @@ namespace osu.Game.Localisation
         public static LocalisableString ToggleInGameInterface => new TranslatableString(getKey(@"toggle_in_game_interface"), @"Toggle in-game interface");
 
         /// <summary>
-        /// "Toggle Mod Select"
+        /// "Toggle in-game leaderboard"
         /// </summary>
-        public static LocalisableString ToggleModSelection => new TranslatableString(getKey(@"toggle_mod_selection"), @"Toggle Mod Select");
+        public static LocalisableString ToggleInGameLeaderboard => new TranslatableString(getKey(@"toggle_in_game_leaderboard"), @"Toggle in-game leaderboard");
+
+        /// <summary>
+        /// "Toggle mod select"
+        /// </summary>
+        public static LocalisableString ToggleModSelection => new TranslatableString(getKey(@"toggle_mod_selection"), @"Toggle mod select");
+
+        /// <summary>
+        /// "Deselect all mods"
+        /// </summary>
+        public static LocalisableString DeselectAllMods => new TranslatableString(getKey(@"deselect_all_mods"), @"Deselect all mods");
 
         /// <summary>
         /// "Random"
@@ -250,9 +290,24 @@ namespace osu.Game.Localisation
         public static LocalisableString EditorDecreaseDistanceSpacing => new TranslatableString(getKey(@"editor_decrease_distance_spacing"), @"Decrease distance spacing");
 
         /// <summary>
+        /// "Cycle previous beat snap divisor"
+        /// </summary>
+        public static LocalisableString EditorCyclePreviousBeatSnapDivisor => new TranslatableString(getKey(@"editor_cycle_previous_beat_snap_divisor"), @"Cycle previous beat snap divisor");
+
+        /// <summary>
+        /// "Cycle next beat snap divisor"
+        /// </summary>
+        public static LocalisableString EditorCycleNextBeatSnapDivisor => new TranslatableString(getKey(@"editor_cycle_next_snap_divisor"), @"Cycle next beat snap divisor");
+
+        /// <summary>
         /// "Toggle skin editor"
         /// </summary>
         public static LocalisableString ToggleSkinEditor => new TranslatableString(getKey(@"toggle_skin_editor"), @"Toggle skin editor");
+
+        /// <summary>
+        /// "Toggle FPS counter"
+        /// </summary>
+        public static LocalisableString ToggleFPSCounter => new TranslatableString(getKey(@"toggle_fps_counter"), @"Toggle FPS counter");
 
         /// <summary>
         /// "Previous volume meter"
@@ -275,10 +330,140 @@ namespace osu.Game.Localisation
         public static LocalisableString SeekReplayBackward => new TranslatableString(getKey(@"seek_replay_backward"), @"Seek replay backward");
 
         /// <summary>
+        /// "Seek replay forward one frame"
+        /// </summary>
+        public static LocalisableString StepReplayForward => new TranslatableString(getKey(@"step_replay_forward"), @"Seek replay forward one frame");
+
+        /// <summary>
+        /// "Step replay backward one frame"
+        /// </summary>
+        public static LocalisableString StepReplayBackward => new TranslatableString(getKey(@"step_replay_backward"), @"Step replay backward one frame");
+
+        /// <summary>
         /// "Toggle chat focus"
         /// </summary>
         public static LocalisableString ToggleChatFocus => new TranslatableString(getKey(@"toggle_chat_focus"), @"Toggle chat focus");
 
-        private static string getKey(string key) => $"{prefix}:{key}";
+        /// <summary>
+        /// "Toggle replay settings"
+        /// </summary>
+        public static LocalisableString ToggleReplaySettings => new TranslatableString(getKey(@"toggle_replay_settings"), @"Toggle replay settings");
+
+        /// <summary>
+        /// "Save replay"
+        /// </summary>
+        public static LocalisableString SaveReplay => new TranslatableString(getKey(@"save_replay"), @"Save replay");
+
+        /// <summary>
+        /// "Export replay"
+        /// </summary>
+        public static LocalisableString ExportReplay => new TranslatableString(getKey(@"export_replay"), @"Export replay");
+
+        /// <summary>
+        /// "Increase offset"
+        /// </summary>
+        public static LocalisableString IncreaseOffset => new TranslatableString(getKey(@"increase_offset"), @"Increase offset");
+
+        /// <summary>
+        /// "Decrease offset"
+        /// </summary>
+        public static LocalisableString DecreaseOffset => new TranslatableString(getKey(@"decrease_offset"), @"Decrease offset");
+
+        /// <summary>
+        /// "Toggle rotate control"
+        /// </summary>
+        public static LocalisableString EditorToggleRotateControl => new TranslatableString(getKey(@"editor_toggle_rotate_control"), @"Toggle rotate control");
+
+        /// <summary>
+        /// "Toggle scale control"
+        /// </summary>
+        public static LocalisableString EditorToggleScaleControl => new TranslatableString(getKey(@"editor_toggle_scale_control"), @"Toggle scale control");
+
+        /// <summary>
+        /// "Toggle autoplay"
+        /// </summary>
+        public static LocalisableString EditorTestPlayToggleAutoplay => new TranslatableString(getKey(@"editor_test_play_toggle_autoplay"), @"Toggle autoplay");
+
+        /// <summary>
+        /// "Toggle quick pause"
+        /// </summary>
+        public static LocalisableString EditorTestPlayToggleQuickPause => new TranslatableString(getKey(@"editor_test_play_toggle_quick_pause"), @"Toggle quick pause");
+
+        /// <summary>
+        /// "Quick exit to initial time"
+        /// </summary>
+        public static LocalisableString EditorTestPlayQuickExitToInitialTime => new TranslatableString(getKey(@"editor_test_play_quick_exit_to_initial_time"), @"Quick exit to initial time");
+
+        /// <summary>
+        /// "Quick exit to current time"
+        /// </summary>
+        public static LocalisableString EditorTestPlayQuickExitToCurrentTime => new TranslatableString(getKey(@"editor_test_play_quick_exit_to_current_time"), @"Quick exit to current time");
+
+        /// <summary>
+        /// "Increase mod speed"
+        /// </summary>
+        public static LocalisableString IncreaseModSpeed => new TranslatableString(getKey(@"increase_mod_speed"), @"Increase mod speed");
+
+        /// <summary>
+        /// "Decrease mod speed"
+        /// </summary>
+        public static LocalisableString DecreaseModSpeed => new TranslatableString(getKey(@"decrease_mod_speed"), @"Decrease mod speed");
+
+        /// <summary>
+        /// "Seek to previous hit object"
+        /// </summary>
+        public static LocalisableString EditorSeekToPreviousHitObject => new TranslatableString(getKey(@"editor_seek_to_previous_hit_object"), @"Seek to previous hit object");
+
+        /// <summary>
+        /// "Seek to next hit object"
+        /// </summary>
+        public static LocalisableString EditorSeekToNextHitObject => new TranslatableString(getKey(@"editor_seek_to_next_hit_object"), @"Seek to next hit object");
+
+        /// <summary>
+        /// "Seek to previous sample point"
+        /// </summary>
+        public static LocalisableString EditorSeekToPreviousSamplePoint => new TranslatableString(getKey(@"editor_seek_to_previous_sample_point"), @"Seek to previous sample point");
+
+        /// <summary>
+        /// "Seek to next sample point"
+        /// </summary>
+        public static LocalisableString EditorSeekToNextSamplePoint => new TranslatableString(getKey(@"editor_seek_to_next_sample_point"), @"Seek to next sample point");
+
+        /// <summary>
+        /// "Add bookmark"
+        /// </summary>
+        public static LocalisableString EditorAddBookmark => new TranslatableString(getKey(@"editor_add_bookmark"), @"Add bookmark");
+
+        /// <summary>
+        /// "Remove closest bookmark"
+        /// </summary>
+        public static LocalisableString EditorRemoveClosestBookmark => new TranslatableString(getKey(@"editor_remove_closest_bookmark"), @"Remove closest bookmark");
+
+        /// <summary>
+        /// "Seek to previous bookmark"
+        /// </summary>
+        public static LocalisableString EditorSeekToPreviousBookmark => new TranslatableString(getKey(@"editor_seek_to_previous_bookmark"), @"Seek to previous bookmark");
+
+        /// <summary>
+        /// "Seek to next bookmark"
+        /// </summary>
+        public static LocalisableString EditorSeekToNextBookmark => new TranslatableString(getKey(@"editor_seek_to_next_bookmark"), @"Seek to next bookmark");
+
+        /// <summary>
+        /// "Absolute scroll song list"
+        /// </summary>
+        public static LocalisableString AbsoluteScrollSongList => new TranslatableString(getKey(@"absolute_scroll_song_list"), @"Absolute scroll song list");
+
+        /// <summary>
+        /// "Toggle movement control"
+        /// </summary>
+        public static LocalisableString EditorToggleMoveControl => new TranslatableString(getKey(@"editor_toggle_move_control"), @"Toggle movement control");
+
+        /// <summary>
+        /// "Discard unsaved changes"
+        /// </summary>
+        public static LocalisableString EditorDiscardUnsavedChanges => new TranslatableString(getKey(@"editor_discard_unsaved_changes"), @"Discard unsaved changes");
+
+        private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

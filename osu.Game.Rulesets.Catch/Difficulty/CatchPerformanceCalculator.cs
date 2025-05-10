@@ -2,22 +2,24 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Audio.Track;
+using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
+using osu.Game.Scoring.Legacy;
 
 namespace osu.Game.Rulesets.Catch.Difficulty
 {
     public class CatchPerformanceCalculator : PerformanceCalculator
     {
-        private int fruitsHit;
-        private int ticksHit;
-        private int tinyTicksHit;
-        private int tinyTicksMissed;
-        private int misses;
+        private int num300;
+        private int num100;
+        private int num50;
+        private int numKatu;
+        private int numMiss;
 
         public CatchPerformanceCalculator()
             : base(new CatchRuleset())
@@ -28,11 +30,11 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         {
             var catchAttributes = (CatchDifficultyAttributes)attributes;
 
-            fruitsHit = score.Statistics.GetValueOrDefault(HitResult.Great);
-            ticksHit = score.Statistics.GetValueOrDefault(HitResult.LargeTickHit);
-            tinyTicksHit = score.Statistics.GetValueOrDefault(HitResult.SmallTickHit);
-            tinyTicksMissed = score.Statistics.GetValueOrDefault(HitResult.SmallTickMiss);
-            misses = score.Statistics.GetValueOrDefault(HitResult.Miss);
+            num300 = score.GetCount300() ?? 0; // HitResult.Great
+            num100 = score.GetCount100() ?? 0; // HitResult.LargeTickHit
+            num50 = score.GetCount50() ?? 0; // HitResult.SmallTickHit
+            numKatu = score.GetCountKatu() ?? 0; // HitResult.SmallTickMiss
+            numMiss = score.GetCountMiss() ?? 0; // HitResult.Miss PLUS HitResult.LargeTickMiss
 
             // We are heavily relying on aim in catch the beat
             double value = Math.Pow(5.0 * Math.Max(1.0, catchAttributes.StarRating / 0.0049) - 4.0, 2.0) / 100000.0;
@@ -45,13 +47,25 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                 (numTotalHits > 2500 ? Math.Log10(numTotalHits / 2500.0) * 0.475 : 0.0);
             value *= lengthBonus;
 
-            value *= Math.Pow(0.97, misses);
+            value *= Math.Pow(0.97, numMiss);
 
             // Combo scaling
             if (catchAttributes.MaxCombo > 0)
                 value *= Math.Min(Math.Pow(score.MaxCombo, 0.8) / Math.Pow(catchAttributes.MaxCombo, 0.8), 1.0);
 
-            double approachRate = catchAttributes.ApproachRate;
+            var difficulty = score.BeatmapInfo!.Difficulty.Clone();
+
+            score.Mods.OfType<IApplicableToDifficulty>().ForEach(m => m.ApplyToDifficulty(difficulty));
+
+            var track = new TrackVirtual(10000);
+            score.Mods.OfType<IApplicableToTrack>().ForEach(m => m.ApplyToTrack(track));
+            double clockRate = track.Rate;
+
+            // this is the same as osu!, so there's potential to share the implementation... maybe
+            double preempt = IBeatmapDifficultyInfo.DifficultyRange(difficulty.ApproachRate, 1800, 1200, 450) / clockRate;
+
+            double approachRate = preempt > 1200.0 ? -(preempt - 1800.0) / 120.0 : -(preempt - 1200.0) / 150.0 + 5.0;
+
             double approachRateFactor = 1.0;
             if (approachRate > 9.0)
                 approachRateFactor += 0.1 * (approachRate - 9.0); // 10% for each AR above 9
@@ -77,7 +91,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             value *= Math.Pow(accuracy(), 5.5);
 
             if (score.Mods.Any(m => m is ModNoFail))
-                value *= 0.90;
+                value *= Math.Max(0.90, 1.0 - 0.02 * numMiss);
 
             return new CatchPerformanceAttributes
             {
@@ -86,8 +100,8 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         }
 
         private double accuracy() => totalHits() == 0 ? 0 : Math.Clamp((double)totalSuccessfulHits() / totalHits(), 0, 1);
-        private int totalHits() => tinyTicksHit + ticksHit + fruitsHit + misses + tinyTicksMissed;
-        private int totalSuccessfulHits() => tinyTicksHit + ticksHit + fruitsHit;
-        private int totalComboHits() => misses + ticksHit + fruitsHit;
+        private int totalHits() => num50 + num100 + num300 + numMiss + numKatu;
+        private int totalSuccessfulHits() => num50 + num100 + num300;
+        private int totalComboHits() => numMiss + num100 + num300;
     }
 }

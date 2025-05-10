@@ -1,12 +1,13 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
-    public class LabelledColourPalette : LabelledDrawable<ColourPalette>
+    public partial class LabelledColourPalette : LabelledDrawable<ColourPalette>
     {
         public LabelledColourPalette()
             : base(true)
@@ -15,7 +16,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         public BindableList<Colour4> Colours => Component.Colours;
 
-        public string ColourNamePrefix
+        public LocalisableString ColourNamePrefix
         {
             get => Component.ColourNamePrefix;
             set => Component.ColourNamePrefix = value;

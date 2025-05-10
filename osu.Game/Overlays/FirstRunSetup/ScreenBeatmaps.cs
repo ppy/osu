@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -14,21 +12,21 @@ using osu.Game.Beatmaps.Drawables;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.UserInterface;
-using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
 using osu.Game.Online;
 using osuTK;
+using osuTK.Graphics;
 using Realms;
 
 namespace osu.Game.Overlays.FirstRunSetup
 {
     [LocalisableDescription(typeof(FirstRunSetupBeatmapScreenStrings), nameof(FirstRunSetupBeatmapScreenStrings.Header))]
-    public class ScreenBeatmaps : FirstRunSetupScreen
+    public partial class ScreenBeatmaps : WizardScreen
     {
         private ProgressRoundedButton downloadBundledButton = null!;
-        private ProgressRoundedButton importBeatmapsButton = null!;
         private ProgressRoundedButton downloadTutorialButton = null!;
+
+        private OsuTextFlowContainer downloadInBackgroundText = null!;
 
         private OsuTextFlowContainer currentlyLoadedBeatmaps = null!;
 
@@ -43,14 +41,14 @@ namespace osu.Game.Overlays.FirstRunSetup
 
         private IDisposable? beatmapSubscription;
 
-        [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(LegacyImportManager? legacyImportManager)
+        [BackgroundDependencyLoader]
+        private void load()
         {
-            Vector2 buttonSize = new Vector2(500, 60);
+            Vector2 buttonSize = new Vector2(400, 50);
 
             Content.Children = new Drawable[]
             {
-                new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: 20))
+                new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: CONTENT_FONT_SIZE))
                 {
                     Colour = OverlayColourProvider.Content1,
                     Text = FirstRunSetupBeatmapScreenStrings.Description,
@@ -63,7 +61,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                     Height = 30,
                     Children = new Drawable[]
                     {
-                        currentlyLoadedBeatmaps = new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: 24, weight: FontWeight.SemiBold))
+                        currentlyLoadedBeatmaps = new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: HEADER_FONT_SIZE, weight: FontWeight.SemiBold))
                         {
                             Colour = OverlayColourProvider.Content2,
                             TextAnchor = Anchor.Centre,
@@ -73,7 +71,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                         },
                     }
                 },
-                new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: 20))
+                new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: CONTENT_FONT_SIZE))
                 {
                     Colour = OverlayColourProvider.Content1,
                     Text = FirstRunSetupBeatmapScreenStrings.TutorialDescription,
@@ -89,7 +87,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                     Text = FirstRunSetupBeatmapScreenStrings.TutorialButton,
                     Action = downloadTutorial
                 },
-                new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: 20))
+                new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: CONTENT_FONT_SIZE))
                 {
                     Colour = OverlayColourProvider.Content1,
                     Text = FirstRunSetupBeatmapScreenStrings.BundledDescription,
@@ -105,33 +103,16 @@ namespace osu.Game.Overlays.FirstRunSetup
                     Text = FirstRunSetupBeatmapScreenStrings.BundledButton,
                     Action = downloadBundled
                 },
-                new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: 20))
+                downloadInBackgroundText = new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: CONTENT_FONT_SIZE))
                 {
-                    Colour = OverlayColourProvider.Content1,
-                    Text = "If you have an existing osu! install, you can also choose to import your existing beatmap collection.",
+                    Colour = OverlayColourProvider.Light2,
+                    Alpha = 0,
+                    TextAnchor = Anchor.TopCentre,
+                    Text = FirstRunSetupBeatmapScreenStrings.DownloadingInBackground,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y
                 },
-                importBeatmapsButton = new ProgressRoundedButton
-                {
-                    Size = buttonSize,
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                    BackgroundColour = colours.Blue3,
-                    Text = MaintenanceSettingsStrings.ImportBeatmapsFromStable,
-                    Action = () =>
-                    {
-                        importBeatmapsButton.Enabled.Value = false;
-                        legacyImportManager?.ImportFromStableAsync(StableContent.Beatmaps).ContinueWith(t => Schedule(() =>
-                        {
-                            if (t.IsCompletedSuccessfully)
-                                importBeatmapsButton.Complete();
-                            else
-                                importBeatmapsButton.Enabled.Value = true;
-                        }));
-                    }
-                },
-                new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: 20))
+                new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: CONTENT_FONT_SIZE))
                 {
                     Colour = OverlayColourProvider.Content1,
                     Text = FirstRunSetupBeatmapScreenStrings.ObtainMoreBeatmaps,
@@ -154,7 +135,7 @@ namespace osu.Game.Overlays.FirstRunSetup
             beatmapSubscription?.Dispose();
         }
 
-        private void beatmapsChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet? changes, Exception error)
+        private void beatmapsChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet? changes) => Schedule(() =>
         {
             currentlyLoadedBeatmaps.Text = FirstRunSetupBeatmapScreenStrings.CurrentlyLoadedBeatmaps(sender.Count);
 
@@ -170,7 +151,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                 currentlyLoadedBeatmaps.ScaleTo(1.1f)
                                        .ScaleTo(1, 1500, Easing.OutQuint);
             }
-        }
+        });
 
         private void downloadTutorial()
         {
@@ -183,12 +164,15 @@ namespace osu.Game.Overlays.FirstRunSetup
 
             var downloadTracker = tutorialDownloader.DownloadTrackers.First();
 
+            downloadTracker.State.BindValueChanged(state =>
+            {
+                if (state.NewValue == DownloadState.LocallyAvailable)
+                    downloadTutorialButton.Complete();
+            }, true);
+
             downloadTracker.Progress.BindValueChanged(progress =>
             {
                 downloadTutorialButton.SetProgress(progress.NewValue, false);
-
-                if (progress.NewValue == 1)
-                    downloadTutorialButton.Complete();
             }, true);
         }
 
@@ -196,6 +180,10 @@ namespace osu.Game.Overlays.FirstRunSetup
         {
             if (bundledDownloader != null)
                 return;
+
+            downloadInBackgroundText
+                .FlashColour(Color4.White, 500)
+                .FadeIn(200);
 
             bundledDownloader = new BundledBeatmapDownloader(false);
 
@@ -212,46 +200,6 @@ namespace osu.Game.Overlays.FirstRunSetup
                     downloadBundledButton.Complete();
                 else
                     downloadBundledButton.SetProgress(progress, true);
-            }
-        }
-
-        private class ProgressRoundedButton : RoundedButton
-        {
-            [Resolved]
-            private OsuColour colours { get; set; } = null!;
-
-            private ProgressBar progressBar = null!;
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-
-                Add(progressBar = new ProgressBar(false)
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Blending = BlendingParameters.Additive,
-                    FillColour = BackgroundColour,
-                    Alpha = 0.5f,
-                    Depth = float.MinValue
-                });
-            }
-
-            public void Complete()
-            {
-                Enabled.Value = false;
-
-                Background.FadeColour(colours.Green, 500, Easing.OutQuint);
-                progressBar.FillColour = colours.Green;
-
-                this.TransformBindableTo(progressBar.Current, 1, 500, Easing.OutQuint);
-            }
-
-            public void SetProgress(double progress, bool animated)
-            {
-                if (!Enabled.Value)
-                    return;
-
-                this.TransformBindableTo(progressBar.Current, progress, animated ? 500 : 0, Easing.OutQuint);
             }
         }
     }

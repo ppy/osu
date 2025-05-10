@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Catch.Tests
 {
     public class CatchDifficultyCalculatorTest : DifficultyCalculatorTest
     {
-        protected override string ResourceAssembly => "osu.Game.Rulesets.Catch";
+        protected override string ResourceAssembly => "osu.Game.Rulesets.Catch.Tests";
 
         [TestCase(4.0505463516206195d, 127, "diffcalc-test")]
         public void Test(double expectedStarRating, int expectedMaxCombo, string name)

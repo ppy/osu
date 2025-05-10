@@ -9,7 +9,7 @@ using osu.Game.Screens.Select.Options;
 namespace osu.Game.Tests.Visual.SongSelect
 {
     [Description("bottom beatmap details")]
-    public class TestSceneBeatmapOptionsOverlay : OsuTestScene
+    public partial class TestSceneBeatmapOptionsOverlay : OsuTestScene
     {
         public TestSceneBeatmapOptionsOverlay()
         {

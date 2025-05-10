@@ -16,7 +16,7 @@ using osuTK.Graphics;
 namespace osu.Game.Tests.Visual.Online
 {
     [TestFixture]
-    public class TestSceneOnlineViewContainer : OsuTestScene
+    public partial class TestSceneOnlineViewContainer : OsuTestScene
     {
         private readonly TestOnlineViewContainer onlineView;
 
@@ -65,7 +65,7 @@ namespace osu.Game.Tests.Visual.Online
             AddUntilStep("loading animation is visible", () => onlineView.LoadingSpinner.IsPresent);
         }
 
-        private class TestOnlineViewContainer : OnlineViewContainer
+        private partial class TestOnlineViewContainer : OnlineViewContainer
         {
             public new LoadingSpinner LoadingSpinner => base.LoadingSpinner;
 

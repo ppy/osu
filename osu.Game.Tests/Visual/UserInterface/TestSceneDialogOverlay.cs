@@ -1,7 +1,12 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
+using System;
+using System.Threading;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Testing;
@@ -11,7 +16,7 @@ using osu.Game.Overlays.Dialog;
 namespace osu.Game.Tests.Visual.UserInterface
 {
     [TestFixture]
-    public class TestSceneDialogOverlay : OsuTestScene
+    public partial class TestSceneDialogOverlay : OsuTestScene
     {
         private DialogOverlay overlay;
 
@@ -37,12 +42,12 @@ namespace osu.Game.Tests.Visual.UserInterface
                     new PopupDialogOkButton
                     {
                         Text = @"I never want to see this again.",
-                        Action = () => System.Console.WriteLine(@"OK"),
+                        Action = () => Console.WriteLine(@"OK"),
                     },
                     new PopupDialogCancelButton
                     {
                         Text = @"Firetruck, I still want quick ranks!",
-                        Action = () => System.Console.WriteLine(@"Cancel"),
+                        Action = () => Console.WriteLine(@"Cancel"),
                     },
                 },
             }));
@@ -84,7 +89,69 @@ namespace osu.Game.Tests.Visual.UserInterface
             }));
 
             AddAssert("second dialog displayed", () => overlay.CurrentDialog == secondDialog);
-            AddAssert("first dialog is not part of hierarchy", () => firstDialog.Parent == null);
+            AddUntilStep("first dialog is not part of hierarchy", () => firstDialog.Parent == null);
+        }
+
+        [Test]
+        public void TestTooMuchText()
+        {
+            AddStep("dialog #1", () => overlay.Push(new TestPopupDialog
+            {
+                Icon = FontAwesome.Regular.TrashAlt,
+                HeaderText = @"Confirm deletion ofConfirm deletion ofConfirm deletion ofConfirm deletion ofConfirm deletion ofConfirm deletion of",
+                BodyText = @"Ayase Rie - Yuima-ru*World TVver.Ayase Rie - Yuima-ru*World TVver.Ayase Rie - Yuima-ru*World TVver.Ayase Rie - Yuima-ru*World TVver.Ayase Rie - Yuima-ru*World TVver.Ayase Rie - Yuima-ru*World TVver.Ayase Rie - Yuima-ru*World TVver.Ayase Rie - Yuima-ru*World TVver.Ayase Rie - Yuima-ru*World TVver. ",
+                Buttons = new PopupDialogButton[]
+                {
+                    new PopupDialogOkButton
+                    {
+                        Text = @"I never want to see this again.",
+                        Action = () => Console.WriteLine(@"OK"),
+                    },
+                    new PopupDialogCancelButton
+                    {
+                        Text = @"Firetruck, I still want quick ranks!",
+                        Action = () => Console.WriteLine(@"Cancel"),
+                    },
+                },
+            }));
+        }
+
+        [Test]
+        public void TestPushBeforeLoad()
+        {
+            PopupDialog dialog = null;
+
+            AddStep("create slow loading dialog overlay", () => overlay = new SlowLoadingDialogOverlay());
+
+            AddStep("start loading overlay", () => LoadComponentAsync(overlay, Add));
+
+            AddStep("push dialog before loaded", () =>
+            {
+                overlay.Push(dialog = new TestPopupDialog
+                {
+                    Buttons = new PopupDialogButton[]
+                    {
+                        new PopupDialogOkButton { Text = @"OK" },
+                    },
+                });
+            });
+
+            AddStep("complete load", () => ((SlowLoadingDialogOverlay)overlay).LoadEvent.Set());
+
+            AddUntilStep("wait for load", () => overlay.IsLoaded);
+
+            AddAssert("dialog displayed", () => overlay.CurrentDialog == dialog);
+        }
+
+        public partial class SlowLoadingDialogOverlay : DialogOverlay
+        {
+            public ManualResetEventSlim LoadEvent = new ManualResetEventSlim();
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                LoadEvent.Wait(10000);
+            }
         }
 
         [Test]
@@ -121,10 +188,10 @@ namespace osu.Game.Tests.Visual.UserInterface
             });
 
             AddAssert("no dialog pushed", () => overlay.CurrentDialog == null);
-            AddAssert("dialog is not part of hierarchy", () => testDialog.Parent == null);
+            AddUntilStep("dialog is not part of hierarchy", () => testDialog.Parent == null);
         }
 
-        private class TestPopupDialog : PopupDialog
+        private partial class TestPopupDialog : PopupDialog
         {
         }
     }

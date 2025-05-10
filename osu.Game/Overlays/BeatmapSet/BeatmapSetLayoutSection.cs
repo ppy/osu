@@ -10,7 +10,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
-    public class BeatmapSetLayoutSection : Container
+    public partial class BeatmapSetLayoutSection : Container
     {
         public BeatmapSetLayoutSection()
         {

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +18,6 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Framework.Platform;
-using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -31,11 +32,14 @@ using osuTK;
 using osuTK.Graphics;
 using osu.Game.Online.API;
 using osu.Game.Resources.Localisation.Web;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Utils;
+using CommonStrings = osu.Game.Localisation.CommonStrings;
+using WebCommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
 
 namespace osu.Game.Online.Leaderboards
 {
-    public class LeaderboardScore : OsuClickableContainer, IHasContextMenu, IHasCustomTooltip<ScoreInfo>
+    public partial class LeaderboardScore : OsuClickableContainer, IHasContextMenu, IHasCustomTooltip<ScoreInfo>
     {
         public const float HEIGHT = 60;
 
@@ -50,6 +54,7 @@ namespace osu.Game.Online.Leaderboards
 
         private readonly int? rank;
         private readonly bool isOnlineScope;
+        private readonly bool highlightFriend;
 
         private Box background;
         private Container content;
@@ -64,33 +69,41 @@ namespace osu.Game.Online.Leaderboards
 
         private List<ScoreComponentLabel> statisticsLabels;
 
-        [Resolved(CanBeNull = true)]
+        [Resolved(canBeNull: true)]
         private IDialogOverlay dialogOverlay { get; set; }
 
-        [Resolved(CanBeNull = true)]
+        [Resolved(canBeNull: true)]
         private SongSelect songSelect { get; set; }
 
+        [Resolved(canBeNull: true)]
+        private Clipboard clipboard { get; set; }
+
         [Resolved]
-        private Storage storage { get; set; }
+        private IAPIProvider api { get; set; }
 
         public ITooltip<ScoreInfo> GetCustomTooltip() => new LeaderboardScoreTooltip();
         public virtual ScoreInfo TooltipContent => Score;
 
-        public LeaderboardScore(ScoreInfo score, int? rank, bool isOnlineScope = true)
+        [Resolved]
+        private ScoreManager scoreManager { get; set; } = null!;
+
+        public LeaderboardScore(ScoreInfo score, int? rank, bool isOnlineScope = true, bool highlightFriend = true)
         {
             Score = score;
 
             this.rank = rank;
             this.isOnlineScope = isOnlineScope;
+            this.highlightFriend = highlightFriend;
 
             RelativeSizeAxes = Axes.X;
             Height = HEIGHT;
         }
 
         [BackgroundDependencyLoader]
-        private void load(IAPIProvider api, OsuColour colour, ScoreManager scoreManager)
+        private void load(IAPIProvider api, OsuColour colour)
         {
             var user = Score.User;
+            bool isUserFriend = api.Friends.Any(friend => friend.TargetID == user.OnlineID);
 
             statisticsLabels = GetStatistics(Score).Select(s => new ScoreComponentLabel(s)).ToList();
 
@@ -119,7 +132,7 @@ namespace osu.Game.Online.Leaderboards
                                 background = new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Colour = user.OnlineID == api.LocalUser.Value.Id && isOnlineScope ? colour.Green : Color4.Black,
+                                    Colour = (highlightFriend && isUserFriend) ? colour.Yellow : (user.OnlineID == api.LocalUser.Value.Id && isOnlineScope ? colour.Green : Color4.Black),
                                     Alpha = background_alpha,
                                 },
                             },
@@ -163,9 +176,11 @@ namespace osu.Game.Online.Leaderboards
                                         {
                                             Anchor = Anchor.BottomLeft,
                                             Origin = Anchor.BottomLeft,
-                                            AutoSizeAxes = Axes.Both,
+                                            AutoSizeAxes = Axes.X,
+                                            Height = 28,
                                             Direction = FillDirection.Horizontal,
                                             Spacing = new Vector2(10f, 0f),
+                                            Margin = new MarginPadding { Bottom = -2 },
                                             Children = new Drawable[]
                                             {
                                                 flagBadgeAndDateContainer = new FillFlowContainer
@@ -175,15 +190,21 @@ namespace osu.Game.Online.Leaderboards
                                                     RelativeSizeAxes = Axes.Y,
                                                     Direction = FillDirection.Horizontal,
                                                     Spacing = new Vector2(5f, 0f),
-                                                    Width = 87f,
+                                                    Width = 130f,
                                                     Masking = true,
                                                     Children = new Drawable[]
                                                     {
-                                                        new UpdateableFlag(user.Country)
+                                                        new UpdateableFlag(user.CountryCode)
                                                         {
                                                             Anchor = Anchor.CentreLeft,
                                                             Origin = Anchor.CentreLeft,
-                                                            Size = new Vector2(30f, 20f),
+                                                            Size = new Vector2(28, 20),
+                                                        },
+                                                        new UpdateableTeamFlag(user.Team)
+                                                        {
+                                                            Anchor = Anchor.CentreLeft,
+                                                            Origin = Anchor.CentreLeft,
+                                                            Size = new Vector2(40, 20),
                                                         },
                                                         new DateLabel(Score.Date)
                                                         {
@@ -191,15 +212,6 @@ namespace osu.Game.Online.Leaderboards
                                                             Origin = Anchor.CentreLeft,
                                                         },
                                                     },
-                                                },
-                                                new FillFlowContainer
-                                                {
-                                                    Origin = Anchor.CentreLeft,
-                                                    Anchor = Anchor.CentreLeft,
-                                                    AutoSizeAxes = Axes.Both,
-                                                    Direction = FillDirection.Horizontal,
-                                                    Margin = new MarginPadding { Left = edge_margin },
-                                                    Children = statisticsLabels
                                                 },
                                             },
                                         },
@@ -220,6 +232,7 @@ namespace osu.Game.Online.Leaderboards
                                             GlowColour = Color4Extensions.FromHex(@"83ccfa"),
                                             Current = scoreManager.GetBindableTotalScoreString(Score),
                                             Font = OsuFont.Numeric.With(size: 23),
+                                            Margin = new MarginPadding { Top = 1 },
                                         },
                                         RankContainer = new Container
                                         {
@@ -236,13 +249,33 @@ namespace osu.Game.Online.Leaderboards
                                         },
                                     },
                                 },
-                                modsContainer = new FillFlowContainer<ModIcon>
+                                new FillFlowContainer
                                 {
+                                    AutoSizeAxes = Axes.Both,
                                     Anchor = Anchor.BottomRight,
                                     Origin = Anchor.BottomRight,
-                                    AutoSizeAxes = Axes.Both,
                                     Direction = FillDirection.Horizontal,
-                                    ChildrenEnumerable = Score.Mods.Select(mod => new ModIcon(mod) { Scale = new Vector2(0.375f) })
+                                    Children = new Drawable[]
+                                    {
+                                        new FillFlowContainer
+                                        {
+                                            Anchor = Anchor.CentreRight,
+                                            Origin = Anchor.CentreRight,
+                                            AutoSizeAxes = Axes.Both,
+                                            Direction = FillDirection.Horizontal,
+                                            Margin = new MarginPadding { Left = edge_margin },
+                                            Children = statisticsLabels
+                                        },
+                                        modsContainer = new FillFlowContainer<ModIcon>
+                                        {
+                                            Anchor = Anchor.CentreRight,
+                                            Origin = Anchor.CentreRight,
+                                            AutoSizeAxes = Axes.Both,
+                                            Spacing = new Vector2(-10, 0),
+                                            Direction = FillDirection.Horizontal,
+                                            ChildrenEnumerable = Score.Mods.AsOrdered().Select(mod => new ModIcon(mod) { Scale = new Vector2(0.34f) })
+                                        },
+                                    }
                                 },
                             },
                         },
@@ -308,9 +341,9 @@ namespace osu.Game.Online.Leaderboards
             base.OnHoverLost(e);
         }
 
-        private class ScoreComponentLabel : Container, IHasTooltip
+        private partial class ScoreComponentLabel : Container, IHasTooltip
         {
-            private const float icon_size = 20;
+            private const float icon_size = 16;
             private readonly FillFlowContainer content;
 
             public override bool Contains(Vector2 screenSpacePos) => content.Contains(screenSpacePos);
@@ -326,7 +359,7 @@ namespace osu.Game.Online.Leaderboards
                 {
                     AutoSizeAxes = Axes.Both,
                     Direction = FillDirection.Horizontal,
-                    Padding = new MarginPadding { Right = 10 },
+                    Padding = new MarginPadding { Right = 5 },
                     Children = new Drawable[]
                     {
                         new Container
@@ -356,21 +389,20 @@ namespace osu.Game.Online.Leaderboards
                                 },
                             },
                         },
-                        new GlowingSpriteText
+                        new OsuSpriteText
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
-                            TextColour = Color4.White,
-                            GlowColour = Color4Extensions.FromHex(@"83ccfa"),
                             Text = statistic.Value,
-                            Font = OsuFont.GetFont(size: 17, weight: FontWeight.Bold),
+                            Spacing = new Vector2(-1, 0),
+                            Font = OsuFont.GetFont(size: 16, weight: FontWeight.Bold, fixedWidth: true)
                         },
                     },
                 };
             }
         }
 
-        private class RankLabel : Container, IHasTooltip
+        private partial class RankLabel : Container, IHasTooltip
         {
             public RankLabel(int? rank)
             {
@@ -389,12 +421,12 @@ namespace osu.Game.Online.Leaderboards
             public LocalisableString TooltipText { get; }
         }
 
-        private class DateLabel : DrawableDate
+        private partial class DateLabel : DrawableDate
         {
             public DateLabel(DateTimeOffset date)
                 : base(date)
             {
-                Font = OsuFont.GetFont(size: 17, weight: FontWeight.Bold, italics: true);
+                Font = OsuFont.GetFont(size: 16, weight: FontWeight.Bold);
             }
 
             protected override string Format() => Date.ToShortRelativeTime(TimeSpan.FromSeconds(30));
@@ -420,14 +452,20 @@ namespace osu.Game.Online.Leaderboards
             {
                 List<MenuItem> items = new List<MenuItem>();
 
-                if (Score.Mods.Length > 0 && modsContainer.Any(s => s.IsHovered) && songSelect != null)
-                    items.Add(new OsuMenuItem("Use these mods", MenuItemType.Highlighted, () => songSelect.Mods.Value = Score.Mods));
+                // system mods should never be copied across regardless of anything.
+                var copyableMods = Score.Mods.Where(m => m.Type != ModType.System).ToArray();
+
+                if (copyableMods.Length > 0 && songSelect != null)
+                    items.Add(new OsuMenuItem("Use these mods", MenuItemType.Highlighted, () => songSelect.Mods.Value = copyableMods));
+
+                if (Score.OnlineID > 0)
+                    items.Add(new OsuMenuItem(CommonStrings.CopyLink, MenuItemType.Standard, () => clipboard?.SetText($@"{api.Endpoints.WebsiteUrl}/scores/{Score.OnlineID}")));
 
                 if (Score.Files.Count > 0)
-                    items.Add(new OsuMenuItem("Export", MenuItemType.Standard, () => new LegacyScoreExporter(storage).Export(Score)));
-
-                if (!isOnlineScope)
-                    items.Add(new OsuMenuItem(CommonStrings.ButtonsDelete, MenuItemType.Destructive, () => dialogOverlay?.Push(new LocalScoreDeleteDialog(Score))));
+                {
+                    items.Add(new OsuMenuItem(CommonStrings.Export, MenuItemType.Standard, () => scoreManager.Export(Score)));
+                    items.Add(new OsuMenuItem(WebCommonStrings.ButtonsDelete, MenuItemType.Destructive, () => dialogOverlay?.Push(new LocalScoreDeleteDialog(Score))));
+                }
 
                 return items.ToArray();
             }

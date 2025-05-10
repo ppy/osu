@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
@@ -20,7 +22,7 @@ namespace osu.Game.Graphics.UserInterface
     /// <summary>
     /// A Checkbox styled to be placed in line with an <see cref="OsuTabControl{T}"/>
     /// </summary>
-    public class OsuTabControlCheckbox : Checkbox
+    public partial class OsuTabControlCheckbox : Checkbox
     {
         private readonly Box box;
         private readonly SpriteText text;
@@ -47,11 +49,10 @@ namespace osu.Game.Graphics.UserInterface
         private const float transition_length = 500;
         private Sample sampleChecked;
         private Sample sampleUnchecked;
+        private readonly SpriteIcon icon;
 
         public OsuTabControlCheckbox()
         {
-            SpriteIcon icon;
-
             AutoSizeAxes = Axes.Both;
 
             Children = new Drawable[]
@@ -83,14 +84,6 @@ namespace osu.Game.Graphics.UserInterface
                     Anchor = Anchor.BottomLeft,
                 }
             };
-
-            Current.ValueChanged += selected =>
-            {
-                icon.Icon = selected.NewValue ? FontAwesome.Regular.CheckCircle : FontAwesome.Regular.Circle;
-                text.Font = text.Font.With(weight: selected.NewValue ? FontWeight.Bold : FontWeight.Medium);
-
-                updateFade();
-            };
         }
 
         [BackgroundDependencyLoader]
@@ -101,6 +94,19 @@ namespace osu.Game.Graphics.UserInterface
 
             sampleChecked = audio.Samples.Get(@"UI/check-on");
             sampleUnchecked = audio.Samples.Get(@"UI/check-off");
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            Current.BindValueChanged(selected =>
+            {
+                icon.Icon = selected.NewValue ? FontAwesome.Regular.CheckCircle : FontAwesome.Regular.Circle;
+                text.Font = text.Font.With(weight: selected.NewValue ? FontWeight.Bold : FontWeight.Medium);
+
+                updateFade();
+            }, true);
         }
 
         protected override bool OnHover(HoverEvent e)

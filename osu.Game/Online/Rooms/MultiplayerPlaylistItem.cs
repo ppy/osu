@@ -1,13 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using MessagePack;
 using osu.Game.Online.API;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Utils;
 
 namespace osu.Game.Online.Rooms
 {
@@ -30,9 +30,20 @@ namespace osu.Game.Online.Rooms
         [Key(4)]
         public int RulesetID { get; set; }
 
+        /// <summary>
+        /// Mods that should be applied for every participant in the room.
+        /// </summary>
         [Key(5)]
         public IEnumerable<APIMod> RequiredMods { get; set; } = Enumerable.Empty<APIMod>();
 
+        /// <summary>
+        /// Mods that participants are allowed to apply at their own discretion.
+        /// </summary>
+        /// <remarks>
+        /// This will be empty when <see cref="Freestyle"/> is <c>true</c>, but participants may still select any mods from their choice of ruleset,
+        /// provided the mod <see cref="IMod.ValidForMultiplayerAsFreeMod">implementation</see> indicates free-mod validity
+        /// and is <see cref="ModUtils.CheckCompatibleSet(IEnumerable{Mod})">compatible</see> with the rest of the user's selection.
+        /// </remarks>
         [Key(6)]
         public IEnumerable<APIMod> AllowedMods { get; set; } = Enumerable.Empty<APIMod>();
 
@@ -55,10 +66,29 @@ namespace osu.Game.Online.Rooms
         [Key(9)]
         public DateTimeOffset? PlayedAt { get; set; }
 
+        [Key(10)]
+        public double StarRating { get; set; }
+
+        /// <summary>
+        /// Indicates whether participants in the room are able to pick their own choice of beatmap difficulty, ruleset, and mods.
+        /// </summary>
+        [Key(11)]
+        public bool Freestyle { get; set; }
+
+        /// <summary>
+        /// Creates a new <see cref="MultiplayerPlaylistItem"/>.
+        /// </summary>
+        [SerializationConstructor]
         public MultiplayerPlaylistItem()
         {
         }
 
+        /// <summary>
+        /// Creates a new <see cref="MultiplayerPlaylistItem"/> from an API <see cref="PlaylistItem"/>.
+        /// </summary>
+        /// <remarks>
+        /// This will create unique instances of the <see cref="RequiredMods"/> and <see cref="AllowedMods"/> arrays but NOT unique instances of the contained <see cref="APIMod"/>s.
+        /// </remarks>
         public MultiplayerPlaylistItem(PlaylistItem item)
         {
             ID = item.ID;
@@ -71,6 +101,22 @@ namespace osu.Game.Online.Rooms
             Expired = item.Expired;
             PlaylistOrder = item.PlaylistOrder ?? 0;
             PlayedAt = item.PlayedAt;
+            StarRating = item.Beatmap.StarRating;
+            Freestyle = item.Freestyle;
+        }
+
+        /// <summary>
+        /// Creates a copy of this <see cref="MultiplayerPlaylistItem"/>.
+        /// </summary>
+        /// <remarks>
+        /// This will create unique instances of the <see cref="RequiredMods"/> and <see cref="AllowedMods"/> arrays but NOT unique instances of the contained <see cref="APIMod"/>s.
+        /// </remarks>
+        public MultiplayerPlaylistItem Clone()
+        {
+            MultiplayerPlaylistItem clone = (MultiplayerPlaylistItem)MemberwiseClone();
+            clone.RequiredMods = RequiredMods.ToArray();
+            clone.AllowedMods = AllowedMods.ToArray();
+            return clone;
         }
     }
 }

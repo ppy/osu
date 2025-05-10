@@ -17,7 +17,7 @@ using osuTK.Graphics;
 namespace osu.Game.Tests.Visual.UserInterface
 {
     [TestFixture]
-    public class TestSceneContextMenu : OsuTestScene
+    public partial class TestSceneContextMenu : OsuTestScene
     {
         private const int start_time = 0;
         private const int duration = 1000;
@@ -77,21 +77,21 @@ namespace osu.Game.Tests.Visual.UserInterface
                 new OsuMenuItem(@"Some option"),
                 new OsuMenuItem(@"Highlighted option", MenuItemType.Highlighted),
                 new OsuMenuItem(@"Another option"),
-                new OsuMenuItem(@"Nested option >")
+                new OsuMenuItem(@"Nested option")
                 {
                     Items = new MenuItem[]
                     {
                         new OsuMenuItem(@"Sub-One"),
                         new OsuMenuItem(@"Sub-Two"),
                         new OsuMenuItem(@"Sub-Three"),
-                        new OsuMenuItem(@"Sub-Nested option >")
+                        new OsuMenuItem(@"Sub-Nested option")
                         {
                             Items = new MenuItem[]
                             {
                                 new OsuMenuItem(@"Double Sub-One"),
                                 new OsuMenuItem(@"Double Sub-Two"),
                                 new OsuMenuItem(@"Double Sub-Three"),
-                                new OsuMenuItem(@"Sub-Sub-Nested option >")
+                                new OsuMenuItem(@"Sub-Sub-Nested option")
                                 {
                                     Items = new MenuItem[]
                                     {
@@ -101,7 +101,16 @@ namespace osu.Game.Tests.Visual.UserInterface
                                     }
                                 }
                             }
-                        }
+                        },
+                    }
+                },
+                new OsuMenuItem(@"Another nested option")
+                {
+                    Items = new MenuItem[]
+                    {
+                        new OsuMenuItem(@"Sub-One"),
+                        new OsuMenuItem(@"Sub-Two"),
+                        new OsuMenuItem(@"Sub-Three"),
                     }
                 },
                 new OsuMenuItem(@"Choose me please"),
@@ -111,12 +120,12 @@ namespace osu.Game.Tests.Visual.UserInterface
             };
         }
 
-        private class MyContextMenuContainer : Container, IHasContextMenu
+        private partial class MyContextMenuContainer : Container, IHasContextMenu
         {
             public MenuItem[] ContextMenuItems => makeMenu();
         }
 
-        private class AnotherContextMenuContainer : Container, IHasContextMenu
+        private partial class AnotherContextMenuContainer : Container, IHasContextMenu
         {
             public MenuItem[] ContextMenuItems
             {

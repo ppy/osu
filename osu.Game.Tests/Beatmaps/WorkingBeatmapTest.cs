@@ -1,10 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using Moq;
 using NUnit.Framework;
 using osu.Game.Beatmaps;
@@ -96,9 +99,10 @@ namespace osu.Game.Tests.Beatmaps
                     Beatmap = beatmap;
                 }
 
+#pragma warning disable CS0067
+                [CanBeNull]
                 public event Action<HitObject, IEnumerable<HitObject>> ObjectConverted;
-
-                protected virtual void OnObjectConverted(HitObject arg1, IEnumerable<HitObject> arg2) => ObjectConverted?.Invoke(arg1, arg2);
+#pragma warning restore CS0067
 
                 public IBeatmap Beatmap { get; }
 

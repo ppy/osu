@@ -1,12 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
-using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -27,7 +28,7 @@ using osuTK.Graphics;
 namespace osu.Game.Rulesets.Mania.Tests
 {
     [TestFixture]
-    public class TestSceneNotes : OsuTestScene
+    public partial class TestSceneNotes : OsuTestScene
     {
         [Test]
         public void TestVariousNotes()
@@ -98,12 +99,12 @@ namespace osu.Game.Rulesets.Mania.Tests
         }
 
         private bool verifyAnchors(DrawableHitObject hitObject, Anchor expectedAnchor)
-            => hitObject.Anchor.HasFlagFast(expectedAnchor) && hitObject.Origin.HasFlagFast(expectedAnchor);
+            => hitObject.Anchor.HasFlag(expectedAnchor) && hitObject.Origin.HasFlag(expectedAnchor);
 
         private bool verifyAnchors(DrawableHoldNote holdNote, Anchor expectedAnchor)
             => verifyAnchors((DrawableHitObject)holdNote, expectedAnchor) && holdNote.NestedHitObjects.All(n => verifyAnchors(n, expectedAnchor));
 
-        private class NoteContainer : Container
+        private partial class NoteContainer : Container
         {
             private readonly Container content;
             protected override Container<Drawable> Content => content;

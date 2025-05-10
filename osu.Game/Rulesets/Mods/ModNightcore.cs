@@ -7,33 +7,48 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Timing;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI;
 using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModNightcore : ModDoubleTime
+    public abstract class ModNightcore : ModRateAdjust
     {
         public override string Name => "Nightcore";
         public override string Acronym => "NC";
         public override IconUsage? Icon => OsuIcon.ModNightcore;
-        public override string Description => "Uguuuuuuuu...";
-    }
+        public override ModType Type => ModType.DifficultyIncrease;
+        public override LocalisableString Description => "Uguuuuuuuu...";
+        public override bool Ranked => UsesDefaultConfiguration;
 
-    public abstract class ModNightcore<TObject> : ModNightcore, IApplicableToDrawableRuleset<TObject>
-        where TObject : HitObject
-    {
+        [SettingSource("Speed increase", "The actual increase to apply", SettingControlType = typeof(MultiplierSettingsSlider))]
+        public override BindableNumber<double> SpeedChange { get; } = new BindableDouble(1.5)
+        {
+            MinValue = 1.01,
+            MaxValue = 2,
+            Precision = 0.01,
+        };
+
         private readonly BindableNumber<double> tempoAdjust = new BindableDouble(1);
         private readonly BindableNumber<double> freqAdjust = new BindableDouble(1);
 
+        private readonly RateAdjustModHelper rateAdjustHelper;
+
         protected ModNightcore()
         {
+            rateAdjustHelper = new RateAdjustModHelper(SpeedChange);
+
+            // intentionally not deferring the speed change handling to `RateAdjustModHelper`
+            // as the expected result of operation is not the same (nightcore should preserve constant pitch).
             SpeedChange.BindValueChanged(val =>
             {
                 freqAdjust.Value = SpeedChange.Default;
@@ -41,24 +56,29 @@ namespace osu.Game.Rulesets.Mods
             }, true);
         }
 
-        public override void ApplyToTrack(ITrack track)
+        public override void ApplyToTrack(IAdjustableAudioComponent track)
         {
-            // base.ApplyToTrack() intentionally not called (different tempo adjustment is applied)
             track.AddAdjustment(AdjustableProperty.Frequency, freqAdjust);
             track.AddAdjustment(AdjustableProperty.Tempo, tempoAdjust);
         }
 
+        public override double ScoreMultiplier => rateAdjustHelper.ScoreMultiplier;
+    }
+
+    public abstract partial class ModNightcore<TObject> : ModNightcore, IApplicableToDrawableRuleset<TObject>
+        where TObject : HitObject
+    {
         public void ApplyToDrawableRuleset(DrawableRuleset<TObject> drawableRuleset)
         {
             drawableRuleset.Overlays.Add(new NightcoreBeatContainer());
         }
 
-        public class NightcoreBeatContainer : BeatSyncedContainer
+        public partial class NightcoreBeatContainer : BeatSyncedContainer
         {
-            private PausableSkinnableSound hatSample;
-            private PausableSkinnableSound clapSample;
-            private PausableSkinnableSound kickSample;
-            private PausableSkinnableSound finishSample;
+            private PausableSkinnableSound? hatSample;
+            private PausableSkinnableSound? clapSample;
+            private PausableSkinnableSound? kickSample;
+            private PausableSkinnableSound? finishSample;
 
             private int? firstBeat;
 

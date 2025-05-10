@@ -1,34 +1,116 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Osu.Skinning;
+using osu.Game.Screens.Play;
 using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.UI.Cursor
 {
-    public class OsuCursor : SkinReloadableDrawable
+    public partial class OsuCursor : SkinReloadableDrawable
     {
-        private const float size = 28;
+        public const float SIZE = 28;
 
         private bool cursorExpand;
 
         private SkinnableDrawable cursorSprite;
+        private Container cursorScaleContainer = null!;
 
-        private Drawable expandTarget => (cursorSprite.Drawable as OsuCursorSprite)?.ExpandTarget ?? cursorSprite;
+        private SkinnableCursor skinnableCursor => (SkinnableCursor)cursorSprite.Drawable;
+
+        /// <summary>
+        /// The current expanded scale of the cursor.
+        /// </summary>
+        public Vector2 CurrentExpandedScale => skinnableCursor.ExpandTarget?.Scale ?? Vector2.One;
+
+        /// <summary>
+        /// The current rotation of the cursor.
+        /// </summary>
+        public float CurrentRotation => skinnableCursor.ExpandTarget?.Rotation ?? 0;
+
+        public IBindable<float> CursorScale => cursorScale;
+
+        /// <summary>
+        /// Mods which want to adjust cursor size should do so via this bindable.
+        /// </summary>
+        public readonly Bindable<float> ModScaleAdjust = new Bindable<float>(1);
+
+        private readonly Bindable<float> cursorScale = new BindableFloat(1);
+
+        private Bindable<float> userCursorScale = null!;
+        private Bindable<bool> autoCursorScale = null!;
+
+        [Resolved(canBeNull: true)]
+        private GameplayState state { get; set; }
+
+        [Resolved]
+        private OsuConfigManager config { get; set; }
 
         public OsuCursor()
         {
             Origin = Anchor.Centre;
 
-            Size = new Vector2(size);
+            Size = new Vector2(SIZE);
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            InternalChild = CreateCursorContent();
+
+            userCursorScale = config.GetBindable<float>(OsuSetting.GameplayCursorSize);
+            userCursorScale.ValueChanged += _ => cursorScale.Value = CalculateCursorScale();
+
+            autoCursorScale = config.GetBindable<bool>(OsuSetting.AutoCursorSize);
+            autoCursorScale.ValueChanged += _ => cursorScale.Value = CalculateCursorScale();
+
+            ModScaleAdjust.ValueChanged += _ => cursorScale.Value = CalculateCursorScale();
+
+            cursorScale.BindValueChanged(e => cursorScaleContainer.Scale = new Vector2(e.NewValue), true);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            cursorScale.Value = CalculateCursorScale();
+        }
+
+        protected virtual Drawable CreateCursorContent() => cursorScaleContainer = new Container
+        {
+            RelativeSizeAxes = Axes.Both,
+            Origin = Anchor.Centre,
+            Anchor = Anchor.Centre,
+            Child = cursorSprite = new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.Cursor), _ => new DefaultCursor(), confineMode: ConfineMode.NoScaling)
+            {
+                Origin = Anchor.Centre,
+                Anchor = Anchor.Centre,
+            },
+        };
+
+        protected virtual float CalculateCursorScale()
+        {
+            float scale = userCursorScale.Value * ModScaleAdjust.Value;
+
+            if (autoCursorScale.Value && state != null)
+            {
+                // if we have a beatmap available, let's get its circle size to figure out an automatic cursor scale modifier.
+                scale *= GetScaleForCircleSize(state.Beatmap.Difficulty.CircleSize);
+            }
+
+            return scale;
         }
 
         protected override void SkinChanged(ISkinSource skin)
@@ -36,35 +118,22 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             cursorExpand = skin.GetConfig<OsuSkinConfiguration, bool>(OsuSkinConfiguration.CursorExpand)?.Value ?? true;
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            InternalChild = new Container
-            {
-                RelativeSizeAxes = Axes.Both,
-                Origin = Anchor.Centre,
-                Anchor = Anchor.Centre,
-                Child = cursorSprite = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.Cursor), _ => new DefaultCursor(), confineMode: ConfineMode.NoScaling)
-                {
-                    Origin = Anchor.Centre,
-                    Anchor = Anchor.Centre,
-                }
-            };
-        }
-
-        private const float pressed_scale = 1.2f;
-        private const float released_scale = 1f;
-
         public void Expand()
         {
             if (!cursorExpand) return;
 
-            expandTarget.ScaleTo(released_scale).ScaleTo(pressed_scale, 400, Easing.OutElasticHalf);
+            skinnableCursor.Expand();
         }
 
-        public void Contract() => expandTarget.ScaleTo(released_scale, 400, Easing.OutQuad);
+        public void Contract() => skinnableCursor.Contract();
 
-        private class DefaultCursor : OsuCursorSprite
+        /// <summary>
+        /// Get the scale applicable to the ActiveCursor based on a beatmap's circle size.
+        /// </summary>
+        public static float GetScaleForCircleSize(float circleSize) =>
+            1f - 0.7f * (1f + circleSize - BeatmapDifficulty.DEFAULT_DIFFICULTY) / BeatmapDifficulty.DEFAULT_DIFFICULTY;
+
+        private partial class DefaultCursor : SkinnableCursor
         {
             public DefaultCursor()
             {
@@ -81,7 +150,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                         Origin = Anchor.Centre,
                         RelativeSizeAxes = Axes.Both,
                         Masking = true,
-                        BorderThickness = size / 6,
+                        BorderThickness = SIZE / 6,
                         BorderColour = Color4.White,
                         EdgeEffect = new EdgeEffectParameters
                         {
@@ -103,7 +172,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                                 Anchor = Anchor.Centre,
                                 RelativeSizeAxes = Axes.Both,
                                 Masking = true,
-                                BorderThickness = size / 3,
+                                BorderThickness = SIZE / 3,
                                 BorderColour = Color4.White.Opacity(0.5f),
                                 Children = new Drawable[]
                                 {

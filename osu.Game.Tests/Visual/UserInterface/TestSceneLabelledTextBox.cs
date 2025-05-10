@@ -10,7 +10,7 @@ using osu.Game.Graphics.UserInterfaceV2;
 namespace osu.Game.Tests.Visual.UserInterface
 {
     [TestFixture]
-    public class TestSceneLabelledTextBox : OsuTestScene
+    public partial class TestSceneLabelledTextBox : OsuTestScene
     {
         [TestCase(false)]
         [TestCase(true)]

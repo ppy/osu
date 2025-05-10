@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
@@ -22,11 +23,6 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         public int TotalColumns => Stages.Sum(g => g.Columns);
 
         /// <summary>
-        /// The total number of columns that were present in this <see cref="ManiaBeatmap"/> before any user adjustments.
-        /// </summary>
-        public readonly int OriginalTotalColumns;
-
-        /// <summary>
         /// Creates a new <see cref="ManiaBeatmap"/>.
         /// </summary>
         /// <param name="defaultStage">The initial stages.</param>
@@ -34,29 +30,44 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         public ManiaBeatmap(StageDefinition defaultStage, int? originalTotalColumns = null)
         {
             Stages.Add(defaultStage);
-            OriginalTotalColumns = originalTotalColumns ?? defaultStage.Columns;
         }
 
         public override IEnumerable<BeatmapStatistic> GetStatistics()
         {
             int notes = HitObjects.Count(s => s is Note);
             int holdNotes = HitObjects.Count(s => s is HoldNote);
+            int sum = Math.Max(1, notes + holdNotes);
 
             return new[]
             {
                 new BeatmapStatistic
                 {
-                    Name = @"Note Count",
+                    Name = @"Notes",
                     CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Circles),
                     Content = notes.ToString(),
+                    BarDisplayLength = notes / (float)sum,
                 },
                 new BeatmapStatistic
                 {
-                    Name = @"Hold Note Count",
+                    Name = @"Hold Notes",
                     CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Sliders),
                     Content = holdNotes.ToString(),
+                    BarDisplayLength = holdNotes / (float)sum,
                 },
             };
+        }
+
+        public StageDefinition GetStageForColumnIndex(int column)
+        {
+            foreach (var stage in Stages)
+            {
+                if (column < stage.Columns)
+                    return stage;
+
+                column -= stage.Columns;
+            }
+
+            throw new ArgumentOutOfRangeException(nameof(column), "Provided index exceeds all available stages");
         }
     }
 }

@@ -7,12 +7,17 @@ namespace osu.Game.Rulesets.Osu.Scoring
 {
     public class OsuHitWindows : HitWindows
     {
-        private static readonly DifficultyRange[] osu_ranges =
+        /// <summary>
+        /// osu! ruleset has a fixed miss window regardless of difficulty settings.
+        /// </summary>
+        public const double MISS_WINDOW = 400;
+
+        internal static readonly DifficultyRange[] OSU_RANGES =
         {
             new DifficultyRange(HitResult.Great, 80, 50, 20),
             new DifficultyRange(HitResult.Ok, 140, 100, 60),
             new DifficultyRange(HitResult.Meh, 200, 150, 100),
-            new DifficultyRange(HitResult.Miss, 400, 400, 400),
+            new DifficultyRange(HitResult.Miss, MISS_WINDOW, MISS_WINDOW, MISS_WINDOW),
         };
 
         public override bool IsHitResultAllowed(HitResult result)
@@ -29,6 +34,6 @@ namespace osu.Game.Rulesets.Osu.Scoring
             return false;
         }
 
-        protected override DifficultyRange[] GetRanges() => osu_ranges;
+        protected override DifficultyRange[] GetRanges() => OSU_RANGES;
     }
 }

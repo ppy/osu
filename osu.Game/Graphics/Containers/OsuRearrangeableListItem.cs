@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -13,7 +15,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Graphics.Containers
 {
-    public abstract class OsuRearrangeableListItem<TModel> : RearrangeableListItem<TModel>
+    public abstract partial class OsuRearrangeableListItem<TModel> : RearrangeableListItem<TModel>
     {
         public const float FADE_DURATION = 100;
 
@@ -62,6 +64,7 @@ namespace osu.Game.Graphics.Containers
         {
             InternalChildren = new Drawable[]
             {
+                new HoverClickSounds(),
                 new GridContainer
                 {
                     RelativeSizeAxes = Axes.X,
@@ -90,7 +93,6 @@ namespace osu.Game.Graphics.Containers
                     ColumnDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
                     RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) }
                 },
-                new HoverClickSounds()
             };
         }
 
@@ -127,7 +129,7 @@ namespace osu.Game.Graphics.Containers
 
         protected abstract Drawable CreateContent();
 
-        public class PlaylistItemHandle : SpriteIcon
+        public partial class PlaylistItemHandle : SpriteIcon
         {
             public bool HandlingDrag { get; private set; }
             private bool isHovering;

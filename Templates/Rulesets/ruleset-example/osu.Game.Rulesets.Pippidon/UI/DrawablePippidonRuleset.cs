@@ -17,7 +17,7 @@ using osu.Game.Rulesets.UI;
 namespace osu.Game.Rulesets.Pippidon.UI
 {
     [Cached]
-    public class DrawablePippidonRuleset : DrawableRuleset<PippidonHitObject>
+    public partial class DrawablePippidonRuleset : DrawableRuleset<PippidonHitObject>
     {
         public DrawablePippidonRuleset(PippidonRuleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
             : base(ruleset, beatmap, mods)

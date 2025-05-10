@@ -1,11 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -13,12 +12,16 @@ using osu.Framework.Utils;
 using osu.Game.Online.API;
 using osu.Game.Online.Spectator;
 using osu.Game.Replays.Legacy;
+using osu.Game.Rulesets;
+using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Replays;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 
 namespace osu.Game.Tests.Visual.Spectator
 {
-    public class TestSpectatorClient : SpectatorClient
+    public partial class TestSpectatorClient : SpectatorClient
     {
         /// <summary>
         /// Maximum number of frames sent per bundle via <see cref="SendFramesFromUser"/>.
@@ -32,17 +35,22 @@ namespace osu.Game.Tests.Visual.Spectator
 
         public int FrameSendAttempts { get; private set; }
 
-        public override IBindable<bool> IsConnected { get; } = new Bindable<bool>(true);
+        public override IBindable<bool> IsConnected => isConnected;
+        private readonly BindableBool isConnected = new BindableBool(true);
 
         public IReadOnlyDictionary<int, ReplayFrame> LastReceivedUserFrames => lastReceivedUserFrames;
 
         private readonly Dictionary<int, ReplayFrame> lastReceivedUserFrames = new Dictionary<int, ReplayFrame>();
 
         private readonly Dictionary<int, int> userBeatmapDictionary = new Dictionary<int, int>();
+        private readonly Dictionary<int, APIMod[]> userModsDictionary = new Dictionary<int, APIMod[]>();
         private readonly Dictionary<int, int> userNextFrameDictionary = new Dictionary<int, int>();
 
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
+
+        [Resolved]
+        private RulesetStore rulesetStore { get; set; } = null!;
 
         public TestSpectatorClient()
         {
@@ -54,9 +62,11 @@ namespace osu.Game.Tests.Visual.Spectator
         /// </summary>
         /// <param name="userId">The user to start play for.</param>
         /// <param name="beatmapId">The playing beatmap id.</param>
-        public void SendStartPlay(int userId, int beatmapId)
+        /// <param name="mods">The mods the user has applied.</param>
+        public void SendStartPlay(int userId, int beatmapId, APIMod[]? mods = null)
         {
             userBeatmapDictionary[userId] = beatmapId;
+            userModsDictionary[userId] = mods ?? Array.Empty<APIMod>();
             userNextFrameDictionary[userId] = 0;
             sendPlayingState(userId);
         }
@@ -68,17 +78,19 @@ namespace osu.Game.Tests.Visual.Spectator
         /// <param name="state">The spectator state to end play with.</param>
         public void SendEndPlay(int userId, SpectatedUserState state = SpectatedUserState.Quit)
         {
-            if (!userBeatmapDictionary.ContainsKey(userId))
+            if (!userBeatmapDictionary.TryGetValue(userId, out int beatmapId))
                 return;
 
             ((ISpectatorClient)this).UserFinishedPlaying(userId, new SpectatorState
             {
-                BeatmapID = userBeatmapDictionary[userId],
+                BeatmapID = beatmapId,
                 RulesetID = 0,
+                Mods = userModsDictionary[userId],
                 State = state
             });
 
             userBeatmapDictionary.Remove(userId);
+            userModsDictionary.Remove(userId);
         }
 
         /// <summary>
@@ -89,12 +101,23 @@ namespace osu.Game.Tests.Visual.Spectator
         /// <param name="userId">The user to send frames for.</param>
         /// <param name="count">The total number of frames to send.</param>
         /// <param name="startTime">The time to start gameplay frames from.</param>
-        public void SendFramesFromUser(int userId, int count, double startTime = 0)
+        /// <param name="initialResultCount">Add a number of misses to frame header data for testing purposes.</param>
+        public void SendFramesFromUser(int userId, int count, double startTime = 0, int initialResultCount = 0)
         {
             var frames = new List<LegacyReplayFrame>();
 
             int currentFrameIndex = userNextFrameDictionary[userId];
             int lastFrameIndex = currentFrameIndex + count - 1;
+
+            var scoreProcessor = new ScoreProcessor(rulesetStore.GetRuleset(0)!.CreateInstance());
+
+            for (int i = 0; i < initialResultCount; i++)
+            {
+                scoreProcessor.ApplyResult(new JudgementResult(new HitObject(), new Judgement())
+                {
+                    Type = HitResult.Miss,
+                });
+            }
 
             for (; currentFrameIndex <= lastFrameIndex; currentFrameIndex++)
             {
@@ -115,18 +138,33 @@ namespace osu.Game.Tests.Visual.Spectator
                 if (frames.Count == 0)
                     return;
 
-                var bundle = new FrameDataBundle(new ScoreInfo { Combo = currentFrameIndex }, frames.ToArray());
+                var bundle = new FrameDataBundle(new ScoreInfo
+                {
+                    Combo = currentFrameIndex,
+                    TotalScore = (long)(currentFrameIndex * 123478 * RNG.NextDouble(0.99, 1.01)),
+                    Accuracy = RNG.NextDouble(0.98, 1),
+                    Statistics = scoreProcessor.Statistics.ToDictionary(),
+                }, scoreProcessor, frames.ToArray());
+
+                if (initialResultCount > 0)
+                {
+                    foreach (var f in frames)
+                        f.Header = bundle.Header;
+                }
+
+                scoreProcessor.ResetFromReplayFrame(frames.Last());
                 ((ISpectatorClient)this).UserSentFrames(userId, bundle);
 
                 frames.Clear();
             }
         }
 
-        protected override Task BeginPlayingInternal(SpectatorState state)
+        protected override Task BeginPlayingInternal(long? scoreToken, SpectatorState state)
         {
             // Track the local user's playing beatmap ID.
             Debug.Assert(state.BeatmapID != null);
             userBeatmapDictionary[api.LocalUser.Value.Id] = state.BeatmapID.Value;
+            userModsDictionary[api.LocalUser.Value.Id] = state.Mods.ToArray();
 
             return ((ISpectatorClient)this).UserBeganPlaying(api.LocalUser.Value.Id, state);
         }
@@ -136,7 +174,7 @@ namespace osu.Game.Tests.Visual.Spectator
             FrameSendAttempts++;
 
             if (ShouldFailSendingFrames)
-                return Task.FromException(new InvalidOperationException());
+                return Task.FromException(new InvalidOperationException($"Intentional fail via {nameof(ShouldFailSendingFrames)}"));
 
             return ((ISpectatorClient)this).UserSentFrames(api.LocalUser.Value.Id, bundle);
         }
@@ -160,8 +198,15 @@ namespace osu.Game.Tests.Visual.Spectator
             {
                 BeatmapID = userBeatmapDictionary[userId],
                 RulesetID = 0,
+                Mods = userModsDictionary[userId],
                 State = SpectatedUserState.Playing
             });
+        }
+
+        protected override async Task DisconnectInternal()
+        {
+            await base.DisconnectInternal().ConfigureAwait(false);
+            isConnected.Value = false;
         }
     }
 }

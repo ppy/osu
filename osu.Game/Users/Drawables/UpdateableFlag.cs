@@ -3,65 +3,76 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
+using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 
 namespace osu.Game.Users.Drawables
 {
-    public class UpdateableFlag : ModelBackedDrawable<Country>
+    public partial class UpdateableFlag : ModelBackedDrawable<CountryCode>
     {
-        public Country Country
-        {
-            get => Model;
-            set => Model = value;
-        }
+        private CountryCode countryCode;
 
-        /// <summary>
-        /// Whether to show a place holder on null country.
-        /// </summary>
-        public bool ShowPlaceholderOnNull = true;
+        public CountryCode CountryCode
+        {
+            get => countryCode;
+            set
+            {
+                countryCode = value;
+                updateModel();
+            }
+        }
 
         /// <summary>
         /// Perform an action in addition to showing the country ranking.
         /// This should be used to perform auxiliary tasks and not as a primary action for clicking a flag (to maintain a consistent UX).
         /// </summary>
-        public Action Action;
+        public Action? Action;
 
-        public UpdateableFlag(Country country = null)
+        private readonly Bindable<bool> hideFlags = new BindableBool();
+
+        [Resolved]
+        private RankingsOverlay? rankingsOverlay { get; set; }
+
+        public UpdateableFlag(CountryCode countryCode = CountryCode.Unknown)
         {
-            Country = country;
+            CountryCode = countryCode;
+            hideFlags.BindValueChanged(_ => updateModel());
         }
 
-        protected override Drawable CreateDrawable(Country country)
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
         {
-            if (country == null && !ShowPlaceholderOnNull)
-                return null;
+            config.BindWith(OsuSetting.HideCountryFlags, hideFlags);
+        }
 
+        protected override Drawable CreateDrawable(CountryCode countryCode)
+        {
             return new Container
             {
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
-                    new DrawableFlag(country)
+                    new DrawableFlag(countryCode)
                     {
                         RelativeSizeAxes = Axes.Both
                     },
-                    new HoverClickSounds(HoverSampleSet.Submit)
+                    new HoverClickSounds()
                 }
             };
         }
 
-        [Resolved(canBeNull: true)]
-        private RankingsOverlay rankingsOverlay { get; set; }
-
         protected override bool OnClick(ClickEvent e)
         {
             Action?.Invoke();
-            rankingsOverlay?.ShowCountry(Country);
+            rankingsOverlay?.ShowCountry(CountryCode);
             return true;
         }
+
+        private void updateModel() => Model = hideFlags.Value ? CountryCode.Unknown : countryCode;
     }
 }

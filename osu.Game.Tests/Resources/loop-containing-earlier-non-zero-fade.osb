@@ -1,0 +1,14 @@
+osu file format v14
+
+[Events]
+//Storyboard Layer 0 (Background)
+Sprite,Background,TopCentre,"img.jpg",320,240
+ L,1000,1
+  F,0,0,,1       // fade inside a loop with non-zero alpha and an earlier start time should be the true start time..
+ F,0,2000,,0     // ..not a zero alpha fade with a later start time
+
+Sprite,Background,TopCentre,"img.jpg",320,240
+ L,2000,1
+  F,0,0,24,0     // fade inside a loop with zero alpha but later start time than the top-level zero alpha start time.
+  F,0,24,48,1
+ F,0,1000,,1     // ..so this should be the true start time

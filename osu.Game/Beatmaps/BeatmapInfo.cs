@@ -2,10 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
-using osu.Framework.Testing;
+using osu.Game.Collections;
 using osu.Game.Database;
 using osu.Game.Models;
 using osu.Game.Online.API.Requests.Responses;
@@ -14,14 +15,15 @@ using osu.Game.Rulesets;
 using osu.Game.Scoring;
 using Realms;
 
-#nullable enable
-
 namespace osu.Game.Beatmaps
 {
     /// <summary>
-    /// A single beatmap difficulty.
+    /// A realm model containing metadata for a single beatmap difficulty.
+    /// This should generally include anything which is required to be filtered on at song select, or anything pertaining to storage of beatmaps in the client.
     /// </summary>
-    [ExcludeFromDynamicCompile]
+    /// <remarks>
+    /// There are some legacy fields in this model which are not persisted to realm. These are isolated in a code region within the class and should eventually be migrated to `Beatmap`.
+    /// </remarks>
     [Serializable]
     [MapTo("Beatmap")]
     public class BeatmapInfo : RealmObject, IHasGuidPrimaryKey, IBeatmapInfo, IEquatable<BeatmapInfo>
@@ -58,7 +60,7 @@ namespace osu.Game.Beatmaps
         }
 
         [UsedImplicitly]
-        private BeatmapInfo()
+        protected BeatmapInfo()
         {
         }
 
@@ -86,46 +88,64 @@ namespace osu.Game.Beatmaps
 
         public string Hash { get; set; } = string.Empty;
 
-        public double StarRating { get; set; }
+        /// <summary>
+        /// Defaults to -1 (meaning not-yet-calculated).
+        /// Will likely be superseded with a better storage considering ruleset/mods.
+        /// </summary>
+        public double StarRating { get; set; } = -1;
 
+        [Indexed]
         public string MD5Hash { get; set; } = string.Empty;
+
+        public string OnlineMD5Hash { get; set; } = string.Empty;
+
+        /// <summary>
+        /// The last time of a local modification (via the editor).
+        /// </summary>
+        public DateTimeOffset? LastLocalUpdate { get; set; }
+
+        /// <summary>
+        /// The last time online metadata was applied to this beatmap.
+        /// </summary>
+        public DateTimeOffset? LastOnlineUpdate { get; set; }
+
+        /// <summary>
+        /// Whether this beatmap matches the online version, based on fetched online metadata.
+        /// Will return <c>true</c> if no online metadata is available.
+        /// </summary>
+        public bool MatchesOnlineVersion => LastOnlineUpdate == null || MD5Hash == OnlineMD5Hash;
 
         [JsonIgnore]
         public bool Hidden { get; set; }
 
-        #region Properties we may not want persisted (but also maybe no harm?)
+        public int EndTimeObjectCount { get; set; } = -1;
 
-        public double AudioLeadIn { get; set; }
-
-        public float StackLeniency { get; set; } = 0.7f;
-
-        public bool SpecialStyle { get; set; }
-
-        public bool LetterboxInBreaks { get; set; }
-
-        public bool WidescreenStoryboard { get; set; } = true;
-
-        public bool EpilepsyWarning { get; set; }
-
-        public bool SamplesMatchPlaybackRate { get; set; } = true;
-
-        public double DistanceSpacing { get; set; } = 1.0;
-
-        public int BeatDivisor { get; set; }
-
-        public int GridSize { get; set; }
-
-        public double TimelineZoom { get; set; } = 1.0;
-
-        [Ignored]
-        public CountdownType Countdown { get; set; } = CountdownType.Normal;
+        public int TotalObjectCount { get; set; } = -1;
 
         /// <summary>
-        /// The number of beats to move the countdown backwards (compared to its default location).
+        /// Reset any fetched online linking information (and history).
         /// </summary>
-        public int CountdownOffset { get; set; }
+        public void ResetOnlineInfo(bool resetOnlineId = true)
+        {
+            if (resetOnlineId)
+                OnlineID = -1;
+            LastOnlineUpdate = null;
+            OnlineMD5Hash = string.Empty;
+            if (Status != BeatmapOnlineStatus.LocallyModified)
+                Status = BeatmapOnlineStatus.None;
+        }
 
-        #endregion
+        /// <summary>
+        /// The time at which this beatmap was last played by the local user.
+        /// </summary>
+        public DateTimeOffset? LastPlayed { get; set; }
+
+        public int BeatDivisor { get; set; } = 4;
+
+        /// <summary>
+        /// The time in milliseconds when last exiting the editor with this beatmap loaded.
+        /// </summary>
+        public double? EditorTimestamp { get; set; }
 
         public bool Equals(BeatmapInfo? other)
         {
@@ -140,14 +160,56 @@ namespace osu.Game.Beatmaps
         public bool AudioEquals(BeatmapInfo? other) => other != null
                                                        && BeatmapSet != null
                                                        && other.BeatmapSet != null
-                                                       && BeatmapSet.Hash == other.BeatmapSet.Hash
-                                                       && Metadata.AudioFile == other.Metadata.AudioFile;
+                                                       && compareFiles(this, other, m => m.AudioFile);
 
         public bool BackgroundEquals(BeatmapInfo? other) => other != null
                                                             && BeatmapSet != null
                                                             && other.BeatmapSet != null
-                                                            && BeatmapSet.Hash == other.BeatmapSet.Hash
-                                                            && Metadata.BackgroundFile == other.Metadata.BackgroundFile;
+                                                            && compareFiles(this, other, m => m.BackgroundFile);
+
+        private static bool compareFiles(BeatmapInfo x, BeatmapInfo y, Func<IBeatmapMetadataInfo, string> getFilename)
+        {
+            Debug.Assert(x.BeatmapSet != null);
+            Debug.Assert(y.BeatmapSet != null);
+
+            string? fileHashX = x.BeatmapSet.GetFile(getFilename(x.Metadata))?.File.Hash;
+            string? fileHashY = y.BeatmapSet.GetFile(getFilename(y.Metadata))?.File.Hash;
+
+            return fileHashX == fileHashY;
+        }
+
+        /// <summary>
+        /// When updating a beatmap, its hashes will change. Collections currently track beatmaps by hash, so they need to be updated.
+        /// This method will handle updating
+        /// </summary>
+        /// <param name="realm">A realm instance in an active write transaction.</param>
+        /// <param name="previousMD5Hash">The previous MD5 hash of the beatmap before update.</param>
+        public void TransferCollectionReferences(Realm realm, string previousMD5Hash)
+        {
+            var collections = realm.All<BeatmapCollection>().AsEnumerable().Where(c => c.BeatmapMD5Hashes.Contains(previousMD5Hash));
+
+            foreach (var c in collections)
+            {
+                c.BeatmapMD5Hashes.Remove(previousMD5Hash);
+                c.BeatmapMD5Hashes.Add(MD5Hash);
+            }
+        }
+
+        /// <summary>
+        /// Local scores are retained separate from a beatmap's lifetime, matched via <see cref="ScoreInfo.BeatmapHash"/>.
+        /// Therefore we need to detach / reattach scores when a beatmap is edited or imported.
+        /// </summary>
+        /// <param name="realm">A realm instance in an active write transaction.</param>
+        public void UpdateLocalScores(Realm realm)
+        {
+            // first disassociate any scores which are already attached and no longer valid.
+            foreach (var score in Scores)
+                score.BeatmapInfo = null;
+
+            // then attach any scores which match the new hash.
+            foreach (var score in realm.All<ScoreInfo>().Where(s => s.BeatmapHash == Hash))
+                score.BeatmapInfo = this;
+        }
 
         IBeatmapMetadataInfo IBeatmapInfo.Metadata => Metadata;
         IBeatmapSetInfo? IBeatmapInfo.BeatmapSet => BeatmapSet;
@@ -155,14 +217,6 @@ namespace osu.Game.Beatmaps
         IBeatmapDifficultyInfo IBeatmapInfo.Difficulty => Difficulty;
 
         #region Compatibility properties
-
-        [Ignored]
-        [Obsolete("Use BeatmapInfo.Difficulty instead.")] // can be removed 20220719
-        public BeatmapDifficulty BaseDifficulty
-        {
-            get => Difficulty;
-            set => Difficulty = value;
-        }
 
         [Ignored]
         public string? Path => File?.Filename;
@@ -177,11 +231,6 @@ namespace osu.Game.Beatmaps
         [Ignored]
         [Obsolete("Use ScoreManager.GetMaximumAchievableComboAsync instead.")]
         public int? MaxCombo { get; set; }
-
-        [Ignored]
-        public int[] Bookmarks { get; set; } = Array.Empty<int>();
-
-        public int BeatmapVersion;
 
         public BeatmapInfo Clone() => (BeatmapInfo)this.Detach().MemberwiseClone();
 

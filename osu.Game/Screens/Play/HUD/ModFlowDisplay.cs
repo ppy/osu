@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -17,7 +17,7 @@ namespace osu.Game.Screens.Play.HUD
     /// <summary>
     /// A horizontally wrapping display of mods. For cases where wrapping is not required, use <see cref="ModDisplay"/> instead.
     /// </summary>
-    public class ModFlowDisplay : ReverseChildIDFillFlowContainer<ModIcon>, IHasCurrentValue<IReadOnlyList<Mod>>
+    public partial class ModFlowDisplay : ReverseChildIDFillFlowContainer<ModIcon>, IHasCurrentValue<IReadOnlyList<Mod>>
     {
         private const int fade_duration = 1000;
 
@@ -28,8 +28,7 @@ namespace osu.Game.Screens.Play.HUD
             get => current.Current;
             set
             {
-                if (value == null)
-                    throw new ArgumentNullException(nameof(value));
+                ArgumentNullException.ThrowIfNull(value);
 
                 current.Current = value;
             }
@@ -69,7 +68,7 @@ namespace osu.Game.Screens.Play.HUD
 
             Spacing = new Vector2(0, -12 * iconScale);
 
-            foreach (Mod mod in current.Value)
+            foreach (Mod mod in current.Value.AsOrdered())
             {
                 Add(new ModIcon(mod)
                 {

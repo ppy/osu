@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Bindables;
 using osu.Game.Audio;
 using osu.Game.Graphics;
@@ -11,9 +12,9 @@ namespace osu.Game.Beatmaps.ControlPoints
     /// <remarks>
     /// Note that going forward, this control point type should always be assigned directly to HitObjects.
     /// </remarks>
-    public class SampleControlPoint : ControlPoint
+    public class SampleControlPoint : ControlPoint, IEquatable<SampleControlPoint>
     {
-        public const string DEFAULT_BANK = "normal";
+        public const string DEFAULT_BANK = HitSampleInfo.BANK_NORMAL;
 
         public static readonly SampleControlPoint DEFAULT = new SampleControlPoint
         {
@@ -29,7 +30,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         public readonly Bindable<string> SampleBankBindable = new Bindable<string>(DEFAULT_BANK) { Default = DEFAULT_BANK };
 
         /// <summary>
-        /// The speed multiplier at this control point.
+        /// The default sample bank at this control point.
         /// </summary>
         public string SampleBank
         {
@@ -38,13 +39,12 @@ namespace osu.Game.Beatmaps.ControlPoints
         }
 
         /// <summary>
-        /// The default sample bank at this control point.
+        /// The default sample volume at this control point.
         /// </summary>
         public readonly BindableInt SampleVolumeBindable = new BindableInt(100)
         {
             MinValue = 0,
             MaxValue = 100,
-            Default = 100
         };
 
         /// <summary>
@@ -54,6 +54,12 @@ namespace osu.Game.Beatmaps.ControlPoints
         {
             get => SampleVolumeBindable.Value;
             set => SampleVolumeBindable.Value = value;
+        }
+
+        public SampleControlPoint()
+        {
+            SampleBankBindable.BindValueChanged(_ => RaiseChanged());
+            SampleVolumeBindable.BindValueChanged(_ => RaiseChanged());
         }
 
         /// <summary>
@@ -69,9 +75,9 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// <param name="hitSampleInfo">The <see cref="HitSampleInfo"/>. This will not be modified.</param>
         /// <returns>The modified <see cref="HitSampleInfo"/>. This does not share a reference with <paramref name="hitSampleInfo"/>.</returns>
         public virtual HitSampleInfo ApplyTo(HitSampleInfo hitSampleInfo)
-            => hitSampleInfo.With(newBank: hitSampleInfo.Bank ?? SampleBank, newVolume: hitSampleInfo.Volume > 0 ? hitSampleInfo.Volume : SampleVolume);
+            => hitSampleInfo.With(newBank: hitSampleInfo.Bank, newVolume: hitSampleInfo.Volume > 0 ? hitSampleInfo.Volume : SampleVolume);
 
-        public override bool IsRedundant(ControlPoint existing)
+        public override bool IsRedundant(ControlPoint? existing)
             => existing is SampleControlPoint existingSample
                && SampleBank == existingSample.SampleBank
                && SampleVolume == existingSample.SampleVolume;
@@ -83,5 +89,16 @@ namespace osu.Game.Beatmaps.ControlPoints
 
             base.CopyFrom(other);
         }
+
+        public override bool Equals(ControlPoint? other)
+            => other is SampleControlPoint otherSampleControlPoint
+               && Equals(otherSampleControlPoint);
+
+        public bool Equals(SampleControlPoint? other)
+            => base.Equals(other)
+               && SampleBank == other.SampleBank
+               && SampleVolume == other.SampleVolume;
+
+        public override int GetHashCode() => HashCode.Combine(base.GetHashCode(), SampleBank, SampleVolume);
     }
 }

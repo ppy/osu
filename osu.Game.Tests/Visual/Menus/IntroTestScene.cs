@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -15,7 +17,7 @@ using osuTK.Graphics;
 namespace osu.Game.Tests.Visual.Menus
 {
     [TestFixture]
-    public abstract class IntroTestScene : OsuTestScene
+    public abstract partial class IntroTestScene : OsuTestScene
     {
         [Cached]
         private OsuLogo logo;
@@ -24,7 +26,7 @@ namespace osu.Game.Tests.Visual.Menus
 
         protected OsuScreenStack IntroStack;
 
-        private IntroScreen intro;
+        protected IntroScreen Intro { get; private set; }
 
         [Cached(typeof(INotificationOverlay))]
         private NotificationOverlay notifications;
@@ -50,6 +52,7 @@ namespace osu.Game.Tests.Visual.Menus
                 },
                 notifications = new NotificationOverlay
                 {
+                    Depth = float.MinValue,
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                 }
@@ -59,28 +62,22 @@ namespace osu.Game.Tests.Visual.Menus
         [Test]
         public virtual void TestPlayIntro()
         {
-            AddStep("restart sequence", () =>
-            {
-                logo.FinishTransforms();
-                logo.IsTracking = false;
+            RestartIntro();
 
-                IntroStack?.Expire();
-
-                Add(IntroStack = new OsuScreenStack
-                {
-                    RelativeSizeAxes = Axes.Both,
-                });
-
-                IntroStack.Push(intro = CreateScreen());
-            });
-
-            AddUntilStep("wait for menu", () => intro.DidLoadMenu);
+            WaitForMenu();
         }
 
         [Test]
         public virtual void TestPlayIntroWithFailingAudioDevice()
         {
-            AddStep("hide notifications", () => notifications.Hide());
+            AddStep("reset notifications", () =>
+            {
+                notifications.Show();
+                notifications.Hide();
+            });
+
+            AddUntilStep("wait for no notifications", () => notifications.UnreadCount.Value, () => Is.EqualTo(0));
+
             AddStep("restart sequence", () =>
             {
                 logo.FinishTransforms();
@@ -93,23 +90,46 @@ namespace osu.Game.Tests.Visual.Menus
                     RelativeSizeAxes = Axes.Both,
                 });
 
-                IntroStack.Push(intro = CreateScreen());
+                IntroStack.Push(Intro = CreateScreen());
             });
 
             AddStep("trigger failure", () =>
             {
                 trackResetDelegate = Scheduler.AddDelayed(() =>
                 {
-                    intro.Beatmap.Value.Track.Seek(0);
+                    Intro.Beatmap.Value.Track.Seek(0);
                 }, 0, true);
             });
 
-            AddUntilStep("wait for menu", () => intro.DidLoadMenu);
+            WaitForMenu();
 
             if (IntroReliesOnTrack)
                 AddUntilStep("wait for notification", () => notifications.UnreadCount.Value == 1);
 
             AddStep("uninstall delegate", () => trackResetDelegate?.Cancel());
+        }
+
+        protected void RestartIntro()
+        {
+            AddStep("restart sequence", () =>
+            {
+                logo.FinishTransforms();
+                logo.IsTracking = false;
+
+                IntroStack?.Expire();
+
+                Add(IntroStack = new OsuScreenStack
+                {
+                    RelativeSizeAxes = Axes.Both,
+                });
+
+                IntroStack.Push(Intro = CreateScreen());
+            });
+        }
+
+        protected void WaitForMenu()
+        {
+            AddUntilStep("wait for menu", () => Intro.DidLoadMenu);
         }
 
         protected abstract IntroScreen CreateScreen();

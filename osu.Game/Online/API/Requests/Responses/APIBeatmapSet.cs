@@ -9,8 +9,6 @@ using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.Models;
 
-#nullable enable
-
 namespace osu.Game.Online.API.Requests.Responses
 {
     public class APIBeatmapSet : IBeatmapSetOnlineInfo, IBeatmapSetInfo
@@ -41,6 +39,9 @@ namespace osu.Game.Online.API.Requests.Responses
 
         [JsonProperty(@"nsfw")]
         public bool HasExplicitContent { get; set; }
+
+        [JsonProperty(@"spotlight")]
+        public bool FeaturedInSpotlight { get; set; }
 
         [JsonProperty(@"video")]
         public bool HasVideo { get; set; }
@@ -110,6 +111,12 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"language")]
         public BeatmapSetOnlineLanguage Language { get; set; }
 
+        [JsonProperty(@"current_nominations")]
+        public BeatmapSetOnlineNomination[]? CurrentNominations { get; set; }
+
+        [JsonProperty(@"related_users")]
+        public APIUser[]? RelatedUsers { get; set; }
+
         public string Source { get; set; } = string.Empty;
 
         [JsonProperty(@"tags")]
@@ -117,6 +124,12 @@ namespace osu.Game.Online.API.Requests.Responses
 
         [JsonProperty(@"beatmaps")]
         public APIBeatmap[] Beatmaps { get; set; } = Array.Empty<APIBeatmap>();
+
+        [JsonProperty(@"converts")]
+        public APIBeatmap[]? Converts { get; set; }
+
+        [JsonProperty(@"related_tags")]
+        public APITag[]? RelatedTags { get; set; }
 
         private BeatmapMetadata metadata => new BeatmapMetadata
         {
@@ -148,5 +161,8 @@ namespace osu.Game.Online.API.Requests.Responses
         #endregion
 
         public bool Equals(IBeatmapSetInfo? other) => other is APIBeatmapSet b && this.MatchesOnlineID(b);
+
+        // ReSharper disable once NonReadonlyMemberInGetHashCode
+        public override int GetHashCode() => OnlineID.GetHashCode();
     }
 }

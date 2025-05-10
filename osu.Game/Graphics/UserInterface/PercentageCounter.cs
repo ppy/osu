@@ -12,9 +12,9 @@ namespace osu.Game.Graphics.UserInterface
     /// <summary>
     /// Used as an accuracy counter. Represented visually as a percentage.
     /// </summary>
-    public class PercentageCounter : RollingCounter<double>
+    public partial class PercentageCounter : RollingCounter<double>
     {
-        protected override double RollingDuration => 750;
+        protected override double RollingDuration => 375;
 
         private float epsilon => 1e-10f;
 

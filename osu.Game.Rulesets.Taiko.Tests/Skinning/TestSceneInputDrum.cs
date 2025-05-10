@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
@@ -11,7 +11,7 @@ using osuTK;
 namespace osu.Game.Rulesets.Taiko.Tests.Skinning
 {
     [TestFixture]
-    public class TestSceneInputDrum : TaikoSkinnableTestScene
+    public partial class TestSceneInputDrum : TaikoSkinnableTestScene
     {
         [BackgroundDependencyLoader]
         private void load()
@@ -30,8 +30,11 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Size = new Vector2(200),
-                    Child = new InputDrum(playfield.HitObjectContainer)
+                    Size = new Vector2(180f, 200f),
+                    Child = new InputDrum
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                    }
                 }
             });
         }

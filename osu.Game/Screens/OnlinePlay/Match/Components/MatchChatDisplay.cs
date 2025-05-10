@@ -1,19 +1,17 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.ComponentModel;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Game.Online.Chat;
 using osu.Game.Online.Rooms;
 
 namespace osu.Game.Screens.OnlinePlay.Match.Components
 {
-    public class MatchChatDisplay : StandAloneChatDisplay
+    public partial class MatchChatDisplay : StandAloneChatDisplay
     {
-        private readonly IBindable<int> channelId = new Bindable<int>();
-
-        [Resolved(CanBeNull = true)]
-        private ChannelManager channelManager { get; set; }
+        [Resolved]
+        private ChannelManager? channelManager { get; set; }
 
         private readonly Room room;
         private readonly bool leaveChannelOnDispose;
@@ -29,22 +27,29 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
         {
             base.LoadComplete();
 
-            // Required for the time being since this component is created prior to the room being joined.
-            channelId.BindTo(room.ChannelId);
-            channelId.BindValueChanged(_ => updateChannel(), true);
+            room.PropertyChanged += onRoomPropertyChanged;
+            updateChannel();
+        }
+
+        private void onRoomPropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(Room.ChannelId))
+                updateChannel();
         }
 
         private void updateChannel()
         {
-            if (room.RoomID.Value == null || channelId.Value == 0)
+            if (room.RoomID == null || room.ChannelId == 0)
                 return;
 
-            Channel.Value = channelManager?.JoinChannel(new Channel { Id = channelId.Value, Type = ChannelType.Multiplayer, Name = $"#lazermp_{room.RoomID.Value}" });
+            Channel.Value = channelManager?.JoinChannel(new Channel { Id = room.ChannelId, Type = ChannelType.Multiplayer, Name = $"#lazermp_{room.RoomID.Value}" });
         }
 
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
+
+            room.PropertyChanged -= onRoomPropertyChanged;
 
             if (leaveChannelOnDispose)
                 channelManager?.LeaveChannel(Channel.Value);

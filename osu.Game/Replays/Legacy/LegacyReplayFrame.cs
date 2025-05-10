@@ -3,7 +3,6 @@
 
 using MessagePack;
 using Newtonsoft.Json;
-using osu.Framework.Extensions.EnumExtensions;
 using osu.Game.Rulesets.Replays;
 using osuTK;
 
@@ -32,19 +31,23 @@ namespace osu.Game.Replays.Legacy
 
         [JsonIgnore]
         [IgnoreMember]
-        public bool MouseLeft1 => ButtonState.HasFlagFast(ReplayButtonState.Left1);
+        public bool MouseLeft1 => ButtonState.HasFlag(ReplayButtonState.Left1);
 
         [JsonIgnore]
         [IgnoreMember]
-        public bool MouseRight1 => ButtonState.HasFlagFast(ReplayButtonState.Right1);
+        public bool MouseRight1 => ButtonState.HasFlag(ReplayButtonState.Right1);
 
         [JsonIgnore]
         [IgnoreMember]
-        public bool MouseLeft2 => ButtonState.HasFlagFast(ReplayButtonState.Left2);
+        public bool MouseLeft2 => ButtonState.HasFlag(ReplayButtonState.Left2);
 
         [JsonIgnore]
         [IgnoreMember]
-        public bool MouseRight2 => ButtonState.HasFlagFast(ReplayButtonState.Right2);
+        public bool MouseRight2 => ButtonState.HasFlag(ReplayButtonState.Right2);
+
+        [JsonIgnore]
+        [IgnoreMember]
+        public bool Smoke => ButtonState.HasFlag(ReplayButtonState.Smoke);
 
         [Key(3)]
         public ReplayButtonState ButtonState;

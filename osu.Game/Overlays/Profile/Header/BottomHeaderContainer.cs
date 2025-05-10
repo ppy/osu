@@ -21,17 +21,17 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Profile.Header
 {
-    public class BottomHeaderContainer : CompositeDrawable
+    public partial class BottomHeaderContainer : CompositeDrawable
     {
-        public readonly Bindable<APIUser> User = new Bindable<APIUser>();
+        public readonly Bindable<UserProfileData?> User = new Bindable<UserProfileData?>();
 
-        private LinkFlowContainer topLinkContainer;
-        private LinkFlowContainer bottomLinkContainer;
+        private LinkFlowContainer topLinkContainer = null!;
+        private LinkFlowContainer bottomLinkContainer = null!;
 
         private Color4 iconColour;
 
         [Resolved]
-        private IAPIProvider api { get; set; }
+        private IAPIProvider api { get; set; } = null!;
 
         public BottomHeaderContainer()
         {
@@ -55,7 +55,7 @@ namespace osu.Game.Overlays.Profile.Header
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Direction = FillDirection.Vertical,
-                    Padding = new MarginPadding { Horizontal = UserProfileOverlay.CONTENT_X_MARGIN, Vertical = 10 },
+                    Padding = new MarginPadding { Horizontal = WaveOverlayContainer.HORIZONTAL_PADDING, Vertical = 10 },
                     Spacing = new Vector2(0, 10),
                     Children = new Drawable[]
                     {
@@ -73,10 +73,10 @@ namespace osu.Game.Overlays.Profile.Header
                 }
             };
 
-            User.BindValueChanged(user => updateDisplay(user.NewValue));
+            User.BindValueChanged(user => updateDisplay(user.NewValue?.User));
         }
 
-        private void updateDisplay(APIUser user)
+        private void updateDisplay(APIUser? user)
         {
             topLinkContainer.Clear();
             bottomLinkContainer.Clear();
@@ -93,7 +93,7 @@ namespace osu.Game.Overlays.Profile.Header
 
             addSpacer(topLinkContainer);
 
-            if (user.IsOnline)
+            if (user.WasRecentlyOnline)
             {
                 topLinkContainer.AddText(UsersStrings.ShowLastvisitOnline);
                 addSpacer(topLinkContainer);
@@ -124,12 +124,12 @@ namespace osu.Game.Overlays.Profile.Header
             }
 
             topLinkContainer.AddText("Contributed ");
-            topLinkContainer.AddLink("forum post".ToQuantity(user.PostCount, "#,##0"), $"{api.WebsiteRootUrl}/users/{user.Id}/posts", creationParameters: embolden);
+            topLinkContainer.AddLink("forum post".ToQuantity(user.PostCount, "#,##0"), $"{api.Endpoints.WebsiteUrl}/users/{user.Id}/posts", creationParameters: embolden);
 
             addSpacer(topLinkContainer);
 
             topLinkContainer.AddText("Posted ");
-            topLinkContainer.AddLink("comment".ToQuantity(user.CommentsCount, "#,##0"), $"{api.WebsiteRootUrl}/comments?user_id={user.Id}", creationParameters: embolden);
+            topLinkContainer.AddLink("comment".ToQuantity(user.CommentsCount, "#,##0"), $"{api.Endpoints.WebsiteUrl}/comments?user_id={user.Id}", creationParameters: embolden);
 
             string websiteWithoutProtocol = user.Website;
 
@@ -144,8 +144,8 @@ namespace osu.Game.Overlays.Profile.Header
 
             bool anyInfoAdded = false;
 
-            anyInfoAdded |= tryAddInfo(FontAwesome.Solid.MapMarker, user.Location);
-            anyInfoAdded |= tryAddInfo(OsuIcon.Heart, user.Interests);
+            anyInfoAdded |= tryAddInfo(FontAwesome.Solid.MapMarkerAlt, user.Location);
+            anyInfoAdded |= tryAddInfo(FontAwesome.Regular.Heart, user.Interests);
             anyInfoAdded |= tryAddInfo(FontAwesome.Solid.Suitcase, user.Occupation);
 
             if (anyInfoAdded)
@@ -162,7 +162,7 @@ namespace osu.Game.Overlays.Profile.Header
 
         private void addSpacer(OsuTextFlowContainer textFlow) => textFlow.AddArbitraryDrawable(new Container { Width = 15 });
 
-        private bool tryAddInfo(IconUsage icon, string content, string link = null)
+        private bool tryAddInfo(IconUsage icon, string content, string? link = null)
         {
             if (string.IsNullOrEmpty(content)) return false;
 
@@ -171,7 +171,7 @@ namespace osu.Game.Overlays.Profile.Header
 
             bottomLinkContainer.AddIcon(icon, text =>
             {
-                text.Font = text.Font.With(size: 10);
+                text.Font = text.Font.With(icon.Family, 10, icon.Weight);
                 text.Colour = iconColour;
             });
 

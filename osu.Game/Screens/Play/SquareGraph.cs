@@ -1,10 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using JetBrains.Annotations;
 using osu.Framework;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -18,14 +21,9 @@ using osu.Framework.Threading;
 
 namespace osu.Game.Screens.Play
 {
-    public class SquareGraph : Container
+    public partial class SquareGraph : Container
     {
         private BufferedContainer<Column> columns;
-
-        public SquareGraph()
-        {
-            AddLayout(layout);
-        }
 
         public int ColumnCount => columns?.Children.Count ?? 0;
 
@@ -73,14 +71,20 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        private readonly LayoutValue layout = new LayoutValue(Invalidation.DrawSize);
         private ScheduledDelegate scheduledCreate;
+
+        private readonly LayoutValue layout = new LayoutValue(Invalidation.DrawSize | Invalidation.DrawInfo);
+
+        public SquareGraph()
+        {
+            AddLayout(layout);
+        }
 
         protected override void Update()
         {
             base.Update();
 
-            if (values != null && !layout.IsValid)
+            if (!layout.IsValid)
             {
                 columns?.FadeOut(500, Easing.OutQuint).Expire();
 
@@ -176,7 +180,7 @@ namespace osu.Game.Screens.Play
             calculatedValues = newValues.ToArray();
         }
 
-        public class Column : Container, IStateful<ColumnState>
+        public partial class Column : Container, IStateful<ColumnState>
         {
             protected readonly Color4 EmptyColour = Color4.White.Opacity(20);
             public Color4 LitColour = Color4.LightBlue;
@@ -187,6 +191,7 @@ namespace osu.Game.Screens.Play
             private const float padding = 2;
             public const float WIDTH = cube_size + padding;
 
+            [CanBeNull]
             public event Action<ColumnState> StateChanged;
 
             private readonly List<Box> drawableRows = new List<Box>();

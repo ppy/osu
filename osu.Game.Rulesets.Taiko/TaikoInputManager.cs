@@ -2,12 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.ComponentModel;
+using osu.Framework.Allocation;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Taiko
 {
-    public class TaikoInputManager : RulesetInputManager<TaikoAction>
+    [Cached] // Used for touch input, see DrumTouchInputArea.
+    public partial class TaikoInputManager : RulesetInputManager<TaikoAction>
     {
         public TaikoInputManager(RulesetInfo ruleset)
             : base(ruleset, 0, SimultaneousBindingMode.Unique)

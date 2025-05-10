@@ -1,30 +1,39 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
+using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Online.Solo;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko;
+using osu.Game.Rulesets.Taiko.Mods;
 using osu.Game.Scoring;
+using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
 using osu.Game.Tests.Beatmaps;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestScenePlayerScoreSubmission : PlayerTestScene
+    public partial class TestScenePlayerScoreSubmission : PlayerTestScene
     {
         protected override bool AllowFail => allowFail;
 
@@ -32,12 +41,19 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private Func<RulesetInfo, IBeatmap> createCustomBeatmap;
         private Func<Ruleset> createCustomRuleset;
+        private Func<Mod[]> createCustomMods;
 
         private DummyAPIAccess dummyAPI => (DummyAPIAccess)API;
 
         protected override bool HasCustomSteps => true;
 
-        protected override TestPlayer CreatePlayer(Ruleset ruleset) => new FakeImportingPlayer(false);
+        protected override TestPlayer CreatePlayer(Ruleset ruleset)
+        {
+            if (createCustomMods != null)
+                SelectedMods.Value = SelectedMods.Value.Concat(createCustomMods()).ToList();
+
+            return new FakeImportingPlayer(false);
+        }
 
         protected new FakeImportingPlayer Player => (FakeImportingPlayer)base.Player;
 
@@ -166,6 +182,30 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
+        public void TestEmptyFailStillImports()
+        {
+            prepareTestAPI(true);
+
+            createPlayerTest(true);
+
+            AddUntilStep("wait for token request", () => Player.TokenCreationRequested);
+
+            AddUntilStep("wait for fail", () => Player.GameplayState.HasFailed);
+            AddUntilStep("wait for fail overlay", () => Player.FailOverlay.State.Value, () => Is.EqualTo(Visibility.Visible));
+
+            AddStep("attempt import", () =>
+            {
+                InputManager.MoveMouseTo(Player.ChildrenOfType<SaveFailedScoreButton>().Single());
+                InputManager.Click(MouseButton.Left);
+            });
+            AddUntilStep("wait for import to start", () => Player.ScoreImportStarted);
+            AddStep("allow import", () => Player.AllowImportCompletion.Release());
+
+            AddUntilStep("import completed", () => Player.ImportedScore, () => Is.Not.Null);
+            AddAssert("ensure no submission", () => Player.SubmittedScore, () => Is.Null);
+        }
+
+        [Test]
         public void TestSubmissionOnFail()
         {
             prepareTestAPI(true);
@@ -177,9 +217,9 @@ namespace osu.Game.Tests.Visual.Gameplay
             addFakeHit();
 
             AddUntilStep("wait for fail", () => Player.GameplayState.HasFailed);
-            AddStep("exit", () => Player.Exit());
 
-            AddAssert("ensure failing submission", () => Player.SubmittedScore?.ScoreInfo.Passed == false);
+            AddUntilStep("wait for submission", () => Player.SubmittedScore != null);
+            AddAssert("ensure failing submission", () => Player.SubmittedScore.ScoreInfo.Passed == false);
         }
 
         [Test]
@@ -190,6 +230,31 @@ namespace osu.Game.Tests.Visual.Gameplay
             createPlayerTest();
 
             AddUntilStep("wait for token request", () => Player.TokenCreationRequested);
+
+            AddStep("exit", () => Player.Exit());
+            AddAssert("ensure no submission", () => Player.SubmittedScore == null);
+        }
+
+        [Test]
+        public void TestNoSubmissionWhenScoreZero()
+        {
+            prepareTestAPI(true);
+
+            createPlayerTest();
+
+            AddUntilStep("wait for token request", () => Player.TokenCreationRequested);
+
+            AddUntilStep("wait for track to start running", () => Beatmap.Value.Track.IsRunning);
+            AddUntilStep("wait for first result", () => Player.Results.Count > 0);
+
+            AddStep("add fake non-scoring hit", () =>
+            {
+                Player.ScoreProcessor.RevertResult(Player.Results.First());
+                Player.ScoreProcessor.ApplyResult(new OsuJudgementResult(Beatmap.Value.Beatmap.HitObjects.First(), new IgnoreJudgement())
+                {
+                    Type = HitResult.IgnoreHit,
+                });
+            });
 
             AddStep("exit", () => Player.Exit());
             AddAssert("ensure no submission", () => Player.SubmittedScore == null);
@@ -207,7 +272,9 @@ namespace osu.Game.Tests.Visual.Gameplay
             addFakeHit();
 
             AddStep("exit", () => Player.Exit());
-            AddAssert("ensure failing submission", () => Player.SubmittedScore?.ScoreInfo.Passed == false);
+
+            AddUntilStep("wait for submission", () => Player.SubmittedScore != null);
+            AddAssert("ensure failing submission", () => Player.SubmittedScore.ScoreInfo.Passed == false);
         }
 
         [Test]
@@ -237,7 +304,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             createPlayerTest(false, r =>
             {
                 var beatmap = createTestBeatmap(r);
-                beatmap.BeatmapInfo.OnlineID = -1;
+                beatmap.BeatmapInfo.ResetOnlineInfo();
                 return beatmap;
             });
 
@@ -255,7 +322,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             prepareTestAPI(true);
 
-            createPlayerTest(false, createRuleset: () => new OsuRuleset
+            createPlayerTest(createRuleset: () => new OsuRuleset
             {
                 RulesetInfo =
                 {
@@ -273,13 +340,28 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("ensure no submission", () => Player.SubmittedScore == null);
         }
 
-        private void createPlayerTest(bool allowFail = false, Func<RulesetInfo, IBeatmap> createBeatmap = null, Func<Ruleset> createRuleset = null)
+        [Test]
+        public void TestNoSubmissionWithModsOfDifferentRuleset()
+        {
+            prepareTestAPI(true);
+
+            createPlayerTest(createRuleset: () => new OsuRuleset(), createMods: () => new Mod[] { new TaikoModHidden() });
+
+            AddUntilStep("wait for token request", () => Player.TokenCreationRequested);
+            AddAssert("gameplay not loaded", () => Player.DrawableRuleset == null);
+
+            AddStep("exit", () => Player.Exit());
+            AddAssert("ensure no submission", () => Player.SubmittedScore == null);
+        }
+
+        private void createPlayerTest(bool allowFail = false, Func<RulesetInfo, IBeatmap> createBeatmap = null, Func<Ruleset> createRuleset = null, Func<Mod[]> createMods = null)
         {
             CreateTest(() => AddStep("set up requirements", () =>
             {
                 this.allowFail = allowFail;
                 createCustomBeatmap = createBeatmap;
                 createCustomRuleset = createRuleset;
+                createCustomMods = createMods;
             }));
         }
 
@@ -343,17 +425,24 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
         }
 
-        protected class FakeImportingPlayer : TestPlayer
+        protected partial class FakeImportingPlayer : TestPlayer
         {
             public bool ScoreImportStarted { get; set; }
             public SemaphoreSlim AllowImportCompletion { get; }
             public Score ImportedScore { get; private set; }
+
+            public new FailOverlay FailOverlay => base.FailOverlay;
 
             public FakeImportingPlayer(bool allowPause = true, bool showResults = true, bool pauseOnFocusLost = false)
                 : base(allowPause, showResults, pauseOnFocusLost)
             {
                 AllowImportCompletion = new SemaphoreSlim(1);
             }
+
+            protected override GameplayClockContainer CreateGameplayClockContainer(WorkingBeatmap beatmap, double gameplayStart) => new MasterGameplayClockContainer(beatmap, gameplayStart)
+            {
+                ShouldValidatePlaybackRate = false,
+            };
 
             protected override async Task ImportScore(Score score)
             {
@@ -363,21 +452,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 
                 ImportedScore = score;
 
-                // It was discovered that Score members could sometimes be half-populated.
-                // In particular, the RulesetID property could be set to 0 even on non-osu! maps.
-                // We want to test that the state of that property is consistent in this test.
-                // EF makes this impossible.
-                //
-                // First off, because of the EF navigational property-explicit foreign key field duality,
-                // it can happen that - for example - the Ruleset navigational property is correctly initialised to mania,
-                // but the RulesetID foreign key property is not initialised and remains 0.
-                // EF silently bypasses this by prioritising the Ruleset navigational property over the RulesetID foreign key one.
-                //
-                // Additionally, adding an entity to an EF DbSet CAUSES SIDE EFFECTS with regard to the foreign key property.
-                // In the above instance, if a ScoreInfo with Ruleset = {mania} and RulesetID = 0 is attached to an EF context,
-                // RulesetID WILL BE SILENTLY SET TO THE CORRECT VALUE of 3.
-                //
-                // For the above reasons, actual importing is disabled in this test.
+                // Calling base.ImportScore is omitted as it will fail for the test method which uses a custom ruleset.
+                // This can be resolved by doing something similar to what TestScenePlayerLocalScoreImport is doing,
+                // but requires a bit of restructuring.
             }
         }
     }

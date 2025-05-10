@@ -8,16 +8,16 @@ using osu.Game.Screens.OnlinePlay.Match.Components;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
-    public class CreateMultiplayerMatchButton : CreateRoomButton
+    public partial class CreateMultiplayerMatchButton : CreateRoomButton
     {
-        private IBindable<bool> isConnected;
-        private IBindable<bool> operationInProgress;
+        private IBindable<bool> isConnected = null!;
+        private IBindable<bool> operationInProgress = null!;
 
         [Resolved]
-        private MultiplayerClient multiplayerClient { get; set; }
+        private MultiplayerClient multiplayerClient { get; set; } = null!;
 
         [Resolved]
-        private OngoingOperationTracker ongoingOperationTracker { get; set; }
+        private OngoingOperationTracker ongoingOperationTracker { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load()

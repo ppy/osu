@@ -1,7 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
+using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -17,10 +20,12 @@ using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
-using osu.Game.IO.Archives;
+using osu.Game.Extensions;
+using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Overlays.Volume;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Skinning;
@@ -30,7 +35,7 @@ using Realms;
 
 namespace osu.Game.Screens.Menu
 {
-    public abstract class IntroScreen : StartupScreen
+    public abstract partial class IntroScreen : StartupScreen
     {
         /// <summary>
         /// Whether we have loaded the menu previously.
@@ -63,6 +68,8 @@ namespace osu.Game.Screens.Menu
 
         protected virtual string SeeyaSampleName => "Intro/seeya";
 
+        protected override bool PlayExitSound => false;
+
         private LeasedBindable<WorkingBeatmap> beatmap;
 
         private OsuScreen nextScreen;
@@ -84,6 +91,13 @@ namespace osu.Game.Screens.Menu
         /// Only valid during or after <see cref="LogoArriving"/>.
         /// </summary>
         protected bool UsingThemedIntro { get; private set; }
+
+        protected override BackgroundScreen CreateBackground() => new BackgroundScreenDefault
+        {
+            Colour = Color4.Black
+        };
+
+        public override bool? AllowGlobalTrackControl => false;
 
         protected IntroScreen([CanBeNull] Func<MainMenu> createNextScreen = null)
         {
@@ -137,7 +151,7 @@ namespace osu.Game.Screens.Menu
                 {
                     // if we detect that the theme track or beatmap is unavailable this is either first startup or things are in a bad state.
                     // this could happen if a user has nuked their files store. for now, reimport to repair this.
-                    var import = beatmaps.Import(new ZipArchiveReader(game.Resources.GetStream($"Tracks/{BeatmapFile}"), BeatmapFile)).GetResultSafely();
+                    var import = beatmaps.Import(new ImportTask(game.Resources.GetStream($"Tracks/{BeatmapFile}"), BeatmapFile)).GetResultSafely();
 
                     import?.PerformWrite(b => b.Protected = true);
 
@@ -157,11 +171,20 @@ namespace osu.Game.Screens.Menu
                     if (s.Beatmaps.Count == 0)
                         return;
 
-                    initialBeatmap = beatmaps.GetWorkingBeatmap(s.Beatmaps.First());
+                    var working = beatmaps.GetWorkingBeatmap(s.Beatmaps.First());
+
+                    // Ensure files area actually present on disk.
+                    // This is to handle edge cases like users deleting files outside the game and breaking the world.
+                    if (!hasAllFiles(working))
+                        return;
+
+                    initialBeatmap = working;
                 });
 
                 return UsingThemedIntro = initialBeatmap != null;
             }
+
+            AddInternal(new GlobalScrollAdjustsVolume());
         }
 
         public override void OnEntering(ScreenTransitionEvent e)
@@ -172,6 +195,20 @@ namespace osu.Game.Screens.Menu
 
         [Resolved]
         private INotificationOverlay notifications { get; set; }
+
+        private bool hasAllFiles(WorkingBeatmap working)
+        {
+            foreach (var f in working.BeatmapSetInfo.Files)
+            {
+                using (var str = working.GetStream(f.File.GetStoragePath()))
+                {
+                    if (str == null)
+                        return false;
+                }
+            }
+
+            return true;
+        }
 
         private void ensureEventuallyArrivingAtMenu()
         {
@@ -187,16 +224,22 @@ namespace osu.Game.Screens.Menu
 
                 PrepareMenuLoad();
                 LoadMenu();
-                notifications.Post(new SimpleErrorNotification
+
+                if (!Debugger.IsAttached)
                 {
-                    Text = "osu! doesn't seem to be able to play audio correctly.\n\nPlease try changing your audio device to a working setting."
-                });
-            }, 5000);
+                    notifications.Post(new SimpleErrorNotification
+                    {
+                        Text = NotificationsStrings.AudioPlaybackIssue
+                    });
+                }
+            }, 8000);
         }
 
         public override void OnResuming(ScreenTransitionEvent e)
         {
             this.FadeIn(300);
+
+            ApplyToBackground(b => b.FadeColour(Color4.Black, 100));
 
             double fadeOutTime = exit_delay;
 
@@ -240,19 +283,39 @@ namespace osu.Game.Screens.Menu
             base.OnResuming(e);
         }
 
+        private bool backgroundFaded;
+
+        protected void FadeInBackground(float duration = 0)
+        {
+            ApplyToBackground(b => b.FadeColour(Color4.White, duration));
+            backgroundFaded = true;
+        }
+
         public override void OnSuspending(ScreenTransitionEvent e)
         {
             base.OnSuspending(e);
             initialBeatmap = null;
+
+            if (!backgroundFaded)
+                FadeInBackground(200);
         }
 
-        protected override BackgroundScreen CreateBackground() => new BackgroundScreenBlack();
-
-        protected virtual void StartTrack()
+        protected void StartTrack()
         {
-            // Only start the current track if it is the menu music. A beatmap's track is started when entering the Main Menu.
-            if (UsingThemedIntro)
-                Track.Start();
+            var drawableTrack = musicController.CurrentTrack;
+
+            if (!UsingThemedIntro)
+            {
+                initialBeatmap?.PrepareTrackForPreview(false, -2600);
+
+                drawableTrack.VolumeTo(0);
+                drawableTrack.Restart();
+                drawableTrack.VolumeTo(1, 2600, Easing.InCubic);
+            }
+            else
+            {
+                drawableTrack.Restart();
+            }
         }
 
         protected override void LogoArriving(OsuLogo logo, bool resuming)

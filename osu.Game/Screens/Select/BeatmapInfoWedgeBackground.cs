@@ -13,7 +13,7 @@ using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Screens.Select
 {
-    internal class BeatmapInfoWedgeBackground : CompositeDrawable
+    internal partial class BeatmapInfoWedgeBackground : CompositeDrawable
     {
         private readonly IWorkingBeatmap beatmap;
 

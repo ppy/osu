@@ -1,13 +1,19 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Screens;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets.Mods;
@@ -20,29 +26,48 @@ using osuTK.Input;
 
 namespace osu.Game.Screens.Select
 {
-    public class PlaySongSelect : SongSelect
+    public partial class PlaySongSelect : SongSelect
     {
-        private OsuScreen playerLoader;
+        private OsuScreen? playerLoader;
 
-        [Resolved(CanBeNull = true)]
-        private INotificationOverlay notifications { get; set; }
+        [Resolved]
+        private INotificationOverlay? notifications { get; set; }
 
         public override bool AllowExternalScreenChange => true;
 
+        public override MenuItem[] CreateForwardNavigationMenuItemsForBeatmap(Func<BeatmapInfo> getBeatmap) => new MenuItem[]
+        {
+            new OsuMenuItem(ButtonSystemStrings.Play.ToSentence(), MenuItemType.Highlighted, () => FinaliseSelection(getBeatmap())),
+            new OsuMenuItem(ButtonSystemStrings.Edit.ToSentence(), MenuItemType.Standard, () => Edit(getBeatmap()))
+        };
+
         protected override UserActivity InitialActivity => new UserActivity.ChoosingBeatmap();
+
+        private PlayBeatmapDetailArea playBeatmapDetailArea = null!;
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            BeatmapOptions.AddButton(@"Edit", @"beatmap", FontAwesome.Solid.PencilAlt, colours.Yellow, () => Edit());
+            BeatmapOptions.AddButton(ButtonSystemStrings.Edit.ToSentence(), @"beatmap", FontAwesome.Solid.PencilAlt, colours.Yellow, () => Edit());
 
-            ((PlayBeatmapDetailArea)BeatmapDetails).Leaderboard.ScoreSelected += PresentScore;
+            AddInternal(new SongSelectTouchInputDetector());
         }
 
         protected void PresentScore(ScoreInfo score) =>
-            FinaliseSelection(score.BeatmapInfo, score.Ruleset, () => this.Push(new SoloResultsScreen(score, false)));
+            FinaliseSelection(score.BeatmapInfo, score.Ruleset, () => this.Push(new SoloResultsScreen(score)));
 
-        protected override BeatmapDetailArea CreateBeatmapDetailArea() => new PlayBeatmapDetailArea();
+        protected override BeatmapDetailArea CreateBeatmapDetailArea()
+        {
+            playBeatmapDetailArea = new PlayBeatmapDetailArea
+            {
+                Leaderboard =
+                {
+                    ScoreSelected = PresentScore
+                }
+            };
+
+            return playBeatmapDetailArea;
+        }
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
@@ -59,9 +84,9 @@ namespace osu.Game.Screens.Select
             return base.OnKeyDown(e);
         }
 
-        private IReadOnlyList<Mod> modsAtGameplayStart;
+        private IReadOnlyList<Mod>? modsAtGameplayStart;
 
-        private ModAutoplay getAutoplayMod() => Ruleset.Value.CreateInstance().GetAutoplayMod();
+        private ModAutoplay? getAutoplayMod() => Ruleset.Value.CreateInstance().GetAutoplayMod();
 
         protected override bool OnStart()
         {
@@ -70,7 +95,7 @@ namespace osu.Game.Screens.Select
             modsAtGameplayStart = Mods.Value;
 
             // Ctrl+Enter should start map with autoplay enabled.
-            if (GetContainingInputManager().CurrentState?.Keyboard.ControlPressed == true)
+            if (GetContainingInputManager()?.CurrentState?.Keyboard.ControlPressed == true)
             {
                 var autoInstance = getAutoplayMod();
 
@@ -78,7 +103,7 @@ namespace osu.Game.Screens.Select
                 {
                     notifications?.Post(new SimpleNotification
                     {
-                        Text = "The current ruleset doesn't have an autoplay mod avalaible!"
+                        Text = NotificationsStrings.NoAutoplayMod
                     });
                     return false;
                 }
@@ -98,26 +123,44 @@ namespace osu.Game.Screens.Select
 
             Player createPlayer()
             {
+                Player player;
+
                 var replayGeneratingMod = Mods.Value.OfType<ICreateReplayData>().FirstOrDefault();
 
                 if (replayGeneratingMod != null)
                 {
-                    return new ReplayPlayer((beatmap, mods) => replayGeneratingMod.CreateScoreFromReplayData(beatmap, mods));
+                    player = new ReplayPlayer((beatmap, mods) => replayGeneratingMod.CreateScoreFromReplayData(beatmap, mods));
+                }
+                else
+                {
+                    player = new SoloPlayer();
                 }
 
-                return new SoloPlayer();
+                return player;
             }
         }
 
         public override void OnResuming(ScreenTransitionEvent e)
         {
             base.OnResuming(e);
+            revertMods();
+        }
 
-            if (playerLoader != null)
-            {
-                Mods.Value = modsAtGameplayStart;
-                playerLoader = null;
-            }
+        public override bool OnExiting(ScreenExitEvent e)
+        {
+            if (base.OnExiting(e))
+                return true;
+
+            revertMods();
+            return false;
+        }
+
+        private void revertMods()
+        {
+            if (playerLoader == null) return;
+
+            Mods.Value = modsAtGameplayStart;
+            playerLoader = null;
         }
     }
 }

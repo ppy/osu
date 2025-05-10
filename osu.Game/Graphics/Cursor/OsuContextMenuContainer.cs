@@ -8,16 +8,16 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Graphics.Cursor
 {
-    public class OsuContextMenuContainer : ContextMenuContainer
+    [Cached(typeof(OsuContextMenuContainer))]
+    public partial class OsuContextMenuContainer : ContextMenuContainer
     {
-        [Cached]
-        private OsuContextMenuSamples samples = new OsuContextMenuSamples();
+        private OsuContextMenu menu = null!;
 
-        public OsuContextMenuContainer()
+        protected override Menu CreateMenu() => menu = new OsuContextMenu(true);
+
+        public void CloseMenu()
         {
-            AddInternal(samples);
+            menu.Close();
         }
-
-        protected override Menu CreateMenu() => new OsuContextMenu(true);
     }
 }

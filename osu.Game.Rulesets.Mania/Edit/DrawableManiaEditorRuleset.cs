@@ -2,23 +2,37 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osuTK;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
+using osu.Game.Rulesets.Mania.Configuration;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
+using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Edit
 {
-    public class DrawableManiaEditorRuleset : DrawableManiaRuleset
+    public partial class DrawableManiaEditorRuleset : DrawableManiaRuleset, ISupportConstantAlgorithmToggle
     {
+        public BindableBool ShowSpeedChanges { get; } = new BindableBool();
+
+        public double? TimelineTimeRange { get; set; }
+
         public new IScrollingInfo ScrollingInfo => base.ScrollingInfo;
 
-        public DrawableManiaEditorRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods)
+        public DrawableManiaEditorRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod>? mods)
             : base(ruleset, beatmap, mods)
         {
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            ShowSpeedChanges.BindValueChanged(showChanges => VisualisationMethod = showChanges.NewValue ? ScrollVisualisationMethod.Sequential : ScrollVisualisationMethod.Constant, true);
         }
 
         protected override Playfield CreatePlayfield() => new ManiaEditorPlayfield(Beatmap.Stages)
@@ -27,5 +41,11 @@ namespace osu.Game.Rulesets.Mania.Edit
             Origin = Anchor.Centre,
             Size = Vector2.One
         };
+
+        protected override void Update()
+        {
+            TargetTimeRange = TimelineTimeRange == null || ShowSpeedChanges.Value ? ComputeScrollTime(Config.Get<double>(ManiaRulesetSetting.ScrollSpeed)) : TimelineTimeRange.Value;
+            base.Update();
+        }
     }
 }

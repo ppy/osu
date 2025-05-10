@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Framework.Testing;
 using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -30,22 +31,25 @@ using osuTK.Input;
 namespace osu.Game.Tournament
 {
     [Cached]
-    public class TournamentSceneManager : CompositeDrawable
+    public partial class TournamentSceneManager : CompositeDrawable
     {
-        private Container screens;
-        private TourneyVideo video;
+        private Container screens = null!;
+        private TourneyVideo video = null!;
 
-        public const float CONTROL_AREA_WIDTH = 160;
+        public const int CONTROL_AREA_WIDTH = 200;
 
-        public const float STREAM_AREA_WIDTH = 1366;
+        public const int STREAM_AREA_WIDTH = 1366;
+        public const int STREAM_AREA_HEIGHT = (int)(STREAM_AREA_WIDTH / ASPECT_RATIO);
 
-        public const double REQUIRED_WIDTH = CONTROL_AREA_WIDTH * 2 + STREAM_AREA_WIDTH;
+        public const float ASPECT_RATIO = 16 / 9f;
+
+        public const int REQUIRED_WIDTH = CONTROL_AREA_WIDTH * 2 + STREAM_AREA_WIDTH;
 
         [Cached]
         private TournamentMatchChatDisplay chat = new TournamentMatchChatDisplay();
 
-        private Container chatContainer;
-        private FillFlowContainer buttons;
+        private Container chatContainer = null!;
+        private FillFlowContainer buttons = null!;
 
         public TournamentSceneManager()
         {
@@ -62,13 +66,20 @@ namespace osu.Game.Tournament
                     RelativeSizeAxes = Axes.Y,
                     X = CONTROL_AREA_WIDTH,
                     FillMode = FillMode.Fit,
-                    FillAspectRatio = 16 / 9f,
+                    FillAspectRatio = ASPECT_RATIO,
                     Anchor = Anchor.TopLeft,
                     Origin = Anchor.TopLeft,
                     Width = STREAM_AREA_WIDTH,
                     //Masking = true,
                     Children = new Drawable[]
                     {
+                        new Box
+                        {
+                            Colour = new Color4(20, 20, 20, 255),
+                            Anchor = Anchor.TopRight,
+                            RelativeSizeAxes = Axes.Both,
+                            Width = 10,
+                        },
                         video = new TourneyVideo("main", true)
                         {
                             Loop = true,
@@ -153,10 +164,10 @@ namespace osu.Game.Tournament
 
         private float depth;
 
-        private Drawable currentScreen;
-        private ScheduledDelegate scheduledHide;
+        private Drawable? currentScreen;
+        private ScheduledDelegate? scheduledHide;
 
-        private Drawable temporaryScreen;
+        private Drawable? temporaryScreen;
 
         public void SetScreen(Drawable screen)
         {
@@ -184,7 +195,7 @@ namespace osu.Game.Tournament
             var lastScreen = currentScreen;
             currentScreen = target;
 
-            if (currentScreen is IProvideVideo)
+            if (currentScreen.ChildrenOfType<TourneyVideo>().FirstOrDefault()?.VideoAvailable == true)
             {
                 video.FadeOut(200);
 
@@ -202,12 +213,12 @@ namespace osu.Game.Tournament
 
             switch (currentScreen)
             {
-                case MapPoolScreen _:
+                case MapPoolScreen:
                     chatContainer.FadeIn(TournamentScreen.FADE_DELAY);
                     chatContainer.ResizeWidthTo(1, 500, Easing.OutQuint);
                     break;
 
-                case GameplayScreen _:
+                case GameplayScreen:
                     chatContainer.FadeIn(TournamentScreen.FADE_DELAY);
                     chatContainer.ResizeWidthTo(0.5f, 500, Easing.OutQuint);
                     break;
@@ -221,7 +232,7 @@ namespace osu.Game.Tournament
                 s.IsSelected = screenType == s.Type;
         }
 
-        private class Separator : CompositeDrawable
+        private partial class Separator : CompositeDrawable
         {
             public Separator()
             {
@@ -230,7 +241,7 @@ namespace osu.Game.Tournament
             }
         }
 
-        private class ScreenButton : TourneyButton
+        private partial class ScreenButton : TourneyButton
         {
             public readonly Type Type;
 
@@ -249,14 +260,13 @@ namespace osu.Game.Tournament
 
                 if (shortcutKey != null)
                 {
-                    Add(new Container
+                    Add(new CircularContainer
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
                         Size = new Vector2(24),
                         Margin = new MarginPadding(5),
                         Masking = true,
-                        CornerRadius = 4,
                         Alpha = 0.5f,
                         Blending = BlendingParameters.Additive,
                         Children = new Drawable[]
@@ -272,7 +282,7 @@ namespace osu.Game.Tournament
                                 Y = -2,
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                                Text = shortcutKey.ToString(),
+                                Text = shortcutKey.Value.ToString(),
                             }
                         }
                     });
@@ -292,7 +302,7 @@ namespace osu.Game.Tournament
 
             private bool isSelected;
 
-            public Action<Type> RequestSelection;
+            public Action<Type>? RequestSelection;
 
             public bool IsSelected
             {

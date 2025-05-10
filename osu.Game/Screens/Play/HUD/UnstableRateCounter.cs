@@ -1,9 +1,10 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -18,17 +19,19 @@ using osuTK;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public class UnstableRateCounter : RollingCounter<int>, ISkinnableDrawable
+    public partial class UnstableRateCounter : RollingCounter<int>, ISerialisableDrawable
     {
         public bool UsesFixedAnchor { get; set; }
 
-        protected override double RollingDuration => 750;
+        protected override double RollingDuration => 375;
 
         private const float alpha_when_invalid = 0.3f;
         private readonly Bindable<bool> valid = new Bindable<bool>();
 
+        private HitEventExtensions.UnstableRateCalculationResult? unstableRateResult;
+
         [Resolved]
-        private ScoreProcessor scoreProcessor { get; set; }
+        private ScoreProcessor scoreProcessor { get; set; } = null!;
 
         public UnstableRateCounter()
         {
@@ -43,9 +46,6 @@ namespace osu.Game.Screens.Play.HUD
                 DrawableCount.FadeTo(e.NewValue ? 1 : alpha_when_invalid, 1000, Easing.OutQuint));
         }
 
-        private bool changesUnstableRate(JudgementResult judgement)
-            => !(judgement.HitObject.HitWindows is HitWindows.EmptyHitWindows) && judgement.IsHit;
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -55,13 +55,20 @@ namespace osu.Game.Screens.Play.HUD
             updateDisplay();
         }
 
-        private void updateDisplay(JudgementResult _) => Scheduler.AddOnce(updateDisplay);
+        private void updateDisplay(JudgementResult result)
+        {
+            if (HitEventExtensions.AffectsUnstableRate(result.HitObject, result.Type))
+                Scheduler.AddOnce(updateDisplay);
+        }
 
         private void updateDisplay()
         {
-            double? unstableRate = scoreProcessor.HitEvents.CalculateUnstableRate();
+            unstableRateResult = scoreProcessor.HitEvents.CalculateUnstableRate(unstableRateResult);
+
+            double? unstableRate = unstableRateResult?.Result;
 
             valid.Value = unstableRate != null;
+
             if (unstableRate != null)
                 Current.Value = (int)Math.Round(unstableRate.Value);
         }
@@ -75,13 +82,14 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.Dispose(isDisposing);
 
-            if (scoreProcessor == null) return;
-
-            scoreProcessor.NewJudgement -= updateDisplay;
-            scoreProcessor.JudgementReverted -= updateDisplay;
+            if (scoreProcessor.IsNotNull())
+            {
+                scoreProcessor.NewJudgement -= updateDisplay;
+                scoreProcessor.JudgementReverted -= updateDisplay;
+            }
         }
 
-        private class TextComponent : CompositeDrawable, IHasText
+        private partial class TextComponent : CompositeDrawable, IHasText
         {
             public LocalisableString Text
             {

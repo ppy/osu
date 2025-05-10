@@ -1,10 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Testing;
-using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Edit;
@@ -19,7 +20,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Editing
 {
-    public class TestSceneEditorClipboard : EditorTestScene
+    public partial class TestSceneEditorClipboard : EditorTestScene
     {
         protected override Ruleset CreateEditorRuleset() => new OsuRuleset();
 
@@ -57,7 +58,7 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddAssert("is one object", () => EditorBeatmap.HitObjects.Count == 1);
 
-            AddAssert("new object selected", () => EditorBeatmap.SelectedHitObjects.Single().StartTime == newTime);
+            AddAssert("new object selected", () => EditorBeatmap.SelectedHitObjects.Single().StartTime == EditorBeatmap.SnapTime(newTime, null));
         }
 
         [Test]
@@ -71,7 +72,7 @@ namespace osu.Game.Tests.Visual.Editing
                     ControlPoints =
                     {
                         new PathControlPoint(),
-                        new PathControlPoint(new Vector2(100, 0), PathType.Bezier)
+                        new PathControlPoint(new Vector2(100, 0), PathType.BEZIER)
                     }
                 }
             };
@@ -93,10 +94,6 @@ namespace osu.Game.Tests.Visual.Editing
                 var path = slider.Path;
                 return path.ControlPoints.Count == 2 && path.ControlPoints.SequenceEqual(addedObject.Path.ControlPoints);
             });
-
-            // see `HitObject.control_point_leniency`.
-            AddAssert("sample control point has correct time", () => Precision.AlmostEquals(slider.SampleControlPoint.Time, slider.GetEndTime(), 1));
-            AddAssert("difficulty control point has correct time", () => slider.DifficultyControlPoint.Time == slider.StartTime);
         }
 
         [Test]
@@ -125,6 +122,8 @@ namespace osu.Game.Tests.Visual.Editing
         [TestCase(true)]
         public void TestCopyPaste(bool deselectAfterCopy)
         {
+            const int paste_time = 2000;
+
             var addedObject = new HitCircle { StartTime = 1000 };
 
             AddStep("add hitobject", () => EditorBeatmap.Add(addedObject));
@@ -133,7 +132,7 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddStep("copy hitobject", () => Editor.Copy());
 
-            AddStep("move forward in time", () => EditorClock.Seek(2000));
+            AddStep("move forward in time", () => EditorClock.Seek(paste_time));
 
             if (deselectAfterCopy)
             {
@@ -147,10 +146,24 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddAssert("are two objects", () => EditorBeatmap.HitObjects.Count == 2);
 
-            AddAssert("new object selected", () => EditorBeatmap.SelectedHitObjects.Single().StartTime == 2000);
+            AddAssert("new object selected", () => EditorBeatmap.SelectedHitObjects.Single().StartTime == EditorBeatmap.SnapTime(paste_time, null));
 
             AddUntilStep("timeline selection box is visible", () => Editor.ChildrenOfType<Timeline>().First().ChildrenOfType<EditorSelectionHandler>().First().Alpha > 0);
             AddUntilStep("composer selection box is visible", () => Editor.ChildrenOfType<HitObjectComposer>().First().ChildrenOfType<EditorSelectionHandler>().First().Alpha > 0);
+        }
+
+        [Test]
+        public void TestClone()
+        {
+            var addedObject = new HitCircle { StartTime = 1000 };
+            AddStep("add hitobject", () => EditorBeatmap.Add(addedObject));
+            AddStep("select added object", () => EditorBeatmap.SelectedHitObjects.Add(addedObject));
+
+            AddAssert("is one object", () => EditorBeatmap.HitObjects.Count == 1);
+            AddStep("clone", () => Editor.Clone());
+            AddAssert("is two objects", () => EditorBeatmap.HitObjects.Count == 2);
+            AddStep("clone", () => Editor.Clone());
+            AddAssert("is three objects", () => EditorBeatmap.HitObjects.Count == 3);
         }
 
         [Test]
@@ -172,6 +185,23 @@ namespace osu.Game.Tests.Visual.Editing
         {
             AddStep("paste hitobject", () => Editor.Paste());
             AddAssert("are no objects", () => EditorBeatmap.HitObjects.Count == 0);
+        }
+
+        [Test]
+        public void TestCloneNothing()
+        {
+            // Add arbitrary object and copy to clipboard.
+            // This is tested to ensure that clone doesn't incorrectly read from the clipboard when no selection is made.
+            var addedObject = new HitCircle { StartTime = 1000 };
+            AddStep("add hitobject", () => EditorBeatmap.Add(addedObject));
+            AddStep("select added object", () => EditorBeatmap.SelectedHitObjects.Add(addedObject));
+            AddStep("copy hitobject", () => Editor.Copy());
+
+            AddStep("deselect all objects", () => EditorBeatmap.SelectedHitObjects.Clear());
+
+            AddAssert("is one object", () => EditorBeatmap.HitObjects.Count == 1);
+            AddStep("clone", () => Editor.Clone());
+            AddAssert("still one object", () => EditorBeatmap.HitObjects.Count == 1);
         }
     }
 }

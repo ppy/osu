@@ -2,60 +2,142 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Components.Menus
 {
-    public class EditorMenuBar : OsuMenu
+    public partial class EditorMenuBar : OsuMenu
     {
+        private const float heading_area = 114;
+
         public EditorMenuBar()
             : base(Direction.Horizontal, true)
         {
             RelativeSizeAxes = Axes.X;
 
             MaskingContainer.CornerRadius = 0;
-            ItemsContainer.Padding = new MarginPadding { Left = 100 };
-            BackgroundColour = Color4Extensions.FromHex("111");
+            ItemsContainer.Padding = new MarginPadding();
+
+            ContentContainer.Margin = new MarginPadding { Left = heading_area };
+            ContentContainer.Masking = true;
         }
 
-        protected override Framework.Graphics.UserInterface.Menu CreateSubMenu() => new SubMenu();
+        [BackgroundDependencyLoader]
+        private void load(OverlayColourProvider colourProvider, TextureStore textures)
+        {
+            BackgroundColour = colourProvider.Background3;
+
+            TextFlowContainer text;
+
+            AddRangeInternal(new[]
+            {
+                new Container
+                {
+                    RelativeSizeAxes = Axes.Y,
+                    Width = heading_area,
+                    Padding = new MarginPadding(8),
+                    Children = new Drawable[]
+                    {
+                        new SpriteIcon
+                        {
+                            Size = new Vector2(26),
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Icon = OsuIcon.EditCircle,
+                        },
+                        text = new TextFlowContainer
+                        {
+                            Anchor = Anchor.CentreRight,
+                            Origin = Anchor.CentreRight,
+                            AutoSizeAxes = Axes.Both,
+                        }
+                    }
+                },
+            });
+
+            text.AddText(@"osu!", t => t.Font = OsuFont.TorusAlternate);
+            text.AddText(@"editor", t =>
+            {
+                t.Font = OsuFont.TorusAlternate;
+                t.Colour = colourProvider.Highlight1;
+            });
+        }
+
+        protected override Framework.Graphics.UserInterface.Menu CreateSubMenu() => new SubMenu
+        {
+            MaxHeight = MaxHeight,
+        };
 
         protected override DrawableMenuItem CreateDrawableMenuItem(MenuItem item) => new DrawableEditorBarMenuItem(item);
 
-        private class DrawableEditorBarMenuItem : DrawableOsuMenuItem
+        internal partial class DrawableEditorBarMenuItem : DrawableMenuItem
         {
-            private BackgroundBox background;
+            private HoverClickSounds hoverClickSounds = null!;
+            private TextContainer text = null!;
 
             public DrawableEditorBarMenuItem(MenuItem item)
                 : base(item)
             {
-                Anchor = Anchor.CentreLeft;
-                Origin = Anchor.CentreLeft;
-
-                StateChanged += stateChanged;
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            private void load(OverlayColourProvider colourProvider)
             {
-                ForegroundColour = colours.BlueLight;
-                BackgroundColour = Color4.Transparent;
-                ForegroundColourHover = Color4.White;
-                BackgroundColourHover = colours.Gray3;
+                ForegroundColour = colourProvider.Light3;
+                BackgroundColour = colourProvider.Background2;
+                ForegroundColourHover = colourProvider.Content1;
+                BackgroundColourHover = colourProvider.Background1;
+
+                AddInternal(hoverClickSounds = new HoverClickSounds(HoverSampleSet.MenuOpen));
             }
 
-            public override void SetFlowDirection(Direction direction)
+            protected override void LoadComplete()
             {
-                AutoSizeAxes = Axes.Both;
+                base.LoadComplete();
+
+                Foreground.Anchor = Anchor.CentreLeft;
+                Foreground.Origin = Anchor.CentreLeft;
+                Item.Action.BindDisabledChanged(_ => updateState(), true);
+            }
+
+            protected override bool OnHover(HoverEvent e)
+            {
+                updateState();
+                return base.OnHover(e);
+            }
+
+            protected override void OnHoverLost(HoverLostEvent e)
+            {
+                updateState();
+                base.OnHoverLost(e);
+            }
+
+            private void updateState()
+            {
+                hoverClickSounds.Enabled.Value = IsActionable;
+                Alpha = IsActionable ? 1 : 0.2f;
+
+                if (IsHovered && IsActionable)
+                {
+                    text.BoldText.FadeIn(DrawableOsuMenuItem.TRANSITION_LENGTH, Easing.OutQuint);
+                    text.NormalText.FadeOut(DrawableOsuMenuItem.TRANSITION_LENGTH, Easing.OutQuint);
+                }
+                else
+                {
+                    text.BoldText.FadeOut(DrawableOsuMenuItem.TRANSITION_LENGTH, Easing.OutQuint);
+                    text.NormalText.FadeIn(DrawableOsuMenuItem.TRANSITION_LENGTH, Easing.OutQuint);
+                }
             }
 
             protected override void UpdateBackgroundColour()
@@ -74,94 +156,126 @@ namespace osu.Game.Screens.Edit.Components.Menus
                     base.UpdateForegroundColour();
             }
 
-            private void stateChanged(MenuItemState newState)
-            {
-                if (newState == MenuItemState.Selected)
-                    background.Expand();
-                else
-                    background.Contract();
-            }
+            protected sealed override Drawable CreateContent() => text = new TextContainer();
+        }
 
-            protected override Drawable CreateBackground() => background = new BackgroundBox();
-            protected override DrawableOsuMenuItem.TextContainer CreateTextContainer() => new TextContainer();
-
-            private new class TextContainer : DrawableOsuMenuItem.TextContainer
+        private partial class TextContainer : Container, IHasText
+        {
+            public LocalisableString Text
             {
-                public TextContainer()
+                get => NormalText.Text;
+                set
                 {
-                    NormalText.Font = NormalText.Font.With(size: 14);
-                    BoldText.Font = BoldText.Font.With(size: 14);
-                    NormalText.Margin = BoldText.Margin = new MarginPadding { Horizontal = 10, Vertical = MARGIN_VERTICAL };
+                    NormalText.Text = value;
+                    BoldText.Text = value;
                 }
             }
 
-            private class BackgroundBox : CompositeDrawable
-            {
-                private readonly Container innerBackground;
+            public readonly SpriteText NormalText;
+            public readonly SpriteText BoldText;
 
-                public BackgroundBox()
+            public TextContainer()
+            {
+                AutoSizeAxes = Axes.Both;
+
+                Child = new Container
                 {
-                    RelativeSizeAxes = Axes.Both;
-                    Masking = true;
-                    InternalChild = innerBackground = new Container
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+
+                    AutoSizeAxes = Axes.Both,
+                    Padding = new MarginPadding { Horizontal = 17, Vertical = DrawableOsuMenuItem.MARGIN_VERTICAL, },
+
+                    Children = new Drawable[]
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        Masking = true,
-                        CornerRadius = 4,
-                        Child = new Box { RelativeSizeAxes = Axes.Both }
-                    };
-                }
-
-                /// <summary>
-                /// Expands the background such that it doesn't show the bottom corners.
-                /// </summary>
-                public void Expand() => innerBackground.Height = 2;
-
-                /// <summary>
-                /// Contracts the background such that it shows the bottom corners.
-                /// </summary>
-                public void Contract() => innerBackground.Height = 1;
+                        NormalText = new OsuSpriteText
+                        {
+                            AlwaysPresent = true, // ensures that the menu item does not change width when switching between normal and bold text.
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Font = OsuFont.GetFont(size: DrawableOsuMenuItem.TEXT_SIZE),
+                        },
+                        BoldText = new OsuSpriteText
+                        {
+                            AlwaysPresent = true, // ensures that the menu item does not change width when switching between normal and bold text.
+                            Alpha = 0,
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Font = OsuFont.GetFont(size: DrawableOsuMenuItem.TEXT_SIZE, weight: FontWeight.Bold),
+                        }
+                    }
+                };
             }
         }
 
-        private class SubMenu : OsuMenu
+        private partial class SubMenu : OsuMenu
         {
             public SubMenu()
                 : base(Direction.Vertical)
             {
-                OriginPosition = new Vector2(5, 1);
-                ItemsContainer.Padding = new MarginPadding { Top = 5, Bottom = 5 };
+                ItemsContainer.Padding = new MarginPadding();
+
+                MaskingContainer.CornerRadius = 0;
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            private void load(OverlayColourProvider colourProvider)
             {
-                BackgroundColour = colours.Gray3;
+                BackgroundColour = colourProvider.Background2;
             }
 
-            protected override Framework.Graphics.UserInterface.Menu CreateSubMenu() => new SubMenu();
+            protected override Framework.Graphics.UserInterface.Menu CreateSubMenu() => new SubMenu
+            {
+                MaxHeight = MaxHeight,
+            };
 
             protected override DrawableMenuItem CreateDrawableMenuItem(MenuItem item)
             {
                 switch (item)
                 {
-                    case EditorMenuItemSpacer spacer:
+                    case OsuMenuItemSpacer spacer:
                         return new DrawableSpacer(spacer);
-                }
 
-                return base.CreateDrawableMenuItem(item);
+                    case StatefulMenuItem stateful:
+                        return new EditorStatefulMenuItem(stateful);
+
+                    default:
+                        return new EditorMenuItem(item);
+                }
             }
 
-            private class DrawableSpacer : DrawableOsuMenuItem
+            private partial class EditorStatefulMenuItem : DrawableStatefulMenuItem
             {
-                public DrawableSpacer(MenuItem item)
+                public EditorStatefulMenuItem(StatefulMenuItem item)
                     : base(item)
                 {
                 }
 
-                protected override bool OnHover(HoverEvent e) => true;
+                [BackgroundDependencyLoader]
+                private void load(OverlayColourProvider colourProvider)
+                {
+                    BackgroundColour = colourProvider.Background2;
+                    BackgroundColourHover = colourProvider.Background1;
 
-                protected override bool OnClick(ClickEvent e) => true;
+                    Foreground.Padding = new MarginPadding { Vertical = 2 };
+                }
+            }
+
+            private partial class EditorMenuItem : DrawableOsuMenuItem
+            {
+                public EditorMenuItem(MenuItem item)
+                    : base(item)
+                {
+                }
+
+                [BackgroundDependencyLoader]
+                private void load(OverlayColourProvider colourProvider)
+                {
+                    BackgroundColour = colourProvider.Background2;
+                    BackgroundColourHover = colourProvider.Background1;
+
+                    Foreground.Padding = new MarginPadding { Vertical = 2 };
+                }
             }
         }
     }

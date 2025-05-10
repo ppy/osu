@@ -1,20 +1,22 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Batches;
-using osu.Framework.Graphics.OpenGL.Vertices;
 using osu.Framework.Graphics.Primitives;
+using osu.Framework.Graphics.Rendering;
+using osu.Framework.Graphics.Rendering.Vertices;
 using osu.Framework.Graphics.Shaders;
+using osu.Framework.Graphics.Shaders.Types;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Graphics.Visualisation;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
-using osu.Framework.Layout;
 using osu.Framework.Timing;
 using osuTK;
 using osuTK.Graphics;
@@ -22,7 +24,8 @@ using osuTK.Graphics.ES30;
 
 namespace osu.Game.Rulesets.Osu.UI.Cursor
 {
-    public class CursorTrail : Drawable, IRequireHighFrequencyMousePosition
+    [DrawVisualiserHidden]
+    public partial class CursorTrail : Drawable, IRequireHighFrequencyMousePosition
     {
         private const int max_sprites = 2048;
 
@@ -31,14 +34,24 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         /// </summary>
         protected virtual float FadeExponent => 1.7f;
 
-        private readonly TrailPart[] parts = new TrailPart[max_sprites];
-        private int currentIndex;
-        private IShader shader;
-        private double timeOffset;
-        private float time;
+        /// <summary>
+        /// The scale used on creation of a new trail part.
+        /// </summary>
+        public Vector2 NewPartScale { get; set; } = Vector2.One;
 
-        private Anchor trailOrigin = Anchor.Centre;
+        /// <summary>
+        /// The rotation (in degrees) to apply to trail parts when <see cref="AllowPartRotation"/> is <c>true</c>.
+        /// </summary>
+        public float PartRotation { get; set; }
 
+        /// <summary>
+        /// Whether to rotate trail parts based on the value of <see cref="PartRotation"/>.
+        /// </summary>
+        protected bool AllowPartRotation { get; set; }
+
+        /// <summary>
+        /// The trail part texture origin.
+        /// </summary>
         protected Anchor TrailOrigin
         {
             get => trailOrigin;
@@ -48,6 +61,13 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 Invalidate(Invalidation.DrawNode);
             }
         }
+
+        private readonly TrailPart[] parts = new TrailPart[max_sprites];
+        private Anchor trailOrigin = Anchor.Centre;
+        private int currentIndex;
+        private IShader shader;
+        private double timeOffset;
+        private float time;
 
         public CursorTrail()
         {
@@ -61,13 +81,12 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 // -1 signals that the part is unusable, and should not be drawn
                 parts[i].InvalidationID = -1;
             }
-
-            AddLayout(partSizeCache);
         }
 
         [BackgroundDependencyLoader]
-        private void load(ShaderManager shaders)
+        private void load(IRenderer renderer, ShaderManager shaders)
         {
+            texture ??= renderer.WhitePixel;
             shader = shaders.Load(@"CursorTrail", FragmentShaderDescriptor.TEXTURE);
         }
 
@@ -77,7 +96,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             resetTime();
         }
 
-        private Texture texture = Texture.WhitePixel;
+        private Texture texture;
 
         public Texture Texture
         {
@@ -91,12 +110,6 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 Invalidate(Invalidation.DrawNode);
             }
         }
-
-        private readonly LayoutValue<Vector2> partSizeCache = new LayoutValue<Vector2>(Invalidation.DrawInfo | Invalidation.RequiredParentSizeToFit | Invalidation.Presence);
-
-        private Vector2 partSize => partSizeCache.IsValid
-            ? partSizeCache.Value
-            : (partSizeCache.Value = new Vector2(Texture.DisplayWidth, Texture.DisplayHeight) * DrawInfo.Matrix.ExtractScale().Xy);
 
         /// <summary>
         /// The amount of time to fade the cursor trail pieces.
@@ -153,6 +166,8 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
         protected void AddTrail(Vector2 position)
         {
+            position = ToLocalSpace(position);
+
             if (InterpolateMovements)
             {
                 if (!lastPosition.HasValue)
@@ -171,7 +186,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                     float distance = diff.Length;
                     Vector2 direction = diff / distance;
 
-                    float interval = partSize.X / 2.5f * IntervalMultiplier;
+                    float interval = Texture.DisplayWidth / 2.5f * IntervalMultiplier;
                     float stopAt = distance - (AvoidDrawingNearCursor ? interval : 0);
 
                     for (float d = interval; d < stopAt; d += interval)
@@ -188,10 +203,11 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             }
         }
 
-        private void addPart(Vector2 screenSpacePosition)
+        private void addPart(Vector2 localSpacePosition)
         {
-            parts[currentIndex].Position = screenSpacePosition;
+            parts[currentIndex].Position = localSpacePosition;
             parts[currentIndex].Time = time + 1;
+            parts[currentIndex].Scale = NewPartScale;
             ++parts[currentIndex].InvalidationID;
 
             currentIndex = (currentIndex + 1) % max_sprites;
@@ -203,6 +219,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         {
             public Vector2 Position;
             public float Time;
+            public Vector2 Scale;
             public long InvalidationID;
         }
 
@@ -215,12 +232,12 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
             private float time;
             private float fadeExponent;
+            private float angle;
 
             private readonly TrailPart[] parts = new TrailPart[max_sprites];
-            private Vector2 size;
             private Vector2 originPosition;
 
-            private readonly QuadBatch<TexturedTrailVertex> vertexBatch = new QuadBatch<TexturedTrailVertex>(max_sprites, 1);
+            private IVertexBatch<TexturedTrailVertex> vertexBatch;
 
             public TrailDrawNode(CursorTrail source)
                 : base(source)
@@ -233,36 +250,51 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
                 shader = Source.shader;
                 texture = Source.texture;
-                size = Source.partSize;
                 time = Source.time;
                 fadeExponent = Source.FadeExponent;
+                angle = Source.AllowPartRotation ? float.DegreesToRadians(Source.PartRotation) : 0;
 
                 originPosition = Vector2.Zero;
 
-                if (Source.TrailOrigin.HasFlagFast(Anchor.x1))
+                if (Source.TrailOrigin.HasFlag(Anchor.x1))
                     originPosition.X = 0.5f;
-                else if (Source.TrailOrigin.HasFlagFast(Anchor.x2))
+                else if (Source.TrailOrigin.HasFlag(Anchor.x2))
                     originPosition.X = 1f;
 
-                if (Source.TrailOrigin.HasFlagFast(Anchor.y1))
+                if (Source.TrailOrigin.HasFlag(Anchor.y1))
                     originPosition.Y = 0.5f;
-                else if (Source.TrailOrigin.HasFlagFast(Anchor.y2))
+                else if (Source.TrailOrigin.HasFlag(Anchor.y2))
                     originPosition.Y = 1f;
 
                 Source.parts.CopyTo(parts, 0);
             }
 
-            public override void Draw(Action<TexturedVertex2D> vertexAction)
+            private IUniformBuffer<CursorTrailParameters> cursorTrailParameters;
+
+            protected override void Draw(IRenderer renderer)
             {
-                base.Draw(vertexAction);
+                base.Draw(renderer);
+
+                vertexBatch ??= renderer.CreateQuadBatch<TexturedTrailVertex>(max_sprites, 1);
+
+                cursorTrailParameters ??= renderer.CreateUniformBuffer<CursorTrailParameters>();
+                cursorTrailParameters.Data = cursorTrailParameters.Data with
+                {
+                    FadeClock = time,
+                    FadeExponent = fadeExponent
+                };
 
                 shader.Bind();
-                shader.GetUniform<float>("g_FadeClock").UpdateValue(ref time);
-                shader.GetUniform<float>("g_FadeExponent").UpdateValue(ref fadeExponent);
+                shader.BindUniformBlock("m_CursorTrailParameters", cursorTrailParameters);
 
-                texture.TextureGL.Bind();
+                texture.Bind();
 
                 RectangleF textureRect = texture.GetTextureRect();
+
+                renderer.PushLocalMatrix(DrawInfo.Matrix);
+
+                float sin = MathF.Sin(angle);
+                float cos = MathF.Cos(angle);
 
                 foreach (var part in parts)
                 {
@@ -274,7 +306,9 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
                     vertexBatch.Add(new TexturedTrailVertex
                     {
-                        Position = new Vector2(part.Position.X - size.X * originPosition.X, part.Position.Y + size.Y * (1 - originPosition.Y)),
+                        Position = rotateAround(
+                            new Vector2(part.Position.X - texture.DisplayWidth * originPosition.X * part.Scale.X, part.Position.Y + texture.DisplayHeight * (1 - originPosition.Y) * part.Scale.Y),
+                            part.Position, sin, cos),
                         TexturePosition = textureRect.BottomLeft,
                         TextureRect = new Vector4(0, 0, 1, 1),
                         Colour = DrawColourInfo.Colour.BottomLeft.Linear,
@@ -283,7 +317,9 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
                     vertexBatch.Add(new TexturedTrailVertex
                     {
-                        Position = new Vector2(part.Position.X + size.X * (1 - originPosition.X), part.Position.Y + size.Y * (1 - originPosition.Y)),
+                        Position = rotateAround(
+                            new Vector2(part.Position.X + texture.DisplayWidth * (1 - originPosition.X) * part.Scale.X,
+                                part.Position.Y + texture.DisplayHeight * (1 - originPosition.Y) * part.Scale.Y), part.Position, sin, cos),
                         TexturePosition = textureRect.BottomRight,
                         TextureRect = new Vector4(0, 0, 1, 1),
                         Colour = DrawColourInfo.Colour.BottomRight.Linear,
@@ -292,7 +328,9 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
                     vertexBatch.Add(new TexturedTrailVertex
                     {
-                        Position = new Vector2(part.Position.X + size.X * (1 - originPosition.X), part.Position.Y - size.Y * originPosition.Y),
+                        Position = rotateAround(
+                            new Vector2(part.Position.X + texture.DisplayWidth * (1 - originPosition.X) * part.Scale.X, part.Position.Y - texture.DisplayHeight * originPosition.Y * part.Scale.Y),
+                            part.Position, sin, cos),
                         TexturePosition = textureRect.TopRight,
                         TextureRect = new Vector4(0, 0, 1, 1),
                         Colour = DrawColourInfo.Colour.TopRight.Linear,
@@ -301,7 +339,9 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
                     vertexBatch.Add(new TexturedTrailVertex
                     {
-                        Position = new Vector2(part.Position.X - size.X * originPosition.X, part.Position.Y - size.Y * originPosition.Y),
+                        Position = rotateAround(
+                            new Vector2(part.Position.X - texture.DisplayWidth * originPosition.X * part.Scale.X, part.Position.Y - texture.DisplayHeight * originPosition.Y * part.Scale.Y),
+                            part.Position, sin, cos),
                         TexturePosition = textureRect.TopLeft,
                         TextureRect = new Vector4(0, 0, 1, 1),
                         Colour = DrawColourInfo.Colour.TopLeft.Linear,
@@ -309,15 +349,34 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                     });
                 }
 
+                renderer.PopLocalMatrix();
+
                 vertexBatch.Draw();
                 shader.Unbind();
+            }
+
+            private static Vector2 rotateAround(Vector2 input, Vector2 origin, float sin, float cos)
+            {
+                float xTranslated = input.X - origin.X;
+                float yTranslated = input.Y - origin.Y;
+
+                return new Vector2(xTranslated * cos - yTranslated * sin, xTranslated * sin + yTranslated * cos) + origin;
             }
 
             protected override void Dispose(bool isDisposing)
             {
                 base.Dispose(isDisposing);
 
-                vertexBatch.Dispose();
+                vertexBatch?.Dispose();
+                cursorTrailParameters?.Dispose();
+            }
+
+            [StructLayout(LayoutKind.Sequential, Pack = 1)]
+            private record struct CursorTrailParameters
+            {
+                public UniformFloat FadeClock;
+                public UniformFloat FadeExponent;
+                private readonly UniformPadding8 pad1;
             }
         }
 

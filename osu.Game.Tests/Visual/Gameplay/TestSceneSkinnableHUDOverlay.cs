@@ -1,47 +1,57 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Audio.Track;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
-using osu.Framework.Timing;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Osu.Beatmaps;
+using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
-using osu.Game.Tests.Beatmaps;
-using osuTK.Input;
+using osu.Game.Screens.Play.HUD;
+using osu.Game.Skinning;
+using osu.Game.Tests.Gameplay;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneSkinnableHUDOverlay : SkinnableTestScene
+    public partial class TestSceneSkinnableHUDOverlay : SkinnableTestScene
     {
         private HUDOverlay hudOverlay;
 
-        [Cached]
-        private ScoreProcessor scoreProcessor = new ScoreProcessor(new OsuRuleset());
+        [Cached(typeof(ScoreProcessor))]
+        private ScoreProcessor scoreProcessor { get; set; }
 
         [Cached(typeof(HealthProcessor))]
         private HealthProcessor healthProcessor = new DrainingHealthProcessor(0);
 
         [Cached]
-        private GameplayState gameplayState = new GameplayState(new TestBeatmap(new OsuRuleset().RulesetInfo), new OsuRuleset());
+        private GameplayState gameplayState = TestGameplayState.Create(new OsuRuleset());
 
-        [Cached]
-        private readonly GameplayClock gameplayClock = new GameplayClock(new FramedClock());
+        [Cached(typeof(IGameplayClock))]
+        private readonly IGameplayClock gameplayClock = new GameplayClockContainer(new TrackVirtual(60000), false, false);
 
         private IEnumerable<HUDOverlay> hudOverlays => CreatedDrawables.OfType<HUDOverlay>();
 
         // best way to check without exposing.
-        private Drawable hideTarget => hudOverlay.KeyCounter;
-        private FillFlowContainer<KeyCounter> keyCounterFlow => hudOverlay.KeyCounter.ChildrenOfType<FillFlowContainer<KeyCounter>>().First();
+        private Drawable hideTarget => hudOverlay.ChildrenOfType<SkinnableContainer>().First();
+        private Drawable keyCounterFlow => hudOverlay.ChildrenOfType<KeyCounterDisplay>().First().ChildrenOfType<FillFlowContainer<KeyCounter>>().Single();
+
+        public TestSceneSkinnableHUDOverlay()
+        {
+            scoreProcessor = gameplayState.ScoreProcessor;
+        }
 
         [Test]
         public void TestComboCounterIncrementing()
@@ -59,7 +69,6 @@ namespace osu.Game.Tests.Visual.Gameplay
             float? initialAlpha = null;
 
             createNew(h => h.OnLoadComplete += _ => initialAlpha = hideTarget.Alpha);
-            AddUntilStep("wait for load", () => hudOverlay.IsAlive);
             AddAssert("initial alpha was less than 1", () => initialAlpha < 1);
         }
 
@@ -70,7 +79,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("set showhud false", () => hudOverlays.ForEach(h => h.ShowHud.Value = false));
 
-            AddUntilStep("hidetarget is hidden", () => !hideTarget.IsPresent);
+            AddUntilStep("hidetarget is hidden", () => hideTarget.Alpha, () => Is.LessThanOrEqualTo(0));
             AddAssert("pause button is still visible", () => hudOverlay.HoldToQuit.IsPresent);
 
             // Key counter flow container should not be affected by this, only the key counter display will be hidden as checked above.
@@ -83,16 +92,16 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 SetContents(_ =>
                 {
-                    hudOverlay = new HUDOverlay(null, Array.Empty<Mod>());
-
-                    // Add any key just to display the key counter visually.
-                    hudOverlay.KeyCounter.Add(new KeyCounterKeyboard(Key.Space));
+                    hudOverlay = new HUDOverlay(new DrawableOsuRuleset(new OsuRuleset(), new OsuBeatmap()), Array.Empty<Mod>());
 
                     action?.Invoke(hudOverlay);
 
                     return hudOverlay;
                 });
             });
+            AddUntilStep("HUD overlay loaded", () => hudOverlay.IsAlive);
+            AddUntilStep("components container loaded",
+                () => hudOverlay.ChildrenOfType<SkinnableContainer>().Any(scc => scc.ComponentsLoaded));
         }
 
         protected override Ruleset CreateRulesetForSkinProvider() => new OsuRuleset();

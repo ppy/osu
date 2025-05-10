@@ -9,7 +9,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneTwoLayerButton : OsuTestScene
+    public partial class TestSceneTwoLayerButton : OsuTestScene
     {
         public TestSceneTwoLayerButton()
         {

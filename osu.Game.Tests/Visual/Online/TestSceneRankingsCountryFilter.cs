@@ -14,14 +14,14 @@ using osu.Framework.Allocation;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneRankingsCountryFilter : OsuTestScene
+    public partial class TestSceneRankingsCountryFilter : OsuTestScene
     {
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Green);
 
         public TestSceneRankingsCountryFilter()
         {
-            var countryBindable = new Bindable<Country>();
+            var countryBindable = new Bindable<CountryCode>();
 
             AddRange(new Drawable[]
             {
@@ -54,20 +54,12 @@ namespace osu.Game.Tests.Visual.Online
                 }
             });
 
-            var country = new Country
-            {
-                FlagName = "BY",
-                FullName = "Belarus"
-            };
-            var unknownCountry = new Country
-            {
-                FlagName = "CK",
-                FullName = "Cook Islands"
-            };
+            const CountryCode country = CountryCode.BY;
+            const CountryCode unknown_country = CountryCode.CK;
 
             AddStep("Set country", () => countryBindable.Value = country);
-            AddStep("Set null country", () => countryBindable.Value = null);
-            AddStep("Set country with no flag", () => countryBindable.Value = unknownCountry);
+            AddStep("Set default country", () => countryBindable.Value = default);
+            AddStep("Set country with no flag", () => countryBindable.Value = unknown_country);
         }
     }
 }

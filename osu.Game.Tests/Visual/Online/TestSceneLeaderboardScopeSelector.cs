@@ -10,7 +10,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneLeaderboardScopeSelector : OsuTestScene
+    public partial class TestSceneLeaderboardScopeSelector : OsuTestScene
     {
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);

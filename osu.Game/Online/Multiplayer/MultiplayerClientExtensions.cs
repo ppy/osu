@@ -1,12 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
+using osu.Framework.Extensions.ExceptionExtensions;
 using osu.Framework.Logging;
 
 namespace osu.Game.Online.Multiplayer
@@ -18,21 +17,15 @@ namespace osu.Game.Online.Multiplayer
             {
                 if (t.IsFaulted)
                 {
-                    Exception? exception = t.Exception;
+                    Debug.Assert(t.Exception != null);
+                    Exception exception = t.Exception.AsSingular();
 
-                    if (exception is AggregateException ae)
-                        exception = ae.InnerException;
+                    if (exception.GetHubExceptionMessage() is string message)
+                        // Hub exceptions generally contain something we can show the user directly.
+                        Logger.Log(message, level: LogLevel.Important);
+                    else
+                        Logger.Error(exception, $"Unobserved exception occurred via {nameof(FireAndForget)} call: {exception.Message}");
 
-                    Debug.Assert(exception != null);
-
-                    string message = exception is HubException
-                        // HubExceptions arrive with additional message context added, but we want to display the human readable message:
-                        // "An unexpected error occurred invoking 'AddPlaylistItem' on the server.InvalidStateException: Can't enqueue more than 3 items at once."
-                        // We generally use the message field for a user-parseable error (eventually to be replaced), so drop the first part for now.
-                        ? exception.Message.Substring(exception.Message.IndexOf(':') + 1).Trim()
-                        : exception.Message;
-
-                    Logger.Log(message, level: LogLevel.Important);
                     onError?.Invoke(exception);
                 }
                 else
@@ -40,5 +33,16 @@ namespace osu.Game.Online.Multiplayer
                     onSuccess?.Invoke();
                 }
             });
+
+        public static string? GetHubExceptionMessage(this Exception exception)
+        {
+            if (exception is HubException hubException)
+                // HubExceptions arrive with additional message context added, but we want to display the human readable message:
+                // "An unexpected error occurred invoking 'AddPlaylistItem' on the server.InvalidStateException: Can't enqueue more than 3 items at once."
+                // We generally use the message field for a user-parseable error (eventually to be replaced), so drop the first part for now.
+                return hubException.Message.Substring(exception.Message.IndexOf(':') + 1).Trim();
+
+            return null;
+        }
     }
 }

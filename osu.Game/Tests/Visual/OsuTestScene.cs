@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -14,6 +16,7 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
@@ -21,6 +24,7 @@ using osu.Framework.Testing;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.Graphics;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
@@ -34,8 +38,7 @@ using osu.Game.Tests.Rulesets;
 
 namespace osu.Game.Tests.Visual
 {
-    [ExcludeFromDynamicCompile]
-    public abstract class OsuTestScene : TestScene
+    public abstract partial class OsuTestScene : TestScene
     {
         [Cached]
         protected Bindable<WorkingBeatmap> Beatmap { get; } = new Bindable<WorkingBeatmap>();
@@ -157,19 +160,24 @@ namespace osu.Game.Tests.Visual
             return Dependencies;
         }
 
+        [Resolved]
+        private OsuColour colours { get; set; }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            var parentBeatmap = Parent.Dependencies.Get<Bindable<WorkingBeatmap>>();
+            ChangeBackgroundColour(ColourInfo.GradientVertical(colours.GreyCarmine, colours.GreyCarmineDarker));
+
+            var parentBeatmap = Parent!.Dependencies.Get<Bindable<WorkingBeatmap>>();
             parentBeatmap.Value = Beatmap.Value;
             Beatmap.BindTo(parentBeatmap);
 
-            var parentRuleset = Parent.Dependencies.Get<Bindable<RulesetInfo>>();
+            var parentRuleset = Parent!.Dependencies.Get<Bindable<RulesetInfo>>();
             parentRuleset.Value = Ruleset.Value;
             Ruleset.BindTo(parentRuleset);
 
-            var parentMods = Parent.Dependencies.Get<Bindable<IReadOnlyList<Mod>>>();
+            var parentMods = Parent!.Dependencies.Get<Bindable<IReadOnlyList<Mod>>>();
             parentMods.Value = SelectedMods.Value;
             SelectedMods.BindTo(parentMods);
         }
@@ -264,7 +272,7 @@ namespace osu.Game.Tests.Visual
         {
             Debug.Assert(original.BeatmapSet != null);
 
-            return new APIBeatmapSet
+            var result = new APIBeatmapSet
             {
                 OnlineID = original.BeatmapSet.OnlineID,
                 Status = BeatmapOnlineStatus.Ranked,
@@ -298,8 +306,15 @@ namespace osu.Game.Tests.Visual
                         StarRating = original.StarRating,
                         DifficultyName = original.DifficultyName,
                     }
-                }
+                },
+                HasFavourited = false,
+                FavouriteCount = 0,
             };
+
+            foreach (var beatmap in result.Beatmaps)
+                beatmap.BeatmapSet = result;
+
+            return result;
         }
 
         protected WorkingBeatmap CreateWorkingBeatmap(RulesetInfo ruleset) =>
@@ -363,6 +378,11 @@ namespace osu.Game.Tests.Visual
                 }
                 else
                     track = audio?.Tracks.GetVirtual(trackLength);
+
+                // We are guaranteed to have a virtual track.
+                // To ease testability, ensure the track is available from point of construction.
+                // (Usually this would be done by MusicController for us).
+                LoadTrack();
             }
 
             ~ClockBackedTestWorkingBeatmap()
@@ -372,6 +392,13 @@ namespace osu.Game.Tests.Visual
             }
 
             protected override Track GetBeatmapTrack() => track;
+
+            public override bool TryTransferTrack(WorkingBeatmap target)
+            {
+                // Our track comes from a local track store that's disposed on finalizer,
+                // therefore it's unsafe to transfer it to another working beatmap.
+                return false;
+            }
 
             public class TrackVirtualStore : AudioCollectionManager<Track>, ITrackStore
             {
@@ -390,9 +417,9 @@ namespace osu.Game.Tests.Visual
 
                 public IEnumerable<string> GetAvailableResources() => throw new NotImplementedException();
 
-                public Track GetVirtual(double length = double.PositiveInfinity)
+                public Track GetVirtual(double length = double.PositiveInfinity, string name = "virtual")
                 {
-                    var track = new TrackVirtualManual(referenceClock) { Length = length };
+                    var track = new TrackVirtualManual(referenceClock, name) { Length = length };
                     AddItem(track);
                     return track;
                 }
@@ -407,7 +434,13 @@ namespace osu.Game.Tests.Visual
 
                 private bool running;
 
-                public TrackVirtualManual(IFrameBasedClock referenceClock)
+                public override double Rate => base.Rate
+                                               // This is mainly to allow some tests to override the rate to zero
+                                               // and avoid interpolation.
+                                               * referenceClock.Rate;
+
+                public TrackVirtualManual(IFrameBasedClock referenceClock, string name = "virtual")
+                    : base(name)
                 {
                     this.referenceClock = referenceClock;
                     Length = double.PositiveInfinity;
@@ -421,9 +454,17 @@ namespace osu.Game.Tests.Visual
                     return accumulated == seek;
                 }
 
+                public override Task<bool> SeekAsync(double seek) => Task.FromResult(Seek(seek));
+
                 public override void Start()
                 {
                     running = true;
+                }
+
+                public override Task StartAsync()
+                {
+                    Start();
+                    return Task.CompletedTask;
                 }
 
                 public override void Reset()
@@ -439,6 +480,12 @@ namespace osu.Game.Tests.Visual
                         running = false;
                         lastReferenceTime = null;
                     }
+                }
+
+                public override Task StopAsync()
+                {
+                    Stop();
+                    return Task.CompletedTask;
                 }
 
                 public override bool IsRunning => running;
@@ -474,7 +521,7 @@ namespace osu.Game.Tests.Visual
             }
         }
 
-        public class OsuTestSceneTestRunner : OsuGameBase, ITestSceneTestRunner
+        public partial class OsuTestSceneTestRunner : OsuGameBase, ITestSceneTestRunner
         {
             private TestSceneTestRunner.TestRunner runner;
 

@@ -1,9 +1,8 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Diagnostics;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Configuration;
@@ -20,13 +19,11 @@ namespace osu.Game.IO
         /// <summary>
         /// The custom storage path as selected by the user.
         /// </summary>
-        [CanBeNull]
-        public string CustomStoragePath => storageConfig.Get<string>(StorageConfig.FullPath);
+        public string? CustomStoragePath => storageConfig.Get<string>(StorageConfig.FullPath);
 
         /// <summary>
         /// The default storage path to be used if a custom storage path hasn't been selected or is not accessible.
         /// </summary>
-        [NotNull]
         public string DefaultStoragePath => defaultStorage.GetFullPath(".");
 
         private readonly GameHost host;
@@ -36,15 +33,20 @@ namespace osu.Game.IO
         public override string[] IgnoreDirectories => new[]
         {
             "cache",
-            $"{OsuGameBase.CLIENT_DATABASE_FILENAME}.management",
         };
 
         public override string[] IgnoreFiles => new[]
         {
             "framework.ini",
             "storage.ini",
-            $"{OsuGameBase.CLIENT_DATABASE_FILENAME}.note",
-            $"{OsuGameBase.CLIENT_DATABASE_FILENAME}.lock",
+        };
+
+        public override string[] IgnoreSuffixes => new[]
+        {
+            // Realm pipe files don't play well with copy operations
+            ".note",
+            ".lock",
+            ".management",
         };
 
         public OsuStorage(GameHost host, Storage defaultStorage)
@@ -58,6 +60,11 @@ namespace osu.Game.IO
             if (!string.IsNullOrEmpty(CustomStoragePath))
                 TryChangeToCustomStorage(out Error);
         }
+
+        /// <summary>
+        /// Returns the <see cref="Storage"/> used for storing exported files.
+        /// </summary>
+        public virtual Storage GetExportStorage() => GetStorageForDirectory(@"exports");
 
         /// <summary>
         /// Resets the custom storage path, changing the target storage to the default location.
@@ -92,6 +99,8 @@ namespace osu.Game.IO
             error = OsuStorageError.None;
             Storage lastStorage = UnderlyingStorage;
 
+            Logger.Log($"Attempting to use custom storage location {CustomStoragePath}");
+
             try
             {
                 Storage userStorage = host.GetStorage(CustomStoragePath);
@@ -100,12 +109,16 @@ namespace osu.Game.IO
                     error = OsuStorageError.AccessibleButEmpty;
 
                 ChangeTargetStorage(userStorage);
+                Logger.Log($"Storage successfully changed to {CustomStoragePath}.");
             }
             catch
             {
                 error = OsuStorageError.NotAccessible;
                 ChangeTargetStorage(lastStorage);
             }
+
+            if (error != OsuStorageError.None)
+                Logger.Log($"Custom storage location could not be used ({error}).");
 
             return error == OsuStorageError.None;
         }

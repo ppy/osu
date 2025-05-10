@@ -7,7 +7,6 @@ using System.Linq;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Framework.Localisation;
-using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Models;
@@ -16,22 +15,47 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Scoring.Legacy;
 using osu.Game.Users;
 using osu.Game.Utils;
 using Realms;
 
-#nullable enable
-
 namespace osu.Game.Scoring
 {
-    [ExcludeFromDynamicCompile]
+    /// <summary>
+    /// A realm model containing metadata for a single score.
+    /// </summary>
     [MapTo("Score")]
     public class ScoreInfo : RealmObject, IHasGuidPrimaryKey, IHasRealmFiles, ISoftDelete, IEquatable<ScoreInfo>, IScoreInfo
     {
         [PrimaryKey]
         public Guid ID { get; set; }
 
-        public BeatmapInfo BeatmapInfo { get; set; } = null!;
+        /// <summary>
+        /// The <see cref="BeatmapInfo"/> this score was made against.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// This property may be <see langword="null"/> if the score was set on a beatmap (or a version of the beatmap) that is not available locally
+        /// e.g. due to online updates, or local modifications to the beatmap.
+        /// The property will only link to a <see cref="BeatmapInfo"/> if its <see cref="Beatmaps.BeatmapInfo.Hash"/> matches <see cref="BeatmapHash"/>.
+        /// </para>
+        /// <para>
+        /// Due to the above, whenever setting this, make sure to also set <see cref="BeatmapHash"/> to allow relational consistency when a beatmap is potentially changed.
+        /// </para>
+        /// </remarks>
+        public BeatmapInfo? BeatmapInfo { get; set; }
+
+        /// <summary>
+        /// The version of the client this score was set using.
+        /// Sourced from <see cref="OsuGameBase.Version"/> at the point of score submission.
+        /// </summary>
+        public string ClientVersion { get; set; } = string.Empty;
+
+        /// <summary>
+        /// The <see cref="osu.Game.Beatmaps.BeatmapInfo.Hash"/> at the point in time when the score was set.
+        /// </summary>
+        public string BeatmapHash { get; set; } = string.Empty;
 
         public RulesetInfo Ruleset { get; set; } = null!;
 
@@ -41,20 +65,83 @@ namespace osu.Game.Scoring
 
         public bool DeletePending { get; set; }
 
+        /// <summary>
+        /// The total number of points awarded for the score.
+        /// </summary>
         public long TotalScore { get; set; }
+
+        /// <summary>
+        /// The total number of points awarded for the score without including mod multipliers.
+        /// </summary>
+        /// <remarks>
+        /// The purpose of this property is to enable future lossless rebalances of mod multipliers.
+        /// </remarks>
+        public long TotalScoreWithoutMods { get; set; }
+
+        /// <summary>
+        /// The version of processing applied to calculate total score as stored in the database.
+        /// If this does not match <see cref="LegacyScoreEncoder.LATEST_VERSION"/>,
+        /// the total score has not yet been updated to reflect the current scoring values.
+        ///
+        /// See <see cref="BackgroundDataStoreProcessor"/>'s conversion logic.
+        /// </summary>
+        /// <remarks>
+        /// This may not match the version stored in the replay files.
+        /// </remarks>
+        public int TotalScoreVersion { get; set; } = LegacyScoreEncoder.LATEST_VERSION;
+
+        /// <summary>
+        /// Used to preserve the total score for legacy scores.
+        /// </summary>
+        /// <remarks>
+        /// Not populated if <see cref="IsLegacyScore"/> is <c>false</c>.
+        /// </remarks>
+        public long? LegacyTotalScore { get; set; }
+
+        /// <summary>
+        /// If background processing of this beatmap failed in some way, this flag will become <c>true</c>.
+        /// Should be used to ensure we don't repeatedly attempt to reprocess the same scores each startup even though we already know they will fail.
+        /// </summary>
+        /// <remarks>
+        /// See https://github.com/ppy/osu/issues/24301 for one example of how this can occur (missing beatmap file on disk).
+        /// </remarks>
+        public bool BackgroundReprocessingFailed { get; set; }
 
         public int MaxCombo { get; set; }
 
         public double Accuracy { get; set; }
 
-        public bool HasReplay { get; set; }
+        [Ignored]
+        public bool HasOnlineReplay { get; set; }
 
         public DateTimeOffset Date { get; set; }
 
         public double? PP { get; set; }
 
+        /// <summary>
+        /// Whether the performance points in this score is awarded to the player. This is used for online display purposes (see <see cref="SoloScoreInfo.Ranked"/>).
+        /// </summary>
+        [Ignored]
+        public bool Ranked { get; set; }
+
+        /// <summary>
+        /// The online ID of this score.
+        /// </summary>
+        /// <remarks>
+        /// In the osu-web database, this ID (if present) comes from the new <c>solo_scores</c> table.
+        /// </remarks>
         [Indexed]
         public long OnlineID { get; set; } = -1;
+
+        /// <summary>
+        /// The legacy online ID of this score.
+        /// </summary>
+        /// <remarks>
+        /// In the osu-web database, this ID (if present) comes from the legacy <c>osu_scores_*_high</c> tables.
+        /// This ID is also stored to replays set on osu!stable.
+        /// </remarks>
+        [Indexed]
+        public long LegacyOnlineID { get; set; } = -1;
 
         [MapTo("User")]
         public RealmUser RealmUser { get; set; } = null!;
@@ -65,16 +152,20 @@ namespace osu.Game.Scoring
         [MapTo("Statistics")]
         public string StatisticsJson { get; set; } = string.Empty;
 
+        [MapTo("MaximumStatistics")]
+        public string MaximumStatisticsJson { get; set; } = string.Empty;
+
         public ScoreInfo(BeatmapInfo? beatmap = null, RulesetInfo? ruleset = null, RealmUser? realmUser = null)
         {
             Ruleset = ruleset ?? new RulesetInfo();
             BeatmapInfo = beatmap ?? new BeatmapInfo();
+            BeatmapHash = BeatmapInfo.Hash;
             RealmUser = realmUser ?? new RealmUser();
             ID = Guid.NewGuid();
         }
 
         [UsedImplicitly] // Realm
-        private ScoreInfo()
+        protected ScoreInfo()
         {
         }
 
@@ -87,8 +178,9 @@ namespace osu.Game.Scoring
         {
             get => user ??= new APIUser
             {
-                Username = RealmUser.Username,
                 Id = RealmUser.OnlineID,
+                Username = RealmUser.Username,
+                CountryCode = RealmUser.CountryCode,
             };
             set
             {
@@ -97,7 +189,8 @@ namespace osu.Game.Scoring
                 RealmUser = new RealmUser
                 {
                     OnlineID = user.OnlineID,
-                    Username = user.Username
+                    Username = user.Username,
+                    CountryCode = user.CountryCode,
                 };
             }
         }
@@ -113,13 +206,10 @@ namespace osu.Game.Scoring
         public int RankInt { get; set; }
 
         IRulesetInfo IScoreInfo.Ruleset => Ruleset;
-        IBeatmapInfo IScoreInfo.Beatmap => BeatmapInfo;
+        IBeatmapInfo? IScoreInfo.Beatmap => BeatmapInfo;
         IUser IScoreInfo.User => User;
-        IEnumerable<INamedFileUsage> IHasNamedFiles.Files => Files;
 
         #region Properties required to make things work with existing usages
-
-        public Guid BeatmapInfoID => BeatmapInfo.ID;
 
         public int UserID => RealmUser.OnlineID;
 
@@ -133,10 +223,18 @@ namespace osu.Game.Scoring
             var clone = (ScoreInfo)this.Detach().MemberwiseClone();
 
             clone.Statistics = new Dictionary<HitResult, int>(clone.Statistics);
+            clone.MaximumStatistics = new Dictionary<HitResult, int>(clone.MaximumStatistics);
+            clone.HitEvents = new List<HitEvent>(clone.HitEvents);
+
+            // Ensure we have fresh mods to avoid any references (ie. after gameplay).
+            clone.clearAllMods();
+            clone.ModsJson = ModsJson;
+
             clone.RealmUser = new RealmUser
             {
                 OnlineID = RealmUser.OnlineID,
                 Username = RealmUser.Username,
+                CountryCode = RealmUser.CountryCode,
             };
 
             return clone;
@@ -159,8 +257,7 @@ namespace osu.Game.Scoring
         /// <summary>
         /// Whether this <see cref="ScoreInfo"/> represents a legacy (osu!stable) score.
         /// </summary>
-        [Ignored]
-        public bool IsLegacyScore => Mods.OfType<ModClassic>().Any();
+        public bool IsLegacyScore { get; set; }
 
         private Dictionary<HitResult, int>? statistics;
 
@@ -178,6 +275,24 @@ namespace osu.Game.Scoring
                 return statistics ??= new Dictionary<HitResult, int>();
             }
             set => statistics = value;
+        }
+
+        private Dictionary<HitResult, int>? maximumStatistics;
+
+        [Ignored]
+        public Dictionary<HitResult, int> MaximumStatistics
+        {
+            get
+            {
+                if (maximumStatistics != null)
+                    return maximumStatistics;
+
+                if (!string.IsNullOrEmpty(MaximumStatisticsJson))
+                    maximumStatistics = JsonConvert.DeserializeObject<Dictionary<HitResult, int>>(MaximumStatisticsJson);
+
+                return maximumStatistics ??= new Dictionary<HitResult, int>();
+            }
+            set => maximumStatistics = value;
         }
 
         private Mod[]? mods;
@@ -251,22 +366,14 @@ namespace osu.Game.Scoring
                 switch (r.result)
                 {
                     case HitResult.SmallTickHit:
-                    {
-                        int total = value + Statistics.GetValueOrDefault(HitResult.SmallTickMiss);
-                        if (total > 0)
-                            yield return new HitResultDisplayStatistic(r.result, value, total, r.displayName);
-
-                        break;
-                    }
-
                     case HitResult.LargeTickHit:
-                    {
-                        int total = value + Statistics.GetValueOrDefault(HitResult.LargeTickMiss);
-                        if (total > 0)
-                            yield return new HitResultDisplayStatistic(r.result, value, total, r.displayName);
+                    case HitResult.SliderTailHit:
+                    case HitResult.LargeBonus:
+                    case HitResult.SmallBonus:
+                        if (MaximumStatistics.TryGetValue(r.result, out int count) && count > 0)
+                            yield return new HitResultDisplayStatistic(r.result, value, count, r.displayName);
 
                         break;
-                    }
 
                     case HitResult.SmallTickMiss:
                     case HitResult.LargeTickMiss:
@@ -282,7 +389,7 @@ namespace osu.Game.Scoring
 
         #endregion
 
-        public bool Equals(ScoreInfo other) => other.ID == ID;
+        public bool Equals(ScoreInfo? other) => other?.ID == ID;
 
         public override string ToString() => this.GetDisplayTitle();
     }

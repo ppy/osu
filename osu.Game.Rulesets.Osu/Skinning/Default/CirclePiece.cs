@@ -2,26 +2,26 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
-using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
-    public class CirclePiece : CompositeDrawable
+    public partial class CirclePiece : CompositeDrawable
     {
         [Resolved]
-        private DrawableHitObject drawableObject { get; set; }
+        private DrawableHitObject drawableObject { get; set; } = null!;
 
-        private TrianglesPiece triangles;
+        private TrianglesPiece triangles = null!;
 
         public CirclePiece()
         {
-            Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
+            Size = OsuHitObject.OBJECT_DIMENSIONS;
             Masking = true;
 
             CornerRadius = Size.X / 2;
@@ -70,7 +70,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         {
             base.Dispose(isDisposing);
 
-            if (drawableObject != null)
+            if (drawableObject.IsNotNull())
                 drawableObject.HitObjectApplied -= onHitObjectApplied;
         }
     }

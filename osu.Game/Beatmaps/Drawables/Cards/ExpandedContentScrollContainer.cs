@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -9,7 +9,7 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Beatmaps.Drawables.Cards
 {
-    public class ExpandedContentScrollContainer : OsuScrollContainer
+    public partial class ExpandedContentScrollContainer : OsuScrollContainer
     {
         public const float HEIGHT = 200;
 
@@ -57,7 +57,9 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             return base.OnScroll(e);
         }
 
-        private class ExpandedContentScrollbar : OsuScrollbar
+        protected override bool OnClick(ClickEvent e) => true;
+
+        private partial class ExpandedContentScrollbar : OsuScrollbar
         {
             public ExpandedContentScrollbar(Direction scrollDir)
                 : base(scrollDir)

@@ -9,7 +9,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneExpandingBar : OsuTestScene
+    public partial class TestSceneExpandingBar : OsuTestScene
     {
         public TestSceneExpandingBar()
         {

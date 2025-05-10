@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Objects;
@@ -12,16 +13,17 @@ using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
+using osuTK.Input;
 using Direction = osu.Framework.Graphics.Direction;
 
 namespace osu.Game.Rulesets.Catch.Edit
 {
-    public class CatchSelectionHandler : EditorSelectionHandler
+    public partial class CatchSelectionHandler : EditorSelectionHandler
     {
         protected ScrollingHitObjectContainer HitObjectContainer => (ScrollingHitObjectContainer)playfield.HitObjectContainer;
 
         [Resolved]
-        private Playfield playfield { get; set; }
+        private Playfield playfield { get; set; } = null!;
 
         public override bool HandleMovement(MoveSelectionEvent<HitObject> moveEvent)
         {
@@ -38,6 +40,13 @@ namespace osu.Game.Rulesets.Catch.Edit
                 return true;
             }
 
+            moveSelection(deltaX);
+
+            return true;
+        }
+
+        private void moveSelection(float deltaX)
+        {
             EditorBeatmap.PerformOnSelection(h =>
             {
                 if (!(h is CatchHitObject catchObject)) return;
@@ -48,7 +57,60 @@ namespace osu.Game.Rulesets.Catch.Edit
                 foreach (var nested in catchObject.NestedHitObjects.OfType<CatchHitObject>())
                     nested.OriginalX += deltaX;
             });
+        }
 
+        private bool nudgeMovementActive;
+
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            // Until the keys below are global actions, this will prevent conflicts with "seek between sample points"
+            // which has a default of ctrl+shift+arrows.
+            if (e.ShiftPressed)
+                return false;
+
+            if (e.ControlPressed)
+            {
+                switch (e.Key)
+                {
+                    case Key.Left:
+                        return nudgeSelection(-1);
+
+                    case Key.Right:
+                        return nudgeSelection(1);
+                }
+            }
+
+            return false;
+        }
+
+        protected override void OnKeyUp(KeyUpEvent e)
+        {
+            base.OnKeyUp(e);
+
+            if (nudgeMovementActive && !e.ControlPressed)
+            {
+                EditorBeatmap.EndChange();
+                nudgeMovementActive = false;
+            }
+        }
+
+        /// <summary>
+        /// Move the current selection spatially by the specified delta, in gamefield coordinates (ie. the same coordinates as the blueprints).
+        /// </summary>
+        private bool nudgeSelection(float deltaX)
+        {
+            if (!nudgeMovementActive)
+            {
+                nudgeMovementActive = true;
+                EditorBeatmap.BeginChange();
+            }
+
+            var firstBlueprint = SelectedBlueprints.FirstOrDefault();
+
+            if (firstBlueprint == null)
+                return false;
+
+            moveSelection(deltaX);
             return true;
         }
 
@@ -76,21 +138,38 @@ namespace osu.Game.Rulesets.Catch.Edit
 
         public override bool HandleReverse()
         {
+            var hitObjects = EditorBeatmap.SelectedHitObjects
+                                          .OfType<CatchHitObject>()
+                                          .OrderBy(obj => obj.StartTime)
+                                          .ToList();
+
             double selectionStartTime = SelectedItems.Min(h => h.StartTime);
             double selectionEndTime = SelectedItems.Max(h => h.GetEndTime());
 
-            EditorBeatmap.PerformOnSelection(hitObject =>
-            {
-                hitObject.StartTime = selectionEndTime - (hitObject.GetEndTime() - selectionStartTime);
+            // the expectation is that even if the objects themselves are reversed temporally,
+            // the position of new combos in the selection should remain the same.
+            // preserve it for later before doing the reversal.
+            var newComboOrder = hitObjects.Select(obj => obj.NewCombo).ToList();
 
-                if (hitObject is JuiceStream juiceStream)
+            foreach (var h in hitObjects)
+            {
+                h.StartTime = selectionEndTime - (h.GetEndTime() - selectionStartTime);
+
+                if (h is JuiceStream juiceStream)
                 {
                     juiceStream.Path.Reverse(out Vector2 positionalOffset);
                     juiceStream.OriginalX += positionalOffset.X;
                     juiceStream.LegacyConvertedY += positionalOffset.Y;
                     EditorBeatmap.Update(juiceStream);
                 }
-            });
+            }
+
+            // re-order objects by start time again after reversing, and restore new combo flag positioning
+            hitObjects = hitObjects.OrderBy(obj => obj.StartTime).ToList();
+
+            for (int i = 0; i < hitObjects.Count; ++i)
+                hitObjects[i].NewCombo = newComboOrder[i];
+
             return true;
         }
 
@@ -129,7 +208,7 @@ namespace osu.Game.Rulesets.Catch.Edit
         {
             switch (hitObject)
             {
-                case BananaShower _:
+                case BananaShower:
                     return false;
 
                 case JuiceStream juiceStream:

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
@@ -20,8 +22,7 @@ namespace osu.Game.Rulesets.Mania.MathUtils
 
         public static void Sort(T[] keys, IComparer<T> comparer)
         {
-            if (keys == null)
-                throw new ArgumentNullException(nameof(keys));
+            ArgumentNullException.ThrowIfNull(keys);
 
             if (keys.Length == 0)
                 return;

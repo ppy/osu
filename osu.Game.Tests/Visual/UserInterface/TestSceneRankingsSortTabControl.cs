@@ -8,7 +8,7 @@ using osu.Game.Overlays.Rankings;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneRankingsSortTabControl : OsuTestScene
+    public partial class TestSceneRankingsSortTabControl : OsuTestScene
     {
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Green);

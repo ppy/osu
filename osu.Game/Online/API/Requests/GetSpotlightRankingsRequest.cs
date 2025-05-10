@@ -24,7 +24,7 @@ namespace osu.Game.Online.API.Requests
             var req = base.CreateWebRequest();
 
             req.AddParameter("spotlight", spotlight.ToString());
-            req.AddParameter("filter", sort.ToString().ToLower());
+            req.AddParameter("filter", sort.ToString().ToLowerInvariant());
 
             return req;
         }

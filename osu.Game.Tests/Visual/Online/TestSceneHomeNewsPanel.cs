@@ -13,7 +13,7 @@ using System.Collections.Generic;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneHomeNewsPanel : OsuTestScene
+    public partial class TestSceneHomeNewsPanel : OsuTestScene
     {
         [Cached]
         private readonly OverlayColourProvider overlayColour = new OverlayColourProvider(OverlayColourScheme.Purple);

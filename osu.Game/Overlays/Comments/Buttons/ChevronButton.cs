@@ -10,7 +10,7 @@ using osu.Framework.Allocation;
 
 namespace osu.Game.Overlays.Comments.Buttons
 {
-    public class ChevronButton : OsuHoverContainer
+    public partial class ChevronButton : OsuHoverContainer
     {
         public readonly BindableBool Expanded = new BindableBool(true);
 
@@ -24,6 +24,7 @@ namespace osu.Game.Overlays.Comments.Buttons
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Size = new Vector2(12),
+                Icon = FontAwesome.Solid.ChevronDown
             };
         }
 
@@ -38,11 +39,12 @@ namespace osu.Game.Overlays.Comments.Buttons
             base.LoadComplete();
             Action = Expanded.Toggle;
             Expanded.BindValueChanged(onExpandedChanged, true);
+            FinishTransforms(true);
         }
 
         private void onExpandedChanged(ValueChangedEvent<bool> expanded)
         {
-            icon.Icon = expanded.NewValue ? FontAwesome.Solid.ChevronUp : FontAwesome.Solid.ChevronDown;
+            icon.ScaleTo(expanded.NewValue ? new Vector2(1f, -1f) : Vector2.One, 300, Easing.OutQuint);
         }
     }
 }

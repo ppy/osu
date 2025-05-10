@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Extensions;
@@ -21,25 +22,25 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
+using osu.Game.Utils;
 using osuTK;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
-    public class BeatmapPicker : Container
+    public partial class BeatmapPicker : Container
     {
         private const float tile_icon_padding = 7;
         private const float tile_spacing = 2;
 
-        private readonly OsuSpriteText version, starRating, starRatingText;
-        private readonly FillFlowContainer starRatingContainer;
+        private readonly LinkFlowContainer infoContainer;
         private readonly Statistic plays, favourites;
 
         public readonly DifficultiesContainer Difficulties;
 
-        public readonly Bindable<APIBeatmap> Beatmap = new Bindable<APIBeatmap>();
-        private APIBeatmapSet beatmapSet;
+        public readonly Bindable<APIBeatmap?> Beatmap = new Bindable<APIBeatmap?>();
+        private APIBeatmapSet? beatmapSet;
 
-        public APIBeatmapSet BeatmapSet
+        public APIBeatmapSet? BeatmapSet
         {
             get => beatmapSet;
             set
@@ -50,6 +51,9 @@ namespace osu.Game.Overlays.BeatmapSet
                 updateDisplay();
             }
         }
+
+        [Resolved]
+        private OsuColour colours { get; set; } = null!;
 
         public BeatmapPicker()
         {
@@ -70,51 +74,13 @@ namespace osu.Game.Overlays.BeatmapSet
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
                             Margin = new MarginPadding { Left = -(tile_icon_padding + tile_spacing / 2), Bottom = 10 },
-                            OnLostHover = () =>
-                            {
-                                showBeatmap(Beatmap.Value);
-                                starRatingContainer.FadeOut(100);
-                            },
+                            OnLostHover = () => showBeatmap(Beatmap.Value, withStarRating: false),
                         },
-                        new FillFlowContainer
+                        infoContainer = new LinkFlowContainer(t => t.Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 11))
                         {
-                            AutoSizeAxes = Axes.Both,
-                            Spacing = new Vector2(5f),
-                            Children = new Drawable[]
-                            {
-                                version = new OsuSpriteText
-                                {
-                                    Anchor = Anchor.BottomLeft,
-                                    Origin = Anchor.BottomLeft,
-                                    Font = OsuFont.GetFont(size: 17, weight: FontWeight.Bold)
-                                },
-                                starRatingContainer = new FillFlowContainer
-                                {
-                                    Anchor = Anchor.BottomLeft,
-                                    Origin = Anchor.BottomLeft,
-                                    Alpha = 0,
-                                    Direction = FillDirection.Horizontal,
-                                    Spacing = new Vector2(2f, 0),
-                                    Margin = new MarginPadding { Bottom = 1 },
-                                    Children = new[]
-                                    {
-                                        starRatingText = new OsuSpriteText
-                                        {
-                                            Anchor = Anchor.BottomLeft,
-                                            Origin = Anchor.BottomLeft,
-                                            Font = OsuFont.GetFont(size: 11, weight: FontWeight.Bold),
-                                            Text = BeatmapsetsStrings.ShowStatsStars,
-                                        },
-                                        starRating = new OsuSpriteText
-                                        {
-                                            Anchor = Anchor.BottomLeft,
-                                            Origin = Anchor.BottomLeft,
-                                            Font = OsuFont.GetFont(size: 11, weight: FontWeight.Bold),
-                                            Text = string.Empty,
-                                        },
-                                    }
-                                },
-                            },
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            TextAnchor = Anchor.BottomLeft,
                         },
                         new FillFlowContainer
                         {
@@ -134,19 +100,17 @@ namespace osu.Game.Overlays.BeatmapSet
 
             Beatmap.ValueChanged += b =>
             {
-                showBeatmap(b.NewValue);
+                showBeatmap(b.NewValue, withStarRating: Difficulties.Any(d => d.IsHovered));
                 updateDifficultyButtons();
             };
         }
 
         [Resolved]
-        private IBindable<RulesetInfo> ruleset { get; set; }
+        private IBindable<RulesetInfo> ruleset { get; set; } = null!;
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
-            starRating.Colour = colours.Yellow;
-            starRatingText.Colour = colours.Yellow;
             updateDisplay();
         }
 
@@ -154,7 +118,7 @@ namespace osu.Game.Overlays.BeatmapSet
         {
             base.LoadComplete();
 
-            ruleset.ValueChanged += r => updateDisplay();
+            ruleset.ValueChanged += _ => updateDisplay();
 
             // done here so everything can bind in intialization and get the first trigger
             Beatmap.TriggerChange();
@@ -166,23 +130,20 @@ namespace osu.Game.Overlays.BeatmapSet
 
             if (BeatmapSet != null)
             {
-                Difficulties.ChildrenEnumerable = BeatmapSet.Beatmaps
+                Difficulties.ChildrenEnumerable = BeatmapSet.Beatmaps.Concat(BeatmapSet.Converts ?? Array.Empty<APIBeatmap>())
                                                             .Where(b => b.Ruleset.MatchesOnlineID(ruleset.Value))
-                                                            .OrderBy(b => b.StarRating)
-                                                            .Select(b => new DifficultySelectorButton(b)
+                                                            .OrderBy(b => !b.Convert)
+                                                            .ThenBy(b => b.StarRating)
+                                                            .Select(b => new DifficultySelectorButton(b, b.Convert ? new RulesetInfo { OnlineID = 0 } : null)
                                                             {
                                                                 State = DifficultySelectorState.NotSelected,
                                                                 OnHovered = beatmap =>
                                                                 {
-                                                                    showBeatmap(beatmap);
-                                                                    starRating.Text = beatmap.StarRating.ToLocalisableString(@"0.##");
-                                                                    starRatingContainer.FadeIn(100);
+                                                                    showBeatmap(beatmap, withStarRating: true);
                                                                 },
                                                                 OnClicked = beatmap => { Beatmap.Value = beatmap; },
                                                             });
             }
-
-            starRatingContainer.FadeOut(100);
 
             // If a selection is already made, try and maintain it.
             if (Beatmap.Value != null)
@@ -197,9 +158,68 @@ namespace osu.Game.Overlays.BeatmapSet
             updateDifficultyButtons();
         }
 
-        private void showBeatmap(IBeatmapInfo beatmapInfo)
+        private void showBeatmap(APIBeatmap? beatmapInfo, bool withStarRating)
         {
-            version.Text = beatmapInfo?.DifficultyName;
+            infoContainer.Clear();
+
+            infoContainer.AddText(beatmapInfo?.DifficultyName ?? string.Empty, s => s.Font = OsuFont.GetFont(size: 17, weight: FontWeight.Bold));
+            infoContainer.AddArbitraryDrawable(Empty().With(e => e.Width = 5));
+
+            var beatmapOwners = beatmapInfo?.BeatmapOwners;
+            bool isHostDifficulty = beatmapOwners?.Length == 1 && beatmapOwners.First().Id == beatmapSet?.AuthorID;
+
+            if (beatmapOwners != null && !isHostDifficulty)
+            {
+                APIUser[] users = BeatmapSet?.RelatedUsers?.Where(u => beatmapOwners.Any(o => o.Id == u.OnlineID)).ToArray() ?? [];
+                int count = users.Length;
+
+                switch (count)
+                {
+                    case 0:
+                        break;
+
+                    case 1:
+                        infoContainer.AddText(BeatmapsetsStrings.ShowDetailsMappedBy(string.Empty));
+                        infoContainer.AddUserLink(users[0]);
+                        break;
+
+                    case 2:
+                        infoContainer.AddText(BeatmapsetsStrings.ShowDetailsMappedBy(string.Empty));
+                        infoContainer.AddUserLink(users[0]);
+                        infoContainer.AddText(CommonStrings.ArrayAndTwoWordsConnector);
+                        infoContainer.AddUserLink(users[1]);
+                        break;
+
+                    default:
+                    {
+                        infoContainer.AddText(BeatmapsetsStrings.ShowDetailsMappedBy(string.Empty));
+
+                        for (int i = 0; i < count; i++)
+                        {
+                            infoContainer.AddUserLink(users[i]);
+
+                            if (i < count - 2)
+                                infoContainer.AddText(CommonStrings.ArrayAndWordsConnector);
+                            else if (i == count - 2)
+                                infoContainer.AddText(CommonStrings.ArrayAndLastWordConnector);
+                        }
+
+                        break;
+                    }
+                }
+            }
+
+            if (withStarRating)
+            {
+                infoContainer.AddArbitraryDrawable(Empty().With(e => e.Width = 5));
+                infoContainer.AddText(
+                    LocalisableString.Interpolate($"{BeatmapsetsStrings.ShowStatsStars} {beatmapInfo?.StarRating.FormatStarRating()}"),
+                    t =>
+                    {
+                        t.Font = OsuFont.GetFont(size: 11, weight: FontWeight.Bold);
+                        t.Colour = colours.Yellow;
+                    });
+            }
         }
 
         private void updateDifficultyButtons()
@@ -207,9 +227,9 @@ namespace osu.Game.Overlays.BeatmapSet
             Difficulties.Children.ToList().ForEach(diff => diff.State = diff.Beatmap == Beatmap.Value ? DifficultySelectorState.Selected : DifficultySelectorState.NotSelected);
         }
 
-        public class DifficultiesContainer : FillFlowContainer<DifficultySelectorButton>
+        public partial class DifficultiesContainer : FillFlowContainer<DifficultySelectorButton>
         {
-            public Action OnLostHover;
+            public Action? OnLostHover;
 
             protected override void OnHoverLost(HoverLostEvent e)
             {
@@ -218,7 +238,7 @@ namespace osu.Game.Overlays.BeatmapSet
             }
         }
 
-        public class DifficultySelectorButton : OsuClickableContainer, IStateful<DifficultySelectorState>
+        public partial class DifficultySelectorButton : OsuClickableContainer, IStateful<DifficultySelectorState>
         {
             private const float transition_duration = 100;
             private const float size = 54;
@@ -230,9 +250,9 @@ namespace osu.Game.Overlays.BeatmapSet
 
             public readonly APIBeatmap Beatmap;
 
-            public Action<APIBeatmap> OnHovered;
-            public Action<APIBeatmap> OnClicked;
-            public event Action<DifficultySelectorState> StateChanged;
+            public Action<APIBeatmap>? OnHovered;
+            public Action<APIBeatmap>? OnClicked;
+            public event Action<DifficultySelectorState>? StateChanged;
 
             private DifficultySelectorState state;
 
@@ -253,7 +273,7 @@ namespace osu.Game.Overlays.BeatmapSet
                 }
             }
 
-            public DifficultySelectorButton(APIBeatmap beatmapInfo)
+            public DifficultySelectorButton(APIBeatmap beatmapInfo, IRulesetInfo? ruleset)
             {
                 Beatmap = beatmapInfo;
                 Size = new Vector2(size);
@@ -272,8 +292,10 @@ namespace osu.Game.Overlays.BeatmapSet
                             Alpha = 0.5f
                         }
                     },
-                    icon = new DifficultyIcon(beatmapInfo, shouldShowTooltip: false)
+                    icon = new DifficultyIcon(beatmapInfo, ruleset)
                     {
+                        TooltipType = DifficultyIconTooltipType.None,
+                        Current = { Value = new StarDifficulty(beatmapInfo.StarRating, 0) },
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Size = new Vector2(size - tile_icon_padding * 2),
@@ -321,7 +343,7 @@ namespace osu.Game.Overlays.BeatmapSet
             }
         }
 
-        private class Statistic : FillFlowContainer
+        private partial class Statistic : FillFlowContainer
         {
             private readonly OsuSpriteText text;
 

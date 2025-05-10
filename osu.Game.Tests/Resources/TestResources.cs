@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,6 +12,7 @@ using System.Threading;
 using NUnit.Framework;
 using osu.Framework.Extensions;
 using osu.Framework.IO.Stores;
+using osu.Framework.Logging;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
@@ -25,6 +28,11 @@ namespace osu.Game.Tests.Resources
     public static class TestResources
     {
         public const double QUICK_BEATMAP_LENGTH = 10000;
+
+        public const string COVER_IMAGE_1 = "https://assets.ppy.sh/user-cover-presets/1/df28696b58541a9e67f6755918951d542d93bdf1da41720fcca2fd2c1ea8cf51.jpeg";
+        public const string COVER_IMAGE_2 = "https://assets.ppy.sh/user-cover-presets/7/4a0ccb7b7fdd5c4238b11f0e7c686760fe2c99c6472b19400e82d1a8ff503e31.jpeg";
+        public const string COVER_IMAGE_3 = "https://assets.ppy.sh/user-cover-presets/12/6e8d3402c8080c2d9549a98321e1bff111dd9c94603ccdb237597479cab6e8a7.jpeg";
+        public const string COVER_IMAGE_4 = "https://assets.ppy.sh/user-cover-presets/17/80f82e4c2b27d8d6eed3ce89708ec27343e5ac63389cba6b5fb4550776562d08.jpeg";
 
         private static readonly TemporaryNativeStorage temp_storage = new TemporaryNativeStorage("TestResources");
 
@@ -70,7 +78,12 @@ namespace osu.Game.Tests.Resources
 
         private static string getTempFilename() => temp_storage.GetFullPath(Guid.NewGuid() + ".osz");
 
-        private static int importId;
+        private static int testId = 1;
+
+        /// <summary>
+        /// Get a unique int value which is incremented each call.
+        /// </summary>
+        public static int GetNextTestID() => Interlocked.Increment(ref testId);
 
         /// <summary>
         /// Create a test beatmap set model.
@@ -85,15 +98,17 @@ namespace osu.Game.Tests.Resources
 
             RulesetInfo getRuleset() => rulesets?[j++ % rulesets.Length];
 
-            int setId = Interlocked.Increment(ref importId);
+            int setId = GetNextTestID();
 
             var metadata = new BeatmapMetadata
             {
                 // Create random metadata, then we can check if sorting works based on these
                 Artist = "Some Artist " + RNG.Next(0, 9),
-                Title = $"Some Song (set id {setId}) {Guid.NewGuid()}",
+                Title = $"Some Song (set id {setId:000}) {Guid.NewGuid()}",
                 Author = { Username = "Some Guy " + RNG.Next(0, 9) },
             };
+
+            Logger.Log($"🛠️ Generating beatmap set \"{metadata}\" for test consumption.");
 
             var beatmapSet = new BeatmapSetInfo
             {
@@ -126,16 +141,20 @@ namespace osu.Game.Tests.Resources
 
                     var rulesetInfo = getRuleset();
 
+                    string hash = Guid.NewGuid().ToString().ComputeMD5Hash();
+
                     yield return new BeatmapInfo
                     {
                         OnlineID = beatmapId,
                         DifficultyName = $"{version} {beatmapId} (length {TimeSpan.FromMilliseconds(length):m\\:ss}, bpm {bpm:0.#})",
                         StarRating = diff,
                         Length = length,
+                        BeatmapSet = beatmapSet,
                         BPM = bpm,
-                        Hash = Guid.NewGuid().ToString().ComputeMD5Hash(),
+                        Hash = hash,
+                        MD5Hash = hash,
                         Ruleset = rulesetInfo,
-                        Metadata = metadata,
+                        Metadata = metadata.DeepClone(),
                         Difficulty = new BeatmapDifficulty
                         {
                             OverallDifficulty = diff,
@@ -164,12 +183,13 @@ namespace osu.Game.Tests.Resources
             {
                 Id = 2,
                 Username = "peppy",
-                CoverUrl = "https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
+                CoverUrl = COVER_IMAGE_3,
             },
             BeatmapInfo = beatmap,
+            BeatmapHash = beatmap.Hash,
             Ruleset = beatmap.Ruleset,
             Mods = new Mod[] { new TestModHardRock(), new TestModDoubleTime() },
-            TotalScore = 2845370,
+            TotalScore = 284537,
             Accuracy = 0.95,
             MaxCombo = 999,
             Position = 1,
@@ -188,8 +208,16 @@ namespace osu.Game.Tests.Resources
                 [HitResult.LargeTickHit] = 100,
                 [HitResult.LargeTickMiss] = 50,
                 [HitResult.SmallBonus] = 10,
-                [HitResult.SmallBonus] = 50
+                [HitResult.LargeBonus] = 50
             },
+            MaximumStatistics = new Dictionary<HitResult, int>
+            {
+                [HitResult.Perfect] = 971,
+                [HitResult.SmallTickHit] = 75,
+                [HitResult.LargeTickHit] = 150,
+                [HitResult.SmallBonus] = 10,
+                [HitResult.LargeBonus] = 50,
+            }
         };
 
         private class TestModHardRock : ModHardRock

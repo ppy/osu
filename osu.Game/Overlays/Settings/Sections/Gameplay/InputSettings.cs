@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework;
@@ -10,7 +10,7 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Gameplay
 {
-    public class InputSettings : SettingsSubsection
+    public partial class InputSettings : SettingsSubsection
     {
         protected override LocalisableString Header => GameplaySettingsStrings.InputHeader;
 
@@ -29,6 +29,12 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 {
                     LabelText = SkinSettingsStrings.AutoCursorSize,
                     Current = config.GetBindable<bool>(OsuSetting.AutoCursorSize)
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = SkinSettingsStrings.GameplayCursorDuringTouch,
+                    Keywords = new[] { @"touchscreen" },
+                    Current = config.GetBindable<bool>(OsuSetting.GameplayCursorDuringTouch)
                 },
             };
 

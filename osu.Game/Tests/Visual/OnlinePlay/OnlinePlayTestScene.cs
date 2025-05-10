@@ -2,15 +2,16 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Database;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
+using osu.Game.Rulesets;
 using osu.Game.Screens.OnlinePlay;
 
 namespace osu.Game.Tests.Visual.OnlinePlay
@@ -18,25 +19,26 @@ namespace osu.Game.Tests.Visual.OnlinePlay
     /// <summary>
     /// A base test scene for all online play components and screens.
     /// </summary>
-    public abstract class OnlinePlayTestScene : ScreenTestScene, IOnlinePlayTestSceneDependencies
+    public abstract partial class OnlinePlayTestScene : ScreenTestScene, IOnlinePlayTestSceneDependencies
     {
-        public Bindable<Room> SelectedRoom => OnlinePlayDependencies?.SelectedRoom;
-        public IRoomManager RoomManager => OnlinePlayDependencies?.RoomManager;
-        public OngoingOperationTracker OngoingOperationTracker => OnlinePlayDependencies?.OngoingOperationTracker;
-        public OnlinePlayBeatmapAvailabilityTracker AvailabilityTracker => OnlinePlayDependencies?.AvailabilityTracker;
-        public TestUserLookupCache UserLookupCache => OnlinePlayDependencies?.UserLookupCache;
-        public BeatmapLookupCache BeatmapLookupCache => OnlinePlayDependencies?.BeatmapLookupCache;
+        public OngoingOperationTracker OngoingOperationTracker => OnlinePlayDependencies.OngoingOperationTracker;
+        public TestUserLookupCache UserLookupCache => OnlinePlayDependencies.UserLookupCache;
+        public BeatmapLookupCache BeatmapLookupCache => OnlinePlayDependencies.BeatmapLookupCache;
 
         /// <summary>
         /// All dependencies required for online play components and screens.
         /// </summary>
-        protected OnlinePlayTestSceneDependencies OnlinePlayDependencies => dependencies?.OnlinePlayDependencies;
+        protected OnlinePlayTestSceneDependencies OnlinePlayDependencies => dependencies.OnlinePlayDependencies!;
 
         protected override Container<Drawable> Content => content;
 
+        [Resolved]
+        private RulesetStore rulesets { get; set; } = null!;
+
         private readonly Container content;
         private readonly Container drawableDependenciesContainer;
-        private DelegatedDependencyContainer dependencies;
+        private DelegatedDependencyContainer dependencies = null!;
+        private int currentRoomId;
 
         protected OnlinePlayTestScene()
         {
@@ -48,35 +50,75 @@ namespace osu.Game.Tests.Visual.OnlinePlay
         }
 
         protected sealed override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
+            => dependencies = new DelegatedDependencyContainer(base.CreateChildDependencies(parent));
+
+        public override void SetUpSteps()
         {
-            dependencies = new DelegatedDependencyContainer(base.CreateChildDependencies(parent));
-            return dependencies;
+            base.SetUpSteps();
+
+            AddStep("setup dependencies", () =>
+            {
+                // Reset the room dependencies to a fresh state.
+                dependencies.OnlinePlayDependencies = CreateOnlinePlayDependencies();
+                drawableDependenciesContainer.Clear();
+                drawableDependenciesContainer.AddRange(dependencies.OnlinePlayDependencies.DrawableComponents);
+
+                var handler = OnlinePlayDependencies.RequestsHandler;
+
+                // Resolving the BeatmapManager in the test scene will inject the game-wide BeatmapManager, while many test scenes cache their own BeatmapManager instead.
+                // To get around this, the BeatmapManager is looked up from the dependencies provided to the children of the test scene instead.
+                var beatmapManager = dependencies.Get<BeatmapManager>();
+
+                ((DummyAPIAccess)API).HandleRequest = request =>
+                {
+                    try
+                    {
+                        return handler.HandleRequest(request, API.LocalUser.Value, beatmapManager);
+                    }
+                    catch (ObjectDisposedException)
+                    {
+                        // These requests can be fired asynchronously, but potentially arrive after game components
+                        // have been disposed (ie. realm in BeatmapManager).
+                        // This only happens in tests and it's easiest to ignore them for now.
+                        Logger.Log($"Handled {nameof(ObjectDisposedException)} in test request handling");
+                        return true;
+                    }
+                };
+            });
         }
 
-        [SetUp]
-        public void Setup() => Schedule(() =>
-        {
-            // Reset the room dependencies to a fresh state.
-            drawableDependenciesContainer.Clear();
-            dependencies.OnlinePlayDependencies = CreateOnlinePlayDependencies();
-            drawableDependenciesContainer.AddRange(OnlinePlayDependencies.DrawableComponents);
-
-            var handler = OnlinePlayDependencies.RequestsHandler;
-
-            // Resolving the BeatmapManager in the test scene will inject the game-wide BeatmapManager, while many test scenes cache their own BeatmapManager instead.
-            // To get around this, the BeatmapManager is looked up from the dependencies provided to the children of the test scene instead.
-            var beatmapManager = dependencies.Get<BeatmapManager>();
-
-            ((DummyAPIAccess)API).HandleRequest = request => handler.HandleRequest(request, API.LocalUser.Value, beatmapManager);
-        });
-
         /// <summary>
-        /// Creates the room dependencies. Called every <see cref="Setup"/>.
+        /// Creates the room dependencies. Called every <see cref="SetUpSteps"/>.
         /// </summary>
         /// <remarks>
         /// Any custom dependencies required for online play sub-classes should be added here.
         /// </remarks>
         protected virtual OnlinePlayTestSceneDependencies CreateOnlinePlayDependencies() => new OnlinePlayTestSceneDependencies();
+
+        protected Room[] GenerateRooms(int count, RulesetInfo? ruleset = null, bool withPassword = false, bool withSpotlightRooms = false)
+        {
+            Room[] rooms = new Room[count];
+
+            // Can't reference Osu ruleset project here.
+            ruleset ??= rulesets.GetRuleset(0)!;
+
+            for (int i = 0; i < count; i++)
+            {
+                rooms[i] = new Room
+                {
+                    RoomID = currentRoomId++,
+                    Name = $@"Room {currentRoomId}",
+                    Host = new APIUser { Username = @"Host" },
+                    Duration = TimeSpan.FromSeconds(10),
+                    Category = withSpotlightRooms && i % 2 == 0 ? RoomCategory.Spotlight : RoomCategory.Normal,
+                    Password = withPassword ? @"password" : null,
+                    PlaylistItemStats = new Room.RoomPlaylistItemStats { RulesetIDs = [ruleset.OnlineID] },
+                    Playlist = [new PlaylistItem(new BeatmapInfo { Metadata = new BeatmapMetadata() }) { RulesetID = ruleset.OnlineID }]
+                };
+            }
+
+            return rooms;
+        }
 
         /// <summary>
         /// A <see cref="IReadOnlyDependencyContainer"/> providing a mutable lookup source for online play dependencies.
@@ -86,7 +128,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
             /// <summary>
             /// The online play dependencies.
             /// </summary>
-            public OnlinePlayTestSceneDependencies OnlinePlayDependencies { get; set; }
+            public OnlinePlayTestSceneDependencies? OnlinePlayDependencies { get; set; }
 
             private readonly IReadOnlyDependencyContainer parent;
             private readonly DependencyContainer injectableDependencies;
@@ -108,7 +150,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
                 => OnlinePlayDependencies?.Get(type, info) ?? parent.Get(type, info);
 
             public void Inject<T>(T instance)
-                where T : class
+                where T : class, IDependencyInjectionCandidate
                 => injectableDependencies.Inject(instance);
         }
     }

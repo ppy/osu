@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using System.Collections.Generic;
@@ -18,10 +20,9 @@ using osu.Framework.Localisation;
 
 namespace osu.Game.Overlays.Rankings.Tables
 {
-    public abstract class RankingsTable<TModel> : TableContainer
+    public abstract partial class RankingsTable<TModel> : TableContainer
     {
         protected const int TEXT_SIZE = 12;
-        private const float horizontal_inset = 20;
         private const float row_height = 32;
         private const float row_spacing = 3;
         private const int items_per_page = 50;
@@ -37,7 +38,7 @@ namespace osu.Game.Overlays.Rankings.Tables
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
-            Padding = new MarginPadding { Horizontal = horizontal_inset };
+            Padding = new MarginPadding { Horizontal = WaveOverlayContainer.HORIZONTAL_PADDING };
             RowSize = new Dimension(GridSizeMode.Absolute, row_height + row_spacing);
         }
 
@@ -77,9 +78,9 @@ namespace osu.Game.Overlays.Rankings.Tables
         protected sealed override Drawable CreateHeader(int index, TableColumn column)
             => (column as RankingsTableColumn)?.CreateHeaderText() ?? new HeaderText(column?.Header ?? default, false);
 
-        protected abstract Country GetCountry(TModel item);
+        protected abstract CountryCode GetCountryCode(TModel item);
 
-        protected abstract Drawable CreateFlagContent(TModel item);
+        protected abstract Drawable[] CreateFlagContent(TModel item);
 
         private OsuSpriteText createIndexDrawable(int index) => new RowText
         {
@@ -91,17 +92,13 @@ namespace osu.Game.Overlays.Rankings.Tables
         {
             AutoSizeAxes = Axes.Both,
             Direction = FillDirection.Horizontal,
-            Spacing = new Vector2(10, 0),
+            Spacing = new Vector2(5, 0),
             Margin = new MarginPadding { Bottom = row_spacing },
-            Children = new[]
-            {
-                new UpdateableFlag(GetCountry(item))
-                {
-                    Size = new Vector2(30, 20),
-                    ShowPlaceholderOnNull = false,
-                },
-                CreateFlagContent(item)
-            }
+            Children =
+            [
+                new UpdateableFlag(GetCountryCode(item)) { Size = new Vector2(28, 20) },
+                ..CreateFlagContent(item)
+            ]
         };
 
         protected class RankingsTableColumn : TableColumn
@@ -117,7 +114,7 @@ namespace osu.Game.Overlays.Rankings.Tables
             public virtual HeaderText CreateHeaderText() => new HeaderText(Header, Highlighted);
         }
 
-        protected class HeaderText : OsuSpriteText
+        protected partial class HeaderText : OsuSpriteText
         {
             private readonly bool isHighlighted;
 
@@ -138,7 +135,7 @@ namespace osu.Game.Overlays.Rankings.Tables
             }
         }
 
-        protected class RowText : OsuSpriteText
+        protected partial class RowText : OsuSpriteText
         {
             public RowText()
             {
@@ -147,7 +144,7 @@ namespace osu.Game.Overlays.Rankings.Tables
             }
         }
 
-        protected class ColouredRowText : RowText
+        protected partial class ColouredRowText : RowText
         {
             [BackgroundDependencyLoader]
             private void load(OverlayColourProvider colourProvider)

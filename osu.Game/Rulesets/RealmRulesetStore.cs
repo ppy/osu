@@ -3,29 +3,33 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
+using osu.Game.Beatmaps;
 using osu.Game.Database;
-
-#nullable enable
 
 namespace osu.Game.Rulesets
 {
     public class RealmRulesetStore : RulesetStore
     {
+        private readonly RealmAccess realmAccess;
         public override IEnumerable<RulesetInfo> AvailableRulesets => availableRulesets;
 
         private readonly List<RulesetInfo> availableRulesets = new List<RulesetInfo>();
 
-        public RealmRulesetStore(RealmAccess realm, Storage? storage = null)
+        public RealmRulesetStore(RealmAccess realmAccess, Storage? storage = null)
             : base(storage)
         {
-            prepareDetachedRulesets(realm);
+            this.realmAccess = realmAccess;
+            prepareDetachedRulesets();
+            informUserAboutBrokenRulesets();
         }
 
-        private void prepareDetachedRulesets(RealmAccess realmAccess)
+        private void prepareDetachedRulesets()
         {
             realmAccess.Write(realm =>
             {
@@ -70,11 +74,24 @@ namespace osu.Game.Rulesets
                 {
                     try
                     {
-                        var resolvedType = Type.GetType(r.InstantiationInfo)
-                                           ?? throw new RulesetLoadException(@"Type could not be resolved");
+                        var resolvedType = Type.GetType(r.InstantiationInfo);
 
-                        var instanceInfo = (Activator.CreateInstance(resolvedType) as Ruleset)?.RulesetInfo
+                        if (resolvedType == null)
+                        {
+                            // ruleset DLL was probably deleted.
+                            r.Available = false;
+                            continue;
+                        }
+
+                        var instance = (Activator.CreateInstance(resolvedType) as Ruleset);
+                        var instanceInfo = instance?.RulesetInfo
                                            ?? throw new RulesetLoadException(@"Instantiation failure");
+
+                        if (!checkRulesetUpToDate(instance))
+                        {
+                            throw new ArgumentOutOfRangeException(nameof(instance.RulesetAPIVersionSupported),
+                                $"Ruleset API version is too old (was {instance.RulesetAPIVersionSupported}, expected {Ruleset.CURRENT_RULESET_API_VERSION})");
+                        }
 
                         // If a ruleset isn't up-to-date with the API, it could cause a crash at an arbitrary point of execution.
                         // To eagerly handle cases of missing implementations, enumerate all types here and mark as non-available on throw.
@@ -85,17 +102,95 @@ namespace osu.Game.Rulesets
                         r.InstantiationInfo = instanceInfo.InstantiationInfo;
                         r.Available = true;
 
+                        testRulesetCompatibility(r);
+
                         detachedRulesets.Add(r.Clone());
                     }
                     catch (Exception ex)
                     {
                         r.Available = false;
-                        Logger.Log($"Could not load ruleset {r}: {ex.Message}");
+                        LogFailedLoad(r.Name, ex);
                     }
                 }
 
-                availableRulesets.AddRange(detachedRulesets.OrderBy(r => r));
+                availableRulesets.AddRange(detachedRulesets.Order());
             });
+        }
+
+        private bool checkRulesetUpToDate(Ruleset instance)
+        {
+            switch (instance.RulesetAPIVersionSupported)
+            {
+                // The default `virtual` implementation leaves the version string empty.
+                // Consider rulesets which haven't override the version as up-to-date for now.
+                // At some point (once ruleset devs add versioning), we'll probably want to disallow this for deployed builds.
+                case @"":
+                // Ruleset is up-to-date, all good.
+                case Ruleset.CURRENT_RULESET_API_VERSION:
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
+
+        private void testRulesetCompatibility(RulesetInfo rulesetInfo)
+        {
+            // do various operations to ensure that we are in a good state.
+            // if we can avoid loading the ruleset at this point (rather than erroring later in runtime) then that is preferred.
+            var instance = rulesetInfo.CreateInstance();
+
+            instance.CreateAllMods();
+            instance.CreateIcon();
+            instance.CreateResourceStore();
+
+            var beatmap = new Beatmap();
+            var converter = instance.CreateBeatmapConverter(beatmap);
+
+            instance.CreateBeatmapProcessor(converter.Convert());
+        }
+
+        private void informUserAboutBrokenRulesets()
+        {
+            if (RulesetStorage == null)
+                return;
+
+            foreach (string brokenRulesetDll in RulesetStorage.GetFiles(@".", @"*.dll.broken"))
+            {
+                Logger.Log($"Ruleset '{Path.GetFileNameWithoutExtension(brokenRulesetDll)}' has been disabled due to causing a crash.\n\n"
+                           + "Please update the ruleset or report the issue to the developers of the ruleset if no updates are available.", level: LogLevel.Important);
+            }
+        }
+
+        internal void TryDisableCustomRulesetsCausing(Exception exception)
+        {
+            try
+            {
+                var stackTrace = new StackTrace(exception);
+
+                foreach (var frame in stackTrace.GetFrames())
+                {
+                    var declaringAssembly = frame.GetMethod()?.DeclaringType?.Assembly;
+                    if (declaringAssembly == null)
+                        continue;
+
+                    if (UserRulesetAssemblies.Contains(declaringAssembly))
+                    {
+                        string sourceLocation = declaringAssembly.Location;
+                        string destinationLocation = Path.ChangeExtension(sourceLocation, @".dll.broken");
+
+                        if (File.Exists(sourceLocation))
+                        {
+                            Logger.Log($"Unhandled exception traced back to custom ruleset {Path.GetFileNameWithoutExtension(sourceLocation)}. Marking as broken.");
+                            File.Move(sourceLocation, destinationLocation);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Log($"Attempt to trace back crash to custom ruleset failed: {ex}");
+            }
         }
     }
 }

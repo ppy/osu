@@ -1,10 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Game.Graphics;
 using osu.Game.Screens.Edit.Compose.Components;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit
@@ -13,6 +16,9 @@ namespace osu.Game.Screens.Edit
     {
         public static readonly int[] PREDEFINED_DIVISORS = { 1, 2, 3, 4, 6, 8, 12, 16 };
 
+        public const int MINIMUM_DIVISOR = 1;
+        public const int MAXIMUM_DIVISOR = 64;
+
         public Bindable<BeatDivisorPresetCollection> ValidDivisors { get; } = new Bindable<BeatDivisorPresetCollection>(BeatDivisorPresetCollection.COMMON);
 
         public BindableBeatDivisor(int value = 1)
@@ -20,6 +26,32 @@ namespace osu.Game.Screens.Edit
         {
             ValidDivisors.BindValueChanged(_ => updateBindableProperties(), true);
             BindValueChanged(_ => ensureValidDivisor());
+        }
+
+        /// <summary>
+        /// Set a divisor, updating the valid divisor range appropriately.
+        /// </summary>
+        /// <param name="divisor">The intended divisor.</param>
+        /// <param name="preferKnownPresets">Forces changing the valid divisors to a known preset.</param>
+        /// <returns>Whether the divisor was successfully set.</returns>
+        public bool SetArbitraryDivisor(int divisor, bool preferKnownPresets = false)
+        {
+            if (divisor < MINIMUM_DIVISOR || divisor > MAXIMUM_DIVISOR)
+                return false;
+
+            // If the current valid divisor range doesn't contain the proposed value, attempt to find one which does.
+            if (preferKnownPresets || !ValidDivisors.Value.Presets.Contains(divisor))
+            {
+                if (BeatDivisorPresetCollection.COMMON.Presets.Contains(divisor))
+                    ValidDivisors.Value = BeatDivisorPresetCollection.COMMON;
+                else if (BeatDivisorPresetCollection.TRIPLETS.Presets.Contains(divisor))
+                    ValidDivisors.Value = BeatDivisorPresetCollection.TRIPLETS;
+                else
+                    ValidDivisors.Value = BeatDivisorPresetCollection.Custom(divisor);
+            }
+
+            Value = divisor;
+            return true;
         }
 
         private void updateBindableProperties()
@@ -36,16 +68,18 @@ namespace osu.Game.Screens.Edit
                 Value = 1;
         }
 
-        public void Next()
+        public void SelectNext()
         {
             var presets = ValidDivisors.Value.Presets;
-            Value = presets.Cast<int?>().SkipWhile(preset => preset != Value).ElementAtOrDefault(1) ?? presets[0];
+            if (presets.Cast<int?>().SkipWhile(preset => preset != Value).ElementAtOrDefault(1) is int newValue)
+                Value = newValue;
         }
 
-        public void Previous()
+        public void SelectPrevious()
         {
             var presets = ValidDivisors.Value.Presets;
-            Value = presets.Cast<int?>().TakeWhile(preset => preset != Value).LastOrDefault() ?? presets[^1];
+            if (presets.Cast<int?>().TakeWhile(preset => preset != Value).LastOrDefault() is int newValue)
+                Value = newValue;
         }
 
         protected override int DefaultPrecision => 1;
@@ -101,16 +135,45 @@ namespace osu.Game.Screens.Edit
         }
 
         /// <summary>
+        /// Get a relative display size for the specified divisor.
+        /// </summary>
+        /// <param name="beatDivisor">The beat divisor.</param>
+        /// <returns>A relative size which can be used to display ticks.</returns>
+        public static Vector2 GetSize(int beatDivisor)
+        {
+            switch (beatDivisor)
+            {
+                case 1:
+                case 2:
+                    return new Vector2(1, 0.9f);
+
+                case 3:
+                case 4:
+                    return new Vector2(0.8f, 0.8f);
+
+                case 6:
+                case 8:
+                    return new Vector2(0.8f, 0.7f);
+
+                default:
+                    return new Vector2(0.8f, 0.6f);
+            }
+        }
+
+        /// <summary>
         /// Retrieves the applicable divisor for a specific beat index.
         /// </summary>
         /// <param name="index">The 0-based beat index.</param>
         /// <param name="beatDivisor">The beat divisor.</param>
+        /// <param name="validDivisors">The list of valid divisors which can be chosen from. Assumes ordered from low to high. Defaults to <see cref="PREDEFINED_DIVISORS"/> if omitted.</param>
         /// <returns>The applicable divisor.</returns>
-        public static int GetDivisorForBeatIndex(int index, int beatDivisor)
+        public static int GetDivisorForBeatIndex(int index, int beatDivisor, int[] validDivisors = null)
         {
+            validDivisors ??= PREDEFINED_DIVISORS;
+
             int beat = index % beatDivisor;
 
-            foreach (int divisor in PREDEFINED_DIVISORS)
+            foreach (int divisor in validDivisors)
             {
                 if ((beat * divisor) % beatDivisor == 0)
                     return divisor;

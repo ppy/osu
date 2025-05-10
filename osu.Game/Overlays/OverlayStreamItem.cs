@@ -9,6 +9,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics;
 using osuTK.Graphics;
@@ -16,9 +18,11 @@ using osu.Framework.Localisation;
 
 namespace osu.Game.Overlays
 {
-    public abstract class OverlayStreamItem<T> : TabItem<T>
+    public abstract partial class OverlayStreamItem<T> : TabItem<T>
     {
-        public readonly Bindable<T> SelectedItem = new Bindable<T>();
+        public const float PADDING = 5;
+
+        public readonly Bindable<T?> SelectedItem = new Bindable<T?>();
 
         private bool userHoveringArea;
 
@@ -34,19 +38,23 @@ namespace osu.Game.Overlays
             }
         }
 
-        private FillFlowContainer<SpriteText> text;
-        private ExpandingBar expandingBar;
+        private FillFlowContainer<SpriteText> text = null!;
+        private ExpandingBar expandingBar = null!;
+        private Sample selectSample = null!;
+        private OsuSpriteText? mainTextPiece;
+        private OsuSpriteText? additionalTextPiece;
+        private OsuSpriteText? infoTextPiece;
 
         protected OverlayStreamItem(T value)
             : base(value)
         {
             Height = 50;
             Width = 90;
-            Margin = new MarginPadding(5);
+            Margin = new MarginPadding(PADDING);
         }
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider, OsuColour colours)
+        private void load(OverlayColourProvider colourProvider, OsuColour colours, AudioManager audio)
         {
             AddRange(new Drawable[]
             {
@@ -57,17 +65,17 @@ namespace osu.Game.Overlays
                     Margin = new MarginPadding { Top = 6 },
                     Children = new[]
                     {
-                        new OsuSpriteText
+                        mainTextPiece = new OsuSpriteText
                         {
                             Text = MainText,
                             Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
                         },
-                        new OsuSpriteText
+                        additionalTextPiece = new OsuSpriteText
                         {
                             Text = AdditionalText,
                             Font = OsuFont.GetFont(size: 16, weight: FontWeight.Regular),
                         },
-                        new OsuSpriteText
+                        infoTextPiece = new OsuSpriteText
                         {
                             Text = InfoText,
                             Font = OsuFont.GetFont(size: 10),
@@ -83,23 +91,63 @@ namespace osu.Game.Overlays
                     CollapsedSize = 2,
                     Expanded = true
                 },
-                new HoverClickSounds()
+                new HoverSounds(HoverSampleSet.TabSelect)
             });
+
+            selectSample = audio.Samples.Get(@"UI/tabselect-select");
 
             SelectedItem.BindValueChanged(_ => updateState(), true);
         }
 
-        protected abstract LocalisableString MainText { get; }
+        private LocalisableString mainText;
 
-        protected abstract LocalisableString AdditionalText { get; }
+        protected LocalisableString MainText
+        {
+            get => mainText;
+            set
+            {
+                mainText = value;
 
-        protected virtual LocalisableString InfoText => string.Empty;
+                if (mainTextPiece != null)
+                    mainTextPiece.Text = value;
+            }
+        }
+
+        private LocalisableString additionalText;
+
+        protected LocalisableString AdditionalText
+        {
+            get => additionalText;
+            set
+            {
+                additionalText = value;
+
+                if (additionalTextPiece != null)
+                    additionalTextPiece.Text = value;
+            }
+        }
+
+        private LocalisableString infoText;
+
+        protected LocalisableString InfoText
+        {
+            get => infoText;
+            set
+            {
+                infoText = value;
+
+                if (infoTextPiece != null)
+                    infoTextPiece.Text = value;
+            }
+        }
 
         protected abstract Color4 GetBarColour(OsuColour colours);
 
         protected override void OnActivated() => updateState();
 
         protected override void OnDeactivated() => updateState();
+
+        protected override void OnActivatedByUser() => selectSample.Play();
 
         protected override bool OnHover(HoverEvent e)
         {

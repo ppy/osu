@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Configuration;
@@ -13,26 +15,29 @@ namespace osu.Game.Input
 {
     /// <summary>
     /// Connects <see cref="OsuSetting.ConfineMouseMode"/> with <see cref="FrameworkSetting.ConfineMouseMode"/>.
-    /// If <see cref="OsuGame.LocalUserPlaying"/> is true, we should also confine the mouse cursor if it has been
+    /// If <see cref="ILocalUserPlayInfo.PlayingState"/> is playing, we should also confine the mouse cursor if it has been
     /// requested with <see cref="OsuConfineMouseMode.DuringGameplay"/>.
     /// </summary>
-    public class ConfineMouseTracker : Component
+    public partial class ConfineMouseTracker : Component
     {
         private Bindable<ConfineMouseMode> frameworkConfineMode;
         private Bindable<WindowMode> frameworkWindowMode;
+        private Bindable<bool> frameworkMinimiseOnFocusLossInFullscreen;
 
         private Bindable<OsuConfineMouseMode> osuConfineMode;
-        private IBindable<bool> localUserPlaying;
+        private IBindable<LocalUserPlayingState> localUserPlaying;
 
         [BackgroundDependencyLoader]
         private void load(ILocalUserPlayInfo localUserInfo, FrameworkConfigManager frameworkConfigManager, OsuConfigManager osuConfigManager)
         {
             frameworkConfineMode = frameworkConfigManager.GetBindable<ConfineMouseMode>(FrameworkSetting.ConfineMouseMode);
             frameworkWindowMode = frameworkConfigManager.GetBindable<WindowMode>(FrameworkSetting.WindowMode);
+            frameworkMinimiseOnFocusLossInFullscreen = frameworkConfigManager.GetBindable<bool>(FrameworkSetting.MinimiseOnFocusLossInFullscreen);
             frameworkWindowMode.BindValueChanged(_ => updateConfineMode());
+            frameworkMinimiseOnFocusLossInFullscreen.BindValueChanged(_ => updateConfineMode());
 
             osuConfineMode = osuConfigManager.GetBindable<OsuConfineMouseMode>(OsuSetting.ConfineMouseMode);
-            localUserPlaying = localUserInfo.IsPlaying.GetBoundCopy();
+            localUserPlaying = localUserInfo.PlayingState.GetBoundCopy();
 
             osuConfineMode.ValueChanged += _ => updateConfineMode();
             localUserPlaying.BindValueChanged(_ => updateConfineMode(), true);
@@ -44,7 +49,8 @@ namespace osu.Game.Input
             if (frameworkConfineMode.Disabled)
                 return;
 
-            if (frameworkWindowMode.Value == WindowMode.Fullscreen)
+            // override confine mode only when clicking outside the window minimises it.
+            if (frameworkWindowMode.Value == WindowMode.Fullscreen && frameworkMinimiseOnFocusLossInFullscreen.Value)
             {
                 frameworkConfineMode.Value = ConfineMouseMode.Fullscreen;
                 return;
@@ -57,7 +63,7 @@ namespace osu.Game.Input
                     break;
 
                 case OsuConfineMouseMode.DuringGameplay:
-                    frameworkConfineMode.Value = localUserPlaying.Value ? ConfineMouseMode.Always : ConfineMouseMode.Never;
+                    frameworkConfineMode.Value = localUserPlaying.Value == LocalUserPlayingState.Playing ? ConfineMouseMode.Always : ConfineMouseMode.Never;
                     break;
 
                 case OsuConfineMouseMode.Always:

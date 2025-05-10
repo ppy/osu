@@ -11,7 +11,7 @@ using osu.Framework.Input.Events;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class OsuTabDropdown<T> : OsuDropdown<T>, IHasAccentColour
+    public partial class OsuTabDropdown<T> : OsuDropdown<T>, IHasAccentColour
     {
         private Color4 accentColour;
 
@@ -58,7 +58,7 @@ namespace osu.Game.Graphics.UserInterface
                 tabDropdownHeader.AccentColour = accentColour;
         }
 
-        private class OsuTabDropdownMenu : OsuDropdownMenu
+        private partial class OsuTabDropdownMenu : OsuDropdownMenu
         {
             public OsuTabDropdownMenu()
             {
@@ -71,7 +71,7 @@ namespace osu.Game.Graphics.UserInterface
 
             protected override DrawableDropdownMenuItem CreateDrawableDropdownMenuItem(MenuItem item) => new DrawableOsuTabDropdownMenuItem(item);
 
-            private class DrawableOsuTabDropdownMenuItem : DrawableOsuDropdownMenuItem
+            private partial class DrawableOsuTabDropdownMenuItem : DrawableOsuDropdownMenuItem
             {
                 public DrawableOsuTabDropdownMenuItem(MenuItem item)
                     : base(item)
@@ -81,7 +81,7 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        protected class OsuTabDropdownHeader : OsuDropdownHeader, IHasAccentColour
+        protected partial class OsuTabDropdownHeader : OsuDropdownHeader, IHasAccentColour
         {
             private Color4 accentColour;
 
@@ -122,8 +122,6 @@ namespace osu.Game.Graphics.UserInterface
                         Anchor = Anchor.Centre,
                     }
                 };
-
-                Padding = new MarginPadding { Left = 5, Right = 5 };
             }
 
             protected override bool OnHover(HoverEvent e)

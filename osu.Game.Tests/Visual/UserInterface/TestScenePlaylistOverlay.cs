@@ -1,29 +1,39 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Bindables;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Testing;
+using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
-using osu.Game.Graphics.Containers;
 using osu.Game.Overlays.Music;
+using osu.Game.Rulesets;
 using osu.Game.Tests.Resources;
 using osuTK;
-using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestScenePlaylistOverlay : OsuManualInputManagerTestScene
+    public partial class TestScenePlaylistOverlay : OsuManualInputManagerTestScene
     {
-        private readonly BindableList<Live<BeatmapSetInfo>> beatmapSets = new BindableList<Live<BeatmapSetInfo>>();
+        protected override bool UseFreshStoragePerRun => true;
 
-        private PlaylistOverlay playlistOverlay;
+        private BeatmapManager beatmapManager = null!;
 
-        private Live<BeatmapSetInfo> first;
+        private const int item_count = 20;
+
+        private List<BeatmapSetInfo> beatmapSets => beatmapManager.GetAllUsableBeatmapSets();
+
+        [BackgroundDependencyLoader]
+        private void load(GameHost host)
+        {
+            Dependencies.Cache(new RealmRulesetStore(Realm));
+            Dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, Realm, null, Audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(Realm);
+        }
 
         [SetUp]
         public void Setup() => Schedule(() =>
@@ -33,7 +43,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Size = new Vector2(300, 500),
-                Child = playlistOverlay = new PlaylistOverlay
+                Child = new PlaylistOverlay
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -42,54 +52,15 @@ namespace osu.Game.Tests.Visual.UserInterface
                 }
             };
 
-            beatmapSets.Clear();
-
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < item_count; i++)
             {
-                beatmapSets.Add(TestResources.CreateTestBeatmapSetInfo().ToLiveUnmanaged());
+                beatmapManager.Import(TestResources.CreateTestBeatmapSetInfo());
             }
 
-            first = beatmapSets.First();
+            beatmapSets.First().ToLive(Realm);
 
-            playlistOverlay.BeatmapSets.BindTo(beatmapSets);
+            // Ensure all the initial imports are present before running any tests.
+            Realm.Run(r => r.Refresh());
         });
-
-        [Test]
-        public void TestRearrangeItems()
-        {
-            AddUntilStep("wait for animations to complete", () => !playlistOverlay.Transforms.Any());
-
-            AddStep("hold 1st item handle", () =>
-            {
-                var handle = this.ChildrenOfType<OsuRearrangeableListItem<Live<BeatmapSetInfo>>.PlaylistItemHandle>().First();
-                InputManager.MoveMouseTo(handle.ScreenSpaceDrawQuad.Centre);
-                InputManager.PressButton(MouseButton.Left);
-            });
-
-            AddStep("drag to 5th", () =>
-            {
-                var item = this.ChildrenOfType<PlaylistItem>().ElementAt(4);
-                InputManager.MoveMouseTo(item.ScreenSpaceDrawQuad.BottomLeft);
-            });
-
-            AddAssert("song 1 is 5th", () => beatmapSets[4].Equals(first));
-
-            AddStep("release handle", () => InputManager.ReleaseButton(MouseButton.Left));
-        }
-
-        [Test]
-        public void TestFiltering()
-        {
-            AddStep("set filter to \"10\"", () =>
-            {
-                var filterControl = playlistOverlay.ChildrenOfType<FilterControl>().Single();
-                filterControl.Search.Current.Value = "10";
-            });
-
-            AddAssert("results filtered correctly",
-                () => playlistOverlay.ChildrenOfType<PlaylistItem>()
-                                     .Where(item => item.MatchingFilter)
-                                     .All(item => item.FilterTerms.Any(term => term.Contains("10"))));
-        }
     }
 }

@@ -9,9 +9,9 @@ using osuTK.Input;
 
 namespace osu.Game.Tournament.Tests.Components
 {
-    public class TestSceneDateTextBox : OsuManualInputManagerTestScene
+    public partial class TestSceneDateTextBox : OsuManualInputManagerTestScene
     {
-        private DateTextBox textBox;
+        private DateTextBox textBox = null!;
 
         [SetUp]
         public void Setup() => Schedule(() =>

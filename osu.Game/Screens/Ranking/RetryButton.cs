@@ -12,12 +12,12 @@ using osuTK;
 
 namespace osu.Game.Screens.Ranking
 {
-    public class RetryButton : OsuAnimatedButton
+    public partial class RetryButton : OsuAnimatedButton
     {
         private readonly Box background;
 
-        [Resolved(canBeNull: true)]
-        private Player player { get; set; }
+        [Resolved]
+        private Player? player { get; set; }
 
         public RetryButton()
         {
@@ -35,11 +35,9 @@ namespace osu.Game.Screens.Ranking
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Size = new Vector2(13),
-                    Icon = FontAwesome.Solid.ArrowCircleLeft,
+                    Icon = FontAwesome.Solid.Redo,
                 },
             };
-
-            TooltipText = "retry";
         }
 
         [BackgroundDependencyLoader]
@@ -48,7 +46,14 @@ namespace osu.Game.Screens.Ranking
             background.Colour = colours.Green;
 
             if (player != null)
+            {
+                TooltipText = player is ReplayPlayer ? "replay" : "retry";
                 Action = () => player.Restart();
+            }
+            else
+            {
+                TooltipText = "retry";
+            }
         }
     }
 }

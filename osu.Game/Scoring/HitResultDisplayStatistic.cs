@@ -1,6 +1,7 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Localisation;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Scoring
@@ -28,9 +29,9 @@ namespace osu.Game.Scoring
         /// <summary>
         /// A custom display name for the result type. May be provided by rulesets to give better clarity.
         /// </summary>
-        public string DisplayName { get; }
+        public LocalisableString DisplayName { get; }
 
-        public HitResultDisplayStatistic(HitResult result, int count, int? maxCount, string displayName)
+        public HitResultDisplayStatistic(HitResult result, int count, int? maxCount, LocalisableString displayName)
         {
             Result = result;
             Count = count;

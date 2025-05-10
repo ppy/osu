@@ -7,8 +7,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Extensions;
 using osu.Game.Rulesets;
 
-#nullable enable
-
 namespace osu.Game.Online.API.Requests.Responses
 {
     public class APIBeatmap : IBeatmapInfo, IBeatmapOnlineInfo
@@ -34,6 +32,9 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"playcount")]
         public int PlayCount { get; set; }
 
+        [JsonProperty(@"current_user_playcount")]
+        public int UserPlayCount { get; set; }
+
         [JsonProperty(@"passcount")]
         public int PassCount { get; set; }
 
@@ -42,6 +43,10 @@ namespace osu.Game.Online.API.Requests.Responses
 
         [JsonProperty(@"difficulty_rating")]
         public double StarRating { get; set; }
+
+        public int EndTimeObjectCount => SliderCount + SpinnerCount;
+
+        public int TotalObjectCount => CircleCount + SliderCount + SpinnerCount;
 
         [JsonProperty(@"drain")]
         public float DrainRate { get; set; }
@@ -65,11 +70,27 @@ namespace osu.Game.Online.API.Requests.Responses
             set => Length = TimeSpan.FromSeconds(value).TotalMilliseconds;
         }
 
+        [JsonIgnore]
+        public double HitLength { get; set; }
+
+        [JsonProperty(@"hit_length")]
+        private double hitLengthInSeconds
+        {
+            get => TimeSpan.FromMilliseconds(HitLength).TotalSeconds;
+            set => HitLength = TimeSpan.FromSeconds(value).TotalMilliseconds;
+        }
+
+        [JsonProperty(@"convert")]
+        public bool Convert { get; set; }
+
         [JsonProperty(@"count_circles")]
         public int CircleCount { get; set; }
 
         [JsonProperty(@"count_sliders")]
         public int SliderCount { get; set; }
+
+        [JsonProperty(@"count_spinners")]
+        public int SpinnerCount { get; set; }
 
         [JsonProperty(@"version")]
         public string DifficultyName { get; set; } = string.Empty;
@@ -77,10 +98,22 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"failtimes")]
         public APIFailTimes? FailTimes { get; set; }
 
+        [JsonProperty(@"top_tag_ids")]
+        public APIBeatmapTag[]? TopTags { get; set; }
+
+        [JsonProperty(@"current_user_tag_ids")]
+        public long[]? OwnTagIds { get; set; }
+
         [JsonProperty(@"max_combo")]
         public int? MaxCombo { get; set; }
 
+        [JsonProperty(@"last_updated")]
+        public DateTimeOffset LastUpdated { get; set; }
+
         public double BPM { get; set; }
+
+        [JsonProperty(@"owners")]
+        public BeatmapOwner[] BeatmapOwners { get; set; } = Array.Empty<BeatmapOwner>();
 
         #region Implementation of IBeatmapInfo
 
@@ -91,7 +124,7 @@ namespace osu.Game.Online.API.Requests.Responses
             DrainRate = DrainRate,
             CircleSize = CircleSize,
             ApproachRate = ApproachRate,
-            OverallDifficulty = OverallDifficulty,
+            OverallDifficulty = OverallDifficulty
         };
 
         IBeatmapSetInfo? IBeatmapInfo.BeatmapSet => BeatmapSet;
@@ -107,7 +140,7 @@ namespace osu.Game.Online.API.Requests.Responses
 
         public bool Equals(IBeatmapInfo? other) => other is APIBeatmap b && this.MatchesOnlineID(b);
 
-        private class APIRuleset : IRulesetInfo
+        public class APIRuleset : IRulesetInfo
         {
             public int OnlineID { get; set; } = -1;
 
@@ -139,7 +172,7 @@ namespace osu.Game.Online.API.Requests.Responses
 
             public bool Equals(IRulesetInfo? other) => other is APIRuleset r && this.MatchesOnlineID(r);
 
-            public int CompareTo(IRulesetInfo other)
+            public int CompareTo(IRulesetInfo? other)
             {
                 if (!(other is APIRuleset ruleset))
                     throw new ArgumentException($@"Object is not of type {nameof(APIRuleset)}.", nameof(other));
@@ -149,6 +182,15 @@ namespace osu.Game.Online.API.Requests.Responses
 
             // ReSharper disable once NonReadonlyMemberInGetHashCode
             public override int GetHashCode() => OnlineID;
+        }
+
+        public class BeatmapOwner
+        {
+            [JsonProperty(@"id")]
+            public int Id { get; set; }
+
+            [JsonProperty(@"username")]
+            public string Username { get; set; } = string.Empty;
         }
     }
 }

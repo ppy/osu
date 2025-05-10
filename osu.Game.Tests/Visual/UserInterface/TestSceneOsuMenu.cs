@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
@@ -10,7 +12,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneOsuMenu : OsuManualInputManagerTestScene
+    public partial class TestSceneOsuMenu : OsuManualInputManagerTestScene
     {
         private OsuMenu menu;
         private bool actionPerformed;

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -12,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneExpandingContainer : OsuManualInputManagerTestScene
+    public partial class TestSceneExpandingContainer : OsuManualInputManagerTestScene
     {
         private TestExpandingContainer container;
         private SettingsToolboxGroup toolboxGroup;
@@ -99,15 +101,15 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         /// <summary>
-        /// Tests expanding a container will expand underlying groups if contracted.
+        /// Tests expanding a container will not expand underlying groups if they were manually contracted by the user.
         /// </summary>
         [Test]
-        public void TestExpandingContainerExpandsContractedGroup()
+        public void TestExpandingContainerDoesNotExpandContractedGroup()
         {
             AddStep("contract group", () => toolboxGroup.Expanded.Value = false);
 
             AddStep("expand container", () => container.Expanded.Value = true);
-            AddAssert("group expanded", () => toolboxGroup.Expanded.Value);
+            AddAssert("group not expanded", () => !toolboxGroup.Expanded.Value);
             AddAssert("controls expanded", () => slider1.Expanded.Value && slider2.Expanded.Value);
 
             AddStep("contract container", () => container.Expanded.Value = false);
@@ -147,7 +149,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("container still expanded", () => container.Expanded.Value);
         }
 
-        private class TestExpandingContainer : ExpandingContainer
+        private partial class TestExpandingContainer : ExpandingContainer
         {
             public TestExpandingContainer()
                 : base(120, 250)

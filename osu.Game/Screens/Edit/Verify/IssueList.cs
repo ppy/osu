@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -9,8 +11,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
-using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Checks.Components;
@@ -19,7 +20,7 @@ using osuTK;
 namespace osu.Game.Screens.Edit.Verify
 {
     [Cached]
-    public class IssueList : CompositeDrawable
+    public partial class IssueList : CompositeDrawable
     {
         private IssueTable table;
 
@@ -51,13 +52,12 @@ namespace osu.Game.Screens.Edit.Verify
             {
                 new Box
                 {
-                    Colour = colours.Background2,
+                    Colour = colours.Background3,
                     RelativeSizeAxes = Axes.Both,
                 },
-                new OsuScrollContainer
+                table = new IssueTable
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Child = table = new IssueTable(),
                 },
                 new FillFlowContainer
                 {
@@ -67,10 +67,10 @@ namespace osu.Game.Screens.Edit.Verify
                     Margin = new MarginPadding(20),
                     Children = new Drawable[]
                     {
-                        new TriangleButton
+                        new RoundedButton
                         {
                             Text = "Refresh",
-                            Action = refresh,
+                            Action = Refresh,
                             Size = new Vector2(120, 40),
                             Anchor = Anchor.BottomRight,
                             Origin = Anchor.BottomRight,
@@ -84,13 +84,13 @@ namespace osu.Game.Screens.Edit.Verify
         {
             base.LoadComplete();
 
-            verify.InterpretedDifficulty.BindValueChanged(_ => refresh());
-            verify.HiddenIssueTypes.BindCollectionChanged((_, __) => refresh());
+            verify.InterpretedDifficulty.BindValueChanged(_ => Refresh());
+            verify.HiddenIssueTypes.BindCollectionChanged((_, _) => Refresh());
 
-            refresh();
+            Refresh();
         }
 
-        private void refresh()
+        public void Refresh()
         {
             var issues = generalVerifier.Run(context);
 
@@ -99,9 +99,10 @@ namespace osu.Game.Screens.Edit.Verify
 
             issues = filter(issues);
 
-            table.Issues = issues
-                           .OrderBy(issue => issue.Template.Type)
-                           .ThenBy(issue => issue.Check.Metadata.Category);
+            table.Issues.Clear();
+            table.Issues.AddRange(issues
+                                  .OrderBy(issue => issue.Template.Type)
+                                  .ThenBy(issue => issue.Check.Metadata.Category));
         }
 
         private IEnumerable<Issue> filter(IEnumerable<Issue> issues)

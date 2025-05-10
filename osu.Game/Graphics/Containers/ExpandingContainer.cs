@@ -12,8 +12,10 @@ namespace osu.Game.Graphics.Containers
     /// <summary>
     /// Represents a <see cref="Container"/> with the ability to expand/contract on hover.
     /// </summary>
-    public class ExpandingContainer : Container, IExpandingContainer
+    public partial class ExpandingContainer : Container, IExpandingContainer
     {
+        public const double TRANSITION_DURATION = 500;
+
         private readonly float contractedWidth;
         private readonly float expandedWidth;
 
@@ -23,6 +25,8 @@ namespace osu.Game.Graphics.Containers
         /// Delay before the container switches to expanded state from hover.
         /// </summary>
         protected virtual double HoverExpansionDelay => 0;
+
+        protected virtual bool ExpandOnHover => true;
 
         protected override Container<Drawable> Content => FillFlow;
 
@@ -51,7 +55,7 @@ namespace osu.Game.Graphics.Containers
             };
         }
 
-        private ScheduledDelegate hoverExpandEvent;
+        private ScheduledDelegate? hoverExpandEvent;
 
         protected override void LoadComplete()
         {
@@ -59,7 +63,7 @@ namespace osu.Game.Graphics.Containers
 
             Expanded.BindValueChanged(v =>
             {
-                this.ResizeWidthTo(v.NewValue ? expandedWidth : contractedWidth, 500, Easing.OutQuint);
+                this.ResizeWidthTo(v.NewValue ? expandedWidth : contractedWidth, TRANSITION_DURATION, Easing.OutQuint);
             }, true);
         }
 
@@ -91,6 +95,9 @@ namespace osu.Game.Graphics.Containers
 
         private void updateHoverExpansion()
         {
+            if (!ExpandOnHover)
+                return;
+
             hoverExpandEvent?.Cancel();
 
             if (IsHovered && !Expanded.Value)

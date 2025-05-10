@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -16,7 +14,7 @@ using osuTK.Input;
 
 namespace osu.Game.Graphics.Containers
 {
-    public class OsuScrollContainer : OsuScrollContainer<Drawable>
+    public partial class OsuScrollContainer : OsuScrollContainer<Drawable>
     {
         public OsuScrollContainer()
         {
@@ -28,30 +26,11 @@ namespace osu.Game.Graphics.Containers
         }
     }
 
-    public class OsuScrollContainer<T> : ScrollContainer<T> where T : Drawable
+    public partial class OsuScrollContainer<T> : ScrollContainer<T>
+        where T : Drawable
     {
-        public const float SCROLL_BAR_HEIGHT = 10;
+        public const float SCROLL_BAR_WIDTH = 10;
         public const float SCROLL_BAR_PADDING = 3;
-
-        /// <summary>
-        /// Allows controlling the scroll bar from any position in the container using the right mouse button.
-        /// Uses the value of <see cref="DistanceDecayOnRightMouseScrollbar"/> to smoothly scroll to the dragged location.
-        /// </summary>
-        public bool RightMouseScrollbar;
-
-        /// <summary>
-        /// Controls the rate with which the target position is approached when performing a relative drag. Default is 0.02.
-        /// </summary>
-        public double DistanceDecayOnRightMouseScrollbar = 0.02;
-
-        private bool shouldPerformRightMouseScroll(MouseButtonEvent e) => RightMouseScrollbar && e.Button == MouseButton.Right;
-
-        private void scrollFromMouseEvent(MouseEvent e) =>
-            ScrollTo(Clamp(ToLocalSpace(e.ScreenSpaceMousePosition)[ScrollDim] / DrawSize[ScrollDim]) * Content.DrawSize[ScrollDim], true, DistanceDecayOnRightMouseScrollbar);
-
-        private bool rightMouseDragging;
-
-        protected override bool IsDragging => base.IsDragging || rightMouseDragging;
 
         public OsuScrollContainer(Direction scrollDirection = Direction.Vertical)
             : base(scrollDirection)
@@ -66,60 +45,16 @@ namespace osu.Game.Graphics.Containers
         /// <param name="extraScroll">An added amount to scroll beyond the requirement to bring the target into view.</param>
         public void ScrollIntoView(Drawable d, bool animated = true, float extraScroll = 0)
         {
-            float childPos0 = GetChildPosInContent(d);
-            float childPos1 = GetChildPosInContent(d, d.DrawSize);
+            double childPos0 = GetChildPosInContent(d);
+            double childPos1 = GetChildPosInContent(d, d.DrawSize);
 
-            float minPos = Math.Min(childPos0, childPos1);
-            float maxPos = Math.Max(childPos0, childPos1);
+            double minPos = Math.Min(childPos0, childPos1);
+            double maxPos = Math.Max(childPos0, childPos1);
 
             if (minPos < Current || (minPos > Current && d.DrawSize[ScrollDim] > DisplayableContent))
                 ScrollTo(minPos - extraScroll, animated);
             else if (maxPos > Current + DisplayableContent)
                 ScrollTo(maxPos - DisplayableContent + extraScroll, animated);
-        }
-
-        protected override bool OnMouseDown(MouseDownEvent e)
-        {
-            if (shouldPerformRightMouseScroll(e))
-            {
-                scrollFromMouseEvent(e);
-                return true;
-            }
-
-            return base.OnMouseDown(e);
-        }
-
-        protected override void OnDrag(DragEvent e)
-        {
-            if (rightMouseDragging)
-            {
-                scrollFromMouseEvent(e);
-                return;
-            }
-
-            base.OnDrag(e);
-        }
-
-        protected override bool OnDragStart(DragStartEvent e)
-        {
-            if (shouldPerformRightMouseScroll(e))
-            {
-                rightMouseDragging = true;
-                return true;
-            }
-
-            return base.OnDragStart(e);
-        }
-
-        protected override void OnDragEnd(DragEndEvent e)
-        {
-            if (rightMouseDragging)
-            {
-                rightMouseDragging = false;
-                return;
-            }
-
-            base.OnDragEnd(e);
         }
 
         protected override bool OnScroll(ScrollEvent e)
@@ -131,15 +66,34 @@ namespace osu.Game.Graphics.Containers
             return base.OnScroll(e);
         }
 
+        #region Absolute scrolling
+
+        /// <summary>
+        /// Controls the rate with which the target position is approached when performing a relative drag. Default is 0.02.
+        /// </summary>
+        public double DistanceDecayOnAbsoluteScroll = 0.02;
+
+        protected virtual void ScrollToAbsolutePosition(Vector2 screenSpacePosition)
+        {
+            float fromScrollbarPosition = FromScrollbarPosition(ToLocalSpace(screenSpacePosition)[ScrollDim]);
+            float scrollbarCentreOffset = FromScrollbarPosition(Scrollbar.DrawHeight) * 0.5f;
+
+            ScrollTo(Clamp(fromScrollbarPosition - scrollbarCentreOffset), true, DistanceDecayOnAbsoluteScroll);
+        }
+
+        #endregion
+
         protected override ScrollbarContainer CreateScrollbar(Direction direction) => new OsuScrollbar(direction);
 
-        protected class OsuScrollbar : ScrollbarContainer
+        protected partial class OsuScrollbar : ScrollbarContainer
         {
             private Color4 hoverColour;
             private Color4 defaultColour;
             private Color4 highlightColour;
 
             private readonly Box box;
+
+            protected override float MinimumDimSize => SCROLL_BAR_WIDTH * 3;
 
             public OsuScrollbar(Direction scrollDir)
                 : base(scrollDir)
@@ -149,7 +103,7 @@ namespace osu.Game.Graphics.Containers
                 CornerRadius = 5;
 
                 // needs to be set initially for the ResizeTo to respect minimum size
-                Size = new Vector2(SCROLL_BAR_HEIGHT);
+                Size = new Vector2(SCROLL_BAR_WIDTH);
 
                 const float margin = 3;
 
@@ -175,11 +129,10 @@ namespace osu.Game.Graphics.Containers
 
             public override void ResizeTo(float val, int duration = 0, Easing easing = Easing.None)
             {
-                Vector2 size = new Vector2(SCROLL_BAR_HEIGHT)
+                this.ResizeTo(new Vector2(SCROLL_BAR_WIDTH)
                 {
                     [(int)ScrollDirection] = val
-                };
-                this.ResizeTo(size, duration, easing);
+                }, duration, easing);
             }
 
             protected override bool OnHover(HoverEvent e)

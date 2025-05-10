@@ -10,7 +10,7 @@ using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
-    public class NoScoresPlaceholder : Container
+    public partial class NoScoresPlaceholder : Container
     {
         private readonly SpriteText text;
 
@@ -40,6 +40,10 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
                 case BeatmapLeaderboardScope.Country:
                     text.Text = BeatmapsetsStrings.ShowScoreboardNoScoresCountry;
+                    break;
+
+                case BeatmapLeaderboardScope.Team:
+                    text.Text = BeatmapsetsStrings.ShowScoreboardNoScoresTeam;
                     break;
             }
         }

@@ -6,10 +6,10 @@ using osu.Game.Tournament.Models;
 
 namespace osu.Game.Tournament.Screens
 {
-    public abstract class TournamentMatchScreen : TournamentScreen
+    public abstract partial class TournamentMatchScreen : TournamentScreen
     {
-        protected readonly Bindable<TournamentMatch> CurrentMatch = new Bindable<TournamentMatch>();
-        private WarningBox noMatchWarning;
+        protected readonly Bindable<TournamentMatch?> CurrentMatch = new Bindable<TournamentMatch?>();
+        private WarningBox? noMatchWarning;
 
         protected override void LoadComplete()
         {
@@ -19,7 +19,7 @@ namespace osu.Game.Tournament.Screens
             CurrentMatch.BindValueChanged(CurrentMatchChanged, true);
         }
 
-        protected virtual void CurrentMatchChanged(ValueChangedEvent<TournamentMatch> match)
+        protected virtual void CurrentMatchChanged(ValueChangedEvent<TournamentMatch?> match)
         {
             if (match.NewValue == null)
             {

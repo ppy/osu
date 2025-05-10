@@ -10,7 +10,7 @@ namespace osu.Game.Beatmaps.Formats
     {
         public static void Register()
         {
-            AddDecoder<Beatmap>("{", m => new JsonBeatmapDecoder());
+            AddDecoder<Beatmap>("{", _ => new JsonBeatmapDecoder());
         }
 
         protected override void ParseStreamInto(LineBufferedReader stream, Beatmap output)

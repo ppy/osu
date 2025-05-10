@@ -17,5 +17,16 @@ namespace osu.Game.Rulesets.Difficulty
         /// Performance of a perfect play for comparison.
         /// </summary>
         public PerformanceAttributes PerfectPerformance { get; set; }
+
+        /// <summary>
+        /// Create a new performance breakdown.
+        /// </summary>
+        /// <param name="performance">Actual gameplay performance.</param>
+        /// <param name="perfectPerformance">Performance of a perfect play for comparison.</param>
+        public PerformanceBreakdown(PerformanceAttributes performance, PerformanceAttributes perfectPerformance)
+        {
+            Performance = performance;
+            PerfectPerformance = perfectPerformance;
+        }
     }
 }

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mania.Beatmaps;
@@ -20,7 +21,7 @@ namespace osu.Game.Rulesets.Mania.Mods
         public override string Acronym => "IN";
         public override double ScoreMultiplier => 1;
 
-        public override string Description => "Hold the keys. To the beat.";
+        public override LocalisableString Description => "Hold the keys. To the beat.";
 
         public override IconUsage? Icon => FontAwesome.Solid.YinYang;
 
@@ -41,8 +42,7 @@ namespace osu.Game.Rulesets.Mania.Mods
                 var locations = column.OfType<Note>().Select(n => (startTime: n.StartTime, samples: n.Samples))
                                       .Concat(column.OfType<HoldNote>().SelectMany(h => new[]
                                       {
-                                          (startTime: h.StartTime, samples: h.GetNodeSamples(0)),
-                                          (startTime: h.EndTime, samples: h.GetNodeSamples(1))
+                                          (startTime: h.StartTime, samples: h.GetNodeSamples(0))
                                       }))
                                       .OrderBy(h => h.startTime).ToList();
 

@@ -1,18 +1,21 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
 {
-    public abstract class BeatmapCardIconButton : OsuClickableContainer
+    public abstract partial class BeatmapCardIconButton : OsuClickableContainer
     {
         private Colour4 idleColour;
 
@@ -40,52 +43,43 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
             }
         }
 
-        private float iconSize;
+        protected SpriteIcon Icon { get; private set; } = null!;
 
-        public float IconSize
-        {
-            get => iconSize;
-            set
-            {
-                iconSize = value;
-                Icon.Size = new Vector2(iconSize);
-            }
-        }
-
-        protected readonly SpriteIcon Icon;
-
-        protected override Container<Drawable> Content => content;
-
-        private readonly Container content;
-
-        protected BeatmapCardIconButton()
-        {
-            Origin = Anchor.Centre;
-            Anchor = Anchor.Centre;
-
-            base.Content.Add(content = new Container
-            {
-                RelativeSizeAxes = Axes.Both,
-                Masking = true,
-                Origin = Anchor.Centre,
-                Anchor = Anchor.Centre,
-                Children = new Drawable[]
-                {
-                    Icon = new SpriteIcon
-                    {
-                        Origin = Anchor.Centre,
-                        Anchor = Anchor.Centre
-                    }
-                }
-            });
-
-            Size = new Vector2(24);
-            IconSize = 12;
-        }
+        private Container content = null!;
+        private Container hover = null!;
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
         {
+            RelativeSizeAxes = Axes.Both;
+
+            Add(content = new Container
+            {
+                RelativeSizeAxes = Axes.Both,
+                Masking = true,
+                Scale = new Vector2(0.8f),
+                Origin = Anchor.Centre,
+                Anchor = Anchor.Centre,
+                Children = new Drawable[]
+                {
+                    hover = new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        CornerRadius = BeatmapCard.CORNER_RADIUS,
+                        Masking = true,
+                        Colour = Color4.White.Opacity(0.1f),
+                        Blending = BlendingParameters.Additive,
+                        Child = new Box { RelativeSizeAxes = Axes.Both, }
+                    },
+                    Icon = new SpriteIcon
+                    {
+                        Origin = Anchor.Centre,
+                        Anchor = Anchor.Centre,
+                        Size = new Vector2(14),
+                    },
+                }
+            });
+
             IdleColour = colourProvider.Light1;
             HoverColour = colourProvider.Content1;
         }
@@ -114,8 +108,15 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
         {
             bool isHovered = IsHovered && Enabled.Value;
 
-            content.ScaleTo(isHovered ? 1.2f : 1, 500, Easing.OutQuint);
-            content.FadeColour(isHovered ? HoverColour : IdleColour, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
+            hover.FadeTo(isHovered ? 1f : 0f, 500, Easing.OutQuint);
+            content.ScaleTo(isHovered ? 0.9f : 0.8f, 500, Easing.OutQuint);
+            Icon.FadeColour(isHovered ? HoverColour : IdleColour, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
+        }
+
+        protected void SetLoading(bool isLoading)
+        {
+            Icon.FadeTo(isLoading ? 0.2f : 1, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
+            Enabled.Value = !isLoading;
         }
     }
 }

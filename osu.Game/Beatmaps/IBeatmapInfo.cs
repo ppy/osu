@@ -5,8 +5,6 @@ using System;
 using osu.Game.Database;
 using osu.Game.Rulesets;
 
-#nullable enable
-
 namespace osu.Game.Beatmaps
 {
     /// <summary>
@@ -35,7 +33,7 @@ namespace osu.Game.Beatmaps
         IBeatmapSetInfo? BeatmapSet { get; }
 
         /// <summary>
-        /// The playable length in milliseconds of this beatmap.
+        /// The total length in milliseconds of this beatmap.
         /// </summary>
         double Length { get; }
 
@@ -61,7 +59,23 @@ namespace osu.Game.Beatmaps
 
         /// <summary>
         /// The basic star rating for this beatmap (with no mods applied).
+        /// Defaults to -1 (meaning not-yet-calculated).
         /// </summary>
         double StarRating { get; }
+
+        /// <summary>
+        /// The number of hitobjects in the beatmap with a distinct end time.
+        /// Defaults to -1 (meaning not-yet-calculated).
+        /// </summary>
+        /// <remarks>
+        /// Canonically, these are hitobjects are either sliders or spinners.
+        /// </remarks>
+        int EndTimeObjectCount { get; }
+
+        /// <summary>
+        /// The total number of hitobjects in the beatmap.
+        /// Defaults to -1 (meaning not-yet-calculated).
+        /// </summary>
+        int TotalObjectCount { get; }
     }
 }

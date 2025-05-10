@@ -6,11 +6,12 @@ using osu.Framework.Audio;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Audio
 {
-    public class VolumeSettings : SettingsSubsection
+    public partial class VolumeSettings : SettingsSubsection
     {
         protected override LocalisableString Header => AudioSettingsStrings.VolumeHeader;
 
@@ -19,7 +20,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
         {
             Children = new Drawable[]
             {
-                new SettingsSlider<double>
+                new VolumeAdjustSlider
                 {
                     LabelText = AudioSettingsStrings.MasterVolume,
                     Current = audio.Volume,
@@ -33,14 +34,15 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                     KeyboardStep = 0.01f,
                     DisplayAsPercentage = true
                 },
-                new SettingsSlider<double>
+                new VolumeAdjustSlider
                 {
                     LabelText = AudioSettingsStrings.EffectVolume,
                     Current = audio.VolumeSample,
                     KeyboardStep = 0.01f,
                     DisplayAsPercentage = true
                 },
-                new SettingsSlider<double>
+
+                new VolumeAdjustSlider
                 {
                     LabelText = AudioSettingsStrings.MusicVolume,
                     Current = audio.VolumeTrack,
@@ -48,6 +50,16 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                     DisplayAsPercentage = true
                 },
             };
+        }
+
+        private partial class VolumeAdjustSlider : SettingsSlider<double>
+        {
+            protected override Drawable CreateControl()
+            {
+                var sliderBar = (RoundedSliderBar<double>)base.CreateControl();
+                sliderBar.PlaySamplesOnAdjust = false;
+                return sliderBar;
+            }
         }
     }
 }

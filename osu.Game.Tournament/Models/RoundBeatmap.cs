@@ -2,16 +2,15 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using Newtonsoft.Json;
-using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Tournament.Models
 {
     public class RoundBeatmap
     {
         public int ID;
-        public string Mods;
+        public string Mods = string.Empty;
 
         [JsonProperty("BeatmapInfo")]
-        public APIBeatmap Beatmap;
+        public TournamentBeatmap? Beatmap;
     }
 }

@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
@@ -17,7 +17,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
-    public class TestSceneMissHitWindowJudgements : ModTestScene
+    public partial class TestSceneMissHitWindowJudgements : ModTestScene
     {
         protected override Ruleset CreatePlayerRuleset() => new OsuRuleset();
 
@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 Autoplay = false,
                 Mod = new TestAutoMod(),
-                Beatmap = new Beatmap
+                CreateBeatmap = () => new Beatmap
                 {
                     HitObjects = { new HitCircle { Position = new Vector2(256, 192) } }
                 },
@@ -47,18 +47,16 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestMissViaNotHitting()
         {
-            var beatmap = new Beatmap
-            {
-                HitObjects = { new HitCircle { Position = new Vector2(256, 192) } }
-            };
-
             var hitWindows = new OsuHitWindows();
-            hitWindows.SetDifficulty(beatmap.Difficulty.OverallDifficulty);
+            hitWindows.SetDifficulty(IBeatmapDifficultyInfo.DEFAULT_DIFFICULTY);
 
             CreateModTest(new ModTestData
             {
                 Autoplay = false,
-                Beatmap = beatmap,
+                CreateBeatmap = () => new Beatmap
+                {
+                    HitObjects = { new HitCircle { Position = new Vector2(256, 192) } }
+                },
                 PassCondition = () => Player.Results.Count > 0 && Player.Results[0].TimeOffset >= hitWindows.WindowFor(HitResult.Meh) && !Player.Results[0].IsHit
             });
         }

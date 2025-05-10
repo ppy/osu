@@ -9,7 +9,7 @@ using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Screens.Play.Break
 {
-    public class RemainingTimeCounter : Counter
+    public partial class RemainingTimeCounter : Counter
     {
         private readonly OsuSpriteText counter;
 

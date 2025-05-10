@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
@@ -10,7 +10,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Tests.Skinning
 {
-    public class TestSceneColumnHitObjectArea : ManiaSkinnableTestScene
+    public partial class TestSceneColumnHitObjectArea : ManiaSkinnableTestScene
     {
         [BackgroundDependencyLoader]
         private void load()
@@ -28,18 +28,20 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
                     {
                         RelativeSizeAxes = Axes.Both,
                         Width = 0.5f,
-                        Child = new ColumnHitObjectArea(new HitObjectContainer())
+                        Child = new ColumnHitObjectArea
                         {
-                            RelativeSizeAxes = Axes.Both
+                            RelativeSizeAxes = Axes.Both,
+                            Child = new HitObjectContainer(),
                         }
                     },
                     new ColumnTestContainer(1, ManiaAction.Key2)
                     {
                         RelativeSizeAxes = Axes.Both,
                         Width = 0.5f,
-                        Child = new ColumnHitObjectArea(new HitObjectContainer())
+                        Child = new ColumnHitObjectArea
                         {
-                            RelativeSizeAxes = Axes.Both
+                            RelativeSizeAxes = Axes.Both,
+                            Child = new HitObjectContainer(),
                         }
                     }
                 }

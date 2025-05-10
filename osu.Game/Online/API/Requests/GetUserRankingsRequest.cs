@@ -3,6 +3,7 @@
 
 using osu.Framework.IO.Network;
 using osu.Game.Rulesets;
+using osu.Game.Users;
 
 namespace osu.Game.Online.API.Requests
 {
@@ -10,21 +11,21 @@ namespace osu.Game.Online.API.Requests
     {
         public readonly UserRankingsType Type;
 
-        private readonly string country;
+        private readonly CountryCode countryCode;
 
-        public GetUserRankingsRequest(RulesetInfo ruleset, UserRankingsType type = UserRankingsType.Performance, int page = 1, string country = null)
+        public GetUserRankingsRequest(RulesetInfo ruleset, UserRankingsType type = UserRankingsType.Performance, int page = 1, CountryCode countryCode = CountryCode.Unknown)
             : base(ruleset, page)
         {
             Type = type;
-            this.country = country;
+            this.countryCode = countryCode;
         }
 
         protected override WebRequest CreateWebRequest()
         {
             var req = base.CreateWebRequest();
 
-            if (country != null)
-                req.AddParameter("country", country);
+            if (countryCode != CountryCode.Unknown)
+                req.AddParameter("country", countryCode.ToString());
 
             return req;
         }

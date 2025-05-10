@@ -6,11 +6,11 @@ using osu.Game.Input.Bindings;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public class ToolbarSettingsButton : ToolbarOverlayToggleButton
+    public partial class ToolbarSettingsButton : ToolbarOverlayToggleButton
     {
         public ToolbarSettingsButton()
         {
-            Width *= 1.4f;
+            ButtonContent.Width *= 1.4f;
             Hotkey = GlobalAction.ToggleSettings;
         }
 

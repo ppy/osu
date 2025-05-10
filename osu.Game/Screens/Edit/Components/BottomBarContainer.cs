@@ -2,26 +2,22 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
-using osu.Game.Graphics;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Components
 {
-    public class BottomBarContainer : Container
+    public partial class BottomBarContainer : Container
     {
-        private const float corner_radius = 5;
         private const float contents_padding = 15;
 
         protected readonly IBindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
 
-        protected readonly IBindable<Track> Track = new Bindable<Track>();
-
-        private readonly Drawable background;
+        public readonly Drawable Background;
         private readonly Container content;
 
         protected override Container<Drawable> Content => content;
@@ -29,11 +25,14 @@ namespace osu.Game.Screens.Edit.Components
         public BottomBarContainer()
         {
             Masking = true;
-            CornerRadius = corner_radius;
 
             InternalChildren = new[]
             {
-                background = new Box { RelativeSizeAxes = Axes.Both },
+                Background = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = Color4.Transparent,
+                },
                 content = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -43,12 +42,9 @@ namespace osu.Game.Screens.Edit.Components
         }
 
         [BackgroundDependencyLoader]
-        private void load(IBindable<WorkingBeatmap> beatmap, OsuColour colours, EditorClock clock)
+        private void load(IBindable<WorkingBeatmap> beatmap)
         {
             Beatmap.BindTo(beatmap);
-            Track.BindTo(clock.Track);
-
-            background.Colour = colours.Gray1;
         }
     }
 }

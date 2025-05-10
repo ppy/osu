@@ -9,8 +9,13 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
-    public class LegacyCursor : OsuCursorSprite
+    public partial class LegacyCursor : SkinnableCursor
     {
+        public static readonly int REVOLUTION_DURATION = 10000;
+
+        private const float pressed_scale = 1.3f;
+        private const float released_scale = 1f;
+
         private readonly ISkin skin;
         private bool spin;
 
@@ -49,7 +54,18 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         protected override void LoadComplete()
         {
             if (spin)
-                ExpandTarget.Spin(10000, RotationDirection.Clockwise);
+                ExpandTarget.Spin(REVOLUTION_DURATION, RotationDirection.Clockwise);
+        }
+
+        public override void Expand()
+        {
+            ExpandTarget?.ScaleTo(released_scale)
+                        .ScaleTo(pressed_scale, 100, Easing.Out);
+        }
+
+        public override void Contract()
+        {
+            ExpandTarget?.ScaleTo(released_scale, 100, Easing.Out);
         }
     }
 }

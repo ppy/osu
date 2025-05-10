@@ -7,9 +7,11 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
     public class FilterCriteria
     {
-        public string SearchString;
-        public RoomStatusFilter Status;
-        public string Category;
-        public RulesetInfo Ruleset;
+        public string SearchString = string.Empty;
+        public RoomModeFilter Mode;
+        public RoomStatusFilter? Status;
+        public string Category = string.Empty;
+        public RulesetInfo? Ruleset;
+        public RoomPermissionsFilter Permissions;
     }
 }

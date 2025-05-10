@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
@@ -16,7 +18,12 @@ using osu.Game.Storyboards;
 namespace osu.Game.Beatmaps
 {
     /// <summary>
-    /// Provides access to the multiple resources offered by a beatmap model (textures, skins, playable beatmaps etc.)
+    /// A more expensive representation of a beatmap which allows access to various associated resources.
+    /// - Access textures and other resources via <see cref="GetStream"/>.
+    /// - Access the storyboard via <see cref="Storyboard"/>.
+    /// - Access a local skin via <see cref="Skin"/>.
+    /// - Access the track via <see cref="LoadTrack"/> (and then <see cref="Track"/> for subsequent accesses).
+    /// - Create a playable <see cref="Beatmap"/> via <see cref="GetPlayableBeatmap(osu.Game.Rulesets.IRulesetInfo,System.Collections.Generic.IReadOnlyList{osu.Game.Rulesets.Mods.Mod})"/>.
     /// </summary>
     public interface IWorkingBeatmap
     {
@@ -25,12 +32,12 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Whether the Beatmap has finished loading.
         ///</summary>
-        public bool BeatmapLoaded { get; }
+        bool BeatmapLoaded { get; }
 
         /// <summary>
         /// Whether the Track has finished loading.
         ///</summary>
-        public bool TrackLoaded { get; }
+        bool TrackLoaded { get; }
 
         /// <summary>
         /// Retrieves the <see cref="IBeatmap"/> which this <see cref="IWorkingBeatmap"/> represents.
@@ -40,7 +47,12 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Retrieves the background for this <see cref="IWorkingBeatmap"/>.
         /// </summary>
-        Texture Background { get; }
+        Texture GetBackground();
+
+        /// <summary>
+        /// Retrieves a cropped background for this <see cref="IWorkingBeatmap"/> used for display on panels.
+        /// </summary>
+        Texture GetPanelBackground();
 
         /// <summary>
         /// Retrieves the <see cref="Waveform"/> for the <see cref="Track"/> of this <see cref="IWorkingBeatmap"/>.
@@ -117,16 +129,16 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Beings loading the contents of this <see cref="IWorkingBeatmap"/> asynchronously.
         /// </summary>
-        public void BeginAsyncLoad();
+        void BeginAsyncLoad();
 
         /// <summary>
         /// Cancels the asynchronous loading of the contents of this <see cref="IWorkingBeatmap"/>.
         /// </summary>
-        public void CancelAsyncLoad();
+        void CancelAsyncLoad();
 
         /// <summary>
         /// Reads the correct track restart point from beatmap metadata and sets looping to enabled.
         /// </summary>
-        void PrepareTrackForPreviewLooping();
+        void PrepareTrackForPreview(bool looping, double offsetFromPreviewPoint = 0);
     }
 }

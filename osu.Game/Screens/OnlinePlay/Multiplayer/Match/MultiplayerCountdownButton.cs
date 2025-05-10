@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
@@ -14,12 +15,13 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Localisation;
 using osu.Game.Online.Multiplayer;
 using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 {
-    public class MultiplayerCountdownButton : IconButton, IHasPopover
+    public partial class MultiplayerCountdownButton : IconButton, IHasPopover
     {
         private static readonly TimeSpan[] available_delays =
         {
@@ -29,15 +31,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             TimeSpan.FromMinutes(2)
         };
 
-        public new Action<TimeSpan> Action;
-
-        public Action CancelAction;
-
-        [Resolved]
-        private MultiplayerClient multiplayerClient { get; set; }
+        public new required Action<TimeSpan> Action;
+        public required Action CancelAction;
 
         [Resolved]
-        private OsuColour colours { get; set; }
+        private MultiplayerClient multiplayerClient { get; set; } = null!;
+
+        [Resolved]
+        private OsuColour colours { get; set; } = null!;
 
         private readonly Drawable background;
 
@@ -53,7 +54,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
             base.Action = this.ShowPopover;
 
-            TooltipText = "Countdown settings";
+            TooltipText = MultiplayerMatchStrings.CountdownSettings;
         }
 
         [BackgroundDependencyLoader]
@@ -77,7 +78,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
         private void onRoomUpdated() => Scheduler.AddOnce(() =>
         {
-            bool countdownActive = multiplayerClient.Room?.Countdown is MatchStartCountdown;
+            bool countdownActive = multiplayerClient.Room?.ActiveCountdowns.Any(c => c is MatchStartCountdown) == true;
 
             if (countdownActive)
             {
@@ -106,10 +107,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
             foreach (var duration in available_delays)
             {
-                flow.Add(new OsuButton
+                flow.Add(new RoundedButton
                 {
                     RelativeSizeAxes = Axes.X,
-                    Text = $"Start match in {duration.Humanize()}",
+                    Text = MultiplayerMatchStrings.StartMatchWithCountdown(duration.Humanize()),
                     BackgroundColour = colours.Green,
                     Action = () =>
                     {
@@ -119,12 +120,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 });
             }
 
-            if (multiplayerClient.Room?.Countdown != null && multiplayerClient.IsHost)
+            if (multiplayerClient.Room?.ActiveCountdowns.Any(c => c is MatchStartCountdown) == true && multiplayerClient.IsHost)
             {
-                flow.Add(new OsuButton
+                flow.Add(new RoundedButton
                 {
                     RelativeSizeAxes = Axes.X,
-                    Text = "Stop countdown",
+                    Text = MultiplayerMatchStrings.StopCountdown,
                     BackgroundColour = colours.Red,
                     Action = () =>
                     {

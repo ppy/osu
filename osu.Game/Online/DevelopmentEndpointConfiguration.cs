@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 namespace osu.Game.Online
@@ -7,11 +7,13 @@ namespace osu.Game.Online
     {
         public DevelopmentEndpointConfiguration()
         {
-            WebsiteRootUrl = APIEndpointUrl = @"https://dev.ppy.sh";
+            WebsiteUrl = APIUrl = @"https://dev.ppy.sh";
             APIClientSecret = @"3LP2mhUrV89xxzD1YKNndXHEhWWCRLPNKioZ9ymT";
             APIClientID = "5";
-            SpectatorEndpointUrl = $"{APIEndpointUrl}/spectator";
-            MultiplayerEndpointUrl = $"{APIEndpointUrl}/multiplayer";
+            SpectatorUrl = $@"{APIUrl}/signalr/spectator";
+            MultiplayerUrl = $@"{APIUrl}/signalr/multiplayer";
+            MetadataUrl = $@"{APIUrl}/signalr/metadata";
+            BeatmapSubmissionServiceUrl = $@"{APIUrl}/beatmap-submission";
         }
     }
 }

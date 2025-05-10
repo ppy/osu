@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -14,21 +15,23 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Chat;
 using osu.Game.Resources.Localisation.Web;
 using osuTK.Graphics;
+using osuTK.Input;
 
 namespace osu.Game.Online.Chat
 {
     /// <summary>
-    /// Display a chat channel in an insolated region.
+    /// Display a chat channel in an isolated region.
     /// </summary>
-    public class StandAloneChatDisplay : CompositeDrawable
+    public partial class StandAloneChatDisplay : CompositeDrawable
     {
-        public readonly Bindable<Channel> Channel = new Bindable<Channel>();
+        [Cached]
+        public readonly Bindable<Channel?> Channel = new Bindable<Channel?>();
 
-        protected readonly ChatTextBox TextBox;
+        protected readonly ChatTextBox? TextBox;
 
-        private ChannelManager channelManager;
+        private ChannelManager? channelManager;
 
-        private StandAloneDrawableChannel drawableChannel;
+        private StandAloneDrawableChannel? drawableChannel;
 
         private readonly bool postingTextBox;
 
@@ -89,6 +92,8 @@ namespace osu.Game.Online.Chat
 
         private void postMessage(TextBox sender, bool newText)
         {
+            Debug.Assert(TextBox != null);
+
             string text = TextBox.Text.Trim();
 
             if (string.IsNullOrWhiteSpace(text))
@@ -102,13 +107,18 @@ namespace osu.Game.Online.Chat
             TextBox.Text = string.Empty;
         }
 
-        protected virtual ChatLine CreateMessage(Message message) => new StandAloneMessage(message);
+        protected virtual ChatLine? CreateMessage(Message message) => new StandAloneMessage(message);
 
-        private void channelChanged(ValueChangedEvent<Channel> e)
+        private void channelChanged(ValueChangedEvent<Channel?> e)
         {
             drawableChannel?.Expire();
 
+            if (e.OldValue != null)
+                TextBox?.Current.UnbindFrom(e.OldValue.TextBoxMessage);
+
             if (e.NewValue == null) return;
+
+            TextBox?.Current.BindTo(e.NewValue.TextBoxMessage);
 
             drawableChannel = CreateDrawableChannel(e.NewValue);
             drawableChannel.CreateChatLineAction = CreateMessage;
@@ -117,8 +127,28 @@ namespace osu.Game.Online.Chat
             AddInternal(drawableChannel);
         }
 
-        public class ChatTextBox : FocusedTextBox
+        public partial class ChatTextBox : HistoryTextBox
         {
+            public Action? Focus;
+            public Action? FocusLost;
+
+            protected override bool OnKeyDown(KeyDownEvent e)
+            {
+                // Chat text boxes are generally used in places where they retain focus, but shouldn't block interaction with other
+                // elements on the same screen.
+                if (!HoldFocus)
+                {
+                    switch (e.Key)
+                    {
+                        case Key.Up:
+                        case Key.Down:
+                            return false;
+                    }
+                }
+
+                return base.OnKeyDown(e);
+            }
+
             protected override void LoadComplete()
             {
                 base.LoadComplete();
@@ -127,60 +157,57 @@ namespace osu.Game.Online.Chat
                 BackgroundFocused = new Color4(10, 10, 10, 255);
             }
 
+            protected override void OnFocus(FocusEvent e)
+            {
+                base.OnFocus(e);
+                Focus?.Invoke();
+            }
+
             protected override void OnFocusLost(FocusLostEvent e)
             {
                 base.OnFocusLost(e);
                 FocusLost?.Invoke();
             }
-
-            public Action FocusLost;
         }
 
-        public class StandAloneDrawableChannel : DrawableChannel
+        public partial class StandAloneDrawableChannel : DrawableChannel
         {
-            public Func<Message, ChatLine> CreateChatLineAction;
-
-            protected override ChatLine CreateChatLine(Message m) => CreateChatLineAction(m);
-
-            protected override DaySeparator CreateDaySeparator(DateTimeOffset time) => new CustomDaySeparator(time);
+            public Func<Message, ChatLine?>? CreateChatLineAction;
 
             public StandAloneDrawableChannel(Channel channel)
                 : base(channel)
             {
             }
 
-            [BackgroundDependencyLoader]
-            private void load()
+            protected override ChatLine? CreateChatLine(Message m) => CreateChatLineAction?.Invoke(m) ?? null;
+
+            protected override DaySeparator CreateDaySeparator(DateTimeOffset time) => new StandAloneDaySeparator(time);
+        }
+
+        protected partial class StandAloneDaySeparator : DaySeparator
+        {
+            protected override float TextSize => 13;
+            protected override float LineHeight => 1;
+            protected override float Spacing => 5;
+            protected override float DateAlign => 125;
+
+            public StandAloneDaySeparator(DateTimeOffset date)
+                : base(date)
             {
-                ChatLineFlow.Padding = new MarginPadding { Horizontal = 0 };
             }
 
-            private class CustomDaySeparator : DaySeparator
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
             {
-                public CustomDaySeparator(DateTimeOffset time)
-                    : base(time)
-                {
-                }
-
-                [BackgroundDependencyLoader]
-                private void load(OsuColour colours)
-                {
-                    Colour = colours.Yellow;
-                    TextSize = 14;
-                    LineHeight = 1;
-                    Padding = new MarginPadding { Horizontal = 10 };
-                    Margin = new MarginPadding { Vertical = 5 };
-                }
+                Height = 25;
+                Colour = colours.Yellow;
             }
         }
 
-        protected class StandAloneMessage : ChatLine
+        protected partial class StandAloneMessage : ChatLine
         {
-            protected override float TextSize => 15;
-
-            protected override float HorizontalPadding => 10;
-            protected override float MessagePadding => 120;
-            protected override float TimestampPadding => 50;
+            protected override float Spacing => 5;
+            protected override float UsernameWidth => 90;
 
             public StandAloneMessage(Message message)
                 : base(message)

@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -9,11 +10,13 @@ using osu.Game.Beatmaps.ControlPoints;
 
 namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
 {
-    public class GroupVisualisation : CompositeDrawable
+    public partial class GroupVisualisation : CompositeDrawable
     {
         public readonly ControlPointGroup Group;
 
         private readonly IBindableList<ControlPoint> controlPoints = new BindableList<ControlPoint>();
+
+        private bool showScrollSpeed;
 
         public GroupVisualisation(ControlPointGroup group)
         {
@@ -24,10 +27,15 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
 
             Group = group;
             X = (float)group.Time;
+        }
 
-            // Run in constructor so IsRedundant calls can work correctly.
+        [BackgroundDependencyLoader]
+        private void load(EditorBeatmap beatmap)
+        {
+            showScrollSpeed = beatmap.BeatmapInfo.Ruleset.CreateInstance().EditorShowScrollSpeed;
+
             controlPoints.BindTo(Group.ControlPoints);
-            controlPoints.BindCollectionChanged((_, __) =>
+            controlPoints.BindCollectionChanged((_, _) =>
             {
                 ClearInternal();
 
@@ -38,20 +46,24 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
                 {
                     switch (point)
                     {
-                        case TimingControlPoint _:
-                            AddInternal(new ControlPointVisualisation(point) { Y = 0, });
+                        case TimingControlPoint:
+                            AddInternal(new ControlPointVisualisation(point)
+                            {
+                                // importantly, override the x position being set since we do that above.
+                                X = 0,
+                                Y = -0.4f,
+                            });
                             break;
 
-                        case DifficultyControlPoint _:
-                            AddInternal(new ControlPointVisualisation(point) { Y = 0.25f, });
-                            break;
+                        case EffectControlPoint:
+                            if (!showScrollSpeed)
+                                return;
 
-                        case SampleControlPoint _:
-                            AddInternal(new ControlPointVisualisation(point) { Y = 0.5f, });
-                            break;
-
-                        case EffectControlPoint effect:
-                            AddInternal(new EffectPointVisualisation(effect) { Y = 0.75f });
+                            AddInternal(new ControlPointVisualisation(point)
+                            {
+                                // importantly, override the x position being set since we do that above.
+                                X = 0,
+                            });
                             break;
                     }
                 }

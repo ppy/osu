@@ -17,7 +17,7 @@ namespace osu.Game.Scoring
 
         protected override ArchiveDownloadRequest<IScoreInfo> CreateDownloadRequest(IScoreInfo score, bool minimiseDownload) => new DownloadReplayRequest(score);
 
-        public override ArchiveDownloadRequest<IScoreInfo> GetExistingDownload(IScoreInfo model)
+        public override ArchiveDownloadRequest<IScoreInfo>? GetExistingDownload(IScoreInfo model)
             => CurrentDownloads.Find(r => r.Model.MatchesOnlineID(model));
     }
 }

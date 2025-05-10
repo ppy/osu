@@ -4,14 +4,12 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Screens;
 using osu.Game.Extensions;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
@@ -19,13 +17,13 @@ using osu.Game.Users;
 
 namespace osu.Game.Screens.OnlinePlay.Playlists
 {
-    public class PlaylistsPlayer : RoomSubmittingPlayer
+    public partial class PlaylistsPlayer : RoomSubmittingPlayer
     {
-        public Action Exited;
+        public Action? Exited;
 
         protected override UserActivity InitialActivity => new UserActivity.InPlaylistGame(Beatmap.Value.BeatmapInfo, Ruleset.Value);
 
-        public PlaylistsPlayer(Room room, PlaylistItem playlistItem, PlayerConfiguration configuration = null)
+        public PlaylistsPlayer(Room room, PlaylistItem playlistItem, PlayerConfiguration? configuration = null)
             : base(room, playlistItem, configuration)
         {
         }
@@ -57,15 +55,12 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
         protected override ResultsScreen CreateResults(ScoreInfo score)
         {
-            Debug.Assert(Room.RoomID.Value != null);
-            return new PlaylistsResultsScreen(score, Room.RoomID.Value.Value, PlaylistItem, true);
-        }
-
-        protected override async Task PrepareScoreForResultsAsync(Score score)
-        {
-            await base.PrepareScoreForResultsAsync(score).ConfigureAwait(false);
-
-            Score.ScoreInfo.TotalScore = (int)Math.Round(ScoreProcessor.ComputeFinalScore(ScoringMode.Standardised, Score.ScoreInfo));
+            Debug.Assert(Room.RoomID != null);
+            return new PlaylistItemScoreResultsScreen(score, Room.RoomID.Value, PlaylistItem)
+            {
+                AllowRetry = true,
+                IsLocalPlay = true,
+            };
         }
 
         protected override void Dispose(bool isDisposing)

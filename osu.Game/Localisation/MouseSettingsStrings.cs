@@ -25,9 +25,9 @@ namespace osu.Game.Localisation
         public static LocalisableString HighPrecisionMouse => new TranslatableString(getKey(@"high_precision_mouse"), @"High precision mouse");
 
         /// <summary>
-        /// "Attempts to bypass any operation system mouse acceleration. On windows, this is equivalent to what used to be known as &quot;Raw Input&quot;."
+        /// "Attempts to bypass any operating system mouse acceleration. On Windows, this is equivalent to what used to be known as &quot;Raw Input&quot;."
         /// </summary>
-        public static LocalisableString HighPrecisionMouseTooltip => new TranslatableString(getKey(@"high_precision_mouse_tooltip"), @"Attempts to bypass any operation system mouse acceleration. On windows, this is equivalent to what used to be known as ""Raw Input"".");
+        public static LocalisableString HighPrecisionMouseTooltip => new TranslatableString(getKey(@"high_precision_mouse_tooltip"), @"Attempts to bypass any operating system mouse acceleration. On Windows, this is equivalent to what used to be known as ""Raw Input"".");
 
         /// <summary>
         /// "Confine mouse cursor to window"
@@ -40,14 +40,14 @@ namespace osu.Game.Localisation
         public static LocalisableString DisableMouseWheelVolumeAdjust => new TranslatableString(getKey(@"disable_mouse_wheel_volume_adjust"), @"Disable mouse wheel adjusting volume during gameplay");
 
         /// <summary>
-        /// "Volume can still be adjusted using the mouse wheel by holding "Alt""
+        /// "Volume can still be adjusted using the mouse wheel by holding &quot;Alt&quot;"
         /// </summary>
         public static LocalisableString DisableMouseWheelVolumeAdjustTooltip => new TranslatableString(getKey(@"disable_mouse_wheel_volume_adjust_tooltip"), @"Volume can still be adjusted using the mouse wheel by holding ""Alt""");
 
         /// <summary>
-        /// "Disable mouse buttons during gameplay"
+        /// "Disable clicks during gameplay"
         /// </summary>
-        public static LocalisableString DisableMouseButtons => new TranslatableString(getKey(@"disable_mouse_buttons"), @"Disable mouse buttons during gameplay");
+        public static LocalisableString DisableClicksDuringGameplay => new TranslatableString(getKey(@"disable_clicks"), @"Disable clicks during gameplay");
 
         /// <summary>
         /// "Enable high precision mouse to adjust sensitivity"
@@ -63,6 +63,21 @@ namespace osu.Game.Localisation
         /// "This setting has known issues on your platform. If you encounter problems, it is recommended to adjust sensitivity externally and keep this disabled for now."
         /// </summary>
         public static LocalisableString HighPrecisionPlatformWarning => new TranslatableString(getKey(@"high_precision_platform_warning"), @"This setting has known issues on your platform. If you encounter problems, it is recommended to adjust sensitivity externally and keep this disabled for now.");
+
+        /// <summary>
+        /// "Always"
+        /// </summary>
+        public static LocalisableString AlwaysConfine => new TranslatableString(getKey(@"always_confine"), @"Always");
+
+        /// <summary>
+        /// "During Gameplay"
+        /// </summary>
+        public static LocalisableString ConfineDuringGameplay => new TranslatableString(getKey(@"confine_during_gameplay"), @"During Gameplay");
+
+        /// <summary>
+        /// "Never"
+        /// </summary>
+        public static LocalisableString NeverConfine => new TranslatableString(getKey(@"never_confine"), @"Never");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

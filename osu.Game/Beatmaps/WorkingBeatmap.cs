@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -14,7 +16,6 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Logging;
-using osu.Framework.Testing;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
@@ -23,7 +24,6 @@ using osu.Game.Storyboards;
 
 namespace osu.Game.Beatmaps
 {
-    [ExcludeFromDynamicCompile]
     public abstract class WorkingBeatmap : IWorkingBeatmap
     {
         public readonly BeatmapInfo BeatmapInfo;
@@ -32,11 +32,7 @@ namespace osu.Game.Beatmaps
         // TODO: remove once the fallback lookup is not required (and access via `working.BeatmapInfo.Metadata` directly).
         public BeatmapMetadata Metadata => BeatmapInfo.Metadata;
 
-        public Waveform Waveform => waveform.Value;
-
         public Storyboard Storyboard => storyboard.Value;
-
-        public Texture Background => GetBackground(); // Texture uses ref counting, so we want to return a new instance every usage.
 
         public ISkin Skin => skin.Value;
 
@@ -46,10 +42,11 @@ namespace osu.Game.Beatmaps
 
         private readonly object beatmapFetchLock = new object();
 
-        private readonly Lazy<Waveform> waveform;
         private readonly Lazy<Storyboard> storyboard;
         private readonly Lazy<ISkin> skin;
+
         private Track track; // track is not Lazy as we allow transferring and loading multiple times.
+        private Waveform waveform; // waveform is also not Lazy as the track may change.
 
         protected WorkingBeatmap(BeatmapInfo beatmapInfo, AudioManager audioManager)
         {
@@ -58,7 +55,6 @@ namespace osu.Game.Beatmaps
             BeatmapInfo = beatmapInfo;
             BeatmapSetInfo = beatmapInfo.BeatmapSet ?? new BeatmapSetInfo();
 
-            waveform = new Lazy<Waveform>(GetWaveform);
             storyboard = new Lazy<Storyboard>(GetStoryboard);
             skin = new Lazy<ISkin>(GetSkin);
         }
@@ -66,10 +62,16 @@ namespace osu.Game.Beatmaps
         #region Resource getters
 
         protected virtual Waveform GetWaveform() => new Waveform(null);
-        protected virtual Storyboard GetStoryboard() => new Storyboard { BeatmapInfo = BeatmapInfo };
+
+        protected virtual Storyboard GetStoryboard() => new Storyboard
+        {
+            BeatmapInfo = BeatmapInfo,
+            Beatmap = Beatmap,
+        };
 
         protected abstract IBeatmap GetBeatmap();
-        protected abstract Texture GetBackground();
+        public abstract Texture GetBackground();
+        public virtual Texture GetPanelBackground() => GetBackground();
         protected abstract Track GetBeatmapTrack();
 
         /// <summary>
@@ -106,11 +108,20 @@ namespace osu.Game.Beatmaps
 
         public virtual bool TrackLoaded => track != null;
 
-        public Track LoadTrack() => track = GetBeatmapTrack() ?? GetVirtualTrack(1000);
-
-        public void PrepareTrackForPreviewLooping()
+        public Track LoadTrack()
         {
-            Track.Looping = true;
+            track = GetBeatmapTrack() ?? GetVirtualTrack(1000);
+
+            // the track may have changed, recycle the current waveform.
+            waveform?.Dispose();
+            waveform = null;
+
+            return track;
+        }
+
+        public void PrepareTrackForPreview(bool looping, double offsetFromPreviewPoint = 0)
+        {
+            Track.Looping = looping;
             Track.RestartPoint = Metadata.PreviewTime;
 
             if (Track.RestartPoint == -1)
@@ -123,19 +134,30 @@ namespace osu.Game.Beatmaps
 
                 Track.RestartPoint = 0.4f * Track.Length;
             }
+
+            Track.RestartPoint += offsetFromPreviewPoint;
         }
 
         /// <summary>
-        /// Transfer a valid audio track into this working beatmap. Used as an optimisation to avoid reload / track swap
-        /// across difficulties in the same beatmap set.
+        /// Attempts to transfer the audio track to a target working beatmap, if valid for transferring.
+        /// Used as an optimisation to avoid reload / track swap across difficulties in the same beatmap set.
         /// </summary>
-        /// <param name="track">The track to transfer.</param>
-        public void TransferTrack([NotNull] Track track) => this.track = track ?? throw new ArgumentNullException(nameof(track));
+        /// <param name="target">The target working beatmap to transfer this track to.</param>
+        /// <returns>Whether the track has been transferred to the <paramref name="target"/>.</returns>
+        public virtual bool TryTransferTrack([NotNull] WorkingBeatmap target)
+        {
+            if (BeatmapInfo?.AudioEquals(target.BeatmapInfo) != true || Track.IsDummyDevice)
+                return false;
+
+            target.track = Track;
+            return true;
+        }
 
         /// <summary>
         /// Get the loaded audio track instance. <see cref="LoadTrack"/> must have first been called.
         /// This generally happens via MusicController when changing the global beatmap.
         /// </summary>
+        [NotNull]
         public Track Track
         {
             get
@@ -158,9 +180,22 @@ namespace osu.Game.Beatmaps
 
         #endregion
 
+        #region Waveform
+
+        public Waveform Waveform => waveform ??= GetWaveform();
+
+        #endregion
+
         #region Beatmap
 
-        public virtual bool BeatmapLoaded => beatmapLoadTask?.IsCompleted ?? false;
+        public virtual bool BeatmapLoaded
+        {
+            get
+            {
+                lock (beatmapFetchLock)
+                    return beatmapLoadTask?.IsCompleted ?? false;
+            }
+        }
 
         public IBeatmap Beatmap
         {
@@ -168,6 +203,8 @@ namespace osu.Game.Beatmaps
             {
                 try
                 {
+                    // TODO: This is a touch expensive and can become an issue if being accessed every Update call.
+                    // Optimally we would not involve the async flow if things are already loaded.
                     return loadBeatmapAsync().GetResultSafely();
                 }
                 catch (AggregateException ae)
@@ -176,12 +213,12 @@ namespace osu.Game.Beatmaps
                     if (ae.InnerExceptions.FirstOrDefault() is TaskCanceledException)
                         return null;
 
-                    Logger.Error(ae, "Beatmap failed to load");
+                    Logger.Error(ae, $"Beatmap failed to load ({BeatmapInfo})");
                     return null;
                 }
                 catch (Exception e)
                 {
-                    Logger.Error(e, "Beatmap failed to load");
+                    Logger.Error(e, $"Beatmap failed to load ({BeatmapInfo})");
                     return null;
                 }
             }
@@ -198,11 +235,18 @@ namespace osu.Game.Beatmaps
                     // Todo: Handle cancellation during beatmap parsing
                     var b = GetBeatmap() ?? new Beatmap();
 
-                    // The original beatmap version needs to be preserved as the database doesn't contain it
-                    BeatmapInfo.BeatmapVersion = b.BeatmapInfo.BeatmapVersion;
-
-                    // Use the database-backed info for more up-to-date values (beatmap id, ranked status, etc)
-                    b.BeatmapInfo = BeatmapInfo;
+                    // Copy across values of key properties for which the database-backed model has data that the decoded beatmap isn't going to.
+                    b.BeatmapInfo.ID = BeatmapInfo.ID;
+                    b.BeatmapInfo.UserSettings = BeatmapInfo.UserSettings;
+                    b.BeatmapInfo.BeatmapSet = BeatmapInfo.BeatmapSet;
+                    b.BeatmapInfo.Status = BeatmapInfo.Status;
+                    b.BeatmapInfo.OnlineID = BeatmapInfo.OnlineID;
+                    b.BeatmapInfo.OnlineMD5Hash = BeatmapInfo.OnlineMD5Hash;
+                    b.BeatmapInfo.LastLocalUpdate = BeatmapInfo.LastLocalUpdate;
+                    b.BeatmapInfo.LastOnlineUpdate = BeatmapInfo.LastOnlineUpdate;
+                    b.BeatmapInfo.LastPlayed = BeatmapInfo.LastPlayed;
+                    b.BeatmapInfo.EditorTimestamp = BeatmapInfo.EditorTimestamp;
+                    b.BeatmapInfo.StarRating = BeatmapInfo.StarRating; // this could be recomputed in the decoding process but it's a bit annoying to do.
 
                     return b;
                 }, loadCancellationSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
@@ -269,12 +313,15 @@ namespace osu.Game.Beatmaps
                 }
             }
 
-            IBeatmapProcessor processor = rulesetInstance.CreateBeatmapProcessor(converted);
+            var processor = rulesetInstance.CreateBeatmapProcessor(converted);
 
-            foreach (var mod in mods.OfType<IApplicableToBeatmapProcessor>())
-                mod.ApplyToBeatmapProcessor(processor);
+            if (processor != null)
+            {
+                foreach (var mod in mods.OfType<IApplicableToBeatmapProcessor>())
+                    mod.ApplyToBeatmapProcessor(processor);
 
-            processor?.PreProcess();
+                processor.PreProcess();
+            }
 
             // Compute default values for hitobjects, including creating nested hitobjects in-case they're needed
             foreach (var obj in converted.HitObjects)

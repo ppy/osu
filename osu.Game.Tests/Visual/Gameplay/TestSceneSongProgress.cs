@@ -1,159 +1,124 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
+using System;
+using System.Linq;
+using System.Threading;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
-using osu.Framework.Timing;
-using osu.Game.Graphics;
-using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Play.HUD;
+using osu.Game.Skinning;
+using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
     [TestFixture]
-    public class TestSceneSongProgress : OsuTestScene
+    public partial class TestSceneSongProgress : SkinnableHUDComponentTestScene
     {
-        private SongProgress progress;
-        private TestSongProgressGraph graph;
-        private readonly Container progressContainer;
+        private GameplayClockContainer gameplayClockContainer = null!;
 
-        private readonly StopwatchClock clock;
-        private readonly FramedClock framedClock;
+        private Box background = null!;
 
-        [Cached]
-        private readonly GameplayClock gameplayClock;
+        private const double skip_target_time = -2000;
 
-        public TestSceneSongProgress()
+        [BackgroundDependencyLoader]
+        private void load()
         {
-            clock = new StopwatchClock();
-            gameplayClock = new GameplayClock(framedClock = new FramedClock(clock));
+            Beatmap.Value = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
 
-            Add(progressContainer = new Container
+            FrameStabilityContainer frameStabilityContainer;
+
+            AddRange(new Drawable[]
             {
-                RelativeSizeAxes = Axes.X,
-                Anchor = Anchor.BottomCentre,
-                Origin = Anchor.BottomCentre,
-                Height = 100,
-                Y = -100,
-                Child = new Box
+                background = new Box
                 {
+                    Colour = Color4.Black,
                     RelativeSizeAxes = Axes.Both,
-                    Colour = OsuColour.Gray(1),
+                    Depth = float.MaxValue
+                },
+                gameplayClockContainer = new MasterGameplayClockContainer(Beatmap.Value, skip_target_time)
+                {
+                    Child = frameStabilityContainer = new FrameStabilityContainer
+                    {
+                        Child = new FakeLoad()
+                    }
                 }
             });
+
+            Dependencies.CacheAs<IGameplayClock>(gameplayClockContainer);
+            Dependencies.CacheAs<IFrameStableClock>(frameStabilityContainer);
+        }
+
+        private partial class FakeLoad : Drawable
+        {
+            protected override void Update()
+            {
+                base.Update();
+                Thread.Sleep(1);
+            }
         }
 
         [SetUpSteps]
         public void SetupSteps()
         {
-            AddStep("add new song progress", () =>
+            AddStep("reset clock", () => gameplayClockContainer.Reset());
+            AddStep("set hit objects", () => this.ChildrenOfType<SongProgress>().ForEach(progress => progress.Objects = Beatmap.Value.Beatmap.HitObjects));
+            AddStep("hook seeking", () =>
             {
-                if (progress != null)
-                {
-                    progress.Expire();
-                    progress = null;
-                }
-
-                progressContainer.Add(progress = new SongProgress
-                {
-                    RelativeSizeAxes = Axes.X,
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
-                });
+                applyToDefaultProgress(d => d.ChildrenOfType<DefaultSongProgressBar>().Single().OnSeek += t => gameplayClockContainer.Seek(t));
+                applyToArgonProgress(d => d.ChildrenOfType<ArgonSongProgressBar>().Single().OnSeek += t => gameplayClockContainer.Seek(t));
             });
-
-            AddStep("add new big graph", () =>
-            {
-                if (graph != null)
-                {
-                    graph.Expire();
-                    graph = null;
-                }
-
-                Add(graph = new TestSongProgressGraph
-                {
-                    RelativeSizeAxes = Axes.X,
-                    Height = 200,
-                    Anchor = Anchor.TopLeft,
-                    Origin = Anchor.TopLeft,
-                });
-            });
-
-            AddStep("reset clock", clock.Reset);
+            AddStep("seek to intro", () => gameplayClockContainer.Seek(skip_target_time));
+            AddStep("start", () => gameplayClockContainer.Start());
         }
 
         [Test]
-        public void TestGraphRecreation()
+        public void TestBasic()
         {
-            AddAssert("ensure not created", () => graph.CreationCount == 0);
-            AddStep("display values", displayRandomValues);
-            AddUntilStep("wait for creation count", () => graph.CreationCount == 1);
-            AddRepeatStep("new values", displayRandomValues, 5);
-            AddWaitStep("wait some", 5);
-            AddAssert("ensure recreation debounced", () => graph.CreationCount == 2);
+            AddToggleStep("toggle seeking", b =>
+            {
+                applyToDefaultProgress(s => s.Interactive.Value = b);
+                applyToArgonProgress(s => s.Interactive.Value = b);
+            });
+
+            AddToggleStep("toggle graph", b =>
+            {
+                applyToDefaultProgress(s => s.ShowGraph.Value = b);
+                applyToArgonProgress(s => s.ShowGraph.Value = b);
+            });
+
+            AddStep("set white background", () => background.FadeColour(Color4.White, 200, Easing.OutQuint));
+            AddStep("randomise background colour", () => background.FadeColour(new Colour4(RNG.NextSingle(), RNG.NextSingle(), RNG.NextSingle(), 1), 200, Easing.OutQuint));
+
+            AddStep("stop", gameplayClockContainer.Stop);
         }
 
         [Test]
-        public void TestDisplay()
+        public void TestSeekToKnownTime()
         {
-            AddStep("display max values", displayMaxValues);
-            AddUntilStep("wait for graph", () => graph.CreationCount == 1);
-            AddStep("start", clock.Start);
-            AddStep("allow seeking", () => progress.AllowSeeking.Value = true);
-            AddStep("hide graph", () => progress.ShowGraph.Value = false);
-            AddStep("disallow seeking", () => progress.AllowSeeking.Value = false);
-            AddStep("allow seeking", () => progress.AllowSeeking.Value = true);
-            AddStep("show graph", () => progress.ShowGraph.Value = true);
-            AddStep("stop", clock.Stop);
+            AddStep("seek to known time", () => gameplayClockContainer.Seek(60000));
+            AddWaitStep("wait some for seek", 15);
+            AddStep("stop", () => gameplayClockContainer.Stop());
         }
 
-        private void displayRandomValues()
-        {
-            var objects = new List<HitObject>();
-            for (double i = 0; i < 5000; i += RNG.NextDouble() * 10 + i / 1000)
-                objects.Add(new HitObject { StartTime = i });
+        private void applyToArgonProgress(Action<ArgonSongProgress> action) =>
+            this.ChildrenOfType<ArgonSongProgress>().ForEach(action);
 
-            replaceObjects(objects);
-        }
+        private void applyToDefaultProgress(Action<DefaultSongProgress> action) =>
+            this.ChildrenOfType<DefaultSongProgress>().ForEach(action);
 
-        private void displayMaxValues()
-        {
-            var objects = new List<HitObject>();
-            for (double i = 0; i < 5000; i++)
-                objects.Add(new HitObject { StartTime = i });
+        protected override Drawable CreateDefaultImplementation() => new DefaultSongProgress();
 
-            replaceObjects(objects);
-        }
+        protected override Drawable CreateArgonImplementation() => new ArgonSongProgress();
 
-        private void replaceObjects(List<HitObject> objects)
-        {
-            progress.Objects = objects;
-            graph.Objects = objects;
-
-            progress.RequestSeek = pos => clock.Seek(pos);
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-            framedClock.ProcessFrame();
-        }
-
-        private class TestSongProgressGraph : SongProgressGraph
-        {
-            public int CreationCount { get; private set; }
-
-            protected override void RecreateGraph()
-            {
-                base.RecreateGraph();
-                CreationCount++;
-            }
-        }
+        protected override Drawable CreateLegacyImplementation() => new LegacySongProgress();
     }
 }

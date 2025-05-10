@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,7 +23,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneStoryboardSamplePlayback : PlayerTestScene
+    public partial class TestSceneStoryboardSamplePlayback : PlayerTestScene
     {
         private Storyboard storyboard;
 
@@ -39,6 +41,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             backgroundLayer.Add(new StoryboardSampleInfo("Intro/welcome.mp3", time: -7000, volume: 20));
             backgroundLayer.Add(new StoryboardSampleInfo("Intro/welcome.mp3", time: -5000, volume: 20));
             backgroundLayer.Add(new StoryboardSampleInfo("Intro/welcome.mp3", time: 0, volume: 20));
+            backgroundLayer.Add(new StoryboardSampleInfo("Intro/welcome.mp3", time: 2000, volume: 20));
         }
 
         [SetUp]
@@ -119,7 +122,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void createPlayerTest()
         {
-            CreateTest(null);
+            CreateTest();
 
             AddAssert("storyboard loaded", () => Player.Beatmap.Value.Storyboard != null);
             waitUntilStoryboardSamplesPlay();

@@ -3,6 +3,7 @@
 
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Skinning;
 using osuTK.Graphics;
@@ -22,20 +23,22 @@ namespace osu.Game.Rulesets.Catch.Objects
         /// </summary>
         public float DistanceToHyperDash { get; set; }
 
-        public readonly Bindable<bool> HyperDashBindable = new Bindable<bool>();
+        private HitObjectProperty<bool> hyperDash;
+
+        public Bindable<bool> HyperDashBindable => hyperDash.Bindable;
 
         /// <summary>
         /// Whether this fruit can initiate a hyperdash.
         /// </summary>
-        public bool HyperDash => HyperDashBindable.Value;
+        public bool HyperDash => hyperDash.Value;
 
-        private CatchHitObject hyperDashTarget;
+        private CatchHitObject? hyperDashTarget;
 
         /// <summary>
         /// The target fruit if we are to initiate a hyperdash.
         /// </summary>
         [JsonIgnore]
-        public CatchHitObject HyperDashTarget
+        public CatchHitObject? HyperDashTarget
         {
             get => hyperDashTarget;
             set

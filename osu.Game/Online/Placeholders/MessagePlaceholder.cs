@@ -7,7 +7,7 @@ using osu.Framework.Localisation;
 
 namespace osu.Game.Online.Placeholders
 {
-    public class MessagePlaceholder : Placeholder
+    public partial class MessagePlaceholder : Placeholder
     {
         private readonly LocalisableString message;
 
@@ -22,6 +22,6 @@ namespace osu.Game.Online.Placeholders
             AddText(this.message = message);
         }
 
-        public override bool Equals(Placeholder other) => (other as MessagePlaceholder)?.message == message;
+        public override bool Equals(Placeholder? other) => (other as MessagePlaceholder)?.message == message;
     }
 }

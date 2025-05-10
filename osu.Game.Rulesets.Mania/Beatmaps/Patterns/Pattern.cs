@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using osu.Game.Rulesets.Mania.Objects;
 
@@ -12,8 +13,8 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns
     /// </summary>
     internal class Pattern
     {
-        private List<ManiaHitObject> hitObjects;
-        private HashSet<int> containedColumns;
+        private List<ManiaHitObject>? hitObjects;
+        private HashSet<int>? containedColumns;
 
         /// <summary>
         /// All the hit objects contained in this pattern.
@@ -70,6 +71,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns
             containedColumns?.Clear();
         }
 
+        [MemberNotNull(nameof(hitObjects), nameof(containedColumns))]
         private void prepareStorage()
         {
             hitObjects ??= new List<ManiaHitObject>();

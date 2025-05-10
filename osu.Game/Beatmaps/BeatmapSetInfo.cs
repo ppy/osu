@@ -6,17 +6,16 @@ using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
-using osu.Framework.Testing;
 using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.Models;
 using Realms;
 
-#nullable enable
-
 namespace osu.Game.Beatmaps
 {
-    [ExcludeFromDynamicCompile]
+    /// <summary>
+    /// A realm model containing metadata for a beatmap set (containing multiple <see cref="BeatmapInfo"/>s).
+    /// </summary>
     [MapTo("BeatmapSet")]
     public class BeatmapSetInfo : RealmObject, IHasGuidPrimaryKey, IHasRealmFiles, ISoftDelete, IEquatable<BeatmapSetInfo>, IBeatmapSetInfo
     {
@@ -27,6 +26,16 @@ namespace osu.Game.Beatmaps
         public int OnlineID { get; set; } = -1;
 
         public DateTimeOffset DateAdded { get; set; }
+
+        /// <summary>
+        /// The date this beatmap set was first submitted.
+        /// </summary>
+        public DateTimeOffset? DateSubmitted { get; set; }
+
+        /// <summary>
+        /// The date this beatmap set was ranked.
+        /// </summary>
+        public DateTimeOffset? DateRanked { get; set; }
 
         [JsonIgnore]
         public IBeatmapMetadataInfo Metadata => Beatmaps.FirstOrDefault()?.Metadata ?? new BeatmapMetadata();
@@ -73,13 +82,6 @@ namespace osu.Game.Beatmaps
         {
         }
 
-        /// <summary>
-        /// Returns the storage path for the file in this beatmapset with the given filename, if any exists, otherwise null.
-        /// The path returned is relative to the user file storage.
-        /// </summary>
-        /// <param name="filename">The name of the file to get the storage path of.</param>
-        public string? GetPathForFile(string filename) => Files.SingleOrDefault(f => string.Equals(f.Filename, filename, StringComparison.OrdinalIgnoreCase))?.File.GetStoragePath();
-
         public bool Equals(BeatmapSetInfo? other)
         {
             if (ReferenceEquals(this, other)) return true;
@@ -95,5 +97,7 @@ namespace osu.Game.Beatmaps
         IEnumerable<IBeatmapInfo> IBeatmapSetInfo.Beatmaps => Beatmaps;
 
         IEnumerable<INamedFileUsage> IHasNamedFiles.Files => Files;
+
+        public bool AllBeatmapsUpToDate => Beatmaps.All(b => b.MatchesOnlineVersion);
     }
 }

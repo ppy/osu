@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +11,9 @@ namespace osu.Game.Online.API.Requests.Responses
 {
     public class CommentBundle
     {
+        [JsonProperty(@"commentable_meta")]
+        public List<CommentableMeta> CommentableMeta { get; set; } = new List<CommentableMeta>();
+
         [JsonProperty(@"comments")]
         public List<Comment> Comments { get; set; }
 

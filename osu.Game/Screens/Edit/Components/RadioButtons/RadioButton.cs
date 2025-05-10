@@ -4,6 +4,7 @@
 using System;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 
 namespace osu.Game.Screens.Edit.Components.RadioButtons
 {
@@ -11,6 +12,7 @@ namespace osu.Game.Screens.Edit.Components.RadioButtons
     {
         /// <summary>
         /// Whether this <see cref="RadioButton"/> is selected.
+        /// Disable this bindable to disable the button.
         /// </summary>
         public readonly BindableBool Selected;
 
@@ -22,11 +24,11 @@ namespace osu.Game.Screens.Edit.Components.RadioButtons
         /// <summary>
         /// A function which creates a drawable icon to represent this item. If null, a sane default should be used.
         /// </summary>
-        public readonly Func<Drawable> CreateIcon;
+        public readonly Func<Drawable?>? CreateIcon;
 
-        private readonly Action action;
+        private readonly Action? action;
 
-        public RadioButton(string label, Action action, Func<Drawable> createIcon = null)
+        public RadioButton(string label, Action? action, Func<Drawable?>? createIcon = null)
         {
             Label = label;
             CreateIcon = createIcon;
@@ -50,5 +52,8 @@ namespace osu.Game.Screens.Edit.Components.RadioButtons
         /// Deselects this <see cref="RadioButton"/>.
         /// </summary>
         public void Deselect() => Selected.Value = false;
+
+        // Tooltip text that will be shown when hovered over
+        public LocalisableString TooltipText { get; set; } = string.Empty;
     }
 }

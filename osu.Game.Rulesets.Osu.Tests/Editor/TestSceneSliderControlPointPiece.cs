@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using Humanizer;
 using NUnit.Framework;
@@ -21,7 +23,7 @@ using osuTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Tests.Editor
 {
-    public class TestSceneSliderControlPointPiece : SelectionBlueprintTestScene
+    public partial class TestSceneSliderControlPointPiece : SelectionBlueprintTestScene
     {
         private Slider slider;
         private DrawableSlider drawableObject;
@@ -36,9 +38,9 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 Position = new Vector2(256, 192),
                 Path = new SliderPath(new[]
                 {
-                    new PathControlPoint(Vector2.Zero, PathType.PerfectCurve),
+                    new PathControlPoint(Vector2.Zero, PathType.PERFECT_CURVE),
                     new PathControlPoint(new Vector2(150, 150)),
-                    new PathControlPoint(new Vector2(300, 0), PathType.PerfectCurve),
+                    new PathControlPoint(new Vector2(300, 0), PathType.PERFECT_CURVE),
                     new PathControlPoint(new Vector2(400, 0)),
                     new PathControlPoint(new Vector2(400, 150))
                 })
@@ -157,17 +159,17 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         }
 
         private void assertSelectionCount(int count) =>
-            AddAssert($"{count} control point pieces selected", () => this.ChildrenOfType<PathControlPointPiece>().Count(piece => piece.IsSelected.Value) == count);
+            AddAssert($"{count} control point pieces selected", () => this.ChildrenOfType<PathControlPointPiece<Slider>>().Count(piece => piece.IsSelected.Value) == count);
 
         private void assertSelected(int index) =>
             AddAssert($"{(index + 1).ToOrdinalWords()} control point piece selected",
-                () => this.ChildrenOfType<PathControlPointPiece>().Single(piece => piece.ControlPoint == slider.Path.ControlPoints[index]).IsSelected.Value);
+                () => this.ChildrenOfType<PathControlPointPiece<Slider>>().Single(piece => piece.ControlPoint == slider.Path.ControlPoints[index]).IsSelected.Value);
 
         private void moveMouseToRelativePosition(Vector2 relativePosition) =>
             AddStep($"move mouse to {relativePosition}", () =>
             {
                 Vector2 position = slider.Position + relativePosition;
-                InputManager.MoveMouseTo(drawableObject.Parent.ToScreenSpace(position));
+                InputManager.MoveMouseTo(drawableObject.Parent!.ToScreenSpace(position));
             });
 
         [Test]
@@ -180,7 +182,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             AddStep("release", () => InputManager.ReleaseButton(MouseButton.Left));
 
             assertControlPointPosition(1, new Vector2(150, 50));
-            assertControlPointType(0, PathType.PerfectCurve);
+            assertControlPointType(0, PathType.PERFECT_CURVE);
         }
 
         [Test]
@@ -200,15 +202,15 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             moveMouseToControlPoint(2);
             AddStep("hold left mouse", () => InputManager.PressButton(MouseButton.Left));
 
-            AddAssert("three control point pieces selected", () => this.ChildrenOfType<PathControlPointPiece>().Count(piece => piece.IsSelected.Value) == 3);
+            AddAssert("three control point pieces selected", () => this.ChildrenOfType<PathControlPointPiece<Slider>>().Count(piece => piece.IsSelected.Value) == 3);
 
             addMovementStep(new Vector2(450, 50));
             AddStep("release left mouse", () => InputManager.ReleaseButton(MouseButton.Left));
 
-            AddAssert("three control point pieces selected", () => this.ChildrenOfType<PathControlPointPiece>().Count(piece => piece.IsSelected.Value) == 3);
+            AddAssert("three control point pieces selected", () => this.ChildrenOfType<PathControlPointPiece<Slider>>().Count(piece => piece.IsSelected.Value) == 3);
 
             assertControlPointPosition(2, new Vector2(450, 50));
-            assertControlPointType(2, PathType.PerfectCurve);
+            assertControlPointType(2, PathType.PERFECT_CURVE);
 
             assertControlPointPosition(3, new Vector2(550, 50));
 
@@ -234,12 +236,12 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             moveMouseToControlPoint(3);
             AddStep("hold left mouse", () => InputManager.PressButton(MouseButton.Left));
 
-            AddAssert("three control point pieces selected", () => this.ChildrenOfType<PathControlPointPiece>().Count(piece => piece.IsSelected.Value) == 3);
+            AddAssert("three control point pieces selected", () => this.ChildrenOfType<PathControlPointPiece<Slider>>().Count(piece => piece.IsSelected.Value) == 3);
 
             addMovementStep(new Vector2(550, 50));
             AddStep("release left mouse", () => InputManager.ReleaseButton(MouseButton.Left));
 
-            AddAssert("three control point pieces selected", () => this.ChildrenOfType<PathControlPointPiece>().Count(piece => piece.IsSelected.Value) == 3);
+            AddAssert("three control point pieces selected", () => this.ChildrenOfType<PathControlPointPiece<Slider>>().Count(piece => piece.IsSelected.Value) == 3);
 
             // note: if the head is part of the selection being moved, the entire slider is moved.
             // the unselected nodes will therefore change position relative to the slider head.
@@ -247,7 +249,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             AddAssert("slider moved", () => Precision.AlmostEquals(slider.Position, new Vector2(256, 192) + new Vector2(150, 50)));
 
             assertControlPointPosition(0, Vector2.Zero);
-            assertControlPointType(0, PathType.PerfectCurve);
+            assertControlPointType(0, PathType.PERFECT_CURVE);
 
             assertControlPointPosition(1, new Vector2(0, 100));
 
@@ -270,7 +272,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             AddStep("release", () => InputManager.ReleaseButton(MouseButton.Left));
 
             assertControlPointPosition(1, new Vector2(400, 0.01f));
-            assertControlPointType(0, PathType.Bezier);
+            assertControlPointType(0, PathType.BEZIER);
         }
 
         [Test]
@@ -280,13 +282,13 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             AddStep("hold", () => InputManager.PressButton(MouseButton.Left));
 
             addMovementStep(new Vector2(400, 0.01f));
-            assertControlPointType(0, PathType.Bezier);
+            assertControlPointType(0, PathType.BEZIER);
 
             addMovementStep(new Vector2(150, 50));
             AddStep("release", () => InputManager.ReleaseButton(MouseButton.Left));
 
             assertControlPointPosition(1, new Vector2(150, 50));
-            assertControlPointType(0, PathType.PerfectCurve);
+            assertControlPointType(0, PathType.PERFECT_CURVE);
         }
 
         [Test]
@@ -296,32 +298,32 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             AddStep("hold", () => InputManager.PressButton(MouseButton.Left));
 
             addMovementStep(new Vector2(350, 0.01f));
-            assertControlPointType(2, PathType.Bezier);
+            assertControlPointType(2, PathType.BEZIER);
 
             addMovementStep(new Vector2(150, 150));
             AddStep("release", () => InputManager.ReleaseButton(MouseButton.Left));
 
             assertControlPointPosition(4, new Vector2(150, 150));
-            assertControlPointType(2, PathType.PerfectCurve);
+            assertControlPointType(2, PathType.PERFECT_CURVE);
         }
 
         [Test]
         public void TestDragControlPointPathAfterChangingType()
         {
-            AddStep("change type to bezier", () => slider.Path.ControlPoints[2].Type = PathType.Bezier);
+            AddStep("change type to bezier", () => slider.Path.ControlPoints[2].Type = PathType.BEZIER);
             AddStep("add point", () => slider.Path.ControlPoints.Add(new PathControlPoint(new Vector2(500, 10))));
-            AddStep("change type to perfect", () => slider.Path.ControlPoints[3].Type = PathType.PerfectCurve);
+            AddStep("change type to perfect", () => slider.Path.ControlPoints[3].Type = PathType.PERFECT_CURVE);
 
             moveMouseToControlPoint(4);
             AddStep("hold", () => InputManager.PressButton(MouseButton.Left));
 
-            assertControlPointType(3, PathType.PerfectCurve);
+            assertControlPointType(3, PathType.PERFECT_CURVE);
 
             addMovementStep(new Vector2(350, 0.01f));
             AddStep("release", () => InputManager.ReleaseButton(MouseButton.Left));
 
             assertControlPointPosition(4, new Vector2(350, 0.01f));
-            assertControlPointType(3, PathType.Bezier);
+            assertControlPointType(3, PathType.BEZIER);
         }
 
         private void addMovementStep(Vector2 relativePosition)
@@ -329,7 +331,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             AddStep($"move mouse to {relativePosition}", () =>
             {
                 Vector2 position = slider.Position + relativePosition;
-                InputManager.MoveMouseTo(drawableObject.Parent.ToScreenSpace(position));
+                InputManager.MoveMouseTo(drawableObject.Parent!.ToScreenSpace(position));
             });
         }
 
@@ -338,7 +340,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             AddStep($"move mouse to control point {index}", () =>
             {
                 Vector2 position = slider.Position + slider.Path.ControlPoints[index].Position;
-                InputManager.MoveMouseTo(drawableObject.Parent.ToScreenSpace(position));
+                InputManager.MoveMouseTo(drawableObject.Parent!.ToScreenSpace(position));
             });
         }
 
@@ -347,12 +349,12 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         private void assertControlPointPosition(int index, Vector2 position) =>
             AddAssert($"control point {index} at {position}", () => Precision.AlmostEquals(position, slider.Path.ControlPoints[index].Position, 1));
 
-        private class TestSliderBlueprint : SliderSelectionBlueprint
+        private partial class TestSliderBlueprint : SliderSelectionBlueprint
         {
             public new SliderBodyPiece BodyPiece => base.BodyPiece;
             public new TestSliderCircleOverlay HeadOverlay => (TestSliderCircleOverlay)base.HeadOverlay;
             public new TestSliderCircleOverlay TailOverlay => (TestSliderCircleOverlay)base.TailOverlay;
-            public new PathControlPointVisualiser ControlPointVisualiser => base.ControlPointVisualiser;
+            public new PathControlPointVisualiser<Slider> ControlPointVisualiser => base.ControlPointVisualiser;
 
             public TestSliderBlueprint(Slider slider)
                 : base(slider)
@@ -362,7 +364,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             protected override SliderCircleOverlay CreateCircleOverlay(Slider slider, SliderPosition position) => new TestSliderCircleOverlay(slider, position);
         }
 
-        private class TestSliderCircleOverlay : SliderCircleOverlay
+        private partial class TestSliderCircleOverlay : SliderCircleOverlay
         {
             public new HitCirclePiece CirclePiece => base.CirclePiece;
 

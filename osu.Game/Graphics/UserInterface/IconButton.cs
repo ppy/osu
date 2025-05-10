@@ -9,7 +9,7 @@ using osu.Framework.Input.Events;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class IconButton : OsuAnimatedButton
+    public partial class IconButton : OsuAnimatedButton
     {
         public const float DEFAULT_BUTTON_SIZE = 30;
 

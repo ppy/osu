@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Tournament.Models;
@@ -13,16 +14,16 @@ using osuTK;
 
 namespace osu.Game.Tournament.Components
 {
-    public class DrawableTeamFlag : Container
+    public partial class DrawableTeamFlag : Container
     {
-        private readonly TournamentTeam team;
+        private readonly TournamentTeam? team;
 
         [UsedImplicitly]
-        private Bindable<string> flag;
+        private Bindable<string>? flag;
 
-        private Sprite flagSprite;
+        private Sprite? flagSprite;
 
-        public DrawableTeamFlag(TournamentTeam team)
+        public DrawableTeamFlag(TournamentTeam? team)
         {
             this.team = team;
         }
@@ -32,18 +33,26 @@ namespace osu.Game.Tournament.Components
         {
             if (team == null) return;
 
-            Size = new Vector2(75, 50);
+            Size = new Vector2(75, 54);
             Masking = true;
             CornerRadius = 5;
-            Child = flagSprite = new Sprite
+            Children = new Drawable[]
             {
-                RelativeSizeAxes = Axes.Both,
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                FillMode = FillMode.Fill
+                new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = Colour4.FromHex("333"),
+                },
+                flagSprite = new Sprite
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    FillMode = FillMode.Fit
+                },
             };
 
-            (flag = team.FlagName.GetBoundCopy()).BindValueChanged(acronym => flagSprite.Texture = textures.Get($@"Flags/{team.FlagName}"), true);
+            (flag = team.FlagName.GetBoundCopy()).BindValueChanged(_ => flagSprite.Texture = textures.Get($@"Flags/{team.FlagName}"), true);
         }
     }
 }

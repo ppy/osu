@@ -2,11 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Pooling;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
@@ -17,121 +18,110 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Music
 {
-    public class PlaylistItem : OsuRearrangeableListItem<Live<BeatmapSetInfo>>, IFilterable
+    public partial class PlaylistItem : PoolableDrawable, IHasCurrentValue<Live<BeatmapSetInfo>>
     {
-        public readonly Bindable<Live<BeatmapSetInfo>> SelectedSet = new Bindable<Live<BeatmapSetInfo>>();
-
-        public Action<Live<BeatmapSetInfo>> RequestSelection;
-
-        private TextFlowContainer text;
-        private ITextPart titlePart;
-
-        [Resolved]
-        private OsuColour colours { get; set; }
-
-        public PlaylistItem(Live<BeatmapSetInfo> item)
-            : base(item)
+        public Bindable<Live<BeatmapSetInfo>> Current
         {
-            Padding = new MarginPadding { Left = 5 };
+            get => current.Current;
+            set => current.Current = value;
         }
 
+        private readonly BindableWithCurrent<Live<BeatmapSetInfo>> current = new BindableWithCurrent<Live<BeatmapSetInfo>>();
+
+        private readonly Bindable<Live<BeatmapSetInfo>?> selectedSet = new Bindable<Live<BeatmapSetInfo>?>();
+        private Action<Live<BeatmapSetInfo>>? requestSelection;
+
+        private MarqueeContainer text = null!;
+
+        [Resolved]
+        private OsuColour colours { get; set; } = null!;
+
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(PlaylistOverlay playlistOverlay)
         {
-            HandleColour = colours.Gray5;
+            RelativeSizeAxes = Axes.X;
+            Height = 20;
+
+            InternalChild = text = new MarqueeContainer
+            {
+                Anchor = Anchor.CentreLeft,
+                Origin = Anchor.CentreLeft,
+                RelativeSizeAxes = Axes.X,
+                InitialMoveDelay = 0,
+                AllowScrolling = false,
+            };
+
+            selectedSet.BindTo(playlistOverlay.SelectedSet);
+            requestSelection = playlistOverlay.ItemSelected;
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
+            Current.BindValueChanged(_ => onItemChanged(), true);
+            selectedSet.BindValueChanged(updateSelectionState, true);
+        }
 
-            Model.PerformRead(m =>
+        private void onItemChanged() => Current.Value.PerformRead(m =>
+        {
+            var metadata = m.Metadata;
+
+            var title = new RomanisableString(metadata.TitleUnicode, metadata.Title);
+            var artist = new RomanisableString(metadata.ArtistUnicode, metadata.Artist);
+
+            text.CreateContent = () =>
             {
-                var metadata = m.Metadata;
+                var flow = new OsuTextFlowContainer
+                {
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Horizontal,
+                };
 
-                var title = new RomanisableString(metadata.TitleUnicode, metadata.Title);
-                var artist = new RomanisableString(metadata.ArtistUnicode, metadata.Artist);
-
-                titlePart = text.AddText(title, sprite => sprite.Font = OsuFont.GetFont(weight: FontWeight.Regular));
-                titlePart.DrawablePartsRecreated += _ => updateSelectionState(true);
-
-                text.AddText(@"  "); // to separate the title from the artist.
-                text.AddText(artist, sprite =>
+                flow.AddText(title, sprite => sprite.Font = OsuFont.GetFont(weight: FontWeight.Regular));
+                flow.AddText(@"  "); // to separate the title from the artist.
+                flow.AddText(artist, sprite =>
                 {
                     sprite.Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold);
                     sprite.Colour = colours.Gray9;
-                    sprite.Padding = new MarginPadding { Top = 1 };
                 });
+                return flow;
+            };
 
-                SelectedSet.BindValueChanged(set =>
-                {
-                    bool newSelected = set.NewValue?.Equals(Model) == true;
-
-                    if (newSelected == selected)
-                        return;
-
-                    selected = newSelected;
-                    updateSelectionState(false);
-                });
-
-                updateSelectionState(true);
-            });
-        }
-
-        private bool selected;
-
-        private void updateSelectionState(bool instant)
-        {
-            foreach (Drawable s in titlePart.Drawables)
-                s.FadeColour(selected ? colours.Yellow : Color4.White, instant ? 0 : FADE_DURATION);
-        }
-
-        protected override Drawable CreateContent() => new DelayedLoadWrapper(text = new OsuTextFlowContainer
-        {
-            RelativeSizeAxes = Axes.X,
-            AutoSizeAxes = Axes.Y,
+            selectedSet.TriggerChange();
+            FinishTransforms(true);
         });
+
+        private bool? selected;
+
+        private void updateSelectionState(ValueChangedEvent<Live<BeatmapSetInfo>?> selected)
+        {
+            bool? wasSelected = this.selected;
+            this.selected = selected.NewValue?.Equals(Current.Value) == true;
+
+            if (wasSelected == this.selected)
+                return;
+
+            text.FadeColour(this.selected == true ? colours.Yellow : Color4.White, 100);
+        }
 
         protected override bool OnClick(ClickEvent e)
         {
-            RequestSelection?.Invoke(Model);
+            requestSelection?.Invoke(Current.Value);
             return true;
         }
 
-        private bool inSelectedCollection = true;
-
-        public bool InSelectedCollection
+        protected override bool OnHover(HoverEvent e)
         {
-            get => inSelectedCollection;
-            set
-            {
-                if (inSelectedCollection == value)
-                    return;
-
-                inSelectedCollection = value;
-                updateFilter();
-            }
+            text.AllowScrolling = true;
+            return true;
         }
 
-        public IEnumerable<string> FilterTerms => Model.PerformRead(m => m.Metadata.GetSearchableTerms());
-
-        private bool matchingFilter = true;
-
-        public bool MatchingFilter
+        protected override void OnHoverLost(HoverLostEvent e)
         {
-            get => matchingFilter && inSelectedCollection;
-            set
-            {
-                if (matchingFilter == value)
-                    return;
-
-                matchingFilter = value;
-                updateFilter();
-            }
+            text.AllowScrolling = false;
+            base.OnHoverLost(e);
         }
-
-        private void updateFilter() => this.FadeTo(MatchingFilter ? 1 : 0, 200);
-
-        public bool FilteringActive { get; set; }
     }
 }

@@ -3,15 +3,14 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
 using Android.Graphics;
 using Android.OS;
-using Android.Provider;
 using Android.Views;
 using osu.Framework.Android;
 using osu.Game.Database;
@@ -50,11 +49,27 @@ namespace osu.Android
         /// <remarks>Adjusted on startup to match expected UX for the current device type (phone/tablet).</remarks>
         public ScreenOrientation DefaultOrientation = ScreenOrientation.Unspecified;
 
-        private OsuGameAndroid game;
+        public new bool IsTablet { get; private set; }
 
-        protected override Framework.Game CreateGame() => game = new OsuGameAndroid(this);
+        private readonly OsuGameAndroid game;
 
-        protected override void OnCreate(Bundle savedInstanceState)
+        private bool gameCreated;
+
+        protected override Framework.Game CreateGame()
+        {
+            if (gameCreated)
+                throw new InvalidOperationException("Framework tried to create a game twice.");
+
+            gameCreated = true;
+            return game;
+        }
+
+        public OsuGameActivity()
+        {
+            game = new OsuGameAndroid(this);
+        }
+
+        protected override void OnCreate(Bundle? savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
 
@@ -72,36 +87,61 @@ namespace osu.Android
             Debug.Assert(Resources?.DisplayMetrics != null);
 
             Point displaySize = new Point();
+#pragma warning disable CA1422 // GetSize is deprecated
             WindowManager.DefaultDisplay.GetSize(displaySize);
+#pragma warning restore CA1422
             float smallestWidthDp = Math.Min(displaySize.X, displaySize.Y) / Resources.DisplayMetrics.Density;
-            bool isTablet = smallestWidthDp >= 600f;
+            IsTablet = smallestWidthDp >= 600f;
 
-            RequestedOrientation = DefaultOrientation = isTablet ? ScreenOrientation.FullUser : ScreenOrientation.SensorLandscape;
+            RequestedOrientation = DefaultOrientation = IsTablet ? ScreenOrientation.FullUser : ScreenOrientation.SensorLandscape;
+
+            // Currently (SDK 6.0.200), BundleAssemblies is not runnable for net6-android.
+            // The assembly files are not available as files either after native AOT.
+            // Manually load them so that they can be loaded by RulesetStore.loadFromAppDomain.
+            // REMEMBER to fully uninstall previous version every time when investigating this!
+            // Don't forget osu.Game.Tests.Android too.
+            Assembly.Load("osu.Game.Rulesets.Osu");
+            Assembly.Load("osu.Game.Rulesets.Taiko");
+            Assembly.Load("osu.Game.Rulesets.Catch");
+            Assembly.Load("osu.Game.Rulesets.Mania");
         }
 
-        protected override void OnNewIntent(Intent intent) => handleIntent(intent);
+        protected override void OnNewIntent(Intent? intent) => handleIntent(intent);
 
-        private void handleIntent(Intent intent)
+        private void handleIntent(Intent? intent)
         {
+            if (intent == null)
+                return;
+
             switch (intent.Action)
             {
                 case Intent.ActionDefault:
                     if (intent.Scheme == ContentResolver.SchemeContent)
-                        handleImportFromUris(intent.Data);
+                    {
+                        if (intent.Data != null)
+                            handleImportFromUris(intent.Data);
+                    }
                     else if (osu_url_schemes.Contains(intent.Scheme))
-                        game.HandleLink(intent.DataString);
+                    {
+                        if (intent.DataString != null)
+                            game.HandleLink(intent.DataString);
+                    }
+
                     break;
 
                 case Intent.ActionSend:
                 case Intent.ActionSendMultiple:
                 {
+                    if (intent.ClipData == null)
+                        break;
+
                     var uris = new List<Uri>();
 
-                    for (int i = 0; i < intent.ClipData?.ItemCount; i++)
+                    for (int i = 0; i < intent.ClipData.ItemCount; i++)
                     {
-                        var content = intent.ClipData?.GetItemAt(i);
-                        if (content != null)
-                            uris.Add(content.Uri);
+                        var item = intent.ClipData.GetItemAt(i);
+                        if (item?.Uri != null)
+                            uris.Add(item.Uri);
                     }
 
                     handleImportFromUris(uris.ToArray());
@@ -116,28 +156,14 @@ namespace osu.Android
 
             await Task.WhenAll(uris.Select(async uri =>
             {
-                // there are more performant overloads of this method, but this one is the most backwards-compatible
-                // (dates back to API 1).
-                var cursor = ContentResolver?.Query(uri, null, null, null, null);
+                var task = await AndroidImportTask.Create(ContentResolver!, uri).ConfigureAwait(false);
 
-                if (cursor == null)
-                    return;
-
-                cursor.MoveToFirst();
-
-                int filenameColumn = cursor.GetColumnIndex(OpenableColumns.DisplayName);
-                string filename = cursor.GetString(filenameColumn);
-
-                // SharpCompress requires archive streams to be seekable, which the stream opened by
-                // OpenInputStream() seems to not necessarily be.
-                // copy to an arbitrary-access memory stream to be able to proceed with the import.
-                var copy = new MemoryStream();
-                using (var stream = ContentResolver.OpenInputStream(uri))
-                    await stream.CopyToAsync(copy).ConfigureAwait(false);
-
-                lock (tasks)
+                if (task != null)
                 {
-                    tasks.Add(new ImportTask(copy, filename));
+                    lock (tasks)
+                    {
+                        tasks.Add(task);
+                    }
                 }
             })).ConfigureAwait(false);
 

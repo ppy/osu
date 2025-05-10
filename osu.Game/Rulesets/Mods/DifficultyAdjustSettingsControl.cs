@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -8,11 +10,12 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public class DifficultyAdjustSettingsControl : SettingsItem<float?>
+    public partial class DifficultyAdjustSettingsControl : SettingsItem<float?>
     {
         [Resolved]
         private IBindable<WorkingBeatmap> beatmap { get; set; }
@@ -26,7 +29,9 @@ namespace osu.Game.Rulesets.Mods
         /// </remarks>
         private readonly BindableNumber<float> sliderDisplayCurrent = new BindableNumber<float>();
 
-        protected override Drawable CreateControl() => new SliderControl(sliderDisplayCurrent);
+        protected sealed override Drawable CreateControl() => new SliderControl(sliderDisplayCurrent, CreateSlider);
+
+        protected virtual RoundedSliderBar<float> CreateSlider(BindableNumber<float> current) => new RoundedSliderBar<float>();
 
         /// <summary>
         /// Guards against beatmap values displayed on slider bars being transferred to user override.
@@ -53,8 +58,8 @@ namespace osu.Game.Rulesets.Mods
         {
             base.LoadComplete();
 
-            Current.BindValueChanged(current => updateCurrentFromSlider());
-            beatmap.BindValueChanged(b => updateCurrentFromSlider(), true);
+            Current.BindValueChanged(_ => updateCurrentFromSlider());
+            beatmap.BindValueChanged(_ => updateCurrentFromSlider(), true);
 
             sliderDisplayCurrent.BindValueChanged(number =>
             {
@@ -85,7 +90,7 @@ namespace osu.Game.Rulesets.Mods
             isInternalChange = false;
         }
 
-        private class SliderControl : CompositeDrawable, IHasCurrentValue<float?>
+        private partial class SliderControl : CompositeDrawable, IHasCurrentValue<float?>
         {
             // This is required as SettingsItem relies heavily on this bindable for internal use.
             // The actual update flow is done via the bindable provided in the constructor.
@@ -97,16 +102,25 @@ namespace osu.Game.Rulesets.Mods
                 set => current.Current = value;
             }
 
-            public SliderControl(BindableNumber<float> currentNumber)
+            public SliderControl(BindableNumber<float> currentNumber, Func<BindableNumber<float>, RoundedSliderBar<float>> createSlider)
             {
                 InternalChildren = new Drawable[]
                 {
-                    new SettingsSlider<float>
+                    createSlider(currentNumber).With(slider =>
                     {
-                        ShowsDefaultIndicator = false,
-                        Current = currentNumber,
-                        KeyboardStep = 0.1f,
-                    }
+                        slider.RelativeSizeAxes = Axes.X;
+                        slider.Current = currentNumber;
+                        slider.KeyboardStep = 0.1f;
+                        // this looks redundant, but isn't because of the various games this component plays
+                        // (`Current` is nullable and represents the underlying setting value,
+                        // `currentNumber` is not nullable and represents what is getting displayed,
+                        // therefore without this, double-clicking the slider would reset `currentNumber` to its bogus default of 0).
+                        slider.ResetToDefault = () =>
+                        {
+                            if (!Current.Disabled)
+                                Current.SetDefault();
+                        };
+                    })
                 };
 
                 AutoSizeAxes = Axes.Y;
@@ -123,8 +137,7 @@ namespace osu.Game.Rulesets.Mods
                 get => this;
                 set
                 {
-                    if (value == null)
-                        throw new ArgumentNullException(nameof(value));
+                    ArgumentNullException.ThrowIfNull(value);
 
                     if (currentBound != null) UnbindFrom(currentBound);
                     BindTo(currentBound = value);

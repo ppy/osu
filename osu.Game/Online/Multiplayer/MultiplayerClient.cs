@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -13,26 +11,45 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Development;
 using osu.Framework.Graphics;
-using osu.Framework.Logging;
 using osu.Game.Database;
+using osu.Game.Localisation;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer.Countdown;
 using osu.Game.Online.Rooms;
-using osu.Game.Online.Rooms.RoomStatuses;
+using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Utils;
-using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Online.Multiplayer
 {
-    public abstract class MultiplayerClient : Component, IMultiplayerClient, IMultiplayerRoomServer
+    public abstract partial class MultiplayerClient : Component, IMultiplayerClient, IMultiplayerRoomServer
     {
+        public Action<Notification>? PostNotification { protected get; set; }
+
+        public Action<Room, string>? PresentMatch { protected get; set; }
+
         /// <summary>
         /// Invoked when any change occurs to the multiplayer room.
         /// </summary>
         public virtual event Action? RoomUpdated;
+
+        /// <summary>
+        /// Invoked when a user's local style is changed.
+        /// </summary>
+        public event Action<MultiplayerRoomUser>? UserStyleChanged;
+
+        /// <summary>
+        /// Invoked when a user's local mods are changed.
+        /// </summary>
+        public event Action<MultiplayerRoomUser>? UserModsChanged;
+
+        /// <summary>
+        /// Invoked when the room's settings are changed.
+        /// </summary>
+        public event Action<MultiplayerRoomSettings>? SettingsChanged;
 
         /// <summary>
         /// Invoked when a new user joins the room.
@@ -48,6 +65,11 @@ namespace osu.Game.Online.Multiplayer
         /// Invoked when a user was kicked from the room forcefully.
         /// </summary>
         public event Action<MultiplayerRoomUser>? UserKicked;
+
+        /// <summary>
+        /// Invoked when the room's host is changed.
+        /// </summary>
+        public event Action<MultiplayerRoomUser?>? HostChanged;
 
         /// <summary>
         /// Invoked when a new item is added to the playlist.
@@ -70,9 +92,9 @@ namespace osu.Game.Online.Multiplayer
         public virtual event Action? LoadRequested;
 
         /// <summary>
-        /// Invoked when the multiplayer server requests loading of play to be aborted.
+        /// Invoked when the multiplayer server requests gameplay to be aborted.
         /// </summary>
-        public event Action? LoadAborted;
+        public event Action<GameplayAbortReason>? GameplayAborted;
 
         /// <summary>
         /// Invoked when the multiplayer server requests gameplay to be started.
@@ -85,6 +107,11 @@ namespace osu.Game.Online.Multiplayer
         public event Action? ResultsReady;
 
         /// <summary>
+        /// Invoked just prior to disconnection requested by the server via <see cref="IStatefulUserHubClient.DisconnectRequested"/>.
+        /// </summary>
+        public event Action? Disconnecting;
+
+        /// <summary>
         /// Whether the <see cref="MultiplayerClient"/> is currently connected.
         /// This is NOT thread safe and usage should be scheduled.
         /// </summary>
@@ -93,7 +120,7 @@ namespace osu.Game.Online.Multiplayer
         /// <summary>
         /// The joined <see cref="MultiplayerRoom"/>.
         /// </summary>
-        public virtual MultiplayerRoom? Room
+        public virtual MultiplayerRoom? Room // virtual for moq
         {
             get
             {
@@ -151,10 +178,7 @@ namespace osu.Game.Online.Multiplayer
             {
                 // clean up local room state on server disconnect.
                 if (!connected.NewValue && Room != null)
-                {
-                    Logger.Log("Connection to multiplayer server was lost.", LoggingTarget.Runtime, LogLevel.Important);
                     LeaveRoom();
-                }
             }));
         }
 
@@ -162,53 +186,89 @@ namespace osu.Game.Online.Multiplayer
         private CancellationTokenSource? joinCancellationSource;
 
         /// <summary>
-        /// Joins the <see cref="MultiplayerRoom"/> for a given API <see cref="Room"/>.
+        /// Creates and joins a <see cref="MultiplayerRoom"/> described by an API <see cref="Room"/>.
         /// </summary>
-        /// <param name="room">The API <see cref="Room"/>.</param>
-        /// <param name="password">An optional password to use for the join operation.</param>
-        public async Task JoinRoom(Room room, string? password = null)
+        /// <param name="room">The API <see cref="Room"/> describing the room to create.</param>
+        /// <exception cref="InvalidOperationException">If the current user is already in another room.</exception>
+        public async Task CreateRoom(Room room)
         {
             if (Room != null)
-                throw new InvalidOperationException("Cannot join a multiplayer room while already in one.");
+                throw new InvalidOperationException("Cannot create a multiplayer room while already in one.");
 
             var cancellationSource = joinCancellationSource = new CancellationTokenSource();
 
             await joinOrLeaveTaskChain.Add(async () =>
             {
-                Debug.Assert(room.RoomID.Value != null);
-
-                // Join the server-side room.
-                var joinedRoom = await JoinRoom(room.RoomID.Value.Value, password ?? room.Password.Value).ConfigureAwait(false);
-                Debug.Assert(joinedRoom != null);
-
-                // Populate users.
-                Debug.Assert(joinedRoom.Users != null);
-                await Task.WhenAll(joinedRoom.Users.Select(PopulateUser)).ConfigureAwait(false);
-
-                // Update the stored room (must be done on update thread for thread-safety).
-                await runOnUpdateThreadAsync(() =>
-                {
-                    Debug.Assert(Room == null);
-
-                    Room = joinedRoom;
-                    APIRoom = room;
-
-                    Debug.Assert(joinedRoom.Playlist.Count > 0);
-
-                    APIRoom.Playlist.Clear();
-                    APIRoom.Playlist.AddRange(joinedRoom.Playlist.Select(createPlaylistItem));
-
-                    Debug.Assert(LocalUser != null);
-                    addUserToAPIRoom(LocalUser);
-
-                    foreach (var user in joinedRoom.Users)
-                        updateUserPlayingState(user.UserID, user.State);
-
-                    updateLocalRoomSettings(joinedRoom.Settings);
-
-                    OnRoomJoined();
-                }, cancellationSource.Token).ConfigureAwait(false);
+                var multiplayerRoom = await CreateRoomInternal(new MultiplayerRoom(room)).ConfigureAwait(false);
+                await setupJoinedRoom(room, multiplayerRoom, cancellationSource.Token).ConfigureAwait(false);
             }, cancellationSource.Token).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Joins the <see cref="MultiplayerRoom"/> for a given API <see cref="Room"/>.
+        /// </summary>
+        /// <param name="room">The API <see cref="Room"/>.</param>
+        /// <param name="password">An optional password to use for the join operation.</param>
+        /// <exception cref="InvalidOperationException">If the current user is already in another room, or <paramref name="room"/> does not represent an active room.</exception>
+        public async Task JoinRoom(Room room, string? password = null)
+        {
+            if (Room != null)
+                throw new InvalidOperationException("Cannot join a multiplayer room while already in one.");
+
+            if (room.RoomID == null)
+                throw new InvalidOperationException("Cannot join an inactive room.");
+
+            var cancellationSource = joinCancellationSource = new CancellationTokenSource();
+
+            await joinOrLeaveTaskChain.Add(async () =>
+            {
+                var multiplayerRoom = await JoinRoomInternal(room.RoomID.Value, password ?? room.Password).ConfigureAwait(false);
+                await setupJoinedRoom(room, multiplayerRoom, cancellationSource.Token).ConfigureAwait(false);
+            }, cancellationSource.Token).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Performs post-join setup of a <see cref="MultiplayerRoom"/>.
+        /// </summary>
+        /// <param name="apiRoom">The incoming API <see cref="Room"/> that was requested to be joined.</param>
+        /// <param name="joinedRoom">The resuling <see cref="MultiplayerRoom"/> that was joined.</param>
+        /// <param name="cancellationToken">A token to cancel the process.</param>
+        private async Task setupJoinedRoom(Room apiRoom, MultiplayerRoom joinedRoom, CancellationToken cancellationToken)
+        {
+            // Populate users.
+            await PopulateUsers(joinedRoom.Users).ConfigureAwait(false);
+            if (joinedRoom.Host != null)
+                await PopulateUsers([joinedRoom.Host]).ConfigureAwait(false);
+
+            // Update the stored room (must be done on update thread for thread-safety).
+            await runOnUpdateThreadAsync(() =>
+            {
+                Debug.Assert(Room == null);
+                Debug.Assert(APIRoom == null);
+
+                Room = joinedRoom;
+                APIRoom = apiRoom;
+
+                APIRoom.RoomID = joinedRoom.RoomID;
+                APIRoom.ChannelId = joinedRoom.ChannelID;
+                APIRoom.Host = joinedRoom.Host?.User;
+                APIRoom.Playlist = joinedRoom.Playlist.Select(item => new PlaylistItem(item)).ToArray();
+                APIRoom.CurrentPlaylistItem = APIRoom.Playlist.Single(item => item.ID == joinedRoom.Settings.PlaylistItemId);
+                // The server will null out the end date upon the host joining the room, but the null value is never communicated to the client.
+                APIRoom.EndDate = null;
+
+                Debug.Assert(LocalUser != null);
+                addUserToAPIRoom(LocalUser);
+
+                foreach (var user in joinedRoom.Users)
+                    updateUserPlayingState(user.UserID, user.State);
+
+                updateLocalRoomSettings(joinedRoom.Settings);
+
+                postServerShuttingDownNotification();
+
+                OnRoomJoined();
+            }, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -218,16 +278,11 @@ namespace osu.Game.Online.Multiplayer
         {
         }
 
-        /// <summary>
-        /// Joins the <see cref="MultiplayerRoom"/> with a given ID.
-        /// </summary>
-        /// <param name="roomId">The room ID.</param>
-        /// <param name="password">An optional password to use when joining the room.</param>
-        /// <returns>The joined <see cref="MultiplayerRoom"/>.</returns>
-        protected abstract Task<MultiplayerRoom> JoinRoom(long roomId, string? password = null);
-
         public Task LeaveRoom()
         {
+            if (Room == null)
+                return Task.CompletedTask;
+
             // The join may have not completed yet, so certain tasks that either update the room or reference the room should be cancelled.
             // This includes the setting of Room itself along with the initial update of the room settings on join.
             joinCancellationSource?.Cancel();
@@ -251,7 +306,27 @@ namespace osu.Game.Online.Multiplayer
             });
         }
 
+        /// <summary>
+        /// Creates the <see cref="MultiplayerRoom"/> with the given settings.
+        /// </summary>
+        /// <param name="room">The room.</param>
+        /// <returns>The joined <see cref="MultiplayerRoom"/></returns>
+        protected abstract Task<MultiplayerRoom> CreateRoomInternal(MultiplayerRoom room);
+
+        /// <summary>
+        /// Joins the <see cref="MultiplayerRoom"/> with a given ID.
+        /// </summary>
+        /// <param name="roomId">The room ID.</param>
+        /// <param name="password">An optional password to use when joining the room.</param>
+        /// <returns>The joined <see cref="MultiplayerRoom"/>.</returns>
+        protected abstract Task<MultiplayerRoom> JoinRoomInternal(long roomId, string? password = null);
+
+        /// <summary>
+        /// Leaves the currently-joined <see cref="MultiplayerRoom"/>.
+        /// </summary>
         protected abstract Task LeaveRoomInternal();
+
+        public abstract Task InvitePlayer(int userId);
 
         /// <summary>
         /// Change the current <see cref="MultiplayerRoom"/> settings.
@@ -264,8 +339,9 @@ namespace osu.Game.Online.Multiplayer
         /// <param name="matchType">The type of the match, if any.</param>
         /// <param name="queueMode">The new queue mode, if any.</param>
         /// <param name="autoStartDuration">The new auto-start countdown duration, if any.</param>
+        /// <param name="autoSkip">The new auto-skip setting.</param>
         public Task ChangeSettings(Optional<string> name = default, Optional<string> password = default, Optional<MatchType> matchType = default, Optional<QueueMode> queueMode = default,
-                                   Optional<TimeSpan> autoStartDuration = default)
+                                   Optional<TimeSpan> autoStartDuration = default, Optional<bool> autoSkip = default)
         {
             if (Room == null)
                 throw new InvalidOperationException("Must be joined to a match to change settings.");
@@ -277,6 +353,7 @@ namespace osu.Game.Online.Multiplayer
                 MatchType = matchType.GetOr(Room.Settings.MatchType),
                 QueueMode = queueMode.GetOr(Room.Settings.QueueMode),
                 AutoStartDuration = autoStartDuration.GetOr(Room.Settings.AutoStartDuration),
+                AutoSkip = autoSkip.GetOr(Room.Settings.AutoSkip)
             });
         }
 
@@ -343,6 +420,10 @@ namespace osu.Game.Online.Multiplayer
 
         public abstract Task ChangeBeatmapAvailability(BeatmapAvailability newBeatmapAvailability);
 
+        public abstract Task DisconnectInternal();
+
+        public abstract Task ChangeUserStyle(int? beatmapId, int? rulesetId);
+
         /// <summary>
         /// Change the local user's mods in the currently joined room.
         /// </summary>
@@ -356,6 +437,8 @@ namespace osu.Game.Online.Multiplayer
         public abstract Task StartMatch();
 
         public abstract Task AbortGameplay();
+
+        public abstract Task AbortMatch();
 
         public abstract Task AddPlaylistItem(MultiplayerPlaylistItem item);
 
@@ -377,15 +460,17 @@ namespace osu.Game.Online.Multiplayer
                 switch (state)
                 {
                     case MultiplayerRoomState.Open:
-                        APIRoom.Status.Value = new RoomStatusOpen();
+                        APIRoom.Status = RoomStatus.Idle;
                         break;
 
+                    case MultiplayerRoomState.WaitingForLoad:
                     case MultiplayerRoomState.Playing:
-                        APIRoom.Status.Value = new RoomStatusPlaying();
+                        APIRoom.Status = RoomStatus.Playing;
                         break;
 
                     case MultiplayerRoomState.Closed:
-                        APIRoom.Status.Value = new RoomStatusEnded();
+                        APIRoom.EndDate = DateTimeOffset.Now;
+                        APIRoom.Status = RoomStatus.Idle;
                         break;
                 }
 
@@ -397,7 +482,7 @@ namespace osu.Game.Online.Multiplayer
 
         async Task IMultiplayerClient.UserJoined(MultiplayerRoomUser user)
         {
-            await PopulateUser(user).ConfigureAwait(false);
+            await PopulateUsers([user]).ConfigureAwait(false);
 
             Scheduler.Add(() =>
             {
@@ -414,54 +499,91 @@ namespace osu.Game.Online.Multiplayer
 
                 UserJoined?.Invoke(user);
                 RoomUpdated?.Invoke();
-            });
+            }, false);
         }
 
-        Task IMultiplayerClient.UserLeft(MultiplayerRoomUser user) =>
-            handleUserLeft(user, UserLeft);
+        Task IMultiplayerClient.UserLeft(MultiplayerRoomUser user)
+        {
+            Scheduler.Add(() => handleUserLeft(user, UserLeft), false);
+            return Task.CompletedTask;
+        }
 
         Task IMultiplayerClient.UserKicked(MultiplayerRoomUser user)
         {
-            if (LocalUser == null)
-                return Task.CompletedTask;
+            Scheduler.Add(() =>
+            {
+                if (LocalUser == null)
+                    return;
 
-            if (user.Equals(LocalUser))
-                LeaveRoom();
+                if (user.Equals(LocalUser))
+                    LeaveRoom();
 
-            return handleUserLeft(user, UserKicked);
+                handleUserLeft(user, UserKicked);
+            }, false);
+
+            return Task.CompletedTask;
+        }
+
+        private void handleUserLeft(MultiplayerRoomUser user, Action<MultiplayerRoomUser>? callback)
+        {
+            Debug.Assert(ThreadSafety.IsUpdateThread);
+
+            if (Room == null)
+                return;
+
+            Room.Users.Remove(user);
+            PlayingUserIds.Remove(user.UserID);
+
+            Debug.Assert(APIRoom != null);
+            APIRoom.RecentParticipants = APIRoom.RecentParticipants.Where(u => u.Id != user.UserID).ToArray();
+            APIRoom.ParticipantCount--;
+
+            callback?.Invoke(user);
+            RoomUpdated?.Invoke();
+        }
+
+        async Task IMultiplayerClient.Invited(int invitedBy, long roomID, string password)
+        {
+            APIUser? apiUser = await userLookupCache.GetUserAsync(invitedBy).ConfigureAwait(false);
+            Room? apiRoom = await getRoomAsync(roomID).ConfigureAwait(false);
+
+            if (apiUser == null || apiRoom == null) return;
+
+            PostNotification?.Invoke(
+                new UserAvatarNotification(apiUser, NotificationsStrings.InvitedYouToTheMultiplayer(apiUser.Username, apiRoom.Name))
+                {
+                    Activated = () =>
+                    {
+                        PresentMatch?.Invoke(apiRoom, password);
+                        return true;
+                    }
+                }
+            );
+
+            Task<Room?> getRoomAsync(long id)
+            {
+                TaskCompletionSource<Room?> taskCompletionSource = new TaskCompletionSource<Room?>();
+
+                var request = new GetRoomRequest(id);
+                request.Success += room => taskCompletionSource.TrySetResult(room);
+                request.Failure += _ => taskCompletionSource.TrySetResult(null);
+
+                API.Queue(request);
+
+                return taskCompletionSource.Task;
+            }
         }
 
         private void addUserToAPIRoom(MultiplayerRoomUser user)
         {
             Debug.Assert(APIRoom != null);
 
-            APIRoom.RecentParticipants.Add(user.User ?? new APIUser
+            APIRoom.RecentParticipants = APIRoom.RecentParticipants.Append(user.User ?? new APIUser
             {
                 Id = user.UserID,
                 Username = "[Unresolved]"
-            });
-            APIRoom.ParticipantCount.Value++;
-        }
-
-        private Task handleUserLeft(MultiplayerRoomUser user, Action<MultiplayerRoomUser>? callback)
-        {
-            Scheduler.Add(() =>
-            {
-                if (Room == null)
-                    return;
-
-                Room.Users.Remove(user);
-                PlayingUserIds.Remove(user.UserID);
-
-                Debug.Assert(APIRoom != null);
-                APIRoom.RecentParticipants.RemoveAll(u => u.Id == user.UserID);
-                APIRoom.ParticipantCount.Value--;
-
-                callback?.Invoke(user);
-                RoomUpdated?.Invoke();
-            }, false);
-
-            return Task.CompletedTask;
+            }).ToArray();
+            APIRoom.ParticipantCount++;
         }
 
         Task IMultiplayerClient.HostChanged(int userId)
@@ -476,8 +598,9 @@ namespace osu.Game.Online.Multiplayer
                 var user = Room.Users.FirstOrDefault(u => u.UserID == userId);
 
                 Room.Host = user;
-                APIRoom.Host.Value = user?.User;
+                APIRoom.Host = user?.User;
 
+                HostChanged?.Invoke(user);
                 RoomUpdated?.Invoke();
             }, false);
 
@@ -549,8 +672,22 @@ namespace osu.Game.Online.Multiplayer
 
                 switch (e)
                 {
-                    case CountdownChangedEvent countdownChangedEvent:
-                        Room.Countdown = countdownChangedEvent.Countdown;
+                    case CountdownStartedEvent countdownStartedEvent:
+                        Room.ActiveCountdowns.Add(countdownStartedEvent.Countdown);
+
+                        switch (countdownStartedEvent.Countdown)
+                        {
+                            case ServerShuttingDownCountdown:
+                                postServerShuttingDownNotification();
+                                break;
+                        }
+
+                        break;
+
+                    case CountdownStoppedEvent countdownStoppedEvent:
+                        MultiplayerCountdown? countdown = Room.ActiveCountdowns.FirstOrDefault(countdown => countdown.ID == countdownStoppedEvent.ID);
+                        if (countdown != null)
+                            Room.ActiveCountdowns.Remove(countdown);
                         break;
                 }
 
@@ -558,6 +695,16 @@ namespace osu.Game.Online.Multiplayer
             }, false);
 
             return Task.CompletedTask;
+        }
+
+        private void postServerShuttingDownNotification()
+        {
+            ServerShuttingDownCountdown? countdown = room?.ActiveCountdowns.OfType<ServerShuttingDownCountdown>().FirstOrDefault();
+
+            if (countdown == null)
+                return;
+
+            PostNotification?.Invoke(new ServerShutdownNotification(countdown.TimeRemaining));
         }
 
         Task IMultiplayerClient.UserBeatmapAvailabilityChanged(int userId, BeatmapAvailability beatmapAvailability)
@@ -578,7 +725,27 @@ namespace osu.Game.Online.Multiplayer
             return Task.CompletedTask;
         }
 
-        public Task UserModsChanged(int userId, IEnumerable<APIMod> mods)
+        Task IMultiplayerClient.UserStyleChanged(int userId, int? beatmapId, int? rulesetId)
+        {
+            Scheduler.Add(() =>
+            {
+                var user = Room?.Users.SingleOrDefault(u => u.UserID == userId);
+
+                // errors here are not critical - user style is mostly for display.
+                if (user == null)
+                    return;
+
+                user.BeatmapId = beatmapId;
+                user.RulesetId = rulesetId;
+
+                UserStyleChanged?.Invoke(user);
+                RoomUpdated?.Invoke();
+            }, false);
+
+            return Task.CompletedTask;
+        }
+
+        Task IMultiplayerClient.UserModsChanged(int userId, IEnumerable<APIMod> mods)
         {
             Scheduler.Add(() =>
             {
@@ -590,6 +757,7 @@ namespace osu.Game.Online.Multiplayer
 
                 user.Mods = mods;
 
+                UserModsChanged?.Invoke(user);
                 RoomUpdated?.Invoke();
             }, false);
 
@@ -609,14 +777,14 @@ namespace osu.Game.Online.Multiplayer
             return Task.CompletedTask;
         }
 
-        Task IMultiplayerClient.LoadAborted()
+        Task IMultiplayerClient.GameplayAborted(GameplayAbortReason reason)
         {
             Scheduler.Add(() =>
             {
                 if (Room == null)
                     return;
 
-                LoadAborted?.Invoke();
+                GameplayAborted?.Invoke(reason);
             }, false);
 
             return Task.CompletedTask;
@@ -658,7 +826,7 @@ namespace osu.Game.Online.Multiplayer
                 Debug.Assert(APIRoom != null);
 
                 Room.Playlist.Add(item);
-                APIRoom.Playlist.Add(createPlaylistItem(item));
+                APIRoom.Playlist = APIRoom.Playlist.Append(new PlaylistItem(item)).ToArray();
 
                 ItemAdded?.Invoke(item);
                 RoomUpdated?.Invoke();
@@ -677,7 +845,7 @@ namespace osu.Game.Online.Multiplayer
                 Debug.Assert(APIRoom != null);
 
                 Room.Playlist.Remove(Room.Playlist.Single(existing => existing.ID == playlistItemId));
-                APIRoom.Playlist.RemoveAll(existing => existing.ID == playlistItemId);
+                APIRoom.Playlist = APIRoom.Playlist.Where(i => i.ID != playlistItemId).ToArray();
 
                 Debug.Assert(Room.Playlist.Count > 0);
 
@@ -698,10 +866,7 @@ namespace osu.Game.Online.Multiplayer
                 Debug.Assert(APIRoom != null);
 
                 Room.Playlist[Room.Playlist.IndexOf(Room.Playlist.Single(existing => existing.ID == item.ID))] = item;
-
-                int existingIndex = APIRoom.Playlist.IndexOf(APIRoom.Playlist.Single(existing => existing.ID == item.ID));
-                APIRoom.Playlist.RemoveAt(existingIndex);
-                APIRoom.Playlist.Insert(existingIndex, createPlaylistItem(item));
+                APIRoom.Playlist = APIRoom.Playlist.Select((pi, i) => pi.ID == item.ID ? new PlaylistItem(item) : APIRoom.Playlist[i]).ToArray();
 
                 ItemChanged?.Invoke(item);
                 RoomUpdated?.Invoke();
@@ -711,10 +876,29 @@ namespace osu.Game.Online.Multiplayer
         }
 
         /// <summary>
-        /// Populates the <see cref="APIUser"/> for a given <see cref="MultiplayerRoomUser"/>.
+        /// Populates the <see cref="APIUser"/> for a given collection of <see cref="MultiplayerRoomUser"/>s.
         /// </summary>
-        /// <param name="multiplayerUser">The <see cref="MultiplayerRoomUser"/> to populate.</param>
-        protected async Task PopulateUser(MultiplayerRoomUser multiplayerUser) => multiplayerUser.User ??= await userLookupCache.GetUserAsync(multiplayerUser.UserID).ConfigureAwait(false);
+        /// <param name="multiplayerUsers">The <see cref="MultiplayerRoomUser"/>s to populate.</param>
+        protected async Task PopulateUsers(IEnumerable<MultiplayerRoomUser> multiplayerUsers)
+        {
+            foreach (int[] userChunk in multiplayerUsers.Select(u => u.UserID).Distinct().Chunk(GetUsersRequest.MAX_IDS_PER_REQUEST))
+            {
+                var request = new GetUsersRequest(userChunk);
+
+                await API.PerformAsync(request).ConfigureAwait(false);
+
+                if (request.Response == null)
+                    return;
+
+                Dictionary<int, APIUser> users = request.Response.Users.ToDictionary(user => user.Id);
+
+                foreach (var multiplayerUser in multiplayerUsers)
+                {
+                    if (users.TryGetValue(multiplayerUser.UserID, out var user))
+                        multiplayerUser.User = user;
+                }
+            }
+        }
 
         /// <summary>
         /// Updates the local room settings with the given <see cref="MultiplayerRoomSettings"/>.
@@ -732,26 +916,17 @@ namespace osu.Game.Online.Multiplayer
 
             // Update a few properties of the room instantaneously.
             Room.Settings = settings;
-            APIRoom.Name.Value = Room.Settings.Name;
-            APIRoom.Password.Value = Room.Settings.Password;
-            APIRoom.Type.Value = Room.Settings.MatchType;
-            APIRoom.QueueMode.Value = Room.Settings.QueueMode;
-            APIRoom.AutoStartDuration.Value = Room.Settings.AutoStartDuration;
+            APIRoom.Name = Room.Settings.Name;
+            APIRoom.Password = Room.Settings.Password;
+            APIRoom.Type = Room.Settings.MatchType;
+            APIRoom.QueueMode = Room.Settings.QueueMode;
+            APIRoom.AutoStartDuration = Room.Settings.AutoStartDuration;
+            APIRoom.CurrentPlaylistItem = APIRoom.Playlist.Single(item => item.ID == settings.PlaylistItemId);
+            APIRoom.AutoSkip = Room.Settings.AutoSkip;
 
+            SettingsChanged?.Invoke(settings);
             RoomUpdated?.Invoke();
         }
-
-        private PlaylistItem createPlaylistItem(MultiplayerPlaylistItem item) => new PlaylistItem(new APIBeatmap { OnlineID = item.BeatmapID })
-        {
-            ID = item.ID,
-            OwnerID = item.OwnerID,
-            RulesetID = item.RulesetID,
-            Expired = item.Expired,
-            PlaylistOrder = item.PlaylistOrder,
-            PlayedAt = item.PlayedAt,
-            RequiredMods = item.RequiredMods.ToArray(),
-            AllowedMods = item.AllowedMods.ToArray()
-        };
 
         /// <summary>
         /// For the provided user ID, update whether the user is included in <see cref="CurrentMatchPlayingUserIds"/>.
@@ -780,7 +955,7 @@ namespace osu.Game.Online.Multiplayer
             {
                 if (cancellationToken.IsCancellationRequested)
                 {
-                    tcs.SetCanceled();
+                    tcs.SetCanceled(cancellationToken);
                     return;
                 }
 
@@ -796,6 +971,16 @@ namespace osu.Game.Online.Multiplayer
             });
 
             return tcs.Task;
+        }
+
+        Task IStatefulUserHubClient.DisconnectRequested()
+        {
+            Schedule(() =>
+            {
+                Disconnecting?.Invoke();
+                DisconnectInternal();
+            });
+            return Task.CompletedTask;
         }
     }
 }

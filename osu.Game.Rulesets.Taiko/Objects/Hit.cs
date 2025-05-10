@@ -5,6 +5,7 @@ using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Game.Audio;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osuTK.Graphics;
 
@@ -12,18 +13,20 @@ namespace osu.Game.Rulesets.Taiko.Objects
 {
     public class Hit : TaikoStrongableHitObject, IHasDisplayColour
     {
-        public readonly Bindable<HitType> TypeBindable = new Bindable<HitType>();
+        private HitObjectProperty<HitType> type;
 
-        public Bindable<Color4> DisplayColour { get; } = new Bindable<Color4>(COLOUR_CENTRE);
+        public Bindable<HitType> TypeBindable => type.Bindable;
 
         /// <summary>
         /// The <see cref="HitType"/> that actuates this <see cref="Hit"/>.
         /// </summary>
         public HitType Type
         {
-            get => TypeBindable.Value;
-            set => TypeBindable.Value = value;
+            get => type.Value;
+            set => type.Value = value;
         }
+
+        public Bindable<Color4> DisplayColour { get; } = new Bindable<Color4>(COLOUR_CENTRE);
 
         public static readonly Color4 COLOUR_CENTRE = Color4Extensions.FromHex(@"bb1177");
         public static readonly Color4 COLOUR_RIM = Color4Extensions.FromHex(@"2299bb");
@@ -36,7 +39,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
                 DisplayColour.Value = Type == HitType.Centre ? COLOUR_CENTRE : COLOUR_RIM;
             });
 
-            SamplesBindable.BindCollectionChanged((_, __) => updateTypeFromSamples());
+            SamplesBindable.BindCollectionChanged((_, _) => updateTypeFromSamples());
         }
 
         private void updateTypeFromSamples()
@@ -58,7 +61,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
             if (isRimType != rimSamples.Any())
             {
                 if (isRimType)
-                    Samples.Add(new HitSampleInfo(HitSampleInfo.HIT_CLAP));
+                    Samples.Add(CreateHitSampleInfo(HitSampleInfo.HIT_CLAP));
                 else
                 {
                     foreach (var sample in rimSamples)
@@ -67,10 +70,18 @@ namespace osu.Game.Rulesets.Taiko.Objects
             }
         }
 
-        protected override StrongNestedHitObject CreateStrongNestedHit(double startTime) => new StrongNestedHit { StartTime = startTime };
+        protected override StrongNestedHitObject CreateStrongNestedHit(double startTime) => new StrongNestedHit(this)
+        {
+            StartTime = startTime,
+            Samples = Samples
+        };
 
         public class StrongNestedHit : StrongNestedHitObject
         {
+            public StrongNestedHit(TaikoHitObject parent)
+                : base(parent)
+            {
+            }
         }
     }
 }

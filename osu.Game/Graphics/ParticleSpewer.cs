@@ -1,12 +1,14 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
+using System.Diagnostics;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.OpenGL.Vertices;
 using osu.Framework.Graphics.Primitives;
+using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Utils;
@@ -14,13 +16,13 @@ using osuTK;
 
 namespace osu.Game.Graphics
 {
-    public abstract class ParticleSpewer : Sprite
+    public abstract partial class ParticleSpewer : Sprite
     {
         private readonly FallingParticle[] particles;
         private int currentIndex;
-        private double lastParticleAdded;
+        private double? lastParticleAdded;
 
-        private readonly double cooldown;
+        private readonly double timeBetweenSpawns;
         private readonly double maxDuration;
 
         /// <summary>
@@ -42,26 +44,68 @@ namespace osu.Game.Graphics
 
             particles = new FallingParticle[perSecond * (int)Math.Ceiling(maxDuration / 1000)];
 
-            cooldown = 1000f / perSecond;
+            timeBetweenSpawns = 1000f / perSecond;
             this.maxDuration = maxDuration;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            Active.BindValueChanged(active =>
+            {
+                // ensure that particles can be spawned immediately after the spewer becomes active.
+                if (active.NewValue)
+                    lastParticleAdded = null;
+            });
         }
 
         protected override void Update()
         {
             base.Update();
 
-            if (Active.Value && CanSpawnParticles && Math.Abs(Time.Current - lastParticleAdded) > cooldown)
+            Invalidate(Invalidation.DrawNode);
+
+            if (!Active.Value || !CanSpawnParticles)
+                return;
+
+            if (lastParticleAdded == null)
             {
-                var newParticle = CreateParticle();
-                newParticle.StartTime = (float)Time.Current;
-
-                particles[currentIndex] = newParticle;
-
-                currentIndex = (currentIndex + 1) % particles.Length;
                 lastParticleAdded = Time.Current;
+                spawnParticle();
+                return;
             }
 
-            Invalidate(Invalidation.DrawNode);
+            double timeElapsed = Time.Current - lastParticleAdded.Value;
+
+            // Avoid spawning too many particles if a long amount of time has passed.
+            if (Math.Abs(timeElapsed) > maxDuration)
+            {
+                lastParticleAdded = Time.Current;
+                spawnParticle();
+                return;
+            }
+
+            Debug.Assert(lastParticleAdded != null);
+
+            for (int i = 0; i < timeElapsed / timeBetweenSpawns; i++)
+            {
+                lastParticleAdded += timeBetweenSpawns;
+                spawnParticle();
+            }
+        }
+
+        private void spawnParticle()
+        {
+            Debug.Assert(lastParticleAdded != null);
+
+            var newParticle = CreateParticle();
+
+            newParticle.StartTime = (float)lastParticleAdded.Value;
+
+            particles[currentIndex] = newParticle;
+
+            currentIndex = (currentIndex + 1) % particles.Length;
         }
 
         /// <summary>
@@ -71,7 +115,7 @@ namespace osu.Game.Graphics
 
         protected override DrawNode CreateDrawNode() => new ParticleSpewerDrawNode(this);
 
-        # region DrawNode
+        #region DrawNode
 
         private class ParticleSpewerDrawNode : SpriteDrawNode
         {
@@ -105,7 +149,7 @@ namespace osu.Game.Graphics
                 sourceSize = Source.DrawSize;
             }
 
-            protected override void Blit(Action<TexturedVertex2D> vertexAction)
+            protected override void Blit(IRenderer renderer)
             {
                 foreach (var p in particles)
                 {
@@ -134,9 +178,9 @@ namespace osu.Game.Graphics
                         transformPosition(rect.BottomRight, rect.Centre, angle)
                     );
 
-                    DrawQuad(Texture, quad, DrawColourInfo.Colour.MultiplyAlpha(alpha), null, vertexAction,
-                        new Vector2(InflationAmount.X / DrawRectangle.Width, InflationAmount.Y / DrawRectangle.Height),
-                        null, TextureCoords);
+                    renderer.DrawQuad(Texture, quad, DrawColourInfo.Colour.MultiplyAlpha(alpha),
+                        inflationPercentage: new Vector2(InflationAmount.X / DrawRectangle.Width, InflationAmount.Y / DrawRectangle.Height),
+                        textureCoords: TextureCoords);
                 }
             }
 
@@ -145,9 +189,9 @@ namespace osu.Game.Graphics
                 float width = Texture.DisplayWidth * scale;
                 float height = Texture.DisplayHeight * scale;
 
-                if (relativePositionAxes.HasFlagFast(Axes.X))
+                if (relativePositionAxes.HasFlag(Axes.X))
                     position.X *= sourceSize.X;
-                if (relativePositionAxes.HasFlagFast(Axes.Y))
+                if (relativePositionAxes.HasFlag(Axes.Y))
                     position.Y *= sourceSize.Y;
 
                 return new RectangleF(

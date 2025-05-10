@@ -15,7 +15,7 @@ namespace osu.Game.Input
     /// <summary>
     /// Track whether the end-user is in an idle state, based on their last interaction with the game.
     /// </summary>
-    public class IdleTracker : Component, IKeyBindingHandler<PlatformAction>, IKeyBindingHandler<GlobalAction>, IHandleGlobalKeyboardInput
+    public partial class IdleTracker : Component, IKeyBindingHandler<PlatformAction>, IKeyBindingHandler<GlobalAction>, IHandleGlobalKeyboardInput
     {
         private readonly double timeToIdle;
 
@@ -66,7 +66,7 @@ namespace osu.Game.Input
         public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e) => updateLastInteractionTime();
 
         [Resolved]
-        private GameHost host { get; set; }
+        private GameHost host { get; set; } = null!;
 
         protected override bool Handle(UIEvent e)
         {
@@ -78,11 +78,11 @@ namespace osu.Game.Input
 
             switch (e)
             {
-                case KeyDownEvent _:
-                case KeyUpEvent _:
-                case MouseDownEvent _:
-                case MouseUpEvent _:
-                case MouseMoveEvent _:
+                case KeyDownEvent:
+                case KeyUpEvent:
+                case MouseDownEvent:
+                case MouseUpEvent:
+                case MouseMoveEvent:
                     return updateLastInteractionTime();
 
                 default:

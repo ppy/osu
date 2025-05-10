@@ -5,22 +5,21 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Rulesets.Osu.Objects;
-using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
-    public class RingPiece : CircularContainer
+    public partial class RingPiece : CircularContainer
     {
-        public RingPiece()
+        public RingPiece(float thickness = 9)
         {
-            Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
+            Size = OsuHitObject.OBJECT_DIMENSIONS;
 
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
             Masking = true;
-            BorderThickness = 9; // roughly matches slider borders and makes stacked circles distinctly visible from each other.
+            BorderThickness = thickness;
             BorderColour = Color4.White;
 
             Child = new Box

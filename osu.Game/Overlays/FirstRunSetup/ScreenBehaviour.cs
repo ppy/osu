@@ -1,15 +1,18 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Development;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
 using osu.Framework.Testing;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
 using osu.Game.Overlays.Settings;
 using osu.Game.Overlays.Settings.Sections;
@@ -17,16 +20,16 @@ using osu.Game.Overlays.Settings.Sections;
 namespace osu.Game.Overlays.FirstRunSetup
 {
     [LocalisableDescription(typeof(FirstRunSetupOverlayStrings), nameof(FirstRunSetupOverlayStrings.Behaviour))]
-    public class ScreenBehaviour : FirstRunSetupScreen
+    public partial class ScreenBehaviour : WizardScreen
     {
         private SearchContainer<SettingsSection> searchContainer;
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuColour colours)
         {
             Content.Children = new Drawable[]
             {
-                new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: 24))
+                new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: CONTENT_FONT_SIZE))
                 {
                     Text = FirstRunSetupOverlayStrings.BehaviourDescription,
                     RelativeSizeAxes = Axes.X,
@@ -50,7 +53,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                     {
                         new[]
                         {
-                            new TriangleButton
+                            new RoundedButton
                             {
                                 Anchor = Anchor.TopLeft,
                                 Origin = Anchor.TopLeft,
@@ -59,10 +62,11 @@ namespace osu.Game.Overlays.FirstRunSetup
                                 Action = applyStandard,
                             },
                             Empty(),
-                            new DangerousTriangleButton
+                            new RoundedButton
                             {
                                 Anchor = Anchor.TopRight,
                                 Origin = Anchor.TopRight,
+                                BackgroundColour = colours.DangerousButtonColour,
                                 Text = FirstRunSetupOverlayStrings.ClassicDefaults,
                                 RelativeSizeAxes = Axes.X,
                                 Action = applyClassic
@@ -87,11 +91,13 @@ namespace osu.Game.Overlays.FirstRunSetup
                         new GraphicsSection(),
                         new OnlineSection(),
                         new MaintenanceSection(),
-                        new DebugSection(),
                     },
                     SearchTerm = SettingsItem<bool>.CLASSIC_DEFAULT_SEARCH_TERM,
                 }
             };
+
+            if (DebugUtils.IsDebugBuild)
+                searchContainer.Add(new DebugSection());
         }
 
         private void applyClassic()

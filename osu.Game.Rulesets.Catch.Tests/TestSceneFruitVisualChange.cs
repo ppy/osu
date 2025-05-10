@@ -7,7 +7,7 @@ using osu.Game.Rulesets.Catch.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Catch.Tests
 {
-    public class TestSceneFruitVisualChange : TestSceneFruitObjects
+    public partial class TestSceneFruitVisualChange : TestSceneFruitObjects
     {
         private readonly Bindable<int> indexInBeatmap = new Bindable<int>();
         private readonly Bindable<bool> hyperDash = new Bindable<bool>();

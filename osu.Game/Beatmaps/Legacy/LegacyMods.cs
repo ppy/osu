@@ -38,6 +38,7 @@ namespace osu.Game.Beatmaps.Legacy
         Key1 = 1 << 26,
         Key3 = 1 << 27,
         Key2 = 1 << 28,
+        ScoreV2 = 1 << 29,
         Mirror = 1 << 30,
     }
 }

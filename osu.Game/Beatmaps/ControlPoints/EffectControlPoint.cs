@@ -1,33 +1,26 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Bindables;
 using osu.Game.Graphics;
 using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.ControlPoints
 {
-    public class EffectControlPoint : ControlPoint
+    public class EffectControlPoint : ControlPoint, IEquatable<EffectControlPoint>
     {
         public static readonly EffectControlPoint DEFAULT = new EffectControlPoint
         {
             KiaiModeBindable = { Disabled = true },
-            OmitFirstBarLineBindable = { Disabled = true },
             ScrollSpeedBindable = { Disabled = true }
         };
-
-        /// <summary>
-        /// Whether the first bar line of this control point is ignored.
-        /// </summary>
-        public readonly BindableBool OmitFirstBarLineBindable = new BindableBool();
 
         /// <summary>
         /// The relative scroll speed at this control point.
         /// </summary>
         public readonly BindableDouble ScrollSpeedBindable = new BindableDouble(1)
         {
-            Precision = 0.01,
-            Default = 1,
             MinValue = 0.01,
             MaxValue = 10
         };
@@ -41,16 +34,7 @@ namespace osu.Game.Beatmaps.ControlPoints
             set => ScrollSpeedBindable.Value = value;
         }
 
-        public override Color4 GetRepresentingColour(OsuColour colours) => colours.Purple;
-
-        /// <summary>
-        /// Whether the first bar line of this control point is ignored.
-        /// </summary>
-        public bool OmitFirstBarLine
-        {
-            get => OmitFirstBarLineBindable.Value;
-            set => OmitFirstBarLineBindable.Value = value;
-        }
+        public override Color4 GetRepresentingColour(OsuColour colours) => colours.Orange1;
 
         /// <summary>
         /// Whether this control point enables Kiai mode.
@@ -66,20 +50,34 @@ namespace osu.Game.Beatmaps.ControlPoints
             set => KiaiModeBindable.Value = value;
         }
 
-        public override bool IsRedundant(ControlPoint existing)
-            => !OmitFirstBarLine
-               && existing is EffectControlPoint existingEffect
+        public EffectControlPoint()
+        {
+            KiaiModeBindable.BindValueChanged(_ => RaiseChanged());
+            ScrollSpeedBindable.BindValueChanged(_ => RaiseChanged());
+        }
+
+        public override bool IsRedundant(ControlPoint? existing)
+            => existing is EffectControlPoint existingEffect
                && KiaiMode == existingEffect.KiaiMode
-               && OmitFirstBarLine == existingEffect.OmitFirstBarLine
                && ScrollSpeed == existingEffect.ScrollSpeed;
 
         public override void CopyFrom(ControlPoint other)
         {
             KiaiMode = ((EffectControlPoint)other).KiaiMode;
-            OmitFirstBarLine = ((EffectControlPoint)other).OmitFirstBarLine;
             ScrollSpeed = ((EffectControlPoint)other).ScrollSpeed;
 
             base.CopyFrom(other);
         }
+
+        public override bool Equals(ControlPoint? other)
+            => other is EffectControlPoint otherEffectControlPoint
+               && Equals(otherEffectControlPoint);
+
+        public bool Equals(EffectControlPoint? other)
+            => base.Equals(other)
+               && ScrollSpeed == other.ScrollSpeed
+               && KiaiMode == other.KiaiMode;
+
+        public override int GetHashCode() => HashCode.Combine(base.GetHashCode(), ScrollSpeed, KiaiMode);
     }
 }

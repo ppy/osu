@@ -11,7 +11,7 @@ namespace osu.Game.Graphics.UserInterface
     /// A rounded bar which can be expanded or collapsed.
     /// Generally used for tabs or breadcrumbs.
     /// </summary>
-    public class ExpandingBar : Circle
+    public partial class ExpandingBar : Circle
     {
         private bool expanded = true;
 

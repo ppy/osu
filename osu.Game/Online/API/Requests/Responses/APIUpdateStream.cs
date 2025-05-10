@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
@@ -25,6 +27,9 @@ namespace osu.Game.Online.API.Requests.Responses
 
         [JsonProperty("latest_build")]
         public APIChangelogBuild LatestBuild { get; set; }
+
+        [JsonProperty("user_count")]
+        public int UserCount { get; set; }
 
         public bool Equals(APIUpdateStream other) => Id == other?.Id;
 

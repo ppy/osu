@@ -15,7 +15,7 @@ using osuTK;
 namespace osu.Game.Rulesets.Catch.Tests
 {
     [TestFixture]
-    public class TestSceneHyperDash : TestSceneCatchPlayer
+    public partial class TestSceneHyperDash : TestSceneCatchPlayer
     {
         protected override bool Autoplay => true;
 
@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                 hyperDashCount = 0;
 
                 // this needs to be done within the frame stable context due to how quickly hyperdash state changes occur.
-                Player.DrawableRuleset.FrameStableComponents.OnUpdate += d =>
+                Player.DrawableRuleset.FrameStableComponents.OnUpdate += _ =>
                 {
                     var catcher = Player.ChildrenOfType<Catcher>().FirstOrDefault();
 
@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Catch.Tests
 
             AddAssert("First note is hyperdash", () => Beatmap.Value.Beatmap.HitObjects[0] is Fruit f && f.HyperDash);
 
-            for (int i = 0; i < 9; i++)
+            for (int i = 0; i < 11; i++)
             {
                 int count = i + 1;
                 AddUntilStep($"wait for hyperdash #{count}", () => hyperDashCount >= count);
@@ -63,7 +63,11 @@ namespace osu.Game.Rulesets.Catch.Tests
                 BeatmapInfo =
                 {
                     Ruleset = ruleset,
-                    Difficulty = new BeatmapDifficulty { CircleSize = 3.6f }
+                    Difficulty = new BeatmapDifficulty
+                    {
+                        CircleSize = 3.6f,
+                        SliderMultiplier = 1,
+                    },
                 }
             };
 
@@ -100,12 +104,22 @@ namespace osu.Game.Rulesets.Catch.Tests
                 })
             }, 1);
 
+            createObjects(() => new Fruit { X = right_x }, count: 2, spacing: 0, spacingAfterGroup: 400);
+            createObjects(() => new TestJuiceStream(left_x)
+            {
+                Path = new SliderPath(new[]
+                {
+                    new PathControlPoint(Vector2.Zero),
+                    new PathControlPoint(new Vector2(0, 300))
+                })
+            }, count: 1, spacingAfterGroup: 150);
+            createObjects(() => new Fruit { X = left_x }, count: 1, spacing: 0, spacingAfterGroup: 400);
+            createObjects(() => new Fruit { X = right_x }, count: 2, spacing: 0);
+
             return beatmap;
 
-            void createObjects(Func<CatchHitObject> createObject, int count = 3)
+            void createObjects(Func<CatchHitObject> createObject, int count = 3, float spacing = 140, float spacingAfterGroup = 700)
             {
-                const float spacing = 140;
-
                 for (int i = 0; i < count; i++)
                 {
                     var hitObject = createObject();
@@ -113,7 +127,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                     beatmap.HitObjects.Add(hitObject);
                 }
 
-                startTime += 700;
+                startTime += spacingAfterGroup;
             }
         }
 

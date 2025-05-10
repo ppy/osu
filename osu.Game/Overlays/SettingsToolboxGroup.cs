@@ -3,14 +3,13 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Caching;
-using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input;
 using osu.Framework.Input.Events;
-using osu.Framework.Layout;
+using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -20,28 +19,42 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    public class SettingsToolboxGroup : Container, IExpandable
+    public partial class SettingsToolboxGroup : Container, IExpandable
     {
+        private readonly string title;
         public const int CONTAINER_WIDTH = 270;
 
         private const float transition_duration = 250;
-        private const int border_thickness = 2;
         private const int header_height = 30;
         private const int corner_radius = 5;
 
-        private const float fade_duration = 800;
-        private const float inactive_alpha = 0.5f;
+        protected override Container<Drawable> Content => content;
 
-        private readonly Cached headerTextVisibilityCache = new Cached();
-
-        private readonly FillFlowContainer content;
-        private readonly IconButton button;
+        private readonly FillFlowContainer content = new FillFlowContainer
+        {
+            Name = @"Content",
+            Origin = Anchor.TopCentre,
+            Anchor = Anchor.TopCentre,
+            Direction = FillDirection.Vertical,
+            RelativeSizeAxes = Axes.X,
+            AutoSizeAxes = Axes.Y,
+            Padding = new MarginPadding { Horizontal = 10, Top = 5, Bottom = 10 },
+            Spacing = new Vector2(0, 15),
+        };
 
         public BindableBool Expanded { get; } = new BindableBool(true);
 
-        private Color4 expandedColour;
+        private OsuSpriteText headerText = null!;
 
-        private readonly OsuSpriteText headerText;
+        private Container headerContent = null!;
+
+        private Box background = null!;
+
+        private IconButton expandButton = null!;
+
+        private InputManager inputManager = null!;
+
+        private Drawable? draggedChild;
 
         /// <summary>
         /// Create a new instance.
@@ -49,20 +62,25 @@ namespace osu.Game.Overlays
         /// <param name="title">The title to be displayed in the header of this group.</param>
         public SettingsToolboxGroup(string title)
         {
+            this.title = title;
+
             AutoSizeAxes = Axes.Y;
             Width = CONTAINER_WIDTH;
             Masking = true;
+        }
+
+        [BackgroundDependencyLoader(true)]
+        private void load(OverlayColourProvider? colourProvider)
+        {
             CornerRadius = corner_radius;
-            BorderColour = Color4.Black;
-            BorderThickness = border_thickness;
 
             InternalChildren = new Drawable[]
             {
-                new Box
+                background = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Black,
-                    Alpha = 0.5f,
+                    Alpha = 0.1f,
+                    Colour = colourProvider?.Background4 ?? Color4.Black,
                 },
                 new FillFlowContainer
                 {
@@ -71,7 +89,7 @@ namespace osu.Game.Overlays
                     AutoSizeAxes = Axes.Y,
                     Children = new Drawable[]
                     {
-                        new Container
+                        headerContent = new Container
                         {
                             Name = @"Header",
                             Origin = Anchor.TopCentre,
@@ -88,7 +106,7 @@ namespace osu.Game.Overlays
                                     Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 17),
                                     Padding = new MarginPadding { Left = 10, Right = 30 },
                                 },
-                                button = new IconButton
+                                expandButton = new IconButton
                                 {
                                     Origin = Anchor.Centre,
                                     Anchor = Anchor.CentreRight,
@@ -99,110 +117,87 @@ namespace osu.Game.Overlays
                                 },
                             }
                         },
-                        content = new FillFlowContainer
-                        {
-                            Name = @"Content",
-                            Origin = Anchor.TopCentre,
-                            Anchor = Anchor.TopCentre,
-                            Direction = FillDirection.Vertical,
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeDuration = transition_duration,
-                            AutoSizeEasing = Easing.OutQuint,
-                            AutoSizeAxes = Axes.Y,
-                            Padding = new MarginPadding(15),
-                            Spacing = new Vector2(0, 15),
-                        }
+                        content
                     }
                 },
             };
         }
 
-        protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
+        protected override void LoadComplete()
         {
-            if (invalidation.HasFlagFast(Invalidation.DrawSize))
-                headerTextVisibilityCache.Invalidate();
+            base.LoadComplete();
 
-            return base.OnInvalidate(invalidation, source);
+            inputManager = GetContainingInputManager()!;
+
+            Expanded.BindValueChanged(_ => updateExpandedState(true));
+            updateExpandedState(false);
+
+            this.Delay(600).Schedule(updateFadeState);
+        }
+
+        protected override bool OnHover(HoverEvent e)
+        {
+            updateFadeState();
+            updateExpandedState(true);
+            return false;
+        }
+
+        protected override void OnHoverLost(HoverLostEvent e)
+        {
+            updateFadeState();
+            updateExpandedState(true);
+            base.OnHoverLost(e);
         }
 
         protected override void Update()
         {
             base.Update();
 
-            if (!headerTextVisibilityCache.IsValid)
-                // These toolbox grouped may be contracted to only show icons.
-                // For now, let's hide the header to avoid text truncation weirdness in such cases.
-                headerText.FadeTo(headerText.DrawWidth < DrawWidth ? 1 : 0, 150, Easing.OutQuint);
-        }
+            // These toolbox grouped may be contracted to only show icons.
+            // For now, let's hide the header to avoid text truncation weirdness in such cases.
+            headerText.Alpha = (float)Interpolation.DampContinuously(headerText.Alpha, headerText.DrawWidth < DrawWidth ? 1 : 0, 40, Time.Elapsed);
 
-        [Resolved(canBeNull: true)]
-        private IExpandingContainer expandingContainer { get; set; }
-
-        private bool expandedByContainer;
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            expandingContainer?.Expanded.BindValueChanged(containerExpanded =>
+            // Dragged child finished its drag operation.
+            if (draggedChild != null && inputManager.DraggedDrawable != draggedChild)
             {
-                if (containerExpanded.NewValue && !Expanded.Value)
-                {
-                    Expanded.Value = true;
-                    expandedByContainer = true;
-                }
-                else if (!containerExpanded.NewValue && expandedByContainer)
-                {
-                    Expanded.Value = false;
-                    expandedByContainer = false;
-                }
+                draggedChild = null;
+                updateExpandedState(true);
+            }
+        }
 
-                updateActiveState();
-            }, true);
-
-            Expanded.BindValueChanged(v =>
+        private void updateExpandedState(bool animate)
+        {
+            // before we collapse down, let's double check the user is not dragging a UI control contained within us.
+            if (inputManager.DraggedDrawable.IsRootedAt(this))
             {
-                // clearing transforms can break autosizing, see: https://github.com/ppy/osu-framework/issues/5064
-                if (v.NewValue != v.OldValue)
-                    content.ClearTransforms();
+                draggedChild = inputManager.DraggedDrawable;
+            }
 
-                if (v.NewValue)
-                    content.AutoSizeAxes = Axes.Y;
-                else
-                {
-                    content.AutoSizeAxes = Axes.None;
-                    content.ResizeHeightTo(0, transition_duration, Easing.OutQuint);
-                }
+            // clearing transforms is necessary to avoid a previous height transform
+            // potentially continuing to get processed while content has changed to autosize.
+            content.ClearTransforms();
 
-                button.FadeColour(Expanded.Value ? expandedColour : Color4.White, 200, Easing.InOutQuint);
-            }, true);
+            if (Expanded.Value || IsHovered || draggedChild != null)
+            {
+                content.AutoSizeAxes = Axes.Y;
+                content.AutoSizeDuration = animate ? transition_duration : 0;
+                content.AutoSizeEasing = Easing.OutQuint;
+            }
+            else
+            {
+                content.AutoSizeAxes = Axes.None;
+                content.ResizeHeightTo(0, animate ? transition_duration : 0, Easing.OutQuint);
+            }
 
-            this.Delay(600).Schedule(updateActiveState);
+            headerContent.FadeColour(Expanded.Value ? Color4.White : OsuColour.Gray(0.7f), 200, Easing.OutQuint);
         }
 
-        protected override bool OnHover(HoverEvent e)
+        private void updateFadeState()
         {
-            updateActiveState();
-            return false;
-        }
+            const float fade_duration = 500;
 
-        protected override void OnHoverLost(HoverLostEvent e)
-        {
-            updateActiveState();
-            base.OnHoverLost(e);
+            background.FadeTo(IsHovered ? 1 : 0.1f, fade_duration, Easing.OutQuint);
+            expandButton.FadeTo(IsHovered ? 1 : 0, fade_duration, Easing.OutQuint);
         }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            expandedColour = colours.Yellow;
-        }
-
-        private void updateActiveState()
-        {
-            this.FadeTo(IsHovered || expandingContainer?.Expanded.Value == true ? 1 : inactive_alpha, fade_duration, Easing.OutQuint);
-        }
-
-        protected override Container<Drawable> Content => content;
     }
 }

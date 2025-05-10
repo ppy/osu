@@ -3,24 +3,26 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Utils;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Catch.Edit.Blueprints.Components;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Screens.Edit;
 using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Rulesets.Catch.Edit.Blueprints
 {
-    public class JuiceStreamSelectionBlueprint : CatchSelectionBlueprint<JuiceStream>
+    public partial class JuiceStreamSelectionBlueprint : CatchSelectionBlueprint<JuiceStream>
     {
         public override Quad SelectionQuad => HitObjectContainer.ToScreenSpace(getBoundingBox().Offset(new Vector2(0, HitObjectContainer.DrawHeight)));
 
@@ -51,9 +53,14 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
 
         private Vector2 rightMouseDownPosition;
 
-        [Resolved(CanBeNull = true)]
-        [CanBeNull]
-        private EditorBeatmap editorBeatmap { get; set; }
+        [Resolved]
+        private EditorBeatmap? editorBeatmap { get; set; }
+
+        [Resolved]
+        private IEditorChangeHandler? changeHandler { get; set; }
+
+        [Resolved]
+        private BindableBeatDivisor? beatDivisor { get; set; }
 
         public JuiceStreamSelectionBlueprint(JuiceStream hitObject)
             : base(hitObject)
@@ -62,7 +69,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
             {
                 scrollingPath = new ScrollingPath(),
                 nestedOutlineContainer = new NestedOutlineContainer(),
-                editablePath = new SelectionEditablePath(positionToDistance)
+                editablePath = new SelectionEditablePath(hitObject, positionToTime)
             };
         }
 
@@ -120,6 +127,20 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
             return base.OnMouseDown(e);
         }
 
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            if (!IsSelected)
+                return false;
+
+            if (e.Key == Key.F && e.ControlPressed && e.ShiftPressed)
+            {
+                convertToStream();
+                return true;
+            }
+
+            return false;
+        }
+
         private void onDefaultsApplied(HitObject _)
         {
             computeObjectBounds();
@@ -145,10 +166,10 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
             return new RectangleF(left, top, right - left, bottom - top).Inflate(objectRadius);
         }
 
-        private double positionToDistance(float relativeYPosition)
+        private double positionToTime(float relativeYPosition)
         {
             double time = HitObjectContainer.TimeAtPosition(relativeYPosition, HitObject.StartTime);
-            return (time - HitObject.StartTime) * HitObject.Velocity;
+            return time - HitObject.StartTime;
         }
 
         private void initializeJuiceStreamPath()
@@ -169,12 +190,64 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
             lastSliderPathVersion = HitObject.Path.Version.Value;
         }
 
+        // duplicated in `SliderSelectionBlueprint.convertToStream()`
+        // consider extracting common helper when applying changes here
+        private void convertToStream()
+        {
+            if (editorBeatmap == null || beatDivisor == null)
+                return;
+
+            var timingPoint = editorBeatmap.ControlPointInfo.TimingPointAt(HitObject.StartTime);
+            double streamSpacing = timingPoint.BeatLength / beatDivisor.Value;
+
+            changeHandler?.BeginChange();
+
+            int i = 0;
+            double time = HitObject.StartTime;
+
+            while (!Precision.DefinitelyBigger(time, HitObject.GetEndTime(), 1))
+            {
+                // positionWithRepeats is a fractional number in the range of [0, HitObject.SpanCount()]
+                // and indicates how many fractional spans of a slider have passed up to time.
+                double positionWithRepeats = (time - HitObject.StartTime) / HitObject.Duration * HitObject.SpanCount();
+                double pathPosition = positionWithRepeats - (int)positionWithRepeats;
+                // every second span is in the reverse direction - need to reverse the path position.
+                if (positionWithRepeats % 2 >= 1)
+                    pathPosition = 1 - pathPosition;
+
+                float fruitXValue = HitObject.OriginalX + HitObject.Path.PositionAt(pathPosition).X;
+
+                editorBeatmap.Add(new Fruit
+                {
+                    StartTime = time,
+                    OriginalX = fruitXValue,
+                    NewCombo = i == 0 && HitObject.NewCombo,
+                    Samples = HitObject.Samples.Select(s => s.With()).ToList()
+                });
+
+                i += 1;
+                time = HitObject.StartTime + i * streamSpacing;
+            }
+
+            editorBeatmap.Remove(HitObject);
+
+            changeHandler?.EndChange();
+        }
+
         private IEnumerable<MenuItem> getContextMenuItems()
         {
             yield return new OsuMenuItem("Add vertex", MenuItemType.Standard, () =>
             {
                 editablePath.AddVertex(rightMouseDownPosition);
-            });
+            })
+            {
+                Hotkey = new Hotkey(new KeyCombination(InputKey.Control, InputKey.MouseLeft))
+            };
+
+            yield return new OsuMenuItem("Convert to stream", MenuItemType.Destructive, convertToStream)
+            {
+                Hotkey = new Hotkey(new KeyCombination(InputKey.Control, InputKey.Shift, InputKey.F))
+            };
         }
 
         protected override void Dispose(bool isDisposing)

@@ -7,18 +7,8 @@ namespace osu.Game.Rulesets.Taiko.Judgements
 {
     public class TaikoDrumRollTickJudgement : TaikoJudgement
     {
-        public override HitResult MaxResult => HitResult.SmallTickHit;
+        public override HitResult MaxResult => HitResult.SmallBonus;
 
-        protected override double HealthIncreaseFor(HitResult result)
-        {
-            switch (result)
-            {
-                case HitResult.SmallTickHit:
-                    return 0.15;
-
-                default:
-                    return 0;
-            }
-        }
+        protected override double HealthIncreaseFor(HitResult result) => 0;
     }
 }

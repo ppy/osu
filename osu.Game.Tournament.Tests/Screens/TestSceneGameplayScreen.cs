@@ -13,10 +13,24 @@ using osu.Game.Tournament.Screens.Gameplay.Components;
 
 namespace osu.Game.Tournament.Tests.Screens
 {
-    public class TestSceneGameplayScreen : TournamentTestScene
+    public partial class TestSceneGameplayScreen : TournamentScreenTestScene
     {
         [Cached]
         private TournamentMatchChatDisplay chat = new TournamentMatchChatDisplay { Width = 0.5f };
+
+        [Test]
+        public void TestWarmup()
+        {
+            createScreen();
+
+            checkScoreVisibility(false);
+
+            toggleWarmup();
+            checkScoreVisibility(true);
+
+            toggleWarmup();
+            checkScoreVisibility(false);
+        }
 
         [Test]
         public void TestStartupState([Values] TourneyState state)
@@ -33,25 +47,11 @@ namespace osu.Game.Tournament.Tests.Screens
             createScreen();
         }
 
-        [Test]
-        public void TestWarmup()
-        {
-            createScreen();
-
-            checkScoreVisibility(false);
-
-            toggleWarmup();
-            checkScoreVisibility(true);
-
-            toggleWarmup();
-            checkScoreVisibility(false);
-        }
-
         private void createScreen()
         {
             AddStep("setup screen", () =>
             {
-                Remove(chat);
+                Remove(chat, false);
 
                 Children = new Drawable[]
                 {

@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -15,7 +15,7 @@ namespace osu.Game.Tournament.Models
     [Serializable]
     public class LadderInfo
     {
-        public Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
+        public Bindable<RulesetInfo?> Ruleset = new Bindable<RulesetInfo?>();
 
         public BindableList<TournamentMatch> Matches = new BindableList<TournamentMatch>();
         public BindableList<TournamentRound> Rounds = new BindableList<TournamentRound>();
@@ -25,7 +25,7 @@ namespace osu.Game.Tournament.Models
         public List<TournamentProgression> Progressions = new List<TournamentProgression>();
 
         [JsonIgnore] // updated manually in TournamentGameBase
-        public Bindable<TournamentMatch> CurrentMatch = new Bindable<TournamentMatch>();
+        public Bindable<TournamentMatch?> CurrentMatch = new Bindable<TournamentMatch?>();
 
         public Bindable<int> ChromaKeyWidth = new BindableInt(1024)
         {
@@ -38,5 +38,11 @@ namespace osu.Game.Tournament.Models
             MinValue = 3,
             MaxValue = 4,
         };
+
+        public Bindable<bool> AutoProgressScreens = new BindableBool(true);
+
+        public Bindable<bool> SplitMapPoolByMods = new BindableBool(true);
+
+        public Bindable<bool> DisplayTeamSeeds = new BindableBool();
     }
 }

@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
@@ -6,9 +6,10 @@ using Humanizer;
 using NUnit.Framework;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.UI;
@@ -20,7 +21,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Editing
 {
-    public class TestSceneHitObjectDifficultyPointAdjustments : EditorTestScene
+    public partial class TestSceneHitObjectDifficultyPointAdjustments : EditorTestScene
     {
         protected override Ruleset CreateEditorRuleset() => new OsuRuleset();
 
@@ -58,12 +59,16 @@ namespace osu.Game.Tests.Visual.Editing
                             new PathControlPoint(new Vector2(100, 0))
                         }
                     },
-                    DifficultyControlPoint = new DifficultyControlPoint
-                    {
-                        SliderVelocity = 2
-                    }
+                    SliderVelocityMultiplier = 2
                 });
             });
+        }
+
+        [Test]
+        public void TestPopoverHasFocus()
+        {
+            clickDifficultyPiece(0);
+            velocityPopoverHasFocus();
         }
 
         [Test]
@@ -86,12 +91,26 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
+        public void TestUndo()
+        {
+            clickDifficultyPiece(1);
+            velocityPopoverHasSingleValue(2);
+
+            setVelocityViaPopover(5);
+            hitObjectHasVelocity(1, 5);
+            dismissPopover();
+
+            AddStep("undo", () => Editor.Undo());
+            hitObjectHasVelocity(1, 2);
+        }
+
+        [Test]
         public void TestMultipleSelectionWithSameSliderVelocity()
         {
             AddStep("unify slider velocity", () =>
             {
-                foreach (var h in EditorBeatmap.HitObjects)
-                    h.DifficultyControlPoint.SliderVelocity = 1.5;
+                foreach (var h in EditorBeatmap.HitObjects.OfType<IHasSliderVelocity>())
+                    h.SliderVelocityMultiplier = 1.5;
             });
 
             AddStep("select both objects", () => EditorBeatmap.SelectedHitObjects.AddRange(EditorBeatmap.HitObjects));
@@ -133,6 +152,15 @@ namespace osu.Game.Tests.Visual.Editing
             InputManager.Click(MouseButton.Left);
         });
 
+        private void velocityPopoverHasFocus() => AddUntilStep("velocity popover textbox focused", () =>
+        {
+            var popover = this.ChildrenOfType<DifficultyPointPiece.DifficultyEditPopover>().SingleOrDefault();
+            var slider = popover?.ChildrenOfType<IndeterminateSliderWithTextBoxInput<double>>().Single();
+            var textbox = slider?.ChildrenOfType<OsuTextBox>().Single();
+
+            return textbox?.HasFocus == true;
+        });
+
         private void velocityPopoverHasSingleValue(double velocity) => AddUntilStep($"velocity popover has {velocity}", () =>
         {
             var popover = this.ChildrenOfType<DifficultyPointPiece.DifficultyEditPopover>().SingleOrDefault();
@@ -151,6 +179,7 @@ namespace osu.Game.Tests.Visual.Editing
 
         private void dismissPopover()
         {
+            AddStep("unfocus textbox", () => InputManager.Key(Key.Escape));
             AddStep("dismiss popover", () => InputManager.Key(Key.Escape));
             AddUntilStep("wait for dismiss", () => !this.ChildrenOfType<DifficultyPointPiece.DifficultyEditPopover>().Any(popover => popover.IsPresent));
         }
@@ -165,7 +194,7 @@ namespace osu.Game.Tests.Visual.Editing
         private void hitObjectHasVelocity(int objectIndex, double velocity) => AddAssert($"{objectIndex.ToOrdinalWords()} has velocity {velocity}", () =>
         {
             var h = EditorBeatmap.HitObjects.ElementAt(objectIndex);
-            return h.DifficultyControlPoint.SliderVelocity == velocity;
+            return h is IHasSliderVelocity hasSliderVelocity && hasSliderVelocity.SliderVelocityMultiplier == velocity;
         });
     }
 }

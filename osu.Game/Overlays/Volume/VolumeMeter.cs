@@ -1,8 +1,11 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Globalization;
+using JetBrains.Annotations;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -15,7 +18,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
@@ -28,13 +30,17 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Volume
 {
-    public class VolumeMeter : Container, IKeyBindingHandler<GlobalAction>, IStateful<SelectionState>
+    public partial class VolumeMeter : Container, IStateful<SelectionState>
     {
         private CircularProgress volumeCircle;
         private CircularProgress volumeCircleGlow;
 
+        protected static readonly Vector2 LABEL_SIZE = new Vector2(120, 20);
+
         public BindableDouble Bindable { get; } = new BindableDouble { MinValue = 0, MaxValue = 1, Precision = 0.01 };
-        private readonly float circleSize;
+
+        protected readonly float CircleSize;
+
         private readonly Color4 meterColour;
         private readonly string name;
 
@@ -47,6 +53,7 @@ namespace osu.Game.Overlays.Volume
         private Sample notchSample;
         private double sampleLastPlaybackTime;
 
+        [CanBeNull]
         public event Action<SelectionState> StateChanged;
 
         private SelectionState state;
@@ -70,7 +77,7 @@ namespace osu.Game.Overlays.Volume
 
         public VolumeMeter(string name, float circleSize, Color4 meterColour)
         {
-            this.circleSize = circleSize;
+            CircleSize = circleSize;
             this.meterColour = meterColour;
             this.name = name;
 
@@ -80,7 +87,7 @@ namespace osu.Game.Overlays.Volume
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, AudioManager audio)
         {
-            hoverSample = audio.Samples.Get($"UI/{HoverSampleSet.Button.GetDescription()}-hover");
+            hoverSample = audio.Samples.Get($@"UI/{HoverSampleSet.Button.GetDescription()}-hover");
             notchSample = audio.Samples.Get(@"UI/notch-tick");
             sampleLastPlaybackTime = Time.Current;
 
@@ -98,7 +105,7 @@ namespace osu.Game.Overlays.Volume
             {
                 new Container
                 {
-                    Size = new Vector2(circleSize),
+                    Size = new Vector2(CircleSize),
                     Children = new Drawable[]
                     {
                         new BufferedContainer
@@ -132,7 +139,7 @@ namespace osu.Game.Overlays.Volume
                                         {
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.Centre,
-                                            Name = "Progress under covers for smoothing",
+                                            Name = @"Progress under covers for smoothing",
                                             RelativeSizeAxes = Axes.Both,
                                             Rotation = 180,
                                             Child = volumeCircle = new CircularProgress
@@ -144,7 +151,7 @@ namespace osu.Game.Overlays.Volume
                                 },
                                 new Circle
                                 {
-                                    Name = "Inner Cover",
+                                    Name = @"Inner Cover",
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
                                     RelativeSizeAxes = Axes.Both,
@@ -153,7 +160,7 @@ namespace osu.Game.Overlays.Volume
                                 },
                                 new Container
                                 {
-                                    Name = "Progress overlay for glow",
+                                    Name = @"Progress overlay for glow",
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
                                     RelativeSizeAxes = Axes.Both,
@@ -196,7 +203,7 @@ namespace osu.Game.Overlays.Volume
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Font = OsuFont.Numeric.With(size: 0.16f * circleSize)
+                            Font = OsuFont.Numeric.With(size: 0.16f * CircleSize)
                         }).WithEffect(new GlowEffect
                         {
                             Colour = Color4.Transparent,
@@ -206,10 +213,10 @@ namespace osu.Game.Overlays.Volume
                 },
                 new Container
                 {
-                    Size = new Vector2(120, 20),
+                    Size = LABEL_SIZE,
                     CornerRadius = 10,
                     Masking = true,
-                    Margin = new MarginPadding { Left = circleSize + 10 },
+                    Margin = new MarginPadding { Left = CircleSize + 10 },
                     Origin = Anchor.CentreLeft,
                     Anchor = Anchor.CentreLeft,
                     Children = new Drawable[]
@@ -232,7 +239,7 @@ namespace osu.Game.Overlays.Volume
 
             Bindable.BindValueChanged(volume => { this.TransformTo(nameof(DisplayVolume), volume.NewValue, 400, Easing.OutQuint); }, true);
 
-            bgProgress.Current.Value = 0.75f;
+            bgProgress.Progress = 0.75f;
         }
 
         private int? displayVolumeInt;
@@ -262,8 +269,8 @@ namespace osu.Game.Overlays.Volume
                     text.Text = intValue.ToString(CultureInfo.CurrentCulture);
                 }
 
-                volumeCircle.Current.Value = displayVolume * 0.75f;
-                volumeCircleGlow.Current.Value = displayVolume * 0.75f;
+                volumeCircle.Progress = displayVolume * 0.75f;
+                volumeCircleGlow.Progress = displayVolume * 0.75f;
 
                 if (intVolumeChanged && IsLoaded)
                     Scheduler.AddOnce(playTickSound);
@@ -312,6 +319,33 @@ namespace osu.Game.Overlays.Volume
 
         private void resetAcceleration() => accelerationModifier = 1;
 
+        private float dragDelta;
+
+        protected override bool OnDragStart(DragStartEvent e)
+        {
+            dragDelta = 0;
+            adjustFromDrag(e.Delta);
+            return true;
+        }
+
+        protected override void OnDrag(DragEvent e)
+        {
+            adjustFromDrag(e.Delta);
+            base.OnDrag(e);
+        }
+
+        private void adjustFromDrag(Vector2 delta)
+        {
+            const float mouse_drag_divisor = 200;
+
+            dragDelta += delta.Y / mouse_drag_divisor;
+
+            if (Math.Abs(dragDelta) < 0.01) return;
+
+            Volume -= dragDelta;
+            dragDelta = 0;
+        }
+
         private void adjust(double delta, bool isPrecise)
         {
             if (delta == 0)
@@ -329,7 +363,7 @@ namespace osu.Game.Overlays.Volume
 
             if (isPrecise)
             {
-                scrollAccumulation += delta * adjust_step * 0.1;
+                scrollAccumulation += delta * adjust_step;
 
                 while (Precision.AlmostBigger(Math.Abs(scrollAccumulation), precision))
                 {
@@ -363,27 +397,6 @@ namespace osu.Game.Overlays.Volume
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-        }
-
-        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
-        {
-            if (!IsHovered)
-                return false;
-
-            switch (e.Action)
-            {
-                case GlobalAction.SelectPrevious:
-                    State = SelectionState.Selected;
-                    adjust(1, false);
-                    return true;
-
-                case GlobalAction.SelectNext:
-                    State = SelectionState.Selected;
-                    adjust(-1, false);
-                    return true;
-            }
-
-            return false;
         }
 
         public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)

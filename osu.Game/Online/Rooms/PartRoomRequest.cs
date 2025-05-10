@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Net.Http;
@@ -23,6 +23,6 @@ namespace osu.Game.Online.Rooms
             return req;
         }
 
-        protected override string Target => $"rooms/{room.RoomID.Value}/users/{User.Id}";
+        protected override string Target => $"rooms/{room.RoomID}/users/{User!.Id}";
     }
 }

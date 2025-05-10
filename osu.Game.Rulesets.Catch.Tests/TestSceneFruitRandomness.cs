@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
@@ -10,7 +10,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Tests
 {
-    public class TestSceneFruitRandomness : OsuTestScene
+    public partial class TestSceneFruitRandomness : OsuTestScene
     {
         private readonly DrawableFruit drawableFruit;
         private readonly DrawableBanana drawableBanana;
@@ -26,6 +26,8 @@ namespace osu.Game.Rulesets.Catch.Tests
             AddSliderStep("start time", 500, 600, 0, x =>
             {
                 drawableFruit.HitObject.StartTime = drawableBanana.HitObject.StartTime = x;
+                drawableFruit.RefreshStateTransforms();
+                drawableBanana.RefreshStateTransforms();
             });
         }
 
@@ -44,6 +46,8 @@ namespace osu.Game.Rulesets.Catch.Tests
             AddStep("Initialize start time", () =>
             {
                 drawableFruit.HitObject.StartTime = drawableBanana.HitObject.StartTime = initial_start_time;
+                drawableFruit.RefreshStateTransforms();
+                drawableBanana.RefreshStateTransforms();
 
                 fruitRotation = drawableFruit.DisplayRotation;
                 bananaRotation = drawableBanana.DisplayRotation;
@@ -54,6 +58,8 @@ namespace osu.Game.Rulesets.Catch.Tests
             AddStep("change start time", () =>
             {
                 drawableFruit.HitObject.StartTime = drawableBanana.HitObject.StartTime = another_start_time;
+                drawableFruit.RefreshStateTransforms();
+                drawableBanana.RefreshStateTransforms();
             });
 
             AddAssert("fruit rotation is changed", () => drawableFruit.DisplayRotation != fruitRotation);
@@ -64,6 +70,8 @@ namespace osu.Game.Rulesets.Catch.Tests
             AddStep("reset start time", () =>
             {
                 drawableFruit.HitObject.StartTime = drawableBanana.HitObject.StartTime = initial_start_time;
+                drawableFruit.RefreshStateTransforms();
+                drawableBanana.RefreshStateTransforms();
             });
 
             AddAssert("rotation and size restored", () =>

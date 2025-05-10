@@ -9,13 +9,15 @@ namespace osu.Game.Rulesets.Taiko.Objects
 {
     public class BarLine : TaikoHitObject, IBarLine
     {
+        private HitObjectProperty<bool> major;
+
+        public Bindable<bool> MajorBindable => major.Bindable;
+
         public bool Major
         {
-            get => MajorBindable.Value;
-            set => MajorBindable.Value = value;
+            get => major.Value;
+            set => major.Value = value;
         }
-
-        public readonly Bindable<bool> MajorBindable = new BindableBool();
 
         public override Judgement CreateJudgement() => new IgnoreJudgement();
     }

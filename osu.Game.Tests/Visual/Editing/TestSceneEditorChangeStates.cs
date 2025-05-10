@@ -1,17 +1,23 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Tests.Visual.Editing
 {
-    public class TestSceneEditorChangeStates : EditorTestScene
+    public partial class TestSceneEditorChangeStates : EditorTestScene
     {
         protected override Ruleset CreateEditorRuleset() => new OsuRuleset();
+
+        protected override IBeatmap CreateBeatmap(RulesetInfo ruleset) => new TestBeatmap(ruleset, false);
 
         [Test]
         public void TestSelectedObjects()

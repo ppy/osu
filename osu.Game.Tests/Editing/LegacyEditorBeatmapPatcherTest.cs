@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.IO;
 using System.Text;
 using NUnit.Framework;
@@ -160,7 +162,7 @@ namespace osu.Game.Tests.Editing
                     {
                         new PathControlPoint(Vector2.Zero),
                         new PathControlPoint(Vector2.One),
-                        new PathControlPoint(new Vector2(2), PathType.Bezier),
+                        new PathControlPoint(new Vector2(2), PathType.BEZIER),
                         new PathControlPoint(new Vector2(3)),
                     }, 50)
                 },
@@ -177,7 +179,7 @@ namespace osu.Game.Tests.Editing
                         StartTime = 2000,
                         Path = new SliderPath(new[]
                         {
-                            new PathControlPoint(Vector2.Zero, PathType.Bezier),
+                            new PathControlPoint(Vector2.Zero, PathType.BEZIER),
                             new PathControlPoint(new Vector2(4)),
                             new PathControlPoint(new Vector2(5)),
                         }, 100)

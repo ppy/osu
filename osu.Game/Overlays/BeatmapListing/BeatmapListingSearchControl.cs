@@ -22,12 +22,12 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.BeatmapListing
 {
-    public class BeatmapListingSearchControl : CompositeDrawable
+    public partial class BeatmapListingSearchControl : CompositeDrawable
     {
         /// <summary>
         /// Any time the text box receives key events (even while masked).
         /// </summary>
-        public Action TypingStarted;
+        public Action? TypingStarted;
 
         public Bindable<string> Query => textBox.Current;
 
@@ -49,7 +49,7 @@ namespace osu.Game.Overlays.BeatmapListing
 
         public Bindable<SearchExplicit> ExplicitContent => explicitContentFilter.Current;
 
-        public APIBeatmapSet BeatmapSet
+        public APIBeatmapSet? BeatmapSet
         {
             set
             {
@@ -65,7 +65,7 @@ namespace osu.Game.Overlays.BeatmapListing
         }
 
         private readonly BeatmapSearchTextBox textBox;
-        private readonly BeatmapSearchMultipleSelectionFilterRow<SearchGeneral> generalFilter;
+        private readonly BeatmapSearchGeneralFilterRow generalFilter;
         private readonly BeatmapSearchRulesetFilterRow modeFilter;
         private readonly BeatmapSearchFilterRow<SearchCategory> categoryFilter;
         private readonly BeatmapSearchFilterRow<SearchGenre> genreFilter;
@@ -105,7 +105,7 @@ namespace osu.Game.Overlays.BeatmapListing
                     Padding = new MarginPadding
                     {
                         Vertical = 20,
-                        Horizontal = 40,
+                        Horizontal = WaveOverlayContainer.HORIZONTAL_PADDING,
                     },
                     Child = new FillFlowContainer
                     {
@@ -126,6 +126,7 @@ namespace osu.Game.Overlays.BeatmapListing
                                 RelativeSizeAxes = Axes.X,
                                 Direction = FillDirection.Vertical,
                                 Padding = new MarginPadding { Horizontal = 10 },
+                                Spacing = new Vector2(5),
                                 Children = new Drawable[]
                                 {
                                     generalFilter = new BeatmapSearchGeneralFilterRow(),
@@ -144,10 +145,11 @@ namespace osu.Game.Overlays.BeatmapListing
                 }
             });
 
+            generalFilter.Current.Add(SearchGeneral.FeaturedArtists);
             categoryFilter.Current.Value = SearchCategory.Leaderboard;
         }
 
-        private IBindable<bool> allowExplicitContent;
+        private IBindable<bool> allowExplicitContent = null!;
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider, OsuConfigManager config)
@@ -161,14 +163,21 @@ namespace osu.Game.Overlays.BeatmapListing
             }, true);
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            generalFilter.Ruleset.BindTo(Ruleset);
+        }
+
         public void TakeFocus() => textBox.TakeFocus();
 
-        private class BeatmapSearchTextBox : BasicSearchTextBox
+        private partial class BeatmapSearchTextBox : BasicSearchTextBox
         {
             /// <summary>
             /// Any time the text box receives key events (even while masked).
             /// </summary>
-            public Action TextChanged;
+            public Action? TextChanged;
 
             protected override Color4 SelectionColour => Color4.Gray;
 
@@ -196,7 +205,7 @@ namespace osu.Game.Overlays.BeatmapListing
             }
         }
 
-        private class TopSearchBeatmapSetCover : UpdateableOnlineBeatmapSetCover
+        private partial class TopSearchBeatmapSetCover : UpdateableOnlineBeatmapSetCover
         {
             protected override bool TransformImmediately => true;
         }

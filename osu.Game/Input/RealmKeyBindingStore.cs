@@ -5,12 +5,12 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Localisation;
 using osu.Game.Database;
 using osu.Game.Input.Bindings;
+using osu.Game.Localisation;
 using osu.Game.Rulesets;
 using Realms;
-
-#nullable enable
 
 namespace osu.Game.Input
 {
@@ -23,6 +23,19 @@ namespace osu.Game.Input
         {
             this.realm = realm;
             this.keyCombinationProvider = keyCombinationProvider;
+        }
+
+        /// <summary>
+        /// For a given <see cref="GlobalAction"/>, return a human-readable string representing the bindings bound to the action.
+        /// </summary>
+        public LocalisableString GetBindingsStringFor(GlobalAction globalAction)
+        {
+            var combinations = GetReadableKeyCombinationsFor(globalAction);
+
+            if (combinations.Count == 0)
+                return ToastStrings.NoKeyBound;
+
+            return string.Join(" / ", combinations);
         }
 
         /// <summary>
@@ -131,6 +144,32 @@ namespace osu.Game.Input
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Clears all <see cref="RealmKeyBinding.KeyCombination"/>s from the provided <paramref name="keyBindings"/>
+        /// which are assigned to more than one binding.
+        /// </summary>
+        /// <param name="keyBindings">The <see cref="RealmKeyBinding"/>s to de-duplicate.</param>
+        /// <returns>Number of bindings cleared.</returns>
+        public static int ClearDuplicateBindings(IEnumerable<IKeyBinding> keyBindings)
+        {
+            int countRemoved = 0;
+
+            var lookup = keyBindings.ToLookup(kb => kb.KeyCombination);
+
+            foreach (var group in lookup)
+            {
+                if (group.Select(kb => kb.Action).Distinct().Count() <= 1)
+                    continue;
+
+                foreach (var binding in group)
+                    binding.KeyCombination = new KeyCombination(InputKey.None);
+
+                countRemoved += group.Count();
+            }
+
+            return countRemoved;
         }
     }
 }

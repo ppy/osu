@@ -1,7 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
+using JetBrains.Annotations;
 using osu.Framework;
 using osuTK;
 using osu.Framework.Allocation;
@@ -17,11 +20,12 @@ using osu.Game.Users;
 namespace osu.Game.Overlays.MedalSplash
 {
     [LongRunningLoad]
-    public class DrawableMedal : Container, IStateful<DisplayState>
+    public partial class DrawableMedal : Container, IStateful<DisplayState>
     {
         private const float scale_when_unlocked = 0.76f;
         private const float scale_when_full = 0.6f;
 
+        [CanBeNull]
         public event Action<DisplayState> StateChanged;
 
         private readonly Medal medal;
@@ -34,7 +38,7 @@ namespace osu.Game.Overlays.MedalSplash
         public DrawableMedal(Medal medal)
         {
             this.medal = medal;
-            Position = new Vector2(0f, MedalOverlay.DISC_SIZE / 2);
+            Position = new Vector2(0f, MedalAnimation.DISC_SIZE / 2);
 
             FillFlowContainer infoFlow;
             Children = new Drawable[]
@@ -103,14 +107,9 @@ namespace osu.Game.Overlays.MedalSplash
                 },
             };
 
-            description.AddText(medal.Description, s =>
-            {
-                s.Anchor = Anchor.TopCentre;
-                s.Origin = Anchor.TopCentre;
-                s.Font = s.Font.With(size: 16);
-            });
+            description.AddText(medal.Description, s => s.Font = s.Font.With(size: 16));
 
-            medalContainer.OnLoadComplete += d =>
+            medalContainer.OnLoadComplete += _ =>
             {
                 unlocked.Position = new Vector2(0f, medalContainer.DrawSize.Y / 2 + 10);
                 infoFlow.Position = new Vector2(0f, unlocked.Position.Y + 90);
@@ -170,7 +169,7 @@ namespace osu.Game.Overlays.MedalSplash
                         .ScaleTo(1);
 
                     this.ScaleTo(scale_when_unlocked, duration, Easing.OutExpo);
-                    this.MoveToY(MedalOverlay.DISC_SIZE / 2 - 30, duration, Easing.OutExpo);
+                    this.MoveToY(MedalAnimation.DISC_SIZE / 2 - 30, duration, Easing.OutExpo);
                     unlocked.FadeInFromZero(duration);
                     break;
 
@@ -180,7 +179,7 @@ namespace osu.Game.Overlays.MedalSplash
                         .ScaleTo(1);
 
                     this.ScaleTo(scale_when_full, duration, Easing.OutExpo);
-                    this.MoveToY(MedalOverlay.DISC_SIZE / 2 - 60, duration, Easing.OutExpo);
+                    this.MoveToY(MedalAnimation.DISC_SIZE / 2 - 60, duration, Easing.OutExpo);
                     unlocked.Show();
                     name.FadeInFromZero(duration + 100);
                     description.FadeInFromZero(duration * 2);

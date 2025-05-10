@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 namespace osu.Game.Utils
 {
     /// <summary>
@@ -24,7 +22,7 @@ namespace osu.Game.Utils
         /// </remarks>
         public readonly bool HasValue;
 
-        private Optional(T value)
+        public Optional(T value)
         {
             Value = value;
             HasValue = true;

@@ -6,9 +6,10 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Dialog
 {
-    public class PopupDialogButton : DialogButton
+    public partial class PopupDialogButton : DialogButton
     {
-        public PopupDialogButton()
+        public PopupDialogButton(HoverSampleSet sampleSet = HoverSampleSet.Button)
+            : base(sampleSet)
         {
             Height = 50;
             BackgroundColour = Color4Extensions.FromHex(@"150e14");

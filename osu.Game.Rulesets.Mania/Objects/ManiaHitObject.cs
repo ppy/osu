@@ -11,19 +11,25 @@ namespace osu.Game.Rulesets.Mania.Objects
 {
     public abstract class ManiaHitObject : HitObject, IHasColumn, IHasXPosition
     {
-        public readonly Bindable<int> ColumnBindable = new Bindable<int>();
+        private HitObjectProperty<int> column;
+
+        public Bindable<int> ColumnBindable => column.Bindable;
 
         public virtual int Column
         {
-            get => ColumnBindable.Value;
-            set => ColumnBindable.Value = value;
+            get => column.Value;
+            set => column.Value = value;
         }
 
         protected override HitWindows CreateHitWindows() => new ManiaHitWindows();
 
         #region LegacyBeatmapEncoder
 
-        float IHasXPosition.X => Column;
+        float IHasXPosition.X
+        {
+            get => Column;
+            set => Column = (int)value;
+        }
 
         #endregion
     }

@@ -19,6 +19,7 @@ namespace osu.Game.Tournament.Models
     {
         public int ID;
 
+        [JsonIgnore]
         public List<string> Acronyms
         {
             get
@@ -31,16 +32,16 @@ namespace osu.Game.Tournament.Models
         }
 
         [JsonIgnore]
-        public readonly Bindable<TournamentTeam> Team1 = new Bindable<TournamentTeam>();
+        public readonly Bindable<TournamentTeam?> Team1 = new Bindable<TournamentTeam?>();
 
-        public string Team1Acronym;
+        public string? Team1Acronym;
 
         public readonly Bindable<int?> Team1Score = new Bindable<int?>();
 
         [JsonIgnore]
-        public readonly Bindable<TournamentTeam> Team2 = new Bindable<TournamentTeam>();
+        public readonly Bindable<TournamentTeam?> Team2 = new Bindable<TournamentTeam?>();
 
-        public string Team2Acronym;
+        public string? Team2Acronym;
 
         public readonly Bindable<int?> Team2Score = new Bindable<int?>();
 
@@ -51,13 +52,13 @@ namespace osu.Game.Tournament.Models
         public readonly ObservableCollection<BeatmapChoice> PicksBans = new ObservableCollection<BeatmapChoice>();
 
         [JsonIgnore]
-        public readonly Bindable<TournamentRound> Round = new Bindable<TournamentRound>();
+        public readonly Bindable<TournamentRound?> Round = new Bindable<TournamentRound?>();
 
         [JsonIgnore]
-        public readonly Bindable<TournamentMatch> Progression = new Bindable<TournamentMatch>();
+        public readonly Bindable<TournamentMatch?> Progression = new Bindable<TournamentMatch?>();
 
         [JsonIgnore]
-        public readonly Bindable<TournamentMatch> LosersProgression = new Bindable<TournamentMatch>();
+        public readonly Bindable<TournamentMatch?> LosersProgression = new Bindable<TournamentMatch?>();
 
         /// <summary>
         /// Should not be set directly. Use LadderInfo.CurrentMatch.Value = this instead.
@@ -77,7 +78,7 @@ namespace osu.Game.Tournament.Models
             Team2.BindValueChanged(t => Team2Acronym = t.NewValue?.Acronym.Value, true);
         }
 
-        public TournamentMatch(TournamentTeam team1 = null, TournamentTeam team2 = null)
+        public TournamentMatch(TournamentTeam? team1 = null, TournamentTeam? team2 = null)
             : this()
         {
             Team1.Value = team1;
@@ -85,10 +86,10 @@ namespace osu.Game.Tournament.Models
         }
 
         [JsonIgnore]
-        public TournamentTeam Winner => !Completed.Value ? null : Team1Score.Value > Team2Score.Value ? Team1.Value : Team2.Value;
+        public TournamentTeam? Winner => !Completed.Value ? null : Team1Score.Value > Team2Score.Value ? Team1.Value : Team2.Value;
 
         [JsonIgnore]
-        public TournamentTeam Loser => !Completed.Value ? null : Team1Score.Value > Team2Score.Value ? Team2.Value : Team1.Value;
+        public TournamentTeam? Loser => !Completed.Value ? null : Team1Score.Value > Team2Score.Value ? Team2.Value : Team1.Value;
 
         public TeamColour WinnerColour => Winner == Team1.Value ? TeamColour.Red : TeamColour.Blue;
 
@@ -104,11 +105,14 @@ namespace osu.Game.Tournament.Models
         }
 
         /// <summary>
-        /// Initialise this match with zeroed scores. Will be a noop if either team is not present.
+        /// Initialise this match with zeroed scores. Will be a noop if either team is not present or if either of the scores are non-zero.
         /// </summary>
         public void StartMatch()
         {
             if (Team1.Value == null || Team2.Value == null)
+                return;
+
+            if (Team1Score.Value > 0 || Team2Score.Value > 0)
                 return;
 
             Team1Score.Value = 0;

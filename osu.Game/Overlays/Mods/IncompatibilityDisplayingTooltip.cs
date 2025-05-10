@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
@@ -15,22 +15,24 @@ using osuTK;
 
 namespace osu.Game.Overlays.Mods
 {
-    internal class IncompatibilityDisplayingTooltip : ModButtonTooltip
+    internal partial class IncompatibilityDisplayingTooltip : ModButtonTooltip
     {
         private readonly OsuSpriteText incompatibleText;
 
         private readonly Bindable<IReadOnlyList<Mod>> incompatibleMods = new Bindable<IReadOnlyList<Mod>>();
 
         [Resolved]
-        private Bindable<RulesetInfo> ruleset { get; set; }
+        private Bindable<RulesetInfo> ruleset { get; set; } = null!;
 
-        public IncompatibilityDisplayingTooltip()
+        public IncompatibilityDisplayingTooltip(OverlayColourProvider colourProvider)
+            : base(colourProvider)
         {
             AddRange(new Drawable[]
             {
                 incompatibleText = new OsuSpriteText
                 {
                     Margin = new MarginPadding { Top = 5 },
+                    Colour = colourProvider.Content2,
                     Font = OsuFont.GetFont(weight: FontWeight.Regular),
                     Text = "Incompatible with:"
                 },
@@ -41,12 +43,6 @@ namespace osu.Game.Overlays.Mods
                     Scale = new Vector2(0.7f)
                 }
             });
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            incompatibleText.Colour = colours.BlueLight;
         }
 
         protected override void UpdateDisplay(Mod mod)

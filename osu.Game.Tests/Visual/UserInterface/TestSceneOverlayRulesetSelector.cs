@@ -16,7 +16,7 @@ using osu.Framework.Allocation;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneOverlayRulesetSelector : OsuTestScene
+    public partial class TestSceneOverlayRulesetSelector : OsuTestScene
     {
         private readonly OverlayRulesetSelector selector;
         private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
@@ -42,7 +42,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             });
         }
 
-        private class ColourProvidedContainer : Container
+        private partial class ColourProvidedContainer : Container
         {
             [Cached]
             private readonly OverlayColourProvider colourProvider;

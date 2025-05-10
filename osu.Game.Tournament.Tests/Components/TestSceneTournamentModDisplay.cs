@@ -9,19 +9,20 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Tournament.Components;
+using osu.Game.Tournament.Models;
 using osuTK;
 
 namespace osu.Game.Tournament.Tests.Components
 {
-    public class TestSceneTournamentModDisplay : TournamentTestScene
+    public partial class TestSceneTournamentModDisplay : TournamentTestScene
     {
         [Resolved]
-        private IAPIProvider api { get; set; }
+        private IAPIProvider api { get; set; } = null!;
 
         [Resolved]
-        private IRulesetStore rulesets { get; set; }
+        private IRulesetStore rulesets { get; set; } = null!;
 
-        private FillFlowContainer<TournamentBeatmapPanel> fillFlow;
+        private FillFlowContainer<TournamentBeatmapPanel> fillFlow = null!;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -42,7 +43,7 @@ namespace osu.Game.Tournament.Tests.Components
 
         private void success(APIBeatmap beatmap)
         {
-            var ruleset = rulesets.GetRuleset(Ladder.Ruleset.Value.OnlineID);
+            var ruleset = rulesets.GetRuleset(Ladder.Ruleset.Value?.OnlineID ?? -1);
 
             if (ruleset == null)
                 return;
@@ -51,7 +52,7 @@ namespace osu.Game.Tournament.Tests.Components
 
             foreach (var mod in mods)
             {
-                fillFlow.Add(new TournamentBeatmapPanel(beatmap, mod.Acronym)
+                fillFlow.Add(new TournamentBeatmapPanel(new TournamentBeatmap(beatmap), mod.Acronym)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre

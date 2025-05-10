@@ -5,13 +5,12 @@ using System.Collections.Generic;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Localisation;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Users;
 
 namespace osu.Game.Overlays.Rankings.Tables
 {
-    public class PerformanceTable : UserBasedTable
+    public partial class PerformanceTable : UserBasedTable
     {
         public PerformanceTable(int page, IReadOnlyList<UserStatistics> rankings)
             : base(page, rankings)
@@ -25,7 +24,7 @@ namespace osu.Game.Overlays.Rankings.Tables
 
         protected override Drawable[] CreateUniqueContent(UserStatistics item) => new Drawable[]
         {
-            new RowText { Text = item.PP?.ToLocalisableString(@"N0") ?? default(LocalisableString), }
+            new RowText { Text = item.PP?.ToLocalisableString(@"N0") ?? default, }
         };
     }
 }

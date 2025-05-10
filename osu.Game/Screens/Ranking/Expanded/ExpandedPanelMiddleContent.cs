@@ -5,12 +5,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
+using osu.Game.Configuration;
+using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -27,7 +31,7 @@ namespace osu.Game.Screens.Ranking.Expanded
     /// <summary>
     /// The content that appears in the middle section of the <see cref="ScorePanel"/>.
     /// </summary>
-    public class ExpandedPanelMiddleContent : CompositeDrawable
+    public partial class ExpandedPanelMiddleContent : CompositeDrawable
     {
         private const float padding = 10;
 
@@ -36,11 +40,10 @@ namespace osu.Game.Screens.Ranking.Expanded
 
         private readonly List<StatisticDisplay> statisticDisplays = new List<StatisticDisplay>();
 
-        private FillFlowContainer starAndModDisplay;
-        private RollingCounter<long> scoreCounter;
+        private RollingCounter<long> scoreCounter = null!;
 
         [Resolved]
-        private ScoreManager scoreManager { get; set; }
+        private ScoreManager scoreManager { get; set; } = null!;
 
         /// <summary>
         /// Creates a new <see cref="ExpandedPanelMiddleContent"/>.
@@ -59,18 +62,23 @@ namespace osu.Game.Screens.Ranking.Expanded
         }
 
         [BackgroundDependencyLoader]
-        private void load(BeatmapDifficultyCache beatmapDifficultyCache)
+        private void load(RealmAccess realmAccess, BeatmapDifficultyCache beatmapDifficultyCache)
         {
-            var beatmap = score.BeatmapInfo;
+            var beatmap = score.BeatmapInfo!;
             var metadata = beatmap.BeatmapSet?.Metadata ?? beatmap.Metadata;
             string creator = metadata.Author.Username;
 
-            int? beatmapMaxCombo = scoreManager.GetMaximumAchievableComboAsync(score).GetResultSafely();
+            StarDifficulty starDifficulty = new StarDifficulty(beatmap.StarRating, 0);
+
+            // In some cases, the beatmap ferried through ScoreInfo actually represents an online beatmap.
+            // If it isn't, we may be able to compute a more accurate difficulty from the ruleset and mods.
+            if (realmAccess.Run(r => r.Find<BeatmapInfo>(score.BeatmapInfo!.ID)) != null)
+                starDifficulty = beatmapDifficultyCache.GetDifficultyAsync(score.BeatmapInfo!, score.Ruleset, score.Mods).GetResultSafely() ?? starDifficulty;
 
             var topStatistics = new List<StatisticDisplay>
             {
                 new AccuracyStatistic(score.Accuracy),
-                new ComboStatistic(score.MaxCombo, beatmapMaxCombo),
+                new ComboStatistic(score.MaxCombo, score.GetMaximumAchievableCombo()),
                 new PerformanceStatistic(score),
             };
 
@@ -98,24 +106,7 @@ namespace osu.Game.Screens.Ranking.Expanded
                         Direction = FillDirection.Vertical,
                         Children = new Drawable[]
                         {
-                            new OsuSpriteText
-                            {
-                                Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre,
-                                Text = new RomanisableString(metadata.TitleUnicode, metadata.Title),
-                                Font = OsuFont.Torus.With(size: 20, weight: FontWeight.SemiBold),
-                                MaxWidth = ScorePanel.EXPANDED_WIDTH - padding * 2,
-                                Truncate = true,
-                            },
-                            new OsuSpriteText
-                            {
-                                Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre,
-                                Text = new RomanisableString(metadata.ArtistUnicode, metadata.Artist),
-                                Font = OsuFont.Torus.With(size: 14, weight: FontWeight.SemiBold),
-                                MaxWidth = ScorePanel.EXPANDED_WIDTH - padding * 2,
-                                Truncate = true,
-                            },
+                            new ClickableMetadata(beatmap.OnlineID, metadata),
                             new Container
                             {
                                 Anchor = Anchor.TopCentre,
@@ -131,19 +122,42 @@ namespace osu.Game.Screens.Ranking.Expanded
                                     FillMode = FillMode.Fit,
                                 }
                             },
-                            scoreCounter = new TotalScoreCounter
+                            scoreCounter = new TotalScoreCounter(!withFlair)
                             {
                                 Margin = new MarginPadding { Top = 0, Bottom = 5 },
                                 Current = { Value = 0 },
                                 Alpha = 0,
                                 AlwaysPresent = true
                             },
-                            starAndModDisplay = new FillFlowContainer
+                            new FillFlowContainer
                             {
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
                                 AutoSizeAxes = Axes.Both,
                                 Spacing = new Vector2(5, 0),
+                                Children = new Drawable[]
+                                {
+                                    new StarRatingDisplay(starDifficulty)
+                                    {
+                                        Anchor = Anchor.CentreLeft,
+                                        Origin = Anchor.CentreLeft
+                                    },
+                                    new DifficultyIcon(beatmap, score.Ruleset)
+                                    {
+                                        Anchor = Anchor.CentreLeft,
+                                        Origin = Anchor.CentreLeft,
+                                        Size = new Vector2(20),
+                                        TooltipType = DifficultyIconTooltipType.Extended,
+                                    },
+                                    new ModDisplay
+                                    {
+                                        Anchor = Anchor.CentreLeft,
+                                        Origin = Anchor.CentreLeft,
+                                        ExpansionMode = ExpansionMode.AlwaysExpanded,
+                                        Scale = new Vector2(0.5f),
+                                        Current = { Value = score.Mods }
+                                    }
+                                }
                             },
                             new FillFlowContainer
                             {
@@ -153,12 +167,13 @@ namespace osu.Game.Screens.Ranking.Expanded
                                 AutoSizeAxes = Axes.Both,
                                 Children = new Drawable[]
                                 {
-                                    new OsuSpriteText
+                                    new TruncatingSpriteText
                                     {
                                         Anchor = Anchor.TopCentre,
                                         Origin = Anchor.TopCentre,
                                         Text = beatmap.DifficultyName,
                                         Font = OsuFont.Torus.With(size: 16, weight: FontWeight.SemiBold),
+                                        MaxWidth = ScorePanel.EXPANDED_WIDTH - padding * 2,
                                     },
                                     new OsuTextFlowContainer(s => s.Font = OsuFont.Torus.With(size: 12))
                                     {
@@ -223,29 +238,6 @@ namespace osu.Game.Screens.Ranking.Expanded
 
             if (score.Date != default)
                 AddInternal(new PlayedOnText(score.Date));
-
-            var starDifficulty = beatmapDifficultyCache.GetDifficultyAsync(beatmap, score.Ruleset, score.Mods).GetResultSafely();
-
-            if (starDifficulty != null)
-            {
-                starAndModDisplay.Add(new StarRatingDisplay(starDifficulty.Value)
-                {
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft
-                });
-            }
-
-            if (score.Mods.Any())
-            {
-                starAndModDisplay.Add(new ModDisplay
-                {
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft,
-                    ExpansionMode = ExpansionMode.AlwaysExpanded,
-                    Scale = new Vector2(0.5f),
-                    Current = { Value = score.Mods }
-                });
-            }
         }
 
         protected override void LoadComplete()
@@ -276,14 +268,79 @@ namespace osu.Game.Screens.Ranking.Expanded
             });
         }
 
-        public class PlayedOnText : OsuSpriteText
+        public partial class PlayedOnText : OsuSpriteText
         {
+            private readonly DateTimeOffset time;
+            private readonly Bindable<bool> prefer24HourTime = new Bindable<bool>();
+
             public PlayedOnText(DateTimeOffset time)
             {
+                this.time = time;
+
                 Anchor = Anchor.BottomCentre;
                 Origin = Anchor.BottomCentre;
                 Font = OsuFont.GetFont(size: 10, weight: FontWeight.SemiBold);
-                Text = $"Played on {time.ToLocalTime():d MMMM yyyy HH:mm}";
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuConfigManager configManager)
+            {
+                configManager.BindWith(OsuSetting.Prefer24HourTime, prefer24HourTime);
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                prefer24HourTime.BindValueChanged(_ => updateDisplay(), true);
+            }
+
+            private void updateDisplay()
+            {
+                Text = LocalisableString.Format("Played on {0}",
+                    time.ToLocalTime().ToLocalisableString(prefer24HourTime.Value ? @"d MMMM yyyy HH:mm" : @"d MMMM yyyy h:mm tt"));
+            }
+        }
+
+        internal partial class ClickableMetadata : OsuHoverContainer
+        {
+            [Resolved]
+            private OsuGame? game { get; set; }
+
+            public ClickableMetadata(int beatmapId, IBeatmapMetadataInfo metadata)
+            {
+                AutoSizeAxes = Axes.Both;
+
+                Anchor = Anchor.TopCentre;
+                Origin = Anchor.TopCentre;
+
+                Child = new FillFlowContainer
+                {
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Vertical,
+                    Children = new Drawable[]
+                    {
+                        new TruncatingSpriteText
+                        {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            Text = new RomanisableString(metadata.TitleUnicode, metadata.Title),
+                            Font = OsuFont.Torus.With(size: 20, weight: FontWeight.SemiBold),
+                            MaxWidth = ScorePanel.EXPANDED_WIDTH - padding * 2,
+                        },
+                        new TruncatingSpriteText
+                        {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            Text = new RomanisableString(metadata.ArtistUnicode, metadata.Artist),
+                            Font = OsuFont.Torus.With(size: 14, weight: FontWeight.SemiBold),
+                            MaxWidth = ScorePanel.EXPANDED_WIDTH - padding * 2,
+                        }
+                    }
+                };
+
+                if (beatmapId > 0)
+                    Action = () => game?.ShowBeatmap(beatmapId);
             }
         }
     }

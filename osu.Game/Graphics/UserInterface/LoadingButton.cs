@@ -10,7 +10,7 @@ using osuTK;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public abstract class LoadingButton : OsuHoverContainer
+    public abstract partial class LoadingButton : OsuHoverContainer
     {
         private bool isLoading;
 
@@ -39,6 +39,7 @@ namespace osu.Game.Graphics.UserInterface
         private readonly LoadingSpinner loading;
 
         protected LoadingButton()
+            : base(HoverSampleSet.Button)
         {
             Add(loading = new LoadingSpinner
             {

@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
@@ -18,7 +18,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Tests.Editor
 {
-    public class TestSceneCatchDistanceSnapGrid : OsuManualInputManagerTestScene
+    public partial class TestSceneCatchDistanceSnapGrid : OsuManualInputManagerTestScene
     {
         private readonly ManualClock manualClock = new ManualClock();
 

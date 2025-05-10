@@ -7,10 +7,13 @@ using osu.Framework.Bindables;
 
 namespace osu.Game.Beatmaps.ControlPoints
 {
-    public class ControlPointGroup : IComparable<ControlPointGroup>
+    public class ControlPointGroup : IComparable<ControlPointGroup>, IEquatable<ControlPointGroup>
     {
-        public event Action<ControlPoint> ItemAdded;
-        public event Action<ControlPoint> ItemRemoved;
+        public event Action<ControlPoint>? ItemAdded;
+        public event Action<ControlPoint>? ItemChanged;
+        public event Action<ControlPoint>? ItemRemoved;
+
+        private void raiseItemChanged(ControlPoint controlPoint) => ItemChanged?.Invoke(controlPoint);
 
         /// <summary>
         /// The time at which the control point takes effect.
@@ -26,7 +29,7 @@ namespace osu.Game.Beatmaps.ControlPoints
             Time = time;
         }
 
-        public int CompareTo(ControlPointGroup other) => Time.CompareTo(other.Time);
+        public int CompareTo(ControlPointGroup? other) => Time.CompareTo(other?.Time);
 
         public void Add(ControlPoint point)
         {
@@ -39,12 +42,32 @@ namespace osu.Game.Beatmaps.ControlPoints
 
             controlPoints.Add(point);
             ItemAdded?.Invoke(point);
+            point.Changed += raiseItemChanged;
         }
 
         public void Remove(ControlPoint point)
         {
             controlPoints.Remove(point);
             ItemRemoved?.Invoke(point);
+            point.Changed -= raiseItemChanged;
+        }
+
+        public sealed override bool Equals(object? obj)
+            => obj is ControlPointGroup otherGroup
+               && Equals(otherGroup);
+
+        public virtual bool Equals(ControlPointGroup? other)
+            => other != null
+               && Time == other.Time
+               && ControlPoints.SequenceEqual(other.ControlPoints);
+
+        public override int GetHashCode()
+        {
+            HashCode hashCode = new HashCode();
+            hashCode.Add(Time);
+            foreach (var point in controlPoints)
+                hashCode.Add(point);
+            return hashCode.ToHashCode();
         }
     }
 }

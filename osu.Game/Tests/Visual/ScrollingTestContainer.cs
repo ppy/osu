@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
@@ -16,7 +18,7 @@ namespace osu.Game.Tests.Visual
     /// A container which provides a <see cref="IScrollingInfo"/> to children.
     /// This should only be used when testing
     /// </summary>
-    public class ScrollingTestContainer : Container
+    public partial class ScrollingTestContainer : Container
     {
         public SortedList<MultiplierControlPoint> ControlPoints => scrollingInfo.Algorithm.ControlPoints;
 
@@ -56,7 +58,7 @@ namespace osu.Game.Tests.Visual
             IBindable<double> IScrollingInfo.TimeRange => TimeRange;
 
             public readonly TestScrollAlgorithm Algorithm = new TestScrollAlgorithm();
-            IScrollAlgorithm IScrollingInfo.Algorithm => Algorithm;
+            IBindable<IScrollAlgorithm> IScrollingInfo.Algorithm => new Bindable<IScrollAlgorithm>(Algorithm);
         }
 
         public class TestScrollAlgorithm : IScrollAlgorithm
@@ -97,8 +99,8 @@ namespace osu.Game.Tests.Visual
             public float GetLength(double startTime, double endTime, double timeRange, float scrollLength)
                 => implementation.GetLength(startTime, endTime, timeRange, scrollLength);
 
-            public float PositionAt(double time, double currentTime, double timeRange, float scrollLength)
-                => implementation.PositionAt(time, currentTime, timeRange, scrollLength);
+            public float PositionAt(double time, double currentTime, double timeRange, float scrollLength, double? originTime = null)
+                => implementation.PositionAt(time, currentTime, timeRange, scrollLength, originTime);
 
             public double TimeAt(float position, double currentTime, double timeRange, float scrollLength)
                 => implementation.TimeAt(position, currentTime, timeRange, scrollLength);

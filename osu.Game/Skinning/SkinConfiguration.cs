@@ -36,7 +36,9 @@ namespace osu.Game.Skinning
             HitCirclePrefix,
             HitCircleOverlap,
             AnimationFramerate,
-            LayeredHitSounds
+            LayeredHitSounds,
+            AllowSliderBallTint,
+            InputOverlayText,
         }
 
         public static List<Color4> DefaultComboColours { get; } = new List<Color4>
@@ -49,7 +51,7 @@ namespace osu.Game.Skinning
 
         public List<Color4> CustomComboColours { get; set; } = new List<Color4>();
 
-        public IReadOnlyList<Color4> ComboColours
+        public IReadOnlyList<Color4>? ComboColours
         {
             get
             {
@@ -62,8 +64,6 @@ namespace osu.Game.Skinning
                 return null;
             }
         }
-
-        void IHasComboColours.AddComboColours(params Color4[] colours) => CustomComboColours.AddRange(colours);
 
         public Dictionary<string, Color4> CustomColours { get; } = new Dictionary<string, Color4>();
 

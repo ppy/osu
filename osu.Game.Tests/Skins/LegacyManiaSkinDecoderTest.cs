@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
@@ -112,6 +112,26 @@ namespace osu.Game.Tests.Skins
 
                 Assert.That(configs.Count, Is.EqualTo(1));
                 Assert.That(configs[0].MinimumColumnWidth, Is.EqualTo(16));
+            }
+        }
+
+        [Test]
+        public void TestParseArrayWithSomeEmptyElements()
+        {
+            var decoder = new LegacyManiaSkinDecoder();
+
+            using (var resStream = TestResources.OpenResource("mania-skin-broken-array.ini"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var configs = decoder.Decode(stream);
+
+                Assert.That(configs.Count, Is.EqualTo(1));
+                Assert.That(configs[0].ColumnLineWidth.Length, Is.EqualTo(5));
+                Assert.That(configs[0].ColumnLineWidth[0], Is.EqualTo(3));
+                Assert.That(configs[0].ColumnLineWidth[1], Is.EqualTo(0)); // malformed entry, should be parsed as zero
+                Assert.That(configs[0].ColumnLineWidth[2], Is.EqualTo(3));
+                Assert.That(configs[0].ColumnLineWidth[3], Is.EqualTo(3));
+                Assert.That(configs[0].ColumnLineWidth[4], Is.EqualTo(3));
             }
         }
     }

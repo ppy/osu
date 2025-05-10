@@ -1,74 +1,85 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
+using System.ComponentModel;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Rooms;
-using osu.Game.Online.Rooms.RoomStatuses;
-using osuTK.Graphics;
+using osu.Game.Localisation;
 
 namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
     /// <summary>
     /// A pill that displays the room's current status.
     /// </summary>
-    public class RoomStatusPill : OnlinePlayComposite
+    public partial class RoomStatusPill : OnlinePlayPill
     {
         [Resolved]
-        private OsuColour colours { get; set; }
+        private OsuColour colours { get; set; } = null!;
 
-        private PillContainer pill;
-        private SpriteText statusText;
+        protected override FontUsage Font => base.Font.With(weight: FontWeight.SemiBold);
 
-        public RoomStatusPill()
+        private readonly Room room;
+
+        public RoomStatusPill(Room room)
         {
-            AutoSizeAxes = Axes.Both;
-        }
-
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            InternalChild = pill = new PillContainer
-            {
-                Child = statusText = new OsuSpriteText
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Font = OsuFont.GetFont(weight: FontWeight.SemiBold, size: 12),
-                    Colour = Color4.Black
-                }
-            };
+            this.room = room;
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            EndDate.BindValueChanged(_ => updateDisplay());
-            Status.BindValueChanged(_ => updateDisplay(), true);
+            TextFlow.Colour = Colour4.Black;
+            Pill.Background.Alpha = 1;
 
+            room.PropertyChanged += onRoomPropertyChanged;
+
+            // Timed update required to track rooms which have hit the end time, see `HasEnded`.
+            Scheduler.AddDelayed(updateDisplay, 1000, true);
+            updateDisplay();
             FinishTransforms(true);
+        }
+
+        private void onRoomPropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case nameof(Room.Status):
+                case nameof(Room.EndDate):
+                case nameof(Room.HasPassword):
+                    updateDisplay();
+                    break;
+            }
         }
 
         private void updateDisplay()
         {
-            RoomStatus status = getDisplayStatus();
+            Pill.Background.FadeColour(colours.ForRoomStatus(room), 100);
 
-            pill.Background.Alpha = 1;
-            pill.Background.FadeColour(status.GetAppropriateColour(colours), 100);
-            statusText.Text = status.Message;
+            if (room.HasEnded)
+                TextFlow.Text = RoomStatusPillStrings.Ended;
+            else
+            {
+                switch (room.Status)
+                {
+                    case RoomStatus.Playing:
+                        TextFlow.Text = RoomStatusPillStrings.Playing;
+                        break;
+
+                    default:
+                        TextFlow.Text = room.HasPassword ? RoomStatusPillStrings.OpenPrivate : RoomStatusPillStrings.Open;
+                        break;
+                }
+            }
         }
 
-        private RoomStatus getDisplayStatus()
+        protected override void Dispose(bool isDisposing)
         {
-            if (EndDate.Value < DateTimeOffset.Now)
-                return new RoomStatusEnded();
-
-            return Status.Value;
+            base.Dispose(isDisposing);
+            room.PropertyChanged -= onRoomPropertyChanged;
         }
     }
 }

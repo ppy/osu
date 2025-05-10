@@ -7,7 +7,7 @@ using osu.Game.Rulesets.Osu.Mods;
 namespace osu.Game.Rulesets.Osu.Tests
 {
     [TestFixture]
-    public class TestSceneHitCircleHidden : TestSceneHitCircle
+    public partial class TestSceneHitCircleHidden : TestSceneHitCircle
     {
         [SetUp]
         public void SetUp() => Schedule(() =>

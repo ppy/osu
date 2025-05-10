@@ -1,55 +1,94 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
+using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Framework.Development;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
+using osu.Framework.Testing;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Cursor;
+using osu.Game.Localisation;
 using osu.Game.Overlays.Settings;
 using osu.Game.Overlays.Settings.Sections;
 using osu.Game.Overlays.Settings.Sections.Input;
 using osuTK.Graphics;
-using System.Collections.Generic;
-using osu.Framework.Bindables;
-using osu.Framework.Localisation;
-using osu.Game.Localisation;
 
 namespace osu.Game.Overlays
 {
-    public class SettingsOverlay : SettingsPanel, INamedOverlayComponent
+    public partial class SettingsOverlay : SettingsPanel, INamedOverlayComponent
     {
-        public string IconTexture => "Icons/Hexacons/settings";
+        public IconUsage Icon => OsuIcon.Settings;
         public LocalisableString Title => SettingsStrings.HeaderTitle;
         public LocalisableString Description => SettingsStrings.HeaderDescription;
 
-        protected override IEnumerable<SettingsSection> CreateSections() => new SettingsSection[]
+        protected override IEnumerable<SettingsSection> CreateSections()
         {
-            // This list should be kept in sync with ScreenBehaviour.
-            new GeneralSection(),
-            new SkinSection(),
-            new InputSection(createSubPanel(new KeyBindingPanel())),
-            new UserInterfaceSection(),
-            new GameplaySection(),
-            new RulesetSection(),
-            new AudioSection(),
-            new GraphicsSection(),
-            new OnlineSection(),
-            new MaintenanceSection(),
-            new DebugSection(),
-        };
+            var sections = new List<SettingsSection>
+            {
+                // This list should be kept in sync with ScreenBehaviour.
+                new GeneralSection(),
+                new SkinSection(),
+                new InputSection(createSubPanel(new KeyBindingPanel())),
+                new UserInterfaceSection(),
+                new GameplaySection(),
+                new RulesetSection(),
+                new AudioSection(),
+                new GraphicsSection(),
+                new OnlineSection(),
+                new MaintenanceSection(),
+            };
+
+            if (DebugUtils.IsDebugBuild)
+                sections.Add(new DebugSection());
+
+            return sections;
+        }
 
         private readonly List<SettingsSubPanel> subPanels = new List<SettingsSubPanel>();
 
         private SettingsSubPanel lastOpenedSubPanel;
 
         protected override Drawable CreateHeader() => new SettingsHeader(Title, Description);
-        protected override Drawable CreateFooter() => new SettingsFooter();
+
+        protected override Drawable CreateFooter() => new OsuContextMenuContainer
+        {
+            RelativeSizeAxes = Axes.X,
+            AutoSizeAxes = Axes.Y,
+            Child = new SettingsFooter()
+        };
 
         public SettingsOverlay()
-            : base(true)
+            : base(false)
         {
         }
 
         public override bool AcceptsFocus => lastOpenedSubPanel == null || lastOpenedSubPanel.State.Value == Visibility.Hidden;
+
+        public void ShowAtControl<T>()
+            where T : Drawable
+        {
+            // if search isn't cleared then the target control won't be visible if it doesn't match the query
+            SearchTextBox.Current.SetDefault();
+
+            Show();
+
+            // wait for load of sections
+            if (!SectionsContainer.Any())
+            {
+                Scheduler.Add(ShowAtControl<T>);
+                return;
+            }
+
+            SectionsContainer.ScrollTo(SectionsContainer.ChildrenOfType<T>().Single());
+        }
 
         private T createSubPanel<T>(T subPanel)
             where T : SettingsSubPanel
@@ -68,16 +107,19 @@ namespace osu.Game.Overlays
             switch (state.NewValue)
             {
                 case Visibility.Visible:
-                    Sidebar?.FadeColour(Color4.DarkGray, 300, Easing.OutQuint);
+                    Sidebar.Expanded.Value = false;
+                    Sidebar.FadeColour(Color4.DarkGray, 300, Easing.OutQuint);
 
                     SectionsContainer.FadeOut(300, Easing.OutQuint);
                     ContentContainer.MoveToX(-PANEL_WIDTH, 500, Easing.OutQuint);
 
                     lastOpenedSubPanel = panel;
+
                     break;
 
                 case Visibility.Hidden:
-                    Sidebar?.FadeColour(Color4.White, 300, Easing.OutQuint);
+                    Sidebar.Expanded.Value = true;
+                    Sidebar.FadeColour(Color4.White, 300, Easing.OutQuint);
 
                     SectionsContainer.FadeIn(500, Easing.OutQuint);
                     ContentContainer.MoveToX(0, 500, Easing.OutQuint);

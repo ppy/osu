@@ -10,10 +10,10 @@ using osu.Game.Screens;
 
 namespace osu.Game.Overlays.Settings.Sections.Maintenance
 {
-    public class StableDirectoryLocationDialog : PopupDialog
+    public partial class StableDirectoryLocationDialog : PopupDialog
     {
         [Resolved]
-        private IPerformFromScreenRunner performer { get; set; }
+        private IPerformFromScreenRunner performer { get; set; } = null!;
 
         public StableDirectoryLocationDialog(TaskCompletionSource<string> taskCompletionSource)
         {

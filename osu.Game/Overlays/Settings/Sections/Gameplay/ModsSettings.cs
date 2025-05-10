@@ -10,11 +10,11 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Gameplay
 {
-    public class ModsSettings : SettingsSubsection
+    public partial class ModsSettings : SettingsSubsection
     {
         protected override LocalisableString Header => GameplaySettingsStrings.ModsHeader;
 
-        public override IEnumerable<string> FilterTerms => base.FilterTerms.Concat(new[] { "mod" });
+        public override IEnumerable<LocalisableString> FilterTerms => base.FilterTerms.Concat(new LocalisableString[] { "mod" });
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
@@ -25,6 +25,7 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 {
                     LabelText = GameplaySettingsStrings.IncreaseFirstObjectVisibility,
                     Current = config.GetBindable<bool>(OsuSetting.IncreaseFirstObjectVisibility),
+                    Keywords = new[] { @"approach", @"circle", @"hidden" },
                 },
             };
         }

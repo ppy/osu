@@ -2,46 +2,56 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Framework.Bindables;
+using System.Collections.Generic;
+using JetBrains.Annotations;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
+using Realms;
 
 namespace osu.Game.Collections
 {
     /// <summary>
     /// A collection of beatmaps grouped by a name.
     /// </summary>
-    public class BeatmapCollection
+    public class BeatmapCollection : RealmObject, IHasGuidPrimaryKey
     {
-        /// <summary>
-        /// Invoked whenever any change occurs on this <see cref="BeatmapCollection"/>.
-        /// </summary>
-        public event Action Changed;
+        [PrimaryKey]
+        public Guid ID { get; set; }
 
         /// <summary>
         /// The collection's name.
         /// </summary>
-        public readonly Bindable<string> Name = new Bindable<string>();
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
-        /// The beatmaps contained by the collection.
+        /// The <see cref="BeatmapInfo.MD5Hash"/>es of beatmaps contained by the collection.
         /// </summary>
-        public readonly BindableList<BeatmapInfo> Beatmaps = new BindableList<BeatmapInfo>();
+        /// <remarks>
+        /// We store as hashes rather than references to <see cref="BeatmapInfo"/>s to allow collections to maintain
+        /// references to beatmaps even if they are removed. This helps with cases like importing collections before
+        /// importing the beatmaps they contain, or when sharing collections between users.
+        ///
+        /// This can probably change in the future as we build the system up.
+        /// </remarks>
+        public IList<string> BeatmapMD5Hashes { get; } = null!;
 
         /// <summary>
         /// The date when this collection was last modified.
         /// </summary>
-        public DateTimeOffset LastModifyDate { get; private set; } = DateTimeOffset.UtcNow;
+        public DateTimeOffset LastModified { get; set; }
 
-        public BeatmapCollection()
+        public BeatmapCollection(string? name = null, IList<string>? beatmapMD5Hashes = null)
         {
-            Beatmaps.CollectionChanged += (_, __) => onChange();
-            Name.ValueChanged += _ => onChange();
+            ID = Guid.NewGuid();
+            Name = name ?? string.Empty;
+            BeatmapMD5Hashes = beatmapMD5Hashes ?? new List<string>();
+
+            LastModified = DateTimeOffset.UtcNow;
         }
 
-        private void onChange()
+        [UsedImplicitly]
+        private BeatmapCollection()
         {
-            LastModifyDate = DateTimeOffset.Now;
-            Changed?.Invoke();
         }
     }
 }

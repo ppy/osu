@@ -3,67 +3,62 @@
 
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Resources.Localisation.Web;
+using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Edit.Setup
 {
-    public class MetadataSection : SetupSection
+    public partial class MetadataSection : SetupSection
     {
-        protected LabelledTextBox ArtistTextBox;
-        protected LabelledTextBox RomanisedArtistTextBox;
+        protected FormTextBox ArtistTextBox = null!;
+        protected FormTextBox RomanisedArtistTextBox = null!;
 
-        protected LabelledTextBox TitleTextBox;
-        protected LabelledTextBox RomanisedTitleTextBox;
+        protected FormTextBox TitleTextBox = null!;
+        protected FormTextBox RomanisedTitleTextBox = null!;
 
-        private LabelledTextBox creatorTextBox;
-        private LabelledTextBox difficultyTextBox;
-        private LabelledTextBox sourceTextBox;
-        private LabelledTextBox tagsTextBox;
+        private FormTextBox creatorTextBox = null!;
+        private FormTextBox difficultyTextBox = null!;
+        private FormTextBox sourceTextBox = null!;
+        private FormTextBox tagsTextBox = null!;
 
-        public override LocalisableString Title => "Metadata";
+        private bool reloading;
+        private bool dirty;
+
+        public override LocalisableString Title => EditorSetupStrings.MetadataHeader;
+
+        [Resolved]
+        private Editor? editor { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(SetupScreen? setupScreen)
         {
-            var metadata = Beatmap.Metadata;
-
             Children = new[]
             {
-                ArtistTextBox = createTextBox<LabelledTextBox>("Artist",
-                    !string.IsNullOrEmpty(metadata.ArtistUnicode) ? metadata.ArtistUnicode : metadata.Artist),
-                RomanisedArtistTextBox = createTextBox<LabelledRomanisedTextBox>("Romanised Artist",
-                    !string.IsNullOrEmpty(metadata.Artist) ? metadata.Artist : MetadataUtils.StripNonRomanisedCharacters(metadata.ArtistUnicode)),
-
-                Empty(),
-
-                TitleTextBox = createTextBox<LabelledTextBox>("Title",
-                    !string.IsNullOrEmpty(metadata.TitleUnicode) ? metadata.TitleUnicode : metadata.Title),
-                RomanisedTitleTextBox = createTextBox<LabelledRomanisedTextBox>("Romanised Title",
-                    !string.IsNullOrEmpty(metadata.Title) ? metadata.Title : MetadataUtils.StripNonRomanisedCharacters(metadata.ArtistUnicode)),
-
-                Empty(),
-
-                creatorTextBox = createTextBox<LabelledTextBox>("Creator", metadata.Author.Username),
-                difficultyTextBox = createTextBox<LabelledTextBox>("Difficulty Name", Beatmap.BeatmapInfo.DifficultyName),
-                sourceTextBox = createTextBox<LabelledTextBox>(BeatmapsetsStrings.ShowInfoSource, metadata.Source),
-                tagsTextBox = createTextBox<LabelledTextBox>(BeatmapsetsStrings.ShowInfoTags, metadata.Tags)
+                ArtistTextBox = createTextBox<FormTextBox>(EditorSetupStrings.Artist),
+                RomanisedArtistTextBox = createTextBox<FormRomanisedTextBox>(EditorSetupStrings.RomanisedArtist),
+                TitleTextBox = createTextBox<FormTextBox>(EditorSetupStrings.Title),
+                RomanisedTitleTextBox = createTextBox<FormRomanisedTextBox>(EditorSetupStrings.RomanisedTitle),
+                creatorTextBox = createTextBox<FormTextBox>(EditorSetupStrings.Creator),
+                difficultyTextBox = createTextBox<FormTextBox>(EditorSetupStrings.DifficultyName),
+                sourceTextBox = createTextBox<FormTextBox>(BeatmapsetsStrings.ShowInfoSource),
+                tagsTextBox = createTextBox<FormTextBox>(BeatmapsetsStrings.ShowInfoMapperTags)
             };
 
-            foreach (var item in Children.OfType<LabelledTextBox>())
-                item.OnCommit += onCommit;
+            if (setupScreen != null)
+                setupScreen.MetadataChanged += reloadMetadata;
+
+            reloadMetadata();
         }
 
-        private TTextBox createTextBox<TTextBox>(LocalisableString label, string initialValue)
-            where TTextBox : LabelledTextBox, new()
+        private TTextBox createTextBox<TTextBox>(LocalisableString label)
+            where TTextBox : FormTextBox, new()
             => new TTextBox
             {
-                Label = label,
-                FixedLabelWidth = LABEL_WIDTH,
-                Current = { Value = initialValue },
+                Caption = label,
                 TabbableContentContainer = this
             };
 
@@ -72,20 +67,35 @@ namespace osu.Game.Screens.Edit.Setup
             base.LoadComplete();
 
             if (string.IsNullOrEmpty(ArtistTextBox.Current.Value))
-                ScheduleAfterChildren(() => GetContainingInputManager().ChangeFocus(ArtistTextBox));
+                ScheduleAfterChildren(() => GetContainingFocusManager()!.ChangeFocus(ArtistTextBox));
 
             ArtistTextBox.Current.BindValueChanged(artist => transferIfRomanised(artist.NewValue, RomanisedArtistTextBox));
             TitleTextBox.Current.BindValueChanged(title => transferIfRomanised(title.NewValue, RomanisedTitleTextBox));
+
+            foreach (var item in Children.OfType<FormTextBox>())
+            {
+                // Apply immediately on any change to ensure that if the user hits Ctrl+S after making a change (without committing)
+                // it will still apply to the beatmap.
+                item.Current.BindValueChanged(_ => applyMetadata());
+                item.OnCommit += (_, newText) =>
+                {
+                    if (newText && dirty)
+                        Beatmap.SaveState();
+                };
+            }
+
+            if (editor != null)
+                editor.Saved += () => dirty = false;
+
             updateReadOnlyState();
         }
 
-        private void transferIfRomanised(string value, LabelledTextBox target)
+        private void transferIfRomanised(string value, FormTextBox target)
         {
             if (MetadataUtils.IsRomanised(value))
                 target.Current.Value = value;
 
             updateReadOnlyState();
-            updateMetadata();
         }
 
         private void updateReadOnlyState()
@@ -94,27 +104,60 @@ namespace osu.Game.Screens.Edit.Setup
             RomanisedTitleTextBox.ReadOnly = MetadataUtils.IsRomanised(TitleTextBox.Current.Value);
         }
 
-        private void onCommit(TextBox sender, bool newText)
+        private void reloadMetadata()
         {
-            if (!newText) return;
+            reloading = true;
 
-            // for now, update on commit rather than making BeatmapMetadata bindables.
-            // after switching database engines we can reconsider if switching to bindables is a good direction.
-            updateMetadata();
+            var metadata = Beatmap.Metadata;
+
+            RomanisedArtistTextBox.ReadOnly = false;
+            RomanisedTitleTextBox.ReadOnly = false;
+
+            ArtistTextBox.Current.Value = !string.IsNullOrEmpty(metadata.ArtistUnicode) ? metadata.ArtistUnicode : metadata.Artist;
+            RomanisedArtistTextBox.Current.Value = !string.IsNullOrEmpty(metadata.Artist) ? metadata.Artist : MetadataUtils.StripNonRomanisedCharacters(metadata.ArtistUnicode);
+            TitleTextBox.Current.Value = !string.IsNullOrEmpty(metadata.TitleUnicode) ? metadata.TitleUnicode : metadata.Title;
+            RomanisedTitleTextBox.Current.Value = !string.IsNullOrEmpty(metadata.Title) ? metadata.Title : MetadataUtils.StripNonRomanisedCharacters(metadata.ArtistUnicode);
+            creatorTextBox.Current.Value = metadata.Author.Username;
+            difficultyTextBox.Current.Value = Beatmap.BeatmapInfo.DifficultyName;
+            sourceTextBox.Current.Value = metadata.Source;
+            tagsTextBox.Current.Value = metadata.Tags;
+
+            updateReadOnlyState();
+
+            reloading = false;
         }
 
-        private void updateMetadata()
+        private void applyMetadata()
         {
+            if (reloading)
+                return;
+
             Beatmap.Metadata.ArtistUnicode = ArtistTextBox.Current.Value;
             Beatmap.Metadata.Artist = RomanisedArtistTextBox.Current.Value;
-
             Beatmap.Metadata.TitleUnicode = TitleTextBox.Current.Value;
             Beatmap.Metadata.Title = RomanisedTitleTextBox.Current.Value;
-
             Beatmap.Metadata.Author.Username = creatorTextBox.Current.Value;
             Beatmap.BeatmapInfo.DifficultyName = difficultyTextBox.Current.Value;
             Beatmap.Metadata.Source = sourceTextBox.Current.Value;
             Beatmap.Metadata.Tags = tagsTextBox.Current.Value;
+
+            dirty = true;
+        }
+
+        private partial class FormRomanisedTextBox : FormTextBox
+        {
+            internal override InnerTextBox CreateTextBox() => new RomanisedTextBox();
+
+            private partial class RomanisedTextBox : InnerTextBox
+            {
+                public RomanisedTextBox()
+                {
+                    InputProperties = new TextInputProperties(TextInputType.Text, false);
+                }
+
+                protected override bool CanAddCharacter(char character)
+                    => MetadataUtils.IsRomanised(character);
+            }
         }
     }
 }

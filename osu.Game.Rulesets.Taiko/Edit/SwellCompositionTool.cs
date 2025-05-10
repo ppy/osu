@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
@@ -10,7 +10,7 @@ using osu.Game.Rulesets.Taiko.Objects;
 
 namespace osu.Game.Rulesets.Taiko.Edit
 {
-    public class SwellCompositionTool : HitObjectCompositionTool
+    public class SwellCompositionTool : CompositionTool
     {
         public SwellCompositionTool()
             : base(nameof(Swell))
@@ -19,6 +19,6 @@ namespace osu.Game.Rulesets.Taiko.Edit
 
         public override Drawable CreateIcon() => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Spinners);
 
-        public override PlacementBlueprint CreatePlacementBlueprint() => new SwellPlacementBlueprint();
+        public override HitObjectPlacementBlueprint CreatePlacementBlueprint() => new SwellPlacementBlueprint();
     }
 }

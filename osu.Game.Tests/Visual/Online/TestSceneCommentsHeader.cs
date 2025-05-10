@@ -10,7 +10,7 @@ using osu.Game.Overlays.Comments;
 namespace osu.Game.Tests.Visual.Online
 {
     [TestFixture]
-    public class TestSceneCommentsHeader : OsuTestScene
+    public partial class TestSceneCommentsHeader : OsuTestScene
     {
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);

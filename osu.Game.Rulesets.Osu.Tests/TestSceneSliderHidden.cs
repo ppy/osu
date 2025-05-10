@@ -7,7 +7,7 @@ using osu.Game.Rulesets.Osu.Mods;
 namespace osu.Game.Rulesets.Osu.Tests
 {
     [TestFixture]
-    public class TestSceneSliderHidden : TestSceneSlider
+    public partial class TestSceneSliderHidden : TestSceneSlider
     {
         [SetUp]
         public void SetUp() => Schedule(() =>

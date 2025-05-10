@@ -10,11 +10,11 @@ using osuTK;
 
 namespace osu.Game.Tournament.Screens.Gameplay.Components
 {
-    public class MatchHeader : Container
+    public partial class MatchHeader : Container
     {
-        private TeamScoreDisplay teamDisplay1;
-        private TeamScoreDisplay teamDisplay2;
-        private DrawableTournamentHeaderLogo logo;
+        private TeamScoreDisplay teamDisplay1 = null!;
+        private TeamScoreDisplay teamDisplay2 = null!;
+        private DrawableTournamentHeaderLogo logo = null!;
 
         private bool showScores = true;
 

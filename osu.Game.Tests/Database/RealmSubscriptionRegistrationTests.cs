@@ -1,13 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
@@ -45,7 +41,7 @@ namespace osu.Game.Tests.Database
                 Assert.That(lastChanges?.ModifiedIndices, Is.Empty);
                 Assert.That(lastChanges?.NewModifiedIndices, Is.Empty);
 
-                realm.Write(r => r.All<BeatmapSetInfo>().First().Beatmaps.First().CountdownOffset = 5);
+                realm.Write(r => r.All<BeatmapSetInfo>().First().Beatmaps.First().EditorTimestamp = 5);
                 realm.Run(r => r.Refresh());
 
                 Assert.That(collectionChanges, Is.EqualTo(1));
@@ -57,7 +53,7 @@ namespace osu.Game.Tests.Database
                 registration.Dispose();
             });
 
-            void onChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet? changes, Exception error)
+            void onChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet? changes)
             {
                 lastChanges = changes;
 
@@ -76,6 +72,35 @@ namespace osu.Game.Tests.Database
         }
 
         [Test]
+        public void TestSubscriptionInitialChangeSetNull()
+        {
+            ChangeSet? firstChanges = null;
+            int receivedChangesCount = 0;
+
+            RunTestWithRealm((realm, _) =>
+            {
+                var registration = realm.RegisterForNotifications(r => r.All<BeatmapSetInfo>(), onChanged);
+
+                realm.WriteAsync(r => r.Add(TestResources.CreateTestBeatmapSetInfo())).WaitSafely();
+
+                realm.Run(r => r.Refresh());
+
+                Assert.That(receivedChangesCount, Is.EqualTo(1));
+                Assert.That(firstChanges, Is.Null);
+
+                registration.Dispose();
+            });
+
+            void onChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet? changes)
+            {
+                if (receivedChangesCount == 0)
+                    firstChanges = changes;
+
+                receivedChangesCount++;
+            }
+        }
+
+        [Test]
         public void TestSubscriptionWithAsyncWrite()
         {
             ChangeSet? lastChanges = null;
@@ -86,11 +111,7 @@ namespace osu.Game.Tests.Database
 
                 realm.Run(r => r.Refresh());
 
-                // Without forcing the write onto its own thread, realm will internally run the operation synchronously, which can cause a deadlock with `WaitSafely`.
-                Task.Run(async () =>
-                {
-                    await realm.WriteAsync(r => r.Add(TestResources.CreateTestBeatmapSetInfo()));
-                }).WaitSafely();
+                realm.WriteAsync(r => r.Add(TestResources.CreateTestBeatmapSetInfo())).WaitSafely();
 
                 realm.Run(r => r.Refresh());
 
@@ -99,7 +120,7 @@ namespace osu.Game.Tests.Database
                 registration.Dispose();
             });
 
-            void onChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet? changes, Exception error) => lastChanges = changes;
+            void onChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet? changes) => lastChanges = changes;
         }
 
         [Test]
@@ -143,7 +164,7 @@ namespace osu.Game.Tests.Database
                 resolvedItems = null;
                 lastChanges = null;
 
-                using (realm.BlockAllOperations())
+                using (realm.BlockAllOperations("testing"))
                     Assert.That(resolvedItems, Is.Empty);
 
                 realm.Write(r => r.Add(TestResources.CreateTestBeatmapSetInfo()));
@@ -161,7 +182,7 @@ namespace osu.Game.Tests.Database
                 testEventsArriving(false);
 
                 // And make sure even after another context loss we don't get firings.
-                using (realm.BlockAllOperations())
+                using (realm.BlockAllOperations("testing"))
                     Assert.That(resolvedItems, Is.Null);
 
                 realm.Write(r => r.Add(TestResources.CreateTestBeatmapSetInfo()));
@@ -192,7 +213,7 @@ namespace osu.Game.Tests.Database
                 }
             });
 
-            void onChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet? changes, Exception error)
+            void onChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet? changes)
             {
                 if (changes == null)
                     resolvedItems = sender;
@@ -219,7 +240,7 @@ namespace osu.Game.Tests.Database
 
                 Assert.That(beatmapSetInfo, Is.Not.Null);
 
-                using (realm.BlockAllOperations())
+                using (realm.BlockAllOperations("testing"))
                 {
                     // custom disposal action fired when context lost.
                     Assert.That(beatmapSetInfo, Is.Null);
@@ -233,7 +254,7 @@ namespace osu.Game.Tests.Database
 
                 Assert.That(beatmapSetInfo, Is.Null);
 
-                using (realm.BlockAllOperations())
+                using (realm.BlockAllOperations("testing"))
                     Assert.That(beatmapSetInfo, Is.Null);
 
                 realm.Run(r => r.Refresh());
@@ -258,7 +279,7 @@ namespace osu.Game.Tests.Database
                 Assert.That(receivedValue, Is.Not.Null);
                 receivedValue = null;
 
-                using (realm.BlockAllOperations())
+                using (realm.BlockAllOperations("testing"))
                 {
                 }
 
@@ -269,7 +290,7 @@ namespace osu.Game.Tests.Database
                 subscription.Dispose();
                 receivedValue = null;
 
-                using (realm.BlockAllOperations())
+                using (realm.BlockAllOperations("testing"))
                     Assert.That(receivedValue, Is.Null);
 
                 realm.Run(r => r.Refresh());

@@ -20,6 +20,11 @@ namespace osu.Game.Localisation
         public static LocalisableString GlobalKeyBindingHeader => new TranslatableString(getKey(@"global_key_binding_header"), @"Global");
 
         /// <summary>
+        /// "Overlays"
+        /// </summary>
+        public static LocalisableString OverlaysSection => new TranslatableString(getKey(@"overlays_section"), @"Overlays");
+
+        /// <summary>
         /// "Song Select"
         /// </summary>
         public static LocalisableString SongSelectSection => new TranslatableString(getKey(@"song_select_section"), @"Song Select");
@@ -30,6 +35,11 @@ namespace osu.Game.Localisation
         public static LocalisableString InGameSection => new TranslatableString(getKey(@"in_game_section"), @"In Game");
 
         /// <summary>
+        /// "Replay"
+        /// </summary>
+        public static LocalisableString ReplaySection => new TranslatableString(getKey(@"replay_section"), @"Replay");
+
+        /// <summary>
         /// "Audio"
         /// </summary>
         public static LocalisableString AudioSection => new TranslatableString(getKey(@"audio_section"), @"Audio");
@@ -38,6 +48,11 @@ namespace osu.Game.Localisation
         /// "Editor"
         /// </summary>
         public static LocalisableString EditorSection => new TranslatableString(getKey(@"editor_section"), @"Editor");
+
+        /// <summary>
+        /// "Editor: Test play"
+        /// </summary>
+        public static LocalisableString EditorTestPlaySection => new TranslatableString(getKey(@"editor_test_play_section"), @"Editor: Test play");
 
         /// <summary>
         /// "Reset all bindings in section"
@@ -53,6 +68,26 @@ namespace osu.Game.Localisation
         /// "Customise your keys!"
         /// </summary>
         public static LocalisableString KeyBindingPanelDescription => new TranslatableString(getKey(@"key_binding_panel_description"), @"Customise your keys!");
+
+        /// <summary>
+        /// "The binding you&#39;ve selected conflicts with another existing binding."
+        /// </summary>
+        public static LocalisableString KeyBindingConflictDetected => new TranslatableString(getKey(@"key_binding_conflict_detected"), @"The binding you've selected conflicts with another existing binding.");
+
+        /// <summary>
+        /// "Keep existing"
+        /// </summary>
+        public static LocalisableString KeepExistingBinding => new TranslatableString(getKey(@"keep_existing_binding"), @"Keep existing");
+
+        /// <summary>
+        /// "Apply new"
+        /// </summary>
+        public static LocalisableString ApplyNewBinding => new TranslatableString(getKey(@"apply_new_binding"), @"Apply new");
+
+        /// <summary>
+        /// "(none)"
+        /// </summary>
+        public static LocalisableString ActionHasNoKeyBinding => new TranslatableString(getKey(@"action_has_no_key_binding"), @"(none)");
 
         private static string getKey(string key) => $"{prefix}:{key}";
     }

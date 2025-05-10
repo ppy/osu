@@ -15,15 +15,15 @@ using osuTK.Graphics;
 
 namespace osu.Game.Users
 {
-    public class UserCoverBackground : ModelBackedDrawable<APIUser>
+    public partial class UserCoverBackground : ModelBackedDrawable<APIUser?>
     {
-        public APIUser User
+        public APIUser? User
         {
             get => Model;
             set => Model = value;
         }
 
-        protected override Drawable CreateDrawable(APIUser user) => new Cover(user);
+        protected override Drawable CreateDrawable(APIUser? user) => new Cover(user);
 
         protected override double LoadDelay => 300;
 
@@ -33,14 +33,17 @@ namespace osu.Game.Users
         protected virtual double UnloadDelay => 5000;
 
         protected override DelayedLoadWrapper CreateDelayedLoadWrapper(Func<Drawable> createContentFunc, double timeBeforeLoad)
-            => new DelayedLoadUnloadWrapper(createContentFunc, timeBeforeLoad, UnloadDelay);
+            => new DelayedLoadUnloadWrapper(createContentFunc, timeBeforeLoad, UnloadDelay)
+            {
+                RelativeSizeAxes = Axes.Both,
+            };
 
         [LongRunningLoad]
-        private class Cover : CompositeDrawable
+        private partial class Cover : CompositeDrawable
         {
-            private readonly APIUser user;
+            private readonly APIUser? user;
 
-            public Cover(APIUser user)
+            public Cover(APIUser? user)
             {
                 this.user = user;
 

@@ -6,11 +6,10 @@ using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
-using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Edit.Blueprints
 {
-    public class CatchPlacementBlueprint<THitObject> : PlacementBlueprint
+    public abstract partial class CatchPlacementBlueprint<THitObject> : HitObjectPlacementBlueprint
         where THitObject : CatchHitObject, new()
     {
         protected new THitObject HitObject => (THitObject)base.HitObject;
@@ -18,13 +17,14 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
         protected ScrollingHitObjectContainer HitObjectContainer => (ScrollingHitObjectContainer)playfield.HitObjectContainer;
 
         [Resolved]
-        private Playfield playfield { get; set; }
+        private Playfield playfield { get; set; } = null!;
 
-        public CatchPlacementBlueprint()
+        [Resolved]
+        protected CatchHitObjectComposer? Composer { get; private set; }
+
+        protected CatchPlacementBlueprint()
             : base(new THitObject())
         {
         }
-
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
     }
 }

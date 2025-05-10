@@ -2,24 +2,29 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Objects;
-using osuTK;
-using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Legacy;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Scoring;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects
 {
-    public abstract class OsuHitObject : HitObject, IHasComboInformation, IHasPosition
+    public abstract class OsuHitObject : HitObject, IHasComboInformation, IHasPosition, IHasTimePreempt
     {
         /// <summary>
         /// The radius of hit objects (ie. the radius of a <see cref="HitCircle"/>).
         /// </summary>
         public const float OBJECT_RADIUS = 64;
+
+        /// <summary>
+        /// The width and height any element participating in display of a hitcircle (or similarly sized object) should be.
+        /// </summary>
+        public static readonly Vector2 OBJECT_DIMENSIONS = new Vector2(OBJECT_RADIUS * 2);
 
         /// <summary>
         /// Scoring distance with a speed-adjusted beat length of 1 second (ie. the speed slider balls move through their track).
@@ -31,19 +36,40 @@ namespace osu.Game.Rulesets.Osu.Objects
         /// </summary>
         public const double PREEMPT_MIN = 450;
 
-        public double TimePreempt = 600;
+        /// <summary>
+        /// Median preempt time at AR=5.
+        /// </summary>
+        public const double PREEMPT_MID = 1200;
+
+        /// <summary>
+        /// Maximum preempt time at AR=0.
+        /// </summary>
+        public const double PREEMPT_MAX = 1800;
+
+        public double TimePreempt { get; set; } = 600;
         public double TimeFadeIn = 400;
 
-        public readonly Bindable<Vector2> PositionBindable = new Bindable<Vector2>();
+        private HitObjectProperty<Vector2> position;
+
+        public Bindable<Vector2> PositionBindable => position.Bindable;
 
         public virtual Vector2 Position
         {
-            get => PositionBindable.Value;
-            set => PositionBindable.Value = value;
+            get => position.Value;
+            set => position.Value = value;
         }
 
-        public float X => Position.X;
-        public float Y => Position.Y;
+        public float X
+        {
+            get => Position.X;
+            set => Position = new Vector2(value, Position.Y);
+        }
+
+        public float Y
+        {
+            get => Position.Y;
+            set => Position = new Vector2(Position.X, value);
+        }
 
         public Vector2 StackedPosition => Position + StackOffset;
 
@@ -51,74 +77,91 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public Vector2 StackedEndPosition => EndPosition + StackOffset;
 
-        public readonly Bindable<int> StackHeightBindable = new Bindable<int>();
+        private HitObjectProperty<int> stackHeight;
+
+        public Bindable<int> StackHeightBindable => stackHeight.Bindable;
 
         public int StackHeight
         {
-            get => StackHeightBindable.Value;
-            set => StackHeightBindable.Value = value;
+            get => stackHeight.Value;
+            set => stackHeight.Value = value;
         }
 
         public virtual Vector2 StackOffset => new Vector2(StackHeight * Scale * -6.4f);
 
         public double Radius => OBJECT_RADIUS * Scale;
 
-        public readonly Bindable<float> ScaleBindable = new BindableFloat(1);
+        private HitObjectProperty<float> scale = new HitObjectProperty<float>(1);
+
+        public Bindable<float> ScaleBindable => scale.Bindable;
 
         public float Scale
         {
-            get => ScaleBindable.Value;
-            set => ScaleBindable.Value = value;
+            get => scale.Value;
+            set => scale.Value = value;
         }
 
         public virtual bool NewCombo { get; set; }
 
-        public readonly Bindable<int> ComboOffsetBindable = new Bindable<int>();
+        private HitObjectProperty<int> comboOffset;
+
+        public Bindable<int> ComboOffsetBindable => comboOffset.Bindable;
 
         public int ComboOffset
         {
-            get => ComboOffsetBindable.Value;
-            set => ComboOffsetBindable.Value = value;
+            get => comboOffset.Value;
+            set => comboOffset.Value = value;
         }
 
-        public Bindable<int> IndexInCurrentComboBindable { get; } = new Bindable<int>();
+        private HitObjectProperty<int> indexInCurrentCombo;
+
+        public Bindable<int> IndexInCurrentComboBindable => indexInCurrentCombo.Bindable;
 
         public virtual int IndexInCurrentCombo
         {
-            get => IndexInCurrentComboBindable.Value;
-            set => IndexInCurrentComboBindable.Value = value;
+            get => indexInCurrentCombo.Value;
+            set => indexInCurrentCombo.Value = value;
         }
 
-        public Bindable<int> ComboIndexBindable { get; } = new Bindable<int>();
+        private HitObjectProperty<int> comboIndex;
+
+        public Bindable<int> ComboIndexBindable => comboIndex.Bindable;
 
         public virtual int ComboIndex
         {
-            get => ComboIndexBindable.Value;
-            set => ComboIndexBindable.Value = value;
+            get => comboIndex.Value;
+            set => comboIndex.Value = value;
         }
 
-        public Bindable<int> ComboIndexWithOffsetsBindable { get; } = new Bindable<int>();
+        private HitObjectProperty<int> comboIndexWithOffsets;
+
+        public Bindable<int> ComboIndexWithOffsetsBindable => comboIndexWithOffsets.Bindable;
 
         public int ComboIndexWithOffsets
         {
-            get => ComboIndexWithOffsetsBindable.Value;
-            set => ComboIndexWithOffsetsBindable.Value = value;
+            get => comboIndexWithOffsets.Value;
+            set => comboIndexWithOffsets.Value = value;
         }
 
-        public Bindable<bool> LastInComboBindable { get; } = new Bindable<bool>();
+        private HitObjectProperty<bool> lastInCombo;
+
+        public Bindable<bool> LastInComboBindable => lastInCombo.Bindable;
 
         public bool LastInCombo
         {
-            get => LastInComboBindable.Value;
-            set => LastInComboBindable.Value = value;
+            get => lastInCombo.Value;
+            set => lastInCombo.Value = value;
         }
 
         protected OsuHitObject()
         {
             StackHeightBindable.BindValueChanged(height =>
             {
-                foreach (var nested in NestedHitObjects.OfType<OsuHitObject>())
-                    nested.StackHeight = height.NewValue;
+                foreach (var nested in NestedHitObjects)
+                {
+                    if (nested is OsuHitObject osuHitObject)
+                        osuHitObject.StackHeight = height.NewValue;
+                }
             });
         }
 
@@ -126,7 +169,7 @@ namespace osu.Game.Rulesets.Osu.Objects
         {
             base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
-            TimePreempt = (float)IBeatmapDifficultyInfo.DifficultyRange(difficulty.ApproachRate, 1800, 1200, PREEMPT_MIN);
+            TimePreempt = (float)IBeatmapDifficultyInfo.DifficultyRange(difficulty.ApproachRate, PREEMPT_MAX, PREEMPT_MID, PREEMPT_MIN);
 
             // Preempt time can go below 450ms. Normally, this is achieved via the DT mod which uniformly speeds up all animations game wide regardless of AR.
             // This uniform speedup is hard to match 1:1, however we can at least make AR>10 (via mods) feel good by extending the upper linear function above.
@@ -134,7 +177,33 @@ namespace osu.Game.Rulesets.Osu.Objects
             // This adjustment is necessary for AR>10, otherwise TimePreempt can become smaller leading to hitcircles not fully fading in.
             TimeFadeIn = 400 * Math.Min(1, TimePreempt / PREEMPT_MIN);
 
-            Scale = (1.0f - 0.7f * (difficulty.CircleSize - 5) / 5) / 2;
+            Scale = LegacyRulesetExtensions.CalculateScaleFromCircleSize(difficulty.CircleSize, true);
+        }
+
+        public void UpdateComboInformation(IHasComboInformation? lastObj)
+        {
+            // Note that this implementation is shared with the osu!catch ruleset's implementation.
+            // If a change is made here, CatchHitObject.cs should also be updated.
+            int index = lastObj?.ComboIndex ?? 0;
+            int indexWithOffsets = lastObj?.ComboIndexWithOffsets ?? 0;
+            int inCurrentCombo = (lastObj?.IndexInCurrentCombo + 1) ?? 0;
+
+            // - For the purpose of combo colours, spinners never start a new combo even if they are flagged as doing so.
+            // - At decode time, the first hitobject in the beatmap and the first hitobject after a spinner are both enforced to be a new combo,
+            //   but this isn't directly enforced by the editor so the extra checks against the last hitobject are duplicated here.
+            if (this is not Spinner && (NewCombo || lastObj == null || lastObj is Spinner))
+            {
+                inCurrentCombo = 0;
+                index++;
+                indexWithOffsets += ComboOffset + 1;
+
+                if (lastObj != null)
+                    lastObj.LastInCombo = true;
+            }
+
+            ComboIndex = index;
+            ComboIndexWithOffsets = indexWithOffsets;
+            IndexInCurrentCombo = inCurrentCombo;
         }
 
         protected override HitWindows CreateHitWindows() => new OsuHitWindows();

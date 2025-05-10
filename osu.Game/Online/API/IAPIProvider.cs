@@ -1,13 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using System.Threading.Tasks;
 using osu.Framework.Bindables;
+using osu.Game.Localisation;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Users;
+using osu.Game.Online.Chat;
+using osu.Game.Online.Notifications.WebSocket;
 
 namespace osu.Game.Online.API
 {
@@ -15,26 +15,34 @@ namespace osu.Game.Online.API
     {
         /// <summary>
         /// The local user.
-        /// This is not thread-safe and should be scheduled locally if consumed from a drawable component.
         /// </summary>
         IBindable<APIUser> LocalUser { get; }
 
         /// <summary>
         /// The user's friends.
-        /// This is not thread-safe and should be scheduled locally if consumed from a drawable component.
         /// </summary>
-        IBindableList<APIUser> Friends { get; }
+        IBindableList<APIRelation> Friends { get; }
 
         /// <summary>
-        /// The current user's activity.
-        /// This is not thread-safe and should be scheduled locally if consumed from a drawable component.
+        /// The users blocked by the local user.
         /// </summary>
-        IBindable<UserActivity> Activity { get; }
+        IBindableList<APIRelation> Blocks { get; }
+
+        /// <summary>
+        /// The language supplied by this provider to API requests.
+        /// </summary>
+        Language Language { get; }
 
         /// <summary>
         /// Retrieve the OAuth access token.
         /// </summary>
         string AccessToken { get; }
+
+        /// <summary>
+        /// Used as an identifier of a single local lazer session.
+        /// Sent across the wire for the purposes of concurrency control to spectator server.
+        /// </summary>
+        Guid SessionIdentifier { get; }
 
         /// <summary>
         /// Returns whether the local user is logged in.
@@ -48,14 +56,9 @@ namespace osu.Game.Online.API
         string ProvidedUsername { get; }
 
         /// <summary>
-        /// The URL endpoint for this API. Does not include a trailing slash.
+        /// Holds configuration for online endpoints.
         /// </summary>
-        string APIEndpointUrl { get; }
-
-        /// <summary>
-        /// The root URL of of the website, excluding the trailing slash.
-        /// </summary>
-        string WebsiteRootUrl { get; }
+        EndpointConfiguration Endpoints { get; }
 
         /// <summary>
         /// The version of the API.
@@ -105,9 +108,30 @@ namespace osu.Game.Online.API
         void Login(string username, string password);
 
         /// <summary>
+        /// Provide a second-factor authentication code for authentication.
+        /// </summary>
+        /// <param name="code">The 2FA code.</param>
+        void AuthenticateSecondFactor(string code);
+
+        /// <summary>
         /// Log out the current user.
         /// </summary>
         void Logout();
+
+        /// <summary>
+        /// Update the friends status of the current user.
+        /// </summary>
+        void UpdateLocalFriends();
+
+        /// <summary>
+        /// Update the list of users blocked by the current user.
+        /// </summary>
+        void UpdateLocalBlocks();
+
+        /// <summary>
+        /// Schedule a callback to run on the update thread.
+        /// </summary>
+        internal void Schedule(Action action);
 
         /// <summary>
         /// Constructs a new <see cref="IHubClientConnector"/>. May be null if not supported.
@@ -116,6 +140,16 @@ namespace osu.Game.Online.API
         /// <param name="endpoint">The endpoint to the hub.</param>
         /// <param name="preferMessagePack">Whether to use MessagePack for serialisation if available on this platform.</param>
         IHubClientConnector? GetHubConnector(string clientName, string endpoint, bool preferMessagePack = true);
+
+        /// <summary>
+        /// Accesses the <see cref="INotificationsClient"/> used to receive asynchronous notifications from web.
+        /// </summary>
+        INotificationsClient NotificationsClient { get; }
+
+        /// <summary>
+        /// Creates a <see cref="IChatClient"/> instance to use in order to chat.
+        /// </summary>
+        IChatClient GetChatClient();
 
         /// <summary>
         /// Create a new user account. This is a blocking operation.

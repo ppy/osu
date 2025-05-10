@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -17,7 +19,7 @@ using osu.Framework.Localisation;
 
 namespace osu.Game.Screens.Select.Options
 {
-    public class BeatmapOptionsOverlay : OsuFocusedOverlayContainer
+    public partial class BeatmapOptionsOverlay : OsuFocusedOverlayContainer
     {
         private const float transition_duration = 500;
         private const float x_position = 0.2f;
@@ -29,6 +31,9 @@ namespace osu.Game.Screens.Select.Options
         private readonly FillFlowContainer<BeatmapOptionsButton> buttonsContainer;
 
         public override bool BlockScreenWideMouse => false;
+
+        protected override string PopInSampleName => "SongSelect/options-pop-in";
+        protected override string PopOutSampleName => "SongSelect/options-pop-out";
 
         public BeatmapOptionsOverlay()
         {
@@ -84,8 +89,6 @@ namespace osu.Game.Screens.Select.Options
 
         protected override void PopIn()
         {
-            base.PopIn();
-
             this.FadeIn(transition_duration, Easing.OutQuint);
 
             if (buttonsContainer.Position.X == 1 || Alpha == 0)

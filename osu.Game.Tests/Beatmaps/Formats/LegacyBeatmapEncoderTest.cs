@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -25,8 +25,10 @@ using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Taiko;
 using osu.Game.Skinning;
+using osu.Game.Storyboards;
 using osu.Game.Tests.Resources;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Tests.Beatmaps.Formats
 {
@@ -36,6 +38,22 @@ namespace osu.Game.Tests.Beatmaps.Formats
         private static readonly DllResourceStore beatmaps_resource_store = TestResources.GetStore();
 
         private static IEnumerable<string> allBeatmaps = beatmaps_resource_store.GetAvailableResources().Where(res => res.EndsWith(".osu", StringComparison.Ordinal));
+
+        [Test]
+        public void TestUnsupportedStoryboardEvents()
+        {
+            const string name = "Resources/storyboard_only_video.osu";
+
+            var decoded = decodeFromLegacy(beatmaps_resource_store.GetStream(name), name);
+            Assert.That(decoded.beatmap.UnhandledEventLines.Count, Is.EqualTo(1));
+            Assert.That(decoded.beatmap.UnhandledEventLines.Single(), Is.EqualTo("Video,0,\"video.avi\""));
+
+            var memoryStream = encodeToLegacy(decoded);
+
+            var storyboard = new LegacyStoryboardDecoder().Decode(new LineBufferedReader(memoryStream));
+            StoryboardLayer video = storyboard.Layers.Single(l => l.Name == "Video");
+            Assert.That(video.Elements.Count, Is.EqualTo(1));
+        }
 
         [TestCaseSource(nameof(allBeatmaps))]
         public void TestEncodeDecodeStability(string name)
@@ -77,7 +95,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
             compareBeatmaps(decoded, decodedAfterEncode);
 
-            ControlPointInfo removeLegacyControlPointTypes(ControlPointInfo controlPointInfo)
+            static ControlPointInfo removeLegacyControlPointTypes(ControlPointInfo controlPointInfo)
             {
                 // emulate non-legacy control points by cloning the non-legacy portion.
                 // the assertion is that the encoder can recreate this losslessly from hitobject data.
@@ -103,14 +121,41 @@ namespace osu.Game.Tests.Beatmaps.Formats
         private void compareBeatmaps((IBeatmap beatmap, TestLegacySkin skin) expected, (IBeatmap beatmap, TestLegacySkin skin) actual)
         {
             // Check all control points that are still considered to be at a global level.
-            Assert.That(expected.beatmap.ControlPointInfo.TimingPoints.Serialize(), Is.EqualTo(actual.beatmap.ControlPointInfo.TimingPoints.Serialize()));
-            Assert.That(expected.beatmap.ControlPointInfo.EffectPoints.Serialize(), Is.EqualTo(actual.beatmap.ControlPointInfo.EffectPoints.Serialize()));
+            Assert.That(actual.beatmap.ControlPointInfo.TimingPoints.Serialize(), Is.EqualTo(expected.beatmap.ControlPointInfo.TimingPoints.Serialize()));
+            Assert.That(actual.beatmap.ControlPointInfo.EffectPoints.Serialize(), Is.EqualTo(expected.beatmap.ControlPointInfo.EffectPoints.Serialize()));
 
             // Check all hitobjects.
-            Assert.That(expected.beatmap.HitObjects.Serialize(), Is.EqualTo(actual.beatmap.HitObjects.Serialize()));
+            Assert.That(actual.beatmap.HitObjects.Serialize(), Is.EqualTo(expected.beatmap.HitObjects.Serialize()));
 
             // Check skin.
             Assert.IsTrue(areComboColoursEqual(expected.skin.Configuration, actual.skin.Configuration));
+        }
+
+        [Test]
+        public void TestEncodeBSplineCurveType()
+        {
+            var beatmap = new Beatmap
+            {
+                HitObjects =
+                {
+                    new Slider
+                    {
+                        Path = new SliderPath(new[]
+                        {
+                            new PathControlPoint(Vector2.Zero, PathType.BSpline(3)),
+                            new PathControlPoint(new Vector2(50)),
+                            new PathControlPoint(new Vector2(100), PathType.BSpline(3)),
+                            new PathControlPoint(new Vector2(150))
+                        })
+                    },
+                }
+            };
+
+            var decodedAfterEncode = decodeFromLegacy(encodeToLegacy((beatmap, new TestLegacySkin(beatmaps_resource_store, string.Empty))), string.Empty);
+            var decodedSlider = (Slider)decodedAfterEncode.beatmap.HitObjects[0];
+            Assert.That(decodedSlider.Path.ControlPoints.Count, Is.EqualTo(4));
+            Assert.That(decodedSlider.Path.ControlPoints[0].Type, Is.EqualTo(PathType.BSpline(3)));
+            Assert.That(decodedSlider.Path.ControlPoints[2].Type, Is.EqualTo(PathType.BSpline(3)));
         }
 
         [Test]
@@ -125,10 +170,10 @@ namespace osu.Game.Tests.Beatmaps.Formats
                         Position = new Vector2(0.6f),
                         Path = new SliderPath(new[]
                         {
-                            new PathControlPoint(Vector2.Zero, PathType.Bezier),
+                            new PathControlPoint(Vector2.Zero, PathType.BEZIER),
                             new PathControlPoint(new Vector2(0.5f)),
                             new PathControlPoint(new Vector2(0.51f)), // This is actually on the same position as the previous one in legacy beatmaps (truncated to int).
-                            new PathControlPoint(new Vector2(1f), PathType.Bezier),
+                            new PathControlPoint(new Vector2(1f), PathType.BEZIER),
                             new PathControlPoint(new Vector2(2f))
                         })
                     },
@@ -138,6 +183,32 @@ namespace osu.Game.Tests.Beatmaps.Formats
             var decodedAfterEncode = decodeFromLegacy(encodeToLegacy((beatmap, new TestLegacySkin(beatmaps_resource_store, string.Empty))), string.Empty);
             var decodedSlider = (Slider)decodedAfterEncode.beatmap.HitObjects[0];
             Assert.That(decodedSlider.Path.ControlPoints.Count, Is.EqualTo(5));
+        }
+
+        [Test]
+        public void TestOnlyEightComboColoursEncoded()
+        {
+            var beatmapSkin = new LegacyBeatmapSkin(new BeatmapInfo(), null)
+            {
+                Configuration =
+                {
+                    CustomComboColours =
+                    {
+                        new Color4(1, 1, 1, 255),
+                        new Color4(2, 2, 2, 255),
+                        new Color4(3, 3, 3, 255),
+                        new Color4(4, 4, 4, 255),
+                        new Color4(5, 5, 5, 255),
+                        new Color4(6, 6, 6, 255),
+                        new Color4(7, 7, 7, 255),
+                        new Color4(8, 8, 8, 255),
+                        new Color4(9, 9, 9, 255),
+                    }
+                }
+            };
+
+            var decodedAfterEncode = decodeFromLegacy(encodeToLegacy((new Beatmap(), beatmapSkin)), string.Empty);
+            Assert.That(decodedAfterEncode.skin.Configuration.CustomComboColours, Has.Count.EqualTo(8));
         }
 
         private bool areComboColoursEqual(IHasComboColours a, IHasComboColours b)
@@ -168,14 +239,16 @@ namespace osu.Game.Tests.Beatmaps.Formats
             {
                 var beatmap = new LegacyBeatmapDecoder { ApplyOffsets = false }.Decode(reader);
                 var beatmapSkin = new TestLegacySkin(beatmaps_resource_store, name);
+                stream.Seek(0, SeekOrigin.Begin);
+                beatmapSkin.Configuration = new LegacySkinDecoder().Decode(reader);
                 return (convert(beatmap), beatmapSkin);
             }
         }
 
         private class TestLegacySkin : LegacySkin
         {
-            public TestLegacySkin(IResourceStore<byte[]> storage, string fileName)
-                : base(new SkinInfo { Name = "Test Skin", Creator = "Craftplacer" }, null, storage, fileName)
+            public TestLegacySkin(IResourceStore<byte[]> fallbackStore, string fileName)
+                : base(new SkinInfo { Name = "Test Skin", Creator = "Craftplacer" }, null, fallbackStore, fileName)
             {
             }
         }
@@ -229,7 +302,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
             protected override IBeatmap GetBeatmap() => beatmap;
 
-            protected override Texture GetBackground() => throw new NotImplementedException();
+            public override Texture GetBackground() => throw new NotImplementedException();
 
             protected override Track GetBeatmapTrack() => throw new NotImplementedException();
 

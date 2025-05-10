@@ -10,7 +10,7 @@ using osu.Game.Utils;
 
 namespace osu.Game.Graphics
 {
-    public class DrawableDate : OsuSpriteText, IHasCustomTooltip<DateTimeOffset>
+    public partial class DrawableDate : OsuSpriteText, IHasCustomTooltip<DateTimeOffset>
     {
         private DateTimeOffset date;
 

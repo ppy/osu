@@ -25,37 +25,40 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneMultiplayerPlaylist : MultiplayerTestScene
+    public partial class TestSceneMultiplayerPlaylist : MultiplayerTestScene
     {
-        private MultiplayerPlaylist list;
-        private BeatmapManager beatmaps;
-        private RulesetStore rulesets;
-        private BeatmapSetInfo importedSet;
-        private BeatmapInfo importedBeatmap;
+        private MultiplayerPlaylist list = null!;
+        private BeatmapManager beatmaps = null!;
+        private BeatmapSetInfo importedSet = null!;
+        private BeatmapInfo importedBeatmap = null!;
 
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
         {
-            Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
-            Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, Realm, rulesets, null, audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(new RealmRulesetStore(Realm));
+            Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, Realm, null, audio, Resources, host, Beatmap.Default));
             Dependencies.Cache(Realm);
         }
 
-        [SetUp]
-        public new void Setup() => Schedule(() =>
-        {
-            Child = list = new MultiplayerPlaylist
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                RelativeSizeAxes = Axes.Both,
-                Size = new Vector2(0.4f, 0.8f)
-            };
-        });
-
         [SetUpSteps]
-        public new void SetUpSteps()
+        public override void SetUpSteps()
         {
+            base.SetUpSteps();
+
+            AddStep("join room", () => JoinRoom(CreateDefaultRoom()));
+            WaitForJoined();
+
+            AddStep("create list", () =>
+            {
+                Child = list = new MultiplayerPlaylist
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Both,
+                    Size = new Vector2(0.4f, 0.8f)
+                };
+            });
+
             AddStep("import beatmap", () =>
             {
                 beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
@@ -125,7 +128,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             addItemStep();
             AddStep("finish current item", () => MultiplayerClient.FinishCurrentItem().WaitSafely());
 
-            AddStep("leave room", () => RoomManager.PartRoom());
+            AddStep("leave room", () => MultiplayerClient.LeaveRoom());
             AddUntilStep("wait for room part", () => !RoomJoined);
 
             AddUntilStep("item 0 not in lists", () => !inHistoryList(0) && !inQueueList(0));
@@ -146,42 +149,41 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("finish current item", () => MultiplayerClient.FinishCurrentItem().WaitSafely());
             assertQueueTabCount(2);
 
-            AddStep("leave room", () => RoomManager.PartRoom());
+            AddStep("leave room", () => MultiplayerClient.LeaveRoom());
             AddUntilStep("wait for room part", () => !RoomJoined);
             assertQueueTabCount(0);
         }
 
-        [Ignore("Expired items are initially removed from the room.")]
         [Test]
         public void TestJoinRoomWithMixedItemsAddedInCorrectLists()
         {
-            AddStep("leave room", () => RoomManager.PartRoom());
+            AddStep("leave room", () => MultiplayerClient.LeaveRoom());
             AddUntilStep("wait for room part", () => !RoomJoined);
 
-            AddStep("join room with items", () =>
+            AddStep("join room with expired items", () =>
             {
-                RoomManager.CreateRoom(new Room
-                {
-                    Name = { Value = "test name" },
-                    Playlist =
+                Room room = CreateDefaultRoom();
+                room.Playlist =
+                [
+                    new PlaylistItem(new TestBeatmap(Ruleset.Value).BeatmapInfo)
                     {
-                        new PlaylistItem(new TestBeatmap(Ruleset.Value).BeatmapInfo)
-                        {
-                            RulesetID = Ruleset.Value.OnlineID
-                        },
-                        new PlaylistItem(new TestBeatmap(Ruleset.Value).BeatmapInfo)
-                        {
-                            RulesetID = Ruleset.Value.OnlineID,
-                            Expired = true
-                        }
+                        RulesetID = Ruleset.Value.OnlineID
+                    },
+                    new PlaylistItem(new TestBeatmap(Ruleset.Value).BeatmapInfo)
+                    {
+                        RulesetID = Ruleset.Value.OnlineID,
+                        Expired = true
                     }
-                });
+                ];
+
+                JoinRoom(room);
             });
 
-            AddUntilStep("wait for room join", () => RoomJoined);
+            WaitForJoined();
 
-            assertItemInQueueListStep(1, 0);
-            assertItemInHistoryListStep(2, 0);
+            // IDs are offset by 1 because we've joined two rooms in this test.
+            assertItemInQueueListStep(2, 0);
+            assertItemInHistoryListStep(3, 0);
         }
 
         [Test]
@@ -196,7 +198,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             addItemStep();
             addItemStep();
 
-            DrawableRoomPlaylistItem[] drawableItems = null;
+            DrawableRoomPlaylistItem[] drawableItems = null!;
             AddStep("get drawable items", () => drawableItems = this.ChildrenOfType<DrawableRoomPlaylistItem>().ToArray());
 
             // Add 1 item for another user.
@@ -264,7 +266,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private void assertQueueTabCount(int count)
         {
-            string queueTabText = count > 0 ? $"Queue ({count})" : "Queue";
+            string queueTabText = count > 0 ? $"Up next ({count})" : "Up next";
             AddUntilStep($"Queue tab shows \"{queueTabText}\"", () =>
             {
                 return this.ChildrenOfType<OsuTabControl<MultiplayerPlaylistDisplayMode>.OsuTabItem>()

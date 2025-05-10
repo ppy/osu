@@ -1,8 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -19,7 +22,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Settings
 {
-    public abstract class SettingsItem<T> : Container, IFilterable, ISettingsItem, IHasCurrentValue<T>, IHasTooltip
+    public abstract partial class SettingsItem<T> : Container, IConditionalFilterable, ISettingsItem, IHasCurrentValue<T>, IHasTooltip
     {
         protected abstract Drawable CreateControl();
 
@@ -40,7 +43,7 @@ namespace osu.Game.Overlays.Settings
 
         private SpriteText labelText;
 
-        private OsuTextFlowContainer warningText;
+        private OsuTextFlowContainer noticeText;
 
         public bool ShowsDefaultIndicator = true;
         private readonly Container defaultValueIndicatorContainer;
@@ -69,27 +72,32 @@ namespace osu.Game.Overlays.Settings
         }
 
         /// <summary>
-        /// Text to be displayed at the bottom of this <see cref="SettingsItem{T}"/>.
-        /// Generally used to recommend the user change their setting as the current one is considered sub-optimal.
+        /// Clear any warning text.
         /// </summary>
-        public LocalisableString? WarningText
+        public void ClearNoticeText()
         {
-            set
+            noticeText?.Expire();
+            noticeText = null;
+        }
+
+        /// <summary>
+        /// Set the text to be displayed at the bottom of this <see cref="SettingsItem{T}"/>.
+        /// Generally used to provide feedback to a user about a sub-optimal setting.
+        /// </summary>
+        /// <param name="text">The text to display.</param>
+        /// <param name="isWarning">Whether the text is in a warning state. Will decide how this is visually represented.</param>
+        public void SetNoticeText(LocalisableString text, bool isWarning = false)
+        {
+            ClearNoticeText();
+
+            // construct lazily for cases where the label is not needed (may be provided by the Control).
+            FlowContent.Add(noticeText = new LinkFlowContainer(cp => cp.Colour = isWarning ? colours.Yellow : colours.Green)
             {
-                bool hasValue = value != default;
-
-                if (warningText == null)
-                {
-                    if (!hasValue)
-                        return;
-
-                    // construct lazily for cases where the label is not needed (may be provided by the Control).
-                    FlowContent.Add(warningText = new SettingsNoticeText(colours) { Margin = new MarginPadding { Bottom = 5 } });
-                }
-
-                warningText.Alpha = hasValue ? 1 : 0;
-                warningText.Text = value ?? default;
-            }
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Margin = new MarginPadding { Bottom = 5 },
+                Text = text,
+            });
         }
 
         public virtual Bindable<T> Current
@@ -98,13 +106,13 @@ namespace osu.Game.Overlays.Settings
             set => controlWithCurrent.Current = value;
         }
 
-        public virtual IEnumerable<string> FilterTerms
+        public virtual IEnumerable<LocalisableString> FilterTerms
         {
             get
             {
-                var keywords = new List<string>(Keywords ?? Array.Empty<string>())
+                var keywords = new List<LocalisableString>(Keywords?.Select(k => (LocalisableString)k) ?? Array.Empty<LocalisableString>())
                 {
-                    LabelText.ToString()
+                    LabelText
                 };
 
                 if (HasClassicDefault)
@@ -135,6 +143,9 @@ namespace osu.Game.Overlays.Settings
         public override bool IsPresent => base.IsPresent && MatchingFilter;
 
         public bool FilteringActive { get; set; }
+
+        public BindableBool CanBeShown { get; } = new BindableBool(true);
+        IBindable<bool> IConditionalFilterable.CanBeShown => CanBeShown;
 
         public event Action SettingChanged;
 
@@ -185,7 +196,7 @@ namespace osu.Game.Overlays.Settings
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        Spacing = new Vector2(0, 10),
+                        Spacing = new Vector2(0, 5),
                         Child = Control = CreateControl(),
                     }
                 }
@@ -206,7 +217,7 @@ namespace osu.Game.Overlays.Settings
             // intentionally done before LoadComplete to avoid overhead.
             if (ShowsDefaultIndicator)
             {
-                defaultValueIndicatorContainer.Add(new RestoreDefaultValueButton<T>
+                defaultValueIndicatorContainer.Add(new RevertToDefaultButton<T>
                 {
                     Current = controlWithCurrent.Current,
                     Anchor = Anchor.Centre,

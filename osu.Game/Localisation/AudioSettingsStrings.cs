@@ -30,12 +30,12 @@ namespace osu.Game.Localisation
         public static LocalisableString OutputDevice => new TranslatableString(getKey(@"output_device"), @"Output device");
 
         /// <summary>
-        /// "Master"
+        /// "Hitsound stereo separation"
         /// </summary>
         public static LocalisableString PositionalLevel => new TranslatableString(getKey(@"positional_hitsound_audio_level"), @"Hitsound stereo separation");
 
         /// <summary>
-        /// "Level"
+        /// "Master"
         /// </summary>
         public static LocalisableString MasterVolume => new TranslatableString(getKey(@"master_volume"), @"Master");
 
@@ -65,10 +65,30 @@ namespace osu.Game.Localisation
         public static LocalisableString AudioOffset => new TranslatableString(getKey(@"audio_offset"), @"Audio offset");
 
         /// <summary>
+        /// "Play a few beatmaps to receive a suggested offset!"
+        /// </summary>
+        public static LocalisableString SuggestedOffsetNote => new TranslatableString(getKey(@"suggested_offset_note"), @"Play a few beatmaps to receive a suggested offset!");
+
+        /// <summary>
+        /// "Based on the last {0} play(s), your offset is set correctly!"
+        /// </summary>
+        public static LocalisableString SuggestedOffsetCorrect(int plays) => new TranslatableString(getKey(@"suggested_offset_correct"), @"Based on the last {0} play(s), your offset is set correctly!", plays);
+
+        /// <summary>
+        /// "Based on the last {0} play(s), the suggested offset is {1} ms."
+        /// </summary>
+        public static LocalisableString SuggestedOffsetValueReceived(int plays, LocalisableString value) => new TranslatableString(getKey(@"suggested_offset_value_received"), @"Based on the last {0} play(s), the suggested offset is {1} ms.", plays, value);
+
+        /// <summary>
+        /// "Apply suggested offset"
+        /// </summary>
+        public static LocalisableString ApplySuggestedOffset => new TranslatableString(getKey(@"apply_suggested_offset"), @"Apply suggested offset");
+
+        /// <summary>
         /// "Offset wizard"
         /// </summary>
         public static LocalisableString OffsetWizard => new TranslatableString(getKey(@"offset_wizard"), @"Offset wizard");
 
-        private static string getKey(string key) => $"{prefix}:{key}";
+        private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

@@ -11,11 +11,11 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 {
-    public class LegacyStageForeground : CompositeDrawable
+    public partial class LegacyStageForeground : CompositeDrawable
     {
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 
-        private Drawable sprite;
+        private Drawable? sprite;
 
         public LegacyStageForeground()
         {
@@ -28,13 +28,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
             string bottomImage = skin.GetManiaSkinConfig<string>(LegacyManiaSkinConfigurationLookups.BottomStageImage)?.Value
                                  ?? "mania-stage-bottom";
 
-            sprite = skin.GetAnimation(bottomImage, true, true)?.With(d =>
-            {
-                if (d == null)
-                    return;
-
-                d.Scale = new Vector2(1.6f);
-            });
+            sprite = skin.GetAnimation(bottomImage, true, true)?.With(d => d.Scale = new Vector2(1.6f));
 
             if (sprite != null)
                 InternalChild = sprite;

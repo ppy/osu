@@ -4,18 +4,19 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
+using osu.Game.Graphics;
 using osu.Game.Localisation;
 using osu.Game.Overlays.Settings.Sections.Gameplay;
 
 namespace osu.Game.Overlays.Settings.Sections
 {
-    public class GameplaySection : SettingsSection
+    public partial class GameplaySection : SettingsSection
     {
         public override LocalisableString Header => GameplaySettingsStrings.GameplaySectionHeader;
 
         public override Drawable CreateIcon() => new SpriteIcon
         {
-            Icon = FontAwesome.Regular.DotCircle
+            Icon = OsuIcon.GameplayC
         };
 
         public GameplaySection()

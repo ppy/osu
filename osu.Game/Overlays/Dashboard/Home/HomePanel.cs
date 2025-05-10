@@ -12,7 +12,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Dashboard.Home
 {
-    public class HomePanel : Container
+    public partial class HomePanel : Container
     {
         protected override Container<Drawable> Content => content;
 

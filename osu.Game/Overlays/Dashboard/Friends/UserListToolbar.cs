@@ -8,7 +8,7 @@ using osu.Framework.Bindables;
 
 namespace osu.Game.Overlays.Dashboard.Friends
 {
-    public class UserListToolbar : CompositeDrawable
+    public partial class UserListToolbar : CompositeDrawable
     {
         public Bindable<UserSortCriteria> SortCriteria => sortControl.Current;
 

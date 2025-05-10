@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System.ComponentModel;
@@ -31,6 +31,9 @@ namespace osu.Game.Overlays.BeatmapListing
         [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.StatusPending))]
         [Description("Pending & WIP")]
         Pending,
+
+        [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.StatusWip))]
+        Wip,
 
         [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.StatusGraveyard))]
         Graveyard,

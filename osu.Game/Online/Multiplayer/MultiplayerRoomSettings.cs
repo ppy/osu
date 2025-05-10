@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using MessagePack;
 using osu.Game.Online.Rooms;
@@ -31,8 +29,25 @@ namespace osu.Game.Online.Multiplayer
         [Key(5)]
         public TimeSpan AutoStartDuration { get; set; }
 
+        [Key(6)]
+        public bool AutoSkip { get; set; }
+
         [IgnoreMember]
         public bool AutoStartEnabled => AutoStartDuration != TimeSpan.Zero;
+
+        public MultiplayerRoomSettings()
+        {
+        }
+
+        public MultiplayerRoomSettings(Room room)
+        {
+            Name = room.Name;
+            Password = room.Password ?? string.Empty;
+            MatchType = room.Type;
+            QueueMode = room.QueueMode;
+            AutoStartDuration = room.AutoStartDuration;
+            AutoSkip = room.AutoSkip;
+        }
 
         public bool Equals(MultiplayerRoomSettings? other)
         {
@@ -44,7 +59,8 @@ namespace osu.Game.Online.Multiplayer
                    && PlaylistItemId == other.PlaylistItemId
                    && MatchType == other.MatchType
                    && QueueMode == other.QueueMode
-                   && AutoStartDuration == other.AutoStartDuration;
+                   && AutoStartDuration == other.AutoStartDuration
+                   && AutoSkip == other.AutoSkip;
         }
 
         public override string ToString() => $"Name:{Name}"
@@ -52,6 +68,7 @@ namespace osu.Game.Online.Multiplayer
                                              + $" Type:{MatchType}"
                                              + $" Item:{PlaylistItemId}"
                                              + $" Queue:{QueueMode}"
-                                             + $" Start:{AutoStartDuration}";
+                                             + $" Start:{AutoStartDuration}"
+                                             + $" AutoSkip:{AutoSkip}";
     }
 }

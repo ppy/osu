@@ -10,13 +10,15 @@ using osu.Game.Rulesets;
 using osuTK.Graphics;
 using osuTK;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays
 {
-    public class OverlayRulesetTabItem : TabItem<RulesetInfo>, IHasTooltip
+    public partial class OverlayRulesetTabItem : TabItem<RulesetInfo>, IHasTooltip
     {
         private Color4 accentColour;
 
@@ -33,11 +35,13 @@ namespace osu.Game.Overlays
         protected override Container<Drawable> Content { get; }
 
         [Resolved]
-        private OverlayColourProvider colourProvider { get; set; }
+        private OverlayColourProvider colourProvider { get; set; } = null!;
 
         private readonly Drawable icon;
 
         public LocalisableString TooltipText => Value.Name;
+
+        private Sample selectSample = null!;
 
         public OverlayRulesetTabItem(RulesetInfo value)
             : base(value)
@@ -59,10 +63,16 @@ namespace osu.Game.Overlays
                         Icon = value.CreateInstance().CreateIcon(),
                     },
                 },
-                new HoverClickSounds()
+                new HoverSounds(HoverSampleSet.TabSelect)
             });
 
             Enabled.Value = true;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audio)
+        {
+            selectSample = audio.Samples.Get(@"UI/tabselect-select");
         }
 
         protected override void LoadComplete()
@@ -89,6 +99,8 @@ namespace osu.Game.Overlays
         protected override void OnActivated() => updateState();
 
         protected override void OnDeactivated() => updateState();
+
+        protected override void OnActivatedByUser() => selectSample.Play();
 
         private void updateState()
         {

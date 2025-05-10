@@ -6,13 +6,13 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Database
 {
-    public class LegacySkinExporter : LegacyExporter<SkinInfo>
+    public class LegacySkinExporter : LegacyArchiveExporter<SkinInfo>
     {
-        protected override string FileExtension => ".osk";
-
         public LegacySkinExporter(Storage storage)
             : base(storage)
         {
         }
+
+        protected override string FileExtension => @".osk";
     }
 }

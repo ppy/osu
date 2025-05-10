@@ -15,7 +15,7 @@ using osu.Game.Rulesets.Taiko;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneSpotlightsLayout : OsuTestScene
+    public partial class TestSceneSpotlightsLayout : OsuTestScene
     {
         protected override bool UseOnlineAPI => true;
 

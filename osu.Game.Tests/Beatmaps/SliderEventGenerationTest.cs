@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
@@ -16,7 +16,7 @@ namespace osu.Game.Tests.Beatmaps
         [Test]
         public void TestSingleSpan()
         {
-            var events = SliderEventGenerator.Generate(start_time, span_duration, 1, span_duration / 2, span_duration, 1, null).ToArray();
+            var events = SliderEventGenerator.Generate(start_time, span_duration, 1, span_duration / 2, span_duration, 1).ToArray();
 
             Assert.That(events[0].Type, Is.EqualTo(SliderEventType.Head));
             Assert.That(events[0].Time, Is.EqualTo(start_time));
@@ -31,7 +31,7 @@ namespace osu.Game.Tests.Beatmaps
         [Test]
         public void TestRepeat()
         {
-            var events = SliderEventGenerator.Generate(start_time, span_duration, 1, span_duration / 2, span_duration, 2, null).ToArray();
+            var events = SliderEventGenerator.Generate(start_time, span_duration, 1, span_duration / 2, span_duration, 2).ToArray();
 
             Assert.That(events[0].Type, Is.EqualTo(SliderEventType.Head));
             Assert.That(events[0].Time, Is.EqualTo(start_time));
@@ -52,7 +52,7 @@ namespace osu.Game.Tests.Beatmaps
         [Test]
         public void TestNonEvenTicks()
         {
-            var events = SliderEventGenerator.Generate(start_time, span_duration, 1, 300, span_duration, 2, null).ToArray();
+            var events = SliderEventGenerator.Generate(start_time, span_duration, 1, 300, span_duration, 2).ToArray();
 
             Assert.That(events[0].Type, Is.EqualTo(SliderEventType.Head));
             Assert.That(events[0].Time, Is.EqualTo(start_time));
@@ -83,12 +83,12 @@ namespace osu.Game.Tests.Beatmaps
         }
 
         [Test]
-        public void TestLegacyLastTickOffset()
+        public void TestLastTickOffset()
         {
-            var events = SliderEventGenerator.Generate(start_time, span_duration, 1, span_duration / 2, span_duration, 1, 100).ToArray();
+            var events = SliderEventGenerator.Generate(start_time, span_duration, 1, span_duration / 2, span_duration, 1).ToArray();
 
             Assert.That(events[2].Type, Is.EqualTo(SliderEventType.LegacyLastTick));
-            Assert.That(events[2].Time, Is.EqualTo(900));
+            Assert.That(events[2].Time, Is.EqualTo(span_duration + SliderEventGenerator.TAIL_LENIENCY));
         }
 
         [Test]
@@ -97,7 +97,7 @@ namespace osu.Game.Tests.Beatmaps
             const double velocity = 5;
             const double min_distance = velocity * 10;
 
-            var events = SliderEventGenerator.Generate(start_time, span_duration, velocity, velocity, span_duration, 2, 0).ToArray();
+            var events = SliderEventGenerator.Generate(start_time, span_duration, velocity, velocity, span_duration, 2).ToArray();
 
             Assert.Multiple(() =>
             {
@@ -111,6 +111,21 @@ namespace osu.Game.Tests.Beatmaps
                     Assert.That(events[tickIndex].Time, Is.LessThan(span_duration - min_distance).Or.GreaterThan(span_duration + min_distance));
                 }
             });
+        }
+
+        [Test]
+        public void TestRepeatsGeneratedEvenForZeroLengthSlider()
+        {
+            var events = SliderEventGenerator.Generate(start_time, span_duration, 1, span_duration / 2, 0, 2).ToArray();
+
+            Assert.That(events[0].Type, Is.EqualTo(SliderEventType.Head));
+            Assert.That(events[0].Time, Is.EqualTo(start_time));
+
+            Assert.That(events[1].Type, Is.EqualTo(SliderEventType.Repeat));
+            Assert.That(events[1].Time, Is.EqualTo(span_duration));
+
+            Assert.That(events[3].Type, Is.EqualTo(SliderEventType.Tail));
+            Assert.That(events[3].Time, Is.EqualTo(span_duration * 2));
         }
     }
 }

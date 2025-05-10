@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -12,13 +14,13 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Overlays;
 using osuTK;
 
 namespace osu.Game.Screens.Import
 {
-    public class FileImportScreen : OsuScreen
+    public partial class FileImportScreen : OsuScreen
     {
         public override bool HideOverlaysOnEnter => true;
 
@@ -26,7 +28,7 @@ namespace osu.Game.Screens.Import
         private Container contentContainer;
         private TextFlowContainer currentFileText;
 
-        private TriangleButton importButton;
+        private RoundedButton importButton;
 
         private const float duration = 300;
         private const float button_height = 50;
@@ -35,8 +37,8 @@ namespace osu.Game.Screens.Import
         [Resolved]
         private OsuGameBase game { get; set; }
 
-        [Resolved]
-        private OsuColour colours { get; set; }
+        [Cached]
+        private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
 
         [BackgroundDependencyLoader(true)]
         private void load()
@@ -51,11 +53,6 @@ namespace osu.Game.Screens.Import
                 Size = new Vector2(0.9f, 0.8f),
                 Children = new Drawable[]
                 {
-                    new Box
-                    {
-                        Colour = colours.GreySeaFoamDark,
-                        RelativeSizeAxes = Axes.Both,
-                    },
                     fileSelector = new OsuFileSelector(validFileExtensions: game.HandledExtensions.ToArray())
                     {
                         RelativeSizeAxes = Axes.Both,
@@ -71,7 +68,7 @@ namespace osu.Game.Screens.Import
                         {
                             new Box
                             {
-                                Colour = colours.GreySeaFoamDarker,
+                                Colour = colourProvider.Background4,
                                 RelativeSizeAxes = Axes.Both
                             },
                             new Container
@@ -98,7 +95,7 @@ namespace osu.Game.Screens.Import
                                     }
                                 },
                             },
-                            importButton = new TriangleButton
+                            importButton = new RoundedButton
                             {
                                 Text = "Import",
                                 Anchor = Anchor.BottomCentre,

@@ -5,6 +5,8 @@ using NUnit.Framework;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
+using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Overlays.Settings;
 using osuTK;
@@ -12,22 +14,26 @@ using osuTK;
 namespace osu.Game.Tests.Visual.Settings
 {
     [TestFixture]
-    public class TestSceneSettingsSource : OsuTestScene
+    public partial class TestSceneSettingsSource : OsuTestScene
     {
         public TestSceneSettingsSource()
         {
             Children = new Drawable[]
             {
-                new FillFlowContainer
+                new PopoverContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Direction = FillDirection.Vertical,
-                    Spacing = new Vector2(20),
-                    Width = 0.5f,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Padding = new MarginPadding(50),
-                    ChildrenEnumerable = new TestTargetClass().CreateSettingsControls()
+                    Child = new FillFlowContainer
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Direction = FillDirection.Vertical,
+                        Spacing = new Vector2(20),
+                        Width = 0.5f,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Padding = new MarginPadding(50),
+                        ChildrenEnumerable = new TestTargetClass().CreateSettingsControls()
+                    },
                 },
             };
         }
@@ -36,6 +42,9 @@ namespace osu.Game.Tests.Visual.Settings
         {
             [SettingSource("Sample bool", "Clicking this changes a setting")]
             public BindableBool TickBindable { get; } = new BindableBool();
+
+            [SettingSource(typeof(TestStrings), nameof(TestStrings.LocalisableLabel), nameof(TestStrings.LocalisableDescription))]
+            public BindableBool LocalisableBindable { get; } = new BindableBool(true);
 
             [SettingSource("Sample float", "Change something for a mod")]
             public BindableFloat SliderBindable { get; } = new BindableFloat
@@ -61,10 +70,13 @@ namespace osu.Game.Tests.Visual.Settings
             };
 
             [SettingSource("Sample number textbox", "Textbox number entry", SettingControlType = typeof(SettingsNumberBox))]
-            public Bindable<int?> IntTextBoxBindable { get; } = new Bindable<int?>
+            public Bindable<int?> IntTextBoxBindable { get; } = new Bindable<int?>();
+
+            [SettingSource("Sample colour", "Change the colour", SettingControlType = typeof(SettingsColour))]
+            public BindableColour4 ColourBindable { get; } = new BindableColour4
             {
-                Default = null,
-                Value = null
+                Default = Colour4.White,
+                Value = Colour4.Red
             };
         }
 
@@ -72,6 +84,12 @@ namespace osu.Game.Tests.Visual.Settings
         {
             Value1,
             Value2
+        }
+
+        private class TestStrings
+        {
+            public static LocalisableString LocalisableLabel => new LocalisableString("Sample localisable label");
+            public static LocalisableString LocalisableDescription => new LocalisableString("Sample localisable description");
         }
     }
 }

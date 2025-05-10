@@ -2,8 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
@@ -18,9 +20,9 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Acronym => "TR";
         public override IconUsage? Icon => FontAwesome.Solid.ArrowsAlt;
         public override ModType Type => ModType.Fun;
-        public override string Description => "Everything rotates. EVERYTHING.";
+        public override LocalisableString Description => "Everything rotates. EVERYTHING.";
         public override double ScoreMultiplier => 1;
-        public override Type[] IncompatibleMods => new[] { typeof(OsuModWiggle), typeof(OsuModMagnetised) };
+        public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(OsuModWiggle), typeof(OsuModMagnetised), typeof(OsuModRepel), typeof(OsuModFreezeFrame), typeof(OsuModDepth) }).ToArray();
 
         private float theta;
 
@@ -32,10 +34,10 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             switch (drawable)
             {
-                case DrawableSliderHead _:
-                case DrawableSliderTail _:
-                case DrawableSliderTick _:
-                case DrawableSliderRepeat _:
+                case DrawableSliderHead:
+                case DrawableSliderTail:
+                case DrawableSliderTick:
+                case DrawableSliderRepeat:
                     return;
 
                 default:

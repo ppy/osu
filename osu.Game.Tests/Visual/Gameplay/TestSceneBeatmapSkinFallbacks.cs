@@ -13,7 +13,6 @@ using osu.Framework.Timing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
-using osu.Game.Extensions;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Skinning.Legacy;
@@ -22,37 +21,24 @@ using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Skinning;
 using osu.Game.Storyboards;
-using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneBeatmapSkinFallbacks : OsuPlayerTestScene
+    public partial class TestSceneBeatmapSkinFallbacks : OsuPlayerTestScene
     {
-        private ISkin currentBeatmapSkin;
+        private ISkin currentBeatmapSkin = null!;
 
         [Resolved]
-        private SkinManager skinManager { get; set; }
-
-        [Cached]
-        private ScoreProcessor scoreProcessor = new ScoreProcessor(new OsuRuleset());
-
-        [Cached(typeof(HealthProcessor))]
-        private HealthProcessor healthProcessor = new DrainingHealthProcessor(0);
-
-        [Cached]
-        private GameplayState gameplayState = new GameplayState(new TestBeatmap(new OsuRuleset().RulesetInfo), new OsuRuleset());
-
-        [Cached]
-        private readonly GameplayClock gameplayClock = new GameplayClock(new FramedClock());
+        private SkinManager skinManager { get; set; } = null!;
 
         protected override bool HasCustomSteps => true;
 
         [Test]
         public void TestEmptyLegacyBeatmapSkinFallsBack()
         {
-            CreateSkinTest(DefaultSkin.CreateInfo(), () => new LegacyBeatmapSkin(new BeatmapInfo(), null));
-            AddUntilStep("wait for hud load", () => Player.ChildrenOfType<SkinnableTargetContainer>().All(c => c.ComponentsLoaded));
-            AddAssert("hud from default skin", () => AssertComponentsFromExpectedSource(SkinnableTarget.MainHUDComponents, skinManager.CurrentSkin.Value));
+            CreateSkinTest(TrianglesSkin.CreateInfo(), () => new LegacyBeatmapSkin(new BeatmapInfo(), null));
+            AddUntilStep("wait for hud load", () => Player.ChildrenOfType<SkinnableContainer>().All(c => c.ComponentsLoaded));
+            AddAssert("hud from default skin", () => AssertComponentsFromExpectedSource(GlobalSkinnableContainers.MainHUDComponents, skinManager.CurrentSkin.Value));
         }
 
         protected void CreateSkinTest(SkinInfo gameCurrentSkin, Func<ISkin> getBeatmapSkin)
@@ -67,46 +53,55 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
         }
 
-        protected bool AssertComponentsFromExpectedSource(SkinnableTarget target, ISkin expectedSource)
+        protected bool AssertComponentsFromExpectedSource(GlobalSkinnableContainers target, ISkin expectedSource)
         {
-            var actualComponentsContainer = Player.ChildrenOfType<SkinnableTargetContainer>().First(s => s.Target == target)
-                                                  .ChildrenOfType<SkinnableTargetComponentsContainer>().SingleOrDefault();
+            var targetContainer = Player.ChildrenOfType<SkinnableContainer>().First(s => s.Lookup.Lookup == target);
+            var actualComponentsContainer = targetContainer.ChildrenOfType<Container>().SingleOrDefault(c => c.Parent == targetContainer);
 
             if (actualComponentsContainer == null)
                 return false;
 
-            var actualInfo = actualComponentsContainer.CreateSkinnableInfo();
+            var actualInfo = actualComponentsContainer.CreateSerialisedInfo();
 
-            var expectedComponentsContainer = (SkinnableTargetComponentsContainer)expectedSource.GetDrawableComponent(new SkinnableTargetComponent(target));
+            var expectedComponentsContainer = expectedSource.GetDrawableComponent(new GlobalSkinnableContainerLookup(target)) as Container;
             if (expectedComponentsContainer == null)
                 return false;
 
-            var expectedComponentsAdjustmentContainer = new Container
+            var expectedComponentsAdjustmentContainer = new DependencyProvidingContainer
             {
-                Position = actualComponentsContainer.Parent.ToSpaceOfOtherDrawable(actualComponentsContainer.DrawPosition, Content),
+                Position = actualComponentsContainer.Parent!.ToSpaceOfOtherDrawable(actualComponentsContainer.DrawPosition, Content),
                 Size = actualComponentsContainer.DrawSize,
                 Child = expectedComponentsContainer,
+                // proxy the same required dependencies that `actualComponentsContainer` is using.
+                CachedDependencies = new (Type, object)[]
+                {
+                    (typeof(ScoreProcessor), actualComponentsContainer.Dependencies.Get<ScoreProcessor>()),
+                    (typeof(HealthProcessor), actualComponentsContainer.Dependencies.Get<HealthProcessor>()),
+                    (typeof(GameplayState), actualComponentsContainer.Dependencies.Get<GameplayState>()),
+                    (typeof(IGameplayClock), actualComponentsContainer.Dependencies.Get<IGameplayClock>()),
+                    (typeof(InputCountController), actualComponentsContainer.Dependencies.Get<InputCountController>())
+                },
             };
 
             Add(expectedComponentsAdjustmentContainer);
             expectedComponentsAdjustmentContainer.UpdateSubTree();
-            var expectedInfo = expectedComponentsContainer.CreateSkinnableInfo();
-            Remove(expectedComponentsAdjustmentContainer);
+            var expectedInfo = expectedComponentsContainer.CreateSerialisedInfo();
+            Remove(expectedComponentsAdjustmentContainer, true);
 
             return almostEqual(actualInfo, expectedInfo);
         }
 
-        private static bool almostEqual(SkinnableInfo info, SkinnableInfo other) =>
+        private static bool almostEqual(SerialisedDrawableInfo drawableInfo, SerialisedDrawableInfo? other) =>
             other != null
-            && info.Type == other.Type
-            && info.Anchor == other.Anchor
-            && info.Origin == other.Origin
-            && Precision.AlmostEquals(info.Position, other.Position, 1)
-            && Precision.AlmostEquals(info.Scale, other.Scale)
-            && Precision.AlmostEquals(info.Rotation, other.Rotation)
-            && info.Children.SequenceEqual(other.Children, new FuncEqualityComparer<SkinnableInfo>(almostEqual));
+            && drawableInfo.Type == other.Type
+            && drawableInfo.Anchor == other.Anchor
+            && drawableInfo.Origin == other.Origin
+            && Precision.AlmostEquals(drawableInfo.Position, other.Position, 1)
+            && Precision.AlmostEquals(drawableInfo.Scale, other.Scale)
+            && Precision.AlmostEquals(drawableInfo.Rotation, other.Rotation)
+            && drawableInfo.Children.SequenceEqual(other.Children, new FuncEqualityComparer<SerialisedDrawableInfo>(almostEqual));
 
-        protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard = null)
+        protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, Storyboard? storyboard = null)
             => new CustomSkinWorkingBeatmap(beatmap, storyboard, Clock, Audio, currentBeatmapSkin);
 
         protected override Ruleset CreatePlayerRuleset() => new TestOsuRuleset();
@@ -115,7 +110,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             private readonly ISkin beatmapSkin;
 
-            public CustomSkinWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard, IFrameBasedClock referenceClock, AudioManager audio, ISkin beatmapSkin)
+            public CustomSkinWorkingBeatmap(IBeatmap beatmap, Storyboard? storyboard, IFrameBasedClock referenceClock, AudioManager audio, ISkin beatmapSkin)
                 : base(beatmap, storyboard, referenceClock, audio)
             {
                 this.beatmapSkin = beatmapSkin;
@@ -126,7 +121,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private class TestOsuRuleset : OsuRuleset
         {
-            public override ISkin CreateLegacySkinProvider(ISkin skin, IBeatmap beatmap) => new TestOsuLegacySkinTransformer(skin);
+            public override ISkin CreateSkinTransformer(ISkin skin, IBeatmap beatmap) => new TestOsuLegacySkinTransformer(skin);
 
             private class TestOsuLegacySkinTransformer : OsuLegacySkinTransformer
             {

@@ -15,7 +15,7 @@ using osuTK.Graphics;
 namespace osu.Game.Tests.Visual.UserInterface
 {
     [TestFixture]
-    public class TestSceneWaveContainer : OsuTestScene
+    public partial class TestSceneWaveContainer : OsuTestScene
     {
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)

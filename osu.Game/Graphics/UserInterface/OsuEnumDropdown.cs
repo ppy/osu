@@ -5,12 +5,12 @@ using System;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class OsuEnumDropdown<T> : OsuDropdown<T>
+    public partial class OsuEnumDropdown<T> : OsuDropdown<T>
         where T : struct, Enum
     {
         public OsuEnumDropdown()
         {
-            Items = (T[])Enum.GetValues(typeof(T));
+            Items = Enum.GetValues<T>();
         }
     }
 }

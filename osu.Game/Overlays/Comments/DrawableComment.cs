@@ -4,12 +4,10 @@
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
-using osu.Framework.Graphics.Sprites;
 using osuTK;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Users.Drawables;
 using osu.Game.Graphics.Containers;
-using osu.Framework.Graphics.Cursor;
 using osu.Framework.Bindables;
 using System.Linq;
 using osu.Game.Graphics.Sprites;
@@ -19,19 +17,29 @@ using System;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using System.Collections.Specialized;
-using osu.Framework.Localisation;
+using System.Diagnostics;
+using osu.Framework.Extensions.LocalisationExtensions;
+using osu.Framework.Logging;
+using osu.Framework.Platform;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Comments.Buttons;
+using osu.Game.Overlays.Dialog;
+using osu.Game.Overlays.OSD;
 using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Comments
 {
-    public class DrawableComment : CompositeDrawable
+    [Cached]
+    public partial class DrawableComment : CompositeDrawable
     {
         private const int avatar_size = 40;
 
-        public Action<DrawableComment, int> RepliesRequested;
+        public Action<DrawableComment, int> RepliesRequested = null!;
 
         public readonly Comment Comment;
+        public readonly IReadOnlyList<CommentableMeta> Meta;
 
         public readonly BindableBool ShowDeleted = new BindableBool();
         public readonly Bindable<CommentsSortCriteria> Sort = new Bindable<CommentsSortCriteria>();
@@ -39,31 +47,64 @@ namespace osu.Game.Overlays.Comments
 
         public readonly BindableList<DrawableComment> Replies = new BindableList<DrawableComment>();
 
-        private readonly BindableBool childrenExpanded = new BindableBool(true);
+        private readonly BindableBool childrenExpanded;
 
         private int currentPage;
 
-        private FillFlowContainer childCommentsVisibilityContainer;
-        private FillFlowContainer childCommentsContainer;
-        private LoadRepliesButton loadRepliesButton;
-        private ShowMoreRepliesButton showMoreButton;
-        private ShowRepliesButton showRepliesButton;
-        private ChevronButton chevronButton;
-        private DeletedCommentsCounter deletedCommentsCounter;
+        /// <summary>
+        /// Local field for tracking comment state. Initialized from Comment.IsDeleted, may change when deleting was requested by user.
+        /// </summary>
+        public bool WasDeleted { get; protected set; }
 
-        public DrawableComment(Comment comment)
+        /// <summary>
+        /// Tracks this comment's level of nesting. 0 means that this comment has no parents.
+        /// </summary>
+        public int Level { get; private set; }
+
+        private FillFlowContainer childCommentsVisibilityContainer = null!;
+        private FillFlowContainer childCommentsContainer = null!;
+        private LoadRepliesButton loadRepliesButton = null!;
+        private ShowMoreRepliesButton showMoreButton = null!;
+        private ShowRepliesButton showRepliesButton = null!;
+        private ChevronButton chevronButton = null!;
+        private LinkFlowContainer actionsContainer = null!;
+        private LoadingSpinner actionsLoading = null!;
+        private DeletedCommentsCounter deletedCommentsCounter = null!;
+        private CommentAuthorLine author = null!;
+        private GridContainer content = null!;
+        private VotePill votePill = null!;
+        private Container<CommentEditor> replyEditorContainer = null!;
+        private Container repliesButtonContainer = null!;
+
+        [Resolved]
+        private IDialogOverlay? dialogOverlay { get; set; }
+
+        [Resolved]
+        private IAPIProvider api { get; set; } = null!;
+
+        [Resolved]
+        private Clipboard clipboard { get; set; } = null!;
+
+        [Resolved]
+        private OnScreenDisplay? onScreenDisplay { get; set; }
+
+        public DrawableComment(Comment comment, IReadOnlyList<CommentableMeta> meta)
         {
             Comment = comment;
+            Meta = meta;
+
+            childrenExpanded = new BindableBool(!comment.Pinned);
         }
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
+        private void load(OverlayColourProvider colourProvider, DrawableComment? parentComment)
         {
-            LinkFlowContainer username;
             FillFlowContainer info;
             CommentMarkdownContainer message;
-            GridContainer content;
-            VotePill votePill;
+
+            Level = parentComment?.Level + 1 ?? 0;
+
+            float childrenPadding = Level < 6 ? 20 : 5;
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -103,7 +144,7 @@ namespace osu.Game.Overlays.Comments
                                             Size = new Vector2(avatar_size),
                                             Children = new Drawable[]
                                             {
-                                                new UpdateableAvatar(Comment.User)
+                                                new UpdateableAvatar(Comment.User, showUserPanelOnHover: true)
                                                 {
                                                     Size = new Vector2(avatar_size),
                                                     Masking = true,
@@ -133,27 +174,7 @@ namespace osu.Game.Overlays.Comments
                                             },
                                             Children = new Drawable[]
                                             {
-                                                new FillFlowContainer
-                                                {
-                                                    AutoSizeAxes = Axes.Both,
-                                                    Direction = FillDirection.Horizontal,
-                                                    Spacing = new Vector2(10, 0),
-                                                    Children = new[]
-                                                    {
-                                                        username = new LinkFlowContainer(s => s.Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold))
-                                                        {
-                                                            AutoSizeAxes = Axes.Both
-                                                        },
-                                                        Comment.Pinned ? new PinnedCommentNotice() : Empty(),
-                                                        new ParentUsername(Comment),
-                                                        new OsuSpriteText
-                                                        {
-                                                            Alpha = Comment.IsDeleted ? 1 : 0,
-                                                            Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold),
-                                                            Text = CommentsStrings.Deleted
-                                                        }
-                                                    }
-                                                },
+                                                author = new CommentAuthorLine(Comment, Meta),
                                                 message = new CommentMarkdownContainer
                                                 {
                                                     RelativeSizeAxes = Axes.X,
@@ -161,22 +182,50 @@ namespace osu.Game.Overlays.Comments
                                                     DocumentMargin = new MarginPadding(0),
                                                     DocumentPadding = new MarginPadding(0),
                                                 },
-                                                info = new FillFlowContainer
+                                                new FillFlowContainer
                                                 {
                                                     AutoSizeAxes = Axes.Both,
                                                     Direction = FillDirection.Horizontal,
                                                     Spacing = new Vector2(10, 0),
                                                     Children = new Drawable[]
                                                     {
-                                                        new DrawableDate(Comment.CreatedAt, 12, false)
+                                                        info = new FillFlowContainer
                                                         {
-                                                            Colour = colourProvider.Foreground1
+                                                            AutoSizeAxes = Axes.Both,
+                                                            Direction = FillDirection.Horizontal,
+                                                            Spacing = new Vector2(10, 0),
+                                                            Children = new Drawable[]
+                                                            {
+                                                                new DrawableDate(Comment.CreatedAt, 12, false)
+                                                                {
+                                                                    Colour = colourProvider.Foreground1,
+                                                                }
+                                                            }
+                                                        },
+                                                        actionsContainer = new LinkFlowContainer(s => s.Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold))
+                                                        {
+                                                            Name = @"Actions buttons",
+                                                            AutoSizeAxes = Axes.Both,
+                                                        },
+                                                        actionsLoading = new LoadingSpinner
+                                                        {
+                                                            Size = new Vector2(12f),
+                                                            Anchor = Anchor.TopLeft,
+                                                            Origin = Anchor.TopLeft
                                                         }
                                                     }
                                                 },
-                                                new Container
+                                                replyEditorContainer = new Container<CommentEditor>
+                                                {
+                                                    AutoSizeAxes = Axes.Y,
+                                                    RelativeSizeAxes = Axes.X,
+                                                    Padding = new MarginPadding { Top = 10 },
+                                                    Alpha = 0,
+                                                },
+                                                repliesButtonContainer = new Container
                                                 {
                                                     AutoSizeAxes = Axes.Both,
+                                                    Alpha = 0,
                                                     Children = new Drawable[]
                                                     {
                                                         showRepliesButton = new ShowRepliesButton(Comment.RepliesCount)
@@ -196,10 +245,11 @@ namespace osu.Game.Overlays.Comments
                             },
                             childCommentsVisibilityContainer = new FillFlowContainer
                             {
+                                Name = @"Children comments",
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
                                 Direction = FillDirection.Vertical,
-                                Padding = new MarginPadding { Left = 20 },
+                                Padding = new MarginPadding { Left = childrenPadding },
                                 Children = new Drawable[]
                                 {
                                     childCommentsContainer = new FillFlowContainer
@@ -241,12 +291,7 @@ namespace osu.Game.Overlays.Comments
                 }
             };
 
-            if (Comment.UserId.HasValue)
-                username.AddUserLink(Comment.User);
-            else
-                username.AddText(Comment.LegacyName);
-
-            if (Comment.EditedAt.HasValue)
+            if (Comment.EditedAt.HasValue && Comment.EditedUser != null)
             {
                 var font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular);
                 var colour = colourProvider.Foreground1;
@@ -280,11 +325,19 @@ namespace osu.Game.Overlays.Comments
             if (Comment.HasMessage)
                 message.Text = Comment.Message;
 
-            if (Comment.IsDeleted)
-            {
-                content.FadeColour(OsuColour.Gray(0.5f));
-                votePill.Hide();
-            }
+            WasDeleted = Comment.IsDeleted;
+            if (WasDeleted)
+                makeDeleted();
+
+            actionsContainer.AddLink(CommonStrings.ButtonsPermalink, copyUrl);
+            actionsContainer.AddArbitraryDrawable(Empty().With(d => d.Width = 10));
+            actionsContainer.AddLink(CommonStrings.ButtonsReply.ToLower(), toggleReply);
+            actionsContainer.AddArbitraryDrawable(Empty().With(d => d.Width = 10));
+
+            if (Comment.UserId.HasValue && Comment.UserId.Value == api.LocalUser.Value.Id)
+                actionsContainer.AddLink(CommonStrings.ButtonsDelete.ToLower(), deleteComment);
+            else
+                actionsContainer.AddArbitraryDrawable(new CommentReportButton(Comment));
 
             if (Comment.IsTopLevel)
             {
@@ -306,6 +359,8 @@ namespace osu.Game.Overlays.Comments
                 switch (args.Action)
                 {
                     case NotifyCollectionChangedAction.Add:
+                        Debug.Assert(args.NewItems != null);
+
                         onRepliesAdded(args.NewItems.Cast<DrawableComment>());
                         break;
 
@@ -315,19 +370,93 @@ namespace osu.Game.Overlays.Comments
             };
         }
 
+        /// <summary>
+        /// Transforms some comment's components to show it as deleted. Invoked both from loading and deleting.
+        /// </summary>
+        private void makeDeleted()
+        {
+            author.MarkDeleted();
+            content.FadeColour(OsuColour.Gray(0.5f));
+            votePill.Hide();
+            actionsContainer.Expire();
+        }
+
+        /// <summary>
+        /// Invokes comment deletion with confirmation.
+        /// </summary>
+        private void deleteComment()
+        {
+            if (dialogOverlay == null)
+                deleteCommentRequest();
+            else
+                dialogOverlay.Push(new ConfirmDialog("Do you really want to delete your comment?", deleteCommentRequest));
+        }
+
+        /// <summary>
+        /// Invokes comment deletion directly.
+        /// </summary>
+        private void deleteCommentRequest()
+        {
+            actionsContainer.Hide();
+            actionsLoading.Show();
+            var request = new CommentDeleteRequest(Comment.Id);
+            request.Success += _ => Schedule(() =>
+            {
+                actionsLoading.Hide();
+                makeDeleted();
+                WasDeleted = true;
+                if (!ShowDeleted.Value)
+                    Hide();
+            });
+            request.Failure += e => Schedule(() =>
+            {
+                Logger.Error(e, "Failed to delete comment");
+                actionsLoading.Hide();
+                actionsContainer.Show();
+            });
+            api.Queue(request);
+        }
+
+        private void copyUrl()
+        {
+            clipboard.SetText($@"{api.Endpoints.APIUrl}/comments/{Comment.Id}");
+            onScreenDisplay?.Display(new CopiedToClipboardToast());
+        }
+
+        private void toggleReply()
+        {
+            if (replyEditorContainer.Count == 0)
+            {
+                replyEditorContainer.Show();
+                replyEditorContainer.Add(new ReplyCommentEditor(Comment, Meta)
+                {
+                    OnPost = comments =>
+                    {
+                        Comment.RepliesCount += comments.Length;
+                        showRepliesButton.Count = Comment.RepliesCount;
+                        Replies.AddRange(comments);
+                    },
+                    OnCancel = toggleReply
+                });
+            }
+            else
+            {
+                replyEditorContainer.ForEach(e => e.Expire());
+                replyEditorContainer.Hide();
+            }
+        }
+
         protected override void LoadComplete()
         {
             ShowDeleted.BindValueChanged(show =>
             {
-                if (Comment.IsDeleted)
+                if (WasDeleted)
                     this.FadeTo(show.NewValue ? 1 : 0);
             }, true);
             childrenExpanded.BindValueChanged(expanded => childCommentsVisibilityContainer.FadeTo(expanded.NewValue ? 1 : 0), true);
             updateButtonsState();
             base.LoadComplete();
         }
-
-        public bool ContainsReply(long replyId) => loadedReplies.ContainsKey(replyId);
 
         private void onRepliesAdded(IEnumerable<DrawableComment> replies)
         {
@@ -365,9 +494,11 @@ namespace osu.Game.Overlays.Comments
             int loadedRepliesCount = loadedReplies.Count;
             bool hasUnloadedReplies = loadedRepliesCount != Comment.RepliesCount;
 
-            loadRepliesButton.FadeTo(hasUnloadedReplies && loadedRepliesCount == 0 ? 1 : 0);
-            showMoreButton.FadeTo(hasUnloadedReplies && loadedRepliesCount > 0 ? 1 : 0);
             showRepliesButton.FadeTo(loadedRepliesCount != 0 ? 1 : 0);
+            loadRepliesButton.FadeTo(hasUnloadedReplies && loadedRepliesCount == 0 ? 1 : 0);
+            repliesButtonContainer.FadeTo(repliesButtonContainer.Any(child => child.Alpha > 0) ? 1 : 0);
+
+            showMoreButton.FadeTo(hasUnloadedReplies && loadedRepliesCount > 0 ? 1 : 0);
 
             if (Comment.IsTopLevel)
                 chevronButton.FadeTo(loadedRepliesCount != 0 ? 1 : 0);
@@ -381,7 +512,7 @@ namespace osu.Game.Overlays.Comments
             {
                 return new MarginPadding
                 {
-                    Horizontal = 70,
+                    Horizontal = WaveOverlayContainer.HORIZONTAL_PADDING,
                     Vertical = 15
                 };
             }
@@ -390,71 +521,6 @@ namespace osu.Game.Overlays.Comments
             {
                 Top = 10
             };
-        }
-
-        private class PinnedCommentNotice : FillFlowContainer
-        {
-            public PinnedCommentNotice()
-            {
-                AutoSizeAxes = Axes.Both;
-                Direction = FillDirection.Horizontal;
-                Spacing = new Vector2(2, 0);
-                Children = new Drawable[]
-                {
-                    new SpriteIcon
-                    {
-                        Icon = FontAwesome.Solid.Thumbtack,
-                        Size = new Vector2(14),
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                    },
-                    new OsuSpriteText
-                    {
-                        Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold),
-                        Text = CommentsStrings.Pinned,
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                    }
-                };
-            }
-        }
-
-        private class ParentUsername : FillFlowContainer, IHasTooltip
-        {
-            public LocalisableString TooltipText => getParentMessage();
-
-            private readonly Comment parentComment;
-
-            public ParentUsername(Comment comment)
-            {
-                parentComment = comment.ParentComment;
-
-                AutoSizeAxes = Axes.Both;
-                Direction = FillDirection.Horizontal;
-                Spacing = new Vector2(3, 0);
-                Alpha = comment.ParentId == null ? 0 : 1;
-                Children = new Drawable[]
-                {
-                    new SpriteIcon
-                    {
-                        Icon = FontAwesome.Solid.Reply,
-                        Size = new Vector2(14),
-                    },
-                    new OsuSpriteText
-                    {
-                        Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold, italics: true),
-                        Text = parentComment?.User?.Username ?? parentComment?.LegacyName
-                    }
-                };
-            }
-
-            private string getParentMessage()
-            {
-                if (parentComment == null)
-                    return string.Empty;
-
-                return parentComment.HasMessage ? parentComment.Message : parentComment.IsDeleted ? "deleted" : string.Empty;
-            }
         }
     }
 }

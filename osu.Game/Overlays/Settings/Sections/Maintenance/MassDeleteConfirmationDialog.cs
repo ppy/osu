@@ -3,30 +3,18 @@
 
 using System;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Game.Overlays.Dialog;
 
 namespace osu.Game.Overlays.Settings.Sections.Maintenance
 {
-    public class MassDeleteConfirmationDialog : PopupDialog
+    public partial class MassDeleteConfirmationDialog : DangerousActionDialog
     {
-        public MassDeleteConfirmationDialog(Action deleteAction)
+        public MassDeleteConfirmationDialog(Action deleteAction, LocalisableString deleteContent)
         {
-            BodyText = "Everything?";
-
-            Icon = FontAwesome.Regular.TrashAlt;
-            HeaderText = @"Confirm deletion of";
-            Buttons = new PopupDialogButton[]
-            {
-                new PopupDialogDangerousButton
-                {
-                    Text = @"Yes. Go for it.",
-                    Action = deleteAction
-                },
-                new PopupDialogCancelButton
-                {
-                    Text = @"No! Abort mission!",
-                },
-            };
+            BodyText = deleteContent;
+            Icon = FontAwesome.Solid.Trash;
+            DangerousAction = deleteAction;
         }
     }
 }

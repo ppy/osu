@@ -15,11 +15,20 @@ namespace osu.Game.Screens.Select.Filter
         [Description("Author")]
         Author,
 
-        [LocalisableDescription(typeof(BeatmapsetsStrings), nameof(BeatmapsetsStrings.ShowStatsBpm))]
+        [LocalisableDescription(typeof(SortStrings), nameof(SortStrings.ArtistTracksBpm))]
         BPM,
+
+        [Description("Date Submitted")]
+        DateSubmitted,
 
         [Description("Date Added")]
         DateAdded,
+
+        [Description("Date Ranked")]
+        DateRanked,
+
+        [Description("Last Played")]
+        LastPlayed,
 
         [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.ListingSearchSortingDifficulty))]
         Difficulty,
@@ -28,10 +37,10 @@ namespace osu.Game.Screens.Select.Filter
         Length,
 
         // todo: pending support (https://github.com/ppy/osu/issues/4917)
-        // [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.ListingSearchFiltersRank))]
+        // [Description("Rank Achieved")]
         // RankAchieved,
 
-        [LocalisableDescription(typeof(BeatmapsetsStrings), nameof(BeatmapsetsStrings.ShowInfoSource))]
+        [Description("Source")]
         Source,
 
         [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.ListingSearchSortingTitle))]

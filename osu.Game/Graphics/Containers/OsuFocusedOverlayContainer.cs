@@ -16,14 +16,13 @@ using osu.Game.Overlays;
 namespace osu.Game.Graphics.Containers
 {
     [Cached(typeof(IPreviewTrackOwner))]
-    public abstract class OsuFocusedOverlayContainer : FocusedOverlayContainer, IPreviewTrackOwner, IKeyBindingHandler<GlobalAction>
+    public abstract partial class OsuFocusedOverlayContainer : FocusedOverlayContainer, IPreviewTrackOwner, IKeyBindingHandler<GlobalAction>
     {
-        private Sample samplePopIn;
-        private Sample samplePopOut;
-        protected virtual string PopInSampleName => "UI/overlay-pop-in";
-        protected virtual string PopOutSampleName => "UI/overlay-pop-out";
+        protected readonly IBindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>(OverlayActivation.All);
 
-        protected override bool BlockScrollInput => false;
+        protected virtual string? PopInSampleName => @"UI/overlay-pop-in";
+        protected virtual string? PopOutSampleName => @"UI/overlay-pop-out";
+        protected virtual double PopInOutSampleBalance => 0;
 
         protected override bool BlockNonPositionalInput => true;
 
@@ -33,25 +32,29 @@ namespace osu.Game.Graphics.Containers
         /// </summary>
         protected virtual bool DimMainContent => true;
 
-        [Resolved(CanBeNull = true)]
-        private OsuGame game { get; set; }
+        [Resolved]
+        private IOverlayManager? overlayManager { get; set; }
 
         [Resolved]
-        private PreviewTrackManager previewTrackManager { get; set; }
+        private PreviewTrackManager previewTrackManager { get; set; } = null!;
 
-        protected readonly IBindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>(OverlayActivation.All);
+        private Sample? samplePopIn;
+        private Sample? samplePopOut;
 
-        [BackgroundDependencyLoader(true)]
-        private void load(AudioManager audio)
+        [BackgroundDependencyLoader]
+        private void load(AudioManager? audio)
         {
-            samplePopIn = audio.Samples.Get(PopInSampleName);
-            samplePopOut = audio.Samples.Get(PopOutSampleName);
+            if (!string.IsNullOrEmpty(PopInSampleName))
+                samplePopIn = audio?.Samples.Get(PopInSampleName);
+
+            if (!string.IsNullOrEmpty(PopOutSampleName))
+                samplePopOut = audio?.Samples.Get(PopOutSampleName);
         }
 
         protected override void LoadComplete()
         {
-            if (game != null)
-                OverlayActivationMode.BindTo(game.OverlayActivationMode);
+            if (overlayManager != null)
+                OverlayActivationMode.BindTo(overlayManager.OverlayActivationMode);
 
             OverlayActivationMode.BindValueChanged(mode =>
             {
@@ -86,6 +89,15 @@ namespace osu.Game.Graphics.Containers
                 Hide();
 
             base.OnMouseUp(e);
+        }
+
+        protected override bool OnScroll(ScrollEvent e)
+        {
+            // allow for controlling volume when alt is held.
+            // mostly for compatibility with osu-stable.
+            if (e.AltPressed) return false;
+
+            return true;
         }
 
         public virtual bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
@@ -124,17 +136,23 @@ namespace osu.Game.Graphics.Containers
                         return;
                     }
 
-                    if (didChange)
-                        samplePopIn?.Play();
+                    if (didChange && samplePopIn != null)
+                    {
+                        samplePopIn.Balance.Value = PopInOutSampleBalance;
+                        samplePopIn.Play();
+                    }
 
-                    if (BlockScreenWideMouse && DimMainContent) game?.AddBlockingOverlay(this);
+                    if (BlockScreenWideMouse && DimMainContent) overlayManager?.ShowBlockingOverlay(this);
                     break;
 
                 case Visibility.Hidden:
-                    if (didChange)
-                        samplePopOut?.Play();
+                    if (didChange && samplePopOut != null)
+                    {
+                        samplePopOut.Balance.Value = PopInOutSampleBalance;
+                        samplePopOut.Play();
+                    }
 
-                    if (BlockScreenWideMouse) game?.RemoveBlockingOverlay(this);
+                    if (BlockScreenWideMouse) overlayManager?.HideBlockingOverlay(this);
                     break;
             }
 
@@ -143,14 +161,13 @@ namespace osu.Game.Graphics.Containers
 
         protected override void PopOut()
         {
-            base.PopOut();
             previewTrackManager.StopAnyPlaying(this);
         }
 
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            game?.RemoveBlockingOverlay(this);
+            overlayManager?.HideBlockingOverlay(this);
         }
     }
 }

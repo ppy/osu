@@ -13,13 +13,15 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Timing
 {
-    public class RowAttribute : CompositeDrawable
+    public partial class RowAttribute : CompositeDrawable
     {
         protected readonly ControlPoint Point;
 
         private readonly string label;
 
-        protected FillFlowContainer Content { get; private set; }
+        protected Drawable Background { get; private set; } = null!;
+
+        protected FillFlowContainer Content { get; private set; } = null!;
 
         public RowAttribute(ControlPoint point, string label)
         {
@@ -41,11 +43,11 @@ namespace osu.Game.Screens.Edit.Timing
             Masking = true;
             CornerRadius = 3;
 
-            InternalChildren = new Drawable[]
+            InternalChildren = new[]
             {
-                new Box
+                Background = new Box
                 {
-                    Colour = overlayColours.Background4,
+                    Colour = overlayColours.Background5,
                     RelativeSizeAxes = Axes.Both,
                 },
                 Content = new FillFlowContainer

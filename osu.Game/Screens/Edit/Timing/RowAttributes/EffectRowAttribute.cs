@@ -8,21 +8,22 @@ using osu.Game.Beatmaps.ControlPoints;
 
 namespace osu.Game.Screens.Edit.Timing.RowAttributes
 {
-    public class EffectRowAttribute : RowAttribute
+    public partial class EffectRowAttribute : RowAttribute
     {
         private readonly Bindable<bool> kiaiMode;
-        private readonly Bindable<bool> omitBarLine;
         private readonly BindableNumber<double> scrollSpeed;
 
-        private AttributeText kiaiModeBubble;
-        private AttributeText omitBarLineBubble;
-        private AttributeText text;
+        private AttributeText kiaiModeBubble = null!;
+        private AttributeText text = null!;
+        private AttributeProgressBar progressBar = null!;
+
+        [Resolved]
+        protected EditorBeatmap Beatmap { get; private set; } = null!;
 
         public EffectRowAttribute(EffectControlPoint effect)
             : base(effect, "effect")
         {
             kiaiMode = effect.KiaiModeBindable.GetBoundCopy();
-            omitBarLine = effect.OmitFirstBarLineBindable.GetBoundCopy();
             scrollSpeed = effect.ScrollSpeedBindable.GetBoundCopy();
         }
 
@@ -31,17 +32,21 @@ namespace osu.Game.Screens.Edit.Timing.RowAttributes
         {
             Content.AddRange(new Drawable[]
             {
-                new AttributeProgressBar(Point)
+                progressBar = new AttributeProgressBar(Point)
                 {
                     Current = scrollSpeed,
                 },
                 text = new AttributeText(Point) { Width = 45 },
                 kiaiModeBubble = new AttributeText(Point) { Text = "kiai" },
-                omitBarLineBubble = new AttributeText(Point) { Text = "no barline" },
             });
 
+            if (!Beatmap.BeatmapInfo.Ruleset.CreateInstance().EditorShowScrollSpeed)
+            {
+                text.Hide();
+                progressBar.Hide();
+            }
+
             kiaiMode.BindValueChanged(enabled => kiaiModeBubble.FadeTo(enabled.NewValue ? 1 : 0), true);
-            omitBarLine.BindValueChanged(enabled => omitBarLineBubble.FadeTo(enabled.NewValue ? 1 : 0), true);
             scrollSpeed.BindValueChanged(_ => updateText(), true);
         }
 

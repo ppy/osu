@@ -14,7 +14,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Screens.Drawings.Components
 {
-    public class Group : Container
+    public partial class Group : Container
     {
         public readonly string GroupName;
 
@@ -84,14 +84,14 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
 
         public bool ContainsTeam(string fullName)
         {
-            return allTeams.Any(t => t.Team.FullName.Value == fullName);
+            return allTeams.Any(t => t.Team?.FullName.Value == fullName);
         }
 
         public bool RemoveTeam(TournamentTeam team)
         {
             allTeams.RemoveAll(gt => gt.Team == team);
 
-            if (teams.RemoveAll(gt => gt.Team == team) > 0)
+            if (teams.RemoveAll(gt => gt.Team == team, true) > 0)
             {
                 TeamsCount--;
                 return true;
@@ -112,7 +112,7 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
         {
             StringBuilder sb = new StringBuilder();
             foreach (GroupTeam gt in allTeams)
-                sb.AppendLine(gt.Team.FullName.Value);
+                sb.AppendLine(gt.Team?.FullName.Value);
             return sb.ToString();
         }
     }

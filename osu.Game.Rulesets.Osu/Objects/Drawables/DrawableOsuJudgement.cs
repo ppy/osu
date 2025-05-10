@@ -5,17 +5,23 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
-    public class DrawableOsuJudgement : DrawableJudgement
+    public partial class DrawableOsuJudgement : DrawableJudgement
     {
-        protected SkinnableLighting Lighting { get; private set; }
+        internal Color4 AccentColour { get; private set; }
+
+        internal SkinnableLighting Lighting { get; private set; } = null!;
 
         [Resolved]
-        private OsuConfigManager config { get; set; }
+        private OsuConfigManager config { get; set; } = null!;
+
+        private Vector2 screenSpacePosition;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -30,18 +36,36 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             });
         }
 
+        public override void Apply(JudgementResult result, DrawableHitObject? judgedObject)
+        {
+            base.Apply(result, judgedObject);
+
+            if (judgedObject is not DrawableOsuHitObject osuObject)
+                return;
+
+            AccentColour = osuObject.AccentColour.Value;
+
+            switch (osuObject)
+            {
+                case DrawableSlider slider:
+                    screenSpacePosition = slider.TailCircle.ToScreenSpace(slider.TailCircle.OriginPosition);
+                    break;
+
+                default:
+                    screenSpacePosition = osuObject.ToScreenSpace(osuObject.OriginPosition);
+                    break;
+            }
+
+            Scale = new Vector2(osuObject.HitObject.Scale);
+        }
+
         protected override void PrepareForUse()
         {
             base.PrepareForUse();
 
             Lighting.ResetAnimation();
-            Lighting.SetColourFrom(JudgedObject, Result);
-
-            if (JudgedObject?.HitObject is OsuHitObject osuObject)
-            {
-                Position = osuObject.StackedEndPosition;
-                Scale = new Vector2(osuObject.Scale);
-            }
+            Lighting.SetColourFrom(this, Result);
+            Position = Parent!.ToLocalSpace(screenSpacePosition);
         }
 
         protected override void ApplyHitAnimations()
@@ -50,7 +74,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             Lighting.Alpha = 0;
 
-            if (hitLightingEnabled && Lighting.Drawable != null)
+            if (hitLightingEnabled)
             {
                 // todo: this animation changes slightly based on new/old legacy skin versions.
                 Lighting.ScaleTo(0.8f).ScaleTo(1.2f, 600, Easing.Out);
@@ -65,7 +89,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override Drawable CreateDefaultJudgement(HitResult result) => new OsuJudgementPiece(result);
 
-        private class OsuJudgementPiece : DefaultJudgementPiece
+        private partial class OsuJudgementPiece : DefaultJudgementPiece
         {
             public OsuJudgementPiece(HitResult result)
                 : base(result)

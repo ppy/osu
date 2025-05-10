@@ -35,6 +35,11 @@ namespace osu.Game.Localisation
         public static LocalisableString AutoCursorSize => new TranslatableString(getKey(@"auto_cursor_size"), @"Adjust gameplay cursor size based on current beatmap");
 
         /// <summary>
+        /// "Show gameplay cursor during touch input"
+        /// </summary>
+        public static LocalisableString GameplayCursorDuringTouch => new TranslatableString(getKey(@"gameplay_cursor_during_touch"), @"Show gameplay cursor during touch input");
+
+        /// <summary>
         /// "Beatmap skins"
         /// </summary>
         public static LocalisableString BeatmapSkins => new TranslatableString(getKey(@"beatmap_skins"), @"Beatmap skins");
@@ -48,11 +53,6 @@ namespace osu.Game.Localisation
         /// "Beatmap hitsounds"
         /// </summary>
         public static LocalisableString BeatmapHitsounds => new TranslatableString(getKey(@"beatmap_hitsounds"), @"Beatmap hitsounds");
-
-        /// <summary>
-        /// "Export selected skin"
-        /// </summary>
-        public static LocalisableString ExportSkinButton => new TranslatableString(getKey(@"export_skin_button"), @"Export selected skin");
 
         private static string getKey(string key) => $"{prefix}:{key}";
     }

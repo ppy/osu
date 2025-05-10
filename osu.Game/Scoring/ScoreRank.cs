@@ -9,6 +9,10 @@ namespace osu.Game.Scoring
 {
     public enum ScoreRank
     {
+        // TODO: Localisable?
+        [Description(@"F")]
+        F = -1,
+
         [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.RankD))]
         [Description(@"D")]
         D,
@@ -31,6 +35,7 @@ namespace osu.Game.Scoring
 
         [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.RankSH))]
         [Description(@"S+")]
+        // ReSharper disable once InconsistentNaming
         SH,
 
         [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.RankX))]
@@ -39,6 +44,7 @@ namespace osu.Game.Scoring
 
         [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.RankXH))]
         [Description(@"SS+")]
+        // ReSharper disable once InconsistentNaming
         XH,
     }
 }

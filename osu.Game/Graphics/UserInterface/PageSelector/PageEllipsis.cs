@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
@@ -9,7 +9,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Graphics.UserInterface.PageSelector
 {
-    internal class PageEllipsis : CompositeDrawable
+    internal partial class PageEllipsis : CompositeDrawable
     {
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)

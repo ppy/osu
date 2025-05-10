@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
@@ -10,7 +10,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
-    public class ManiaReplayRecorder : ReplayRecorder<ManiaAction>
+    public partial class ManiaReplayRecorder : ReplayRecorder<ManiaAction>
     {
         public ManiaReplayRecorder(Score score)
             : base(score)

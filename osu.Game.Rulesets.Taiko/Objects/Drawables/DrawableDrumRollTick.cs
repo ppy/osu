@@ -1,19 +1,25 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using JetBrains.Annotations;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Skinning.Default;
 using osu.Game.Skinning;
+using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
-    public class DrawableDrumRollTick : DrawableTaikoStrongableHitObject<DrumRollTick, DrumRollTick.StrongNestedHit>
+    public partial class DrawableDrumRollTick : DrawableTaikoStrongableHitObject<DrumRollTick, DrumRollTick.StrongNestedHit>
     {
+        public BindableBool IsFirstTick = new BindableBool();
+
         /// <summary>
         /// The hit type corresponding to the <see cref="TaikoAction"/> that the user pressed to hit this <see cref="DrawableDrumRollTick"/>.
         /// </summary>
@@ -30,27 +36,34 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             FillMode = FillMode.Fit;
         }
 
-        protected override SkinnableDrawable CreateMainPiece() => new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.DrumRollTick),
-            _ => new TickPiece
-            {
-                Filled = HitObject.FirstTick
-            });
+        protected override SkinnableDrawable CreateMainPiece() => new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.DrumRollTick), _ => new TickPiece());
 
-        protected override double MaximumJudgementOffset => HitObject.HitWindow;
+        protected override void OnApply()
+        {
+            base.OnApply();
+
+            IsFirstTick.Value = HitObject.FirstTick;
+        }
+
+        protected override void RecreatePieces()
+        {
+            base.RecreatePieces();
+            Size = new Vector2(HitObject.IsStrong ? TaikoStrongableHitObject.DEFAULT_STRONG_SIZE : TaikoHitObject.DEFAULT_SIZE);
+        }
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
             if (!userTriggered)
             {
                 if (timeOffset > HitObject.HitWindow)
-                    ApplyResult(r => r.Type = r.Judgement.MinResult);
+                    ApplyMinResult();
                 return;
             }
 
             if (Math.Abs(timeOffset) > HitObject.HitWindow)
                 return;
 
-            ApplyResult(r => r.Type = r.Judgement.MaxResult);
+            ApplyMaxResult();
         }
 
         public override void OnKilled()
@@ -58,7 +71,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             base.OnKilled();
 
             if (Time.Current > HitObject.GetEndTime() && !Judged)
-                ApplyResult(r => r.Type = r.Judgement.MinResult);
+                ApplyMinResult();
         }
 
         protected override void UpdateHitStateTransforms(ArmedState state)
@@ -66,7 +79,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             switch (state)
             {
                 case ArmedState.Hit:
-                    this.ScaleTo(0, 100, Easing.OutQuint);
+                    this.ScaleTo(1.4f, 200, Easing.OutQuint);
+                    this.FadeOut(200, Easing.OutQuint);
                     break;
             }
         }
@@ -79,7 +93,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         protected override DrawableStrongNestedHit CreateStrongNestedHit(DrumRollTick.StrongNestedHit hitObject) => new StrongNestedHit(hitObject);
 
-        public class StrongNestedHit : DrawableStrongNestedHit
+        public partial class StrongNestedHit : DrawableStrongNestedHit
         {
             public new DrawableDrumRollTick ParentHitObject => (DrawableDrumRollTick)base.ParentHitObject;
 
@@ -98,15 +112,11 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 if (!ParentHitObject.Judged)
                     return;
 
-                ApplyResult(r => r.Type = ParentHitObject.IsHit ? r.Judgement.MaxResult : r.Judgement.MinResult);
-            }
-
-            public override void OnKilled()
-            {
-                base.OnKilled();
-
-                if (Time.Current > ParentHitObject.HitObject.GetEndTime() && !Judged)
-                    ApplyResult(r => r.Type = r.Judgement.MinResult);
+                ApplyResult(static (r, hitObject) =>
+                {
+                    var nestedHit = (StrongNestedHit)hitObject;
+                    r.Type = nestedHit.ParentHitObject!.IsHit ? r.Judgement.MaxResult : r.Judgement.MinResult;
+                });
             }
 
             public override bool OnPressed(KeyBindingPressEvent<TaikoAction> e) => false;

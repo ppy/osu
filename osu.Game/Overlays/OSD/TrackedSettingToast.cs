@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -19,7 +21,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.OSD
 {
-    public class TrackedSettingToast : Toast
+    public partial class TrackedSettingToast : Toast
     {
         private const int lights_bottom_margin = 40;
 
@@ -66,7 +68,7 @@ namespace osu.Game.Overlays.OSD
                     if (val) selectedOption = 0;
                     break;
 
-                case Enum _:
+                case Enum:
                     var values = Enum.GetValues(description.RawValue.GetType());
                     optionCount = values.Length;
                     selectedOption = Convert.ToInt32(description.RawValue);
@@ -127,7 +129,7 @@ namespace osu.Game.Overlays.OSD
             sampleChange = audio.Samples.Get("UI/osd-change");
         }
 
-        private class OptionLight : Container
+        private partial class OptionLight : Container
         {
             private Color4 glowingColour, idleColour;
 

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -19,7 +21,7 @@ using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
-    public class AuthorInfo : Container
+    public partial class AuthorInfo : Container
     {
         private const float height = 50;
 
@@ -53,7 +55,7 @@ namespace osu.Game.Overlays.BeatmapSet
                     AutoSizeAxes = Axes.Both,
                     CornerRadius = 4,
                     Masking = true,
-                    Child = avatar = new UpdateableAvatar(showGuestOnNull: false)
+                    Child = avatar = new UpdateableAvatar(showUserPanelOnHover: true, showGuestOnNull: false)
                     {
                         Size = new Vector2(height),
                     },
@@ -103,7 +105,7 @@ namespace osu.Game.Overlays.BeatmapSet
             }
         }
 
-        private class Field : FillFlowContainer
+        private partial class Field : FillFlowContainer
         {
             public Field(string first, string second, FontUsage secondFont)
             {

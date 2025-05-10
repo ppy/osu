@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
@@ -12,10 +14,11 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Skinning.Default;
 using osu.Game.Skinning;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
-    public class DrawableSliderRepeat : DrawableOsuHitObject, ITrackSnaking, IHasMainCirclePiece
+    public partial class DrawableSliderRepeat : DrawableOsuHitObject
     {
         public new SliderRepeat HitObject => (SliderRepeat)base.HitObject;
 
@@ -24,15 +27,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public DrawableSlider DrawableSlider => (DrawableSlider)ParentHitObject;
 
-        private double animDuration;
-
         public SkinnableDrawable CirclePiece { get; private set; }
 
-        public ReverseArrowPiece Arrow { get; private set; }
+        public SkinnableDrawable Arrow { get; private set; }
 
         private Drawable scaleContainer;
-
-        public override bool DisplayResult => false;
 
         public DrawableSliderRepeat()
             : base(null)
@@ -48,9 +47,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private void load()
         {
             Origin = Anchor.Centre;
-            Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
+            Size = OsuHitObject.OBJECT_DIMENSIONS;
 
-            InternalChild = scaleContainer = new Container
+            AddInternal(scaleContainer = new Container
             {
                 RelativeSizeAxes = Axes.Both,
                 Anchor = Anchor.Centre,
@@ -58,14 +57,18 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 Children = new Drawable[]
                 {
                     // no default for this; only visible in legacy skins.
-                    CirclePiece = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SliderTailHitCircle), _ => Empty())
+                    CirclePiece = new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.SliderTailHitCircle), _ => Empty())
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                     },
-                    Arrow = new ReverseArrowPiece(),
+                    Arrow = new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.ReverseArrow), _ => new DefaultReverseArrow())
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                    },
                 }
-            };
+            });
 
             ScaleBindable.BindValueChanged(scale => scaleContainer.Scale = new Vector2(scale.NewValue));
         }
@@ -75,27 +78,24 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             base.OnApply();
 
             Position = HitObject.Position - DrawableSlider.Position;
+            hasRotation = false;
         }
 
-        protected override void CheckForResult(bool userTriggered, double timeOffset)
-        {
-            if (HitObject.StartTime <= Time.Current)
-                ApplyResult(r => r.Type = DrawableSlider.Tracking.Value ? r.Judgement.MaxResult : r.Judgement.MinResult);
-        }
+        protected override void CheckForResult(bool userTriggered, double timeOffset) => DrawableSlider.SliderInputManager.TryJudgeNestedObject(this, timeOffset);
 
         protected override void UpdateInitialTransforms()
         {
-            animDuration = Math.Min(300, HitObject.SpanDuration);
+            base.UpdateInitialTransforms();
 
-            this.Animate(
-                d => d.FadeIn(animDuration),
-                d => d.ScaleTo(0.5f).ScaleTo(1f, animDuration * 2, Easing.OutElasticHalf)
-            );
+            ApplyRepeatFadeIn(CirclePiece, HitObject.TimeFadeIn);
+            ApplyRepeatFadeIn(Arrow, 150);
         }
 
         protected override void UpdateHitStateTransforms(ArmedState state)
         {
             base.UpdateHitStateTransforms(state);
+
+            double animDuration = Math.Min(300, HitObject.SpanDuration);
 
             switch (state)
             {
@@ -109,11 +109,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
                 case ArmedState.Hit:
                     this.FadeOut(animDuration, Easing.Out);
-
-                    const float final_scale = 1.5f;
-
-                    Arrow.ScaleTo(Scale * final_scale, animDuration, Easing.Out);
-                    CirclePiece.ScaleTo(Scale * final_scale, animDuration, Easing.Out);
                     break;
             }
         }
@@ -148,7 +143,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 break;
             }
 
-            float aimRotation = MathUtils.RadiansToDegrees(MathF.Atan2(aimRotationVector.Y - Position.Y, aimRotationVector.X - Position.X));
+            float aimRotation = float.RadiansToDegrees(MathF.Atan2(aimRotationVector.Y - Position.Y, aimRotationVector.X - Position.X));
             while (Math.Abs(aimRotation - Arrow.Rotation) > 180)
                 aimRotation += aimRotation < Arrow.Rotation ? 360 : -360;
 
@@ -164,5 +159,36 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 Arrow.Rotation = Interpolation.ValueAt(Math.Clamp(Clock.ElapsedFrameTime, 0, 100), Arrow.Rotation, aimRotation, 0, 50, Easing.OutQuint);
             }
         }
+
+        #region FOR EDITOR USE ONLY, DO NOT USE FOR ANY OTHER PURPOSE
+
+        internal void SuppressHitAnimations()
+        {
+            UpdateState(ArmedState.Idle);
+            UpdateComboColour();
+
+            // This method is called every frame in editor contexts, thus the lack of need for transforms.
+
+            bool hit = Time.Current >= HitStateUpdateTime;
+
+            if (hit)
+            {
+                // More or less matches stable (see https://github.com/peppy/osu-stable-reference/blob/bb57924c1552adbed11ee3d96cdcde47cf96f2b6/osu!/GameplayElements/HitObjects/Osu/HitCircleOsu.cs#L336-L338)
+                AccentColour.Value = Color4.White;
+                Alpha = Interpolation.ValueAt(Time.Current, 1f, 0f, HitStateUpdateTime, HitStateUpdateTime + 700);
+                Arrow.Alpha = 0;
+            }
+
+            LifetimeEnd = HitStateUpdateTime + 700;
+        }
+
+        internal void RestoreHitAnimations()
+        {
+            UpdateState(ArmedState.Hit);
+            UpdateComboColour();
+            Arrow.Alpha = 1;
+        }
+
+        #endregion
     }
 }

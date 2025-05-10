@@ -6,7 +6,10 @@ using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
+using osu.Game.Input.Bindings;
 using osu.Game.Online.Rooms;
 using osuTK;
 
@@ -15,28 +18,28 @@ namespace osu.Game.Screens.OnlinePlay
     /// <summary>
     /// A scrollable list which displays the <see cref="PlaylistItem"/>s in a <see cref="Room"/>.
     /// </summary>
-    public class DrawableRoomPlaylist : OsuRearrangeableListContainer<PlaylistItem>
+    public partial class DrawableRoomPlaylist : OsuRearrangeableListContainer<PlaylistItem>, IKeyBindingHandler<GlobalAction>
     {
         /// <summary>
         /// The currently-selected item. Selection is visually represented with a border.
         /// May be updated by clicking playlist items if <see cref="AllowSelection"/> is <c>true</c>.
         /// </summary>
-        public readonly Bindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
+        public readonly Bindable<PlaylistItem?> SelectedItem = new Bindable<PlaylistItem?>();
 
         /// <summary>
         /// Invoked when an item is requested to be deleted.
         /// </summary>
-        public Action<PlaylistItem> RequestDeletion;
+        public Action<PlaylistItem>? RequestDeletion;
 
         /// <summary>
         /// Invoked when an item requests its results to be shown.
         /// </summary>
-        public Action<PlaylistItem> RequestResults;
+        public Action<PlaylistItem>? RequestResults;
 
         /// <summary>
         /// Invoked when an item requests to be edited.
         /// </summary>
-        public Action<PlaylistItem> RequestEdit;
+        public Action<PlaylistItem>? RequestEdit;
 
         private bool allowReordering;
 
@@ -151,6 +154,8 @@ namespace osu.Game.Screens.OnlinePlay
 
         protected override FillFlowContainer<RearrangeableListItem<PlaylistItem>> CreateListFillFlowContainer() => new FillFlowContainer<RearrangeableListItem<PlaylistItem>>
         {
+            LayoutDuration = 200,
+            LayoutEasing = Easing.OutQuint,
             Spacing = new Vector2(0, 2)
         };
 
@@ -158,7 +163,12 @@ namespace osu.Game.Screens.OnlinePlay
         {
             d.SelectedItem.BindTarget = SelectedItem;
             d.RequestDeletion = i => RequestDeletion?.Invoke(i);
-            d.RequestResults = i => RequestResults?.Invoke(i);
+            d.RequestResults = i =>
+            {
+                if (AllowSelection)
+                    SelectedItem.Value = i;
+                RequestResults?.Invoke(i);
+            };
             d.RequestEdit = i => RequestEdit?.Invoke(i);
             d.AllowReordering = AllowReordering;
             d.AllowDeletion = AllowDeletion;
@@ -169,5 +179,78 @@ namespace osu.Game.Screens.OnlinePlay
         });
 
         protected virtual DrawableRoomPlaylistItem CreateDrawablePlaylistItem(PlaylistItem item) => new DrawableRoomPlaylistItem(item);
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            // schedules added as the properties may change value while the drawable items haven't been created yet.
+            SelectedItem.BindValueChanged(_ => Scheduler.AddOnce(scrollToSelection));
+            Items.BindCollectionChanged((_, _) => Scheduler.AddOnce(scrollToSelection), true);
+        }
+
+        private void scrollToSelection()
+        {
+            // SelectedItem and ItemMap/drawable items are managed separately,
+            // so if the item can't be unmapped to a drawable, don't try to scroll to it.
+            // best effort is made to not drop any updates, by subscribing to both sources.
+            if (SelectedItem.Value == null || !ItemMap.TryGetValue(SelectedItem.Value, out var drawableItem))
+                return;
+
+            // ScrollIntoView does not handle non-loaded items appropriately, delay scroll until the item finishes loading.
+            // see: https://github.com/ppy/osu-framework/issues/5158
+            if (!drawableItem.IsLoaded)
+                drawableItem.OnLoadComplete += _ => ScrollContainer.ScrollIntoView(drawableItem);
+            else
+                ScrollContainer.ScrollIntoView(drawableItem);
+        }
+
+        #region Key selection logic (shared with BeatmapCarousel and RoomListing)
+
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+        {
+            if (!AllowSelection)
+                return false;
+
+            switch (e.Action)
+            {
+                case GlobalAction.SelectNext:
+                    selectNext(1);
+                    return true;
+
+                case GlobalAction.SelectPrevious:
+                    selectNext(-1);
+                    return true;
+            }
+
+            return false;
+        }
+
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
+        {
+        }
+
+        private void selectNext(int direction)
+        {
+            var visibleItems = ListContainer.AsEnumerable().Where(r => r.IsPresent);
+
+            PlaylistItem? item;
+
+            if (SelectedItem.Value == null)
+                item = visibleItems.FirstOrDefault()?.Model;
+            else
+            {
+                if (direction < 0)
+                    visibleItems = visibleItems.Reverse();
+
+                item = visibleItems.SkipWhile(r => r.Model != SelectedItem.Value).Skip(1).FirstOrDefault()?.Model;
+            }
+
+            // we already have a valid selection only change selection if we still have a room to switch to.
+            if (item != null)
+                SelectedItem.Value = item;
+        }
+
+        #endregion
     }
 }

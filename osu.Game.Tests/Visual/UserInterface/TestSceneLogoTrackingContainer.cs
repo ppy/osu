@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using NUnit.Framework;
@@ -16,7 +18,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneLogoTrackingContainer : OsuTestScene
+    public partial class TestSceneLogoTrackingContainer : OsuTestScene
     {
         private OsuLogo logo;
         private TestLogoTrackingContainer trackingContainer;
@@ -257,7 +259,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private void removeFacade()
         {
-            trackingContainer.Remove(logoFacade);
+            trackingContainer.Remove(logoFacade, false);
             visualBox.Colour = Color4.White;
             moveLogoFacade();
         }
@@ -267,20 +269,20 @@ namespace osu.Game.Tests.Visual.UserInterface
             if (!logoFacade.Transforms.Any() && !transferContainer.Transforms.Any())
             {
                 Random random = new Random();
-                trackingContainer.Delay(500).MoveTo(new Vector2(random.Next(0, (int)logo.Parent.DrawWidth), random.Next(0, (int)logo.Parent.DrawHeight)), 300);
-                transferContainer.Delay(500).MoveTo(new Vector2(random.Next(0, (int)logo.Parent.DrawWidth), random.Next(0, (int)logo.Parent.DrawHeight)), 300);
+                trackingContainer.Delay(500).MoveTo(new Vector2(random.Next(0, (int)logo.Parent!.DrawWidth), random.Next(0, (int)logo.Parent!.DrawHeight)), 300);
+                transferContainer.Delay(500).MoveTo(new Vector2(random.Next(0, (int)logo.Parent!.DrawWidth), random.Next(0, (int)logo.Parent!.DrawHeight)), 300);
             }
 
             if (randomPositions)
                 Schedule(moveLogoFacade);
         }
 
-        private class TestLogoTrackingContainer : LogoTrackingContainer
+        private partial class TestLogoTrackingContainer : LogoTrackingContainer
         {
             /// <summary>
             /// Check that the logo is tracking the position of the facade, with an acceptable precision lenience.
             /// </summary>
-            public bool IsLogoTracking => Precision.AlmostEquals(Logo.Position, ComputeLogoTrackingPosition());
+            public bool IsLogoTracking => Precision.AlmostEquals(Logo!.Position, ComputeLogoTrackingPosition());
         }
     }
 }

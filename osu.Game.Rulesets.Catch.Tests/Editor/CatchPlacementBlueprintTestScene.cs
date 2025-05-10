@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using NUnit.Framework;
@@ -10,7 +12,6 @@ using osu.Framework.Testing;
 using osu.Framework.Timing;
 using osu.Game.Rulesets.Catch.Edit.Blueprints.Components;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
-using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Tests.Visual;
@@ -19,8 +20,10 @@ using osuTK.Input;
 
 namespace osu.Game.Rulesets.Catch.Tests.Editor
 {
-    public abstract class CatchPlacementBlueprintTestScene : PlacementBlueprintTestScene
+    public abstract partial class CatchPlacementBlueprintTestScene : PlacementBlueprintTestScene
     {
+        protected sealed override Ruleset CreateRuleset() => new CatchRuleset();
+
         protected const double TIME_SNAP = 100;
 
         protected DrawableCatchHitObject LastObject;
@@ -69,11 +72,11 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
             contentContainer.Playfield.HitObjectContainer.Add(hitObject);
         }
 
-        protected override SnapResult SnapForBlueprint(PlacementBlueprint blueprint)
+        protected override void UpdatePlacementTimeAndPosition()
         {
-            var result = base.SnapForBlueprint(blueprint);
-            result.Time = Math.Round(HitObjectContainer.TimeAtScreenSpacePosition(result.ScreenSpacePosition) / TIME_SNAP) * TIME_SNAP;
-            return result;
+            var position = InputManager.CurrentState.Mouse.Position;
+            double time = Math.Round(HitObjectContainer.TimeAtScreenSpacePosition(position) / TIME_SNAP) * TIME_SNAP;
+            CurrentBlueprint.UpdateTimeAndPosition(position, time);
         }
     }
 }

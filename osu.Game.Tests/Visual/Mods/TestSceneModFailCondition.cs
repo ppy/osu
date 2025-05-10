@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
@@ -12,7 +12,7 @@ using osu.Game.Screens.Play;
 
 namespace osu.Game.Tests.Visual.Mods
 {
-    public class TestSceneModFailCondition : ModTestScene
+    public partial class TestSceneModFailCondition : ModTestScene
     {
         private bool restartRequested;
 
@@ -21,7 +21,7 @@ namespace osu.Game.Tests.Visual.Mods
         protected override TestPlayer CreateModPlayer(Ruleset ruleset)
         {
             var player = base.CreateModPlayer(ruleset);
-            player.RestartRequested = () => restartRequested = true;
+            player.PrepareLoaderForRestart = _ => restartRequested = true;
             return player;
         }
 

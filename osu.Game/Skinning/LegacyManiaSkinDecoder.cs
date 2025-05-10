@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -84,12 +86,20 @@ namespace osu.Game.Skinning
                         parseArrayValue(pair.Value, currentConfig.ColumnWidth);
                         break;
 
+                    case "BarlineHeight":
+                        currentConfig.BarLineHeight = float.Parse(pair.Value, CultureInfo.InvariantCulture);
+                        break;
+
                     case "HitPosition":
                         currentConfig.HitPosition = (480 - Math.Clamp(float.Parse(pair.Value, CultureInfo.InvariantCulture), 240, 480)) * LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR;
                         break;
 
                     case "LightPosition":
                         currentConfig.LightPosition = (480 - float.Parse(pair.Value, CultureInfo.InvariantCulture)) * LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR;
+                        break;
+
+                    case "ComboPosition":
+                        currentConfig.ComboPosition = (float.Parse(pair.Value, CultureInfo.InvariantCulture)) * LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR;
                         break;
 
                     case "ScorePosition":
@@ -112,22 +122,30 @@ namespace osu.Game.Skinning
                         parseArrayValue(pair.Value, currentConfig.HoldNoteLightWidth);
                         break;
 
-                    case "WidthForNoteHeightScale":
-                        float minWidth = float.Parse(pair.Value, CultureInfo.InvariantCulture) * LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR;
-                        if (minWidth > 0)
-                            currentConfig.MinimumColumnWidth = minWidth;
+                    case "NoteBodyStyle":
+                        if (Enum.TryParse<LegacyNoteBodyStyle>(pair.Value, out var style))
+                            currentConfig.NoteBodyStyle = style;
                         break;
 
-                    case string _ when pair.Key.StartsWith("Colour", StringComparison.Ordinal):
-                        HandleColours(currentConfig, line);
+                    case "WidthForNoteHeightScale":
+                        currentConfig.WidthForNoteHeightScale = (float.Parse(pair.Value, CultureInfo.InvariantCulture)) * LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR;
+                        break;
+
+                    case "LightFramePerSecond":
+                        int lightFramePerSecond = int.Parse(pair.Value, CultureInfo.InvariantCulture);
+                        currentConfig.LightFramePerSecond = lightFramePerSecond > 0 ? lightFramePerSecond : 24;
+                        break;
+
+                    case string when pair.Key.StartsWith("Colour", StringComparison.Ordinal):
+                        HandleColours(currentConfig, line, true);
                         break;
 
                     // Custom sprite paths
-                    case string _ when pair.Key.StartsWith("NoteImage", StringComparison.Ordinal):
-                    case string _ when pair.Key.StartsWith("KeyImage", StringComparison.Ordinal):
-                    case string _ when pair.Key.StartsWith("Hit", StringComparison.Ordinal):
-                    case string _ when pair.Key.StartsWith("Stage", StringComparison.Ordinal):
-                    case string _ when pair.Key.StartsWith("Lighting", StringComparison.Ordinal):
+                    case string when pair.Key.StartsWith("NoteImage", StringComparison.Ordinal):
+                    case string when pair.Key.StartsWith("KeyImage", StringComparison.Ordinal):
+                    case string when pair.Key.StartsWith("Hit", StringComparison.Ordinal):
+                    case string when pair.Key.StartsWith("Stage", StringComparison.Ordinal):
+                    case string when pair.Key.StartsWith("Lighting", StringComparison.Ordinal):
                         currentConfig.ImageLookups[pair.Key] = pair.Value;
                         break;
                 }
@@ -145,7 +163,15 @@ namespace osu.Game.Skinning
                 if (i >= output.Length)
                     break;
 
-                output[i] = float.Parse(values[i], CultureInfo.InvariantCulture) * (applyScaleFactor ? LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR : 1);
+                if (!float.TryParse(values[i], NumberStyles.Float, CultureInfo.InvariantCulture, out float parsedValue))
+                    // some skins may provide incorrect entries in array values. to match stable behaviour, read such entries as zero.
+                    // see: https://github.com/ppy/osu/issues/26464, stable code: https://github.com/peppy/osu-stable-reference/blob/3ea48705eb67172c430371dcfc8a16a002ed0d3d/osu!/Graphics/Skinning/Components/Section.cs#L134-L137
+                    parsedValue = 0;
+
+                if (applyScaleFactor)
+                    parsedValue *= LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR;
+
+                output[i] = parsedValue;
             }
         }
     }

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using NUnit.Framework;
 using osu.Framework.Bindables;
@@ -11,7 +13,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneStatefulMenuItem : OsuManualInputManagerTestScene
+    public partial class TestSceneStatefulMenuItem : OsuManualInputManagerTestScene
     {
         [Test]
         public void TestTernaryRadioMenuItem()
@@ -106,6 +108,51 @@ namespace osu.Game.Tests.Visual.UserInterface
                 {
                     InputManager.MoveMouseTo(menu.ScreenSpaceDrawQuad.Centre);
                     InputManager.Click(MouseButton.Left);
+                });
+
+            void checkState(TernaryState expected)
+                => AddAssert($"state is {expected}", () => state.Value == expected);
+        }
+
+        [Test]
+        public void TestItemRespondsToRightClick()
+        {
+            OsuMenu menu = null;
+
+            Bindable<TernaryState> state = new Bindable<TernaryState>(TernaryState.Indeterminate);
+
+            AddStep("create menu", () =>
+            {
+                state.Value = TernaryState.Indeterminate;
+
+                Child = menu = new OsuMenu(Direction.Vertical, true)
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Items = new[]
+                    {
+                        new TernaryStateToggleMenuItem("First"),
+                        new TernaryStateToggleMenuItem("Second") { State = { BindTarget = state } },
+                        new TernaryStateToggleMenuItem("Third") { State = { Value = TernaryState.True } },
+                    }
+                };
+            });
+
+            checkState(TernaryState.Indeterminate);
+
+            click();
+            checkState(TernaryState.True);
+
+            click();
+            checkState(TernaryState.False);
+
+            AddStep("change state via bindable", () => state.Value = TernaryState.True);
+
+            void click() =>
+                AddStep("click", () =>
+                {
+                    InputManager.MoveMouseTo(menu.ScreenSpaceDrawQuad.Centre);
+                    InputManager.Click(MouseButton.Right);
                 });
 
             void checkState(TernaryState expected)

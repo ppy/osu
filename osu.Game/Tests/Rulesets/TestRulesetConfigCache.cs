@@ -12,8 +12,8 @@ namespace osu.Game.Tests.Rulesets
     /// </summary>
     public class TestRulesetConfigCache : IRulesetConfigCache
     {
-        private readonly ConcurrentDictionary<string, IRulesetConfigManager> configCache = new ConcurrentDictionary<string, IRulesetConfigManager>();
+        private readonly ConcurrentDictionary<string, IRulesetConfigManager?> configCache = new ConcurrentDictionary<string, IRulesetConfigManager?>();
 
-        public IRulesetConfigManager GetConfigFor(Ruleset ruleset) => configCache.GetOrAdd(ruleset.ShortName, _ => ruleset.CreateConfig(null));
+        public IRulesetConfigManager? GetConfigFor(Ruleset ruleset) => configCache.GetOrAdd(ruleset.ShortName, _ => ruleset.CreateConfig(null));
     }
 }

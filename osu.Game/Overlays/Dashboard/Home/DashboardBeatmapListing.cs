@@ -10,7 +10,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Dashboard.Home
 {
-    public class DashboardBeatmapListing : CompositeDrawable
+    public partial class DashboardBeatmapListing : CompositeDrawable
     {
         private readonly List<APIBeatmapSet> newBeatmaps;
         private readonly List<APIBeatmapSet> popularBeatmaps;

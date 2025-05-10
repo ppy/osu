@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -12,35 +13,40 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using osu.Game.Overlays.Settings;
+using osu.Game.Overlays;
 using osu.Game.Tournament.Components;
+using osu.Game.Tournament.Screens.Editors.Components;
 using osuTK;
 
 namespace osu.Game.Tournament.Screens.Editors
 {
-    public abstract class TournamentEditorScreen<TDrawable, TModel> : TournamentScreen, IProvideVideo
+    public abstract partial class TournamentEditorScreen<TDrawable, TModel> : TournamentScreen
         where TDrawable : Drawable, IModelBacked<TModel>
         where TModel : class, new()
     {
         protected abstract BindableList<TModel> Storage { get; }
 
-        private FillFlowContainer<TDrawable> flow;
+        [Resolved]
+        private IDialogOverlay? dialogOverlay { get; set; }
 
-        [Resolved(canBeNull: true)]
-        private TournamentSceneManager sceneManager { get; set; }
+        private FillFlowContainer<TDrawable> flow = null!;
 
-        protected ControlPanel ControlPanel;
+        [Resolved]
+        private TournamentSceneManager? sceneManager { get; set; }
 
-        private readonly TournamentScreen parentScreen;
-        private BackButton backButton;
+        protected ControlPanel ControlPanel = null!;
 
-        protected TournamentEditorScreen(TournamentScreen parentScreen = null)
+        private readonly TournamentScreen? parentScreen;
+
+        private BackButton backButton = null!;
+
+        protected TournamentEditorScreen(TournamentScreen? parentScreen = null)
         {
             this.parentScreen = parentScreen;
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuColour colours)
         {
             AddRangeInternal(new Drawable[]
             {
@@ -60,6 +66,7 @@ namespace osu.Game.Tournament.Screens.Editors
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         Spacing = new Vector2(20),
+                        Padding = new MarginPadding(20),
                     },
                 },
                 ControlPanel = new ControlPanel
@@ -72,11 +79,15 @@ namespace osu.Game.Tournament.Screens.Editors
                             Text = "Add new",
                             Action = () => Storage.Add(new TModel())
                         },
-                        new DangerousSettingsButton
+                        new TourneyButton
                         {
                             RelativeSizeAxes = Axes.X,
+                            BackgroundColour = colours.DangerousButtonColour,
                             Text = "Clear all",
-                            Action = Storage.Clear
+                            Action = () =>
+                            {
+                                dialogOverlay?.Push(new TournamentClearAllDialog(() => Storage.Clear()));
+                            }
                         },
                     }
                 }
@@ -100,11 +111,15 @@ namespace osu.Game.Tournament.Screens.Editors
                 switch (args.Action)
                 {
                     case NotifyCollectionChangedAction.Add:
+                        Debug.Assert(args.NewItems != null);
+
                         args.NewItems.Cast<TModel>().ForEach(i => flow.Add(CreateDrawable(i)));
                         break;
 
                     case NotifyCollectionChangedAction.Remove:
-                        args.OldItems.Cast<TModel>().ForEach(i => flow.RemoveAll(d => d.Model == i));
+                        Debug.Assert(args.OldItems != null);
+
+                        args.OldItems.Cast<TModel>().ForEach(i => flow.RemoveAll(d => d.Model == i, true));
                         break;
                 }
             };

@@ -18,12 +18,12 @@ namespace osu.Game.Tournament.Models
         /// <summary>
         /// Path to the IPC directory used by the stable (cutting-edge) install.
         /// </summary>
-        public string StablePath { get; set; }
+        public string? StablePath { get; set; }
 
         /// <summary>
         /// Fired whenever stable info is successfully saved to file.
         /// </summary>
-        public event Action OnStableInfoSaved;
+        public event Action? OnStableInfoSaved;
 
         private const string config_path = "stable.json";
 
@@ -45,7 +45,7 @@ namespace osu.Game.Tournament.Models
 
         public void SaveChanges()
         {
-            using (var stream = configStorage.GetStream(config_path, FileAccess.Write, FileMode.Create))
+            using (var stream = configStorage.CreateFileSafely(config_path))
             using (var sw = new StreamWriter(stream))
             {
                 sw.Write(JsonConvert.SerializeObject(this,

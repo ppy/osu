@@ -26,7 +26,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneMatchStartControl : OsuManualInputManagerTestScene
+    public partial class TestSceneMatchStartControl : OsuManualInputManagerTestScene
     {
         private readonly Mock<MultiplayerClient> multiplayerClient = new Mock<MultiplayerClient>();
         private readonly Mock<OnlinePlayBeatmapAvailabilityTracker> availabilityTracker = new Mock<OnlinePlayBeatmapAvailabilityTracker>();
@@ -34,17 +34,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private readonly Bindable<BeatmapAvailability> beatmapAvailability = new Bindable<BeatmapAvailability>();
         private readonly Bindable<Room> room = new Bindable<Room>();
 
-        private MultiplayerRoom multiplayerRoom;
-        private MultiplayerRoomUser localUser;
-        private OngoingOperationTracker ongoingOperationTracker;
+        private MultiplayerRoom multiplayerRoom = null!;
+        private MultiplayerRoomUser localUser = null!;
+        private OngoingOperationTracker ongoingOperationTracker = null!;
 
-        private PopoverContainer content;
-        private MatchStartControl control;
+        private PopoverContainer content = null!;
+        private MatchStartControl control = null!;
 
         private OsuButton readyButton => control.ChildrenOfType<OsuButton>().Single();
-
-        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
-            new CachedModelDependencyContainer<Room>(base.CreateChildDependencies(parent)) { Model = { BindTarget = room } };
 
         [BackgroundDependencyLoader]
         private void load()
@@ -88,9 +85,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                                          setRoomCountdown(countdownStart.Duration);
                                          break;
 
-                                     case StopCountdownRequest _:
-                                         multiplayerRoom.Countdown = null;
-                                         raiseRoomUpdated();
+                                     case StopCountdownRequest:
+                                         clearRoomCountdown();
                                          break;
                                  }
                              });
@@ -111,25 +107,25 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                 beatmapAvailability.Value = BeatmapAvailability.LocallyAvailable();
 
-                var playlistItem = new PlaylistItem(Beatmap.Value.BeatmapInfo)
+                PlaylistItem item = new PlaylistItem(Beatmap.Value.BeatmapInfo)
                 {
                     RulesetID = Beatmap.Value.BeatmapInfo.Ruleset.OnlineID
                 };
 
                 room.Value = new Room
                 {
-                    Playlist = { playlistItem },
-                    CurrentPlaylistItem = { Value = playlistItem }
+                    Playlist = [item],
+                    CurrentPlaylistItem = item
                 };
 
-                localUser = new MultiplayerRoomUser(API.LocalUser.Value.Id) { User = API.LocalUser.Value };
+                localUser = new MultiplayerRoomUser(API.LocalUser.Value.Id)
+                {
+                    User = API.LocalUser.Value
+                };
 
                 multiplayerRoom = new MultiplayerRoom(0)
                 {
-                    Playlist =
-                    {
-                        new MultiplayerPlaylistItem(playlistItem),
-                    },
+                    Playlist = { new MultiplayerPlaylistItem(item) },
                     Users = { localUser },
                     Host = localUser,
                 };
@@ -141,7 +137,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Size = new Vector2(250, 50),
+                    Size = new Vector2(250, 50)
                 };
             });
         }
@@ -242,14 +238,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
 
             AddStep("start countdown", () => multiplayerClient.Object.SendMatchRequest(new StartMatchCountdownRequest { Duration = TimeSpan.FromMinutes(1) }).WaitSafely());
-            AddUntilStep("countdown started", () => multiplayerRoom.Countdown != null);
+            AddUntilStep("countdown started", () => multiplayerRoom.ActiveCountdowns.Any());
 
             AddStep("transfer host to local user", () => transferHost(localUser));
             AddUntilStep("local user is host", () => multiplayerRoom.Host?.Equals(multiplayerClient.Object.LocalUser) == true);
 
             ClickButtonWhenEnabled<MultiplayerReadyButton>();
             checkLocalUserState(MultiplayerUserState.Ready);
-            AddAssert("countdown still active", () => multiplayerRoom.Countdown != null);
+            AddAssert("countdown still active", () => multiplayerRoom.ActiveCountdowns.Any());
         }
 
         [Test]
@@ -377,6 +373,41 @@ namespace osu.Game.Tests.Visual.Multiplayer
             }, users);
         }
 
+        [Test]
+        public void TestAbortMatch()
+        {
+            AddStep("setup client", () =>
+            {
+                multiplayerClient.Setup(m => m.StartMatch())
+                                 .Callback(() =>
+                                 {
+                                     multiplayerClient.Raise(m => m.LoadRequested -= null);
+                                     multiplayerClient.Object.Room!.State = MultiplayerRoomState.WaitingForLoad;
+
+                                     // The local user state doesn't really matter, so let's do the same as the base implementation for these tests.
+                                     changeUserState(localUser.UserID, MultiplayerUserState.Idle);
+                                 });
+
+                multiplayerClient.Setup(m => m.AbortMatch())
+                                 .Callback(() =>
+                                 {
+                                     multiplayerClient.Object.Room!.State = MultiplayerRoomState.Open;
+                                     raiseRoomUpdated();
+                                 });
+            });
+
+            // Ready
+            ClickButtonWhenEnabled<MultiplayerReadyButton>();
+
+            // Start match
+            ClickButtonWhenEnabled<MultiplayerReadyButton>();
+            AddUntilStep("countdown button disabled", () => !this.ChildrenOfType<MultiplayerCountdownButton>().Single().Enabled.Value);
+
+            // Abort
+            ClickButtonWhenEnabled<MultiplayerReadyButton>();
+            AddStep("check abort request received", () => multiplayerClient.Verify(m => m.AbortMatch(), Times.Once));
+        }
+
         private void verifyGameplayStartFlow()
         {
             checkLocalUserState(MultiplayerUserState.Ready);
@@ -390,7 +421,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private void setRoomCountdown(TimeSpan duration)
         {
-            multiplayerRoom.Countdown = new MatchStartCountdown { TimeRemaining = duration };
+            multiplayerRoom.ActiveCountdowns.Add(new MatchStartCountdown { TimeRemaining = duration });
+            raiseRoomUpdated();
+        }
+
+        private void clearRoomCountdown()
+        {
+            multiplayerRoom.ActiveCountdowns.Clear();
             raiseRoomUpdated();
         }
 

@@ -13,33 +13,35 @@ using osu.Game.Users.Drawables;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneDrawableRoomParticipantsList : OnlinePlayTestScene
+    public partial class TestSceneDrawableRoomParticipantsList : OnlinePlayTestScene
     {
-        private DrawableRoomParticipantsList list;
+        private Room room = null!;
+        private DrawableRoomParticipantsList list = null!;
 
-        [SetUp]
-        public new void Setup() => Schedule(() =>
+        public override void SetUpSteps()
         {
-            SelectedRoom.Value = new Room
+            base.SetUpSteps();
+
+            AddStep("create list", () =>
             {
-                Name = { Value = "test room" },
-                Host =
+                room = new Room
                 {
-                    Value = new APIUser
+                    Name = "test room",
+                    Host = new APIUser
                     {
                         Id = 2,
                         Username = "peppy",
                     }
-                }
-            };
+                };
 
-            Child = list = new DrawableRoomParticipantsList
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                NumberOfCircles = 4
-            };
-        });
+                Child = list = new DrawableRoomParticipantsList(room)
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    NumberOfCircles = 4
+                };
+            });
+        }
 
         [Test]
         public void TestCircleCountNearLimit()
@@ -118,7 +120,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddAssert("4 circles displayed", () => list.ChildrenOfType<UpdateableAvatar>().Count() == 4);
             AddAssert("46 hidden users", () => list.ChildrenOfType<DrawableRoomParticipantsList.HiddenUserCount>().Single().Count == 46);
 
-            AddStep("remove from end", () => removeUserAt(SelectedRoom.Value.RecentParticipants.Count - 1));
+            AddStep("remove from end", () => removeUserAt(room.RecentParticipants.Count - 1));
             AddAssert("4 circles displayed", () => list.ChildrenOfType<UpdateableAvatar>().Count() == 4);
             AddAssert("45 hidden users", () => list.ChildrenOfType<DrawableRoomParticipantsList.HiddenUserCount>().Single().Count == 45);
 
@@ -137,18 +139,18 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private void addUser(int id)
         {
-            SelectedRoom.Value.RecentParticipants.Add(new APIUser
+            room.RecentParticipants = room.RecentParticipants.Append(new APIUser
             {
                 Id = id,
                 Username = $"User {id}"
-            });
-            SelectedRoom.Value.ParticipantCount.Value++;
+            }).ToArray();
+            room.ParticipantCount++;
         }
 
         private void removeUserAt(int index)
         {
-            SelectedRoom.Value.RecentParticipants.RemoveAt(index);
-            SelectedRoom.Value.ParticipantCount.Value--;
+            room.RecentParticipants = room.RecentParticipants.Where(u => !u.Equals(room.RecentParticipants[index])).ToArray();
+            room.ParticipantCount--;
         }
     }
 }

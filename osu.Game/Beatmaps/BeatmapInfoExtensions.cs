@@ -3,11 +3,26 @@
 
 using System.Linq;
 using osu.Framework.Localisation;
+using osu.Game.Online.API;
+using osu.Game.Rulesets;
+using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Screens.Select;
 
 namespace osu.Game.Beatmaps
 {
     public static class BeatmapInfoExtensions
     {
+        /// <summary>
+        /// Given an <see cref="IBeatmap"/>, update length, BPM and object counts.
+        /// </summary>
+        public static void UpdateStatisticsFromBeatmap(this BeatmapInfo beatmapInfo, IBeatmap beatmap)
+        {
+            beatmapInfo.Length = beatmap.CalculatePlayableLength();
+            beatmapInfo.BPM = 60000 / beatmap.GetMostCommonBeatLength();
+            beatmapInfo.EndTimeObjectCount = beatmap.HitObjects.Count(h => h is IHasDuration);
+            beatmapInfo.TotalObjectCount = beatmap.HitObjects.Count;
+        }
+
         /// <summary>
         /// A user-presentable display title representing this beatmap.
         /// </summary>
@@ -29,11 +44,35 @@ namespace osu.Game.Beatmaps
             return new RomanisableString($"{metadata.GetPreferred(true)}".Trim(), $"{metadata.GetPreferred(false)}".Trim());
         }
 
-        public static string[] GetSearchableTerms(this IBeatmapInfo beatmapInfo) => new[]
+        public static bool Match(this IBeatmapInfo beatmapInfo, params FilterCriteria.OptionalTextFilter[] filters)
         {
-            beatmapInfo.DifficultyName
-        }.Concat(beatmapInfo.Metadata.GetSearchableTerms()).Where(s => !string.IsNullOrEmpty(s)).ToArray();
+            foreach (var filter in filters)
+            {
+                if (filter.Matches(beatmapInfo.DifficultyName))
+                    continue;
+
+                if (BeatmapMetadataInfoExtensions.Match(beatmapInfo.Metadata, filter))
+                    continue;
+
+                // failed to match a single filter at all - fail the whole match.
+                return false;
+            }
+
+            // got through all filters without failing any - pass the whole match.
+            return true;
+        }
 
         private static string getVersionString(IBeatmapInfo beatmapInfo) => string.IsNullOrEmpty(beatmapInfo.DifficultyName) ? string.Empty : $"[{beatmapInfo.DifficultyName}]";
+
+        /// <summary>
+        /// Get the beatmap info page URL, or <c>null</c> if unavailable.
+        /// </summary>
+        public static string? GetOnlineURL(this IBeatmapInfo beatmapInfo, IAPIProvider api, IRulesetInfo? ruleset = null)
+        {
+            if (beatmapInfo.OnlineID <= 0 || beatmapInfo.BeatmapSet == null)
+                return null;
+
+            return $@"{api.Endpoints.WebsiteUrl}/beatmapsets/{beatmapInfo.BeatmapSet.OnlineID}#{ruleset?.ShortName ?? beatmapInfo.Ruleset.ShortName}/{beatmapInfo.OnlineID}";
+        }
     }
 }

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -19,7 +21,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Tests
 {
-    public class TestSceneDrawableHitObjects : OsuTestScene
+    public partial class TestSceneDrawableHitObjects : OsuTestScene
     {
         private DrawableCatchRuleset drawableRuleset;
         private double playfieldTime => drawableRuleset.Playfield.Time.Current;
@@ -124,7 +126,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             {
                 X = xCoords,
                 StartTime = playfieldTime + 1000,
-                Path = new SliderPath(PathType.Linear, new[]
+                Path = new SliderPath(PathType.LINEAR, new[]
                 {
                     Vector2.Zero,
                     new Vector2(0, 200)

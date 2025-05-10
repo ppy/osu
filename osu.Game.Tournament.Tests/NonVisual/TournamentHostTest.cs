@@ -11,7 +11,7 @@ namespace osu.Game.Tournament.Tests.NonVisual
 {
     public abstract class TournamentHostTest
     {
-        public static TournamentGameBase LoadTournament(GameHost host, TournamentGameBase tournament = null)
+        public static TournamentGameBase LoadTournament(GameHost host, TournamentGameBase? tournament = null)
         {
             tournament ??= new TournamentGameBase();
             Task.Factory.StartNew(() => host.Run(tournament), TaskCreationOptions.LongRunning)

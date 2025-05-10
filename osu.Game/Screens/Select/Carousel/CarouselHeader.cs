@@ -19,7 +19,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Select.Carousel
 {
-    public class CarouselHeader : Container
+    public partial class CarouselHeader : Container
     {
         public Container BorderContainer;
 
@@ -46,7 +46,8 @@ namespace osu.Game.Screens.Select.Carousel
                 Children = new Drawable[]
                 {
                     Content,
-                    hoverLayer = new HoverLayer()
+                    hoverLayer = new HoverLayer(),
+                    new HeaderSounds(),
                 }
             };
         }
@@ -91,11 +92,9 @@ namespace osu.Game.Screens.Select.Carousel
             }
         }
 
-        public class HoverLayer : HoverSampleDebounceComponent
+        public partial class HoverLayer : CompositeDrawable
         {
-            private Sample sampleHover;
-
-            private Box box;
+            private Box box = null!;
 
             public HoverLayer()
             {
@@ -103,7 +102,7 @@ namespace osu.Game.Screens.Select.Carousel
             }
 
             [BackgroundDependencyLoader]
-            private void load(AudioManager audio, OsuColour colours)
+            private void load(OsuColour colours)
             {
                 InternalChild = box = new Box
                 {
@@ -112,8 +111,6 @@ namespace osu.Game.Screens.Select.Carousel
                     Blending = BlendingParameters.Additive,
                     RelativeSizeAxes = Axes.Both,
                 };
-
-                sampleHover = audio.Samples.Get("UI/default-hover");
             }
 
             public bool InsetForBorder
@@ -146,6 +143,17 @@ namespace osu.Game.Screens.Select.Carousel
             {
                 box.FadeOut(1000, Easing.OutQuint);
                 base.OnHoverLost(e);
+            }
+        }
+
+        private partial class HeaderSounds : HoverSampleDebounceComponent
+        {
+            private Sample? sampleHover;
+
+            [BackgroundDependencyLoader]
+            private void load(AudioManager audio)
+            {
+                sampleHover = audio.Samples.Get("UI/default-hover");
             }
 
             public override void PlayHoverSample()

@@ -1,11 +1,14 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.IO;
-using osu.Game.IO.FileAbstraction;
+using osu.Framework.Logging;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit.Checks.Components;
 using osu.Game.Storyboards;
+using osu.Game.Utils;
 using TagLib;
 using File = TagLib.File;
 
@@ -42,7 +45,7 @@ namespace osu.Game.Rulesets.Edit.Checks
 
             foreach (string filename in videoPaths)
             {
-                string storagePath = beatmapSet?.GetPathForFile(filename);
+                string? storagePath = beatmapSet?.GetPathForFile(filename);
 
                 if (storagePath == null)
                 {
@@ -58,7 +61,7 @@ namespace osu.Game.Rulesets.Edit.Checks
                 {
                     // We use TagLib here for platform invariance; BASS cannot detect audio presence on Linux.
                     using (Stream data = context.WorkingBeatmap.GetStream(storagePath))
-                    using (File tagFile = File.Create(new StreamFileAbstraction(filename, data)))
+                    using (File tagFile = TagLibUtils.GetTagLibFile(filename, data))
                     {
                         if (tagFile.Properties.AudioChannels == 0)
                             continue;
@@ -73,6 +76,11 @@ namespace osu.Game.Rulesets.Edit.Checks
                 catch (UnsupportedFormatException)
                 {
                     issue = new IssueTemplateFileError(this).Create(filename, "Unsupported format");
+                }
+                catch (Exception ex)
+                {
+                    issue = new IssueTemplateFileError(this).Create(filename, "Internal failure - see logs for more info");
+                    Logger.Log($"Failed when running {nameof(CheckAudioInVideo)}: {ex}");
                 }
 
                 yield return issue;

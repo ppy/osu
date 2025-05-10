@@ -14,26 +14,26 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Timing
 {
-    internal abstract class Section<T> : CompositeDrawable
+    internal abstract partial class Section<T> : CompositeDrawable
         where T : ControlPoint
     {
-        private OsuCheckbox checkbox;
-        private Container content;
+        private OsuCheckbox checkbox = null!;
+        private Container content = null!;
 
-        protected FillFlowContainer Flow { get; private set; }
+        protected FillFlowContainer Flow { get; private set; } = null!;
 
-        protected Bindable<T> ControlPoint { get; } = new Bindable<T>();
+        protected Bindable<T?> ControlPoint { get; } = new Bindable<T?>();
 
         private const float header_height = 50;
 
         [Resolved]
-        protected EditorBeatmap Beatmap { get; private set; }
+        protected EditorBeatmap Beatmap { get; private set; } = null!;
 
         [Resolved]
-        protected Bindable<ControlPointGroup> SelectedGroup { get; private set; }
+        protected Bindable<ControlPointGroup> SelectedGroup { get; private set; } = null!;
 
-        [Resolved(canBeNull: true)]
-        protected IEditorChangeHandler ChangeHandler { get; private set; }
+        [Resolved]
+        protected IEditorChangeHandler? ChangeHandler { get; private set; }
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colours)
@@ -44,9 +44,15 @@ namespace osu.Game.Screens.Edit.Timing
             AutoSizeAxes = Axes.Y;
 
             Masking = true;
+            CornerRadius = 5;
 
             InternalChildren = new Drawable[]
             {
+                new Box
+                {
+                    Colour = colours.Background4,
+                    RelativeSizeAxes = Axes.Both,
+                },
                 new Container
                 {
                     RelativeSizeAxes = Axes.X,
@@ -69,14 +75,9 @@ namespace osu.Game.Screens.Edit.Timing
                     AutoSizeAxes = Axes.Y,
                     Children = new Drawable[]
                     {
-                        new Box
-                        {
-                            Colour = colours.Background3,
-                            RelativeSizeAxes = Axes.Both,
-                        },
                         Flow = new FillFlowContainer
                         {
-                            Padding = new MarginPadding(20),
+                            Padding = new MarginPadding(10) { Top = 0 },
                             Spacing = new Vector2(20),
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
@@ -125,7 +126,7 @@ namespace osu.Game.Screens.Edit.Timing
             ControlPoint.BindValueChanged(OnControlPointChanged, true);
         }
 
-        protected abstract void OnControlPointChanged(ValueChangedEvent<T> point);
+        protected abstract void OnControlPointChanged(ValueChangedEvent<T?> point);
 
         protected abstract T CreatePoint();
     }

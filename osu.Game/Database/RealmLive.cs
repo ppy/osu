@@ -4,10 +4,9 @@
 using System;
 using System.Diagnostics;
 using osu.Framework.Development;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Statistics;
 using Realms;
-
-#nullable enable
 
 namespace osu.Game.Database
 {
@@ -31,7 +30,7 @@ namespace osu.Game.Database
         /// <summary>
         /// Construct a new instance of live realm data.
         /// </summary>
-        /// <param name="data">The realm data.</param>
+        /// <param name="data">The realm data. Must be managed (see <see cref="IRealmObjectBase.IsManaged"/>).</param>
         /// <param name="realm">The realm factory the data was sourced from. May be null for an unmanaged object.</param>
         public RealmLive(T data, RealmAccess realm)
             : base(data.ID)
@@ -63,7 +62,7 @@ namespace osu.Game.Database
                     return;
                 }
 
-                perform(retrieveFromID(r));
+                perform(r.FindWithRefresh<T>(ID)!);
                 RealmLiveStatistics.USAGE_ASYNC.Value++;
             });
         }
@@ -85,7 +84,7 @@ namespace osu.Game.Database
 
             return realm.Run(r =>
             {
-                var returnData = perform(retrieveFromID(r));
+                var returnData = perform(r.FindWithRefresh<T>(ID)!);
                 RealmLiveStatistics.USAGE_ASYNC.Value++;
 
                 if (returnData is RealmObjectBase realmObject && realmObject.IsManaged)
@@ -106,9 +105,12 @@ namespace osu.Game.Database
 
             PerformRead(t =>
             {
-                var transaction = t.Realm.BeginWrite();
-                perform(t);
-                transaction.Commit();
+                using (var transaction = t.Realm!.BeginWrite())
+                {
+                    perform(t);
+                    transaction.Commit();
+                }
+
                 RealmLiveStatistics.WRITES.Value++;
             });
         }
@@ -132,31 +134,16 @@ namespace osu.Game.Database
         {
             Debug.Assert(ThreadSafety.IsUpdateThread);
 
-            if (dataIsFromUpdateThread && !data.Realm.IsClosed)
+            if (dataIsFromUpdateThread && !data.Realm.AsNonNull().IsClosed)
             {
                 RealmLiveStatistics.USAGE_UPDATE_IMMEDIATE.Value++;
                 return;
             }
 
             dataIsFromUpdateThread = true;
-            data = retrieveFromID(realm.Realm);
+            data = realm.Realm.FindWithRefresh<T>(ID)!;
+
             RealmLiveStatistics.USAGE_UPDATE_REFETCH.Value++;
-        }
-
-        private T retrieveFromID(Realm realm)
-        {
-            var found = realm.Find<T>(ID);
-
-            if (found == null)
-            {
-                // It may be that we access this from the update thread before a refresh has taken place.
-                // To ensure that behaviour matches what we'd expect (the object *is* available), force
-                // a refresh to bring in any off-thread changes immediately.
-                realm.Refresh();
-                found = realm.Find<T>(ID);
-            }
-
-            return found;
         }
     }
 

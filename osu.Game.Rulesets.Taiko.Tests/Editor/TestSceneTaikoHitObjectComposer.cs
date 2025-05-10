@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
@@ -14,13 +14,13 @@ using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Taiko.Tests.Editor
 {
-    public class TestSceneTaikoHitObjectComposer : EditorClockTestScene
+    public partial class TestSceneTaikoHitObjectComposer : EditorClockTestScene
     {
         [SetUp]
         public void Setup() => Schedule(() =>
         {
             BeatDivisor.Value = 8;
-            Clock.Seek(0);
+            EditorClock.Seek(0);
 
             Child = new TestComposer { RelativeSizeAxes = Axes.Both };
         });
@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Editor
         {
         }
 
-        private class TestComposer : CompositeDrawable
+        private partial class TestComposer : CompositeDrawable
         {
             [Cached(typeof(EditorBeatmap))]
             [Cached(typeof(IBeatSnapProvider))]

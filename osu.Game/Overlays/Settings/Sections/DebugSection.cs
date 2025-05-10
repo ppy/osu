@@ -4,18 +4,18 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
-using osu.Game.Localisation;
+using osu.Game.Graphics;
 using osu.Game.Overlays.Settings.Sections.DebugSettings;
 
 namespace osu.Game.Overlays.Settings.Sections
 {
-    public class DebugSection : SettingsSection
+    public partial class DebugSection : SettingsSection
     {
-        public override LocalisableString Header => DebugSettingsStrings.DebugSectionHeader;
+        public override LocalisableString Header => @"Debug";
 
         public override Drawable CreateIcon() => new SpriteIcon
         {
-            Icon = FontAwesome.Solid.Bug
+            Icon = OsuIcon.Debug
         };
 
         public DebugSection()
@@ -23,6 +23,7 @@ namespace osu.Game.Overlays.Settings.Sections
             Children = new Drawable[]
             {
                 new GeneralSettings(),
+                new BatchImportSettings(),
                 new MemorySettings(),
             };
         }

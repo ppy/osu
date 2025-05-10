@@ -9,17 +9,13 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Visualisations
     /// <summary>
     /// Represents a singular point on a timeline part.
     /// </summary>
-    public class PointVisualisation : Circle
+    public partial class PointVisualisation : FastCircle
     {
+        public readonly double StartTime;
+
         public const float MAX_WIDTH = 4;
 
         public PointVisualisation(double startTime)
-            : this()
-        {
-            X = (float)startTime;
-        }
-
-        public PointVisualisation()
         {
             RelativePositionAxes = Axes.Both;
             RelativeSizeAxes = Axes.Y;
@@ -28,7 +24,10 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Visualisations
             Origin = Anchor.Centre;
 
             Width = MAX_WIDTH;
-            Height = 0.75f;
+            Height = 0.4f;
+
+            X = (float)startTime;
+            StartTime = startTime;
         }
     }
 }

@@ -8,7 +8,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneLoadingSpinner : OsuGridTestScene
+    public partial class TestSceneLoadingSpinner : OsuGridTestScene
     {
         public TestSceneLoadingSpinner()
             : base(2, 2)

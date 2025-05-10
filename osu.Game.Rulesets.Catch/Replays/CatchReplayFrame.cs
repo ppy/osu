@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Catch.Replays
         {
         }
 
-        public CatchReplayFrame(double time, float? position = null, bool dashing = false, CatchReplayFrame lastFrame = null)
+        public CatchReplayFrame(double time, float? position = null, bool dashing = false, CatchReplayFrame? lastFrame = null)
             : base(time)
         {
             Position = position ?? -1;
@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Catch.Replays
             }
         }
 
-        public void FromLegacy(LegacyReplayFrame currentFrame, IBeatmap beatmap, ReplayFrame lastFrame = null)
+        public void FromLegacy(LegacyReplayFrame currentFrame, IBeatmap beatmap, ReplayFrame? lastFrame = null)
         {
             Position = currentFrame.Position.X;
             Dashing = currentFrame.ButtonState == ReplayButtonState.Left1;

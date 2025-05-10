@@ -16,7 +16,7 @@ namespace osu.Game.Graphics.UserInterface
     /// <summary>
     /// Highlight on hover, bounce on click.
     /// </summary>
-    public class OsuAnimatedButton : OsuClickableContainer
+    public partial class OsuAnimatedButton : OsuClickableContainer
     {
         /// <summary>
         /// The colour that should be flashed when the <see cref="OsuAnimatedButton"/> is clicked.
@@ -24,6 +24,8 @@ namespace osu.Game.Graphics.UserInterface
         protected Color4 FlashColour = Color4.White.Opacity(0.3f);
 
         private Color4 hoverColour = Color4.White.Opacity(0.1f);
+
+        protected float ScaleOnMouseDown { get; init; } = 0.75f;
 
         /// <summary>
         /// The background colour of the <see cref="OsuAnimatedButton"/> while it is hovered.
@@ -39,15 +41,15 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         [Resolved]
-        private OsuColour colours { get; set; }
+        private OsuColour colours { get; set; } = null!;
 
         protected override Container<Drawable> Content => content;
 
         private readonly Container content;
         private readonly Box hover;
 
-        public OsuAnimatedButton()
-            : base(HoverSampleSet.Button)
+        public OsuAnimatedButton(HoverSampleSet sampleSet = HoverSampleSet.Button)
+            : base(sampleSet)
         {
             base.Content.Add(content = new Container
             {
@@ -109,13 +111,17 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnClick(ClickEvent e)
         {
+            // Handle case where a click is triggered via TriggerClick().
+            if (!IsHovered)
+                hover.FadeOutFromOne(1600);
+
             hover.FlashColour(FlashColour, 800, Easing.OutQuint);
             return base.OnClick(e);
         }
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
-            Content.ScaleTo(0.75f, 2000, Easing.OutQuint);
+            Content.ScaleTo(ScaleOnMouseDown, 2000, Easing.OutQuint);
             return base.OnMouseDown(e);
         }
 

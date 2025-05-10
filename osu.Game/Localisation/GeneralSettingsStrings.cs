@@ -10,11 +10,6 @@ namespace osu.Game.Localisation
         private const string prefix = @"osu.Game.Resources.Localisation.GeneralSettings";
 
         /// <summary>
-        /// "General"
-        /// </summary>
-        public static LocalisableString GeneralSectionHeader => new TranslatableString(getKey(@"general_section_header"), @"General");
-
-        /// <summary>
         /// "Language"
         /// </summary>
         public static LocalisableString LanguageHeader => new TranslatableString(getKey(@"language_header"), @"Language");
@@ -50,9 +45,19 @@ namespace osu.Game.Localisation
         public static LocalisableString CheckUpdate => new TranslatableString(getKey(@"check_update"), @"Check for updates");
 
         /// <summary>
+        /// "Checking for updates"
+        /// </summary>
+        public static LocalisableString CheckingForUpdates => new TranslatableString(getKey(@"checking_for_updates"), @"Checking for updates");
+
+        /// <summary>
         /// "Open osu! folder"
         /// </summary>
         public static LocalisableString OpenOsuFolder => new TranslatableString(getKey(@"open_osu_folder"), @"Open osu! folder");
+
+        /// <summary>
+        /// "Export logs"
+        /// </summary>
+        public static LocalisableString ExportLogs => new TranslatableString(getKey(@"export_logs"), @"Export logs");
 
         /// <summary>
         /// "Change folder location..."
@@ -63,6 +68,21 @@ namespace osu.Game.Localisation
         /// "Run setup wizard"
         /// </summary>
         public static LocalisableString RunSetupWizard => new TranslatableString(getKey(@"run_setup_wizard"), @"Run setup wizard");
+
+        /// <summary>
+        /// "Learn more about lazer"
+        /// </summary>
+        public static LocalisableString LearnMoreAboutLazer => new TranslatableString(getKey(@"learn_more_about_lazer"), @"Learn more about lazer");
+
+        /// <summary>
+        /// "Check out the feature comparison and FAQ"
+        /// </summary>
+        public static LocalisableString LearnMoreAboutLazerTooltip => new TranslatableString(getKey(@"check_out_the_feature_comparison"), @"Check out the feature comparison and FAQ");
+
+        /// <summary>
+        /// "You are running the latest release ({0})"
+        /// </summary>
+        public static LocalisableString RunningLatestRelease(string version) => new TranslatableString(getKey(@"running_latest_release"), @"You are running the latest release ({0})", version);
 
         private static string getKey(string key) => $"{prefix}:{key}";
     }
