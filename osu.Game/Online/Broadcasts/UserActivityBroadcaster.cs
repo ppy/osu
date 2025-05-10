@@ -8,22 +8,18 @@ using osu.Game.Users;
 
 namespace osu.Game.Online.Broadcasts
 {
-    public partial class UserActivityBroadcaster : Broadcaster<string>
+    public partial class UserActivityBroadcaster : Broadcaster
     {
         private Bindable<UserActivity?>? activity;
-
-        public UserActivityBroadcaster()
-            : base(@"activity")
-        {
-        }
 
         [BackgroundDependencyLoader]
         private void load(SessionStatics session)
         {
             activity = session.GetBindable<UserActivity?>(Static.UserOnlineActivity);
-            activity.BindValueChanged(value => Broadcast(value.NewValue?.GetType().Name ?? no_activity), true);
+            activity.BindValueChanged(value => Broadcast(type, value.NewValue?.GetType().Name ?? no_activity), true);
         }
 
+        private const string type = @"activity";
         private const string no_activity = @"None";
     }
 }

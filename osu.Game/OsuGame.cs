@@ -1248,8 +1248,6 @@ namespace osu.Game
             loadComponentSingleFile<BeatmapStore>(new RealmDetachedBeatmapStore(), Add, true);
 
             loadComponentSingleFile<IBroadcastServer>(new BroadcastServer(new Uri(@"http://localhost:7270/")), Add, true);
-            loadComponentSingleFile(new RulesetBroadcaster(), Add);
-            loadComponentSingleFile(new BeatmapBroadcaster(), Add);
             loadComponentSingleFile(new UserActivityBroadcaster(), Add);
 
             Add(externalLinkOpener = new ExternalLinkOpener());

@@ -9,15 +9,9 @@ using osu.Game.IO.Serialization;
 
 namespace osu.Game.Online.Broadcasts
 {
-    public abstract partial class Broadcaster<T> : Component
+    public abstract partial class Broadcaster : Component
     {
         private IBroadcastServer? server;
-        private readonly string type;
-
-        protected Broadcaster(string type)
-        {
-            this.type = type;
-        }
 
         [BackgroundDependencyLoader]
         private void load(IBroadcastServer server)
@@ -25,18 +19,15 @@ namespace osu.Game.Online.Broadcasts
             this.server = server;
         }
 
-        protected void Broadcast(T message)
+        protected void Broadcast(string type, object message)
         {
-            if (server == null)
-                return;
-
             var payload = new Payload
             {
                 Type = type,
                 Message = message,
             };
 
-            server.Broadcast(payload.Serialize()).WaitSafely();
+            server?.Broadcast(payload.Serialize()).WaitSafely();
         }
 
         [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
@@ -46,7 +37,7 @@ namespace osu.Game.Online.Broadcasts
             public string Type;
 
             [JsonProperty(@"message")]
-            public T Message;
+            public object Message;
         }
     }
 }
