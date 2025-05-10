@@ -28,9 +28,6 @@
     <PackageReference Include="DiscordRichPresence" Version="1.2.1.24" />
     <PackageReference Include="Velopack" Version="0.0.1053" />
   </ItemGroup>
-  <ItemGroup Label="Framework References">
-    <FrameworkReference Include="Microsoft.AspNetCore.App"/>
-  </ItemGroup>
   <ItemGroup Label="Resources">
     <EmbeddedResource Include="lazer.ico" />
   </ItemGroup>

@@ -10,23 +10,18 @@ using Microsoft.Win32;
 using osu.Desktop.Performance;
 using osu.Desktop.Security;
 using osu.Desktop.Updater;
-using osu.Desktop.WebSockets;
 using osu.Desktop.Windows;
 using osu.Framework;
 using osu.Framework.Logging;
 using osu.Game.Updater;
-using osu.Desktop.Windows;
 using osu.Framework.Allocation;
 using osu.Framework.Platform;
-using osu.Framework.Threading;
 using osu.Game;
 using osu.Game.IO;
 using osu.Game.IPC;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Performance;
 using osu.Game.Utils;
-using osu.Game.Online.Broadcasts;
-using osu.Game.Updater;
 
 namespace osu.Desktop
 {
@@ -131,18 +126,6 @@ namespace osu.Desktop
                 LoadComponentAsync(new GameplayWinKeyBlocker(), Add);
 
             LoadComponentAsync(new ElevatedPrivilegesChecker(), Add);
-
-            LoadComponentAsync(new GameStateBroadcastServer(), loaded =>
-            {
-                loaded.AddRange(new GameStateBroadcaster[]
-                {
-                    new RulesetStateBroadcaster(),
-                    new BeatmapStateBroadcaster(),
-                    new UserActivityStateBroadcaster(),
-                });
-
-                Add(loaded);
-            });
         }
 
         public override void SetHost(GameHost host)
