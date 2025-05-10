@@ -228,7 +228,6 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.WasSupporter, false);
             SetDefault(OsuSetting.EditorWaveformOpacity, 0.25f);
-            SetDefault(OsuSetting.EditorHitAnimations, false);
             SetDefault(OsuSetting.BroadcastGameState, false);
         }
 
