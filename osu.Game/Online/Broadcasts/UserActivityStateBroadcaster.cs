@@ -8,7 +8,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Online.Broadcasts
 {
-    public class UserActivityStateBroadcaster : GameStateBroadcaster<string>
+    public partial class UserActivityStateBroadcaster : GameStateBroadcaster<string>
     {
         public override string Type => @"Activity";
         public override string Message => activity?.Value?.GetType().Name;

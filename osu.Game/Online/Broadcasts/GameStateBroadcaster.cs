@@ -10,7 +10,7 @@ using osu.Game.IO.Serialization;
 namespace osu.Game.Online.Broadcasts
 {
     [JsonObject(MemberSerialization.OptIn)]
-    public abstract class GameStateBroadcaster : Component
+    public abstract partial class GameStateBroadcaster : Component
     {
         [JsonProperty]
         public abstract string Type { get; }
@@ -18,7 +18,7 @@ namespace osu.Game.Online.Broadcasts
         public abstract void Broadcast();
     }
 
-    public abstract class GameStateBroadcaster<T> : GameStateBroadcaster
+    public abstract partial class GameStateBroadcaster<T> : GameStateBroadcaster
     {
         [JsonProperty]
         public abstract T Message { get; }

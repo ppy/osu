@@ -12,7 +12,7 @@ using osu.Game.Online.Broadcasts;
 namespace osu.Desktop.WebSockets
 {
     [Cached(typeof(IGameStateBroadcastServer))]
-    public class GameStateBroadcastServer : WebSocketServer, IGameStateBroadcastServer
+    public partial class GameStateBroadcastServer : WebSocketServer, IGameStateBroadcastServer
     {
         public override string Endpoint => @"state";
 
@@ -46,7 +46,7 @@ namespace osu.Desktop.WebSockets
             => AddRangeInternal(broadcasters);
 
         public void Remove(GameStateBroadcaster broadcaster)
-            => RemoveInternal(broadcaster);
+            => RemoveInternal(broadcaster, true);
 
         protected override void OnConnectionReady(WebSocketConnection connection)
         {
