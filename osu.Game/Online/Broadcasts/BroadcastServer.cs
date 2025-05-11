@@ -11,7 +11,6 @@ using osu.Game.Online.WebSockets;
 
 namespace osu.Game.Online.Broadcasts
 {
-
     public partial class BroadcastServer : Component, IBroadcastServer
     {
         private readonly Uri uri;
