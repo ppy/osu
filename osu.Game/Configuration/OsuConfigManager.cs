@@ -194,7 +194,6 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.DiscordRichPresence, DiscordRichPresenceMode.Full);
 
             SetDefault(OsuSetting.EditorDim, 0.25f, 0f, 0.75f, 0.25f);
-            SetDefault(OsuSetting.EditorWaveformOpacity, 0.25f, 0f, 1f, 0.25f);
             SetDefault(OsuSetting.EditorShowHitMarkers, true);
             SetDefault(OsuSetting.EditorAutoSeekOnPlacement, true);
             SetDefault(OsuSetting.EditorLimitedDistanceSnap, false);
@@ -227,7 +226,6 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.EditorSubmissionLoadInBrowserAfterSubmission, true);
 
             SetDefault(OsuSetting.WasSupporter, false);
-            SetDefault(OsuSetting.EditorWaveformOpacity, 0.25f);
             SetDefault(OsuSetting.BroadcastGameState, false);
         }
 
