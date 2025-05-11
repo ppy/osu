@@ -126,6 +126,9 @@ namespace osu.Desktop
                 LoadComponentAsync(new GameplayWinKeyBlocker(), Add);
 
             LoadComponentAsync(new ElevatedPrivilegesChecker(), Add);
+
+            osuSchemeLinkIPCChannel = new OsuSchemeLinkIPCChannel(Host, this);
+            archiveImportIPCChannel = new ArchiveImportIPCChannel(Host, this);
         }
 
         public override void SetHost(GameHost host)
