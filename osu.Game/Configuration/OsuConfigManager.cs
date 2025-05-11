@@ -430,7 +430,6 @@ namespace osu.Game.Configuration
         MenuBackgroundSource,
         GameplayDisableWinKey,
         SeasonalBackgroundMode,
-        EditorWaveformOpacity,
         EditorShowHitMarkers,
         EditorAutoSeekOnPlacement,
         DiscordRichPresence,
