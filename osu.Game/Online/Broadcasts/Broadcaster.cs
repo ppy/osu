@@ -13,8 +13,8 @@ namespace osu.Game.Online.Broadcasts
     {
         private IBroadcastServer? server;
 
-        [BackgroundDependencyLoader]
-        private void load(IBroadcastServer server)
+        [BackgroundDependencyLoader(true)]
+        private void load(IBroadcastServer? server)
         {
             this.server = server;
         }
