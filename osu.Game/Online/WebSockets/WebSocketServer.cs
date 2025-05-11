@@ -13,7 +13,8 @@ namespace osu.Game.Online.WebSockets
 {
     public partial class WebSocketServer
     {
-        private int connectionId = -1;
+        public int Connected => connections.Count;
+
         private HttpListener? listener;
         private Task? process;
         private CancellationTokenSource? cts;
@@ -46,16 +47,10 @@ namespace osu.Game.Online.WebSockets
             {
             }
 
-            cts.Cancel();
             listener.Stop();
 
-            try
-            {
-                await process.ConfigureAwait(false);
-            }
-            catch (HttpListenerException)
-            {
-            }
+            await cts.CancelAsync().ConfigureAwait(false);
+            await process.ConfigureAwait(false);
 
             listener = null;
 
@@ -75,41 +70,47 @@ namespace osu.Game.Online.WebSockets
             await Task.WhenAll(connections.Values.Select(connection => connection.SendAsync(message, token))).ConfigureAwait(false);
         }
 
-        protected virtual Task OnMessageReceived(int id, ReadOnlyMemory<byte> data, CancellationToken token) => Task.CompletedTask;
+        protected virtual Task OnMessage(int id, ReadOnlyMemory<byte> data, CancellationToken token = default) => Task.CompletedTask;
 
         private async Task handleRequest(CancellationToken token)
         {
             if (listener == null)
                 return;
 
-            while (!token.IsCancellationRequested)
-            {
-                var context = await listener.GetContextAsync().ConfigureAwait(false);
+            int id = 0;
 
-                if (!await handleWebSocketRequest(context, token).ConfigureAwait(false))
-                {
-                    context.Response.StatusCode = 500;
-                    context.Response.Close();
-                }
-            }
-        }
-
-        private async Task<bool> handleWebSocketRequest(HttpListenerContext context, CancellationToken token)
-        {
             try
             {
-                var wsContext = await context.AcceptWebSocketAsync(null).ConfigureAwait(false);
-                int nextId = Interlocked.Increment(ref connectionId);
+                while (!token.IsCancellationRequested)
+                {
+                    var context = await listener.GetContextAsync().ConfigureAwait(false);
 
-                var connection = new WebSocketConnection(this, nextId, wsContext.WebSocket);
-                connections.TryAdd(nextId, connection);
-                await connection.StartAsync(token).ConfigureAwait(false);
+                    if (context.Request.IsWebSocketRequest)
+                    {
+                        var wsContext = await context.AcceptWebSocketAsync(null).ConfigureAwait(false);
+                        int next = Interlocked.Increment(ref id);
 
-                return true;
+                        var connection = new WebSocketConnection(this, id, wsContext.WebSocket);
+                        connections.TryAdd(next, connection);
+
+                        await connection.StartAsync(token).ConfigureAwait(false);
+                    }
+                    else
+                    {
+                        context.Response.StatusCode = 500;
+                        context.Response.Close();
+                    }
+                }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return false;
+                // An HttpListenerException with the error code 995 (ERROR_OPERATION_ABORTED) is thrown
+                // when we call HttpListener.Stop on another thread while HttpListener.GetContextAsync is
+                // blocking in this thread. It is safe to ignore.
+                if (!(ex is HttpListenerException hx && hx.ErrorCode == 995))
+                {
+                    throw;
+                }
             }
         }
 
@@ -125,17 +126,23 @@ namespace osu.Game.Online.WebSockets
                 this.server = server;
             }
 
-            protected override Task OnMessageReceived(ReadOnlyMemory<byte> data, CancellationToken token)
+            protected override Task OnMessage(ReadOnlyMemory<byte> data, CancellationToken token = default)
             {
-                return server.OnMessageReceived(id, data, token);
+                return server.OnMessage(id, data, token);
+            }
+
+            protected override Task OnClosing()
+            {
+                server.connections.TryRemove(id, out _);
+                return base.OnClosing();
             }
 
             protected override async Task CloseAsync(WebSocket socket, CancellationToken token)
             {
                 // When the close request is initiated by the server, CloseAsync must be called to notify the client
                 // that the socket is being closed from the server's side.
+                // See also: https://mcguirev10.com/2019/08/17/how-to-close-websocket-correctly.html
                 await socket.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, token).ConfigureAwait(false);
-                server.connections.TryRemove(id, out _);
             }
         }
     }

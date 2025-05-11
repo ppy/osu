@@ -14,10 +14,12 @@ namespace osu.Game.Online.WebSockets
     public class WebSocketClient
     {
         private readonly WebSocket socket;
-        private Uri? uri;
+        private readonly Uri? uri;
 
         private Task? process;
         private CancellationTokenSource? cts;
+
+        private readonly object sync = new object();
 
         public WebSocketClient(WebSocket socket)
         {
@@ -47,28 +49,12 @@ namespace osu.Game.Online.WebSockets
             if (cts == null || process == null)
                 return;
 
-            try
-            {
-                // ReceiveAsync throws when we cancel its token and the close handshake has not been completed.
-                // As we're initiating the handshake, we first tell the server that we're closing. Then we wait
-                // until the server acknowledges our handshake.
-                // See also: https://mcguirev10.com/2019/08/17/how-to-close-websocket-correctly.html
-                await CloseAsync(socket, token).ConfigureAwait(false);
-                while (socket.State != WebSocketState.Closed && token.IsCancellationRequested) ;
-            }
-            catch (OperationCanceledException)
-            {
-            }
-
-            cts.Cancel();
+            await OnClosing().ConfigureAwait(false);
+            await CloseAsync(socket, token).ConfigureAwait(false);
+            await cts.CancelAsync().ConfigureAwait(false);
             await process.ConfigureAwait(false);
 
-            socket.Dispose();
-
-            cts.Dispose();
-            cts = null;
-
-            process = null;
+            dispose();
         }
 
         public async Task SendAsync(ReadOnlyMemory<byte> data, CancellationToken token = default)
@@ -90,12 +76,15 @@ namespace osu.Game.Online.WebSockets
             await sendAsync(buffer.Memory.Slice(0, written), WebSocketMessageType.Text, token).ConfigureAwait(false);
         }
 
-        protected virtual Task OnMessageReceived(ReadOnlyMemory<byte> data, CancellationToken token) => Task.CompletedTask;
+        protected virtual Task OnMessage(ReadOnlyMemory<byte> data, CancellationToken token = default) => Task.CompletedTask;
+
+        protected virtual Task OnClosing() => Task.CompletedTask;
 
         protected virtual Task CloseAsync(WebSocket socket, CancellationToken token)
         {
-            // When the close request is initiated by the client, CloseOutputAsync must be called so the websocket can transition
+            // When the close request is initiated by the client, WebSocket.CloseOutputAsync must be called so the websocket can transition
             // to the CloseSent state which is required to transition to the Closed state when the server acknowledges our close message.
+            // See also: https://mcguirev10.com/2019/08/17/how-to-close-websocket-correctly.html
             return socket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, string.Empty, token);
         }
 
@@ -117,23 +106,26 @@ namespace osu.Game.Online.WebSockets
                 while (!token.IsCancellationRequested)
                 {
                     if (socket.State == WebSocketState.Closed)
-                        continue;
+                        break;
 
                     var result = await socket.ReceiveAsync(buffer.Memory.Slice(bytesRead), token).ConfigureAwait(false);
                     bytesRead += result.Count;
 
                     // If the token is cancelled while ReceiveAsync is blocking, the socket state changes to aborted.
                     if (socket.State == WebSocketState.Aborted)
-                        continue;
+                        break;
 
                     // The server is notifying us that the connection will close.
                     if (socket.State == WebSocketState.CloseReceived && result.MessageType == WebSocketMessageType.Close)
+                    {
+                        await OnClosing().ConfigureAwait(false);
                         await socket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None).ConfigureAwait(false);
+                    }
 
                     // Data is sent in chunks. Only submit received data when an "end of message" packet has been received.
                     if (socket.State == WebSocketState.Open && result.MessageType != WebSocketMessageType.Close && result.EndOfMessage)
                     {
-                        await OnMessageReceived(buffer.Memory.Slice(0, bytesRead), token).ConfigureAwait(false);
+                        await OnMessage(buffer.Memory.Slice(0, bytesRead), token).ConfigureAwait(false);
                         bytesRead = 0;
                     }
                 }
@@ -148,7 +140,18 @@ namespace osu.Game.Online.WebSockets
             finally
             {
                 buffer.Dispose();
+                dispose();
             }
+        }
+
+        private void dispose()
+        {
+            socket.Dispose();
+
+            cts?.Dispose();
+            cts = null;
+
+            process = null;
         }
 
         private static ClientWebSocket createClientWebSocket(IDictionary<string, string>? headers = null)
