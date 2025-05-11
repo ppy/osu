@@ -3,7 +3,6 @@
 
 using Newtonsoft.Json;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Game.IO.Serialization;
 
@@ -27,7 +26,7 @@ namespace osu.Game.Online.Broadcasts
                 Message = message,
             };
 
-            server?.Broadcast(payload.Serialize()).WaitSafely();
+            server?.Broadcast(payload.Serialize());
         }
 
         [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
