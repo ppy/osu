@@ -5,6 +5,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
 using osu.Game.Configuration;
+using osu.Game.Online.API;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Screens.Play;
 
@@ -25,16 +26,7 @@ namespace osu.Game.Online.Broadcasts
 
         protected override void LoadComplete()
         {
-            broadcast(@"mods", state.Mods.Select(mod => new ModDetails
-            {
-                Name = mod.Acronym,
-                Settings = mod.GetOrderedSettingsSourceProperties().Select(pair => new ModSettingDetails
-                {
-                    Name = pair.Item1.Label.ToString(),
-                    Value = pair.Item2.GetValue(mod),
-                }).ToArray()
-            }).ToArray());
-
+            broadcast(@"mods", state.Mods.Select(mod => new APIMod(mod)).ToArray());
             broadcast(@"ruleset", state.Ruleset.RulesetInfo.ShortName);
             broadcast(@"beatmap", state.Beatmap.BeatmapInfo);
 
@@ -82,24 +74,6 @@ namespace osu.Game.Online.Broadcasts
 
             [JsonProperty(@"value")]
             public T Value;
-        }
-
-        private struct ModDetails
-        {
-            [JsonProperty(@"name")]
-            public string Name;
-
-            [JsonProperty(@"settings")]
-            public ModSettingDetails[] Settings;
-        }
-
-        private struct ModSettingDetails
-        {
-            [JsonProperty(@"name")]
-            public string Name;
-
-            [JsonProperty(@"value")]
-            public object? Value;
         }
     }
 }
