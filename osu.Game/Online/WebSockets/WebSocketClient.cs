@@ -78,7 +78,7 @@ namespace osu.Game.Online.WebSockets
 
         protected virtual Task OnMessage(ReadOnlyMemory<byte> data, CancellationToken token = default) => Task.CompletedTask;
 
-        protected virtual Task OnClosing() => Task.CompletedTask;
+        protected virtual Task OnClosing(CancellationToken token = default) => Task.CompletedTask;
 
         protected virtual Task CloseAsync(WebSocket socket, CancellationToken token)
         {
@@ -118,7 +118,7 @@ namespace osu.Game.Online.WebSockets
                     // The server is notifying us that the connection will close.
                     if (socket.State == WebSocketState.CloseReceived && result.MessageType == WebSocketMessageType.Close)
                     {
-                        await OnClosing().ConfigureAwait(false);
+                        await OnClosing(token).ConfigureAwait(false);
                         await socket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None).ConfigureAwait(false);
                     }
 

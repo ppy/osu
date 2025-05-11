@@ -72,6 +72,10 @@ namespace osu.Game.Online.WebSockets
 
         protected virtual Task OnMessage(int id, ReadOnlyMemory<byte> data, CancellationToken token = default) => Task.CompletedTask;
 
+        protected virtual Task OnConnect(int id, CancellationToken token = default) => Task.CompletedTask;
+
+        protected virtual Task OnDisconnect(int id, CancellationToken token = default) => Task.CompletedTask;
+
         private async Task handleRequest(CancellationToken token)
         {
             if (listener == null)
@@ -94,6 +98,7 @@ namespace osu.Game.Online.WebSockets
                         connections.TryAdd(next, connection);
 
                         await connection.StartAsync(token).ConfigureAwait(false);
+                        await OnConnect(next, token).ConfigureAwait(false);
                     }
                     else
                     {
@@ -131,10 +136,11 @@ namespace osu.Game.Online.WebSockets
                 return server.OnMessage(id, data, token);
             }
 
-            protected override Task OnClosing()
+            protected override async Task OnClosing(CancellationToken token = default)
             {
                 server.connections.TryRemove(id, out _);
-                return base.OnClosing();
+                await server.OnDisconnect(id, token).ConfigureAwait(false);
+                await base.OnClosing(token).ConfigureAwait(false);
             }
 
             protected override async Task CloseAsync(WebSocket socket, CancellationToken token)
