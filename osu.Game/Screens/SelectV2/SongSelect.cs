@@ -19,6 +19,7 @@ using osu.Game.Overlays.Mods;
 using osu.Game.Screens.Footer;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Select;
+using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
@@ -153,6 +154,10 @@ namespace osu.Game.Screens.SelectV2
                             },
                         }
                     },
+                },
+                new SkinnableContainer(new GlobalSkinnableContainerLookup(GlobalSkinnableContainers.SongSelect))
+                {
+                    RelativeSizeAxes = Axes.Both,
                 },
                 modSelectOverlay,
             });
