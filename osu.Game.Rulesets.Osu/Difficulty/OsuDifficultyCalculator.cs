@@ -332,7 +332,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             amountOfBigTicks += repeats;
 
-            int amountOfSmallTicks = sliders.Select(s => s.NestedHitObjects.Count(s => s is SliderTick)).Sum();
+            int amountOfSmallTicks = sliders.Select(s => s.NestedHitObjects.Count(nho => nho is SliderTick)).Sum();
 
             double totalScore = amountOfBigTicks * big_tick_score + amountOfSmallTicks * small_tick_score;
 

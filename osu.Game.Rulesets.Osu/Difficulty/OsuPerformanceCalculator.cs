@@ -372,7 +372,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         /// <summary>
         /// This function is harsher version of current effective misscount, used to provide reasonable value for cases where score-based misscount can't do this.
         /// </summary>
-
         private double getMaximumMisscount(OsuDifficultyAttributes attributes)
         {
             // Consider that full combo is maximum combo minus dropped slider tails since they don't contribute to combo but also don't break it
@@ -410,7 +409,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double nonComboScore = (300 + attributes.SliderNestedScorePerObject) * totalHits;
 
             double comboScore = attributes.MaximumLegacyScore - nonComboScore;
-            comboScore /= 300 / 25 * scorev1Multiplier;
+            comboScore /= 300.0 / 25.0 * scorev1Multiplier;
             if (Precision.AlmostEquals(scorev1Multiplier, 0)) comboScore = 0;
 
             decimal a = attributes.MaxCombo;
@@ -421,6 +420,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             return (double)x;
         }
+
         private double calculateEstimatedSliderbreaks(double topWeightedSliderFactor, OsuDifficultyAttributes attributes)
         {
             if (!usingClassicSliderAccuracy || countOk == 0)
