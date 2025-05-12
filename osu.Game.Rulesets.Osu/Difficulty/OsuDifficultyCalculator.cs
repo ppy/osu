@@ -58,6 +58,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double speedDifficultStrainCount = speed.CountTopWeightedStrains();
             double readingDifficultyStrainCount = reading?.CountTopWeightedStrains() ?? 0.0;
 
+            double aimNoSlidersTopWeightedSliderCount = aimWithoutSliders.CountTopWeightedSliders();
+            double aimNoSlidersDifficultStrainCount = aimWithoutSliders.CountTopWeightedStrains();
+
+            double aimTopWeightedSliderFactor = aimNoSlidersTopWeightedSliderCount / Math.Max(1, aimNoSlidersDifficultStrainCount - aimNoSlidersTopWeightedSliderCount);
+
+            double speedTopWeightedSliderCount = speed.CountTopWeightedSliders();
+            double speedTopWeightedSliderFactor = speedTopWeightedSliderCount / Math.Max(1, speedDifficultStrainCount - speedTopWeightedSliderCount);
+
             double difficultSliders = aim.GetDifficultSliders();
 
             HitWindows hitWindows = new OsuHitWindows();
@@ -124,6 +132,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 AimDifficultStrainCount = aimDifficultStrainCount,
                 SpeedDifficultStrainCount = speedDifficultStrainCount,
                 ReadingDifficultStrainCount = readingDifficultyStrainCount,
+                AimTopWeightedSliderFactor = aimTopWeightedSliderFactor,
+                SpeedTopWeightedSliderFactor = speedTopWeightedSliderFactor,
                 DrainRate = drainRate,
                 MaxCombo = beatmap.GetMaxCombo(),
                 HitCircleCount = hitCircleCount,
