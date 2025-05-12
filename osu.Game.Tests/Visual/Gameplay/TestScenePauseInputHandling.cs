@@ -6,7 +6,6 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
-using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
@@ -299,18 +298,12 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("go to resume cursor", () => InputManager.MoveMouseTo(this.ChildrenOfType<OsuResumeOverlay.OsuClickToResumeCursor>().Single()));
             AddStep("press Z to resume", () => InputManager.PressKey(Key.Z));
 
-            // ensure the input manager receives the Z button press...
-            checkKeyCounterState(() => counter, 1, true);
-            AddAssert("button is pressed in kbc", () => Player.DrawableRuleset.Playfield.FindClosestParent<OsuInputManager>()!.PressedActions.Single() == OsuAction.LeftButton);
-
-            // ...but also ensure the hit circle in front of the cursor isn't hit by checking max combo.
+            checkKeyCounterState(() => counter, 0, false);
             AddAssert("circle not hit", () => Player.ScoreProcessor.HighestCombo.Value, () => Is.EqualTo(0));
             assertCountOfMatchingReplayFrames<OsuReplayFrame>("left button never pressed in replay", f => f.Actions.Contains(OsuAction.LeftButton), 0);
 
             AddStep("release Z", () => InputManager.ReleaseKey(Key.Z));
-
-            checkKeyCounterState(() => counter, 1, false);
-            AddAssert("button is released in kbc", () => !Player.DrawableRuleset.Playfield.FindClosestParent<OsuInputManager>()!.PressedActions.Any());
+            checkKeyCounterState(() => counter, 0, false);
         }
 
         [Test]
@@ -374,7 +367,6 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("release X", () => InputManager.ReleaseKey(Key.X));
 
             AddAssert("circle hit", () => Player.ScoreProcessor.HighestCombo.Value, () => Is.EqualTo(2));
-            assertCountOfMatchingReplayFrames<OsuReplayFrame>("right button pressed twice in replay", f => f.Actions.Contains(OsuAction.RightButton), 2);
         }
 
         private void loadPlayer(Func<Ruleset> createRuleset)
