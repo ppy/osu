@@ -7,15 +7,18 @@ using osu.Game.Rulesets;
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets.Mods;
-using System.Text;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using osu.Framework.IO.Network;
+using osu.Game.Extensions;
 
 namespace osu.Game.Online.API.Requests
 {
     public class GetScoresRequest : APIRequest<APIScoresCollection>, IEquatable<GetScoresRequest>
     {
-        public const int MAX_SCORES_PER_REQUEST = 50;
+        public const int DEFAULT_SCORES_PER_REQUEST = 50;
+        public const int MAX_SCORES_PER_REQUEST = 100;
 
         private readonly IBeatmapInfo beatmapInfo;
         private readonly BeatmapLeaderboardScope scope;
@@ -36,19 +39,20 @@ namespace osu.Game.Online.API.Requests
             this.mods = mods ?? Array.Empty<IMod>();
         }
 
-        protected override string Target => $@"beatmaps/{beatmapInfo.OnlineID}/scores{createQueryParameters()}";
+        protected override string Target => $@"beatmaps/{beatmapInfo.OnlineID}/scores";
 
-        private string createQueryParameters()
+        protected override WebRequest CreateWebRequest()
         {
-            StringBuilder query = new StringBuilder(@"?");
+            var req = base.CreateWebRequest();
 
-            query.Append($@"type={scope.ToString().ToLowerInvariant()}");
-            query.Append($@"&mode={ruleset.ShortName}");
+            req.AddParameter(@"type", scope.ToString().ToLowerInvariant());
+            req.AddParameter(@"mode", ruleset.ShortName);
 
             foreach (var mod in mods)
-                query.Append($@"&mods[]={mod.Acronym}");
+                req.AddParameter(@"mods[]", mod.Acronym);
 
-            return query.ToString();
+            req.AddParameter(@"limit", (scope.RequiresSupporter(mods.Any()) ? MAX_SCORES_PER_REQUEST : DEFAULT_SCORES_PER_REQUEST).ToString(CultureInfo.InvariantCulture));
+            return req;
         }
 
         public bool Equals(GetScoresRequest? other)
