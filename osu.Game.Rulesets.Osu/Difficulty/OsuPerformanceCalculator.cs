@@ -330,6 +330,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private double calculateEstimatedSliderbreaks(double topWeightedSliderFactor, OsuDifficultyAttributes attributes)
         {
             double possibleBreaks = countOk + countMeh;
+            
+            // Imagine a score that has 1x100.
+            // Imagine the effective miss count is 1 and the miss count is 0.
+            // To ensure we don't get a total miss count of 2, we need to remove the difference between these two numbers.
+            // This results in the amount of possible breaks being zero, because we're accounting for the fact that the estimated miss count handled the only possible sliderbreak already.
+            // In the non 1x100 case, this will always result in the possible breaks being slightly below the Ok count, and works fine when combined with effective miss count.
             possibleBreaks -= effectiveMissCount - countMiss;
 
             if (!usingClassicSliderAccuracy || possibleBreaks <= 0)
