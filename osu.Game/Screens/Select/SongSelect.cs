@@ -524,12 +524,12 @@ namespace osu.Game.Screens.Select
 
         private ScheduledDelegate? selectionChangedDebounce;
 
-        private void updateCarouselSelection(ValueChangedEvent<WorkingBeatmap>? e = null)
+        private void updateCarouselSelection(ValueChangedEvent<WorkingBeatmap?> e = default)
         {
-            var beatmap = e?.NewValue ?? Beatmap.Value;
+            var beatmap = e.NewValue ?? Beatmap.Value;
             if (beatmap is DummyWorkingBeatmap || !this.IsCurrentScreen()) return;
 
-            if (beatmap.BeatmapSetInfo.Protected && e != null)
+            if (beatmap.BeatmapSetInfo.Protected)
             {
                 Logger.Log($"Denying working beatmap switch to protected beatmap {beatmap}");
                 Beatmap.Value = e.OldValue;
