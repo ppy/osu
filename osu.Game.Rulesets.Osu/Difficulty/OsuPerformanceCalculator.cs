@@ -426,6 +426,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             x /= Math.Max(a + 2 * (b - 1), 1);
 
             return (double)x;
+        }
         private double calculateEstimatedSliderbreaks(double topWeightedSliderFactor, OsuDifficultyAttributes attributes)
         {
             if (!usingClassicSliderAccuracy || countOk == 0)
