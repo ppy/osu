@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu.Difficulty.Evaluators;
+using osu.Game.Rulesets.Osu.Difficulty.Utils;
 using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
@@ -42,9 +44,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             currentStrain += StrainValueOf(current) * skillMultiplier;
 
             if (current.BaseObject is Slider)
-            {
                 sliderStrains.Add(currentStrain);
-            }
 
             return currentStrain;
         }
@@ -55,10 +55,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 return 0;
 
             double maxSliderStrain = sliderStrains.Max();
+
             if (maxSliderStrain == 0)
                 return 0;
 
             return sliderStrains.Sum(strain => 1.0 / (1.0 + Math.Exp(-(strain / maxSliderStrain * 12.0 - 6.0))));
         }
+
+        public double CountTopWeightedSliders() => OsuStrainUtils.CountTopWeightedSliders(sliderStrains, DifficultyValue());
     }
 }
