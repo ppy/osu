@@ -50,6 +50,128 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddAssert("beatmap set deleted", () => Beatmaps.GetAllUsableBeatmapSets().Any(), () => Is.False);
         }
 
+        [Test]
+        public void TestSpeedChange()
+        {
+            LoadSongSelect();
+            AddStep("clear mods", () => SelectedMods.Value = Array.Empty<Mod>());
+
+            decreaseModSpeed();
+            AddAssert("half time activated at 0.95x", () => SelectedMods.Value.OfType<ModHalfTime>().Single().SpeedChange.Value, () => Is.EqualTo(0.95).Within(0.005));
+
+            decreaseModSpeed();
+            AddAssert("half time speed changed to 0.9x", () => SelectedMods.Value.OfType<ModHalfTime>().Single().SpeedChange.Value, () => Is.EqualTo(0.9).Within(0.005));
+
+            increaseModSpeed();
+            AddAssert("half time speed changed to 0.95x", () => SelectedMods.Value.OfType<ModHalfTime>().Single().SpeedChange.Value, () => Is.EqualTo(0.95).Within(0.005));
+
+            increaseModSpeed();
+            AddAssert("no mods selected", () => SelectedMods.Value.Count == 0);
+
+            increaseModSpeed();
+            AddAssert("double time activated at 1.05x", () => SelectedMods.Value.OfType<ModDoubleTime>().Single().SpeedChange.Value, () => Is.EqualTo(1.05).Within(0.005));
+
+            increaseModSpeed();
+            AddAssert("double time speed changed to 1.1x", () => SelectedMods.Value.OfType<ModDoubleTime>().Single().SpeedChange.Value, () => Is.EqualTo(1.1).Within(0.005));
+
+            decreaseModSpeed();
+            AddAssert("double time speed changed to 1.05x", () => SelectedMods.Value.OfType<ModDoubleTime>().Single().SpeedChange.Value, () => Is.EqualTo(1.05).Within(0.005));
+
+            OsuModNightcore nc = new OsuModNightcore
+            {
+                SpeedChange = { Value = 1.05 }
+            };
+            AddStep("select NC", () => SelectedMods.Value = new[] { nc });
+
+            increaseModSpeed();
+            AddAssert("nightcore speed changed to 1.1x", () => SelectedMods.Value.OfType<ModNightcore>().Single().SpeedChange.Value, () => Is.EqualTo(1.1).Within(0.005));
+
+            decreaseModSpeed();
+            AddAssert("nightcore speed changed to 1.05x", () => SelectedMods.Value.OfType<ModNightcore>().Single().SpeedChange.Value, () => Is.EqualTo(1.05).Within(0.005));
+
+            decreaseModSpeed();
+            AddAssert("no mods selected", () => SelectedMods.Value.Count == 0);
+
+            decreaseModSpeed();
+            AddAssert("daycore activated at 0.95x", () => SelectedMods.Value.OfType<ModDaycore>().Single().SpeedChange.Value, () => Is.EqualTo(0.95).Within(0.005));
+
+            decreaseModSpeed();
+            AddAssert("daycore activated at 0.95x", () => SelectedMods.Value.OfType<ModDaycore>().Single().SpeedChange.Value, () => Is.EqualTo(0.9).Within(0.005));
+
+            increaseModSpeed();
+            AddAssert("daycore activated at 0.95x", () => SelectedMods.Value.OfType<ModDaycore>().Single().SpeedChange.Value, () => Is.EqualTo(0.95).Within(0.005));
+
+            OsuModDoubleTime dt = new OsuModDoubleTime
+            {
+                SpeedChange = { Value = 1.02 },
+                AdjustPitch = { Value = true },
+            };
+            AddStep("select DT", () => SelectedMods.Value = new[] { dt });
+
+            decreaseModSpeed();
+            AddAssert("half time activated at 0.97x", () => SelectedMods.Value.OfType<ModHalfTime>().Single().SpeedChange.Value, () => Is.EqualTo(0.97).Within(0.005));
+            AddAssert("adjust pitch preserved", () => SelectedMods.Value.OfType<ModHalfTime>().Single().AdjustPitch.Value, () => Is.True);
+
+            OsuModHalfTime ht = new OsuModHalfTime
+            {
+                SpeedChange = { Value = 0.97 },
+                AdjustPitch = { Value = true },
+            };
+            Mod[] modlist = { ht, new OsuModHardRock(), new OsuModHidden() };
+            AddStep("select HT+HD", () => SelectedMods.Value = modlist);
+
+            increaseModSpeed();
+            AddAssert("double time activated at 1.02x", () => SelectedMods.Value.OfType<ModDoubleTime>().Single().SpeedChange.Value, () => Is.EqualTo(1.02).Within(0.005));
+            AddAssert("double time activated at 1.02x", () => SelectedMods.Value.OfType<ModDoubleTime>().Single().AdjustPitch.Value, () => Is.True);
+            AddAssert("HD still enabled", () => SelectedMods.Value.OfType<ModHidden>().SingleOrDefault(), () => Is.Not.Null);
+            AddAssert("HR still enabled", () => SelectedMods.Value.OfType<ModHardRock>().SingleOrDefault(), () => Is.Not.Null);
+
+            AddStep("select WU", () => SelectedMods.Value = new[] { new ModWindUp() });
+            increaseModSpeed();
+            AddAssert("windup still active", () => SelectedMods.Value.First() is ModWindUp);
+
+            AddStep("select AS", () => SelectedMods.Value = new[] { new ModAdaptiveSpeed() });
+            increaseModSpeed();
+            AddAssert("adaptive speed still active", () => SelectedMods.Value.First() is ModAdaptiveSpeed);
+
+            OsuModDoubleTime dtWithAdjustPitch = new OsuModDoubleTime
+            {
+                SpeedChange = { Value = 1.05 },
+                AdjustPitch = { Value = true },
+            };
+            AddStep("select DT x1.05", () => SelectedMods.Value = new[] { dtWithAdjustPitch });
+
+            decreaseModSpeed();
+            AddAssert("no mods selected", () => SelectedMods.Value.Count == 0);
+
+            decreaseModSpeed();
+            AddAssert("half time activated at 0.95x", () => SelectedMods.Value.OfType<ModHalfTime>().Single().SpeedChange.Value, () => Is.EqualTo(0.95).Within(0.005));
+            AddAssert("half time has adjust pitch active", () => SelectedMods.Value.OfType<ModHalfTime>().Single().AdjustPitch.Value, () => Is.True);
+
+            AddStep("turn off adjust pitch", () => SelectedMods.Value.OfType<ModHalfTime>().Single().AdjustPitch.Value = false);
+
+            increaseModSpeed();
+            AddAssert("no mods selected", () => SelectedMods.Value.Count == 0);
+
+            increaseModSpeed();
+            AddAssert("double time activated at 1.05x", () => SelectedMods.Value.OfType<ModDoubleTime>().Single().SpeedChange.Value, () => Is.EqualTo(1.05).Within(0.005));
+            AddAssert("double time has adjust pitch inactive", () => SelectedMods.Value.OfType<ModDoubleTime>().Single().AdjustPitch.Value, () => Is.False);
+
+            void increaseModSpeed() => AddStep("increase mod speed", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Key(Key.Up);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+
+            void decreaseModSpeed() => AddStep("decrease mod speed", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Key(Key.Down);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+        }
+
         #endregion
 
         #region Footer
