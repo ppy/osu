@@ -207,7 +207,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (effectiveMissCount > 0)
             {
                 double estimatedSliderbreaks = calculateEstimatedSliderbreaks(attributes.AimTopWeightedSliderFactor, attributes);
-                aimValue *= calculateMissPenalty(effectiveMissCount + estimatedSliderbreaks, attributes.AimDifficultStrainCount);
+                aimValue *= calculateMissPenalty(Math.Min(effectiveMissCount + estimatedSliderbreaks, totalImperfectHits), attributes.AimDifficultStrainCount);
             }
 
             // TC bonuses are excluded when blinds is present as the increased visual difficulty is unimportant when notes cannot be seen.
@@ -238,7 +238,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (effectiveMissCount > 0)
             {
                 double estimatedSliderbreaks = calculateEstimatedSliderbreaks(attributes.SpeedTopWeightedSliderFactor, attributes);
-                speedValue *= calculateMissPenalty(effectiveMissCount + estimatedSliderbreaks, attributes.SpeedDifficultStrainCount);
+                speedValue *= calculateMissPenalty(Math.Min(effectiveMissCount + estimatedSliderbreaks, totalImperfectHits), attributes.SpeedDifficultStrainCount);
             }
 
             // TC bonuses are excluded when blinds is present as the increased visual difficulty is unimportant when notes cannot be seen.
@@ -329,26 +329,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double calculateEstimatedSliderbreaks(double topWeightedSliderFactor, OsuDifficultyAttributes attributes)
         {
-            double possibleBreaks = countOk + countMeh;
-            
-            // Imagine a score that has 1x100.
-            // Imagine the effective miss count is 1 and the miss count is 0.
-            // To ensure we don't get a total miss count of 2, we need to remove the difference between these two numbers.
-            // This results in the amount of possible breaks being zero, because we're accounting for the fact that the estimated miss count handled the only possible sliderbreak already.
-            // In the non 1x100 case, this will always result in the possible breaks being slightly below the Ok count, and works fine when combined with effective miss count.
-            possibleBreaks -= effectiveMissCount - countMiss;
+            // Only ok and meh can be a sliderbreak
+            int okMehs = countOk + countMeh;
 
-            if (!usingClassicSliderAccuracy || possibleBreaks <= 0)
+            if (!usingClassicSliderAccuracy || okMehs == 0)
                 return 0;
 
             double missedComboPercent = 1.0 - (double)scoreMaxCombo / attributes.MaxCombo;
 
-            double estimatedSliderbreaks = Math.Min(possibleBreaks, effectiveMissCount * topWeightedSliderFactor);
+            double estimatedSliderbreaks = effectiveMissCount * topWeightedSliderFactor;
 
-            // scores with more oks are more likely to have sliderbreaks
-            double okAdjustment = ((countOk - estimatedSliderbreaks) + 0.5) / countOk;
+            // scores with more oks and mehs are more likely to have sliderbreaks
+            double okMehAdjustment = ((okMehs - estimatedSliderbreaks) + 0.5) / okMehs;
 
-            return estimatedSliderbreaks * okAdjustment * DifficultyCalculationUtils.Logistic(missedComboPercent, 0.33, 15);
+            return estimatedSliderbreaks * okMehAdjustment * DifficultyCalculationUtils.Logistic(missedComboPercent, 0.33, 15);
         }
 
         /// <summary>
