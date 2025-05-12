@@ -35,6 +35,7 @@ namespace osu.Game.Tests.Visual.Playlists
         private BeatmapManager manager = null!;
         private TestPlaylistsRoomSubScreen match = null!;
         private BeatmapSetInfo importedBeatmap = null!;
+        private Room room = null!;
 
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
@@ -47,11 +48,9 @@ namespace osu.Game.Tests.Visual.Playlists
         [SetUpSteps]
         public void SetupSteps()
         {
-            AddStep("set room", () => SelectedRoom.Value = new Room());
-
             importBeatmap();
 
-            AddStep("load match", () => LoadScreen(match = new TestPlaylistsRoomSubScreen(SelectedRoom.Value!)));
+            AddStep("load match", () => LoadScreen(match = new TestPlaylistsRoomSubScreen(room = new Room())));
             AddUntilStep("wait for load", () => match.IsCurrentScreen());
         }
 
@@ -119,7 +118,7 @@ namespace osu.Game.Tests.Visual.Playlists
                 ];
             });
 
-            AddAssert("first playlist item selected", () => match.SelectedItem.Value == SelectedRoom.Value!.Playlist[0]);
+            AddAssert("first playlist item selected", () => match.SelectedItem.Value == room.Playlist[0]);
         }
 
         [Test]
@@ -197,10 +196,9 @@ namespace osu.Game.Tests.Visual.Playlists
             AddUntilStep("match has correct beatmap", () => realHash == match.Beatmap.Value.BeatmapInfo.MD5Hash);
         }
 
-        private void setupAndCreateRoom(Action<Room> room)
+        private void setupAndCreateRoom(Action<Room> setupFunc)
         {
-            AddStep("setup room", () => room(SelectedRoom.Value!));
-
+            AddStep("setup room", () => setupFunc(room));
             AddStep("click create button", () =>
             {
                 InputManager.MoveMouseTo(this.ChildrenOfType<PlaylistsRoomSettingsOverlay.CreateRoomButton>().Single());
