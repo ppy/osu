@@ -51,12 +51,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             if (currPreempt < 500)
             {
-                preemptDifficulty += Math.Pow(500 - currPreempt, 2.5) / 120000;
+                preemptDifficulty += Math.Pow(500 - currPreempt, 2.3) / 75000;
 
-                // Nerf preempt on most comfortable densities
-                // https://www.desmos.com/calculator/31mrv4rlfh
-                double densityDifficulty = 1 + DifficultyCalculationUtils.BellCurve(pastObjectDifficultyInfluence, 2.2, 1, 3.0);
-                preemptDifficulty *= constantAngleNerfFactor * angularVelocityFactor / densityDifficulty;
+                preemptDifficulty *= constantAngleNerfFactor * angularVelocityFactor;
             }
 
             double hiddenDifficulty = 0.0;
