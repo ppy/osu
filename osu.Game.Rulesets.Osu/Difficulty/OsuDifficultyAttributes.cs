@@ -75,6 +75,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         [JsonProperty("speed_difficult_strain_count")]
         public double SpeedDifficultStrainCount { get; set; }
 
+        [JsonProperty("slider_nested_score_per_object")]
+        public double SliderNestedScorePerObject { get; set; }
+
+        [JsonProperty("legacy_score_base_multiplier")]
+        public double LegacyScoreBaseMultiplier { get; set; }
+
+        [JsonProperty("maximum_legacy_score")]
+        public double MaximumLegacyScore { get; set; }
+
         /// <summary>
         /// The beatmap's drain rate. This doesn't scale with rate-adjusting mods.
         /// </summary>
@@ -94,15 +103,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         /// The number of spinners in the beatmap.
         /// </summary>
         public int SpinnerCount { get; set; }
-
-        [JsonProperty("slider_nested_score_per_object")]
-        public double SliderNestedScorePerObject { get; set; }
-
-        [JsonProperty("legacy_score_base_multiplier")]
-        public double LegacyScoreBaseMultiplier { get; set; }
-
-        [JsonProperty("maximum_legacy_score")]
-        public long MaximumLegacyScore { get; set; }
 
         public override IEnumerable<(int attributeId, object value)> ToDatabaseAttributes()
         {
@@ -124,6 +124,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             yield return (ATTRIB_ID_AIM_DIFFICULT_SLIDER_COUNT, AimDifficultSliderCount);
             yield return (ATTRIB_ID_AIM_TOP_WEIGHTED_SLIDER_FACTOR, AimTopWeightedSliderFactor);
             yield return (ATTRIB_ID_SPEED_TOP_WEIGHTED_SLIDER_FACTOR, SpeedTopWeightedSliderFactor);
+            yield return (ATTRIB_ID_SLIDER_NESTED_SCORE_PER_OBJECT, SliderNestedScorePerObject);
+            yield return (ATTRIB_ID_LEGACY_SCORE_BASE_MULTIPLIER, LegacyScoreBaseMultiplier);
+            yield return (ATTRIB_ID_MAXIMUM_LEGACY_SCORE, MaximumLegacyScore);
         }
 
         public override void FromDatabaseAttributes(IReadOnlyDictionary<int, double> values, IBeatmapOnlineInfo onlineInfo)
@@ -141,6 +144,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             AimDifficultSliderCount = values[ATTRIB_ID_AIM_DIFFICULT_SLIDER_COUNT];
             AimTopWeightedSliderFactor = values[ATTRIB_ID_AIM_TOP_WEIGHTED_SLIDER_FACTOR];
             SpeedTopWeightedSliderFactor = values[ATTRIB_ID_SPEED_TOP_WEIGHTED_SLIDER_FACTOR];
+            SliderNestedScorePerObject = values[ATTRIB_ID_SLIDER_NESTED_SCORE_PER_OBJECT];
+            LegacyScoreBaseMultiplier = values[ATTRIB_ID_LEGACY_SCORE_BASE_MULTIPLIER];
+            MaximumLegacyScore = values[ATTRIB_ID_MAXIMUM_LEGACY_SCORE];
             DrainRate = onlineInfo.DrainRate;
             HitCircleCount = onlineInfo.CircleCount;
             SliderCount = onlineInfo.SliderCount;
