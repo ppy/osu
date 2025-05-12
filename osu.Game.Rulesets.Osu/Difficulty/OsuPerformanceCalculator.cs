@@ -329,11 +329,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double calculateEstimatedSliderbreaks(double topWeightedSliderFactor, OsuDifficultyAttributes attributes)
         {
-            if (!usingClassicSliderAccuracy || countOk == 0)
+            double possibleBreaks = countOk + countMeh;
+            possibleBreaks -= effectiveMissCount - countMiss;
+
+            if (!usingClassicSliderAccuracy || possibleBreaks <= 0)
                 return 0;
 
             double missedComboPercent = 1.0 - (double)scoreMaxCombo / attributes.MaxCombo;
-            double estimatedSliderbreaks = Math.Min(countOk, effectiveMissCount * topWeightedSliderFactor);
+
+            double estimatedSliderbreaks = Math.Min(possibleBreaks, effectiveMissCount * topWeightedSliderFactor);
 
             // scores with more oks are more likely to have sliderbreaks
             double okAdjustment = ((countOk - estimatedSliderbreaks) + 0.5) / countOk;
