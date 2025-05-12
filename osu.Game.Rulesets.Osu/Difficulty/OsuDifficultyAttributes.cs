@@ -121,6 +121,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             yield return (ATTRIB_ID_AIM_DIFFICULT_SLIDER_COUNT, AimDifficultSliderCount);
             yield return (ATTRIB_ID_AIM_TOP_WEIGHTED_SLIDER_FACTOR, AimTopWeightedSliderFactor);
             yield return (ATTRIB_ID_SPEED_TOP_WEIGHTED_SLIDER_FACTOR, SpeedTopWeightedSliderFactor);
+            yield return (ATTRIB_ID_SNAP_AIM_DIFFICULTY, SnapAimDifficulty);
+            yield return (ATTRIB_ID_FLOW_AIM_DIFFICULTY, FlowAimDifficulty);
         }
 
         public override void FromDatabaseAttributes(IReadOnlyDictionary<int, double> values, IBeatmapOnlineInfo onlineInfo)
@@ -138,6 +140,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             AimDifficultSliderCount = values[ATTRIB_ID_AIM_DIFFICULT_SLIDER_COUNT];
             AimTopWeightedSliderFactor = values[ATTRIB_ID_AIM_TOP_WEIGHTED_SLIDER_FACTOR];
             SpeedTopWeightedSliderFactor = values[ATTRIB_ID_SPEED_TOP_WEIGHTED_SLIDER_FACTOR];
+            SnapAimDifficulty = values[ATTRIB_ID_SNAP_AIM_DIFFICULTY];
+            FlowAimDifficulty = values[ATTRIB_ID_FLOW_AIM_DIFFICULTY];
             DrainRate = onlineInfo.DrainRate;
             HitCircleCount = onlineInfo.CircleCount;
             SliderCount = onlineInfo.SliderCount;
