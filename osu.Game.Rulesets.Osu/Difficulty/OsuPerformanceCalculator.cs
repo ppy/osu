@@ -438,6 +438,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // scores with more oks are more likely to have sliderbreaks
             double okAdjustment = ((countOk - estimatedSliderbreaks) + 0.5) / countOk;
 
+            // there're low probability of extra sliderbreaks on effective misscounts close to 1
+            estimatedSliderbreaks *= DifficultyCalculationUtils.Smoothstep(effectiveMissCount, 1, 2);
+
             return estimatedSliderbreaks * okAdjustment * DifficultyCalculationUtils.Logistic(missedComboPercent, 0.33, 15);
         }
 
