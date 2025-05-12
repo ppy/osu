@@ -58,6 +58,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double aimDifficultStrainCount = aim.CountTopWeightedStrains();
             double speedDifficultStrainCount = speed.CountTopWeightedStrains();
 
+            double aimNoSlidersTopWeightedSliderCount = aimWithoutSliders.CountTopWeightedSliders();
+            double aimNoSlidersDifficultStrainCount = aimWithoutSliders.CountTopWeightedStrains();
+
+            double aimTopWeightedSliderFactor = aimNoSlidersTopWeightedSliderCount / Math.Max(1, aimNoSlidersDifficultStrainCount - aimNoSlidersTopWeightedSliderCount);
+
+            double speedTopWeightedSliderCount = speed.CountTopWeightedSliders();
+            double speedTopWeightedSliderFactor = speedTopWeightedSliderCount / Math.Max(1, speedDifficultStrainCount - speedTopWeightedSliderCount);
+
             double difficultSliders = aim.GetDifficultSliders();
 
             double preempt = IBeatmapDifficultyInfo.DifficultyRange(beatmap.Difficulty.ApproachRate, 1800, 1200, 450) / clockRate;
@@ -118,6 +126,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 SliderFactor = sliderFactor,
                 AimDifficultStrainCount = aimDifficultStrainCount,
                 SpeedDifficultStrainCount = speedDifficultStrainCount,
+                AimTopWeightedSliderFactor = aimTopWeightedSliderFactor,
+                SpeedTopWeightedSliderFactor = speedTopWeightedSliderFactor,
                 DrainRate = drainRate,
                 MaxCombo = beatmap.GetMaxCombo(),
                 HitCircleCount = hitCircleCount,
