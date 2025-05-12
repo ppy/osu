@@ -20,6 +20,19 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         }
 
         [Test]
+        public void TestOpenSkinEditor()
+        {
+            AddStep("toggle skin editor", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.Key(Key.S);
+                InputManager.ReleaseKey(Key.ControlLeft);
+                InputManager.ReleaseKey(Key.ShiftLeft);
+            });
+        }
+
+        [Test]
         public void TestClickLogo()
         {
             AddStep("click", () =>
