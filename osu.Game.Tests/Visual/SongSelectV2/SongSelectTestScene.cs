@@ -134,6 +134,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         {
             AddStep("load screen", () => Stack.Push(Screen = new SoloSongSelect()));
             AddUntilStep("wait for load", () => Stack.CurrentScreen == Screen && Screen.IsLoaded);
+            AddUntilStep("wait for filtering", () => !Carousel.IsFiltering);
         }
 
         protected void ImportBeatmapForRuleset(int rulesetId)
