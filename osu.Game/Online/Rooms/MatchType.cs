@@ -12,6 +12,8 @@ namespace osu.Game.Online.Rooms
 
         Playlists,
 
+        Tournaments,
+
         [LocalisableDescription(typeof(MatchesStrings), nameof(MatchesStrings.MatchTeamTypesHeadToHead))]
         HeadToHead,
 
