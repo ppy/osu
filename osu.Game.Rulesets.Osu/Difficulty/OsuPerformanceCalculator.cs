@@ -361,14 +361,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double maximumMissCount = calculateMaximumComboBasedMissCount(attributes);
 
-            double scoreObtainedDuringMaxCombo = calculateScoreForCombo(attributes, score.MaxCombo, relevantComboPerObject, scoreV1Multiplier);
+            double scoreObtainedDuringMaxCombo = calculateScoreAtCombo(attributes, score.MaxCombo, relevantComboPerObject, scoreV1Multiplier);
             double remainingScore = score.LegacyTotalScore.Value - scoreObtainedDuringMaxCombo;
 
             if (remainingScore <= 0)
                 return maximumMissCount;
 
             double remainingCombo = attributes.MaxCombo - score.MaxCombo;
-            double expectedRemainingScore = calculateScoreForCombo(attributes, remainingCombo, relevantComboPerObject, scoreV1Multiplier);
+            double expectedRemainingScore = calculateScoreAtCombo(attributes, remainingCombo, relevantComboPerObject, scoreV1Multiplier);
 
             double scoreBasedMissCount = expectedRemainingScore / remainingScore;
 
@@ -399,7 +399,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return missCount;
         }
 
-        private double calculateScoreForCombo(OsuDifficultyAttributes attributes, double combo, double relevantComboPerObject, double scoreV1Multiplier)
+        private double calculateScoreAtCombo(OsuDifficultyAttributes attributes, double combo, double relevantComboPerObject, double scoreV1Multiplier)
         {
             // Sum of arithmetic progression
             double n = combo / relevantComboPerObject - 1;
