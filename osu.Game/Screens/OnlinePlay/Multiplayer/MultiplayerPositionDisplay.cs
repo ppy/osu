@@ -166,7 +166,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             localPlayerMarker.MoveToX(marker_size / 2 + Math.Min(relativePosition * (width - marker_size / 2), width - marker_size / 2), 1000, Easing.OutPow10);
         }
 
-        private class PositionCounter : RollingCounter<int>
+        private partial class PositionCounter : RollingCounter<int>
         {
             protected override double RollingDuration => Current.Value > 0 ? 1000 : 0;
             protected override Easing RollingEasing => Easing.OutPow10;
