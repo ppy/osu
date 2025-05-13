@@ -401,14 +401,19 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double calculateScoreAtCombo(OsuDifficultyAttributes attributes, double combo, double relevantComboPerObject, double scoreV1Multiplier)
         {
-            // Sum of arithmetic progression
             double n = combo / relevantComboPerObject - 1;
             double a = relevantComboPerObject - 1;
 
+            // The combo portion of ScoreV1 follows arithmetic progression
+            // Therefore, we calculate the combo portion of score using the combo per object and our current combo.
             double comboScore = relevantComboPerObject > 0 ? (2 * a + (n - 1) * relevantComboPerObject) * n / 2 : 0;
+
+            // We then apply the accuracy and ScoreV1 multipliers to the resulting score.
             comboScore *= accuracy * 300 / 25 * scoreV1Multiplier;
 
             double objectsHit = (totalHits - countMiss) * combo / attributes.MaxCombo;
+
+            // Score also has a non-combo portion we need to create the final score value.
             double nonComboScore = (300 + attributes.SliderNestedScorePerObject) * accuracy * objectsHit;
 
             return comboScore + nonComboScore;
@@ -418,7 +423,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
             double nonComboScore = (300 + attributes.SliderNestedScorePerObject) * totalHits;
 
+            // We want to figure out the value of the combo score portion, so we remove the non-combo value from the maximum score.
             double comboScore = attributes.MaximumLegacyScore - nonComboScore;
+
+            // We then reverse apply the ScoreV1 multipliers to get the raw value.
             comboScore /= 300.0 / 25.0 * scoreV1Multiplier;
 
             if (Precision.AlmostEquals(scoreV1Multiplier, 0))
@@ -427,6 +435,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             decimal a = attributes.MaxCombo;
             decimal b = (decimal)comboScore;
 
+            // Reverse the arithmetic progression to work out the amount of combo per object based on the score.
             decimal x = (a - 2) * a;
             x /= Math.Max(a + 2 * (b - 1), 1);
 
@@ -444,7 +453,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // scores with more oks are more likely to have sliderbreaks
             double okAdjustment = ((countOk - estimatedSliderbreaks) + 0.5) / countOk;
 
-            // there're low probability of extra sliderbreaks on effective misscounts close to 1
+            // There is a low probability of extra slider breaks on effective miss counts close to 1, as score based calculations are good at indicating if only a single break occurred.
             estimatedSliderbreaks *= DifficultyCalculationUtils.Smoothstep(effectiveMissCount, 1, 2);
 
             return estimatedSliderbreaks * okAdjustment * DifficultyCalculationUtils.Logistic(missedComboPercent, 0.33, 15);
