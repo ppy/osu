@@ -352,6 +352,23 @@ namespace osu.Game.Graphics.Carousel
 
         #region Input handling
 
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            switch (e.Key)
+            {
+                case Key.Enter:
+                case Key.KeypadEnter:
+                    // this is a special hard-coded case to allow activating item with modifier keys pressed
+                    // (e.g. press Ctrl+Enter to start beatmap with autoplay mod selected).
+                    // We can't rely on GlobalAction.Select for that as it only responds to pressing the key without any modifiers.
+                    if (currentKeyboardSelection.CarouselItem != null)
+                        Activate(currentKeyboardSelection.CarouselItem);
+                    return true;
+            }
+
+            return base.OnKeyDown(e);
+        }
+
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
             switch (e.Action)

@@ -185,6 +185,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             // todo: remove when that's the case.
             AddAssert("no beatmap selected", () => Beatmap.IsDefault);
             AddStep("select beatmap", () => Beatmap.Value = Beatmaps.GetWorkingBeatmap(Beatmaps.GetAllUsableBeatmapSets().Single().Beatmaps.First()));
+            AddStep("press right", () => InputManager.Key(Key.Right)); // press right to select in carousel, also remove.
             AddAssert("beatmap selected", () => !Beatmap.IsDefault);
 
             AddStep("press ctrl+enter", () =>
@@ -214,6 +215,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             // todo: remove when that's the case.
             AddAssert("no beatmap selected", () => Beatmap.IsDefault);
             AddStep("select beatmap", () => Beatmap.Value = Beatmaps.GetWorkingBeatmap(Beatmaps.GetAllUsableBeatmapSets().Single().Beatmaps.First()));
+            AddStep("press right", () => InputManager.Key(Key.Right)); // press right to select in carousel, also remove.
             AddAssert("beatmap selected", () => !Beatmap.IsDefault);
 
             ChangeMods(new OsuModAutoplay());
@@ -245,6 +247,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             // todo: remove when that's the case.
             AddAssert("no beatmap selected", () => Beatmap.IsDefault);
             AddStep("select beatmap", () => Beatmap.Value = Beatmaps.GetWorkingBeatmap(Beatmaps.GetAllUsableBeatmapSets().Single().Beatmaps.First()));
+            AddStep("press right", () => InputManager.Key(Key.Right)); // press right to select in carousel, also remove.
             AddAssert("beatmap selected", () => !Beatmap.IsDefault);
 
             ChangeMods(new OsuModRelax());
