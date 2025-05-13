@@ -168,6 +168,57 @@ namespace osu.Game.Tests.Visual.Ranking
         }
 
         [Test]
+        public void TestOnlineLeaderboardWithLessThan50Scores_UserWasInTop50()
+        {
+            ScoreInfo localScore = null!;
+
+            AddStep("set leaderboard to global", () => leaderboardManager.FetchWithCriteria(new LeaderboardCriteria(importedBeatmap, importedBeatmap.Ruleset, BeatmapLeaderboardScope.Global, null)));
+            AddStep("set up request handling", () => dummyAPI.HandleRequest = req =>
+            {
+                switch (req)
+                {
+                    case GetScoresRequest getScoresRequest:
+                        var scores = new List<SoloScoreInfo>();
+
+                        for (int i = 0; i < 30; ++i)
+                        {
+                            var score = TestResources.CreateTestScoreInfo(importedBeatmap);
+                            score.TotalScore = 10_000 * (30 - i);
+                            score.Position = i + 1;
+                            scores.Add(SoloScoreInfo.ForSubmission(score));
+                        }
+
+                        scores[^1].ID = 123456;
+                        scores[^1].UserID = API.LocalUser.Value.OnlineID;
+
+                        getScoresRequest.TriggerSuccess(new APIScoresCollection
+                        {
+                            Scores = scores,
+                            UserScore = new APIScoreWithPosition
+                            {
+                                Score = scores[^1],
+                                Position = 30
+                            }
+                        });
+                        return true;
+                }
+
+                return false;
+            });
+
+            AddStep("show results", () =>
+            {
+                localScore = TestResources.CreateTestScoreInfo(importedBeatmap);
+                localScore.TotalScore = 151_000;
+                localScore.Position = null;
+                LoadScreen(new SoloResultsScreen(localScore));
+            });
+            AddUntilStep("wait for loaded", () => ((Drawable)Stack.CurrentScreen).IsLoaded);
+            AddAssert("local score is #16", () => this.ChildrenOfType<ScorePanelList>().Single().GetPanelForScore(localScore).ScorePosition.Value, () => Is.EqualTo(16));
+            AddAssert("previous user best not shown", () => this.ChildrenOfType<ScorePanel>().All(p => p.Score.OnlineID != 123456));
+        }
+
+        [Test]
         public void TestOnlineLeaderboardWithLessThan50Scores_UserIsLast()
         {
             ScoreInfo localScore = null!;
@@ -207,7 +258,7 @@ namespace osu.Game.Tests.Visual.Ranking
         }
 
         [Test]
-        public void TestOnlineLeaderboardWithMoreThan50Scores_UserOutsideOfTop50()
+        public void TestOnlineLeaderboardWithMoreThan50Scores_UserOutsideOfTop50_DidNotBeatOwnBest()
         {
             ScoreInfo localScore = null!;
 
@@ -227,15 +278,69 @@ namespace osu.Game.Tests.Visual.Ranking
                             scores.Add(SoloScoreInfo.ForSubmission(score));
                         }
 
-                        var userBest = TestResources.CreateTestScoreInfo(importedBeatmap);
+                        var userBest = SoloScoreInfo.ForSubmission(TestResources.CreateTestScoreInfo(importedBeatmap));
                         userBest.TotalScore = 50_000;
+                        userBest.ID = 123456;
 
                         getScoresRequest.TriggerSuccess(new APIScoresCollection
                         {
                             Scores = scores,
                             UserScore = new APIScoreWithPosition
                             {
-                                Score = SoloScoreInfo.ForSubmission(userBest),
+                                Score = userBest,
+                                Position = 133_337,
+                            }
+                        });
+                        return true;
+                }
+
+                return false;
+            });
+
+            AddStep("show results", () =>
+            {
+                localScore = TestResources.CreateTestScoreInfo(importedBeatmap);
+                localScore.TotalScore = 31_000;
+                localScore.Position = null;
+                LoadScreen(new SoloResultsScreen(localScore));
+            });
+            AddUntilStep("wait for loaded", () => ((Drawable)Stack.CurrentScreen).IsLoaded);
+            AddAssert("local score has no position", () => this.ChildrenOfType<ScorePanelList>().Single().GetPanelForScore(localScore).ScorePosition.Value, () => Is.Null);
+            AddAssert("previous user best shown at same position", () => this.ChildrenOfType<ScorePanel>().Any(p => p.Score.OnlineID == 123456 && p.ScorePosition.Value == 133_337));
+        }
+
+        [Test]
+        public void TestOnlineLeaderboardWithMoreThan50Scores_UserOutsideOfTop50_BeatOwnBest()
+        {
+            ScoreInfo localScore = null!;
+
+            AddStep("set leaderboard to global", () => leaderboardManager.FetchWithCriteria(new LeaderboardCriteria(importedBeatmap, importedBeatmap.Ruleset, BeatmapLeaderboardScope.Global, null)));
+            AddStep("set up request handling", () => dummyAPI.HandleRequest = req =>
+            {
+                switch (req)
+                {
+                    case GetScoresRequest getScoresRequest:
+                        var scores = new List<SoloScoreInfo>();
+
+                        for (int i = 0; i < 50; ++i)
+                        {
+                            var score = TestResources.CreateTestScoreInfo(importedBeatmap);
+                            score.TotalScore = 500_000 + 10_000 * (50 - i);
+                            score.Position = i + 1;
+                            scores.Add(SoloScoreInfo.ForSubmission(score));
+                        }
+
+                        var userBest = SoloScoreInfo.ForSubmission(TestResources.CreateTestScoreInfo(importedBeatmap));
+                        userBest.TotalScore = 50_000;
+                        userBest.ID = 123456;
+                        userBest.UserID = API.LocalUser.Value.OnlineID;
+
+                        getScoresRequest.TriggerSuccess(new APIScoresCollection
+                        {
+                            Scores = scores,
+                            UserScore = new APIScoreWithPosition
+                            {
+                                Score = userBest,
                                 Position = 133_337,
                             }
                         });
@@ -254,7 +359,7 @@ namespace osu.Game.Tests.Visual.Ranking
             });
             AddUntilStep("wait for loaded", () => ((Drawable)Stack.CurrentScreen).IsLoaded);
             AddAssert("local score has no position", () => this.ChildrenOfType<ScorePanelList>().Single().GetPanelForScore(localScore).ScorePosition.Value, () => Is.Null);
-            AddAssert("user best position preserved", () => this.ChildrenOfType<ScorePanel>().Any(p => p.ScorePosition.Value == 133_337));
+            AddAssert("previous user best not shown", () => this.ChildrenOfType<ScorePanel>().All(p => p.Score.OnlineID != 123456));
         }
 
         [Test]
@@ -278,15 +383,17 @@ namespace osu.Game.Tests.Visual.Ranking
                             scores.Add(SoloScoreInfo.ForSubmission(score));
                         }
 
-                        var userBest = TestResources.CreateTestScoreInfo(importedBeatmap);
+                        var userBest = SoloScoreInfo.ForSubmission(TestResources.CreateTestScoreInfo(importedBeatmap));
                         userBest.TotalScore = 50_000;
+                        userBest.ID = 123456;
+                        userBest.UserID = API.LocalUser.Value.OnlineID;
 
                         getScoresRequest.TriggerSuccess(new APIScoresCollection
                         {
                             Scores = scores,
                             UserScore = new APIScoreWithPosition
                             {
-                                Score = SoloScoreInfo.ForSubmission(userBest),
+                                Score = userBest,
                                 Position = 133_337,
                             }
                         });
@@ -305,7 +412,7 @@ namespace osu.Game.Tests.Visual.Ranking
             });
             AddUntilStep("wait for loaded", () => ((Drawable)Stack.CurrentScreen).IsLoaded);
             AddAssert("local score is #36", () => this.ChildrenOfType<ScorePanelList>().Single().GetPanelForScore(localScore).ScorePosition.Value, () => Is.EqualTo(36));
-            AddAssert("user best position incremented by 1", () => this.ChildrenOfType<ScorePanel>().Any(p => p.ScorePosition.Value == 133_338));
+            AddAssert("previous user best not shown", () => this.ChildrenOfType<ScorePanel>().All(p => p.Score.OnlineID != 123456));
         }
 
         [Test]
