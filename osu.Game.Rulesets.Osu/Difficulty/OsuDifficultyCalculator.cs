@@ -307,7 +307,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private long calculateMaximumScoreV1(IBeatmap beatmap, Mod[] mods)
         {
             var simulator = new OsuLegacyScoreSimulator();
-            var attributes = simulator.Simulate(Working, beatmap);
+            var attributes = simulator.Simulate(WorkingBeatmap, beatmap);
 
             double legacyModMultiplier = simulator.GetLegacyScoreMultiplier(mods, new LegacyBeatmapConversionDifficultyInfo());
             int maximumLegacyAccuracyScore = attributes.AccuracyScore;
