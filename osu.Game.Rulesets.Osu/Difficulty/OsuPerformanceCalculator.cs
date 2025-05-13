@@ -325,30 +325,27 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double missCount = countMiss;
 
-            if (attributes.SliderCount > 0)
+            if (usingClassicSliderAccuracy)
             {
-                if (usingClassicSliderAccuracy)
-                {
-                    // Consider that full combo is maximum combo minus dropped slider tails since they don't contribute to combo but also don't break it
-                    // In classic scores we can't know the amount of dropped sliders so we estimate to 10% of all sliders on the map
-                    double fullComboThreshold = attributes.MaxCombo - 0.1 * attributes.SliderCount;
+                // Consider that full combo is maximum combo minus dropped slider tails since they don't contribute to combo but also don't break it
+                // In classic scores we can't know the amount of dropped sliders so we estimate to 10% of all sliders on the map
+                double fullComboThreshold = attributes.MaxCombo - 0.1 * attributes.SliderCount;
 
-                    if (scoreMaxCombo < fullComboThreshold)
-                        missCount = fullComboThreshold / Math.Max(1.0, scoreMaxCombo);
+                if (scoreMaxCombo < fullComboThreshold)
+                    missCount = fullComboThreshold / Math.Max(1.0, scoreMaxCombo);
 
-                    // In classic scores there can't be more misses than a sum of all non-perfect judgements
-                    missCount = Math.Min(missCount, totalImperfectHits);
-                }
-                else
-                {
-                    double fullComboThreshold = attributes.MaxCombo - countSliderEndsDropped;
+                // In classic scores there can't be more misses than a sum of all non-perfect judgements
+                missCount = Math.Min(missCount, totalImperfectHits);
+            }
+            else
+            {
+                double fullComboThreshold = attributes.MaxCombo - countSliderEndsDropped;
 
-                    if (scoreMaxCombo < fullComboThreshold)
-                        missCount = fullComboThreshold / Math.Max(1.0, scoreMaxCombo);
+                if (scoreMaxCombo < fullComboThreshold)
+                    missCount = fullComboThreshold / Math.Max(1.0, scoreMaxCombo);
 
-                    // Combine regular misses with tick misses since tick misses break combo as well
-                    missCount = Math.Min(missCount, countSliderTickMiss + countMiss);
-                }
+                // Combine regular misses with tick misses since tick misses break combo as well
+                missCount = Math.Min(missCount, countSliderTickMiss + countMiss);
             }
 
             return missCount;
