@@ -104,7 +104,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (usingClassicSliderAccuracy && score.LegacyTotalScore != null)
             {
                 scoreBasedMissCount = calculateScoreBasedMissCount(score, osuAttributes);
-                effectiveMissCount = scoreBasedMissCount!.Value;
+                effectiveMissCount = scoreBasedMissCount.Value;
             }
             else
             {
