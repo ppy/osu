@@ -10,9 +10,11 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Screens.Play;
@@ -31,7 +33,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         private readonly Bindable<int?> position = new Bindable<int?>();
 
-        private OsuSpriteText positionText = null!;
+        private RollingCounter<int> positionText = null!;
 
         private Drawable localPlayerMarker = null!;
 
@@ -58,14 +60,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             InternalChildren = new Drawable[]
             {
-                positionText = new OsuSpriteText
+                positionText = new PositionCounter
                 {
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                     Alpha = 0,
                     Padding = new MarginPadding { Right = -5 },
-                    Font = OsuFont.Torus.With(size: 60, weight: FontWeight.Light, fixedWidth: true),
-                    Spacing = new Vector2(-8, 0),
                 },
                 new Container
                 {
@@ -152,18 +152,41 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             if (position.Value == null)
             {
                 positionText.Alpha = min_alpha;
-                positionText.Text = "-";
+                positionText.Current.Value = -1;
                 localPlayerMarker.FadeOut();
                 return;
             }
 
             float relativePosition = (float)(position.Value.Value - 1) / scores.Count;
 
-            positionText.Text = $@"#{position.Value.Value:N0}";
-            positionText.Alpha = min_alpha + (max_alpha - min_alpha) * (1 - relativePosition);
+            positionText.Current.Value = position.Value.Value;
+            positionText.FadeTo(min_alpha + (max_alpha - min_alpha) * (1 - relativePosition), 1000, Easing.OutPow10);
 
             localPlayerMarker.FadeIn();
             localPlayerMarker.MoveToX(marker_size / 2 + Math.Min(relativePosition * (width - marker_size / 2), width - marker_size / 2), 1000, Easing.OutPow10);
+        }
+
+        private class PositionCounter : RollingCounter<int>
+        {
+            protected override double RollingDuration => Current.Value > 0 ? 1000 : 0;
+            protected override Easing RollingEasing => Easing.OutPow10;
+
+            protected override LocalisableString FormatCount(int count)
+            {
+                if (count <= 0)
+                    return "-";
+
+                return "#" + base.FormatCount(count);
+            }
+
+            protected override OsuSpriteText CreateSpriteText()
+            {
+                return new OsuSpriteText
+                {
+                    Font = OsuFont.Torus.With(size: 60, weight: FontWeight.Light, fixedWidth: true),
+                    Spacing = new Vector2(-8, 0),
+                };
+            }
         }
     }
 }
