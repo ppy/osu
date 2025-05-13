@@ -6,6 +6,7 @@ using NUnit.Framework;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Carousel;
+using osu.Game.Screens.Select.Filter;
 using osu.Game.Screens.SelectV2;
 using osuTK;
 using osuTK.Input;
@@ -234,6 +235,28 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             ClickVisiblePanelWithOffset<PanelBeatmap>(3, new Vector2(0, (CarouselItem.DEFAULT_HEIGHT / 2 + 1)));
             WaitForSelection(0, 3);
+        }
+
+        [Test]
+        public void TestDifficultySortingWithNoGroups()
+        {
+            AddBeatmaps(2, 3);
+            WaitForDrawablePanels();
+
+            SortAndGroupBy(SortMode.Difficulty, GroupMode.All);
+            WaitForFiltering();
+
+            AddUntilStep("standalone panels displayed", () => GetVisiblePanels<PanelBeatmapStandalone>().Any());
+
+            SelectNextGroup();
+            WaitForSelection(0, 0);
+
+            SelectNextGroup();
+            WaitForSelection(1, 0);
+
+            SelectNextPanel();
+            Select();
+            WaitForSelection(0, 1);
         }
 
         private void checkSelectionIterating(bool isIterating)

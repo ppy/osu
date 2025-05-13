@@ -54,7 +54,7 @@ namespace osu.Game.Screens.SelectV2
                 HashSet<CarouselItem>? currentGroupItems = null;
                 HashSet<CarouselItem>? currentSetItems = null;
 
-                BeatmapSetsGroupedTogether = criteria.Group != GroupMode.Difficulty;
+                BeatmapSetsGroupedTogether = criteria.Sort != SortMode.Difficulty;
 
                 foreach (var item in items)
                 {
@@ -100,6 +100,8 @@ namespace osu.Game.Screens.SelectV2
                     {
                         if (lastGroupItem != null)
                             lastGroupItem.NestedItemCount++;
+
+                        item.DrawHeight = PanelBeatmapStandalone.HEIGHT;
                     }
 
                     addItem(item);
