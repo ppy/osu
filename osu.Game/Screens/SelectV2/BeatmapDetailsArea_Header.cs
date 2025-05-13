@@ -48,6 +48,7 @@ namespace osu.Game.Screens.SelectV2
                                 Width = 200,
                                 Height = 22,
                                 Margin = new MarginPadding { Top = 2f },
+                                IsSwitchable = true,
                             },
                             leaderboardControls = new FillFlowContainer
                             {
