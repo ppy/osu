@@ -411,8 +411,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double objectsHit = (totalHits - countMiss) * combo / attributes.MaxCombo;
             double nonComboScore = (300 + attributes.SliderNestedScorePerObject) * accuracy * objectsHit;
 
-            double total = comboScore + nonComboScore;
-            return total;
+            return comboScore + nonComboScore;
         }
 
         private double calculateScoreRelevantComboPerObject(OsuDifficultyAttributes attributes, double scoreV1Multiplier)
