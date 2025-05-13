@@ -141,6 +141,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             else
                 position.Value = null;
 
+            updateVisibility();
             updatePosition();
         }
 
