@@ -359,7 +359,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double scoreV1Multiplier = attributes.LegacyScoreBaseMultiplier * new OsuLegacyScoreSimulator().GetLegacyScoreMultiplier(score.Mods, new LegacyBeatmapConversionDifficultyInfo());
             double relevantComboPerObject = calculateScoreRelevantComboPerObject(attributes, scoreV1Multiplier);
 
-            double maximumMissCount = getMaximumComboBasedMissCount(attributes);
+            double maximumMissCount = calculateMaximumComboBasedMissCount(attributes);
 
             double scoreObtainedDuringMaxCombo = calculateScoreForCombo(attributes, score.MaxCombo, relevantComboPerObject, scoreV1Multiplier);
             double remainingScore = score.LegacyTotalScore.Value - scoreObtainedDuringMaxCombo;
@@ -382,7 +382,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         /// <summary>
         /// This function is a harsher version of current combo-based miss count, used to provide reasonable value for cases where score-based miss count can't do this.
         /// </summary>
-        private double getMaximumComboBasedMissCount(OsuDifficultyAttributes attributes)
+        private double calculateMaximumComboBasedMissCount(OsuDifficultyAttributes attributes)
         {
             double missCount = 0;
 
