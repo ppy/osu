@@ -43,8 +43,8 @@ namespace osu.Game.Rulesets.Mods
             {
                 yield return ("Speed change", $"{InitialRate.Value:N2}x to {FinalRate.Value:N2}x");
 
-                if (!AdjustPitch.Value)
-                    yield return ("Adjust pitch", "Off");
+                if (!AdjustPitch.IsDefault)
+                    yield return ("Adjust pitch", AdjustPitch.Value ? "On" : "Off");
             }
         }
 
