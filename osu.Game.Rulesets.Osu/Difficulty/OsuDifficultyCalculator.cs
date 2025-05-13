@@ -134,8 +134,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 SliderCount = sliderCount,
                 SpinnerCount = spinnerCount,
                 SliderNestedScorePerObject = calculateSliderNestedScorePerObject(beatmap, totalHits),
-                LegacyScoreBaseMultiplier = calculateScorev1BaseMultiplier(beatmap, totalHits),
-                MaximumLegacyScore = calculateMaximumScorev1(beatmap, mods)
+                LegacyScoreBaseMultiplier = calculateScoreV1BaseMultiplier(beatmap, totalHits),
+                MaximumLegacyScore = calculateMaximumScoreV1(beatmap, mods)
             };
 
             return attributes;
@@ -304,8 +304,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             new OsuModSpunOut(),
         };
 
-        // Simulates SS on the map to get maximum score for NM SS
-        private long calculateMaximumScorev1(IBeatmap beatmap, Mod[] mods)
+        private long calculateMaximumScoreV1(IBeatmap beatmap, Mod[] mods)
         {
             var simulator = new OsuLegacyScoreSimulator();
             var attributes = simulator.Simulate(Working, beatmap);
@@ -317,20 +316,21 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return maximumLegacyAccuracyScore + maximumLegacyComboScore;
         }
 
-        // Calculates average amount of score you're getting per object that's not affected by combo multiplier
-        // This includes stuff like sliderticks
+        /// <summary>
+        /// Calculates the average amount of score per object that is caused by all sorts of slider ticks.
+        /// </summary>
         private double calculateSliderNestedScorePerObject(IBeatmap beatmap, int objectCount)
         {
             const double big_tick_score = 30;
             const double small_tick_score = 10;
 
-            var sliders = beatmap.HitObjects.OfType<Slider>();
+            var sliders = beatmap.HitObjects.OfType<Slider>().ToArray();
 
             // 1 for head, 1 for tail
-            int amountOfBigTicks = sliders.Count() * 2;
-            int repeats = sliders.Select(s => s.RepeatCount).Sum();
+            int amountOfBigTicks = sliders.Length * 2;
 
-            amountOfBigTicks += repeats;
+            // Add slider repeats
+            amountOfBigTicks += sliders.Select(s => s.RepeatCount).Sum();
 
             int amountOfSmallTicks = sliders.Select(s => s.NestedHitObjects.Count(nho => nho is SliderTick)).Sum();
 
@@ -339,8 +339,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return totalScore / objectCount;
         }
 
-        // Uses very old difficulty calculation to get base multiplier for score
-        private double calculateScorev1BaseMultiplier(IBeatmap beatmap, int objectCount)
+        private double calculateScoreV1BaseMultiplier(IBeatmap beatmap, int objectCount)
         {
             int drainLength = 0;
 
