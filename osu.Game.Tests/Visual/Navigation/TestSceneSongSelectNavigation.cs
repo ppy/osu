@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -15,9 +16,10 @@ using osu.Game.Screens.Footer;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.SelectV2;
 
-namespace osu.Game.Tests.Visual.SongSelectV2
+namespace osu.Game.Tests.Visual.Navigation
 {
-    public partial class TestSceneSongSelectLocalDatabase : ScreenTestScene
+    [Explicit]
+    public partial class TestSceneSongSelectNavigation : ScreenTestScene
     {
         [Cached]
         private readonly ScreenFooter screenFooter;
@@ -30,7 +32,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
         protected override bool UseOnlineAPI => true;
 
-        public TestSceneSongSelectLocalDatabase()
+        public TestSceneSongSelectNavigation()
         {
             Children = new Drawable[]
             {
