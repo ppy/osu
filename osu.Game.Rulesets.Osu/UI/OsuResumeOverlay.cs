@@ -181,7 +181,7 @@ namespace osu.Game.Rulesets.Osu.UI
             public OsuResumeOverlayInputBlocker()
             {
                 RelativeSizeAxes = Axes.Both;
-                // `ReplayRecorder` specifies `float.MaxValue`. we need to go deeper than it to be able to block inputs from reaching it (depth influences event processing order).
+                // `ReplayRecorder` specifies `float.MinValue`. we need to go deeper than it to be able to block inputs from reaching it (depth influences event processing order).
                 Depth = float.NegativeInfinity;
             }
 
