@@ -21,6 +21,7 @@ using osu.Framework.Logging;
 using osu.Framework.Utils;
 using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
+using osu.Game.Online.Multiplayer;
 using osuTK;
 using osuTK.Input;
 
@@ -169,7 +170,12 @@ namespace osu.Game.Graphics.Carousel
         /// <summary>
         /// Queue an asynchronous filter operation.
         /// </summary>
-        protected virtual Task FilterAsync() => filterTask = performFilter();
+        protected Task FilterAsync()
+        {
+            filterTask = performFilter();
+            filterTask.FireAndForget();
+            return filterTask;
+        }
 
         /// <summary>
         /// Check whether two models are the same for display purposes.
