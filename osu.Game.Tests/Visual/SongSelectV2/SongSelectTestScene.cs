@@ -44,6 +44,9 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [Cached]
         private readonly OsuLogo logo;
 
+        [Cached]
+        private readonly VolumeOverlay volume;
+
         [Cached(typeof(INotificationOverlay))]
         private readonly INotificationOverlay notificationOverlay = new NotificationOverlay();
 
@@ -68,6 +71,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                         {
                             Alpha = 0f,
                         },
+                        volume = new VolumeOverlay(),
                     },
                 },
             };
