@@ -15,7 +15,6 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osu.Game.Screens.Footer;
-using osu.Game.Screens.SelectV2;
 
 namespace osu.Game.Tests.Visual.SongSelectV2
 {
@@ -49,11 +48,11 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 },
             };
 
-            screenFooter.SetButtons(new ScreenFooterButton[]
+            screenFooter.SetButtons(new[]
             {
-                new FooterButtonMods(modOverlay) { Current = SelectedMods },
-                new FooterButtonRandom(),
-                new FooterButtonOptions(),
+                new ScreenFooterButton(modOverlay) { Text = "Mods", Icon = FontAwesome.Solid.ExchangeAlt, AccentColour = new OsuColour().Lime1 },
+                new ScreenFooterButton { Text = "Random", Icon = FontAwesome.Solid.Random, AccentColour = new OsuColour().Blue1, Enabled = { Value = true } },
+                new ScreenFooterButton { Text = "Options", Icon = FontAwesome.Solid.Cog, AccentColour = new OsuColour().Purple1, Enabled = { Value = true } },
             });
         });
 
