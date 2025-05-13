@@ -5,90 +5,59 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Allocation;
-using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Cursor;
-using osu.Framework.Screens;
 using osu.Framework.Testing;
-using osu.Game.Database;
-using osu.Game.Overlays;
+using osu.Game.Overlays.Dialog;
 using osu.Game.Overlays.Mods;
-using osu.Game.Overlays.Toolbar;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
-using osu.Game.Screens;
 using osu.Game.Screens.Footer;
-using osu.Game.Screens.Menu;
-using osu.Game.Screens.SelectV2;
+using osu.Game.Screens.Select;
 using osuTK.Input;
+using FooterButtonMods = osu.Game.Screens.SelectV2.FooterButtonMods;
 
 namespace osu.Game.Tests.Visual.SongSelectV2
 {
-    public partial class TestSceneSongSelect : ScreenTestScene
+    public partial class TestSceneSongSelect : SongSelectTestScene
     {
-        [Cached]
-        private readonly ScreenFooter screenFooter;
+        #region Hotkeys
 
-        [Cached]
-        private readonly OsuLogo logo;
-
-        [Cached(typeof(INotificationOverlay))]
-        private readonly INotificationOverlay notificationOverlay = new NotificationOverlay();
-
-        protected override bool UseOnlineAPI => true;
-
-        public TestSceneSongSelect()
+        [Test]
+        public void TestDeleteHotkey()
         {
-            Children = new Drawable[]
+            LoadSongSelect();
+
+            ImportBeatmapForRuleset(0);
+
+            AddAssert("beatmap imported", () => Beatmaps.GetAllUsableBeatmapSets().Any(), () => Is.True);
+
+            // song select should automatically select the beatmap for us but this is not implemented yet.
+            // todo: remove when that's the case.
+            AddAssert("no beatmap selected", () => Beatmap.IsDefault);
+            AddStep("select beatmap", () => Beatmap.Value = Beatmaps.GetWorkingBeatmap(Beatmaps.GetAllUsableBeatmapSets().Single().Beatmaps.First()));
+            AddAssert("beatmap selected", () => !Beatmap.IsDefault);
+
+            AddStep("press shift-delete", () =>
             {
-                new PopoverContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Children = new Drawable[]
-                    {
-                        new Toolbar
-                        {
-                            State = { Value = Visibility.Visible },
-                        },
-                        screenFooter = new ScreenFooter
-                        {
-                            OnBack = () => Stack.CurrentScreen.Exit(),
-                        },
-                        logo = new OsuLogo
-                        {
-                            Alpha = 0f,
-                        },
-                    },
-                },
-            };
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.Key(Key.Delete);
+                InputManager.ReleaseKey(Key.ShiftLeft);
+            });
 
-            Stack.Padding = new MarginPadding { Top = Toolbar.HEIGHT };
+            AddUntilStep("delete dialog shown", () => DialogOverlay.CurrentDialog, Is.InstanceOf<BeatmapDeleteDialog>);
+            AddStep("confirm deletion", () => DialogOverlay.CurrentDialog!.PerformAction<PopupDialogDangerousButton>());
+
+            AddAssert("beatmap set deleted", () => Beatmaps.GetAllUsableBeatmapSets().Any(), () => Is.False);
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            RealmDetachedBeatmapStore beatmapStore;
-
-            Dependencies.CacheAs<BeatmapStore>(beatmapStore = new RealmDetachedBeatmapStore());
-            Add(beatmapStore);
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            Stack.ScreenPushed += updateFooter;
-            Stack.ScreenExited += updateFooter;
-        }
+        #endregion
 
         #region Footer
 
         [Test]
-        public void TestMods()
+        public void TestFooterMods()
         {
-            loadSongSelect();
+            LoadSongSelect();
 
             AddStep("one mod", () => SelectedMods.Value = new List<Mod> { new OsuModHidden() });
             AddStep("two mods", () => SelectedMods.Value = new List<Mod> { new OsuModHidden(), new OsuModHardRock() });
@@ -115,25 +84,17 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         }
 
         [Test]
-        public void TestShowOptions()
+        public void TestFooterModOverlay()
         {
-            loadSongSelect();
+            LoadSongSelect();
 
-            AddStep("enable options", () =>
+            AddStep("Press F1", () =>
             {
-                var optionsButton = this.ChildrenOfType<ScreenFooterButton>().Last();
-
-                optionsButton.Enabled.Value = true;
-                optionsButton.TriggerClick();
+                InputManager.MoveMouseTo(this.ChildrenOfType<FooterButtonMods>().Single());
+                InputManager.Click(MouseButton.Left);
             });
-        }
-
-        [Test]
-        public void TestState()
-        {
-            loadSongSelect();
-
-            AddToggleStep("set options enabled state", state => this.ChildrenOfType<ScreenFooterButton>().Last().Enabled.Value = state);
+            AddAssert("Overlay visible", () => this.ChildrenOfType<ModSelectOverlay>().Single().State.Value == Visibility.Visible);
+            AddStep("Hide", () => this.ChildrenOfType<ModSelectOverlay>().Single().Hide());
         }
 
         // add these test cases when functionality is implemented.
@@ -203,39 +164,27 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         // }
 
         [Test]
-        public void TestOverlayPresent()
+        public void TestFooterShowOptions()
         {
-            loadSongSelect();
+            LoadSongSelect();
 
-            AddStep("Press F1", () =>
+            AddStep("enable options", () =>
             {
-                InputManager.MoveMouseTo(this.ChildrenOfType<FooterButtonMods>().Single());
-                InputManager.Click(MouseButton.Left);
+                var optionsButton = this.ChildrenOfType<ScreenFooterButton>().Last();
+
+                optionsButton.Enabled.Value = true;
+                optionsButton.TriggerClick();
             });
-            AddAssert("Overlay visible", () => this.ChildrenOfType<ModSelectOverlay>().Single().State.Value == Visibility.Visible);
-            AddStep("Hide", () => this.ChildrenOfType<ModSelectOverlay>().Single().Hide());
+        }
+
+        [Test]
+        public void TestFooterOptionsState()
+        {
+            LoadSongSelect();
+
+            AddToggleStep("set options enabled state", state => this.ChildrenOfType<ScreenFooterButton>().Last().Enabled.Value = state);
         }
 
         #endregion
-
-        private void loadSongSelect()
-        {
-            AddStep("load screen", () => Stack.Push(new SoloSongSelect()));
-            AddUntilStep("wait for load", () => Stack.CurrentScreen is Screens.SelectV2.SongSelect songSelect && songSelect.IsLoaded);
-        }
-
-        private void updateFooter(IScreen? _, IScreen? newScreen)
-        {
-            if (newScreen is IOsuScreen osuScreen && osuScreen.ShowFooter)
-            {
-                screenFooter.Show();
-                screenFooter.SetButtons(osuScreen.CreateFooterButtons());
-            }
-            else
-            {
-                screenFooter.Hide();
-                screenFooter.SetButtons(Array.Empty<ScreenFooterButton>());
-            }
-        }
     }
 }
