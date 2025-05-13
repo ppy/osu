@@ -6,12 +6,14 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.Footer;
+using osu.Game.Screens.Play;
 using osu.Game.Screens.Select;
 using osuTK.Input;
 using FooterButtonMods = osu.Game.Screens.SelectV2.FooterButtonMods;
@@ -170,6 +172,97 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 InputManager.Key(Key.Down);
                 InputManager.ReleaseKey(Key.ControlLeft);
             });
+        }
+
+        [Test]
+        public void TestAutoplayShortcut()
+        {
+            ImportBeatmapForRuleset(0);
+
+            LoadSongSelect();
+
+            // song select should automatically select the beatmap for us but this is not implemented yet.
+            // todo: remove when that's the case.
+            AddAssert("no beatmap selected", () => Beatmap.IsDefault);
+            AddStep("select beatmap", () => Beatmap.Value = Beatmaps.GetWorkingBeatmap(Beatmaps.GetAllUsableBeatmapSets().Single().Beatmaps.First()));
+            AddAssert("beatmap selected", () => !Beatmap.IsDefault);
+
+            AddStep("press ctrl+enter", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Key(Key.Enter);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+
+            AddUntilStep("wait for player", () => Stack.CurrentScreen is PlayerLoader);
+
+            AddAssert("autoplay selected", () => Screen.Mods.Value.Single() is ModAutoplay);
+
+            AddUntilStep("wait for return to ss", () => Screen.IsCurrentScreen());
+
+            AddAssert("no mods selected", () => Screen.Mods.Value.Count == 0);
+        }
+
+        [Test]
+        public void TestAutoplayShortcutKeepsAutoplayIfSelectedAlready()
+        {
+            ImportBeatmapForRuleset(0);
+
+            LoadSongSelect();
+
+            // song select should automatically select the beatmap for us but this is not implemented yet.
+            // todo: remove when that's the case.
+            AddAssert("no beatmap selected", () => Beatmap.IsDefault);
+            AddStep("select beatmap", () => Beatmap.Value = Beatmaps.GetWorkingBeatmap(Beatmaps.GetAllUsableBeatmapSets().Single().Beatmaps.First()));
+            AddAssert("beatmap selected", () => !Beatmap.IsDefault);
+
+            ChangeMods(new OsuModAutoplay());
+
+            AddStep("press ctrl+enter", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Key(Key.Enter);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+
+            AddUntilStep("wait for player", () => Stack.CurrentScreen is PlayerLoader);
+
+            AddAssert("autoplay selected", () => Screen.Mods.Value.Single() is ModAutoplay);
+
+            AddUntilStep("wait for return to ss", () => Screen.IsCurrentScreen());
+
+            AddAssert("autoplay still selected", () => Screen.Mods.Value.Single() is ModAutoplay);
+        }
+
+        [Test]
+        public void TestAutoplayShortcutReturnsInitialModsOnExit()
+        {
+            ImportBeatmapForRuleset(0);
+
+            LoadSongSelect();
+
+            // song select should automatically select the beatmap for us but this is not implemented yet.
+            // todo: remove when that's the case.
+            AddAssert("no beatmap selected", () => Beatmap.IsDefault);
+            AddStep("select beatmap", () => Beatmap.Value = Beatmaps.GetWorkingBeatmap(Beatmaps.GetAllUsableBeatmapSets().Single().Beatmaps.First()));
+            AddAssert("beatmap selected", () => !Beatmap.IsDefault);
+
+            ChangeMods(new OsuModRelax());
+
+            AddStep("press ctrl+enter", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Key(Key.Enter);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+
+            AddUntilStep("wait for player", () => Stack.CurrentScreen is PlayerLoader);
+
+            AddAssert("only autoplay selected", () => Screen.Mods.Value.Single() is ModAutoplay);
+
+            AddUntilStep("wait for return to ss", () => Screen.IsCurrentScreen());
+
+            AddAssert("relax returned", () => Screen.Mods.Value.Single() is ModRelax);
         }
 
         #endregion
