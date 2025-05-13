@@ -432,14 +432,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (Precision.AlmostEquals(scoreV1Multiplier, 0))
                 comboScore = 0;
 
-            decimal a = attributes.MaxCombo;
-            decimal b = (decimal)comboScore;
+            double a = attributes.MaxCombo;
+            double b = comboScore;
 
             // Reverse the arithmetic progression to work out the amount of combo per object based on the score.
-            decimal x = (a - 2) * a;
+            double x = (a - 2) * a;
             x /= Math.Max(a + 2 * (b - 1), 1);
 
-            return (double)x;
+            return x;
         }
 
         private double calculateEstimatedSliderbreaks(double topWeightedSliderFactor, OsuDifficultyAttributes attributes)
