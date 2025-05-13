@@ -63,6 +63,8 @@ namespace osu.Game.Screens.SelectV2
 
         private NoResultsPlaceholder noResultsPlaceholder = null!;
 
+        public override bool? ApplyModTrackAdjustments => true;
+
         public override bool ShowFooter => true;
 
         [Resolved]
