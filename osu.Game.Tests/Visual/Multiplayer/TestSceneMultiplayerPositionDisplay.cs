@@ -7,6 +7,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.Play;
@@ -23,11 +24,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private GameplayLeaderboardScore score = null!;
 
-        private readonly Bindable<int?> position = new Bindable<int?>(50);
+        private readonly Bindable<int?> position = new Bindable<int?>(8);
 
         private TestSceneGameplayLeaderboard.TestGameplayLeaderboardProvider leaderboardProvider = null!;
         private MultiplayerPositionDisplay display = null!;
         private GameplayState gameplayState = null!;
+
+        private const int player_count = 32;
 
         [Test]
         public void TestAppearance()
@@ -54,8 +57,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                 score = leaderboardProvider.CreateLeaderboardScore(new BindableLong(), API.LocalUser.Value, true);
                 score.Position.BindTo(position);
+
+                for (int i = 0; i < player_count - 1; i++)
+                {
+                    var r = leaderboardProvider.CreateRandomScore(new APIUser());
+                    r.Position.Value = i;
+                }
             });
-            AddSliderStep("set score position", 1, 100, 50, r => position.Value = r);
+
+            AddSliderStep("set score position", 1, player_count, position.Value!.Value, r => position.Value = r);
             AddStep("unset position", () => position.Value = null);
 
             AddStep("toggle leaderboardProvider on", () => config.SetValue(OsuSetting.GameplayLeaderboard, true));
