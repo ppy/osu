@@ -39,8 +39,8 @@ namespace osu.Game.Rulesets.Mods
                 foreach (var description in base.SettingDescription)
                     yield return description;
 
-                if (AdjustPitch.Value)
-                    yield return ("Adjust pitch", "On");
+                if (!AdjustPitch.IsDefault)
+                    yield return ("Adjust pitch", AdjustPitch.Value ? "On" : "Off");
             }
         }
 
