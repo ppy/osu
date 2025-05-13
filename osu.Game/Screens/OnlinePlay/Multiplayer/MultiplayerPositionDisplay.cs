@@ -22,7 +22,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
-    public partial class MultiplayerPositionDisplay : CompositeDrawable
+    public partial class MultiplayerPositionDisplay : VisibilityContainer
     {
         private readonly IBindable<APIUser> user = new Bindable<APIUser>();
         private readonly IBindableList<GameplayLeaderboardScore> scores = new BindableList<GameplayLeaderboardScore>();
@@ -41,8 +41,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         private const float min_alpha = 0.2f;
         private const float max_alpha = 0.4f;
 
+        private GameplayLeaderboardScore? userScore;
+
+        protected override bool StartHidden => true;
+
         [BackgroundDependencyLoader]
-        private void load(IGameplayLeaderboardProvider leaderboardProvider, IAPIProvider api, OsuConfigManager configManager, GameplayState gameplayState)
+        private void load(IGameplayLeaderboardProvider leaderboardProvider, IAPIProvider api, OsuConfigManager configManager, GameplayState gameplayState, OsuColour colours)
         {
             scores.BindTo(leaderboardProvider.Scores);
             user.BindTo(api.LocalUser);
@@ -83,8 +87,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                         localPlayerMarker = new Circle
                         {
                             Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
-                            Colour = Color4.Cyan,
+                            Origin = Anchor.Centre,
+                            Colour = colours.Blue1,
                             Size = new Vector2(marker_size),
                             Blending = BlendingParameters.Additive,
                             Alpha = 0.4f,
@@ -98,42 +102,68 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
             base.LoadComplete();
 
-            user.BindValueChanged(_ => updateState());
-            scores.BindCollectionChanged((_, __) => updateState());
-            showLeaderboard.BindValueChanged(_ => updateState());
-            localUserPlayingState.BindValueChanged(_ => updateState(), true);
+            user.BindValueChanged(_ => updateScoreBindings());
+            scores.BindCollectionChanged((_, __) => updateScoreBindings(), true);
 
-            position.BindValueChanged(_ =>
-            {
-                if (position.Value == null)
-                {
-                    positionText.Alpha = 0;
-                    positionText.Text = "-";
-                    localPlayerMarker.FadeOut();
-                    return;
-                }
+            showLeaderboard.BindValueChanged(_ => updateVisibility());
+            localUserPlayingState.BindValueChanged(_ => updateVisibility(), true);
 
-                float relativePosition = (float)(position.Value.Value - 1) / scores.Count;
-
-                positionText.Text = $@"#{position.Value.Value:N0}";
-                positionText.Alpha = min_alpha + (max_alpha - min_alpha) * (1 - relativePosition);
-
-                localPlayerMarker.FadeIn();
-                localPlayerMarker.MoveToX(Math.Min(relativePosition * width, width - marker_size), 1000, Easing.OutQuint);
-            }, true);
+            State.BindValueChanged(_ => updatePosition());
+            position.BindValueChanged(_ => updatePosition(), true);
         }
 
-        private void updateState()
+        protected override void PopIn()
+        {
+            this.FadeIn(500, Easing.OutQuint);
+            localPlayerMarker.ScaleTo(Vector2.One, 500, Easing.OutQuint);
+        }
+
+        protected override void PopOut()
+        {
+            this.FadeOut(500, Easing.OutQuint);
+            localPlayerMarker.ScaleTo(new Vector2(0.8f), 500, Easing.Out);
+        }
+
+        private void updateVisibility()
+        {
+            bool shouldDisplay = userScore != null && (showLeaderboard.Value || localUserPlayingState.Value == LocalUserPlayingState.Break);
+
+            State.Value = shouldDisplay ? Visibility.Visible : Visibility.Hidden;
+        }
+
+        private void updateScoreBindings()
         {
             position.UnbindBindings();
 
-            var userScore = scores.SingleOrDefault(s => s.User.Equals(user.Value));
+            userScore = scores.SingleOrDefault(s => s.User.Equals(user.Value));
             if (userScore != null)
                 position.BindTo(userScore.Position);
             else
                 position.Value = null;
 
-            Alpha = userScore != null && (showLeaderboard.Value || localUserPlayingState.Value == LocalUserPlayingState.Break) ? 1 : 0;
+            updatePosition();
+        }
+
+        private void updatePosition()
+        {
+            // only update when visible to delay animations.
+            if (State.Value != Visibility.Visible) return;
+
+            if (position.Value == null)
+            {
+                positionText.Alpha = min_alpha;
+                positionText.Text = "-";
+                localPlayerMarker.FadeOut();
+                return;
+            }
+
+            float relativePosition = (float)(position.Value.Value - 1) / scores.Count;
+
+            positionText.Text = $@"#{position.Value.Value:N0}";
+            positionText.Alpha = min_alpha + (max_alpha - min_alpha) * (1 - relativePosition);
+
+            localPlayerMarker.FadeIn();
+            localPlayerMarker.MoveToX(marker_size / 2 + Math.Min(relativePosition * (width - marker_size / 2), width - marker_size / 2), 1000, Easing.OutPow10);
         }
     }
 }
