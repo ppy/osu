@@ -19,6 +19,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
+using osu.Game.Overlays.Volume;
 using osu.Game.Screens.Footer;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Select;
@@ -78,6 +79,7 @@ namespace osu.Game.Screens.SelectV2
         {
             AddRangeInternal(new Drawable[]
             {
+                new GlobalScrollAdjustsVolume(),
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
