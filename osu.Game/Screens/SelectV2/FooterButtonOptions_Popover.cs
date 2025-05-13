@@ -33,23 +33,22 @@ namespace osu.Game.Screens.SelectV2
         {
             private FillFlowContainer buttonFlow = null!;
             private readonly FooterButtonOptions footerButton;
+            private readonly WorkingBeatmap beatmap;
+            private readonly SongSelect songSelect;
 
             [Cached]
             private readonly OverlayColourProvider colourProvider;
 
-            private WorkingBeatmap beatmapWhenOpening = null!;
-
-            [Resolved]
-            private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
-
-            public Popover(FooterButtonOptions footerButton, OverlayColourProvider colourProvider)
+            public Popover(FooterButtonOptions footerButton, WorkingBeatmap beatmap, SongSelect songSelect, OverlayColourProvider colourProvider)
             {
                 this.footerButton = footerButton;
+                this.beatmap = beatmap;
+                this.songSelect = songSelect;
                 this.colourProvider = colourProvider;
             }
 
             [BackgroundDependencyLoader]
-            private void load(ManageCollectionsDialog? manageCollectionsDialog, OsuColour colours, BeatmapManager? beatmapManager)
+            private void load(OsuColour colours, BeatmapManager beatmaps, ManageCollectionsDialog? manageCollectionsDialog)
             {
                 Content.Padding = new MarginPadding(5);
 
@@ -60,23 +59,21 @@ namespace osu.Game.Screens.SelectV2
                     Spacing = new Vector2(3),
                 };
 
-                beatmapWhenOpening = beatmap.Value;
-
                 addHeader(CommonStrings.General);
                 addButton(SongSelectStrings.ManageCollections, FontAwesome.Solid.Book, () => manageCollectionsDialog?.Show());
 
-                addHeader(SongSelectStrings.ForAllDifficulties, beatmapWhenOpening.BeatmapSetInfo.ToString());
-                addButton(SongSelectStrings.DeleteBeatmap, FontAwesome.Solid.Trash, () => { }, colours.Red1); // songSelect?.DeleteBeatmap(beatmapWhenOpening.BeatmapSetInfo);
+                addHeader(SongSelectStrings.ForAllDifficulties, beatmap.BeatmapSetInfo.ToString());
+                addButton(SongSelectStrings.DeleteBeatmap, FontAwesome.Solid.Trash, () => songSelect.DeleteBeatmap(beatmap.BeatmapSetInfo), colours.Red1);
 
-                addHeader(SongSelectStrings.ForSelectedDifficulty, beatmapWhenOpening.BeatmapInfo.DifficultyName);
-                // TODO: make work, and make show "unplayed" or "played" based on status.
-                addButton(SongSelectStrings.MarkAsPlayed, FontAwesome.Regular.TimesCircle, null);
-                addButton(SongSelectStrings.ClearAllLocalScores, FontAwesome.Solid.Eraser, () => { }, colours.Red1); // songSelect?.ClearScores(beatmapWhenOpening.BeatmapInfo);
+                addHeader(SongSelectStrings.ForSelectedDifficulty, beatmap.BeatmapInfo.DifficultyName);
+                // TODO: replace with "remove from played" button when beatmap is already played.
+                addButton(SongSelectStrings.MarkAsPlayed, FontAwesome.Regular.TimesCircle, () => beatmaps.MarkPlayed(beatmap.BeatmapInfo));
+                addButton(SongSelectStrings.ClearAllLocalScores, FontAwesome.Solid.Eraser, () => songSelect.ClearScores(beatmap.BeatmapInfo), colours.Red1);
 
-                // if (songSelect != null && songSelect.AllowEditing)
-                addButton(SongSelectStrings.EditBeatmap, FontAwesome.Solid.PencilAlt, () => { }); // songSelect.Edit(beatmapWhenOpening.BeatmapInfo);
+                if (songSelect is SoloSongSelect soloSongSelect)
+                    addButton(SongSelectStrings.EditBeatmap, FontAwesome.Solid.PencilAlt, () => soloSongSelect.Edit(beatmap.BeatmapInfo));
 
-                addButton(WebCommonStrings.ButtonsHide.ToSentence(), FontAwesome.Solid.Magic, () => beatmapManager?.Hide(beatmapWhenOpening.BeatmapInfo));
+                addButton(WebCommonStrings.ButtonsHide.ToSentence(), FontAwesome.Solid.Magic, () => beatmaps.Hide(beatmap.BeatmapInfo));
             }
 
             protected override void LoadComplete()
@@ -84,8 +81,12 @@ namespace osu.Game.Screens.SelectV2
                 base.LoadComplete();
 
                 ScheduleAfterChildren(() => GetContainingFocusManager()!.ChangeFocus(this));
+            }
 
-                beatmap.BindValueChanged(_ => Hide());
+            protected override void UpdateState(ValueChangedEvent<Visibility> state)
+            {
+                base.UpdateState(state);
+                footerButton.OverlayState.Value = state.NewValue;
             }
 
             private void addHeader(LocalisableString text, string? context = null)
@@ -129,6 +130,27 @@ namespace osu.Game.Screens.SelectV2
                 buttonFlow.Add(button);
             }
 
+            protected override bool OnKeyDown(KeyDownEvent e)
+            {
+                // don't absorb control as ToolbarRulesetSelector uses control + number to navigate
+                if (e.ControlPressed) return false;
+
+                if (!e.Repeat && e.Key >= Key.Number1 && e.Key <= Key.Number9)
+                {
+                    int requested = e.Key - Key.Number1;
+
+                    OptionButton? found = buttonFlow.Children.OfType<OptionButton>().ElementAtOrDefault(requested);
+
+                    if (found != null)
+                    {
+                        found.TriggerClick();
+                        return true;
+                    }
+                }
+
+                return base.OnKeyDown(e);
+            }
+
             private partial class OptionButton : OsuButton
             {
                 public IconUsage Icon { get; init; }
@@ -165,33 +187,6 @@ namespace osu.Game.Screens.SelectV2
                     Anchor = Anchor.CentreLeft,
                     X = 40
                 };
-            }
-
-            protected override bool OnKeyDown(KeyDownEvent e)
-            {
-                // don't absorb control as ToolbarRulesetSelector uses control + number to navigate
-                if (e.ControlPressed) return false;
-
-                if (!e.Repeat && e.Key >= Key.Number1 && e.Key <= Key.Number9)
-                {
-                    int requested = e.Key - Key.Number1;
-
-                    OptionButton? found = buttonFlow.Children.OfType<OptionButton>().ElementAtOrDefault(requested);
-
-                    if (found != null)
-                    {
-                        found.TriggerClick();
-                        return true;
-                    }
-                }
-
-                return base.OnKeyDown(e);
-            }
-
-            protected override void UpdateState(ValueChangedEvent<Visibility> state)
-            {
-                base.UpdateState(state);
-                footerButton.OverlayState.Value = state.NewValue;
             }
         }
     }

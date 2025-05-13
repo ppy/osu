@@ -191,7 +191,7 @@ namespace osu.Game.Screens.SelectV2
         {
             new FooterButtonMods(modSelectOverlay) { Current = Mods },
             new FooterButtonRandom(),
-            new FooterButtonOptions(),
+            new FooterButtonOptions(this),
         };
 
         protected override void LoadComplete()
