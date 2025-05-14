@@ -50,6 +50,9 @@ namespace osu.Game.Screens.SelectV2
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
+        [Resolved]
+        private SongSelect? songSelect { get; set; }
+
         private Container<Placeholder> placeholderContainer = null!;
         private Placeholder? placeholder;
 
@@ -244,6 +247,7 @@ namespace osu.Game.Screens.SelectV2
                 Rank = i + 1,
                 IsPersonalBest = s.OnlineID == userScore?.OnlineID,
                 SelectedMods = { BindTarget = mods },
+                Action = () => onLeaderboardScoreClicked(s),
             }), loadedScores =>
             {
                 int delay = 200;
@@ -279,6 +283,7 @@ namespace osu.Game.Screens.SelectV2
                     IsPersonalBest = true,
                     Rank = userScore.Position,
                     SelectedMods = { BindTarget = mods },
+                    Action = () => onLeaderboardScoreClicked(userScore),
                 };
 
                 scoresScroll.TransformTo(nameof(scoresScroll.Padding), new MarginPadding { Bottom = personal_best_height }, 300, Easing.OutQuint);
@@ -306,6 +311,12 @@ namespace osu.Game.Screens.SelectV2
             personalBestDisplay.MoveToX(-100, 300, Easing.OutQuint);
             personalBestDisplay.FadeOut(300, Easing.OutQuint);
             scoresScroll.TransformTo(nameof(scoresScroll.Padding), new MarginPadding(), 300, Easing.OutQuint);
+        }
+
+        private void onLeaderboardScoreClicked(ScoreInfo score)
+        {
+            if (songSelect is SoloSongSelect soloSongSelect)
+                soloSongSelect.PresentScore(score);
         }
 
         private LeaderboardState displayedState;
