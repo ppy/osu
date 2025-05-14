@@ -57,9 +57,8 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             score.Mods.OfType<IApplicableToDifficulty>().ForEach(m => m.ApplyToDifficulty(difficulty));
 
-            var track = new TrackVirtual(10000);
-            score.Mods.OfType<IApplicableToTrack>().ForEach(m => m.ApplyToTrack(track));
-            double clockRate = track.Rate;
+            double clockRate = 1;
+            score.Mods.OfType<IApplicableToRate>().ForEach(m => clockRate = m.ApplyToRate(0, clockRate));
 
             // this is the same as osu!, so there's potential to share the implementation... maybe
             double preempt = IBeatmapDifficultyInfo.DifficultyRange(difficulty.ApproachRate, 1800, 1200, 450) / clockRate;

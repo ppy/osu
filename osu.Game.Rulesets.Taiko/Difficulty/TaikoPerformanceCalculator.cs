@@ -43,9 +43,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             countMeh = score.Statistics.GetValueOrDefault(HitResult.Meh);
             countMiss = score.Statistics.GetValueOrDefault(HitResult.Miss);
 
-            var track = new TrackVirtual(10000);
-            score.Mods.OfType<IApplicableToTrack>().ForEach(m => m.ApplyToTrack(track));
-            clockRate = track.Rate;
+            clockRate = 1;
+            score.Mods.OfType<IApplicableToRate>().ForEach(m => clockRate = m.ApplyToRate(0, clockRate));
 
             var difficulty = score.BeatmapInfo!.Difficulty.Clone();
 
