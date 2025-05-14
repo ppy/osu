@@ -114,7 +114,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 : 0;
 
             double sliderNestedScorePerObject = calculateSliderNestedScorePerObject(beatmap, totalHits);
-            double legacyScoreBaseMultiplier = calculateScoreV1BaseMultiplier(beatmap, totalHits);
+            double legacyScoreBaseMultiplier = LegacyRulesetExtensions.CalculateDifficultyPeppyStars(beatmap);
             double maximumLegacyScore = calculateMaximumScoreV1(beatmap, mods);
 
             OsuDifficultyAttributes attributes = new OsuDifficultyAttributes
@@ -299,19 +299,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double totalScore = amountOfBigTicks * big_tick_score + amountOfSmallTicks * small_tick_score;
 
             return totalScore / objectCount;
-        }
-
-        private double calculateScoreV1BaseMultiplier(IBeatmap beatmap, int objectCount)
-        {
-            int drainLength = 0;
-
-            if (beatmap.HitObjects.Count > 0)
-            {
-                int breakLength = beatmap.Breaks.Select(b => (int)Math.Round(b.EndTime) - (int)Math.Round(b.StartTime)).Sum();
-                drainLength = ((int)Math.Round(beatmap.HitObjects[^1].StartTime) - (int)Math.Round(beatmap.HitObjects[0].StartTime) - breakLength) / 1000;
-            }
-
-            return LegacyRulesetExtensions.CalculateDifficultyPeppyStars(beatmap.Difficulty, objectCount, drainLength);
         }
 
         protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
