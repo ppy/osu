@@ -354,7 +354,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             }
         }
 
-        public class TestBeatmapCarousel : BeatmapCarousel
+        public partial class TestBeatmapCarousel : BeatmapCarousel
         {
             public IEnumerable<BeatmapInfo> PostFilterBeatmaps = null!;
 
