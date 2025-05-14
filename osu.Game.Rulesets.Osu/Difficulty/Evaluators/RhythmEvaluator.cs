@@ -89,19 +89,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     else
                     {
                         // bpm change is into slider, this is easy acc window
-                        if (currObj.BaseObject is Slider)
-                        {
-                            if (isClassic)
-                                effectiveRatio *= 0.125;
-                            else
-                                effectiveRatio *= 1;
-                        }
+                        if (currObj.BaseObject is Slider && isClassic)
+                            effectiveRatio *= 0.125;
 
                         // bpm change was from a slider, this is easier typically than circle -> circle
                         // unintentional side effect is that bursts with kicksliders at the ends might have lower difficulty than bursts without sliders
-                        if (prevObj.BaseObject is Slider)
-                            if (prevObj.TravelTime > (currDelta - deltaDifferenceEpsilon) / 6)
-                                effectiveRatio *= 0.3;
+                        if (prevObj.BaseObject is Slider && prevObj.TravelTime > (currDelta - deltaDifferenceEpsilon) / 6)
+                            effectiveRatio *= 0.3;
 
                         // repeated island polarity (2 -> 4, 3 -> 5)
                         if (island.IsSimilarPolarity(previousIsland))
