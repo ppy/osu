@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Audio.Track;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
@@ -17,6 +16,7 @@ using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Scoring.Legacy;
 using osu.Game.Scoring;
+using osu.Game.Utils;
 
 namespace osu.Game.Rulesets.Osu.Difficulty
 {
@@ -82,9 +82,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             score.Mods.OfType<IApplicableToDifficulty>().ForEach(m => m.ApplyToDifficulty(difficulty));
 
-            var track = new TrackVirtual(10000);
-            score.Mods.OfType<IApplicableToTrack>().ForEach(m => m.ApplyToTrack(track));
-            clockRate = track.Rate;
+            clockRate = ModUtils.CalculateRateWithMods(score.Mods);
 
             HitWindows hitWindows = new OsuHitWindows();
             hitWindows.SetDifficulty(difficulty.OverallDifficulty);
