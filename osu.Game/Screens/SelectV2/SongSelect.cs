@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -9,16 +10,21 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
+using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
+using osu.Game.Overlays.Volume;
 using osu.Game.Screens.Footer;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Select;
+using osu.Game.Skinning;
+using osu.Game.Utils;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
@@ -29,7 +35,8 @@ namespace osu.Game.Screens.SelectV2
     /// This screen is intended to house all components introduced in the new song select design to add transitions and examine the overall look.
     /// This will be gradually built upon and ultimately replace <see cref="Select.SongSelect"/> once everything is in place.
     /// </summary>
-    public abstract partial class SongSelect : OsuScreen
+    [Cached(typeof(SongSelect))]
+    public abstract partial class SongSelect : OsuScreen, IKeyBindingHandler<GlobalAction>
     {
         private const float logo_scale = 0.4f;
         private const double fade_duration = 300;
@@ -43,6 +50,8 @@ namespace osu.Game.Screens.SelectV2
             ShowPresets = true,
         };
 
+        private ModSpeedHotkeyHandler modSpeedHotkeyHandler = null!;
+
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
 
@@ -55,7 +64,12 @@ namespace osu.Game.Screens.SelectV2
 
         private NoResultsPlaceholder noResultsPlaceholder = null!;
 
+        public override bool? ApplyModTrackAdjustments => true;
+
         public override bool ShowFooter => true;
+
+        [Resolved]
+        private OsuGameBase game { get; set; } = null!;
 
         [Resolved]
         private OsuLogo? logo { get; set; }
@@ -68,6 +82,7 @@ namespace osu.Game.Screens.SelectV2
         {
             AddRangeInternal(new Drawable[]
             {
+                new GlobalScrollAdjustsVolume(),
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -154,6 +169,11 @@ namespace osu.Game.Screens.SelectV2
                         }
                     },
                 },
+                new SkinnableContainer(new GlobalSkinnableContainerLookup(GlobalSkinnableContainers.SongSelect))
+                {
+                    RelativeSizeAxes = Axes.Both,
+                },
+                modSpeedHotkeyHandler = new ModSpeedHotkeyHandler(),
                 modSelectOverlay,
             });
         }
@@ -336,6 +356,26 @@ namespace osu.Game.Screens.SelectV2
         #endregion
 
         #region Hotkeys
+
+        public virtual bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+        {
+            if (!this.IsCurrentScreen()) return false;
+
+            switch (e.Action)
+            {
+                case GlobalAction.IncreaseModSpeed:
+                    return modSpeedHotkeyHandler.ChangeSpeed(0.05, ModUtils.FlattenMods(game.AvailableMods.Value.SelectMany(kv => kv.Value)));
+
+                case GlobalAction.DecreaseModSpeed:
+                    return modSpeedHotkeyHandler.ChangeSpeed(-0.05, ModUtils.FlattenMods(game.AvailableMods.Value.SelectMany(kv => kv.Value)));
+            }
+
+            return false;
+        }
+
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
+        {
+        }
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {

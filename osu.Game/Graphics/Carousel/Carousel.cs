@@ -21,6 +21,7 @@ using osu.Framework.Logging;
 using osu.Framework.Utils;
 using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
+using osu.Game.Online.Multiplayer;
 using osuTK;
 using osuTK.Input;
 
@@ -169,7 +170,12 @@ namespace osu.Game.Graphics.Carousel
         /// <summary>
         /// Queue an asynchronous filter operation.
         /// </summary>
-        protected virtual Task FilterAsync() => filterTask = performFilter();
+        protected Task FilterAsync()
+        {
+            filterTask = performFilter();
+            filterTask.FireAndForget();
+            return filterTask;
+        }
 
         /// <summary>
         /// Check whether two models are the same for display purposes.
@@ -309,6 +315,8 @@ namespace osu.Game.Graphics.Carousel
                 HandleItemSelected(currentSelection.Model);
 
                 refreshAfterSelection();
+                if (!Scroll.UserScrolling)
+                    scrollToSelection();
 
                 NewItemsPresented?.Invoke();
             });
@@ -463,6 +471,9 @@ namespace osu.Game.Graphics.Carousel
 
         #region Selection handling
 
+        /// <summary>
+        /// Becomes invalid when the current selection has changed and needs to be updated visually.
+        /// </summary>
         private readonly Cached selectionValid = new Cached();
 
         private Selection currentKeyboardSelection = new Selection();
@@ -563,7 +574,10 @@ namespace osu.Game.Graphics.Carousel
             if (!selectionValid.IsValid)
             {
                 refreshAfterSelection();
+
+                // Always scroll to selection in this case (regardless of `UserScrolling` state), centering the selection.
                 scrollToSelection();
+
                 selectionValid.Validate();
             }
 

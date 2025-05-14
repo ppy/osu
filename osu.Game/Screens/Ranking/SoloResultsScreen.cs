@@ -10,6 +10,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Extensions;
+using osu.Game.Online.API;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Scoring;
 using osu.Game.Screens.Select.Leaderboards;
@@ -19,6 +20,9 @@ namespace osu.Game.Screens.Ranking
     public partial class SoloResultsScreen : ResultsScreen
     {
         private readonly IBindable<LeaderboardScores?> globalScores = new Bindable<LeaderboardScores?>();
+
+        [Resolved]
+        private IAPIProvider api { get; set; } = null!;
 
         [Resolved]
         private LeaderboardManager leaderboardManager { get; set; } = null!;
@@ -77,7 +81,7 @@ namespace osu.Game.Screens.Ranking
                     Score.Position = clonedScore.Position;
                     sortedScores.Add(Score);
                 }
-                else
+                else if (criteria.Scope == BeatmapLeaderboardScope.Local || clonedScore.UserID != api.LocalUser.Value.OnlineID || clonedScore.TotalScore > Score.TotalScore)
                     sortedScores.Add(clonedScore);
             }
 

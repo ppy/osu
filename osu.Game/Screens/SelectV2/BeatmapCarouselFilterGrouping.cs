@@ -54,7 +54,7 @@ namespace osu.Game.Screens.SelectV2
                 HashSet<CarouselItem>? currentGroupItems = null;
                 HashSet<CarouselItem>? currentSetItems = null;
 
-                BeatmapSetsGroupedTogether = criteria.Group != GroupMode.Difficulty;
+                BeatmapSetsGroupedTogether = criteria.Sort != SortMode.Difficulty;
 
                 foreach (var item in items)
                 {
@@ -100,6 +100,8 @@ namespace osu.Game.Screens.SelectV2
                     {
                         if (lastGroupItem != null)
                             lastGroupItem.NestedItemCount++;
+
+                        item.DrawHeight = PanelBeatmapStandalone.HEIGHT;
                     }
 
                     addItem(item);
@@ -134,12 +136,20 @@ namespace osu.Game.Screens.SelectV2
                     break;
 
                 case GroupMode.Difficulty:
-                    int starGroup = lastGroup?.Data as int? ?? -1;
+                    var starGroup = lastGroup?.Data as StarDifficulty? ?? new StarDifficulty(-1, 0);
+                    double beatmapStarRating = Math.Round(beatmap.StarRating, 2);
 
-                    if (beatmap.StarRating > starGroup)
+                    if (beatmapStarRating >= starGroup.Stars + 1)
                     {
-                        starGroup = (int)Math.Floor(beatmap.StarRating);
-                        return new GroupDefinition(starGroup + 1, $"{starGroup} - {starGroup + 1} *");
+                        starGroup = new StarDifficulty((int)Math.Floor(beatmapStarRating), 0);
+
+                        if (starGroup.Stars == 0)
+                            return new GroupDefinition(starGroup, "Below 1 Star");
+
+                        if (starGroup.Stars == 1)
+                            return new GroupDefinition(starGroup, "1 Star");
+
+                        return new GroupDefinition(starGroup, $"{starGroup.Stars} Stars");
                     }
 
                     break;
