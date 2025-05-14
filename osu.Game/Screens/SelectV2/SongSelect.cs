@@ -10,12 +10,15 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Cursor;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
@@ -96,81 +99,85 @@ namespace osu.Game.Screens.SelectV2
                 {
                     RelativeSizeAxes = Axes.Both,
                     Padding = new MarginPadding { Bottom = ScreenFooter.HEIGHT },
-                    Child = new PopoverContainer
+                    Child = new OsuContextMenuContainer
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Children = new Drawable[]
+                        Child = new PopoverContainer
                         {
-                            new GridContainer // used for max width implementation
+                            RelativeSizeAxes = Axes.Both,
+                            Children = new Drawable[]
                             {
-                                RelativeSizeAxes = Axes.Both,
-                                ColumnDimensions = new[]
+                                new GridContainer // used for max width implementation
                                 {
-                                    new Dimension(GridSizeMode.Relative, 0.5f, maxSize: 850),
-                                    new Dimension(),
-                                    new Dimension(GridSizeMode.Relative, 0.5f, maxSize: 750),
-                                },
-                                Content = new[]
-                                {
-                                    new[]
+                                    RelativeSizeAxes = Axes.Both,
+                                    ColumnDimensions = new[]
                                     {
-                                        wedgesContainer = new FillFlowContainer
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                            Margin = new MarginPadding
-                                            {
-                                                Top = -CORNER_RADIUS_HIDE_OFFSET,
-                                                Left = -CORNER_RADIUS_HIDE_OFFSET
-                                            },
-                                            Spacing = new Vector2(0f, 4f),
-                                            Direction = FillDirection.Vertical,
-                                            Shear = OsuGame.SHEAR,
-                                            Children = new Drawable[]
-                                            {
-                                                new ShearAligningWrapper(titleWedge = new BeatmapTitleWedge()),
-                                                new ShearAligningWrapper(detailsArea = new BeatmapDetailsArea()),
-                                            },
-                                        },
-                                        Empty(),
-                                        new Container
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                            Children = new CompositeDrawable[]
-                                            {
-                                                new Container
-                                                {
-                                                    RelativeSizeAxes = Axes.Both,
-                                                    Padding = new MarginPadding
-                                                    {
-                                                        Top = FilterControl.HEIGHT_FROM_SCREEN_TOP + 5,
-                                                        Bottom = 5,
-                                                    },
-                                                    Children = new Drawable[]
-                                                    {
-                                                        carousel = new BeatmapCarousel
-                                                        {
-                                                            BleedTop = FilterControl.HEIGHT_FROM_SCREEN_TOP + 5,
-                                                            BleedBottom = ScreenFooter.HEIGHT + 5,
-                                                            RequestPresentBeatmap = _ => OnStart(),
-                                                            NewItemsPresented = newItemsPresented,
-                                                            RelativeSizeAxes = Axes.Both,
-                                                        },
-                                                        noResultsPlaceholder = new NoResultsPlaceholder(),
-                                                    }
-                                                },
-                                                filterControl = new FilterControl
-                                                {
-                                                    Anchor = Anchor.TopRight,
-                                                    Origin = Anchor.TopRight,
-                                                    RelativeSizeAxes = Axes.X,
-                                                },
-                                            }
-                                        },
+                                        new Dimension(GridSizeMode.Relative, 0.5f, maxSize: 850),
+                                        new Dimension(),
+                                        new Dimension(GridSizeMode.Relative, 0.5f, maxSize: 750),
                                     },
-                                }
-                            },
-                        }
-                    },
+                                    Content = new[]
+                                    {
+                                        new[]
+                                        {
+                                            wedgesContainer = new FillFlowContainer
+                                            {
+                                                RelativeSizeAxes = Axes.Both,
+                                                Margin = new MarginPadding
+                                                {
+                                                    Top = -CORNER_RADIUS_HIDE_OFFSET,
+                                                    Left = -CORNER_RADIUS_HIDE_OFFSET
+                                                },
+                                                Spacing = new Vector2(0f, 4f),
+                                                Direction = FillDirection.Vertical,
+                                                Shear = OsuGame.SHEAR,
+                                                Children = new Drawable[]
+                                                {
+                                                    new ShearAligningWrapper(titleWedge = new BeatmapTitleWedge()),
+                                                    new ShearAligningWrapper(detailsArea = new BeatmapDetailsArea()),
+                                                },
+                                            },
+                                            Empty(),
+                                            new Container
+                                            {
+                                                RelativeSizeAxes = Axes.Both,
+                                                Children = new CompositeDrawable[]
+                                                {
+                                                    new Container
+                                                    {
+                                                        RelativeSizeAxes = Axes.Both,
+                                                        Padding = new MarginPadding
+                                                        {
+                                                            Top = FilterControl.HEIGHT_FROM_SCREEN_TOP + 5,
+                                                            Bottom = 5,
+                                                        },
+                                                        Children = new Drawable[]
+                                                        {
+                                                            carousel = new BeatmapCarousel
+                                                            {
+                                                                BleedTop = FilterControl.HEIGHT_FROM_SCREEN_TOP + 5,
+                                                                BleedBottom = ScreenFooter.HEIGHT + 5,
+                                                                RequestPresentBeatmap = FinaliseSelection,
+                                                                NewItemsPresented = newItemsPresented,
+                                                                RelativeSizeAxes = Axes.Both,
+                                                            },
+                                                            noResultsPlaceholder = new NoResultsPlaceholder(),
+                                                        }
+                                                    },
+                                                    filterControl = new FilterControl
+                                                    {
+                                                        Anchor = Anchor.TopRight,
+                                                        Origin = Anchor.TopRight,
+                                                        RelativeSizeAxes = Axes.X,
+                                                    },
+                                                }
+                                            },
+                                        },
+                                    }
+                                },
+                            }
+                        },
+                    }
                 },
                 new SkinnableContainer(new GlobalSkinnableContainerLookup(GlobalSkinnableContainers.SongSelect))
                 {
@@ -179,6 +186,15 @@ namespace osu.Game.Screens.SelectV2
                 modSpeedHotkeyHandler = new ModSpeedHotkeyHandler(),
                 modSelectOverlay,
             });
+        }
+
+        /// <summary>
+        /// Finalises selection on the given <see cref="BeatmapInfo"/>.
+        /// </summary>
+        protected void FinaliseSelection(BeatmapInfo beatmap)
+        {
+            Beatmap.Value = Beatmaps.GetWorkingBeatmap(beatmap);
+            OnStart();
         }
 
         /// <summary>
@@ -363,6 +379,15 @@ namespace osu.Game.Screens.SelectV2
         {
             dialogs?.Push(new BeatmapClearScoresDialog(beatmap));
         }
+
+        /// <summary>
+        /// Creates any "action" menu items for the provided beatmap (ie. "Select", "Play", "Edit").
+        /// These will always be placed at the top of the context menu, with common items added below them.
+        /// </summary>
+        public virtual IEnumerable<MenuItem> CreateForwardNavigationMenuItemsForBeatmap(BeatmapInfo beatmap) => new[]
+        {
+            new OsuMenuItem("Select", MenuItemType.Highlighted, () => FinaliseSelection(beatmap)),
+        };
 
         #endregion
 

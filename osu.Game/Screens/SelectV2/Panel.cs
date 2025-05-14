@@ -67,7 +67,7 @@ namespace osu.Game.Screens.SelectV2
             TopLevelContent.ReceivePositionalInputAt(screenSpacePos);
 
         [Resolved]
-        private BeatmapCarousel? carousel { get; set; }
+        protected BeatmapCarousel? Carousel { get; private set; }
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider, OsuColour colours)
@@ -213,7 +213,7 @@ namespace osu.Game.Screens.SelectV2
 
         protected override bool OnClick(ClickEvent e)
         {
-            carousel?.Activate(Item!);
+            Carousel?.Activate(Item!);
             return true;
         }
 

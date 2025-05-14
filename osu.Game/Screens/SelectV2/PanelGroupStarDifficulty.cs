@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -8,19 +9,22 @@ using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.UserInterface;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.SelectV2
 {
-    public partial class PanelGroupStarDifficulty : Panel
+    public partial class PanelGroupStarDifficulty : Panel, IHasContextMenu
     {
         public const float HEIGHT = PanelGroup.HEIGHT;
 
@@ -198,6 +202,20 @@ namespace osu.Game.Screens.SelectV2
 
             // Move the count pill in the opposite direction to keep it pinned to the screen regardless of the X position of TopLevelContent.
             countPill.X = -TopLevelContent.X;
+        }
+
+        public MenuItem[] ContextMenuItems
+        {
+            get
+            {
+                if (Item == null)
+                    return Array.Empty<MenuItem>();
+
+                return new MenuItem[]
+                {
+                    new OsuMenuItem(Expanded.Value ? "Collapse" : "Expand", MenuItemType.Highlighted, () => Carousel?.Activate(Item)),
+                };
+            }
         }
     }
 }
