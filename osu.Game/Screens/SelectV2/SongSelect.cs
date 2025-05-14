@@ -75,10 +75,7 @@ namespace osu.Game.Screens.SelectV2
         private OsuLogo? logo { get; set; }
 
         [Resolved]
-        protected BeatmapManager Beatmaps { get; private set; } = null!;
-
-        [Resolved]
-        private IDialogOverlay? dialogs { get; set; }
+        private IDialogOverlay? dialogOverlay { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -353,7 +350,7 @@ namespace osu.Game.Screens.SelectV2
         /// </summary>
         public void DeleteBeatmap(BeatmapSetInfo beatmapSet)
         {
-            dialogs?.Push(new BeatmapDeleteDialog(beatmapSet));
+            dialogOverlay?.Push(new BeatmapDeleteDialog(beatmapSet));
         }
 
         /// <summary>
@@ -361,7 +358,7 @@ namespace osu.Game.Screens.SelectV2
         /// </summary>
         public void ClearScores(BeatmapInfo beatmap)
         {
-            dialogs?.Push(new BeatmapClearScoresDialog(beatmap));
+            dialogOverlay?.Push(new BeatmapClearScoresDialog(beatmap));
         }
 
         #endregion
