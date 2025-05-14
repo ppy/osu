@@ -337,7 +337,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double missedComboPercent = 1.0 - (double)scoreMaxCombo / attributes.MaxCombo;
 
-            double estimatedSliderbreaks = effectiveMissCount * topWeightedSliderFactor;
+            double estimatedSliderbreaks = Math.Min(okMehs, effectiveMissCount * topWeightedSliderFactor);
 
             // scores with more oks and mehs are more likely to have sliderbreaks
             double okMehAdjustment = ((okMehs - estimatedSliderbreaks) + 0.5) / okMehs;
