@@ -309,7 +309,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             var simulator = new OsuLegacyScoreSimulator();
             var attributes = simulator.Simulate(WorkingBeatmap, beatmap);
 
-            double legacyModMultiplier = simulator.GetLegacyScoreMultiplier(mods, new LegacyBeatmapConversionDifficultyInfo());
+            double legacyModMultiplier = OsuLegacyScoreSimulator.GetOsuLegacyScoreMultiplier(mods);
             int maximumLegacyAccuracyScore = attributes.AccuracyScore;
             long maximumLegacyComboScore = (long)Math.Round(attributes.ComboScore * legacyModMultiplier);
 
