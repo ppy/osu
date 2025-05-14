@@ -1732,7 +1732,10 @@ namespace osu.Game
 
                 if (newScreen.ShowFooter)
                 {
-                    BackButton.Hide();
+                    // force the back button to be hidden when footer is visible
+                    backButtonVisibility.UnbindFrom(newScreen.BackButtonVisibility);
+                    backButtonVisibility.BindTo(new BindableBool());
+
                     ScreenFooter.SetButtons(newScreen.CreateFooterButtons());
                     ScreenFooter.Show();
                 }
