@@ -155,6 +155,7 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.B }, GlobalAction.EditorRemoveClosestBookmark),
             new KeyBinding(new[] { InputKey.Alt, InputKey.Left }, GlobalAction.EditorSeekToPreviousBookmark),
             new KeyBinding(new[] { InputKey.Alt, InputKey.Right }, GlobalAction.EditorSeekToNextBookmark),
+            new KeyBinding(new[] { InputKey.Control, InputKey.L }, GlobalAction.EditorDiscardUnsavedChanges),
         };
 
         private static IEnumerable<KeyBinding> editorTestPlayKeyBindings => new[]
@@ -227,6 +228,10 @@ namespace osu.Game.Input.Bindings
         };
     }
 
+    /// <remarks>
+    /// IMPORTANT: New entries should always be added at the end of the enum, as key bindings are stored using the enum's numeric value and
+    /// changes in order would cause key bindings to get associated with the wrong action.
+    /// </remarks>
     public enum GlobalAction
     {
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleChat))]
@@ -498,6 +503,9 @@ namespace osu.Game.Input.Bindings
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorToggleMoveControl))]
         EditorToggleMoveControl,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorDiscardUnsavedChanges))]
+        EditorDiscardUnsavedChanges,
     }
 
     public enum GlobalActionCategory

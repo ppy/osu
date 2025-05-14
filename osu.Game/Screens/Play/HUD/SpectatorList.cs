@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Specialized;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -11,12 +12,11 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
-using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Online.Chat;
 using osu.Game.Localisation.HUD;
-using osu.Game.Localisation.SkinComponents;
+using osu.Game.Online.Chat;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Spectator;
 using osu.Game.Skinning;
 using osuTK;
@@ -28,17 +28,16 @@ namespace osu.Game.Screens.Play.HUD
     {
         private const int max_spectators_displayed = 10;
 
-        public BindableList<SpectatorUser> Spectators { get; } = new BindableList<SpectatorUser>();
-        public Bindable<LocalUserPlayingState> UserPlayingState { get; } = new Bindable<LocalUserPlayingState>();
-
-        [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.Font), nameof(SkinnableComponentStrings.FontDescription))]
-        public Bindable<Typeface> Font { get; } = new Bindable<Typeface>(Typeface.Torus);
-
-        [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.TextColour), nameof(SkinnableComponentStrings.TextColourDescription))]
+        public Bindable<Typeface> HeaderFont { get; } = new Bindable<Typeface>(Typeface.Torus);
         public BindableColour4 HeaderColour { get; } = new BindableColour4(Colour4.White);
 
-        protected OsuSpriteText Header { get; private set; } = null!;
+        private IBindableList<SpectatorUser> watchingUsers { get; } = new BindableList<SpectatorUser>();
+        private IBindableList<int> multiplayerPlayers { get; } = new BindableList<int>();
+        private BindableList<SpectatorUser> actualSpectators { get; } = new BindableList<SpectatorUser>();
 
+        private Bindable<LocalUserPlayingState> userPlayingState { get; } = new Bindable<LocalUserPlayingState>();
+
+        private OsuSpriteText header = null!;
         private FillFlowContainer mainFlow = null!;
         private FillFlowContainer<SpectatorListEntry> spectatorsFlow = null!;
         private DrawablePool<SpectatorListEntry> pool = null!;
@@ -48,6 +47,9 @@ namespace osu.Game.Screens.Play.HUD
 
         [Resolved]
         private GameplayState gameplayState { get; set; } = null!;
+
+        [Resolved]
+        private MultiplayerClient multiplayerClient { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
@@ -63,7 +65,7 @@ namespace osu.Game.Screens.Play.HUD
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
-                        Header = new OsuSpriteText
+                        header = new OsuSpriteText
                         {
                             Colour = colours.Blue0,
                             Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
@@ -78,24 +80,72 @@ namespace osu.Game.Screens.Play.HUD
                 pool = new DrawablePool<SpectatorListEntry>(max_spectators_displayed),
             };
 
-            HeaderColour.Value = Header.Colour;
+            HeaderColour.Value = header.Colour;
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            ((IBindableList<SpectatorUser>)Spectators).BindTo(client.WatchingUsers);
-            ((IBindable<LocalUserPlayingState>)UserPlayingState).BindTo(gameplayState.PlayingState);
+            ((IBindable<LocalUserPlayingState>)userPlayingState).BindTo(gameplayState.PlayingState);
 
-            Spectators.BindCollectionChanged(onSpectatorsChanged, true);
-            UserPlayingState.BindValueChanged(_ => updateVisibility());
+            multiplayerPlayers.BindTo(multiplayerClient.CurrentMatchPlayingUserIds);
+            multiplayerPlayers.BindCollectionChanged((_, _) => removePlayersFromMultiplayerRoom());
 
-            Font.BindValueChanged(_ => updateAppearance());
+            watchingUsers.BindTo(client.WatchingUsers);
+            watchingUsers.BindCollectionChanged(onWatchingUsersChanged, true);
+
+            actualSpectators.BindCollectionChanged(onSpectatorsChanged, true);
+            userPlayingState.BindValueChanged(_ => updateVisibility());
+
+            HeaderFont.BindValueChanged(_ => updateAppearance());
             HeaderColour.BindValueChanged(_ => updateAppearance(), true);
             FinishTransforms(true);
 
             this.FadeInFromZero(200, Easing.OutQuint);
+        }
+
+        private void onWatchingUsersChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                {
+                    for (int i = 0; i < e.NewItems!.Count; i++)
+                        actualSpectators.Add((SpectatorUser)e.NewItems![i]!);
+
+                    break;
+                }
+
+                case NotifyCollectionChangedAction.Remove:
+                {
+                    for (int i = 0; i < e.OldItems!.Count; i++)
+                        actualSpectators.Remove((SpectatorUser)e.OldItems![i]!);
+
+                    break;
+                }
+
+                case NotifyCollectionChangedAction.Reset:
+                {
+                    actualSpectators.Clear();
+                    break;
+                }
+
+                default:
+                    throw new NotSupportedException();
+            }
+
+            removePlayersFromMultiplayerRoom();
+        }
+
+        private void removePlayersFromMultiplayerRoom()
+        {
+            // the multiplayer gameplay leaderboard relies on calling `SpectatorClient.WatchUser()` to get updates on users' total scores.
+            // this has an unfortunate side effect of other players showing up in `SpectatorClient.WatchingUsers`.
+            //
+            // we do not generally wish to display other players in the room as spectators due to that implementation detail,
+            // therefore this code is intended to filter out those players on the client side.
+            actualSpectators.RemoveAll(s => multiplayerPlayers.Contains(s.OnlineID));
         }
 
         private void onSpectatorsChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -125,10 +175,10 @@ namespace osu.Game.Screens.Play.HUD
                     for (int i = 0; i < spectatorsFlow.Count; i++)
                         spectatorsFlow.SetLayoutPosition(spectatorsFlow[i], i);
 
-                    if (Spectators.Count >= max_spectators_displayed && spectatorsFlow.Count < max_spectators_displayed)
+                    if (actualSpectators.Count >= max_spectators_displayed && spectatorsFlow.Count < max_spectators_displayed)
                     {
                         for (int i = spectatorsFlow.Count; i < max_spectators_displayed; i++)
-                            addNewSpectatorToList(i, Spectators[i]);
+                            addNewSpectatorToList(i, actualSpectators[i]);
                     }
 
                     break;
@@ -144,7 +194,7 @@ namespace osu.Game.Screens.Play.HUD
                     throw new NotSupportedException();
             }
 
-            Header.Text = SpectatorListStrings.SpectatorCount(Spectators.Count).ToUpper();
+            header.Text = SpectatorListStrings.SpectatorCount(actualSpectators.Count).ToUpper();
             updateVisibility();
 
             for (int i = 0; i < spectatorsFlow.Count; i++)
@@ -160,7 +210,7 @@ namespace osu.Game.Screens.Play.HUD
             var entry = pool.Get(entry =>
             {
                 entry.Current.Value = spectator;
-                entry.UserPlayingState = UserPlayingState;
+                entry.UserPlayingState = userPlayingState;
             });
 
             spectatorsFlow.Insert(i, entry);
@@ -169,15 +219,15 @@ namespace osu.Game.Screens.Play.HUD
         private void updateVisibility()
         {
             // We don't want to show spectators when we are watching a replay.
-            mainFlow.FadeTo(Spectators.Count > 0 && UserPlayingState.Value != LocalUserPlayingState.NotPlaying ? 1 : 0, 250, Easing.OutQuint);
+            mainFlow.FadeTo(actualSpectators.Count > 0 && userPlayingState.Value != LocalUserPlayingState.NotPlaying ? 1 : 0, 250, Easing.OutQuint);
         }
 
         private void updateAppearance()
         {
-            Header.Font = OsuFont.GetFont(Font.Value, 12, FontWeight.Bold);
-            Header.Colour = HeaderColour.Value;
+            header.Font = OsuFont.GetFont(HeaderFont.Value, 12, FontWeight.Bold);
+            header.Colour = HeaderColour.Value;
 
-            Width = Header.DrawWidth;
+            Width = header.DrawWidth;
         }
 
         private partial class SpectatorListEntry : PoolableDrawable

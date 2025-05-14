@@ -2,12 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Mania.Skinning.Legacy
@@ -22,26 +24,46 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
             this.result = result;
             this.animation = animation;
 
-            Anchor = Anchor.BottomCentre;
             Origin = Anchor.Centre;
 
             AutoSizeAxes = Axes.Both;
         }
 
-        [BackgroundDependencyLoader]
-        private void load(ISkinSource skin)
-        {
-            float hitPosition = skin.GetManiaSkinConfig<float>(LegacyManiaSkinConfigurationLookups.HitPosition)?.Value ?? 0;
-            float scorePosition = skin.GetManiaSkinConfig<float>(LegacyManiaSkinConfigurationLookups.ScorePosition)?.Value ?? 0;
+        private IBindable<ScrollingDirection> direction = null!;
 
-            float absoluteHitPosition = 480f * LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR - hitPosition;
-            Y = scorePosition - absoluteHitPosition;
+        [Resolved]
+        private ISkinSource skin { get; set; } = null!;
+
+        [BackgroundDependencyLoader]
+        private void load(IScrollingInfo scrollingInfo)
+        {
+            direction = scrollingInfo.Direction.GetBoundCopy();
+            direction.BindValueChanged(_ => onDirectionChanged(), true);
 
             InternalChild = animation.With(d =>
             {
                 d.Anchor = Anchor.Centre;
                 d.Origin = Anchor.Centre;
             });
+        }
+
+        private void onDirectionChanged()
+        {
+            float hitPosition = skin.GetManiaSkinConfig<float>(LegacyManiaSkinConfigurationLookups.HitPosition)?.Value ?? 0;
+            float scorePosition = skin.GetManiaSkinConfig<float>(LegacyManiaSkinConfigurationLookups.ScorePosition)?.Value ?? 0;
+
+            float hitPositionFromTop = 480f * LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR - hitPosition;
+
+            if (scorePosition > hitPositionFromTop / 2f)
+            {
+                Anchor = direction.Value == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre;
+                Y = direction.Value == ScrollingDirection.Up ? hitPositionFromTop - scorePosition : scorePosition - hitPositionFromTop;
+            }
+            else
+            {
+                Anchor = direction.Value == ScrollingDirection.Up ? Anchor.BottomCentre : Anchor.TopCentre;
+                Y = direction.Value == ScrollingDirection.Up ? -scorePosition : scorePosition;
+            }
         }
 
         public void PlayAnimation()

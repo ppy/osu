@@ -72,10 +72,10 @@ namespace osu.Game.Tests.Visual.Online
             AddUntilStep("Panel loaded", () => currentlyOnline.ChildrenOfType<UserGridPanel>().FirstOrDefault()?.User.Id == 2);
             AddAssert("Spectate button disabled", () => currentlyOnline.ChildrenOfType<PurpleRoundedButton>().First().Enabled.Value, () => Is.False);
 
-            AddStep("User began playing", () => spectatorClient.SendStartPlay(streamingUser.Id, 0));
+            AddStep("User began playing", () => metadataClient.UserPresenceUpdated(streamingUser.Id, new UserPresence { Status = UserStatus.Online, Activity = new UserActivity.InSoloGame() }));
             AddAssert("Spectate button enabled", () => currentlyOnline.ChildrenOfType<PurpleRoundedButton>().First().Enabled.Value, () => Is.True);
 
-            AddStep("User finished playing", () => spectatorClient.SendEndPlay(streamingUser.Id));
+            AddStep("User finished playing", () => metadataClient.UserPresenceUpdated(streamingUser.Id, new UserPresence { Status = UserStatus.Online, Activity = new UserActivity.ChoosingBeatmap() }));
             AddAssert("Spectate button disabled", () => currentlyOnline.ChildrenOfType<PurpleRoundedButton>().First().Enabled.Value, () => Is.False);
 
             AddStep("Remove playing user", () => metadataClient.UserPresenceUpdated(streamingUser.Id, null));
@@ -88,13 +88,12 @@ namespace osu.Game.Tests.Visual.Online
         {
             IDisposable token = null!;
 
-            AddStep("User began playing", () => spectatorClient.SendStartPlay(streamingUser.Id, 0));
             AddStep("Begin watching user presence", () => token = metadataClient.BeginWatchingUserPresence());
-            AddStep("Add online user", () => metadataClient.UserPresenceUpdated(streamingUser.Id, new UserPresence { Status = UserStatus.Online, Activity = new UserActivity.ChoosingBeatmap() }));
-            AddUntilStep("Panel loaded", () => currentlyOnline.ChildrenOfType<UserGridPanel>().FirstOrDefault()?.User.Id == 2);
+            AddStep("Add online user", () => metadataClient.UserPresenceUpdated(streamingUser.Id, new UserPresence { Status = UserStatus.Online, Activity = new UserActivity.InSoloGame() }));
+            AddUntilStep("Panel loaded", () => currentlyOnline.ChildrenOfType<UserGridPanel>().FirstOrDefault()?.User.Id == streamingUser.Id);
             AddAssert("Spectate button enabled", () => currentlyOnline.ChildrenOfType<PurpleRoundedButton>().First().Enabled.Value, () => Is.True);
 
-            AddStep("User finished playing", () => spectatorClient.SendEndPlay(streamingUser.Id));
+            AddStep("User finished playing", () => metadataClient.UserPresenceUpdated(streamingUser.Id, new UserPresence { Status = UserStatus.Online, Activity = new UserActivity.ChoosingBeatmap() }));
             AddAssert("Spectate button disabled", () => currentlyOnline.ChildrenOfType<PurpleRoundedButton>().First().Enabled.Value, () => Is.False);
             AddStep("Remove playing user", () => metadataClient.UserPresenceUpdated(streamingUser.Id, null));
             AddStep("End watching user presence", () => token.Dispose());

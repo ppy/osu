@@ -23,6 +23,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 {
     public partial class TestSceneSliderPlacementBlueprint : PlacementBlueprintTestScene
     {
+        protected sealed override Ruleset CreateRuleset() => new OsuRuleset();
+
         [SetUp]
         public void Setup() => Schedule(() =>
         {

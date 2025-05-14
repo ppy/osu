@@ -62,10 +62,7 @@ namespace osu.Game.Rulesets.Taiko.Edit
                 if (h is not TaikoStrongableHitObject strongable) return;
 
                 if (strongable.IsStrong != state)
-                {
                     strongable.IsStrong = state;
-                    EditorBeatmap.Update(strongable);
-                }
             });
         }
 
@@ -77,10 +74,7 @@ namespace osu.Game.Rulesets.Taiko.Edit
             EditorBeatmap.PerformOnSelection(h =>
             {
                 if (h is Hit taikoHit)
-                {
                     taikoHit.Type = state ? HitType.Rim : HitType.Centre;
-                    EditorBeatmap.Update(h);
-                }
             });
         }
 

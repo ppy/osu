@@ -13,6 +13,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 {
     public partial class TestSceneSpinnerPlacementBlueprint : PlacementBlueprintTestScene
     {
+        protected sealed override Ruleset CreateRuleset() => new OsuRuleset();
+
         protected override DrawableHitObject CreateHitObject(HitObject hitObject) => new DrawableSpinner((Spinner)hitObject);
 
         protected override HitObjectPlacementBlueprint CreateBlueprint() => new SpinnerPlacementBlueprint();

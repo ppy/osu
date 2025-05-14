@@ -72,6 +72,7 @@ using osu.Game.Skinning;
 using osu.Game.Updater;
 using osu.Game.Users;
 using osu.Game.Utils;
+using osuTK;
 using osuTK.Graphics;
 using Sentry;
 
@@ -420,6 +421,7 @@ namespace osu.Game
 
             SelectedMods.BindValueChanged(modsChanged);
             Beatmap.BindValueChanged(beatmapChanged, true);
+            configUserActivity.BindValueChanged(_ => updateWindowTitle());
 
             applySafeAreaConsiderations = LocalConfig.GetBindable<bool>(OsuSetting.SafeAreaConsiderations);
             applySafeAreaConsiderations.BindValueChanged(apply => SafeAreaContainer.SafeAreaOverrideEdges = apply.NewValue ? SafeAreaOverrideEdges : Edges.All, true);
@@ -517,10 +519,10 @@ namespace osu.Game
             }
         });
 
-        public void CopyUrlToClipboard(string url) => waitForReady(() => onScreenDisplay, _ =>
+        public void CopyToClipboard(string value) => waitForReady(() => onScreenDisplay, _ =>
         {
-            dependencies.Get<Clipboard>().SetText(url);
-            onScreenDisplay.Display(new CopyUrlToast());
+            dependencies.Get<Clipboard>().SetText(value);
+            onScreenDisplay.Display(new CopiedToClipboardToast());
         });
 
         public void OpenUrlExternally(string url, LinkWarnMode warnMode = LinkWarnMode.Default) => waitForReady(() => externalLinkOpener, _ => externalLinkOpener.OpenUrlExternally(url, warnMode));
@@ -813,6 +815,12 @@ namespace osu.Game
 
         protected virtual UpdateManager CreateUpdateManager() => new UpdateManager();
 
+        /// <summary>
+        /// Adjust the globally applied <see cref="DrawSizePreservingFillContainer.TargetDrawSize"/> in every <see cref="ScalingContainer"/>.
+        /// Useful for changing how the game handles different aspect ratios.
+        /// </summary>
+        public virtual Vector2 ScalingContainerTargetDrawSize { get; } = new Vector2(1024, 768);
+
         protected override Container CreateScalingContainer() => new ScalingContainer(ScalingMode.Everything);
 
         #region Beatmap progression
@@ -821,6 +829,35 @@ namespace osu.Game
         {
             beatmap.OldValue?.CancelAsyncLoad();
             beatmap.NewValue?.BeginAsyncLoad();
+            updateWindowTitle();
+        }
+
+        private void updateWindowTitle()
+        {
+            if (Host.Window == null)
+                return;
+
+            string newTitle;
+
+            switch (configUserActivity.Value)
+            {
+                default:
+                    newTitle = Name;
+                    break;
+
+                case UserActivity.InGame:
+                case UserActivity.TestingBeatmap:
+                case UserActivity.WatchingReplay:
+                    newTitle = $"{Name} - {Beatmap.Value.BeatmapInfo.GetDisplayTitleRomanisable(true, false)}";
+                    break;
+
+                case UserActivity.EditingBeatmap:
+                    newTitle = $"{Name} - {Beatmap.Value.BeatmapInfo.Path ?? "new beatmap"}";
+                    break;
+            }
+
+            if (newTitle != Host.Window.Title)
+                Host.Window.Title = newTitle;
         }
 
         private void modsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
