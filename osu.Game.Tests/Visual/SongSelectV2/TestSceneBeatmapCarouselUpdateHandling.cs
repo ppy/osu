@@ -8,6 +8,7 @@ using NUnit.Framework;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Extensions;
+using osu.Game.Screens.Select.Filter;
 using osu.Game.Screens.SelectV2;
 using osu.Game.Tests.Resources;
 
@@ -128,6 +129,124 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             AddAssert("selection is updateable beatmap", () => Carousel.CurrentSelection, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
             AddAssert("visible panel is updateable beatmap", () => GetSelectedPanel()?.Item?.Model, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
+        }
+
+        /// <summary>
+        /// Ensures stability is maintained on different sort modes while an item is removed and then immediately re-added.
+        /// </summary>
+        [Test]
+        public void TestSortingStabilityWithRemovedAndReaddedItem()
+        {
+            RemoveAllBeatmaps();
+
+            const int diff_count = 5;
+
+            AddStep("Populate beatmap sets", () =>
+            {
+                for (int i = 0; i < 3; i++)
+                {
+                    var set = TestResources.CreateTestBeatmapSetInfo(diff_count);
+
+                    // only need to set the first as they are a shared reference.
+                    var beatmap = set.Beatmaps.First();
+
+                    beatmap.Metadata.Artist = "same artist";
+                    beatmap.Metadata.Title = "same title";
+
+                    // testing the case where DateAdded happens to equal (quite rare).
+                    set.DateAdded = DateTimeOffset.UnixEpoch;
+
+                    BeatmapSets.Add(set);
+                }
+            });
+
+            BeatmapSetInfo removedBeatmap = null!;
+            Guid[] originalOrder = null!;
+
+            SortBy(SortMode.Artist);
+            WaitForFiltering();
+
+            AddAssert("Items in descending added order", () => Carousel.PostFilterBeatmaps.Select(b => b.BeatmapSet!.DateAdded), () => Is.Ordered.Descending);
+            AddStep("Save order", () => originalOrder = Carousel.PostFilterBeatmaps.Select(b => b.ID).ToArray());
+
+            AddStep("Remove item", () =>
+            {
+                removedBeatmap = BeatmapSets[1];
+                BeatmapSets.RemoveAt(1);
+            });
+            AddStep("Re-add item", () => BeatmapSets.Insert(1, removedBeatmap));
+            WaitForFiltering();
+
+            AddAssert("Order didn't change", () => Carousel.PostFilterBeatmaps.Select(b => b.ID), () => Is.EqualTo(originalOrder));
+
+            SortBy(SortMode.Title);
+            WaitForFiltering();
+
+            AddAssert("Order didn't change", () => Carousel.PostFilterBeatmaps.Select(b => b.ID), () => Is.EqualTo(originalOrder));
+        }
+
+        /// <summary>
+        /// Ensures stability is maintained on different sort modes while a new item is added to the carousel.
+        /// </summary>
+        [Test]
+        public void TestSortingStabilityWithNewItems()
+        {
+            RemoveAllBeatmaps();
+
+            const int diff_count = 5;
+
+            AddStep("Populate beatmap sets", () =>
+            {
+                for (int i = 0; i < 3; i++)
+                {
+                    var set = TestResources.CreateTestBeatmapSetInfo(diff_count);
+
+                    // only need to set the first as they are a shared reference.
+                    var beatmap = set.Beatmaps.First();
+
+                    beatmap.Metadata.Artist = "same artist";
+                    beatmap.Metadata.Title = "same title";
+
+                    // testing the case where DateAdded happens to equal (quite rare).
+                    set.DateAdded = DateTimeOffset.UnixEpoch;
+
+                    BeatmapSets.Add(set);
+                }
+            });
+
+            Guid[] originalOrder = null!;
+
+            SortBy(SortMode.Artist);
+            WaitForFiltering();
+
+            AddAssert("Items in descending added order", () => Carousel.PostFilterBeatmaps.Select(b => b.BeatmapSet!.DateAdded), () => Is.Ordered.Descending);
+            AddStep("Save order", () => originalOrder = Carousel.PostFilterBeatmaps.Select(b => b.ID).ToArray());
+
+            AddStep("Add new item", () =>
+            {
+                var set = TestResources.CreateTestBeatmapSetInfo();
+
+                // only need to set the first as they are a shared reference.
+                var beatmap = set.Beatmaps.First();
+
+                beatmap.Metadata.Artist = "same artist";
+                beatmap.Metadata.Title = "same title";
+
+                set.DateAdded = DateTimeOffset.FromUnixTimeSeconds(1);
+
+                BeatmapSets.Add(set);
+
+                // add set to expected ordering
+                originalOrder = set.Beatmaps.Select(b => b.ID).Concat(originalOrder).ToArray();
+            });
+            WaitForFiltering();
+
+            AddAssert("Order didn't change", () => Carousel.PostFilterBeatmaps.Select(b => b.ID), () => Is.EqualTo(originalOrder));
+
+            SortBy(SortMode.Title);
+            WaitForFiltering();
+
+            AddAssert("Order didn't change", () => Carousel.PostFilterBeatmaps.Select(b => b.ID), () => Is.EqualTo(originalOrder));
         }
 
         private void updateBeatmap(Action<BeatmapInfo>? updateBeatmap = null, Action<BeatmapSetInfo>? updateSet = null)
