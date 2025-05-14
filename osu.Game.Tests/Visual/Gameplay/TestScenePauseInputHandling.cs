@@ -13,14 +13,18 @@ using osu.Game.Configuration;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Mania.Replays;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Replays;
+using osu.Game.Rulesets.Osu.Skinning.Default;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Skinning;
 using osu.Game.Storyboards;
+using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
@@ -50,15 +54,24 @@ namespace osu.Game.Tests.Visual.Gameplay
                     Position = OsuPlayfield.BASE_SIZE / 2,
                     StartTime = 5000,
                 },
-                new HitCircle
+                new Slider
                 {
                     Position = OsuPlayfield.BASE_SIZE / 2,
                     StartTime = 10000,
+                    Path = new SliderPath
+                    {
+                        ControlPoints =
+                        {
+                            new PathControlPoint(),
+                            new PathControlPoint(new Vector2(0, 100))
+                        }
+                    }
                 },
-                new HitCircle
+                new Spinner
                 {
                     Position = OsuPlayfield.BASE_SIZE / 2,
                     StartTime = 15000,
+                    Duration = 5000,
                 }
             }
         };
@@ -367,6 +380,56 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("release X", () => InputManager.ReleaseKey(Key.X));
 
             AddAssert("circle hit", () => Player.ScoreProcessor.HighestCombo.Value, () => Is.EqualTo(2));
+        }
+
+        [Test]
+        public void TestOsuSliderContinuesTrackingOnResume([Values] bool resumeWithSameKey)
+        {
+            loadPlayer(() => new OsuRuleset());
+
+            seekTo(10000);
+            AddStep("press X", () => InputManager.PressKey(Key.X));
+            AddAssert("slider head hit", () => Player.ScoreProcessor.HighestCombo.Value, () => Is.EqualTo(1));
+            AddAssert("slider tracking", () => this.ChildrenOfType<SliderInputManager>().Single().Tracking, () => Is.True);
+
+            AddStep("pause", () => Player.Pause());
+            AddStep("release X", () => InputManager.ReleaseKey(Key.X));
+
+            AddStep("resume", () => Player.Resume());
+            AddStep("go to resume cursor", () => InputManager.MoveMouseTo(this.ChildrenOfType<OsuResumeOverlay.OsuClickToResumeCursor>().Single()));
+
+            if (resumeWithSameKey)
+                AddStep("press X", () => InputManager.PressKey(Key.X));
+            else
+                AddStep("press Z", () => InputManager.ReleaseKey(Key.Z));
+
+            seekTo(10010);
+            AddAssert("slider still tracking", () => this.ChildrenOfType<SliderInputManager>().Single().Tracking, () => Is.True);
+        }
+
+        [Test]
+        public void TestOsuSpinnerContinuesTrackingOnResume([Values] bool resumeWithSameKey)
+        {
+            loadPlayer(() => new OsuRuleset());
+
+            seekTo(15000);
+            AddStep("move mouse higher", () => InputManager.MoveMouseTo(Content, new Vector2(0, -50)));
+            AddStep("press X", () => InputManager.PressKey(Key.X));
+            AddAssert("spinner tracking", () => this.ChildrenOfType<SpinnerRotationTracker>().Single().Tracking, () => Is.True);
+
+            AddStep("pause", () => Player.Pause());
+            AddStep("release X", () => InputManager.ReleaseKey(Key.X));
+
+            AddStep("resume", () => Player.Resume());
+            AddStep("go to resume cursor", () => InputManager.MoveMouseTo(this.ChildrenOfType<OsuResumeOverlay.OsuClickToResumeCursor>().Single()));
+
+            if (resumeWithSameKey)
+                AddStep("press X", () => InputManager.PressKey(Key.X));
+            else
+                AddStep("press Z", () => InputManager.ReleaseKey(Key.Z));
+
+            seekTo(15010);
+            AddAssert("spinner still tracking", () => this.ChildrenOfType<SpinnerRotationTracker>().Single().Tracking, () => Is.True);
         }
 
         private void loadPlayer(Func<Ruleset> createRuleset)
