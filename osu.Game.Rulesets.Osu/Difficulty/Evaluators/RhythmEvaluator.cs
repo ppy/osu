@@ -15,13 +15,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
     {
         private const int history_time_max = 5 * 1000; // 5 seconds
         private const int history_objects_max = 32;
-        private const double rhythm_overall_multiplier = 0.95;
+        private const double rhythm_overall_multiplier = 1.2;
         private const double rhythm_ratio_multiplier = 12.0;
 
         /// <summary>
         /// Calculates a rhythm multiplier for the difficulty of the tap associated with historic data of the current <see cref="OsuDifficultyHitObject"/>.
         /// </summary>
-        public static double EvaluateDifficultyOf(DifficultyHitObject current)
+        public static double EvaluateDifficultyOf(DifficultyHitObject current, bool isClassic)
         {
             if (current.BaseObject is Spinner)
                 return 0;
@@ -90,16 +90,22 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     {
                         // bpm change is into slider, this is easy acc window
                         if (currObj.BaseObject is Slider)
-                            effectiveRatio *= 0.125;
+                        {
+                            if (isClassic)
+                                effectiveRatio *= 0.125;
+                            else
+                                effectiveRatio *= 1;
+                        }
 
                         // bpm change was from a slider, this is easier typically than circle -> circle
                         // unintentional side effect is that bursts with kicksliders at the ends might have lower difficulty than bursts without sliders
                         if (prevObj.BaseObject is Slider)
-                            effectiveRatio *= 0.3;
+                            if (prevObj.TravelTime > (currDelta - deltaDifferenceEpsilon) / 6)
+                                effectiveRatio *= 0.3;
 
                         // repeated island polarity (2 -> 4, 3 -> 5)
                         if (island.IsSimilarPolarity(previousIsland))
-                            effectiveRatio *= 0.5;
+                            effectiveRatio *= 0.25;
 
                         // previous increase happened a note ago, 1/1->1/2-1/4, dont want to buff this.
                         if (lastDelta > prevDelta + deltaDifferenceEpsilon && prevDelta > currDelta + deltaDifferenceEpsilon)
@@ -108,7 +114,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                         // repeated island size (ex: triplet -> triplet)
                         // TODO: remove this nerf since its staying here only for balancing purposes because of the flawed ratio calculation
                         if (previousIsland.DeltaCount == island.DeltaCount)
-                            effectiveRatio *= 0.5;
+                            effectiveRatio *= 0.3;
 
                         var islandCount = islandCounts.FirstOrDefault(x => x.Island.Equals(island));
 
