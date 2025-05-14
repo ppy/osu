@@ -80,9 +80,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             score.Mods.OfType<IApplicableToDifficulty>().ForEach(m => m.ApplyToDifficulty(difficulty));
 
-            var track = new TrackVirtual(10000);
-            score.Mods.OfType<IApplicableToTrack>().ForEach(m => m.ApplyToTrack(track));
-            clockRate = track.Rate;
+            clockRate = 1;
+            score.Mods.OfType<IApplicableToRate>().ForEach(m => clockRate = m.ApplyToRate(0, clockRate));
 
             HitWindows hitWindows = new OsuHitWindows();
             hitWindows.SetDifficulty(difficulty.OverallDifficulty);
