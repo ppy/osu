@@ -75,6 +75,9 @@ namespace osu.Game.Screens.SelectV2
         private OsuLogo? logo { get; set; }
 
         [Resolved]
+        protected BeatmapManager Beatmaps { get; private set; } = null!;
+
+        [Resolved]
         private IDialogOverlay? dialogs { get; set; }
 
         [BackgroundDependencyLoader]
@@ -346,11 +349,19 @@ namespace osu.Game.Screens.SelectV2
         #region Beatmap management
 
         /// <summary>
-        /// Opens up <see cref="BeatmapDeleteDialog"/> with the given beatmap set.
+        /// Requests the user for confirmation to delete the given beatmap set.
         /// </summary>
-        public void RequestDeleteBeatmap(BeatmapSetInfo set)
+        public void DeleteBeatmap(BeatmapSetInfo beatmapSet)
         {
-            dialogs?.Push(new BeatmapDeleteDialog(set));
+            dialogs?.Push(new BeatmapDeleteDialog(beatmapSet));
+        }
+
+        /// <summary>
+        /// Requests the user for confirmation to clear all local scores in the given beatmap.
+        /// </summary>
+        public void ClearScores(BeatmapInfo beatmap)
+        {
+            dialogs?.Push(new BeatmapClearScoresDialog(beatmap));
         }
 
         #endregion
@@ -387,7 +398,7 @@ namespace osu.Game.Screens.SelectV2
                     if (e.ShiftPressed)
                     {
                         if (!Beatmap.IsDefault)
-                            RequestDeleteBeatmap(Beatmap.Value.BeatmapSetInfo);
+                            DeleteBeatmap(Beatmap.Value.BeatmapSetInfo);
                         return true;
                     }
 
