@@ -16,7 +16,6 @@ using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Rulesets.Scoring.Legacy;
 
 namespace osu.Game.Rulesets.Osu.Difficulty
 {
@@ -114,6 +113,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 ? Math.Cbrt(multiplier) * star_rating_multiplier * (Math.Cbrt(100000 / Math.Pow(2, 1 / 1.1) * basePerformance) + 4)
                 : 0;
 
+            double sliderNestedScorePerObject = calculateSliderNestedScorePerObject(beatmap, totalHits);
+            double legacyScoreBaseMultiplier = calculateScoreV1BaseMultiplier(beatmap, totalHits);
+            double maximumLegacyScore = calculateMaximumScoreV1(beatmap, mods);
+
             OsuDifficultyAttributes attributes = new OsuDifficultyAttributes
             {
                 StarRating = starRating,
@@ -133,9 +136,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 HitCircleCount = hitCircleCount,
                 SliderCount = sliderCount,
                 SpinnerCount = spinnerCount,
-                SliderNestedScorePerObject = calculateSliderNestedScorePerObject(beatmap, totalHits),
-                LegacyScoreBaseMultiplier = calculateScoreV1BaseMultiplier(beatmap, totalHits),
-                MaximumLegacyScore = calculateMaximumScoreV1(beatmap, mods)
+                SliderNestedScorePerObject = sliderNestedScorePerObject,
+                LegacyScoreBaseMultiplier = legacyScoreBaseMultiplier,
+                MaximumLegacyScore = legacyScoreBaseMultiplier
             };
 
             return attributes;
@@ -263,47 +266,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return flashlightRating * Math.Sqrt(ratingMultiplier);
         }
 
-        protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
-        {
-            List<DifficultyHitObject> objects = new List<DifficultyHitObject>();
-
-            // The first jump is formed by the first two hitobjects of the map.
-            // If the map has less than two OsuHitObjects, the enumerator will not return anything.
-            for (int i = 1; i < beatmap.HitObjects.Count; i++)
-            {
-                objects.Add(new OsuDifficultyHitObject(beatmap.HitObjects[i], beatmap.HitObjects[i - 1], clockRate, objects, objects.Count));
-            }
-
-            return objects;
-        }
-
-        protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, double clockRate)
-        {
-            var skills = new List<Skill>
-            {
-                new Aim(mods, true),
-                new Aim(mods, false),
-                new Speed(mods)
-            };
-
-            if (mods.Any(h => h is OsuModFlashlight))
-                skills.Add(new Flashlight(mods));
-
-            return skills.ToArray();
-        }
-
-        protected override Mod[] DifficultyAdjustmentMods => new Mod[]
-        {
-            new OsuModTouchDevice(),
-            new OsuModDoubleTime(),
-            new OsuModHalfTime(),
-            new OsuModEasy(),
-            new OsuModHardRock(),
-            new OsuModFlashlight(),
-            new OsuModHidden(),
-            new OsuModSpunOut(),
-        };
-
         private long calculateMaximumScoreV1(IBeatmap beatmap, Mod[] mods)
         {
             var simulator = new OsuLegacyScoreSimulator();
@@ -351,5 +313,46 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             return LegacyRulesetExtensions.CalculateDifficultyPeppyStars(beatmap.Difficulty, objectCount, drainLength);
         }
+
+        protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
+        {
+            List<DifficultyHitObject> objects = new List<DifficultyHitObject>();
+
+            // The first jump is formed by the first two hitobjects of the map.
+            // If the map has less than two OsuHitObjects, the enumerator will not return anything.
+            for (int i = 1; i < beatmap.HitObjects.Count; i++)
+            {
+                objects.Add(new OsuDifficultyHitObject(beatmap.HitObjects[i], beatmap.HitObjects[i - 1], clockRate, objects, objects.Count));
+            }
+
+            return objects;
+        }
+
+        protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, double clockRate)
+        {
+            var skills = new List<Skill>
+            {
+                new Aim(mods, true),
+                new Aim(mods, false),
+                new Speed(mods)
+            };
+
+            if (mods.Any(h => h is OsuModFlashlight))
+                skills.Add(new Flashlight(mods));
+
+            return skills.ToArray();
+        }
+
+        protected override Mod[] DifficultyAdjustmentMods => new Mod[]
+        {
+            new OsuModTouchDevice(),
+            new OsuModDoubleTime(),
+            new OsuModHalfTime(),
+            new OsuModEasy(),
+            new OsuModHardRock(),
+            new OsuModFlashlight(),
+            new OsuModHidden(),
+            new OsuModSpunOut(),
+        };
     }
 }
