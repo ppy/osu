@@ -16,6 +16,7 @@ using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Utils;
+using osu.Game.Rulesets.Scoring.Legacy;
 
 namespace osu.Game.Rulesets.Osu.Difficulty
 {
@@ -353,7 +354,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (attributes.MaxCombo == 0 || score.LegacyTotalScore == null)
                 return 0;
 
-            double scoreV1Multiplier = attributes.LegacyScoreBaseMultiplier * OsuLegacyScoreSimulator.GetOsuLegacyScoreMultiplier(score.Mods);
+            double scoreV1Multiplier = attributes.LegacyScoreBaseMultiplier * new OsuLegacyScoreSimulator().GetLegacyScoreMultiplier(score.Mods, new LegacyBeatmapConversionDifficultyInfo());
             double relevantComboPerObject = calculateScoreRelevantComboPerObject(attributes, scoreV1Multiplier);
 
             double maximumMissCount = calculateMaximumComboBasedMissCount(attributes);

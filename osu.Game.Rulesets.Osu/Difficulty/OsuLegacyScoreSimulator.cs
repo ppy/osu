@@ -177,7 +177,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 combo++;
         }
 
-        public static double GetOsuLegacyScoreMultiplier(IReadOnlyList<Mod> mods)
+        public double GetLegacyScoreMultiplier(IReadOnlyList<Mod> mods, LegacyBeatmapConversionDifficultyInfo difficulty)
         {
             bool scoreV2 = mods.Any(m => m is ModScoreV2);
 
@@ -229,7 +229,5 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             return multiplier;
         }
-
-        public double GetLegacyScoreMultiplier(IReadOnlyList<Mod> mods, LegacyBeatmapConversionDifficultyInfo difficulty) => GetOsuLegacyScoreMultiplier(mods);
     }
 }

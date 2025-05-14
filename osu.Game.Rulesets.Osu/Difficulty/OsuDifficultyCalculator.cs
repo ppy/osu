@@ -16,6 +16,7 @@ using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Scoring.Legacy;
 
 namespace osu.Game.Rulesets.Osu.Difficulty
 {
@@ -271,7 +272,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             var simulator = new OsuLegacyScoreSimulator();
             var attributes = simulator.Simulate(WorkingBeatmap, beatmap);
 
-            double legacyModMultiplier = OsuLegacyScoreSimulator.GetOsuLegacyScoreMultiplier(mods);
+            double legacyModMultiplier = simulator.GetLegacyScoreMultiplier(mods, new LegacyBeatmapConversionDifficultyInfo());
             int maximumLegacyAccuracyScore = attributes.AccuracyScore;
             long maximumLegacyComboScore = (long)Math.Round(attributes.ComboScore * legacyModMultiplier);
 
