@@ -249,14 +249,16 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddUntilStep("standalone panels displayed", () => GetVisiblePanels<PanelBeatmapStandalone>().Any());
 
             SelectNextGroup();
-            WaitForSelection(0, 0);
+            // both sets have a difficulty with 0.00* star rating.
+            // in the case of a tie when sorting, the first tie-breaker is `DateAdded` descending, which will pick the last set added (see `TestResources.CreateTestBeatmapSetInfo()`).
+            WaitForSelection(1, 0);
 
             SelectNextGroup();
-            WaitForSelection(1, 0);
+            WaitForSelection(0, 0);
 
             SelectNextPanel();
             Select();
-            WaitForSelection(0, 1);
+            WaitForSelection(1, 1);
         }
 
         private void checkSelectionIterating(bool isIterating)
