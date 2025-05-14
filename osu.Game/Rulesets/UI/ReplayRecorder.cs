@@ -40,8 +40,6 @@ namespace osu.Game.Rulesets.UI
             this.target = target;
 
             RelativeSizeAxes = Axes.Both;
-
-            Depth = float.MinValue;
         }
 
         protected override void LoadComplete()
