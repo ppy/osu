@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             AddStep("start moving left", () => InputManager.PressKey(Key.Left));
             seekTo(5000);
             AddStep("end moving left", () => InputManager.ReleaseKey(Key.Left));
-            AddAssert("catcher max left", () => this.ChildrenOfType<CatcherArea>().Single().X, () => Is.EqualTo(0));
+            AddAssert("catcher max left", () => this.ChildrenOfType<Catcher>().Single().X, () => Is.EqualTo(0));
             AddAssert("movement to left recorded to replay", () => Player.Score.Replay.Frames.OfType<CatchReplayFrame>().Any(f => f.Actions.SequenceEqual([CatchAction.MoveLeft])));
             AddAssert("replay reached left edge", () => Player.Score.Replay.Frames.OfType<CatchReplayFrame>().Any(f => Precision.AlmostEquals(f.Position, 0)));
 
@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                 InputManager.ReleaseKey(Key.LShift);
                 InputManager.ReleaseKey(Key.Right);
             });
-            AddAssert("catcher max right", () => this.ChildrenOfType<CatcherArea>().Single().X, () => Is.EqualTo(0));
+            AddAssert("catcher max right", () => this.ChildrenOfType<Catcher>().Single().X, () => Is.EqualTo(CatchPlayfield.WIDTH));
             AddAssert("dash to right recorded to replay", () => Player.Score.Replay.Frames.OfType<CatchReplayFrame>().Any(f => f.Actions.SequenceEqual([CatchAction.Dash, CatchAction.MoveRight])));
             AddAssert("replay reached right edge", () => Player.Score.Replay.Frames.OfType<CatchReplayFrame>().Any(f => Precision.AlmostEquals(f.Position, CatchPlayfield.WIDTH)));
         }
