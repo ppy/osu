@@ -1729,14 +1729,24 @@ namespace osu.Game
                 else
                     Toolbar.Show();
 
+                var newOsuScreen = (OsuScreen)newScreen;
+
                 if (newScreen.ShowFooter)
                 {
                     // the legacy back button should never display while the new footer is in use, as it
                     // contains its own local back button.
                     ((BindableBool)backButtonVisibility).Value = false;
 
-                    ScreenFooter.SetButtons(newScreen.CreateFooterButtons());
-                    ScreenFooter.Show();
+                    BackButton.Hide();
+                    newOsuScreen.OnLoadComplete += _ =>
+                    {
+                        var buttons = newScreen.CreateFooterButtons();
+
+                        newOsuScreen.LoadComponentsAgainstScreenDependencies(buttons);
+
+                        ScreenFooter.SetButtons(buttons);
+                        ScreenFooter.Show();
+                    };
                 }
                 else
                 {
@@ -1746,7 +1756,7 @@ namespace osu.Game
                     ScreenFooter.Hide();
                 }
 
-                skinEditor.SetTarget((OsuScreen)newScreen);
+                skinEditor.SetTarget(newOsuScreen);
             }
         }
 
