@@ -65,7 +65,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         }
 
         [Test]
-        public void TestScrollPositionMaintainedOnAdd_LastSelected()
+        public void TestScrollPositionMaintainedOnRemove_LastSelected()
         {
             Quad positionBefore = default;
 
