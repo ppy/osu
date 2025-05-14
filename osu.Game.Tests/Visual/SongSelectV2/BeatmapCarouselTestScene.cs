@@ -4,9 +4,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -35,7 +37,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
     {
         protected readonly BindableList<BeatmapSetInfo> BeatmapSets = new BindableList<BeatmapSetInfo>();
 
-        protected BeatmapCarousel Carousel = null!;
+        protected TestBeatmapCarousel Carousel = null!;
 
         protected OsuScrollContainer<Drawable> Scroll => Carousel.ChildrenOfType<OsuScrollContainer<Drawable>>().Single();
 
@@ -100,7 +102,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                             },
                             new Drawable[]
                             {
-                                Carousel = new BeatmapCarousel
+                                Carousel = new TestBeatmapCarousel
                                 {
                                     NewItemsPresented = () => NewItemsPresentedInvocationCount++,
                                     BleedTop = 50,
@@ -349,6 +351,22 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 {
                     cp.Font = cp.Font.With(size: 18, weight: FontWeight.Bold);
                 });
+            }
+        }
+
+        public class TestBeatmapCarousel : BeatmapCarousel
+        {
+            public IEnumerable<BeatmapInfo> PostFilterBeatmaps = null!;
+
+            protected override Task<IEnumerable<CarouselItem>> FilterAsync()
+            {
+                var filterAsync = base.FilterAsync();
+                filterAsync.ContinueWith(result =>
+                {
+                    if (result.IsCompletedSuccessfully)
+                        PostFilterBeatmaps = result.GetResultSafely().Select(i => i.Model).OfType<BeatmapInfo>();
+                });
+                return filterAsync;
             }
         }
     }

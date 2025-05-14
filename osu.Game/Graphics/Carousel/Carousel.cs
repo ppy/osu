@@ -170,7 +170,7 @@ namespace osu.Game.Graphics.Carousel
         /// <summary>
         /// Queue an asynchronous filter operation.
         /// </summary>
-        protected Task FilterAsync()
+        protected virtual Task<IEnumerable<CarouselItem>> FilterAsync()
         {
             filterTask = performFilter();
             filterTask.FireAndForget();
@@ -257,10 +257,10 @@ namespace osu.Game.Graphics.Carousel
 
         private List<CarouselItem>? carouselItems;
 
-        private Task filterTask = Task.CompletedTask;
+        private Task<IEnumerable<CarouselItem>> filterTask = Task.FromResult(Enumerable.Empty<CarouselItem>());
         private CancellationTokenSource cancellationSource = new CancellationTokenSource();
 
-        private async Task performFilter()
+        private async Task<IEnumerable<CarouselItem>> performFilter()
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
             var cts = new CancellationTokenSource();
@@ -303,7 +303,7 @@ namespace osu.Game.Graphics.Carousel
             }, cts.Token).ConfigureAwait(false);
 
             if (cts.Token.IsCancellationRequested)
-                return;
+                return Enumerable.Empty<CarouselItem>();
 
             Schedule(() =>
             {
@@ -318,6 +318,8 @@ namespace osu.Game.Graphics.Carousel
 
                 NewItemsPresented?.Invoke();
             });
+
+            return items;
 
             void log(string text) => Logger.Log($"Carousel[op {cts.GetHashCode().ToString()}] {stopwatch.ElapsedMilliseconds} ms: {text}");
         }
