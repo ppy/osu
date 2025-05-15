@@ -1738,6 +1738,8 @@ namespace osu.Game
                     ((BindableBool)backButtonVisibility).Value = false;
 
                     BackButton.Hide();
+                    ScreenFooter.Show();
+
                     newOsuScreen.OnLoadComplete += _ =>
                     {
                         var buttons = newScreen.CreateFooterButtons();
