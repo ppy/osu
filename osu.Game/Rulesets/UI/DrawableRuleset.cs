@@ -300,6 +300,7 @@ namespace osu.Game.Rulesets.UI
 
             if (score == null)
             {
+                NewResult -= emitImportantFrame;
                 recordingInputManager.Recorder = null;
                 return;
             }
@@ -311,7 +312,10 @@ namespace osu.Game.Rulesets.UI
 
             recorder.ScreenSpaceToGamefield = Playfield.ScreenSpaceToGamefield;
 
+            NewResult += emitImportantFrame;
             recordingInputManager.Recorder = recorder;
+
+            void emitImportantFrame(JudgementResult judgementResult) => recordingInputManager.Recorder?.RecordFrame(true);
         }
 
         public override void SetReplayScore(Score replayScore)
