@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using NUnit.Framework;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -21,14 +20,12 @@ using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.UserInterface.PageSelector;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
-using osu.Game.Screens.Edit;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
@@ -284,9 +281,10 @@ namespace osu.Game.Screens.Menu
             return base.OnMidiDown(e);
         }
 
-        private void NavButtonManager(bool foward)
+        private void navButtonManager(bool foward)
         {
-            if(selectedButton != -1) currButtonsLevel[selectedButton].NavUnhover();
+            if(selectedButton != -1)
+                currButtonsLevel[selectedButton].NavUnhover();
             Logger.Log($"selectedButton: {selectedButton}");
 
             selectedButton += foward ? 1 : -1;
@@ -323,12 +321,12 @@ namespace osu.Game.Screens.Menu
                     return true;
 
                 case GlobalAction.SelectNextGroup:
-                    NavButtonManager(true);
+                    navButtonManager(true);
                     Logger.Log($"next pressed in menu");
                     return true;
 
                 case GlobalAction.SelectPreviousGroup:
-                    NavButtonManager(false);
+                    navButtonManager(false);
                     Logger.Log("prev pressed in menu");
                     return true;
 
@@ -363,8 +361,6 @@ namespace osu.Game.Screens.Menu
                 default:
                     return false;
             }
-
-            return false; // Ensure all code paths return a value.
         }
 
         public void StopSamplePlayback()
@@ -504,16 +500,19 @@ namespace osu.Game.Screens.Menu
             {
                 case ButtonSystemState.TopLevel:
                     currButtonsLevel = buttonsTopLevel;
-                    if (currButtonsLevel.Count == 4) currButtonsLevel.Add(settingsButton);
+                    if (currButtonsLevel.Count == 4)
+                        currButtonsLevel.Add(settingsButton);
                     break;
                 case ButtonSystemState.Play:
                     currButtonsLevel = buttonsPlay;
                     currButtonsLevel.RemoveAt(currButtonsLevel.Count - 1);
-                    if (currButtonsLevel.Count == 3) currButtonsLevel.Add(backButton);
+                    if (currButtonsLevel.Count == 3)
+                        currButtonsLevel.Add(backButton);
                     break;
                 case ButtonSystemState.Edit:
                     currButtonsLevel = buttonsEdit;
-                    if(currButtonsLevel.Count == 2) currButtonsLevel.Add(backButton);
+                    if(currButtonsLevel.Count == 2)
+                        currButtonsLevel.Add(backButton);
                     break;
                 default:
                     return;
