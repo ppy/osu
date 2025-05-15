@@ -51,29 +51,29 @@ namespace osu.Game.Rulesets.UI
         protected override void Update()
         {
             base.Update();
-            recordFrame(false);
+            RecordFrame(false);
         }
 
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
-            recordFrame(false);
+            RecordFrame(false);
             return base.OnMouseMove(e);
         }
 
         public bool OnPressed(KeyBindingPressEvent<T> e)
         {
             pressedActions.Add(e.Action);
-            recordFrame(true);
+            RecordFrame(true);
             return false;
         }
 
         public void OnReleased(KeyBindingReleaseEvent<T> e)
         {
             pressedActions.Remove(e.Action);
-            recordFrame(true);
+            RecordFrame(true);
         }
 
-        private void recordFrame(bool important)
+        public override void RecordFrame(bool important)
         {
             var last = target.Replay.Frames.LastOrDefault();
 
@@ -98,5 +98,7 @@ namespace osu.Game.Rulesets.UI
     public abstract partial class ReplayRecorder : Component
     {
         public Func<Vector2, Vector2> ScreenSpaceToGamefield;
+
+        public abstract void RecordFrame(bool important);
     }
 }
