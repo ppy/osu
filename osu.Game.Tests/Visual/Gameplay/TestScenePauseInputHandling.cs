@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Rulesets;
@@ -65,7 +66,8 @@ namespace osu.Game.Tests.Visual.Gameplay
                             new PathControlPoint(),
                             new PathControlPoint(new Vector2(0, 100))
                         }
-                    }
+                    },
+                    Samples = [new HitSampleInfo(HitSampleInfo.HIT_NORMAL)]
                 },
                 new Spinner
                 {
@@ -143,31 +145,31 @@ namespace osu.Game.Tests.Visual.Gameplay
             checkKeyCounterState(() => counter, 0, false);
             assertCountOfMatchingReplayFrames<ManiaReplayFrame>("key4 never pressed in replay", f => f.Actions.Contains(ManiaAction.Key4), 0);
 
-            AddStep("press space", () => InputManager.PressKey(Key.Space));
+            AddStep("press J", () => InputManager.PressKey(Key.J));
             checkKeyCounterState(() => counter, 1, true);
             assertCountOfMatchingReplayFrames<ManiaReplayFrame>("key4 pressed once in replay", f => f.Actions.Contains(ManiaAction.Key4), 1);
 
-            AddStep("release space", () => InputManager.ReleaseKey(Key.Space));
+            AddStep("release J", () => InputManager.ReleaseKey(Key.J));
             checkKeyCounterState(() => counter, 1, false);
             assertCountOfMatchingReplayFrames<ManiaReplayFrame>("key4 pressed once in replay", f => f.Actions.Contains(ManiaAction.Key4), 1);
 
             AddStep("pause", () => Player.Pause());
-            AddStep("press space", () => InputManager.PressKey(Key.Space));
+            AddStep("press J", () => InputManager.PressKey(Key.J));
             checkKeyCounterState(() => counter, 1, false);
             assertCountOfMatchingReplayFrames<ManiaReplayFrame>("key4 pressed once in replay", f => f.Actions.Contains(ManiaAction.Key4), 1);
 
-            AddStep("release space", () => InputManager.ReleaseKey(Key.Space));
+            AddStep("release J", () => InputManager.ReleaseKey(Key.J));
             checkKeyCounterState(() => counter, 1, false);
             assertCountOfMatchingReplayFrames<ManiaReplayFrame>("key4 pressed once in replay", f => f.Actions.Contains(ManiaAction.Key4), 1);
 
             AddStep("resume", () => Player.Resume());
             AddUntilStep("wait for resume", () => Player.GameplayClockContainer.IsRunning);
 
-            AddStep("press space", () => InputManager.PressKey(Key.Space));
+            AddStep("press J", () => InputManager.PressKey(Key.J));
             checkKeyCounterState(() => counter, 2, true);
             assertCountOfMatchingReplayFrames<ManiaReplayFrame>("key4 pressed twice in replay", f => f.Actions.Contains(ManiaAction.Key4), 2);
 
-            AddStep("release space", () => InputManager.ReleaseKey(Key.Space));
+            AddStep("release J", () => InputManager.ReleaseKey(Key.J));
             checkKeyCounterState(() => counter, 2, false);
             assertCountOfMatchingReplayFrames<ManiaReplayFrame>("key4 pressed twice in replay", f => f.Actions.Contains(ManiaAction.Key4), 2);
         }
@@ -219,10 +221,10 @@ namespace osu.Game.Tests.Visual.Gameplay
             loadPlayer(() => new ManiaRuleset());
             AddStep("get key counter", () => counter = this.ChildrenOfType<KeyCounter>().Single(k => k.Trigger is KeyCounterActionTrigger<ManiaAction> actionTrigger && actionTrigger.Action == ManiaAction.Key4));
 
-            AddStep("press space", () => InputManager.PressKey(Key.Space));
+            AddStep("press J", () => InputManager.PressKey(Key.J));
             AddStep("pause", () => Player.Pause());
 
-            AddStep("release space", () => InputManager.ReleaseKey(Key.Space));
+            AddStep("release J", () => InputManager.ReleaseKey(Key.J));
             checkKeyCounterState(() => counter, 1, true);
 
             AddStep("resume", () => Player.Resume());
@@ -282,19 +284,19 @@ namespace osu.Game.Tests.Visual.Gameplay
             loadPlayer(() => new ManiaRuleset());
             AddStep("get key counter", () => counter = this.ChildrenOfType<KeyCounter>().Single(k => k.Trigger is KeyCounterActionTrigger<ManiaAction> actionTrigger && actionTrigger.Action == ManiaAction.Key4));
 
-            AddStep("press space", () => InputManager.PressKey(Key.Space));
+            AddStep("press J", () => InputManager.PressKey(Key.J));
             checkKeyCounterState(() => counter, 1, true);
 
             AddStep("pause", () => Player.Pause());
 
-            AddStep("release space", () => InputManager.ReleaseKey(Key.Space));
-            AddStep("press space", () => InputManager.PressKey(Key.Space));
+            AddStep("release J", () => InputManager.ReleaseKey(Key.J));
+            AddStep("press J", () => InputManager.PressKey(Key.J));
 
             AddStep("resume", () => Player.Resume());
             AddUntilStep("wait for resume", () => Player.GameplayClockContainer.IsRunning);
             checkKeyCounterState(() => counter, 1, true);
 
-            AddStep("release space", () => InputManager.ReleaseKey(Key.Space));
+            AddStep("release J", () => InputManager.ReleaseKey(Key.J));
             checkKeyCounterState(() => counter, 1, false);
         }
 
