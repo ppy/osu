@@ -99,7 +99,7 @@ namespace osu.Game.Screens
         Bindable<RulesetInfo> Ruleset { get; }
 
         /// <summary>
-        /// A list of footer buttons to be added to the game footer, or empty to display no buttons.
+        /// Buttons to be added to the game's footer toolbar.
         /// </summary>
         IReadOnlyList<ScreenFooterButton> CreateFooterButtons();
 

@@ -23,6 +23,8 @@ namespace osu.Game.Screens.SelectV2
         [Resolved]
         private INotificationOverlay? notifications { get; set; }
 
+        public override bool EditingAllowed => true;
+
         protected override bool OnStart()
         {
             if (playerLoader != null) return false;
@@ -98,7 +100,7 @@ namespace osu.Game.Screens.SelectV2
             playerLoader = null;
         }
 
-        private partial class PlayerLoader : Screens.Play.PlayerLoader
+        private partial class PlayerLoader : Play.PlayerLoader
         {
             public override bool ShowFooter => true;
 
