@@ -23,11 +23,23 @@ namespace osu.Game.Screens.Footer
 {
     public partial class ScreenFooter : OverlayContainer
     {
+        public ScreenBackButton BackButton { get; private set; } = null!;
+
+        /// <summary>
+        /// Called when logo tracking begins, intended to bring the osu! logo to the frontmost visually.
+        /// </summary>
+        public Action<bool>? RequestLogoInFront { private get; init; }
+
+        /// <summary>
+        /// The back button was pressed.
+        /// </summary>
+        public Action? BackButtonPressed { private get; init; }
+
+        public const int HEIGHT = 50;
+
         private const int padding = 60;
         private const float delay_per_button = 30;
         private const double transition_duration = 400;
-
-        public const int HEIGHT = 50;
 
         private readonly List<OverlayContainer> overlays = new List<OverlayContainer>();
 
@@ -39,12 +51,6 @@ namespace osu.Game.Screens.Footer
 
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
-
-        public ScreenBackButton BackButton { get; private set; } = null!;
-
-        public Action<bool>? RequestLogoInFront { get; set; }
-
-        public Action? OnBack;
 
         public ScreenFooter(BackReceptor? receptor = null)
         {
@@ -322,7 +328,7 @@ namespace osu.Game.Screens.Footer
                 return;
             }
 
-            OnBack?.Invoke();
+            BackButtonPressed?.Invoke();
         }
 
         public partial class BackReceptor : Drawable, IKeyBindingHandler<GlobalAction>
