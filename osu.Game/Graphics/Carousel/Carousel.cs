@@ -356,13 +356,11 @@ namespace osu.Game.Graphics.Carousel
         {
             switch (e.Key)
             {
-                // this is a special hard-coded case to allow activating item with modifier keys pressed
-                // (e.g. press Ctrl+Enter to start beatmap with autoplay mod selected).
-                // We can't rely on GlobalAction.Select as it only responds to pressing the key without any modifiers.
+                // this is a special hard-coded case; we can't rely on OnPressed as GlobalActionContainer is
+                // matching with exact modifier consideration (so Ctrl+Enter would be ignored).
                 case Key.Enter:
                 case Key.KeypadEnter:
-                    if (currentKeyboardSelection.CarouselItem != null)
-                        Activate(currentKeyboardSelection.CarouselItem);
+                    activateSelection();
                     return true;
             }
 
@@ -374,8 +372,7 @@ namespace osu.Game.Graphics.Carousel
             switch (e.Action)
             {
                 case GlobalAction.Select:
-                    if (currentKeyboardSelection.CarouselItem != null)
-                        Activate(currentKeyboardSelection.CarouselItem);
+                    activateSelection();
                     return true;
 
                 case GlobalAction.SelectNext:
@@ -400,6 +397,12 @@ namespace osu.Game.Graphics.Carousel
 
         public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
+        }
+
+        private void activateSelection()
+        {
+            if (currentKeyboardSelection.CarouselItem != null)
+                Activate(currentKeyboardSelection.CarouselItem);
         }
 
         private void traverseKeyboardSelection(int direction)

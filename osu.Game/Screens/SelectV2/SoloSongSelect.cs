@@ -6,12 +6,10 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Screens;
-using osu.Game.Beatmaps;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Screens.Edit;
 using osu.Game.Screens.Play;
 using osu.Game.Utils;
 
@@ -19,20 +17,6 @@ namespace osu.Game.Screens.SelectV2
 {
     public partial class SoloSongSelect : SongSelect
     {
-        [Resolved]
-        private BeatmapManager beatmaps { get; set; } = null!;
-
-        /// <summary>
-        /// Opens beatmap editor with the given beatmap.
-        /// </summary>
-        public void Edit(BeatmapInfo beatmap)
-        {
-            // Forced refetch is important here to guarantee correct invalidation across all difficulties.
-            Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap, true);
-
-            this.Push(new EditorLoader());
-        }
-
         private PlayerLoader? playerLoader;
         private IReadOnlyList<Mod>? modsAtGameplayStart;
 
