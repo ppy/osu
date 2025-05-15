@@ -18,6 +18,7 @@ using osu.Game.Database;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Toolbar;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Screens;
 using osu.Game.Screens.Footer;
 using osu.Game.Screens.Menu;
@@ -133,6 +134,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         {
             AddStep("load screen", () => Stack.Push(Screen = new SoloSongSelect()));
             AddUntilStep("wait for load", () => Stack.CurrentScreen == Screen && Screen.IsLoaded);
+            AddUntilStep("wait for filtering", () => !Carousel.IsFiltering);
         }
 
         protected void ImportBeatmapForRuleset(int rulesetId)
@@ -149,6 +151,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             // For cases where song select is null, the assertions are provided by the load checks.
             AddUntilStep("wait for imported to arrive in carousel", () => Screen.IsNull() || Carousel.Filters.OfType<BeatmapCarouselFilterGrouping>().Single().SetItems.Count > beatmapsCount);
         }
+
+        protected void ChangeMods(params Mod[] mods) => AddStep($"change mods to {string.Join(", ", mods.Select(m => m.Acronym))}", () => SelectedMods.Value = mods);
 
         protected void ChangeRuleset(int rulesetId)
         {
