@@ -352,13 +352,27 @@ namespace osu.Game.Graphics.Carousel
 
         #region Input handling
 
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            switch (e.Key)
+            {
+                // this is a special hard-coded case; we can't rely on OnPressed as GlobalActionContainer is
+                // matching with exact modifier consideration (so Ctrl+Enter would be ignored).
+                case Key.Enter:
+                case Key.KeypadEnter:
+                    activateSelection();
+                    return true;
+            }
+
+            return base.OnKeyDown(e);
+        }
+
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
             switch (e.Action)
             {
                 case GlobalAction.Select:
-                    if (currentKeyboardSelection.CarouselItem != null)
-                        Activate(currentKeyboardSelection.CarouselItem);
+                    activateSelection();
                     return true;
 
                 case GlobalAction.SelectNext:
@@ -383,6 +397,12 @@ namespace osu.Game.Graphics.Carousel
 
         public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
+        }
+
+        private void activateSelection()
+        {
+            if (currentKeyboardSelection.CarouselItem != null)
+                Activate(currentKeyboardSelection.CarouselItem);
         }
 
         private void traverseKeyboardSelection(int direction)
