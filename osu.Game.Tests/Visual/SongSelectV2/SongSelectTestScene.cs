@@ -66,7 +66,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                         },
                         screenFooter = new ScreenFooter
                         {
-                            OnBack = () => Stack.CurrentScreen.Exit(),
+                            BackButtonPressed = () => Stack.CurrentScreen.Exit(),
                         },
                         logo = new OsuLogo
                         {
