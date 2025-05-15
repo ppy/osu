@@ -12,6 +12,7 @@ using osu.Game.Overlays.Dialog;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Screens.Play;
 using osu.Game.Screens.Select;
 using osuTK.Input;
 using FooterButtonMods = osu.Game.Screens.SelectV2.FooterButtonMods;
