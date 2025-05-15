@@ -15,11 +15,13 @@ using osu.Framework.Input.Events;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
+using osu.Game.Collections;
 using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osu.Game.Overlays.Volume;
+using osu.Game.Screens.Edit;
 using osu.Game.Screens.Footer;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Select;
@@ -35,8 +37,8 @@ namespace osu.Game.Screens.SelectV2
     /// This screen is intended to house all components introduced in the new song select design to add transitions and examine the overall look.
     /// This will be gradually built upon and ultimately replace <see cref="Select.SongSelect"/> once everything is in place.
     /// </summary>
-    [Cached(typeof(SongSelect))]
-    public abstract partial class SongSelect : OsuScreen, IKeyBindingHandler<GlobalAction>
+    [Cached(typeof(ISongSelectBeatmapActions))]
+    public abstract partial class SongSelect : OsuScreen, IKeyBindingHandler<GlobalAction>, ISongSelectBeatmapActions
     {
         private const float logo_scale = 0.4f;
         private const double fade_duration = 300;
@@ -76,6 +78,12 @@ namespace osu.Game.Screens.SelectV2
 
         [Resolved]
         private IDialogOverlay? dialogOverlay { get; set; }
+
+        [Resolved]
+        private BeatmapManager beatmaps { get; set; } = null!;
+
+        [Resolved]
+        private ManageCollectionsDialog? collectionsDialog { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -343,26 +351,6 @@ namespace osu.Game.Screens.SelectV2
 
         #endregion
 
-        #region Beatmap management
-
-        /// <summary>
-        /// Requests the user for confirmation to delete the given beatmap set.
-        /// </summary>
-        public void DeleteBeatmap(BeatmapSetInfo beatmapSet)
-        {
-            dialogOverlay?.Push(new BeatmapDeleteDialog(beatmapSet));
-        }
-
-        /// <summary>
-        /// Requests the user for confirmation to clear all local scores in the given beatmap.
-        /// </summary>
-        public void ClearScores(BeatmapInfo beatmap)
-        {
-            dialogOverlay?.Push(new BeatmapClearScoresDialog(beatmap));
-        }
-
-        #endregion
-
         #region Hotkeys
 
         public virtual bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
@@ -395,7 +383,7 @@ namespace osu.Game.Screens.SelectV2
                     if (e.ShiftPressed)
                     {
                         if (!Beatmap.IsDefault)
-                            DeleteBeatmap(Beatmap.Value.BeatmapSetInfo);
+                            Delete(Beatmap.Value.BeatmapSetInfo);
                         return true;
                     }
 
@@ -404,6 +392,31 @@ namespace osu.Game.Screens.SelectV2
 
             return base.OnKeyDown(e);
         }
+
+        #endregion
+
+        #region Beatmap management
+
+        public virtual bool EditingAllowed => false;
+
+        public void ManageCollections() => collectionsDialog?.Show();
+
+        public void MarkPlayed(BeatmapInfo beatmap) => beatmaps.MarkPlayed(beatmap);
+
+        public void Hide(BeatmapInfo beatmap) => beatmaps.Hide(beatmap);
+
+        public void Edit(BeatmapInfo beatmap)
+        {
+            if (!EditingAllowed) return;
+
+            // Forced refetch is important here to guarantee correct invalidation across all difficulties.
+            Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap, true);
+            this.Push(new EditorLoader());
+        }
+
+        public void Delete(BeatmapSetInfo beatmapSet) => dialogOverlay?.Push(new BeatmapDeleteDialog(beatmapSet));
+
+        public void ClearScores(BeatmapInfo beatmap) => dialogOverlay?.Push(new BeatmapClearScoresDialog(beatmap));
 
         #endregion
     }
