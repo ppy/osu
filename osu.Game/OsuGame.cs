@@ -1105,7 +1105,7 @@ namespace osu.Game
                                 {
                                     Anchor = Anchor.BottomLeft,
                                     Origin = Anchor.BottomLeft,
-                                    Action = () => ScreenFooter.OnBack?.Invoke(),
+                                    Action = handleBackButton,
                                 },
                                 logoContainer = new Container { RelativeSizeAxes = Axes.Both },
                                 footerBasedOverlayContent = new Container
@@ -1120,14 +1120,7 @@ namespace osu.Game
                                     Child = ScreenFooter = new ScreenFooter(backReceptor)
                                     {
                                         RequestLogoInFront = inFront => ScreenContainer.ChangeChildDepth(logoContainer, inFront ? float.MinValue : 0),
-                                        OnBack = () =>
-                                        {
-                                            if (!(ScreenStack.CurrentScreen is IOsuScreen currentScreen))
-                                                return;
-
-                                            if (!((Drawable)currentScreen).IsLoaded || (currentScreen.AllowUserExit && !currentScreen.OnBackButton()))
-                                                ScreenStack.Exit();
-                                        }
+                                        BackButtonPressed = handleBackButton
                                     },
                                 },
                             }
@@ -1306,6 +1299,13 @@ namespace osu.Game
 
             // Importantly, this should be run after binding PostNotification to the import handlers so they can present the import after game startup.
             handleStartupImport();
+        }
+
+        private void handleBackButton()
+        {
+            if (!(ScreenStack.CurrentScreen is IOsuScreen currentScreen)) return;
+
+            if (!((Drawable)currentScreen).IsLoaded || (currentScreen.AllowUserExit && !currentScreen.OnBackButton())) ScreenStack.Exit();
         }
 
         private void handleStartupImport()
