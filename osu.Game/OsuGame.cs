@@ -188,7 +188,7 @@ namespace osu.Game
         /// <summary>
         /// Whether the back button is currently displayed.
         /// </summary>
-        private readonly IBindable<bool> backButtonVisibility = new Bindable<bool>();
+        private readonly IBindable<bool> backButtonVisibility = new BindableBool();
 
         IBindable<LocalUserPlayingState> ILocalUserPlayInfo.PlayingState => UserPlayingState;
 
@@ -1718,7 +1718,6 @@ namespace osu.Game
             // Bind to new screen.
             if (newScreen != null)
             {
-                backButtonVisibility.BindTo(newScreen.BackButtonVisibility);
                 OverlayActivationMode.BindTo(newScreen.OverlayActivationMode);
                 configUserActivity.BindTo(newScreen.Activity);
 
@@ -1732,12 +1731,17 @@ namespace osu.Game
 
                 if (newScreen.ShowFooter)
                 {
-                    BackButton.Hide();
+                    // the legacy back button should never display while the new footer is in use, as it
+                    // contains its own local back button.
+                    ((BindableBool)backButtonVisibility).Value = false;
+
                     ScreenFooter.SetButtons(newScreen.CreateFooterButtons());
                     ScreenFooter.Show();
                 }
                 else
                 {
+                    backButtonVisibility.BindTo(newScreen.BackButtonVisibility);
+
                     ScreenFooter.SetButtons(Array.Empty<ScreenFooterButton>());
                     ScreenFooter.Hide();
                 }
