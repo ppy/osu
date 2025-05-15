@@ -81,8 +81,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         [JsonProperty("legacy_score_base_multiplier")]
         public double LegacyScoreBaseMultiplier { get; set; }
 
-        [JsonProperty("maximum_legacy_score")]
-        public double MaximumLegacyScore { get; set; }
+        [JsonProperty("maximum_legacy_combo_score")]
+        public double MaximumLegacyComboScore { get; set; }
 
         /// <summary>
         /// The beatmap's drain rate. This doesn't scale with rate-adjusting mods.
@@ -126,7 +126,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             yield return (ATTRIB_ID_SPEED_TOP_WEIGHTED_SLIDER_FACTOR, SpeedTopWeightedSliderFactor);
             yield return (ATTRIB_ID_SLIDER_NESTED_SCORE_PER_OBJECT, SliderNestedScorePerObject);
             yield return (ATTRIB_ID_LEGACY_SCORE_BASE_MULTIPLIER, LegacyScoreBaseMultiplier);
-            yield return (ATTRIB_ID_MAXIMUM_LEGACY_SCORE, MaximumLegacyScore);
+            yield return (ATTRIB_ID_MAXIMUM_LEGACY_COMBO_SCORE, MaximumLegacyComboScore);
         }
 
         public override void FromDatabaseAttributes(IReadOnlyDictionary<int, double> values, IBeatmapOnlineInfo onlineInfo)
@@ -146,7 +146,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             SpeedTopWeightedSliderFactor = values[ATTRIB_ID_SPEED_TOP_WEIGHTED_SLIDER_FACTOR];
             SliderNestedScorePerObject = values[ATTRIB_ID_SLIDER_NESTED_SCORE_PER_OBJECT];
             LegacyScoreBaseMultiplier = values[ATTRIB_ID_LEGACY_SCORE_BASE_MULTIPLIER];
-            MaximumLegacyScore = values[ATTRIB_ID_MAXIMUM_LEGACY_SCORE];
+            MaximumLegacyComboScore = values[ATTRIB_ID_MAXIMUM_LEGACY_COMBO_SCORE];
             DrainRate = onlineInfo.DrainRate;
             HitCircleCount = onlineInfo.CircleCount;
             SliderCount = onlineInfo.SliderCount;

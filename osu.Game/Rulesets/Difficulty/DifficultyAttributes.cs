@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Difficulty
         protected const int ATTRIB_ID_SPEED_TOP_WEIGHTED_SLIDER_FACTOR = 35;
         protected const int ATTRIB_ID_SLIDER_NESTED_SCORE_PER_OBJECT = 37;
         protected const int ATTRIB_ID_LEGACY_SCORE_BASE_MULTIPLIER = 39;
-        protected const int ATTRIB_ID_MAXIMUM_LEGACY_SCORE = 41;
+        protected const int ATTRIB_ID_MAXIMUM_LEGACY_COMBO_SCORE = 41;
 
         /// <summary>
         /// The mods which were applied to the beatmap.

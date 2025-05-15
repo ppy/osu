@@ -355,7 +355,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 return 0;
 
             double scoreV1Multiplier = attributes.LegacyScoreBaseMultiplier * new OsuLegacyScoreSimulator().GetLegacyScoreMultiplier(score.Mods, new LegacyBeatmapConversionDifficultyInfo());
-            double relevantComboPerObject = calculateScoreRelevantComboPerObject(attributes, scoreV1Multiplier);
+            double relevantComboPerObject = calculateScoreRelevantComboPerObject(attributes);
 
             double maximumMissCount = calculateMaximumComboBasedMissCount(attributes);
 
@@ -416,19 +416,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             return comboScore + nonComboScore;
         }
-
-        private double calculateScoreRelevantComboPerObject(OsuDifficultyAttributes attributes, double scoreV1Multiplier)
+        private double calculateScoreRelevantComboPerObject(OsuDifficultyAttributes attributes)
         {
-            double nonComboScore = (300 + attributes.SliderNestedScorePerObject) * totalHits;
-
-            // We want to figure out the value of the combo score portion, so we remove the non-combo value from the maximum score.
-            double comboScore = attributes.MaximumLegacyScore - nonComboScore;
+            double comboScore = attributes.MaximumLegacyComboScore;
 
             // We then reverse apply the ScoreV1 multipliers to get the raw value.
-            comboScore /= 300.0 / 25.0 * scoreV1Multiplier;
-
-            if (Precision.AlmostEquals(scoreV1Multiplier, 0))
-                comboScore = 0;
+            comboScore /= 300.0 / 25.0 * attributes.LegacyScoreBaseMultiplier;
 
             double a = attributes.MaxCombo;
             double b = comboScore;
