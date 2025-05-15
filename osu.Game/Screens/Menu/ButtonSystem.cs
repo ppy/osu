@@ -286,7 +286,6 @@ namespace osu.Game.Screens.Menu
 
         private void NavButtonManager(bool foward)
         {
-
             if(selectedButton != -1) currButtonsLevel[selectedButton].NavUnhover();
             Logger.Log($"selectedButton: {selectedButton}");
 
