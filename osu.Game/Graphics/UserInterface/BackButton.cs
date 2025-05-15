@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -14,11 +12,11 @@ namespace osu.Game.Graphics.UserInterface
     // todo: remove this once all screens migrate to display the new game footer and back button.
     public partial class BackButton : VisibilityContainer
     {
-        public Action Action;
+        public Action? Action { get; init; }
 
         private readonly TwoLayerButton button;
 
-        public BackButton(ScreenFooter.BackReceptor receptor = null)
+        public BackButton(ScreenFooter.BackReceptor? receptor = null)
         {
             Size = TwoLayerButton.SIZE_EXTENDED;
 
