@@ -40,9 +40,6 @@ namespace osu.Game.Screens.Footer
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
 
-        [Resolved]
-        private OsuGame? game { get; set; }
-
         public ScreenBackButton BackButton { get; private set; } = null!;
 
         public Action<bool>? RequestLogoInFront { get; set; }
@@ -144,8 +141,7 @@ namespace osu.Game.Screens.Footer
         {
             logoTrackingContainer.StopTracking();
 
-            if (game != null)
-                changeLogoDepthDelegate = Scheduler.AddDelayed(() => RequestLogoInFront?.Invoke(false), transition_duration);
+            changeLogoDepthDelegate = Scheduler.AddDelayed(() => RequestLogoInFront?.Invoke(false), transition_duration);
         }
 
         protected override void PopIn()
