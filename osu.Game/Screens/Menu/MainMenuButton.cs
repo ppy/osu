@@ -22,6 +22,8 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps.ControlPoints;
+using NUnit.Framework.Internal;
+using osu.Game.Screens.Edit;
 
 namespace osu.Game.Screens.Menu
 {
@@ -213,6 +215,33 @@ namespace osu.Game.Screens.Menu
             );
 
             rightward = !rightward;
+        }
+
+        public string NavHover()
+        {
+            if (State != ButtonState.Expanded) return this.sampleName;
+
+            double duration = TimeUntilNextBeat;
+
+            icon.ClearTransforms();
+            icon.RotateTo(rightward ? -BOUNCE_ROTATION : BOUNCE_ROTATION, duration, Easing.InOutSine);
+            icon.ScaleTo(new Vector2(HOVER_SCALE, HOVER_SCALE * BOUNCE_COMPRESSION), duration, Easing.Out);
+
+            //sampleHover?.Play();
+            background.ResizeTo(Vector2.Multiply(initialSize, new Vector2(1.5f, 1)), 500, Easing.OutElastic);
+
+            return this.sampleName;
+        }
+
+        public void NavUnhover()
+        {
+            icon.ClearTransforms();
+            icon.RotateTo(0, 500, Easing.Out);
+            icon.MoveTo(Vector2.Zero, 500, Easing.Out);
+            icon.ScaleTo(Vector2.One, 200, Easing.Out);
+
+            if (State == ButtonState.Expanded)
+                background.ResizeTo(initialSize, 500, Easing.OutElastic);
         }
 
         protected override bool OnHover(HoverEvent e)

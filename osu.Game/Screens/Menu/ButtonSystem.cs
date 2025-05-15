@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using NUnit.Framework;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -20,12 +21,14 @@ using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.UserInterface.PageSelector;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
+using osu.Game.Screens.Edit;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
@@ -80,10 +83,15 @@ namespace osu.Game.Screens.Menu
         private readonly ButtonArea buttonArea;
 
         private readonly MainMenuButton backButton;
+        private readonly MainMenuButton settingsButton;
 
         private readonly List<MainMenuButton> buttonsTopLevel = new List<MainMenuButton>();
         private readonly List<MainMenuButton> buttonsPlay = new List<MainMenuButton>();
         private readonly List<MainMenuButton> buttonsEdit = new List<MainMenuButton>();
+
+        //for menu navegation with keyboard
+        private List<MainMenuButton> currButtonsLevel = new List<MainMenuButton>();
+        private int selectedButton = -1;
 
         private Sample? sampleBackToLogo;
         private Sample? sampleLogoSwoosh;
@@ -104,7 +112,7 @@ namespace osu.Game.Screens.Menu
 
             buttonArea.AddRange(new Drawable[]
             {
-                new MainMenuButton(ButtonSystemStrings.Settings, string.Empty, OsuIcon.Settings, new Color4(85, 85, 85, 255), (_, _) => OnSettings?.Invoke(), Key.O, Key.S)
+                settingsButton = new MainMenuButton(ButtonSystemStrings.Settings, string.Empty, OsuIcon.Settings, new Color4(85, 85, 85, 255), (_, _) => OnSettings?.Invoke(), Key.O, Key.S)
                 {
                     Padding = new MarginPadding { Right = WEDGE_WIDTH },
                 },
@@ -276,6 +284,23 @@ namespace osu.Game.Screens.Menu
             return base.OnMidiDown(e);
         }
 
+        private void NavButtonManager(bool foward)
+        {
+
+            if(selectedButton != -1) currButtonsLevel[selectedButton].NavUnhover();
+            Logger.Log($"selectedButton: {selectedButton}");
+
+            selectedButton += foward ? 1 : -1;
+
+            if (selectedButton == currButtonsLevel.Count) selectedButton = 0;
+            if (selectedButton == -1 || selectedButton == -2) selectedButton = currButtonsLevel.Count - 1;
+
+            System.Diagnostics.Debug.Assert(currButtonsLevel.Count > 0);
+            currButtonsLevel[selectedButton].NavHover();
+
+            return;
+        }
+
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
             if (e.Repeat)
@@ -287,7 +312,25 @@ namespace osu.Game.Screens.Menu
                     return goBack();
 
                 case GlobalAction.Select:
-                    logo?.TriggerClick();
+
+                    if (selectedButton == -1)
+                    {
+                        logo?.TriggerClick();
+                        return false;
+                    }
+
+                    Logger.Log("button selected");
+                    if (currButtonsLevel.Count > 0) currButtonsLevel[selectedButton].TriggerClick();
+                    return true;
+
+                case GlobalAction.SelectNextGroup:
+                    NavButtonManager(true);
+                    Logger.Log($"next pressed in menu");
+                    return true;
+
+                case GlobalAction.SelectPreviousGroup:
+                    NavButtonManager(false);
+                    Logger.Log("prev pressed in menu");
                     return true;
 
                 default:
@@ -321,6 +364,8 @@ namespace osu.Game.Screens.Menu
                 default:
                     return false;
             }
+
+            return false; // Ensure all code paths return a value.
         }
 
         public void StopSamplePlayback()
@@ -453,6 +498,26 @@ namespace osu.Game.Screens.Menu
                 case ButtonSystemState.EnteringMode:
                     logoTrackingContainer.StartTracking(logo, lastState == ButtonSystemState.Initial ? MainMenu.FADE_OUT_DURATION : 0, Easing.InSine);
                     break;
+            }
+
+            selectedButton = -1;
+            switch (State)
+            {
+                case ButtonSystemState.TopLevel:
+                    currButtonsLevel = buttonsTopLevel;
+                    if (currButtonsLevel.Count == 4) currButtonsLevel.Add(settingsButton);
+                    break;
+                case ButtonSystemState.Play:
+                    currButtonsLevel = buttonsPlay;
+                    currButtonsLevel.RemoveAt(currButtonsLevel.Count - 1);
+                    if (currButtonsLevel.Count == 3) currButtonsLevel.Add(backButton);
+                    break;
+                case ButtonSystemState.Edit:
+                    currButtonsLevel = buttonsEdit;
+                    if(currButtonsLevel.Count == 2) currButtonsLevel.Add(backButton);
+                    break;
+                default:
+                    return;
             }
         }
     }
