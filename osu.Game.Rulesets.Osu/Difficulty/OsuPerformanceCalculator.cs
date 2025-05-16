@@ -12,7 +12,6 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Osu.Difficulty.Skills;
-using osu.Game.Rulesets.Osu.Difficulty.Utils;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
@@ -101,7 +100,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (usingClassicSliderAccuracy && score.LegacyTotalScore != null)
             {
-                scoreBasedMissCount = calculateScoreBasedEstimatedMissCount(score, osuAttributes);
+                var legacyScoreMissCalculator = new OsuLegacyScoreMissCalculator(score, osuAttributes);
+                scoreBasedMissCount = legacyScoreMissCalculator.Calculate();
+
                 effectiveMissCount = scoreBasedMissCount.Value;
             }
             else
@@ -345,57 +346,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 // Combine regular misses with tick misses since tick misses break combo as well
                 missCount = Math.Min(missCount, countSliderTickMiss + countMiss);
             }
-
-            return missCount;
-        }
-
-        private double calculateScoreBasedEstimatedMissCount(ScoreInfo score, OsuDifficultyAttributes attributes)
-        {
-            if (attributes.MaxCombo == 0 || score.LegacyTotalScore == null)
-                return 0;
-
-            double scoreV1Multiplier = attributes.LegacyScoreBaseMultiplier * LegacyScoreUtils.GetLegacyScoreMultiplier(score.Mods);
-            double relevantComboPerObject = LegacyScoreUtils.CalculateRelevantScoreComboPerObject(attributes);
-
-            double maximumMissCount = calculateMaximumComboBasedMissCount(attributes);
-
-            double scoreObtainedDuringMaxCombo = LegacyScoreUtils.CalculateScoreAtCombo(score, attributes, score.MaxCombo, relevantComboPerObject, scoreV1Multiplier);
-            double remainingScore = score.LegacyTotalScore.Value - scoreObtainedDuringMaxCombo;
-
-            if (remainingScore <= 0)
-                return maximumMissCount;
-
-            double remainingCombo = attributes.MaxCombo - score.MaxCombo;
-            double expectedRemainingScore = LegacyScoreUtils.CalculateScoreAtCombo(score, attributes, remainingCombo, relevantComboPerObject, scoreV1Multiplier);
-
-            double scoreBasedMissCount = expectedRemainingScore / remainingScore;
-
-            // If there's less then one miss detected - let combo-based miss count decide if this is FC or not
-            scoreBasedMissCount = Math.Max(scoreBasedMissCount, 1);
-
-            // Cap result by very harsh version of combo-based miss count
-            return Math.Min(scoreBasedMissCount, maximumMissCount);
-        }
-
-        /// <summary>
-        /// This function is a harsher version of current combo-based miss count, used to provide reasonable value for cases where score-based miss count can't do this.
-        /// </summary>
-        private double calculateMaximumComboBasedMissCount(OsuDifficultyAttributes attributes)
-        {
-            if (attributes.SliderCount <= 0)
-                return countMiss;
-
-            double missCount = 0;
-
-            // Consider that full combo is maximum combo minus dropped slider tails since they don't contribute to combo but also don't break it
-            // In classic scores we can't know the amount of dropped sliders so we estimate to 10% of all sliders on the map
-            double fullComboThreshold = attributes.MaxCombo - 0.1 * attributes.SliderCount;
-
-            if (scoreMaxCombo < fullComboThreshold)
-                missCount = Math.Pow(fullComboThreshold / Math.Max(1.0, scoreMaxCombo), 2.5);
-
-            // In classic scores there can't be more misses than a sum of all non-perfect judgements
-            missCount = Math.Min(missCount, totalImperfectHits);
 
             return missCount;
         }
