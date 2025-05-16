@@ -29,12 +29,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             foreach (var loopObj in retrievePastVisibleObjects(currObj, preempt))
             {
-                double loopDifficulty = currObj.OpacityAt(loopObj.BaseObject.StartTime, false);
+                double loopDifficulty = currObj.OpacityAt(loopObj.StartTime, false);
 
                 // Small distances means objects may be cheesed, so it doesn't matter whether they are arranged confusingly.
                 loopDifficulty *= DifficultyCalculationUtils.Logistic(-(loopObj.LazyJumpDistance - 75) / 15);
 
-                double timeBetweenCurrAndLoopObj = (currObj.BaseObject.StartTime - loopObj.BaseObject.StartTime) / clockRate;
+                double timeBetweenCurrAndLoopObj = currObj.StartTime - loopObj.StartTime;
                 double timeNerfFactor = getTimeNerfFactor(timeBetweenCurrAndLoopObj);
 
                 loopDifficulty *= timeNerfFactor;
@@ -60,8 +60,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                 hiddenDifficulty *= constantAngleNerfFactor * angularVelocityFactor;
 
-                // Buff perfect stacks
-                hiddenDifficulty += currObj.LazyJumpDistance == 0 ? 2 : 0;
+                // Buff perfect stacks only if current note is completely invisible at the time you click the previous note
+                hiddenDifficulty += currObj.LazyJumpDistance == 0 &&
+                                    currObj.OpacityAt(currObj.Previous(0).StartTime + preempt, hidden) == 0 &&
+                                    currObj.Previous(0).StartTime + preempt > currObj.StartTime
+                    ? timeSpentInvisibleFactor / 200.0
+                    : 0;
             }
 
             double preemptDifficulty = 0.0;
@@ -90,7 +94,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                 if (hitObject.IsNull() ||
                     current.StartTime - hitObject.StartTime > reading_window_size ||
-                    hitObject.StartTime < current.StartTime - preempt)
+                    hitObject.StartTime + preempt < current.StartTime) // Current object not visible at the time object needs to be clicked
                     break;
 
                 yield return hitObject;
@@ -108,8 +112,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 OsuDifficultyHitObject hitObject = (OsuDifficultyHitObject)current.Next(i);
 
                 if (hitObject.IsNull() ||
-                    (hitObject.StartTime - current.StartTime) > reading_window_size ||
-                    current.StartTime < hitObject.StartTime - preempt)
+                    hitObject.StartTime - current.StartTime > reading_window_size ||
+                    current.StartTime + preempt < hitObject.StartTime) // Object not visible at the time current object needs to be clicked
                     break;
 
                 objects.Add(hitObject);
