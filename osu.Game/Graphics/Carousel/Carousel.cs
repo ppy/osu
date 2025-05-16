@@ -773,7 +773,7 @@ namespace osu.Game.Graphics.Carousel
             var carouselPanel = (ICarouselPanel)panel;
 
             // expired panels should have a depth behind all other panels to make the transition not look weird.
-            Scroll.Panels.ChangeChildDepth(panel, panel.Depth + 1);
+            Scroll.Panels.ChangeChildDepth(panel, panel.Depth + 1024);
 
             panel.FadeOut(150, Easing.OutQuint);
             panel.MoveToX(panel.X + 100, 200, Easing.Out);
