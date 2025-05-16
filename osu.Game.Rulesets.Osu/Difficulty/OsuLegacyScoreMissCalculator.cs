@@ -89,9 +89,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // We then reverse apply the ScoreV1 multipliers to get the raw value.
             comboScore /= 300.0 / 25.0 * attributes.LegacyScoreBaseMultiplier;
 
-            double a = attributes.MaxCombo;
-            double b = comboScore;
-
             // Reverse the arithmetic progression to work out the amount of combo per object based on the score.
             double result = (attributes.MaxCombo - 2) * attributes.MaxCombo;
             result /= Math.Max(attributes.MaxCombo + 2 * (comboScore - 1), 1);
