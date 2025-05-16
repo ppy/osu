@@ -710,7 +710,7 @@ namespace osu.Game.Graphics.Carousel
                 }
 
                 // If the new display range doesn't contain the panel, it's no longer required for display.
-                expirePanelImmediately(panel);
+                expirePanel(panel);
             }
 
             // Add any new items which need to be displayed and haven't yet.
@@ -738,12 +738,17 @@ namespace osu.Game.Graphics.Carousel
                 Scroll.SetLayoutHeight(0);
         }
 
-        private static void expirePanelImmediately(Drawable panel)
+        private void expirePanel(Drawable panel)
         {
-            panel.FinishTransforms();
-            panel.Expire();
-
             var carouselPanel = (ICarouselPanel)panel;
+
+            // expired panels should have a depth behind all other panels to make the transition not look weird.
+            Scroll.Panels.ChangeChildDepth(panel, panel.Depth + 1);
+
+            panel.FadeOut(150, Easing.OutQuint);
+            panel.MoveToX(panel.X + 100, 200, Easing.Out);
+
+            panel.Expire();
 
             carouselPanel.Item = null;
             carouselPanel.Selected.Value = false;
