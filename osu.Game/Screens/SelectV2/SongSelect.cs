@@ -455,6 +455,15 @@ namespace osu.Game.Screens.SelectV2
             this.Push(new EditorLoader());
         }
 
+        /// <summary>
+        /// Finalises selection on the given <see cref="BeatmapInfo"/>.
+        /// </summary>
+        public void SelectAndStart(BeatmapInfo beatmap)
+        {
+            Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap);
+            OnStart();
+        }
+
         public void Delete(BeatmapSetInfo beatmapSet) => dialogOverlay?.Push(new BeatmapDeleteDialog(beatmapSet));
 
         public void ClearScores(BeatmapInfo beatmap) => dialogOverlay?.Push(new BeatmapClearScoresDialog(beatmap));
