@@ -44,10 +44,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Utils
         /// </summary>
         public static double CalculateScoreAtCombo(ScoreInfo score, OsuDifficultyAttributes attributes, double combo, double relevantComboPerObject, double scoreV1Multiplier)
         {
-            int countMiss = score.Statistics.GetValueOrDefault(HitResult.Miss);
             int countGreat = score.Statistics.GetValueOrDefault(HitResult.Great);
             int countOk = score.Statistics.GetValueOrDefault(HitResult.Ok);
             int countMeh = score.Statistics.GetValueOrDefault(HitResult.Meh);
+            int countMiss = score.Statistics.GetValueOrDefault(HitResult.Miss);
 
             int totalHits = countGreat + countOk + countMeh + countMiss;
 
