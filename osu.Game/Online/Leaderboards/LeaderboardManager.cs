@@ -180,7 +180,7 @@ namespace osu.Game.Online.Leaderboards
                 }
             }
 
-            newScores = newScores.Detach().OrderByTotalScore();
+            newScores = newScores.Detach().OrderByCriteria(CurrentCriteria.Sorting);
 
             var newScoresArray = newScores.ToArray();
             scores.Value = LeaderboardScores.Success(newScoresArray, newScoresArray.Length, null);
@@ -191,7 +191,8 @@ namespace osu.Game.Online.Leaderboards
         BeatmapInfo? Beatmap,
         RulesetInfo? Ruleset,
         BeatmapLeaderboardScope Scope,
-        Mod[]? ExactMods
+        Mod[]? ExactMods,
+        RankingsSort Sorting = RankingsSort.Score
     );
 
     public record LeaderboardScores

@@ -41,6 +41,8 @@ namespace osu.Game.Screens.SelectV2
 
         public IBindable<BeatmapLeaderboardScope> Scope { get; } = new Bindable<BeatmapLeaderboardScope>();
 
+        public IBindable<RankingsSort> Sorting { get; } = new Bindable<RankingsSort>();
+
         public IBindable<bool> FilterBySelectedMods { get; } = new BindableBool();
 
         [Resolved]
@@ -171,6 +173,7 @@ namespace osu.Game.Screens.SelectV2
             base.LoadComplete();
 
             Scope.BindValueChanged(_ => refetchScores());
+            Sorting.BindValueChanged(_ => refetchScores());
             FilterBySelectedMods.BindValueChanged(_ => refetchScores());
             beatmap.BindValueChanged(_ => refetchScores());
             ruleset.BindValueChanged(_ => refetchScores());
@@ -220,8 +223,7 @@ namespace osu.Game.Screens.SelectV2
                 // For now, we forcefully refresh to keep things simple.
                 // In the future, removing this requirement may be deemed useful, but will need ample testing of edge case scenarios
                 // (like returning from gameplay after setting a new score, returning to song select after main menu).
-                leaderboardManager.FetchWithCriteria(new LeaderboardCriteria(fetchBeatmapInfo, fetchRuleset, Scope.Value, FilterBySelectedMods.Value ? mods.Value.ToArray() : null),
-                    forceRefresh: true);
+                leaderboardManager.FetchWithCriteria(new LeaderboardCriteria(fetchBeatmapInfo, fetchRuleset, Scope.Value, FilterBySelectedMods.Value ? mods.Value.ToArray() : null, Sorting.Value), forceRefresh: true);
 
                 if (!initialFetchComplete)
                 {
