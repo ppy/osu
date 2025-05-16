@@ -8,12 +8,19 @@ using NUnit.Framework;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
+using osu.Game.Online.API;
+using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Scoring;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Select;
+using osu.Game.Screens.Select.Leaderboards;
+using osu.Game.Screens.SelectV2;
 using osuTK.Input;
 using FooterButtonMods = osu.Game.Screens.SelectV2.FooterButtonMods;
 using FooterButtonOptions = osu.Game.Screens.SelectV2.FooterButtonOptions;
@@ -22,6 +29,55 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 {
     public partial class TestSceneSongSelect : SongSelectTestScene
     {
+        [Test]
+        public void TestResultsScreenWhenClickingLeaderboardScore()
+        {
+            LoadSongSelect();
+            ImportBeatmapForRuleset(0);
+
+            AddAssert("beatmap imported", () => Beatmaps.GetAllUsableBeatmapSets().Any(), () => Is.True);
+
+            // song select should automatically select the beatmap for us but this is not implemented yet.
+            // todo: remove when that's the case.
+            AddAssert("no beatmap selected", () => Beatmap.IsDefault);
+            AddStep("select beatmap", () => Beatmap.Value = Beatmaps.GetWorkingBeatmap(Beatmaps.GetAllUsableBeatmapSets().Single().Beatmaps.First()));
+            AddAssert("beatmap selected", () => !Beatmap.IsDefault);
+
+            AddStep($"import score", () =>
+            {
+                var beatmapInfo = Beatmaps.GetAllUsableBeatmapSets().Single().Beatmaps.First();
+                ScoreManager.Import(new ScoreInfo
+                {
+                    Hash = Guid.NewGuid().ToString(),
+                    BeatmapHash = beatmapInfo.Hash,
+                    BeatmapInfo = beatmapInfo,
+                    Ruleset = new OsuRuleset().RulesetInfo,
+                    User = new GuestUser(),
+                });
+            });
+
+            AddStep("select ranking tab", () =>
+            {
+                InputManager.MoveMouseTo(SongSelect.ChildrenOfType<BeatmapDetailsArea.WedgeSelector<BeatmapDetailsArea.Header.Selection>>().Last());
+                InputManager.Click(MouseButton.Left);
+            });
+
+            // probably should be done via dropdown menu instead of forcing this way?
+            AddStep("set local scope", () =>
+            {
+                var current = LeaderboardManager.CurrentCriteria!;
+                LeaderboardManager.FetchWithCriteria(new LeaderboardCriteria(current.Beatmap, current.Ruleset, BeatmapLeaderboardScope.Local, null));
+            });
+
+            AddUntilStep("wait for score panel", () => SongSelect.ChildrenOfType<BeatmapLeaderboardScore>().Any());
+            AddStep("click score panel", () =>
+            {
+                InputManager.MoveMouseTo(SongSelect.ChildrenOfType<BeatmapLeaderboardScore>().Single());
+                InputManager.Click(MouseButton.Left);
+            });
+            AddUntilStep("wait for results screen", () => Stack.CurrentScreen is ResultsScreen);
+        }
+
         #region Hotkeys
 
         [Test]
