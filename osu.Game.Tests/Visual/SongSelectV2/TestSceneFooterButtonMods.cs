@@ -20,14 +20,14 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 {
     public partial class TestSceneFooterButtonMods : OsuTestScene
     {
-        private readonly TestScreenFooterButtonMods footerButtonMods;
+        private readonly FooterButtonMods footerButtonMods;
 
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
 
         public TestSceneFooterButtonMods()
         {
-            Add(footerButtonMods = new TestScreenFooterButtonMods(new TestModSelectOverlay())
+            Add(footerButtonMods = new FooterButtonMods(new TestModSelectOverlay())
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.CentreLeft,
@@ -63,19 +63,19 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         {
             var hiddenMod = new Mod[] { new OsuModHidden() };
             AddStep(@"Add Hidden", () => changeMods(hiddenMod));
-            AddAssert(@"Check Hidden multiplier", () => assertModsMultiplier(hiddenMod));
+            assertModsMultiplier(hiddenMod);
 
             var hardRockMod = new Mod[] { new OsuModHardRock() };
             AddStep(@"Add HardRock", () => changeMods(hardRockMod));
-            AddAssert(@"Check HardRock multiplier", () => assertModsMultiplier(hardRockMod));
+            assertModsMultiplier(hardRockMod);
 
             var doubleTimeMod = new Mod[] { new OsuModDoubleTime() };
             AddStep(@"Add DoubleTime", () => changeMods(doubleTimeMod));
-            AddAssert(@"Check DoubleTime multiplier", () => assertModsMultiplier(doubleTimeMod));
+            assertModsMultiplier(doubleTimeMod);
 
             var multipleIncrementMods = new Mod[] { new OsuModDoubleTime(), new OsuModHidden(), new OsuModHardRock() };
             AddStep(@"Add multiple Mods", () => changeMods(multipleIncrementMods));
-            AddAssert(@"Check multiple mod multiplier", () => assertModsMultiplier(multipleIncrementMods));
+            assertModsMultiplier(multipleIncrementMods);
         }
 
         [Test]
@@ -83,15 +83,15 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         {
             var easyMod = new Mod[] { new OsuModEasy() };
             AddStep(@"Add Easy", () => changeMods(easyMod));
-            AddAssert(@"Check Easy multiplier", () => assertModsMultiplier(easyMod));
+            assertModsMultiplier(easyMod);
 
             var noFailMod = new Mod[] { new OsuModNoFail() };
             AddStep(@"Add NoFail", () => changeMods(noFailMod));
-            AddAssert(@"Check NoFail multiplier", () => assertModsMultiplier(noFailMod));
+            assertModsMultiplier(noFailMod);
 
             var multipleDecrementMods = new Mod[] { new OsuModEasy(), new OsuModNoFail() };
             AddStep(@"Add Multiple Mods", () => changeMods(multipleDecrementMods));
-            AddAssert(@"Check multiple mod multiplier", () => assertModsMultiplier(multipleDecrementMods));
+            assertModsMultiplier(multipleDecrementMods);
         }
 
         [Test]
@@ -105,12 +105,12 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
         private void changeMods(IReadOnlyList<Mod> mods) => footerButtonMods.Current.Value = mods;
 
-        private bool assertModsMultiplier(IEnumerable<Mod> mods)
+        private void assertModsMultiplier(IEnumerable<Mod> mods)
         {
             double multiplier = mods.Aggregate(1.0, (current, mod) => current * mod.ScoreMultiplier);
             string expectedValue = ModUtils.FormatScoreMultiplier(multiplier).ToString();
 
-            return expectedValue == footerButtonMods.MultiplierText.Current.Value;
+            AddAssert($"Displayed multiplier is {expectedValue}", () => footerButtonMods.ChildrenOfType<OsuSpriteText>().First(t => t.Text.ToString().Contains('x')).Text.ToString(), () => Is.EqualTo(expectedValue));
         }
 
         private partial class TestModSelectOverlay : UserModSelectOverlay
@@ -119,16 +119,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 : base(OverlayColourScheme.Aquamarine)
             {
                 ShowPresets = true;
-            }
-        }
-
-        private partial class TestScreenFooterButtonMods : FooterButtonMods
-        {
-            public new OsuSpriteText MultiplierText => base.MultiplierText;
-
-            public TestScreenFooterButtonMods(ModSelectOverlay overlay)
-                : base(overlay)
-            {
             }
         }
     }

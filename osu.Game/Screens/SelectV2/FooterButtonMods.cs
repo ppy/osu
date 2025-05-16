@@ -50,7 +50,7 @@ namespace osu.Game.Screens.SelectV2
         private ModDisplay modDisplay = null!;
         private OsuSpriteText modCountText = null!;
 
-        protected OsuSpriteText MultiplierText { get; private set; } = null!;
+        private OsuSpriteText multiplierText { get; set; } = null!;
 
         [Resolved]
         private OsuColour colours { get; set; } = null!;
@@ -104,7 +104,7 @@ namespace osu.Game.Screens.SelectV2
                             RelativeSizeAxes = Axes.Both,
                             Width = 1f - mod_display_portion,
                             Masking = true,
-                            Child = MultiplierText = new OsuSpriteText
+                            Child = multiplierText = new OsuSpriteText
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
@@ -221,14 +221,14 @@ namespace osu.Game.Screens.SelectV2
             }
 
             double multiplier = Current.Value?.Aggregate(1.0, (current, mod) => current * mod.ScoreMultiplier) ?? 1;
-            MultiplierText.Text = ModUtils.FormatScoreMultiplier(multiplier);
+            multiplierText.Text = ModUtils.FormatScoreMultiplier(multiplier);
 
             if (multiplier > 1)
-                MultiplierText.FadeColour(colours.Red1, duration, easing);
+                multiplierText.FadeColour(colours.Red1, duration, easing);
             else if (multiplier < 1)
-                MultiplierText.FadeColour(colours.Lime1, duration, easing);
+                multiplierText.FadeColour(colours.Lime1, duration, easing);
             else
-                MultiplierText.FadeColour(Color4.White, duration, easing);
+                multiplierText.FadeColour(Color4.White, duration, easing);
         }
 
         private partial class ModCountText : OsuSpriteText, IHasCustomTooltip<IReadOnlyList<Mod>>
