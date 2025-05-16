@@ -70,6 +70,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Utils
 
         /// <summary>
         /// Calculates the relevant combo per object for legacy score.
+        /// This assumes a uniform distribution for circles and sliders.
+        /// This handles cases where objects (such as buzz sliders) do not fit a normal arithmetic progression model.
         /// </summary>
         public static double CalculateRelevantScoreComboPerObject(OsuDifficultyAttributes attributes)
         {
