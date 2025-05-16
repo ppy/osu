@@ -50,5 +50,10 @@ namespace osu.Game.Screens.SelectV2
         /// Present the provided score at the results screen.
         /// </summary>
         void PresentScore(ScoreInfo score);
+
+        /// <summary>
+        /// Selects the provided beatmap and progresses song select to the next screen.
+        /// </summary>
+        void SelectAndStart(BeatmapInfo beatmap);
     }
 }
