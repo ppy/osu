@@ -93,10 +93,8 @@ namespace osu.Game.Rulesets.UI
                 else
                     target.Replay.Frames.Add(frame);
 
-                // the above de-duplication is not done for spectator client because it's more complicated to do
-                // (not possible to "un-send" a sent frame).
-                // a similar solution to the above could be applied at `FrameDataBundle` buffering level in `SpectatorClient` if deemed necessary,
-                // but it'd still not be completely matching (consider situation where buffer happens to be flushed between frames with the same timestamp).
+                // the above de-duplication is done at `FrameDataBundle` level in `SpectatorClient`.
+                // it's not 100% matching because of the possibility of duplicated frames crossing a bundle boundary, but it's close and simple enough.
                 spectatorClient?.HandleFrame(frame);
             }
         }
