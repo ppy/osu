@@ -14,6 +14,7 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
@@ -27,11 +28,14 @@ using osu.Game.Screens.Play.HUD;
 using osu.Game.Utils;
 using osuTK;
 using osuTK.Graphics;
+using osuTK.Input;
 
 namespace osu.Game.Screens.SelectV2
 {
     public partial class FooterButtonMods : ScreenFooterButton, IHasCurrentValue<IReadOnlyList<Mod>>
     {
+        public Action? RequestDeselectAllMods { get; init; }
+
         private const float bar_height = 30f;
         private const float mod_display_portion = 0.65f;
 
@@ -170,6 +174,18 @@ namespace osu.Game.Screens.SelectV2
             }, true);
 
             FinishTransforms(true);
+        }
+
+        protected override bool OnMouseDown(MouseDownEvent e)
+        {
+            // should probably be OnClick but right mouse button clicks isn't setup well.
+            if (e.Button == MouseButton.Right)
+            {
+                RequestDeselectAllMods?.Invoke();
+                return true;
+            }
+
+            return base.OnMouseDown(e);
         }
 
         private const double duration = 240;
