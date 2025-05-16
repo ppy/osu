@@ -2,12 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Legacy;
-using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Utils
@@ -35,65 +32,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Utils
             double totalScore = amountOfBigTicks * big_tick_score + amountOfSmallTicks * small_tick_score;
 
             return totalScore / objectCount;
-        }
-
-        /// <summary>
-        /// Returns the legacy score multiplier for the given mods.
-        /// </summary>
-        /// <remarks>
-        /// Logic copied from <see cref="OsuLegacyScoreSimulator.GetLegacyScoreMultiplier"/>.
-        /// </remarks>
-        public static double GetLegacyScoreMultiplier(IReadOnlyList<Mod> mods)
-        {
-            bool scoreV2 = mods.Any(m => m is ModScoreV2);
-
-            double multiplier = 1.0;
-
-            foreach (var mod in mods)
-            {
-                switch (mod)
-                {
-                    case OsuModNoFail:
-                        multiplier *= scoreV2 ? 1.0 : 0.5;
-                        break;
-
-                    case OsuModEasy:
-                        multiplier *= 0.5;
-                        break;
-
-                    case OsuModHalfTime:
-                    case OsuModDaycore:
-                        multiplier *= 0.3;
-                        break;
-
-                    case OsuModHidden:
-                        multiplier *= 1.06;
-                        break;
-
-                    case OsuModHardRock:
-                        multiplier *= scoreV2 ? 1.10 : 1.06;
-                        break;
-
-                    case OsuModDoubleTime:
-                    case OsuModNightcore:
-                        multiplier *= scoreV2 ? 1.20 : 1.12;
-                        break;
-
-                    case OsuModFlashlight:
-                        multiplier *= 1.12;
-                        break;
-
-                    case OsuModSpunOut:
-                        multiplier *= 0.9;
-                        break;
-
-                    case OsuModRelax:
-                    case OsuModAutopilot:
-                        return 0;
-                }
-            }
-
-            return multiplier;
         }
 
         public static int CalculateDifficultyPeppyStars(IBeatmap beatmap)

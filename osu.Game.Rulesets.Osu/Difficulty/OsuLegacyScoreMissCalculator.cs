@@ -3,7 +3,9 @@
 
 using System;
 using System.Collections.Generic;
-using osu.Game.Rulesets.Osu.Difficulty.Utils;
+using System.Linq;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 
@@ -25,7 +27,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (attributes.MaxCombo == 0 || score.LegacyTotalScore == null)
                 return 0;
 
-            double scoreV1Multiplier = attributes.LegacyScoreBaseMultiplier * LegacyScoreUtils.GetLegacyScoreMultiplier(score.Mods);
+            double scoreV1Multiplier = attributes.LegacyScoreBaseMultiplier * getLegacyScoreMultiplier();
             double relevantComboPerObject = calculateRelevantScoreComboPerObject();
 
             double maximumMissCount = calculateMaximumComboBasedMissCount();
@@ -124,6 +126,62 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             missCount = Math.Min(missCount, totalImperfectHits);
 
             return missCount;
+        }
+
+        /// <remarks>
+        /// Logic copied from <see cref="OsuLegacyScoreSimulator.GetLegacyScoreMultiplier"/>.
+        /// </remarks>
+        private double getLegacyScoreMultiplier()
+        {
+            bool scoreV2 = score.Mods.Any(m => m is ModScoreV2);
+
+            double multiplier = 1.0;
+
+            foreach (var mod in score.Mods)
+            {
+                switch (mod)
+                {
+                    case OsuModNoFail:
+                        multiplier *= scoreV2 ? 1.0 : 0.5;
+                        break;
+
+                    case OsuModEasy:
+                        multiplier *= 0.5;
+                        break;
+
+                    case OsuModHalfTime:
+                    case OsuModDaycore:
+                        multiplier *= 0.3;
+                        break;
+
+                    case OsuModHidden:
+                        multiplier *= 1.06;
+                        break;
+
+                    case OsuModHardRock:
+                        multiplier *= scoreV2 ? 1.10 : 1.06;
+                        break;
+
+                    case OsuModDoubleTime:
+                    case OsuModNightcore:
+                        multiplier *= scoreV2 ? 1.20 : 1.12;
+                        break;
+
+                    case OsuModFlashlight:
+                        multiplier *= 1.12;
+                        break;
+
+                    case OsuModSpunOut:
+                        multiplier *= 0.9;
+                        break;
+
+                    case OsuModRelax:
+                    case OsuModAutopilot:
+                        return 0;
+                }
+            }
+
+            return multiplier;
         }
     }
 }
