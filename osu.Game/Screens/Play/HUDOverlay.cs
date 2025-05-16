@@ -85,7 +85,6 @@ namespace osu.Game.Screens.Play
         private readonly BindableBool replayLoaded = new BindableBool();
 
         private static bool hasShownNotificationOnce;
-
         private readonly FillFlowContainer bottomRightElements;
 
         internal readonly FillFlowContainer TopRightElements;
@@ -148,6 +147,9 @@ namespace osu.Game.Screens.Play
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
+                        // This display is potentially a duplicate of users with a local ModDisplay in their skins.
+                        // It would be very nice to remove this, but the version here has special logic with regards to replays
+                        // and initial states, so needs a bit of thought before doing so.
                         ModDisplay = CreateModsContainer(),
                     }
                 },
@@ -238,7 +240,7 @@ namespace osu.Game.Screens.Play
             {
                 if (e.NewValue)
                 {
-                    ModDisplay.FadeIn(200);
+                    ModDisplay.FadeIn(1000, FADE_EASING);
                     InputCountController.Margin = new MarginPadding(10) { Bottom = 30 };
                 }
                 else
@@ -249,6 +251,9 @@ namespace osu.Game.Screens.Play
 
                 updateVisibility();
             }, true);
+
+            ModDisplay.ExpansionMode = ExpansionMode.AlwaysExpanded;
+            Scheduler.AddDelayed(() => ModDisplay.ExpansionMode = ExpansionMode.ExpandOnHover, 1200);
         }
 
         protected override void Update()
@@ -275,18 +280,18 @@ namespace osu.Game.Screens.Play
             if (rulesetComponents != null)
                 processDrawables(rulesetComponents);
 
-            if (lowestTopScreenSpaceRight.HasValue)
-                TopRightElements.Y = MathHelper.Clamp(ToLocalSpace(new Vector2(0, lowestTopScreenSpaceRight.Value)).Y, 0, DrawHeight - TopRightElements.DrawHeight);
+            if (lowestTopScreenSpaceRight.HasValue && DrawHeight - TopRightElements.DrawHeight > 0)
+                TopRightElements.Y = Math.Clamp(ToLocalSpace(new Vector2(0, lowestTopScreenSpaceRight.Value)).Y, 0, DrawHeight - TopRightElements.DrawHeight);
             else
                 TopRightElements.Y = 0;
 
-            if (lowestTopScreenSpaceLeft.HasValue)
-                LeaderboardFlow.Y = MathHelper.Clamp(ToLocalSpace(new Vector2(0, lowestTopScreenSpaceLeft.Value)).Y, 0, DrawHeight - LeaderboardFlow.DrawHeight);
+            if (lowestTopScreenSpaceLeft.HasValue && DrawHeight - LeaderboardFlow.DrawHeight > 0)
+                LeaderboardFlow.Y = Math.Clamp(ToLocalSpace(new Vector2(0, lowestTopScreenSpaceLeft.Value)).Y, 0, DrawHeight - LeaderboardFlow.DrawHeight);
             else
                 LeaderboardFlow.Y = 0;
 
-            if (highestBottomScreenSpace.HasValue)
-                bottomRightElements.Y = BottomScoringElementsHeight = -MathHelper.Clamp(DrawHeight - ToLocalSpace(highestBottomScreenSpace.Value).Y, 0, DrawHeight - bottomRightElements.DrawHeight);
+            if (highestBottomScreenSpace.HasValue && DrawHeight - bottomRightElements.DrawHeight > 0)
+                bottomRightElements.Y = BottomScoringElementsHeight = -Math.Clamp(DrawHeight - ToLocalSpace(highestBottomScreenSpace.Value).Y, 0, DrawHeight - bottomRightElements.DrawHeight);
             else
                 bottomRightElements.Y = 0;
 
@@ -412,7 +417,7 @@ namespace osu.Game.Screens.Play
 
                 case GlobalAction.HoldForHUD:
                     holdingForHUD.Value = true;
-                    return true;
+                    return false;
 
                 case GlobalAction.ToggleInGameInterface:
                     switch (configVisibilityMode.Value)
