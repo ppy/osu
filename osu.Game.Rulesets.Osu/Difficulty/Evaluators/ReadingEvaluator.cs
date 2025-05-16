@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             foreach (var loopObj in retrievePastVisibleObjects(currObj, preempt))
             {
-                double loopDifficulty = currObj.OpacityAt(loopObj.StartTime, false);
+                double loopDifficulty = currObj.OpacityAt(loopObj.BaseObject.StartTime, false);
 
                 // Small distances means objects may be cheesed, so it doesn't matter whether they are arranged confusingly.
                 loopDifficulty *= DifficultyCalculationUtils.Logistic(-(loopObj.LazyJumpDistance - 75) / 15);
@@ -61,9 +61,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 hiddenDifficulty *= constantAngleNerfFactor * angularVelocityFactor;
 
                 // Buff perfect stacks only if current note is completely invisible at the time you click the previous note
+                var previousObj = currObj.Previous(0);
                 hiddenDifficulty += currObj.LazyJumpDistance == 0 &&
-                                    currObj.OpacityAt(currObj.Previous(0).StartTime + preempt, hidden) == 0 &&
-                                    currObj.Previous(0).StartTime + preempt > currObj.StartTime
+                                    currObj.OpacityAt(previousObj.BaseObject.StartTime + preempt, hidden) == 0 &&
+                                    previousObj.StartTime + preempt > currObj.StartTime
                     ? timeSpentInvisibleFactor / 200.0
                     : 0;
             }
