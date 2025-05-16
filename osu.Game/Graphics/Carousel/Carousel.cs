@@ -801,12 +801,7 @@ namespace osu.Game.Graphics.Carousel
                 base.OffsetScrollPosition(offset);
 
                 foreach (var panel in Panels)
-                {
-                    var c = (ICarouselPanel)panel;
-                    Debug.Assert(c.Item != null);
-
-                    c.DrawYPosition += offset;
-                }
+                    ((ICarouselPanel)panel).DrawYPosition += offset;
             }
 
             public override void Clear(bool disposeChildren)
