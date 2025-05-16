@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
     {
         private const double reading_window_size = 3000;
 
-        public static double EvaluateDifficultyOf(DifficultyHitObject current, double clockRate, double preempt, bool hidden)
+        public static double EvaluateDifficultyOf(int totalObjects, DifficultyHitObject current, double clockRate, double preempt, bool hidden)
         {
             if (current.BaseObject is Spinner || current.Index == 0)
                 return 0;
@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double timeDifficultyFactor = 9000 / pastObjectDifficultyInfluence;
 
                 // Cap objects because after a certain point hidden density is mainly memory
-                double visibleObjectFactor = Math.Min(retrieveCurrentVisibleObjects(currObj, preempt).Count, 8);
+                double visibleObjectFactor = Math.Min(getCurrentVisibleObjectCount(totalObjects, currObj, preempt), 8);
 
                 hiddenDifficulty += visibleObjectFactor * timeSpentInvisibleFactor / timeDifficultyFactor;
 
@@ -103,11 +103,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
         // Returns a list of objects that are visible on screen at
         // the point in time at which the current object needs to be clicked.
-        private static List<OsuDifficultyHitObject> retrieveCurrentVisibleObjects(OsuDifficultyHitObject current, double preempt)
+        private static int getCurrentVisibleObjectCount(int totalObjects, OsuDifficultyHitObject current, double preempt)
         {
-            List<OsuDifficultyHitObject> objects = new List<OsuDifficultyHitObject>();
+            int visibleObjectCount = 0;
 
-            for (int i = 0; i < current.Count; i++)
+            for (int i = 0; i < totalObjects; i++)
             {
                 OsuDifficultyHitObject hitObject = (OsuDifficultyHitObject)current.Next(i);
 
@@ -116,10 +116,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     current.StartTime + preempt < hitObject.StartTime) // Object not visible at the time current object needs to be clicked
                     break;
 
-                objects.Add(hitObject);
+                visibleObjectCount += 1;
             }
 
-            return objects;
+            return visibleObjectCount;
         }
 
         private static double getDurationSpentInvisible(OsuDifficultyHitObject current)
