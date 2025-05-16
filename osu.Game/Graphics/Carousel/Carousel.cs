@@ -623,7 +623,7 @@ namespace osu.Game.Graphics.Carousel
                 if (c.Item == null)
                     continue;
 
-                float normalisedDepth = (float)(Math.Abs(selectedYPos - c.DrawYPosition) / DrawHeight);
+                float normalisedDepth = (float)(Math.Abs(selectedYPos - c.Item.CarouselYPosition) / DrawHeight);
                 Scroll.Panels.ChangeChildDepth(panel, c.Item.DepthLayer + normalisedDepth);
 
                 if (c.DrawYPosition != c.Item.CarouselYPosition)
@@ -695,6 +695,12 @@ namespace osu.Game.Graphics.Carousel
             {
                 var carouselPanel = (ICarouselPanel)panel;
 
+                if (carouselPanel.Item == null)
+                {
+                    // Item is null when a panel is already fading away from existence; should be ignored for tracking purposes.
+                    continue;
+                }
+
                 // The case where we're intending to display this panel, but it's already displayed.
                 // Note that we **must compare the model here** as the CarouselItems may be fresh instances due to a filter operation.
                 //
@@ -710,7 +716,7 @@ namespace osu.Game.Graphics.Carousel
                 }
 
                 // If the new display range doesn't contain the panel, it's no longer required for display.
-                expirePanelImmediately(panel);
+                expirePanel(panel);
             }
 
             // Add any new items which need to be displayed and haven't yet.
@@ -721,10 +727,34 @@ namespace osu.Game.Graphics.Carousel
                 if (drawable is not ICarouselPanel carouselPanel)
                     throw new InvalidOperationException($"Carousel panel drawables must implement {typeof(ICarouselPanel)}");
 
-                carouselPanel.DrawYPosition = item.CarouselYPosition;
                 carouselPanel.Item = item;
-
                 Scroll.Add(drawable);
+            }
+
+            if (toDisplay.Any())
+            {
+                // To make transitions of items appearing in the flow look good, do a pass and make sure newly added items spawn from
+                // just beneath the *current interpolated position* of the previous panel.
+                var orderedPanels = Scroll.Panels
+                                          .OfType<ICarouselPanel>()
+                                          .Where(p => p.Item != null)
+                                          .OrderBy(p => p.Item!.CarouselYPosition)
+                                          .ToList();
+
+                for (int i = 0; i < orderedPanels.Count; i++)
+                {
+                    var panel = orderedPanels[i];
+
+                    if (toDisplay.Contains(panel.Item!))
+                    {
+                        // Don't apply to the last because animating the tail of the list looks bad.
+                        // It's usually off-screen anyway.
+                        if (i > 0 && i < orderedPanels.Count - 1)
+                            panel.DrawYPosition = orderedPanels[i - 1].DrawYPosition;
+                        else
+                            panel.DrawYPosition = panel.Item!.CarouselYPosition;
+                    }
+                }
             }
 
             // Update the total height of all items (to make the scroll container scrollable through the full height even though
@@ -738,12 +768,17 @@ namespace osu.Game.Graphics.Carousel
                 Scroll.SetLayoutHeight(0);
         }
 
-        private static void expirePanelImmediately(Drawable panel)
+        private void expirePanel(Drawable panel)
         {
-            panel.FinishTransforms();
-            panel.Expire();
-
             var carouselPanel = (ICarouselPanel)panel;
+
+            // expired panels should have a depth behind all other panels to make the transition not look weird.
+            Scroll.Panels.ChangeChildDepth(panel, panel.Depth + 1024);
+
+            panel.FadeOut(150, Easing.OutQuint);
+            panel.MoveToX(panel.X + 100, 200, Easing.Out);
+
+            panel.Expire();
 
             carouselPanel.Item = null;
             carouselPanel.Selected.Value = false;
@@ -801,12 +836,7 @@ namespace osu.Game.Graphics.Carousel
                 base.OffsetScrollPosition(offset);
 
                 foreach (var panel in Panels)
-                {
-                    var c = (ICarouselPanel)panel;
-                    Debug.Assert(c.Item != null);
-
-                    c.DrawYPosition += offset;
-                }
+                    ((ICarouselPanel)panel).DrawYPosition += offset;
             }
 
             public override void Clear(bool disposeChildren)
