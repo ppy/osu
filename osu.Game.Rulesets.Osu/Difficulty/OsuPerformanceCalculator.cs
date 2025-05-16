@@ -12,11 +12,11 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Osu.Difficulty.Skills;
+using osu.Game.Rulesets.Osu.Difficulty.Utils;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Utils;
-using osu.Game.Rulesets.Scoring.Legacy;
 
 namespace osu.Game.Rulesets.Osu.Difficulty
 {
@@ -354,19 +354,19 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (attributes.MaxCombo == 0 || score.LegacyTotalScore == null)
                 return 0;
 
-            double scoreV1Multiplier = attributes.LegacyScoreBaseMultiplier * new OsuLegacyScoreSimulator().GetLegacyScoreMultiplier(score.Mods, new LegacyBeatmapConversionDifficultyInfo());
-            double relevantComboPerObject = calculateScoreRelevantComboPerObject(attributes);
+            double scoreV1Multiplier = attributes.LegacyScoreBaseMultiplier * LegacyScoreUtils.GetLegacyScoreMultiplier(score.Mods);
+            double relevantComboPerObject = LegacyScoreUtils.CalculateRelevantScoreComboPerObject(attributes);
 
             double maximumMissCount = calculateMaximumComboBasedMissCount(attributes);
 
-            double scoreObtainedDuringMaxCombo = calculateScoreAtCombo(attributes, score.MaxCombo, relevantComboPerObject, scoreV1Multiplier);
+            double scoreObtainedDuringMaxCombo = LegacyScoreUtils.CalculateScoreAtCombo(score, attributes, score.MaxCombo, relevantComboPerObject, scoreV1Multiplier);
             double remainingScore = score.LegacyTotalScore.Value - scoreObtainedDuringMaxCombo;
 
             if (remainingScore <= 0)
                 return maximumMissCount;
 
             double remainingCombo = attributes.MaxCombo - score.MaxCombo;
-            double expectedRemainingScore = calculateScoreAtCombo(attributes, remainingCombo, relevantComboPerObject, scoreV1Multiplier);
+            double expectedRemainingScore = LegacyScoreUtils.CalculateScoreAtCombo(score, attributes, remainingCombo, relevantComboPerObject, scoreV1Multiplier);
 
             double scoreBasedMissCount = expectedRemainingScore / remainingScore;
 
@@ -395,39 +395,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             missCount = Math.Min(missCount, totalImperfectHits);
 
             return missCount;
-        }
-
-        private double calculateScoreAtCombo(OsuDifficultyAttributes attributes, double combo, double relevantComboPerObject, double scoreV1Multiplier)
-        {
-            double estimatedObjects = combo / relevantComboPerObject - 1;
-
-            // The combo portion of ScoreV1 follows arithmetic progression
-            // Therefore, we calculate the combo portion of score using the combo per object and our current combo.
-            double comboScore = relevantComboPerObject > 0 ? (2 * (relevantComboPerObject - 1) + (estimatedObjects - 1) * relevantComboPerObject) * estimatedObjects / 2 : 0;
-
-            // We then apply the accuracy and ScoreV1 multipliers to the resulting score.
-            comboScore *= accuracy * 300 / 25 * scoreV1Multiplier;
-
-            double objectsHit = (totalHits - countMiss) * combo / attributes.MaxCombo;
-
-            // Score also has a non-combo portion we need to create the final score value.
-            double nonComboScore = (300 + attributes.SliderNestedScorePerObject) * accuracy * objectsHit;
-
-            return comboScore + nonComboScore;
-        }
-
-        private double calculateScoreRelevantComboPerObject(OsuDifficultyAttributes attributes)
-        {
-            double comboScore = attributes.MaximumLegacyComboScore;
-
-            // We then reverse apply the ScoreV1 multipliers to get the raw value.
-            comboScore /= 300.0 / 25.0 * attributes.LegacyScoreBaseMultiplier;
-
-            // Reverse the arithmetic progression to work out the amount of combo per object based on the score.
-            double result = (attributes.MaxCombo - 2) * attributes.MaxCombo;
-            result /= Math.Max(attributes.MaxCombo + 2 * (comboScore - 1), 1);
-
-            return result;
         }
 
         private double calculateEstimatedSliderbreaks(double topWeightedSliderFactor, OsuDifficultyAttributes attributes)

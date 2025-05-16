@@ -41,7 +41,7 @@ namespace osu.Game.Scoring.Legacy
         /// <item><description>30000011: Re-do catch scoring to mirror stable Score V2 as closely as feasible. Reconvert all scores.</description></item>
         /// <item><description>
         /// 30000012: Fix incorrect total score conversion on selected beatmaps after implementing the more correct
-        /// <see cref="LegacyRulesetExtensions.CalculateDifficultyPeppyStars(BeatmapDifficulty, int, int)"/> method. Reconvert all scores.
+        /// <see cref="LegacyRulesetExtensions.CalculateDifficultyPeppyStars"/> method. Reconvert all scores.
         /// </description></item>
         /// <item><description>30000013: All local scores will use lazer definitions of ranks for consistency. Recalculates the rank of all scores.</description></item>
         /// <item><description>30000014: Fix edge cases in conversion for osu! scores on selected beatmaps. Reconvert all scores.</description></item>

@@ -9,9 +9,9 @@ using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Difficulty.Skills;
+using osu.Game.Rulesets.Osu.Difficulty.Utils;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Scoring;
@@ -113,8 +113,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 ? Math.Cbrt(multiplier) * star_rating_multiplier * (Math.Cbrt(100000 / Math.Pow(2, 1 / 1.1) * basePerformance) + 4)
                 : 0;
 
-            double sliderNestedScorePerObject = calculateSliderNestedScorePerObject(beatmap, totalHits);
-            double legacyScoreBaseMultiplier = LegacyRulesetExtensions.CalculateDifficultyPeppyStars(beatmap);
+            double sliderNestedScorePerObject = LegacyScoreUtils.CalculateSliderNestedScorePerObject(beatmap, totalHits);
+            double legacyScoreBaseMultiplier = LegacyScoreUtils.CalculateDifficultyPeppyStars(beatmap);
 
             var simulator = new OsuLegacyScoreSimulator();
             var scoreAttributes = simulator.Simulate(WorkingBeatmap, beatmap);
@@ -266,29 +266,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             ratingMultiplier *= 0.98 + Math.Pow(Math.Max(0, overallDifficulty), 2) / 2500;
 
             return flashlightRating * Math.Sqrt(ratingMultiplier);
-        }
-
-        /// <summary>
-        /// Calculates the average amount of score per object that is caused by all sorts of slider ticks.
-        /// </summary>
-        private double calculateSliderNestedScorePerObject(IBeatmap beatmap, int objectCount)
-        {
-            const double big_tick_score = 30;
-            const double small_tick_score = 10;
-
-            var sliders = beatmap.HitObjects.OfType<Slider>().ToArray();
-
-            // 1 for head, 1 for tail
-            int amountOfBigTicks = sliders.Length * 2;
-
-            // Add slider repeats
-            amountOfBigTicks += sliders.Select(s => s.RepeatCount).Sum();
-
-            int amountOfSmallTicks = sliders.Select(s => s.NestedHitObjects.Count(nho => nho is SliderTick)).Sum();
-
-            double totalScore = amountOfBigTicks * big_tick_score + amountOfSmallTicks * small_tick_score;
-
-            return totalScore / objectCount;
         }
 
         protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)

@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Objects.Types;
@@ -92,20 +91,6 @@ namespace osu.Game.Rulesets.Objects.Legacy
             decimal circleSize = (decimal)(double)difficulty.CircleSize;
 
             return (int)Math.Round((drainRate + overallDifficulty + circleSize + objectToDrainRatio) / 38 * 5);
-        }
-
-        public static int CalculateDifficultyPeppyStars(IBeatmap beatmap)
-        {
-            int objectCount = beatmap.HitObjects.Count;
-            int drainLength = 0;
-
-            if (objectCount > 0)
-            {
-                int breakLength = beatmap.Breaks.Select(b => (int)Math.Round(b.EndTime) - (int)Math.Round(b.StartTime)).Sum();
-                drainLength = ((int)Math.Round(beatmap.HitObjects[^1].StartTime) - (int)Math.Round(beatmap.HitObjects[0].StartTime) - breakLength) / 1000;
-            }
-
-            return CalculateDifficultyPeppyStars(beatmap.Difficulty, objectCount, drainLength);
         }
     }
 }
