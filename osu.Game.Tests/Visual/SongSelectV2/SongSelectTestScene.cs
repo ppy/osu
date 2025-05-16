@@ -15,10 +15,12 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
+using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Toolbar;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Scoring;
 using osu.Game.Screens;
 using osu.Game.Screens.Footer;
 using osu.Game.Screens.Menu;
@@ -33,6 +35,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         protected BeatmapManager Beatmaps { get; private set; } = null!;
         protected RealmRulesetStore Rulesets { get; private set; } = null!;
         protected OsuConfigManager Config { get; private set; } = null!;
+        protected ScoreManager ScoreManager { get; private set; } = null!;
 
         private RealmDetachedBeatmapStore beatmapStore = null!;
 
@@ -51,6 +54,9 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [Cached(typeof(INotificationOverlay))]
         private readonly INotificationOverlay notificationOverlay = new NotificationOverlay();
 
+        [Cached]
+        protected readonly LeaderboardManager LeaderboardManager = new LeaderboardManager();
+
         protected SongSelectTestScene()
         {
             Children = new Drawable[]
@@ -60,6 +66,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
+                        LeaderboardManager,
                         new Toolbar
                         {
                             State = { Value = Visibility.Visible },
@@ -90,6 +97,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             dependencies.Cache(Realm);
             dependencies.Cache(Beatmaps = new BeatmapManager(LocalStorage, Realm, null, Dependencies.Get<AudioManager>(), Resources, Dependencies.Get<GameHost>(), Beatmap.Default));
             dependencies.Cache(Config = new OsuConfigManager(LocalStorage));
+            dependencies.Cache(ScoreManager = new ScoreManager(Rulesets, () => Beatmaps, LocalStorage, Realm, API, Config));
 
             dependencies.CacheAs<BeatmapStore>(beatmapStore = new RealmDetachedBeatmapStore());
 

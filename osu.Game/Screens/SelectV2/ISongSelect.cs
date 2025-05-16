@@ -2,13 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Beatmaps;
+using osu.Game.Scoring;
 
 namespace osu.Game.Screens.SelectV2
 {
     /// <summary>
     /// Actions exposed by song select which are used by subcomponents to perform top-level operations.
     /// </summary>
-    public interface ISongSelectBeatmapActions
+    public interface ISongSelect
     {
         /// <summary>
         /// Requests the user for confirmation to delete the given beatmap set.
@@ -44,5 +45,10 @@ namespace osu.Game.Screens.SelectV2
         /// Hides a beatmap from user's vision.
         /// </summary>
         void Hide(BeatmapInfo beatmap);
+
+        /// <summary>
+        /// Present the provided score at the results screen.
+        /// </summary>
+        void PresentScore(ScoreInfo score);
     }
 }
