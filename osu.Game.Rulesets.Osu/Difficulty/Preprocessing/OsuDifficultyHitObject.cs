@@ -235,7 +235,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 float tailJumpDistance = Vector2.Subtract(lastSlider.TailCircle.StackedPosition, BaseObject.StackedPosition).Length * scalingFactor;
                 MinimumJumpDistance = Math.Max(0, Math.Min(LazyJumpDistance - (maximum_slider_radius - assumed_slider_radius), tailJumpDistance - maximum_slider_radius));
 
-                float distanceBetweenStartPositions = (BaseObject.StackedPosition * scalingFactor - lastObject.StackedPosition * scalingFactor).Length;
+                float distanceBetweenStartPositions = (BaseObject.StackedPosition * scalingFactor - lastDifficultyObject.BaseObject.StackedPosition * scalingFactor).Length;
 
                 if (MinimumJumpDistance < distanceBetweenStartPositions)
                 {
