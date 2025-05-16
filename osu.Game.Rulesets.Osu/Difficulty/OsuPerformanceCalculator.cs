@@ -416,6 +416,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             return comboScore + nonComboScore;
         }
+
         private double calculateScoreRelevantComboPerObject(OsuDifficultyAttributes attributes)
         {
             double comboScore = attributes.MaximumLegacyComboScore;
