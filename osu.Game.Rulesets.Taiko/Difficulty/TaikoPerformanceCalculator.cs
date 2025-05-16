@@ -4,12 +4,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Objects;
+using osu.Game.Rulesets.Taiko.Scoring;
 using osu.Game.Scoring;
+using osu.Game.Utils;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty
 {
@@ -20,6 +23,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         private int countMeh;
         private int countMiss;
         private double? estimatedUnstableRate;
+
+        private double clockRate;
+        private double greatHitWindow;
 
         private double effectiveMissCount;
 
@@ -36,7 +42,19 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             countOk = score.Statistics.GetValueOrDefault(HitResult.Ok);
             countMeh = score.Statistics.GetValueOrDefault(HitResult.Meh);
             countMiss = score.Statistics.GetValueOrDefault(HitResult.Miss);
-            estimatedUnstableRate = computeDeviationUpperBound(taikoAttributes) * 10;
+
+            clockRate = ModUtils.CalculateRateWithMods(score.Mods);
+
+            var difficulty = score.BeatmapInfo!.Difficulty.Clone();
+
+            score.Mods.OfType<IApplicableToDifficulty>().ForEach(m => m.ApplyToDifficulty(difficulty));
+
+            HitWindows hitWindows = new TaikoHitWindows();
+            hitWindows.SetDifficulty(difficulty.OverallDifficulty);
+
+            greatHitWindow = hitWindows.WindowFor(HitResult.Great) / clockRate;
+
+            estimatedUnstableRate = computeDeviationUpperBound() * 10;
 
             // The effectiveMissCount is calculated by gaining a ratio for totalSuccessfulHits and increasing the miss penalty for shorter object counts lower than 1000.
             if (totalSuccessfulHits > 0)
@@ -104,7 +122,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
         private double computeAccuracyValue(ScoreInfo score, TaikoDifficultyAttributes attributes, bool isConvert)
         {
-            if (attributes.GreatHitWindow <= 0 || estimatedUnstableRate == null)
+            if (greatHitWindow <= 0 || estimatedUnstableRate == null)
                 return 0;
 
             double accuracyValue = Math.Pow(70 / estimatedUnstableRate.Value, 1.1) * Math.Pow(attributes.StarRating, 0.4) * 100.0;
@@ -123,9 +141,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         /// and the hit judgements, assuming the player's mean hit error is 0. The estimation is consistent in that
         /// two SS scores on the same map with the same settings will always return the same deviation.
         /// </summary>
-        private double? computeDeviationUpperBound(TaikoDifficultyAttributes attributes)
+        private double? computeDeviationUpperBound()
         {
-            if (countGreat == 0 || attributes.GreatHitWindow <= 0)
+            if (countGreat == 0 || greatHitWindow <= 0)
                 return null;
 
             const double z = 2.32634787404; // 99% critical value for the normal distribution (one-tailed).
@@ -139,7 +157,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             double pLowerBound = (n * p + z * z / 2) / (n + z * z) - z / (n + z * z) * Math.Sqrt(n * p * (1 - p) + z * z / 4);
 
             // We can be 99% confident that the deviation is not higher than:
-            return attributes.GreatHitWindow / (Math.Sqrt(2) * DifficultyCalculationUtils.ErfInv(pLowerBound));
+            return greatHitWindow / (Math.Sqrt(2) * DifficultyCalculationUtils.ErfInv(pLowerBound));
         }
 
         private int totalHits => countGreat + countOk + countMeh + countMiss;
