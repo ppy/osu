@@ -28,11 +28,15 @@ namespace osu.Game.Rulesets.Difficulty
         /// </summary>
         protected IBeatmap Beatmap { get; private set; }
 
+        /// <summary>
+        /// The working beatmap for which difficulty will be calculated.
+        /// </summary>
+        protected readonly IWorkingBeatmap WorkingBeatmap;
+
         private Mod[] playableMods;
         private double clockRate;
 
         private readonly IRulesetInfo ruleset;
-        private readonly IWorkingBeatmap beatmap;
 
         /// <summary>
         /// A yymmdd version which is used to discern when reprocessing is required.
@@ -42,7 +46,7 @@ namespace osu.Game.Rulesets.Difficulty
         protected DifficultyCalculator(IRulesetInfo ruleset, IWorkingBeatmap beatmap)
         {
             this.ruleset = ruleset;
-            this.beatmap = beatmap;
+            WorkingBeatmap = beatmap;
         }
 
         /// <summary>
@@ -178,7 +182,7 @@ namespace osu.Game.Rulesets.Difficulty
         private void preProcess([NotNull] IEnumerable<Mod> mods, CancellationToken cancellationToken)
         {
             playableMods = mods.Select(m => m.DeepClone()).ToArray();
-            Beatmap = beatmap.GetPlayableBeatmap(ruleset, playableMods, cancellationToken);
+            Beatmap = WorkingBeatmap.GetPlayableBeatmap(ruleset, playableMods, cancellationToken);
 
             clockRate = ModUtils.CalculateRateWithMods(playableMods);
         }
