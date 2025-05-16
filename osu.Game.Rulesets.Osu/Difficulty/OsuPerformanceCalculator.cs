@@ -95,20 +95,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             overallDifficulty = (80 - greatHitWindow) / 6;
             approachRate = preempt > 1200 ? (1800 - preempt) / 120 : (1200 - preempt) / 150 + 5;
 
-            double comboBasedMissCount = calculateComboBasedEstimatedMissCount(osuAttributes);
-            double? scoreBasedMissCount = null;
+            double comboBasedEstimatedMissCount = calculateComboBasedEstimatedMissCount(osuAttributes);
+            double? scoreBasedEstimatedMissCount = null;
 
             if (usingClassicSliderAccuracy && score.LegacyTotalScore != null)
             {
                 var legacyScoreMissCalculator = new OsuLegacyScoreMissCalculator(score, osuAttributes);
-                scoreBasedMissCount = legacyScoreMissCalculator.Calculate();
+                scoreBasedEstimatedMissCount = legacyScoreMissCalculator.Calculate();
 
-                effectiveMissCount = scoreBasedMissCount.Value;
+                effectiveMissCount = scoreBasedEstimatedMissCount.Value;
             }
             else
             {
                 // Use combo-based miss count if this isn't a legacy score
-                effectiveMissCount = comboBasedMissCount;
+                effectiveMissCount = comboBasedEstimatedMissCount;
             }
 
             effectiveMissCount = Math.Max(countMiss, effectiveMissCount);
@@ -153,8 +153,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 Accuracy = accuracyValue,
                 Flashlight = flashlightValue,
                 EffectiveMissCount = effectiveMissCount,
-                ComboBasedMissCount = comboBasedMissCount,
-                ScoreBasedMissCount = scoreBasedMissCount,
+                ComboBasedEstimatedMissCount = comboBasedEstimatedMissCount,
+                ScoreBasedEstimatedMissCount = scoreBasedEstimatedMissCount,
                 SpeedDeviation = speedDeviation,
                 Total = totalValue
             };
