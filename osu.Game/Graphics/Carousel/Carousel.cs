@@ -623,7 +623,7 @@ namespace osu.Game.Graphics.Carousel
                 if (c.Item == null)
                     continue;
 
-                float normalisedDepth = (float)(Math.Abs(selectedYPos - c.DrawYPosition) / DrawHeight);
+                float normalisedDepth = (float)(Math.Abs(selectedYPos - c.Item.CarouselYPosition) / DrawHeight);
                 Scroll.Panels.ChangeChildDepth(panel, c.Item.DepthLayer + normalisedDepth);
 
                 if (c.DrawYPosition != c.Item.CarouselYPosition)
