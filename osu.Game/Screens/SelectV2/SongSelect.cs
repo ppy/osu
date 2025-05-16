@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -21,9 +22,11 @@ using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osu.Game.Overlays.Volume;
+using osu.Game.Scoring;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Footer;
 using osu.Game.Screens.Menu;
+using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Select;
 using osu.Game.Skinning;
 using osu.Game.Utils;
@@ -37,8 +40,8 @@ namespace osu.Game.Screens.SelectV2
     /// This screen is intended to house all components introduced in the new song select design to add transitions and examine the overall look.
     /// This will be gradually built upon and ultimately replace <see cref="Select.SongSelect"/> once everything is in place.
     /// </summary>
-    [Cached(typeof(ISongSelectBeatmapActions))]
-    public abstract partial class SongSelect : OsuScreen, IKeyBindingHandler<GlobalAction>, ISongSelectBeatmapActions
+    [Cached(typeof(ISongSelect))]
+    public abstract partial class SongSelect : OsuScreen, IKeyBindingHandler<GlobalAction>, ISongSelect
     {
         private const float logo_scale = 0.4f;
         private const double fade_duration = 300;
@@ -394,6 +397,18 @@ namespace osu.Game.Screens.SelectV2
         }
 
         #endregion
+
+        /// <summary>
+        /// Opens results screen with the given score.
+        /// This assumes active beatmap and ruleset selection matches the score.
+        /// </summary>
+        public void PresentScore(ScoreInfo score)
+        {
+            Debug.Assert(Beatmap.Value.BeatmapInfo.Equals(score.BeatmapInfo));
+            Debug.Assert(Ruleset.Value.Equals(score.Ruleset));
+
+            this.Push(new SoloResultsScreen(score));
+        }
 
         #region Beatmap management
 

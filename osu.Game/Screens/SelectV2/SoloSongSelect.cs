@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Screens;
@@ -11,9 +10,7 @@ using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Scoring;
 using osu.Game.Screens.Play;
-using osu.Game.Screens.Ranking;
 using osu.Game.Utils;
 
 namespace osu.Game.Screens.SelectV2
@@ -27,18 +24,6 @@ namespace osu.Game.Screens.SelectV2
         private INotificationOverlay? notifications { get; set; }
 
         public override bool EditingAllowed => true;
-
-        /// <summary>
-        /// Opens results screen with the given score.
-        /// This assumes active beatmap and ruleset selection matches the score.
-        /// </summary>
-        public void PresentScore(ScoreInfo score)
-        {
-            Debug.Assert(Beatmap.Value.BeatmapInfo.Equals(score.BeatmapInfo));
-            Debug.Assert(Ruleset.Value.Equals(score.Ruleset));
-
-            this.Push(new SoloResultsScreen(score));
-        }
 
         protected override bool OnStart()
         {

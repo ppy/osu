@@ -37,7 +37,7 @@ namespace osu.Game.Screens.SelectV2
 
             // Can't use DI for these due to popover being initialised from a footer button which ends up being on the global
             // PopoverContainer.
-            public ISongSelectBeatmapActions? BeatmapActions { get; init; }
+            public ISongSelect? SongSelect { get; init; }
             public required OverlayColourProvider ColourProvider { get; init; }
 
             public Popover(FooterButtonOptions footerButton, WorkingBeatmap beatmap)
@@ -59,20 +59,20 @@ namespace osu.Game.Screens.SelectV2
                 };
 
                 addHeader(CommonStrings.General);
-                addButton(SongSelectStrings.ManageCollections, FontAwesome.Solid.Book, () => BeatmapActions?.ManageCollections());
+                addButton(SongSelectStrings.ManageCollections, FontAwesome.Solid.Book, () => SongSelect?.ManageCollections());
 
                 addHeader(SongSelectStrings.ForAllDifficulties, beatmap.BeatmapSetInfo.ToString());
-                addButton(SongSelectStrings.DeleteBeatmap, FontAwesome.Solid.Trash, () => BeatmapActions?.Delete(beatmap.BeatmapSetInfo), colours.Red1);
+                addButton(SongSelectStrings.DeleteBeatmap, FontAwesome.Solid.Trash, () => SongSelect?.Delete(beatmap.BeatmapSetInfo), colours.Red1);
 
                 addHeader(SongSelectStrings.ForSelectedDifficulty, beatmap.BeatmapInfo.DifficultyName);
                 // TODO: replace with "remove from played" button when beatmap is already played.
-                addButton(SongSelectStrings.MarkAsPlayed, FontAwesome.Regular.TimesCircle, () => BeatmapActions?.MarkPlayed(beatmap.BeatmapInfo));
-                addButton(SongSelectStrings.ClearAllLocalScores, FontAwesome.Solid.Eraser, () => BeatmapActions?.ClearScores(beatmap.BeatmapInfo), colours.Red1);
+                addButton(SongSelectStrings.MarkAsPlayed, FontAwesome.Regular.TimesCircle, () => SongSelect?.MarkPlayed(beatmap.BeatmapInfo));
+                addButton(SongSelectStrings.ClearAllLocalScores, FontAwesome.Solid.Eraser, () => SongSelect?.ClearScores(beatmap.BeatmapInfo), colours.Red1);
 
-                if (BeatmapActions?.EditingAllowed == true)
-                    addButton(SongSelectStrings.EditBeatmap, FontAwesome.Solid.PencilAlt, () => BeatmapActions.Edit(beatmap.BeatmapInfo));
+                if (SongSelect?.EditingAllowed == true)
+                    addButton(SongSelectStrings.EditBeatmap, FontAwesome.Solid.PencilAlt, () => SongSelect.Edit(beatmap.BeatmapInfo));
 
-                addButton(WebCommonStrings.ButtonsHide.ToSentence(), FontAwesome.Solid.Magic, () => BeatmapActions?.Hide(beatmap.BeatmapInfo));
+                addButton(WebCommonStrings.ButtonsHide.ToSentence(), FontAwesome.Solid.Magic, () => SongSelect?.Hide(beatmap.BeatmapInfo));
             }
 
             protected override void LoadComplete()

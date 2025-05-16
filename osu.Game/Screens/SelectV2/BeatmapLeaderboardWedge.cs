@@ -51,7 +51,7 @@ namespace osu.Game.Screens.SelectV2
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
         [Resolved]
-        private SongSelect? songSelect { get; set; }
+        private ISongSelect? songSelect { get; set; }
 
         private Container<Placeholder> placeholderContainer = null!;
         private Placeholder? placeholder;
@@ -313,11 +313,7 @@ namespace osu.Game.Screens.SelectV2
             scoresScroll.TransformTo(nameof(scoresScroll.Padding), new MarginPadding(), 300, Easing.OutQuint);
         }
 
-        private void onLeaderboardScoreClicked(ScoreInfo score)
-        {
-            if (songSelect is SoloSongSelect soloSongSelect)
-                soloSongSelect.PresentScore(score);
-        }
+        private void onLeaderboardScoreClicked(ScoreInfo score) => songSelect?.PresentScore(score);
 
         private LeaderboardState displayedState;
 
