@@ -26,18 +26,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 return 0;
 
             double scoreV1Multiplier = attributes.LegacyScoreBaseMultiplier * LegacyScoreUtils.GetLegacyScoreMultiplier(score.Mods);
-            double relevantComboPerObject = LegacyScoreUtils.CalculateRelevantScoreComboPerObject(attributes);
+            double relevantComboPerObject = calculateRelevantScoreComboPerObject();
 
             double maximumMissCount = calculateMaximumComboBasedMissCount();
 
-            double scoreObtainedDuringMaxCombo = LegacyScoreUtils.CalculateScoreAtCombo(score, attributes, score.MaxCombo, relevantComboPerObject, scoreV1Multiplier);
+            double scoreObtainedDuringMaxCombo = calculateScoreAtCombo(score.MaxCombo, relevantComboPerObject, scoreV1Multiplier);
             double remainingScore = score.LegacyTotalScore.Value - scoreObtainedDuringMaxCombo;
 
             if (remainingScore <= 0)
                 return maximumMissCount;
 
             double remainingCombo = attributes.MaxCombo - score.MaxCombo;
-            double expectedRemainingScore = LegacyScoreUtils.CalculateScoreAtCombo(score, attributes, remainingCombo, relevantComboPerObject, scoreV1Multiplier);
+            double expectedRemainingScore = calculateScoreAtCombo(remainingCombo, relevantComboPerObject, scoreV1Multiplier);
 
             double scoreBasedMissCount = expectedRemainingScore / remainingScore;
 
@@ -46,6 +46,57 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // Cap result by very harsh version of combo-based miss count
             return Math.Min(scoreBasedMissCount, maximumMissCount);
+        }
+
+        /// <summary>
+        /// Calculates the amount of score that would be achieved at a given combo.
+        /// </summary>
+        private double calculateScoreAtCombo(double combo, double relevantComboPerObject, double scoreV1Multiplier)
+        {
+            int countGreat = score.Statistics.GetValueOrDefault(HitResult.Great);
+            int countOk = score.Statistics.GetValueOrDefault(HitResult.Ok);
+            int countMeh = score.Statistics.GetValueOrDefault(HitResult.Meh);
+            int countMiss = score.Statistics.GetValueOrDefault(HitResult.Miss);
+
+            int totalHits = countGreat + countOk + countMeh + countMiss;
+
+            double estimatedObjects = combo / relevantComboPerObject - 1;
+
+            // The combo portion of ScoreV1 follows arithmetic progression
+            // Therefore, we calculate the combo portion of score using the combo per object and our current combo.
+            double comboScore = relevantComboPerObject > 0 ? (2 * (relevantComboPerObject - 1) + (estimatedObjects - 1) * relevantComboPerObject) * estimatedObjects / 2 : 0;
+
+            // We then apply the accuracy and ScoreV1 multipliers to the resulting score.
+            comboScore *= score.Accuracy * 300 / 25 * scoreV1Multiplier;
+
+            double objectsHit = (totalHits - countMiss) * combo / attributes.MaxCombo;
+
+            // Score also has a non-combo portion we need to create the final score value.
+            double nonComboScore = (300 + attributes.SliderNestedScorePerObject) * score.Accuracy * objectsHit;
+
+            return comboScore + nonComboScore;
+        }
+
+        /// <summary>
+        /// Calculates the relevant combo per object for legacy score.
+        /// This assumes a uniform distribution for circles and sliders.
+        /// This handles cases where objects (such as buzz sliders) do not fit a normal arithmetic progression model.
+        /// </summary>
+        private double calculateRelevantScoreComboPerObject()
+        {
+            double comboScore = attributes.MaximumLegacyComboScore;
+
+            // We then reverse apply the ScoreV1 multipliers to get the raw value.
+            comboScore /= 300.0 / 25.0 * attributes.LegacyScoreBaseMultiplier;
+
+            double a = attributes.MaxCombo;
+            double b = comboScore;
+
+            // Reverse the arithmetic progression to work out the amount of combo per object based on the score.
+            double result = (attributes.MaxCombo - 2) * attributes.MaxCombo;
+            result /= Math.Max(attributes.MaxCombo + 2 * (comboScore - 1), 1);
+
+            return result;
         }
 
         /// <summary>
