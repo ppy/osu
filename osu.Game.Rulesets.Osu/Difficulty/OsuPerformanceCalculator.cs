@@ -197,7 +197,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (effectiveMissCount > 0)
             {
                 double estimatedSliderbreaks = calculateEstimatedSliderbreaks(attributes.AimTopWeightedSliderFactor, attributes);
-                aimValue *= calculateMissPenalty(effectiveMissCount + estimatedSliderbreaks, attributes.AimDifficultStrainCount);
+                aimValue *= calculateMissPenalty(Math.Min(effectiveMissCount + estimatedSliderbreaks, totalImperfectHits), attributes.AimDifficultStrainCount);
             }
 
             // TC bonuses are excluded when blinds is present as the increased visual difficulty is unimportant when notes cannot be seen.
@@ -228,7 +228,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (effectiveMissCount > 0)
             {
                 double estimatedSliderbreaks = calculateEstimatedSliderbreaks(attributes.SpeedTopWeightedSliderFactor, attributes);
-                speedValue *= calculateMissPenalty(effectiveMissCount + estimatedSliderbreaks, attributes.SpeedDifficultStrainCount);
+                speedValue *= calculateMissPenalty(Math.Min(effectiveMissCount + estimatedSliderbreaks, totalImperfectHits), attributes.SpeedDifficultStrainCount);
             }
 
             // TC bonuses are excluded when blinds is present as the increased visual difficulty is unimportant when notes cannot be seen.
@@ -352,19 +352,23 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double calculateEstimatedSliderbreaks(double topWeightedSliderFactor, OsuDifficultyAttributes attributes)
         {
-            if (!usingClassicSliderAccuracy || countOk == 0)
+            // Only ok and meh can be a sliderbreak
+            int okMehs = countOk + countMeh;
+
+            if (!usingClassicSliderAccuracy || okMehs == 0)
                 return 0;
 
             double missedComboPercent = 1.0 - (double)scoreMaxCombo / attributes.MaxCombo;
-            double estimatedSliderbreaks = Math.Min(countOk, effectiveMissCount * topWeightedSliderFactor);
 
-            // scores with more oks are more likely to have sliderbreaks
-            double okAdjustment = ((countOk - estimatedSliderbreaks) + 0.5) / countOk;
+            double estimatedSliderbreaks = Math.Min(okMehs, effectiveMissCount * topWeightedSliderFactor);
+
+            // scores with more oks and mehs are more likely to have sliderbreaks
+            double okMehAdjustment = ((okMehs - estimatedSliderbreaks) + 0.5) / okMehs;
 
             // There is a low probability of extra slider breaks on effective miss counts close to 1, as score based calculations are good at indicating if only a single break occurred.
             estimatedSliderbreaks *= DifficultyCalculationUtils.Smoothstep(effectiveMissCount, 1, 2);
 
-            return estimatedSliderbreaks * okAdjustment * DifficultyCalculationUtils.Logistic(missedComboPercent, 0.33, 15);
+            return estimatedSliderbreaks * okMehAdjustment * DifficultyCalculationUtils.Logistic(missedComboPercent, 0.33, 15);
         }
 
         /// <summary>
