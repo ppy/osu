@@ -84,6 +84,10 @@ namespace osu.Game.Storyboards
         {
             get
             {
+                // Hide if there is a video
+                if (GetLayer("Video").Elements.Count != 0)
+                    return true;
+
                 string backgroundPath = BeatmapInfo.Metadata.BackgroundFile;
 
                 if (string.IsNullOrEmpty(backgroundPath))
