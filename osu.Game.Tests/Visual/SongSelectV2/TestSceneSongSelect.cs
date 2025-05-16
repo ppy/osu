@@ -197,11 +197,11 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             AddUntilStep("wait for player", () => Stack.CurrentScreen is PlayerLoader);
 
-            AddAssert("autoplay selected", () => Screen.Mods.Value.Single() is ModAutoplay);
+            AddAssert("autoplay selected", () => SongSelect.Mods.Value.Single() is ModAutoplay);
 
-            AddUntilStep("wait for return to ss", () => Screen.IsCurrentScreen());
+            AddUntilStep("wait for return to ss", () => SongSelect.IsCurrentScreen());
 
-            AddAssert("no mods selected", () => Screen.Mods.Value.Count == 0);
+            AddAssert("no mods selected", () => SongSelect.Mods.Value.Count == 0);
         }
 
         [Test]
@@ -229,11 +229,11 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             AddUntilStep("wait for player", () => Stack.CurrentScreen is PlayerLoader);
 
-            AddAssert("autoplay selected", () => Screen.Mods.Value.Single() is ModAutoplay);
+            AddAssert("autoplay selected", () => SongSelect.Mods.Value.Single() is ModAutoplay);
 
-            AddUntilStep("wait for return to ss", () => Screen.IsCurrentScreen());
+            AddUntilStep("wait for return to ss", () => SongSelect.IsCurrentScreen());
 
-            AddAssert("autoplay still selected", () => Screen.Mods.Value.Single() is ModAutoplay);
+            AddAssert("autoplay still selected", () => SongSelect.Mods.Value.Single() is ModAutoplay);
         }
 
         [Test]
@@ -261,11 +261,11 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             AddUntilStep("wait for player", () => Stack.CurrentScreen is PlayerLoader);
 
-            AddAssert("only autoplay selected", () => Screen.Mods.Value.Single() is ModAutoplay);
+            AddAssert("only autoplay selected", () => SongSelect.Mods.Value.Single() is ModAutoplay);
 
-            AddUntilStep("wait for return to ss", () => Screen.IsCurrentScreen());
+            AddUntilStep("wait for return to ss", () => SongSelect.IsCurrentScreen());
 
-            AddAssert("relax returned", () => Screen.Mods.Value.Single() is ModRelax);
+            AddAssert("relax returned", () => SongSelect.Mods.Value.Single() is ModRelax);
         }
 
         #endregion

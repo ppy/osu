@@ -36,11 +36,11 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
         private RealmDetachedBeatmapStore beatmapStore = null!;
 
-        protected Screens.SelectV2.SongSelect Screen { get; private set; } = null!;
-        protected BeatmapCarousel Carousel => Screen.ChildrenOfType<BeatmapCarousel>().Single();
+        protected Screens.SelectV2.SongSelect SongSelect { get; private set; } = null!;
+        protected BeatmapCarousel Carousel => SongSelect.ChildrenOfType<BeatmapCarousel>().Single();
 
         [Cached]
-        private readonly ScreenFooter screenFooter;
+        protected readonly ScreenFooter Footer;
 
         [Cached]
         private readonly OsuLogo logo;
@@ -64,7 +64,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                         {
                             State = { Value = Visibility.Visible },
                         },
-                        screenFooter = new ScreenFooter
+                        Footer = new ScreenFooter
                         {
                             BackButtonPressed = () => Stack.CurrentScreen.Exit(),
                         },
@@ -124,7 +124,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 Config.SetValue(OsuSetting.SongSelectSortingMode, SortMode.Title);
                 Config.SetValue(OsuSetting.SongSelectGroupingMode, GroupMode.All);
 
-                Screen = null!;
+                SongSelect = null!;
             });
 
             AddStep("delete all beatmaps", () => Beatmaps.Delete());
@@ -132,8 +132,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
         protected virtual void LoadSongSelect()
         {
-            AddStep("load screen", () => Stack.Push(Screen = new SoloSongSelect()));
-            AddUntilStep("wait for load", () => Stack.CurrentScreen == Screen && Screen.IsLoaded);
+            AddStep("load screen", () => Stack.Push(SongSelect = new SoloSongSelect()));
+            AddUntilStep("wait for load", () => Stack.CurrentScreen == SongSelect && SongSelect.IsLoaded);
             AddUntilStep("wait for filtering", () => !Carousel.IsFiltering);
         }
 
@@ -143,13 +143,13 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             AddStep($"import test map for ruleset {rulesetId}", () =>
             {
-                beatmapsCount = Screen.IsNull() ? 0 : Carousel.Filters.OfType<BeatmapCarouselFilterGrouping>().Single().SetItems.Count;
+                beatmapsCount = SongSelect.IsNull() ? 0 : Carousel.Filters.OfType<BeatmapCarouselFilterGrouping>().Single().SetItems.Count;
                 Beatmaps.Import(TestResources.CreateTestBeatmapSetInfo(3, Rulesets.AvailableRulesets.Where(r => r.OnlineID == rulesetId).ToArray()));
             });
 
             // This is specifically for cases where the add is happening post song select load.
             // For cases where song select is null, the assertions are provided by the load checks.
-            AddUntilStep("wait for imported to arrive in carousel", () => Screen.IsNull() || Carousel.Filters.OfType<BeatmapCarouselFilterGrouping>().Single().SetItems.Count > beatmapsCount);
+            AddUntilStep("wait for imported to arrive in carousel", () => SongSelect.IsNull() || Carousel.Filters.OfType<BeatmapCarouselFilterGrouping>().Single().SetItems.Count > beatmapsCount);
         }
 
         protected void ChangeMods(params Mod[] mods) => AddStep($"change mods to {string.Join(", ", mods.Select(m => m.Acronym))}", () => SelectedMods.Value = mods);
@@ -177,19 +177,19 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             });
         }
 
-        protected void WaitForSuspension() => AddUntilStep("wait for not current", () => !Screen.AsNonNull().IsCurrentScreen());
+        protected void WaitForSuspension() => AddUntilStep("wait for not current", () => !SongSelect.AsNonNull().IsCurrentScreen());
 
         private void updateFooter(IScreen? _, IScreen? newScreen)
         {
             if (newScreen is IOsuScreen osuScreen && osuScreen.ShowFooter)
             {
-                screenFooter.Show();
-                screenFooter.SetButtons(osuScreen.CreateFooterButtons());
+                Footer.Show();
+                Footer.SetButtons(osuScreen.CreateFooterButtons());
             }
             else
             {
-                screenFooter.Hide();
-                screenFooter.SetButtons(Array.Empty<ScreenFooterButton>());
+                Footer.Hide();
+                Footer.SetButtons(Array.Empty<ScreenFooterButton>());
             }
         }
     }
