@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -22,6 +23,7 @@ using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osu.Game.Overlays.Volume;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Footer;
@@ -197,7 +199,11 @@ namespace osu.Game.Screens.SelectV2
 
         public override IReadOnlyList<ScreenFooterButton> CreateFooterButtons() => new ScreenFooterButton[]
         {
-            new FooterButtonMods(modSelectOverlay) { Current = Mods },
+            new FooterButtonMods(modSelectOverlay)
+            {
+                Current = Mods,
+                RequestDeselectAllMods = () => Mods.Value = Array.Empty<Mod>()
+            },
             new FooterButtonRandom(),
             new FooterButtonOptions(),
         };
