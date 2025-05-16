@@ -349,7 +349,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return missCount;
         }
 
-        private double calculateScoreBasedMissCount(ScoreInfo score, OsuDifficultyAttributes attributes)
+        private double calculateScoreBasedMissCountEstimation(ScoreInfo score, OsuDifficultyAttributes attributes)
         {
             if (attributes.MaxCombo == 0 || score.LegacyTotalScore == null)
                 return 0;
