@@ -82,7 +82,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double speedNotes = speed.RelevantNoteCount();
 
             double aimDifficultStrainCount = aim.CountTopWeightedStrains();
-            double speedDifficultStrainCount = speed.CountTopWeightedStrains();
+            double speedDifficultStrainCount = speed.CountTopWeightedNotes();
 
             double aimNoSlidersTopWeightedSliderCount = aimWithoutSliders.CountTopWeightedSliders();
             double aimNoSlidersDifficultStrainCount = aimWithoutSliders.CountTopWeightedStrains();
