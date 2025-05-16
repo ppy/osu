@@ -86,8 +86,17 @@ namespace osu.Game.Rulesets.UI
 
             if (frame != null)
             {
-                target.Replay.Frames.Add(frame);
+                // only keep the last recorded frame for a given timestamp.
+                // this reduces redundancy of frames in the resulting replay.
+                if (last?.Time == frame.Time)
+                    target.Replay.Frames[^1] = frame;
+                else
+                    target.Replay.Frames.Add(frame);
 
+                // the above de-duplication is not done for spectator client because it's more complicated to do
+                // (not possible to "un-send" a sent frame).
+                // a similar solution to the above could be applied at `FrameDataBundle` buffering level in `SpectatorClient` if deemed necessary,
+                // but it'd still not be completely matching (consider situation where buffer happens to be flushed between frames with the same timestamp).
                 spectatorClient?.HandleFrame(frame);
             }
         }
