@@ -53,6 +53,21 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         }
 
         [Test]
+        public void TestClearModsViaModButtonRightClick()
+        {
+            LoadSongSelect();
+
+            AddStep("select NC", () => SelectedMods.Value = new[] { new OsuModNightcore() });
+            AddAssert("mods selected", () => SelectedMods.Value, () => Has.Count.EqualTo(1));
+            AddStep("right click mod button", () =>
+            {
+                InputManager.MoveMouseTo(Footer.ChildrenOfType<FooterButtonMods>().Single());
+                InputManager.Click(MouseButton.Right);
+            });
+            AddAssert("not mods selected", () => SelectedMods.Value, () => Has.Count.EqualTo(0));
+        }
+
+        [Test]
         public void TestSpeedChange()
         {
             LoadSongSelect();
