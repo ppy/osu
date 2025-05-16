@@ -382,6 +382,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         /// </summary>
         private double calculateMaximumComboBasedMissCount(OsuDifficultyAttributes attributes)
         {
+            if (attributes.SliderCount <= 0)
+                return countMiss;
+
             double missCount = 0;
 
             // Consider that full combo is maximum combo minus dropped slider tails since they don't contribute to combo but also don't break it
