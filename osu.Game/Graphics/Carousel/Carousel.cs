@@ -747,10 +747,12 @@ namespace osu.Game.Graphics.Carousel
 
                     if (toDisplay.Contains(panel.Item!))
                     {
-                        if (i == 0)
-                            panel.DrawYPosition = panel.Item!.CarouselYPosition;
-                        else
+                        // Don't apply to the last because animating the tail of the list looks bad.
+                        // It's usually off-screen anyway.
+                        if (i > 0 && i < orderedPanels.Count - 1)
                             panel.DrawYPosition = orderedPanels[i - 1].DrawYPosition;
+                        else
+                            panel.DrawYPosition = panel.Item!.CarouselYPosition;
                     }
                 }
             }
