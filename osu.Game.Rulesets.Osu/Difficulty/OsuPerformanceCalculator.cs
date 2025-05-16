@@ -96,12 +96,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             overallDifficulty = (80 - greatHitWindow) / 6;
             approachRate = preempt > 1200 ? (1800 - preempt) / 120 : (1200 - preempt) / 150 + 5;
 
-            double comboBasedMissCount = calculateComboBasedMissCount(osuAttributes);
+            double comboBasedMissCount = calculateComboBasedEstimatedMissCount(osuAttributes);
             double? scoreBasedMissCount = null;
 
             if (usingClassicSliderAccuracy && score.LegacyTotalScore != null)
             {
-                scoreBasedMissCount = calculateScoreBasedMissCount(score, osuAttributes);
+                scoreBasedMissCount = calculateScoreBasedEstimatedMissCount(score, osuAttributes);
                 effectiveMissCount = scoreBasedMissCount.Value;
             }
             else
@@ -316,7 +316,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return flashlightValue;
         }
 
-        private double calculateComboBasedMissCount(OsuDifficultyAttributes attributes)
+        private double calculateComboBasedEstimatedMissCount(OsuDifficultyAttributes attributes)
         {
             if (attributes.SliderCount <= 0)
                 return countMiss;
@@ -349,7 +349,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return missCount;
         }
 
-        private double calculateScoreBasedMissCountEstimation(ScoreInfo score, OsuDifficultyAttributes attributes)
+        private double calculateScoreBasedEstimatedMissCount(ScoreInfo score, OsuDifficultyAttributes attributes)
         {
             if (attributes.MaxCombo == 0 || score.LegacyTotalScore == null)
                 return 0;
@@ -399,12 +399,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double calculateScoreAtCombo(OsuDifficultyAttributes attributes, double combo, double relevantComboPerObject, double scoreV1Multiplier)
         {
-            double n = combo / relevantComboPerObject - 1;
-            double a = relevantComboPerObject - 1;
+            double estimatedObjects = combo / relevantComboPerObject - 1;
 
             // The combo portion of ScoreV1 follows arithmetic progression
             // Therefore, we calculate the combo portion of score using the combo per object and our current combo.
-            double comboScore = relevantComboPerObject > 0 ? (2 * a + (n - 1) * relevantComboPerObject) * n / 2 : 0;
+            double comboScore = relevantComboPerObject > 0 ? (2 * (relevantComboPerObject - 1) + (estimatedObjects - 1) * relevantComboPerObject) * estimatedObjects / 2 : 0;
 
             // We then apply the accuracy and ScoreV1 multipliers to the resulting score.
             comboScore *= accuracy * 300 / 25 * scoreV1Multiplier;
@@ -424,14 +423,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // We then reverse apply the ScoreV1 multipliers to get the raw value.
             comboScore /= 300.0 / 25.0 * attributes.LegacyScoreBaseMultiplier;
 
-            double a = attributes.MaxCombo;
-            double b = comboScore;
-
             // Reverse the arithmetic progression to work out the amount of combo per object based on the score.
-            double x = (a - 2) * a;
-            x /= Math.Max(a + 2 * (b - 1), 1);
+            double result = (attributes.MaxCombo - 2) * attributes.MaxCombo;
+            result /= Math.Max(attributes.MaxCombo + 2 * (comboScore - 1), 1);
 
-            return x;
+            return result;
         }
 
         private double calculateEstimatedSliderbreaks(double topWeightedSliderFactor, OsuDifficultyAttributes attributes)
