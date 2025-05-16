@@ -695,6 +695,12 @@ namespace osu.Game.Graphics.Carousel
             {
                 var carouselPanel = (ICarouselPanel)panel;
 
+                if (carouselPanel.Item == null)
+                {
+                    // Item is null when a panel is already fading away from existence; should be ignored for tracking purposes.
+                    continue;
+                }
+
                 // The case where we're intending to display this panel, but it's already displayed.
                 // Note that we **must compare the model here** as the CarouselItems may be fresh instances due to a filter operation.
                 //
@@ -721,10 +727,32 @@ namespace osu.Game.Graphics.Carousel
                 if (drawable is not ICarouselPanel carouselPanel)
                     throw new InvalidOperationException($"Carousel panel drawables must implement {typeof(ICarouselPanel)}");
 
-                carouselPanel.DrawYPosition = item.CarouselYPosition;
                 carouselPanel.Item = item;
-
                 Scroll.Add(drawable);
+            }
+
+            if (toDisplay.Any())
+            {
+                // To make transitions of items appearing in the flow look good, do a pass and make sure newly added items spawn from
+                // just beneath the *current interpolated position* of the previous panel.
+                var orderedPanels = Scroll.Panels
+                                          .OfType<ICarouselPanel>()
+                                          .Where(p => p.Item != null)
+                                          .OrderBy(p => p.Item!.CarouselYPosition)
+                                          .ToList();
+
+                for (int i = 0; i < orderedPanels.Count; i++)
+                {
+                    var panel = orderedPanels[i];
+
+                    if (toDisplay.Contains(panel.Item!))
+                    {
+                        if (i == 0)
+                            panel.DrawYPosition = panel.Item!.CarouselYPosition;
+                        else
+                            panel.DrawYPosition = orderedPanels[i - 1].DrawYPosition;
+                    }
+                }
             }
 
             // Update the total height of all items (to make the scroll container scrollable through the full height even though
