@@ -43,7 +43,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddStep("select beatmap", () => Beatmap.Value = Beatmaps.GetWorkingBeatmap(Beatmaps.GetAllUsableBeatmapSets().Single().Beatmaps.First()));
             AddAssert("beatmap selected", () => !Beatmap.IsDefault);
 
-            AddStep($"import score", () =>
+            AddStep("import score", () =>
             {
                 var beatmapInfo = Beatmaps.GetAllUsableBeatmapSets().Single().Beatmaps.First();
                 ScoreManager.Import(new ScoreInfo
