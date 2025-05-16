@@ -23,7 +23,7 @@ namespace osu.Game.Screens.SelectV2
         private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
 
         [Resolved]
-        private ISongSelectBeatmapActions? beatmapActions { get; set; }
+        private ISongSelect? songSelect { get; set; }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colour)
@@ -51,7 +51,7 @@ namespace osu.Game.Screens.SelectV2
         public Framework.Graphics.UserInterface.Popover GetPopover() => new Popover(this, beatmap.Value)
         {
             ColourProvider = colourProvider,
-            BeatmapActions = beatmapActions
+            SongSelect = songSelect
         };
     }
 }
