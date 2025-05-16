@@ -96,7 +96,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             overallDifficulty = (80 - greatHitWindow) / 6;
             approachRate = preempt > 1200 ? (1800 - preempt) / 120 : (1200 - preempt) / 150 + 5;
 
-            double comboBasedMissCount = calculateComboBasedMissCount(score, osuAttributes);
+            double comboBasedMissCount = calculateComboBasedMissCount(osuAttributes);
             double? scoreBasedMissCount = null;
 
             if (usingClassicSliderAccuracy && score.LegacyTotalScore != null)
@@ -316,9 +316,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return flashlightValue;
         }
 
-        private double calculateComboBasedMissCount(ScoreInfo score, OsuDifficultyAttributes attributes)
+        private double calculateComboBasedMissCount(OsuDifficultyAttributes attributes)
         {
-            if (attributes.SliderCount == 0)
+            if (attributes.SliderCount <= 0)
                 return countMiss;
 
             double missCount = countMiss;
