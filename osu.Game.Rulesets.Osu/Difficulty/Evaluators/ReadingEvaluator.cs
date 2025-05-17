@@ -32,14 +32,21 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double loopDifficulty = currObj.OpacityAt(loopObj.BaseObject.StartTime, false);
 
                 // Small distances means objects may be cheesed, so it doesn't matter whether they are arranged confusingly.
+                // https://www.desmos.com/calculator/6sgz6j5zb1
                 loopDifficulty *= DifficultyCalculationUtils.Logistic(-(loopObj.LazyJumpDistance - 75) / 15);
 
+                // Account less for objects close to the max reading window
                 double timeBetweenCurrAndLoopObj = currObj.StartTime - loopObj.StartTime;
                 double timeNerfFactor = getTimeNerfFactor(timeBetweenCurrAndLoopObj);
 
                 loopDifficulty *= timeNerfFactor;
                 pastObjectDifficultyInfluence += loopDifficulty;
             }
+
+            // Award only denser than average maps
+            double noteDensityDifficulty = Math.Max(0, pastObjectDifficultyInfluence - 2.7);
+
+            noteDensityDifficulty *= constantAngleNerfFactor * angularVelocityFactor;
 
             double hiddenDifficulty = 0.0;
 
@@ -50,13 +57,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 // Nerf extremely high times as you begin to rely more on memory the longer a note is invisible
                 double timeSpentInvisibleFactor = Math.Min(timeSpentInvisible, 1000) + (timeSpentInvisible > 1000 ? 2000 * Math.Log10(timeSpentInvisible / 1000) : 0);
 
-                // Nerf hidden difficulty less the more past object difficulty you have
-                double timeDifficultyFactor = 9000 / pastObjectDifficultyInfluence;
-
                 // Cap objects because after a certain point hidden density is mainly memory
                 double visibleObjectFactor = Math.Min(getCurrentVisibleObjectCount(totalObjects, currObj, preempt), 8);
 
-                hiddenDifficulty += visibleObjectFactor * timeSpentInvisibleFactor / timeDifficultyFactor;
+                hiddenDifficulty += visibleObjectFactor * timeSpentInvisibleFactor * pastObjectDifficultyInfluence * 0.00009;
 
                 hiddenDifficulty *= constantAngleNerfFactor * angularVelocityFactor;
 
@@ -71,22 +75,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             double preemptDifficulty = 0.0;
 
+            // Arbitrary curve for the base value preempt difficulty should have as approach rate increases
+            // https://www.desmos.com/calculator/hd9dojqyt2
             preemptDifficulty += preempt > 500 ? 0 : Math.Pow(500 - preempt, 2.3) / 75000;
 
             preemptDifficulty *= constantAngleNerfFactor * angularVelocityFactor;
-
-            // Award only denser than average maps
-            double noteDensityDifficulty = Math.Max(0, pastObjectDifficultyInfluence - 2.7);
-
-            noteDensityDifficulty *= constantAngleNerfFactor * angularVelocityFactor;
 
             double difficulty = preemptDifficulty + hiddenDifficulty + noteDensityDifficulty;
 
             return difficulty;
         }
 
-        // Returns a list of objects that are visible on screen at
-        // the point in time at which the current object becomes visible.
+        // Returns a list of objects that are visible on screen at the point in time the current object becomes visible.
         private static IEnumerable<OsuDifficultyHitObject> retrievePastVisibleObjects(OsuDifficultyHitObject current, double preempt)
         {
             for (int i = 0; i < current.Index; i++)
@@ -102,8 +102,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             }
         }
 
-        // Returns a list of objects that are visible on screen at
-        // the point in time at which the current object needs to be clicked.
+        // Returns the amount of objects visible at the point in time the current object needs to be clicked
         private static int getCurrentVisibleObjectCount(int totalObjects, OsuDifficultyHitObject current, double preempt)
         {
             int visibleObjectCount = 0;
@@ -123,6 +122,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             return visibleObjectCount;
         }
 
+        // Returns the amount of time a note spends invisible with the hidden mod at the current approach rate
         private static double getDurationSpentInvisible(OsuDifficultyHitObject current)
         {
             var baseObject = (OsuHitObject)current.BaseObject;
@@ -133,6 +133,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             return (fadeOutStartTime + fadeOutDuration) - (baseObject.StartTime - baseObject.TimePreempt);
         }
 
+        // Returns a factor of how often the current object's angle has been repeated in a certain time frame
+        // It does this by checking the difference in angle between current and past objects and sums them based on a range of similarity
+        // https://www.desmos.com/calculator/91acokynyf
         private static double getConstantAngleNerfFactor(OsuDifficultyHitObject current)
         {
             const double time_limit = 2000;
@@ -149,6 +152,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 if (loopObj.IsNull())
                     break;
 
+                // Account less for objects that are close to the time limit
                 double longIntervalFactor = Math.Clamp(1 - (loopObj.StrainTime - time_limit_low) / (time_limit - time_limit_low), 0, 1);
 
                 if (loopObj.Angle.IsNotNull() && current.Angle.IsNotNull())
@@ -164,11 +168,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             return Math.Min(1, 2 / constantAngleCount);
         }
 
+        // Returns a nerfing factor for when objects are very distant in time, affecting reading less
         private static double getTimeNerfFactor(double deltaTime)
         {
             return Math.Clamp(2 - deltaTime / (reading_window_size / 2), 0, 1);
         }
 
+        // Returns the velocity of going from the previous object to the current scaled by the difference in their angles
+        // Includes a targeted nerf for cases where objects go back and forth through a middle point
+        // https://www.desmos.com/calculator/5vwzshwz7t
         private static double getAngularVelocityFactor(OsuDifficultyHitObject current)
         {
             var previous = (OsuDifficultyHitObject)current.Previous(0);
@@ -176,10 +184,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             if (!current.Angle.HasValue ||
                 previous?.Angle == null ||
-                !(Math.Abs(current.DeltaTime - previous.DeltaTime) < 10)) return current.MinimumJumpDistance / current.StrainTime;
+                !(Math.Abs(current.DeltaTime - previous.DeltaTime) < 10))
+            {
+                return current.MinimumJumpDistance / current.StrainTime; // Return unscaled velocity if conditions aren't met
+            }
 
             double angleDifference = Math.Abs(current.Angle.Value - previous.Angle.Value);
-            double angleDifferenceAdjusted = Math.Sin(angleDifference / 2) * 180.0;
+            double angleDifferenceAdjusted = 0.1 + Math.Sin(angleDifference / 2) * 180.0;
             double angularVelocity = angleDifferenceAdjusted * (current.MinimumJumpDistance / current.StrainTime);
             double angularVelocityBonus = Math.Max(0.0, Math.Pow(angularVelocity, 0.4) - 1.0) * 0.35;
 
