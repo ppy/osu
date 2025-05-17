@@ -423,5 +423,11 @@ namespace osu.Game.Screens.SelectV2
         #endregion
     }
 
-    public record GroupDefinition(object Data, string Title);
+    /// <summary>
+    /// Defines a grouping header for a set of carousel items.
+    /// </summary>
+    /// <param name="Order">The order of this group in the carousel, sorted using ascending order.</param>
+    /// <param name="Title">The title of this group.</param>
+    /// <param name="Data">Additional data. Provide a <see cref="StarDifficulty"/> for difficulty groups, or null for any other group.</param>
+    public record GroupDefinition(int Order, string Title, object? Data = null);
 }
