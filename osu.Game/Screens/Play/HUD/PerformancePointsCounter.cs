@@ -23,6 +23,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
+using osu.Game.Scoring.Legacy;
 using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Play.HUD
@@ -45,6 +46,7 @@ namespace osu.Game.Screens.Play.HUD
         private JudgementResult lastJudgement;
         private PerformanceCalculator performanceCalculator;
         private ScoreInfo scoreInfo;
+        private ILegacyScoreProcessor legacyScoreProcessor;
 
         private Mod[] clonedMods;
 
@@ -78,8 +80,16 @@ namespace osu.Game.Screens.Play.HUD
 
             if (scoreProcessor != null)
             {
-                scoreProcessor.NewJudgement += onJudgementChanged;
-                scoreProcessor.JudgementReverted += onJudgementChanged;
+                // Setup legacy score processor for legacy scores
+                if (clonedMods.OfType<ModClassic>().Any())
+                {
+                    legacyScoreProcessor = scoreProcessor.CreateLegacyScoreProcessor();
+                    legacyScoreProcessor.ApplyBeatmap(gameplayState.Beatmap);
+                    legacyScoreProcessor.ApplyMods(clonedMods);
+                }
+
+                scoreProcessor.NewJudgement += onJudgementAdded;
+                scoreProcessor.JudgementReverted += onJudgementReverted;
             }
 
             if (gameplayState?.LastJudgementResult.Value != null)
@@ -87,6 +97,24 @@ namespace osu.Game.Screens.Play.HUD
         }
 
         public virtual bool IsValid { get; set; }
+
+        private long legacyTotalScore;
+
+        private void onJudgementAdded(JudgementResult judgement)
+        {
+            if (legacyScoreProcessor != null)
+                legacyTotalScore += legacyScoreProcessor.GetScoreForResult(judgement);
+
+            onJudgementChanged(judgement);
+        }
+
+        private void onJudgementReverted(JudgementResult judgement)
+        {
+            if (legacyScoreProcessor != null)
+                legacyTotalScore -= legacyScoreProcessor.GetScoreForResult(judgement);
+
+            onJudgementChanged(judgement);
+        }
 
         private void onJudgementChanged(JudgementResult judgement)
         {
@@ -101,6 +129,8 @@ namespace osu.Game.Screens.Play.HUD
             }
 
             scoreProcessor.PopulateScore(scoreInfo);
+            scoreInfo.LegacyTotalScore = legacyTotalScore;
+
             Current.Value = (int)Math.Round(performanceCalculator?.Calculate(scoreInfo, attrib).Total ?? 0, MidpointRounding.AwayFromZero);
             IsValid = true;
         }
@@ -124,8 +154,8 @@ namespace osu.Game.Screens.Play.HUD
 
             if (scoreProcessor != null)
             {
-                scoreProcessor.NewJudgement -= onJudgementChanged;
-                scoreProcessor.JudgementReverted -= onJudgementChanged;
+                scoreProcessor.NewJudgement -= onJudgementAdded;
+                scoreProcessor.JudgementReverted -= onJudgementReverted;
             }
 
             loadCancellationSource?.Cancel();

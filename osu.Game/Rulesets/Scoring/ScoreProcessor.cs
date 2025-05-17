@@ -65,8 +65,6 @@ namespace osu.Game.Rulesets.Scoring
         /// </remarks>
         public readonly BindableLong TotalScoreWithoutMods = new BindableLong { MinValue = 0 };
 
-        public readonly BindableLong LegacyTotalScore = new BindableLong { MinValue = 0 };
-
         /// <summary>
         /// The current accuracy.
         /// </summary>
@@ -178,8 +176,6 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         private double scoreMultiplier = 1;
 
-        private ILegacyScoreProcessor? legacyScoreProcessor;
-
         public Dictionary<HitResult, int> MaximumStatistics
         {
             get
@@ -193,7 +189,7 @@ namespace osu.Game.Rulesets.Scoring
 
         public IReadOnlyDictionary<HitResult, int> Statistics => ScoreResultCounts;
 
-        protected virtual ILegacyScoreProcessor? CreateLegacyScoreProcessor() => null;
+        public virtual ILegacyScoreProcessor? CreateLegacyScoreProcessor() => null;
 
         private bool beatmapApplied;
 
@@ -208,7 +204,6 @@ namespace osu.Game.Rulesets.Scoring
         public ScoreProcessor(Ruleset ruleset)
         {
             Ruleset = ruleset;
-            legacyScoreProcessor = CreateLegacyScoreProcessor();
 
             Combo.ValueChanged += combo => HighestCombo.Value = Math.Max(HighestCombo.Value, combo.NewValue);
             Accuracy.ValueChanged += _ => updateRank();
@@ -220,8 +215,6 @@ namespace osu.Game.Rulesets.Scoring
                 foreach (var m in mods.NewValue)
                     scoreMultiplier *= m.ScoreMultiplier;
 
-                legacyScoreProcessor?.ApplyMods(mods.NewValue);
-
                 updateScore();
                 updateRank();
             };
@@ -230,7 +223,6 @@ namespace osu.Game.Rulesets.Scoring
         public override void ApplyBeatmap(IBeatmap beatmap)
         {
             base.ApplyBeatmap(beatmap);
-            legacyScoreProcessor?.ApplyBeatmap(beatmap);
             beatmapApplied = true;
         }
 
@@ -264,9 +256,6 @@ namespace osu.Game.Rulesets.Scoring
                 currentBonusPortion += GetBonusScoreChange(result);
             else if (result.Type.IsScorable())
                 currentComboPortion += GetComboScoreChange(result);
-
-            if (legacyScoreProcessor != null)
-                LegacyTotalScore.Value += legacyScoreProcessor.GetScoreForResult(result);
 
             ApplyScoreChange(result);
 
@@ -316,9 +305,6 @@ namespace osu.Game.Rulesets.Scoring
                 currentBonusPortion -= GetBonusScoreChange(result);
             else if (result.Type.IsScorable())
                 currentComboPortion -= GetComboScoreChange(result);
-
-            if (legacyScoreProcessor != null)
-                LegacyTotalScore.Value -= legacyScoreProcessor.GetScoreForResult(result);
 
             RemoveScoreChange(result);
 
@@ -456,7 +442,6 @@ namespace osu.Game.Rulesets.Scoring
             currentComboPortion = 0;
             currentBonusPortion = 0;
 
-            LegacyTotalScore.Value = 0;
             TotalScore.Value = 0;
             Accuracy.Value = 1;
             Combo.Value = 0;
@@ -486,7 +471,6 @@ namespace osu.Game.Rulesets.Scoring
             // Populate total score after everything else.
             score.TotalScoreWithoutMods = TotalScoreWithoutMods.Value;
             score.TotalScore = TotalScore.Value;
-            score.LegacyTotalScore = LegacyTotalScore.Value;
         }
 
         /// <summary>
