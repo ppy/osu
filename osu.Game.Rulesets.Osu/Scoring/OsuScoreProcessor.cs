@@ -35,7 +35,5 @@ namespace osu.Game.Rulesets.Osu.Scoring
 
         protected override HitEvent CreateHitEvent(JudgementResult result)
             => base.CreateHitEvent(result).With((result as OsuHitCircleJudgementResult)?.CursorPositionAtHit);
-
-        public override ILegacyScoreProcessor? CreateLegacyScoreProcessor() => new OsuLegacyScoreProcessor();
     }
 }
