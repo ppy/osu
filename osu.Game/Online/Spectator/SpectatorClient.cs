@@ -247,6 +247,11 @@ namespace osu.Game.Online.Spectator
 
                 var convertedFrame = convertible.ToLegacy(currentBeatmap);
 
+                // only keep the last recorded frame for a given timestamp.
+                // this reduces redundancy of frames in the resulting replay.
+                //
+                // this is also done at `ReplayRecorded`, but needs to be done here as well
+                // due to the flow being handled differently.
                 if (pendingFrames.LastOrDefault()?.Time == convertedFrame.Time)
                     pendingFrames[^1] = convertedFrame;
                 else
