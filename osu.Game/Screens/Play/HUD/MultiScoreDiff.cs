@@ -4,6 +4,7 @@
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Logging;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
@@ -11,6 +12,7 @@ using osu.Game.Overlays.SkinEditor;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Skinning;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play.HUD
 {
@@ -60,6 +62,14 @@ namespace osu.Game.Screens.Play.HUD
 
             base.Update();
 
+            updateCounterValue();
+            updateTextColor();
+        }
+
+        public bool UsesFixedAnchor { get; set; }
+
+        private void updateCounterValue()
+        {
             Logger.Log($"user name : {multiplayerClient!.LocalUser!.User!.Username}");
 
             Logger.Log($"user count : {leaderboardProvider.Scores.Count}");
@@ -84,10 +94,26 @@ namespace osu.Game.Screens.Play.HUD
             }
 
             var curTopScore = scoresButMe.ToList().OrderByDescending(s => s.TotalScore.Value).FirstOrDefault();
-
+ 
             Current.Value = player.Score.ScoreInfo.TotalScore - curTopScore!.TotalScore.Value;
+
+
         }
 
-        public bool UsesFixedAnchor { get; set; }
+        private void updateTextColor()
+        {
+            SRGBColour colour = new SRGBColour();
+
+            if (Current.Value < 0)
+            {
+                colour.SRGB = Color4.Red;
+            }
+            else
+            {
+                colour.SRGB = Color4.White;
+            }
+
+            Colour = ColourInfo.SingleColour(colour);
+        }
     }
 }
