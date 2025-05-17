@@ -42,9 +42,14 @@ namespace osu.Game.Screens.Play.HUD
 
         protected override void Update()
         {
+            if (isHidden)
+            {
+                return;
+            }
+
             if (multiplayerClient.LocalUser == null)
             {
-                if (!skinEditor.IsPresent && !isHidden)
+                if (!skinEditor.IsPresent)
                 {
                     Hide();
                     isHidden = true;
@@ -72,6 +77,9 @@ namespace osu.Game.Screens.Play.HUD
             // If the user is the only one in the room
             if (scoresButMe.Count == 0)
             {
+                Hide();
+                isHidden = true;
+
                 return;
             }
 
