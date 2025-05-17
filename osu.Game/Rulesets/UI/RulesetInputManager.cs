@@ -39,6 +39,7 @@ namespace osu.Game.Rulesets.UI
 
         public ReplayRecorder? Recorder
         {
+            get => recorder;
             set
             {
                 if (value == recorder)

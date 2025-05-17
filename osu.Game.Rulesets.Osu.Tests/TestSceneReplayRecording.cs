@@ -58,17 +58,23 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             seekTo(0);
             AddStep("move cursor to circle", () => InputManager.MoveMouseTo(Player.DrawableRuleset.Playfield.HitObjectContainer.AliveObjects.Single()));
-            AddStep("press X", () => InputManager.Key(Key.X));
+            AddStep("press X", () => InputManager.PressKey(Key.X));
+            seekTo(15);
+            AddStep("release X", () => InputManager.ReleaseKey(Key.X));
             AddAssert("right button press recorded to replay", () => Player.Score.Replay.Frames.OfType<OsuReplayFrame>().Any(f => f.Actions.SequenceEqual([OsuAction.RightButton])));
 
             seekTo(5000);
             AddStep("move cursor to circle", () => InputManager.MoveMouseTo(Player.DrawableRuleset.Playfield.HitObjectContainer.AliveObjects.Single()));
-            AddStep("press Z", () => InputManager.Key(Key.Z));
+            AddStep("press Z", () => InputManager.PressKey(Key.Z));
+            seekTo(5015);
+            AddStep("release Z", () => InputManager.ReleaseKey(Key.Z));
             AddAssert("left button press recorded to replay", () => Player.Score.Replay.Frames.OfType<OsuReplayFrame>().Any(f => f.Actions.SequenceEqual([OsuAction.LeftButton])));
 
             seekTo(10000);
             AddStep("move cursor to circle", () => InputManager.MoveMouseTo(Player.DrawableRuleset.Playfield.HitObjectContainer.AliveObjects.Single()));
-            AddStep("press C", () => InputManager.Key(Key.C));
+            AddStep("press C", () => InputManager.PressKey(Key.C));
+            seekTo(10015);
+            AddStep("release C", () => InputManager.ReleaseKey(Key.C));
             AddAssert("smoke button press recorded to replay", () => Player.Score.Replay.Frames.OfType<OsuReplayFrame>().Any(f => f.Actions.SequenceEqual([OsuAction.Smoke])));
         }
 

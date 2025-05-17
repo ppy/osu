@@ -46,8 +46,10 @@ namespace osu.Game.Rulesets.Mania.Tests
         public void TestRecording()
         {
             seekTo(0);
-            AddStep("press space", () => InputManager.Key(Key.Space));
-            AddAssert("button press recorded to replay", () => Player.Score.Replay.Frames.OfType<ManiaReplayFrame>().Any(f => f.Actions.SequenceEqual([ManiaAction.Key1])));
+            AddStep("press space", () => InputManager.PressKey(Key.Space));
+            seekTo(15);
+            AddStep("release space", () => InputManager.ReleaseKey(Key.Space));
+            AddUntilStep("button press recorded to replay", () => Player.Score.Replay.Frames.OfType<ManiaReplayFrame>().Any(f => f.Actions.SequenceEqual([ManiaAction.Key1])));
         }
 
         private void seekTo(double time)
