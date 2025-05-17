@@ -1,11 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Colour;
-using osu.Framework.Logging;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays.SkinEditor;
@@ -70,10 +68,6 @@ namespace osu.Game.Screens.Play.HUD
 
         private void updateCounterValue()
         {
-            Logger.Log($"user name : {multiplayerClient!.LocalUser!.User!.Username}");
-
-            Logger.Log($"user count : {leaderboardProvider.Scores.Count}");
-
             // If the leaderborad is yet fully loaded
             if (leaderboardProvider.Scores.Count == 0)
             {
@@ -81,8 +75,6 @@ namespace osu.Game.Screens.Play.HUD
             }
 
             var scoresButMe = leaderboardProvider.Scores.ToList().Where(s => s.User.Username != multiplayerClient.LocalUser.User.Username).ToList();
-
-            Logger.Log($"scoresButMe count : {scoresButMe.Count}");
 
             // If the user is the only one in the room
             if (scoresButMe.Count == 0)
@@ -94,10 +86,8 @@ namespace osu.Game.Screens.Play.HUD
             }
 
             var curTopScore = scoresButMe.ToList().OrderByDescending(s => s.TotalScore.Value).FirstOrDefault();
- 
+
             Current.Value = player.Score.ScoreInfo.TotalScore - curTopScore!.TotalScore.Value;
-
-
         }
 
         private void updateTextColor()
