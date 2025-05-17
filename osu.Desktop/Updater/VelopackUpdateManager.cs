@@ -47,7 +47,7 @@ namespace osu.Desktop.Updater
 
         private void onReleaseStreamChanged()
         {
-            updateManager = new UpdateManager(new GithubSource(@"https://github.com/ppy/osu", null, releaseStream.Value == ReleaseStream.Photon), new UpdateOptions
+            updateManager = new UpdateManager(new GithubSource(@"https://github.com/ppy/osu", null, releaseStream.Value == ReleaseStream.Tachyon), new UpdateOptions
             {
                 AllowVersionDowngrade = true,
             });
