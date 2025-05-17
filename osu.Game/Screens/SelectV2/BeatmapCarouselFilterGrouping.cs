@@ -48,7 +48,7 @@ namespace osu.Game.Screens.SelectV2
                 var criteria = getCriteria();
                 var newItems = new List<CarouselItem>();
 
-                BeatmapSetsGroupedTogether = criteria.Sort != SortMode.Difficulty;
+                BeatmapSetsGroupedTogether = criteria.Sort != SortMode.Difficulty && criteria.Group != GroupMode.Difficulty;
 
                 var groups = getGroups((List<CarouselItem>)items, criteria);
 
