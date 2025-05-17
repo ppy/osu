@@ -7,7 +7,6 @@ using osu.Framework.Graphics.Colour;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays.SkinEditor;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Skinning;
 using osuTK.Graphics;
@@ -16,9 +15,6 @@ namespace osu.Game.Screens.Play.HUD
 {
     public partial class MultiScoreDiff : RollingCounter<long>, ISerialisableDrawable
     {
-        [Resolved]
-        private ScoreProcessor scoreProcessor { get; set; } = null!;
-
         [Resolved]
         private Player player { get; set; } = null!;
 
