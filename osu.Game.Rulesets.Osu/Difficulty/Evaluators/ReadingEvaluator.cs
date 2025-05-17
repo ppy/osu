@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 {
     public static class ReadingEvaluator
     {
-        private const double reading_window_size = 3000;
+        private const double reading_window_size = 3000; // 3 seconds
 
         public static double EvaluateDifficultyOf(int totalObjects, DifficultyHitObject current, double clockRate, double preempt, bool hidden)
         {
@@ -60,7 +60,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 // Cap objects because after a certain point hidden density is mainly memory
                 double visibleObjectFactor = Math.Min(getCurrentVisibleObjectCount(totalObjects, currObj, preempt), 8);
 
-                hiddenDifficulty += visibleObjectFactor * timeSpentInvisibleFactor * pastObjectDifficultyInfluence * 0.00009;
+                hiddenDifficulty += visibleObjectFactor * timeSpentInvisibleFactor * pastObjectDifficultyInfluence / 9000;
 
                 hiddenDifficulty *= constantAngleNerfFactor * angularVelocityFactor;
 
@@ -138,7 +138,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         // https://www.desmos.com/calculator/91acokynyf
         private static double getConstantAngleNerfFactor(OsuDifficultyHitObject current)
         {
-            const double time_limit = 2000;
+            const double time_limit = 2000; // 2 seconds
             const double time_limit_low = 200;
 
             double constantAngleCount = 0;
