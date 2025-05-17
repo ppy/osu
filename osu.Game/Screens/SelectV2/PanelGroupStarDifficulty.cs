@@ -140,7 +140,7 @@ namespace osu.Game.Screens.SelectV2
             Debug.Assert(Item != null);
 
             var group = (GroupDefinition)Item.Model;
-            var stars = (StarDifficulty)group.Data;
+            var stars = (StarDifficulty)group.Data!;
             int starNumber = (int)stars.Stars;
 
             ratingColour = starNumber >= 9 ? OsuColour.Gray(0.2f) : colours.ForStarDifficulty(starNumber);
