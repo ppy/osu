@@ -16,7 +16,6 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Scoring;
-using osu.Game.Scoring.Legacy;
 
 namespace osu.Game.Rulesets.Scoring
 {

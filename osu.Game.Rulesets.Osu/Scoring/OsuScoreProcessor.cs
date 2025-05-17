@@ -6,7 +6,6 @@ using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
-using osu.Game.Scoring.Legacy;
 
 namespace osu.Game.Rulesets.Osu.Scoring
 {
