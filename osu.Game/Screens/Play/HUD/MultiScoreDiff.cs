@@ -70,7 +70,7 @@ namespace osu.Game.Screens.Play.HUD
                 return;
             }
 
-            var scoresButMe = leaderboardProvider.Scores.ToList().Where(s => s.User.Username != multiplayerClient.LocalUser.User.Username).ToList();
+            var scoresButMe = leaderboardProvider.Scores.ToList().Where(s => s.User.Username != multiplayerClient.LocalUser!.User!.Username).ToList();
 
             // If the user is the only one in the room
             if (scoresButMe.Count == 0)
