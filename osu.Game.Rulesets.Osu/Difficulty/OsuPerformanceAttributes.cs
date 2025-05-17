@@ -30,6 +30,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         [JsonProperty("speed_deviation")]
         public double? SpeedDeviation { get; set; }
 
+        [JsonProperty("combo_based_estimated_miss_count")]
+        public double ComboBasedEstimatedMissCount { get; set; }
+
+        [JsonProperty("score_based_estimated_miss_count")]
+        public double? ScoreBasedEstimatedMissCount { get; set; }
+
         public override IEnumerable<PerformanceDisplayAttribute> GetAttributesForDisplay()
         {
             foreach (var attribute in base.GetAttributesForDisplay())
