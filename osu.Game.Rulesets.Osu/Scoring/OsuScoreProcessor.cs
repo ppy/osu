@@ -6,6 +6,7 @@ using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
+using osu.Game.Scoring.Legacy;
 
 namespace osu.Game.Rulesets.Osu.Scoring
 {
@@ -34,5 +35,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
 
         protected override HitEvent CreateHitEvent(JudgementResult result)
             => base.CreateHitEvent(result).With((result as OsuHitCircleJudgementResult)?.CursorPositionAtHit);
+
+        protected override ILegacyScoreProcessor? CreateLegacyScoreProcessor() => new OsuLegacyScoreProcessor();
     }
 }
