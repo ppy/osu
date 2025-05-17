@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Play.HUD
 
         protected override double RollingDuration => 0;
 
-        private bool isHidden = false;
+        private bool isHidden = new bool();
 
         [BackgroundDependencyLoader]
         private void load()
@@ -70,7 +70,7 @@ namespace osu.Game.Screens.Play.HUD
                 return;
             }
 
-            var scoresButMe = leaderboardProvider.Scores.ToList().Where(s => s.User.Username != multiplayerClient!.LocalUser!.User!.Username).ToList();
+            var scoresButMe = leaderboardProvider.Scores.ToList().Where(s => s.User.Username != multiplayerClient.LocalUser.User.Username).ToList();
 
             // If the user is the only one in the room
             if (scoresButMe.Count == 0)
@@ -81,7 +81,7 @@ namespace osu.Game.Screens.Play.HUD
                 return;
             }
 
-            var curTopScore = scoresButMe.ToList().OrderByDescending(s => s.TotalScore.Value).FirstOrDefault();
+            var curTopScore = scoresButMe.ToList().MaxBy(s => s.TotalScore.Value);
 
             Current.Value = player.Score.ScoreInfo.TotalScore - curTopScore!.TotalScore.Value;
         }
