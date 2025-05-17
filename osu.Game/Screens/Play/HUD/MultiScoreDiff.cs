@@ -1,13 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Logging;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Overlays.SkinEditor;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Skinning;
@@ -28,7 +28,12 @@ namespace osu.Game.Screens.Play.HUD
         [Resolved]
         private IGameplayLeaderboardProvider leaderboardProvider { get; set; } = null!;
 
+        [Resolved]
+        private SkinEditorOverlay skinEditor { get; set; } = null!;
+
         protected override double RollingDuration => 0;
+
+        private bool isHidden = false;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -37,13 +42,18 @@ namespace osu.Game.Screens.Play.HUD
 
         protected override void Update()
         {
-            base.Update();
-
-            // If the user is not in a multiplayer room
             if (multiplayerClient.LocalUser == null)
             {
+                if (!skinEditor.IsPresent && !isHidden)
+                {
+                    Hide();
+                    isHidden = true;
+                }
+
                 return;
             }
+
+            base.Update();
 
             Logger.Log($"user name : {multiplayerClient!.LocalUser!.User!.Username}");
 
