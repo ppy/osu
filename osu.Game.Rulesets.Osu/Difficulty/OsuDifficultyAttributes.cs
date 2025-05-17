@@ -80,6 +80,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         [JsonProperty("flow_aim")]
         public double FlowAimDifficulty { get; set; }
+        
+        [JsonProperty("slider_nested_score_per_object")]
+        public double SliderNestedScorePerObject { get; set; }
+
+        [JsonProperty("legacy_score_base_multiplier")]
+        public double LegacyScoreBaseMultiplier { get; set; }
+
+        [JsonProperty("maximum_legacy_combo_score")]
+        public double MaximumLegacyComboScore { get; set; }
 
         /// <summary>
         /// The beatmap's drain rate. This doesn't scale with rate-adjusting mods.
@@ -121,6 +130,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             yield return (ATTRIB_ID_AIM_DIFFICULT_SLIDER_COUNT, AimDifficultSliderCount);
             yield return (ATTRIB_ID_AIM_TOP_WEIGHTED_SLIDER_FACTOR, AimTopWeightedSliderFactor);
             yield return (ATTRIB_ID_SPEED_TOP_WEIGHTED_SLIDER_FACTOR, SpeedTopWeightedSliderFactor);
+            yield return (ATTRIB_ID_SLIDER_NESTED_SCORE_PER_OBJECT, SliderNestedScorePerObject);
+            yield return (ATTRIB_ID_LEGACY_SCORE_BASE_MULTIPLIER, LegacyScoreBaseMultiplier);
+            yield return (ATTRIB_ID_MAXIMUM_LEGACY_COMBO_SCORE, MaximumLegacyComboScore);
             yield return (ATTRIB_ID_SNAP_AIM_DIFFICULTY, SnapAimDifficulty);
             yield return (ATTRIB_ID_FLOW_AIM_DIFFICULTY, FlowAimDifficulty);
         }
@@ -140,6 +152,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             AimDifficultSliderCount = values[ATTRIB_ID_AIM_DIFFICULT_SLIDER_COUNT];
             AimTopWeightedSliderFactor = values[ATTRIB_ID_AIM_TOP_WEIGHTED_SLIDER_FACTOR];
             SpeedTopWeightedSliderFactor = values[ATTRIB_ID_SPEED_TOP_WEIGHTED_SLIDER_FACTOR];
+            SliderNestedScorePerObject = values[ATTRIB_ID_SLIDER_NESTED_SCORE_PER_OBJECT];
+            LegacyScoreBaseMultiplier = values[ATTRIB_ID_LEGACY_SCORE_BASE_MULTIPLIER];
+            MaximumLegacyComboScore = values[ATTRIB_ID_MAXIMUM_LEGACY_COMBO_SCORE];
             SnapAimDifficulty = values[ATTRIB_ID_SNAP_AIM_DIFFICULTY];
             FlowAimDifficulty = values[ATTRIB_ID_FLOW_AIM_DIFFICULTY];
             DrainRate = onlineInfo.DrainRate;
