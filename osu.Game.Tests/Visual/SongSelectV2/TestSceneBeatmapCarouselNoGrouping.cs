@@ -243,7 +243,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddBeatmaps(2, 3);
             WaitForDrawablePanels();
 
-            SortAndGroupBy(SortMode.Difficulty, GroupMode.All);
+            SortAndGroupBy(SortMode.Difficulty, GroupMode.NoGrouping);
             WaitForFiltering();
 
             AddUntilStep("standalone panels displayed", () => GetVisiblePanels<PanelBeatmapStandalone>().Any());
