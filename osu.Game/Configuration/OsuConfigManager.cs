@@ -227,6 +227,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.EditorSubmissionLoadInBrowserAfterSubmission, true);
 
             SetDefault(OsuSetting.WasSupporter, false);
+            SetDefault(OsuSetting.BroadcastGameState, false);
         }
 
         protected override bool CheckLookupContainsPrivateInformation(OsuSetting lookup)
@@ -434,6 +435,7 @@ namespace osu.Game.Configuration
         DiscordRichPresence,
 
         ShowOnlineExplicitContent,
+        BroadcastGameState,
         LastProcessedMetadataId,
         SafeAreaConsiderations,
         ComboColourNormalisationAmount,
