@@ -1,14 +1,15 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.ComponentModel;
 
 namespace osu.Game.Screens.Select.Filter
 {
     public enum GroupMode
     {
-        [Description("All")]
-        All,
+        [Description("No Grouping")]
+        NoGrouping,
 
         [Description("Artist")]
         Artist,
@@ -37,19 +38,19 @@ namespace osu.Game.Screens.Select.Filter
         [Description("My Maps")]
         MyMaps,
 
-        [Description("No Grouping")]
-        NoGrouping,
-
         [Description("Rank Achieved")]
         RankAchieved,
 
         [Description("Ranked Status")]
         RankedStatus,
 
-        [Description("Recently Played")]
-        RecentlyPlayed,
+        [Description("Last Played")]
+        LastPlayed,
 
         [Description("Title")]
-        Title
+        Title,
+
+        [Obsolete($"Use {nameof(NoGrouping)} instead.")] // todo: remove in 20251018
+        All,
     }
 }

@@ -162,7 +162,9 @@ namespace osu.Game.Screens.SelectV2
                                     groupDropdown = new ShearedDropdown<GroupMode>("Group by")
                                     {
                                         RelativeSizeAxes = Axes.X,
-                                        Items = Enum.GetValues<GroupMode>(),
+#pragma warning disable CS0618 // Type or member is obsolete
+                                        Items = Enum.GetValues<GroupMode>().Where(m => m != GroupMode.All),
+#pragma warning restore CS0618 // Type or member is obsolete
                                     },
                                     Empty(),
                                     collectionDropdown = new CollectionDropdown
