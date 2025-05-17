@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Play.HUD
 
         protected override double RollingDuration => 0;
 
-        private bool isHidden = new bool();
+        private bool isHidden;
 
         [BackgroundDependencyLoader]
         private void load()
