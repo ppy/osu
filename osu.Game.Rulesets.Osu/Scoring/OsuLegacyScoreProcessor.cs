@@ -3,11 +3,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Osu.Difficulty;
-using osu.Game.Rulesets.Osu.Difficulty.Utils;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Scoring.Legacy;
@@ -21,7 +22,16 @@ namespace osu.Game.Rulesets.Osu.Scoring
 
         public void ApplyBeatmap(IBeatmap beatmap)
         {
-            difficultyMultiplier = LegacyScoreUtils.CalculateDifficultyPeppyStars(beatmap);
+            int objectCount = beatmap.HitObjects.Count;
+            int drainLength = 0;
+
+            if (objectCount > 0)
+            {
+                int breakLength = beatmap.Breaks.Select(b => (int)Math.Round(b.EndTime) - (int)Math.Round(b.StartTime)).Sum();
+                drainLength = ((int)Math.Round(beatmap.HitObjects[^1].StartTime) - (int)Math.Round(beatmap.HitObjects[0].StartTime) - breakLength) / 1000;
+            }
+
+            difficultyMultiplier = LegacyRulesetExtensions.CalculateDifficultyPeppyStars(beatmap.Difficulty, objectCount, drainLength);
         }
 
         public void ApplyMods(IReadOnlyList<Mod> mods)
