@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Colour;
@@ -31,6 +32,8 @@ namespace osu.Game.Screens.Play.HUD
         protected override double RollingDuration => 0;
 
         private bool isHidden;
+
+        private List<GameplayLeaderboardScore>? scoresButMe;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -71,15 +74,18 @@ namespace osu.Game.Screens.Play.HUD
                 return;
             }
 
-            var scoresButMe = leaderboardProvider.Scores.ToList().Where(s => s.User.Username != multiplayerClient.LocalUser!.User!.Username).ToList();
-
-            // If the user is the only one in the room
-            if (scoresButMe.Count == 0)
+            if (scoresButMe == null)
             {
-                Hide();
-                isHidden = true;
+                scoresButMe = leaderboardProvider.Scores.ToList().Where(s => s.User.Username != multiplayerClient.LocalUser!.User!.Username).ToList();
 
-                return;
+                // If the user is the only one in the room
+                if (scoresButMe.Count == 0)
+                {
+                    Hide();
+                    isHidden = true;
+
+                    return;
+                }
             }
 
             var curTopScore = scoresButMe.ToList().MaxBy(s => s.TotalScore.Value);
