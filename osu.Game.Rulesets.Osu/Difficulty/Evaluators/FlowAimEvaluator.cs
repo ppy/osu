@@ -267,6 +267,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             deltaVelocity *= 1 - distanceSimilarity1 * distanceSimilarity2 * directionFactor;
 
+            // Penalize rhythm change
+            deltaVelocity *= DifficultyCalculationUtils.ReverseLerp(osuLast0Obj.StrainTime, osuCurrObj.StrainTime * 0.55, osuCurrObj.StrainTime * 0.75);
+
             // Don't reward very big differences too much
             if (deltaVelocity > minVelocity * 2)
             {

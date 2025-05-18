@@ -75,8 +75,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 // Don't increase snap distance when previous jump is very big, as it leads to cheese being overrewarded
                 double bigDistanceDifferenceFactor = DifficultyCalculationUtils.ReverseLerp(osuLastObj.LazyJumpDistance, notOverlappingAdjust + diameter, notOverlappingAdjust + diameter * 2);
 
-                // And don't nerf spaced bursts with this
-                bigDistanceDifferenceFactor *= 1 - (1 - lowSpacingFactor) * (1 - DifficultyCalculationUtils.ReverseLerpTwoDirectional(osuCurrObj.StrainTime, osuLastObj.StrainTime, 1.95, 1.5));
+                // And don't nerf bursts with this
+                bigDistanceDifferenceFactor *= DifficultyCalculationUtils.ReverseLerpTwoDirectional(osuCurrObj.StrainTime, osuLastObj.StrainTime, 1.95, 1.5);
 
                 double totalBonus = result + angleSnapDifficultyBonus - currDistance;
                 return currDistance + totalBonus * (1 - bigDistanceDifferenceFactor);
