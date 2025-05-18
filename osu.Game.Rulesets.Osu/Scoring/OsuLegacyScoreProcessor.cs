@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
 {
     public class OsuLegacyScoreProcessor : ILegacyScoreProcessor
     {
-        private double difficultyMultiplier = 0.0, modMultuplier = 1.0;
+        private double difficultyMultiplier, modMultuplier = 1.0;
 
         public void ApplyBeatmap(IBeatmap beatmap)
         {

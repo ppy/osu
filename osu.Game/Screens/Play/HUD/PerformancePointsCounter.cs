@@ -84,8 +84,8 @@ namespace osu.Game.Screens.Play.HUD
                 if (clonedMods.OfType<ModClassic>().Any())
                 {
                     legacyScoreProcessor = gameplayState.Ruleset.CreateLegacyScoreProcessor();
-                    legacyScoreProcessor.ApplyBeatmap(gameplayState.Beatmap);
-                    legacyScoreProcessor.ApplyMods(clonedMods);
+                    legacyScoreProcessor?.ApplyBeatmap(gameplayState.Beatmap);
+                    legacyScoreProcessor?.ApplyMods(clonedMods);
                 }
 
                 scoreProcessor.NewJudgement += onJudgementAdded;

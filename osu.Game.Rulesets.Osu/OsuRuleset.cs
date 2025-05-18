@@ -237,7 +237,7 @@ namespace osu.Game.Rulesets.Osu
 
         public override PerformanceCalculator CreatePerformanceCalculator() => new OsuPerformanceCalculator();
 
-        public override ILegacyScoreProcessor? CreateLegacyScoreProcessor() => new OsuLegacyScoreProcessor();
+        public override ILegacyScoreProcessor CreateLegacyScoreProcessor() => new OsuLegacyScoreProcessor();
 
         public override HitObjectComposer CreateHitObjectComposer() => new OsuHitObjectComposer(this);
 
