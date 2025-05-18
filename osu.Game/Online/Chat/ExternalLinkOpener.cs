@@ -49,12 +49,12 @@ namespace osu.Game.Online.Chat
 
             if (url.StartsWith('/'))
             {
-                url = $"{api.WebsiteRootUrl}{url}";
+                url = $"{api.Endpoints.WebsiteUrl}{url}";
                 isTrustedDomain = true;
             }
             else
             {
-                isTrustedDomain = url.StartsWith(api.WebsiteRootUrl, StringComparison.Ordinal);
+                isTrustedDomain = url.StartsWith(api.Endpoints.WebsiteUrl, StringComparison.Ordinal);
             }
 
             if (!url.CheckIsValidUrl())
