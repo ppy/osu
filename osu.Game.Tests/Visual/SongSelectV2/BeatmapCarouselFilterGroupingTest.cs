@@ -160,6 +160,21 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             assertTotal(results, total);
         }
 
+        [Test]
+        public async Task TestGroupingByLastPlayed_NeverBelowOverFiveMonthsAgo()
+        {
+            List<BeatmapSetInfo> beatmapSets = new List<BeatmapSetInfo>();
+            addBeatmapSet(applyLastPlayed(null), beatmapSets, out var neverBeatmap);
+            addBeatmapSet(applyLastPlayed(DateTimeOffset.Now.AddMonths(-6)), beatmapSets, out var overFiveMonthsBeatmap);
+
+            var results = await runGrouping(GroupMode.LastPlayed, beatmapSets);
+            int total = 0;
+
+            assertGroup(results, 0, "Over 5 months ago", new[] { overFiveMonthsBeatmap }, ref total);
+            assertGroup(results, 1, "Never", new[] { neverBeatmap }, ref total);
+            assertTotal(results, total);
+        }
+
         private Action<BeatmapSetInfo> applyLastPlayed(DateTimeOffset? lastPlayed)
         {
             return s => s.Beatmaps.ForEach(b => b.LastPlayed = lastPlayed);
@@ -298,14 +313,29 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         {
             var groupingFilter = new BeatmapCarouselFilterGrouping(() => new FilterCriteria { Group = group });
             var carouselItems = await groupingFilter.Run(beatmapSets.SelectMany(s => s.Beatmaps.Select(b => new CarouselItem(b))).ToList(), CancellationToken.None);
+
+            // sanity check to ensure no detection of two group items with equal order value.
+            var groups = carouselItems.Select(i => i.Model).OfType<GroupDefinition>();
+
+            foreach (var header in groups)
+            {
+                var sameOrder = groups.FirstOrDefault(g => g != header && g.Order == header.Order);
+                if (sameOrder != null)
+                    Assert.Fail($"Detected two groups with equal order number: \"{header.Title}\" vs. \"{sameOrder.Title}\"");
+            }
+
             return carouselItems;
         }
 
         private static void assertGroup(List<CarouselItem> items, int index, string expectedTitle, IEnumerable<BeatmapSetInfo> expectedBeatmapSets, ref int totalItems)
         {
             var groupItem = items.Where(i => i.Model is GroupDefinition).ElementAtOrDefault(index);
+
             if (groupItem == null)
-                throw new AssertionException($"Expected group at index {index}, but that is out of bounds");
+            {
+                Assert.Fail($"Expected group at index {index}, but that is out of bounds");
+                return;
+            }
 
             var itemsInGroup = items.SkipWhile(i => i != groupItem).Skip(1).TakeWhile(i => i.Model is not GroupDefinition);
 

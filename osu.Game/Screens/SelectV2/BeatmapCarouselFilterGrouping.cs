@@ -240,7 +240,7 @@ namespace osu.Game.Screens.SelectV2
                     return new GroupDefinition(i, $"{i / 30} months ago");
             }
 
-            return new GroupDefinition(int.MaxValue, "Over 5 months ago");
+            return new GroupDefinition(151, "Over 5 months ago");
         }
 
         private GroupDefinition defineGroupByStatus(BeatmapOnlineStatus status)
