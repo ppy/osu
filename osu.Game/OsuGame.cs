@@ -1740,7 +1740,12 @@ namespace osu.Game
                     BackButton.Hide();
                     ScreenFooter.Show();
 
-                    newOsuScreen.OnLoadComplete += _ =>
+                    if (newOsuScreen.IsLoaded)
+                        updateFooterButtons();
+                    else
+                        newOsuScreen.OnLoadComplete += _ => updateFooterButtons();
+
+                    void updateFooterButtons()
                     {
                         var buttons = newScreen.CreateFooterButtons();
 
@@ -1748,7 +1753,7 @@ namespace osu.Game
 
                         ScreenFooter.SetButtons(buttons);
                         ScreenFooter.Show();
-                    };
+                    }
                 }
                 else
                 {
