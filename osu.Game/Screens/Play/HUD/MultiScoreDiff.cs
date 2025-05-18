@@ -4,6 +4,7 @@
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Colour;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays.SkinEditor;
@@ -45,7 +46,7 @@ namespace osu.Game.Screens.Play.HUD
 
             if (multiplayerClient.LocalUser == null)
             {
-                if (!skinEditor.IsPresent)
+                if (skinEditor.State.Value == Visibility.Hidden)
                 {
                     Hide();
                     isHidden = true;
