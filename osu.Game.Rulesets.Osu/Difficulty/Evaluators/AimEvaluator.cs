@@ -68,7 +68,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 // Don't buff doubles jumps as you don't snap in this case (except very close to itself doubles, that need to have some distance bonus to be calculated as flow)
                 double lowSpacingFactor = DifficultyCalculationUtils.ReverseLerp(currDistance, radius * 2, radius);
 
-                // Make nerf much smaller if it's not doubles and time is different
+                // Make nerf much smaller if it's not doubles
                 double notOverlappingAdjust = diameter * 2 * (1 - lowSpacingFactor);
 
                 // Don't increase snap distance when previous jump is very big, as it leads to cheese being overrewarded
