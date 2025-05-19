@@ -549,7 +549,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         private void assertCountOfMatchingReplayFrames<TReplayFrame>(string description, Func<TReplayFrame, bool> predicate, int count)
             where TReplayFrame : ReplayFrame
         {
-            AddAssert(description, () => Player.Score.Replay.Frames.OfType<TReplayFrame>().Count(predicate), () => Is.EqualTo(count));
+            AddUntilStep(description, () => Player.Score.Replay.Frames.OfType<TReplayFrame>().Count(predicate), () => Is.EqualTo(count));
         }
 
         protected override TestPlayer CreatePlayer(Ruleset ruleset) => new PausePlayer();
