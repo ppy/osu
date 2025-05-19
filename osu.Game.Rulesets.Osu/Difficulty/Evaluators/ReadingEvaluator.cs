@@ -15,6 +15,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
     public static class ReadingEvaluator
     {
         private const double reading_window_size = 3000; // 3 seconds
+        private const double density_difficulty_base = 2.7;
+        private const double hidden_balancing_factor = 9000;
+        private const double preempt_balancing_factor = 75000;
 
         public static double EvaluateDifficultyOf(int totalObjects, DifficultyHitObject current, double clockRate, double preempt, bool hidden)
         {
@@ -44,7 +47,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             }
 
             // Award only denser than average maps
-            double noteDensityDifficulty = Math.Max(0, pastObjectDifficultyInfluence - 2.7);
+            double noteDensityDifficulty = Math.Max(0, pastObjectDifficultyInfluence - density_difficulty_base);
 
             noteDensityDifficulty *= constantAngleNerfFactor * angularVelocityFactor;
 
@@ -57,10 +60,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 // Nerf extremely high times as you begin to rely more on memory the longer a note is invisible
                 double timeSpentInvisibleFactor = Math.Min(timeSpentInvisible, 1000) + (timeSpentInvisible > 1000 ? 2000 * Math.Log10(timeSpentInvisible / 1000) : 0);
 
-                // Cap objects because after a certain point hidden density is mainly memory
                 double visibleObjectFactor = Math.Min(getCurrentVisibleObjectCount(totalObjects, currObj, preempt), 8);
 
-                hiddenDifficulty += visibleObjectFactor * timeSpentInvisibleFactor * pastObjectDifficultyInfluence / 9000;
+                hiddenDifficulty += visibleObjectFactor * timeSpentInvisibleFactor * pastObjectDifficultyInfluence / hidden_balancing_factor;
 
                 hiddenDifficulty *= constantAngleNerfFactor * angularVelocityFactor;
 
@@ -69,7 +71,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 hiddenDifficulty += currObj.LazyJumpDistance == 0 &&
                                     currObj.OpacityAt(previousObj.BaseObject.StartTime + preempt, hidden) == 0 &&
                                     previousObj.StartTime + preempt > currObj.StartTime
-                    ? timeSpentInvisibleFactor / 200.0
+                    ? timeSpentInvisibleFactor / (hidden_balancing_factor * 0.02)
                     : 0;
             }
 
@@ -77,7 +79,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             // Arbitrary curve for the base value preempt difficulty should have as approach rate increases
             // https://www.desmos.com/calculator/hd9dojqyt2
-            preemptDifficulty += preempt > 500 ? 0 : Math.Pow(500 - preempt, 2.3) / 75000;
+            preemptDifficulty += preempt > 500 ? 0 : Math.Pow(500 - preempt, 2.3) / preempt_balancing_factor;
 
             preemptDifficulty *= constantAngleNerfFactor * angularVelocityFactor;
 
