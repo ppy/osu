@@ -225,10 +225,10 @@ namespace osu.Game.Screens.SelectV2
                 {
                     settingChangeTracker?.Dispose();
 
-                    updateDifficultyStatistics();
+                    updateDisplay();
 
                     settingChangeTracker = new ModSettingChangeTracker(m.NewValue);
-                    settingChangeTracker.SettingChanged += _ => updateDifficultyStatistics();
+                    settingChangeTracker.SettingChanged += _ => updateDisplay();
                 });
 
                 updateDisplay();
