@@ -126,7 +126,7 @@ namespace osu.Game.Screens.SelectV2
                                 AutoSizeAxes = Axes.Both,
                                 Children = new Drawable[]
                                 {
-                                    difficultyStarRating = new StarRatingDisplay(default, StarRatingDisplaySize.Small)
+                                    difficultyStarRating = new StarRatingDisplay(default, StarRatingDisplaySize.Small, animated: true)
                                     {
                                         Origin = Anchor.CentreLeft,
                                         Anchor = Anchor.CentreLeft,
