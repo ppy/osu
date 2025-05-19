@@ -17,6 +17,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         private const double velocity_change_multiplier = 0.75;
         private const double wiggle_multiplier = 1.02;
 
+        private const double aim_control_multiplier = 2.1;
+
         /// <summary>
         /// Evaluates the difficulty of aiming the current object, based on:
         /// <list type="bullet">
@@ -66,6 +68,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double sliderBonus = 0;
             double velocityChangeBonus = 0;
             double wiggleBonus = 0;
+            double aimControlBonus = 0;
 
             double aimStrain = currVelocity; // Start strain with regular velocity.
 
@@ -75,6 +78,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 {
                     double currAngle = osuCurrObj.Angle.Value;
                     double lastAngle = osuLastObj.Angle.Value;
+                    double? lastlastAngle = null;
+
+                    if (osuLastLastObj.Angle != null)
+                        lastlastAngle = osuLastLastObj.Angle.Value;
 
                     // Rewarding angles, take the smaller velocity as base.
                     double angleBonus = Math.Min(currVelocity, prevVelocity);
@@ -85,6 +92,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     // Penalize angle repetition.
                     wideAngleBonus *= 1 - Math.Min(wideAngleBonus, Math.Pow(calcWideAngleBonus(lastAngle), 3));
                     acuteAngleBonus *= 0.08 + 0.92 * (1 - Math.Min(acuteAngleBonus, Math.Pow(calcAcuteAngleBonus(lastAngle), 3)));
+
+                    if (lastlastAngle != null)
+                    {
+                        wideAngleBonus *= 1 - Math.Min(calcAcuteAngleBonus(lastAngle), Math.Pow(calcWideAngleBonus((double)lastlastAngle), 3));
+                        acuteAngleBonus *= 0.08 + 0.92 * (1 - Math.Min(calcAcuteAngleBonus(lastAngle), Math.Pow(calcAcuteAngleBonus((double)lastlastAngle), 3)));
+                    }
+
+                    // Penalize easy angle change.
+                    acuteAngleBonus *= 0.08 + 0.92 * DifficultyCalculationUtils.Smoothstep(currAngle, Math.Min(lastAngle, double.DegreesToRadians(100)), double.DegreesToRadians(40));
+
+                    // Buff hard angle change.
+                    aimControlBonus = angleBonus * DifficultyCalculationUtils.Smoothstep(Math.Abs(currAngle - lastAngle), double.DegreesToRadians(40), double.DegreesToRadians(100));
+
+                    aimControlBonus *= Math.Max(Math.Log10(Math.Max(osuCurrObj.Index / 100, 1)), 0);
 
                     // Apply full wide angle bonus for distance more than one diameter
                     wideAngleBonus *= angleBonus * DifficultyCalculationUtils.Smootherstep(osuCurrObj.LazyJumpDistance, 0, diameter);
@@ -133,7 +154,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             aimStrain += wiggleBonus * wiggle_multiplier;
 
             // Add in acute angle bonus or wide angle bonus + velocity change bonus, whichever is larger.
-            aimStrain += Math.Max(acuteAngleBonus * acute_angle_multiplier, wideAngleBonus * wide_angle_multiplier + velocityChangeBonus * velocity_change_multiplier);
+            aimStrain += Math.Max(acuteAngleBonus * acute_angle_multiplier + aimControlBonus * aim_control_multiplier, wideAngleBonus * wide_angle_multiplier + velocityChangeBonus * velocity_change_multiplier);
 
             // Add in additional slider velocity bonus.
             if (withSliderTravelDistance)
