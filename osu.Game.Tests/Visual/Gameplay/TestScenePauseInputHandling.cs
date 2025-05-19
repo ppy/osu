@@ -394,6 +394,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("slider head hit", () => Player.ScoreProcessor.HighestCombo.Value, () => Is.EqualTo(1));
             AddAssert("slider tracking", () => this.ChildrenOfType<SliderInputManager>().Single().Tracking, () => Is.True);
 
+            // note operation ordering - gameplay paused while still holding X
             AddStep("pause", () => Player.Pause());
             AddStep("release X", () => InputManager.ReleaseKey(Key.X));
 
@@ -403,10 +404,59 @@ namespace osu.Game.Tests.Visual.Gameplay
             if (resumeWithSameKey)
                 AddStep("press X", () => InputManager.PressKey(Key.X));
             else
-                AddStep("press Z", () => InputManager.ReleaseKey(Key.Z));
+                AddStep("press Z", () => InputManager.PressKey(Key.Z));
 
-            seekTo(10010);
+            // there's a nasty interaction with `SliderInputManager`'s "time to accept any key after" mechanic here.
+            // basically switching keys when holding a slider is only permitted *after* the head was hit with one key and the other is not pressed.
+            // if the delta between the seek above and this one is too small, the current time of player
+            // may not change between the head hit and the slider tracking switch (because of frame stability),
+            // therefore this test fails in the "resume with other key" scenario due to assuming the key switch is illegal at that time.
+            // thus, the delta between the seek above and this one must be large enough to make that improbable to occur.
+            seekTo(10040);
             AddAssert("slider still tracking", () => this.ChildrenOfType<SliderInputManager>().Single().Tracking, () => Is.True);
+
+            if (resumeWithSameKey)
+                AddStep("release X", () => InputManager.ReleaseKey(Key.X));
+            else
+                AddStep("release Z", () => InputManager.ReleaseKey(Key.Z));
+        }
+
+        [Test]
+        public void TestOsuSliderPicksUpTrackingOnResume([Values] bool resumeWithSameKey)
+        {
+            loadPlayer(() => new OsuRuleset());
+
+            seekTo(10000);
+            AddStep("press X", () => InputManager.PressKey(Key.X));
+            AddAssert("slider head hit", () => Player.ScoreProcessor.HighestCombo.Value, () => Is.EqualTo(1));
+            AddAssert("slider tracking", () => this.ChildrenOfType<SliderInputManager>().Single().Tracking, () => Is.True);
+
+            // note operation ordering - gameplay paused while not holding anything
+            AddStep("release X", () => InputManager.ReleaseKey(Key.X));
+            AddAssert("slider not tracking", () => this.ChildrenOfType<SliderInputManager>().Single().Tracking, () => Is.False);
+            AddStep("pause", () => Player.Pause());
+
+            AddStep("resume", () => Player.Resume());
+            AddStep("go to resume cursor", () => InputManager.MoveMouseTo(this.ChildrenOfType<OsuResumeOverlay.OsuClickToResumeCursor>().Single()));
+
+            if (resumeWithSameKey)
+                AddStep("press X", () => InputManager.PressKey(Key.X));
+            else
+                AddStep("press Z", () => InputManager.PressKey(Key.Z));
+
+            // there's a nasty interaction with `SliderInputManager`'s "time to accept any key after" mechanic here.
+            // basically switching keys when holding a slider is only permitted *after* the head was hit with one key and the other is not pressed.
+            // if the delta between the seek above and this one is too small, the current time of player
+            // may not change between the head hit and the slider tracking switch (because of frame stability),
+            // therefore this test fails in the "resume with other key" scenario due to assuming the key switch is illegal at that time.
+            // thus, the delta between the seek above and this one must be large enough to make that improbable to occur.
+            seekTo(10040);
+            AddAssert("slider tracking again", () => this.ChildrenOfType<SliderInputManager>().Single().Tracking, () => Is.True);
+
+            if (resumeWithSameKey)
+                AddStep("release X", () => InputManager.ReleaseKey(Key.X));
+            else
+                AddStep("release Z", () => InputManager.ReleaseKey(Key.Z));
         }
 
         [Test]
@@ -419,6 +469,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("press X", () => InputManager.PressKey(Key.X));
             AddAssert("spinner tracking", () => this.ChildrenOfType<SpinnerRotationTracker>().Single().Tracking, () => Is.True);
 
+            // note operation ordering - gameplay paused while still holding X
             AddStep("pause", () => Player.Pause());
             AddStep("release X", () => InputManager.ReleaseKey(Key.X));
 
@@ -428,10 +479,47 @@ namespace osu.Game.Tests.Visual.Gameplay
             if (resumeWithSameKey)
                 AddStep("press X", () => InputManager.PressKey(Key.X));
             else
-                AddStep("press Z", () => InputManager.ReleaseKey(Key.Z));
+                AddStep("press Z", () => InputManager.PressKey(Key.Z));
 
-            seekTo(15010);
+            seekTo(15040);
             AddAssert("spinner still tracking", () => this.ChildrenOfType<SpinnerRotationTracker>().Single().Tracking, () => Is.True);
+
+            if (resumeWithSameKey)
+                AddStep("release X", () => InputManager.ReleaseKey(Key.X));
+            else
+                AddStep("release Z", () => InputManager.ReleaseKey(Key.Z));
+        }
+
+        [Test]
+        public void TestOsuSpinnerPicksUpTrackingOnResume([Values] bool resumeWithSameKey)
+        {
+            loadPlayer(() => new OsuRuleset());
+
+            seekTo(15000);
+            AddStep("move mouse higher", () => InputManager.MoveMouseTo(Content, new Vector2(0, -50)));
+            AddStep("press X", () => InputManager.PressKey(Key.X));
+            AddAssert("spinner tracking", () => this.ChildrenOfType<SpinnerRotationTracker>().Single().Tracking, () => Is.True);
+
+            // note operation ordering - gameplay paused while not holding anything
+            AddStep("release X", () => InputManager.ReleaseKey(Key.X));
+            AddAssert("spinner not tracking", () => this.ChildrenOfType<SpinnerRotationTracker>().Single().Tracking, () => Is.False);
+            AddStep("pause", () => Player.Pause());
+
+            AddStep("resume", () => Player.Resume());
+            AddStep("go to resume cursor", () => InputManager.MoveMouseTo(this.ChildrenOfType<OsuResumeOverlay.OsuClickToResumeCursor>().Single()));
+
+            if (resumeWithSameKey)
+                AddStep("press X", () => InputManager.PressKey(Key.X));
+            else
+                AddStep("press Z", () => InputManager.PressKey(Key.Z));
+
+            seekTo(15040);
+            AddAssert("spinner tracking again", () => this.ChildrenOfType<SpinnerRotationTracker>().Single().Tracking, () => Is.True);
+
+            if (resumeWithSameKey)
+                AddStep("release X", () => InputManager.ReleaseKey(Key.X));
+            else
+                AddStep("release Z", () => InputManager.ReleaseKey(Key.Z));
         }
 
         private void loadPlayer(Func<Ruleset> createRuleset)
