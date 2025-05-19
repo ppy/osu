@@ -34,7 +34,6 @@ namespace osu.Game.Screens.Play.HUD
 
         private List<GameplayLeaderboardScore>? scoresButMe;
 
-
         protected override void Update()
         {
             if (isHidden)
