@@ -287,7 +287,7 @@ namespace osu.Game.Screens.SelectV2
                 {
                     // This can take time as it is a synchronous task.
                     // TODO: We're calling `GetPlayableBeatmap` multiple times every map load at song select.
-                    var playableBeatmap = beatmap.Value.GetPlayableBeatmap(ruleset.Value);
+                    var playableBeatmap = beatmap.Value.GetPlayableBeatmap(ruleset.Value, mods.Value);
                     var statistics = playableBeatmap.GetStatistics()
                                                     .Select(s => new StatisticDifficulty.Data(s.Name, s.BarDisplayLength ?? 0, s.BarDisplayLength ?? 0, 1, s.Content))
                                                     .ToList();
