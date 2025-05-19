@@ -35,10 +35,6 @@ namespace osu.Game.Screens.Play.HUD
 
         private List<GameplayLeaderboardScore>? scoresButMe;
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-        }
 
         protected override void Update()
         {
