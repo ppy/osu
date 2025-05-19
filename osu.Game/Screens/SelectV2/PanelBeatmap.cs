@@ -202,7 +202,7 @@ namespace osu.Game.Screens.SelectV2
 
             var beatmap = (BeatmapInfo)Item.Model;
 
-            starDifficultyBindable = difficultyCache.GetBindableDifficulty(beatmap, starDifficultyCancellationSource.Token);
+            starDifficultyBindable = difficultyCache.GetBindableDifficulty(beatmap, starDifficultyCancellationSource.Token, 200);
             starDifficultyBindable.BindValueChanged(_ => updateDisplay(), true);
         }
 
