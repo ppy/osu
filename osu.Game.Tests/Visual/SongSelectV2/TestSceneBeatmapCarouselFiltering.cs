@@ -290,5 +290,26 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             CheckDisplayedBeatmapsCount(local_set_count);
         }
+
+        [Test]
+        public void TestFirstDifficultyFiltered()
+        {
+            AddBeatmaps(2, 3);
+            WaitForDrawablePanels();
+
+            SelectNextGroup();
+            WaitForSelection(0, 0);
+
+            CheckDisplayedBeatmapsCount(6);
+
+            ApplyToFilter("filter first away", c => c.UserStarDifficulty.Min = 3);
+            WaitForFiltering();
+
+            CheckDisplayedBeatmapsCount(4);
+
+            SelectNextGroup();
+            SelectPrevGroup();
+            WaitForSelection(0, 1);
+        }
     }
 }
