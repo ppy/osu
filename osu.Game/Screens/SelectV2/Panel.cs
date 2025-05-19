@@ -7,9 +7,11 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Pooling;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Carousel;
@@ -20,7 +22,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.SelectV2
 {
-    public abstract partial class Panel : PoolableDrawable, ICarouselPanel
+    public abstract partial class Panel : PoolableDrawable, ICarouselPanel, IHasContextMenu
     {
         private const float corner_radius = 10;
 
@@ -270,6 +272,8 @@ namespace osu.Game.Screens.SelectV2
             Content.Padding = Content.Padding with { Left = iconContainer.DrawWidth };
             backgroundLayerHorizontalPadding.Padding = new MarginPadding { Left = iconContainer.DrawWidth };
         }
+
+        public abstract MenuItem[]? ContextMenuItems { get; }
 
         #region ICarouselPanel
 
