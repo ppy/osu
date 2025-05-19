@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.Carousel;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
 
@@ -35,7 +36,7 @@ namespace osu.Game.Screens.SelectV2
             this.getCriteria = getCriteria;
         }
 
-        public async Task<IEnumerable<CarouselItem>> Run(IEnumerable<CarouselItem> items, CancellationToken cancellationToken)
+        public async Task<List<CarouselItem>> Run(IEnumerable<CarouselItem> items, CancellationToken cancellationToken)
         {
             return await Task.Run(() =>
             {
@@ -46,12 +47,14 @@ namespace osu.Game.Screens.SelectV2
                 var newItems = new List<CarouselItem>();
 
                 BeatmapInfo? lastBeatmap = null;
+
                 GroupDefinition? lastGroup = null;
+                CarouselItem? lastGroupItem = null;
 
                 HashSet<CarouselItem>? currentGroupItems = null;
                 HashSet<CarouselItem>? currentSetItems = null;
 
-                BeatmapSetsGroupedTogether = criteria.Group != GroupMode.Difficulty;
+                BeatmapSetsGroupedTogether = criteria.Sort != SortMode.Difficulty;
 
                 foreach (var item in items)
                 {
@@ -68,7 +71,7 @@ namespace osu.Game.Screens.SelectV2
                         groupItems[newGroup] = currentGroupItems = new HashSet<CarouselItem>();
                         lastGroup = newGroup;
 
-                        addItem(new CarouselItem(newGroup)
+                        addItem(lastGroupItem = new CarouselItem(newGroup)
                         {
                             DrawHeight = PanelGroup.HEIGHT,
                             DepthLayer = -2,
@@ -83,12 +86,22 @@ namespace osu.Game.Screens.SelectV2
                         {
                             setItems[beatmap.BeatmapSet!] = currentSetItems = new HashSet<CarouselItem>();
 
+                            if (lastGroupItem != null)
+                                lastGroupItem.NestedItemCount++;
+
                             addItem(new CarouselItem(beatmap.BeatmapSet!)
                             {
                                 DrawHeight = PanelBeatmapSet.HEIGHT,
                                 DepthLayer = -1
                             });
                         }
+                    }
+                    else
+                    {
+                        if (lastGroupItem != null)
+                            lastGroupItem.NestedItemCount++;
+
+                        item.DrawHeight = PanelBeatmapStandalone.HEIGHT;
                     }
 
                     addItem(item);
@@ -123,12 +136,20 @@ namespace osu.Game.Screens.SelectV2
                     break;
 
                 case GroupMode.Difficulty:
-                    int starGroup = lastGroup?.Data as int? ?? -1;
+                    var starGroup = lastGroup?.Data as StarDifficulty? ?? new StarDifficulty(-1, 0);
+                    double beatmapStarRating = Math.Round(beatmap.StarRating, 2);
 
-                    if (beatmap.StarRating > starGroup)
+                    if (beatmapStarRating >= starGroup.Stars + 1)
                     {
-                        starGroup = (int)Math.Floor(beatmap.StarRating);
-                        return new GroupDefinition(starGroup + 1, $"{starGroup} - {starGroup + 1} *");
+                        starGroup = new StarDifficulty((int)Math.Floor(beatmapStarRating), 0);
+
+                        if (starGroup.Stars == 0)
+                            return new GroupDefinition(starGroup, "Below 1 Star");
+
+                        if (starGroup.Stars == 1)
+                            return new GroupDefinition(starGroup, "1 Star");
+
+                        return new GroupDefinition(starGroup, $"{starGroup.Stars} Stars");
                     }
 
                     break;

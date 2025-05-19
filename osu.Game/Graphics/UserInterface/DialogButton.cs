@@ -129,7 +129,7 @@ namespace osu.Game.Graphics.UserInterface
                                 Radius = 5,
                             },
                             Colour = ButtonColour,
-                            Shear = new Vector2(0.2f, 0),
+                            Shear = OsuGame.SHEAR,
                             Children = new Drawable[]
                             {
                                 new Box
@@ -149,7 +149,7 @@ namespace osu.Game.Graphics.UserInterface
                                             RelativeSizeAxes = Axes.Both,
                                             TriangleScale = 4,
                                             ColourDark = OsuColour.Gray(0.88f),
-                                            Shear = new Vector2(-0.2f, 0),
+                                            Shear = -OsuGame.SHEAR,
                                             ClampAxes = Axes.Y
                                         },
                                     },

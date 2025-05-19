@@ -7,6 +7,7 @@ using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Configuration;
+using osu.Game.Extensions;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Objects;
@@ -35,6 +36,24 @@ namespace osu.Game.Rulesets.Osu.Mods
             ExtendedMaxValue = 11,
             ReadCurrentFromDifficulty = diff => diff.ApproachRate,
         };
+
+        public override string ExtendedIconInformation
+        {
+            get
+            {
+                if (UserAdjustedSettingsCount != 1)
+                    return string.Empty;
+
+                if (!CircleSize.IsDefault) return format("CS", CircleSize);
+                if (!ApproachRate.IsDefault) return format("AR", ApproachRate);
+                if (!OverallDifficulty.IsDefault) return format("OD", OverallDifficulty);
+                if (!DrainRate.IsDefault) return format("HP", DrainRate);
+
+                return string.Empty;
+
+                string format(string acronym, DifficultyBindable bindable) => $"{acronym}{bindable.Value!.Value.ToStandardFormattedString(1)}";
+            }
+        }
 
         public override IEnumerable<(LocalisableString setting, LocalisableString value)> SettingDescription
         {
