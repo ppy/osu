@@ -190,6 +190,8 @@ namespace osu.Game.Screens.SelectV2
 
             localRank.Beatmap = null;
             starDifficultyBindable = null;
+
+            starDifficultyCancellationSource?.Cancel();
         }
 
         private void computeStarRating()
@@ -204,6 +206,17 @@ namespace osu.Game.Screens.SelectV2
 
             starDifficultyBindable = difficultyCache.GetBindableDifficulty(beatmap, starDifficultyCancellationSource.Token, 200);
             starDifficultyBindable.BindValueChanged(_ => updateDisplay(), true);
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (Item?.IsVisible != true)
+            {
+                starDifficultyCancellationSource?.Cancel();
+                starDifficultyCancellationSource = null;
+            }
         }
 
         private void updateKeyCount()
