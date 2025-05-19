@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Play.HUD
         [Resolved]
         private SkinEditorOverlay skinEditor { get; set; } = null!;
 
-        protected override double RollingDuration => 0;
+        protected override double RollingDuration => 37;
 
         private bool isHidden;
 
