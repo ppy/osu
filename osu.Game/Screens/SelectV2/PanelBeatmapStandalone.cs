@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -9,6 +10,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
@@ -36,6 +38,9 @@ namespace osu.Game.Screens.SelectV2
 
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
+
+        [Resolved]
+        private SongSelect? songSelect { get; set; }
 
         [Resolved]
         private BeatmapManager beatmaps { get; set; } = null!;
@@ -285,6 +290,22 @@ namespace osu.Game.Screens.SelectV2
             AccentColour = colours.ForStarDifficulty(starDifficulty.Stars);
             difficultyIcon.FadeColour(starDifficulty.Stars > OsuColour.STAR_DIFFICULTY_DEFINED_COLOUR_CUTOFF ? colours.Orange1 : colourProvider.Background5, duration, Easing.OutQuint);
             difficultyStarRating.Current.Value = starDifficulty;
+        }
+
+        public override MenuItem[] ContextMenuItems
+        {
+            get
+            {
+                if (Item == null)
+                    return Array.Empty<MenuItem>();
+
+                List<MenuItem> items = new List<MenuItem>();
+
+                if (songSelect != null)
+                    items.AddRange(songSelect.GetForwardActions((BeatmapInfo)Item.Model));
+
+                return items.ToArray();
+            }
         }
     }
 }

@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Screens;
@@ -20,13 +21,15 @@ using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
+using osu.Game.Localisation;
+using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osu.Game.Overlays.Volume;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
-using osu.Game.Screens.Edit;
 using osu.Game.Screens.Footer;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Ranking;
@@ -77,22 +80,28 @@ namespace osu.Game.Screens.SelectV2
         public override bool ShowFooter => true;
 
         [Resolved]
-        private OsuGameBase game { get; set; } = null!;
+        private OsuGameBase? game { get; set; }
 
         [Resolved]
         private OsuLogo? logo { get; set; }
 
         [Resolved]
-        private IDialogOverlay? dialogOverlay { get; set; }
+        private BeatmapSetOverlay? beatmapOverlay { get; set; }
 
         [Resolved]
         private BeatmapManager beatmaps { get; set; } = null!;
+
+        [Resolved]
+        private IAPIProvider api { get; set; } = null!;
 
         [Resolved]
         private ManageCollectionsDialog? collectionsDialog { get; set; }
 
         [Resolved]
         private DifficultyRecommender? difficultyRecommender { get; set; }
+
+        [Resolved]
+        private IDialogOverlay? dialogOverlay { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -390,13 +399,18 @@ namespace osu.Game.Screens.SelectV2
         {
             if (!this.IsCurrentScreen()) return false;
 
+            if (game == null)
+                return false;
+
+            var flattenedMods = ModUtils.FlattenMods(game.AvailableMods.Value.SelectMany(kv => kv.Value));
+
             switch (e.Action)
             {
                 case GlobalAction.IncreaseModSpeed:
-                    return modSpeedHotkeyHandler.ChangeSpeed(0.05, ModUtils.FlattenMods(game.AvailableMods.Value.SelectMany(kv => kv.Value)));
+                    return modSpeedHotkeyHandler.ChangeSpeed(0.05, flattenedMods);
 
                 case GlobalAction.DecreaseModSpeed:
-                    return modSpeedHotkeyHandler.ChangeSpeed(-0.05, ModUtils.FlattenMods(game.AvailableMods.Value.SelectMany(kv => kv.Value)));
+                    return modSpeedHotkeyHandler.ChangeSpeed(-0.05, flattenedMods);
             }
 
             return false;
@@ -440,25 +454,6 @@ namespace osu.Game.Screens.SelectV2
             this.Push(new SoloResultsScreen(score));
         }
 
-        #region Beatmap management
-
-        public virtual bool EditingAllowed => false;
-
-        public void ManageCollections() => collectionsDialog?.Show();
-
-        public void MarkPlayed(BeatmapInfo beatmap) => beatmaps.MarkPlayed(beatmap);
-
-        public void Hide(BeatmapInfo beatmap) => beatmaps.Hide(beatmap);
-
-        public void Edit(BeatmapInfo beatmap)
-        {
-            if (!EditingAllowed) return;
-
-            // Forced refetch is important here to guarantee correct invalidation across all difficulties.
-            Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap, true);
-            this.Push(new EditorLoader());
-        }
-
         /// <summary>
         /// Finalises selection on the given <see cref="BeatmapInfo"/>.
         /// </summary>
@@ -468,9 +463,29 @@ namespace osu.Game.Screens.SelectV2
             OnStart();
         }
 
-        public void Delete(BeatmapSetInfo beatmapSet) => dialogOverlay?.Push(new BeatmapDeleteDialog(beatmapSet));
+        #region Beatmap management
 
-        public void ClearScores(BeatmapInfo beatmap) => dialogOverlay?.Push(new BeatmapClearScoresDialog(beatmap));
+        public virtual IEnumerable<OsuMenuItem> GetForwardActions(BeatmapInfo beatmap)
+        {
+            yield return new OsuMenuItem("Select", MenuItemType.Highlighted, () => SelectAndStart(beatmap))
+            {
+                Icon = FontAwesome.Solid.Check
+            };
+
+            yield return new OsuMenuItemSpacer();
+
+            if (beatmap.OnlineID > 0)
+            {
+                yield return new OsuMenuItem("Details...", MenuItemType.Standard, () => beatmapOverlay?.FetchAndShowBeatmap(beatmap.OnlineID));
+
+                if (beatmap.GetOnlineURL(api, Ruleset.Value) is string url)
+                    yield return new OsuMenuItem(CommonStrings.CopyLink, MenuItemType.Standard, () => (game as OsuGame)?.CopyToClipboard(url));
+            }
+        }
+
+        public void ManageCollections() => collectionsDialog?.Show();
+
+        public void Delete(BeatmapSetInfo beatmapSet) => dialogOverlay?.Push(new BeatmapDeleteDialog(beatmapSet));
 
         #endregion
     }

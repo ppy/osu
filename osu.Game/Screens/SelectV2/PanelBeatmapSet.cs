@@ -1,18 +1,22 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Carousel;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osuTK;
 
@@ -35,7 +39,13 @@ namespace osu.Game.Screens.SelectV2
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
         [Resolved]
+        private BeatmapSetOverlay? beatmapOverlay { get; set; }
+
+        [Resolved]
         private BeatmapManager beatmaps { get; set; } = null!;
+
+        [Resolved]
+        private SongSelect? songSelect { get; set; }
 
         public PanelBeatmapSet()
         {
@@ -163,6 +173,31 @@ namespace osu.Game.Screens.SelectV2
             background.Beatmap = null;
             updateButton.BeatmapSet = null;
             difficultiesDisplay.BeatmapSet = null;
+        }
+
+        public override MenuItem[] ContextMenuItems
+        {
+            get
+            {
+                if (Item == null)
+                    return Array.Empty<MenuItem>();
+
+                var beatmapSet = (BeatmapSetInfo)Item.Model;
+
+                List<MenuItem> items = new List<MenuItem>();
+
+                if (!Expanded.Value)
+                {
+                    items.Add(new OsuMenuItem("Expand", MenuItemType.Highlighted, () => TriggerClick()));
+                    items.Add(new OsuMenuItemSpacer());
+                }
+
+                if (beatmapSet.OnlineID > 0)
+                    items.Add(new OsuMenuItem("Details...", MenuItemType.Standard, () => beatmapOverlay?.FetchAndShowBeatmapSet(beatmapSet.OnlineID)));
+
+                items.Add(new OsuMenuItem("Delete...", MenuItemType.Destructive, () => songSelect?.Delete(beatmapSet)));
+                return items.ToArray();
+            }
         }
     }
 }
