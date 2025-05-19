@@ -158,7 +158,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 return;
             }
 
-            float relativePosition = Math.Clamp((float)(position.Value.Value - 1) / (scores.Count - 1), 0, 1);
+            float relativePosition = Math.Clamp((float)(position.Value.Value - 1) / Math.Max(scores.Count - 1, 1), 0, 1);
 
             positionText.Current.Value = position.Value.Value;
             positionText.FadeTo(min_alpha + (max_alpha - min_alpha) * (1 - relativePosition), 1000, Easing.OutPow10);
