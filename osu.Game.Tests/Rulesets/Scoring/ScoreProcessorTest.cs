@@ -422,7 +422,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
         }
 
         [Test]
-        public void TestComboAccounting()
+        public void TestComboAccounting([Values] bool shuffleResults)
         {
             var testBeatmap = new Beatmap
             {
@@ -467,7 +467,13 @@ namespace osu.Game.Tests.Rulesets.Scoring
             Assert.That(scoreProcessor.Combo.Value, Is.EqualTo(14));
             Assert.That(scoreProcessor.HighestCombo.Value, Is.EqualTo(25));
 
-            foreach (var result in Enumerable.Reverse(results))
+            // random shuffle is VERY extreme and overkill.
+            // it might not work correctly for any other `ScoreProcessor` property, and the intermediate results likely make no sense.
+            // the goal is only to demonstrate idempotency to zero when reverting all results.
+            var random = new Random(20250519);
+            var toRevert = shuffleResults ? results.OrderBy(_ => random.Next()).ToList() : Enumerable.Reverse(results);
+
+            foreach (var result in toRevert)
                 scoreProcessor.RevertResult(result);
 
             Assert.That(scoreProcessor.Combo.Value, Is.Zero);
