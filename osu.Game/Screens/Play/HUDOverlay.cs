@@ -14,6 +14,7 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Configuration;
+using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
@@ -50,7 +51,7 @@ namespace osu.Game.Screens.Play
                 return base.ShouldBeConsideredForInput(child);
 
             // hold to quit button should always be interactive.
-            return child == bottomRightElements;
+            return child == BottomRightElements;
         }
 
         public readonly ModDisplay ModDisplay;
@@ -85,9 +86,14 @@ namespace osu.Game.Screens.Play
         private readonly BindableBool replayLoaded = new BindableBool();
 
         private static bool hasShownNotificationOnce;
-        private readonly FillFlowContainer bottomRightElements;
 
-        internal readonly FillFlowContainer TopRightElements;
+        // The following flows are used to attach fixed non-skinnable elements in particular implementations of the player
+        // (e.g. replay or multiplayer-specific controls).
+        // They will make a best-effort attempt to get out of the way of any other skinnable components.
+
+        public readonly FillFlowContainer TopLeftElements;
+        public readonly FillFlowContainer TopRightElements;
+        public readonly FillFlowContainer BottomRightElements;
 
         internal readonly IBindable<bool> IsPlaying = new Bindable<bool>();
 
@@ -100,12 +106,6 @@ namespace osu.Game.Screens.Play
         [CanBeNull]
         private readonly SkinnableContainer rulesetComponents;
 
-        /// <summary>
-        /// A flow which sits at the left side of the screen to house leaderboard (and related) components.
-        /// Will automatically be positioned to avoid colliding with top scoring elements.
-        /// </summary>
-        public readonly FillFlowContainer LeaderboardFlow;
-
         private readonly List<Drawable> hideTargets;
 
         /// <summary>
@@ -113,7 +113,7 @@ namespace osu.Game.Screens.Play
         /// </summary>
         internal readonly Drawable PlayfieldSkinLayer;
 
-        public HUDOverlay([CanBeNull] DrawableRuleset drawableRuleset, IReadOnlyList<Mod> mods, bool alwaysShowLeaderboard = true)
+        public HUDOverlay([CanBeNull] DrawableRuleset drawableRuleset, IReadOnlyList<Mod> mods)
         {
             Container rightSettings;
 
@@ -153,7 +153,7 @@ namespace osu.Game.Screens.Play
                         ModDisplay = CreateModsContainer(),
                     }
                 },
-                bottomRightElements = new FillFlowContainer
+                BottomRightElements = new FillFlowContainer
                 {
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,
@@ -176,7 +176,7 @@ namespace osu.Game.Screens.Play
                         PlayerSettingsOverlay = new PlayerSettingsOverlay(),
                     }
                 },
-                LeaderboardFlow = new FillFlowContainer
+                TopLeftElements = new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
                     Direction = FillDirection.Vertical,
@@ -190,12 +190,11 @@ namespace osu.Game.Screens.Play
             if (rulesetComponents != null)
                 hideTargets.Add(rulesetComponents);
 
-            if (!alwaysShowLeaderboard)
-                hideTargets.Add(LeaderboardFlow);
+            hideTargets.Add(TopLeftElements);
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuConfigManager config, INotificationOverlay notificationOverlay)
+        private void load(OsuConfigManager config, RealmKeyBindingStore keyBindingStore, INotificationOverlay notificationOverlay)
         {
             if (drawableRuleset != null)
             {
@@ -214,7 +213,7 @@ namespace osu.Game.Screens.Play
 
                 notificationOverlay?.Post(new SimpleNotification
                 {
-                    Text = NotificationsStrings.ScoreOverlayDisabled(config.LookupKeyBindings(GlobalAction.ToggleInGameInterface))
+                    Text = NotificationsStrings.ScoreOverlayDisabled(keyBindingStore.GetBindingsStringFor(GlobalAction.ToggleInGameInterface))
                 });
             }
 
@@ -285,15 +284,15 @@ namespace osu.Game.Screens.Play
             else
                 TopRightElements.Y = 0;
 
-            if (lowestTopScreenSpaceLeft.HasValue && DrawHeight - LeaderboardFlow.DrawHeight > 0)
-                LeaderboardFlow.Y = Math.Clamp(ToLocalSpace(new Vector2(0, lowestTopScreenSpaceLeft.Value)).Y, 0, DrawHeight - LeaderboardFlow.DrawHeight);
+            if (lowestTopScreenSpaceLeft.HasValue && DrawHeight - TopLeftElements.DrawHeight > 0)
+                TopLeftElements.Y = Math.Clamp(ToLocalSpace(new Vector2(0, lowestTopScreenSpaceLeft.Value)).Y, 0, DrawHeight - TopLeftElements.DrawHeight);
             else
-                LeaderboardFlow.Y = 0;
+                TopLeftElements.Y = 0;
 
-            if (highestBottomScreenSpace.HasValue && DrawHeight - bottomRightElements.DrawHeight > 0)
-                bottomRightElements.Y = BottomScoringElementsHeight = -Math.Clamp(DrawHeight - ToLocalSpace(highestBottomScreenSpace.Value).Y, 0, DrawHeight - bottomRightElements.DrawHeight);
+            if (highestBottomScreenSpace.HasValue && DrawHeight - BottomRightElements.DrawHeight > 0)
+                BottomRightElements.Y = BottomScoringElementsHeight = -Math.Clamp(DrawHeight - ToLocalSpace(highestBottomScreenSpace.Value).Y, 0, DrawHeight - BottomRightElements.DrawHeight);
             else
-                bottomRightElements.Y = 0;
+                BottomRightElements.Y = 0;
 
             void processDrawables(SkinnableContainer components)
             {

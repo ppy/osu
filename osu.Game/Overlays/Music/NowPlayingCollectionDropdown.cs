@@ -15,7 +15,7 @@ namespace osu.Game.Overlays.Music
     /// <summary>
     /// A <see cref="CollectionDropdown"/> for use in the <see cref="NowPlayingOverlay"/>.
     /// </summary>
-    public partial class NowPlayingCollectionDropdown : CollectionDropdown
+    public partial class NowPlayingCollectionDropdown : CollectionDropdown // TODO: class is now unused. if we decide this isn't coming back it can be nuked.
     {
         protected override bool ShowManageCollectionsItem => false;
 

@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Diagnostics;
 using osu.Framework;
 using osu.Framework.Bindables;
 using osu.Framework.Configuration;
@@ -180,7 +179,10 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.ScalingPositionX, 0.5f, 0f, 1f, 0.01f);
             SetDefault(OsuSetting.ScalingPositionY, 0.5f, 0f, 1f, 0.01f);
 
-            SetDefault(OsuSetting.UIScale, 1f, 0.8f, 1.6f, 0.01f);
+            if (RuntimeInfo.IsMobile)
+                SetDefault(OsuSetting.UIScale, 1f, 0.8f, 1.1f, 0.01f);
+            else
+                SetDefault(OsuSetting.UIScale, 1f, 0.8f, 1.6f, 0.01f);
 
             SetDefault(OsuSetting.UIHoldActivationDelay, 200.0, 0.0, 500.0, 50.0);
 
@@ -223,6 +225,8 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.EditorSubmissionNotifyOnDiscussionReplies, true);
             SetDefault(OsuSetting.EditorSubmissionLoadInBrowserAfterSubmission, true);
+
+            SetDefault(OsuSetting.WasSupporter, false);
         }
 
         protected override bool CheckLookupContainsPrivateInformation(OsuSetting lookup)
@@ -263,10 +267,6 @@ namespace osu.Game.Configuration
 
         public override TrackedSettings CreateTrackedSettings()
         {
-            // these need to be assigned in normal game startup scenarios.
-            Debug.Assert(LookupKeyBindings != null);
-            Debug.Assert(LookupSkinName != null);
-
             return new TrackedSettings
             {
                 new TrackedSetting<bool>(OsuSetting.ShowFpsDisplay, state => new SettingDescription(
@@ -330,8 +330,7 @@ namespace osu.Game.Configuration
         }
 
         public Func<Guid, string> LookupSkinName { private get; set; } = _ => @"unknown";
-
-        public Func<GlobalAction, LocalisableString> LookupKeyBindings { get; set; } = _ => @"unknown";
+        public Func<GlobalAction, LocalisableString> LookupKeyBindings { private get; set; } = _ => @"unknown";
 
         IBindable<float> IGameplaySettings.ComboColourNormalisationAmount => GetOriginalBindable<float>(OsuSetting.ComboColourNormalisationAmount);
         IBindable<float> IGameplaySettings.PositionalHitsoundsLevel => GetOriginalBindable<float>(OsuSetting.PositionalHitsoundsLevel);
@@ -469,5 +468,11 @@ namespace osu.Game.Configuration
         EditorShowStoryboard,
         EditorSubmissionNotifyOnDiscussionReplies,
         EditorSubmissionLoadInBrowserAfterSubmission,
+
+        /// <summary>
+        /// Cached state of whether local user is a supporter.
+        /// Used to allow early checks (ie for startup samples) to be in the correct state, even if the API authentication process has not completed.
+        /// </summary>
+        WasSupporter
     }
 }

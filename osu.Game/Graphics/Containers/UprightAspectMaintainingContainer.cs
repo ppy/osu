@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Extensions.MatrixExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Layout;
@@ -54,7 +55,8 @@ namespace osu.Game.Graphics.Containers
             parentMatrix.M31 = 0.0f;
             parentMatrix.M32 = 0.0f;
 
-            Matrix3 reversedParent = parentMatrix.Inverted();
+            Matrix3 reversedParent = parentMatrix;
+            MatrixExtensions.FastInvert(ref reversedParent);
 
             // Extract the rotation.
             float angle = MathF.Atan2(reversedParent.M12, reversedParent.M11);

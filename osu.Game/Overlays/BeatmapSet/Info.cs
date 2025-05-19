@@ -10,9 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.BeatmapListing;
 
@@ -38,7 +36,6 @@ namespace osu.Game.Overlays.BeatmapSet
             MetadataSection source, mapperTags;
             MetadataSectionGenre genre;
             MetadataSectionLanguage language;
-            OsuSpriteText notRankedPlaceholder;
 
             RelativeSizeAxes = Axes.X;
             Height = base_height;
@@ -109,14 +106,6 @@ namespace osu.Game.Overlays.BeatmapSet
                                     RelativeSizeAxes = Axes.Both,
                                     Padding = new MarginPadding { Top = 20, Horizontal = 15 },
                                 },
-                                notRankedPlaceholder = new OsuSpriteText
-                                {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    Alpha = 0,
-                                    Text = "This beatmap is not ranked",
-                                    Font = OsuFont.GetFont(size: 12)
-                                },
                             },
                         },
                     },
@@ -131,9 +120,6 @@ namespace osu.Game.Overlays.BeatmapSet
                 updateUserTags();
                 genre.Metadata = b.NewValue?.Genre ?? new BeatmapSetOnlineGenre { Id = (int)SearchGenre.Unspecified };
                 language.Metadata = b.NewValue?.Language ?? new BeatmapSetOnlineLanguage { Id = (int)SearchLanguage.Unspecified };
-                bool setHasLeaderboard = b.NewValue?.Status > 0;
-                successRate.Alpha = setHasLeaderboard ? 1 : 0;
-                notRankedPlaceholder.Alpha = setHasLeaderboard ? 0 : 1;
             });
             Beatmap.BindValueChanged(b =>
             {

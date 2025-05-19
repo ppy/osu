@@ -27,7 +27,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 AutoSizeAxes = Axes.Y,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Child = new MissingBeatmapNotification(CreateAPIBeatmapSet(Ruleset.Value).Beatmaps.First(), new ImportScoreTest.TestArchiveReader(), "deadbeef")
+                Child = new MissingBeatmapNotification(CreateAPIBeatmapSet(Ruleset.Value).Beatmaps.First(), "deadbeef", new ImportScoreTest.TestArchiveReader())
             };
         }
     }

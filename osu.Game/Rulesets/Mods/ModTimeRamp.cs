@@ -32,6 +32,7 @@ namespace osu.Game.Rulesets.Mods
         [SettingSource("Adjust pitch", "Should pitch be adjusted with speed")]
         public abstract BindableBool AdjustPitch { get; }
 
+        public sealed override bool ValidForFreestyleAsRequiredMod => true;
         public sealed override bool ValidForMultiplayerAsFreeMod => false;
 
         public override Type[] IncompatibleMods => new[] { typeof(ModRateAdjust), typeof(ModAdaptiveSpeed) };
@@ -41,6 +42,9 @@ namespace osu.Game.Rulesets.Mods
             get
             {
                 yield return ("Speed change", $"{InitialRate.Value:N2}x to {FinalRate.Value:N2}x");
+
+                if (!AdjustPitch.IsDefault)
+                    yield return ("Adjust pitch", AdjustPitch.Value ? "On" : "Off");
             }
         }
 

@@ -167,6 +167,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
             }, true);
         }
 
+        protected override bool OnMouseDown(MouseDownEvent e) => true;
+        protected override bool OnClick(ClickEvent e) => true;
+
         private void cycleDivisorType(int direction)
         {
             int totalTypes = Enum.GetValues<BeatDivisorType>().Length;

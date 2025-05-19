@@ -23,6 +23,7 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
                 {
                     LabelText = UserInterfaceStrings.ShowConvertedBeatmaps,
                     Current = config.GetBindable<bool>(OsuSetting.ShowConvertedBeatmaps),
+                    Keywords = new[] { "converts", "converted" }
                 },
                 new SettingsEnumDropdown<RandomSelectAlgorithm>
                 {

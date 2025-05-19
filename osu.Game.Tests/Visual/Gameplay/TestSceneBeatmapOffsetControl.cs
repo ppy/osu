@@ -50,20 +50,16 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddStep("Set short reference score", () =>
             {
+                // 50 events total. one of them (head circle) being timed / having hitwindows, rest having no hitwindows
                 List<HitEvent> hitEvents =
                 [
-                    // 10 events total. one of them (head circle) being timed / having hitwindows, rest having no hitwindows
                     new HitEvent(30, 1, HitResult.LargeTickHit, new SliderHeadCircle { ClassicSliderBehaviour = true }, null, null),
-                    new HitEvent(0, 1, HitResult.LargeTickHit, new SliderTick(), null, null),
-                    new HitEvent(0, 1, HitResult.LargeTickHit, new SliderTick(), null, null),
-                    new HitEvent(0, 1, HitResult.LargeTickHit, new SliderTick(), null, null),
-                    new HitEvent(0, 1, HitResult.LargeTickHit, new SliderTick(), null, null),
-                    new HitEvent(0, 1, HitResult.LargeTickHit, new SliderTick(), null, null),
-                    new HitEvent(0, 1, HitResult.LargeTickHit, new SliderTick(), null, null),
-                    new HitEvent(0, 1, HitResult.LargeTickHit, new SliderTick(), null, null),
-                    new HitEvent(0, 1, HitResult.LargeTickHit, new SliderTick(), null, null),
-                    new HitEvent(0, 1, HitResult.LargeTickHit, new SliderTick(), null, null),
                 ];
+
+                for (int i = 0; i < 49; i++)
+                {
+                    hitEvents.Add(new HitEvent(0, 1, HitResult.LargeTickHit, new SliderTick(), null, null));
+                }
 
                 foreach (var ev in hitEvents)
                     ev.HitObject.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());

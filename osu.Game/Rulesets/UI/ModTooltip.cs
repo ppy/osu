@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
@@ -101,36 +102,38 @@ namespace osu.Game.Rulesets.UI
             };
         }
 
-        private Mod? displayedContent;
+        private (LocalisableString setting, LocalisableString value)[]? displayedSettings;
 
         public void SetContent(Mod content)
         {
-            if (content == displayedContent)
-                return;
-
-            displayedContent = content;
             nameText.Text = content.Name;
-            settingsLabelsFlow.Clear();
-            settingsValuesFlow.Clear();
 
-            if (content.SettingDescription.Any())
+            if (displayedSettings == null || !displayedSettings.SequenceEqual(content.SettingDescription))
             {
-                settingsLabelsFlow.Show();
-                settingsValuesFlow.Show();
+                displayedSettings = content.SettingDescription.ToArray();
 
-                foreach (var part in content.SettingDescription)
+                settingsLabelsFlow.Clear();
+                settingsValuesFlow.Clear();
+
+                if (displayedSettings.Any())
                 {
-                    settingsLabelsFlow.AddText(part.setting);
-                    settingsLabelsFlow.NewLine();
+                    settingsLabelsFlow.Show();
+                    settingsValuesFlow.Show();
 
-                    settingsValuesFlow.AddText(part.value);
-                    settingsValuesFlow.NewLine();
+                    foreach (var part in displayedSettings)
+                    {
+                        settingsLabelsFlow.AddText(part.setting);
+                        settingsLabelsFlow.NewLine();
+
+                        settingsValuesFlow.AddText(part.value);
+                        settingsValuesFlow.NewLine();
+                    }
                 }
-            }
-            else
-            {
-                settingsLabelsFlow.Hide();
-                settingsValuesFlow.Hide();
+                else
+                {
+                    settingsLabelsFlow.Hide();
+                    settingsValuesFlow.Hide();
+                }
             }
         }
 

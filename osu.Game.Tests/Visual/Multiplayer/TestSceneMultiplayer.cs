@@ -443,7 +443,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("Enter song select", () =>
             {
                 var currentSubScreen = ((Screens.OnlinePlay.Multiplayer.Multiplayer)multiplayerComponents.CurrentScreen).CurrentSubScreen;
-                ((MultiplayerMatchSubScreen)currentSubScreen).OpenSongSelection(item);
+                ((MultiplayerMatchSubScreen)currentSubScreen).ShowSongSelect(item);
             });
 
             AddUntilStep("wait for song select", () => this.ChildrenOfType<MultiplayerMatchSongSelect>().FirstOrDefault()?.BeatmapSetsLoaded == true);
@@ -484,7 +484,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("Enter song select", () =>
             {
                 var currentSubScreen = ((Screens.OnlinePlay.Multiplayer.Multiplayer)multiplayerComponents.CurrentScreen).CurrentSubScreen;
-                ((MultiplayerMatchSubScreen)currentSubScreen).OpenSongSelection(item);
+                ((MultiplayerMatchSubScreen)currentSubScreen).ShowSongSelect(item);
             });
 
             AddUntilStep("wait for song select", () => this.ChildrenOfType<MultiplayerMatchSongSelect>().FirstOrDefault()?.BeatmapSetsLoaded == true);
@@ -525,7 +525,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("Enter song select", () =>
             {
                 var currentSubScreen = ((Screens.OnlinePlay.Multiplayer.Multiplayer)multiplayerComponents.CurrentScreen).CurrentSubScreen;
-                ((MultiplayerMatchSubScreen)currentSubScreen).OpenSongSelection(item);
+                ((MultiplayerMatchSubScreen)currentSubScreen).ShowSongSelect(item);
             });
 
             AddUntilStep("wait for song select", () => this.ChildrenOfType<MultiplayerMatchSongSelect>().FirstOrDefault()?.BeatmapSetsLoaded == true);
@@ -657,7 +657,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("invoke on back button", () => multiplayerComponents.OnBackButton());
 
-            AddAssert("mod overlay is hidden", () => this.ChildrenOfType<RoomSubScreen>().Single().UserModsSelectOverlay.State.Value == Visibility.Hidden);
+            AddAssert("mod overlay is hidden", () => this.ChildrenOfType<MultiplayerUserModSelectOverlay>().Single().State.Value == Visibility.Hidden);
 
             AddAssert("dialog overlay is hidden", () => DialogOverlay.State.Value == Visibility.Hidden);
 
@@ -828,11 +828,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("wait for room open", () => this.ChildrenOfType<MultiplayerMatchSubScreen>().FirstOrDefault()?.IsLoaded == true);
             AddUntilStep("wait for join", () => multiplayerClient.RoomJoined);
 
-            AddAssert("local room has correct settings", () =>
-            {
-                var localRoom = this.ChildrenOfType<MultiplayerMatchSubScreen>().Single().Room;
-                return localRoom.Name == multiplayerClient.ServerSideRooms[0].Name && localRoom.Playlist.Single().ID == 2;
-            });
+            AddAssert("local room has correct name", () => this.ChildrenOfType<MultiplayerRoomPanel>().Single().Room.Name, () => Is.EqualTo(multiplayerClient.ServerSideRooms[0].Name));
+            AddAssert("local room has correct playlist", () => this.ChildrenOfType<MultiplayerQueueList>().Single().Items.Single().ID, () => Is.EqualTo(2));
         }
 
         [Test]
@@ -1057,6 +1054,45 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("wait for loading", () => multiplayerClient.ClientRoom?.State == MultiplayerRoomState.WaitingForLoad);
             AddUntilStep("wait for gameplay to start", () => multiplayerClient.ClientRoom?.State == MultiplayerRoomState.Playing);
             AddAssert("hidden is selected", () => SelectedMods.Value, () => Has.One.TypeOf(typeof(OsuModHidden)));
+        }
+
+        [FlakyTest]
+        [Test]
+        public void TestGlobalBeatmapDoesNotChangeAtResults()
+        {
+            createRoom(() => new Room
+            {
+                Name = "Test Room",
+                QueueMode = QueueMode.AllPlayers,
+                Playlist =
+                [
+                    new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
+                    {
+                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
+                        AllowedMods = new[] { new APIMod { Acronym = "HD" } },
+                    },
+                    new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 1)).BeatmapInfo)
+                    {
+                        RulesetID = new TaikoRuleset().RulesetInfo.OnlineID,
+                        AllowedMods = new[] { new APIMod { Acronym = "HD" } },
+                    },
+                ]
+            });
+
+            enterGameplay();
+
+            // Gameplay runs in real-time, so we need to incrementally check if gameplay has finished in order to not time out.
+            for (double i = 1000; i < TestResources.QUICK_BEATMAP_LENGTH; i += 1000)
+            {
+                double time = i;
+                AddUntilStep($"wait for time > {i}", () => this.ChildrenOfType<GameplayClockContainer>().SingleOrDefault()?.CurrentTime > time);
+            }
+
+            AddUntilStep("wait for results", () => multiplayerComponents.CurrentScreen is ResultsScreen);
+
+            AddAssert("global beatmap still matches first playlist item", () => Beatmap.Value.BeatmapInfo.OnlineID, () => Is.EqualTo(multiplayerClient.ClientRoom!.Playlist[0].BeatmapID));
+            AddStep("return to match", () => multiplayerComponents.Exit());
+            AddAssert("global beatmap matches second playlist item", () => Beatmap.Value.BeatmapInfo.OnlineID, () => Is.EqualTo(multiplayerClient.ClientRoom!.Playlist[1].BeatmapID));
         }
 
         private void enterGameplay()
