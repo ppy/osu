@@ -91,18 +91,7 @@ namespace osu.Game.Screens.Play.HUD
 
         private void updateTextColor()
         {
-            SRGBColour colour = new SRGBColour();
-
-            if (Current.Value < 0)
-            {
-                colour.SRGB = Color4.Red;
-            }
-            else
-            {
-                colour.SRGB = Color4.White;
-            }
-
-            Colour = ColourInfo.SingleColour(colour);
+            Colour = Current.Value < 0 ? Color4.Red : Color4.White;
         }
     }
 }
