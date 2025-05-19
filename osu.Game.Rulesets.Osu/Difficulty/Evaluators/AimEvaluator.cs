@@ -63,6 +63,23 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 prevVelocity = Math.Max(prevVelocity, movementVelocity + travelVelocity);
             }
 
+            double prevPrevVelocity = 0;
+
+            if (current.Index > 3)
+            {
+                var osuLastLastLastObj = (OsuDifficultyHitObject)current.Previous(2);
+
+                prevPrevVelocity = osuLastLastObj.LazyJumpDistance / osuLastLastObj.StrainTime;
+
+                if (osuLastLastLastObj.BaseObject is Slider && withSliderTravelDistance)
+                {
+                    double travelVelocity = osuLastLastLastObj.TravelDistance / osuLastLastLastObj.TravelTime;
+                    double movementVelocity = osuLastLastObj.MinimumJumpDistance / osuLastLastObj.MinimumJumpTime;
+
+                    prevPrevVelocity = Math.Max(prevPrevVelocity, movementVelocity + travelVelocity);
+                }
+            }
+
             double wideAngleBonus = 0;
             double acuteAngleBonus = 0;
             double sliderBonus = 0;
@@ -78,10 +95,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 {
                     double currAngle = osuCurrObj.Angle.Value;
                     double lastAngle = osuLastObj.Angle.Value;
-                    double? lastlastAngle = null;
-
-                    if (osuLastLastObj.Angle != null)
-                        lastlastAngle = osuLastLastObj.Angle.Value;
 
                     // Rewarding angles, take the smaller velocity as base.
                     double angleBonus = Math.Min(currVelocity, prevVelocity);
@@ -93,19 +106,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     wideAngleBonus *= 1 - Math.Min(wideAngleBonus, Math.Pow(calcWideAngleBonus(lastAngle), 3));
                     acuteAngleBonus *= 0.08 + 0.92 * (1 - Math.Min(acuteAngleBonus, Math.Pow(calcAcuteAngleBonus(lastAngle), 3)));
 
-                    if (lastlastAngle != null)
-                    {
-                        wideAngleBonus *= 1 - Math.Min(calcAcuteAngleBonus(lastAngle), Math.Pow(calcWideAngleBonus((double)lastlastAngle), 3));
-                        acuteAngleBonus *= 0.08 + 0.92 * (1 - Math.Min(calcAcuteAngleBonus(lastAngle), Math.Pow(calcAcuteAngleBonus((double)lastlastAngle), 3)));
-                    }
-
                     // Penalize easy angle change.
                     acuteAngleBonus *= 0.08 + 0.92 * DifficultyCalculationUtils.Smoothstep(currAngle, Math.Min(lastAngle, double.DegreesToRadians(100)), double.DegreesToRadians(40));
 
                     // Buff hard angle change.
-                    aimControlBonus = angleBonus * DifficultyCalculationUtils.Smoothstep(Math.Abs(currAngle - lastAngle), double.DegreesToRadians(40), double.DegreesToRadians(100));
+                    aimControlBonus = Math.Min(angleBonus, prevPrevVelocity) * DifficultyCalculationUtils.Smoothstep(Math.Abs(currAngle - lastAngle), double.DegreesToRadians(40), double.DegreesToRadians(100));
 
-                    aimControlBonus *= Math.Max(Math.Log10(Math.Max(osuCurrObj.Index / 100, 1)), 0);
+                    // Buff aim control bonus for distance more than 1.5 diameter.
+                    aimControlBonus *= DifficultyCalculationUtils.Smootherstep(osuCurrObj.LazyJumpDistance, 0, diameter * 1.5);
 
                     // Apply full wide angle bonus for distance more than one diameter
                     wideAngleBonus *= angleBonus * DifficultyCalculationUtils.Smootherstep(osuCurrObj.LazyJumpDistance, 0, diameter);
