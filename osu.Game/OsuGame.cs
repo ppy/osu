@@ -47,7 +47,6 @@ using osu.Game.IO;
 using osu.Game.Localisation;
 using osu.Game.Online;
 using osu.Game.Online.API.Requests;
-using osu.Game.Online.Broadcasts;
 using osu.Game.Online.Chat;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Online.Rooms;
@@ -1246,9 +1245,6 @@ namespace osu.Game
 
             loadComponentSingleFile(new BackgroundDataStoreProcessor(), Add);
             loadComponentSingleFile<BeatmapStore>(new RealmDetachedBeatmapStore(), Add, true);
-
-            loadComponentSingleFile<IBroadcastServer>(new BroadcastServer(new Uri(@"http://localhost:7270/")), Add, true);
-            loadComponentSingleFile(new UserActivityBroadcaster(), Add);
 
             Add(externalLinkOpener = new ExternalLinkOpener());
             Add(new MusicKeyBindingHandler());
