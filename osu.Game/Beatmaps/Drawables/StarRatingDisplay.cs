@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -9,6 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
@@ -23,8 +25,6 @@ namespace osu.Game.Beatmaps.Drawables
     /// </summary>
     public partial class StarRatingDisplay : CompositeDrawable, IHasCurrentValue<StarDifficulty>
     {
-        public const double TRANSFORM_DURATION = 750;
-
         private readonly bool animated;
         private readonly Box background;
         private readonly SpriteIcon starIcon;
@@ -147,7 +147,8 @@ namespace osu.Game.Beatmaps.Drawables
             Current.BindValueChanged(c =>
             {
                 if (animated)
-                    this.TransformBindableTo(displayedStars, c.NewValue.Stars, TRANSFORM_DURATION, Easing.OutQuint);
+                    // Animation roughly matches `StarCounter`'s implementation.
+                    this.TransformBindableTo(displayedStars, c.NewValue.Stars, 100 + 80 * Math.Abs(c.NewValue.Stars - c.OldValue.Stars), Easing.OutQuint);
                 else
                     displayedStars.Value = c.NewValue.Stars;
             });
