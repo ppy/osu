@@ -4,7 +4,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
@@ -84,7 +83,7 @@ namespace osu.Game.Screens.Play.HUD
                 }
             }
 
-            var curTopScore = scoresButMe.ToList().MaxBy(s => s.TotalScore.Value);
+            var curTopScore = scoresButMe.MaxBy(s => s.TotalScore.Value);
 
             Current.Value = player.Score.ScoreInfo.TotalScore - curTopScore!.TotalScore.Value;
         }
