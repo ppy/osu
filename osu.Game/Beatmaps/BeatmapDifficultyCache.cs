@@ -102,7 +102,11 @@ namespace osu.Game.Beatmaps
         /// <returns>A bindable that is updated to contain the star difficulty when it becomes available. Will be null while in an initial calculating state (but not during updates to ruleset and mods if a stale value is already propagated).</returns>
         public IBindable<StarDifficulty?> GetBindableDifficulty(IBeatmapInfo beatmapInfo, CancellationToken cancellationToken = default, int computationDelay = 0)
         {
-            var bindable = new BindableStarDifficulty(beatmapInfo, cancellationToken);
+            var bindable = new BindableStarDifficulty(beatmapInfo, cancellationToken)
+            {
+                // Start with an approximate known value instead of zero.
+                Value = new StarDifficulty(beatmapInfo.StarRating, 0)
+            };
 
             updateBindable(bindable, currentRuleset.Value, currentMods.Value, cancellationToken, computationDelay);
 
