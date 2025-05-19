@@ -49,7 +49,7 @@ namespace osu.Game.Online.WebSockets
             if (cts == null || process == null)
                 return;
 
-            await OnClosing().ConfigureAwait(false);
+            await OnClosing(token).ConfigureAwait(false);
             await CloseAsync(socket, token).ConfigureAwait(false);
             await cts.CancelAsync().ConfigureAwait(false);
             await process.ConfigureAwait(false);
