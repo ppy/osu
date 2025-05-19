@@ -14,7 +14,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public partial class MultiScoreDiff : RollingCounter<long>, ISerialisableDrawable
+    public partial class ScoreDifferenceToFirstPlaceInMultiplayDisplay : RollingCounter<long>, ISerialisableDrawable
     {
         [Resolved]
         private Player player { get; set; } = null!;
