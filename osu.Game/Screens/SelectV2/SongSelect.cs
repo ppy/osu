@@ -240,6 +240,7 @@ namespace osu.Game.Screens.SelectV2
             detailsArea.Show();
             filterControl.Show();
 
+            modSelectOverlay.Beatmap.BindTo(Beatmap);
             modSelectOverlay.SelectedMods.BindTo(Mods);
         }
 
@@ -255,6 +256,8 @@ namespace osu.Game.Screens.SelectV2
             detailsArea.Show();
             filterControl.Show();
 
+            modSelectOverlay.Beatmap.BindTo(Beatmap);
+
             // required due to https://github.com/ppy/osu-framework/issues/3218
             modSelectOverlay.SelectedMods.Disabled = false;
             modSelectOverlay.SelectedMods.BindTo(Mods);
@@ -265,6 +268,7 @@ namespace osu.Game.Screens.SelectV2
             this.FadeOut(fade_duration, Easing.OutQuint);
 
             modSelectOverlay.SelectedMods.UnbindFrom(Mods);
+            modSelectOverlay.Beatmap.UnbindFrom(Beatmap);
 
             titleWedge.Hide();
             detailsArea.Hide();
