@@ -11,6 +11,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Audio;
+using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Mania.Judgements;
 using osu.Game.Rulesets.Mania.Skinning.Default;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -29,9 +31,9 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
     {
         public override bool DisplayResult => false;
 
-        public IBindable<bool> IsHitting => isHitting;
+        public IBindable<bool> IsHolding => isHolding;
 
-        private readonly Bindable<bool> isHitting = new Bindable<bool>();
+        private readonly Bindable<bool> isHolding = new Bindable<bool>();
 
         public DrawableHoldNoteHead Head => headContainer.Child;
         public DrawableHoldNoteTail Tail => tailContainer.Child;
@@ -54,16 +56,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         private Container maskingContainer;
 
         private SkinnableDrawable bodyPiece;
-
-        /// <summary>
-        /// Time at which the user started holding this hold note. Null if the user is not holding this hold note.
-        /// </summary>
-        public double? HoldStartTime { get; private set; }
-
-        /// <summary>
-        /// Used to decide whether to visually clamp the hold note to the judgement line.
-        /// </summary>
-        private double? releaseTime;
 
         public DrawableHoldNote()
             : this(null)
@@ -126,7 +118,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         {
             base.LoadComplete();
 
-            isHitting.BindValueChanged(updateSlidingSample, true);
+            isHolding.BindValueChanged(updateSlidingSample, true);
         }
 
         protected override void OnApply()
@@ -134,8 +126,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             base.OnApply();
 
             sizingContainer.Size = Vector2.One;
-            HoldStartTime = null;
-            releaseTime = null;
         }
 
         protected override void AddNestedHitObject(DrawableHitObject hitObject)
@@ -214,11 +204,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         {
             base.Update();
 
-            if (Time.Current < releaseTime)
-                releaseTime = null;
-
-            if (Time.Current < HoldStartTime)
-                endHold();
+            isHolding.Value = Result.IsHolding(Time.Current);
 
             // Pad the full size container so its contents (i.e. the masking container) reach under the tail.
             // This is required for the tail to not be masked away, since it lies outside the bounds of the hold note.
@@ -249,7 +235,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 //
                 // As per stable, this should not apply for early hits, waiting until the object starts to touch the
                 // judgement area first.
-                if (Head.IsHit && releaseTime == null && DrawHeight > 0)
+                if (Head.IsHit && !Result.DroppedHoldAfter(HitObject.StartTime) && DrawHeight > 0)
                 {
                     // How far past the hit target this hold note is.
                     float yOffset = Direction.Value == ScrollingDirection.Up ? -Y : Y;
@@ -259,6 +245,10 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             else
                 sizingContainer.Height = 1;
         }
+
+        protected override JudgementResult CreateResult(Judgement judgement) => new HoldNoteJudgementResult(HitObject, judgement);
+
+        public new HoldNoteJudgementResult Result => (HoldNoteJudgementResult)base.Result;
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
@@ -274,7 +264,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                     Body.TriggerResult(Tail.IsHit);
 
                 // Important that this is always called when a result is applied.
-                endHold();
+                Result.ReportHoldState(Time.Current, false);
             }
         }
 
@@ -283,7 +273,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             base.MissForcefully();
 
             // Important that this is always called when a result is applied.
-            endHold();
+            Result.ReportHoldState(Time.Current, false);
         }
 
         public bool OnPressed(KeyBindingPressEvent<ManiaAction> e)
@@ -317,8 +307,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             if (timeOffset < -Head.HitObject.HitWindows.WindowFor(HitResult.Miss))
                 return;
 
-            HoldStartTime = Time.Current;
-            isHitting.Value = true;
+            Result.ReportHoldState(Time.Current, true);
         }
 
         public void OnReleased(KeyBindingReleaseEvent<ManiaAction> e)
@@ -337,20 +326,13 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             // the user has released too early (before the tail).
             //
             // In such a case, we want to record this against the DrawableHoldNoteBody.
-            if (HoldStartTime != null)
+            if (isHolding.Value)
             {
                 Tail.UpdateResult();
                 Body.TriggerResult(Tail.IsHit);
 
-                endHold();
-                releaseTime = Time.Current;
+                Result.ReportHoldState(Time.Current, false);
             }
-        }
-
-        private void endHold()
-        {
-            HoldStartTime = null;
-            isHitting.Value = false;
         }
 
         protected override void LoadSamples()
