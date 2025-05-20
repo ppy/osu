@@ -611,7 +611,7 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddAssert("ensure score is databased", () => Game.Realm.Run(r => r.Find<ScoreInfo>(score.ID)?.DeletePending == false));
 
-            AddStep("press back button", () => Game.ChildrenOfType<BackButton>().First().Action());
+            AddStep("press back button", () => Game.ChildrenOfType<BackButton>().First().Action!.Invoke());
 
             AddStep("show local scores",
                 () => Game.ChildrenOfType<BeatmapDetailAreaTabControl>().First().Current.Value = new BeatmapDetailAreaLeaderboardTabItem<BeatmapLeaderboardScope>(BeatmapLeaderboardScope.Local));
@@ -644,7 +644,7 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddAssert("ensure score is databased", () => Game.Realm.Run(r => r.Find<ScoreInfo>(score.ID)?.DeletePending == false));
 
-            AddStep("press back button", () => Game.ChildrenOfType<BackButton>().First().Action());
+            AddStep("press back button", () => Game.ChildrenOfType<BackButton>().First().Action!.Invoke());
 
             AddStep("show local scores",
                 () => Game.ChildrenOfType<BeatmapDetailAreaTabControl>().First().Current.Value = new BeatmapDetailAreaLeaderboardTabItem<BeatmapLeaderboardScope>(BeatmapLeaderboardScope.Local));
@@ -734,7 +734,7 @@ namespace osu.Game.Tests.Visual.Navigation
         public void TestPushSongSelectAndPressBackButtonImmediately()
         {
             AddStep("push song select", () => Game.ScreenStack.Push(new TestPlaySongSelect()));
-            AddStep("press back button", () => Game.ChildrenOfType<BackButton>().First().Action());
+            AddStep("press back button", () => Game.ChildrenOfType<BackButton>().First().Action!.Invoke());
             AddWaitStep("wait two frames", 2);
         }
 
@@ -914,7 +914,7 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddUntilStep("wait for lounge", () => multiplayerComponents.ChildrenOfType<LoungeSubScreen>().SingleOrDefault()?.IsLoaded == true);
             AddStep("open room", () => multiplayerComponents.ChildrenOfType<LoungeSubScreen>().Single().Open());
-            AddStep("press back button", () => Game.ChildrenOfType<BackButton>().First().Action());
+            AddStep("press back button", () => Game.ChildrenOfType<BackButton>().First().Action!.Invoke());
             AddWaitStep("wait two frames", 2);
 
             AddStep("exit lounge", () => Game.ScreenStack.Exit());

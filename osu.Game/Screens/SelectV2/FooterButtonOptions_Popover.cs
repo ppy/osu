@@ -12,7 +12,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
-using osu.Game.Collections;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -34,22 +33,21 @@ namespace osu.Game.Screens.SelectV2
             private FillFlowContainer buttonFlow = null!;
             private readonly FooterButtonOptions footerButton;
 
-            [Cached]
-            private readonly OverlayColourProvider colourProvider;
+            private readonly WorkingBeatmap beatmap;
 
-            private WorkingBeatmap beatmapWhenOpening = null!;
+            // Can't use DI for these due to popover being initialised from a footer button which ends up being on the global
+            // PopoverContainer.
+            public ISongSelect? SongSelect { get; init; }
+            public required OverlayColourProvider ColourProvider { get; init; }
 
-            [Resolved]
-            private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
-
-            public Popover(FooterButtonOptions footerButton, OverlayColourProvider colourProvider)
+            public Popover(FooterButtonOptions footerButton, WorkingBeatmap beatmap)
             {
                 this.footerButton = footerButton;
-                this.colourProvider = colourProvider;
+                this.beatmap = beatmap;
             }
 
             [BackgroundDependencyLoader]
-            private void load(ManageCollectionsDialog? manageCollectionsDialog, OsuColour colours, BeatmapManager? beatmapManager)
+            private void load(OsuColour colours)
             {
                 Content.Padding = new MarginPadding(5);
 
@@ -60,23 +58,21 @@ namespace osu.Game.Screens.SelectV2
                     Spacing = new Vector2(3),
                 };
 
-                beatmapWhenOpening = beatmap.Value;
-
                 addHeader(CommonStrings.General);
-                addButton(SongSelectStrings.ManageCollections, FontAwesome.Solid.Book, () => manageCollectionsDialog?.Show());
+                addButton(SongSelectStrings.ManageCollections, FontAwesome.Solid.Book, () => SongSelect?.ManageCollections());
 
-                addHeader(SongSelectStrings.ForAllDifficulties, beatmapWhenOpening.BeatmapSetInfo.ToString());
-                addButton(SongSelectStrings.DeleteBeatmap, FontAwesome.Solid.Trash, () => { }, colours.Red1); // songSelect?.DeleteBeatmap(beatmapWhenOpening.BeatmapSetInfo);
+                addHeader(SongSelectStrings.ForAllDifficulties, beatmap.BeatmapSetInfo.ToString());
+                addButton(SongSelectStrings.DeleteBeatmap, FontAwesome.Solid.Trash, () => SongSelect?.Delete(beatmap.BeatmapSetInfo), colours.Red1);
 
-                addHeader(SongSelectStrings.ForSelectedDifficulty, beatmapWhenOpening.BeatmapInfo.DifficultyName);
-                // TODO: make work, and make show "unplayed" or "played" based on status.
-                addButton(SongSelectStrings.MarkAsPlayed, FontAwesome.Regular.TimesCircle, null);
-                addButton(SongSelectStrings.ClearAllLocalScores, FontAwesome.Solid.Eraser, () => { }, colours.Red1); // songSelect?.ClearScores(beatmapWhenOpening.BeatmapInfo);
+                addHeader(SongSelectStrings.ForSelectedDifficulty, beatmap.BeatmapInfo.DifficultyName);
+                // TODO: replace with "remove from played" button when beatmap is already played.
+                addButton(SongSelectStrings.MarkAsPlayed, FontAwesome.Regular.TimesCircle, () => SongSelect?.MarkPlayed(beatmap.BeatmapInfo));
+                addButton(SongSelectStrings.ClearAllLocalScores, FontAwesome.Solid.Eraser, () => SongSelect?.ClearScores(beatmap.BeatmapInfo), colours.Red1);
 
-                // if (songSelect != null && songSelect.AllowEditing)
-                addButton(SongSelectStrings.EditBeatmap, FontAwesome.Solid.PencilAlt, () => { }); // songSelect.Edit(beatmapWhenOpening.BeatmapInfo);
+                if (SongSelect?.EditingAllowed == true)
+                    addButton(SongSelectStrings.EditBeatmap, FontAwesome.Solid.PencilAlt, () => SongSelect.Edit(beatmap.BeatmapInfo));
 
-                addButton(WebCommonStrings.ButtonsHide.ToSentence(), FontAwesome.Solid.Magic, () => beatmapManager?.Hide(beatmapWhenOpening.BeatmapInfo));
+                addButton(WebCommonStrings.ButtonsHide.ToSentence(), FontAwesome.Solid.Magic, () => SongSelect?.Hide(beatmap.BeatmapInfo));
             }
 
             protected override void LoadComplete()
@@ -84,8 +80,12 @@ namespace osu.Game.Screens.SelectV2
                 base.LoadComplete();
 
                 ScheduleAfterChildren(() => GetContainingFocusManager()!.ChangeFocus(this));
+            }
 
-                beatmap.BindValueChanged(_ => Hide());
+            protected override void UpdateState(ValueChangedEvent<Visibility> state)
+            {
+                base.UpdateState(state);
+                footerButton.OverlayState.Value = state.NewValue;
             }
 
             private void addHeader(LocalisableString text, string? context = null)
@@ -104,7 +104,7 @@ namespace osu.Game.Screens.SelectV2
                     textFlow.NewLine();
                     textFlow.AddText(context, t =>
                     {
-                        t.Colour = colourProvider.Content2;
+                        t.Colour = ColourProvider.Content2;
                         t.Font = t.Font.With(size: 13);
                     });
                 }
@@ -118,6 +118,7 @@ namespace osu.Game.Screens.SelectV2
                 {
                     Text = text,
                     Icon = icon,
+                    BackgroundColour = ColourProvider.Background3,
                     TextColour = colour,
                     Action = () =>
                     {
@@ -127,44 +128,6 @@ namespace osu.Game.Screens.SelectV2
                 };
 
                 buttonFlow.Add(button);
-            }
-
-            private partial class OptionButton : OsuButton
-            {
-                public IconUsage Icon { get; init; }
-                public Color4? TextColour { get; init; }
-
-                public OptionButton()
-                {
-                    Size = new Vector2(265, 50);
-                }
-
-                [BackgroundDependencyLoader]
-                private void load(OverlayColourProvider colourProvider)
-                {
-                    BackgroundColour = colourProvider.Background3;
-
-                    SpriteText.Colour = TextColour ?? Color4.White;
-                    Content.CornerRadius = 10;
-
-                    Add(new SpriteIcon
-                    {
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                        Size = new Vector2(17),
-                        X = 15,
-                        Icon = Icon,
-                        Colour = TextColour ?? Color4.White,
-                    });
-                }
-
-                protected override SpriteText CreateText() => new OsuSpriteText
-                {
-                    Depth = -1,
-                    Origin = Anchor.CentreLeft,
-                    Anchor = Anchor.CentreLeft,
-                    X = 40
-                };
             }
 
             protected override bool OnKeyDown(KeyDownEvent e)
@@ -188,10 +151,40 @@ namespace osu.Game.Screens.SelectV2
                 return base.OnKeyDown(e);
             }
 
-            protected override void UpdateState(ValueChangedEvent<Visibility> state)
+            private partial class OptionButton : OsuButton
             {
-                base.UpdateState(state);
-                footerButton.OverlayState.Value = state.NewValue;
+                public IconUsage Icon { get; init; }
+                public Color4? TextColour { get; init; }
+
+                public OptionButton()
+                {
+                    Size = new Vector2(265, 50);
+                }
+
+                [BackgroundDependencyLoader]
+                private void load()
+                {
+                    SpriteText.Colour = TextColour ?? Color4.White;
+                    Content.CornerRadius = 10;
+
+                    Add(new SpriteIcon
+                    {
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
+                        Size = new Vector2(17),
+                        X = 15,
+                        Icon = Icon,
+                        Colour = TextColour ?? Color4.White,
+                    });
+                }
+
+                protected override SpriteText CreateText() => new OsuSpriteText
+                {
+                    Depth = -1,
+                    Origin = Anchor.CentreLeft,
+                    Anchor = Anchor.CentreLeft,
+                    X = 40
+                };
             }
         }
     }

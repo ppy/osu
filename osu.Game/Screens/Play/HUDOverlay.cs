@@ -51,7 +51,7 @@ namespace osu.Game.Screens.Play
                 return base.ShouldBeConsideredForInput(child);
 
             // hold to quit button should always be interactive.
-            return child == bottomRightElements;
+            return child == BottomRightElements;
         }
 
         public readonly ModDisplay ModDisplay;
@@ -92,8 +92,8 @@ namespace osu.Game.Screens.Play
         // They will make a best-effort attempt to get out of the way of any other skinnable components.
 
         public readonly FillFlowContainer TopLeftElements;
-        internal readonly FillFlowContainer TopRightElements;
-        private readonly FillFlowContainer bottomRightElements;
+        public readonly FillFlowContainer TopRightElements;
+        public readonly FillFlowContainer BottomRightElements;
 
         internal readonly IBindable<bool> IsPlaying = new Bindable<bool>();
 
@@ -153,7 +153,7 @@ namespace osu.Game.Screens.Play
                         ModDisplay = CreateModsContainer(),
                     }
                 },
-                bottomRightElements = new FillFlowContainer
+                BottomRightElements = new FillFlowContainer
                 {
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,
@@ -289,10 +289,10 @@ namespace osu.Game.Screens.Play
             else
                 TopLeftElements.Y = 0;
 
-            if (highestBottomScreenSpace.HasValue && DrawHeight - bottomRightElements.DrawHeight > 0)
-                bottomRightElements.Y = BottomScoringElementsHeight = -Math.Clamp(DrawHeight - ToLocalSpace(highestBottomScreenSpace.Value).Y, 0, DrawHeight - bottomRightElements.DrawHeight);
+            if (highestBottomScreenSpace.HasValue && DrawHeight - BottomRightElements.DrawHeight > 0)
+                BottomRightElements.Y = BottomScoringElementsHeight = -Math.Clamp(DrawHeight - ToLocalSpace(highestBottomScreenSpace.Value).Y, 0, DrawHeight - BottomRightElements.DrawHeight);
             else
-                bottomRightElements.Y = 0;
+                BottomRightElements.Y = 0;
 
             void processDrawables(SkinnableContainer components)
             {

@@ -5,90 +5,348 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Allocation;
-using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Cursor;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
-using osu.Game.Database;
-using osu.Game.Overlays;
+using osu.Game.Online.API;
+using osu.Game.Online.Leaderboards;
+using osu.Game.Overlays.Dialog;
 using osu.Game.Overlays.Mods;
-using osu.Game.Overlays.Toolbar;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
-using osu.Game.Screens;
-using osu.Game.Screens.Footer;
-using osu.Game.Screens.Menu;
+using osu.Game.Scoring;
+using osu.Game.Screens.Play;
+using osu.Game.Screens.Ranking;
+using osu.Game.Screens.Select;
+using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Screens.SelectV2;
 using osuTK.Input;
+using FooterButtonMods = osu.Game.Screens.SelectV2.FooterButtonMods;
+using FooterButtonOptions = osu.Game.Screens.SelectV2.FooterButtonOptions;
 
 namespace osu.Game.Tests.Visual.SongSelectV2
 {
-    public partial class TestSceneSongSelect : ScreenTestScene
+    public partial class TestSceneSongSelect : SongSelectTestScene
     {
-        [Cached]
-        private readonly ScreenFooter screenFooter;
-
-        [Cached]
-        private readonly OsuLogo logo;
-
-        [Cached(typeof(INotificationOverlay))]
-        private readonly INotificationOverlay notificationOverlay = new NotificationOverlay();
-
-        protected override bool UseOnlineAPI => true;
-
-        public TestSceneSongSelect()
+        [Test]
+        public void TestResultsScreenWhenClickingLeaderboardScore()
         {
-            Children = new Drawable[]
+            LoadSongSelect();
+            ImportBeatmapForRuleset(0);
+
+            AddAssert("beatmap imported", () => Beatmaps.GetAllUsableBeatmapSets().Any(), () => Is.True);
+
+            // song select should automatically select the beatmap for us but this is not implemented yet.
+            // todo: remove when that's the case.
+            AddAssert("no beatmap selected", () => Beatmap.IsDefault);
+            AddStep("select beatmap", () => Beatmap.Value = Beatmaps.GetWorkingBeatmap(Beatmaps.GetAllUsableBeatmapSets().Single().Beatmaps.First()));
+            AddAssert("beatmap selected", () => !Beatmap.IsDefault);
+
+            AddStep("import score", () =>
             {
-                new PopoverContainer
+                var beatmapInfo = Beatmaps.GetAllUsableBeatmapSets().Single().Beatmaps.First();
+                ScoreManager.Import(new ScoreInfo
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Children = new Drawable[]
-                    {
-                        new Toolbar
-                        {
-                            State = { Value = Visibility.Visible },
-                        },
-                        screenFooter = new ScreenFooter
-                        {
-                            OnBack = () => Stack.CurrentScreen.Exit(),
-                        },
-                        logo = new OsuLogo
-                        {
-                            Alpha = 0f,
-                        },
-                    },
-                },
+                    Hash = Guid.NewGuid().ToString(),
+                    BeatmapHash = beatmapInfo.Hash,
+                    BeatmapInfo = beatmapInfo,
+                    Ruleset = new OsuRuleset().RulesetInfo,
+                    User = new GuestUser(),
+                });
+            });
+
+            AddStep("select ranking tab", () =>
+            {
+                InputManager.MoveMouseTo(SongSelect.ChildrenOfType<BeatmapDetailsArea.WedgeSelector<BeatmapDetailsArea.Header.Selection>>().Last());
+                InputManager.Click(MouseButton.Left);
+            });
+
+            // probably should be done via dropdown menu instead of forcing this way?
+            AddStep("set local scope", () =>
+            {
+                var current = LeaderboardManager.CurrentCriteria!;
+                LeaderboardManager.FetchWithCriteria(new LeaderboardCriteria(current.Beatmap, current.Ruleset, BeatmapLeaderboardScope.Local, null));
+            });
+
+            AddUntilStep("wait for score panel", () => SongSelect.ChildrenOfType<BeatmapLeaderboardScore>().Any());
+            AddStep("click score panel", () =>
+            {
+                InputManager.MoveMouseTo(SongSelect.ChildrenOfType<BeatmapLeaderboardScore>().Single());
+                InputManager.Click(MouseButton.Left);
+            });
+            AddUntilStep("wait for results screen", () => Stack.CurrentScreen is ResultsScreen);
+        }
+
+        #region Hotkeys
+
+        [Test]
+        public void TestDeleteHotkey()
+        {
+            LoadSongSelect();
+
+            ImportBeatmapForRuleset(0);
+
+            AddAssert("beatmap imported", () => Beatmaps.GetAllUsableBeatmapSets().Any(), () => Is.True);
+
+            // song select should automatically select the beatmap for us but this is not implemented yet.
+            // todo: remove when that's the case.
+            AddAssert("no beatmap selected", () => Beatmap.IsDefault);
+            AddStep("select beatmap", () => Beatmap.Value = Beatmaps.GetWorkingBeatmap(Beatmaps.GetAllUsableBeatmapSets().Single().Beatmaps.First()));
+            AddAssert("beatmap selected", () => !Beatmap.IsDefault);
+
+            AddStep("press shift-delete", () =>
+            {
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.Key(Key.Delete);
+                InputManager.ReleaseKey(Key.ShiftLeft);
+            });
+
+            AddUntilStep("delete dialog shown", () => DialogOverlay.CurrentDialog, Is.InstanceOf<BeatmapDeleteDialog>);
+            AddStep("confirm deletion", () => DialogOverlay.CurrentDialog!.PerformAction<PopupDialogDangerousButton>());
+
+            AddAssert("beatmap set deleted", () => Beatmaps.GetAllUsableBeatmapSets().Any(), () => Is.False);
+        }
+
+        [Test]
+        public void TestClearModsViaModButtonRightClick()
+        {
+            LoadSongSelect();
+
+            AddStep("select NC", () => SelectedMods.Value = new[] { new OsuModNightcore() });
+            AddAssert("mods selected", () => SelectedMods.Value, () => Has.Count.EqualTo(1));
+            AddStep("right click mod button", () =>
+            {
+                InputManager.MoveMouseTo(Footer.ChildrenOfType<FooterButtonMods>().Single());
+                InputManager.Click(MouseButton.Right);
+            });
+            AddAssert("not mods selected", () => SelectedMods.Value, () => Has.Count.EqualTo(0));
+        }
+
+        [Test]
+        public void TestSpeedChange()
+        {
+            LoadSongSelect();
+            AddStep("clear mods", () => SelectedMods.Value = Array.Empty<Mod>());
+
+            decreaseModSpeed();
+            AddAssert("half time activated at 0.95x", () => SelectedMods.Value.OfType<ModHalfTime>().Single().SpeedChange.Value, () => Is.EqualTo(0.95).Within(0.005));
+
+            decreaseModSpeed();
+            AddAssert("half time speed changed to 0.9x", () => SelectedMods.Value.OfType<ModHalfTime>().Single().SpeedChange.Value, () => Is.EqualTo(0.9).Within(0.005));
+
+            increaseModSpeed();
+            AddAssert("half time speed changed to 0.95x", () => SelectedMods.Value.OfType<ModHalfTime>().Single().SpeedChange.Value, () => Is.EqualTo(0.95).Within(0.005));
+
+            increaseModSpeed();
+            AddAssert("no mods selected", () => SelectedMods.Value.Count == 0);
+
+            increaseModSpeed();
+            AddAssert("double time activated at 1.05x", () => SelectedMods.Value.OfType<ModDoubleTime>().Single().SpeedChange.Value, () => Is.EqualTo(1.05).Within(0.005));
+
+            increaseModSpeed();
+            AddAssert("double time speed changed to 1.1x", () => SelectedMods.Value.OfType<ModDoubleTime>().Single().SpeedChange.Value, () => Is.EqualTo(1.1).Within(0.005));
+
+            decreaseModSpeed();
+            AddAssert("double time speed changed to 1.05x", () => SelectedMods.Value.OfType<ModDoubleTime>().Single().SpeedChange.Value, () => Is.EqualTo(1.05).Within(0.005));
+
+            OsuModNightcore nc = new OsuModNightcore
+            {
+                SpeedChange = { Value = 1.05 }
             };
+            AddStep("select NC", () => SelectedMods.Value = new[] { nc });
 
-            Stack.Padding = new MarginPadding { Top = Toolbar.HEIGHT };
+            increaseModSpeed();
+            AddAssert("nightcore speed changed to 1.1x", () => SelectedMods.Value.OfType<ModNightcore>().Single().SpeedChange.Value, () => Is.EqualTo(1.1).Within(0.005));
+
+            decreaseModSpeed();
+            AddAssert("nightcore speed changed to 1.05x", () => SelectedMods.Value.OfType<ModNightcore>().Single().SpeedChange.Value, () => Is.EqualTo(1.05).Within(0.005));
+
+            decreaseModSpeed();
+            AddAssert("no mods selected", () => SelectedMods.Value.Count == 0);
+
+            decreaseModSpeed();
+            AddAssert("daycore activated at 0.95x", () => SelectedMods.Value.OfType<ModDaycore>().Single().SpeedChange.Value, () => Is.EqualTo(0.95).Within(0.005));
+
+            decreaseModSpeed();
+            AddAssert("daycore activated at 0.95x", () => SelectedMods.Value.OfType<ModDaycore>().Single().SpeedChange.Value, () => Is.EqualTo(0.9).Within(0.005));
+
+            increaseModSpeed();
+            AddAssert("daycore activated at 0.95x", () => SelectedMods.Value.OfType<ModDaycore>().Single().SpeedChange.Value, () => Is.EqualTo(0.95).Within(0.005));
+
+            OsuModDoubleTime dt = new OsuModDoubleTime
+            {
+                SpeedChange = { Value = 1.02 },
+                AdjustPitch = { Value = true },
+            };
+            AddStep("select DT", () => SelectedMods.Value = new[] { dt });
+
+            decreaseModSpeed();
+            AddAssert("half time activated at 0.97x", () => SelectedMods.Value.OfType<ModHalfTime>().Single().SpeedChange.Value, () => Is.EqualTo(0.97).Within(0.005));
+            AddAssert("adjust pitch preserved", () => SelectedMods.Value.OfType<ModHalfTime>().Single().AdjustPitch.Value, () => Is.True);
+
+            OsuModHalfTime ht = new OsuModHalfTime
+            {
+                SpeedChange = { Value = 0.97 },
+                AdjustPitch = { Value = true },
+            };
+            Mod[] modlist = { ht, new OsuModHardRock(), new OsuModHidden() };
+            AddStep("select HT+HD", () => SelectedMods.Value = modlist);
+
+            increaseModSpeed();
+            AddAssert("double time activated at 1.02x", () => SelectedMods.Value.OfType<ModDoubleTime>().Single().SpeedChange.Value, () => Is.EqualTo(1.02).Within(0.005));
+            AddAssert("double time activated at 1.02x", () => SelectedMods.Value.OfType<ModDoubleTime>().Single().AdjustPitch.Value, () => Is.True);
+            AddAssert("HD still enabled", () => SelectedMods.Value.OfType<ModHidden>().SingleOrDefault(), () => Is.Not.Null);
+            AddAssert("HR still enabled", () => SelectedMods.Value.OfType<ModHardRock>().SingleOrDefault(), () => Is.Not.Null);
+
+            AddStep("select WU", () => SelectedMods.Value = new[] { new ModWindUp() });
+            increaseModSpeed();
+            AddAssert("windup still active", () => SelectedMods.Value.First() is ModWindUp);
+
+            AddStep("select AS", () => SelectedMods.Value = new[] { new ModAdaptiveSpeed() });
+            increaseModSpeed();
+            AddAssert("adaptive speed still active", () => SelectedMods.Value.First() is ModAdaptiveSpeed);
+
+            OsuModDoubleTime dtWithAdjustPitch = new OsuModDoubleTime
+            {
+                SpeedChange = { Value = 1.05 },
+                AdjustPitch = { Value = true },
+            };
+            AddStep("select DT x1.05", () => SelectedMods.Value = new[] { dtWithAdjustPitch });
+
+            decreaseModSpeed();
+            AddAssert("no mods selected", () => SelectedMods.Value.Count == 0);
+
+            decreaseModSpeed();
+            AddAssert("half time activated at 0.95x", () => SelectedMods.Value.OfType<ModHalfTime>().Single().SpeedChange.Value, () => Is.EqualTo(0.95).Within(0.005));
+            AddAssert("half time has adjust pitch active", () => SelectedMods.Value.OfType<ModHalfTime>().Single().AdjustPitch.Value, () => Is.True);
+
+            AddStep("turn off adjust pitch", () => SelectedMods.Value.OfType<ModHalfTime>().Single().AdjustPitch.Value = false);
+
+            increaseModSpeed();
+            AddAssert("no mods selected", () => SelectedMods.Value.Count == 0);
+
+            increaseModSpeed();
+            AddAssert("double time activated at 1.05x", () => SelectedMods.Value.OfType<ModDoubleTime>().Single().SpeedChange.Value, () => Is.EqualTo(1.05).Within(0.005));
+            AddAssert("double time has adjust pitch inactive", () => SelectedMods.Value.OfType<ModDoubleTime>().Single().AdjustPitch.Value, () => Is.False);
+
+            void increaseModSpeed() => AddStep("increase mod speed", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Key(Key.Up);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+
+            void decreaseModSpeed() => AddStep("decrease mod speed", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Key(Key.Down);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
+        [Test]
+        public void TestAutoplayShortcut()
         {
-            RealmDetachedBeatmapStore beatmapStore;
+            ImportBeatmapForRuleset(0);
 
-            Dependencies.CacheAs<BeatmapStore>(beatmapStore = new RealmDetachedBeatmapStore());
-            Add(beatmapStore);
+            LoadSongSelect();
+
+            // song select should automatically select the beatmap for us but this is not implemented yet.
+            // todo: remove when that's the case.
+            AddAssert("no beatmap selected", () => Beatmap.IsDefault);
+            AddStep("select beatmap", () => Beatmap.Value = Beatmaps.GetWorkingBeatmap(Beatmaps.GetAllUsableBeatmapSets().Single().Beatmaps.First()));
+            AddStep("press right", () => InputManager.Key(Key.Right)); // press right to select in carousel, also remove.
+            AddAssert("beatmap selected", () => !Beatmap.IsDefault);
+
+            AddStep("press ctrl+enter", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Key(Key.Enter);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+
+            AddUntilStep("wait for player", () => Stack.CurrentScreen is PlayerLoader);
+
+            AddAssert("autoplay selected", () => SongSelect.Mods.Value.Single() is ModAutoplay);
+
+            AddUntilStep("wait for return to ss", () => SongSelect.IsCurrentScreen());
+
+            AddAssert("no mods selected", () => SongSelect.Mods.Value.Count == 0);
         }
 
-        protected override void LoadComplete()
+        [Test]
+        public void TestAutoplayShortcutKeepsAutoplayIfSelectedAlready()
         {
-            base.LoadComplete();
+            ImportBeatmapForRuleset(0);
 
-            Stack.ScreenPushed += updateFooter;
-            Stack.ScreenExited += updateFooter;
+            LoadSongSelect();
+
+            // song select should automatically select the beatmap for us but this is not implemented yet.
+            // todo: remove when that's the case.
+            AddAssert("no beatmap selected", () => Beatmap.IsDefault);
+            AddStep("select beatmap", () => Beatmap.Value = Beatmaps.GetWorkingBeatmap(Beatmaps.GetAllUsableBeatmapSets().Single().Beatmaps.First()));
+            AddStep("press right", () => InputManager.Key(Key.Right)); // press right to select in carousel, also remove.
+            AddAssert("beatmap selected", () => !Beatmap.IsDefault);
+
+            ChangeMods(new OsuModAutoplay());
+
+            AddStep("press ctrl+enter", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Key(Key.Enter);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+
+            AddUntilStep("wait for player", () => Stack.CurrentScreen is PlayerLoader);
+
+            AddAssert("autoplay selected", () => SongSelect.Mods.Value.Single() is ModAutoplay);
+
+            AddUntilStep("wait for return to ss", () => SongSelect.IsCurrentScreen());
+
+            AddAssert("autoplay still selected", () => SongSelect.Mods.Value.Single() is ModAutoplay);
         }
+
+        [Test]
+        public void TestAutoplayShortcutReturnsInitialModsOnExit()
+        {
+            ImportBeatmapForRuleset(0);
+
+            LoadSongSelect();
+
+            // song select should automatically select the beatmap for us but this is not implemented yet.
+            // todo: remove when that's the case.
+            AddAssert("no beatmap selected", () => Beatmap.IsDefault);
+            AddStep("select beatmap", () => Beatmap.Value = Beatmaps.GetWorkingBeatmap(Beatmaps.GetAllUsableBeatmapSets().Single().Beatmaps.First()));
+            AddStep("press right", () => InputManager.Key(Key.Right)); // press right to select in carousel, also remove.
+            AddAssert("beatmap selected", () => !Beatmap.IsDefault);
+
+            ChangeMods(new OsuModRelax());
+
+            AddStep("press ctrl+enter", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Key(Key.Enter);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+
+            AddUntilStep("wait for player", () => Stack.CurrentScreen is PlayerLoader);
+
+            AddAssert("only autoplay selected", () => SongSelect.Mods.Value.Single() is ModAutoplay);
+
+            AddUntilStep("wait for return to ss", () => SongSelect.IsCurrentScreen());
+
+            AddAssert("relax returned", () => SongSelect.Mods.Value.Single() is ModRelax);
+        }
+
+        #endregion
 
         #region Footer
 
         [Test]
-        public void TestMods()
+        public void TestFooterMods()
         {
-            loadSongSelect();
+            LoadSongSelect();
 
             AddStep("one mod", () => SelectedMods.Value = new List<Mod> { new OsuModHidden() });
             AddStep("two mods", () => SelectedMods.Value = new List<Mod> { new OsuModHidden(), new OsuModHardRock() });
@@ -115,25 +373,17 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         }
 
         [Test]
-        public void TestShowOptions()
+        public void TestFooterModOverlay()
         {
-            loadSongSelect();
+            LoadSongSelect();
 
-            AddStep("enable options", () =>
+            AddStep("Press F1", () =>
             {
-                var optionsButton = this.ChildrenOfType<ScreenFooterButton>().Last();
-
-                optionsButton.Enabled.Value = true;
-                optionsButton.TriggerClick();
+                InputManager.MoveMouseTo(this.ChildrenOfType<FooterButtonMods>().Single());
+                InputManager.Click(MouseButton.Left);
             });
-        }
-
-        [Test]
-        public void TestState()
-        {
-            loadSongSelect();
-
-            AddToggleStep("set options enabled state", state => this.ChildrenOfType<ScreenFooterButton>().Last().Enabled.Value = state);
+            AddAssert("Overlay visible", () => this.ChildrenOfType<ModSelectOverlay>().Single().State.Value == Visibility.Visible);
+            AddStep("Hide", () => this.ChildrenOfType<ModSelectOverlay>().Single().Hide());
         }
 
         // add these test cases when functionality is implemented.
@@ -203,39 +453,46 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         // }
 
         [Test]
-        public void TestOverlayPresent()
+        public void TestFooterOptions()
         {
-            loadSongSelect();
+            LoadSongSelect();
 
-            AddStep("Press F1", () =>
-            {
-                InputManager.MoveMouseTo(this.ChildrenOfType<FooterButtonMods>().Single());
-                InputManager.Click(MouseButton.Left);
-            });
-            AddAssert("Overlay visible", () => this.ChildrenOfType<ModSelectOverlay>().Single().State.Value == Visibility.Visible);
-            AddStep("Hide", () => this.ChildrenOfType<ModSelectOverlay>().Single().Hide());
+            ImportBeatmapForRuleset(0);
+
+            // song select should automatically select the beatmap for us but this is not implemented yet.
+            // todo: remove when that's the case.
+            AddAssert("no beatmap selected", () => Beatmap.IsDefault);
+            AddStep("select beatmap", () => Beatmap.Value = Beatmaps.GetWorkingBeatmap(Beatmaps.GetAllUsableBeatmapSets().Single().Beatmaps.First()));
+            AddAssert("options enabled", () => this.ChildrenOfType<FooterButtonOptions>().Single().Enabled.Value);
+
+            AddStep("click", () => this.ChildrenOfType<FooterButtonOptions>().Single().TriggerClick());
+            AddUntilStep("popover displayed", () => this.ChildrenOfType<FooterButtonOptions.Popover>().Any(p => p.IsPresent));
+        }
+
+        [Test]
+        public void TestFooterOptionsState()
+        {
+            LoadSongSelect();
+
+            ImportBeatmapForRuleset(0);
+
+            // song select should automatically select the beatmap for us but this is not implemented yet.
+            // todo: remove when that's the case.
+            AddAssert("no beatmap selected", () => Beatmap.IsDefault);
+            AddStep("select beatmap", () => Beatmap.Value = Beatmaps.GetWorkingBeatmap(Beatmaps.GetAllUsableBeatmapSets().Single().Beatmaps.First()));
+
+            AddAssert("options enabled", () => this.ChildrenOfType<FooterButtonOptions>().Single().Enabled.Value);
+            AddStep("delete all beatmaps", () => Beatmaps.Delete());
+
+            // song select should automatically select the beatmap for us but this is not implemented yet.
+            // todo: remove when that's the case.
+            AddAssert("beatmap selected", () => !Beatmap.IsDefault);
+            AddStep("select no beatmap", () => Beatmap.SetDefault());
+
+            AddUntilStep("wait for no beatmap", () => Beatmap.IsDefault);
+            AddAssert("options disabled", () => !this.ChildrenOfType<FooterButtonOptions>().Single().Enabled.Value);
         }
 
         #endregion
-
-        private void loadSongSelect()
-        {
-            AddStep("load screen", () => Stack.Push(new SoloSongSelect()));
-            AddUntilStep("wait for load", () => Stack.CurrentScreen is Screens.SelectV2.SongSelect songSelect && songSelect.IsLoaded);
-        }
-
-        private void updateFooter(IScreen? _, IScreen? newScreen)
-        {
-            if (newScreen is IOsuScreen osuScreen && osuScreen.ShowFooter)
-            {
-                screenFooter.Show();
-                screenFooter.SetButtons(osuScreen.CreateFooterButtons());
-            }
-            else
-            {
-                screenFooter.Hide();
-                screenFooter.SetButtons(Array.Empty<ScreenFooterButton>());
-            }
-        }
     }
 }

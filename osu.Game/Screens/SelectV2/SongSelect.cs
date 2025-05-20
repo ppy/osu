@@ -1,7 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -9,16 +12,26 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
+using osu.Game.Collections;
 using osu.Game.Graphics.Containers;
+using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
+using osu.Game.Overlays.Volume;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Scoring;
+using osu.Game.Screens.Edit;
 using osu.Game.Screens.Footer;
 using osu.Game.Screens.Menu;
+using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Select;
+using osu.Game.Skinning;
+using osu.Game.Utils;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
@@ -29,7 +42,8 @@ namespace osu.Game.Screens.SelectV2
     /// This screen is intended to house all components introduced in the new song select design to add transitions and examine the overall look.
     /// This will be gradually built upon and ultimately replace <see cref="Select.SongSelect"/> once everything is in place.
     /// </summary>
-    public abstract partial class SongSelect : OsuScreen
+    [Cached(typeof(ISongSelect))]
+    public abstract partial class SongSelect : OsuScreen, IKeyBindingHandler<GlobalAction>, ISongSelect
     {
         private const float logo_scale = 0.4f;
         private const double fade_duration = 300;
@@ -43,6 +57,8 @@ namespace osu.Game.Screens.SelectV2
             ShowPresets = true,
         };
 
+        private ModSpeedHotkeyHandler modSpeedHotkeyHandler = null!;
+
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
 
@@ -55,19 +71,31 @@ namespace osu.Game.Screens.SelectV2
 
         private NoResultsPlaceholder noResultsPlaceholder = null!;
 
+        public override bool? ApplyModTrackAdjustments => true;
+
         public override bool ShowFooter => true;
+
+        [Resolved]
+        private OsuGameBase game { get; set; } = null!;
 
         [Resolved]
         private OsuLogo? logo { get; set; }
 
         [Resolved]
-        private IDialogOverlay? dialogs { get; set; }
+        private IDialogOverlay? dialogOverlay { get; set; }
+
+        [Resolved]
+        private BeatmapManager beatmaps { get; set; } = null!;
+
+        [Resolved]
+        private ManageCollectionsDialog? collectionsDialog { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()
         {
             AddRangeInternal(new Drawable[]
             {
+                new GlobalScrollAdjustsVolume(),
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -154,6 +182,11 @@ namespace osu.Game.Screens.SelectV2
                         }
                     },
                 },
+                new SkinnableContainer(new GlobalSkinnableContainerLookup(GlobalSkinnableContainers.SongSelect))
+                {
+                    RelativeSizeAxes = Axes.Both,
+                },
+                modSpeedHotkeyHandler = new ModSpeedHotkeyHandler(),
                 modSelectOverlay,
             });
         }
@@ -166,7 +199,11 @@ namespace osu.Game.Screens.SelectV2
 
         public override IReadOnlyList<ScreenFooterButton> CreateFooterButtons() => new ScreenFooterButton[]
         {
-            new FooterButtonMods(modSelectOverlay) { Current = Mods },
+            new FooterButtonMods(modSelectOverlay)
+            {
+                Current = Mods,
+                RequestDeselectAllMods = () => Mods.Value = Array.Empty<Mod>()
+            },
             new FooterButtonRandom(),
             new FooterButtonOptions(),
         };
@@ -323,19 +360,27 @@ namespace osu.Game.Screens.SelectV2
 
         #endregion
 
-        #region Beatmap management
+        #region Hotkeys
 
-        /// <summary>
-        /// Opens up <see cref="BeatmapDeleteDialog"/> with the given beatmap set.
-        /// </summary>
-        public void RequestDeleteBeatmap(BeatmapSetInfo set)
+        public virtual bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-            dialogs?.Push(new BeatmapDeleteDialog(set));
+            if (!this.IsCurrentScreen()) return false;
+
+            switch (e.Action)
+            {
+                case GlobalAction.IncreaseModSpeed:
+                    return modSpeedHotkeyHandler.ChangeSpeed(0.05, ModUtils.FlattenMods(game.AvailableMods.Value.SelectMany(kv => kv.Value)));
+
+                case GlobalAction.DecreaseModSpeed:
+                    return modSpeedHotkeyHandler.ChangeSpeed(-0.05, ModUtils.FlattenMods(game.AvailableMods.Value.SelectMany(kv => kv.Value)));
+            }
+
+            return false;
         }
 
-        #endregion
-
-        #region Hotkeys
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
+        {
+        }
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
@@ -347,7 +392,7 @@ namespace osu.Game.Screens.SelectV2
                     if (e.ShiftPressed)
                     {
                         if (!Beatmap.IsDefault)
-                            RequestDeleteBeatmap(Beatmap.Value.BeatmapSetInfo);
+                            Delete(Beatmap.Value.BeatmapSetInfo);
                         return true;
                     }
 
@@ -356,6 +401,43 @@ namespace osu.Game.Screens.SelectV2
 
             return base.OnKeyDown(e);
         }
+
+        #endregion
+
+        /// <summary>
+        /// Opens results screen with the given score.
+        /// This assumes active beatmap and ruleset selection matches the score.
+        /// </summary>
+        public void PresentScore(ScoreInfo score)
+        {
+            Debug.Assert(Beatmap.Value.BeatmapInfo.Equals(score.BeatmapInfo));
+            Debug.Assert(Ruleset.Value.Equals(score.Ruleset));
+
+            this.Push(new SoloResultsScreen(score));
+        }
+
+        #region Beatmap management
+
+        public virtual bool EditingAllowed => false;
+
+        public void ManageCollections() => collectionsDialog?.Show();
+
+        public void MarkPlayed(BeatmapInfo beatmap) => beatmaps.MarkPlayed(beatmap);
+
+        public void Hide(BeatmapInfo beatmap) => beatmaps.Hide(beatmap);
+
+        public void Edit(BeatmapInfo beatmap)
+        {
+            if (!EditingAllowed) return;
+
+            // Forced refetch is important here to guarantee correct invalidation across all difficulties.
+            Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap, true);
+            this.Push(new EditorLoader());
+        }
+
+        public void Delete(BeatmapSetInfo beatmapSet) => dialogOverlay?.Push(new BeatmapDeleteDialog(beatmapSet));
+
+        public void ClearScores(BeatmapInfo beatmap) => dialogOverlay?.Push(new BeatmapClearScoresDialog(beatmap));
 
         #endregion
     }

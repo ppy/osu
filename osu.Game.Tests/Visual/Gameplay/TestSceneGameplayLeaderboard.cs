@@ -50,11 +50,11 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("add many scores in one go", () =>
             {
                 for (int i = 0; i < 32; i++)
-                    createRandomScore(new APIUser { Username = $"Player {i + 1}" });
+                    leaderboardProvider.CreateRandomScore(new APIUser { Username = $"Player {i + 1}" });
 
                 // Add player at end to force an animation down the whole list.
                 playerScore.Value = 0;
-                createLeaderboardScore(playerScore, new APIUser { Username = "You", Id = 3 }, true);
+                leaderboardProvider.CreateLeaderboardScore(playerScore, new APIUser { Username = "You", Id = 3 }, true);
             });
 
             // Gameplay leaderboard has custom scroll logic, which when coupled with LayoutDuration
@@ -84,7 +84,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             addLocalPlayer();
 
             int playerNumber = 1;
-            AddRepeatStep("add player with random score", () => createRandomScore(new APIUser { Username = $"Player {playerNumber++}" }), 10);
+            AddRepeatStep("add player with random score", () => leaderboardProvider.CreateRandomScore(new APIUser { Username = $"Player {playerNumber++}" }), 10);
         }
 
         [Test]
@@ -93,10 +93,10 @@ namespace osu.Game.Tests.Visual.Gameplay
             createLeaderboard();
             addLocalPlayer();
 
-            AddStep("add peppy", () => createRandomScore(new APIUser { Username = "peppy", Id = 2 }));
-            AddStep("add smoogipoo", () => createRandomScore(new APIUser { Username = "smoogipoo", Id = 1040328 }));
-            AddStep("add flyte", () => createRandomScore(new APIUser { Username = "flyte", Id = 3103765 }));
-            AddStep("add frenzibyte", () => createRandomScore(new APIUser { Username = "frenzibyte", Id = 14210502 }));
+            AddStep("add peppy", () => leaderboardProvider.CreateRandomScore(new APIUser { Username = "peppy", Id = 2 }));
+            AddStep("add smoogipoo", () => leaderboardProvider.CreateRandomScore(new APIUser { Username = "smoogipoo", Id = 1040328 }));
+            AddStep("add flyte", () => leaderboardProvider.CreateRandomScore(new APIUser { Username = "flyte", Id = 3103765 }));
+            AddStep("add frenzibyte", () => leaderboardProvider.CreateRandomScore(new APIUser { Username = "frenzibyte", Id = 14210502 }));
         }
 
         [Test]
@@ -123,12 +123,12 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             int playerNumber = 1;
 
-            AddRepeatStep("add 3 other players", () => createRandomScore(new APIUser { Username = $"Player {playerNumber++}" }), 3);
+            AddRepeatStep("add 3 other players", () => leaderboardProvider.CreateRandomScore(new APIUser { Username = $"Player {playerNumber++}" }), 3);
             AddUntilStep("no pink color scores",
                 () => leaderboard.ChildrenOfType<Box>().Select(b => ((Colour4)b.Colour).ToHex()),
                 () => Does.Not.Contain("#FF549A"));
 
-            AddRepeatStep("add 3 friend score", () => createRandomScore(friend), 3);
+            AddRepeatStep("add 3 friend score", () => leaderboardProvider.CreateRandomScore(friend), 3);
             AddUntilStep("at least one friend score is pink",
                 () => leaderboard.GetAllScoresForUsername("my friend")
                                  .SelectMany(score => score.ChildrenOfType<Box>())
@@ -141,7 +141,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("add local player", () =>
             {
                 playerScore.Value = 1222333;
-                createLeaderboardScore(playerScore, new APIUser { Username = "You", Id = 3 }, true);
+                leaderboardProvider.CreateLeaderboardScore(playerScore, new APIUser { Username = "You", Id = 3 }, true);
             });
         }
 
@@ -159,14 +159,6 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
         }
 
-        private void createRandomScore(APIUser user) => createLeaderboardScore(new BindableLong(RNG.Next(0, 5_000_000)), user);
-
-        private void createLeaderboardScore(BindableLong score, APIUser user, bool isTracked = false)
-        {
-            var leaderboardScore = new GameplayLeaderboardScore(user, isTracked, score);
-            leaderboardProvider.Scores.Add(leaderboardScore);
-        }
-
         private partial class TestDrawableGameplayLeaderboard : DrawableGameplayLeaderboard
         {
             public float Spacing => Flow.Spacing.Y;
@@ -175,10 +167,20 @@ namespace osu.Game.Tests.Visual.Gameplay
                 => Flow.Where(i => i.User?.Username == username);
         }
 
-        private class TestGameplayLeaderboardProvider : IGameplayLeaderboardProvider
+        public class TestGameplayLeaderboardProvider : IGameplayLeaderboardProvider
         {
-            IBindableList<GameplayLeaderboardScore> IGameplayLeaderboardProvider.Scores => Scores;
             public BindableList<GameplayLeaderboardScore> Scores { get; } = new BindableList<GameplayLeaderboardScore>();
+
+            public GameplayLeaderboardScore CreateRandomScore(APIUser user) => CreateLeaderboardScore(new BindableLong(RNG.Next(0, 5_000_000)), user);
+
+            public GameplayLeaderboardScore CreateLeaderboardScore(BindableLong totalScore, APIUser user, bool isTracked = false)
+            {
+                var score = new GameplayLeaderboardScore(user, isTracked, totalScore);
+                Scores.Add(score);
+                return score;
+            }
+
+            IBindableList<GameplayLeaderboardScore> IGameplayLeaderboardProvider.Scores => Scores;
         }
     }
 }

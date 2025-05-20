@@ -88,6 +88,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                     }
                 }
             }, HUDOverlay.TopLeftElements.Add);
+            LoadComponentAsync(new MultiplayerPositionDisplay
+            {
+                Anchor = Anchor.BottomRight,
+                Origin = Anchor.BottomRight,
+            }, d => HUDOverlay.BottomRightElements.Insert(-1, d));
 
             LoadComponentAsync(leaderboardProvider, loaded =>
             {
