@@ -27,6 +27,17 @@ namespace osu.Game.Rulesets.Mania.Judgements
 
         public bool IsHolding(double currentTime) => getLastReport(currentTime).holding;
 
+        public bool DroppedHoldAfter(double time)
+        {
+            foreach (var state in holdingState)
+            {
+                if (state.time >= time && !state.holding)
+                    return true;
+            }
+
+            return false;
+        }
+
         public void ReportHoldState(double currentTime, bool holding)
         {
             var lastReport = getLastReport(currentTime);

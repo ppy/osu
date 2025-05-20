@@ -235,7 +235,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 //
                 // As per stable, this should not apply for early hits, waiting until the object starts to touch the
                 // judgement area first.
-                if (Head.IsHit && isHolding.Value && DrawHeight > 0)
+                if (Head.IsHit && !Result.DroppedHoldAfter(HitObject.StartTime) && DrawHeight > 0)
                 {
                     // How far past the hit target this hold note is.
                     float yOffset = Direction.Value == ScrollingDirection.Up ? -Y : Y;
