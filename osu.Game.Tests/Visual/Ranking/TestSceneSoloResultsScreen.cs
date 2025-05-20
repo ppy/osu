@@ -125,7 +125,7 @@ namespace osu.Game.Tests.Visual.Ranking
 
             AddStep("show results", () => LoadScreen(new SoloResultsScreen(localScore)));
             AddUntilStep("wait for loaded", () => ((Drawable)Stack.CurrentScreen).IsLoaded);
-            AddAssert("local score is #16", () => this.ChildrenOfType<ScorePanelList>().Single().GetPanelForScore(localScore).ScorePosition.Value, () => Is.EqualTo(16));
+            AddUntilStep("local score is #16", () => this.ChildrenOfType<ScorePanelList>().Single().GetPanelForScore(localScore).ScorePosition.Value, () => Is.EqualTo(16));
         }
 
         [Test]
