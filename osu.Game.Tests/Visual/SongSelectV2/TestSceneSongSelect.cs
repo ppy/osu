@@ -6,20 +6,78 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Screens;
 using osu.Framework.Testing;
+using osu.Game.Online.API;
+using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
-using osu.Game.Screens.Footer;
+using osu.Game.Scoring;
+using osu.Game.Screens.Play;
+using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Select;
+using osu.Game.Screens.Select.Leaderboards;
+using osu.Game.Screens.SelectV2;
 using osuTK.Input;
 using FooterButtonMods = osu.Game.Screens.SelectV2.FooterButtonMods;
+using FooterButtonOptions = osu.Game.Screens.SelectV2.FooterButtonOptions;
 
 namespace osu.Game.Tests.Visual.SongSelectV2
 {
     public partial class TestSceneSongSelect : SongSelectTestScene
     {
+        [Test]
+        public void TestResultsScreenWhenClickingLeaderboardScore()
+        {
+            LoadSongSelect();
+            ImportBeatmapForRuleset(0);
+
+            AddAssert("beatmap imported", () => Beatmaps.GetAllUsableBeatmapSets().Any(), () => Is.True);
+
+            // song select should automatically select the beatmap for us but this is not implemented yet.
+            // todo: remove when that's the case.
+            AddAssert("no beatmap selected", () => Beatmap.IsDefault);
+            AddStep("select beatmap", () => Beatmap.Value = Beatmaps.GetWorkingBeatmap(Beatmaps.GetAllUsableBeatmapSets().Single().Beatmaps.First()));
+            AddAssert("beatmap selected", () => !Beatmap.IsDefault);
+
+            AddStep("import score", () =>
+            {
+                var beatmapInfo = Beatmaps.GetAllUsableBeatmapSets().Single().Beatmaps.First();
+                ScoreManager.Import(new ScoreInfo
+                {
+                    Hash = Guid.NewGuid().ToString(),
+                    BeatmapHash = beatmapInfo.Hash,
+                    BeatmapInfo = beatmapInfo,
+                    Ruleset = new OsuRuleset().RulesetInfo,
+                    User = new GuestUser(),
+                });
+            });
+
+            AddStep("select ranking tab", () =>
+            {
+                InputManager.MoveMouseTo(SongSelect.ChildrenOfType<BeatmapDetailsArea.WedgeSelector<BeatmapDetailsArea.Header.Selection>>().Last());
+                InputManager.Click(MouseButton.Left);
+            });
+
+            // probably should be done via dropdown menu instead of forcing this way?
+            AddStep("set local scope", () =>
+            {
+                var current = LeaderboardManager.CurrentCriteria!;
+                LeaderboardManager.FetchWithCriteria(new LeaderboardCriteria(current.Beatmap, current.Ruleset, BeatmapLeaderboardScope.Local, null));
+            });
+
+            AddUntilStep("wait for score panel", () => SongSelect.ChildrenOfType<BeatmapLeaderboardScore>().Any());
+            AddStep("click score panel", () =>
+            {
+                InputManager.MoveMouseTo(SongSelect.ChildrenOfType<BeatmapLeaderboardScore>().Single());
+                InputManager.Click(MouseButton.Left);
+            });
+            AddUntilStep("wait for results screen", () => Stack.CurrentScreen is ResultsScreen);
+        }
+
         #region Hotkeys
 
         [Test]
@@ -48,6 +106,21 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddStep("confirm deletion", () => DialogOverlay.CurrentDialog!.PerformAction<PopupDialogDangerousButton>());
 
             AddAssert("beatmap set deleted", () => Beatmaps.GetAllUsableBeatmapSets().Any(), () => Is.False);
+        }
+
+        [Test]
+        public void TestClearModsViaModButtonRightClick()
+        {
+            LoadSongSelect();
+
+            AddStep("select NC", () => SelectedMods.Value = new[] { new OsuModNightcore() });
+            AddAssert("mods selected", () => SelectedMods.Value, () => Has.Count.EqualTo(1));
+            AddStep("right click mod button", () =>
+            {
+                InputManager.MoveMouseTo(Footer.ChildrenOfType<FooterButtonMods>().Single());
+                InputManager.Click(MouseButton.Right);
+            });
+            AddAssert("not mods selected", () => SelectedMods.Value, () => Has.Count.EqualTo(0));
         }
 
         [Test]
@@ -172,6 +245,100 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             });
         }
 
+        [Test]
+        public void TestAutoplayShortcut()
+        {
+            ImportBeatmapForRuleset(0);
+
+            LoadSongSelect();
+
+            // song select should automatically select the beatmap for us but this is not implemented yet.
+            // todo: remove when that's the case.
+            AddAssert("no beatmap selected", () => Beatmap.IsDefault);
+            AddStep("select beatmap", () => Beatmap.Value = Beatmaps.GetWorkingBeatmap(Beatmaps.GetAllUsableBeatmapSets().Single().Beatmaps.First()));
+            AddStep("press right", () => InputManager.Key(Key.Right)); // press right to select in carousel, also remove.
+            AddAssert("beatmap selected", () => !Beatmap.IsDefault);
+
+            AddStep("press ctrl+enter", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Key(Key.Enter);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+
+            AddUntilStep("wait for player", () => Stack.CurrentScreen is PlayerLoader);
+
+            AddAssert("autoplay selected", () => SongSelect.Mods.Value.Single() is ModAutoplay);
+
+            AddUntilStep("wait for return to ss", () => SongSelect.IsCurrentScreen());
+
+            AddAssert("no mods selected", () => SongSelect.Mods.Value.Count == 0);
+        }
+
+        [Test]
+        public void TestAutoplayShortcutKeepsAutoplayIfSelectedAlready()
+        {
+            ImportBeatmapForRuleset(0);
+
+            LoadSongSelect();
+
+            // song select should automatically select the beatmap for us but this is not implemented yet.
+            // todo: remove when that's the case.
+            AddAssert("no beatmap selected", () => Beatmap.IsDefault);
+            AddStep("select beatmap", () => Beatmap.Value = Beatmaps.GetWorkingBeatmap(Beatmaps.GetAllUsableBeatmapSets().Single().Beatmaps.First()));
+            AddStep("press right", () => InputManager.Key(Key.Right)); // press right to select in carousel, also remove.
+            AddAssert("beatmap selected", () => !Beatmap.IsDefault);
+
+            ChangeMods(new OsuModAutoplay());
+
+            AddStep("press ctrl+enter", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Key(Key.Enter);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+
+            AddUntilStep("wait for player", () => Stack.CurrentScreen is PlayerLoader);
+
+            AddAssert("autoplay selected", () => SongSelect.Mods.Value.Single() is ModAutoplay);
+
+            AddUntilStep("wait for return to ss", () => SongSelect.IsCurrentScreen());
+
+            AddAssert("autoplay still selected", () => SongSelect.Mods.Value.Single() is ModAutoplay);
+        }
+
+        [Test]
+        public void TestAutoplayShortcutReturnsInitialModsOnExit()
+        {
+            ImportBeatmapForRuleset(0);
+
+            LoadSongSelect();
+
+            // song select should automatically select the beatmap for us but this is not implemented yet.
+            // todo: remove when that's the case.
+            AddAssert("no beatmap selected", () => Beatmap.IsDefault);
+            AddStep("select beatmap", () => Beatmap.Value = Beatmaps.GetWorkingBeatmap(Beatmaps.GetAllUsableBeatmapSets().Single().Beatmaps.First()));
+            AddStep("press right", () => InputManager.Key(Key.Right)); // press right to select in carousel, also remove.
+            AddAssert("beatmap selected", () => !Beatmap.IsDefault);
+
+            ChangeMods(new OsuModRelax());
+
+            AddStep("press ctrl+enter", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Key(Key.Enter);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+
+            AddUntilStep("wait for player", () => Stack.CurrentScreen is PlayerLoader);
+
+            AddAssert("only autoplay selected", () => SongSelect.Mods.Value.Single() is ModAutoplay);
+
+            AddUntilStep("wait for return to ss", () => SongSelect.IsCurrentScreen());
+
+            AddAssert("relax returned", () => SongSelect.Mods.Value.Single() is ModRelax);
+        }
+
         #endregion
 
         #region Footer
@@ -286,17 +453,20 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         // }
 
         [Test]
-        public void TestFooterShowOptions()
+        public void TestFooterOptions()
         {
             LoadSongSelect();
 
-            AddStep("enable options", () =>
-            {
-                var optionsButton = this.ChildrenOfType<ScreenFooterButton>().Last();
+            ImportBeatmapForRuleset(0);
 
-                optionsButton.Enabled.Value = true;
-                optionsButton.TriggerClick();
-            });
+            // song select should automatically select the beatmap for us but this is not implemented yet.
+            // todo: remove when that's the case.
+            AddAssert("no beatmap selected", () => Beatmap.IsDefault);
+            AddStep("select beatmap", () => Beatmap.Value = Beatmaps.GetWorkingBeatmap(Beatmaps.GetAllUsableBeatmapSets().Single().Beatmaps.First()));
+            AddAssert("options enabled", () => this.ChildrenOfType<FooterButtonOptions>().Single().Enabled.Value);
+
+            AddStep("click", () => this.ChildrenOfType<FooterButtonOptions>().Single().TriggerClick());
+            AddUntilStep("popover displayed", () => this.ChildrenOfType<FooterButtonOptions.Popover>().Any(p => p.IsPresent));
         }
 
         [Test]
@@ -304,7 +474,23 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         {
             LoadSongSelect();
 
-            AddToggleStep("set options enabled state", state => this.ChildrenOfType<ScreenFooterButton>().Last().Enabled.Value = state);
+            ImportBeatmapForRuleset(0);
+
+            // song select should automatically select the beatmap for us but this is not implemented yet.
+            // todo: remove when that's the case.
+            AddAssert("no beatmap selected", () => Beatmap.IsDefault);
+            AddStep("select beatmap", () => Beatmap.Value = Beatmaps.GetWorkingBeatmap(Beatmaps.GetAllUsableBeatmapSets().Single().Beatmaps.First()));
+
+            AddAssert("options enabled", () => this.ChildrenOfType<FooterButtonOptions>().Single().Enabled.Value);
+            AddStep("delete all beatmaps", () => Beatmaps.Delete());
+
+            // song select should automatically select the beatmap for us but this is not implemented yet.
+            // todo: remove when that's the case.
+            AddAssert("beatmap selected", () => !Beatmap.IsDefault);
+            AddStep("select no beatmap", () => Beatmap.SetDefault());
+
+            AddUntilStep("wait for no beatmap", () => Beatmap.IsDefault);
+            AddAssert("options disabled", () => !this.ChildrenOfType<FooterButtonOptions>().Single().Enabled.Value);
         }
 
         #endregion

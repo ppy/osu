@@ -23,8 +23,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 {
     public partial class TestSceneSongSelectFiltering : SongSelectTestScene
     {
-        private FilterControl filter => Screen.ChildrenOfType<FilterControl>().Single();
-        private ShearedFilterTextBox filterTextBox => Screen.ChildrenOfType<ShearedFilterTextBox>().Single();
+        private FilterControl filter => SongSelect.ChildrenOfType<FilterControl>().Single();
+        private ShearedFilterTextBox filterTextBox => SongSelect.ChildrenOfType<ShearedFilterTextBox>().Single();
         private int filterOperationsCount;
 
         protected override void LoadSongSelect()
@@ -60,8 +60,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddStep("push child screen", () => Stack.Push(new TestSceneOsuScreenStack.TestScreen("test child")));
             WaitForSuspension();
 
-            AddStep("return", () => Screen.MakeCurrent());
-            AddUntilStep("wait for current", () => Screen.IsCurrentScreen());
+            AddStep("return", () => SongSelect.MakeCurrent());
+            AddUntilStep("wait for current", () => SongSelect.IsCurrentScreen());
             AddAssert("filter count is 0", () => filterOperationsCount, () => Is.EqualTo(0));
         }
 
@@ -80,8 +80,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             AddStep("change convert setting", () => Config.SetValue(OsuSetting.ShowConvertedBeatmaps, true));
 
-            AddStep("return", () => Screen.MakeCurrent());
-            AddUntilStep("wait for current", () => Screen.IsCurrentScreen());
+            AddStep("return", () => SongSelect.MakeCurrent());
+            AddUntilStep("wait for current", () => SongSelect.IsCurrentScreen());
             AddAssert("filter count is 1", () => filterOperationsCount, () => Is.EqualTo(1));
         }
 
@@ -246,7 +246,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             checkMatchedBeatmaps(0);
         }
 
-        private NoResultsPlaceholder? getPlaceholder() => Screen.ChildrenOfType<NoResultsPlaceholder>().FirstOrDefault();
+        private NoResultsPlaceholder? getPlaceholder() => SongSelect.ChildrenOfType<NoResultsPlaceholder>().FirstOrDefault();
 
         private void checkMatchedBeatmaps(int expected) => AddUntilStep($"{expected} matching shown", () => Carousel.MatchedBeatmapsCount, () => Is.EqualTo(expected));
     }

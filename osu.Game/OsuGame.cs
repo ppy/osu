@@ -188,7 +188,7 @@ namespace osu.Game
         /// <summary>
         /// Whether the back button is currently displayed.
         /// </summary>
-        private readonly IBindable<bool> backButtonVisibility = new Bindable<bool>();
+        private readonly IBindable<bool> backButtonVisibility = new BindableBool();
 
         IBindable<LocalUserPlayingState> ILocalUserPlayInfo.PlayingState => UserPlayingState;
 
@@ -1105,7 +1105,7 @@ namespace osu.Game
                                 {
                                     Anchor = Anchor.BottomLeft,
                                     Origin = Anchor.BottomLeft,
-                                    Action = () => ScreenFooter.OnBack?.Invoke(),
+                                    Action = handleBackButton,
                                 },
                                 logoContainer = new Container { RelativeSizeAxes = Axes.Both },
                                 footerBasedOverlayContent = new Container
@@ -1120,14 +1120,7 @@ namespace osu.Game
                                     Child = ScreenFooter = new ScreenFooter(backReceptor)
                                     {
                                         RequestLogoInFront = inFront => ScreenContainer.ChangeChildDepth(logoContainer, inFront ? float.MinValue : 0),
-                                        OnBack = () =>
-                                        {
-                                            if (!(ScreenStack.CurrentScreen is IOsuScreen currentScreen))
-                                                return;
-
-                                            if (!((Drawable)currentScreen).IsLoaded || (currentScreen.AllowUserExit && !currentScreen.OnBackButton()))
-                                                ScreenStack.Exit();
-                                        }
+                                        BackButtonPressed = handleBackButton
                                     },
                                 },
                             }
@@ -1306,6 +1299,13 @@ namespace osu.Game
 
             // Importantly, this should be run after binding PostNotification to the import handlers so they can present the import after game startup.
             handleStartupImport();
+        }
+
+        private void handleBackButton()
+        {
+            if (!(ScreenStack.CurrentScreen is IOsuScreen currentScreen)) return;
+
+            if (!((Drawable)currentScreen).IsLoaded || (currentScreen.AllowUserExit && !currentScreen.OnBackButton())) ScreenStack.Exit();
         }
 
         private void handleStartupImport()
@@ -1718,7 +1718,6 @@ namespace osu.Game
             // Bind to new screen.
             if (newScreen != null)
             {
-                backButtonVisibility.BindTo(newScreen.BackButtonVisibility);
                 OverlayActivationMode.BindTo(newScreen.OverlayActivationMode);
                 configUserActivity.BindTo(newScreen.Activity);
 
@@ -1730,19 +1729,41 @@ namespace osu.Game
                 else
                     Toolbar.Show();
 
+                var newOsuScreen = (OsuScreen)newScreen;
+
                 if (newScreen.ShowFooter)
                 {
+                    // the legacy back button should never display while the new footer is in use, as it
+                    // contains its own local back button.
+                    ((BindableBool)backButtonVisibility).Value = false;
+
                     BackButton.Hide();
-                    ScreenFooter.SetButtons(newScreen.CreateFooterButtons());
                     ScreenFooter.Show();
+
+                    if (newOsuScreen.IsLoaded)
+                        updateFooterButtons();
+                    else
+                        newOsuScreen.OnLoadComplete += _ => updateFooterButtons();
+
+                    void updateFooterButtons()
+                    {
+                        var buttons = newScreen.CreateFooterButtons();
+
+                        newOsuScreen.LoadComponentsAgainstScreenDependencies(buttons);
+
+                        ScreenFooter.SetButtons(buttons);
+                        ScreenFooter.Show();
+                    }
                 }
                 else
                 {
+                    backButtonVisibility.BindTo(newScreen.BackButtonVisibility);
+
                     ScreenFooter.SetButtons(Array.Empty<ScreenFooterButton>());
                     ScreenFooter.Hide();
                 }
 
-                skinEditor.SetTarget((OsuScreen)newScreen);
+                skinEditor.SetTarget(newOsuScreen);
             }
         }
 

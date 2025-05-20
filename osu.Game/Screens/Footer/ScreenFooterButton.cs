@@ -54,6 +54,7 @@ namespace osu.Game.Screens.Footer
 
         public LocalisableString Text
         {
+            get => text.Text;
             set => text.Text = value;
         }
 
