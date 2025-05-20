@@ -295,7 +295,6 @@ namespace osu.Game.Overlays.BeatmapSet
                     icon = new DifficultyIcon(beatmapInfo, ruleset)
                     {
                         TooltipType = DifficultyIconTooltipType.None,
-                        Current = { Value = new StarDifficulty(beatmapInfo.StarRating, 0) },
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Size = new Vector2(size - tile_icon_padding * 2),
