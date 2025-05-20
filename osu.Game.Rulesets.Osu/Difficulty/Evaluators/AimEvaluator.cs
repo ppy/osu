@@ -107,7 +107,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     acuteAngleBonus *= 0.08 + 0.92 * (1 - Math.Min(acuteAngleBonus, Math.Pow(calcAcuteAngleBonus(lastAngle), 3)));
 
                     // Penalize easy angle change.
-                    acuteAngleBonus *= 0.08 + 0.92 * DifficultyCalculationUtils.Smoothstep(currAngle, Math.Min(lastAngle, double.DegreesToRadians(100)), double.DegreesToRadians(40));
+                    acuteAngleBonus *= 0.08 + 0.92 * DifficultyCalculationUtils.Smoothstep(Math.Abs(currAngle - lastAngle), double.DegreesToRadians(60), double.DegreesToRadians(10));
 
                     // Buff hard angle change.
                     aimControlBonus = Math.Min(angleBonus, prevPrevVelocity) * DifficultyCalculationUtils.Smoothstep(Math.Abs(currAngle - lastAngle), double.DegreesToRadians(40), double.DegreesToRadians(100));
