@@ -109,11 +109,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     // Penalize easy angle change.
                     acuteAngleBonus *= 0.08 + 0.92 * DifficultyCalculationUtils.Smoothstep(Math.Abs(currAngle - lastAngle), double.DegreesToRadians(60), double.DegreesToRadians(10));
 
-                    // Buff hard angle change.
+                    // Detect hard angle change.
                     aimControlBonus = Math.Min(angleBonus, prevPrevVelocity) * DifficultyCalculationUtils.Smoothstep(Math.Abs(currAngle - lastAngle), double.DegreesToRadians(40), double.DegreesToRadians(100));
 
-                    // Buff aim control bonus for distance more than 2 diameters.
-                    aimControlBonus *= DifficultyCalculationUtils.Smootherstep(osuCurrObj.LazyJumpDistance, 0, diameter * 2);
+                    // Apply full aim control bonus for distance more than 2 diameters and 150 BPM.
+                    aimControlBonus *= DifficultyCalculationUtils.Smootherstep(osuCurrObj.LazyJumpDistance, 0, diameter * 2) *
+                                       DifficultyCalculationUtils.Smoothstep(DifficultyCalculationUtils.MillisecondsToBPM(osuCurrObj.StrainTime, 4), 100, 150);
 
                     // Apply full wide angle bonus for distance more than one diameter
                     wideAngleBonus *= angleBonus * DifficultyCalculationUtils.Smootherstep(osuCurrObj.LazyJumpDistance, 0, diameter);
@@ -161,7 +162,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             aimStrain += wiggleBonus * wiggle_multiplier;
 
-            aimStrain += aimControlBonus * aim_control_multiplier * DifficultyCalculationUtils.Smoothstep(DifficultyCalculationUtils.MillisecondsToBPM(osuCurrObj.StrainTime, 4), 100, 150);
+            aimStrain += aimControlBonus * aim_control_multiplier;
 
             // Add in acute angle bonus or wide angle bonus + velocity change bonus, whichever is larger.
             aimStrain += Math.Max(acuteAngleBonus * acute_angle_multiplier, wideAngleBonus * wide_angle_multiplier + velocityChangeBonus * velocity_change_multiplier);
