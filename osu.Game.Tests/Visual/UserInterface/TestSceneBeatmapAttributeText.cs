@@ -73,10 +73,10 @@ namespace osu.Game.Tests.Visual.UserInterface
             });
         });
 
-        [TestCase(BeatmapAttribute.CircleSize, "Circle Size: 1.00")]
-        [TestCase(BeatmapAttribute.HPDrain, "HP Drain: 2.00")]
-        [TestCase(BeatmapAttribute.Accuracy, "Accuracy: 3.00")]
-        [TestCase(BeatmapAttribute.ApproachRate, "Approach Rate: 4.00")]
+        [TestCase(BeatmapAttribute.CircleSize, "Circle Size: 1")]
+        [TestCase(BeatmapAttribute.HPDrain, "HP Drain: 2")]
+        [TestCase(BeatmapAttribute.Accuracy, "Accuracy: 3")]
+        [TestCase(BeatmapAttribute.ApproachRate, "Approach Rate: 4")]
         [TestCase(BeatmapAttribute.Title, "Title: _Title")]
         [TestCase(BeatmapAttribute.Artist, "Artist: _Artist")]
         [TestCase(BeatmapAttribute.Creator, "Creator: _Creator")]
@@ -121,15 +121,15 @@ namespace osu.Game.Tests.Visual.UserInterface
                     Difficulty =
                     {
                         ApproachRate = 10,
-                        CircleSize = 9
+                        CircleSize = 9.5f
                     }
                 }
             }));
 
-            test(BeatmapAttribute.BPM, new OsuModDoubleTime(), "BPM: 100.00", "BPM: 150.00");
+            test(BeatmapAttribute.BPM, new OsuModDoubleTime(), "BPM: 100", "BPM: 150");
             test(BeatmapAttribute.Length, new OsuModDoubleTime(), "Length: 00:30", "Length: 00:20");
-            test(BeatmapAttribute.ApproachRate, new OsuModDoubleTime(), "Approach Rate: 10.00", "Approach Rate: 11.00");
-            test(BeatmapAttribute.CircleSize, new OsuModHardRock(), "Circle Size: 9.00", "Circle Size: 10.00");
+            test(BeatmapAttribute.ApproachRate, new OsuModDoubleTime(), "Approach Rate: 10", "Approach Rate: 11");
+            test(BeatmapAttribute.CircleSize, new OsuModHardRock(), "Circle Size: 9.5", "Circle Size: 10");
 
             void test(BeatmapAttribute attribute, Mod mod, string before, string after)
             {
@@ -157,6 +157,23 @@ namespace osu.Game.Tests.Visual.UserInterface
             // Changing mod setting
             AddStep("change mod difficulty to 2", () => mod.Difficulty.Value = 2);
             AddUntilStep("check star rating is 2", getText, () => Is.EqualTo("Star Rating: 2.00"));
+        }
+
+        [Test]
+        public void TestMaxPp()
+        {
+            AddStep("set test ruleset", () => Ruleset.Value = new TestRuleset().RulesetInfo);
+            AddStep("set max pp attribute", () => text.Attribute.Value = BeatmapAttribute.MaxPP);
+            AddAssert("check max pp is 0", getText, () => Is.EqualTo("Max PP: 0"));
+
+            // Adding mod
+            TestMod mod = null!;
+            AddStep("add mod with pp 1", () => SelectedMods.Value = new[] { mod = new TestMod { Performance = { Value = 1 } } });
+            AddUntilStep("check max pp is 1", getText, () => Is.EqualTo("Max PP: 1"));
+
+            // Changing mod setting
+            AddStep("change mod pp to 2", () => mod.Performance.Value = 2);
+            AddUntilStep("check max pp is 2", getText, () => Is.EqualTo("Max PP: 2"));
         }
 
         private string getText() => text.ChildrenOfType<SpriteText>().Single().Text.ToString();

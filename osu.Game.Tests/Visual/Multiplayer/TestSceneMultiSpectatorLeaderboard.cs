@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -18,13 +16,16 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public partial class TestSceneMultiSpectatorLeaderboard : MultiplayerTestScene
     {
-        private Dictionary<int, ManualClock> clocks;
-        private MultiSpectatorLeaderboard leaderboard;
+        private Dictionary<int, ManualClock> clocks = null!;
+        private MultiSpectatorLeaderboard? leaderboard;
 
         [SetUpSteps]
         public override void SetUpSteps()
         {
             base.SetUpSteps();
+
+            AddStep("join room", () => JoinRoom(CreateDefaultRoom()));
+            WaitForJoined();
 
             AddStep("reset", () =>
             {
@@ -55,13 +56,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 }, Add);
             });
 
-            AddUntilStep("wait for load", () => leaderboard.IsLoaded);
+            AddUntilStep("wait for load", () => leaderboard!.IsLoaded);
             AddUntilStep("wait for user population", () => leaderboard.ChildrenOfType<GameplayLeaderboardScore>().Count() == 2);
 
             AddStep("add clock sources", () =>
             {
                 foreach ((int userId, var clock) in clocks)
-                    leaderboard.AddClock(userId, clock);
+                    leaderboard!.AddClock(userId, clock);
             });
         }
 

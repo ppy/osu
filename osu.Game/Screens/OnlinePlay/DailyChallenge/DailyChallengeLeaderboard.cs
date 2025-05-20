@@ -138,14 +138,14 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             if (request?.CompletionState == APIRequestCompletionState.Waiting)
                 return;
 
-            request = new IndexPlaylistScoresRequest(room.RoomID.Value!.Value, playlistItem.ID);
+            request = new IndexPlaylistScoresRequest(room.RoomID!.Value, playlistItem.ID);
 
             request.Success += req => Schedule(() =>
             {
-                var best = req.Scores.Select(s => s.CreateScoreInfo(scoreManager, rulesets, playlistItem, beatmap.Value.BeatmapInfo)).ToArray();
+                var best = req.Scores.Select(s => s.CreateScoreInfo(scoreManager, rulesets, beatmap.Value.BeatmapInfo)).ToArray();
 
                 userBestScore.Value = req.UserScore;
-                var userBest = userBestScore.Value?.CreateScoreInfo(scoreManager, rulesets, playlistItem, beatmap.Value.BeatmapInfo);
+                var userBest = userBestScore.Value?.CreateScoreInfo(scoreManager, rulesets, beatmap.Value.BeatmapInfo);
 
                 cancellationTokenSource?.Cancel();
                 cancellationTokenSource = null;

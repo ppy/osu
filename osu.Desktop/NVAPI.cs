@@ -258,10 +258,8 @@ namespace osu.Desktop
                 Version = NvProfile.Stride,
                 IsPredefined = 0,
                 ProfileName = PROFILE_NAME,
-                GPUSupport = new uint[32]
+                GpuSupport = NvDrsGpuSupport.Geforce
             };
-
-            newProfile.GPUSupport[0] = 1;
 
             if (checkError(CreateProfile(sessionHandle, ref newProfile, out profileHandle), nameof(CreateProfile)))
                 return false;
@@ -463,9 +461,7 @@ namespace osu.Desktop
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = NVAPI.UNICODE_STRING_MAX)]
         public string ProfileName;
 
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
-        public uint[] GPUSupport;
-
+        public NvDrsGpuSupport GpuSupport;
         public uint IsPredefined;
         public uint NumOfApps;
         public uint NumOfSettings;
@@ -611,6 +607,7 @@ namespace osu.Desktop
         SYNC_NOT_ACTIVE = -194, // The requested action cannot be performed without Sync being enabled.
         SYNC_MASTER_NOT_FOUND = -195, // The requested action cannot be performed without Sync Master being enabled.
         INVALID_SYNC_TOPOLOGY = -196, // Invalid displays passed in the NV_GSYNC_DISPLAY pointer.
+
         ECID_SIGN_ALGO_UNSUPPORTED = -197, // The specified signing algorithm is not supported. Either an incorrect value was entered or the current installed driver/hardware does not support the input value.
         ECID_KEY_VERIFICATION_FAILED = -198, // The encrypted public key verification has failed.
         FIRMWARE_OUT_OF_DATE = -199, // The device's firmware is out of date.
@@ -748,5 +745,13 @@ namespace osu.Desktop
         OGL_THREAD_CONTROL_DISABLE = 0x00000002,
         OGL_THREAD_CONTROL_NUM_VALUES = 2,
         OGL_THREAD_CONTROL_DEFAULT = 0
+    }
+
+    [Flags]
+    internal enum NvDrsGpuSupport : uint
+    {
+        Geforce = 1 << 0,
+        Quadro = 1 << 1,
+        Nvs = 1 << 2
     }
 }

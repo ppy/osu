@@ -20,12 +20,61 @@ namespace osu.Game.Tests.NonVisual.Ranking
         public void TestDistributedHits()
         {
             var events = Enumerable.Range(-5, 11)
-                                   .Select(t => new HitEvent(t - 5, 1.0, HitResult.Great, new HitObject(), null, null));
+                                   .Select(t => new HitEvent(t - 5, 1.0, HitResult.Great, new HitObject(), null, null))
+                                   .ToList();
 
             var unstableRate = new UnstableRate(events);
 
             Assert.IsNotNull(unstableRate.Value);
-            Assert.IsTrue(Precision.AlmostEquals(unstableRate.Value.Value, 10 * Math.Sqrt(10)));
+            Assert.AreEqual(unstableRate.Value.Value, 10 * Math.Sqrt(10), Precision.DOUBLE_EPSILON);
+        }
+
+        [Test]
+        public void TestDistributedHitsIncrementalRewind()
+        {
+            var events = Enumerable.Range(-5, 11)
+                                   .Select(t => new HitEvent(t - 5, 1.0, HitResult.Great, new HitObject(), null, null))
+                                   .ToList();
+
+            // Add some red herrings
+            events.Insert(4, new HitEvent(200, 1.0, HitResult.Meh, new HitObject { HitWindows = HitWindows.Empty }, null, null));
+            events.Insert(8, new HitEvent(-100, 1.0, HitResult.Miss, new HitObject(), null, null));
+
+            HitEventExtensions.UnstableRateCalculationResult result = null;
+
+            for (int i = 0; i < events.Count; i++)
+            {
+                result = events.GetRange(0, i + 1)
+                               .CalculateUnstableRate(result);
+            }
+
+            result = events.GetRange(0, 2).CalculateUnstableRate(result);
+
+            Assert.IsNotNull(result!.Result);
+            Assert.AreEqual(5, result.Result, Precision.DOUBLE_EPSILON);
+        }
+
+        [Test]
+        public void TestDistributedHitsIncremental()
+        {
+            var events = Enumerable.Range(-5, 11)
+                                   .Select(t => new HitEvent(t - 5, 1.0, HitResult.Great, new HitObject(), null, null))
+                                   .ToList();
+
+            // Add some red herrings
+            events.Insert(4, new HitEvent(200, 1.0, HitResult.Meh, new HitObject { HitWindows = HitWindows.Empty }, null, null));
+            events.Insert(8, new HitEvent(-100, 1.0, HitResult.Miss, new HitObject(), null, null));
+
+            HitEventExtensions.UnstableRateCalculationResult result = null;
+
+            for (int i = 0; i < events.Count; i++)
+            {
+                result = events.GetRange(0, i + 1)
+                               .CalculateUnstableRate(result);
+            }
+
+            Assert.IsNotNull(result!.Result);
+            Assert.AreEqual(10 * Math.Sqrt(10), result.Result, Precision.DOUBLE_EPSILON);
         }
 
         [Test]

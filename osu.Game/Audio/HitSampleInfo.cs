@@ -33,12 +33,12 @@ namespace osu.Game.Audio
         /// <summary>
         /// All valid sample addition constants.
         /// </summary>
-        public static IEnumerable<string> AllAdditions => new[] { HIT_WHISTLE, HIT_FINISH, HIT_CLAP };
+        public static readonly string[] ALL_ADDITIONS = [HIT_WHISTLE, HIT_FINISH, HIT_CLAP];
 
         /// <summary>
         /// All valid bank constants.
         /// </summary>
-        public static IEnumerable<string> AllBanks => new[] { BANK_NORMAL, BANK_SOFT, BANK_DRUM };
+        public static readonly string[] ALL_BANKS = [BANK_NORMAL, BANK_SOFT, BANK_DRUM];
 
         /// <summary>
         /// The name of the sample to load.

@@ -140,8 +140,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             if (hoveredControlPoint == null)
                 return false;
 
-            hoveredControlPoint.IsSelected.Value = true;
-            ControlPointVisualiser?.DeleteSelected();
+            if (hoveredControlPoint.IsSelected.Value)
+                ControlPointVisualiser?.DeleteSelected();
+            else
+                ControlPointVisualiser?.Delete([hoveredControlPoint.ControlPoint]);
+
             return true;
         }
 
@@ -267,14 +270,14 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             if (adjustVelocity)
             {
                 proposedVelocity = proposedDistance / oldDuration;
-                proposedDistance = MathHelper.Clamp(proposedDistance, 0.1 * oldDuration, 10 * oldDuration);
+                proposedDistance = Math.Clamp(proposedDistance, 0.1 * oldDuration, 10 * oldDuration);
             }
             else
             {
-                double minDistance = distanceSnapProvider?.GetBeatSnapDistanceAt(HitObject, false) * oldVelocityMultiplier ?? 1;
+                double minDistance = distanceSnapProvider?.GetBeatSnapDistance() * oldVelocityMultiplier ?? 1;
                 // Add a small amount to the proposed distance to make it easier to snap to the full length of the slider.
-                proposedDistance = distanceSnapProvider?.FindSnappedDistance(HitObject, (float)proposedDistance + 1, DistanceSnapTarget.Start) ?? proposedDistance;
-                proposedDistance = MathHelper.Clamp(proposedDistance, minDistance, HitObject.Path.CalculatedDistance);
+                proposedDistance = distanceSnapProvider?.FindSnappedDistance((float)proposedDistance + 1, HitObject.StartTime, HitObject) ?? proposedDistance;
+                proposedDistance = Math.Clamp(proposedDistance, minDistance, HitObject.Path.CalculatedDistance);
             }
 
             if (Precision.AlmostEquals(proposedDistance, HitObject.Path.Distance) && Precision.AlmostEquals(proposedVelocity, HitObject.SliderVelocityMultiplier))
@@ -473,7 +476,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             HitObject.SnapTo(distanceSnapProvider);
 
             // If there are 0 or 1 remaining control points, or the slider has an invalid length, it is in a degenerate form and should be deleted
-            if (controlPoints.Count <= 1 || !HitObject.Path.HasValidLength)
+            if (controlPoints.Count <= 1 || !HitObject.Path.HasValidLengthForPlacement)
             {
                 placementHandler?.Delete(HitObject);
                 return;
@@ -551,6 +554,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             HitObject.Position += first;
         }
 
+        // duplicated in `JuiceStreamSelectionBlueprint.convertToStream()`
+        // consider extracting common helper when applying changes here
         private void convertToStream()
         {
             if (editorBeatmap == null || beatDivisor == null)
@@ -621,7 +626,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
         {
-            if (BodyPiece.ReceivePositionalInputAt(screenSpacePos))
+            if (BodyPiece.ReceivePositionalInputAt(screenSpacePos) && (IsSelected || DrawableObject.Body.Alpha > 0 || DrawableObject.HeadCircle.Alpha > 0))
                 return true;
 
             if (ControlPointVisualiser == null)
