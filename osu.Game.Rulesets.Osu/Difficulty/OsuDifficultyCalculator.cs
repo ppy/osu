@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 {
     public class OsuDifficultyCalculator : DifficultyCalculator
     {
-        private const double performance_base_multiplier = 1.115; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things.
+        private const double performance_base_multiplier = 1.12; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things.
         private const double difficulty_multiplier = 0.0675;
         private const double star_rating_multiplier = 0.0265;
 
@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double aimDifficultStrainCount = aim.CountTopWeightedStrains();
             double speedDifficultStrainCount = speed.CountTopWeightedStrains();
-            double readingDifficultyStrainCount = reading?.CountTopWeightedStrains() ?? 0.0;
+            double readingDifficultNoteCount = reading?.CountTopWeightedNotes() ?? 0.0;
 
             double aimNoSlidersTopWeightedSliderCount = aimWithoutSliders.CountTopWeightedSliders();
             double aimNoSlidersDifficultStrainCount = aimWithoutSliders.CountTopWeightedStrains();
@@ -91,7 +91,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double readingRating = 0.0;
 
             if (reading is not null)
-                readingRating = computeReadingRating(reading.DifficultyValue(), mods, readingDifficultyStrainCount, overallDifficulty);
+                readingRating = computeReadingRating(reading.DifficultyValue(), mods, overallDifficulty);
 
             double flashlightRating = 0.0;
 
@@ -138,7 +138,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 SliderFactor = sliderFactor,
                 AimDifficultStrainCount = aimDifficultStrainCount,
                 SpeedDifficultStrainCount = speedDifficultStrainCount,
-                ReadingDifficultStrainCount = readingDifficultyStrainCount,
+                ReadingDifficultNoteCount = readingDifficultNoteCount,
                 AimTopWeightedSliderFactor = aimTopWeightedSliderFactor,
                 SpeedTopWeightedSliderFactor = speedTopWeightedSliderFactor,
                 DrainRate = drainRate,
@@ -205,7 +205,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return speedRating * Math.Cbrt(ratingMultiplier);
         }
 
-        private double computeReadingRating(double readingDifficultyValue, Mod[] mods, double readingDifficultyStrainCount, double overallDifficulty)
+        private double computeReadingRating(double readingDifficultyValue, Mod[] mods, double overallDifficulty)
         {
             double readingRating = Math.Sqrt(readingDifficultyValue) * difficulty_multiplier;
 
@@ -224,10 +224,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             }
 
             double ratingMultiplier = 1.0;
-
-            double readingLengthBonus = 1 + Math.Min(0.5, readingDifficultyStrainCount / 700.0) +
-                                        (readingDifficultyStrainCount > 350 ? Math.Log10(readingDifficultyStrainCount / 350) : 0);
-            ratingMultiplier *= Math.Sqrt(readingLengthBonus);
 
             // It is important to also consider accuracy difficulty when doing that.
             ratingMultiplier *= 0.75 + Math.Pow(Math.Max(0, overallDifficulty), 2.2) / 800;

@@ -15,9 +15,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
     public static class ReadingEvaluator
     {
         private const double reading_window_size = 3000; // 3 seconds
-        private const double density_difficulty_base = 2.7;
+        private const double density_difficulty_base = 2.5;
         private const double hidden_balancing_factor = 9000;
-        private const double preempt_balancing_factor = 75000;
+        private const double preempt_balancing_factor = 50000;
+        private const double angular_velocity_multiplier = 0.4;
 
         public static double EvaluateDifficultyOf(int totalObjects, DifficultyHitObject current, double clockRate, double preempt, bool hidden)
         {
@@ -35,8 +36,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double loopDifficulty = currObj.OpacityAt(loopObj.BaseObject.StartTime, false);
 
                 // Small distances means objects may be cheesed, so it doesn't matter whether they are arranged confusingly.
-                // https://www.desmos.com/calculator/6sgz6j5zb1
-                loopDifficulty *= DifficultyCalculationUtils.Logistic(-(loopObj.LazyJumpDistance - 75) / 15);
+                // https://www.desmos.com/calculator/o7yehaflok
+                loopDifficulty *= DifficultyCalculationUtils.Logistic(-(loopObj.LazyJumpDistance - 60) / 15);
 
                 // Account less for objects close to the max reading window
                 double timeBetweenCurrAndLoopObj = currObj.StartTime - loopObj.StartTime;
@@ -178,23 +179,25 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
         // Returns the velocity of going from the previous object to the current scaled by the difference in their angles
         // Includes a targeted nerf for cases where objects go back and forth through a middle point
-        // https://www.desmos.com/calculator/5vwzshwz7t
+        // https://www.desmos.com/calculator/ytxnrcbyhd
         private static double getAngularVelocityFactor(OsuDifficultyHitObject current)
         {
             var previous = (OsuDifficultyHitObject)current.Previous(0);
             var previous2 = (OsuDifficultyHitObject)current.Previous(2);
 
+            double velocity = current.MinimumJumpDistance / current.StrainTime;
+
             if (!current.Angle.HasValue ||
                 previous?.Angle == null ||
                 !(Math.Abs(current.DeltaTime - previous.DeltaTime) < 10))
             {
-                return current.MinimumJumpDistance / current.StrainTime; // Return unscaled velocity if conditions aren't met
+                return velocity; // Return unscaled velocity if conditions aren't met
             }
 
             double angleDifference = Math.Abs(current.Angle.Value - previous.Angle.Value);
-            double angleDifferenceAdjusted = 0.1 + Math.Sin(angleDifference / 2) * 180.0;
-            double angularVelocity = angleDifferenceAdjusted * (current.MinimumJumpDistance / current.StrainTime);
-            double angularVelocityBonus = Math.Max(0.0, Math.Pow(angularVelocity, 0.4) - 1.0) * 0.35;
+            double angleDifferenceAdjusted = Math.Sin(angleDifference / 2) * 180.0;
+            double angularVelocity = angleDifferenceAdjusted * velocity;
+            double angularVelocityBonus = Math.Max(0.1, Math.Pow(angularVelocity, 0.4)) * angular_velocity_multiplier;
 
             if (previous2 == null) return angularVelocityBonus;
             // If objects just go back and forth through a middle point - don't give as much bonus
