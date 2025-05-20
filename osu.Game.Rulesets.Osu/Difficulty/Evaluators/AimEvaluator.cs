@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         private const double velocity_change_multiplier = 0.75;
         private const double wiggle_multiplier = 1.02;
 
-        private const double aim_control_multiplier = 2.1;
+        private const double aim_control_multiplier = 1.3;
 
         /// <summary>
         /// Evaluates the difficulty of aiming the current object, based on:
@@ -114,7 +114,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                     // Apply full aim control bonus for distance more than 2 diameters and 150 BPM.
                     aimControlBonus *= DifficultyCalculationUtils.Smootherstep(osuCurrObj.LazyJumpDistance, 0, diameter * 2) *
-                                       DifficultyCalculationUtils.Smoothstep(DifficultyCalculationUtils.MillisecondsToBPM(osuCurrObj.StrainTime, 4), 100, 150);
+                                       DifficultyCalculationUtils.Smoothstep(DifficultyCalculationUtils.MillisecondsToBPM(osuCurrObj.StrainTime, 2), 100, 260);
 
                     // Apply full wide angle bonus for distance more than one diameter
                     wideAngleBonus *= angleBonus * DifficultyCalculationUtils.Smootherstep(osuCurrObj.LazyJumpDistance, 0, diameter);
