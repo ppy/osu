@@ -24,6 +24,15 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         {
             base.LoadComplete();
 
+            Child = wedge = new BeatmapMetadataWedge
+            {
+                State = { Value = Visibility.Visible },
+            };
+        }
+
+        [SetUp]
+        public void SetUp()
+        {
             ((DummyAPIAccess)API).HandleRequest = request =>
             {
                 switch (request)
@@ -40,11 +49,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                     default:
                         return false;
                 }
-            };
-
-            Child = wedge = new BeatmapMetadataWedge
-            {
-                State = { Value = Visibility.Visible },
             };
         }
 
@@ -203,6 +207,76 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 currentOnlineSet = onlineSet;
                 Beatmap.Value = working;
             });
+        }
+
+        [Test]
+        public void TestLoading()
+        {
+            Action proceed = null!;
+
+            AddStep("setup", () =>
+            {
+                currentOnlineSet = null;
+
+                ((DummyAPIAccess)API).HandleRequest = request =>
+                {
+                    switch (request)
+                    {
+                        case GetBeatmapSetRequest set:
+                            proceed = () => set.TriggerSuccess(currentOnlineSet!);
+                            return true;
+
+                        default:
+                            return false;
+                    }
+                };
+            });
+
+            AddStep("set beatmap", () =>
+            {
+                var (working, onlineSet) = createTestBeatmap();
+
+                currentOnlineSet = onlineSet;
+                Beatmap.Value = working;
+            });
+            AddStep("finish load", () => proceed());
+
+            AddStep("set beatmap", () =>
+            {
+                var (working, onlineSet) = createTestBeatmap();
+
+                onlineSet.RelatedTags![0].Name = "other/tag";
+                onlineSet.RelatedTags[1].Name = "another/tag";
+                onlineSet.RelatedTags[2].Name = "some/tag";
+
+                currentOnlineSet = onlineSet;
+                Beatmap.Value = working;
+            });
+            AddStep("finish load", () => proceed());
+
+            AddStep("no user tags", () =>
+            {
+                var (working, onlineSet) = createTestBeatmap();
+
+                onlineSet.Beatmaps.Single().TopTags = null;
+                onlineSet.RelatedTags = null;
+
+                currentOnlineSet = onlineSet;
+                Beatmap.Value = working;
+            });
+            AddStep("finish load", () => proceed());
+
+            AddStep("no user tags", () =>
+            {
+                var (working, onlineSet) = createTestBeatmap();
+
+                onlineSet.Beatmaps.Single().TopTags = null;
+                onlineSet.RelatedTags = null;
+
+                currentOnlineSet = onlineSet;
+                Beatmap.Value = working;
+            });
+            AddStep("finish load", () => proceed());
         }
 
         private (WorkingBeatmap, APIBeatmapSet) createTestBeatmap()
