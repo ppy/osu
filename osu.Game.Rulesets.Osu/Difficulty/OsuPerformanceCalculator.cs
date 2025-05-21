@@ -411,7 +411,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // 99% critical value for the normal distribution (one-tailed).
             const double z = 2.32634787404;
 
-            // We can be 99% confident that the sample p is at least this value.
+            // We can be 99% confident that the population proportion is at least this value.
             double pLowerBound = Math.Max(p, (n * p + z * z / 2) / (n + z * z) - z / (n + z * z) * Math.Sqrt(n * p * (1 - p) + z * z / 4));
 
             // Compute deviation assuming greats and oks are normally distributed.
