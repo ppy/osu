@@ -137,6 +137,15 @@ namespace osu.Game.Graphics.Carousel
         }
 
         /// <summary>
+        /// Scroll carousel to the selected item if available.
+        /// </summary>
+        public void ScrollToSelection()
+        {
+            if (currentKeyboardSelection.CarouselItem != null)
+                Scroll.ScrollTo(currentKeyboardSelection.CarouselItem.CarouselYPosition - visibleHalfHeight + BleedTop);
+        }
+
+        /// <summary>
         /// Returns the vertical spacing between two given carousel items. Negative value can be used to create an overlapping effect.
         /// </summary>
         protected virtual float GetSpacingBetweenPanels(CarouselItem top, CarouselItem bottom) => 0f;
@@ -316,7 +325,7 @@ namespace osu.Game.Graphics.Carousel
 
                 refreshAfterSelection();
                 if (!Scroll.UserScrolling)
-                    scrollToSelection();
+                    ScrollToSelection();
 
                 NewItemsPresented?.Invoke();
             });
@@ -553,12 +562,6 @@ namespace osu.Game.Graphics.Carousel
                 Scroll.OffsetScrollPosition((float)(currentKeyboardSelection.YPosition!.Value - prevKeyboard.YPosition.Value));
         }
 
-        private void scrollToSelection()
-        {
-            if (currentKeyboardSelection.CarouselItem != null)
-                Scroll.ScrollTo(currentKeyboardSelection.CarouselItem.CarouselYPosition - visibleHalfHeight + BleedTop);
-        }
-
         #endregion
 
         #region Display handling
@@ -598,7 +601,7 @@ namespace osu.Game.Graphics.Carousel
                 refreshAfterSelection();
 
                 // Always scroll to selection in this case (regardless of `UserScrolling` state), centering the selection.
-                scrollToSelection();
+                ScrollToSelection();
 
                 selectionValid.Validate();
             }
