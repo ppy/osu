@@ -92,6 +92,7 @@ namespace osu.Game.Screens.SelectV2
             InternalChildren = new Drawable[]
             {
                 new WedgeBackground(),
+                new WedgeScrollBlockerComponent(),
                 new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,

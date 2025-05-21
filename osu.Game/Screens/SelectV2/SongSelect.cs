@@ -116,7 +116,6 @@ namespace osu.Game.Screens.SelectV2
                                 RelativeSizeAxes = Axes.Both,
                                 ColumnDimensions = new[]
                                 {
-                                    new Dimension(GridSizeMode.Relative, 0.5f, maxSize: 850),
                                     new Dimension(),
                                     new Dimension(GridSizeMode.Relative, 0.5f, maxSize: 750),
                                 },
@@ -124,23 +123,6 @@ namespace osu.Game.Screens.SelectV2
                                 {
                                     new[]
                                     {
-                                        wedgesContainer = new FillFlowContainer
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                            Margin = new MarginPadding
-                                            {
-                                                Top = -CORNER_RADIUS_HIDE_OFFSET,
-                                                Left = -CORNER_RADIUS_HIDE_OFFSET
-                                            },
-                                            Spacing = new Vector2(0f, 4f),
-                                            Direction = FillDirection.Vertical,
-                                            Shear = OsuGame.SHEAR,
-                                            Children = new Drawable[]
-                                            {
-                                                new ShearAligningWrapper(titleWedge = new BeatmapTitleWedge()),
-                                                new ShearAligningWrapper(detailsArea = new BeatmapDetailsArea()),
-                                            },
-                                        },
                                         Empty(),
                                         new Container
                                         {
@@ -179,6 +161,41 @@ namespace osu.Game.Screens.SelectV2
                                     },
                                 }
                             },
+                            new GridContainer // used for max width implementation
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                ColumnDimensions = new[]
+                                {
+                                    new Dimension(GridSizeMode.Relative, 0.5f, maxSize: 850),
+                                },
+                                Content = new[]
+                                {
+                                    new Drawable[]
+                                    {
+                                        new ResetScrollOnHoverContainer(carousel)
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            Child = wedgesContainer = new FillFlowContainer
+                                            {
+                                                RelativeSizeAxes = Axes.Both,
+                                                Margin = new MarginPadding
+                                                {
+                                                    Top = -CORNER_RADIUS_HIDE_OFFSET,
+                                                    Left = -CORNER_RADIUS_HIDE_OFFSET
+                                                },
+                                                Spacing = new Vector2(0f, 4f),
+                                                Direction = FillDirection.Vertical,
+                                                Shear = OsuGame.SHEAR,
+                                                Children = new Drawable[]
+                                                {
+                                                    new ShearAligningWrapper(titleWedge = new BeatmapTitleWedge()),
+                                                    new ShearAligningWrapper(detailsArea = new BeatmapDetailsArea()),
+                                                },
+                                            },
+                                        }
+                                    }
+                                }
+                            }
                         }
                     },
                 },
@@ -444,5 +461,21 @@ namespace osu.Game.Screens.SelectV2
         public void ClearScores(BeatmapInfo beatmap) => dialogOverlay?.Push(new BeatmapClearScoresDialog(beatmap));
 
         #endregion
+
+        private partial class ResetScrollOnHoverContainer : Container
+        {
+            private readonly BeatmapCarousel carousel;
+
+            public ResetScrollOnHoverContainer(BeatmapCarousel carousel)
+            {
+                this.carousel = carousel;
+            }
+
+            protected override bool OnHover(HoverEvent e)
+            {
+                carousel.ScrollToSelection();
+                return base.OnHover(e);
+            }
+        }
     }
 }

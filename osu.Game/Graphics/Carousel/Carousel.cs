@@ -823,6 +823,8 @@ namespace osu.Game.Graphics.Carousel
 
             public void SetLayoutHeight(float height) => Panels.Height = height;
 
+            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
+
             public CarouselScrollContainer()
             {
                 // Managing our own custom layout within ScrollContent causes feedback with public ScrollContainer calculations,
