@@ -412,7 +412,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             const double z = 2.32634787404;
 
             // We can be 99% confident that the population proportion is at least this value.
-            double pLowerBound = Math.Max(p, (n * p + z * z / 2) / (n + z * z) - z / (n + z * z) * Math.Sqrt(n * p * (1 - p) + z * z / 4));
+            double pLowerBound = Math.Min(p, (n * p + z * z / 2) / (n + z * z) - z / (n + z * z) * Math.Sqrt(n * p * (1 - p) + z * z / 4));
 
             double deviation;
 
