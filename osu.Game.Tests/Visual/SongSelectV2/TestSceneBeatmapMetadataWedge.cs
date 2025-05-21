@@ -216,8 +216,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [Test]
         public void TestLoading()
         {
-            Action proceed = null!;
-
             AddStep("override request handling", () =>
             {
                 currentOnlineSet = null;
@@ -227,7 +225,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                     switch (request)
                     {
                         case GetBeatmapSetRequest set:
-                            proceed = () => set.TriggerSuccess(currentOnlineSet!);
+                            Scheduler.AddDelayed(() => set.TriggerSuccess(currentOnlineSet!), 500);
                             return true;
 
                         default:
@@ -243,7 +241,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 currentOnlineSet = onlineSet;
                 Beatmap.Value = working;
             });
-            AddStep("finish load", () => proceed());
+            AddWaitStep("wait", 5);
 
             AddStep("set beatmap", () =>
             {
@@ -256,7 +254,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 currentOnlineSet = onlineSet;
                 Beatmap.Value = working;
             });
-            AddStep("finish load", () => proceed());
+            AddWaitStep("wait", 5);
 
             AddStep("no user tags", () =>
             {
@@ -268,7 +266,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 currentOnlineSet = onlineSet;
                 Beatmap.Value = working;
             });
-            AddStep("finish load", () => proceed());
+            AddWaitStep("wait", 5);
 
             AddStep("no user tags", () =>
             {
@@ -280,7 +278,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 currentOnlineSet = onlineSet;
                 Beatmap.Value = working;
             });
-            AddStep("finish load", () => proceed());
+            AddWaitStep("wait", 5);
         }
 
         private (WorkingBeatmap, APIBeatmapSet) createTestBeatmap()
