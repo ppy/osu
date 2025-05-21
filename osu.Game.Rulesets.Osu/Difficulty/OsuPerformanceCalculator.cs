@@ -426,7 +426,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 double okHitWindowTailAmount = Math.Sqrt(2 / Math.PI) * okHitWindow * Math.Exp(-0.5 * Math.Pow(okHitWindow / deviation, 2))
                                                / (deviation * DifficultyCalculationUtils.Erf(okHitWindow / (Math.Sqrt(2) * deviation)));
 
-                deviation = okHitWindowTailAmount < 0.99 ? deviation * Math.Sqrt(1 - okHitWindowTailAmount) : okHitWindow / Math.Sqrt(3);
+                deviation *= Math.Sqrt(1 - okHitWindowTailAmount);
             }
             else
             {
