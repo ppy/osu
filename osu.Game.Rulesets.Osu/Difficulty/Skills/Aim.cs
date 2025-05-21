@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double currentStrain;
 
-        private double skillMultiplier => 25.6;
+        private double skillMultiplier => 23.0;
         private double strainDecayBase => 0.15;
 
         private readonly List<double> sliderStrains = new List<double>();
@@ -45,6 +45,34 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 sliderStrains.Add(currentStrain);
 
             return currentStrain;
+        }
+
+        public override double DifficultyValue()
+        {
+            double difficulty = 0;
+
+            // Sections with 0 strain are excluded to avoid worst-case time complexity of the following sort (e.g. /b/2351871).
+            // These sections will not contribute to the difficulty.
+            var peaks = GetCurrentStrainPeaks().Where(p => p > 0);
+
+            List<double> strains = peaks.ToList();
+
+            int index = 0;
+
+            // Difficulty is the weighted sum of the highest strains from every section.
+            // We're sorting from highest to lowest strain.
+            foreach (double strain in strains.OrderDescending())
+            {
+                // Use a harmonic sum for strain which effectively buffs longer consistent maps
+                // Constants are arbitrary and give good values
+                // https://www.desmos.com/calculator/ceo4jgciqg
+                double weight = (1.5 + (20.0 / (1 + index))) / (index + 1.5 + (20.0 / (1.0 + index)));
+
+                difficulty += strain * weight;
+                index += 1;
+            }
+
+            return difficulty;
         }
 
         public double GetDifficultSliders()
