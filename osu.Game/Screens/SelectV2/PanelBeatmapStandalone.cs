@@ -126,7 +126,7 @@ namespace osu.Game.Screens.SelectV2
                                 AutoSizeAxes = Axes.Both,
                                 Children = new Drawable[]
                                 {
-                                    difficultyStarRating = new StarRatingDisplay(default, StarRatingDisplaySize.Small)
+                                    difficultyStarRating = new StarRatingDisplay(default, StarRatingDisplaySize.Small, animated: true)
                                     {
                                         Origin = Anchor.CentreLeft,
                                         Anchor = Anchor.CentreLeft,
@@ -226,6 +226,8 @@ namespace osu.Game.Screens.SelectV2
             updateButton.BeatmapSet = null;
             difficultyRank.Beatmap = null;
             starDifficultyBindable = null;
+
+            starDifficultyCancellationSource?.Cancel();
         }
 
         private void computeStarRating()
@@ -238,8 +240,19 @@ namespace osu.Game.Screens.SelectV2
 
             var beatmap = (BeatmapInfo)Item.Model;
 
-            starDifficultyBindable = difficultyCache.GetBindableDifficulty(beatmap, starDifficultyCancellationSource.Token);
+            starDifficultyBindable = difficultyCache.GetBindableDifficulty(beatmap, starDifficultyCancellationSource.Token, 200);
             starDifficultyBindable.BindValueChanged(_ => updateDisplay(), true);
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (Item?.IsVisible != true)
+            {
+                starDifficultyCancellationSource?.Cancel();
+                starDifficultyCancellationSource = null;
+            }
         }
 
         private void updateKeyCount()
