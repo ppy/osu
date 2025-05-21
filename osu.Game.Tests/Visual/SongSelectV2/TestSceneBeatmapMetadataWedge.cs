@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Models;
 using osu.Game.Online.API;
@@ -30,26 +31,29 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             };
         }
 
-        [SetUp]
-        public void SetUp()
+        [SetUpSteps]
+        public override void SetUpSteps()
         {
-            ((DummyAPIAccess)API).HandleRequest = request =>
+            AddStep("register request handling", () =>
             {
-                switch (request)
+                ((DummyAPIAccess)API).HandleRequest = request =>
                 {
-                    case GetBeatmapSetRequest set:
-                        if (set.ID == currentOnlineSet?.OnlineID)
-                        {
-                            set.TriggerSuccess(currentOnlineSet);
-                            return true;
-                        }
+                    switch (request)
+                    {
+                        case GetBeatmapSetRequest set:
+                            if (set.ID == currentOnlineSet?.OnlineID)
+                            {
+                                set.TriggerSuccess(currentOnlineSet);
+                                return true;
+                            }
 
-                        return false;
+                            return false;
 
-                    default:
-                        return false;
-                }
-            };
+                        default:
+                            return false;
+                    }
+                };
+            });
         }
 
         [Test]
@@ -214,7 +218,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         {
             Action proceed = null!;
 
-            AddStep("setup", () =>
+            AddStep("override request handling", () =>
             {
                 currentOnlineSet = null;
 
