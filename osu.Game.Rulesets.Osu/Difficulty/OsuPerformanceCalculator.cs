@@ -414,16 +414,25 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // We can be 99% confident that the population proportion is at least this value.
             double pLowerBound = Math.Max(p, (n * p + z * z / 2) / (n + z * z) - z / (n + z * z) * Math.Sqrt(n * p * (1 - p) + z * z / 4));
 
-            // Compute deviation assuming greats and oks are normally distributed.
-            double deviation = p > 0 ? greatHitWindow / (Math.Sqrt(2) * DifficultyCalculationUtils.ErfInv(pLowerBound)) : double.PositiveInfinity;
+            double deviation;
 
-            // Subtract the deviation provided by tails that land outside the ok hit window from the deviation computed above.
-            // This is equivalent to calculating the deviation of a normal distribution truncated at +-okHitWindow.
-            double okHitWindowTailAmount = Math.Sqrt(2 / Math.PI) * okHitWindow * Math.Exp(-0.5 * Math.Pow(okHitWindow / deviation, 2))
-                                           / (deviation * DifficultyCalculationUtils.Erf(okHitWindow / (Math.Sqrt(2) * deviation)));
+            if (pLowerBound > 0)
+            {
+                // Compute deviation assuming greats and oks are normally distributed.
+                deviation = greatHitWindow / (Math.Sqrt(2) * DifficultyCalculationUtils.ErfInv(pLowerBound));
 
-            // If deviation is too high to calculate the adjustment for precisely, we set it to a tested limit value.
-            deviation = okHitWindowTailAmount < 0.99 ? deviation * Math.Sqrt(1 - okHitWindowTailAmount) : okHitWindow / Math.Sqrt(3);
+                // Subtract the deviation provided by tails that land outside the ok hit window from the deviation computed above.
+                // This is equivalent to calculating the deviation of a normal distribution truncated at +-okHitWindow.
+                double okHitWindowTailAmount = Math.Sqrt(2 / Math.PI) * okHitWindow * Math.Exp(-0.5 * Math.Pow(okHitWindow / deviation, 2))
+                                               / (deviation * DifficultyCalculationUtils.Erf(okHitWindow / (Math.Sqrt(2) * deviation)));
+
+                deviation = okHitWindowTailAmount < 0.99 ? deviation * Math.Sqrt(1 - okHitWindowTailAmount) : okHitWindow / Math.Sqrt(3);
+            }
+            else
+            {
+                // A tested limit value for the case of a score only containing oks.
+                deviation = okHitWindow / Math.Sqrt(3);
+            }
 
             // Compute and add the variance for mehs, assuming that they are uniformly distributed.
             double mehVariance = (mehHitWindow * mehHitWindow + okHitWindow * mehHitWindow + okHitWindow * okHitWindow) / 3;
