@@ -90,6 +90,9 @@ namespace osu.Game.Screens.SelectV2
         [Resolved]
         private ManageCollectionsDialog? collectionsDialog { get; set; }
 
+        [Resolved]
+        private DifficultyRecommender? difficultyRecommender { get; set; }
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -162,6 +165,7 @@ namespace osu.Game.Screens.SelectV2
                                                             BleedTop = FilterControl.HEIGHT_FROM_SCREEN_TOP + 5,
                                                             BleedBottom = ScreenFooter.HEIGHT + 5,
                                                             RequestPresentBeatmap = _ => OnStart(),
+                                                            GetRecommendedBeatmap = getRecommendedBeatmap,
                                                             NewItemsPresented = newItemsPresented,
                                                             RelativeSizeAxes = Axes.Both,
                                                         },
@@ -227,6 +231,13 @@ namespace osu.Game.Screens.SelectV2
 
             detailsArea.Height = wedgesContainer.DrawHeight - titleWedge.LayoutSize.Y - 4;
         }
+
+        #region Selection handling
+
+        private BeatmapInfo getRecommendedBeatmap(IEnumerable<BeatmapInfo> beatmaps)
+            => difficultyRecommender?.GetRecommendedBeatmap(beatmaps) ?? beatmaps.First();
+
+        #endregion
 
         #region Transitions
 
