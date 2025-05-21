@@ -346,7 +346,6 @@ namespace osu.Game.Screens.SelectV2
             filterDebounce?.Cancel();
             filterDebounce = Scheduler.AddDelayed(() =>
             {
-                noResultsPlaceholder.Filter = criteria;
                 carousel.Filter(criteria);
             }, filter_delay);
         }
@@ -355,7 +354,13 @@ namespace osu.Game.Screens.SelectV2
         {
             int count = carousel.MatchedBeatmapsCount;
 
-            noResultsPlaceholder.State.Value = count == 0 ? Visibility.Visible : Visibility.Hidden;
+            if (count == 0)
+            {
+                noResultsPlaceholder.Show();
+                noResultsPlaceholder.Filter = carousel.Criteria;
+            }
+            else
+                noResultsPlaceholder.Hide();
 
             // Intentionally not localised until we have proper support for this (see https://github.com/ppy/osu-framework/pull/4918
             // but also in this case we want support for formatting a number within a string).
