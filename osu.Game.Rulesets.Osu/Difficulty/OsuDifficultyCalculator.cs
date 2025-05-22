@@ -271,6 +271,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
             bool isFullyHidden = mods.OfType<OsuModHidden>().Any(m => !m.OnlyFadeApproachCircles.Value);
 
+            if (approachRate >= 10)
+            {
+                // Decreased HD bonus for AR > 10
+                return 0.04 * Math.Pow(11.5 - approachRate, 2) * 2 / 2.25;
+            }
             if (approachRate >= 7)
             {
                 // Normal curve for AR > 7, rewarding lower AR
@@ -278,12 +283,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             }
             else if (approachRate >= 2)
             {
-                // For fully hidden notes - add additional reward for extra low AR
+                // For fully hidden notes - add additional reward for extra low AR compared to not fully hidden
                 return 0.2 + (isFullyHidden ? 0.04 : 0.03) * (7.0 - approachRate);
             }
             else
             {
-                // Max bonus is 0.7 for fully hidden and 0.55 for half-hidden or traceable
+                // Max bonus is 0.6 for fully hidden and 0.5 for half-hidden or traceable
                 return (isFullyHidden ? 0.4 : 0.35) + (isFullyHidden ? 0.2 : 0.15) * (1 - Math.Pow(1.5, approachRate - 2));
             }
         }
