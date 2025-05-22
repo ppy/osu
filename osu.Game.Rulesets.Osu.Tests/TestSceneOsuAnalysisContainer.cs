@@ -87,7 +87,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         private Replay fabricateReplay()
         {
             var frames = new List<ReplayFrame>();
-            var random = new Random();
+            var random = new Random(20250522);
             int posX = 250;
             int posY = 250;
 
