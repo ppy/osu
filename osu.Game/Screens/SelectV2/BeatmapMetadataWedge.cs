@@ -338,6 +338,7 @@ namespace osu.Game.Screens.SelectV2
             {
                 genre.Data = null;
                 language.Data = null;
+                userTags.Tags = null;
                 return;
             }
 

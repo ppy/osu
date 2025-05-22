@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Models;
 using osu.Game.Online.API;
@@ -24,28 +25,35 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         {
             base.LoadComplete();
 
-            ((DummyAPIAccess)API).HandleRequest = request =>
-            {
-                switch (request)
-                {
-                    case GetBeatmapSetRequest set:
-                        if (set.ID == currentOnlineSet?.OnlineID)
-                        {
-                            set.TriggerSuccess(currentOnlineSet);
-                            return true;
-                        }
-
-                        return false;
-
-                    default:
-                        return false;
-                }
-            };
-
             Child = wedge = new BeatmapMetadataWedge
             {
                 State = { Value = Visibility.Visible },
             };
+        }
+
+        [SetUpSteps]
+        public override void SetUpSteps()
+        {
+            AddStep("register request handling", () =>
+            {
+                ((DummyAPIAccess)API).HandleRequest = request =>
+                {
+                    switch (request)
+                    {
+                        case GetBeatmapSetRequest set:
+                            if (set.ID == currentOnlineSet?.OnlineID)
+                            {
+                                set.TriggerSuccess(currentOnlineSet);
+                                return true;
+                            }
+
+                            return false;
+
+                        default:
+                            return false;
+                    }
+                };
+            });
         }
 
         [Test]
@@ -203,6 +211,74 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 currentOnlineSet = onlineSet;
                 Beatmap.Value = working;
             });
+        }
+
+        [Test]
+        public void TestLoading()
+        {
+            AddStep("override request handling", () =>
+            {
+                currentOnlineSet = null;
+
+                ((DummyAPIAccess)API).HandleRequest = request =>
+                {
+                    switch (request)
+                    {
+                        case GetBeatmapSetRequest set:
+                            Scheduler.AddDelayed(() => set.TriggerSuccess(currentOnlineSet!), 500);
+                            return true;
+
+                        default:
+                            return false;
+                    }
+                };
+            });
+
+            AddStep("set beatmap", () =>
+            {
+                var (working, onlineSet) = createTestBeatmap();
+
+                currentOnlineSet = onlineSet;
+                Beatmap.Value = working;
+            });
+            AddWaitStep("wait", 5);
+
+            AddStep("set beatmap", () =>
+            {
+                var (working, onlineSet) = createTestBeatmap();
+
+                onlineSet.RelatedTags![0].Name = "other/tag";
+                onlineSet.RelatedTags[1].Name = "another/tag";
+                onlineSet.RelatedTags[2].Name = "some/tag";
+
+                currentOnlineSet = onlineSet;
+                Beatmap.Value = working;
+            });
+            AddWaitStep("wait", 5);
+
+            AddStep("no user tags", () =>
+            {
+                var (working, onlineSet) = createTestBeatmap();
+
+                onlineSet.Beatmaps.Single().TopTags = null;
+                onlineSet.RelatedTags = null;
+
+                currentOnlineSet = onlineSet;
+                Beatmap.Value = working;
+            });
+            AddWaitStep("wait", 5);
+
+            AddStep("no user tags", () =>
+            {
+                var (working, onlineSet) = createTestBeatmap();
+
+                onlineSet.Beatmaps.Single().TopTags = null;
+                onlineSet.RelatedTags = null;
+
+                currentOnlineSet = onlineSet;
+                Beatmap.Value = working;
+            });
+            AddWaitStep("wait", 5);
         }
 
         private (WorkingBeatmap, APIBeatmapSet) createTestBeatmap()
