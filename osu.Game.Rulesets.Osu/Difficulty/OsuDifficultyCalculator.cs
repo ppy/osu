@@ -271,15 +271,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
             bool isFullyHidden = mods.OfType<OsuModHidden>().Any(m => !m.OnlyFadeApproachCircles.Value);
 
-            if (approachRate >= 10)
+            if (approachRate >= 11.5)
             {
-                // Decreased HD bonus for AR > 10
-                return 0.04 * Math.Pow(11.5 - approachRate, 2) * 2 / 2.25;
+                return 0;
             }
-            if (approachRate >= 7)
+            else if (approachRate >= 7)
             {
                 // Normal curve for AR > 7, rewarding lower AR
-                return 0.04 * (12.0 - approachRate);
+                // Or High AR curve for approx AR > 10.35
+                // Whatever is lower
+                return Math.Min(0.04 * (12.0 - approachRate), 0.05 * Math.Pow(11.5 - approachRate, 2));
             }
             else if (approachRate >= 2)
             {
