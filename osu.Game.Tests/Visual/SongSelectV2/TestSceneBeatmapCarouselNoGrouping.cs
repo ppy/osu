@@ -267,7 +267,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddBeatmaps(5, 3);
             WaitForDrawablePanels();
 
-            AddStep("set recommendation algorithm", () => Carousel.GetRecommendedBeatmap = beatmaps => beatmaps.Last());
+            AddStep("set recommendation algorithm", () => BeatmapRecommendationFunction = beatmaps => beatmaps.Last());
 
             SelectPrevGroup();
 

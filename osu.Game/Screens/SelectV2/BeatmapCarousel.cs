@@ -27,9 +27,9 @@ namespace osu.Game.Screens.SelectV2
         public Action<BeatmapInfo>? RequestPresentBeatmap { private get; init; }
 
         /// <summary>
-        /// Accepts a list of beatmaps and returns the beatmap recommended for the user.
+        /// From the provided beatmaps, return the most appropriate one for the user's skill.
         /// </summary>
-        public Func<IEnumerable<BeatmapInfo>, BeatmapInfo>? GetRecommendedBeatmap { private get; set; }
+        public Func<IEnumerable<BeatmapInfo>, BeatmapInfo>? ChooseRecommendedBeatmap { private get; init; }
 
         public const float SPACING = 3f;
 
@@ -190,7 +190,7 @@ namespace osu.Game.Screens.SelectV2
                     if (grouping.SetItems.TryGetValue(setInfo, out var items))
                     {
                         var beatmaps = items.Select(i => i.Model).OfType<BeatmapInfo>();
-                        CurrentSelection = GetRecommendedBeatmap?.Invoke(beatmaps) ?? beatmaps.First();
+                        CurrentSelection = ChooseRecommendedBeatmap?.Invoke(beatmaps) ?? beatmaps.First();
                     }
 
                     return;
