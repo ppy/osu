@@ -35,13 +35,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Utils
 
             foreach (var spinner in beatmap.HitObjects.OfType<Spinner>())
             {
-                spinnerScore += CalculateSpinnerScore(spinner);
+                spinnerScore += calculateSpinnerScore(spinner);
             }
 
             return (sliderScore + spinnerScore) / objectCount;
         }
 
-        public static double CalculateSpinnerScore(Spinner spinner)
+        /// <remarks>
+        /// Logic borrowed from <see cref="OsuLegacyScoreSimulator.simulateHit"/> for basic score calculations.
+        /// </remarks>
+        private static double calculateSpinnerScore(Spinner spinner)
         {
             const int spin_score = 100;
             const int bonus_spin_score = 1000;
@@ -73,10 +76,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Utils
 
             int bonusSpins = (totalHalfSpinsPossible - halfSpinsRequiredBeforeBonus) / 2;
 
-            // Reduce amount of bonus speans because we want more average case instead of max one
+            // Reduce amount of bonus spins because we want to represent the more average case, rather than the best one.
             bonusSpins = Math.Max(0, bonusSpins - fullSpins / 2);
 
-            // Bonus spin score
             score += bonus_spin_score * bonusSpins;
 
             return score;
