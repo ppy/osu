@@ -183,8 +183,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (mods.Any(m => m is OsuModHidden))
             {
-                // We want to give more reward for lower AR when it comes to aim and HD. This nerfs high AR and buffs lower AR.
-                ratingMultiplier *= 1.0 + 0.04 * (12.0 - approachRate);
+                ratingMultiplier *= 1.0 + CalculateReadingModBonus(mods, approachRate);
             }
 
             // It is important to consider accuracy difficulty when scaling with accuracy.
@@ -266,6 +265,27 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             ratingMultiplier *= 0.98 + Math.Pow(Math.Max(0, overallDifficulty), 2) / 2500;
 
             return flashlightRating * Math.Sqrt(ratingMultiplier);
+        }
+
+        public static double CalculateReadingModBonus(Mod[] mods, double approachRate)
+        {
+            bool isFullyHidden = mods.OfType<OsuModHidden>().Any(m => !m.OnlyFadeApproachCircles.Value);
+
+            if (approachRate >= 7)
+            {
+                // Normal curve for AR > 7, rewarding lower AR
+                return 0.04 * (12.0 - approachRate);
+            }
+            else if (approachRate >= 2)
+            {
+                // For fully hidden notes - add additional reward for extra low AR
+                return 0.2 + (isFullyHidden ? 0.04 : 0.03) * (7.0 - approachRate);
+            }
+            else
+            {
+                // Max bonus is 0.7 for fully hidden and 0.55 for half-hidden or traceable
+                return (isFullyHidden ? 0.4 : 0.35) + (isFullyHidden ? 0.2 : 0.15) * (1 - Math.Pow(1.5, approachRate - 2));
+            }
         }
 
         protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
