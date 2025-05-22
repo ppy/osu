@@ -133,7 +133,6 @@ namespace osu.Game.Screens.SelectV2
                                     personalBestText = new OsuSpriteText
                                     {
                                         Colour = colourProvider.Content2,
-                                        Text = "Personal Best",
                                         Font = OsuFont.Style.Caption1.With(weight: FontWeight.SemiBold),
                                     },
                                     personalBestScoreContainer = new Container<BeatmapLeaderboardScore>
