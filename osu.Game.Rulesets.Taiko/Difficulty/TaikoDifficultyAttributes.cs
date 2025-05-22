@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         public double StaminaTopStrains { get; set; }
 
         /// <summary>
-        /// The factor corresponding to the consistency ratio of a map.
+        /// The factor corresponding to the consistency of a map.
         /// </summary>
         [JsonProperty("consistency_factor")]
         public double ConsistencyFactor { get; set; }
