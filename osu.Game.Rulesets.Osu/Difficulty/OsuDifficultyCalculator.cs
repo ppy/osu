@@ -271,27 +271,21 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
             bool isFullyHidden = mods.OfType<OsuModHidden>().Any(m => !m.OnlyFadeApproachCircles.Value);
 
-            if (approachRate >= 11.5)
-            {
-                return 0;
-            }
-            else if (approachRate >= 7)
-            {
-                // Normal curve for AR > 7, rewarding lower AR
-                // Or High AR curve for approx AR > 10.35
-                // Whatever is lower
-                return Math.Min(0.04 * (12.0 - approachRate), 0.05 * Math.Pow(11.5 - approachRate, 2));
-            }
-            else if (approachRate >= 2)
-            {
-                // For fully hidden notes - add additional reward for extra low AR compared to not fully hidden
-                return 0.2 + (isFullyHidden ? 0.04 : 0.03) * (7.0 - approachRate);
-            }
-            else
-            {
-                // Max bonus is 0.6 for fully hidden and 0.5 for half-hidden or traceable
-                return (isFullyHidden ? 0.4 : 0.35) + (isFullyHidden ? 0.2 : 0.15) * (1 - Math.Pow(1.5, approachRate - 2));
-            }
+            if (approachRate >= 11.5) return 0;
+
+            // High AR curve for approx AR > 10.35
+            double bonus = 0.05 * Math.Pow(11.5 - approachRate, 2);
+
+            // Normal curve, rewarding lower AR up to AR5
+            bonus = Math.Min(0.04 * (12.0 - Math.Max(approachRate, 5)), bonus);
+
+            // For AR up to 0 fully hidden notes - reduce reward for extra low AR on not fully hidden
+            if (approachRate < 5) bonus += (isFullyHidden ? 0.04 : 0.03) * (5.0 - Math.Max(approachRate, 0));
+
+            // Starting from AR0 - cap values so they won't grow to infinity
+            if (approachRate < 0) bonus += (isFullyHidden ? 0.1 : 0.075) * (1 - Math.Pow(1.5, approachRate));
+
+            return bonus;
         }
 
         protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
