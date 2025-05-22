@@ -7,7 +7,7 @@ using osu.Game.Online.API;
 
 namespace osu.Game.Online.Rooms
 {
-    public class JoinRoomRequest : APIRequest
+    public class JoinRoomRequest : APIRequest<Room>
     {
         public readonly Room Room;
         public readonly string? Password;
@@ -16,6 +16,9 @@ namespace osu.Game.Online.Rooms
         {
             Room = room;
             Password = password;
+
+            // Also copy back to the source model, since it is likely to have been stored elsewhere.
+            Success += r => Room.CopyFrom(r);
         }
 
         protected override WebRequest CreateWebRequest()
@@ -27,6 +30,6 @@ namespace osu.Game.Online.Rooms
             return req;
         }
 
-        protected override string Target => $@"rooms/{Room.RoomID.Value}/users/{User!.Id}";
+        protected override string Target => $@"rooms/{Room.RoomID}/users/{User!.Id}";
     }
 }

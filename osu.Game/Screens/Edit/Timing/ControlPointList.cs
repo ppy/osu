@@ -20,6 +20,8 @@ namespace osu.Game.Screens.Edit.Timing
 {
     public partial class ControlPointList : CompositeDrawable
     {
+        public Action? SelectClosestTimingPoint { get; init; }
+
         private ControlPointTable table = null!;
         private Container controls = null!;
         private OsuButton deleteButton = null!;
@@ -33,6 +35,9 @@ namespace osu.Game.Screens.Edit.Timing
 
         [Resolved]
         private Bindable<ControlPointGroup?> selectedGroup { get; set; } = null!;
+
+        [Resolved]
+        private IEditorChangeHandler? editorChangeHandler { get; set; }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, OverlayColourProvider colourProvider)
@@ -72,7 +77,7 @@ namespace osu.Game.Screens.Edit.Timing
                                 new RoundedButton
                                 {
                                     Text = "Select closest to current time",
-                                    Action = goToCurrentGroup,
+                                    Action = SelectClosestTimingPoint,
                                     Size = new Vector2(220, 30),
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
@@ -110,6 +115,9 @@ namespace osu.Game.Screens.Edit.Timing
                     }
                 },
             };
+
+            if (editorChangeHandler != null)
+                editorChangeHandler.OnStateChange += onUndoRedo;
         }
 
         protected override void LoadComplete()
@@ -138,17 +146,6 @@ namespace osu.Game.Screens.Edit.Timing
 
             addButton.Enabled.Value = clock.CurrentTimeAccurate != selectedGroup.Value?.Time;
             table.Padding = new MarginPadding { Bottom = controls.DrawHeight };
-        }
-
-        private void goToCurrentGroup()
-        {
-            double accurateTime = clock.CurrentTimeAccurate;
-
-            var activeTimingPoint = Beatmap.ControlPointInfo.TimingPointAt(accurateTime);
-            var activeEffectPoint = Beatmap.ControlPointInfo.EffectPointAt(accurateTime);
-
-            double latestActiveTime = Math.Max(activeTimingPoint.Time, activeEffectPoint.Time);
-            selectedGroup.Value = Beatmap.ControlPointInfo.GroupAt(latestActiveTime);
         }
 
         private void delete()
@@ -184,6 +181,22 @@ namespace osu.Game.Screens.Edit.Timing
             }
 
             selectedGroup.Value = group;
+        }
+
+        private void onUndoRedo()
+        {
+            // Best effort. We have no tracking of control points through undo/redo changes.
+            // If we don't deselect, things like offset changes could spawn groups to be added from previous states (see https://github.com/ppy/osu/issues/31098).
+            if (selectedGroup.Value != null && !Beatmap.ControlPointInfo.Groups.Contains(selectedGroup.Value))
+                selectedGroup.Value = null;
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (editorChangeHandler != null)
+                editorChangeHandler.OnStateChange -= onUndoRedo;
         }
     }
 }

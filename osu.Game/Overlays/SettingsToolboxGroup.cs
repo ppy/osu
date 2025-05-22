@@ -3,13 +3,13 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input;
 using osu.Framework.Input.Events;
-using osu.Framework.Layout;
+using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -27,8 +27,6 @@ namespace osu.Game.Overlays
         private const float transition_duration = 250;
         private const int header_height = 30;
         private const int corner_radius = 5;
-
-        private readonly Cached headerTextVisibilityCache = new Cached();
 
         protected override Container<Drawable> Content => content;
 
@@ -53,6 +51,10 @@ namespace osu.Game.Overlays
         private Box background = null!;
 
         private IconButton expandButton = null!;
+
+        private InputManager inputManager = null!;
+
+        private Drawable? draggedChild;
 
         /// <summary>
         /// Create a new instance.
@@ -125,6 +127,8 @@ namespace osu.Game.Overlays
         {
             base.LoadComplete();
 
+            inputManager = GetContainingInputManager()!;
+
             Expanded.BindValueChanged(_ => updateExpandedState(true));
             updateExpandedState(false);
 
@@ -149,30 +153,31 @@ namespace osu.Game.Overlays
         {
             base.Update();
 
-            if (!headerTextVisibilityCache.IsValid)
+            // These toolbox grouped may be contracted to only show icons.
+            // For now, let's hide the header to avoid text truncation weirdness in such cases.
+            headerText.Alpha = (float)Interpolation.DampContinuously(headerText.Alpha, headerText.DrawWidth < DrawWidth ? 1 : 0, 40, Time.Elapsed);
+
+            // Dragged child finished its drag operation.
+            if (draggedChild != null && inputManager.DraggedDrawable != draggedChild)
             {
-                // These toolbox grouped may be contracted to only show icons.
-                // For now, let's hide the header to avoid text truncation weirdness in such cases.
-                headerText.FadeTo(headerText.DrawWidth < DrawWidth ? 1 : 0, 150, Easing.OutQuint);
-                headerTextVisibilityCache.Validate();
+                draggedChild = null;
+                updateExpandedState(true);
             }
-        }
-
-        protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
-        {
-            if (invalidation.HasFlag(Invalidation.DrawSize))
-                headerTextVisibilityCache.Invalidate();
-
-            return base.OnInvalidate(invalidation, source);
         }
 
         private void updateExpandedState(bool animate)
         {
+            // before we collapse down, let's double check the user is not dragging a UI control contained within us.
+            if (inputManager.DraggedDrawable.IsRootedAt(this))
+            {
+                draggedChild = inputManager.DraggedDrawable;
+            }
+
             // clearing transforms is necessary to avoid a previous height transform
             // potentially continuing to get processed while content has changed to autosize.
             content.ClearTransforms();
 
-            if (Expanded.Value || IsHovered)
+            if (Expanded.Value || IsHovered || draggedChild != null)
             {
                 content.AutoSizeAxes = Axes.Y;
                 content.AutoSizeDuration = animate ? transition_duration : 0;
@@ -184,7 +189,7 @@ namespace osu.Game.Overlays
                 content.ResizeHeightTo(0, animate ? transition_duration : 0, Easing.OutQuint);
             }
 
-            headerContent.FadeColour(Expanded.Value ? Color4.White : OsuColour.Gray(0.5f), 200, Easing.OutQuint);
+            headerContent.FadeColour(Expanded.Value ? Color4.White : OsuColour.Gray(0.7f), 200, Easing.OutQuint);
         }
 
         private void updateFadeState()

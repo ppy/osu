@@ -80,14 +80,34 @@ namespace osu.Game.Localisation
         public static LocalisableString TimingBasedColouring => new TranslatableString(getKey(@"Timing_based_colouring"), @"Timing-based note colouring");
 
         /// <summary>
-        /// "{0}ms (speed {1})"
+        /// "{0}ms (speed {1:N1})"
         /// </summary>
-        public static LocalisableString ScrollSpeedTooltip(int scrollTime, int scrollSpeed) => new TranslatableString(getKey(@"ruleset"), @"{0}ms (speed {1})", scrollTime, scrollSpeed);
+        public static LocalisableString ScrollSpeedTooltip(int scrollTime, double scrollSpeed) => new TranslatableString(getKey(@"ruleset"), @"{0}ms (speed {1:N1})", scrollTime, scrollSpeed);
 
         /// <summary>
         /// "Touch control scheme"
         /// </summary>
         public static LocalisableString TouchControlScheme => new TranslatableString(getKey(@"touch_control_scheme"), @"Touch control scheme");
+
+        /// <summary>
+        /// "Mobile layout"
+        /// </summary>
+        public static LocalisableString MobileLayout => new TranslatableString(getKey(@"mobile_layout"), @"Mobile layout");
+
+        /// <summary>
+        /// "Portrait (expanded columns)"
+        /// </summary>
+        public static LocalisableString PortraitExpandedColumns => new TranslatableString(getKey(@"portrait_expanded_columns"), @"Portrait (expanded columns)");
+
+        /// <summary>
+        /// "Landscape (expanded columns)"
+        /// </summary>
+        public static LocalisableString LandscapeExpandedColumns => new TranslatableString(getKey(@"landscape_expanded_columns"), @"Landscape (expanded columns)");
+
+        /// <summary>
+        /// "Landscape (touch overlay)"
+        /// </summary>
+        public static LocalisableString LandscapeTouchOverlay => new TranslatableString(getKey(@"landscape_touch_overlay"), @"Landscape (touch overlay)");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

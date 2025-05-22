@@ -9,7 +9,7 @@ using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Rulesets.Catch.Edit.Blueprints
 {
-    public partial class CatchPlacementBlueprint<THitObject> : HitObjectPlacementBlueprint
+    public abstract partial class CatchPlacementBlueprint<THitObject> : HitObjectPlacementBlueprint
         where THitObject : CatchHitObject, new()
     {
         protected new THitObject HitObject => (THitObject)base.HitObject;
@@ -19,7 +19,10 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
         [Resolved]
         private Playfield playfield { get; set; } = null!;
 
-        public CatchPlacementBlueprint()
+        [Resolved]
+        protected CatchHitObjectComposer? Composer { get; private set; }
+
+        protected CatchPlacementBlueprint()
             : base(new THitObject())
         {
         }

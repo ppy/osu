@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
@@ -18,9 +16,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         public bool GameplayPassed => player?.GameplayState.HasPassed == true;
 
         [Resolved]
-        private MultiplayerClient multiplayerClient { get; set; }
+        private MultiplayerClient multiplayerClient { get; set; } = null!;
 
-        private Player player;
+        [Resolved]
+        private OsuGame? game { get; set; }
+
+        private Player? player;
 
         public MultiplayerPlayerLoader(Func<Player> createPlayer)
             : base(createPlayer)
@@ -41,11 +42,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
             base.OnPlayerLoaded();
 
+            game?.Window?.Flash();
+
             multiplayerClient.ChangeState(MultiplayerUserState.Loaded)
                              .ContinueWith(task => failAndBail(task.Exception?.Message ?? "Server error"), TaskContinuationOptions.NotOnRanToCompletion);
         }
 
-        private void failAndBail(string message = null)
+        private void failAndBail(string? message = null)
         {
             if (!string.IsNullOrEmpty(message))
                 Logger.Log(message, LoggingTarget.Runtime, LogLevel.Important);

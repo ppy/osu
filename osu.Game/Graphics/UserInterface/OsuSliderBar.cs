@@ -18,6 +18,8 @@ namespace osu.Game.Graphics.UserInterface
     public abstract partial class OsuSliderBar<T> : SliderBar<T>, IHasTooltip
         where T : struct, INumber<T>, IMinMaxValue<T>
     {
+        public override bool AcceptsFocus => !Current.Disabled;
+
         public bool PlaySamplesOnAdjust { get; set; } = true;
 
         /// <summary>

@@ -301,7 +301,7 @@ namespace osu.Game.Screens.Select.Carousel
                     items.Add(new OsuMenuItem("Restore all hidden", MenuItemType.Standard, () => restoreHiddenRequested(beatmapSet)));
 
                 if (beatmapSet.GetOnlineURL(api, ruleset.Value) is string url)
-                    items.Add(new OsuMenuItem(CommonStrings.CopyLink, MenuItemType.Standard, () => game?.CopyUrlToClipboard(url)));
+                    items.Add(new OsuMenuItem(CommonStrings.CopyLink, MenuItemType.Standard, () => game?.CopyToClipboard(url)));
 
                 if (dialogOverlay != null)
                     items.Add(new OsuMenuItem("Delete...", MenuItemType.Destructive, () => dialogOverlay.Push(new BeatmapDeleteDialog(beatmapSet))));

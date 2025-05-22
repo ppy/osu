@@ -219,7 +219,7 @@ namespace osu.Game.Screens.Play
 
             float progress = (float)(gameplayClock.CurrentTime - displayTime) / (float)(fadeOutBeginTime - displayTime);
             float newWidth = 1 - Math.Clamp(progress, 0, 1);
-            remainingTimeBox.ResizeWidthTo(newWidth, timingPoint.BeatLength * 2, Easing.OutQuint);
+            remainingTimeBox.ResizeWidthTo(newWidth, timingPoint.BeatLength * 3.5, Easing.OutQuint);
         }
 
         public partial class FadeContainer : Container, IStateful<Visibility>

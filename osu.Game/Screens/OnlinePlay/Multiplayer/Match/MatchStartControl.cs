@@ -23,6 +23,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 {
     public partial class MatchStartControl : CompositeDrawable
     {
+        public required Bindable<PlaylistItem?> SelectedItem
+        {
+            get => selectedItem;
+            set => selectedItem.Current = value;
+        }
+
         [Resolved]
         private OngoingOperationTracker ongoingOperationTracker { get; set; } = null!;
 
@@ -32,9 +38,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         [Resolved]
         private MultiplayerClient client { get; set; } = null!;
 
-        [Resolved]
-        private IBindable<PlaylistItem?> currentItem { get; set; } = null!;
-
+        private readonly BindableWithCurrent<PlaylistItem?> selectedItem = new BindableWithCurrent<PlaylistItem?>();
         private readonly MultiplayerReadyButton readyButton;
         private readonly MultiplayerCountdownButton countdownButton;
 
@@ -94,7 +98,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         {
             base.LoadComplete();
 
-            currentItem.BindValueChanged(_ => updateState());
+            SelectedItem.BindValueChanged(_ => updateState());
             client.RoomUpdated += onRoomUpdated;
             client.LoadRequested += onLoadRequested;
             updateState();
@@ -210,7 +214,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
             readyButton.Enabled.Value = countdownButton.Enabled.Value =
                 client.Room.State != MultiplayerRoomState.Closed
-                && currentItem.Value?.ID == client.Room.Settings.PlaylistItemId
+                && SelectedItem.Value?.ID == client.Room.Settings.PlaylistItemId
                 && !client.Room.Playlist.Single(i => i.ID == client.Room.Settings.PlaylistItemId).Expired
                 && !operationInProgress.Value;
 
