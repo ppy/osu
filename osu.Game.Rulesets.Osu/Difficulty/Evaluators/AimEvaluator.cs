@@ -206,7 +206,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double rhythmPenalty = Math.Pow(Math.Min(osuCurrObj.StrainTime, osuLastObj.StrainTime) / Math.Max(osuCurrObj.StrainTime, osuLastObj.StrainTime), 2);
                 velocityChangeBonus *= rhythmPenalty;
 
-                var osuLast2Obj = (OsuDifficultyHitObject)current.Previous(2);
                 double prev1Distance = osuLast1Obj.LazyJumpDistance;
                 double prev2Distance = osuLast2Obj?.LazyJumpDistance ?? 0;
 

@@ -84,8 +84,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             }
 
             double velocityChangeBonus = CalculateFlowVelocityChangeBonus(current);
-
             flowDifficulty += angleBonus + velocityChangeBonus;
+
             flowDifficulty *= flowMultiplier;
 
             if (osuLast0Obj.BaseObject is Slider && withSliderTravelDistance)
@@ -94,7 +94,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 flowDifficulty += sliderBonus * AimEvaluator.SLIDER_MULTIPLIER;
             }
 
-            return flowDifficulty;
+            return flowDifficulty * osuCurrObj.SmallCircleBonus;
         }
 
         private static double getOverlapness(OsuDifficultyHitObject odho1, OsuDifficultyHitObject odho2)
