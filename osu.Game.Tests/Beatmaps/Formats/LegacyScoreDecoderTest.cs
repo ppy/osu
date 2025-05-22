@@ -155,10 +155,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             var scoreInfo = TestResources.CreateTestScoreInfo(ruleset);
             var beatmap = new TestBeatmap(ruleset)
             {
-                BeatmapInfo =
-                {
-                    BeatmapVersion = beatmapVersion
-                }
+                BeatmapVersion = beatmapVersion
             };
 
             var score = new Score
@@ -633,14 +630,14 @@ namespace osu.Game.Tests.Beatmaps.Formats
                     MD5Hash = md5Hash,
                     Ruleset = new OsuRuleset().RulesetInfo,
                     Difficulty = new BeatmapDifficulty(),
-                    BeatmapVersion = beatmapVersion,
                 },
-                // needs to have at least one objects so that `StandardisedScoreMigrationTools` doesn't die
+                // needs to have at least one object so that `StandardisedScoreMigrationTools` doesn't die
                 // when trying to recompute total score.
                 HitObjects =
                 {
                     new HitCircle()
-                }
+                },
+                BeatmapVersion = beatmapVersion,
             });
         }
     }

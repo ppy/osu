@@ -94,6 +94,8 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("release", () => InputManager.ReleaseButton(MouseButton.Left));
 
             AddAssert("new beatmap not persisted", () => beatmapManager.QueryBeatmapSet(s => s.ID == editorBeatmap.BeatmapInfo.BeatmapSet.AsNonNull().ID)?.Value.DeletePending == true);
+
+            AddUntilStep("wait for default beatmap", () => Editor.Beatmap.Value is DummyWorkingBeatmap);
         }
 
         [Test]
@@ -171,6 +173,8 @@ namespace osu.Game.Tests.Visual.Editing
                 return difficultyName != null && difficultyName != firstDifficultyName;
             });
 
+            ensureEditorLoaded();
+
             AddAssert("created difficulty has timing point", () =>
             {
                 var timingPoint = EditorBeatmap.ControlPointInfo.TimingPoints.Single();
@@ -203,12 +207,21 @@ namespace osu.Game.Tests.Visual.Editing
         [Test]
         public void TestCreateNewDifficultyWithScrollSpeed_SameRuleset()
         {
-            string firstDifficultyName = Guid.NewGuid().ToString();
+            string previousDifficultyName = null!;
 
+            AddStep("set unique difficulty name", () => EditorBeatmap.BeatmapInfo.DifficultyName = previousDifficultyName = Guid.NewGuid().ToString());
             AddStep("save beatmap", () => Editor.Save());
             AddStep("create new difficulty", () => Editor.CreateNewDifficulty(new ManiaRuleset().RulesetInfo));
 
-            AddStep("set unique difficulty name", () => EditorBeatmap.BeatmapInfo.DifficultyName = firstDifficultyName);
+            AddUntilStep("wait for created", () =>
+            {
+                string? difficultyName = Editor.ChildrenOfType<EditorBeatmap>().SingleOrDefault()?.BeatmapInfo.DifficultyName;
+                return difficultyName != null && difficultyName != previousDifficultyName;
+            });
+
+            ensureEditorLoaded();
+
+            AddStep("set unique difficulty name", () => EditorBeatmap.BeatmapInfo.DifficultyName = previousDifficultyName = Guid.NewGuid().ToString());
             AddStep("add timing point", () => EditorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = 1000 }));
             AddStep("add effect points", () =>
             {
@@ -229,8 +242,10 @@ namespace osu.Game.Tests.Visual.Editing
             AddUntilStep("wait for created", () =>
             {
                 string? difficultyName = Editor.ChildrenOfType<EditorBeatmap>().SingleOrDefault()?.BeatmapInfo.DifficultyName;
-                return difficultyName != null && difficultyName != firstDifficultyName;
+                return difficultyName != null && difficultyName != previousDifficultyName;
             });
+
+            ensureEditorLoaded();
 
             AddAssert("created difficulty has timing point", () =>
             {
@@ -279,6 +294,8 @@ namespace osu.Game.Tests.Visual.Editing
                 string? difficultyName = Editor.ChildrenOfType<EditorBeatmap>().SingleOrDefault()?.BeatmapInfo.DifficultyName;
                 return difficultyName != null && difficultyName != firstDifficultyName;
             });
+
+            ensureEditorLoaded();
 
             AddAssert("created difficulty has timing point", () =>
             {
@@ -360,6 +377,8 @@ namespace osu.Game.Tests.Visual.Editing
                 return difficultyName != null && difficultyName != originalDifficultyName;
             });
 
+            ensureEditorLoaded();
+
             AddAssert("created difficulty has copy suffix in name", () => EditorBeatmap.BeatmapInfo.DifficultyName == copyDifficultyName);
             AddAssert("created difficulty has timing point", () =>
             {
@@ -370,7 +389,9 @@ namespace osu.Game.Tests.Visual.Editing
             AddAssert("approach rate correctly copied", () => EditorBeatmap.Difficulty.ApproachRate == 4);
             AddAssert("combo colours correctly copied", () => EditorBeatmap.BeatmapSkin.AsNonNull().ComboColours.Count == 2);
 
+            ensureEditorLoaded();
             AddAssert("status is modified", () => EditorBeatmap.BeatmapInfo.Status == BeatmapOnlineStatus.LocallyModified);
+
             AddAssert("online ID not copied", () => EditorBeatmap.BeatmapInfo.OnlineID == -1);
 
             AddStep("save beatmap", () => Editor.Save());
@@ -433,6 +454,8 @@ namespace osu.Game.Tests.Visual.Editing
                 return difficultyName != null && difficultyName != originalDifficultyName;
             });
 
+            ensureEditorLoaded();
+
             AddStep("save without changes", () => Editor.Save());
 
             AddAssert("collection still points to old beatmap", () => !collection.BeatmapMD5Hashes.Contains(EditorBeatmap.BeatmapInfo.MD5Hash)
@@ -470,6 +493,9 @@ namespace osu.Game.Tests.Visual.Editing
                 string? difficultyName = Editor.ChildrenOfType<EditorBeatmap>().SingleOrDefault()?.BeatmapInfo.DifficultyName;
                 return difficultyName != null && difficultyName != "New Difficulty";
             });
+
+            ensureEditorLoaded();
+
             AddAssert("new difficulty has correct name", () => EditorBeatmap.BeatmapInfo.DifficultyName == "New Difficulty (1)");
             AddAssert("new difficulty persisted", () =>
             {
@@ -507,6 +533,8 @@ namespace osu.Game.Tests.Visual.Editing
                 return difficultyName != null && difficultyName != duplicate_difficulty_name;
             });
 
+            ensureEditorLoaded();
+
             AddStep("set difficulty name", () => EditorBeatmap.BeatmapInfo.DifficultyName = duplicate_difficulty_name);
             AddStep("try to save beatmap", () => Editor.Save());
             AddAssert("beatmap set not corrupted", () =>
@@ -533,6 +561,8 @@ namespace osu.Game.Tests.Visual.Editing
                 return set != null && set.PerformRead(s => s.Beatmaps.Count == 1 && s.Files.Count == 1);
             });
 
+            ensureEditorLoaded();
+
             AddStep("create new difficulty", () => Editor.CreateNewDifficulty(new CatchRuleset().RulesetInfo));
 
             AddUntilStep("wait for created", () =>
@@ -540,7 +570,8 @@ namespace osu.Game.Tests.Visual.Editing
                 string? difficultyName = Editor.ChildrenOfType<EditorBeatmap>().SingleOrDefault()?.BeatmapInfo.DifficultyName;
                 return difficultyName != null && difficultyName != duplicate_difficulty_name;
             });
-            AddUntilStep("wait for editor load", () => Editor.IsLoaded && DialogOverlay.IsLoaded);
+
+            ensureEditorLoaded();
 
             AddStep("add hitobjects", () => EditorBeatmap.AddRange(new[]
             {
@@ -577,6 +608,9 @@ namespace osu.Game.Tests.Visual.Editing
                 string? difficultyName = Editor.ChildrenOfType<EditorBeatmap>().SingleOrDefault()?.BeatmapInfo.DifficultyName;
                 return difficultyName != null && difficultyName == "New Difficulty";
             });
+
+            ensureEditorLoaded();
+
             AddAssert("new difficulty persisted", () =>
             {
                 var set = beatmapManager.QueryBeatmapSet(s => s.ID == setId);
@@ -603,6 +637,9 @@ namespace osu.Game.Tests.Visual.Editing
                 string? difficultyName = Editor.ChildrenOfType<EditorBeatmap>().SingleOrDefault()?.BeatmapInfo.DifficultyName;
                 return difficultyName != null && difficultyName == "New Difficulty (1)";
             });
+
+            ensureEditorLoaded();
+
             AddAssert("new difficulty persisted", () =>
             {
                 var set = beatmapManager.QueryBeatmapSet(s => s.ID == setId);
@@ -728,6 +765,8 @@ namespace osu.Game.Tests.Visual.Editing
             AddAssert("other audio not removed", () => Beatmap.Value.BeatmapSetInfo.Files.Any(f => f.Filename == "audio (1).mp3"));
         }
 
+        private void ensureEditorLoaded() => AddUntilStep("wait for editor load", () => Editor.IsLoaded && DialogOverlay.IsLoaded);
+
         private void createNewDifficulty()
         {
             string? currentDifficulty = null;
@@ -741,13 +780,14 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddUntilStep("wait for dialog", () => DialogOverlay.CurrentDialog is CreateNewDifficultyDialog);
             AddStep("confirm creation with no objects", () => DialogOverlay.CurrentDialog!.PerformOkAction());
+
             AddUntilStep("wait for created", () =>
             {
                 string? difficultyName = Editor.ChildrenOfType<EditorBeatmap>().SingleOrDefault()?.BeatmapInfo.DifficultyName;
                 return difficultyName != null && difficultyName != currentDifficulty;
             });
+            ensureEditorLoaded();
 
-            AddUntilStep("wait for editor load", () => Editor.IsLoaded);
             AddStep("enter setup mode", () => Editor.Mode.Value = EditorScreenMode.SongSetup);
             AddUntilStep("wait for load", () => Editor.ChildrenOfType<SetupScreen>().Any());
         }
@@ -758,7 +798,7 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep($"switch to difficulty #{index + 1}", () =>
                 Editor.SwitchToDifficulty(Beatmap.Value.BeatmapSetInfo.Beatmaps.ElementAt(index)));
 
-            AddUntilStep("wait for editor load", () => Editor.IsLoaded);
+            ensureEditorLoaded();
             AddStep("enter setup mode", () => Editor.Mode.Value = EditorScreenMode.SongSetup);
             AddUntilStep("wait for load", () => Editor.ChildrenOfType<SetupScreen>().Any());
         }

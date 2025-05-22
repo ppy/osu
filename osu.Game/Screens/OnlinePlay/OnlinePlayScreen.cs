@@ -11,7 +11,6 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Screens.Menu;
-using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Lounge;
 using osu.Game.Users;
 
@@ -36,9 +35,6 @@ namespace osu.Game.Screens.OnlinePlay
         private readonly ScreenStack screenStack = new OnlinePlaySubScreenStack { RelativeSizeAxes = Axes.Both };
         private OnlinePlayScreenWaveContainer waves = null!;
 
-        [Cached(Type = typeof(IRoomManager))]
-        protected RoomManager RoomManager { get; private set; }
-
         [Cached]
         private readonly OngoingOperationTracker ongoingOperationTracker = new OngoingOperationTracker();
 
@@ -51,8 +47,6 @@ namespace osu.Game.Screens.OnlinePlay
             Origin = Anchor.Centre;
             RelativeSizeAxes = Axes.Both;
             Padding = new MarginPadding { Horizontal = -HORIZONTAL_OVERFLOW_PADDING };
-
-            RoomManager = CreateRoomManager();
         }
 
         private readonly IBindable<APIState> apiState = new Bindable<APIState>();
@@ -67,7 +61,6 @@ namespace osu.Game.Screens.OnlinePlay
                 {
                     screenStack,
                     new Header(ScreenTitle, screenStack),
-                    RoomManager,
                     ongoingOperationTracker,
                 }
             };
@@ -165,8 +158,6 @@ namespace osu.Game.Screens.OnlinePlay
                 subScreen.Exit();
             }
 
-            RoomManager.PartRoom();
-
             waves.Hide();
 
             this.Delay(WaveContainer.DISAPPEAR_DURATION).FadeOut();
@@ -223,8 +214,6 @@ namespace osu.Game.Screens.OnlinePlay
         }
 
         protected abstract string ScreenTitle { get; }
-
-        protected virtual RoomManager CreateRoomManager() => new RoomManager();
 
         protected abstract LoungeSubScreen CreateLounge();
 
