@@ -180,7 +180,21 @@ namespace osu.Game.Tournament.Components
                 return;
             }
 
-            var newChoice = currentMatch.Value.PicksBans.FirstOrDefault(p => p.BeatmapID == Beatmap?.OnlineID);
+            // protected?
+            var protectedChoice = currentMatch.Value.PicksBans.FirstOrDefault(p => p.BeatmapID == Beatmap?.OnlineID && p.Type == ChoiceType.Protect);
+
+            if (protectedChoice != null)
+            {
+                protectIndicator.FadeIn();
+                protectIndicator.Colour = TournamentGame.GetTeamColour(protectedChoice.Team);
+            }
+            else
+            {
+                protectIndicator.Alpha = 0;
+                protectIndicator.Colour = Color4.White;
+            }
+
+            var newChoice = currentMatch.Value.PicksBans.LastOrDefault(p => p.BeatmapID == Beatmap?.OnlineID && p.Type != ChoiceType.Protect);
 
             bool shouldFlash = newChoice != choice;
 
@@ -189,29 +203,20 @@ namespace osu.Game.Tournament.Components
                 if (shouldFlash)
                     flash.FadeOutFromOne(500).Loop(0, 10);
 
-                if (newChoice.Type == ChoiceType.Protect)
+                borderBox.BorderThickness = 6;
+                borderBox.BorderColour = TournamentGame.GetTeamColour(newChoice.Team);
+
+                switch (newChoice.Type)
                 {
-                    protectIndicator.FadeIn();
-                    protectIndicator.Colour = TournamentGame.GetTeamColour(newChoice.Team);
-                }
-                else
-                {
-                    borderBox.BorderThickness = 6;
+                    case ChoiceType.Pick:
+                        borderBox.Colour = Color4.White;
+                        borderBox.Alpha = 1;
+                        break;
 
-                    borderBox.BorderColour = TournamentGame.GetTeamColour(newChoice.Team);
-
-                    switch (newChoice.Type)
-                    {
-                        case ChoiceType.Pick:
-                            borderBox.Colour = Color4.White;
-                            borderBox.Alpha = 1;
-                            break;
-
-                        case ChoiceType.Ban:
-                            borderBox.Colour = Color4.Gray;
-                            borderBox.Alpha = 0.5f;
-                            break;
-                    }
+                    case ChoiceType.Ban:
+                        borderBox.Colour = Color4.Gray;
+                        borderBox.Alpha = 0.5f;
+                        break;
                 }
             }
             else
@@ -219,9 +224,6 @@ namespace osu.Game.Tournament.Components
                 borderBox.Colour = Color4.White;
                 borderBox.BorderThickness = 0;
                 borderBox.Alpha = 1;
-
-                protectIndicator.Alpha = 0;
-                protectIndicator.Colour = Color4.White;
             }
 
             choice = newChoice;
