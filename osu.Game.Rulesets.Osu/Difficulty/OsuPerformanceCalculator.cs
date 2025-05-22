@@ -276,8 +276,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (!usingClassicSliderAccuracy || usingScoreV2)
                 amountHitObjectsWithAccuracy += attributes.SliderCount;
 
+            double sliderErrors = 0;
+            if (!usingClassicSliderAccuracy)
+                sliderErrors = countSliderEndsDropped + countSliderTickMiss;
+
             if (amountHitObjectsWithAccuracy > 0)
-                betterAccuracyPercentage = ((countGreat - Math.Max(totalHits - amountHitObjectsWithAccuracy, 0)) * 6 + (countOk + countMiss) * 2 + countMeh) / (double)(amountHitObjectsWithAccuracy * 6);
+                betterAccuracyPercentage = ((countGreat - Math.Max(totalHits - amountHitObjectsWithAccuracy - sliderErrors, 0)) * 6 + (countOk + countMiss + sliderErrors) * 2 + countMeh) / (double)(amountHitObjectsWithAccuracy * 6);
             else
                 betterAccuracyPercentage = 0;
 
