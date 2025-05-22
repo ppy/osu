@@ -209,11 +209,24 @@ namespace osu.Game.Tournament.Screens.MapPool
                     addForBeatmap(map.Beatmap.OnlineID);
                 else
                 {
-                    var existing = CurrentMatch.Value?.PicksBans.FirstOrDefault(p => p.BeatmapID == map.Beatmap?.OnlineID);
+                    // try to remove pick first
+                    var existing = CurrentMatch.Value?.PicksBans.FirstOrDefault(p => p.BeatmapID == map.Beatmap?.OnlineID && p.Type == ChoiceType.Pick);
 
                     if (existing != null)
                     {
                         CurrentMatch.Value?.PicksBans.Remove(existing);
+                        setNextMode();
+                    }
+
+                    // remove map protect if no pick was removed
+                    if (existing == null)
+                    {
+                        var existingProtect = CurrentMatch.Value?.PicksBans.FirstOrDefault(p => p.BeatmapID == map.Beatmap?.OnlineID && p.Type == ChoiceType.Protect);
+
+                        if (existingProtect == null)
+                            return true;
+
+                        CurrentMatch.Value?.PicksBans.Remove(existingProtect);
                         setNextMode();
                     }
                 }
