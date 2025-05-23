@@ -188,10 +188,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             ratingMultiplier *= 1.0 + approachRateFactor * approachRateLengthBonus; // Buff for longer maps with high AR.
 
-            if (mods.Any(m => m is OsuModHidden || m is OsuModTraceable))
+            if (mods.Any(m => m is OsuModHidden))
             {
                 double highArNerf = calculateAimHiddenHighArNerf(approachRate, relevantMechanicalDifficulty);
-                ratingMultiplier *= 1.0 + calculateReadingModBonus(mods, approachRate, highArNerf);
+                ratingMultiplier *= 1.0 + CalculateReadingModBonus(mods, approachRate, highArNerf);
             }
 
             // It is important to consider accuracy difficulty when scaling with accuracy.
@@ -231,10 +231,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             ratingMultiplier *= 1.0 + approachRateFactor * approachRateLengthBonus; // Buff for longer maps with high AR.
 
-            if (mods.Any(m => m is OsuModHidden || m is OsuModTraceable))
+            if (mods.Any(m => m is OsuModHidden))
             {
                 double highArNerf = calculateSpeedHiddenHighArNerf(approachRate, relevantMechanicalDifficulty);
-                ratingMultiplier *= 1.0 + calculateReadingModBonus(mods, approachRate, highArNerf);
+                ratingMultiplier *= 1.0 + CalculateReadingModBonus(mods, approachRate, highArNerf);
             }
 
             ratingMultiplier *= 0.95 + Math.Pow(Math.Max(0, overallDifficulty), 2) / 750;
@@ -300,7 +300,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return Math.Clamp((high_ar_nerf_end_point - approachRate) / (high_ar_nerf_end_point - highArNerfStartingPoint), 0, 1);
         }
 
-        private static double calculateReadingModBonus(Mod[] mods, double approachRate, double highArNerf)
+        public static double CalculateReadingModBonus(Mod[] mods, double approachRate, double highArNerf)
         {
             bool isFullyHidden = mods.OfType<OsuModHidden>().Any(m => !m.OnlyFadeApproachCircles.Value);
 
