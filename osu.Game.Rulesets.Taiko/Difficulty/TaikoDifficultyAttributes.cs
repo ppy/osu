@@ -11,13 +11,22 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
     public class TaikoDifficultyAttributes : DifficultyAttributes
     {
         /// <summary>
+        /// The difficulty corresponding to the mechanical skills in osu!taiko.
+        /// This includes colour and stamina combined.
+        /// </summary>
+        [JsonProperty("mechanical_difficulty")]
+        public double MechanicalDifficulty { get; set; }
+
+        /// <summary>
         /// The difficulty corresponding to the rhythm skill.
         /// </summary>
+        [JsonProperty("rhythm_difficulty")]
         public double RhythmDifficulty { get; set; }
 
         /// <summary>
         /// The difficulty corresponding to the reading skill.
         /// </summary>
+        [JsonProperty("reading_difficulty")]
         public double ReadingDifficulty { get; set; }
 
         /// <summary>
@@ -36,9 +45,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         [JsonProperty("mono_stamina_factor")]
         public double MonoStaminaFactor { get; set; }
 
-        public double RhythmTopStrains { get; set; }
-
-        public double ColourTopStrains { get; set; }
+        /// <summary>
+        /// The factor corresponding to the consistency of a map.
+        /// </summary>
+        [JsonProperty("consistency_factor")]
+        public double ConsistencyFactor { get; set; }
 
         public double StaminaTopStrains { get; set; }
 
@@ -48,7 +59,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 yield return v;
 
             yield return (ATTRIB_ID_DIFFICULTY, StarRating);
+            yield return (ATTRIB_ID_MECHANICAL_DIFFICULTY, MechanicalDifficulty);
+            yield return (ATTRIB_ID_RHYTHM_DIFFICULTY, RhythmDifficulty);
+            yield return (ATTRIB_ID_READING_DIFFICULTY, ReadingDifficulty);
             yield return (ATTRIB_ID_MONO_STAMINA_FACTOR, MonoStaminaFactor);
+            yield return (ATTRIB_ID_CONSISTENCY_FACTOR, ConsistencyFactor);
         }
 
         public override void FromDatabaseAttributes(IReadOnlyDictionary<int, double> values, IBeatmapOnlineInfo onlineInfo)
@@ -56,7 +71,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             base.FromDatabaseAttributes(values, onlineInfo);
 
             StarRating = values[ATTRIB_ID_DIFFICULTY];
+            MechanicalDifficulty = values[ATTRIB_ID_MECHANICAL_DIFFICULTY];
+            RhythmDifficulty = values[ATTRIB_ID_RHYTHM_DIFFICULTY];
+            ReadingDifficulty = values[ATTRIB_ID_READING_DIFFICULTY];
             MonoStaminaFactor = values[ATTRIB_ID_MONO_STAMINA_FACTOR];
+            ConsistencyFactor = values[ATTRIB_ID_CONSISTENCY_FACTOR];
         }
     }
 }
