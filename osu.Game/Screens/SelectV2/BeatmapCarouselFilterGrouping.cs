@@ -176,19 +176,19 @@ namespace osu.Game.Screens.SelectV2
                     }, items);
 
                 case GroupMode.Collections:
-                    // todo: unsupported.
+                    // TODO: needs implementation
                     goto case GroupMode.NoGrouping;
 
                 case GroupMode.Favourites:
-                    // todo: unsupported.
+                    // TODO: needs implementation
                     goto case GroupMode.NoGrouping;
 
                 case GroupMode.MyMaps:
-                    // todo: unsupported.
+                    // TODO: needs implementation
                     goto case GroupMode.NoGrouping;
 
                 case GroupMode.RankAchieved:
-                    // todo: unsupported.
+                    // TODO: needs implementation
                     goto case GroupMode.NoGrouping;
 
                 default:
