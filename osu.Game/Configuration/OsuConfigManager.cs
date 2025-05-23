@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Drawing;
 using osu.Framework;
 using osu.Framework.Bindables;
 using osu.Framework.Configuration;
@@ -129,6 +130,9 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.CursorRotation, true);
 
             SetDefault(OsuSetting.MenuParallax, true);
+
+            SetDefault(OsuSetting.VirtualResolution, new Size(1366, 768));
+
 
             // See https://stackoverflow.com/a/63307411 for default sourcing.
             SetDefault(OsuSetting.Prefer24HourTime, !CultureInfoHelper.SystemCulture.DateTimeFormat.ShortTimePattern.Contains(@"tt"));
@@ -380,6 +384,7 @@ namespace osu.Game.Configuration
         MenuTips,
         CursorRotation,
         MenuParallax,
+        VirtualResolution,
         Prefer24HourTime,
         BeatmapDetailTab,
         BeatmapDetailModsFilter,
