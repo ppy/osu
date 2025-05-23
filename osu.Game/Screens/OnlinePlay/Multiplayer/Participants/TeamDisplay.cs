@@ -5,11 +5,13 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.Multiplayer;
@@ -19,9 +21,15 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 {
-    internal partial class TeamDisplay : CompositeDrawable
+    internal partial class TeamDisplay : CompositeDrawable, IHasCurrentValue<MultiplayerRoomUser>
     {
-        private readonly MultiplayerRoomUser user;
+        public Bindable<MultiplayerRoomUser> Current
+        {
+            get => current.Current;
+            set => current.Current = value;
+        }
+
+        private readonly BindableWithCurrent<MultiplayerRoomUser> current = new BindableWithCurrent<MultiplayerRoomUser>(new MultiplayerRoomUser(-1));
 
         [Resolved]
         private OsuColour colours { get; set; } = null!;
@@ -33,10 +41,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
         private Drawable box = null!;
         private Sample? sampleTeamSwap;
 
-        public TeamDisplay(MultiplayerRoomUser user)
+        public TeamDisplay()
         {
-            this.user = user;
-
             RelativeSizeAxes = Axes.Y;
             AutoSizeAxes = Axes.X;
             Margin = new MarginPadding { Horizontal = 3 };
@@ -69,12 +75,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                 }
             };
 
-            if (client.LocalUser?.Equals(user) == true)
-            {
-                clickableContent.Action = changeTeam;
-                clickableContent.TooltipText = "Change team";
-            }
-
             sampleTeamSwap = audio.Samples.Get(@"Multiplayer/team-swap");
         }
 
@@ -83,7 +83,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
             base.LoadComplete();
 
             client.RoomUpdated += onRoomUpdated;
-            updateState();
+            current.BindValueChanged(_ => updateUser(), true);
         }
 
         private void changeTeam()
@@ -96,12 +96,28 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 
         public int? DisplayedTeam { get; private set; }
 
+        private void updateUser()
+        {
+            var user = current.Value;
+
+            if (client.LocalUser?.Equals(user) == true)
+            {
+                clickableContent.Action = changeTeam;
+                clickableContent.TooltipText = "Change team";
+            }
+
+            // reset to ensure samples don't play
+            DisplayedTeam = null;
+            updateState();
+        }
+
         private void onRoomUpdated() => Scheduler.AddOnce(updateState);
 
         private void updateState()
         {
             // we don't have a way of knowing when an individual user's state has updated, so just handle on RoomUpdated for now.
 
+            var user = current.Value;
             var userRoomState = client.Room?.Users.FirstOrDefault(u => u.Equals(user))?.MatchState;
 
             const double duration = 400;

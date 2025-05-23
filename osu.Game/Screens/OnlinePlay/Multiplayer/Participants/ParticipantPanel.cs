@@ -61,7 +61,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 
         private SpriteIcon crown = null!;
 
-        private Container teamDisplayContainer = null!;
         private UserCoverBackground userCover = null!;
         private UpdateableAvatar userAvatar = null!;
         private OsuSpriteText username = null!;
@@ -107,9 +106,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                             Colour = Color4Extensions.FromHex("#F7E65D"),
                             Alpha = 0
                         },
-                        teamDisplayContainer = new Container
+                        new TeamDisplay
                         {
-                            AutoSizeAxes = Axes.Both,
+                            Current = { BindTarget = Current },
                         },
                         new Container
                         {
@@ -243,7 +242,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
         private void updateUser()
         {
             userCover.User = current.Value.User;
-            teamDisplayContainer.Child = new TeamDisplay(current.Value);
             userAvatar.User = current.Value.User;
             teamFlagContainer.Child = new UpdateableTeamFlag(current.Value.User?.Team)
             {
