@@ -823,6 +823,9 @@ namespace osu.Game.Graphics.Carousel
 
             public void SetLayoutHeight(float height) => Panels.Height = height;
 
+            /// <summary>
+            /// Allow handling right click scroll outside of the carousel's display area.
+            /// </summary>
             public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
             public CarouselScrollContainer()
