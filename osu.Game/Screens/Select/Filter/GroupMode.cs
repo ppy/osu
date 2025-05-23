@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.ComponentModel;
 
 namespace osu.Game.Screens.Select.Filter
@@ -49,8 +48,5 @@ namespace osu.Game.Screens.Select.Filter
 
         [Description("Title")]
         Title,
-
-        [Obsolete($"Use {nameof(NoGrouping)} instead.")] // todo: can be removed after 20251201
-        All,
     }
 }

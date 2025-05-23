@@ -126,9 +126,6 @@ namespace osu.Game.Screens.SelectV2
         {
             switch (criteria.Group)
             {
-#pragma warning disable CS0618 // Type or member is obsolete
-                case GroupMode.All:
-#pragma warning restore CS0618 // Type or member is obsolete
                 case GroupMode.NoGrouping:
                     return new List<GroupMapping> { new GroupMapping(null, items) };
 
