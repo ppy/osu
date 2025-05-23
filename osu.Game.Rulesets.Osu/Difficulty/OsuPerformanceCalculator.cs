@@ -213,7 +213,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 aimValue *= 1.0 + OsuDifficultyCalculator.CalculateReadingModBonus(score.Mods, approachRate, 1.0);
             }
 
-
             aimValue *= accuracy;
 
             return aimValue;

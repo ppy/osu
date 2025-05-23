@@ -149,9 +149,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return attributes;
         }
 
-        private double calculateStarRating(double basePerformance, double multiplier) => basePerformance > 0.00001
-                ? Math.Cbrt(multiplier) * star_rating_multiplier * (Math.Cbrt(100000 / Math.Pow(2, 1 / 1.1) * basePerformance) + 4)
-                : 0;
+        private double calculateStarRating(double basePerformance, double multiplier)
+        {
+            if (basePerformance <= 0.00001)
+                return 0;
+
+            return Math.Cbrt(multiplier) * star_rating_multiplier * (Math.Cbrt(100000 / Math.Pow(2, 1 / 1.1) * basePerformance) + 4);
+        }
 
         private double computeAimRating(double aimDifficultyValue, Mod[] mods, int totalHits, double approachRate, double overallDifficulty, double relevantMechanicalDifficulty)
         {
