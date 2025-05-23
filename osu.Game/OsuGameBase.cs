@@ -437,20 +437,21 @@ namespace osu.Game
 
         private void addFilesWarning()
         {
-            var realmStore = new RealmFileStore(realm, Storage);
-
             const string filename = "IMPORTANT READ ME.txt";
 
-            if (!realmStore.Storage.Exists(filename))
+            if (!Storage.Exists(filename))
             {
-                using (var stream = realmStore.Storage.CreateFileSafely(filename))
+                using (var stream = Storage.CreateFileSafely(filename))
                 using (var textWriter = new StreamWriter(stream))
                 {
-                    textWriter.WriteLine(@"This folder contains all your user files (beatmaps, skins, replays etc.)");
-                    textWriter.WriteLine(@"Please do not touch or delete this folder!!");
+                    textWriter.WriteLine(@"This folder contains all your user files and configuration.");
+                    textWriter.WriteLine(@"Please DO NOT make manual changes to this folder.");
                     textWriter.WriteLine();
-                    textWriter.WriteLine(@"If you are really looking to completely delete user data, please delete");
-                    textWriter.WriteLine(@"the parent folder including all other files and directories");
+                    textWriter.WriteLine(@"- If you want to back up your game files, please back up THE ENTIRETY OF THIS DIRECTORY.");
+                    textWriter.WriteLine(@"- If you want to delete all of your game files, please delete THE ENTIRETY OF THIS DIRECTORY.");
+                    textWriter.WriteLine();
+                    textWriter.WriteLine(@"To be very clear, the ""files/"" directory inside this directory stores all the raw pieces of your beatmaps, skins, and replays.");
+                    textWriter.WriteLine(@"Importantly, it is NOT the only directory you need a backup of to avoid losing data. If you copy only the ""files/"" directory, YOU WILL LOSE DATA.");
                     textWriter.WriteLine();
                     textWriter.WriteLine(@"For more information on how these files are organised,");
                     textWriter.WriteLine(@"see https://github.com/ppy/osu/wiki/User-file-storage");

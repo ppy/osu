@@ -133,6 +133,7 @@ namespace osu.Game.Online.Leaderboards
                                         return s;
                                     })
                                     .ToArray(),
+                            response.ScoresCount,
                             response.UserScore?.CreateScoreInfo(rulesets, newCriteria.Beatmap)
                         );
                         inFlightOnlineRequest = null;
@@ -181,7 +182,8 @@ namespace osu.Game.Online.Leaderboards
 
             newScores = newScores.Detach().OrderByTotalScore();
 
-            scores.Value = LeaderboardScores.Success(newScores.ToArray(), null);
+            var newScoresArray = newScores.ToArray();
+            scores.Value = LeaderboardScores.Success(newScoresArray, newScoresArray.Length, null);
         }
     }
 
@@ -195,6 +197,7 @@ namespace osu.Game.Online.Leaderboards
     public record LeaderboardScores
     {
         public ICollection<ScoreInfo> TopScores { get; }
+        public int TotalScores { get; }
         public ScoreInfo? UserScore { get; }
         public LeaderboardFailState? FailState { get; }
 
@@ -210,15 +213,16 @@ namespace osu.Game.Online.Leaderboards
             }
         }
 
-        private LeaderboardScores(ICollection<ScoreInfo> topScores, ScoreInfo? userScore, LeaderboardFailState? failState)
+        private LeaderboardScores(ICollection<ScoreInfo> topScores, int totalScores, ScoreInfo? userScore, LeaderboardFailState? failState)
         {
             TopScores = topScores;
+            TotalScores = totalScores;
             UserScore = userScore;
             FailState = failState;
         }
 
-        public static LeaderboardScores Success(ICollection<ScoreInfo> topScores, ScoreInfo? userScore) => new LeaderboardScores(topScores, userScore, null);
-        public static LeaderboardScores Failure(LeaderboardFailState failState) => new LeaderboardScores([], null, failState);
+        public static LeaderboardScores Success(ICollection<ScoreInfo> topScores, int totalScores, ScoreInfo? userScore) => new LeaderboardScores(topScores, totalScores, userScore, null);
+        public static LeaderboardScores Failure(LeaderboardFailState failState) => new LeaderboardScores([], 0, null, failState);
     }
 
     public enum LeaderboardFailState
