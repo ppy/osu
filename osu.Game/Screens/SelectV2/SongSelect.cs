@@ -487,6 +487,12 @@ namespace osu.Game.Screens.SelectV2
 
         public void Delete(BeatmapSetInfo beatmapSet) => dialogOverlay?.Push(new BeatmapDeleteDialog(beatmapSet));
 
+        public void RestoreAllHidden(BeatmapSetInfo beatmapSet)
+        {
+            foreach (var b in beatmapSet.Beatmaps)
+                beatmaps.Restore(b);
+        }
+
         #endregion
     }
 }

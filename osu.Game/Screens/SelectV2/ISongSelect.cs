@@ -19,6 +19,11 @@ namespace osu.Game.Screens.SelectV2
         void Delete(BeatmapSetInfo beatmapBeatmapSetInfo);
 
         /// <summary>
+        /// Immediately restores any hidden beatmaps in the provided beatmap set.
+        /// </summary>
+        void RestoreAllHidden(BeatmapSetInfo beatmapSet);
+
+        /// <summary>
         /// Opens the manage collections dialog.
         /// </summary>
         void ManageCollections();
