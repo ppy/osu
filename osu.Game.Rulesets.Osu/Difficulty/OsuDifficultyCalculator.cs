@@ -49,22 +49,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             var aim = skills.OfType<Aim>().Single(a => a.IncludeSliders);
             var aimWithoutSliders = skills.OfType<Aim>().Single(a => !a.IncludeSliders);
-            var speed = skills.OfType<Speed>().Single();
             var flashlight = skills.OfType<Flashlight>().SingleOrDefault();
 
             var speed = skills.OfType<Speed>().Single(s => !s.WithoutStamina);
-            double speedRating = Math.Sqrt(speed.DifficultyValue()) * difficulty_multiplier;
+            var speedWithoutStamina = skills.OfType<Speed>().Single(s => s.WithoutStamina);
             double speedNotes = speed.RelevantNoteCount();
 
-            var speedWithoutStamina = skills.OfType<Speed>().Single(s => s.WithoutStamina);
-            double speedRatingNoStamina = Math.Sqrt(speedWithoutStamina.DifficultyValue()) * difficulty_multiplier;
-            double staminaFactor = speedRating > 0 ? speedRatingNoStamina / speedRating : 1;
-
-            var stamina = skills.OfType<Stamina>().Single();
-            double staminaRating = Math.Sqrt(stamina.DifficultyValue()) * difficulty_multiplier;
-
-            var flashlight = skills.OfType<Flashlight>().SingleOrDefault();
-            double flashlightRating = flashlight == null ? 0.0 : Math.Sqrt(flashlight.DifficultyValue()) * difficulty_multiplier;
+            var stamina = skills.OfType<Stamina>().Single(); // TODO: remove
 
             double aimDifficultStrainCount = aim.CountTopWeightedStrains();
             double speedDifficultStrainCount = speed.CountTopWeightedStrains();
@@ -100,6 +91,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double aimRating = computeAimRating(aim.DifficultyValue(), mods, totalHits, approachRate, overallDifficulty);
             double aimRatingNoSliders = computeAimRating(aimWithoutSliders.DifficultyValue(), mods, totalHits, approachRate, overallDifficulty);
             double speedRating = computeSpeedRating(speed.DifficultyValue(), mods, totalHits, approachRate, overallDifficulty);
+
+            double speedRatingNoStamina = computeSpeedRating(speedWithoutStamina.DifficultyValue(), mods, totalHits, approachRate, overallDifficulty);
+            double staminaRating = computeSpeedRating(stamina.DifficultyValue(), mods, totalHits, approachRate, overallDifficulty);
+            double staminaFactor = speedRating > 0 ? speedRatingNoStamina / speedRating : 1;
 
             double flashlightRating = 0.0;
 

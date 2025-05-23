@@ -66,9 +66,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             currentBurstStrain += SpeedEvaluator.EvaluateDifficultyOf(current, Mods) * burstMultiplier;
 
             if (WithoutStamina)
-                return currentBurstStrain * currentRhythm;
+            {
+                double totalStrain = currentBurstStrain * currentRhythm;
 
-            return totalStrain;
+                if (current.BaseObject is Slider)
+                    sliderStrains.Add(totalStrain);
+
+                return totalStrain;
+            }
 
             double staminaValue = StaminaEvaluator.EvaluateDifficultyOf(current);
 
