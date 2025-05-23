@@ -291,15 +291,15 @@ namespace osu.Game.Screens.SelectV2
         private GroupDefinition defineGroupByStars(double stars)
         {
             int starInt = (int)Math.Round(stars, 2);
-            var groupData = new StarDifficulty(starInt, 0);
+            var starDifficulty = new StarDifficulty(starInt, 0);
 
             if (starInt == 0)
-                return new GroupDefinition(0, "Below 1 Star", groupData);
+                return new StarDifficultyGroupDefinition(0, "Below 1 Star", starDifficulty);
 
             if (starInt == 1)
-                return new GroupDefinition(1, "1 Star", groupData);
+                return new StarDifficultyGroupDefinition(1, "1 Star", starDifficulty);
 
-            return new GroupDefinition(starInt, $"{starInt} Stars", groupData);
+            return new StarDifficultyGroupDefinition(starInt, $"{starInt} Stars", starDifficulty);
         }
 
         private GroupDefinition defineGroupByLength(double length)
