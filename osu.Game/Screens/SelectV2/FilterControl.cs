@@ -162,9 +162,7 @@ namespace osu.Game.Screens.SelectV2
                                     groupDropdown = new ShearedDropdown<GroupMode>("Group by")
                                     {
                                         RelativeSizeAxes = Axes.X,
-#pragma warning disable CS0618 // Type or member is obsolete
-                                        Items = Enum.GetValues<GroupMode>().Where(m => m != GroupMode.All),
-#pragma warning restore CS0618 // Type or member is obsolete
+                                        Items = Enum.GetValues<GroupMode>(),
                                     },
                                     Empty(),
                                     collectionDropdown = new CollectionDropdown
@@ -187,7 +185,7 @@ namespace osu.Game.Screens.SelectV2
             difficultyRangeSlider.UpperBound = config.GetBindable<double>(OsuSetting.DisplayStarsMaximum);
             config.BindWith(OsuSetting.ShowConvertedBeatmaps, showConvertedBeatmapsButton.Active);
             config.BindWith(OsuSetting.SongSelectSortingMode, sortDropdown.Current);
-            config.BindWith(OsuSetting.SongSelectGroupingMode, groupDropdown.Current);
+            config.BindWith(OsuSetting.SongSelectGroupMode, groupDropdown.Current);
 
             ruleset.BindValueChanged(_ => updateCriteria());
             mods.BindValueChanged(m =>
