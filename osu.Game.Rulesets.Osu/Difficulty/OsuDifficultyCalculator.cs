@@ -314,7 +314,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // Nerf HD on High AR depending on Star Rating
             bonus *= highArNerf;
 
-            // For AR up to 0 fully hidden notes - reduce reward for extra low AR on not fully hidden
+            // For AR up to 0 - reduce reward for extra low AR on not fully hidden
             if (approachRate < 5) bonus += (isFullyHidden ? 0.04 : 0.03) * (5.0 - Math.Max(approachRate, 0));
 
             // Starting from AR0 - cap values so they won't grow to infinity
