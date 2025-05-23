@@ -9,12 +9,12 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Tournament.Models;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Components
@@ -31,7 +31,8 @@ namespace osu.Game.Tournament.Components
 
         private Box flash = null!;
         private Container borderBox = null!;
-        private SpriteIcon protectIndicator = null!;
+        private TournamentProtectIcon protectIcon = null!;
+        private FillFlowContainer rightFlow = null!;
 
         public TournamentBeatmapPanel(IBeatmapInfo? beatmap, string mod = "")
         {
@@ -126,26 +127,47 @@ namespace osu.Game.Tournament.Components
                             Alpha = 0,
                         },
                     }
-                },
-                protectIndicator = new SpriteIcon
+                }
+            });
+
+            AddInternal(rightFlow = new FillFlowContainer
+            {
+                Anchor = Anchor.CentreRight,
+                Origin = Anchor.CentreRight,
+                Margin = new MarginPadding(10),
+                // Width = 60,
+                RelativeSizeAxes = Axes.Y,
+                Direction = FillDirection.Horizontal,
+                Children = new Drawable[]
                 {
-                    Icon = FontAwesome.Solid.Lock,
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft,
-                    Width = 14,
-                    X = -6,
-                    Alpha = 0,
-                    // X = -24,
-                    // Y = 30,
-                    // Rotation = 40,
-                    RelativeSizeAxes = Axes.Y,
-                    // Margin = new MarginPadding { Right = 20, Vertical = 20 }
+                    protectIcon = new TournamentProtectIcon
+                    {
+                        Anchor = Anchor.CentreRight,
+                        Origin = Anchor.CentreRight,
+                        Width = 60,
+                        Scale = new Vector2(0.5f),
+                        // X = -6,
+                        Alpha = 1,
+                        // X = -24,
+                        // Y = 30,
+                        // Rotation = 40,
+                        RelativeSizeAxes = Axes.Y,
+                        // TeamColour = TeamColour.Red
+                    }
                 }
             });
 
             if (!string.IsNullOrEmpty(mod))
             {
-                AddInternal(new TournamentModIcon(mod)
+                // AddInternal(new TournamentModIcon(mod)
+                // {
+                //     Anchor = Anchor.CentreRight,
+                //     Origin = Anchor.CentreRight,
+                //     Margin = new MarginPadding(10),
+                //     Width = 60,
+                //     RelativeSizeAxes = Axes.Y,
+                // });
+                rightFlow.Insert(-1, new TournamentModIcon(mod)
                 {
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
@@ -184,15 +206,9 @@ namespace osu.Game.Tournament.Components
             var protectedChoice = currentMatch.Value.PicksBans.FirstOrDefault(p => p.BeatmapID == Beatmap?.OnlineID && p.Type == ChoiceType.Protect);
 
             if (protectedChoice != null)
-            {
-                protectIndicator.FadeIn();
-                protectIndicator.Colour = TournamentGame.GetTeamColour(protectedChoice.Team);
-            }
+                protectIcon.TeamColour = protectedChoice.Team;
             else
-            {
-                protectIndicator.Alpha = 0;
-                protectIndicator.Colour = Color4.White;
-            }
+                protectIcon.TeamColour = null;
 
             var newChoice = currentMatch.Value.PicksBans.LastOrDefault(p => p.BeatmapID == Beatmap?.OnlineID && p.Type != ChoiceType.Protect);
 
