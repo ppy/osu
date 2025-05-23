@@ -210,7 +210,7 @@ namespace osu.Game.Tournament.Screens.MapPool
                 else
                 {
                     // try to remove pick first
-                    var existing = CurrentMatch.Value?.PicksBans.FirstOrDefault(p => p.BeatmapID == map.Beatmap?.OnlineID && p.Type == ChoiceType.Pick);
+                    var existing = CurrentMatch.Value?.PicksBans.FirstOrDefault(p => p.BeatmapID == map.Beatmap?.OnlineID && p.Type is ChoiceType.Pick or ChoiceType.Ban);
 
                     if (existing != null)
                     {
