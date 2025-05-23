@@ -312,7 +312,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                     Username = @"waaiiru",
                     CountryCode = CountryCode.ES,
                 },
-            });
+                Date = DateTimeOffset.Now,
+            }, 1234567);
         }
 
         private void showPersonalBest()
@@ -332,8 +333,9 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                     Id = 6602580,
                     Username = @"waaiiru",
                     CountryCode = CountryCode.ES,
-                }
-            });
+                },
+                Date = DateTimeOffset.Now,
+            }, 1234567);
         }
 
         private void setScope(BeatmapLeaderboardScope scope)
@@ -364,7 +366,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         private partial class TestBeatmapLeaderboardWedge : BeatmapLeaderboardWedge
         {
             public new void SetState(LeaderboardState state) => base.SetState(state);
-            public new void SetScores(IEnumerable<ScoreInfo> scores, ScoreInfo? userScore = null) => base.SetScores(scores, userScore);
+            public new void SetScores(IEnumerable<ScoreInfo> scores, ScoreInfo? userScore = null, int? totalCount = null) => base.SetScores(scores, userScore, totalCount);
         }
     }
 }

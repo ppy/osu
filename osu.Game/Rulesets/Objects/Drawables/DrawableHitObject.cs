@@ -781,7 +781,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// Creates the <see cref="JudgementResult"/> that represents the scoring result for this <see cref="DrawableHitObject"/>.
         /// </summary>
         /// <param name="judgement">The <see cref="Judgement"/> that provides the scoring information.</param>
-        protected virtual JudgementResult CreateResult(Judgement judgement) => new JudgementResult(HitObject, judgement);
+        protected internal virtual JudgementResult CreateResult(Judgement judgement) => new JudgementResult(HitObject, judgement);
 
         private void ensureEntryHasResult()
         {
