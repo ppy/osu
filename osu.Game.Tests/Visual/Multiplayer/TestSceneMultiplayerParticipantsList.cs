@@ -230,7 +230,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestManyUsers()
         {
-            const int users_count = 20;
+            const int users_count = 200;
 
             AddStep("add many users", () =>
             {
@@ -276,6 +276,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddRepeatStep("switch hosts", () => MultiplayerClient.TransferHost(RNG.Next(0, users_count)), 10);
             AddStep("give host back", () => MultiplayerClient.TransferHost(API.LocalUser.Value.Id));
+
+            AddRepeatStep("perform many random state changes at once", () =>
+            {
+                for (int i = 0; i < users_count; ++i)
+                {
+                    MultiplayerClient.ChangeUserBeatmapAvailability(i, BeatmapAvailability.LocallyAvailable());
+                    MultiplayerClient.ChangeUserState(i, RNG.NextBool() ? MultiplayerUserState.Idle : MultiplayerUserState.Ready);
+                }
+            }, 100);
         }
 
         [Test]
