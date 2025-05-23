@@ -50,7 +50,7 @@ namespace osu.Game.Screens.Select.Filter
         [Description("Title")]
         Title,
 
-        [Obsolete($"Use {nameof(NoGrouping)} instead.")] // todo: remove in 20251018
+        [Obsolete($"Use {nameof(NoGrouping)} instead.")] // todo: can be removed after 20251201
         All,
     }
 }
