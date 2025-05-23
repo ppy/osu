@@ -35,9 +35,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         // Increasing this multiplier buffs versatile aim+flow maps
         public static double AimVersatilityBonus = 0.08;
 
-        // Increasing this multiplier nerfs mixed aim+speed map (but not snapaim + flowaim!)
-        public static double MechanicsAdditionPortion => 0.13;
-
         public static double CalculateDifficultyMultiplier(Mod[] mods, int totalHits, int spinnerCount)
         {
             double multiplier = performance_base_multiplier;
@@ -112,16 +109,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double baseSpeedPerformance = OsuStrainSkill.DifficultyToPerformance(speedRating);
             double baseFlashlightPerformance = Flashlight.DifficultyToPerformance(flashlightRating);
 
-            // Adjust aim and speed summation to nerf mixed maps
-            if (baseAimPerformance > baseSpeedPerformance)
-                baseSpeedPerformance += (baseAimPerformance - baseSpeedPerformance) * MechanicsAdditionPortion;
-            else
-                baseAimPerformance += (baseSpeedPerformance - baseAimPerformance) * MechanicsAdditionPortion;
-
             double basePerformance =
                 Math.Pow(
-                    Math.Pow(baseAimPerformance, 1.1) +
-                    Math.Pow(baseSpeedPerformance, 1.1) +
+                    Math.Pow(SumMechanicalDifficulty(baseAimPerformance, baseSpeedPerformance), 1.1) +
                     Math.Pow(baseFlashlightPerformance, 1.1), 1.0 / 1.1
                 );
 
@@ -164,6 +154,39 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             };
 
             return attributes;
+        }
+
+        // Arbitrary constants that work well
+        public static double SumMechanicalDifficulty(double aim, double speed)
+        {
+            const double base_multiplier = 1.093;
+            const double addition_portion = 0.6;
+            const double power = 7.7;
+
+            double difficulty =
+                Math.Pow(
+                    Math.Pow(aim + addition_portion * speed, power) +
+                    Math.Pow(speed + addition_portion * aim, power), 1.0 / power
+                );
+
+            return difficulty * base_multiplier;
+        }
+
+        public static double SumMechanicalDifficulty2(double aim, double speed)
+        {
+            const double base_multiplier = 0.87;
+            const double addition_portion = 0.149425;
+            const double power = 1.1;
+
+            double max = Math.Max(aim, speed);
+
+            double difficulty =
+                Math.Pow(
+                    Math.Pow(aim + addition_portion * max, power) +
+                    Math.Pow(speed + addition_portion * max, power), 1.0 / power
+                );
+
+            return difficulty * base_multiplier;
         }
 
         private double computeTotalAimRating(double aimDifficultyValue, double snapAimDifficultyValue, double flowAimDifficultyValue, Mod[] mods, int totalHits, double approachRate, double overallDifficulty)

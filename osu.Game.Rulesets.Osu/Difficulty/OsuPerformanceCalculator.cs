@@ -141,16 +141,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double accuracyValue = computeAccuracyValue(score, osuAttributes);
             double flashlightValue = computeFlashlightValue(score, osuAttributes);
 
-            // Adjust aim and speed summation to nerf mixed maps
-            if (aimValue > speedValue)
-                speedValue += (aimValue - speedValue) * OsuDifficultyCalculator.MechanicsAdditionPortion;
-            else
-                aimValue += (speedValue - aimValue) * OsuDifficultyCalculator.MechanicsAdditionPortion;
-
             double totalValue =
                 Math.Pow(
-                    Math.Pow(aimValue, 1.1) +
-                    Math.Pow(speedValue, 1.1) +
+                    Math.Pow(OsuDifficultyCalculator.SumMechanicalDifficulty2(aimValue, speedValue), 1.1) +
                     Math.Pow(accuracyValue, 1.1) +
                     Math.Pow(flashlightValue, 1.1), 1.0 / 1.1
                 ) * multiplier;
