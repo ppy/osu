@@ -49,5 +49,59 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
             },
             PassCondition = () => Player.ScoreProcessor.Combo.Value == 2
         });
+
+        [Test]
+        public void TestRewind()
+        {
+            bool seekedBack = false;
+            bool missRecorded = false;
+
+            CreateModTest(new ModTestData
+            {
+                Mod = new OsuModStrictTracking(),
+                Autoplay = false,
+                CreateBeatmap = () => new Beatmap
+                {
+                    HitObjects = new List<HitObject>
+                    {
+                        new Slider
+                        {
+                            StartTime = 1000,
+                            Path = new SliderPath
+                            {
+                                ControlPoints =
+                                {
+                                    new PathControlPoint(),
+                                    new PathControlPoint(new Vector2(0, 100))
+                                }
+                            }
+                        }
+                    }
+                },
+                ReplayFrames = new List<ReplayFrame>
+                {
+                    new OsuReplayFrame(0, new Vector2(100, 0)),
+                    new OsuReplayFrame(1000, new Vector2(100, 0)),
+                    new OsuReplayFrame(1050, new Vector2()),
+                    new OsuReplayFrame(1100, new Vector2(), OsuAction.LeftButton),
+                    new OsuReplayFrame(1750, new Vector2(0, 100), OsuAction.LeftButton),
+                    new OsuReplayFrame(1751, new Vector2(0, 100)),
+                },
+                PassCondition = () => seekedBack && !missRecorded,
+            });
+            AddStep("subscribe to new judgements", () => Player.ScoreProcessor.NewJudgement += j =>
+            {
+                if (!j.IsHit)
+                    missRecorded = true;
+            });
+            AddUntilStep("wait for gameplay completion", () => Player.GameplayState.HasCompleted);
+            AddAssert("no misses", () => missRecorded, () => Is.False);
+            AddStep("seek back", () =>
+            {
+                Player.GameplayClockContainer.Stop();
+                Player.Seek(1040);
+                seekedBack = true;
+            });
+        }
     }
 }

@@ -47,6 +47,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
 
+        public Func<IEnumerable<BeatmapInfo>, BeatmapInfo>? BeatmapRecommendationFunction { get; set; }
+
         private OsuTextFlowContainer stats = null!;
 
         private int beatmapCount;
@@ -69,6 +71,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         {
             AddStep("create components", () =>
             {
+                BeatmapRecommendationFunction = null;
                 NewItemsPresentedInvocationCount = 0;
 
                 Box topBox;
@@ -105,6 +108,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                                 Carousel = new TestBeatmapCarousel
                                 {
                                     NewItemsPresented = () => NewItemsPresentedInvocationCount++,
+                                    ChooseRecommendedBeatmap = beatmaps => BeatmapRecommendationFunction?.Invoke(beatmaps) ?? beatmaps.First(),
                                     BleedTop = 50,
                                     BleedBottom = 50,
                                     Anchor = Anchor.Centre,

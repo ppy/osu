@@ -75,6 +75,11 @@ namespace osu.Game.Rulesets.Judgements
         public int HighestComboAtJudgement { get; internal set; }
 
         /// <summary>
+        /// The highest combo achieved after this <see cref="JudgementResult"/> occurred.
+        /// </summary>
+        public int HighestComboAfterJudgement { get; internal set; }
+
+        /// <summary>
         /// The health prior to this <see cref="JudgementResult"/> occurring.
         /// </summary>
         public double HealthAtJudgement { get; internal set; }

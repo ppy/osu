@@ -254,7 +254,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         [CanBeNull]
         public SnapResult TrySnapToDistanceGrid(Vector2 screenSpacePosition, double? fixedTime = null)
         {
-            if (DistanceSnapProvider.DistanceSnapToggle.Value != TernaryState.True || distanceSnapGrid == null)
+            if (DistanceSnapProvider.DistanceSnapToggle.Value != TernaryState.True || distanceSnapGrid?.IsLoaded != true)
                 return null;
 
             var playfield = PlayfieldAtScreenSpacePosition(screenSpacePosition);

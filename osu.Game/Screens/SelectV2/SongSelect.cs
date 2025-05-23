@@ -90,6 +90,9 @@ namespace osu.Game.Screens.SelectV2
         [Resolved]
         private ManageCollectionsDialog? collectionsDialog { get; set; }
 
+        [Resolved]
+        private DifficultyRecommender? difficultyRecommender { get; set; }
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -162,6 +165,7 @@ namespace osu.Game.Screens.SelectV2
                                                             BleedTop = FilterControl.HEIGHT_FROM_SCREEN_TOP + 5,
                                                             BleedBottom = ScreenFooter.HEIGHT + 5,
                                                             RequestPresentBeatmap = _ => OnStart(),
+                                                            ChooseRecommendedBeatmap = getRecommendedBeatmap,
                                                             NewItemsPresented = newItemsPresented,
                                                             RelativeSizeAxes = Axes.Both,
                                                         },
@@ -228,6 +232,13 @@ namespace osu.Game.Screens.SelectV2
             detailsArea.Height = wedgesContainer.DrawHeight - titleWedge.LayoutSize.Y - 4;
         }
 
+        #region Selection handling
+
+        private BeatmapInfo getRecommendedBeatmap(IEnumerable<BeatmapInfo> beatmaps)
+            => difficultyRecommender?.GetRecommendedBeatmap(beatmaps) ?? beatmaps.First();
+
+        #endregion
+
         #region Transitions
 
         public override void OnEntering(ScreenTransitionEvent e)
@@ -240,6 +251,7 @@ namespace osu.Game.Screens.SelectV2
             detailsArea.Show();
             filterControl.Show();
 
+            modSelectOverlay.Beatmap.BindTo(Beatmap);
             modSelectOverlay.SelectedMods.BindTo(Mods);
         }
 
@@ -255,6 +267,8 @@ namespace osu.Game.Screens.SelectV2
             detailsArea.Show();
             filterControl.Show();
 
+            modSelectOverlay.Beatmap.BindTo(Beatmap);
+
             // required due to https://github.com/ppy/osu-framework/issues/3218
             modSelectOverlay.SelectedMods.Disabled = false;
             modSelectOverlay.SelectedMods.BindTo(Mods);
@@ -265,6 +279,7 @@ namespace osu.Game.Screens.SelectV2
             this.FadeOut(fade_duration, Easing.OutQuint);
 
             modSelectOverlay.SelectedMods.UnbindFrom(Mods);
+            modSelectOverlay.Beatmap.UnbindFrom(Beatmap);
 
             titleWedge.Hide();
             detailsArea.Hide();
@@ -342,7 +357,6 @@ namespace osu.Game.Screens.SelectV2
             filterDebounce?.Cancel();
             filterDebounce = Scheduler.AddDelayed(() =>
             {
-                noResultsPlaceholder.Filter = criteria;
                 carousel.Filter(criteria);
             }, filter_delay);
         }
@@ -351,7 +365,13 @@ namespace osu.Game.Screens.SelectV2
         {
             int count = carousel.MatchedBeatmapsCount;
 
-            noResultsPlaceholder.State.Value = count == 0 ? Visibility.Visible : Visibility.Hidden;
+            if (count == 0)
+            {
+                noResultsPlaceholder.Show();
+                noResultsPlaceholder.Filter = carousel.Criteria;
+            }
+            else
+                noResultsPlaceholder.Hide();
 
             // Intentionally not localised until we have proper support for this (see https://github.com/ppy/osu-framework/pull/4918
             // but also in this case we want support for formatting a number within a string).

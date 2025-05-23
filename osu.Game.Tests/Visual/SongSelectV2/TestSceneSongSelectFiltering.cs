@@ -246,6 +246,28 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             checkMatchedBeatmaps(0);
         }
 
+        [Test]
+        public void TestHideBeatmap()
+        {
+            LoadSongSelect();
+            ImportBeatmapForRuleset(0);
+
+            checkMatchedBeatmaps(3);
+
+            // song select should automatically select the beatmap for us but this is not implemented yet.
+            // todo: remove when that's the case.
+            AddAssert("no beatmap selected", () => Beatmap.IsDefault);
+            AddStep("select beatmap", () => Beatmap.Value = Beatmaps.GetWorkingBeatmap(Beatmaps.GetAllUsableBeatmapSets().Single().Beatmaps.First()));
+
+            AddStep("hide", () => Beatmaps.Hide(Beatmap.Value.BeatmapInfo));
+
+            checkMatchedBeatmaps(2);
+
+            AddStep("restore", () => Beatmaps.Restore(Beatmap.Value.BeatmapInfo));
+
+            checkMatchedBeatmaps(3);
+        }
+
         private NoResultsPlaceholder? getPlaceholder() => SongSelect.ChildrenOfType<NoResultsPlaceholder>().FirstOrDefault();
 
         private void checkMatchedBeatmaps(int expected) => AddUntilStep($"{expected} matching shown", () => Carousel.MatchedBeatmapsCount, () => Is.EqualTo(expected));

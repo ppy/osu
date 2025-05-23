@@ -20,6 +20,7 @@ namespace osu.Game.Tests.Visual.Beatmaps
     public partial class TestSceneBeatmapSetOnlineStatusPill : ThemeComparisonTestScene
     {
         private bool showUnknownStatus;
+        private bool animated = true;
 
         protected override Drawable CreateContent() => new FillFlowContainer
         {
@@ -37,10 +38,11 @@ namespace osu.Game.Tests.Visual.Beatmaps
                     new BeatmapSetOnlineStatusPill
                     {
                         ShowUnknownStatus = showUnknownStatus,
+                        Animated = animated,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Status = status
-                    }
+                    },
                 }
             })
         };
@@ -61,6 +63,12 @@ namespace osu.Game.Tests.Visual.Beatmaps
             AddStep("toggle show unknown", () =>
             {
                 showUnknownStatus = !showUnknownStatus;
+                CreateThemedContent(OverlayColourScheme.Red);
+            });
+
+            AddStep("toggle animate", () =>
+            {
+                animated = !animated;
                 CreateThemedContent(OverlayColourScheme.Red);
             });
 

@@ -26,6 +26,11 @@ namespace osu.Game.Screens.SelectV2
     {
         public Action<BeatmapInfo>? RequestPresentBeatmap { private get; init; }
 
+        /// <summary>
+        /// From the provided beatmaps, return the most appropriate one for the user's skill.
+        /// </summary>
+        public Func<IEnumerable<BeatmapInfo>, BeatmapInfo>? ChooseRecommendedBeatmap { private get; init; }
+
         public const float SPACING = 3f;
 
         private IBindableList<BeatmapSetInfo> detachedBeatmaps = null!;
@@ -181,8 +186,13 @@ namespace osu.Game.Screens.SelectV2
                     return;
 
                 case BeatmapSetInfo setInfo:
-                    // Selecting a set isn't valid – let's re-select the first difficulty.
-                    CurrentSelection = setInfo.Beatmaps.First();
+                    // Selecting a set isn't valid – let's re-select the first visible difficulty.
+                    if (grouping.SetItems.TryGetValue(setInfo, out var items))
+                    {
+                        var beatmaps = items.Select(i => i.Model).OfType<BeatmapInfo>();
+                        CurrentSelection = ChooseRecommendedBeatmap?.Invoke(beatmaps) ?? beatmaps.First();
+                    }
+
                     return;
 
                 case BeatmapInfo beatmapInfo:

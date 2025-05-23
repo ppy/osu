@@ -158,13 +158,15 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 return;
             }
 
-            float relativePosition = (float)(position.Value.Value - 1) / scores.Count;
+            float relativePosition = Math.Clamp((float)(position.Value.Value - 1) / Math.Max(scores.Count - 1, 1), 0, 1);
 
             positionText.Current.Value = position.Value.Value;
             positionText.FadeTo(min_alpha + (max_alpha - min_alpha) * (1 - relativePosition), 1000, Easing.OutPow10);
 
             localPlayerMarker.FadeIn();
-            localPlayerMarker.MoveToX(marker_size / 2 + Math.Min(relativePosition * (width - marker_size / 2), width - marker_size / 2), 1000, Easing.OutPow10);
+            float markerWidth = Math.Max(marker_size, width / scores.Count);
+            localPlayerMarker.ResizeWidthTo(markerWidth, 1000, Easing.OutPow10);
+            localPlayerMarker.MoveToX(markerWidth / 2 + (width - markerWidth) * relativePosition, 1000, Easing.OutPow10);
         }
 
         private partial class PositionCounter : RollingCounter<int>
