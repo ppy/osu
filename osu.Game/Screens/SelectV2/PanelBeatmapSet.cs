@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -17,7 +18,10 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Carousel;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
+using osu.Game.Online.API;
 using osu.Game.Overlays;
+using osu.Game.Rulesets;
 using osuTK;
 
 namespace osu.Game.Screens.SelectV2
@@ -45,7 +49,16 @@ namespace osu.Game.Screens.SelectV2
         private BeatmapManager beatmaps { get; set; } = null!;
 
         [Resolved]
-        private SongSelect? songSelect { get; set; }
+        private ISongSelect? songSelect { get; set; }
+
+        [Resolved]
+        private OsuGame? game { get; set; }
+
+        [Resolved]
+        private IAPIProvider api { get; set; } = null!;
+
+        [Resolved]
+        private IBindable<RulesetInfo> ruleset { get; set; } = null!;
 
         public PanelBeatmapSet()
         {
@@ -191,6 +204,12 @@ namespace osu.Game.Screens.SelectV2
                     items.Add(new OsuMenuItem("Expand", MenuItemType.Highlighted, () => TriggerClick()));
                     items.Add(new OsuMenuItemSpacer());
                 }
+
+                if (beatmapSet.Beatmaps.Any(b => b.Hidden))
+                    items.Add(new OsuMenuItem("Restore all hidden", MenuItemType.Standard, () => songSelect?.RestoreAllHidden(beatmapSet)));
+
+                if (beatmapSet.GetOnlineURL(api, ruleset.Value) is string url)
+                    items.Add(new OsuMenuItem(CommonStrings.CopyLink, MenuItemType.Standard, () => game?.CopyToClipboard(url)));
 
                 if (beatmapSet.OnlineID > 0)
                     items.Add(new OsuMenuItem("Details...", MenuItemType.Standard, () => beatmapOverlay?.FetchAndShowBeatmapSet(beatmapSet.OnlineID)));
