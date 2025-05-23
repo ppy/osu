@@ -89,7 +89,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             if (Link == null) return;
 
-            game?.CopyUrlToClipboard(Link);
+            game?.CopyToClipboard(Link);
         }
     }
 }

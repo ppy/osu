@@ -21,7 +21,7 @@ namespace osu.Android
         [Cached]
         private readonly OsuGameActivity gameActivity;
 
-        protected override Vector2 ScalingContainerTargetDrawSize => new Vector2(1024, 1024 * DrawHeight / DrawWidth);
+        public override Vector2 ScalingContainerTargetDrawSize => new Vector2(1024, 1024 * DrawHeight / DrawWidth);
 
         public OsuGameAndroid(OsuGameActivity activity)
             : base(null)

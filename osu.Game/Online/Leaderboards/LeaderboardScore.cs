@@ -190,7 +190,7 @@ namespace osu.Game.Online.Leaderboards
                                                     RelativeSizeAxes = Axes.Y,
                                                     Direction = FillDirection.Horizontal,
                                                     Spacing = new Vector2(5f, 0f),
-                                                    Width = 114f,
+                                                    Width = 130f,
                                                     Masking = true,
                                                     Children = new Drawable[]
                                                     {
@@ -271,6 +271,7 @@ namespace osu.Game.Online.Leaderboards
                                             Anchor = Anchor.CentreRight,
                                             Origin = Anchor.CentreRight,
                                             AutoSizeAxes = Axes.Both,
+                                            Spacing = new Vector2(-10, 0),
                                             Direction = FillDirection.Horizontal,
                                             ChildrenEnumerable = Score.Mods.AsOrdered().Select(mod => new ModIcon(mod) { Scale = new Vector2(0.34f) })
                                         },
@@ -394,7 +395,7 @@ namespace osu.Game.Online.Leaderboards
                             Origin = Anchor.CentreLeft,
                             Text = statistic.Value,
                             Spacing = new Vector2(-1, 0),
-                            Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold, fixedWidth: true)
+                            Font = OsuFont.GetFont(size: 16, weight: FontWeight.Bold, fixedWidth: true)
                         },
                     },
                 };
@@ -425,7 +426,7 @@ namespace osu.Game.Online.Leaderboards
             public DateLabel(DateTimeOffset date)
                 : base(date)
             {
-                Font = OsuFont.GetFont(size: 13, weight: FontWeight.Bold, italics: true);
+                Font = OsuFont.GetFont(size: 16, weight: FontWeight.Bold);
             }
 
             protected override string Format() => Date.ToShortRelativeTime(TimeSpan.FromSeconds(30));
@@ -451,8 +452,11 @@ namespace osu.Game.Online.Leaderboards
             {
                 List<MenuItem> items = new List<MenuItem>();
 
-                if (Score.Mods.Length > 0 && songSelect != null)
-                    items.Add(new OsuMenuItem("Use these mods", MenuItemType.Highlighted, () => songSelect.Mods.Value = Score.Mods));
+                // system mods should never be copied across regardless of anything.
+                var copyableMods = Score.Mods.Where(m => m.Type != ModType.System).ToArray();
+
+                if (copyableMods.Length > 0 && songSelect != null)
+                    items.Add(new OsuMenuItem("Use these mods", MenuItemType.Highlighted, () => songSelect.Mods.Value = copyableMods));
 
                 if (Score.OnlineID > 0)
                     items.Add(new OsuMenuItem(CommonStrings.CopyLink, MenuItemType.Standard, () => clipboard?.SetText($@"{api.Endpoints.WebsiteUrl}/scores/{Score.OnlineID}")));

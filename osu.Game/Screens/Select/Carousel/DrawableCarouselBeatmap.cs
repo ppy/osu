@@ -301,7 +301,7 @@ namespace osu.Game.Screens.Select.Carousel
                 items.Add(new OsuMenuItem("Collections") { Items = collectionItems });
 
                 if (beatmapInfo.GetOnlineURL(api, ruleset.Value) is string url)
-                    items.Add(new OsuMenuItem(CommonStrings.CopyLink, MenuItemType.Standard, () => game?.CopyUrlToClipboard(url)));
+                    items.Add(new OsuMenuItem(CommonStrings.CopyLink, MenuItemType.Standard, () => game?.CopyToClipboard(url)));
 
                 if (manager != null)
                     items.Add(new OsuMenuItem("Mark as played", MenuItemType.Standard, () => manager.MarkPlayed(beatmapInfo)));
