@@ -163,13 +163,17 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 CoverUrl = TestResources.COVER_IMAGE_3,
             }));
 
-            AddUntilStep("first user crown visible", () => this.ChildrenOfType<ParticipantPanel>().ElementAt(0).ChildrenOfType<SpriteIcon>().First().Alpha == 1);
-            AddUntilStep("second user crown hidden", () => this.ChildrenOfType<ParticipantPanel>().ElementAt(1).ChildrenOfType<SpriteIcon>().First().Alpha == 0);
+            AddUntilStep("first user crown visible",
+                () => this.ChildrenOfType<ParticipantPanel>().Single(p => p.Current.Value.UserID == 1001).ChildrenOfType<SpriteIcon>().First().Alpha == 1);
+            AddUntilStep("second user crown hidden",
+                () => this.ChildrenOfType<ParticipantPanel>().Single(p => p.Current.Value.UserID == 3).ChildrenOfType<SpriteIcon>().First().Alpha == 0);
 
             AddStep("make second user host", () => MultiplayerClient.TransferHost(3));
 
-            AddUntilStep("first user crown hidden", () => this.ChildrenOfType<ParticipantPanel>().ElementAt(0).ChildrenOfType<SpriteIcon>().First().Alpha == 0);
-            AddUntilStep("second user crown visible", () => this.ChildrenOfType<ParticipantPanel>().ElementAt(1).ChildrenOfType<SpriteIcon>().First().Alpha == 1);
+            AddUntilStep("first user crown visible",
+                () => this.ChildrenOfType<ParticipantPanel>().Single(p => p.Current.Value.UserID == 1001).ChildrenOfType<SpriteIcon>().First().Alpha == 0);
+            AddUntilStep("second user crown hidden",
+                () => this.ChildrenOfType<ParticipantPanel>().Single(p => p.Current.Value.UserID == 3).ChildrenOfType<SpriteIcon>().First().Alpha == 1);
         }
 
         [Test]
@@ -185,9 +189,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("make second user host", () => MultiplayerClient.TransferHost(3));
             AddAssert("second user above first", () =>
             {
-                var first = this.ChildrenOfType<ParticipantPanel>().ElementAt(0);
-                var second = this.ChildrenOfType<ParticipantPanel>().ElementAt(1);
-                return second.Y < first.Y;
+                var first = this.ChildrenOfType<ParticipantPanel>().Single(u => u.Current.Value.UserID == 1001);
+                var second = this.ChildrenOfType<ParticipantPanel>().Single(u => u.Current.Value.UserID == 3);
+                return second.ScreenSpaceDrawQuad.TopLeft.Y < first.ScreenSpaceDrawQuad.TopLeft.Y;
             });
         }
 
