@@ -41,7 +41,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestAddUser()
         {
-            AddAssert("one unique panel", () => this.ChildrenOfType<ParticipantPanel>().Select(p => p.User).Distinct().Count() == 1);
+            AddAssert("one unique panel", () => this.ChildrenOfType<ParticipantPanel>().Select(p => p.Current.Value).Distinct().Count() == 1);
 
             AddStep("add user", () => MultiplayerClient.AddUser(new APIUser
             {
@@ -50,20 +50,20 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 CoverUrl = TestResources.COVER_IMAGE_3,
             }));
 
-            AddAssert("two unique panels", () => this.ChildrenOfType<ParticipantPanel>().Select(p => p.User).Distinct().Count() == 2);
+            AddAssert("two unique panels", () => this.ChildrenOfType<ParticipantPanel>().Select(p => p.Current.Value).Distinct().Count() == 2);
         }
 
         [Test]
         public void TestAddUnresolvedUser()
         {
-            AddAssert("one unique panel", () => this.ChildrenOfType<ParticipantPanel>().Select(p => p.User).Distinct().Count() == 1);
+            AddAssert("one unique panel", () => this.ChildrenOfType<ParticipantPanel>().Select(p => p.Current.Value).Distinct().Count() == 1);
 
             AddStep("add non-resolvable user", () => MultiplayerClient.TestAddUnresolvedUser());
             AddUntilStep("null user added", () => MultiplayerClient.ClientRoom.AsNonNull().Users.Count(u => u.User == null) == 1);
 
-            AddUntilStep("two unique panels", () => this.ChildrenOfType<ParticipantPanel>().Select(p => p.User).Distinct().Count() == 2);
+            AddUntilStep("two unique panels", () => this.ChildrenOfType<ParticipantPanel>().Select(p => p.Current.Value).Distinct().Count() == 2);
 
-            AddStep("kick null user", () => this.ChildrenOfType<ParticipantPanel>().Single(p => p.User.User == null)
+            AddStep("kick null user", () => this.ChildrenOfType<ParticipantPanel>().Single(p => p.Current.Value.User == null)
                                                 .ChildrenOfType<ParticipantPanel.KickButton>().Single().TriggerClick());
 
             AddUntilStep("null user kicked", () => MultiplayerClient.ClientRoom.AsNonNull().Users.Count == 1);
@@ -86,7 +86,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("remove host", () => MultiplayerClient.RemoveUser(API.LocalUser.Value));
 
-            AddAssert("single panel is for second user", () => this.ChildrenOfType<ParticipantPanel>().Single().User.UserID == secondUser?.Id);
+            AddAssert("single panel is for second user", () => this.ChildrenOfType<ParticipantPanel>().Single().Current.Value.UserID == secondUser?.Id);
         }
 
         [Test]
@@ -122,7 +122,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddRepeatStep("increment progress", () =>
             {
-                float progress = this.ChildrenOfType<ParticipantPanel>().Single().User.BeatmapAvailability.DownloadProgress ?? 0;
+                float progress = this.ChildrenOfType<ParticipantPanel>().Single().Current.Value.BeatmapAvailability.DownloadProgress ?? 0;
                 MultiplayerClient.ChangeBeatmapAvailability(BeatmapAvailability.Downloading(progress + RNG.NextSingle(0.1f)));
             }, 25);
 
