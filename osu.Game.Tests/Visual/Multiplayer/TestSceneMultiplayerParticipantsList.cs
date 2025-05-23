@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using NUnit.Framework;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
@@ -15,6 +16,7 @@ using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Catch.Mods;
 using osu.Game.Rulesets.Mods;
@@ -24,6 +26,7 @@ using osu.Game.Screens.OnlinePlay.Multiplayer.Participants;
 using osu.Game.Tests.Resources;
 using osu.Game.Users;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
@@ -445,6 +448,35 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 MultiplayerClient.ChangeUserMods(0,
                     [new APIMod(new CatchModFloatingFruits()), new APIMod(new CatchModHidden()), new APIMod(new CatchModMirror())]);
             });
+        }
+
+        [Test]
+        public void TestTeams()
+        {
+            AddStep("enable teams", () => MultiplayerClient.ChangeSettings(matchType: MatchType.TeamVersus));
+            AddAssert("one unique panel", () => this.ChildrenOfType<ParticipantPanel>().Select(p => p.Current.Value).Distinct().Count() == 1);
+
+            int id = 3;
+            AddRepeatStep("add users", () => MultiplayerClient.AddUser(new APIUser
+            {
+                Id = Interlocked.Increment(ref id),
+                Username = "Second",
+                CoverUrl = TestResources.COVER_IMAGE_3,
+            }), 5);
+
+            AddAssert("two unique panels", () => this.ChildrenOfType<ParticipantPanel>().Select(p => p.Current.Value).Distinct().Count() == 6);
+
+            AddAssert("user 1001 on red team",
+                () => (MultiplayerClient.ClientRoom!.Users.Single(u => u.UserID == 1001).MatchState as TeamVersusUserState)?.TeamID,
+                () => Is.EqualTo(0));
+            AddStep("click first team indicator", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<TeamDisplay>().First());
+                InputManager.Click(MouseButton.Left);
+            });
+            AddAssert("user 1001 on blue team",
+                () => (MultiplayerClient.ClientRoom!.Users.Single(u => u.UserID == 1001).MatchState as TeamVersusUserState)?.TeamID,
+                () => Is.EqualTo(1));
         }
 
         private void createNewParticipantsList()
