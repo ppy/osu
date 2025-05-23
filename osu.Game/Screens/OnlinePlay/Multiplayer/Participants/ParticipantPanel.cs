@@ -237,6 +237,16 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 
             if (client.IsNotNull())
                 client.RoomUpdated -= onRoomUpdated;
+
+            // this is a safety measure.
+            // `MultiplayerRoomUser` has equality members overridden to compare by `UserID` only.
+            // `MultiplayerClient` only delivers updates of fields values to specific object references.
+            // if this operation is not done here, in a scenario wherein a user quits and rejoins a room,
+            // it is possible for a single poolable panel to be freed and then used for the same user with the same ID,
+            // which at bindable level will lead to `current` not changing (because of the overridden equality member),
+            // which will lead to this instance not showing any updates for the user in question
+            // because it's associated with an object reference that `MultiplayerClient` is no longer updating.
+            current.SetDefault();
         }
 
         private void updateUser()
