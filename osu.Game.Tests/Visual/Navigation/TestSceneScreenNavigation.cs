@@ -1333,6 +1333,35 @@ namespace osu.Game.Tests.Visual.Navigation
             AddAssert("still nothing selected", () => Game.Beatmap.IsDefault);
         }
 
+        [Test]
+        public void TestPresentBeatmapWithDifficultyRange()
+        {
+            BeatmapSetInfo beatmap = null;
+
+            Screens.Select.SongSelect songSelect = null;
+            PushAndConfirm(() => songSelect = new TestPlaySongSelect());
+            AddUntilStep("wait for song select", () => songSelect.BeatmapSetsLoaded);
+
+            AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
+            AddUntilStep("wait for selected", () =>
+            {
+                beatmap = Game.Beatmap.Value?.BeatmapSetInfo;
+                return !Game.Beatmap.IsDefault;
+            });
+
+            AddStep("set difficulty range", () =>
+            {
+                Game.LocalConfig.GetBindable<double>(OsuSetting.DisplayStarsMinimum).Value = beatmap.MaxStarDifficulty;
+                Game.LocalConfig.GetBindable<double>(OsuSetting.DisplayStarsMaximum).Value = beatmap.MaxStarDifficulty + 0.1;
+            });
+            AddWaitStep("wait until sorted", 2);
+
+            AddStep("present beatmap", () => Game.PresentBeatmap(beatmap));
+
+            AddAssert("diffificuty in difficulty range selected", () => Game.Beatmap.Value.BeatmapInfo.StarRating >= Game.LocalConfig.Get<double>(OsuSetting.DisplayStarsMinimum)
+                                                                        && Game.Beatmap.Value.BeatmapInfo.StarRating < Game.LocalConfig.Get<double>(OsuSetting.DisplayStarsMaximum));
+        }
+
         private Func<Player> playToResults()
         {
             var player = playToCompletion();
