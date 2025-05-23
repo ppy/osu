@@ -490,8 +490,6 @@ namespace osu.Game.Screens.Edit
             Mode.Value = isNewBeatmap ? EditorScreenMode.SongSetup : EditorScreenMode.Compose;
             Mode.BindValueChanged(onModeChanged, true);
 
-            musicController.TrackChanged += onTrackChanged;
-
             MutationTracker.InProgress.BindValueChanged(_ =>
             {
                 foreach (var item in saveRelatedMenuItems)
@@ -503,6 +501,7 @@ namespace osu.Game.Screens.Edit
         {
             base.Dispose(isDisposing);
 
+            // redundant (should have happened via a `resetTrack()` call in `OnExiting()`), but done for safety
             musicController.TrackChanged -= onTrackChanged;
         }
 
@@ -845,14 +844,14 @@ namespace osu.Game.Screens.Edit
         {
             base.OnEntering(e);
             setUpBackground();
-            resetTrack(true);
+            setUpTrack(seekToStart: true);
         }
 
         public override void OnResuming(ScreenTransitionEvent e)
         {
             base.OnResuming(e);
             setUpBackground();
-            clock.BindAdjustments();
+            setUpTrack();
         }
 
         private void setUpBackground()
@@ -899,8 +898,9 @@ namespace osu.Game.Screens.Edit
                     beatmap.EditorTimestamp = clock.CurrentTime;
             });
 
+            // `resetTrack()` MUST happen before `refetchBeatmap()`, because along other things, `refetchBeatmap()` causes a global working beatmap change,
+            // which would cause `EditorClock` to reload the track and automatically reapply adjustments to it if not preceded by `resetTrack()`.
             resetTrack();
-
             refetchBeatmap();
 
             return base.OnExiting(e);
@@ -909,12 +909,11 @@ namespace osu.Game.Screens.Edit
         public override void OnSuspending(ScreenTransitionEvent e)
         {
             base.OnSuspending(e);
-            clock.Stop();
+
+            // `resetTrack()` MUST happen before `refetchBeatmap()`, because along other things, `refetchBeatmap()` causes a global working beatmap change,
+            // which would cause `EditorClock` to reload the track and automatically reapply adjustments to it if not preceded by `resetTrack()`.
+            resetTrack();
             refetchBeatmap();
-            // unfortunately ordering matters here.
-            // this unbind MUST happen after `refetchBeatmap()`, because along other things, `refetchBeatmap()` causes a global working beatmap change,
-            // which causes `EditorClock` to reload the track and automatically reapply adjustments to it.
-            clock.UnbindAdjustments();
         }
 
         private void refetchBeatmap()
@@ -1038,7 +1037,7 @@ namespace osu.Game.Screens.Edit
             editorBeatmap.PreviewTime.Value = (int)clock.CurrentTime;
         }
 
-        private void resetTrack(bool seekToStart = false)
+        private void setUpTrack(bool seekToStart = false)
         {
             clock.Stop();
 
@@ -1059,6 +1058,16 @@ namespace osu.Game.Screens.Edit
 
                 clock.Seek(Math.Max(0, targetTime));
             }
+
+            clock.BindAdjustments();
+            musicController.TrackChanged += onTrackChanged;
+        }
+
+        private void resetTrack()
+        {
+            clock.Stop();
+            clock.UnbindAdjustments();
+            musicController.TrackChanged -= onTrackChanged;
         }
 
         private void onModeChanged(ValueChangedEvent<EditorScreenMode> e)

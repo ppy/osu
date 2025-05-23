@@ -41,17 +41,20 @@ namespace osu.Game.Screens.SelectV2
             {
                 var beatmap = (BeatmapInfo)item.Model;
 
-                if (checkMatch(beatmap, criteria))
-                {
-                    countMatching++;
-                    yield return item;
-                }
+                if (beatmap.Hidden)
+                    continue;
+
+                if (!checkCriteriaMatch(beatmap, criteria))
+                    continue;
+
+                countMatching++;
+                yield return item;
             }
 
             BeatmapItemsCount = countMatching;
         }
 
-        private static bool checkMatch(BeatmapInfo beatmap, FilterCriteria criteria)
+        private static bool checkCriteriaMatch(BeatmapInfo beatmap, FilterCriteria criteria)
         {
             bool match = criteria.Ruleset == null ||
                          beatmap.Ruleset.ShortName == criteria.Ruleset.ShortName ||

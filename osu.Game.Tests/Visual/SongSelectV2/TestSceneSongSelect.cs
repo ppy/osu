@@ -9,7 +9,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Online.API;
-using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets.Mods;
@@ -66,7 +65,10 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddStep("set local scope", () =>
             {
                 var current = LeaderboardManager.CurrentCriteria!;
-                LeaderboardManager.FetchWithCriteria(new LeaderboardCriteria(current.Beatmap, current.Ruleset, BeatmapLeaderboardScope.Local, null));
+                LeaderboardManager.FetchWithCriteria(current with
+                {
+                    Scope = BeatmapLeaderboardScope.Local,
+                });
             });
 
             AddUntilStep("wait for score panel", () => SongSelect.ChildrenOfType<BeatmapLeaderboardScore>().Any());
