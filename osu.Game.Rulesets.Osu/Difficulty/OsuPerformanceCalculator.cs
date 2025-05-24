@@ -210,7 +210,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 aimValue *= 1.3 + (totalHits * (0.0016 / (1 + 2 * effectiveMissCount)) * Math.Pow(accuracy, 16)) * (1 - 0.003 * attributes.DrainRate * attributes.DrainRate);
             else if (score.Mods.Any(m => m is OsuModTraceable))
             {
-                aimValue *= 1.0 + OsuDifficultyCalculator.CalculateReadingModBonus(score.Mods, approachRate, 1.0);
+                aimValue *= 1.0 + OsuDifficultyCalculator.CalculateReadingBonus(score.Mods, approachRate);
             }
 
             aimValue *= accuracy;
@@ -243,7 +243,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             }
             else if (score.Mods.Any(m => m is OsuModTraceable))
             {
-                speedValue *= 1.0 + OsuDifficultyCalculator.CalculateReadingModBonus(score.Mods, approachRate, 1.0);
+                speedValue *= 1.0 + OsuDifficultyCalculator.CalculateReadingBonus(score.Mods, approachRate);
             }
 
             double speedHighDeviationMultiplier = calculateSpeedHighDeviationNerf(attributes);
