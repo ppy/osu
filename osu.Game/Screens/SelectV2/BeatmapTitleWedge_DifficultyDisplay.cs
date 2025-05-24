@@ -8,13 +8,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Configuration;
@@ -63,9 +61,6 @@ namespace osu.Game.Screens.SelectV2
             private OsuSpriteText mappedByText = null!;
             private OsuHoverContainer mapperLink = null!;
             private OsuSpriteText mapperText = null!;
-
-            internal LocalisableString DisplayedVersion => difficultyText.Text;
-            internal LocalisableString DisplayedAuthor => mapperText.Text;
 
             private GridContainer ratingAndNameContainer = null!;
             private DifficultyStatisticsDisplay countStatisticsDisplay = null!;
@@ -258,24 +253,10 @@ namespace osu.Game.Screens.SelectV2
                     mapperText.Text = beatmap.Value.Metadata.Author.Username;
                 }
 
-                updateStarDifficulty(cancellationSource.Token);
+                starRatingDisplay.Current = (Bindable<StarDifficulty>)difficultyCache.GetBindableDifficulty(beatmap.Value.BeatmapInfo, cancellationSource.Token, 200);
+
                 updateCountStatistics(cancellationSource.Token);
                 updateDifficultyStatistics();
-            }
-
-            private void updateStarDifficulty(CancellationToken cancellationToken)
-            {
-                difficultyCache.GetDifficultyAsync(beatmap.Value.BeatmapInfo, ruleset.Value, mods.Value, cancellationToken)
-                               .ContinueWith(task =>
-                               {
-                                   Schedule(() =>
-                                   {
-                                       if (cancellationToken.IsCancellationRequested)
-                                           return;
-
-                                       starRatingDisplay.Current.Value = task.GetResultSafely() ?? default;
-                                   });
-                               }, cancellationToken);
             }
 
             private void updateCountStatistics(CancellationToken cancellationToken)
