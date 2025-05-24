@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using NUnit.Framework;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
@@ -15,6 +16,7 @@ using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Catch.Mods;
 using osu.Game.Rulesets.Mods;
@@ -24,6 +26,7 @@ using osu.Game.Screens.OnlinePlay.Multiplayer.Participants;
 using osu.Game.Tests.Resources;
 using osu.Game.Users;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
@@ -41,7 +44,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestAddUser()
         {
-            AddAssert("one unique panel", () => this.ChildrenOfType<ParticipantPanel>().Select(p => p.User).Distinct().Count() == 1);
+            AddAssert("one unique panel", () => this.ChildrenOfType<ParticipantPanel>().Select(p => p.Current.Value).Distinct().Count() == 1);
 
             AddStep("add user", () => MultiplayerClient.AddUser(new APIUser
             {
@@ -50,20 +53,20 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 CoverUrl = TestResources.COVER_IMAGE_3,
             }));
 
-            AddAssert("two unique panels", () => this.ChildrenOfType<ParticipantPanel>().Select(p => p.User).Distinct().Count() == 2);
+            AddAssert("two unique panels", () => this.ChildrenOfType<ParticipantPanel>().Select(p => p.Current.Value).Distinct().Count() == 2);
         }
 
         [Test]
         public void TestAddUnresolvedUser()
         {
-            AddAssert("one unique panel", () => this.ChildrenOfType<ParticipantPanel>().Select(p => p.User).Distinct().Count() == 1);
+            AddAssert("one unique panel", () => this.ChildrenOfType<ParticipantPanel>().Select(p => p.Current.Value).Distinct().Count() == 1);
 
             AddStep("add non-resolvable user", () => MultiplayerClient.TestAddUnresolvedUser());
             AddUntilStep("null user added", () => MultiplayerClient.ClientRoom.AsNonNull().Users.Count(u => u.User == null) == 1);
 
-            AddUntilStep("two unique panels", () => this.ChildrenOfType<ParticipantPanel>().Select(p => p.User).Distinct().Count() == 2);
+            AddUntilStep("two unique panels", () => this.ChildrenOfType<ParticipantPanel>().Select(p => p.Current.Value).Distinct().Count() == 2);
 
-            AddStep("kick null user", () => this.ChildrenOfType<ParticipantPanel>().Single(p => p.User.User == null)
+            AddStep("kick null user", () => this.ChildrenOfType<ParticipantPanel>().Single(p => p.Current.Value.User == null)
                                                 .ChildrenOfType<ParticipantPanel.KickButton>().Single().TriggerClick());
 
             AddUntilStep("null user kicked", () => MultiplayerClient.ClientRoom.AsNonNull().Users.Count == 1);
@@ -86,7 +89,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("remove host", () => MultiplayerClient.RemoveUser(API.LocalUser.Value));
 
-            AddAssert("single panel is for second user", () => this.ChildrenOfType<ParticipantPanel>().Single().User.UserID == secondUser?.Id);
+            AddAssert("single panel is for second user", () => this.ChildrenOfType<ParticipantPanel>().Single().Current.Value.UserID == secondUser?.Id);
         }
 
         [Test]
@@ -122,7 +125,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddRepeatStep("increment progress", () =>
             {
-                float progress = this.ChildrenOfType<ParticipantPanel>().Single().User.BeatmapAvailability.DownloadProgress ?? 0;
+                float progress = this.ChildrenOfType<ParticipantPanel>().Single().Current.Value.BeatmapAvailability.DownloadProgress ?? 0;
                 MultiplayerClient.ChangeBeatmapAvailability(BeatmapAvailability.Downloading(progress + RNG.NextSingle(0.1f)));
             }, 25);
 
@@ -163,13 +166,17 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 CoverUrl = TestResources.COVER_IMAGE_3,
             }));
 
-            AddUntilStep("first user crown visible", () => this.ChildrenOfType<ParticipantPanel>().ElementAt(0).ChildrenOfType<SpriteIcon>().First().Alpha == 1);
-            AddUntilStep("second user crown hidden", () => this.ChildrenOfType<ParticipantPanel>().ElementAt(1).ChildrenOfType<SpriteIcon>().First().Alpha == 0);
+            AddUntilStep("first user crown visible",
+                () => this.ChildrenOfType<ParticipantPanel>().Single(p => p.Current.Value.UserID == 1001).ChildrenOfType<SpriteIcon>().First().Alpha == 1);
+            AddUntilStep("second user crown hidden",
+                () => this.ChildrenOfType<ParticipantPanel>().Single(p => p.Current.Value.UserID == 3).ChildrenOfType<SpriteIcon>().First().Alpha == 0);
 
             AddStep("make second user host", () => MultiplayerClient.TransferHost(3));
 
-            AddUntilStep("first user crown hidden", () => this.ChildrenOfType<ParticipantPanel>().ElementAt(0).ChildrenOfType<SpriteIcon>().First().Alpha == 0);
-            AddUntilStep("second user crown visible", () => this.ChildrenOfType<ParticipantPanel>().ElementAt(1).ChildrenOfType<SpriteIcon>().First().Alpha == 1);
+            AddUntilStep("first user crown visible",
+                () => this.ChildrenOfType<ParticipantPanel>().Single(p => p.Current.Value.UserID == 1001).ChildrenOfType<SpriteIcon>().First().Alpha == 0);
+            AddUntilStep("second user crown hidden",
+                () => this.ChildrenOfType<ParticipantPanel>().Single(p => p.Current.Value.UserID == 3).ChildrenOfType<SpriteIcon>().First().Alpha == 1);
         }
 
         [Test]
@@ -185,9 +192,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("make second user host", () => MultiplayerClient.TransferHost(3));
             AddAssert("second user above first", () =>
             {
-                var first = this.ChildrenOfType<ParticipantPanel>().ElementAt(0);
-                var second = this.ChildrenOfType<ParticipantPanel>().ElementAt(1);
-                return second.Y < first.Y;
+                var first = this.ChildrenOfType<ParticipantPanel>().Single(u => u.Current.Value.UserID == 1001);
+                var second = this.ChildrenOfType<ParticipantPanel>().Single(u => u.Current.Value.UserID == 3);
+                return second.ScreenSpaceDrawQuad.TopLeft.Y < first.ScreenSpaceDrawQuad.TopLeft.Y;
             });
         }
 
@@ -230,7 +237,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestManyUsers()
         {
-            const int users_count = 20;
+            const int users_count = 200;
 
             AddStep("add many users", () =>
             {
@@ -276,6 +283,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddRepeatStep("switch hosts", () => MultiplayerClient.TransferHost(RNG.Next(0, users_count)), 10);
             AddStep("give host back", () => MultiplayerClient.TransferHost(API.LocalUser.Value.Id));
+
+            AddRepeatStep("perform many random state changes at once", () =>
+            {
+                for (int i = 0; i < users_count; ++i)
+                {
+                    MultiplayerClient.ChangeUserBeatmapAvailability(i, BeatmapAvailability.LocallyAvailable());
+                    MultiplayerClient.ChangeUserState(i, RNG.NextBool() ? MultiplayerUserState.Idle : MultiplayerUserState.Ready);
+                }
+            }, 100);
         }
 
         [Test]
@@ -432,6 +448,35 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 MultiplayerClient.ChangeUserMods(0,
                     [new APIMod(new CatchModFloatingFruits()), new APIMod(new CatchModHidden()), new APIMod(new CatchModMirror())]);
             });
+        }
+
+        [Test]
+        public void TestTeams()
+        {
+            AddStep("enable teams", () => MultiplayerClient.ChangeSettings(matchType: MatchType.TeamVersus));
+            AddAssert("one unique panel", () => this.ChildrenOfType<ParticipantPanel>().Select(p => p.Current.Value).Distinct().Count() == 1);
+
+            int id = 3;
+            AddRepeatStep("add users", () => MultiplayerClient.AddUser(new APIUser
+            {
+                Id = Interlocked.Increment(ref id),
+                Username = "Second",
+                CoverUrl = TestResources.COVER_IMAGE_3,
+            }), 5);
+
+            AddAssert("two unique panels", () => this.ChildrenOfType<ParticipantPanel>().Select(p => p.Current.Value).Distinct().Count() == 6);
+
+            AddAssert("user 1001 on red team",
+                () => (MultiplayerClient.ClientRoom!.Users.Single(u => u.UserID == 1001).MatchState as TeamVersusUserState)?.TeamID,
+                () => Is.EqualTo(0));
+            AddStep("click first team indicator", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<TeamDisplay>().First());
+                InputManager.Click(MouseButton.Left);
+            });
+            AddAssert("user 1001 on blue team",
+                () => (MultiplayerClient.ClientRoom!.Users.Single(u => u.UserID == 1001).MatchState as TeamVersusUserState)?.TeamID,
+                () => Is.EqualTo(1));
         }
 
         private void createNewParticipantsList()
