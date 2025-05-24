@@ -156,23 +156,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return attributes;
         }
 
-        // Arbitrary constants that work well
+        // Summation for aim and speed, reducing reward for mixed maps
         public static double SumMechanicalDifficulty(double aim, double speed)
-        {
-            const double base_multiplier = 1.093;
-            const double addition_portion = 0.6;
-            const double power = 7.7;
-
-            double difficulty =
-                Math.Pow(
-                    Math.Pow(aim + addition_portion * speed, power) +
-                    Math.Pow(speed + addition_portion * aim, power), 1.0 / power
-                );
-
-            return difficulty * base_multiplier;
-        }
-
-        public static double SumMechanicalDifficulty2(double aim, double speed)
         {
             const double base_multiplier = 0.87;
             const double addition_portion = 0.149425;
