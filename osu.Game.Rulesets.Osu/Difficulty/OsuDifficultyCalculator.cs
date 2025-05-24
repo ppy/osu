@@ -43,15 +43,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return multiplier;
         }
 
-        public static double CalculateReadingBonus(Mod[] mods, double approachRate, double approachRateFactor = 1)
+        /// <summary>
+        /// Calculates a visibility bonus that is applicable to Hidden and Traceable.
+        /// </summary>
+        public static double CalculateVisibilityBonus(Mod[] mods, double approachRate, double visibilityFactor = 1)
         {
             bool isFullyHidden = mods.OfType<OsuModHidden>().Any(m => !m.OnlyFadeApproachCircles.Value);
 
             // Start from normal curve, rewarding lower AR up to AR5
             double readingBonus = 0.04 * (12.0 - Math.Max(approachRate, 5));
 
-            // Nerf initial bonus depending on AR factor
-            readingBonus *= approachRateFactor;
+            // Nerf initial bonus depending on visibility factor
+            readingBonus *= visibilityFactor;
 
             // For AR up to 0 - reduce reward for very low ARs when object is visible
             if (approachRate < 5)
@@ -208,8 +211,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (mods.Any(m => m is OsuModHidden))
             {
-                double readingApproachRateFactor = calculateAimReadingApproachRateFactor(approachRate, relevantMechanicalDifficulty);
-                ratingMultiplier *= 1.0 + CalculateReadingBonus(mods, approachRate, readingApproachRateFactor);
+                double readingApproachRateFactor = calculateAimVisibilityFactor(approachRate, relevantMechanicalDifficulty);
+                ratingMultiplier *= 1.0 + CalculateVisibilityBonus(mods, approachRate, readingApproachRateFactor);
             }
 
             // It is important to consider accuracy difficulty when scaling with accuracy.
@@ -251,8 +254,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (mods.Any(m => m is OsuModHidden))
             {
-                double readingApproachRateFactor = calculateSpeedReadingApproachRateFactor(approachRate, relevantMechanicalDifficulty);
-                ratingMultiplier *= 1.0 + CalculateReadingBonus(mods, approachRate, readingApproachRateFactor);
+                double visibilityFactor = calculateSpeedVisibilityFactor(approachRate, relevantMechanicalDifficulty);
+                ratingMultiplier *= 1.0 + CalculateVisibilityBonus(mods, approachRate, visibilityFactor);
             }
 
             ratingMultiplier *= 0.95 + Math.Pow(Math.Max(0, overallDifficulty), 2) / 750;
@@ -293,7 +296,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return flashlightRating * Math.Sqrt(ratingMultiplier);
         }
 
-        private static double calculateAimReadingApproachRateFactor(double approachRate, double relevantMechanicalDifficultyRating)
+        private static double calculateAimVisibilityFactor(double approachRate, double relevantMechanicalDifficultyRating)
         {
             const double ar_factor_end_point = 11.5;
 
@@ -303,7 +306,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return DifficultyCalculationUtils.ReverseLerp(approachRate, ar_factor_end_point, arFactorStartingPoint);
         }
 
-        private static double calculateSpeedReadingApproachRateFactor(double approachRate, double relevantMechanicalDifficultyRating)
+        private static double calculateSpeedVisibilityFactor(double approachRate, double relevantMechanicalDifficultyRating)
         {
             const double ar_factor_end_point = 11.5;
 
