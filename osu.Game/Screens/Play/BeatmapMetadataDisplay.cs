@@ -4,7 +4,6 @@
 #nullable disable
 
 using System.Collections.Generic;
-using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -55,7 +54,7 @@ namespace osu.Game.Screens.Play
             this.mods.BindTo(mods);
         }
 
-        private IBindable<StarDifficulty?> starDifficulty;
+        private IBindable<StarDifficulty> starDifficulty;
 
         private FillFlowContainer versionFlow;
         private StarRatingDisplay starRatingDisplay;
@@ -191,9 +190,9 @@ namespace osu.Game.Screens.Play
         {
             base.LoadComplete();
 
-            if (starDifficulty.Value != null)
+            if (starDifficulty.Value.Stars > 0)
             {
-                starRatingDisplay.Current.Value = starDifficulty.Value.Value;
+                starRatingDisplay.Current.Value = starDifficulty.Value;
                 starRatingDisplay.Show();
             }
             else
@@ -201,9 +200,7 @@ namespace osu.Game.Screens.Play
 
             starDifficulty.ValueChanged += d =>
             {
-                Debug.Assert(d.NewValue != null);
-
-                starRatingDisplay.Current.Value = d.NewValue.Value;
+                starRatingDisplay.Current.Value = d.NewValue;
 
                 versionFlow.AutoSizeDuration = 300;
                 versionFlow.AutoSizeEasing = Easing.OutQuint;
