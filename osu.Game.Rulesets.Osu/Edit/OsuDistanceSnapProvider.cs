@@ -17,13 +17,13 @@ namespace osu.Game.Rulesets.Osu.Edit
         public override double ReadCurrentDistanceSnap(HitObject before, HitObject after)
         {
             // Check to see if before and after HitObjects exist within the same stack.
-            if ((((OsuHitObject)before).EndPosition - ((OsuHitObject)after).Position).Length < 0.01)
+            if (Vector2.Distance(((OsuHitObject)before).EndPosition, ((OsuHitObject)after).Position) < 0.01)
                 return 0;
 
             var lastObjectWithVelocity = EditorBeatmap.HitObjects.TakeWhile(ho => ho != after).OfType<IHasSliderVelocity>().LastOrDefault();
 
             float expectedDistance = DurationToDistance(after.StartTime - before.GetEndTime(), before.StartTime, lastObjectWithVelocity);
-            float actualDistance = (((OsuHitObject)after).StackedPosition - ((OsuHitObject)before).EndPosition).Length;
+            float actualDistance = Vector2.Distance(((OsuHitObject)before).EndPosition, ((OsuHitObject)after).StackedPosition);
 
             return actualDistance / expectedDistance;
         }
