@@ -140,7 +140,10 @@ namespace osu.Game.Screens.Ranking
                     set => Alpha = value ? 1 : 0;
                 }
 
-                public bool FilteringActive { set { } }
+                public bool FilteringActive
+                {
+                    set { }
+                }
 
                 public GroupFlow(string? name)
                 {
@@ -245,8 +248,15 @@ namespace osu.Game.Screens.Ranking
 
                 public IEnumerable<LocalisableString> FilterTerms => [Tag.FullName, Tag.Description];
 
-                public bool MatchingFilter { set => Alpha = value ? 1 : 0; }
-                public bool FilteringActive { set { } }
+                public bool MatchingFilter
+                {
+                    set => Alpha = value ? 1 : 0;
+                }
+
+                public bool FilteringActive
+                {
+                    set { }
+                }
 
                 protected override void LoadComplete()
                 {
