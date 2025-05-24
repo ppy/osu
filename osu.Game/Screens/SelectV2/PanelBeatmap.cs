@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
@@ -8,6 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.UserInterface;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
@@ -52,6 +54,9 @@ namespace osu.Game.Screens.SelectV2
 
         [Resolved]
         private IBindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
+
+        [Resolved]
+        private ISongSelect? songSelect { get; set; }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
         {
@@ -254,6 +259,22 @@ namespace osu.Game.Screens.SelectV2
             var starRatingColour = colours.ForStarDifficulty(starDifficulty.Stars);
             starCounter.FadeColour(starRatingColour, duration, Easing.OutQuint);
             AccentColour = starRatingColour;
+        }
+
+        public override MenuItem[] ContextMenuItems
+        {
+            get
+            {
+                if (Item == null)
+                    return Array.Empty<MenuItem>();
+
+                List<MenuItem> items = new List<MenuItem>();
+
+                if (songSelect != null)
+                    items.AddRange(songSelect.GetForwardActions((BeatmapInfo)Item.Model));
+
+                return items.ToArray();
+            }
         }
     }
 }
