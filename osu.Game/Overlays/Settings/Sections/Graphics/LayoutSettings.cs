@@ -51,6 +51,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
         private SettingsDropdown<Size> resolutionDropdown = null!;
         private SettingsDropdown<Display> displayDropdown = null!;
         private SettingsDropdown<WindowMode> windowModeDropdown = null!;
+        private Bindable<WindowMode> windowMode = null!;
         private SettingsCheckbox minimiseOnFocusLossCheckbox = null!;
         private SettingsCheckbox safeAreaConsiderationsCheckbox = null!;
 
@@ -61,12 +62,16 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
         private Bindable<float> scalingBackgroundDim = null!;
 
+        private Bindable<Size> virtualResolution = null!;
+        private ResolutionSettingsDropdown virtualResolutionDropdown = null!;
         private const int transition_duration = 400;
 
         [BackgroundDependencyLoader]
         private void load(FrameworkConfigManager config, OsuConfigManager osuConfig, GameHost host)
         {
             window = host.Window;
+
+            windowMode = config.GetBindable<WindowMode>(FrameworkSetting.WindowMode);
 
             scalingMode = osuConfig.GetBindable<ScalingMode>(OsuSetting.Scaling);
             sizeFullscreen = config.GetBindable<Size>(FrameworkSetting.SizeFullscreen);
@@ -75,6 +80,8 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             scalingPositionX = osuConfig.GetBindable<float>(OsuSetting.ScalingPositionX);
             scalingPositionY = osuConfig.GetBindable<float>(OsuSetting.ScalingPositionY);
             scalingBackgroundDim = osuConfig.GetBindable<float>(OsuSetting.ScalingBackgroundDim);
+
+            virtualResolution = osuConfig.GetBindable<Size>(OsuSetting.VirtualResolution);
 
             if (window != null)
             {
@@ -93,6 +100,13 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     Items = window?.SupportedWindowModes,
                     CanBeShown = { Value = window?.SupportedWindowModes.Count() > 1 },
                     Current = config.GetBindable<WindowMode>(FrameworkSetting.WindowMode),
+                },
+                virtualResolutionDropdown = new ResolutionSettingsDropdown
+                {
+                    LabelText = GraphicsSettingsStrings.Resolution,
+                    ShowsDefaultIndicator = false,
+                    ItemSource = resolutions,
+                    Current = virtualResolution
                 },
                 displayDropdown = new DisplaySettingsDropdown
                 {
@@ -191,6 +205,13 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             base.LoadComplete();
 
             scalingSettings.ForEach(s => bindPreviewEvent(s.Current));
+
+
+            windowMode.BindValueChanged(mode =>
+            {
+                virtualResolutionDropdown.CanBeShown.Value = mode.NewValue != WindowMode.Fullscreen;
+                virtualResolution.Value = new Size(currentDisplay.Value.Bounds.Width, currentDisplay.Value.Bounds.Height);
+            }, true);
 
             windowModeDropdown.Current.BindValueChanged(_ =>
             {

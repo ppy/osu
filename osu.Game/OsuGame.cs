@@ -4,6 +4,7 @@
 #nullable disable
 
 using System;
+using System.Drawing;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -24,6 +25,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
@@ -154,6 +156,8 @@ namespace osu.Game
 
         private Container overlayOffsetContainer;
 
+        private Container contentContainer { get; set; }
+        private Container virtualContainer { get; set; }
         private OnScreenDisplay onScreenDisplay;
 
         [Resolved]
@@ -222,7 +226,7 @@ namespace osu.Game
         private Bindable<bool> applySafeAreaConsiderations;
 
         private Bindable<float> uiScale;
-
+        private Bindable<Size> virtualResolution;
         private Bindable<UserActivity> configUserActivity;
 
         private Bindable<string> configSkin;
@@ -436,6 +440,8 @@ namespace osu.Game
 
             applySafeAreaConsiderations = LocalConfig.GetBindable<bool>(OsuSetting.SafeAreaConsiderations);
             applySafeAreaConsiderations.BindValueChanged(apply => SafeAreaContainer.SafeAreaOverrideEdges = apply.NewValue ? SafeAreaOverrideEdges : Edges.All, true);
+
+            virtualResolution = LocalConfig.GetBindable<Size>(OsuSetting.VirtualResolution);
         }
 
         private ExternalLinkOpener externalLinkOpener;
@@ -1087,60 +1093,82 @@ namespace osu.Game
 
             AddRange(new Drawable[]
             {
-                ScreenOffsetContainer = new Container
+                new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Children = new Drawable[]
+                    Colour = Colour4.Black
+                },
+                ScreenContainer = new ScalingContainer(ScalingMode.Everything)
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Child = virtualContainer = new Container
                     {
-                        ScreenContainer = new ScalingContainer(ScalingMode.ExcludeOverlays)
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        RelativeSizeAxes = Axes.None,
+                        Size = Vector2.One,
+                        Child = contentContainer = new Container
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
                             Children = new Drawable[]
                             {
-                                backReceptor = new ScreenFooter.BackReceptor(),
-                                ScreenStack = new OsuScreenStack { RelativeSizeAxes = Axes.Both },
-                                BackButton = new BackButton(backReceptor)
+                                ScreenOffsetContainer = new Container
                                 {
-                                    Anchor = Anchor.BottomLeft,
-                                    Origin = Anchor.BottomLeft,
-                                    Action = handleBackButton,
-                                },
-                                logoContainer = new Container { RelativeSizeAxes = Axes.Both },
-                                footerBasedOverlayContent = new Container
-                                {
-                                    Depth = -1,
                                     RelativeSizeAxes = Axes.Both,
-                                },
-                                new PopoverContainer
-                                {
-                                    Depth = -1,
-                                    RelativeSizeAxes = Axes.Both,
-                                    Child = ScreenFooter = new ScreenFooter(backReceptor)
+                                    Children = new Drawable[]
                                     {
-                                        RequestLogoInFront = inFront => ScreenContainer.ChangeChildDepth(logoContainer, inFront ? float.MinValue : 0),
-                                        BackButtonPressed = handleBackButton
-                                    },
+                                        backReceptor = new ScreenFooter.BackReceptor(),
+                                        ScreenStack = new OsuScreenStack { RelativeSizeAxes = Axes.Both },
+                                        BackButton = new BackButton(backReceptor)
+                                        {
+                                            Anchor = Anchor.BottomLeft,
+                                            Origin = Anchor.BottomLeft,
+                                            Action = handleBackButton,
+                                        },
+                                        logoContainer = new Container { RelativeSizeAxes = Axes.Both },
+                                        footerBasedOverlayContent = new Container
+                                        {
+                                            Depth = -1,
+                                            RelativeSizeAxes = Axes.Both,
+                                        },
+                                        new PopoverContainer
+                                        {
+                                            Depth = -1,
+                                            RelativeSizeAxes = Axes.Both,
+                                            Child = ScreenFooter = new ScreenFooter(backReceptor)
+                                            {
+                                                RequestLogoInFront = inFront => ScreenContainer.ChangeChildDepth(logoContainer, inFront ? float.MinValue : 0),
+                                                BackButtonPressed = handleBackButton
+                                            },
+                                        },
+                                    }
                                 },
+                                overlayOffsetContainer = new Container
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Children = new Drawable[]
+                                    {
+                                        overlayContent = new Container { RelativeSizeAxes = Axes.Both },
+                                        leftFloatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
+                                        rightFloatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
+                                    }
+                                },
+
+                                topMostOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
+                                idleTracker,
+                                new ConfineMouseTracker()
                             }
-                        },
+                        }
                     }
-                },
-                overlayOffsetContainer = new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Children = new Drawable[]
-                    {
-                        overlayContent = new Container { RelativeSizeAxes = Axes.Both },
-                        leftFloatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
-                        rightFloatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
-                    }
-                },
-                topMostOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
-                idleTracker,
-                new ConfineMouseTracker()
+                }
             });
+
+            virtualResolution.BindValueChanged(newSize =>
+            {
+                virtualContainer.Size = new Vector2(newSize.NewValue.Width, newSize.NewValue.Height);
+            }, true);
 
             dependencies.Cache(ScreenFooter);
 
