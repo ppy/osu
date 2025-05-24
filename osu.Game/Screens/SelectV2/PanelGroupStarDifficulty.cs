@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
@@ -139,9 +138,8 @@ namespace osu.Game.Screens.SelectV2
 
             Debug.Assert(Item != null);
 
-            var group = (GroupDefinition)Item.Model;
-            var stars = (StarDifficulty)group.Data;
-            int starNumber = (int)stars.Stars;
+            var group = (StarDifficultyGroupDefinition)Item.Model;
+            int starNumber = (int)group.Difficulty.Stars;
 
             ratingColour = starNumber >= 9 ? OsuColour.Gray(0.2f) : colours.ForStarDifficulty(starNumber);
 
