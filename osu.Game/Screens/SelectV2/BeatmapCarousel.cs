@@ -411,10 +411,10 @@ namespace osu.Game.Screens.SelectV2
         {
             switch (item.Model)
             {
-                case GroupDefinition group:
-                    if (group.Data is StarDifficulty)
-                        return starsGroupPanelPool.Get();
+                case StarDifficultyGroupDefinition:
+                    return starsGroupPanelPool.Get();
 
+                case GroupDefinition:
                     return groupPanelPool.Get();
 
                 case BeatmapInfo:
@@ -433,5 +433,15 @@ namespace osu.Game.Screens.SelectV2
         #endregion
     }
 
-    public record GroupDefinition(object Data, string Title);
+    /// <summary>
+    /// Defines a grouping header for a set of carousel items.
+    /// </summary>
+    /// <param name="Order">The order of this group in the carousel, sorted using ascending order.</param>
+    /// <param name="Title">The title of this group.</param>
+    public record GroupDefinition(int Order, string Title);
+
+    /// <summary>
+    /// Defines a grouping header for a set of carousel items grouped by star difficulty.
+    /// </summary>
+    public record StarDifficultyGroupDefinition(int Order, string Title, StarDifficulty Difficulty) : GroupDefinition(Order, Title);
 }

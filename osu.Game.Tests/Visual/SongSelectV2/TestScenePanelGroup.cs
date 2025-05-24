@@ -56,21 +56,21 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                             {
                                 new PanelGroupStarDifficulty
                                 {
-                                    Item = new CarouselItem(new GroupDefinition(new StarDifficulty(star, 0), $"{star} Star(s)"))
+                                    Item = new CarouselItem(new StarDifficultyGroupDefinition(0, $"{star} Star(s)", new StarDifficulty(star, 0)))
                                 },
                                 new PanelGroupStarDifficulty
                                 {
-                                    Item = new CarouselItem(new GroupDefinition(new StarDifficulty(star, 0), $"{star} Star(s)")),
+                                    Item = new CarouselItem(new StarDifficultyGroupDefinition(1, $"{star} Star(s)", new StarDifficulty(star, 0))),
                                     KeyboardSelected = { Value = true },
                                 },
                                 new PanelGroupStarDifficulty
                                 {
-                                    Item = new CarouselItem(new GroupDefinition(new StarDifficulty(star, 0), $"{star} Star(s)")),
+                                    Item = new CarouselItem(new StarDifficultyGroupDefinition(2, $"{star} Star(s)", new StarDifficulty(star, 0))),
                                     Expanded = { Value = true },
                                 },
                                 new PanelGroupStarDifficulty
                                 {
-                                    Item = new CarouselItem(new GroupDefinition(new StarDifficulty(star, 0), $"{star} Star(s)")),
+                                    Item = new CarouselItem(new StarDifficultyGroupDefinition(3, $"{star} Star(s)", new StarDifficulty(star, 0))),
                                     Expanded = { Value = true },
                                     KeyboardSelected = { Value = true },
                                 },
