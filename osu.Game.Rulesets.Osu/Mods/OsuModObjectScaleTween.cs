@@ -24,6 +24,9 @@ namespace osu.Game.Rulesets.Osu.Mods
         [SettingSource("Starting Size", "The initial size multiplier applied to all objects.")]
         public abstract BindableNumber<float> StartScale { get; }
 
+        [SettingSource("Scale Sliders", "Scale the slider bodies as well.")]
+        public BindableBool ScaleSliders { get; } = new BindableBool(true);
+
         protected virtual float EndScale => 1;
 
         public override Type[] IncompatibleMods => new[] { typeof(IRequiresApproachCircles), typeof(OsuModSpinIn), typeof(OsuModObjectScaleTween), typeof(OsuModDepth) };
@@ -44,12 +47,12 @@ namespace osu.Game.Rulesets.Osu.Mods
             // apply grow effect
             switch (drawable)
             {
-                case DrawableSliderHead:
                 case DrawableSliderTail:
-                    // special cases we should *not* be scaling.
+                    // special case we should *not* be scaling.
                     break;
 
-                case DrawableSlider:
+                case DrawableSlider when ScaleSliders.Value:
+                case DrawableSliderHead when !ScaleSliders.Value:
                 case DrawableHitCircle:
                 {
                     using (drawable.BeginAbsoluteSequence(h.StartTime - h.TimePreempt))
