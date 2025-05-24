@@ -14,7 +14,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Tournament.Models;
-using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Components
@@ -32,7 +31,7 @@ namespace osu.Game.Tournament.Components
         private Box flash = null!;
         private Container borderBox = null!;
         private TournamentProtectIcon protectIcon = null!;
-        private FillFlowContainer rightFlow = null!;
+        private FillFlowContainer modIconContainer = null!;
 
         public TournamentBeatmapPanel(IBeatmapInfo? beatmap, string mod = "")
         {
@@ -41,8 +40,6 @@ namespace osu.Game.Tournament.Components
 
             Width = 400;
             Height = HEIGHT;
-
-            Padding = new MarginPadding { Left = 8 };
         }
 
         [BackgroundDependencyLoader]
@@ -119,6 +116,7 @@ namespace osu.Game.Tournament.Components
                                 }
                             },
                         },
+
                         flash = new Box
                         {
                             RelativeSizeAxes = Axes.Both,
@@ -126,38 +124,31 @@ namespace osu.Game.Tournament.Components
                             Blending = BlendingParameters.Additive,
                             Alpha = 0,
                         },
+                        modIconContainer = new FillFlowContainer
+                        {
+                            Anchor = Anchor.CentreRight,
+                            Origin = Anchor.CentreRight,
+                            Padding = new MarginPadding { Vertical = 10 },
+                            RelativeSizeAxes = Axes.Y,
+                            Direction = FillDirection.Horizontal,
+                        },
                     }
-                }
-            });
-
-            AddInternal(rightFlow = new FillFlowContainer
-            {
-                Anchor = Anchor.CentreRight,
-                Origin = Anchor.CentreRight,
-                Margin = new MarginPadding(10),
-                RelativeSizeAxes = Axes.Y,
-                Direction = FillDirection.Horizontal,
-                Children = new Drawable[]
+                },
+                protectIcon = new TournamentProtectIcon
                 {
-                    protectIcon = new TournamentProtectIcon
-                    {
-                        Anchor = Anchor.CentreRight,
-                        Origin = Anchor.CentreRight,
-                        Width = 60,
-                        Scale = new Vector2(0.5f),
-                        Alpha = 1,
-                        RelativeSizeAxes = Axes.Y,
-                    }
-                }
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight,
+                    Alpha = 1,
+                    Margin = new MarginPadding { Top = 14, Right = 14 },
+                },
             });
 
             if (!string.IsNullOrEmpty(mod))
             {
-                rightFlow.Insert(-1, new TournamentModIcon(mod)
+                modIconContainer.Insert(-1, new TournamentModIcon(mod)
                 {
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
-                    Margin = new MarginPadding(10),
                     Width = 60,
                     RelativeSizeAxes = Axes.Y,
                 });

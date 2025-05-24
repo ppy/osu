@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Utils;
@@ -16,7 +17,7 @@ namespace osu.Game.Tournament.Components
     public partial class TournamentProtectIcon : Container
     {
         private SpriteIcon protectIcon = null!;
-        private Sprite background = null!;
+        private Circle background = null!;
 
         private Color4 backgroundColour;
 
@@ -42,25 +43,25 @@ namespace osu.Game.Tournament.Components
             {
                 new Container
                 {
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
                     Name = "main content",
-                    Size = new Vector2(80), //to match mod icon size
+                    Size = new Vector2(22),
                     Children = new Drawable[]
                     {
-                        background = new Sprite
+                        background = new Circle
                         {
                             RelativeSizeAxes = Axes.Both,
                             FillMode = FillMode.Fit,
-                            Texture = textures.Get("Icons/BeatmapDetails/mod-icon"),
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                         },
                         protectIcon = new SpriteIcon
                         {
+                            RelativeSizeAxes = Axes.Both,
                             Origin = Anchor.Centre,
                             Anchor = Anchor.Centre,
-                            Size = new Vector2(40),
+                            Scale = new Vector2(0.6f),
                             Icon = FontAwesome.Solid.ShieldAlt,
                         },
                     }
