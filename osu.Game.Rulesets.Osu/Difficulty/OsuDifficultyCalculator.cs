@@ -293,7 +293,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double mechanicalDifficultyFactor = DifficultyCalculationUtils.ReverseLerp(relevantMechanicalDifficultyRating, 5, 10);
             double highArNerfStartingPoint = double.Lerp(9, 10.33, mechanicalDifficultyFactor);
             const double high_ar_nerf_end_point = 11.5;
-            return Math.Clamp((high_ar_nerf_end_point - approachRate) / (high_ar_nerf_end_point - highArNerfStartingPoint), 0, 1);
+            return DifficultyCalculationUtils.ReverseLerp(approachRate, high_ar_nerf_end_point, highArNerfStartingPoint);
         }
 
         private static double calculateSpeedHiddenHighArNerf(double approachRate, double relevantMechanicalDifficultyRating)
@@ -301,7 +301,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double mechanicalDifficultyFactor = DifficultyCalculationUtils.ReverseLerp(relevantMechanicalDifficultyRating, 5, 10);
             double highArNerfStartingPoint = double.Lerp(10, 10.33, mechanicalDifficultyFactor);
             const double high_ar_nerf_end_point = 11.5;
-            return Math.Clamp((high_ar_nerf_end_point - approachRate) / (high_ar_nerf_end_point - highArNerfStartingPoint), 0, 1);
+            return DifficultyCalculationUtils.ReverseLerp(approachRate, high_ar_nerf_end_point, highArNerfStartingPoint);
         }
 
         public static double CalculateReadingModBonus(Mod[] mods, double approachRate, double highArNerf)
