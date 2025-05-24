@@ -230,6 +230,11 @@ namespace osu.Game.Screens.SelectV2
             base.Update();
 
             detailsArea.Height = wedgesContainer.DrawHeight - titleWedge.LayoutSize.Y - 4;
+
+            if (!Beatmap.Value.BeatmapInfo.Equals(carousel.CurrentSelection as BeatmapInfo))
+            {
+                Beatmap.Value = beatmaps.GetWorkingBeatmap(carousel.CurrentSelection as BeatmapInfo);
+            }
         }
 
         #region Selection handling
