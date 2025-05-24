@@ -65,7 +65,11 @@ namespace osu.Game.Screens.SelectV2
 
             Width = 0.9f;
 
-            InternalChild = new FillFlowContainer
+            AddInternal(new WedgeScrollBlockerComponent
+            {
+                Shear = OsuGame.SHEAR,
+            });
+            AddInternal(new FillFlowContainer
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
@@ -226,7 +230,7 @@ namespace osu.Game.Screens.SelectV2
                         },
                     }),
                 }
-            };
+            });
         }
 
         protected override void LoadComplete()
