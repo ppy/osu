@@ -227,9 +227,12 @@ namespace osu.Game.Screens.SelectV2
 
                     updateDifficultyStatistics();
 
-                    settingChangeTracker = new ModSettingChangeTracker(m.NewValue);
-                    settingChangeTracker.SettingChanged += _ => updateDifficultyStatistics();
-                });
+                    if (m.NewValue.Any())
+                    {
+                        settingChangeTracker = new ModSettingChangeTracker(m.NewValue);
+                        settingChangeTracker.SettingChanged += _ => updateDifficultyStatistics();
+                    }
+                }, true);
 
                 updateDisplay();
             }
