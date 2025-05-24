@@ -307,7 +307,7 @@ namespace osu.Game.Screens.SelectV2
 
             private void updateDifficultyStatistics() => Scheduler.AddOnce(() =>
             {
-                if (beatmap.IsDefault)
+                if (beatmap.IsDefault || ruleset.Value == null)
                 {
                     difficultyStatisticsDisplay.TooltipContent = null;
                     difficultyStatisticsDisplay.Statistics = Array.Empty<StatisticDifficulty.Data>();
@@ -320,28 +320,25 @@ namespace osu.Game.Screens.SelectV2
                 foreach (var mod in mods.Value.OfType<IApplicableToDifficulty>())
                     mod.ApplyToDifficulty(originalDifficulty);
 
-                var rateAdjustedDifficulty = originalDifficulty;
+                Ruleset rulesetInstance = ruleset.Value.CreateInstance();
 
-                if (ruleset.Value != null)
-                {
-                    double rate = ModUtils.CalculateRateWithMods(mods.Value);
+                double rate = ModUtils.CalculateRateWithMods(mods.Value);
 
-                    rateAdjustedDifficulty = ruleset.Value.CreateInstance().GetRateAdjustedDisplayDifficulty(originalDifficulty, rate);
-                    difficultyStatisticsDisplay.TooltipContent = new AdjustedAttributesTooltip.Data(originalDifficulty, rateAdjustedDifficulty);
-                }
+                BeatmapDifficulty rateAdjustedDifficulty = rulesetInstance.GetRateAdjustedDisplayDifficulty(originalDifficulty, rate);
+                difficultyStatisticsDisplay.TooltipContent = new AdjustedAttributesTooltip.Data(originalDifficulty, rateAdjustedDifficulty);
 
                 StatisticDifficulty.Data firstStatistic;
 
-                switch (ruleset.Value?.OnlineID)
+                switch (ruleset.Value.OnlineID)
                 {
                     case 3:
                         // Account for mania differences locally for now.
                         // Eventually this should be handled in a more modular way, allowing rulesets to return arbitrary difficulty attributes.
-                        ILegacyRuleset legacyRuleset = (ILegacyRuleset)ruleset.Value.CreateInstance();
+                        ILegacyRuleset legacyRuleset = (ILegacyRuleset)rulesetInstance;
 
                         // For the time being, the key count is static no matter what, because:
-                        // a) The method doesn't have knowledge of the active keymods. Doing so may require considerations for filtering.
-                        // b) Using the difficulty adjustment mod to adjust OD doesn't have an effect on conversion.
+                        // - The method doesn't have knowledge of the active keymods. Doing so may require considerations for filtering.
+                        // - Using the difficulty adjustment mod to adjust OD doesn't have an effect on conversion.
                         int keyCount = legacyRuleset.GetKeyCount(beatmap.Value.BeatmapInfo, mods.Value);
 
                         firstStatistic = new StatisticDifficulty.Data(BeatmapsetsStrings.ShowStatsCsMania, keyCount, keyCount, 10);
