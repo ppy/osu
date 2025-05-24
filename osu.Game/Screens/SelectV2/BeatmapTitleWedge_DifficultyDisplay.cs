@@ -15,6 +15,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
+using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Configuration;
@@ -218,24 +219,32 @@ namespace osu.Game.Screens.SelectV2
             {
                 base.LoadComplete();
 
-                beatmap.BindValueChanged(_ => updateDisplay());
-                ruleset.BindValueChanged(_ => updateDisplay());
+                beatmap.BindValueChanged(_ => updateDisplayDebounced());
+                ruleset.BindValueChanged(_ => updateDisplayDebounced());
 
                 mods.BindValueChanged(m =>
                 {
                     settingChangeTracker?.Dispose();
 
-                    updateDifficultyStatistics();
+                    updateDisplayDebounced();
 
                     settingChangeTracker = new ModSettingChangeTracker(m.NewValue);
-                    settingChangeTracker.SettingChanged += _ => updateDifficultyStatistics();
+                    settingChangeTracker.SettingChanged += _ => updateDisplayDebounced();
                 });
 
-                updateDisplay();
+                updateDisplayDebounced();
             }
 
             [Resolved]
             private ILinkHandler? linkHandler { get; set; }
+
+            private ScheduledDelegate? updateDebounce;
+
+            private void updateDisplayDebounced()
+            {
+                updateDebounce?.Cancel();
+                updateDebounce = Scheduler.AddDelayed(updateDisplay, 100);
+            }
 
             private void updateDisplay()
             {
@@ -287,7 +296,7 @@ namespace osu.Game.Screens.SelectV2
                 {
                     // This can take time as it is a synchronous task.
                     // TODO: We're calling `GetPlayableBeatmap` multiple times every map load at song select.
-                    var playableBeatmap = beatmap.Value.GetPlayableBeatmap(ruleset.Value);
+                    var playableBeatmap = beatmap.Value.GetPlayableBeatmap(ruleset.Value, mods.Value);
                     var statistics = playableBeatmap.GetStatistics()
                                                     .Select(s => new StatisticDifficulty.Data(s.Name, s.BarDisplayLength ?? 0, s.BarDisplayLength ?? 0, 1, s.Content))
                                                     .ToList();
