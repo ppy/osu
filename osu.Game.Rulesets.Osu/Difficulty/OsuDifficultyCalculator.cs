@@ -181,7 +181,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (mods.Any(m => m is OsuModAutopilot))
                 return 0;
 
-            double aimRating = Math.Sqrt(aimDifficultyValue) * difficulty_multiplier;
+            double aimRating = calculateDifficultyRating(aimDifficultyValue);
 
             if (mods.Any(m => m is OsuModTouchDevice))
                 aimRating = Math.Pow(aimRating, 0.8);
@@ -228,7 +228,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (mods.Any(m => m is OsuModRelax))
                 return 0;
 
-            double speedRating = Math.Sqrt(speedDifficultyValue) * difficulty_multiplier;
+            double speedRating = calculateDifficultyRating(speedDifficultyValue);
 
             if (mods.Any(m => m is OsuModAutopilot))
                 speedRating *= 0.5;
@@ -270,7 +270,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (!mods.Any(m => m is OsuModFlashlight))
                 return 0;
 
-            double flashlightRating = Math.Sqrt(flashlightDifficultyValue) * difficulty_multiplier;
+            double flashlightRating = calculateDifficultyRating(flashlightDifficultyValue);
 
             if (mods.Any(m => m is OsuModTouchDevice))
                 flashlightRating = Math.Pow(flashlightRating, 0.8);
@@ -320,8 +320,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private static double calculateMechanicalDifficultyRating(double aimDifficultyValue, double speedDifficultyValue)
         {
-            double aimValue = OsuStrainSkill.DifficultyToPerformance(Math.Sqrt(aimDifficultyValue) * difficulty_multiplier);
-            double speedValue = OsuStrainSkill.DifficultyToPerformance(Math.Sqrt(speedDifficultyValue) * difficulty_multiplier);
+            double aimValue = OsuStrainSkill.DifficultyToPerformance(calculateDifficultyRating(aimDifficultyValue));
+            double speedValue = OsuStrainSkill.DifficultyToPerformance(calculateDifficultyRating(speedDifficultyValue));
 
             double totalValue = Math.Pow(Math.Pow(aimValue, 1.1) + Math.Pow(speedValue, 1.1), 1 / 1.1);
 
@@ -335,6 +335,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             return Math.Cbrt(multiplier) * star_rating_multiplier * (Math.Cbrt(100000 / Math.Pow(2, 1 / 1.1) * basePerformance) + 4);
         }
+
+        private static double calculateDifficultyRating(double difficultyValue) => Math.Sqrt(difficultyValue) * difficulty_multiplier;
 
         protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
         {
