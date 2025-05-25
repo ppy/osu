@@ -56,7 +56,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // Start from normal curve, rewarding lower AR up to AR5
             double readingBonus = 0.04 * (12.0 - Math.Max(approachRate, 5));
 
-            // Nerf initial bonus depending on visibility factor
             readingBonus *= visibilityFactor;
 
             // For AR up to 0 - reduce reward for very low ARs when object is visible
