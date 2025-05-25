@@ -4,7 +4,6 @@
 using System.Collections.Generic;
 using osu.Game.Rulesets.Edit.Checks.Components;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Rulesets.Edit.Checks
 {
@@ -21,6 +20,12 @@ namespace osu.Game.Rulesets.Edit.Checks
             new IssueTemplateConcurrentDifferent(this)
         };
 
+        /// <summary>
+        /// Determines whether two hitobjects can be considered concurrent based on ruleset requirements.
+        /// </summary>
+        /// <returns>Whether the two hitobjects can be concurrent.</returns>
+        protected virtual bool ConcurrentCondition(HitObject first, HitObject second) => true;
+
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
             var hitObjects = context.Beatmap.HitObjects;
@@ -33,9 +38,8 @@ namespace osu.Game.Rulesets.Edit.Checks
                 {
                     var nextHitobject = hitObjects[j];
 
-                    // Accounts for rulesets with hitobjects separated by columns, such as Mania.
-                    // In these cases we only care about concurrent objects within the same column.
-                    if ((hitobject as IHasColumn)?.Column != (nextHitobject as IHasColumn)?.Column)
+                    // Some rulesets impose additional requirements for concurrency, such as Mania only considering hitobjects in the same column.
+                    if (!ConcurrentCondition(hitobject, nextHitobject))
                         continue;
 
                     // Two hitobjects cannot be concurrent without also being concurrent with all objects in between.
