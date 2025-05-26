@@ -20,13 +20,7 @@ namespace osu.Game.Rulesets.Edit.Checks
             new IssueTemplateConcurrentDifferent(this)
         };
 
-        /// <summary>
-        /// The conditions that must hold true for any two hitobjects to be considered for the concurrency check.
-        /// </summary>
-        /// <returns>Whether the two hitobjects could be concurrent.</returns>
-        protected virtual bool ConcurrencyPrecondition(HitObject first, HitObject second) => true;
-
-        public IEnumerable<Issue> Run(BeatmapVerifierContext context)
+        public virtual IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
             var hitObjects = context.Beatmap.HitObjects;
 
@@ -38,13 +32,9 @@ namespace osu.Game.Rulesets.Edit.Checks
                 {
                     var nextHitobject = hitObjects[j];
 
-                    // Some rulesets impose additional preconditions for concurrency, such as Mania only considering hitobjects in the same column.
-                    if (!ConcurrencyPrecondition(hitobject, nextHitobject))
-                        continue;
-
                     // Two hitobjects cannot be concurrent without also being concurrent with all objects in between.
                     // So if the next object is not concurrent, then we know no future objects will be either.
-                    if (!areConcurrent(hitobject, nextHitobject))
+                    if (!AreConcurrent(hitobject, nextHitobject))
                         break;
 
                     if (hitobject.GetType() == nextHitobject.GetType())
@@ -55,7 +45,7 @@ namespace osu.Game.Rulesets.Edit.Checks
             }
         }
 
-        private bool areConcurrent(HitObject hitobject, HitObject nextHitobject) => nextHitobject.StartTime <= hitobject.GetEndTime() + ms_leniency;
+        protected bool AreConcurrent(HitObject hitobject, HitObject nextHitobject) => nextHitobject.StartTime <= hitobject.GetEndTime() + ms_leniency;
 
         public abstract class IssueTemplateConcurrent : IssueTemplate
         {
