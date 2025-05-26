@@ -270,9 +270,6 @@ namespace osu.Game.Screens.Menu
         }
 
         [CanBeNull]
-        private Drawable proxiedLogo;
-
-        [CanBeNull]
         private ScheduledDelegate mobileDisclaimerSchedule;
 
         protected override void LogoArriving(OsuLogo logo, bool resuming)
@@ -284,7 +281,7 @@ namespace osu.Game.Screens.Menu
             logo.FadeColour(Color4.White, 100, Easing.OutQuint);
             logo.FadeIn(100, Easing.OutQuint);
 
-            proxiedLogo = logo.ProxyToContainer(logoTarget);
+            logo.ProxyToContainer(logoTarget);
 
             if (resuming)
             {
@@ -343,11 +340,7 @@ namespace osu.Game.Screens.Menu
             var seq = logo.FadeOut(300, Easing.InSine)
                           .ScaleTo(0.2f, 300, Easing.InSine);
 
-            if (proxiedLogo != null)
-            {
-                logo.ReturnProxy();
-                proxiedLogo = null;
-            }
+            logo.ReturnProxy();
 
             seq.OnComplete(_ => Buttons.SetOsuLogo(null));
             seq.OnAbort(_ => Buttons.SetOsuLogo(null));
@@ -357,11 +350,7 @@ namespace osu.Game.Screens.Menu
         {
             base.LogoExiting(logo);
 
-            if (proxiedLogo != null)
-            {
-                logo.ReturnProxy();
-                proxiedLogo = null;
-            }
+            logo.ReturnProxy();
         }
 
         public override void OnSuspending(ScreenTransitionEvent e)
