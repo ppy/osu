@@ -35,6 +35,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Footer;
 using osu.Game.Screens.Menu;
+using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Select;
 using osu.Game.Skinning;
@@ -50,7 +51,7 @@ namespace osu.Game.Screens.SelectV2
     /// This will be gradually built upon and ultimately replace <see cref="Select.SongSelect"/> once everything is in place.
     /// </summary>
     [Cached(typeof(ISongSelect))]
-    public abstract partial class SongSelect : OsuScreen, IKeyBindingHandler<GlobalAction>, ISongSelect
+    public abstract partial class SongSelect : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>, ISongSelect
     {
         // this is intentionally slightly higher than key repeat, but low enough to not impeded user experience.
         // this avoids rapid churn loading when iterating the carousel using keyboard.
@@ -346,6 +347,17 @@ namespace osu.Game.Screens.SelectV2
 
             if (this.IsCurrentScreen())
                 ensurePlayingSelected();
+
+            // If not the current screen, this will be applied in OnResuming.
+            if (this.IsCurrentScreen())
+            {
+                ApplyToBackground(backgroundModeBeatmap =>
+                {
+                    backgroundModeBeatmap.Beatmap = beatmap;
+                    backgroundModeBeatmap.IgnoreUserSettings.Value = true;
+                    backgroundModeBeatmap.FadeColour(Color4.White, 250);
+                });
+            }
         }
 
         #endregion
