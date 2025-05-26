@@ -341,6 +341,9 @@ namespace osu.Game.Screens.SelectV2
 
         private void selectBeatmap(WorkingBeatmap beatmap)
         {
+            if (beatmap.BeatmapInfo.BeatmapSet!.Protected)
+                return;
+
             carousel.CurrentSelection = beatmap.BeatmapInfo;
 
             Beatmap.Value = beatmap;
@@ -377,9 +380,13 @@ namespace osu.Game.Screens.SelectV2
             modSelectOverlay.Beatmap.BindTo(Beatmap);
             modSelectOverlay.SelectedMods.BindTo(Mods);
 
-            selectBeatmap(Beatmap.Value);
-
             beginLooping();
+
+            // force reselection if entering song select with a protected beatmap
+            if (Beatmap.Value.BeatmapInfo.BeatmapSet!.Protected)
+                Beatmap.SetDefault();
+            else
+                selectBeatmap(Beatmap.Value);
         }
 
         public override void OnResuming(ScreenTransitionEvent e)
@@ -401,6 +408,11 @@ namespace osu.Game.Screens.SelectV2
             modSelectOverlay.SelectedMods.BindTo(Mods);
 
             beginLooping();
+
+            if (Beatmap.Value.BeatmapInfo.BeatmapSet!.Protected)
+                Beatmap.SetDefault();
+            else
+                selectBeatmap(Beatmap.Value);
         }
 
         public override void OnSuspending(ScreenTransitionEvent e)
