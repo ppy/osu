@@ -690,7 +690,7 @@ namespace osu.Game.Screens.SelectV2
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Font = OsuFont.Style.Heading2,
-                    Text = rank == null ? "-" : rank.Value.FormatRank().Insert(0, "#"),
+                    Text = rank?.FormatRank().Insert(0, "#") ?? "-",
                     Shadow = !darkText,
                 };
             }
