@@ -8,6 +8,7 @@ using NUnit.Framework;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
+using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Overlays.Mods;
@@ -469,6 +470,50 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             AddStep("click", () => this.ChildrenOfType<FooterButtonOptions>().Single().TriggerClick());
             AddUntilStep("popover displayed", () => this.ChildrenOfType<FooterButtonOptions.Popover>().Any(p => p.IsPresent));
+        }
+
+        [Test]
+        public void TestSelectionChangedFromProtectedToNone()
+        {
+            ImportBeatmapForRuleset(0);
+            AddStep("set protected on import", () => Realm.Write(r => r.All<BeatmapSetInfo>().First(s => !s.DeletePending).Protected = true));
+
+            AddStep("selected protected", () => Beatmap.Value = Beatmaps.GetWorkingBeatmap(Beatmaps.GetAllUsableBeatmapSets().First(s => s.Protected).Beatmaps.First()));
+
+            LoadSongSelect();
+
+            AddUntilStep("beatmap deselected", () => Beatmap.IsDefault);
+        }
+
+        [Test]
+        public void TestSelectionChangedFromProtectedToSomething()
+        {
+            ImportBeatmapForRuleset(0);
+            AddStep("set protected on import", () => Realm.Write(r => r.All<BeatmapSetInfo>().First(s => !s.DeletePending).Protected = true));
+
+            AddStep("selected protected", () => Beatmap.Value = Beatmaps.GetWorkingBeatmap(Beatmaps.GetAllUsableBeatmapSets().First(s => s.Protected).Beatmaps.First()));
+
+            ImportBeatmapForRuleset(0);
+
+            LoadSongSelect();
+
+            AddUntilStep("beatmap selected", () => !Beatmap.IsDefault);
+            AddUntilStep("selection not protected", () => !Beatmap.Value.BeatmapSetInfo.Protected);
+        }
+
+        [Test]
+        public void TestSelectAfterDeletion()
+        {
+            LoadSongSelect();
+
+            ImportBeatmapForRuleset(0);
+            AddUntilStep("beatmap selected", () => !Beatmap.IsDefault);
+
+            AddStep("delete all beatmaps", () => Beatmaps.Delete());
+            AddUntilStep("beatmap not selected", () => Beatmap.IsDefault);
+
+            AddStep("restore deleted", () => Beatmaps.UndeleteAll());
+            AddUntilStep("beatmap selected", () => !Beatmap.IsDefault);
         }
 
         [Test]
