@@ -83,6 +83,7 @@ namespace osu.Game.Screens.SelectV2
                         textFlow = new LinkFlowContainer
                         {
                             Alpha = 0,
+                            AlwaysPresent = true,
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                             Padding = new MarginPadding { Top = 20 },
