@@ -47,9 +47,15 @@ namespace osu.Game.Screens.SelectV2
 
         protected Container Content { get; private set; } = null!;
 
-        public Drawable Background { set => backgroundContainer.Child = value; }
+        public Drawable Background
+        {
+            set => backgroundContainer.Child = value;
+        }
 
-        public Drawable Icon { set => iconContainer.Child = value; }
+        public Drawable Icon
+        {
+            set => iconContainer.Child = value;
+        }
 
         private Color4? accentColour;
 
