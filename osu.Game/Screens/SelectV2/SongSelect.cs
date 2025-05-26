@@ -469,7 +469,8 @@ namespace osu.Game.Screens.SelectV2
 
             logo.Action = () =>
             {
-                OnStart();
+                if (this.IsCurrentScreen())
+                    OnStart();
                 return false;
             };
         }
