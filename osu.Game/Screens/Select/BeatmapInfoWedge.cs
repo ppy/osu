@@ -185,7 +185,7 @@ namespace osu.Game.Screens.Select
             }
 
             private CancellationTokenSource cancellationSource;
-            private IBindable<StarDifficulty?> starDifficulty;
+            private IBindable<StarDifficulty> starDifficulty;
 
             [BackgroundDependencyLoader]
             private void load(LocalisationManager localisation)
@@ -329,7 +329,7 @@ namespace osu.Game.Screens.Select
                 starDifficulty = difficultyCache.GetBindableDifficulty(working.BeatmapInfo, (cancellationSource = new CancellationTokenSource()).Token);
                 starDifficulty.BindValueChanged(s =>
                 {
-                    starRatingDisplay.Current.Value = s.NewValue ?? default;
+                    starRatingDisplay.Current.Value = s.NewValue;
 
                     // Don't roll the counter on initial display (but still allow it to roll on applying mods etc.)
                     if (!starRatingDisplay.IsPresent)

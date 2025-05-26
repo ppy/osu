@@ -51,7 +51,7 @@ namespace osu.Game.Screens.SelectV2
         [Resolved]
         private BeatmapDifficultyCache difficultyCache { get; set; } = null!;
 
-        private IBindable<StarDifficulty?>? starDifficultyBindable;
+        private IBindable<StarDifficulty>? starDifficultyBindable;
         private CancellationTokenSource? starDifficultyCancellationSource;
 
         private PanelSetBackground background = null!;

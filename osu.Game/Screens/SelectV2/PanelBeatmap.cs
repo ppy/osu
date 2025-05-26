@@ -37,7 +37,7 @@ namespace osu.Game.Screens.SelectV2
         private OsuSpriteText difficultyText = null!;
         private OsuSpriteText authorText = null!;
 
-        private IBindable<StarDifficulty?>? starDifficultyBindable;
+        private IBindable<StarDifficulty>? starDifficultyBindable;
         private CancellationTokenSource? starDifficultyCancellationSource;
 
         [Resolved]
