@@ -51,24 +51,25 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             List<double> notes = peaks.ToList();
 
-            const double reduced_duration = 40 * 1000.0;
+            const double reduced_duration = 60 * 1000.0;
 
-            const double reduced_base_line = 0.7;
+            const double reduced_base_line = 0.0; // Assume the first seconds are completely memorised
 
-            double reducedSectionCount = 0;
+            double reducedNoteCount = 0;
 
             foreach (var hitObject in objectList)
             {
                 if (hitObject.StartTime / clockRate > reduced_duration)
                     break;
 
-                reducedSectionCount++;
+                reducedNoteCount++;
             }
 
-            for (int i = 0; i < Math.Min(notes.Count, reducedSectionCount); i++)
+            for (int i = 0; i < Math.Min(notes.Count, reducedNoteCount); i++)
             {
-                double scale = Math.Log10(Interpolation.Lerp(1, 10, Math.Clamp((float)i / reducedSectionCount, 0, 1)));
-                notes[i] *= Interpolation.Lerp(reduced_base_line, 1.0, scale);
+                double scale = Math.Log10(Interpolation.Lerp(1, 10, Math.Clamp((float)i / reducedNoteCount, 0, 1)));
+                double mult = Interpolation.Lerp(reduced_base_line, 1.0, scale);
+                notes[i] *= mult;
             }
 
             int index = 0;
