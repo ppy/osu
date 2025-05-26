@@ -53,7 +53,7 @@ namespace osu.Game.Screens.SelectV2
     [Cached(typeof(ISongSelect))]
     public abstract partial class SongSelect : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>, ISongSelect
     {
-        // this is intentionally slightly higher than key repeat, but low enough to not impeded user experience.
+        // this is intentionally slightly higher than key repeat, but low enough to not impede user experience.
         // this avoids rapid churn loading when iterating the carousel using keyboard.
         public const int SELECTION_DEBOUNCE = 100;
 
