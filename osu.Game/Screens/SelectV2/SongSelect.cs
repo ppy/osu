@@ -255,7 +255,7 @@ namespace osu.Game.Screens.SelectV2
             {
                 logo?.ScaleTo(v.NewValue == Visibility.Visible ? 0f : logo_scale, 400, Easing.OutQuint)
                     .FadeTo(v.NewValue == Visibility.Visible ? 0f : 1f, 200, Easing.OutQuint);
-            }, true);
+            });
         }
 
         protected override void Update()
