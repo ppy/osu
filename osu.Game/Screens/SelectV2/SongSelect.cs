@@ -234,11 +234,15 @@ namespace osu.Game.Screens.SelectV2
         {
             new FooterButtonMods(modSelectOverlay)
             {
+                Hotkey = GlobalAction.ToggleModSelection,
                 Current = Mods,
                 RequestDeselectAllMods = () => Mods.Value = Array.Empty<Mod>()
             },
             new FooterButtonRandom(),
-            new FooterButtonOptions(),
+            new FooterButtonOptions
+            {
+                Hotkey = GlobalAction.ToggleBeatmapOptions,
+            }
         };
 
         protected override void LoadComplete()
