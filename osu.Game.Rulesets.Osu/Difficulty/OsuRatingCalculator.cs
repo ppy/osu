@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (mods.Any(m => m is OsuModAutopilot))
                 return 0;
 
-            double aimRating = Math.Sqrt(aimDifficultyValue) * difficulty_multiplier;
+            double aimRating = CalculateDifficultyRating(aimDifficultyValue);
 
             if (mods.Any(m => m is OsuModTouchDevice))
                 aimRating = Math.Pow(aimRating, 0.8);
@@ -80,7 +80,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (mods.Any(m => m is OsuModRelax))
                 return 0;
 
-            double speedRating = Math.Sqrt(speedDifficultyValue) * difficulty_multiplier;
+            double speedRating = CalculateDifficultyRating(speedDifficultyValue);
 
             if (mods.Any(m => m is OsuModAutopilot))
                 speedRating *= 0.5;
@@ -122,7 +122,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (!mods.Any(m => m is OsuModFlashlight))
                 return 0;
 
-            double flashlightRating = Math.Sqrt(flashlightDifficultyValue) * difficulty_multiplier;
+            double flashlightRating = CalculateDifficultyRating(flashlightDifficultyValue);
 
             if (mods.Any(m => m is OsuModTouchDevice))
                 flashlightRating = Math.Pow(flashlightRating, 0.8);
