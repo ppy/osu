@@ -1108,6 +1108,8 @@ namespace osu.Game
                                     Action = handleBackButton,
                                 },
                                 logoContainer = new Container { RelativeSizeAxes = Axes.Both },
+                                // TODO: what is this? why is this?
+                                // TODO: this is being screen scaled even though it's probably AN OVERLAY.
                                 footerBasedOverlayContent = new Container
                                 {
                                     Depth = -1,
@@ -1119,6 +1121,7 @@ namespace osu.Game
                                     RelativeSizeAxes = Axes.Both,
                                     Child = ScreenFooter = new ScreenFooter(backReceptor)
                                     {
+                                        // TODO: this is really really weird and should not exist.
                                         RequestLogoInFront = inFront => ScreenContainer.ChangeChildDepth(logoContainer, inFront ? float.MinValue : 0),
                                         BackButtonPressed = handleBackButton
                                     },
