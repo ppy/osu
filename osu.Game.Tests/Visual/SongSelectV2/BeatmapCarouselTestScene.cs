@@ -107,8 +107,9 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                             {
                                 Carousel = new TestBeatmapCarousel
                                 {
-                                    NewItemsPresented = () => NewItemsPresentedInvocationCount++,
-                                    ChooseRecommendedBeatmap = beatmaps => BeatmapRecommendationFunction?.Invoke(beatmaps) ?? beatmaps.First(),
+                                    NewItemsPresented = _ => NewItemsPresentedInvocationCount++,
+                                    RequestSelection = b => Carousel.CurrentSelection = b,
+                                    RequestRecommendedSelection = beatmaps => Carousel.CurrentSelection = BeatmapRecommendationFunction?.Invoke(beatmaps) ?? beatmaps.First(),
                                     BleedTop = 50,
                                     BleedBottom = 50,
                                     Anchor = Anchor.Centre,

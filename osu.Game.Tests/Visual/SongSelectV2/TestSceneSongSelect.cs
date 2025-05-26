@@ -8,6 +8,7 @@ using NUnit.Framework;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
+using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Overlays.Mods;
@@ -36,10 +37,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             AddAssert("beatmap imported", () => Beatmaps.GetAllUsableBeatmapSets().Any(), () => Is.True);
 
-            // song select should automatically select the beatmap for us but this is not implemented yet.
-            // todo: remove when that's the case.
-            AddAssert("no beatmap selected", () => Beatmap.IsDefault);
-            AddStep("select beatmap", () => Beatmap.Value = Beatmaps.GetWorkingBeatmap(Beatmaps.GetAllUsableBeatmapSets().Single().Beatmaps.First()));
             AddAssert("beatmap selected", () => !Beatmap.IsDefault);
 
             AddStep("import score", () =>
@@ -90,11 +87,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             ImportBeatmapForRuleset(0);
 
             AddAssert("beatmap imported", () => Beatmaps.GetAllUsableBeatmapSets().Any(), () => Is.True);
-
-            // song select should automatically select the beatmap for us but this is not implemented yet.
-            // todo: remove when that's the case.
-            AddAssert("no beatmap selected", () => Beatmap.IsDefault);
-            AddStep("select beatmap", () => Beatmap.Value = Beatmaps.GetWorkingBeatmap(Beatmaps.GetAllUsableBeatmapSets().Single().Beatmaps.First()));
             AddAssert("beatmap selected", () => !Beatmap.IsDefault);
 
             AddStep("press shift-delete", () =>
@@ -253,11 +245,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             ImportBeatmapForRuleset(0);
 
             LoadSongSelect();
-
-            // song select should automatically select the beatmap for us but this is not implemented yet.
-            // todo: remove when that's the case.
-            AddAssert("no beatmap selected", () => Beatmap.IsDefault);
-            AddStep("select beatmap", () => Beatmap.Value = Beatmaps.GetWorkingBeatmap(Beatmaps.GetAllUsableBeatmapSets().Single().Beatmaps.First()));
             AddStep("press right", () => InputManager.Key(Key.Right)); // press right to select in carousel, also remove.
             AddAssert("beatmap selected", () => !Beatmap.IsDefault);
 
@@ -283,11 +270,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             ImportBeatmapForRuleset(0);
 
             LoadSongSelect();
-
-            // song select should automatically select the beatmap for us but this is not implemented yet.
-            // todo: remove when that's the case.
-            AddAssert("no beatmap selected", () => Beatmap.IsDefault);
-            AddStep("select beatmap", () => Beatmap.Value = Beatmaps.GetWorkingBeatmap(Beatmaps.GetAllUsableBeatmapSets().Single().Beatmaps.First()));
             AddStep("press right", () => InputManager.Key(Key.Right)); // press right to select in carousel, also remove.
             AddAssert("beatmap selected", () => !Beatmap.IsDefault);
 
@@ -315,11 +297,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             ImportBeatmapForRuleset(0);
 
             LoadSongSelect();
-
-            // song select should automatically select the beatmap for us but this is not implemented yet.
-            // todo: remove when that's the case.
-            AddAssert("no beatmap selected", () => Beatmap.IsDefault);
-            AddStep("select beatmap", () => Beatmap.Value = Beatmaps.GetWorkingBeatmap(Beatmaps.GetAllUsableBeatmapSets().Single().Beatmaps.First()));
             AddStep("press right", () => InputManager.Key(Key.Right)); // press right to select in carousel, also remove.
             AddAssert("beatmap selected", () => !Beatmap.IsDefault);
 
@@ -460,15 +437,54 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             LoadSongSelect();
 
             ImportBeatmapForRuleset(0);
-
-            // song select should automatically select the beatmap for us but this is not implemented yet.
-            // todo: remove when that's the case.
-            AddAssert("no beatmap selected", () => Beatmap.IsDefault);
-            AddStep("select beatmap", () => Beatmap.Value = Beatmaps.GetWorkingBeatmap(Beatmaps.GetAllUsableBeatmapSets().Single().Beatmaps.First()));
             AddAssert("options enabled", () => this.ChildrenOfType<FooterButtonOptions>().Single().Enabled.Value);
 
             AddStep("click", () => this.ChildrenOfType<FooterButtonOptions>().Single().TriggerClick());
             AddUntilStep("popover displayed", () => this.ChildrenOfType<FooterButtonOptions.Popover>().Any(p => p.IsPresent));
+        }
+
+        [Test]
+        public void TestSelectionChangedFromProtectedToNone()
+        {
+            ImportBeatmapForRuleset(0);
+            AddStep("set protected on import", () => Realm.Write(r => r.All<BeatmapSetInfo>().First(s => !s.DeletePending).Protected = true));
+
+            AddStep("selected protected", () => Beatmap.Value = Beatmaps.GetWorkingBeatmap(Beatmaps.GetAllUsableBeatmapSets().First(s => s.Protected).Beatmaps.First()));
+
+            LoadSongSelect();
+
+            AddUntilStep("beatmap deselected", () => Beatmap.IsDefault);
+        }
+
+        [Test]
+        public void TestSelectionChangedFromProtectedToSomething()
+        {
+            ImportBeatmapForRuleset(0);
+            AddStep("set protected on import", () => Realm.Write(r => r.All<BeatmapSetInfo>().First(s => !s.DeletePending).Protected = true));
+
+            AddStep("selected protected", () => Beatmap.Value = Beatmaps.GetWorkingBeatmap(Beatmaps.GetAllUsableBeatmapSets().First(s => s.Protected).Beatmaps.First()));
+
+            ImportBeatmapForRuleset(0);
+
+            LoadSongSelect();
+
+            AddUntilStep("beatmap selected", () => !Beatmap.IsDefault);
+            AddUntilStep("selection not protected", () => !Beatmap.Value.BeatmapSetInfo.Protected);
+        }
+
+        [Test]
+        public void TestSelectAfterDeletion()
+        {
+            LoadSongSelect();
+
+            ImportBeatmapForRuleset(0);
+            AddUntilStep("beatmap selected", () => !Beatmap.IsDefault);
+
+            AddStep("delete all beatmaps", () => Beatmaps.Delete());
+            AddUntilStep("beatmap not selected", () => Beatmap.IsDefault);
+
+            AddStep("restore deleted", () => Beatmaps.UndeleteAll());
+            AddUntilStep("beatmap selected", () => !Beatmap.IsDefault);
         }
 
         [Test]
@@ -478,16 +494,9 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             ImportBeatmapForRuleset(0);
 
-            // song select should automatically select the beatmap for us but this is not implemented yet.
-            // todo: remove when that's the case.
-            AddAssert("no beatmap selected", () => Beatmap.IsDefault);
-            AddStep("select beatmap", () => Beatmap.Value = Beatmaps.GetWorkingBeatmap(Beatmaps.GetAllUsableBeatmapSets().Single().Beatmaps.First()));
-
             AddAssert("options enabled", () => this.ChildrenOfType<FooterButtonOptions>().Single().Enabled.Value);
             AddStep("delete all beatmaps", () => Beatmaps.Delete());
 
-            // song select should automatically select the beatmap for us but this is not implemented yet.
-            // todo: remove when that's the case.
             AddAssert("beatmap selected", () => !Beatmap.IsDefault);
             AddStep("select no beatmap", () => Beatmap.SetDefault());
 

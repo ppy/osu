@@ -39,7 +39,7 @@ namespace osu.Game.Graphics.Carousel
         /// <summary>
         /// Called after a filter operation or change in items results in the visible carousel items changing.
         /// </summary>
-        public Action? NewItemsPresented { private get; init; }
+        public Action<IEnumerable<CarouselItem>>? NewItemsPresented { private get; init; }
 
         /// <summary>
         /// Height of the area above the carousel that should be treated as visible due to transparency of elements in front of it.
@@ -318,7 +318,7 @@ namespace osu.Game.Graphics.Carousel
                 if (!Scroll.UserScrolling)
                     scrollToSelection();
 
-                NewItemsPresented?.Invoke();
+                NewItemsPresented?.Invoke(carouselItems);
             });
 
             return items;
