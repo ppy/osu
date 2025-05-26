@@ -27,9 +27,14 @@ namespace osu.Game.Screens.SelectV2
         public Action<BeatmapInfo>? RequestPresentBeatmap { private get; init; }
 
         /// <summary>
-        /// From the provided beatmaps, return the most appropriate one for the user's skill.
+        /// From the provided beatmaps, select the most appropriate one for the user's skill.
         /// </summary>
-        public Func<IEnumerable<BeatmapInfo>, BeatmapInfo>? ChooseRecommendedBeatmap { private get; init; }
+        public required Action<IEnumerable<BeatmapInfo>> RequestRecommendedSelection { private get; init; }
+
+        /// <summary>
+        /// Selection requested for the provided beatmap.
+        /// </summary>
+        public required Action<BeatmapInfo> RequestSelection { private get; init; }
 
         public const float SPACING = 3f;
 
@@ -139,7 +144,7 @@ namespace osu.Game.Screens.SelectV2
                             // TODO: should this exist in song select instead of here?
                             // we need to ensure the global beatmap is also updated alongside changes.
                             if (CurrentSelection != null && CheckModelEquality(beatmap, CurrentSelection))
-                                CurrentSelection = matchingNewBeatmap;
+                                RequestSelection(matchingNewBeatmap);
 
                             Items.ReplaceRange(previousIndex, 1, [matchingNewBeatmap]);
                             newSetBeatmaps.Remove(matchingNewBeatmap);
@@ -190,7 +195,7 @@ namespace osu.Game.Screens.SelectV2
                     if (grouping.SetItems.TryGetValue(setInfo, out var items))
                     {
                         var beatmaps = items.Select(i => i.Model).OfType<BeatmapInfo>();
-                        CurrentSelection = ChooseRecommendedBeatmap?.Invoke(beatmaps) ?? beatmaps.First();
+                        RequestRecommendedSelection(beatmaps);
                     }
 
                     return;
@@ -202,7 +207,7 @@ namespace osu.Game.Screens.SelectV2
                         return;
                     }
 
-                    CurrentSelection = beatmapInfo;
+                    RequestSelection(beatmapInfo);
                     return;
             }
         }
