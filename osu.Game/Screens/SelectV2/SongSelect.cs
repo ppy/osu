@@ -21,6 +21,7 @@ using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
+using osu.Game.Graphics.Carousel;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
@@ -192,7 +193,7 @@ namespace osu.Game.Screens.SelectV2
                                                                 RelativeSizeAxes = Axes.Both,
                                                                 RequestPresentBeatmap = _ => OnStart(),
                                                                 RequestSelection = selectBeatmap,
-                                                                RequestRecommendedSelection = beatmaps => { selectBeatmap(difficultyRecommender?.GetRecommendedBeatmap(beatmaps) ?? beatmaps.First()); },
+                                                                RequestRecommendedSelection = selectRecommendedBeatmap,
                                                                 NewItemsPresented = newItemsPresented,
                                                             },
                                                             noResultsPlaceholder = new NoResultsPlaceholder(),
@@ -323,6 +324,11 @@ namespace osu.Game.Screens.SelectV2
         #region Selection handling
 
         private ScheduledDelegate? selectionDebounce;
+
+        private void selectRecommendedBeatmap(IEnumerable<BeatmapInfo> beatmaps)
+        {
+            selectBeatmap(difficultyRecommender?.GetRecommendedBeatmap(beatmaps) ?? beatmaps.First());
+        }
 
         private void selectBeatmap(BeatmapInfo beatmap)
         {
@@ -473,7 +479,7 @@ namespace osu.Game.Screens.SelectV2
             filterDebounce = Scheduler.AddDelayed(() => { carousel.Filter(criteria); }, filter_delay);
         }
 
-        private void newItemsPresented()
+        private void newItemsPresented(IEnumerable<CarouselItem> carouselItems)
         {
             int count = carousel.MatchedBeatmapsCount;
 
@@ -488,6 +494,16 @@ namespace osu.Game.Screens.SelectV2
             // Intentionally not localised until we have proper support for this (see https://github.com/ppy/osu-framework/pull/4918
             // but also in this case we want support for formatting a number within a string).
             filterControl.StatusText = count != 1 ? $"{count:#,0} matches" : $"{count:#,0} match";
+
+            if (!carouselItems.Any())
+            {
+                Beatmap.SetDefault();
+                return;
+            }
+
+            if (Beatmap.IsDefault || Beatmap.Value.BeatmapSetInfo?.DeletePending == true)
+                // TODO: this should probably use random, not recommended like this.
+                selectRecommendedBeatmap(carouselItems.Select(i => i.Model).OfType<BeatmapInfo>());
         }
 
         #endregion
