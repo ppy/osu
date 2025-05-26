@@ -5,7 +5,6 @@ using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -22,7 +21,6 @@ using osu.Game.Overlays;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
-using WebCommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
 
 namespace osu.Game.Screens.SelectV2
 {
@@ -65,14 +63,23 @@ namespace osu.Game.Screens.SelectV2
                 addButton(SongSelectStrings.DeleteBeatmap, FontAwesome.Solid.Trash, () => SongSelect?.Delete(beatmap.BeatmapSetInfo), colours.Red1);
 
                 addHeader(SongSelectStrings.ForSelectedDifficulty, beatmap.BeatmapInfo.DifficultyName);
-                // TODO: replace with "remove from played" button when beatmap is already played.
-                addButton(SongSelectStrings.MarkAsPlayed, FontAwesome.Regular.TimesCircle, () => SongSelect?.MarkPlayed(beatmap.BeatmapInfo));
-                addButton(SongSelectStrings.ClearAllLocalScores, FontAwesome.Solid.Eraser, () => SongSelect?.ClearScores(beatmap.BeatmapInfo), colours.Red1);
 
-                if (SongSelect?.EditingAllowed == true)
-                    addButton(SongSelectStrings.EditBeatmap, FontAwesome.Solid.PencilAlt, () => SongSelect.Edit(beatmap.BeatmapInfo));
+                if (SongSelect == null) return;
 
-                addButton(WebCommonStrings.ButtonsHide.ToSentence(), FontAwesome.Solid.Magic, () => SongSelect?.Hide(beatmap.BeatmapInfo));
+                foreach (OsuMenuItem item in SongSelect.GetForwardActions(beatmap.BeatmapInfo))
+                {
+                    if (item is OsuMenuItemSpacer)
+                    {
+                        buttonFlow.Add(new Container
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Height = 10,
+                        });
+                        continue;
+                    }
+
+                    addButton(item.Text.Value, item.Icon, item.Action.Value, item.Type == MenuItemType.Destructive ? colours.Red1 : null);
+                }
             }
 
             protected override void LoadComplete()
@@ -112,12 +119,12 @@ namespace osu.Game.Screens.SelectV2
                 buttonFlow.Add(textFlow);
             }
 
-            private void addButton(LocalisableString text, IconUsage icon, Action? action, Color4? colour = null)
+            private void addButton(LocalisableString text, IconUsage? icon, Action? action, Color4? colour = null)
             {
                 var button = new OptionButton
                 {
                     Text = text,
-                    Icon = icon,
+                    Icon = icon ?? new IconUsage(),
                     BackgroundColour = ColourProvider.Background3,
                     TextColour = colour,
                     Action = () =>

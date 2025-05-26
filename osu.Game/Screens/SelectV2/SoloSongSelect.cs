@@ -5,13 +5,21 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.LocalisationExtensions;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Screens;
+using osu.Game.Beatmaps;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
+using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Screens.Edit;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Select;
 using osu.Game.Utils;
+using WebCommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
 
 namespace osu.Game.Screens.SelectV2
 {
@@ -21,9 +29,48 @@ namespace osu.Game.Screens.SelectV2
         private IReadOnlyList<Mod>? modsAtGameplayStart;
 
         [Resolved]
+        private BeatmapSetOverlay? beatmapOverlay { get; set; }
+
+        [Resolved]
+        private BeatmapManager beatmaps { get; set; } = null!;
+
+        [Resolved]
+        private IAPIProvider api { get; set; } = null!;
+
+        [Resolved]
         private INotificationOverlay? notifications { get; set; }
 
-        public override bool EditingAllowed => true;
+        [Resolved]
+        private IDialogOverlay? dialogOverlay { get; set; }
+
+        [Resolved]
+        private OsuGame? game { get; set; }
+
+        public override IEnumerable<OsuMenuItem> GetForwardActions(BeatmapInfo beatmap)
+        {
+            yield return new OsuMenuItem(ButtonSystemStrings.Play.ToSentence(), MenuItemType.Highlighted, () => SelectAndStart(beatmap)) { Icon = FontAwesome.Solid.Check };
+            yield return new OsuMenuItem(ButtonSystemStrings.Edit.ToSentence(), MenuItemType.Standard, () => edit(beatmap)) { Icon = FontAwesome.Solid.PencilAlt };
+
+            yield return new OsuMenuItemSpacer();
+
+            if (beatmap.OnlineID > 0)
+            {
+                yield return new OsuMenuItem("Details...", MenuItemType.Standard, () => beatmapOverlay?.FetchAndShowBeatmap(beatmap.OnlineID));
+
+                if (beatmap.GetOnlineURL(api, Ruleset.Value) is string url)
+                    yield return new OsuMenuItem(CommonStrings.CopyLink, MenuItemType.Standard, () => game?.CopyToClipboard(url));
+
+                yield return new OsuMenuItemSpacer();
+            }
+
+            // TODO: replace with "remove from played" button when beatmap is already played.
+            yield return new OsuMenuItem(SongSelectStrings.MarkAsPlayed, MenuItemType.Standard, () => beatmaps.MarkPlayed(beatmap)) { Icon = FontAwesome.Solid.TimesCircle };
+            yield return new OsuMenuItem(SongSelectStrings.ClearAllLocalScores, MenuItemType.Standard, () => dialogOverlay?.Push(new BeatmapClearScoresDialog(beatmap)))
+            {
+                Icon = FontAwesome.Solid.Eraser
+            };
+            yield return new OsuMenuItem(WebCommonStrings.ButtonsHide.ToSentence(), MenuItemType.Destructive, () => beatmaps.Hide(beatmap));
+        }
 
         protected override bool OnStart()
         {
@@ -73,6 +120,13 @@ namespace osu.Game.Screens.SelectV2
 
                 return player;
             }
+        }
+
+        private void edit(BeatmapInfo beatmap)
+        {
+            // Forced refetch is important here to guarantee correct invalidation across all difficulties.
+            Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap, true);
+            this.Push(new EditorLoader());
         }
 
         public override void OnResuming(ScreenTransitionEvent e)
