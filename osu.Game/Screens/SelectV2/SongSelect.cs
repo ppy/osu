@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Audio.Track;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -15,10 +16,12 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
+using osu.Game.Graphics.Carousel;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
@@ -32,6 +35,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Footer;
 using osu.Game.Screens.Menu;
+using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Select;
 using osu.Game.Skinning;
@@ -47,14 +51,24 @@ namespace osu.Game.Screens.SelectV2
     /// This will be gradually built upon and ultimately replace <see cref="Select.SongSelect"/> once everything is in place.
     /// </summary>
     [Cached(typeof(ISongSelect))]
-    public abstract partial class SongSelect : OsuScreen, IKeyBindingHandler<GlobalAction>, ISongSelect
+    public abstract partial class SongSelect : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>, ISongSelect
     {
+        // this is intentionally slightly higher than key repeat, but low enough to not impede user experience.
+        // this avoids rapid churn loading when iterating the carousel using keyboard.
+        public const int SELECTION_DEBOUNCE = 100;
+
         private const float logo_scale = 0.4f;
         private const double fade_duration = 300;
 
         public const float WEDGE_CONTENT_MARGIN = CORNER_RADIUS_HIDE_OFFSET + OsuGame.SCREEN_EDGE_MARGIN;
         public const float CORNER_RADIUS_HIDE_OFFSET = 20f;
         public const float ENTER_DURATION = 600;
+
+        /// <summary>
+        /// Whether this song select instance should take control of the global track,
+        /// applying looping and preview offsets.
+        /// </summary>
+        protected bool ControlGlobalMusic { get; init; } = true;
 
         private readonly ModSelectOverlay modSelectOverlay = new UserModSelectOverlay(OverlayColourScheme.Aquamarine)
         {
@@ -177,9 +191,11 @@ namespace osu.Game.Screens.SelectV2
                                                             {
                                                                 BleedTop = FilterControl.HEIGHT_FROM_SCREEN_TOP + 5,
                                                                 BleedBottom = ScreenFooter.HEIGHT + 5,
-                                                                RequestPresentBeatmap = SelectAndStart,
-                                                                NewItemsPresented = newItemsPresented,
                                                                 RelativeSizeAxes = Axes.Both,
+                                                                RequestPresentBeatmap = _ => OnStart(),
+                                                                RequestSelection = selectBeatmap,
+                                                                RequestRecommendedSelection = selectRecommendedBeatmap,
+                                                                NewItemsPresented = newItemsPresented,
                                                             },
                                                             noResultsPlaceholder = new NoResultsPlaceholder(),
                                                         }
@@ -245,10 +261,107 @@ namespace osu.Game.Screens.SelectV2
             detailsArea.Height = wedgesContainer.DrawHeight - titleWedge.LayoutSize.Y - 4;
         }
 
+        #region Audio
+
+        [Resolved]
+        private MusicController music { get; set; } = null!;
+
+        private readonly WeakReference<ITrack?> lastTrack = new WeakReference<ITrack?>(null);
+
+        /// <summary>
+        /// Ensures some music is playing for the current track.
+        /// Will resume playback from a manual user pause if the track has changed.
+        /// </summary>
+        private void ensurePlayingSelected()
+        {
+            if (!ControlGlobalMusic)
+                return;
+
+            ITrack track = music.CurrentTrack;
+
+            bool isNewTrack = !lastTrack.TryGetTarget(out var last) || last != track;
+
+            if (!track.IsRunning && (music.UserPauseRequested != true || isNewTrack))
+            {
+                Logger.Log($"Song select decided to {nameof(ensurePlayingSelected)}");
+                music.Play(true);
+            }
+
+            lastTrack.SetTarget(track);
+        }
+
+        private bool isHandlingLooping;
+
+        private void beginLooping()
+        {
+            if (!ControlGlobalMusic)
+                return;
+
+            Debug.Assert(!isHandlingLooping);
+
+            isHandlingLooping = true;
+
+            ensureTrackLooping(Beatmap.Value, TrackChangeDirection.None);
+
+            music.TrackChanged += ensureTrackLooping;
+        }
+
+        private void endLooping()
+        {
+            // may be called multiple times during screen exit process.
+            if (!isHandlingLooping)
+                return;
+
+            music.CurrentTrack.Looping = isHandlingLooping = false;
+
+            music.TrackChanged -= ensureTrackLooping;
+        }
+
+        private void ensureTrackLooping(IWorkingBeatmap beatmap, TrackChangeDirection changeDirection)
+            => beatmap.PrepareTrackForPreview(true);
+
+        #endregion
+
         #region Selection handling
 
-        private BeatmapInfo getRecommendedBeatmap(IEnumerable<BeatmapInfo> beatmaps)
-            => difficultyRecommender?.GetRecommendedBeatmap(beatmaps) ?? beatmaps.First();
+        private ScheduledDelegate? selectionDebounce;
+
+        private void selectRecommendedBeatmap(IEnumerable<BeatmapInfo> beatmaps)
+        {
+            selectBeatmap(difficultyRecommender?.GetRecommendedBeatmap(beatmaps) ?? beatmaps.First());
+        }
+
+        private void selectBeatmap(BeatmapInfo beatmap)
+        {
+            carousel.CurrentSelection = beatmap;
+
+            selectionDebounce?.Cancel();
+            selectionDebounce = Scheduler.AddDelayed(() => selectBeatmap(beatmaps.GetWorkingBeatmap(beatmap)), SELECTION_DEBOUNCE);
+        }
+
+        private void selectBeatmap(WorkingBeatmap beatmap)
+        {
+            if (beatmap.BeatmapInfo.BeatmapSet!.Protected)
+                return;
+
+            carousel.CurrentSelection = beatmap.BeatmapInfo;
+
+            Beatmap.Value = beatmap;
+
+            if (this.IsCurrentScreen())
+                ensurePlayingSelected();
+
+            // If not the current screen, this will be applied in OnResuming.
+            if (this.IsCurrentScreen())
+            {
+                ApplyToBackground(backgroundModeBeatmap =>
+                {
+                    backgroundModeBeatmap.Beatmap = beatmap;
+                    backgroundModeBeatmap.IgnoreUserSettings.Value = true;
+                    backgroundModeBeatmap.FadeColour(Color4.White, 250);
+                });
+            }
+        }
 
         #endregion
 
@@ -266,6 +379,14 @@ namespace osu.Game.Screens.SelectV2
 
             modSelectOverlay.Beatmap.BindTo(Beatmap);
             modSelectOverlay.SelectedMods.BindTo(Mods);
+
+            beginLooping();
+
+            // force reselection if entering song select with a protected beatmap
+            if (Beatmap.Value.BeatmapInfo.BeatmapSet!.Protected)
+                Beatmap.SetDefault();
+            else
+                selectBeatmap(Beatmap.Value);
         }
 
         public override void OnResuming(ScreenTransitionEvent e)
@@ -285,6 +406,13 @@ namespace osu.Game.Screens.SelectV2
             // required due to https://github.com/ppy/osu-framework/issues/3218
             modSelectOverlay.SelectedMods.Disabled = false;
             modSelectOverlay.SelectedMods.BindTo(Mods);
+
+            beginLooping();
+
+            if (Beatmap.Value.BeatmapInfo.BeatmapSet!.Protected)
+                Beatmap.SetDefault();
+            else
+                selectBeatmap(Beatmap.Value);
         }
 
         public override void OnSuspending(ScreenTransitionEvent e)
@@ -300,6 +428,8 @@ namespace osu.Game.Screens.SelectV2
 
             carousel.VisuallyFocusSelected = true;
 
+            endLooping();
+
             base.OnSuspending(e);
         }
 
@@ -310,6 +440,8 @@ namespace osu.Game.Screens.SelectV2
             titleWedge.Hide();
             detailsArea.Hide();
             filterControl.Hide();
+
+            endLooping();
 
             return base.OnExiting(e);
         }
@@ -368,13 +500,10 @@ namespace osu.Game.Screens.SelectV2
         private void criteriaChanged(FilterCriteria criteria)
         {
             filterDebounce?.Cancel();
-            filterDebounce = Scheduler.AddDelayed(() =>
-            {
-                carousel.Filter(criteria);
-            }, filter_delay);
+            filterDebounce = Scheduler.AddDelayed(() => { carousel.Filter(criteria); }, filter_delay);
         }
 
-        private void newItemsPresented()
+        private void newItemsPresented(IEnumerable<CarouselItem> carouselItems)
         {
             int count = carousel.MatchedBeatmapsCount;
 
@@ -389,6 +518,16 @@ namespace osu.Game.Screens.SelectV2
             // Intentionally not localised until we have proper support for this (see https://github.com/ppy/osu-framework/pull/4918
             // but also in this case we want support for formatting a number within a string).
             filterControl.StatusText = count != 1 ? $"{count:#,0} matches" : $"{count:#,0} match";
+
+            if (!carouselItems.Any())
+            {
+                Beatmap.SetDefault();
+                return;
+            }
+
+            if (Beatmap.IsDefault || Beatmap.Value.BeatmapSetInfo?.DeletePending == true)
+                // TODO: this should probably use random, not recommended like this.
+                selectRecommendedBeatmap(carouselItems.Select(i => i.Model).OfType<BeatmapInfo>());
         }
 
         #endregion
