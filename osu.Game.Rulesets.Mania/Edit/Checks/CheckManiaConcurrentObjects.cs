@@ -10,6 +10,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Checks
     public class CheckManiaConcurrentObjects : CheckConcurrentObjects
     {
         // Mania hitobjects are only considered concurrent if they also share the same column.
-        protected override bool ConcurrentCondition(HitObject first, HitObject second) => (first as IHasColumn)?.Column == (second as IHasColumn)?.Column;
+        protected override bool ConcurrencyPrecondition(HitObject first, HitObject second)
+            => (first as IHasColumn)?.Column == (second as IHasColumn)?.Column;
     }
 }
