@@ -185,7 +185,7 @@ namespace osu.Game.Screens.SelectV2
             difficultyRangeSlider.UpperBound = config.GetBindable<double>(OsuSetting.DisplayStarsMaximum);
             config.BindWith(OsuSetting.ShowConvertedBeatmaps, showConvertedBeatmapsButton.Active);
             config.BindWith(OsuSetting.SongSelectSortingMode, sortDropdown.Current);
-            config.BindWith(OsuSetting.SongSelectGroupingMode, groupDropdown.Current);
+            config.BindWith(OsuSetting.SongSelectGroupMode, groupDropdown.Current);
 
             ruleset.BindValueChanged(_ => updateCriteria());
             mods.BindValueChanged(m =>
