@@ -21,10 +21,10 @@ namespace osu.Game.Rulesets.Edit.Checks
         };
 
         /// <summary>
-        /// Determines whether two hitobjects can be considered concurrent based on ruleset requirements.
+        /// The conditions that must hold true for any two hitobjects to be considered for the concurrency check.
         /// </summary>
-        /// <returns>Whether the two hitobjects can be concurrent.</returns>
-        protected virtual bool ConcurrentCondition(HitObject first, HitObject second) => true;
+        /// <returns>Whether the two hitobjects could be concurrent.</returns>
+        protected virtual bool ConcurrencyPrecondition(HitObject first, HitObject second) => true;
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
@@ -38,8 +38,8 @@ namespace osu.Game.Rulesets.Edit.Checks
                 {
                     var nextHitobject = hitObjects[j];
 
-                    // Some rulesets impose additional requirements for concurrency, such as Mania only considering hitobjects in the same column.
-                    if (!ConcurrentCondition(hitobject, nextHitobject))
+                    // Some rulesets impose additional preconditions for concurrency, such as Mania only considering hitobjects in the same column.
+                    if (!ConcurrencyPrecondition(hitobject, nextHitobject))
                         continue;
 
                     // Two hitobjects cannot be concurrent without also being concurrent with all objects in between.
