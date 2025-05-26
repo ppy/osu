@@ -190,15 +190,7 @@ namespace osu.Game.Screens.Play
         {
             base.LoadComplete();
 
-            if (starDifficulty.Value.Stars > 0)
-            {
-                starRatingDisplay.Current.Value = starDifficulty.Value;
-                starRatingDisplay.Show();
-            }
-            else
-                starRatingDisplay.Hide();
-
-            starDifficulty.ValueChanged += d =>
+            starDifficulty.BindValueChanged(d =>
             {
                 starRatingDisplay.Current.Value = d.NewValue;
 
@@ -206,7 +198,7 @@ namespace osu.Game.Screens.Play
                 versionFlow.AutoSizeEasing = Easing.OutQuint;
 
                 starRatingDisplay.FadeIn(300, Easing.InQuint);
-            };
+            }, true);
         }
 
         private partial class MetadataLineLabel : OsuSpriteText
