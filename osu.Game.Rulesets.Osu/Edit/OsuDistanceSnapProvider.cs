@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             var lastObjectWithVelocity = EditorBeatmap.HitObjects.TakeWhile(ho => ho != after).OfType<IHasSliderVelocity>().LastOrDefault();
 
             float expectedDistance = DurationToDistance(after.StartTime - before.GetEndTime(), before.StartTime, lastObjectWithVelocity);
-            float actualDistance = Vector2.Distance(((OsuHitObject)before).EndPosition, ((OsuHitObject)after).StackedPosition);
+            float actualDistance = Vector2.Distance(((OsuHitObject)before).StackedEndPosition, ((OsuHitObject)after).StackedPosition);
 
             return actualDistance / expectedDistance;
         }
