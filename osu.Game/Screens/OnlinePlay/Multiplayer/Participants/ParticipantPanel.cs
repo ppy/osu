@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
-using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -106,10 +105,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                             Colour = Color4Extensions.FromHex("#F7E65D"),
                             Alpha = 0
                         },
-                        new TeamDisplay
-                        {
-                            Current = { BindTarget = Current },
-                        },
+                        new TeamDisplay { Current = Current },
                         new Container
                         {
                             RelativeSizeAxes = Axes.Both,
@@ -161,7 +157,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                                             Anchor = Anchor.CentreLeft,
                                             Origin = Anchor.CentreLeft,
                                             Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 18),
-                                            //Text = user?.Username ?? string.Empty
                                         },
                                         userRankText = new OsuSpriteText
                                         {
@@ -215,13 +210,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
             };
         }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            current.BindValueChanged(_ => updateUser());
-        }
-
         protected override void PrepareForUse()
         {
             base.PrepareForUse();
@@ -235,9 +223,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
         {
             base.FreeAfterUse();
 
-            if (client.IsNotNull())
-                client.RoomUpdated -= onRoomUpdated;
-
+            client.RoomUpdated -= onRoomUpdated;
             // this is a safety measure.
             // `MultiplayerRoomUser` has equality members overridden to compare by `UserID` only.
             // `MultiplayerClient` only delivers updates of fields values to specific object references.
@@ -251,13 +237,15 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 
         private void updateUser()
         {
-            userCover.User = current.Value.User;
-            userAvatar.User = current.Value.User;
-            teamFlagContainer.Child = new UpdateableTeamFlag(current.Value.User?.Team)
+            var user = current.Value.User;
+
+            userCover.User = user;
+            userAvatar.User = user;
+            teamFlagContainer.Child = new UpdateableTeamFlag(user?.Team)
             {
                 Size = new Vector2(40, 20)
             };
-            username.Text = current.Value.User?.Username ?? string.Empty;
+            username.Text = user?.Username ?? string.Empty;
 
             updateState();
         }
