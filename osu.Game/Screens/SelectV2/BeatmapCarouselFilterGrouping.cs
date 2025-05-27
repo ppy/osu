@@ -251,7 +251,7 @@ namespace osu.Game.Screens.SelectV2
             if (date == null)
                 return new GroupDefinition(0, "Unranked");
 
-            return new GroupDefinition(date.Value.Year, $"{date.Value.Year}");
+            return new GroupDefinition(-date.Value.Year, $"{date.Value.Year}");
         }
 
         private GroupDefinition defineGroupBySubmittedDate(DateTimeOffset? date)
@@ -259,7 +259,7 @@ namespace osu.Game.Screens.SelectV2
             if (date == null)
                 return new GroupDefinition(0, "Not Submitted");
 
-            return new GroupDefinition(date.Value.Year, $"{date.Value.Year}");
+            return new GroupDefinition(-date.Value.Year, $"{date.Value.Year}");
         }
 
         private GroupDefinition defineGroupByStatus(BeatmapOnlineStatus status)
