@@ -308,8 +308,145 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             CheckDisplayedBeatmapsCount(4);
 
             SelectNextGroup();
-            SelectPrevGroup();
             WaitForSelection(0, 1);
+            SelectPrevGroup();
+            WaitForSelection(1, 1);
+        }
+
+        [Test]
+        public void TestNavigateFromFilteredItem_SelectNextGroup()
+        {
+            AddBeatmaps(5, 3);
+            WaitForDrawablePanels();
+
+            SelectNextGroup();
+            SelectNextGroup();
+            SelectNextGroup();
+            WaitForSelection(2, 0);
+
+            ApplyToFilter("filter first away", c => c.UserStarDifficulty.Min = 3);
+            WaitForFiltering();
+
+            SelectNextGroup();
+            WaitForSelection(0, 1);
+        }
+
+        [Test]
+        public void TestNavigateFromFilteredItem_SelectPrevGroup()
+        {
+            AddBeatmaps(5, 3);
+            WaitForDrawablePanels();
+
+            SelectNextGroup();
+            SelectNextGroup();
+            SelectNextGroup();
+            WaitForSelection(2, 0);
+
+            ApplyToFilter("filter first away", c => c.UserStarDifficulty.Min = 3);
+            WaitForFiltering();
+
+            SelectPrevGroup();
+            WaitForSelection(4, 1);
+        }
+
+        [Test]
+        public void TestNavigateFromFilteredItem_SelectPrevGroup_OnlyOnePanelAvailable()
+        {
+            AddBeatmaps(2, 3);
+            WaitForDrawablePanels();
+
+            SelectPrevGroup();
+            WaitForSelection(1, 0);
+
+            ApplyToFilter("filter last set away", c => c.SearchText = BeatmapSets.First().Metadata.Title);
+            WaitForFiltering();
+
+            SelectPrevGroup();
+            WaitForSelection(0, 0);
+        }
+
+        [Test]
+        public void TestNavigateFromFilteredItem_SelectNextGroup_OnlyOnePanelAvailable()
+        {
+            AddBeatmaps(2, 3);
+            WaitForDrawablePanels();
+
+            SelectNextGroup();
+            WaitForSelection(0, 0);
+
+            ApplyToFilter("filter first set away", c => c.SearchText = BeatmapSets.Last().Metadata.Title);
+            WaitForFiltering();
+
+            SelectNextGroup();
+            WaitForSelection(1, 0);
+        }
+
+        [Test]
+        public void TestNavigateFromFilteredItem_SelectNextPanel()
+        {
+            AddBeatmaps(5, 3);
+            WaitForDrawablePanels();
+
+            SelectNextGroup();
+            SelectNextGroup();
+            SelectNextGroup();
+            WaitForSelection(2, 0);
+
+            ApplyToFilter("filter first away", c => c.UserStarDifficulty.Min = 3);
+            WaitForFiltering();
+
+            SelectNextPanel();
+            AddAssert("keyboard selected is first set", () => GetKeyboardSelectedPanel()?.Item?.Model, () => Is.EqualTo(BeatmapSets.First()));
+        }
+
+        [Test]
+        public void TestNavigateFromFilteredItem_SelectPrevPanel()
+        {
+            AddBeatmaps(5, 3);
+            WaitForDrawablePanels();
+
+            SelectNextGroup();
+            SelectNextGroup();
+            SelectNextGroup();
+            WaitForSelection(2, 0);
+
+            ApplyToFilter("filter first away", c => c.UserStarDifficulty.Min = 3);
+            WaitForFiltering();
+
+            SelectPrevPanel();
+            AddAssert("keyboard selected is last set", () => GetKeyboardSelectedPanel()?.Item?.Model, () => Is.EqualTo(BeatmapSets.Last()));
+        }
+
+        [Test]
+        public void TestNavigateFromFilteredItem_SelectPrevPanel_OnlyOnePanelAvailable()
+        {
+            AddBeatmaps(2, 3);
+            WaitForDrawablePanels();
+
+            SelectPrevGroup();
+            WaitForSelection(1, 0);
+
+            ApplyToFilter("filter last set away", c => c.SearchText = BeatmapSets.First().Metadata.Title);
+            WaitForFiltering();
+
+            SelectPrevPanel();
+            AddAssert("keyboard selected is first set", () => GetKeyboardSelectedPanel()?.Item?.Model, () => Is.EqualTo(BeatmapSets.First()));
+        }
+
+        [Test]
+        public void TestNavigateFromFilteredItem_SelectNextPanel_OnlyOnePanelAvailable()
+        {
+            AddBeatmaps(2, 3);
+            WaitForDrawablePanels();
+
+            SelectNextGroup();
+            WaitForSelection(0, 0);
+
+            ApplyToFilter("filter first set away", c => c.SearchText = BeatmapSets.Last().Metadata.Title);
+            WaitForFiltering();
+
+            SelectNextPanel();
+            AddAssert("keyboard selected is second set", () => GetKeyboardSelectedPanel()?.Item?.Model, () => Is.EqualTo(BeatmapSets.Last()));
         }
     }
 }

@@ -220,7 +220,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 // offset by one because the group itself is included in the items list.
                 CarouselItem item = groupingFilter.GroupItems[g].ElementAt(panel + 1);
 
-                return ReferenceEquals(Carousel.CurrentSelection, item.Model);
+                return (Carousel.CurrentSelection as BeatmapInfo)?
+                    .Equals(item.Model as BeatmapInfo) == true;
             });
         }
 
@@ -229,7 +230,10 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddUntilStep($"selected is set{set}{(diff.HasValue ? $" diff{diff.Value}" : "")}", () =>
             {
                 if (diff != null)
-                    return ReferenceEquals(Carousel.CurrentSelection, BeatmapSets[set].Beatmaps[diff.Value]);
+                {
+                    return (Carousel.CurrentSelection as BeatmapInfo)?
+                        .Equals(BeatmapSets[set].Beatmaps[diff.Value]) == true;
+                }
 
                 return BeatmapSets[set].Beatmaps.Contains(Carousel.CurrentSelection);
             });
