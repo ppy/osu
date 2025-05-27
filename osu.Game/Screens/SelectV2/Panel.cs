@@ -158,10 +158,10 @@ namespace osu.Game.Screens.SelectV2
                     selectionLayer = new Box
                     {
                         Alpha = 0,
-                        Colour = ColourInfo.GradientHorizontal(colours.Yellow.Opacity(0), colours.Yellow.Opacity(0.5f)),
+                        Colour = ColourInfo.GradientHorizontal(colours.BlueDark.Opacity(0), colours.BlueDark.Opacity(0.6f)),
                         Blending = BlendingParameters.Additive,
                         RelativeSizeAxes = Axes.Both,
-                        Width = 0.7f,
+                        Width = 0.3f,
                         Anchor = Anchor.TopRight,
                         Origin = Anchor.TopRight,
                     },
