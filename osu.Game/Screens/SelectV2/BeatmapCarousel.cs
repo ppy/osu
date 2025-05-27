@@ -360,13 +360,22 @@ namespace osu.Game.Screens.SelectV2
 
         private ScheduledDelegate? loadingDebounce;
 
+        /// <summary>
+        /// We need to track this state locally since `FilterCriteria` is passed by reference and not accurate.
+        /// It should really be a struct.
+        /// </summary>
+        private bool splitOutDifficulties;
+
         public void Filter(FilterCriteria criteria)
         {
+            bool resetDisplay = criteria.SplitOutDifficulties != splitOutDifficulties;
+            splitOutDifficulties = criteria.SplitOutDifficulties;
+
             Criteria = criteria;
 
             loadingDebounce ??= Scheduler.AddDelayed(() => loading.Show(), 250);
 
-            FilterAsync().ContinueWith(_ => Schedule(() =>
+            FilterAsync(resetDisplay).ContinueWith(_ => Schedule(() =>
             {
                 loadingDebounce?.Cancel();
                 loadingDebounce = null;

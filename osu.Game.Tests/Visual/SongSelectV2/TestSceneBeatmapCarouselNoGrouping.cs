@@ -262,6 +262,27 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         }
 
         [Test]
+        public void TestPanelChangesFromStandaloneToNormal()
+        {
+            AddBeatmaps(1, 3);
+            WaitForDrawablePanels();
+
+            SortBy(SortMode.Difficulty);
+            WaitForFiltering();
+
+            AddUntilStep("standalone panels displayed", () => GetVisiblePanels<PanelBeatmapStandalone>().Count(), () => Is.EqualTo(3));
+
+            SelectNextGroup();
+            WaitForSelection(0, 0);
+
+            SortBy(SortMode.Title);
+
+            AddUntilStep("set panel displayed", () => GetVisiblePanels<PanelBeatmapSet>().Count(), () => Is.EqualTo(1));
+            AddUntilStep("normal panels displayed", () => GetVisiblePanels<PanelBeatmap>().Count(), () => Is.EqualTo(3));
+            AddUntilStep("standalone panels not displayed", () => GetVisiblePanels<PanelBeatmapStandalone>().Count(), () => Is.EqualTo(0));
+        }
+
+        [Test]
         public void TestRecommendedSelection()
         {
             AddBeatmaps(5, 3);
