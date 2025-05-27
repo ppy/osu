@@ -137,6 +137,17 @@ namespace osu.Game.Graphics.Carousel
         }
 
         /// <summary>
+        /// Scroll carousel to the selected item if available.
+        /// </summary>
+        public void ScrollToSelection()
+        {
+            // TODO: this likely needs to be delayed until currentKeyboardSelection has a valid value.
+            // Early calls to `ScrollToSelection` will currently silently fail.
+            if (currentKeyboardSelection.CarouselItem != null)
+                Scroll.ScrollTo(currentKeyboardSelection.CarouselItem.CarouselYPosition - visibleHalfHeight + BleedTop);
+        }
+
+        /// <summary>
         /// Returns the vertical spacing between two given carousel items. Negative value can be used to create an overlapping effect.
         /// </summary>
         protected virtual float GetSpacingBetweenPanels(CarouselItem top, CarouselItem bottom) => 0f;
@@ -316,7 +327,7 @@ namespace osu.Game.Graphics.Carousel
 
                 refreshAfterSelection();
                 if (!Scroll.UserScrolling)
-                    scrollToSelection();
+                    ScrollToSelection();
 
                 NewItemsPresented?.Invoke(carouselItems);
             });
@@ -553,12 +564,6 @@ namespace osu.Game.Graphics.Carousel
                 Scroll.OffsetScrollPosition((float)(currentKeyboardSelection.YPosition!.Value - prevKeyboard.YPosition.Value));
         }
 
-        private void scrollToSelection()
-        {
-            if (currentKeyboardSelection.CarouselItem != null)
-                Scroll.ScrollTo(currentKeyboardSelection.CarouselItem.CarouselYPosition - visibleHalfHeight + BleedTop);
-        }
-
         #endregion
 
         #region Display handling
@@ -598,7 +603,7 @@ namespace osu.Game.Graphics.Carousel
                 refreshAfterSelection();
 
                 // Always scroll to selection in this case (regardless of `UserScrolling` state), centering the selection.
-                scrollToSelection();
+                ScrollToSelection();
 
                 selectionValid.Validate();
             }
@@ -819,6 +824,11 @@ namespace osu.Game.Graphics.Carousel
             public readonly Container Panels;
 
             public void SetLayoutHeight(float height) => Panels.Height = height;
+
+            /// <summary>
+            /// Allow handling right click scroll outside of the carousel's display area.
+            /// </summary>
+            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
             public CarouselScrollContainer()
             {
