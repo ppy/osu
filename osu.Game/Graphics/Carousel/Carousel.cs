@@ -7,6 +7,9 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Caching;
 using osu.Framework.Extensions.TypeExtensions;
@@ -452,6 +455,7 @@ namespace osu.Game.Graphics.Carousel
 
                 if (newItem.IsVisible)
                 {
+                    playTraversalSound();
                     setKeyboardSelection(newItem.Model);
                     return;
                 }
@@ -510,6 +514,29 @@ namespace osu.Game.Graphics.Carousel
                     return;
                 }
             } while (newIndex != originalIndex);
+        }
+
+        #endregion
+
+        #region Audio
+
+        private Sample? sampleKeyboardTraversal;
+
+        private double audioFeedbackLastPlaybackTime;
+
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audio)
+        {
+            sampleKeyboardTraversal = audio.Samples.Get(@"UI/button-hover");
+        }
+
+        private void playTraversalSound()
+        {
+            if (Time.Current - audioFeedbackLastPlaybackTime >= 50)
+            {
+                sampleKeyboardTraversal?.Play();
+                audioFeedbackLastPlaybackTime = Time.Current;
+            }
         }
 
         #endregion
