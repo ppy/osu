@@ -154,22 +154,40 @@ namespace osu.Game.Screens.SelectV2
                                     {
                                         new[]
                                         {
-                                            wedgesContainer = new FillFlowContainer
+                                            new Container
                                             {
                                                 RelativeSizeAxes = Axes.Both,
-                                                Margin = new MarginPadding
-                                                {
-                                                    Top = -CORNER_RADIUS_HIDE_OFFSET,
-                                                    Left = -CORNER_RADIUS_HIDE_OFFSET
-                                                },
-                                                Spacing = new Vector2(0f, 4f),
-                                                Direction = FillDirection.Vertical,
+                                                Depth = float.MinValue,
                                                 Shear = OsuGame.SHEAR,
                                                 Children = new Drawable[]
                                                 {
-                                                    new ShearAligningWrapper(titleWedge = new BeatmapTitleWedge()),
-                                                    new ShearAligningWrapper(detailsArea = new BeatmapDetailsArea()),
-                                                },
+                                                    new Container
+                                                    {
+                                                        // Pad enough to only reset scroll when well into the left wedge areas.
+                                                        Padding = new MarginPadding { Right = 40 },
+                                                        RelativeSizeAxes = Axes.Both,
+                                                        Child = new Select.SongSelect.LeftSideInteractionContainer(() => carousel.ScrollToSelection())
+                                                        {
+                                                            RelativeSizeAxes = Axes.Both,
+                                                        },
+                                                    },
+                                                    wedgesContainer = new FillFlowContainer
+                                                    {
+                                                        RelativeSizeAxes = Axes.Both,
+                                                        Margin = new MarginPadding
+                                                        {
+                                                            Top = -CORNER_RADIUS_HIDE_OFFSET,
+                                                            Left = -CORNER_RADIUS_HIDE_OFFSET
+                                                        },
+                                                        Spacing = new Vector2(0f, 4f),
+                                                        Direction = FillDirection.Vertical,
+                                                        Children = new Drawable[]
+                                                        {
+                                                            new ShearAligningWrapper(titleWedge = new BeatmapTitleWedge()),
+                                                            new ShearAligningWrapper(detailsArea = new BeatmapDetailsArea()),
+                                                        },
+                                                    },
+                                                }
                                             },
                                             Empty(),
                                             new Container
