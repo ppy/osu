@@ -537,7 +537,7 @@ namespace osu.Game.Graphics.Carousel
 
         private void playTraversalSound()
         {
-            if (Time.Current - audioFeedbackLastPlaybackTime >= 50)
+            if (Time.Current - audioFeedbackLastPlaybackTime >= OsuGameBase.SAMPLE_DEBOUNCE_TIME)
             {
                 sampleKeyboardTraversal?.Play();
                 audioFeedbackLastPlaybackTime = Time.Current;
