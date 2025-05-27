@@ -277,6 +277,8 @@ namespace osu.Game.Screens.SelectV2
                 logo?.ScaleTo(v.NewValue == Visibility.Visible ? 0f : logo_scale, 400, Easing.OutQuint)
                     .FadeTo(v.NewValue == Visibility.Visible ? 0f : 1f, 200, Easing.OutQuint);
             });
+
+            Beatmap.BindValueChanged(_ => updateSelection());
         }
 
         protected override void Update()
@@ -349,6 +351,15 @@ namespace osu.Game.Screens.SelectV2
 
         #region Selection handling
 
+        /// <summary>
+        /// Immediately flush any pending selection. Should be run before performing final actions such as leaving the screen.
+        /// </summary>
+        protected void FinaliseSelection()
+        {
+            if (selectionDebounce?.State == ScheduledDelegate.RunState.Waiting)
+                selectionDebounce.RunTask();
+        }
+
         private ScheduledDelegate? selectionDebounce;
 
         private void selectRecommendedBeatmap(IEnumerable<BeatmapInfo> beatmaps)
@@ -358,20 +369,20 @@ namespace osu.Game.Screens.SelectV2
 
         private void selectBeatmap(BeatmapInfo beatmap)
         {
+            if (beatmap.BeatmapSet!.Protected)
+                return;
+
             carousel.CurrentSelection = beatmap;
 
             selectionDebounce?.Cancel();
-            selectionDebounce = Scheduler.AddDelayed(() => selectBeatmap(beatmaps.GetWorkingBeatmap(beatmap)), SELECTION_DEBOUNCE);
+            selectionDebounce = Scheduler.AddDelayed(() => Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap), SELECTION_DEBOUNCE);
         }
 
-        private void selectBeatmap(WorkingBeatmap beatmap)
+        private void updateSelection() => Scheduler.AddOnce(() =>
         {
-            if (beatmap.BeatmapInfo.BeatmapSet!.Protected)
-                return;
+            var beatmap = Beatmap.Value;
 
             carousel.CurrentSelection = beatmap.BeatmapInfo;
-
-            Beatmap.Value = beatmap;
 
             if (this.IsCurrentScreen())
                 ensurePlayingSelected();
@@ -387,7 +398,7 @@ namespace osu.Game.Screens.SelectV2
                     backgroundModeBeatmap.FadeColour(Color4.White, 250);
                 });
             }
-        }
+        });
 
         #endregion
 
@@ -412,7 +423,7 @@ namespace osu.Game.Screens.SelectV2
             if (Beatmap.Value.BeatmapInfo.BeatmapSet!.Protected)
                 Beatmap.SetDefault();
             else
-                selectBeatmap(Beatmap.Value);
+                updateSelection();
         }
 
         public override void OnResuming(ScreenTransitionEvent e)
@@ -438,7 +449,7 @@ namespace osu.Game.Screens.SelectV2
             if (Beatmap.Value.BeatmapInfo.BeatmapSet!.Protected)
                 Beatmap.SetDefault();
             else
-                selectBeatmap(Beatmap.Value);
+                updateSelection();
         }
 
         public override void OnSuspending(ScreenTransitionEvent e)
