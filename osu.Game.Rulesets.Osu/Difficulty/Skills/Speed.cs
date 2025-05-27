@@ -9,7 +9,7 @@ using osu.Game.Rulesets.Osu.Difficulty.Evaluators;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
 using System.Linq;
-using osu.Game.Rulesets.Osu.Difficulty.Utils;
+using osu.Game.Rulesets.Difficulty.Utils;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
@@ -64,6 +64,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return ObjectStrains.Sum(strain => 1.0 / (1.0 + Math.Exp(-(strain / maxStrain * 12.0 - 6.0))));
         }
 
-        public double CountTopWeightedSliders() => OsuStrainUtils.CountTopWeightedSliders(sliderStrains, DifficultyValue());
+        public double CountTopWeightedSliders() => StrainUtils.CountTopWeightedStrains(sliderStrains, DifficultyValue());
     }
 }
