@@ -309,6 +309,30 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
         #endregion
 
+        #region Ranked date grouping
+
+        [Test]
+        public async Task TestGroupingByRankedDate()
+        {
+            int total = 0;
+
+            var beatmapSets = new List<BeatmapSetInfo>();
+            addBeatmapSet(s => s.DateRanked = new DateTimeOffset(2025, 5, 27, 0, 0, 0, TimeSpan.Zero), beatmapSets, out var beatmap2025);
+            addBeatmapSet(s => s.DateRanked = new DateTimeOffset(2010, 4, 20, 0, 0, 0, TimeSpan.Zero), beatmapSets, out var beatmap2010);
+            addBeatmapSet(s => s.DateRanked = new DateTimeOffset(2007, 12, 1, 0, 0, 0, TimeSpan.Zero), beatmapSets, out var beatmapDec2007);
+            addBeatmapSet(s => s.DateRanked = new DateTimeOffset(2007, 10, 6, 0, 0, 0, TimeSpan.Zero), beatmapSets, out var beatmapOct2007);
+            addBeatmapSet(s => s.DateRanked = null, beatmapSets, out var beatmapUnranked);
+
+            var results = await runGrouping(GroupMode.DateRanked, beatmapSets);
+            assertGroup(results, 0, "2025", new[] { beatmap2025 }, ref total);
+            assertGroup(results, 1, "2010", new[] { beatmap2010 }, ref total);
+            assertGroup(results, 2, "2007", new[] { beatmapOct2007, beatmapDec2007 }, ref total);
+            assertGroup(results, 3, "Unranked", new[] { beatmapUnranked }, ref total);
+            assertTotal(results, total);
+        }
+
+        #endregion
+
         private static async Task<List<CarouselItem>> runGrouping(GroupMode group, List<BeatmapSetInfo> beatmapSets)
         {
             var groupingFilter = new BeatmapCarouselFilterGrouping(() => new FilterCriteria { Group = group });
