@@ -351,6 +351,15 @@ namespace osu.Game.Screens.SelectV2
 
         #region Selection handling
 
+        /// <summary>
+        /// Immediately flush any pending selection. Should be run before performing final actions such as leaving the screen.
+        /// </summary>
+        protected void FinaliseSelection()
+        {
+            if (selectionDebounce?.State == ScheduledDelegate.RunState.Waiting)
+                selectionDebounce.RunTask();
+        }
+
         private ScheduledDelegate? selectionDebounce;
 
         private void selectRecommendedBeatmap(IEnumerable<BeatmapInfo> beatmaps)
