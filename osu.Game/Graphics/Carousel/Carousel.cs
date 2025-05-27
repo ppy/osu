@@ -541,18 +541,19 @@ namespace osu.Game.Graphics.Carousel
             // Position transfer won't happen unless we invalidate this.
             displayedRange = null;
 
-            // The case where no items are available for display yet.
+            Selection prevKeyboard = currentKeyboardSelection;
+
+            // Importantly, we also reset the `Selection` to the most basic state.
+            // Removing the index and carousel item here is important to ensure we are aware of if a selection has been filtered away.
+            // If it hasn't been filtered, the full details will be re-populated just below in the loop.
+            currentKeyboardSelection = new Selection(currentKeyboardSelection.Model);
+            currentSelection = new Selection(currentSelection.Model);
+
             if (carouselItems == null)
-            {
-                currentKeyboardSelection = new Selection();
-                currentSelection = new Selection();
                 return;
-            }
 
             CarouselItem? lastVisible = null;
             int count = carouselItems.Count;
-
-            Selection prevKeyboard = currentKeyboardSelection;
 
             // We are performing two important operations here:
             // - Update all Y positions. After a selection occurs, panels may have changed visibility state and therefore Y positions.
@@ -572,7 +573,7 @@ namespace osu.Game.Graphics.Carousel
 
             // If a keyboard selection is currently made, we want to keep the view stable around the selection.
             // That means that we should offset the immediate scroll position by any change in Y position for the selection.
-            if (prevKeyboard.YPosition != null && currentKeyboardSelection.YPosition != prevKeyboard.YPosition)
+            if (prevKeyboard.YPosition != null && currentKeyboardSelection.YPosition != null && currentKeyboardSelection.YPosition != prevKeyboard.YPosition)
                 Scroll.OffsetScrollPosition((float)(currentKeyboardSelection.YPosition!.Value - prevKeyboard.YPosition.Value));
         }
 
