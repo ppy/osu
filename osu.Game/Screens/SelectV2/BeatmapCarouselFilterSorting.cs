@@ -35,11 +35,11 @@ namespace osu.Game.Screens.SelectV2
                 if (ab.BeatmapSet!.Equals(bb.BeatmapSet))
                     return compareDifficulty(ab, bb);
 
-                return compare(ab, bb, items, criteria.Sort);
+                return compare(ab, bb, criteria.Sort);
             })).ToList();
         }, cancellationToken).ConfigureAwait(false);
 
-        private static int compare(BeatmapInfo a, BeatmapInfo b, IEnumerable<CarouselItem> items, SortMode sort)
+        private static int compare(BeatmapInfo a, BeatmapInfo b, SortMode sort)
         {
             int comparison;
 
@@ -80,15 +80,15 @@ namespace osu.Game.Screens.SelectV2
                     break;
 
                 case SortMode.LastPlayed:
-                    comparison = -compareUsingAggregateMax(a, b, items, static b => (b.LastPlayed ?? DateTimeOffset.MinValue).ToUnixTimeSeconds());
+                    comparison = -compareUsingAggregateMax(a, b, static b => (b.LastPlayed ?? DateTimeOffset.MinValue).ToUnixTimeSeconds());
                     break;
 
                 case SortMode.BPM:
-                    comparison = compareUsingAggregateMax(a, b, items, static b => b.BPM);
+                    comparison = compareUsingAggregateMax(a, b, static b => b.BPM);
                     break;
 
                 case SortMode.Length:
-                    comparison = compareUsingAggregateMax(a, b, items, static b => b.Length);
+                    comparison = compareUsingAggregateMax(a, b, static b => b.Length);
                     break;
 
                 default:
@@ -118,10 +118,10 @@ namespace osu.Game.Screens.SelectV2
             return comparison;
         }
 
-        private static int compareUsingAggregateMax(BeatmapInfo a, BeatmapInfo b, IEnumerable<CarouselItem> items, Func<BeatmapInfo, double> func)
+        private static int compareUsingAggregateMax(BeatmapInfo a, BeatmapInfo b, Func<BeatmapInfo, double> func)
         {
-            var aMatchedBeatmaps = items.Select(i => i.Model).Cast<BeatmapInfo>().Where(beatmap => beatmap.BeatmapSet!.Equals(a.BeatmapSet));
-            var bMatchedBeatmaps = items.Select(i => i.Model).Cast<BeatmapInfo>().Where(beatmap => beatmap.BeatmapSet!.Equals(b.BeatmapSet));
+            var aMatchedBeatmaps = a.BeatmapSet!.Beatmaps.Where(bb => !bb.Hidden);
+            var bMatchedBeatmaps = b.BeatmapSet!.Beatmaps.Where(bb => !bb.Hidden);
 
             bool aAny = aMatchedBeatmaps.Any();
             bool bAny = bMatchedBeatmaps.Any();
