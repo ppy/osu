@@ -76,6 +76,8 @@ namespace osu.Game.Screens.SelectV2
         {
             if (playerLoader != null) return false;
 
+            FinaliseSelection();
+
             modsAtGameplayStart = Mods.Value;
 
             // Ctrl+Enter should start map with autoplay enabled.
@@ -124,8 +126,11 @@ namespace osu.Game.Screens.SelectV2
 
         private void edit(BeatmapInfo beatmap)
         {
+            FinaliseSelection();
+
             // Forced refetch is important here to guarantee correct invalidation across all difficulties.
             Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap, true);
+
             this.Push(new EditorLoader());
         }
 
