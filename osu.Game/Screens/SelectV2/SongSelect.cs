@@ -157,6 +157,9 @@ namespace osu.Game.Screens.SelectV2
                                             new Container
                                             {
                                                 RelativeSizeAxes = Axes.Both,
+                                                // Ensure the left components are on top of the carousel both visually (although they should never overlay)
+                                                // but more importantly, for input purposes to allow the scroll-to-selection logic to override carousel's
+                                                // screen-wide scroll handling.
                                                 Depth = float.MinValue,
                                                 Shear = OsuGame.SHEAR,
                                                 Children = new Drawable[]
