@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.PolygonExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -310,7 +311,10 @@ namespace osu.Game.Screens.SelectV2
                  .FadeOut(120, Easing.Out)
                  .Expire();
 
-                delay += 20;
+                // If the user is scrolled down in the list, start delaying only from the current visible range to
+                // avoid the perceived transition from taking longer than expected.
+                if (d.ScreenSpaceDrawQuad.Intersects(scoresScroll.ScreenSpaceDrawQuad))
+                    delay += 20;
             }
 
             personalBestDisplay.MoveToX(-100, 300, Easing.OutQuint);
