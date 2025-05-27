@@ -255,7 +255,7 @@ namespace osu.Game.Screens.SelectV2
             {
                 logo?.ScaleTo(v.NewValue == Visibility.Visible ? 0f : logo_scale, 400, Easing.OutQuint)
                     .FadeTo(v.NewValue == Visibility.Visible ? 0f : 1f, 200, Easing.OutQuint);
-            }, true);
+            });
         }
 
         protected override void Update()
@@ -455,7 +455,7 @@ namespace osu.Game.Screens.SelectV2
         {
             base.LogoArriving(logo, resuming);
 
-            if (logo.Alpha > 0.8f)
+            if (logo.Alpha > 0.8f && resuming)
                 Footer?.StartTrackingLogo(logo, 400, Easing.OutQuint);
             else
             {
@@ -469,7 +469,8 @@ namespace osu.Game.Screens.SelectV2
 
             logo.Action = () =>
             {
-                OnStart();
+                if (this.IsCurrentScreen())
+                    OnStart();
                 return false;
             };
         }
@@ -483,7 +484,9 @@ namespace osu.Game.Screens.SelectV2
         protected override void LogoExiting(OsuLogo logo)
         {
             base.LogoExiting(logo);
-            Scheduler.AddDelayed(() => Footer?.StopTrackingLogo(), 120);
+
+            Footer?.StopTrackingLogo();
+
             logo.ScaleTo(0.2f, 120, Easing.Out);
             logo.FadeOut(120, Easing.Out);
         }
