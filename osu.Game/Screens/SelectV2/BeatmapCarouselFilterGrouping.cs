@@ -144,9 +144,6 @@ namespace osu.Game.Screens.SelectV2
                 case GroupMode.DateRanked:
                     return getGroupsBy(b => defineGroupByRankedDate(b.BeatmapSet!.DateRanked), items);
 
-                case GroupMode.DateSubmitted:
-                    return getGroupsBy(b => defineGroupBySubmittedDate(b.BeatmapSet!.DateSubmitted), items);
-
                 case GroupMode.LastPlayed:
                     return getGroupsBy(b =>
                     {
@@ -250,14 +247,6 @@ namespace osu.Game.Screens.SelectV2
         {
             if (date == null)
                 return new GroupDefinition(0, "Unranked");
-
-            return new GroupDefinition(-date.Value.Year, $"{date.Value.Year}");
-        }
-
-        private GroupDefinition defineGroupBySubmittedDate(DateTimeOffset? date)
-        {
-            if (date == null)
-                return new GroupDefinition(0, "Not Submitted");
 
             return new GroupDefinition(-date.Value.Year, $"{date.Value.Year}");
         }
