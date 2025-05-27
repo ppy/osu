@@ -181,8 +181,12 @@ namespace osu.Game.Graphics.Carousel
         /// <summary>
         /// Queue an asynchronous filter operation.
         /// </summary>
-        protected virtual Task<IEnumerable<CarouselItem>> FilterAsync()
+        /// <param name="clearExistingPanels">Whether all existing drawable panels should be reset post filter.</param>
+        protected virtual Task<IEnumerable<CarouselItem>> FilterAsync(bool clearExistingPanels = false)
         {
+            if (clearExistingPanels)
+                filterReusesPanels.Invalidate();
+
             filterTask = performFilter();
             filterTask.FireAndForget();
             return filterTask;
@@ -321,6 +325,14 @@ namespace osu.Game.Graphics.Carousel
                 log("Items ready for display");
                 carouselItems = items;
                 displayedRange = null;
+
+                if (!filterReusesPanels.IsValid)
+                {
+                    foreach (var panel in Scroll.Panels)
+                        expirePanel(panel);
+
+                    filterReusesPanels.Validate();
+                }
 
                 // Need to call this to ensure correct post-selection logic is handled on the new items list.
                 HandleItemSelected(currentSelection.Model);
@@ -586,6 +598,11 @@ namespace osu.Game.Graphics.Carousel
         /// Half the height of the visible content.
         /// </summary>
         private float visibleHalfHeight;
+
+        /// <summary>
+        /// Whether existing panels can be re-used in the next filter.
+        /// </summary>
+        private readonly Cached filterReusesPanels = new Cached();
 
         protected override void Update()
         {
