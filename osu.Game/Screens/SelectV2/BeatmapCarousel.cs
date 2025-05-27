@@ -360,7 +360,7 @@ namespace osu.Game.Screens.SelectV2
 
         private void playActivationSound(CarouselItem item)
         {
-            if (Time.Current - audioFeedbackLastPlaybackTime >= 50)
+            if (Time.Current - audioFeedbackLastPlaybackTime >= OsuGameBase.SAMPLE_DEBOUNCE_TIME)
             {
                 switch (item.Model)
                 {
