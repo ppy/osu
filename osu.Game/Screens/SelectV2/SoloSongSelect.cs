@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Screens;
@@ -45,6 +47,14 @@ namespace osu.Game.Screens.SelectV2
 
         [Resolved]
         private OsuGame? game { get; set; }
+
+        private Sample? sampleConfirmSelection { get; set; }
+
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audio)
+        {
+            sampleConfirmSelection = audio.Samples.Get(@"SongSelect/confirm-selection");
+        }
 
         public override IEnumerable<OsuMenuItem> GetForwardActions(BeatmapInfo beatmap)
         {
@@ -99,6 +109,8 @@ namespace osu.Game.Screens.SelectV2
 
                 Mods.Value = mods;
             }
+
+            sampleConfirmSelection?.Play();
 
             this.Push(playerLoader = new PlayerLoader(createPlayer));
             return true;
