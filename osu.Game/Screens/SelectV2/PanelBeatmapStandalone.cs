@@ -40,7 +40,7 @@ namespace osu.Game.Screens.SelectV2
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
         [Resolved]
-        private SongSelect? songSelect { get; set; }
+        private ISongSelect? songSelect { get; set; }
 
         [Resolved]
         private BeatmapManager beatmaps { get; set; } = null!;
