@@ -269,6 +269,12 @@ namespace osu.Game.Graphics.Carousel
             Items.BindCollectionChanged((_, _) => FilterAsync());
         }
 
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audio)
+        {
+            loadSamples(audio);
+        }
+
         #endregion
 
         #region Filtering and display preparation
@@ -524,8 +530,7 @@ namespace osu.Game.Graphics.Carousel
 
         private double audioFeedbackLastPlaybackTime;
 
-        [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        private void loadSamples(AudioManager audio)
         {
             sampleKeyboardTraversal = audio.Samples.Get(@"UI/button-hover");
         }
