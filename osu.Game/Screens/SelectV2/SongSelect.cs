@@ -425,7 +425,10 @@ namespace osu.Game.Screens.SelectV2
 
             // force reselection if entering song select with a protected beatmap
             if (Beatmap.Value.BeatmapInfo.BeatmapSet!.Protected)
-                Beatmap.SetDefault();
+            {
+                if (!carousel.NextRandom())
+                    Beatmap.SetDefault();
+            }
             else
                 updateSelection();
         }
