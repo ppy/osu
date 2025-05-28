@@ -144,6 +144,7 @@ namespace osu.Game.Screens.SelectV2
                 {
                     background = new Box
                     {
+                        Alpha = 0.4f,
                         RelativeSizeAxes = Axes.Both,
                         Colour = backgroundColour
                     },
@@ -190,6 +191,7 @@ namespace osu.Game.Screens.SelectV2
                                     {
                                         foreground = new Box
                                         {
+                                            Alpha = 0.4f,
                                             RelativeSizeAxes = Axes.Both,
                                             Colour = foregroundColour
                                         },
