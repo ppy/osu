@@ -564,7 +564,7 @@ namespace osu.Game.Screens.SelectV2
             if (CurrentSelectionItem != null)
                 playSpinSample(distanceBetween(carouselItems.First(i => !ReferenceEquals(i.Model, set)), CurrentSelectionItem), visibleSets.Count);
 
-            RequestRecommendedSelection(set.Beatmaps);
+            RequestRecommendedSelection(set.Beatmaps.Where(b => !b.Hidden));
             return true;
         }
 
