@@ -249,16 +249,24 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [Test]
         public void TestHideBeatmap()
         {
+            BeatmapInfo? hiddenBeatmap = null;
+
             LoadSongSelect();
             ImportBeatmapForRuleset(0);
 
             checkMatchedBeatmaps(3);
 
-            AddStep("hide", () => Beatmaps.Hide(Beatmap.Value.BeatmapInfo));
+            AddStep("hide selected", () =>
+            {
+                hiddenBeatmap = Beatmap.Value.BeatmapInfo;
+                Beatmaps.Hide(hiddenBeatmap);
+            });
 
             checkMatchedBeatmaps(2);
 
-            AddStep("restore", () => Beatmaps.Restore(Beatmap.Value.BeatmapInfo));
+            AddAssert("selection changed", () => Beatmap.Value.BeatmapInfo, () => Is.Not.EqualTo(hiddenBeatmap));
+
+            AddStep("restore", () => Beatmaps.Restore(hiddenBeatmap!));
 
             checkMatchedBeatmaps(3);
         }
