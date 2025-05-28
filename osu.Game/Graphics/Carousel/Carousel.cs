@@ -756,12 +756,7 @@ namespace osu.Game.Graphics.Carousel
                     continue;
                 }
 
-                // The case where we're intending to display this panel, but it's already displayed.
-                // Note that we **must compare the model here** as the CarouselItems may be fresh instances due to a filter operation.
-                //
-                // Reference equality is used here instead of CheckModelEquality intentionally. In order to switch to `CheckModelEquality`,
-                // we need a way to signal to the drawable panels that there is an update.
-                var existing = toDisplay.FirstOrDefault(i => ReferenceEquals(i.Model, carouselPanel.Item!.Model));
+                var existing = toDisplay.FirstOrDefault(i => CheckModelEquality(i.Model, carouselPanel.Item!.Model));
 
                 if (existing != null)
                 {

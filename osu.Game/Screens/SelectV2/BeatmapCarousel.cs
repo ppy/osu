@@ -473,6 +473,12 @@ namespace osu.Game.Screens.SelectV2
             if (x is BeatmapInfo beatmapX && y is BeatmapInfo beatmapY)
                 return beatmapX.Equals(beatmapY);
 
+            if (x is GroupDefinition groupX && y is GroupDefinition groupY)
+                return groupX.Equals(groupY);
+
+            if (x is StarDifficultyGroupDefinition starX && y is StarDifficultyGroupDefinition starY)
+                return starX.Equals(starY);
+
             return base.CheckModelEquality(x, y);
         }
 
