@@ -17,6 +17,7 @@ using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Carousel;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Select;
@@ -77,7 +78,7 @@ namespace osu.Game.Screens.SelectV2
                 grouping = new BeatmapCarouselFilterGrouping(() => Criteria),
             };
 
-            AddInternal(loading = new LoadingLayer(dimBackground: true));
+            AddInternal(loading = new LoadingLayer());
         }
 
         [BackgroundDependencyLoader]
@@ -428,13 +429,18 @@ namespace osu.Game.Screens.SelectV2
 
             Criteria = criteria;
 
-            loadingDebounce ??= Scheduler.AddDelayed(() => loading.Show(), 250);
+            loadingDebounce ??= Scheduler.AddDelayed(() =>
+            {
+                Scroll.FadeColour(OsuColour.Gray(0.5f), 1000, Easing.OutQuint);
+                loading.Show();
+            }, 250);
 
             FilterAsync(resetDisplay).ContinueWith(_ => Schedule(() =>
             {
                 loadingDebounce?.Cancel();
                 loadingDebounce = null;
 
+                Scroll.FadeColour(OsuColour.Gray(1f), 500, Easing.OutQuint);
                 loading.Hide();
             }));
         }
