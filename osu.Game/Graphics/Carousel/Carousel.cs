@@ -282,7 +282,7 @@ namespace osu.Game.Graphics.Carousel
         /// <summary>
         /// Retrieve a list of all <see cref="CarouselItem"/>s currently displayed.
         /// </summary>
-        protected IList<CarouselItem>? GetCarouselItems() => carouselItems;
+        protected IReadOnlyCollection<CarouselItem>? GetCarouselItems() => carouselItems;
 
         private List<CarouselItem>? carouselItems;
 
