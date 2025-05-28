@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Screens.Select.Filter;
@@ -46,6 +47,14 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         {
             RemoveFirstBeatmap();
             RemoveAllBeatmaps();
+        }
+
+        [Test]
+        [Explicit]
+        public void TestLoadingDisplay()
+        {
+            AddStep("induce slow filtering", () => Carousel.FilterDelay = 2000);
+            SortAndGroupBy(SortMode.Artist, GroupMode.NoGrouping);
         }
 
         [Test]
