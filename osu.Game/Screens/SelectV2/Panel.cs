@@ -216,7 +216,18 @@ namespace osu.Game.Screens.SelectV2
         protected override void PrepareForUse()
         {
             base.PrepareForUse();
-            this.FadeInFromZero(DURATION, Easing.OutQuint);
+
+            this.FadeIn(DURATION, Easing.OutQuint);
+        }
+
+        protected override void FreeAfterUse()
+        {
+            base.FreeAfterUse();
+
+            Hide();
+
+            // Important to set this to null to handle reuse scenarios correctly, see `Item` implementation.
+            item = null;
         }
 
         protected override bool OnClick(ClickEvent e)
@@ -283,7 +294,30 @@ namespace osu.Game.Screens.SelectV2
 
         #region ICarouselPanel
 
-        public CarouselItem? Item { get; set; }
+        private CarouselItem? item;
+
+        public CarouselItem? Item
+        {
+            get => item;
+            set
+            {
+                if (ReferenceEquals(item, value))
+                    return;
+
+                // If a new item is set and we already have an item, this is a case of reuse.
+                // To keep things simple, assume that we need to do a full refresh.
+                //
+                // In the future, this could be more contextual and check whether the associated model has actually changed.
+                if (item != null && value != null)
+                {
+                    item = value;
+                    PrepareForUse();
+                }
+                else
+                    item = value;
+            }
+        }
+
         public BindableBool Selected { get; } = new BindableBool();
         public BindableBool Expanded { get; } = new BindableBool();
         public BindableBool KeyboardSelected { get; } = new BindableBool();
