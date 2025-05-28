@@ -17,16 +17,48 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         {
             RemoveAllBeatmaps();
             CreateCarousel();
-
-            SortAndGroupBy(SortMode.Artist, GroupMode.Artist);
         }
 
         /// <summary>
         /// Test random non-repeating algorithm
         /// </summary>
         [Test]
-        public void TestRandom()
+        public void TestRandomArtistGrouping()
         {
+            SortAndGroupBy(SortMode.Artist, GroupMode.Artist);
+
+            AddBeatmaps(10, 3, true);
+            WaitForDrawablePanels();
+
+            nextRandom();
+            ensureRandomDidNotRepeat();
+            nextRandom();
+            ensureRandomDidNotRepeat();
+            nextRandom();
+            ensureRandomDidNotRepeat();
+
+            prevRandom();
+            checkRewindCorrectSet();
+            prevRandom();
+            checkRewindCorrectSet();
+
+            nextRandom();
+            ensureRandomDidNotRepeat();
+            nextRandom();
+            ensureRandomDidNotRepeat();
+
+            nextRandom();
+            AddAssert("ensure repeat", () => BeatmapSetRequestedSelections.Contains(Carousel.SelectedBeatmapSet!));
+        }
+
+        /// <summary>
+        /// Test random non-repeating algorithm
+        /// </summary>
+        [Test]
+        public void TestRandomDifficultyGrouping()
+        {
+            SortAndGroupBy(SortMode.Difficulty, GroupMode.Difficulty);
+
             AddBeatmaps(10, 3, true);
             WaitForDrawablePanels();
 
