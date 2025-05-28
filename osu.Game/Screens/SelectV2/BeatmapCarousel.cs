@@ -8,6 +8,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Pooling;
@@ -79,10 +81,11 @@ namespace osu.Game.Screens.SelectV2
         }
 
         [BackgroundDependencyLoader]
-        private void load(BeatmapStore beatmapStore, CancellationToken? cancellationToken)
+        private void load(BeatmapStore beatmapStore, AudioManager audio, CancellationToken? cancellationToken)
         {
             setupPools();
             setupBeatmaps(beatmapStore, cancellationToken);
+            loadSamples(audio);
         }
 
         #region Beatmap source hookup
@@ -176,39 +179,46 @@ namespace osu.Game.Screens.SelectV2
 
         protected override void HandleItemActivated(CarouselItem item)
         {
-            switch (item.Model)
+            try
             {
-                case GroupDefinition group:
-                    // Special case – collapsing an open group.
-                    if (lastSelectedGroup == group)
-                    {
-                        setExpansionStateOfGroup(lastSelectedGroup, false);
-                        lastSelectedGroup = null;
+                switch (item.Model)
+                {
+                    case GroupDefinition group:
+                        // Special case – collapsing an open group.
+                        if (lastSelectedGroup == group)
+                        {
+                            setExpansionStateOfGroup(lastSelectedGroup, false);
+                            lastSelectedGroup = null;
+                            return;
+                        }
+
+                        setExpandedGroup(group);
                         return;
-                    }
 
-                    setExpandedGroup(group);
-                    return;
+                    case BeatmapSetInfo setInfo:
+                        // Selecting a set isn't valid – let's re-select the first visible difficulty.
+                        if (grouping.SetItems.TryGetValue(setInfo, out var items))
+                        {
+                            var beatmaps = items.Select(i => i.Model).OfType<BeatmapInfo>();
+                            RequestRecommendedSelection(beatmaps);
+                        }
 
-                case BeatmapSetInfo setInfo:
-                    // Selecting a set isn't valid – let's re-select the first visible difficulty.
-                    if (grouping.SetItems.TryGetValue(setInfo, out var items))
-                    {
-                        var beatmaps = items.Select(i => i.Model).OfType<BeatmapInfo>();
-                        RequestRecommendedSelection(beatmaps);
-                    }
-
-                    return;
-
-                case BeatmapInfo beatmapInfo:
-                    if (CurrentSelection != null && CheckModelEquality(CurrentSelection, beatmapInfo))
-                    {
-                        RequestPresentBeatmap?.Invoke(beatmapInfo);
                         return;
-                    }
 
-                    RequestSelection(beatmapInfo);
-                    return;
+                    case BeatmapInfo beatmapInfo:
+                        if (CurrentSelection != null && CheckModelEquality(CurrentSelection, beatmapInfo))
+                        {
+                            RequestPresentBeatmap?.Invoke(beatmapInfo);
+                            return;
+                        }
+
+                        RequestSelection(beatmapInfo);
+                        return;
+                }
+            }
+            finally
+            {
+                playActivationSound(item);
             }
         }
 
@@ -326,6 +336,51 @@ namespace osu.Game.Screens.SelectV2
                     else
                         i.IsVisible = expanded;
                 }
+            }
+        }
+
+        #endregion
+
+        #region Audio
+
+        private Sample? sampleChangeDifficulty;
+        private Sample? sampleChangeSet;
+        private Sample? sampleOpen;
+        private Sample? sampleClose;
+
+        private double audioFeedbackLastPlaybackTime;
+
+        private void loadSamples(AudioManager audio)
+        {
+            sampleChangeDifficulty = audio.Samples.Get(@"SongSelect/select-difficulty");
+            sampleChangeSet = audio.Samples.Get(@"SongSelect/select-expand");
+            sampleOpen = audio.Samples.Get(@"UI/menu-open");
+            sampleClose = audio.Samples.Get(@"UI/menu-close");
+        }
+
+        private void playActivationSound(CarouselItem item)
+        {
+            if (Time.Current - audioFeedbackLastPlaybackTime >= OsuGameBase.SAMPLE_DEBOUNCE_TIME)
+            {
+                switch (item.Model)
+                {
+                    case GroupDefinition:
+                        if (item.IsExpanded)
+                            sampleOpen?.Play();
+                        else
+                            sampleClose?.Play();
+                        return;
+
+                    case BeatmapSetInfo:
+                        sampleChangeSet?.Play();
+                        return;
+
+                    case BeatmapInfo:
+                        sampleChangeDifficulty?.Play();
+                        return;
+                }
+
+                audioFeedbackLastPlaybackTime = Time.Current;
             }
         }
 
