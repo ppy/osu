@@ -259,7 +259,11 @@ namespace osu.Game.Screens.SelectV2
                 Current = Mods,
                 RequestDeselectAllMods = () => Mods.Value = Array.Empty<Mod>()
             },
-            new FooterButtonRandom(),
+            new FooterButtonRandom
+            {
+                NextRandom = () => carousel.NextRandom(),
+                PreviousRandom = () => carousel.PreviousRandom()
+            },
             new FooterButtonOptions
             {
                 Hotkey = GlobalAction.ToggleBeatmapOptions,
@@ -421,7 +425,10 @@ namespace osu.Game.Screens.SelectV2
 
             // force reselection if entering song select with a protected beatmap
             if (Beatmap.Value.BeatmapInfo.BeatmapSet!.Protected)
-                Beatmap.SetDefault();
+            {
+                if (!carousel.NextRandom())
+                    Beatmap.SetDefault();
+            }
             else
                 updateSelection();
         }
