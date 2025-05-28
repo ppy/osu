@@ -244,6 +244,22 @@ namespace osu.Game.Screens.SelectV2
             }
         }
 
+        protected override void HandleFilterCompleted()
+        {
+            base.HandleFilterCompleted();
+
+            // Store selected group before handling selection (it may implicitly change the expanded group).
+            var groupForReselection = ExpandedGroup;
+
+            // Ensure correct post-selection logic is handled on the new items list.
+            // This will update the visual state of the selected item.
+            HandleItemSelected(CurrentSelection);
+
+            // If a group was selected that is not the one containing the selection, reselect it.
+            if (groupForReselection != null)
+                setExpandedGroup(groupForReselection);
+        }
+
         protected override bool CheckValidForGroupSelection(CarouselItem item)
         {
             switch (item.Model)
