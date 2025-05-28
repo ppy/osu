@@ -220,19 +220,18 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             CheckDisplayedBeatmapSetsCount(1);
             CheckDisplayedBeatmapsCount(3);
 
-            CheckNoSelection();
+            CheckHasSelection();
+
             SelectNextPanel();
             Select();
-            SelectNextPanel();
-            Select();
-            WaitForGroupSelection(0, 1);
+            WaitForGroupSelection(0, 2);
 
             for (int i = 0; i < 6; i++)
                 SelectNextPanel();
 
             Select();
 
-            WaitForGroupSelection(0, 2);
+            WaitForGroupSelection(0, 3);
 
             ApplyToFilter("remove filter", c => c.SearchText = string.Empty);
             WaitForFiltering();
