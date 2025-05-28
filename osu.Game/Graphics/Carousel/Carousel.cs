@@ -407,20 +407,27 @@ namespace osu.Game.Graphics.Carousel
                     activateSelection();
                     return true;
 
+                // the selection traversal handlers below are scheduled to avoid an issue
+                // wherein if the update frame rate is low, keeping one of the actions below pressed leads to selection moving back to the start / end.
+                // the reason why that happens is that the code managing `current(Keyboard)?Selection` can lose track of the index of the selected item
+                // if the selection is changed more than once during an update frame,
+                // which can happen if repeat inputs are enqueued for processing at a rate faster than the update refresh rate.
+                // `refreshAfterSelection()` is the method responsible for updating the index of the selected item here which runs once per frame.
+
                 case GlobalAction.SelectNext:
-                    traverseKeyboardSelection(1);
+                    Scheduler.AddOnce(traverseKeyboardSelection, 1);
                     return true;
 
                 case GlobalAction.SelectPrevious:
-                    traverseKeyboardSelection(-1);
+                    Scheduler.AddOnce(traverseKeyboardSelection, -1);
                     return true;
 
                 case GlobalAction.SelectNextGroup:
-                    traverseGroupSelection(1);
+                    Scheduler.AddOnce(traverseGroupSelection, 1);
                     return true;
 
                 case GlobalAction.SelectPreviousGroup:
-                    traverseGroupSelection(-1);
+                    Scheduler.AddOnce(traverseGroupSelection, -1);
                     return true;
             }
 
