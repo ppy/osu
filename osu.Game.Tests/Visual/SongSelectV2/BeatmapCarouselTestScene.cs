@@ -367,6 +367,9 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         {
             public IEnumerable<BeatmapInfo> PostFilterBeatmaps = null!;
 
+            public new BeatmapSetInfo? ExpandedBeatmapSet => base.ExpandedBeatmapSet;
+            public new GroupDefinition? ExpandedGroup => base.ExpandedGroup;
+
             protected override Task<IEnumerable<CarouselItem>> FilterAsync(bool clearExistingPanels = false)
             {
                 var filterAsync = base.FilterAsync(clearExistingPanels);
