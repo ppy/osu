@@ -48,7 +48,7 @@ namespace osu.Game.Screens.SelectV2
                 var criteria = getCriteria();
                 var newItems = new List<CarouselItem>();
 
-                BeatmapSetsGroupedTogether = criteria.Sort != SortMode.Difficulty && criteria.Group != GroupMode.Difficulty;
+                BeatmapSetsGroupedTogether = ShouldGroupBeatmapsTogether(criteria);
 
                 var groups = getGroups((List<CarouselItem>)items, criteria);
 
@@ -120,6 +120,11 @@ namespace osu.Game.Screens.SelectV2
 
                 return newItems;
             }, cancellationToken).ConfigureAwait(false);
+        }
+
+        public static bool ShouldGroupBeatmapsTogether(FilterCriteria criteria)
+        {
+            return criteria.Sort != SortMode.Difficulty && criteria.Group != GroupMode.Difficulty;
         }
 
         private List<GroupMapping> getGroups(List<CarouselItem> items, FilterCriteria criteria)
