@@ -196,6 +196,13 @@ namespace osu.Game.Graphics.Carousel
         }
 
         /// <summary>
+        /// Fired after a filter operation completed.
+        /// </summary>
+        protected virtual void HandleFilterCompleted()
+        {
+        }
+
+        /// <summary>
         /// Check whether two models are the same for display purposes.
         /// </summary>
         protected virtual bool CheckModelEquality(object x, object y) => ReferenceEquals(x, y);
@@ -343,8 +350,7 @@ namespace osu.Game.Graphics.Carousel
                     filterReusesPanels.Validate();
                 }
 
-                // Need to call this to ensure correct post-selection logic is handled on the new items list.
-                HandleItemSelected(currentSelection.Model);
+                HandleFilterCompleted();
 
                 refreshAfterSelection();
                 if (!Scroll.UserScrolling)
