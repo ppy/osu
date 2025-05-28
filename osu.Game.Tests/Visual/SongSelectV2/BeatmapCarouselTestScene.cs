@@ -375,6 +375,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
         public partial class TestBeatmapCarousel : BeatmapCarousel
         {
+            public int FilterDelay = 0;
+
             public IEnumerable<BeatmapInfo> PostFilterBeatmaps = null!;
 
             public BeatmapInfo? SelectedBeatmapInfo => CurrentSelection as BeatmapInfo;
@@ -383,15 +385,15 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             public new BeatmapSetInfo? ExpandedBeatmapSet => base.ExpandedBeatmapSet;
             public new GroupDefinition? ExpandedGroup => base.ExpandedGroup;
 
-            protected override Task<IEnumerable<CarouselItem>> FilterAsync(bool clearExistingPanels = false)
+            protected override async Task<IEnumerable<CarouselItem>> FilterAsync(bool clearExistingPanels = false)
             {
-                var filterAsync = base.FilterAsync(clearExistingPanels);
-                filterAsync.ContinueWith(result =>
-                {
-                    if (result.IsCompletedSuccessfully)
-                        PostFilterBeatmaps = result.GetResultSafely().Select(i => i.Model).OfType<BeatmapInfo>();
-                });
-                return filterAsync;
+                var items = await base.FilterAsync(clearExistingPanels);
+
+                if (FilterDelay != 0)
+                    await Task.Delay(FilterDelay);
+
+                PostFilterBeatmaps = items.Select(i => i.Model).OfType<BeatmapInfo>();
+                return items;
             }
         }
     }

@@ -50,6 +50,14 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
         [Test]
         [Explicit]
+        public void TestLoadingDisplay()
+        {
+            AddStep("induce slow filtering", () => Carousel.FilterDelay = 2000);
+            SortAndGroupBy(SortMode.Artist, GroupMode.NoGrouping);
+        }
+
+        [Test]
+        [Explicit]
         public void TestAddRemoveRepeatedOps()
         {
             AddRepeatStep("add beatmaps", () => BeatmapSets.Add(TestResources.CreateTestBeatmapSetInfo(RNG.Next(1, 4))), 20);
