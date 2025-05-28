@@ -580,8 +580,7 @@ namespace osu.Game.Screens.SelectV2
             }
 
             if (Beatmap.IsDefault || currentBeatmapNotValid)
-                // TODO: this should probably use random, not recommended like this.
-                selectRecommendedBeatmap(carouselItems.Select(i => i.Model).OfType<BeatmapInfo>());
+                carousel.NextRandom();
         }
 
         #endregion
