@@ -295,7 +295,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             else if (score.Mods.Any(m => m is OsuModHidden || m is OsuModTraceable))
             {
                 // Decrease bonus for AR > 10
-                accuracyValue *= 1 + 0.08 * Math.Clamp((11.5 - approachRate) / (11.5 - 10), 0, 1);
+                accuracyValue *= 1 + 0.08 * DifficultyCalculationUtils.ReverseLerp(approachRate, 11.5, 10);
             }
 
             if (score.Mods.Any(m => m is OsuModFlashlight))
