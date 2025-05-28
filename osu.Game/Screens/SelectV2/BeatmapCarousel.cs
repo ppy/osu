@@ -252,6 +252,8 @@ namespace osu.Game.Screens.SelectV2
         {
             base.HandleFilterCompleted();
 
+            attemptSelectSingleFilteredResult();
+
             // Store selected group before handling selection (it may implicitly change the expanded group).
             var groupForReselection = ExpandedGroup;
 
@@ -262,6 +264,36 @@ namespace osu.Game.Screens.SelectV2
             // If a group was selected that is not the one containing the selection, reselect it.
             if (groupForReselection != null)
                 setExpandedGroup(groupForReselection);
+        }
+
+        /// <summary>
+        /// If we don't have a selection and there's a single beatmap set returned, select it for the user.
+        /// </summary>
+        private void attemptSelectSingleFilteredResult()
+        {
+            var items = GetCarouselItems();
+
+            if (items == null || items.Count == 0) return;
+
+            BeatmapSetInfo? beatmapSetInfo = null;
+
+            foreach (var item in items)
+            {
+                if (item.Model is BeatmapInfo beatmapInfo)
+                {
+                    if (beatmapSetInfo == null)
+                    {
+                        beatmapSetInfo = beatmapInfo.BeatmapSet!;
+                        continue;
+                    }
+
+                    // Found a beatmap with a different beatmap set, abort.
+                    if (!beatmapSetInfo.Equals(beatmapInfo.BeatmapSet))
+                        return;
+                }
+            }
+
+            RequestRecommendedSelection(items.Select(i => i.Model).OfType<BeatmapInfo>());
         }
 
         protected override bool CheckValidForGroupSelection(CarouselItem item)
