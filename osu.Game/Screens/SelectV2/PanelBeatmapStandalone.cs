@@ -120,6 +120,7 @@ namespace osu.Game.Screens.SelectV2
                             },
                             statusPill = new BeatmapSetOnlineStatusPill
                             {
+                                Animated = false,
                                 Origin = Anchor.CentreLeft,
                                 Anchor = Anchor.CentreLeft,
                                 TextSize = OsuFont.Style.Caption2.Size,
