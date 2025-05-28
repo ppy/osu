@@ -566,11 +566,9 @@ namespace osu.Game.Screens.SelectV2
             // but also in this case we want support for formatting a number within a string).
             filterControl.StatusText = count != 1 ? $"{count:#,0} matches" : $"{count:#,0} match";
 
+            // Importantly, if all results are filtered away don't deselect the current global beatmap selection.
             if (!carouselItems.Any())
-            {
-                Beatmap.SetDefault();
                 return;
-            }
 
             if (Beatmap.IsDefault || Beatmap.Value.BeatmapSetInfo?.DeletePending == true)
                 // TODO: this should probably use random, not recommended like this.
