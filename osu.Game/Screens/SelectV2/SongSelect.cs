@@ -162,6 +162,11 @@ namespace osu.Game.Screens.SelectV2
                                                 // screen-wide scroll handling.
                                                 Depth = float.MinValue,
                                                 Shear = OsuGame.SHEAR,
+                                                Padding = new MarginPadding
+                                                {
+                                                    Top = -CORNER_RADIUS_HIDE_OFFSET,
+                                                    Left = -CORNER_RADIUS_HIDE_OFFSET,
+                                                },
                                                 Children = new Drawable[]
                                                 {
                                                     new Container
@@ -177,11 +182,6 @@ namespace osu.Game.Screens.SelectV2
                                                     wedgesContainer = new FillFlowContainer
                                                     {
                                                         RelativeSizeAxes = Axes.Both,
-                                                        Margin = new MarginPadding
-                                                        {
-                                                            Top = -CORNER_RADIUS_HIDE_OFFSET,
-                                                            Left = -CORNER_RADIUS_HIDE_OFFSET
-                                                        },
                                                         Spacing = new Vector2(0f, 4f),
                                                         Direction = FillDirection.Vertical,
                                                         Children = new Drawable[]
