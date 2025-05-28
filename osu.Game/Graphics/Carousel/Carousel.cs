@@ -286,6 +286,11 @@ namespace osu.Game.Graphics.Carousel
 
         #region Filtering and display preparation
 
+        /// <summary>
+        /// Retrieve a list of all <see cref="CarouselItem"/>s currently displayed.
+        /// </summary>
+        protected IReadOnlyCollection<CarouselItem>? GetCarouselItems() => carouselItems;
+
         private List<CarouselItem>? carouselItems;
 
         private Task<IEnumerable<CarouselItem>> filterTask = Task.FromResult(Enumerable.Empty<CarouselItem>());
@@ -560,6 +565,11 @@ namespace osu.Game.Graphics.Carousel
         #endregion
 
         #region Selection handling
+
+        /// <summary>
+        /// The currently selected <see cref="CarouselItem"/>, if any is selected.
+        /// </summary>
+        protected CarouselItem? CurrentSelectionItem => currentSelection.CarouselItem;
 
         /// <summary>
         /// Becomes invalid when the current selection has changed and needs to be updated visually.
