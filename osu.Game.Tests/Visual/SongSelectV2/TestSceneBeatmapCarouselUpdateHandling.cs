@@ -8,6 +8,7 @@ using NUnit.Framework;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Extensions;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.Select.Filter;
 using osu.Game.Screens.SelectV2;
 using osu.Game.Tests.Resources;
@@ -63,6 +64,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [Test]
         public void TestBeatmapSetMetadataUpdated()
         {
+            PanelBeatmapSet panel = null!;
+
             var metadata = new BeatmapMetadata
             {
                 Artist = "updated test",
@@ -77,10 +80,15 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 originalDrawables.AddRange(Carousel.ChildrenOfType<Panel>().ToList());
             });
 
+            AddStep("find panel", () => panel = Carousel.ChildrenOfType<PanelBeatmapSet>().Single(p => p.ChildrenOfType<OsuSpriteText>().Any(t => t.Text.ToString() == "beatmap")));
+
             updateBeatmap(b => b.Metadata = metadata);
 
             WaitForFiltering();
-            AddAssert("drawables changed", () => Carousel.ChildrenOfType<Panel>(), () => Is.Not.EqualTo(originalDrawables));
+
+            AddAssert("drawables unchanged", () => Carousel.ChildrenOfType<Panel>(), () => Is.EqualTo(originalDrawables));
+
+            AddAssert("title updated", () => panel.ChildrenOfType<OsuSpriteText>().Any(t => t.Text.ToString() == metadata.Title));
         }
 
         [Test]
