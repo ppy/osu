@@ -142,13 +142,7 @@ namespace osu.Game.Graphics.Carousel
         /// <summary>
         /// Scroll carousel to the selected item if available.
         /// </summary>
-        public void ScrollToSelection()
-        {
-            // TODO: this likely needs to be delayed until currentKeyboardSelection has a valid value.
-            // Early calls to `ScrollToSelection` will currently silently fail.
-            if (currentKeyboardSelection.CarouselItem != null)
-                Scroll.ScrollTo(currentKeyboardSelection.CarouselItem.CarouselYPosition - visibleHalfHeight + BleedTop);
-        }
+        public void ScrollToSelection() => scrollToSelection.Invalidate();
 
         /// <summary>
         /// Returns the vertical spacing between two given carousel items. Negative value can be used to create an overlapping effect.
@@ -660,6 +654,12 @@ namespace osu.Game.Graphics.Carousel
         /// </summary>
         private readonly Cached filterReusesPanels = new Cached();
 
+        /// <summary>
+        /// Scrolling to selection relies on <see cref="currentKeyboardSelection"/> being fully populated.
+        /// This flag ensures it runs after <see cref="refreshAfterSelection"/> validates this.
+        /// </summary>
+        private readonly Cached scrollToSelection = new Cached();
+
         protected override void Update()
         {
             base.Update();
@@ -679,6 +679,14 @@ namespace osu.Game.Graphics.Carousel
                 ScrollToSelection();
 
                 selectionValid.Validate();
+            }
+
+            if (!scrollToSelection.IsValid)
+            {
+                if (currentKeyboardSelection.YPosition != null)
+                    Scroll.ScrollTo(currentKeyboardSelection.YPosition.Value - visibleHalfHeight + BleedTop);
+
+                scrollToSelection.Validate();
             }
 
             var range = getDisplayRange();
