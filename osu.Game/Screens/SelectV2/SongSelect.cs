@@ -259,7 +259,11 @@ namespace osu.Game.Screens.SelectV2
                 Current = Mods,
                 RequestDeselectAllMods = () => Mods.Value = Array.Empty<Mod>()
             },
-            new FooterButtonRandom(),
+            new FooterButtonRandom
+            {
+                NextRandom = () => carousel.NextRandom(),
+                PreviousRandom = () => carousel.PreviousRandom()
+            },
             new FooterButtonOptions
             {
                 Hotkey = GlobalAction.ToggleBeatmapOptions,

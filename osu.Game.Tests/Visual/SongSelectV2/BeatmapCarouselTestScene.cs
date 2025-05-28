@@ -35,6 +35,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 {
     public abstract partial class BeatmapCarouselTestScene : OsuManualInputManagerTestScene
     {
+        protected readonly Stack<BeatmapSetInfo> BeatmapSetRequestedSelections = new Stack<BeatmapSetInfo>();
+
         protected readonly BindableList<BeatmapSetInfo> BeatmapSets = new BindableList<BeatmapSetInfo>();
 
         protected TestBeatmapCarousel Carousel = null!;
@@ -71,6 +73,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         {
             AddStep("create components", () =>
             {
+                BeatmapSetRequestedSelections.Clear();
                 BeatmapRecommendationFunction = null;
                 NewItemsPresentedInvocationCount = 0;
 
@@ -108,8 +111,15 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                                 Carousel = new TestBeatmapCarousel
                                 {
                                     NewItemsPresented = _ => NewItemsPresentedInvocationCount++,
-                                    RequestSelection = b => Carousel.CurrentSelection = b,
-                                    RequestRecommendedSelection = beatmaps => Carousel.CurrentSelection = BeatmapRecommendationFunction?.Invoke(beatmaps) ?? beatmaps.First(),
+                                    RequestSelection = b =>
+                                    {
+                                        Carousel.CurrentSelection = b;
+                                    },
+                                    RequestRecommendedSelection = beatmaps =>
+                                    {
+                                        BeatmapSetRequestedSelections.Push(beatmaps.First().BeatmapSet!);
+                                        Carousel.CurrentSelection = BeatmapRecommendationFunction?.Invoke(beatmaps) ?? beatmaps.First();
+                                    },
                                     BleedTop = 50,
                                     BleedBottom = 50,
                                     Anchor = Anchor.Centre,
@@ -366,6 +376,9 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         public partial class TestBeatmapCarousel : BeatmapCarousel
         {
             public IEnumerable<BeatmapInfo> PostFilterBeatmaps = null!;
+
+            public BeatmapInfo? SelectedBeatmapInfo => CurrentSelection as BeatmapInfo;
+            public BeatmapSetInfo? SelectedBeatmapSet => SelectedBeatmapInfo?.BeatmapSet;
 
             protected override Task<IEnumerable<CarouselItem>> FilterAsync(bool clearExistingPanels = false)
             {

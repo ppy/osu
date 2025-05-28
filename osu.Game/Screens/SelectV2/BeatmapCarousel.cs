@@ -16,6 +16,7 @@ using osu.Framework.Graphics.Pooling;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Graphics.Carousel;
 using osu.Game.Graphics.UserInterface;
@@ -81,11 +82,13 @@ namespace osu.Game.Screens.SelectV2
         }
 
         [BackgroundDependencyLoader]
-        private void load(BeatmapStore beatmapStore, AudioManager audio, CancellationToken? cancellationToken)
+        private void load(BeatmapStore beatmapStore, AudioManager audio, OsuConfigManager config, CancellationToken? cancellationToken)
         {
             setupPools();
             setupBeatmaps(beatmapStore, cancellationToken);
             loadSamples(audio);
+
+            config.BindWith(OsuSetting.RandomSelectAlgorithm, randomAlgorithm);
         }
 
         #region Beatmap source hookup
@@ -356,6 +359,9 @@ namespace osu.Game.Screens.SelectV2
             sampleChangeSet = audio.Samples.Get(@"SongSelect/select-expand");
             sampleOpen = audio.Samples.Get(@"UI/menu-open");
             sampleClose = audio.Samples.Get(@"UI/menu-close");
+
+            spinSample = audio.Samples.Get("SongSelect/random-spin");
+            randomSelectSample = audio.Samples.Get(@"SongSelect/select-random");
         }
 
         private void playActivationSound(CarouselItem item)
@@ -497,6 +503,106 @@ namespace osu.Game.Screens.SelectV2
             }
 
             throw new InvalidOperationException();
+        }
+
+        #endregion
+
+        #region Random selection handling
+
+        private readonly Bindable<RandomSelectAlgorithm> randomAlgorithm = new Bindable<RandomSelectAlgorithm>();
+        private readonly List<BeatmapSetInfo> previouslyVisitedRandomSets = new List<BeatmapSetInfo>();
+        private readonly List<BeatmapInfo> randomSelectedBeatmaps = new List<BeatmapInfo>();
+
+        private Sample? spinSample;
+        private Sample? randomSelectSample;
+
+        public bool NextRandom()
+        {
+            var carouselItems = GetCarouselItems();
+
+            if (carouselItems?.Any() != true)
+                return false;
+
+            ICollection<BeatmapSetInfo> visibleSets = grouping.SetItems.Keys;
+
+            if (CurrentSelection is BeatmapInfo beatmapInfo)
+            {
+                randomSelectedBeatmaps.Add(beatmapInfo);
+
+                // when performing a random, we want to add the current set to the previously visited list
+                // else the user may be "randomised" to the existing selection.
+                if (previouslyVisitedRandomSets.LastOrDefault()?.Equals(beatmapInfo.BeatmapSet) != true)
+                    previouslyVisitedRandomSets.Add(beatmapInfo.BeatmapSet!);
+            }
+
+            BeatmapSetInfo set;
+
+            if (randomAlgorithm.Value == RandomSelectAlgorithm.RandomPermutation)
+            {
+                ICollection<BeatmapSetInfo> notYetVisitedSets = visibleSets.Except(previouslyVisitedRandomSets).ToList();
+
+                if (!notYetVisitedSets.Any())
+                {
+                    previouslyVisitedRandomSets.RemoveAll(s => visibleSets.Contains(s));
+                    notYetVisitedSets = visibleSets;
+                }
+
+                set = notYetVisitedSets.ElementAt(RNG.Next(notYetVisitedSets.Count));
+                previouslyVisitedRandomSets.Add(set);
+            }
+            else
+                set = visibleSets.ElementAt(RNG.Next(visibleSets.Count));
+
+            if (CurrentSelectionItem != null)
+                playSpinSample(distanceBetween(carouselItems.First(i => !ReferenceEquals(i.Model, set)), CurrentSelectionItem), visibleSets.Count);
+
+            RequestRecommendedSelection(set.Beatmaps);
+            return true;
+        }
+
+        public void PreviousRandom()
+        {
+            var carouselItems = GetCarouselItems();
+
+            if (carouselItems?.Any() != true)
+                return;
+
+            while (randomSelectedBeatmaps.Any())
+            {
+                var previousBeatmap = randomSelectedBeatmaps[^1];
+                randomSelectedBeatmaps.RemoveAt(randomSelectedBeatmaps.Count - 1);
+
+                var previousBeatmapItem = carouselItems.FirstOrDefault(i => i.Model is BeatmapInfo b && b.Equals(previousBeatmap));
+
+                if (previousBeatmapItem == null)
+                    return;
+
+                if (CurrentSelection is BeatmapInfo beatmapInfo)
+                {
+                    if (randomAlgorithm.Value == RandomSelectAlgorithm.RandomPermutation)
+                        previouslyVisitedRandomSets.Remove(beatmapInfo.BeatmapSet!);
+
+                    playSpinSample(distanceBetween(previousBeatmapItem, CurrentSelectionItem!), carouselItems.Count);
+                }
+
+                RequestSelection(previousBeatmap);
+                break;
+            }
+        }
+
+        private double distanceBetween(CarouselItem item1, CarouselItem item2) => Math.Ceiling(Math.Abs(item1.CarouselYPosition - item2.CarouselYPosition) / PanelBeatmapSet.HEIGHT);
+
+        private void playSpinSample(double distance, int count)
+        {
+            var chan = spinSample?.GetChannel();
+
+            if (chan != null)
+            {
+                chan.Frequency.Value = 1f + Math.Min(1f, distance / count);
+                chan.Play();
+            }
+
+            randomSelectSample?.Play();
         }
 
         #endregion
