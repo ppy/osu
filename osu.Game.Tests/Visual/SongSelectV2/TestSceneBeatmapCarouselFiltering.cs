@@ -154,6 +154,30 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         }
 
         [Test]
+        public void TestCarouselChangesSelectionOnSingleMatch_FromSelection()
+        {
+            AddBeatmaps(50, 3);
+            WaitForDrawablePanels();
+
+            SelectPrevGroup();
+            WaitForSelection(49, 0);
+
+            ApplyToFilter("filter all but one", c => c.SearchText = BeatmapSets.First().Metadata.Title);
+            WaitForSelection(0, 0);
+        }
+
+        [Test]
+        public void TestCarouselChangesSelectionOnSingleMatch_FromNoSelection()
+        {
+            AddBeatmaps(50, 3);
+            WaitForDrawablePanels();
+
+            CheckNoSelection();
+            ApplyToFilter("filter all but one", c => c.SearchText = BeatmapSets.First().Metadata.Title);
+            WaitForSelection(0, 0);
+        }
+
+        [Test]
         public void TestCarouselRemembersSelectionDifficultySort()
         {
             Guid selectedID = Guid.Empty;
