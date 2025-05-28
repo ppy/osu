@@ -196,6 +196,13 @@ namespace osu.Game.Graphics.Carousel
         }
 
         /// <summary>
+        /// Fired after a filter operation completed.
+        /// </summary>
+        protected virtual void HandleFilterCompleted()
+        {
+        }
+
+        /// <summary>
         /// Check whether two models are the same for display purposes.
         /// </summary>
         protected virtual bool CheckModelEquality(object x, object y) => ReferenceEquals(x, y);
@@ -279,6 +286,11 @@ namespace osu.Game.Graphics.Carousel
 
         #region Filtering and display preparation
 
+        /// <summary>
+        /// Retrieve a list of all <see cref="CarouselItem"/>s currently displayed.
+        /// </summary>
+        protected IReadOnlyCollection<CarouselItem>? GetCarouselItems() => carouselItems;
+
         private List<CarouselItem>? carouselItems;
 
         private Task<IEnumerable<CarouselItem>> filterTask = Task.FromResult(Enumerable.Empty<CarouselItem>());
@@ -343,8 +355,7 @@ namespace osu.Game.Graphics.Carousel
                     filterReusesPanels.Validate();
                 }
 
-                // Need to call this to ensure correct post-selection logic is handled on the new items list.
-                HandleItemSelected(currentSelection.Model);
+                HandleFilterCompleted();
 
                 refreshAfterSelection();
                 if (!Scroll.UserScrolling)
@@ -407,20 +418,27 @@ namespace osu.Game.Graphics.Carousel
                     activateSelection();
                     return true;
 
+                // the selection traversal handlers below are scheduled to avoid an issue
+                // wherein if the update frame rate is low, keeping one of the actions below pressed leads to selection moving back to the start / end.
+                // the reason why that happens is that the code managing `current(Keyboard)?Selection` can lose track of the index of the selected item
+                // if the selection is changed more than once during an update frame,
+                // which can happen if repeat inputs are enqueued for processing at a rate faster than the update refresh rate.
+                // `refreshAfterSelection()` is the method responsible for updating the index of the selected item here which runs once per frame.
+
                 case GlobalAction.SelectNext:
-                    traverseKeyboardSelection(1);
+                    Scheduler.AddOnce(traverseKeyboardSelection, 1);
                     return true;
 
                 case GlobalAction.SelectPrevious:
-                    traverseKeyboardSelection(-1);
+                    Scheduler.AddOnce(traverseKeyboardSelection, -1);
                     return true;
 
                 case GlobalAction.SelectNextGroup:
-                    traverseGroupSelection(1);
+                    Scheduler.AddOnce(traverseGroupSelection, 1);
                     return true;
 
                 case GlobalAction.SelectPreviousGroup:
-                    traverseGroupSelection(-1);
+                    Scheduler.AddOnce(traverseGroupSelection, -1);
                     return true;
             }
 
@@ -547,6 +565,11 @@ namespace osu.Game.Graphics.Carousel
         #endregion
 
         #region Selection handling
+
+        /// <summary>
+        /// The currently selected <see cref="CarouselItem"/>, if any is selected.
+        /// </summary>
+        protected CarouselItem? CurrentSelectionItem => currentSelection.CarouselItem;
 
         /// <summary>
         /// Becomes invalid when the current selection has changed and needs to be updated visually.
@@ -756,12 +779,7 @@ namespace osu.Game.Graphics.Carousel
                     continue;
                 }
 
-                // The case where we're intending to display this panel, but it's already displayed.
-                // Note that we **must compare the model here** as the CarouselItems may be fresh instances due to a filter operation.
-                //
-                // Reference equality is used here instead of CheckModelEquality intentionally. In order to switch to `CheckModelEquality`,
-                // we need a way to signal to the drawable panels that there is an update.
-                var existing = toDisplay.FirstOrDefault(i => ReferenceEquals(i.Model, carouselPanel.Item!.Model));
+                var existing = toDisplay.FirstOrDefault(i => CheckModelEquality(i.Model, carouselPanel.Item!.Model));
 
                 if (existing != null)
                 {
