@@ -177,8 +177,9 @@ namespace osu.Game.Screens.SelectV2
 
         #region Selection handling
 
-        private GroupDefinition? lastSelectedGroup;
-        private BeatmapInfo? lastSelectedBeatmap;
+        protected GroupDefinition? ExpandedGroup { get; private set; }
+
+        protected BeatmapSetInfo? ExpandedBeatmapSet { get; private set; }
 
         protected override void HandleItemActivated(CarouselItem item)
         {
@@ -188,10 +189,10 @@ namespace osu.Game.Screens.SelectV2
                 {
                     case GroupDefinition group:
                         // Special case – collapsing an open group.
-                        if (lastSelectedGroup == group)
+                        if (ExpandedGroup == group)
                         {
-                            setExpansionStateOfGroup(lastSelectedGroup, false);
-                            lastSelectedGroup = null;
+                            setExpansionStateOfGroup(ExpandedGroup, false);
+                            ExpandedGroup = null;
                             return;
                         }
 
@@ -246,6 +247,22 @@ namespace osu.Game.Screens.SelectV2
             }
         }
 
+        protected override void HandleFilterCompleted()
+        {
+            base.HandleFilterCompleted();
+
+            // Store selected group before handling selection (it may implicitly change the expanded group).
+            var groupForReselection = ExpandedGroup;
+
+            // Ensure correct post-selection logic is handled on the new items list.
+            // This will update the visual state of the selected item.
+            HandleItemSelected(CurrentSelection);
+
+            // If a group was selected that is not the one containing the selection, reselect it.
+            if (groupForReselection != null)
+                setExpandedGroup(groupForReselection);
+        }
+
         protected override bool CheckValidForGroupSelection(CarouselItem item)
         {
             switch (item.Model)
@@ -266,9 +283,9 @@ namespace osu.Game.Screens.SelectV2
 
         private void setExpandedGroup(GroupDefinition group)
         {
-            if (lastSelectedGroup != null)
-                setExpansionStateOfGroup(lastSelectedGroup, false);
-            lastSelectedGroup = group;
+            if (ExpandedGroup != null)
+                setExpansionStateOfGroup(ExpandedGroup, false);
+            ExpandedGroup = group;
             setExpansionStateOfGroup(group, true);
         }
 
@@ -322,10 +339,10 @@ namespace osu.Game.Screens.SelectV2
 
         private void setExpandedSet(BeatmapInfo beatmapInfo)
         {
-            if (lastSelectedBeatmap != null)
-                setExpansionStateOfSetItems(lastSelectedBeatmap.BeatmapSet!, false);
-            lastSelectedBeatmap = beatmapInfo;
-            setExpansionStateOfSetItems(beatmapInfo.BeatmapSet!, true);
+            if (ExpandedBeatmapSet != null)
+                setExpansionStateOfSetItems(ExpandedBeatmapSet, false);
+            ExpandedBeatmapSet = beatmapInfo.BeatmapSet!;
+            setExpansionStateOfSetItems(ExpandedBeatmapSet, true);
         }
 
         private void setExpansionStateOfSetItems(BeatmapSetInfo set, bool expanded)
@@ -478,6 +495,12 @@ namespace osu.Game.Screens.SelectV2
 
             if (x is BeatmapInfo beatmapX && y is BeatmapInfo beatmapY)
                 return beatmapX.Equals(beatmapY);
+
+            if (x is GroupDefinition groupX && y is GroupDefinition groupY)
+                return groupX.Equals(groupY);
+
+            if (x is StarDifficultyGroupDefinition starX && y is StarDifficultyGroupDefinition starY)
+                return starX.Equals(starY);
 
             return base.CheckModelEquality(x, y);
         }
