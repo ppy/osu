@@ -202,9 +202,9 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             CheckDisplayedGroupsCount(3);
             CheckDisplayedBeatmapsCount(3);
 
-            CheckNoSelection();
-            SelectNextPanel();
-            Select();
+            // Single result gets selected automatically
+            WaitForGroupSelection(0, 0);
+
             SelectNextPanel();
             Select();
             WaitForGroupSelection(0, 0);

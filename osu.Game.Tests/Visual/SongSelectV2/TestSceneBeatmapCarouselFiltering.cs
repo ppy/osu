@@ -44,9 +44,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             CheckDisplayedBeatmapSetsCount(1);
             CheckDisplayedBeatmapsCount(3);
 
-            SelectNextPanel();
-            Select();
-
             WaitForSelection(2, 0);
 
             for (int i = 0; i < 5; i++)
@@ -151,6 +148,30 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 ApplyToFilter("remove filter", c => c.SearchText = string.Empty);
                 AddAssert("selection not changed", () => ((BeatmapInfo)Carousel.CurrentSelection!).ID == selectedID);
             }
+        }
+
+        [Test]
+        public void TestCarouselChangesSelectionOnSingleMatch_FromSelection()
+        {
+            AddBeatmaps(50, 3);
+            WaitForDrawablePanels();
+
+            SelectPrevGroup();
+            WaitForSelection(49, 0);
+
+            ApplyToFilter("filter all but one", c => c.SearchText = BeatmapSets.First().Metadata.Title);
+            WaitForSelection(0, 0);
+        }
+
+        [Test]
+        public void TestCarouselChangesSelectionOnSingleMatch_FromNoSelection()
+        {
+            AddBeatmaps(50, 3);
+            WaitForDrawablePanels();
+
+            CheckNoSelection();
+            ApplyToFilter("filter all but one", c => c.SearchText = BeatmapSets.First().Metadata.Title);
+            WaitForSelection(0, 0);
         }
 
         [Test]
@@ -445,7 +466,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             ApplyToFilter("filter first set away", c => c.SearchText = BeatmapSets.Last().Metadata.Title);
             WaitForFiltering();
 
-            SelectNextPanel();
+            // Single result is automatically selected for us, so we iterate once backwards to the set header.
+            SelectPrevPanel();
             AddAssert("keyboard selected is second set", () => GetKeyboardSelectedPanel()?.Item?.Model, () => Is.EqualTo(BeatmapSets.Last()));
         }
     }
