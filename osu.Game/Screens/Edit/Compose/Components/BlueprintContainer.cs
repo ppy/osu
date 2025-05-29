@@ -166,6 +166,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected override void OnMouseUp(MouseUpEvent e)
         {
+            if (e.Button != MouseButton.Left)
+                return;
+
             // Special case for when a drag happened instead of a click
             Schedule(() =>
             {
