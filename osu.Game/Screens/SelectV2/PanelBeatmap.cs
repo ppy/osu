@@ -66,6 +66,11 @@ namespace osu.Game.Screens.SelectV2
         [Resolved]
         private ISongSelect? songSelect { get; set; }
 
+        public PanelBeatmap()
+        {
+            PanelXOffset = 60;
+        }
+
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
         {
             var inputRectangle = TopLevelContent.DrawRectangle;
