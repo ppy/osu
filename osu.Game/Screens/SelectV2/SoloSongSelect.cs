@@ -86,6 +86,8 @@ namespace osu.Game.Screens.SelectV2
         {
             if (playerLoader != null) return false;
 
+            if (Beatmap.IsDefault) return false;
+
             FinaliseSelection();
 
             modsAtGameplayStart = Mods.Value;
