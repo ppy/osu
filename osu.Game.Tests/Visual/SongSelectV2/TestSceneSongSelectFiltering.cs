@@ -203,6 +203,21 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         }
 
         [Test]
+        public void TestSelectionRetainedWhenFilteringAllPanelsAway()
+        {
+            ImportBeatmapForRuleset(0);
+
+            LoadSongSelect();
+
+            AddAssert("has selection", () => Beatmap.IsDefault, () => Is.False);
+
+            AddStep("change star filter", () => Config.SetValue(OsuSetting.DisplayStarsMinimum, 10.0));
+            AddUntilStep("wait for placeholder visible", () => getPlaceholder()?.State.Value == Visibility.Visible);
+
+            AddAssert("still has selection", () => Beatmap.IsDefault, () => Is.False);
+        }
+
+        [Test]
         public void TestPlaceholderVisibleWithConvertSetting()
         {
             ImportBeatmapForRuleset(0);
