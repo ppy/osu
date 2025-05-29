@@ -54,7 +54,7 @@ namespace osu.Game.Overlays.Mods
         protected IBindable<RulesetInfo> GameRuleset = null!;
 
         private CancellationTokenSource? cancellationSource;
-        private IBindable<StarDifficulty?> starDifficulty = null!;
+        private IBindable<StarDifficulty> starDifficulty = null!;
 
         public ITooltip<AdjustedAttributesTooltip.Data?> GetCustomTooltip() => new AdjustedAttributesTooltip();
 
@@ -87,9 +87,9 @@ namespace osu.Game.Overlays.Mods
             RightContent.AddRange(new Drawable[]
             {
                 circleSizeDisplay = new VerticalAttributeDisplay("CS") { Shear = -OsuGame.SHEAR, },
-                drainRateDisplay = new VerticalAttributeDisplay("HP") { Shear = -OsuGame.SHEAR, },
-                overallDifficultyDisplay = new VerticalAttributeDisplay("OD") { Shear = -OsuGame.SHEAR, },
                 approachRateDisplay = new VerticalAttributeDisplay("AR") { Shear = -OsuGame.SHEAR, },
+                overallDifficultyDisplay = new VerticalAttributeDisplay("OD") { Shear = -OsuGame.SHEAR, },
+                drainRateDisplay = new VerticalAttributeDisplay("HP") { Shear = -OsuGame.SHEAR, },
             });
         }
 
@@ -134,7 +134,7 @@ namespace osu.Game.Overlays.Mods
             starDifficulty = difficultyCache.GetBindableDifficulty(BeatmapInfo.Value, (cancellationSource = new CancellationTokenSource()).Token);
             starDifficulty.BindValueChanged(s =>
             {
-                starRatingDisplay.Current.Value = s.NewValue ?? default;
+                starRatingDisplay.Current.Value = s.NewValue;
 
                 if (!starRatingDisplay.IsPresent)
                     starRatingDisplay.FinishTransforms(true);

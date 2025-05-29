@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Carousel;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Overlays;
 using osu.Game.Screens.SelectV2;
 using osu.Game.Tests.Resources;
@@ -58,37 +59,41 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
         protected override Drawable CreateContent()
         {
-            return new FillFlowContainer
+            return new OsuContextMenuContainer
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Width = 0.5f,
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-                Direction = FillDirection.Vertical,
-                Spacing = new Vector2(0f, 5f),
-                Children = new Drawable[]
+                RelativeSizeAxes = Axes.Both,
+                Child = new FillFlowContainer
                 {
-                    new PanelBeatmapSet
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Width = 0.5f,
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Direction = FillDirection.Vertical,
+                    Spacing = new Vector2(0f, 5f),
+                    Children = new Drawable[]
                     {
-                        Item = new CarouselItem(beatmapSet)
-                    },
-                    new PanelBeatmapSet
-                    {
-                        Item = new CarouselItem(beatmapSet),
-                        KeyboardSelected = { Value = true }
-                    },
-                    new PanelBeatmapSet
-                    {
-                        Item = new CarouselItem(beatmapSet),
-                        Expanded = { Value = true }
-                    },
-                    new PanelBeatmapSet
-                    {
-                        Item = new CarouselItem(beatmapSet),
-                        KeyboardSelected = { Value = true },
-                        Expanded = { Value = true }
-                    },
+                        new PanelBeatmapSet
+                        {
+                            Item = new CarouselItem(beatmapSet)
+                        },
+                        new PanelBeatmapSet
+                        {
+                            Item = new CarouselItem(beatmapSet),
+                            KeyboardSelected = { Value = true }
+                        },
+                        new PanelBeatmapSet
+                        {
+                            Item = new CarouselItem(beatmapSet),
+                            Expanded = { Value = true }
+                        },
+                        new PanelBeatmapSet
+                        {
+                            Item = new CarouselItem(beatmapSet),
+                            KeyboardSelected = { Value = true },
+                            Expanded = { Value = true }
+                        },
+                    }
                 }
             };
         }

@@ -130,7 +130,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 SelectedMods.SetDefault();
 
                 Config.SetValue(OsuSetting.SongSelectSortingMode, SortMode.Title);
-                Config.SetValue(OsuSetting.SongSelectGroupingMode, GroupMode.All);
+                Config.SetValue(OsuSetting.SongSelectGroupMode, GroupMode.NoGrouping);
 
                 SongSelect = null!;
             });
@@ -189,10 +189,24 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
         private void updateFooter(IScreen? _, IScreen? newScreen)
         {
-            if (newScreen is IOsuScreen osuScreen && osuScreen.ShowFooter)
+            if (newScreen is OsuScreen osuScreen && osuScreen.ShowFooter)
             {
                 Footer.Show();
-                Footer.SetButtons(osuScreen.CreateFooterButtons());
+
+                if (osuScreen.IsLoaded)
+                    updateFooterButtons();
+                else
+                    osuScreen.OnLoadComplete += _ => updateFooterButtons();
+
+                void updateFooterButtons()
+                {
+                    var buttons = osuScreen.CreateFooterButtons();
+
+                    osuScreen.LoadComponentsAgainstScreenDependencies(buttons);
+
+                    Footer.SetButtons(buttons);
+                    Footer.Show();
+                }
             }
             else
             {

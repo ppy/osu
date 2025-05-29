@@ -8,13 +8,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Configuration;
@@ -63,9 +61,6 @@ namespace osu.Game.Screens.SelectV2
             private OsuSpriteText mappedByText = null!;
             private OsuHoverContainer mapperLink = null!;
             private OsuSpriteText mapperText = null!;
-
-            internal LocalisableString DisplayedVersion => difficultyText.Text;
-            internal LocalisableString DisplayedAuthor => mapperText.Text;
 
             private GridContainer ratingAndNameContainer = null!;
             private DifficultyStatisticsDisplay countStatisticsDisplay = null!;
@@ -227,9 +222,12 @@ namespace osu.Game.Screens.SelectV2
 
                     updateDifficultyStatistics();
 
-                    settingChangeTracker = new ModSettingChangeTracker(m.NewValue);
-                    settingChangeTracker.SettingChanged += _ => updateDifficultyStatistics();
-                });
+                    if (m.NewValue.Any())
+                    {
+                        settingChangeTracker = new ModSettingChangeTracker(m.NewValue);
+                        settingChangeTracker.SettingChanged += _ => updateDifficultyStatistics();
+                    }
+                }, true);
 
                 updateDisplay();
             }
@@ -255,24 +253,10 @@ namespace osu.Game.Screens.SelectV2
                     mapperText.Text = beatmap.Value.Metadata.Author.Username;
                 }
 
-                updateStarDifficulty(cancellationSource.Token);
+                starRatingDisplay.Current = (Bindable<StarDifficulty>)difficultyCache.GetBindableDifficulty(beatmap.Value.BeatmapInfo, cancellationSource.Token, 200);
+
                 updateCountStatistics(cancellationSource.Token);
                 updateDifficultyStatistics();
-            }
-
-            private void updateStarDifficulty(CancellationToken cancellationToken)
-            {
-                difficultyCache.GetDifficultyAsync(beatmap.Value.BeatmapInfo, ruleset.Value, mods.Value, cancellationToken)
-                               .ContinueWith(task =>
-                               {
-                                   Schedule(() =>
-                                   {
-                                       if (cancellationToken.IsCancellationRequested)
-                                           return;
-
-                                       starRatingDisplay.Current.Value = task.GetResultSafely() ?? default;
-                                   });
-                               }, cancellationToken);
             }
 
             private void updateCountStatistics(CancellationToken cancellationToken)
@@ -304,57 +288,54 @@ namespace osu.Game.Screens.SelectV2
 
             private void updateDifficultyStatistics() => Scheduler.AddOnce(() =>
             {
-                if (beatmap.IsDefault)
+                if (beatmap.IsDefault || ruleset.Value == null)
                 {
                     difficultyStatisticsDisplay.TooltipContent = null;
                     difficultyStatisticsDisplay.Statistics = Array.Empty<StatisticDifficulty.Data>();
                     return;
                 }
 
-                BeatmapDifficulty baseDifficulty = beatmap.Value.BeatmapInfo.Difficulty;
-                BeatmapDifficulty originalDifficulty = new BeatmapDifficulty(baseDifficulty);
+                BeatmapDifficulty originalDifficulty = beatmap.Value.BeatmapInfo.Difficulty;
+                BeatmapDifficulty adjustedDifficulty = new BeatmapDifficulty(originalDifficulty);
 
                 foreach (var mod in mods.Value.OfType<IApplicableToDifficulty>())
-                    mod.ApplyToDifficulty(originalDifficulty);
+                    mod.ApplyToDifficulty(adjustedDifficulty);
 
-                var rateAdjustedDifficulty = originalDifficulty;
+                Ruleset rulesetInstance = ruleset.Value.CreateInstance();
 
-                if (ruleset.Value != null)
-                {
-                    double rate = ModUtils.CalculateRateWithMods(mods.Value);
+                double rate = ModUtils.CalculateRateWithMods(mods.Value);
 
-                    rateAdjustedDifficulty = ruleset.Value.CreateInstance().GetRateAdjustedDisplayDifficulty(originalDifficulty, rate);
-                    difficultyStatisticsDisplay.TooltipContent = new AdjustedAttributesTooltip.Data(originalDifficulty, rateAdjustedDifficulty);
-                }
+                adjustedDifficulty = rulesetInstance.GetRateAdjustedDisplayDifficulty(adjustedDifficulty, rate);
+                difficultyStatisticsDisplay.TooltipContent = new AdjustedAttributesTooltip.Data(originalDifficulty, adjustedDifficulty);
 
                 StatisticDifficulty.Data firstStatistic;
 
-                switch (ruleset.Value?.OnlineID)
+                switch (ruleset.Value.OnlineID)
                 {
                     case 3:
                         // Account for mania differences locally for now.
                         // Eventually this should be handled in a more modular way, allowing rulesets to return arbitrary difficulty attributes.
-                        ILegacyRuleset legacyRuleset = (ILegacyRuleset)ruleset.Value.CreateInstance();
+                        ILegacyRuleset legacyRuleset = (ILegacyRuleset)rulesetInstance;
 
                         // For the time being, the key count is static no matter what, because:
-                        // a) The method doesn't have knowledge of the active keymods. Doing so may require considerations for filtering.
-                        // b) Using the difficulty adjustment mod to adjust OD doesn't have an effect on conversion.
+                        // - The method doesn't have knowledge of the active keymods. Doing so may require considerations for filtering.
+                        // - Using the difficulty adjustment mod to adjust OD doesn't have an effect on conversion.
                         int keyCount = legacyRuleset.GetKeyCount(beatmap.Value.BeatmapInfo, mods.Value);
 
                         firstStatistic = new StatisticDifficulty.Data(BeatmapsetsStrings.ShowStatsCsMania, keyCount, keyCount, 10);
                         break;
 
                     default:
-                        firstStatistic = new StatisticDifficulty.Data(BeatmapsetsStrings.ShowStatsCs, baseDifficulty.CircleSize, rateAdjustedDifficulty.CircleSize, 10);
+                        firstStatistic = new StatisticDifficulty.Data(BeatmapsetsStrings.ShowStatsCs, originalDifficulty.CircleSize, adjustedDifficulty.CircleSize, 10);
                         break;
                 }
 
                 difficultyStatisticsDisplay.Statistics = new[]
                 {
                     firstStatistic,
-                    new StatisticDifficulty.Data(BeatmapsetsStrings.ShowStatsAccuracy, baseDifficulty.OverallDifficulty, rateAdjustedDifficulty.OverallDifficulty, 10),
-                    new StatisticDifficulty.Data(BeatmapsetsStrings.ShowStatsDrain, baseDifficulty.DrainRate, rateAdjustedDifficulty.DrainRate, 10),
-                    new StatisticDifficulty.Data(BeatmapsetsStrings.ShowStatsAr, baseDifficulty.ApproachRate, rateAdjustedDifficulty.ApproachRate, 10),
+                    new StatisticDifficulty.Data(BeatmapsetsStrings.ShowStatsAr, originalDifficulty.ApproachRate, adjustedDifficulty.ApproachRate, 10),
+                    new StatisticDifficulty.Data(BeatmapsetsStrings.ShowStatsAccuracy, originalDifficulty.OverallDifficulty, adjustedDifficulty.OverallDifficulty, 10),
+                    new StatisticDifficulty.Data(BeatmapsetsStrings.ShowStatsDrain, originalDifficulty.DrainRate, adjustedDifficulty.DrainRate, 10),
                 };
             });
 

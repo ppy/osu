@@ -202,9 +202,9 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             CheckDisplayedGroupsCount(3);
             CheckDisplayedBeatmapsCount(3);
 
-            CheckNoSelection();
-            SelectNextPanel();
-            Select();
+            // Single result gets selected automatically
+            WaitForGroupSelection(0, 0);
+
             SelectNextPanel();
             Select();
             WaitForGroupSelection(0, 0);
@@ -223,6 +223,26 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             CheckDisplayedGroupsCount(3);
             CheckDisplayedBeatmapsCount(30);
+        }
+
+        [Test]
+        public void TestExpandedGroupStillExpandedAfterFilter()
+        {
+            SelectPrevGroup();
+
+            WaitForGroupSelection(2, 9);
+            AddAssert("expanded group is last", () => (Carousel.ExpandedGroup as StarDifficultyGroupDefinition)?.Difficulty.Stars, () => Is.EqualTo(6));
+
+            SelectNextPanel();
+            Select();
+
+            WaitForGroupSelection(2, 9);
+            AddAssert("expanded group is first", () => (Carousel.ExpandedGroup as StarDifficultyGroupDefinition)?.Difficulty.Stars, () => Is.EqualTo(0));
+
+            // doesn't actually filter anything away, but triggers a filter.
+            ApplyToFilter("filter", c => c.SearchText = "Some");
+
+            AddAssert("expanded group is still first", () => (Carousel.ExpandedGroup as StarDifficultyGroupDefinition)?.Difficulty.Stars, () => Is.EqualTo(0));
         }
     }
 }

@@ -7,9 +7,9 @@ using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.PolygonExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
@@ -62,13 +62,14 @@ namespace osu.Game.Screens.SelectV2
         private Container personalBestDisplay = null!;
 
         private Container<BeatmapLeaderboardScore> personalBestScoreContainer = null!;
+        private OsuSpriteText personalBestText = null!;
         private LoadingLayer loading = null!;
 
         private CancellationTokenSource? cancellationTokenSource;
 
         private readonly IBindable<LeaderboardScores?> fetchedScores = new Bindable<LeaderboardScores?>();
 
-        private const float personal_best_height = 80;
+        private const float personal_best_height = 100;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -107,7 +108,10 @@ namespace osu.Game.Screens.SelectV2
                         RelativeSizeAxes = Axes.X,
                         Height = personal_best_height,
                         Shear = OsuGame.SHEAR,
-                        Margin = new MarginPadding { Left = -40f },
+                        Margin = new MarginPadding
+                        {
+                            Left = -40f,
+                        },
                         CornerRadius = 10f,
                         Masking = true,
                         // push the personal best 1px down to hide masking issues
@@ -116,11 +120,7 @@ namespace osu.Game.Screens.SelectV2
                         Alpha = 0f,
                         Children = new Drawable[]
                         {
-                            new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Colour = colourProvider.Background4,
-                            },
+                            new WedgeBackground(),
                             new Container
                             {
                                 RelativeSizeAxes = Axes.X,
@@ -129,10 +129,9 @@ namespace osu.Game.Screens.SelectV2
                                 Padding = new MarginPadding { Top = 5f, Bottom = 5f, Left = 70f, Right = 10f },
                                 Children = new Drawable[]
                                 {
-                                    new OsuSpriteText
+                                    personalBestText = new OsuSpriteText
                                     {
                                         Colour = colourProvider.Content2,
-                                        Text = "Personal Best",
                                         Font = OsuFont.Style.Caption1.With(weight: FontWeight.SemiBold),
                                     },
                                     personalBestScoreContainer = new Container<BeatmapLeaderboardScore>
@@ -189,7 +188,7 @@ namespace osu.Game.Screens.SelectV2
 
         private void refetchScores()
         {
-            SetScores(Array.Empty<ScoreInfo>(), null);
+            SetScores(Array.Empty<ScoreInfo>());
 
             if (beatmap.IsDefault)
             {
@@ -225,10 +224,10 @@ namespace osu.Game.Screens.SelectV2
             if (scores.FailState != null)
                 SetState((LeaderboardState)scores.FailState);
             else
-                SetScores(scores.TopScores, scores.UserScore);
+                SetScores(scores.TopScores, scores.UserScore, scores.TotalScores);
         }
 
-        protected void SetScores(IEnumerable<ScoreInfo> scores, ScoreInfo? userScore)
+        protected void SetScores(IEnumerable<ScoreInfo> scores, ScoreInfo? userScore = null, int? totalCount = null)
         {
             cancellationTokenSource?.Cancel();
             cancellationTokenSource = new CancellationTokenSource();
@@ -287,6 +286,11 @@ namespace osu.Game.Screens.SelectV2
                 };
 
                 scoresScroll.TransformTo(nameof(scoresScroll.Padding), new MarginPadding { Bottom = personal_best_height }, 300, Easing.OutQuint);
+
+                if (totalCount != null && userScore.Position != null)
+                    personalBestText.Text = $"Personal Best (#{userScore.Position:N0} of {totalCount.Value:N0})";
+                else
+                    personalBestText.Text = "Personal Best";
             }
         }
 
@@ -305,7 +309,10 @@ namespace osu.Game.Screens.SelectV2
                  .FadeOut(120, Easing.Out)
                  .Expire();
 
-                delay += 20;
+                // If the user is scrolled down in the list, start delaying only from the current visible range to
+                // avoid the perceived transition from taking longer than expected.
+                if (d.ScreenSpaceDrawQuad.Intersects(scoresScroll.ScreenSpaceDrawQuad))
+                    delay += 20;
             }
 
             personalBestDisplay.MoveToX(-100, 300, Easing.OutQuint);

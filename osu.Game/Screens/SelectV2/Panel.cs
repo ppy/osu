@@ -7,9 +7,11 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Pooling;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Carousel;
@@ -20,7 +22,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.SelectV2
 {
-    public abstract partial class Panel : PoolableDrawable, ICarouselPanel
+    public abstract partial class Panel : PoolableDrawable, ICarouselPanel, IHasContextMenu
     {
         private const float corner_radius = 10;
 
@@ -45,19 +47,24 @@ namespace osu.Game.Screens.SelectV2
 
         protected Container Content { get; private set; } = null!;
 
-        public Drawable Background { set => backgroundContainer.Child = value; }
+        public Drawable Background
+        {
+            set => backgroundContainer.Child = value;
+        }
 
-        public Drawable Icon { set => iconContainer.Child = value; }
+        public Drawable Icon
+        {
+            set => iconContainer.Child = value;
+        }
 
         private Color4? accentColour;
 
         public Color4? AccentColour
         {
-            get => accentColour;
             set
             {
                 accentColour = value;
-                updateDisplay();
+                updateAccentColour();
             }
         }
 
@@ -87,8 +94,8 @@ namespace osu.Game.Screens.SelectV2
                 EdgeEffect = new EdgeEffectParameters
                 {
                     Type = EdgeEffectType.Shadow,
-                    Offset = new Vector2(1f),
-                    Radius = 10,
+                    Hollow = true,
+                    Radius = 2,
                 },
                 Children = new Drawable[]
                 {
@@ -100,7 +107,7 @@ namespace osu.Game.Screens.SelectV2
                             backgroundBorder = new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Colour = Color4.White,
+                                Colour = Color4.Black,
                             },
                             backgroundLayerHorizontalPadding = new Container
                             {
@@ -116,6 +123,8 @@ namespace osu.Game.Screens.SelectV2
                                         {
                                             RelativeSizeAxes = Axes.Both,
                                         },
+                                        // TODO: this is only used by beatmap panels and should NOT be in this class.
+                                        // it's wasting fill rate.
                                         backgroundAccentGradient = new Box
                                         {
                                             RelativeSizeAxes = Axes.Both,
@@ -150,10 +159,9 @@ namespace osu.Game.Screens.SelectV2
                     selectionLayer = new Box
                     {
                         Alpha = 0,
-                        Colour = ColourInfo.GradientHorizontal(colours.Yellow.Opacity(0), colours.Yellow.Opacity(0.5f)),
-                        Blending = BlendingParameters.Additive,
                         RelativeSizeAxes = Axes.Both,
-                        Width = 0.7f,
+                        Width = 0.6f,
+                        Blending = BlendingParameters.Additive,
                         Anchor = Anchor.TopRight,
                         Origin = Anchor.TopRight,
                     },
@@ -182,15 +190,15 @@ namespace osu.Game.Screens.SelectV2
         {
             base.LoadComplete();
 
-            Expanded.BindValueChanged(_ => updateDisplay(), true);
-
-            Selected.BindValueChanged(selected =>
+            Expanded.BindValueChanged(_ =>
             {
-                if (selected.NewValue)
-                    selectionLayer.FadeIn(100, Easing.OutQuint);
-                else
-                    selectionLayer.FadeOut(200, Easing.OutQuint);
+                updateSelectedState();
+                updateXOffset();
+            });
 
+            Selected.BindValueChanged(_ =>
+            {
+                updateSelectedState();
                 updateXOffset();
             }, true);
 
@@ -208,7 +216,21 @@ namespace osu.Game.Screens.SelectV2
         protected override void PrepareForUse()
         {
             base.PrepareForUse();
-            this.FadeInFromZero(DURATION, Easing.OutQuint);
+
+            updateAccentColour();
+            updateXOffset();
+
+            this.FadeIn(DURATION, Easing.OutQuint);
+        }
+
+        protected override void FreeAfterUse()
+        {
+            base.FreeAfterUse();
+
+            Hide();
+
+            // Important to set this to null to handle reuse scenarios correctly, see `Item` implementation.
+            item = null;
         }
 
         protected override bool OnClick(ClickEvent e)
@@ -217,18 +239,29 @@ namespace osu.Game.Screens.SelectV2
             return true;
         }
 
-        private void updateDisplay()
+        private void updateAccentColour()
         {
             var backgroundColour = accentColour ?? Color4.White;
+
+            backgroundAccentGradient.Colour = ColourInfo.GradientHorizontal(backgroundColour.Opacity(0.25f), backgroundColour.Opacity(0f));
+            backgroundBorder.Colour = backgroundColour;
+
+            selectionLayer.Colour = ColourInfo.GradientHorizontal(backgroundColour.Opacity(0), backgroundColour.Opacity(0.5f));
+
+            updateSelectedState(animated: false);
+        }
+
+        private void updateSelectedState(bool animated = true)
+        {
+            bool selectedOrExpanded = Expanded.Value || Selected.Value;
+
             var edgeEffectColour = accentColour ?? Color4Extensions.FromHex(@"4EBFFF");
+            TopLevelContent.FadeEdgeEffectTo(selectedOrExpanded ? edgeEffectColour.Opacity(0.8f) : Color4.Black.Opacity(0.4f), animated ? DURATION : 0, Easing.OutQuint);
 
-            backgroundAccentGradient.FadeColour(ColourInfo.GradientHorizontal(backgroundColour.Opacity(0.25f), backgroundColour.Opacity(0f)), DURATION, Easing.OutQuint);
-            backgroundBorder.FadeColour(backgroundColour, DURATION, Easing.OutQuint);
-
-            TopLevelContent.FadeEdgeEffectTo(Expanded.Value ? edgeEffectColour.Opacity(0.5f) : Color4.Black.Opacity(0.4f), DURATION, Easing.OutQuint);
-
-            updateXOffset();
-            updateHover();
+            if (selectedOrExpanded)
+                selectionLayer.FadeIn(100, Easing.OutQuint);
+            else
+                selectionLayer.FadeOut(200, Easing.OutQuint);
         }
 
         private void updateXOffset()
@@ -244,23 +277,15 @@ namespace osu.Game.Screens.SelectV2
             TopLevelContent.MoveToX(x, DURATION, Easing.OutQuint);
         }
 
-        private void updateHover()
-        {
-            if (IsHovered)
-                hoverLayer.FadeIn(100, Easing.OutQuint);
-            else
-                hoverLayer.FadeOut(1000, Easing.OutQuint);
-        }
-
         protected override bool OnHover(HoverEvent e)
         {
-            updateHover();
+            hoverLayer.FadeIn(100, Easing.OutQuint);
             return true;
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            updateHover();
+            hoverLayer.FadeOut(1000, Easing.OutQuint);
             base.OnHoverLost(e);
         }
 
@@ -271,9 +296,34 @@ namespace osu.Game.Screens.SelectV2
             backgroundLayerHorizontalPadding.Padding = new MarginPadding { Left = iconContainer.DrawWidth };
         }
 
+        public abstract MenuItem[]? ContextMenuItems { get; }
+
         #region ICarouselPanel
 
-        public CarouselItem? Item { get; set; }
+        private CarouselItem? item;
+
+        public CarouselItem? Item
+        {
+            get => item;
+            set
+            {
+                if (ReferenceEquals(item, value))
+                    return;
+
+                // If a new item is set and we already have an item, this is a case of reuse.
+                // To keep things simple, assume that we need to do a full refresh.
+                //
+                // In the future, this could be more contextual and check whether the associated model has actually changed.
+                if (item != null && value != null)
+                {
+                    item = value;
+                    PrepareForUse();
+                }
+                else
+                    item = value;
+            }
+        }
+
         public BindableBool Selected { get; } = new BindableBool();
         public BindableBool Expanded { get; } = new BindableBool();
         public BindableBool KeyboardSelected { get; } = new BindableBool();

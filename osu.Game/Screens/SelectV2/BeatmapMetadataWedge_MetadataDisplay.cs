@@ -56,9 +56,15 @@ namespace osu.Game.Screens.SelectV2
                 }
             }
 
-            public (string[] tags, Action<string> linkAction) Tags
+            public (string[] tags, Action<string> linkAction)? Tags
             {
-                set => setTags(value.tags, value.linkAction);
+                set
+                {
+                    if (value != null)
+                        setTags(value.Value.tags, value.Value.linkAction);
+                    else
+                        setLoading();
+                }
             }
 
             public MetadataDisplay(LocalisableString label)

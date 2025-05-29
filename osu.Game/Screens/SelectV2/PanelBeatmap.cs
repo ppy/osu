@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
@@ -8,6 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.UserInterface;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
@@ -35,7 +37,7 @@ namespace osu.Game.Screens.SelectV2
         private OsuSpriteText difficultyText = null!;
         private OsuSpriteText authorText = null!;
 
-        private IBindable<StarDifficulty?>? starDifficultyBindable;
+        private IBindable<StarDifficulty>? starDifficultyBindable;
         private CancellationTokenSource? starDifficultyCancellationSource;
 
         [Resolved]
@@ -52,6 +54,9 @@ namespace osu.Game.Screens.SelectV2
 
         [Resolved]
         private IBindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
+
+        [Resolved]
+        private ISongSelect? songSelect { get; set; }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
         {
@@ -96,17 +101,17 @@ namespace osu.Game.Screens.SelectV2
                             AutoSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
-                                starRatingDisplay = new StarRatingDisplay(default, StarRatingDisplaySize.Small)
-                                {
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft,
-                                    Scale = new Vector2(0.875f),
-                                },
                                 localRank = new PanelLocalRankDisplay
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
                                     Scale = new Vector2(0.65f)
+                                },
+                                starRatingDisplay = new StarRatingDisplay(default, StarRatingDisplaySize.Small, animated: true)
+                                {
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
+                                    Scale = new Vector2(0.875f),
                                 },
                                 starCounter = new StarCounter
                                 {
@@ -134,7 +139,7 @@ namespace osu.Game.Screens.SelectV2
                                     Font = OsuFont.Style.Body.With(weight: FontWeight.SemiBold),
                                     Anchor = Anchor.BottomLeft,
                                     Origin = Anchor.BottomLeft,
-                                    Margin = new MarginPadding { Right = 5f },
+                                    Margin = new MarginPadding { Right = 3f },
                                 },
                                 authorText = new OsuSpriteText
                                 {
@@ -190,6 +195,8 @@ namespace osu.Game.Screens.SelectV2
 
             localRank.Beatmap = null;
             starDifficultyBindable = null;
+
+            starDifficultyCancellationSource?.Cancel();
         }
 
         private void computeStarRating()
@@ -202,8 +209,36 @@ namespace osu.Game.Screens.SelectV2
 
             var beatmap = (BeatmapInfo)Item.Model;
 
-            starDifficultyBindable = difficultyCache.GetBindableDifficulty(beatmap, starDifficultyCancellationSource.Token);
-            starDifficultyBindable.BindValueChanged(_ => updateDisplay(), true);
+            starDifficultyBindable = difficultyCache.GetBindableDifficulty(beatmap, starDifficultyCancellationSource.Token, SongSelect.SELECTION_DEBOUNCE);
+            starDifficultyBindable.BindValueChanged(_ =>
+            {
+                var starDifficulty = starDifficultyBindable?.Value ?? default;
+
+                starRatingDisplay.Current.Value = starDifficulty;
+                starCounter.Current = (float)starDifficulty.Stars;
+            }, true);
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (Item?.IsVisible != true)
+            {
+                starDifficultyCancellationSource?.Cancel();
+                starDifficultyCancellationSource = null;
+            }
+
+            // Dirty hack to make sure we don't take up spacing in parent fill flow when not displaying a rank.
+            // I can't find a better way to do this.
+            starRatingDisplay.Margin = new MarginPadding { Left = 1 / starRatingDisplay.Scale.X * (localRank.HasRank ? 0 : -3) };
+
+            var diffColour = starRatingDisplay.DisplayedDifficultyColour;
+
+            AccentColour = diffColour;
+            starCounter.Colour = diffColour;
+
+            difficultyIcon.Colour = starRatingDisplay.DisplayedStars.Value > OsuColour.STAR_DIFFICULTY_DEFINED_COLOUR_CUTOFF ? colours.Orange1 : colourProvider.Background5;
         }
 
         private void updateKeyCount()
@@ -227,20 +262,20 @@ namespace osu.Game.Screens.SelectV2
                 keyCountText.Alpha = 0;
         }
 
-        private void updateDisplay()
+        public override MenuItem[] ContextMenuItems
         {
-            const float duration = 500;
+            get
+            {
+                if (Item == null)
+                    return Array.Empty<MenuItem>();
 
-            var starDifficulty = starDifficultyBindable?.Value ?? default;
+                List<MenuItem> items = new List<MenuItem>();
 
-            starRatingDisplay.Current.Value = starDifficulty;
-            starCounter.Current = (float)starDifficulty.Stars;
+                if (songSelect != null)
+                    items.AddRange(songSelect.GetForwardActions((BeatmapInfo)Item.Model));
 
-            difficultyIcon.FadeColour(starDifficulty.Stars > OsuColour.STAR_DIFFICULTY_DEFINED_COLOUR_CUTOFF ? colours.Orange1 : colourProvider.Background5, duration, Easing.OutQuint);
-
-            var starRatingColour = colours.ForStarDifficulty(starDifficulty.Stars);
-            starCounter.FadeColour(starRatingColour, duration, Easing.OutQuint);
-            AccentColour = starRatingColour;
+                return items.ToArray();
+            }
         }
     }
 }

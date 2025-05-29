@@ -203,6 +203,21 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         }
 
         [Test]
+        public void TestSelectionRetainedWhenFilteringAllPanelsAway()
+        {
+            ImportBeatmapForRuleset(0);
+
+            LoadSongSelect();
+
+            AddAssert("has selection", () => Beatmap.IsDefault, () => Is.False);
+
+            AddStep("change star filter", () => Config.SetValue(OsuSetting.DisplayStarsMinimum, 10.0));
+            AddUntilStep("wait for placeholder visible", () => getPlaceholder()?.State.Value == Visibility.Visible);
+
+            AddAssert("still has selection", () => Beatmap.IsDefault, () => Is.False);
+        }
+
+        [Test]
         public void TestPlaceholderVisibleWithConvertSetting()
         {
             ImportBeatmapForRuleset(0);
@@ -244,6 +259,31 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             AddStep("hard delete beatmap", () => Realm.Write(r => r.RemoveRange(r.All<BeatmapSetInfo>().Where(s => !s.Protected))));
             checkMatchedBeatmaps(0);
+        }
+
+        [Test]
+        public void TestHideBeatmap()
+        {
+            BeatmapInfo? hiddenBeatmap = null;
+
+            LoadSongSelect();
+            ImportBeatmapForRuleset(0);
+
+            checkMatchedBeatmaps(3);
+
+            AddStep("hide selected", () =>
+            {
+                hiddenBeatmap = Beatmap.Value.BeatmapInfo;
+                Beatmaps.Hide(hiddenBeatmap);
+            });
+
+            checkMatchedBeatmaps(2);
+
+            AddAssert("selection changed", () => Beatmap.Value.BeatmapInfo, () => Is.Not.EqualTo(hiddenBeatmap));
+
+            AddStep("restore", () => Beatmaps.Restore(hiddenBeatmap!));
+
+            checkMatchedBeatmaps(3);
         }
 
         private NoResultsPlaceholder? getPlaceholder() => SongSelect.ChildrenOfType<NoResultsPlaceholder>().FirstOrDefault();

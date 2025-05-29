@@ -300,7 +300,10 @@ namespace osu.Game.Overlays.Mods
             }
         }
 
-        public bool FilteringActive { set { } }
+        public bool FilteringActive
+        {
+            set { }
+        }
 
         #endregion
     }

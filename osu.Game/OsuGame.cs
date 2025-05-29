@@ -742,7 +742,7 @@ namespace osu.Game
                 }
             }, validScreens: new[]
             {
-                typeof(SongSelect), typeof(IHandlePresentBeatmap)
+                typeof(SongSelect), typeof(Screens.SelectV2.SongSelect), typeof(IHandlePresentBeatmap)
             });
         }
 
@@ -845,7 +845,7 @@ namespace osu.Game
             // which may not match the score, and thus crash.
             IEnumerable<Type> validScreens =
                 Beatmap.Value.BeatmapInfo.Equals(databasedBeatmap) && Ruleset.Value.Equals(databasedScore.ScoreInfo.Ruleset)
-                    ? new[] { typeof(SongSelect), typeof(DailyChallenge) }
+                    ? new[] { typeof(SongSelect), typeof(Screens.SelectV2.SongSelect), typeof(DailyChallenge) }
                     : Array.Empty<Type>();
 
             PerformFromScreen(screen =>
@@ -1108,6 +1108,8 @@ namespace osu.Game
                                     Action = handleBackButton,
                                 },
                                 logoContainer = new Container { RelativeSizeAxes = Axes.Both },
+                                // TODO: what is this? why is this?
+                                // TODO: this is being screen scaled even though it's probably AN OVERLAY.
                                 footerBasedOverlayContent = new Container
                                 {
                                     Depth = -1,
@@ -1119,6 +1121,7 @@ namespace osu.Game
                                     RelativeSizeAxes = Axes.Both,
                                     Child = ScreenFooter = new ScreenFooter(backReceptor)
                                     {
+                                        // TODO: this is really really weird and should not exist.
                                         RequestLogoInFront = inFront => ScreenContainer.ChangeChildDepth(logoContainer, inFront ? float.MinValue : 0),
                                         BackButtonPressed = handleBackButton
                                     },
