@@ -401,6 +401,7 @@ namespace osu.Game.Screens.SelectV2
                     backgroundModeBeatmap.BlurAmount.Value = 0;
                     backgroundModeBeatmap.Beatmap = beatmap;
                     backgroundModeBeatmap.IgnoreUserSettings.Value = true;
+                    backgroundModeBeatmap.DimWhenUserSettingsIgnored.Value = 0.1f;
                     backgroundModeBeatmap.FadeColour(Color4.White, 250);
                 });
             }
