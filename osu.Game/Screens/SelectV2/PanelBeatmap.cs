@@ -101,17 +101,17 @@ namespace osu.Game.Screens.SelectV2
                             AutoSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
-                                starRatingDisplay = new StarRatingDisplay(default, StarRatingDisplaySize.Small, animated: true)
-                                {
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft,
-                                    Scale = new Vector2(0.875f),
-                                },
                                 localRank = new PanelLocalRankDisplay
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
                                     Scale = new Vector2(0.65f)
+                                },
+                                starRatingDisplay = new StarRatingDisplay(default, StarRatingDisplaySize.Small, animated: true)
+                                {
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
+                                    Scale = new Vector2(0.875f),
                                 },
                                 starCounter = new StarCounter
                                 {
@@ -139,7 +139,7 @@ namespace osu.Game.Screens.SelectV2
                                     Font = OsuFont.Style.Body.With(weight: FontWeight.SemiBold),
                                     Anchor = Anchor.BottomLeft,
                                     Origin = Anchor.BottomLeft,
-                                    Margin = new MarginPadding { Right = 5f },
+                                    Margin = new MarginPadding { Right = 3f },
                                 },
                                 authorText = new OsuSpriteText
                                 {
