@@ -259,6 +259,10 @@ namespace osu.Game.Screens.SelectV2
                 starDifficultyCancellationSource?.Cancel();
                 starDifficultyCancellationSource = null;
             }
+
+            // Dirty hack to make sure we don't take up spacing in parent fill flow when not displaying a rank.
+            // I can't find a better way to do this.
+            starRatingDisplay.Margin = new MarginPadding { Left = 1 / starRatingDisplay.Scale.X * (localRank.HasRank ? 0 : -3) };
         }
 
         private void updateKeyCount()
