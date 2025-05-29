@@ -85,6 +85,8 @@ namespace osu.Game.Screens.SelectV2
         protected override bool OnStart()
         {
             if (playerLoader != null) return false;
+            if (!this.IsCurrentScreen()) return false;
+            if (Beatmap.IsDefault) return false;
 
             FinaliseSelection();
 
