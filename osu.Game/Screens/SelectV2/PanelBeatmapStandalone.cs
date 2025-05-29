@@ -104,12 +104,12 @@ namespace osu.Game.Screens.SelectV2
                 {
                     titleText = new OsuSpriteText
                     {
-                        Font = OsuFont.Style.Heading1.With(typeface: Typeface.TorusAlternate),
+                        Font = OsuFont.Style.Heading2.With(typeface: Typeface.TorusAlternate, weight: FontWeight.Bold),
                     },
                     artistText = new OsuSpriteText
                     {
-                        Font = OsuFont.Style.Caption2.With(weight: FontWeight.SemiBold),
-                        Padding = new MarginPadding { Top = -4 },
+                        Font = OsuFont.Style.Caption1.With(weight: FontWeight.SemiBold),
+                        Padding = new MarginPadding { Top = -2 },
                     },
                     difficultyLine = new FillFlowContainer
                     {
