@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -61,34 +62,27 @@ namespace osu.Game.Screens.SelectV2
                             Direction = FillDirection.Horizontal,
                             // This makes the gradient not be perfectly horizontal, but diagonal at a ~40° angle
                             Shear = new Vector2(0.8f, 0),
-                            Alpha = 0.5f,
                             Children = new[]
                             {
                                 // The left half with no gradient applied
                                 new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Colour = Color4.Black,
+                                    Colour = Color4.Black.Opacity(0.5f),
                                     Width = 0.4f,
                                 },
-                                // Piecewise-linear gradient with 3 segments to make it appear smoother
                                 new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Colour = ColourInfo.GradientHorizontal(Color4.Black, new Color4(0f, 0f, 0f, 0.9f)),
-                                    Width = 0.05f,
-                                },
-                                new Box
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Colour = ColourInfo.GradientHorizontal(new Color4(0f, 0f, 0f, 0.9f), new Color4(0f, 0f, 0f, 0.1f)),
+                                    Colour = ColourInfo.GradientHorizontal(Color4.Black.Opacity(0.5f), Color4.Black.Opacity(0.3f)),
                                     Width = 0.2f,
                                 },
                                 new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Colour = ColourInfo.GradientHorizontal(new Color4(0f, 0f, 0f, 0.1f), new Color4(0, 0, 0, 0)),
-                                    Width = 0.05f,
+                                    Colour = ColourInfo.GradientHorizontal(Color4.Black.Opacity(0.3f), Color4.Black.Opacity(0.2f)),
+                                    // Slightly more than 1.0 in total to account for shear.
+                                    Width = 0.45f,
                                 },
                             }
                         },

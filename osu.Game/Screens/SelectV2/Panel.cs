@@ -94,8 +94,8 @@ namespace osu.Game.Screens.SelectV2
                 EdgeEffect = new EdgeEffectParameters
                 {
                     Type = EdgeEffectType.Shadow,
-                    Offset = new Vector2(1f),
-                    Radius = 10,
+                    Hollow = true,
+                    Radius = 2,
                 },
                 Children = new Drawable[]
                 {
@@ -123,6 +123,8 @@ namespace osu.Game.Screens.SelectV2
                                         {
                                             RelativeSizeAxes = Axes.Both,
                                         },
+                                        // TODO: this is only used by beatmap panels and should NOT be in this class.
+                                        // it's wasting fill rate.
                                         backgroundAccentGradient = new Box
                                         {
                                             RelativeSizeAxes = Axes.Both,
@@ -157,10 +159,9 @@ namespace osu.Game.Screens.SelectV2
                     selectionLayer = new Box
                     {
                         Alpha = 0,
-                        Colour = ColourInfo.GradientHorizontal(colours.BlueDark.Opacity(0), colours.BlueDark.Opacity(0.6f)),
-                        Blending = BlendingParameters.Additive,
                         RelativeSizeAxes = Axes.Both,
-                        Width = 0.3f,
+                        Width = 0.6f,
+                        Blending = BlendingParameters.Additive,
                         Anchor = Anchor.TopRight,
                         Origin = Anchor.TopRight,
                     },
@@ -202,6 +203,7 @@ namespace osu.Game.Screens.SelectV2
                 else
                     selectionLayer.FadeOut(200, Easing.OutQuint);
 
+                updateEdgeEffect();
                 updateXOffset();
             }, true);
 
@@ -249,13 +251,15 @@ namespace osu.Game.Screens.SelectV2
             backgroundAccentGradient.Colour = ColourInfo.GradientHorizontal(backgroundColour.Opacity(0.25f), backgroundColour.Opacity(0f));
             backgroundBorder.Colour = backgroundColour;
 
+            selectionLayer.Colour = ColourInfo.GradientHorizontal(backgroundColour.Opacity(0), backgroundColour.Opacity(0.5f));
+
             updateEdgeEffect(animated: false);
         }
 
         private void updateEdgeEffect(bool animated = true)
         {
             var edgeEffectColour = accentColour ?? Color4Extensions.FromHex(@"4EBFFF");
-            TopLevelContent.FadeEdgeEffectTo(Expanded.Value ? edgeEffectColour.Opacity(0.5f) : Color4.Black.Opacity(0.4f), animated ? DURATION : 0, Easing.OutQuint);
+            TopLevelContent.FadeEdgeEffectTo(Expanded.Value || Selected.Value ? edgeEffectColour.Opacity(0.8f) : Color4.Black.Opacity(0.4f), animated ? DURATION : 0, Easing.OutQuint);
         }
 
         private void updateXOffset()
