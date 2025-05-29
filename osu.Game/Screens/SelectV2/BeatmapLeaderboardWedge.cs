@@ -10,7 +10,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.PolygonExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
@@ -70,7 +69,7 @@ namespace osu.Game.Screens.SelectV2
 
         private readonly IBindable<LeaderboardScores?> fetchedScores = new Bindable<LeaderboardScores?>();
 
-        private const float personal_best_height = 80;
+        private const float personal_best_height = 100;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -109,7 +108,10 @@ namespace osu.Game.Screens.SelectV2
                         RelativeSizeAxes = Axes.X,
                         Height = personal_best_height,
                         Shear = OsuGame.SHEAR,
-                        Margin = new MarginPadding { Left = -40f },
+                        Margin = new MarginPadding
+                        {
+                            Left = -40f,
+                        },
                         CornerRadius = 10f,
                         Masking = true,
                         // push the personal best 1px down to hide masking issues
@@ -118,11 +120,7 @@ namespace osu.Game.Screens.SelectV2
                         Alpha = 0f,
                         Children = new Drawable[]
                         {
-                            new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Colour = colourProvider.Background4,
-                            },
+                            new WedgeBackground(),
                             new Container
                             {
                                 RelativeSizeAxes = Axes.X,

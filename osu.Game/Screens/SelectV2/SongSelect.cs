@@ -146,9 +146,9 @@ namespace osu.Game.Screens.SelectV2
                                     RelativeSizeAxes = Axes.Both,
                                     ColumnDimensions = new[]
                                     {
-                                        new Dimension(GridSizeMode.Relative, 0.5f, maxSize: 850),
+                                        new Dimension(GridSizeMode.Relative, 0.5f, maxSize: 660),
                                         new Dimension(),
-                                        new Dimension(GridSizeMode.Relative, 0.5f, maxSize: 750),
+                                        new Dimension(GridSizeMode.Relative, 0.5f, maxSize: 580),
                                     },
                                     Content = new[]
                                     {
@@ -162,6 +162,11 @@ namespace osu.Game.Screens.SelectV2
                                                 // screen-wide scroll handling.
                                                 Depth = float.MinValue,
                                                 Shear = OsuGame.SHEAR,
+                                                Padding = new MarginPadding
+                                                {
+                                                    Top = -CORNER_RADIUS_HIDE_OFFSET,
+                                                    Left = -CORNER_RADIUS_HIDE_OFFSET,
+                                                },
                                                 Children = new Drawable[]
                                                 {
                                                     new Container
@@ -177,11 +182,6 @@ namespace osu.Game.Screens.SelectV2
                                                     wedgesContainer = new FillFlowContainer
                                                     {
                                                         RelativeSizeAxes = Axes.Both,
-                                                        Margin = new MarginPadding
-                                                        {
-                                                            Top = -CORNER_RADIUS_HIDE_OFFSET,
-                                                            Left = -CORNER_RADIUS_HIDE_OFFSET
-                                                        },
                                                         Spacing = new Vector2(0f, 4f),
                                                         Direction = FillDirection.Vertical,
                                                         Children = new Drawable[]
@@ -401,6 +401,7 @@ namespace osu.Game.Screens.SelectV2
                     backgroundModeBeatmap.BlurAmount.Value = 0;
                     backgroundModeBeatmap.Beatmap = beatmap;
                     backgroundModeBeatmap.IgnoreUserSettings.Value = true;
+                    backgroundModeBeatmap.DimWhenUserSettingsIgnored.Value = 0.1f;
                     backgroundModeBeatmap.FadeColour(Color4.White, 250);
                 });
             }

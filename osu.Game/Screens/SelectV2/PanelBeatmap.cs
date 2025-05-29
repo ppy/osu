@@ -210,7 +210,13 @@ namespace osu.Game.Screens.SelectV2
             var beatmap = (BeatmapInfo)Item.Model;
 
             starDifficultyBindable = difficultyCache.GetBindableDifficulty(beatmap, starDifficultyCancellationSource.Token, SongSelect.SELECTION_DEBOUNCE);
-            starDifficultyBindable.BindValueChanged(_ => updateDisplay(), true);
+            starDifficultyBindable.BindValueChanged(_ =>
+            {
+                var starDifficulty = starDifficultyBindable?.Value ?? default;
+
+                starRatingDisplay.Current.Value = starDifficulty;
+                starCounter.Current = (float)starDifficulty.Stars;
+            }, true);
         }
 
         protected override void Update()
@@ -226,6 +232,13 @@ namespace osu.Game.Screens.SelectV2
             // Dirty hack to make sure we don't take up spacing in parent fill flow when not displaying a rank.
             // I can't find a better way to do this.
             starRatingDisplay.Margin = new MarginPadding { Left = 1 / starRatingDisplay.Scale.X * (localRank.HasRank ? 0 : -3) };
+
+            var diffColour = starRatingDisplay.DisplayedDifficultyColour;
+
+            AccentColour = diffColour;
+            starCounter.Colour = diffColour;
+
+            difficultyIcon.Colour = starRatingDisplay.DisplayedStars.Value > OsuColour.STAR_DIFFICULTY_DEFINED_COLOUR_CUTOFF ? colours.Orange1 : colourProvider.Background5;
         }
 
         private void updateKeyCount()
@@ -247,22 +260,6 @@ namespace osu.Game.Screens.SelectV2
             }
             else
                 keyCountText.Alpha = 0;
-        }
-
-        private void updateDisplay()
-        {
-            const float duration = 500;
-
-            var starDifficulty = starDifficultyBindable?.Value ?? default;
-
-            starRatingDisplay.Current.Value = starDifficulty;
-            starCounter.Current = (float)starDifficulty.Stars;
-
-            difficultyIcon.FadeColour(starDifficulty.Stars > OsuColour.STAR_DIFFICULTY_DEFINED_COLOUR_CUTOFF ? colours.Orange1 : colourProvider.Background5, duration, Easing.OutQuint);
-
-            var starRatingColour = colours.ForStarDifficulty(starDifficulty.Stars);
-            starCounter.FadeColour(starRatingColour, duration, Easing.OutQuint);
-            AccentColour = starRatingColour;
         }
 
         public override MenuItem[] ContextMenuItems
