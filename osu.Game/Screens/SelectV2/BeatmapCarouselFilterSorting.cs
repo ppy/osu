@@ -27,19 +27,27 @@ namespace osu.Game.Screens.SelectV2
         {
             var criteria = getCriteria();
 
+            bool groupedSets = BeatmapCarouselFilterGrouping.ShouldGroupBeatmapsTogether(criteria);
+
             return items.Order(Comparer<CarouselItem>.Create((a, b) =>
             {
                 var ab = (BeatmapInfo)a.Model;
                 var bb = (BeatmapInfo)b.Model;
 
-                if (ab.BeatmapSet!.Equals(bb.BeatmapSet))
-                    return compareDifficulty(ab, bb);
+                if (groupedSets)
+                {
+                    if (ab.BeatmapSet!.Equals(bb.BeatmapSet))
+                        return compareDifficulty(ab, bb, criteria.Sort);
 
-                return compare(ab, bb, criteria.Sort);
+                    // If we're grouping by sets, all fallback sorts need to be aggregates for the set.
+                    return compare(ab, bb, criteria.Sort, aggregate: true);
+                }
+
+                return compare(ab, bb, criteria.Sort, aggregate: false);
             })).ToList();
         }, cancellationToken).ConfigureAwait(false);
 
-        private static int compare(BeatmapInfo a, BeatmapInfo b, SortMode sort)
+        private static int compare(BeatmapInfo a, BeatmapInfo b, SortMode sort, bool aggregate)
         {
             int comparison;
 
@@ -80,15 +88,24 @@ namespace osu.Game.Screens.SelectV2
                     break;
 
                 case SortMode.LastPlayed:
-                    comparison = -compareUsingAggregateMax(a, b, static b => (b.LastPlayed ?? DateTimeOffset.MinValue).ToUnixTimeSeconds());
+                    if (aggregate)
+                        comparison = compareUsingAggregateMax(b, a, static b => (b.LastPlayed ?? DateTimeOffset.MinValue).ToUnixTimeSeconds());
+                    else
+                        comparison = Nullable.Compare(b.LastPlayed, a.LastPlayed);
                     break;
 
                 case SortMode.BPM:
-                    comparison = compareUsingAggregateMax(a, b, static b => b.BPM);
+                    if (aggregate)
+                        comparison = compareUsingAggregateMax(a, b, static b => b.BPM);
+                    else
+                        comparison = a.BPM.CompareTo(b.BPM);
                     break;
 
                 case SortMode.Length:
-                    comparison = compareUsingAggregateMax(a, b, static b => b.Length);
+                    if (aggregate)
+                        comparison = compareUsingAggregateMax(a, b, static b => b.Length);
+                    else
+                        comparison = a.Length.CompareTo(b.Length);
                     break;
 
                 default:
@@ -108,7 +125,7 @@ namespace osu.Game.Screens.SelectV2
             return comparison;
         }
 
-        private static int compareDifficulty(BeatmapInfo a, BeatmapInfo b)
+        private static int compareDifficulty(BeatmapInfo a, BeatmapInfo b, SortMode sort)
         {
             int comparison = a.Ruleset.CompareTo(b.Ruleset);
 
