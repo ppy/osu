@@ -64,6 +64,9 @@ namespace osu.Game.Screens.SelectV2
             if (grouping.BeatmapSetsGroupedTogether && (top.Model is BeatmapInfo || bottom.Model is BeatmapInfo))
                 return SPACING;
 
+            if (!grouping.BeatmapSetsGroupedTogether && (top == CurrentSelectionItem || bottom == CurrentSelectionItem))
+                return SPACING * 2;
+
             return -SPACING;
         }
 
