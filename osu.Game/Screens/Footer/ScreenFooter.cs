@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -312,6 +313,8 @@ namespace osu.Game.Screens.Footer
 
         private void showOverlay(OverlayContainer overlay)
         {
+            this.HidePopover();
+
             foreach (var o in overlays.Where(o => o != overlay))
                 o.Hide();
 
