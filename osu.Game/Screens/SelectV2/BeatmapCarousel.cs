@@ -7,6 +7,7 @@ using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -49,6 +50,8 @@ namespace osu.Game.Screens.SelectV2
         private readonly BeatmapCarouselFilterMatching matching;
         private readonly BeatmapCarouselFilterGrouping grouping;
 
+        private bool waitingForInitialCriteria;
+
         /// <summary>
         /// Total number of beatmap difficulties displayed with the filter.
         /// </summary>
@@ -67,8 +70,10 @@ namespace osu.Game.Screens.SelectV2
             return -SPACING;
         }
 
-        public BeatmapCarousel()
+        public BeatmapCarousel(bool waitForInitialCriteria = false)
         {
+            waitingForInitialCriteria = waitForInitialCriteria;
+
             DebounceDelay = 100;
             DistanceOffscreenToPreload = 100;
 
@@ -473,6 +478,8 @@ namespace osu.Game.Screens.SelectV2
 
         public void Filter(FilterCriteria criteria)
         {
+            waitingForInitialCriteria = false;
+
             bool resetDisplay = grouping.BeatmapSetsGroupedTogether != BeatmapCarouselFilterGrouping.ShouldGroupBeatmapsTogether(criteria);
 
             Criteria = criteria;
@@ -491,6 +498,14 @@ namespace osu.Game.Screens.SelectV2
                 Scroll.FadeColour(OsuColour.Gray(1f), 500, Easing.OutQuint);
                 loading.Hide();
             }));
+        }
+
+        protected override Task<IEnumerable<CarouselItem>> FilterAsync(bool clearExistingPanels = false)
+        {
+            if (waitingForInitialCriteria)
+                return Task.FromResult(Enumerable.Empty<CarouselItem>());
+
+            return base.FilterAsync(clearExistingPanels);
         }
 
         #endregion

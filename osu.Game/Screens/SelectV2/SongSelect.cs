@@ -208,7 +208,7 @@ namespace osu.Game.Screens.SelectV2
                                                         },
                                                         Children = new Drawable[]
                                                         {
-                                                            carousel = new BeatmapCarousel
+                                                            carousel = new BeatmapCarousel(waitForInitialCriteria: true)
                                                             {
                                                                 BleedTop = FilterControl.HEIGHT_FROM_SCREEN_TOP + 5,
                                                                 BleedBottom = ScreenFooter.HEIGHT + 5,
