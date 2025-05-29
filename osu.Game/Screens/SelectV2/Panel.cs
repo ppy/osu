@@ -192,18 +192,13 @@ namespace osu.Game.Screens.SelectV2
 
             Expanded.BindValueChanged(_ =>
             {
-                updateEdgeEffect();
+                updateSelectedState();
                 updateXOffset();
             });
 
-            Selected.BindValueChanged(selected =>
+            Selected.BindValueChanged(_ =>
             {
-                if (selected.NewValue)
-                    selectionLayer.FadeIn(100, Easing.OutQuint);
-                else
-                    selectionLayer.FadeOut(200, Easing.OutQuint);
-
-                updateEdgeEffect();
+                updateSelectedState();
                 updateXOffset();
             }, true);
 
@@ -253,13 +248,20 @@ namespace osu.Game.Screens.SelectV2
 
             selectionLayer.Colour = ColourInfo.GradientHorizontal(backgroundColour.Opacity(0), backgroundColour.Opacity(0.5f));
 
-            updateEdgeEffect(animated: false);
+            updateSelectedState(animated: false);
         }
 
-        private void updateEdgeEffect(bool animated = true)
+        private void updateSelectedState(bool animated = true)
         {
+            bool selectedOrExpanded = Expanded.Value || Selected.Value;
+
             var edgeEffectColour = accentColour ?? Color4Extensions.FromHex(@"4EBFFF");
-            TopLevelContent.FadeEdgeEffectTo(Expanded.Value || Selected.Value ? edgeEffectColour.Opacity(0.8f) : Color4.Black.Opacity(0.4f), animated ? DURATION : 0, Easing.OutQuint);
+            TopLevelContent.FadeEdgeEffectTo(selectedOrExpanded ? edgeEffectColour.Opacity(0.8f) : Color4.Black.Opacity(0.4f), animated ? DURATION : 0, Easing.OutQuint);
+
+            if (selectedOrExpanded)
+                selectionLayer.FadeIn(100, Easing.OutQuint);
+            else
+                selectionLayer.FadeOut(200, Easing.OutQuint);
         }
 
         private void updateXOffset()
