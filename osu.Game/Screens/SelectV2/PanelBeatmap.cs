@@ -101,17 +101,17 @@ namespace osu.Game.Screens.SelectV2
                             AutoSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
-                                starRatingDisplay = new StarRatingDisplay(default, StarRatingDisplaySize.Small, animated: true)
-                                {
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft,
-                                    Scale = new Vector2(0.875f),
-                                },
                                 localRank = new PanelLocalRankDisplay
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
                                     Scale = new Vector2(0.65f)
+                                },
+                                starRatingDisplay = new StarRatingDisplay(default, StarRatingDisplaySize.Small, animated: true)
+                                {
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
+                                    Scale = new Vector2(0.875f),
                                 },
                                 starCounter = new StarCounter
                                 {
@@ -139,7 +139,7 @@ namespace osu.Game.Screens.SelectV2
                                     Font = OsuFont.Style.Body.With(weight: FontWeight.SemiBold),
                                     Anchor = Anchor.BottomLeft,
                                     Origin = Anchor.BottomLeft,
-                                    Margin = new MarginPadding { Right = 5f },
+                                    Margin = new MarginPadding { Right = 3f },
                                 },
                                 authorText = new OsuSpriteText
                                 {
@@ -222,6 +222,10 @@ namespace osu.Game.Screens.SelectV2
                 starDifficultyCancellationSource?.Cancel();
                 starDifficultyCancellationSource = null;
             }
+
+            // Dirty hack to make sure we don't take up spacing in parent fill flow when not displaying a rank.
+            // I can't find a better way to do this.
+            starRatingDisplay.Margin = new MarginPadding { Left = 1 / starRatingDisplay.Scale.X * (localRank.HasRank ? 0 : -3) };
         }
 
         private void updateKeyCount()
