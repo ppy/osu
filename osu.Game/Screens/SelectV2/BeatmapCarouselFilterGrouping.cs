@@ -165,7 +165,7 @@ namespace osu.Game.Screens.SelectV2
                         if (BeatmapSetsGroupedTogether)
                             date = aggregateMax(b, static b => (b.LastPlayed ?? DateTimeOffset.MinValue));
 
-                        if (date == null)
+                        if (date == null || date == DateTimeOffset.MinValue)
                             return new GroupDefinition(int.MaxValue, "Never");
 
                         return defineGroupByDate(date.Value);
