@@ -85,9 +85,9 @@ namespace osu.Game.Overlays.Mods
             if (data != null)
             {
                 attemptAdd("CS", bd => bd.CircleSize);
-                attemptAdd("HP", bd => bd.DrainRate);
-                attemptAdd("OD", bd => bd.OverallDifficulty);
                 attemptAdd("AR", bd => bd.ApproachRate);
+                attemptAdd("OD", bd => bd.OverallDifficulty);
+                attemptAdd("HP", bd => bd.DrainRate);
             }
 
             if (attributesFillFlow.Any())
