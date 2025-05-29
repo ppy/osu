@@ -295,18 +295,18 @@ namespace osu.Game.Screens.SelectV2
                     return;
                 }
 
-                BeatmapDifficulty baseDifficulty = beatmap.Value.BeatmapInfo.Difficulty;
-                BeatmapDifficulty originalDifficulty = new BeatmapDifficulty(baseDifficulty);
+                BeatmapDifficulty originalDifficulty = beatmap.Value.BeatmapInfo.Difficulty;
+                BeatmapDifficulty adjustedDifficulty = new BeatmapDifficulty(originalDifficulty);
 
                 foreach (var mod in mods.Value.OfType<IApplicableToDifficulty>())
-                    mod.ApplyToDifficulty(originalDifficulty);
+                    mod.ApplyToDifficulty(adjustedDifficulty);
 
                 Ruleset rulesetInstance = ruleset.Value.CreateInstance();
 
                 double rate = ModUtils.CalculateRateWithMods(mods.Value);
 
-                BeatmapDifficulty rateAdjustedDifficulty = rulesetInstance.GetRateAdjustedDisplayDifficulty(originalDifficulty, rate);
-                difficultyStatisticsDisplay.TooltipContent = new AdjustedAttributesTooltip.Data(originalDifficulty, rateAdjustedDifficulty);
+                adjustedDifficulty = rulesetInstance.GetRateAdjustedDisplayDifficulty(adjustedDifficulty, rate);
+                difficultyStatisticsDisplay.TooltipContent = new AdjustedAttributesTooltip.Data(originalDifficulty, adjustedDifficulty);
 
                 StatisticDifficulty.Data firstStatistic;
 
@@ -326,16 +326,16 @@ namespace osu.Game.Screens.SelectV2
                         break;
 
                     default:
-                        firstStatistic = new StatisticDifficulty.Data(BeatmapsetsStrings.ShowStatsCs, baseDifficulty.CircleSize, rateAdjustedDifficulty.CircleSize, 10);
+                        firstStatistic = new StatisticDifficulty.Data(BeatmapsetsStrings.ShowStatsCs, originalDifficulty.CircleSize, adjustedDifficulty.CircleSize, 10);
                         break;
                 }
 
                 difficultyStatisticsDisplay.Statistics = new[]
                 {
                     firstStatistic,
-                    new StatisticDifficulty.Data(BeatmapsetsStrings.ShowStatsAr, baseDifficulty.ApproachRate, rateAdjustedDifficulty.ApproachRate, 10),
-                    new StatisticDifficulty.Data(BeatmapsetsStrings.ShowStatsAccuracy, baseDifficulty.OverallDifficulty, rateAdjustedDifficulty.OverallDifficulty, 10),
-                    new StatisticDifficulty.Data(BeatmapsetsStrings.ShowStatsDrain, baseDifficulty.DrainRate, rateAdjustedDifficulty.DrainRate, 10),
+                    new StatisticDifficulty.Data(BeatmapsetsStrings.ShowStatsAr, originalDifficulty.ApproachRate, adjustedDifficulty.ApproachRate, 10),
+                    new StatisticDifficulty.Data(BeatmapsetsStrings.ShowStatsAccuracy, originalDifficulty.OverallDifficulty, adjustedDifficulty.OverallDifficulty, 10),
+                    new StatisticDifficulty.Data(BeatmapsetsStrings.ShowStatsDrain, originalDifficulty.DrainRate, adjustedDifficulty.DrainRate, 10),
                 };
             });
 
