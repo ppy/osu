@@ -139,7 +139,7 @@ namespace osu.Game.Screens.SelectV2
         {
             switch (criteria.Group)
             {
-                case GroupMode.NoGrouping:
+                case GroupMode.None:
                     return new List<GroupMapping> { new GroupMapping(null, items) };
 
                 case GroupMode.Artist:
@@ -201,19 +201,19 @@ namespace osu.Game.Screens.SelectV2
 
                 case GroupMode.Collections:
                     // TODO: needs implementation
-                    goto case GroupMode.NoGrouping;
+                    goto case GroupMode.None;
 
                 case GroupMode.Favourites:
                     // TODO: needs implementation
-                    goto case GroupMode.NoGrouping;
+                    goto case GroupMode.None;
 
                 case GroupMode.MyMaps:
                     // TODO: needs implementation
-                    goto case GroupMode.NoGrouping;
+                    goto case GroupMode.None;
 
                 case GroupMode.RankAchieved:
                     // TODO: needs implementation
-                    goto case GroupMode.NoGrouping;
+                    goto case GroupMode.None;
 
                 default:
                     throw new ArgumentOutOfRangeException();
