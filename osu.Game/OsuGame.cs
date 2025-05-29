@@ -587,6 +587,18 @@ namespace osu.Game
         public void FilterBeatmapSetLanguage(SearchLanguage language) => waitForReady(() => beatmapListing, _ => beatmapListing.ShowWithLanguageFilter(language));
 
         /// <summary>
+        /// Sets the currently selected ruleset to the given other ruleset by looking it up using its short name.
+        /// Does nothing if currently playing a map or otherwise unable to change ruleset.
+        /// </summary>
+        /// <param name="shortName">The new ruleset's shortname.</param>
+        public void TrySetRuleset(string shortName) => Schedule(() =>
+        {
+            var ruleset = RulesetStore.GetRuleset(shortName);
+            if (ruleset is not null && !Ruleset.Disabled)
+                Ruleset.Value = ruleset;
+        });
+
+        /// <summary>
         /// Show a wiki's page as an overlay
         /// </summary>
         /// <param name="path">The wiki page to show</param>

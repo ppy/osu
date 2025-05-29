@@ -28,6 +28,7 @@ namespace osu.Game.Tests.Visual.Navigation
 
         private OsuSchemeLinkIPCChannel osuSchemeLinkIPCSender = null!;
         private ArchiveImportIPCChannel archiveImportIPCSender = null!;
+        private CommandIPCChannel commandIPCSender = null!;
 
         private const int requested_beatmap_set_id = 1;
 
@@ -66,6 +67,7 @@ namespace osu.Game.Tests.Visual.Navigation
                 ipcSenderHost = new HeadlessGameHost(gameHost.Name, new HostOptions { IPCPipeName = OsuGame.IPC_PIPE_NAME });
                 osuSchemeLinkIPCSender = new OsuSchemeLinkIPCChannel(ipcSenderHost);
                 archiveImportIPCSender = new ArchiveImportIPCChannel(ipcSenderHost);
+                commandIPCSender = new CommandIPCChannel(ipcSenderHost);
             });
         }
 
@@ -87,12 +89,22 @@ namespace osu.Game.Tests.Visual.Navigation
             AddAssert("original file deleted", () => File.Exists(beatmapFilepath), () => Is.False);
         }
 
+        [Test]
+        public void TestCommandIPCChannel()
+        {
+            AddStep("set ruleset to osu via IPC", () => commandIPCSender.RunCommand("set-ruleset", ["osu"]).WaitSafely());
+            AddUntilStep("ruleset was changed", () => Game.Ruleset.Value.ShortName, () => Is.EqualTo("osu"));
+            AddStep("set ruleset to taiko via IPC", () => commandIPCSender.RunCommand("set-ruleset", ["taiko"]).WaitSafely());
+            AddUntilStep("ruleset was changed", () => Game.Ruleset.Value.ShortName, () => Is.EqualTo("taiko"));
+        }
+
         public override void TearDownSteps()
         {
             AddStep("dispose IPC senders", () =>
             {
                 osuSchemeLinkIPCSender.Dispose();
                 archiveImportIPCSender.Dispose();
+                commandIPCSender.Dispose();
                 ipcSenderHost.Dispose();
             });
             base.TearDownSteps();
@@ -102,6 +114,7 @@ namespace osu.Game.Tests.Visual.Navigation
         {
             private OsuSchemeLinkIPCChannel? osuSchemeLinkIPCChannel;
             private ArchiveImportIPCChannel? archiveImportIPCChannel;
+            private CommandIPCChannel? commandIPCChannel;
 
             public IpcGame(Storage storage, IAPIProvider api, string[]? args = null)
                 : base(storage, api, args)
@@ -113,6 +126,7 @@ namespace osu.Game.Tests.Visual.Navigation
                 base.LoadComplete();
                 osuSchemeLinkIPCChannel = new OsuSchemeLinkIPCChannel(Host, this);
                 archiveImportIPCChannel = new ArchiveImportIPCChannel(Host, this);
+                commandIPCChannel = new CommandIPCChannel(Host, this);
             }
 
             protected override void Dispose(bool isDisposing)
@@ -120,6 +134,7 @@ namespace osu.Game.Tests.Visual.Navigation
                 base.Dispose(isDisposing);
                 osuSchemeLinkIPCChannel?.Dispose();
                 archiveImportIPCChannel?.Dispose();
+                commandIPCChannel?.Dispose();
             }
         }
     }

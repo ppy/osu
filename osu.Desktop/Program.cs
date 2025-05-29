@@ -157,6 +157,15 @@ namespace osu.Desktop
                 return true;
             }
 
+            if (args.Length == 2 && args[0] == "set-ruleset")
+            {
+                var commandHandler = new CommandIPCChannel(host);
+                if (!commandHandler.RunCommand(args[0], args[1..]).Wait(3000))
+                    throw new IPCTimeoutException(commandHandler.GetType());
+
+                return true;
+            }
+
             if (args.Length > 0 && args[0].Contains('.')) // easy way to check for a file import in args
             {
                 var importer = new ArchiveImportIPCChannel(host);

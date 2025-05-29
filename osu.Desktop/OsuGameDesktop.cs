@@ -30,6 +30,7 @@ namespace osu.Desktop
     {
         private OsuSchemeLinkIPCChannel? osuSchemeLinkIPCChannel;
         private ArchiveImportIPCChannel? archiveImportIPCChannel;
+        private CommandIPCChannel? commandIPCChannel;
 
         [Cached(typeof(IHighPerformanceSessionManager))]
         private readonly HighPerformanceSessionManager highPerformanceSessionManager = new HighPerformanceSessionManager();
@@ -140,6 +141,7 @@ namespace osu.Desktop
 
             osuSchemeLinkIPCChannel = new OsuSchemeLinkIPCChannel(Host, this);
             archiveImportIPCChannel = new ArchiveImportIPCChannel(Host, this);
+            commandIPCChannel = new CommandIPCChannel(Host, this);
         }
 
         public override void SetHost(GameHost host)
@@ -160,6 +162,7 @@ namespace osu.Desktop
             base.Dispose(isDisposing);
             osuSchemeLinkIPCChannel?.Dispose();
             archiveImportIPCChannel?.Dispose();
+            commandIPCChannel?.Dispose();
         }
     }
 }
