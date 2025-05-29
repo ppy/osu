@@ -273,6 +273,11 @@ namespace osu.Game.Screens.SelectV2
             // Dirty hack to make sure we don't take up spacing in parent fill flow when not displaying a rank.
             // I can't find a better way to do this.
             starRatingDisplay.Margin = new MarginPadding { Left = 1 / starRatingDisplay.Scale.X * (localRank.HasRank ? 0 : -3) };
+
+            var diffColour = starRatingDisplay.DisplayedDifficultyColour;
+
+            AccentColour = diffColour;
+            starCounter.Colour = diffColour;
         }
 
         private void updateKeyCount()
@@ -306,10 +311,6 @@ namespace osu.Game.Screens.SelectV2
             starCounter.Current = (float)starDifficulty.Stars;
 
             difficultyIcon.FadeColour(starDifficulty.Stars > OsuColour.STAR_DIFFICULTY_DEFINED_COLOUR_CUTOFF ? colours.Orange1 : colourProvider.Background5, duration, Easing.OutQuint);
-
-            var starRatingColour = colours.ForStarDifficulty(starDifficulty.Stars);
-            starCounter.FadeColour(starRatingColour, duration, Easing.OutQuint);
-            AccentColour = colours.ForStarDifficulty(starDifficulty.Stars);
         }
 
         public override MenuItem[] ContextMenuItems
