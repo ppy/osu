@@ -81,7 +81,7 @@ namespace osu.Game.Screens.SelectV2
         private const float username_min_width = 120;
         private const float statistics_regular_min_width = 165;
         private const float statistics_compact_min_width = 90;
-        private const float rank_label_width = 60;
+        private const float rank_label_width = 40;
 
         private const int corner_radius = 10;
         private const int transition_duration = 200;
@@ -144,6 +144,7 @@ namespace osu.Game.Screens.SelectV2
                 {
                     background = new Box
                     {
+                        Alpha = 0.4f,
                         RelativeSizeAxes = Axes.Both,
                         Colour = backgroundColour
                     },
@@ -190,6 +191,7 @@ namespace osu.Game.Screens.SelectV2
                                     {
                                         foreground = new Box
                                         {
+                                            Alpha = 0.4f,
                                             RelativeSizeAxes = Axes.Both,
                                             Colour = foregroundColour
                                         },
@@ -312,8 +314,8 @@ namespace osu.Game.Screens.SelectV2
                                                         Child = statisticsContainer = new FillFlowContainer
                                                         {
                                                             Name = @"Statistics container",
-                                                            Padding = new MarginPadding { Right = 40 },
-                                                            Spacing = new Vector2(25, 0),
+                                                            Padding = new MarginPadding { Right = 10 },
+                                                            Spacing = new Vector2(20, 0),
                                                             Shear = sheared ? -OsuGame.SHEAR : Vector2.Zero,
                                                             Anchor = Anchor.CentreRight,
                                                             Origin = Anchor.CentreRight,
@@ -567,13 +569,13 @@ namespace osu.Game.Screens.SelectV2
 
         private DisplayMode getCurrentDisplayMode()
         {
-            if (DrawWidth >= HEIGHT + username_min_width + statistics_regular_min_width + expanded_right_content_width + rank_label_width)
+            if (DrawWidth >= username_min_width + statistics_regular_min_width + expanded_right_content_width + rank_label_width)
                 return DisplayMode.Full;
 
-            if (DrawWidth >= HEIGHT + username_min_width + statistics_regular_min_width + expanded_right_content_width)
+            if (DrawWidth >= username_min_width + statistics_regular_min_width + expanded_right_content_width)
                 return DisplayMode.Regular;
 
-            if (DrawWidth >= HEIGHT + username_min_width + statistics_compact_min_width + expanded_right_content_width)
+            if (DrawWidth >= username_min_width + statistics_compact_min_width + expanded_right_content_width)
                 return DisplayMode.Compact;
 
             return DisplayMode.Minimal;
