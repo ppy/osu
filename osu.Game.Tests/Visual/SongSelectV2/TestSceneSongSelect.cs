@@ -16,6 +16,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Scoring;
+using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Select;
@@ -75,6 +76,24 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 InputManager.Click(MouseButton.Left);
             });
             AddUntilStep("wait for results screen", () => Stack.CurrentScreen is ResultsScreen);
+        }
+
+        [Test]
+        public void TestCookieDoesNothingIfNothingSelected()
+        {
+            var screensPushed = new List<IScreen>();
+
+            LoadSongSelect();
+            AddStep("subscribe to screen pushed", () => Stack.ScreenPushed += onScreenPushed);
+            AddStep("click osu! cookie", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<OsuLogo>().Single());
+                InputManager.Click(MouseButton.Left);
+            });
+            AddAssert("no screens pushed", () => screensPushed, () => Is.Empty);
+            AddStep("unsubscribe from screen pushed", () => Stack.ScreenPushed -= onScreenPushed);
+
+            void onScreenPushed(IScreen lastScreen, IScreen newScreen) => screensPushed.Add(lastScreen);
         }
 
         #region Hotkeys
