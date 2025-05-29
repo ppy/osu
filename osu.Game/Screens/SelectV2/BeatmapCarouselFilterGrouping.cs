@@ -124,7 +124,15 @@ namespace osu.Game.Screens.SelectV2
 
         public static bool ShouldGroupBeatmapsTogether(FilterCriteria criteria)
         {
-            return criteria.Sort != SortMode.Difficulty && criteria.Group != GroupMode.Difficulty;
+            // In certain cases, we intentionally split out difficulties
+            // where it's more relevant or convenient to view them as individual items.
+            if (criteria.Sort == SortMode.Difficulty || criteria.Group == GroupMode.Difficulty)
+                return false;
+            if (criteria.Sort == SortMode.LastPlayed && criteria.Group == GroupMode.LastPlayed)
+                return false;
+
+            // In the majority case we group sets together for display.
+            return true;
         }
 
         private List<GroupMapping> getGroups(List<CarouselItem> items, FilterCriteria criteria)
