@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private readonly double clockRate;
         private readonly bool hasHiddenMod;
         private readonly double preempt;
-        private double skillMultiplier => 17.0;
+        private double skillMultiplier => 23.0;
 
         public Reading(IBeatmap beatmap, Mod[] mods, double clockRate)
             : base(mods)
@@ -45,8 +45,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
             double difficulty = 0;
 
-            // Sections with 0 strain are excluded to avoid worst-case time complexity of the following sort (e.g. /b/2351871).
-            // These sections will not contribute to the difficulty.
+            // Notes with 0 difficulty are excluded to avoid worst-case time complexity of the following sort (e.g. /b/2351871).
+            // These notes will not contribute to the difficulty.
             var peaks = noteDifficulties.Where(p => p > 0);
 
             List<double> notes = peaks.ToList();
@@ -74,18 +74,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             int index = 0;
 
-            // Difficulty is the weighted sum of the highest strains from every section.
-            // We're sorting from highest to lowest strain.
-            foreach (double strain in notes.OrderDescending())
+            // Difficulty is the weighted sum of the highest notes.
+            // We're sorting from highest to lowest note.
+            foreach (double note in notes.OrderDescending())
             {
-                // Use a harmonic sum for strain which effectively buffs longer maps
-                // Constants are arbitrary and give good values
+                // Use a harmonic sum for note which effectively buffs maps with more notes, especially if note difficulties are consistent.
+                // Constants are arbitrary and give good values.
                 // https://www.desmos.com/calculator/gquji01mlg
                 double weight = (1.0 + (1.0 / (1 + index))) / (Math.Pow(index, 0.8) + 1.0 + (1.0 / (1.0 + index)));
 
                 noteWeights.Add(weight);
 
-                difficulty += strain * weight;
+                difficulty += note * weight;
                 index += 1;
             }
 
@@ -93,20 +93,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         }
 
         /// <summary>
-        /// Returns the number of relevant objects weighted against the top strain.
+        /// Returns the number of relevant objects weighted against the top note.
         /// </summary>
         public virtual double CountTopWeightedNotes()
         {
-            if (noteDifficulties.Count == 0)
+            if (noteDifficulties.Count == 0 || noteWeights.Sum() == 0)
                 return 0.0;
 
-            double consistentTopStrain = DifficultyValue() / noteWeights.Sum(); // What would the top strain be if all strain values were identical
+            double consistentTopNote = DifficultyValue() / noteWeights.Sum(); // What would the top note be if all note values were identical
 
-            if (consistentTopStrain == 0)
+            if (consistentTopNote == 0)
                 return noteDifficulties.Count;
 
-            // Use a weighted sum of all strains. Constants are arbitrary and give nice values
-            return noteDifficulties.Sum(s => 1.1 / (1 + Math.Exp(-10 * (s / consistentTopStrain - 0.88))));
+            // Use a weighted sum of all notes. Constants are arbitrary and give nice values
+            return noteDifficulties.Sum(s => 1.1 / (1 + Math.Exp(-10 * (s / consistentTopNote - 0.88))));
         }
     }
 }
