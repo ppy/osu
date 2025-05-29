@@ -115,7 +115,7 @@ namespace osu.Game.Screens.SelectV2
                     {
                         Direction = FillDirection.Horizontal,
                         AutoSizeAxes = Axes.Both,
-                        Padding = new MarginPadding { Top = 4},
+                        Padding = new MarginPadding { Top = 4 },
                         Children = new Drawable[]
                         {
                             statusPill = new BeatmapSetOnlineStatusPill
