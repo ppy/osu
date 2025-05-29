@@ -227,7 +227,10 @@ namespace osu.Game.Screens.SelectV2
             // I can't find a better way to do this.
             starRatingDisplay.Margin = new MarginPadding { Left = 1 / starRatingDisplay.Scale.X * (localRank.HasRank ? 0 : -3) };
 
-            AccentColour = starRatingDisplay.DisplayedDifficultyColour;
+            var diffColour = starRatingDisplay.DisplayedDifficultyColour;
+
+            AccentColour = diffColour;
+            starCounter.Colour = diffColour;
         }
 
         private void updateKeyCount()
@@ -261,10 +264,6 @@ namespace osu.Game.Screens.SelectV2
             starCounter.Current = (float)starDifficulty.Stars;
 
             difficultyIcon.FadeColour(starDifficulty.Stars > OsuColour.STAR_DIFFICULTY_DEFINED_COLOUR_CUTOFF ? colours.Orange1 : colourProvider.Background5, duration, Easing.OutQuint);
-
-            var starRatingColour = colours.ForStarDifficulty(starDifficulty.Stars);
-            starCounter.FadeColour(starRatingColour, duration, Easing.OutQuint);
-            AccentColour = starRatingColour;
         }
 
         public override MenuItem[] ContextMenuItems
