@@ -148,7 +148,7 @@ namespace osu.Game.Screens.SelectV2
                                     {
                                         new Dimension(GridSizeMode.Relative, 0.5f, maxSize: 660),
                                         new Dimension(),
-                                        new Dimension(GridSizeMode.Relative, 0.5f, maxSize: 580),
+                                        new Dimension(GridSizeMode.Relative, 0.5f, maxSize: 620),
                                     },
                                     Content = new[]
                                     {
