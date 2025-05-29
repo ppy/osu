@@ -7,12 +7,16 @@ using System.Diagnostics;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Carousel;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -39,6 +43,10 @@ namespace osu.Game.Screens.SelectV2
 
         private IBindable<StarDifficulty>? starDifficultyBindable;
         private CancellationTokenSource? starDifficultyCancellationSource;
+
+        private Box backgroundAccentGradient = null!;
+
+        private TrianglesV2 triangles = null!;
 
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
@@ -81,6 +89,25 @@ namespace osu.Game.Screens.SelectV2
                 Size = new Vector2(16f),
                 Margin = new MarginPadding { Horizontal = 5f },
                 Colour = colourProvider.Background5,
+            };
+
+            Background = new Container
+            {
+                RelativeSizeAxes = Axes.Both,
+                Children = new Drawable[]
+                {
+                    backgroundAccentGradient = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                    },
+                    triangles = new TrianglesV2
+                    {
+                        ScaleAdjust = 1.2f,
+                        Thickness = 0.01f,
+                        Velocity = 0.3f,
+                        RelativeSizeAxes = Axes.Both,
+                    },
+                }
             };
 
             Content.Children = new[]
@@ -235,10 +262,17 @@ namespace osu.Game.Screens.SelectV2
 
             var diffColour = starRatingDisplay.DisplayedDifficultyColour;
 
-            AccentColour = diffColour;
-            starCounter.Colour = diffColour;
+            if (AccentColour != diffColour)
+            {
+                AccentColour = diffColour;
+                starCounter.Colour = diffColour;
 
-            difficultyIcon.Colour = starRatingDisplay.DisplayedStars.Value > OsuColour.STAR_DIFFICULTY_DEFINED_COLOUR_CUTOFF ? colours.Orange1 : colourProvider.Background5;
+                backgroundAccentGradient.Colour = ColourInfo.GradientHorizontal(diffColour.Opacity(0.25f), diffColour.Opacity(0f));
+
+                difficultyIcon.Colour = starRatingDisplay.DisplayedStars.Value > OsuColour.STAR_DIFFICULTY_DEFINED_COLOUR_CUTOFF ? colours.Orange1 : colourProvider.Background5;
+
+                triangles.Colour = ColourInfo.GradientVertical(diffColour.Opacity(0.25f), diffColour.Opacity(0f));
+            }
         }
 
         private void updateKeyCount()

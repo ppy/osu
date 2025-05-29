@@ -34,7 +34,6 @@ namespace osu.Game.Screens.SelectV2
 
         private Box backgroundBorder = null!;
         private Box backgroundGradient = null!;
-        private Box backgroundAccentGradient = null!;
         private Container backgroundLayerHorizontalPadding = null!;
         private Container backgroundContainer = null!;
         private Container iconContainer = null!;
@@ -61,6 +60,7 @@ namespace osu.Game.Screens.SelectV2
 
         public Color4? AccentColour
         {
+            get => accentColour;
             set
             {
                 accentColour = value;
@@ -120,12 +120,6 @@ namespace osu.Game.Screens.SelectV2
                                     Children = new Drawable[]
                                     {
                                         backgroundGradient = new Box
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                        },
-                                        // TODO: this is only used by beatmap panels and should NOT be in this class.
-                                        // it's wasting fill rate.
-                                        backgroundAccentGradient = new Box
                                         {
                                             RelativeSizeAxes = Axes.Both,
                                         },
@@ -243,7 +237,6 @@ namespace osu.Game.Screens.SelectV2
         {
             var backgroundColour = accentColour ?? Color4.White;
 
-            backgroundAccentGradient.Colour = ColourInfo.GradientHorizontal(backgroundColour.Opacity(0.25f), backgroundColour.Opacity(0f));
             backgroundBorder.Colour = backgroundColour;
 
             selectionLayer.Colour = ColourInfo.GradientHorizontal(backgroundColour.Opacity(0), backgroundColour.Opacity(0.5f));
