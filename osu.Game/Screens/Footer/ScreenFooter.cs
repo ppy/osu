@@ -174,6 +174,7 @@ namespace osu.Game.Screens.Footer
             for (int i = 0; i < oldButtons.Length; i++)
             {
                 var oldButton = oldButtons[i];
+                oldButton.Enabled.Value = false;
 
                 buttonsFlow.Remove(oldButton, false);
                 hiddenButtonsContainer.Add(oldButton);

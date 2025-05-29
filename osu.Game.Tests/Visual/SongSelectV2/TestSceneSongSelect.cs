@@ -337,6 +337,30 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddAssert("relax returned", () => SongSelect.Mods.Value.Single() is ModRelax);
         }
 
+        [Test]
+        public void TestModSelectCannotBeOpenedAfterConfirmingSelection()
+        {
+            ImportBeatmapForRuleset(0);
+
+            LoadSongSelect();
+            AddStep("press right", () => InputManager.Key(Key.Right)); // press right to select in carousel, also remove.
+            AddAssert("beatmap selected", () => !Beatmap.IsDefault);
+
+            ChangeMods(new OsuModAutoplay());
+
+            AddStep("press ctrl+enter", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Key(Key.Enter);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+            AddStep("press F1", () => InputManager.PressKey(Key.F1));
+            AddAssert("mod select not visible", () => this.ChildrenOfType<ModSelectOverlay>().Single().State.Value, () => Is.EqualTo(Visibility.Hidden));
+
+            AddUntilStep("wait for player", () => Stack.CurrentScreen is PlayerLoader);
+            AddAssert("osu! cookie visible", () => this.ChildrenOfType<OsuLogo>().Single().Alpha, () => Is.Not.Zero);
+        }
+
         #endregion
 
         #region Footer
