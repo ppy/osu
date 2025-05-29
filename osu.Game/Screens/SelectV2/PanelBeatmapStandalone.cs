@@ -257,7 +257,13 @@ namespace osu.Game.Screens.SelectV2
             var beatmap = (BeatmapInfo)Item.Model;
 
             starDifficultyBindable = difficultyCache.GetBindableDifficulty(beatmap, starDifficultyCancellationSource.Token, SongSelect.SELECTION_DEBOUNCE);
-            starDifficultyBindable.BindValueChanged(_ => updateDisplay(), true);
+            starDifficultyBindable.BindValueChanged(_ =>
+            {
+                var starDifficulty = starDifficultyBindable?.Value ?? default;
+
+                starRatingDisplay.Current.Value = starDifficulty;
+                starCounter.Current = (float)starDifficulty.Stars;
+            }, true);
         }
 
         protected override void Update()
@@ -278,6 +284,8 @@ namespace osu.Game.Screens.SelectV2
 
             AccentColour = diffColour;
             starCounter.Colour = diffColour;
+
+            difficultyIcon.Colour = starRatingDisplay.DisplayedStars.Value > OsuColour.STAR_DIFFICULTY_DEFINED_COLOUR_CUTOFF ? colours.Orange1 : colourProvider.Background5;
         }
 
         private void updateKeyCount()
@@ -299,18 +307,6 @@ namespace osu.Game.Screens.SelectV2
             }
             else
                 keyCountText.Alpha = 0;
-        }
-
-        private void updateDisplay()
-        {
-            const float duration = 500;
-
-            var starDifficulty = starDifficultyBindable?.Value ?? default;
-
-            starRatingDisplay.Current.Value = starDifficulty;
-            starCounter.Current = (float)starDifficulty.Stars;
-
-            difficultyIcon.FadeColour(starDifficulty.Stars > OsuColour.STAR_DIFFICULTY_DEFINED_COLOUR_CUTOFF ? colours.Orange1 : colourProvider.Background5, duration, Easing.OutQuint);
         }
 
         public override MenuItem[] ContextMenuItems
