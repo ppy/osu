@@ -143,6 +143,9 @@ namespace osu.Game.Screens.SelectV2
 
         private void edit(BeatmapInfo beatmap)
         {
+            if (!this.IsCurrentScreen())
+                return;
+
             FinaliseSelection();
 
             // Forced refetch is important here to guarantee correct invalidation across all difficulties.

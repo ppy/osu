@@ -390,6 +390,9 @@ namespace osu.Game.Screens.SelectV2
 
         private void selectBeatmap(BeatmapInfo beatmap)
         {
+            if (!this.IsCurrentScreen())
+                return;
+
             if (beatmap.BeatmapSet!.Protected)
                 return;
 
@@ -674,6 +677,9 @@ namespace osu.Game.Screens.SelectV2
         /// </summary>
         public void SelectAndStart(BeatmapInfo beatmap)
         {
+            if (!this.IsCurrentScreen())
+                return;
+
             Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap);
             OnStart();
         }
