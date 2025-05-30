@@ -228,7 +228,10 @@ namespace osu.Game.Screens.SelectV2
                                                                 RequestRecommendedSelection = selectRecommendedBeatmap,
                                                                 NewItemsPresented = newItemsPresented,
                                                             },
-                                                            noResultsPlaceholder = new NoResultsPlaceholder(),
+                                                            noResultsPlaceholder = new NoResultsPlaceholder
+                                                            {
+                                                                RequestClearFilterText = () => filterControl.Search(string.Empty)
+                                                            }
                                                         }
                                                     },
                                                     filterControl = new FilterControl

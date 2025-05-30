@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -20,6 +21,8 @@ namespace osu.Game.Screens.SelectV2
 {
     public partial class NoResultsPlaceholder : VisibilityContainer
     {
+        public Action? RequestClearFilterText { get; init; }
+
         private FilterCriteria? filter;
 
         private LinkFlowContainer textFlow = null!;
@@ -130,6 +133,18 @@ namespace osu.Game.Screens.SelectV2
             {
                 textFlow.AddParagraph("No beatmaps match your filter criteria!");
                 textFlow.AddParagraph(string.Empty);
+
+                if (!string.IsNullOrEmpty(filter?.SearchText))
+                {
+                    addBulletPoint();
+                    textFlow.AddText("Try ");
+                    textFlow.AddLink("clearing", () =>
+                    {
+                        RequestClearFilterText?.Invoke();
+                    });
+
+                    textFlow.AddText(" your current search criteria.");
+                }
 
                 if (filter?.UserStarDifficulty.HasFilter == true)
                 {
