@@ -68,6 +68,9 @@ namespace osu.Game.IO.Serialization.Converters
                 if (typeIndex == null)
                     throw new JsonException("Expected $type token.");
 
+                if (typeIndex < 0 || typeIndex >= lookupTable.Count)
+                    throw new JsonException($"$type index {typeIndex} is out of range.");
+
                 // Prevent instantiation of types that do not inherit the type targetted by this converter
                 Type type = Type.GetType(lookupTable[typeIndex.Value])!;
                 if (!type.IsAssignableTo(itemType))
