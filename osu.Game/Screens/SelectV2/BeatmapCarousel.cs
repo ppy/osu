@@ -7,6 +7,7 @@ using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -90,9 +91,9 @@ namespace osu.Game.Screens.SelectV2
 
             Filters = new ICarouselFilter[]
             {
-                matching = new BeatmapCarouselFilterMatching(() => Criteria),
-                new BeatmapCarouselFilterSorting(() => Criteria),
-                grouping = new BeatmapCarouselFilterGrouping(() => Criteria),
+                matching = new BeatmapCarouselFilterMatching(() => Criteria!),
+                new BeatmapCarouselFilterSorting(() => Criteria!),
+                grouping = new BeatmapCarouselFilterGrouping(() => Criteria!),
             };
 
             AddInternal(loading = new LoadingLayer());
@@ -483,7 +484,7 @@ namespace osu.Game.Screens.SelectV2
 
         #region Filtering
 
-        public FilterCriteria Criteria { get; private set; } = new FilterCriteria();
+        public FilterCriteria? Criteria { get; private set; }
 
         private ScheduledDelegate? loadingDebounce;
 
@@ -507,6 +508,14 @@ namespace osu.Game.Screens.SelectV2
                 Scroll.FadeColour(OsuColour.Gray(1f), 500, Easing.OutQuint);
                 loading.Hide();
             }));
+        }
+
+        protected override Task<IEnumerable<CarouselItem>> FilterAsync(bool clearExistingPanels = false)
+        {
+            if (Criteria == null)
+                return Task.FromResult(Enumerable.Empty<CarouselItem>());
+
+            return base.FilterAsync(clearExistingPanels);
         }
 
         #endregion
