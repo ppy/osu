@@ -356,7 +356,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                                 """);
             createHeader("carousel");
             stats.AddParagraph($"""
-                                sorting: {Carousel.IsFiltering}
+                                filtering: {Carousel.IsFiltering} (total {Carousel.FilterCount} times)
                                 tracked: {Carousel.ItemsTracked}
                                 displayable: {Carousel.DisplayableItems}
                                 displayed: {Carousel.VisibleItems}

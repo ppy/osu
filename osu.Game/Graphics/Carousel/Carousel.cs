@@ -72,6 +72,11 @@ namespace osu.Game.Graphics.Carousel
         public bool IsFiltering => !filterTask.IsCompleted;
 
         /// <summary>
+        /// The number of times filter operations have been triggered.
+        /// </summary>
+        internal int FilterCount { get; private set; }
+
+        /// <summary>
         /// The number of displayable items currently being tracked (before filtering).
         /// </summary>
         public int ItemsTracked => Items.Count;
@@ -187,6 +192,8 @@ namespace osu.Game.Graphics.Carousel
         /// <param name="clearExistingPanels">Whether all existing drawable panels should be reset post filter.</param>
         protected virtual Task<IEnumerable<CarouselItem>> FilterAsync(bool clearExistingPanels = false)
         {
+            FilterCount++;
+
             if (clearExistingPanels)
                 filterReusesPanels.Invalidate();
 
