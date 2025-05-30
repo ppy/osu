@@ -79,6 +79,15 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         }
 
         [Test]
+        public void TestSingleFilterWhenEntering()
+        {
+            ImportBeatmapForRuleset(0);
+            LoadSongSelect();
+
+            AddAssert("single filter", () => Carousel.FilterCount, () => Is.EqualTo(1));
+        }
+
+        [Test]
         public void TestCookieDoesNothingIfNothingSelected()
         {
             var screensPushed = new List<IScreen>();
