@@ -117,6 +117,15 @@ namespace osu.Game.Screens.SelectV2
 
         private readonly bool sheared;
 
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
+        {
+            var inputRectangle = DrawRectangle;
+
+            inputRectangle = inputRectangle.Inflate(new MarginPadding { Vertical = BeatmapLeaderboardWedge.SPACING_BETWEEN_SCORES / 2 });
+
+            return inputRectangle.Contains(ToLocalSpace(screenSpacePos));
+        }
+
         public BeatmapLeaderboardScore(ScoreInfo score, bool sheared = true)
         {
             this.score = score;
