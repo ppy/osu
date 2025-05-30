@@ -60,12 +60,25 @@ namespace osu.Game.Screens.SelectV2
             if ((top.Model is GroupDefinition) ^ (bottom.Model is GroupDefinition))
                 return SPACING * 2;
 
-            // Beatmap difficulty panels do not overlap with themselves or any other panel.
-            if (grouping.BeatmapSetsGroupedTogether && (top.Model is BeatmapInfo || bottom.Model is BeatmapInfo))
-                return SPACING;
+            if (grouping.BeatmapSetsGroupedTogether)
+            {
+                // Give some space around the expanded beatmap set, at the top..
+                if (bottom.Model is BeatmapSetInfo && bottom.IsExpanded)
+                    return SPACING * 2;
 
-            if (!grouping.BeatmapSetsGroupedTogether && (top == CurrentSelectionItem || bottom == CurrentSelectionItem))
-                return SPACING * 2;
+                // ..and the bottom.
+                if (top.Model is BeatmapInfo && bottom.Model is BeatmapSetInfo)
+                    return SPACING * 2;
+
+                // Beatmap difficulty panels do not overlap with themselves or any other panel.
+                if (top.Model is BeatmapInfo || bottom.Model is BeatmapInfo)
+                    return SPACING;
+            }
+            else
+            {
+                if (top == CurrentSelectionItem || bottom == CurrentSelectionItem)
+                    return SPACING * 2;
+            }
 
             return -SPACING;
         }
