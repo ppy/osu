@@ -198,6 +198,8 @@ namespace osu.Game.Graphics.Carousel
             if (clearExistingPanels)
                 filterReusesPanels.Invalidate();
 
+            filterAfterItemsChanged.Validate();
+
             filterTask = performFilter();
             filterTask.FireAndForget();
             return filterTask;
@@ -281,7 +283,7 @@ namespace osu.Game.Graphics.Carousel
                 RelativeSizeAxes = Axes.Both,
             };
 
-            Items.BindCollectionChanged((_, _) => FilterAsync());
+            Items.BindCollectionChanged((_, _) => filterAfterItemsChanged.Invalidate());
         }
 
         [BackgroundDependencyLoader]
@@ -303,6 +305,12 @@ namespace osu.Game.Graphics.Carousel
 
         private Task<IEnumerable<CarouselItem>> filterTask = Task.FromResult(Enumerable.Empty<CarouselItem>());
         private CancellationTokenSource cancellationSource = new CancellationTokenSource();
+
+        /// <summary>
+        /// For background re-filters, ensure we wait for the previous filter operation to complete before starting another.
+        /// This avoids the carousel never updating its display in high churn scenarios.
+        /// </summary>
+        private readonly Cached filterAfterItemsChanged = new Cached();
 
         private async Task<IEnumerable<CarouselItem>> performFilter()
         {
@@ -726,6 +734,9 @@ namespace osu.Game.Graphics.Carousel
                 c.KeyboardSelected.Value = c.Item == currentKeyboardSelection?.CarouselItem;
                 c.Expanded.Value = c.Item.IsExpanded;
             }
+
+            if (!filterAfterItemsChanged.IsValid && !IsFiltering)
+                FilterAsync();
         }
 
         protected virtual float GetPanelXOffset(Drawable panel)
