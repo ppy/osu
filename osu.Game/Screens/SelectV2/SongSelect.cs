@@ -21,6 +21,7 @@ using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
+using osu.Game.Database;
 using osu.Game.Graphics.Carousel;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
@@ -659,6 +660,12 @@ namespace osu.Game.Screens.SelectV2
 
         #region Beatmap management
 
+        [Resolved]
+        private ManageCollectionsDialog? manageCollectionsDialog { get; set; }
+
+        [Resolved]
+        private RealmAccess realm { get; set; } = null!;
+
         public virtual IEnumerable<OsuMenuItem> GetForwardActions(BeatmapInfo beatmap)
         {
             yield return new OsuMenuItem("Select", MenuItemType.Highlighted, () => SelectAndStart(beatmap))
@@ -675,6 +682,23 @@ namespace osu.Game.Screens.SelectV2
                 if (beatmap.GetOnlineURL(api, Ruleset.Value) is string url)
                     yield return new OsuMenuItem(CommonStrings.CopyLink, MenuItemType.Standard, () => (game as OsuGame)?.CopyToClipboard(url));
             }
+
+            yield return new OsuMenuItemSpacer();
+
+            foreach (var i in CreateCollectionMenuActions(beatmap))
+                yield return i;
+        }
+
+        protected IEnumerable<OsuMenuItem> CreateCollectionMenuActions(BeatmapInfo beatmap)
+        {
+            var collectionItems = realm.Realm.All<BeatmapCollection>()
+                                       .OrderBy(c => c.Name)
+                                       .AsEnumerable()
+                                       .Select(c => new CollectionToggleMenuItem(c.ToLive(realm), beatmap)).Cast<OsuMenuItem>().ToList();
+
+            collectionItems.Add(new OsuMenuItem("Manage...", MenuItemType.Standard, () => manageCollectionsDialog?.Show()));
+
+            yield return new OsuMenuItem("Collections") { Items = collectionItems };
         }
 
         public void ManageCollections() => collectionsDialog?.Show();

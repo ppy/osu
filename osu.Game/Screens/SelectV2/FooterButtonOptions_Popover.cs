@@ -68,6 +68,10 @@ namespace osu.Game.Screens.SelectV2
 
                 foreach (OsuMenuItem item in SongSelect.GetForwardActions(beatmap.BeatmapInfo))
                 {
+                    // We can't display menus with child items here, so just ignore them.
+                    if (item.Items.Any())
+                        continue;
+
                     if (item is OsuMenuItemSpacer)
                     {
                         buttonFlow.Add(new Container
