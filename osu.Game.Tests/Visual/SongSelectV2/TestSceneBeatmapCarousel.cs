@@ -35,7 +35,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [Explicit]
         public void TestSorting()
         {
-            SortAndGroupBy(SortMode.Artist, GroupMode.NoGrouping);
+            SortAndGroupBy(SortMode.Artist, GroupMode.None);
             SortAndGroupBy(SortMode.Difficulty, GroupMode.Difficulty);
             SortAndGroupBy(SortMode.Artist, GroupMode.Artist);
         }
@@ -53,7 +53,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         public void TestLoadingDisplay()
         {
             AddStep("induce slow filtering", () => Carousel.FilterDelay = 2000);
-            SortAndGroupBy(SortMode.Artist, GroupMode.NoGrouping);
+            SortAndGroupBy(SortMode.Artist, GroupMode.None);
         }
 
         [Test]
