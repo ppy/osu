@@ -73,6 +73,16 @@ namespace osu.Game.Graphics.Containers
             return true;
         }
 
+        protected override bool OnClick(ClickEvent e)
+        {
+            base.OnClick(e);
+
+            if (!Expanded.Value)
+                Expanded.Value = true;
+
+            return true;
+        }
+
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
             updateHoverExpansion();
