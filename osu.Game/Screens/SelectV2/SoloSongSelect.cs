@@ -73,6 +73,9 @@ namespace osu.Game.Screens.SelectV2
                 yield return new OsuMenuItemSpacer();
             }
 
+            foreach (var i in CreateCollectionMenuActions(beatmap))
+                yield return i;
+
             // TODO: replace with "remove from played" button when beatmap is already played.
             yield return new OsuMenuItem(SongSelectStrings.MarkAsPlayed, MenuItemType.Standard, () => beatmaps.MarkPlayed(beatmap)) { Icon = FontAwesome.Solid.TimesCircle };
             yield return new OsuMenuItem(SongSelectStrings.ClearAllLocalScores, MenuItemType.Standard, () => dialogOverlay?.Push(new BeatmapClearScoresDialog(beatmap)))
