@@ -632,13 +632,13 @@ namespace osu.Game.Graphics.Carousel
             {
                 var item = carouselItems[i];
 
+                updateItemYPosition(item, ref lastVisible, ref yPos);
+
                 if (CheckModelEquality(item.Model, currentKeyboardSelection.Model!))
                     currentKeyboardSelection = new Selection(currentKeyboardSelection.Model, item, item.CarouselYPosition, i);
 
                 if (CheckModelEquality(item.Model, currentSelection.Model!))
                     currentSelection = new Selection(currentSelection.Model, item, item.CarouselYPosition, i);
-
-                updateItemYPosition(item, ref lastVisible, ref yPos);
             }
 
             // Update the total height of all items (to make the scroll container scrollable through the full height even though
