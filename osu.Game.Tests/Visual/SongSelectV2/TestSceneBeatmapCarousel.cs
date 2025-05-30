@@ -6,9 +6,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Screens.Select.Filter;
+using osu.Game.Screens.SelectV2;
 using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests.Visual.SongSelectV2
@@ -115,6 +117,17 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddUntilStep("maybe they are done now", () => generated.Count, () => Is.EqualTo(count));
 
             AddStep("add all beatmaps", () => BeatmapSets.AddRange(generated));
+        }
+
+        [Test]
+        public void TestSingleItemDisplayed()
+        {
+            CreateCarousel();
+            RemoveAllBeatmaps();
+
+            SortAndGroupBy(SortMode.Difficulty, GroupMode.None);
+            AddBeatmaps(1, fixedDifficultiesPerSet: 1);
+            AddUntilStep("single item is shown", () => this.ChildrenOfType<PanelBeatmapStandalone>().Count(), () => Is.EqualTo(1));
         }
     }
 }
