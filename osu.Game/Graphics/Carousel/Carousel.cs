@@ -747,6 +747,9 @@ namespace osu.Game.Graphics.Carousel
         {
             Debug.Assert(carouselItems != null);
 
+            if (carouselItems.Count == 0)
+                return DisplayRange.EMPTY;
+
             // Find index range of all items that should be on-screen
             carouselBoundsItem.CarouselYPosition = visibleUpperBound - DistanceOffscreenToPreload;
             int firstIndex = carouselItems.BinarySearch(carouselBoundsItem);
@@ -766,7 +769,7 @@ namespace osu.Game.Graphics.Carousel
         {
             Debug.Assert(carouselItems != null);
 
-            List<CarouselItem> toDisplay = range.Last - range.First == 0
+            List<CarouselItem> toDisplay = range == DisplayRange.EMPTY
                 ? new List<CarouselItem>()
                 : carouselItems.GetRange(range.First, range.Last - range.First + 1);
 
@@ -885,7 +888,10 @@ namespace osu.Game.Graphics.Carousel
         /// <param name="Index">The index of the selection as of the last run of <see cref="Carousel{T}.refreshAfterSelection"/>. May be null if selection is not present as an item, or if <see cref="Carousel{T}.refreshAfterSelection"/> has not been run yet.</param>
         private record Selection(object? Model = null, CarouselItem? CarouselItem = null, double? YPosition = null, int? Index = null);
 
-        private record DisplayRange(int First, int Last);
+        private record DisplayRange(int First, int Last)
+        {
+            public static readonly DisplayRange EMPTY = new DisplayRange(-1, -1);
+        }
 
         /// <summary>
         /// Implementation of scroll container which handles very large vertical lists by internally using <c>double</c> precision
