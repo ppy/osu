@@ -103,19 +103,19 @@ namespace osu.Game.Screens.SelectV2
         private void load(BeatmapStore beatmapStore, AudioManager audio, OsuConfigManager config, CancellationToken? cancellationToken)
         {
             setupPools();
-            setupBeatmaps(beatmapStore, cancellationToken);
+            detachedBeatmaps = beatmapStore.GetBeatmapSets(cancellationToken);
             loadSamples(audio);
 
             config.BindWith(OsuSetting.RandomSelectAlgorithm, randomAlgorithm);
         }
 
-        #region Beatmap source hookup
-
-        private void setupBeatmaps(BeatmapStore beatmapStore, CancellationToken? cancellationToken)
+        protected override void LoadComplete()
         {
-            detachedBeatmaps = beatmapStore.GetBeatmapSets(cancellationToken);
+            base.LoadComplete();
             detachedBeatmaps.BindCollectionChanged(beatmapSetsChanged, true);
         }
+
+        #region Beatmap source hookup
 
         private void beatmapSetsChanged(object? beatmaps, NotifyCollectionChangedEventArgs changed)
         {
