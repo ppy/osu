@@ -144,7 +144,7 @@ namespace osu.Game.Screens.SelectV2
                             {
                                 Direction = FillDirection.Horizontal,
                                 AutoSizeAxes = Axes.Both,
-                                Padding = new MarginPadding { Top = 2, Bottom = 2 },
+                                Padding = new MarginPadding { Bottom = 4 },
                                 Children = new Drawable[]
                                 {
                                     keyCountText = new OsuSpriteText
