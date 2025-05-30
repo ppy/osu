@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -20,9 +21,13 @@ namespace osu.Game.Screens.SelectV2
 {
     public partial class NoResultsPlaceholder : VisibilityContainer
     {
+        public Action? RequestClearFilterText { get; init; }
+
         private FilterCriteria? filter;
 
         private LinkFlowContainer textFlow = null!;
+
+        private SpriteIcon icon = null!;
 
         [Resolved]
         private BeatmapManager beatmaps { get; set; } = null!;
@@ -50,8 +55,7 @@ namespace osu.Game.Screens.SelectV2
         [BackgroundDependencyLoader]
         private void load()
         {
-            Width = 400;
-            AutoSizeAxes = Axes.Y;
+            RelativeSizeAxes = Axes.Both;
 
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
@@ -61,11 +65,13 @@ namespace osu.Game.Screens.SelectV2
                 new FillFlowContainer
                 {
                     Direction = FillDirection.Vertical,
-                    RelativeSizeAxes = Axes.X,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Width = 300,
                     AutoSizeAxes = Axes.Y,
                     Children = new Drawable[]
                     {
-                        new SpriteIcon
+                        icon = new SpriteIcon
                         {
                             Icon = FontAwesome.Solid.Ghost,
                             Anchor = Anchor.TopCentre,
@@ -78,7 +84,7 @@ namespace osu.Game.Screens.SelectV2
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                             Font = OsuFont.Style.Title,
-                            Text = "No beatmaps found"
+                            Text = "No matching beatmaps"
                         },
                         textFlow = new LinkFlowContainer
                         {
@@ -115,6 +121,9 @@ namespace osu.Game.Screens.SelectV2
             this.ScaleTo(0.9f)
                 .ScaleTo(1f, 1000, Easing.OutQuint);
 
+            icon.ScaleTo(new Vector2(-1, 1))
+                .ScaleTo(new Vector2(1, 1), 500, Easing.InOutSine);
+
             textFlow.FadeInFromZero(800, Easing.OutQuint);
 
             textFlow.Clear();
@@ -130,6 +139,18 @@ namespace osu.Game.Screens.SelectV2
             {
                 textFlow.AddParagraph("No beatmaps match your filter criteria!");
                 textFlow.AddParagraph(string.Empty);
+
+                if (!string.IsNullOrEmpty(filter?.SearchText))
+                {
+                    addBulletPoint();
+                    textFlow.AddText("Try ");
+                    textFlow.AddLink("clearing", () =>
+                    {
+                        RequestClearFilterText?.Invoke();
+                    });
+
+                    textFlow.AddText(" your current search criteria.");
+                }
 
                 if (filter?.UserStarDifficulty.HasFilter == true)
                 {
