@@ -7,8 +7,10 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
+using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Leaderboards;
 using osuTK;
 
@@ -28,10 +30,12 @@ namespace osu.Game.Screens.SelectV2
 
             public IBindable<BeatmapLeaderboardScope> Scope => scopeDropdown.Current;
 
+            private readonly Bindable<BeatmapDetailTab> configDetailTab = new Bindable<BeatmapDetailTab>();
+
             public IBindable<bool> FilterBySelectedMods => selectedModsToggle.Active;
 
             [BackgroundDependencyLoader]
-            private void load()
+            private void load(OsuConfigManager config)
             {
                 InternalChildren = new Drawable[]
                 {
@@ -98,17 +102,94 @@ namespace osu.Game.Screens.SelectV2
                         },
                     },
                 };
+
+                config.BindWith(OsuSetting.BeatmapDetailTab, configDetailTab);
+                config.BindWith(OsuSetting.BeatmapDetailModsFilter, selectedModsToggle.Active);
             }
 
             protected override void LoadComplete()
             {
                 base.LoadComplete();
 
+                scopeDropdown.Current.Value = tryMapDetailTabToLeaderboardScope(configDetailTab.Value) ?? scopeDropdown.Current.Value;
+                scopeDropdown.Current.BindValueChanged(_ => updateConfigDetailTab());
+
+                tabControl.Current.Value = configDetailTab.Value == BeatmapDetailTab.Details ? Selection.Details : Selection.Ranking;
                 tabControl.Current.BindValueChanged(v =>
                 {
                     leaderboardControls.FadeTo(v.NewValue == Selection.Ranking ? 1 : 0, 300, Easing.OutQuint);
+                    updateConfigDetailTab();
                 }, true);
             }
+
+            #region Reading / writing state from / to configuration
+
+            private void updateConfigDetailTab()
+            {
+                switch (tabControl.Current.Value)
+                {
+                    case Selection.Details:
+                        configDetailTab.Value = BeatmapDetailTab.Details;
+                        return;
+
+                    case Selection.Ranking:
+                        configDetailTab.Value = mapLeaderboardScopeToDetailTab(scopeDropdown.Current.Value);
+                        return;
+
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(tabControl.Current.Value), tabControl.Current.Value, null);
+                }
+            }
+
+            private static BeatmapLeaderboardScope? tryMapDetailTabToLeaderboardScope(BeatmapDetailTab tab)
+            {
+                switch (tab)
+                {
+                    case BeatmapDetailTab.Local:
+                        return BeatmapLeaderboardScope.Local;
+
+                    case BeatmapDetailTab.Country:
+                        return BeatmapLeaderboardScope.Country;
+
+                    case BeatmapDetailTab.Global:
+                        return BeatmapLeaderboardScope.Global;
+
+                    case BeatmapDetailTab.Friends:
+                        return BeatmapLeaderboardScope.Friend;
+
+                    case BeatmapDetailTab.Team:
+                        return BeatmapLeaderboardScope.Team;
+
+                    default:
+                        return null;
+                }
+            }
+
+            private static BeatmapDetailTab mapLeaderboardScopeToDetailTab(BeatmapLeaderboardScope scope)
+            {
+                switch (scope)
+                {
+                    case BeatmapLeaderboardScope.Local:
+                        return BeatmapDetailTab.Local;
+
+                    case BeatmapLeaderboardScope.Country:
+                        return BeatmapDetailTab.Country;
+
+                    case BeatmapLeaderboardScope.Global:
+                        return BeatmapDetailTab.Global;
+
+                    case BeatmapLeaderboardScope.Friend:
+                        return BeatmapDetailTab.Friends;
+
+                    case BeatmapLeaderboardScope.Team:
+                        return BeatmapDetailTab.Team;
+
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(scope), scope, null);
+                }
+            }
+
+            #endregion
 
             public enum Selection
             {

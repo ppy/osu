@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private Bindable<TabType> selectedTab;
+        private Bindable<BeatmapDetailTab> selectedTab;
 
         private Bindable<bool> selectedModsFilter;
 
@@ -41,7 +41,7 @@ namespace osu.Game.Screens.Select
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            selectedTab = config.GetBindable<TabType>(OsuSetting.BeatmapDetailTab);
+            selectedTab = config.GetBindable<BeatmapDetailTab>(OsuSetting.BeatmapDetailTab);
             selectedModsFilter = config.GetBindable<bool>(OsuSetting.BeatmapDetailModsFilter);
 
             selectedTab.BindValueChanged(tab => CurrentTab.Value = getTabItemFromTabType(tab.NewValue), true);
@@ -86,26 +86,26 @@ namespace osu.Game.Screens.Select
             new BeatmapDetailAreaLeaderboardTabItem<BeatmapLeaderboardScope>(BeatmapLeaderboardScope.Team),
         }).ToArray();
 
-        private BeatmapDetailAreaTabItem getTabItemFromTabType(TabType type)
+        private BeatmapDetailAreaTabItem getTabItemFromTabType(BeatmapDetailTab type)
         {
             switch (type)
             {
-                case TabType.Details:
+                case BeatmapDetailTab.Details:
                     return new BeatmapDetailAreaDetailTabItem();
 
-                case TabType.Local:
+                case BeatmapDetailTab.Local:
                     return new BeatmapDetailAreaLeaderboardTabItem<BeatmapLeaderboardScope>(BeatmapLeaderboardScope.Local);
 
-                case TabType.Global:
+                case BeatmapDetailTab.Global:
                     return new BeatmapDetailAreaLeaderboardTabItem<BeatmapLeaderboardScope>(BeatmapLeaderboardScope.Global);
 
-                case TabType.Country:
+                case BeatmapDetailTab.Country:
                     return new BeatmapDetailAreaLeaderboardTabItem<BeatmapLeaderboardScope>(BeatmapLeaderboardScope.Country);
 
-                case TabType.Friends:
+                case BeatmapDetailTab.Friends:
                     return new BeatmapDetailAreaLeaderboardTabItem<BeatmapLeaderboardScope>(BeatmapLeaderboardScope.Friend);
 
-                case TabType.Team:
+                case BeatmapDetailTab.Team:
                     return new BeatmapDetailAreaLeaderboardTabItem<BeatmapLeaderboardScope>(BeatmapLeaderboardScope.Team);
 
                 default:
@@ -113,30 +113,30 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private TabType getTabTypeFromTabItem(BeatmapDetailAreaTabItem item)
+        private BeatmapDetailTab getTabTypeFromTabItem(BeatmapDetailAreaTabItem item)
         {
             switch (item)
             {
                 case BeatmapDetailAreaDetailTabItem:
-                    return TabType.Details;
+                    return BeatmapDetailTab.Details;
 
                 case BeatmapDetailAreaLeaderboardTabItem<BeatmapLeaderboardScope> leaderboardTab:
                     switch (leaderboardTab.Scope)
                     {
                         case BeatmapLeaderboardScope.Local:
-                            return TabType.Local;
+                            return BeatmapDetailTab.Local;
 
                         case BeatmapLeaderboardScope.Country:
-                            return TabType.Country;
+                            return BeatmapDetailTab.Country;
 
                         case BeatmapLeaderboardScope.Global:
-                            return TabType.Global;
+                            return BeatmapDetailTab.Global;
 
                         case BeatmapLeaderboardScope.Friend:
-                            return TabType.Friends;
+                            return BeatmapDetailTab.Friends;
 
                         case BeatmapLeaderboardScope.Team:
-                            return TabType.Team;
+                            return BeatmapDetailTab.Team;
 
                         default:
                             throw new ArgumentOutOfRangeException(nameof(item));
@@ -145,16 +145,6 @@ namespace osu.Game.Screens.Select
                 default:
                     throw new ArgumentOutOfRangeException(nameof(item));
             }
-        }
-
-        public enum TabType
-        {
-            Details,
-            Local,
-            Country,
-            Global,
-            Friends,
-            Team
         }
     }
 }

@@ -40,7 +40,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.Ruleset, string.Empty);
             SetDefault(OsuSetting.Skin, SkinInfo.ARGON_SKIN.ToString());
 
-            SetDefault(OsuSetting.BeatmapDetailTab, PlayBeatmapDetailArea.TabType.Local);
+            SetDefault(OsuSetting.BeatmapDetailTab, BeatmapDetailTab.Local);
             SetDefault(OsuSetting.BeatmapDetailModsFilter, false);
 
             SetDefault(OsuSetting.ShowConvertedBeatmaps, true);
