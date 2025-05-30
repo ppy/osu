@@ -191,6 +191,12 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         protected void CheckNoSelection() => AddAssert("has no selection", () => Carousel.CurrentSelection, () => Is.Null);
         protected void CheckHasSelection() => AddAssert("has selection", () => Carousel.CurrentSelection, () => Is.Not.Null);
 
+        protected void CheckRequestPresentCount(int expected) =>
+            AddAssert($"check present count is {expected}", () => Carousel.RequestPresentBeatmapCount, () => Is.EqualTo(expected));
+
+        protected void CheckActivationCount(int expected) =>
+            AddAssert($"check activation count is {expected}", () => Carousel.ActivationCount, () => Is.EqualTo(expected));
+
         protected void CheckDisplayedBeatmapsCount(int expected)
         {
             AddAssert($"{expected} diffs displayed", () => Carousel.MatchedBeatmapsCount, () => Is.EqualTo(expected));
@@ -375,6 +381,9 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
         public partial class TestBeatmapCarousel : BeatmapCarousel
         {
+            public int ActivationCount { get; private set; }
+            public int RequestPresentBeatmapCount { get; private set; }
+
             public int FilterDelay = 0;
 
             public IEnumerable<BeatmapInfo> PostFilterBeatmaps = null!;
@@ -384,6 +393,17 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             public new BeatmapSetInfo? ExpandedBeatmapSet => base.ExpandedBeatmapSet;
             public new GroupDefinition? ExpandedGroup => base.ExpandedGroup;
+
+            public TestBeatmapCarousel()
+            {
+                RequestPresentBeatmap = _ => RequestPresentBeatmapCount++;
+            }
+
+            protected override void HandleItemActivated(CarouselItem item)
+            {
+                ActivationCount++;
+                base.HandleItemActivated(item);
+            }
 
             protected override async Task<IEnumerable<CarouselItem>> FilterAsync(bool clearExistingPanels = false)
             {
