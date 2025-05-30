@@ -50,8 +50,13 @@ namespace osu.Game.Screens.Footer
         private Container<ScreenFooterButton> hiddenButtonsContainer = null!;
         private LogoTrackingContainer logoTrackingContainer = null!;
 
+        // TODO: This has some weird update logic local in this class, but it only works for overlay containers.
+        // This is not what we want. The footer is to be displayed on *screens* with different colour schemes.
+        // It needs to update on screen switch.
+        //
+        // For now it's locked to Blue to match song select (the most prominent usage).
         [Cached]
-        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
+        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 
         public ScreenFooter(BackReceptor? receptor = null)
         {

@@ -70,15 +70,20 @@ namespace osu.Game.Screens.SelectV2
         /// </summary>
         protected bool ControlGlobalMusic { get; init; } = true;
 
-        private readonly ModSelectOverlay modSelectOverlay = new UserModSelectOverlay(OverlayColourScheme.Aquamarine)
+        // Colour scheme for mod overlay is left as default (green) to match mods button.
+        // Not sure about this, but we'll iterate based on feedback.
+        private readonly ModSelectOverlay modSelectOverlay = new UserModSelectOverlay
         {
             ShowPresets = true,
         };
 
         private ModSpeedHotkeyHandler modSpeedHotkeyHandler = null!;
 
+        // Blue is the most neutral choice, so I'm using that for now.
+        // Purple makes the most sense to match the "gameplay" flow, but it's a bit too strong for the current design.
+        // TODO: Colour scheme choice should probably be customisable by the user.
         [Cached]
-        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
+        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 
         private BeatmapCarousel carousel = null!;
 
