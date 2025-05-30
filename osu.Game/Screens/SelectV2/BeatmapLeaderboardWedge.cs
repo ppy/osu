@@ -35,6 +35,8 @@ namespace osu.Game.Screens.SelectV2
 {
     public partial class BeatmapLeaderboardWedge : VisibilityContainer
     {
+        public const float SPACING_BETWEEN_SCORES = 4;
+
         public IBindable<BeatmapLeaderboardScope> Scope { get; } = new Bindable<BeatmapLeaderboardScope>();
 
         public IBindable<bool> FilterBySelectedMods { get; } = new BindableBool();
@@ -258,10 +260,10 @@ namespace osu.Game.Screens.SelectV2
 
                 foreach (var d in loadedScores)
                 {
-                    d.Y = (BeatmapLeaderboardScore.HEIGHT + 4f) * i;
+                    d.Y = (BeatmapLeaderboardScore.HEIGHT + SPACING_BETWEEN_SCORES) * i;
 
                     // This is a bit of a weird one. We're already in a sheared state and don't want top-level
-                    // shear applied, but still need the `BeatmapLeadeboardScore` to be in "sheared" mode (see ctor).
+                    // shear applied, but still need the `BeatmapLeaderboardScore` to be in "sheared" mode (see ctor).
                     d.Shear = Vector2.Zero;
 
                     scoresContainer.Add(d);
