@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -10,7 +8,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using osu.Framework.Extensions.ObjectExtensions;
 
 namespace osu.Game.IO.Serialization.Converters
 {
@@ -43,7 +40,7 @@ namespace osu.Game.IO.Serialization.Converters
 
         public override bool CanConvert(Type objectType) => tryGetListItemType(objectType, out _);
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override object ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
         {
             if (!tryGetListItemType(objectType, out var itemType))
                 throw new JsonSerializationException($"May not use {nameof(TypedListConverter)} on a type that does not implement {typeof(IReadOnlyList<>).Name}");
@@ -55,22 +52,24 @@ namespace osu.Game.IO.Serialization.Converters
             if (obj["$lookup_table"] == null)
                 return list;
 
-            var lookupTable = serializer.Deserialize<List<string>>(obj["$lookup_table"].CreateReader());
+            var lookupTable = serializer.Deserialize<List<string>>(obj["$lookup_table"]!.CreateReader());
             if (lookupTable == null)
                 return list;
 
             if (obj["$items"] == null)
                 return list;
 
-            foreach (var tok in obj["$items"])
+            foreach (var tok in obj["$items"]!)
             {
                 var itemReader = tok.CreateReader();
 
-                if (tok["$type"] == null)
+                int? typeIndex = tok["$type"]?.Value<int>();
+
+                if (typeIndex == null)
                     throw new JsonException("Expected $type token.");
 
                 // Prevent instantiation of types that do not inherit the type targetted by this converter
-                Type type = Type.GetType(lookupTable[(int)tok["$type"]]).AsNonNull();
+                Type type = Type.GetType(lookupTable[typeIndex.Value])!;
                 if (!type.IsAssignableTo(itemType))
                     continue;
 
@@ -83,7 +82,7 @@ namespace osu.Game.IO.Serialization.Converters
             return list;
         }
 
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
         {
             if (value == null)
             {
