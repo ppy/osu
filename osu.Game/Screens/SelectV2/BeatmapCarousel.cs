@@ -7,6 +7,7 @@ using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -60,9 +61,25 @@ namespace osu.Game.Screens.SelectV2
             if ((top.Model is GroupDefinition) ^ (bottom.Model is GroupDefinition))
                 return SPACING * 2;
 
-            // Beatmap difficulty panels do not overlap with themselves or any other panel.
-            if (grouping.BeatmapSetsGroupedTogether && (top.Model is BeatmapInfo || bottom.Model is BeatmapInfo))
-                return SPACING;
+            if (grouping.BeatmapSetsGroupedTogether)
+            {
+                // Give some space around the expanded beatmap set, at the top..
+                if (bottom.Model is BeatmapSetInfo && bottom.IsExpanded)
+                    return SPACING * 2;
+
+                // ..and the bottom.
+                if (top.Model is BeatmapInfo && bottom.Model is BeatmapSetInfo)
+                    return SPACING * 2;
+
+                // Beatmap difficulty panels do not overlap with themselves or any other panel.
+                if (top.Model is BeatmapInfo || bottom.Model is BeatmapInfo)
+                    return SPACING;
+            }
+            else
+            {
+                if (top == CurrentSelectionItem || bottom == CurrentSelectionItem)
+                    return SPACING * 2;
+            }
 
             return -SPACING;
         }
@@ -74,9 +91,9 @@ namespace osu.Game.Screens.SelectV2
 
             Filters = new ICarouselFilter[]
             {
-                matching = new BeatmapCarouselFilterMatching(() => Criteria),
-                new BeatmapCarouselFilterSorting(() => Criteria),
-                grouping = new BeatmapCarouselFilterGrouping(() => Criteria),
+                matching = new BeatmapCarouselFilterMatching(() => Criteria!),
+                new BeatmapCarouselFilterSorting(() => Criteria!),
+                grouping = new BeatmapCarouselFilterGrouping(() => Criteria!),
             };
 
             AddInternal(loading = new LoadingLayer());
@@ -86,19 +103,19 @@ namespace osu.Game.Screens.SelectV2
         private void load(BeatmapStore beatmapStore, AudioManager audio, OsuConfigManager config, CancellationToken? cancellationToken)
         {
             setupPools();
-            setupBeatmaps(beatmapStore, cancellationToken);
+            detachedBeatmaps = beatmapStore.GetBeatmapSets(cancellationToken);
             loadSamples(audio);
 
             config.BindWith(OsuSetting.RandomSelectAlgorithm, randomAlgorithm);
         }
 
-        #region Beatmap source hookup
-
-        private void setupBeatmaps(BeatmapStore beatmapStore, CancellationToken? cancellationToken)
+        protected override void LoadComplete()
         {
-            detachedBeatmaps = beatmapStore.GetBeatmapSets(cancellationToken);
+            base.LoadComplete();
             detachedBeatmaps.BindCollectionChanged(beatmapSetsChanged, true);
         }
+
+        #region Beatmap source hookup
 
         private void beatmapSetsChanged(object? beatmaps, NotifyCollectionChangedEventArgs changed)
         {
@@ -467,7 +484,7 @@ namespace osu.Game.Screens.SelectV2
 
         #region Filtering
 
-        public FilterCriteria Criteria { get; private set; } = new FilterCriteria();
+        public FilterCriteria? Criteria { get; private set; }
 
         private ScheduledDelegate? loadingDebounce;
 
@@ -491,6 +508,14 @@ namespace osu.Game.Screens.SelectV2
                 Scroll.FadeColour(OsuColour.Gray(1f), 500, Easing.OutQuint);
                 loading.Hide();
             }));
+        }
+
+        protected override Task<IEnumerable<CarouselItem>> FilterAsync(bool clearExistingPanels = false)
+        {
+            if (Criteria == null)
+                return Task.FromResult(Enumerable.Empty<CarouselItem>());
+
+            return base.FilterAsync(clearExistingPanels);
         }
 
         #endregion
