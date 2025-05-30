@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Audio;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
@@ -20,6 +21,9 @@ namespace osu.Game.Screens.Play.HUD
 
         private readonly UpdateableRank rank;
 
+        private SkinnableSound rankDownSample = null!;
+        private SkinnableSound rankUpSample = null!;
+
         public DefaultRankDisplay()
         {
             Size = new Vector2(70, 35);
@@ -33,13 +37,34 @@ namespace osu.Game.Screens.Play.HUD
             };
         }
 
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            AddRangeInternal([
+                rankDownSample = new SkinnableSound(new SampleInfo("Gameplay/rank-down")),
+                rankUpSample = new SkinnableSound(new SampleInfo("Gameplay/rank-up"))
+            ]);
+        }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
             rank.Rank = scoreProcessor.Rank.Value;
 
-            scoreProcessor.Rank.BindValueChanged(v => rank.Rank = v.NewValue);
+            scoreProcessor.Rank.BindValueChanged(v =>
+            {
+                // Don't play rank-down sfx on quit/retry
+                if (v.NewValue > Scoring.ScoreRank.F)
+                {
+                    if (v.NewValue > rank.Rank)
+                        rankUpSample.Play();
+                    else
+                        rankDownSample.Play();
+                }
+
+                rank.Rank = v.NewValue;
+            });
         }
     }
 }
