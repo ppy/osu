@@ -148,13 +148,7 @@ namespace osu.Game.Graphics.Carousel
         /// <summary>
         /// Scroll carousel to the selected item if available.
         /// </summary>
-        public void ScrollToSelection()
-        {
-            // TODO: this likely needs to be delayed until currentKeyboardSelection has a valid value.
-            // Early calls to `ScrollToSelection` will currently silently fail.
-            if (currentKeyboardSelection.CarouselItem != null)
-                Scroll.ScrollTo(currentKeyboardSelection.CarouselItem.CarouselYPosition - visibleHalfHeight + BleedTop);
-        }
+        public void ScrollToSelection() => scrollToSelection.Invalidate();
 
         /// <summary>
         /// Returns the vertical spacing between two given carousel items. Negative value can be used to create an overlapping effect.
@@ -638,14 +632,18 @@ namespace osu.Game.Graphics.Carousel
             {
                 var item = carouselItems[i];
 
+                updateItemYPosition(item, ref lastVisible, ref yPos);
+
                 if (CheckModelEquality(item.Model, currentKeyboardSelection.Model!))
                     currentKeyboardSelection = new Selection(currentKeyboardSelection.Model, item, item.CarouselYPosition, i);
 
                 if (CheckModelEquality(item.Model, currentSelection.Model!))
                     currentSelection = new Selection(currentSelection.Model, item, item.CarouselYPosition, i);
-
-                updateItemYPosition(item, ref lastVisible, ref yPos);
             }
+
+            // Update the total height of all items (to make the scroll container scrollable through the full height even though
+            // most items are not displayed / loaded).
+            Scroll.SetLayoutHeight(yPos + visibleHalfHeight);
 
             // If a keyboard selection is currently made, we want to keep the view stable around the selection.
             // That means that we should offset the immediate scroll position by any change in Y position for the selection.
@@ -680,6 +678,12 @@ namespace osu.Game.Graphics.Carousel
         /// Whether existing panels can be re-used in the next filter.
         /// </summary>
         private readonly Cached filterReusesPanels = new Cached();
+
+        /// <summary>
+        /// Scrolling to selection relies on <see cref="currentKeyboardSelection"/> being fully populated.
+        /// This flag ensures it runs after <see cref="refreshAfterSelection"/> validates this.
+        /// </summary>
+        private readonly Cached scrollToSelection = new Cached();
 
         protected override void Update()
         {
@@ -737,6 +741,19 @@ namespace osu.Game.Graphics.Carousel
 
             if (!filterAfterItemsChanged.IsValid && !IsFiltering)
                 FilterAsync();
+        }
+
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+
+            if (!scrollToSelection.IsValid)
+            {
+                if (currentKeyboardSelection.YPosition != null)
+                    Scroll.ScrollTo(currentKeyboardSelection.YPosition.Value - visibleHalfHeight + BleedTop);
+
+                scrollToSelection.Validate();
+            }
         }
 
         protected virtual float GetPanelXOffset(Drawable panel)
@@ -856,16 +873,6 @@ namespace osu.Game.Graphics.Carousel
                     }
                 }
             }
-
-            // Update the total height of all items (to make the scroll container scrollable through the full height even though
-            // most items are not displayed / loaded).
-            if (carouselItems.Count > 0)
-            {
-                var lastItem = carouselItems[^1];
-                Scroll.SetLayoutHeight((float)(lastItem.CarouselYPosition + lastItem.DrawHeight + visibleHalfHeight));
-            }
-            else
-                Scroll.SetLayoutHeight(0);
         }
 
         private void expirePanel(Drawable panel)
