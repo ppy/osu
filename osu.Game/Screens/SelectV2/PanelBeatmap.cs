@@ -40,6 +40,7 @@ namespace osu.Game.Screens.SelectV2
         private PanelLocalRankDisplay localRank = null!;
         private OsuSpriteText difficultyText = null!;
         private OsuSpriteText authorText = null!;
+        private FillFlowContainer mainFill = null!;
 
         private IBindable<StarDifficulty>? starDifficultyBindable;
         private CancellationTokenSource? starDifficultyCancellationSource;
@@ -115,75 +116,84 @@ namespace osu.Game.Screens.SelectV2
                 }
             };
 
-            Content.Children = new[]
+            Content.Child = new FillFlowContainer
             {
-                new FillFlowContainer
+                AutoSizeAxes = Axes.Both,
+                Anchor = Anchor.CentreLeft,
+                Origin = Anchor.CentreLeft,
+                Spacing = new Vector2(3),
+                Margin = new MarginPadding { Left = 5 },
+                Direction = FillDirection.Horizontal,
+                Children = new Drawable[]
                 {
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft,
-                    Padding = new MarginPadding { Left = 10f },
-                    Direction = FillDirection.Vertical,
-                    AutoSizeAxes = Axes.Both,
-                    Children = new Drawable[]
+                    localRank = new PanelLocalRankDisplay
                     {
-                        new FillFlowContainer
+                        Scale = new Vector2(0.8f),
+                        Origin = Anchor.CentreLeft,
+                        Anchor = Anchor.CentreLeft,
+                    },
+                    mainFill = new FillFlowContainer
+                    {
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
+                        Direction = FillDirection.Vertical,
+                        AutoSizeAxes = Axes.Both,
+                        Children = new Drawable[]
                         {
-                            Direction = FillDirection.Horizontal,
-                            AutoSizeAxes = Axes.Both,
-                            Children = new[]
+                            new FillFlowContainer
                             {
-                                keyCountText = new OsuSpriteText
+                                Direction = FillDirection.Horizontal,
+                                AutoSizeAxes = Axes.Both,
+                                Padding = new MarginPadding { Top = 2, Bottom = 2 },
+                                Children = new Drawable[]
                                 {
-                                    Font = OsuFont.Style.Body.With(weight: FontWeight.SemiBold),
-                                    Anchor = Anchor.BottomLeft,
-                                    Origin = Anchor.BottomLeft,
-                                    Alpha = 0,
-                                },
-                                difficultyText = new OsuSpriteText
-                                {
-                                    Font = OsuFont.Style.Body.With(weight: FontWeight.SemiBold),
-                                    Anchor = Anchor.BottomLeft,
-                                    Origin = Anchor.BottomLeft,
-                                    Margin = new MarginPadding { Right = 3f },
-                                },
-                                authorText = new OsuSpriteText
-                                {
-                                    Colour = colourProvider.Content2,
-                                    Font = OsuFont.Style.Caption1.With(weight: FontWeight.SemiBold),
-                                    Anchor = Anchor.BottomLeft,
-                                    Origin = Anchor.BottomLeft
+                                    keyCountText = new OsuSpriteText
+                                    {
+                                        Font = OsuFont.Style.Body.With(weight: FontWeight.SemiBold),
+                                        Anchor = Anchor.BottomLeft,
+                                        Origin = Anchor.BottomLeft,
+                                        Alpha = 0,
+                                    },
+                                    difficultyText = new OsuSpriteText
+                                    {
+                                        Font = OsuFont.Style.Body.With(weight: FontWeight.SemiBold),
+                                        Anchor = Anchor.BottomLeft,
+                                        Origin = Anchor.BottomLeft,
+                                        Margin = new MarginPadding { Right = 3f },
+                                    },
+                                    authorText = new OsuSpriteText
+                                    {
+                                        Colour = colourProvider.Content2,
+                                        Font = OsuFont.Style.Caption1.With(weight: FontWeight.SemiBold),
+                                        Anchor = Anchor.BottomLeft,
+                                        Origin = Anchor.BottomLeft
+                                    }
                                 }
-                            }
-                        },
-                        new FillFlowContainer
-                        {
-                            Direction = FillDirection.Horizontal,
-                            Spacing = new Vector2(3, 0),
-                            AutoSizeAxes = Axes.Both,
-                            Children = new Drawable[]
+                            },
+                            new FillFlowContainer
                             {
-                                localRank = new PanelLocalRankDisplay
+                                Direction = FillDirection.Horizontal,
+                                Spacing = new Vector2(3),
+                                AutoSizeAxes = Axes.Both,
+                                Children = new Drawable[]
                                 {
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft,
-                                    Scale = new Vector2(0.65f)
+                                    starRatingDisplay = new StarRatingDisplay(default, StarRatingDisplaySize.Small, animated: true)
+                                    {
+                                        Origin = Anchor.CentreLeft,
+                                        Anchor = Anchor.CentreLeft,
+                                        Scale = new Vector2(0.875f),
+                                    },
+                                    starCounter = new StarCounter
+                                    {
+                                        Anchor = Anchor.CentreLeft,
+                                        Origin = Anchor.CentreLeft,
+                                        Scale = new Vector2(0.4f)
+                                    }
                                 },
-                                starRatingDisplay = new StarRatingDisplay(default, StarRatingDisplaySize.Small, animated: true)
-                                {
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft,
-                                    Scale = new Vector2(0.875f),
-                                },
-                                starCounter = new StarCounter
-                                {
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft,
-                                    Scale = new Vector2(0.4f)
-                                }
                             }
-                        },
+                        }
                     }
-                },
+                }
             };
         }
 
@@ -263,7 +273,7 @@ namespace osu.Game.Screens.SelectV2
 
             // Dirty hack to make sure we don't take up spacing in parent fill flow when not displaying a rank.
             // I can't find a better way to do this.
-            starRatingDisplay.Margin = new MarginPadding { Left = 1 / starRatingDisplay.Scale.X * (localRank.HasRank ? 0 : -3) };
+            mainFill.Margin = new MarginPadding { Left = 1 / starRatingDisplay.Scale.X * (localRank.HasRank ? 0 : -3) };
 
             var diffColour = starRatingDisplay.DisplayedDifficultyColour;
 
