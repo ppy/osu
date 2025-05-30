@@ -14,6 +14,8 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
+using osu.Game.Collections;
+using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Carousel;
 using osu.Game.Graphics.Sprites;
@@ -188,6 +190,12 @@ namespace osu.Game.Screens.SelectV2
             difficultiesDisplay.BeatmapSet = null;
         }
 
+        [Resolved]
+        private RealmAccess realm { get; set; } = null!;
+
+        [Resolved]
+        private ManageCollectionsDialog? manageCollectionsDialog { get; set; }
+
         public override MenuItem[] ContextMenuItems
         {
             get
@@ -215,12 +223,69 @@ namespace osu.Game.Screens.SelectV2
                     items.Add(new OsuMenuItemSpacer());
                 }
 
+                var collectionItems = realm.Realm.All<BeatmapCollection>()
+                                           .OrderBy(c => c.Name)
+                                           .AsEnumerable()
+                                           .Select(createCollectionMenuItem)
+                                           .ToList();
+
+                if (manageCollectionsDialog != null)
+                    collectionItems.Add(new OsuMenuItem("Manage...", MenuItemType.Standard, manageCollectionsDialog.Show));
+
+                items.Add(new OsuMenuItem("Collections") { Items = collectionItems });
+
                 if (beatmapSet.Beatmaps.Any(b => b.Hidden))
                     items.Add(new OsuMenuItem("Restore all hidden", MenuItemType.Standard, () => songSelect?.RestoreAllHidden(beatmapSet)));
 
                 items.Add(new OsuMenuItem("Delete...", MenuItemType.Destructive, () => songSelect?.Delete(beatmapSet)));
                 return items.ToArray();
             }
+        }
+
+        private MenuItem createCollectionMenuItem(BeatmapCollection collection)
+        {
+            var beatmapSet = (BeatmapSetInfo)Item!.Model;
+
+            Debug.Assert(beatmapSet != null);
+
+            TernaryState state;
+
+            int countExisting = beatmapSet.Beatmaps.Count(b => collection.BeatmapMD5Hashes.Contains(b.MD5Hash));
+
+            if (countExisting == beatmapSet.Beatmaps.Count)
+                state = TernaryState.True;
+            else if (countExisting > 0)
+                state = TernaryState.Indeterminate;
+            else
+                state = TernaryState.False;
+
+            var liveCollection = collection.ToLive(realm);
+
+            return new TernaryStateToggleMenuItem(collection.Name, MenuItemType.Standard, s =>
+            {
+                liveCollection.PerformWrite(c =>
+                {
+                    foreach (var b in beatmapSet.Beatmaps)
+                    {
+                        switch (s)
+                        {
+                            case TernaryState.True:
+                                if (c.BeatmapMD5Hashes.Contains(b.MD5Hash))
+                                    continue;
+
+                                c.BeatmapMD5Hashes.Add(b.MD5Hash);
+                                break;
+
+                            case TernaryState.False:
+                                c.BeatmapMD5Hashes.Remove(b.MD5Hash);
+                                break;
+                        }
+                    }
+                });
+            })
+            {
+                State = { Value = state }
+            };
         }
     }
 }

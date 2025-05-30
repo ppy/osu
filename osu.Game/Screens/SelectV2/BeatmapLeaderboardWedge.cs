@@ -3,14 +3,16 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.PolygonExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
@@ -27,11 +29,14 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Select.Leaderboards;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.SelectV2
 {
     public partial class BeatmapLeaderboardWedge : VisibilityContainer
     {
+        public const float SPACING_BETWEEN_SCORES = 4;
+
         public IBindable<BeatmapLeaderboardScope> Scope { get; } = new Bindable<BeatmapLeaderboardScope>();
 
         public IBindable<bool> FilterBySelectedMods { get; } = new BindableBool();
@@ -70,7 +75,7 @@ namespace osu.Game.Screens.SelectV2
 
         private readonly IBindable<LeaderboardScores?> fetchedScores = new Bindable<LeaderboardScores?>();
 
-        private const float personal_best_height = 80;
+        private const float personal_best_height = 100;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -109,7 +114,10 @@ namespace osu.Game.Screens.SelectV2
                         RelativeSizeAxes = Axes.X,
                         Height = personal_best_height,
                         Shear = OsuGame.SHEAR,
-                        Margin = new MarginPadding { Left = -40f },
+                        Margin = new MarginPadding
+                        {
+                            Left = -40f,
+                        },
                         CornerRadius = 10f,
                         Masking = true,
                         // push the personal best 1px down to hide masking issues
@@ -118,11 +126,7 @@ namespace osu.Game.Screens.SelectV2
                         Alpha = 0f,
                         Children = new Drawable[]
                         {
-                            new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Colour = colourProvider.Background4,
-                            },
+                            new WedgeBackground(),
                             new Container
                             {
                                 RelativeSizeAxes = Axes.X,
@@ -256,10 +260,10 @@ namespace osu.Game.Screens.SelectV2
 
                 foreach (var d in loadedScores)
                 {
-                    d.Y = (BeatmapLeaderboardScore.HEIGHT + 4f) * i;
+                    d.Y = (BeatmapLeaderboardScore.HEIGHT + SPACING_BETWEEN_SCORES) * i;
 
                     // This is a bit of a weird one. We're already in a sheared state and don't want top-level
-                    // shear applied, but still need the `BeatmapLeadeboardScore` to be in "sheared" mode (see ctor).
+                    // shear applied, but still need the `BeatmapLeaderboardScore` to be in "sheared" mode (see ctor).
                     d.Shear = Vector2.Zero;
 
                     scoresContainer.Add(d);
@@ -351,6 +355,59 @@ namespace osu.Game.Screens.SelectV2
             placeholder.ScaleTo(0.8f).Then().ScaleTo(1, 900, Easing.OutQuint);
             placeholder.FadeInFromZero(300, Easing.OutQuint);
         }
+
+        #region Fade handling
+
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+
+            const int height = BeatmapLeaderboardScore.HEIGHT;
+
+            float fadeBottom = (float)(scoresScroll.Current + scoresScroll.DrawHeight);
+            float fadeTop = (float)(scoresScroll.Current);
+
+            if (!scoresScroll.IsScrolledToStart())
+                fadeTop += height;
+
+            foreach (var c in scoresContainer)
+            {
+                float topY = c.ToSpaceOfOtherDrawable(Vector2.Zero, scoresContainer).Y;
+                float bottomY = topY + height;
+
+                bool requireBottomFade = bottomY >= fadeBottom;
+                bool requireTopFade = topY < fadeTop;
+
+                if (!requireBottomFade && !requireTopFade)
+                {
+                    c.Colour = Color4.White;
+                    continue;
+                }
+
+                if (topY > fadeBottom + height || bottomY < fadeTop - height)
+                {
+                    c.Colour = Color4.Transparent;
+                    continue;
+                }
+
+                if (requireBottomFade)
+                {
+                    c.Colour = ColourInfo.GradientVertical(
+                        Color4.White.Opacity(Math.Min(1 - (topY - fadeBottom) / height, 1)),
+                        Color4.White.Opacity(Math.Min(1 - (bottomY - fadeBottom) / height, 1)));
+                }
+                else
+                {
+                    Debug.Assert(requireTopFade);
+
+                    c.Colour = ColourInfo.GradientVertical(
+                        Color4.White.Opacity(Math.Min(1 - (fadeTop - topY) / height, 1)),
+                        Color4.White.Opacity(Math.Min(1 - (fadeTop - bottomY) / height, 1)));
+                }
+            }
+        }
+
+        #endregion
 
         private Placeholder? getPlaceholderFor(LeaderboardState state)
         {

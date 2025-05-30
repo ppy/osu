@@ -12,6 +12,7 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Caching;
+using osu.Framework.Development;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -70,6 +71,11 @@ namespace osu.Game.Graphics.Carousel
         /// Whether an asynchronous filter / group operation is currently underway.
         /// </summary>
         public bool IsFiltering => !filterTask.IsCompleted;
+
+        /// <summary>
+        /// The number of times filter operations have been triggered.
+        /// </summary>
+        internal int FilterCount { get; private set; }
 
         /// <summary>
         /// The number of displayable items currently being tracked (before filtering).
@@ -181,8 +187,12 @@ namespace osu.Game.Graphics.Carousel
         /// <param name="clearExistingPanels">Whether all existing drawable panels should be reset post filter.</param>
         protected virtual Task<IEnumerable<CarouselItem>> FilterAsync(bool clearExistingPanels = false)
         {
+            FilterCount++;
+
             if (clearExistingPanels)
                 filterReusesPanels.Invalidate();
+
+            filterAfterItemsChanged.Validate();
 
             filterTask = performFilter();
             filterTask.FireAndForget();
@@ -267,7 +277,7 @@ namespace osu.Game.Graphics.Carousel
                 RelativeSizeAxes = Axes.Both,
             };
 
-            Items.BindCollectionChanged((_, _) => FilterAsync());
+            Items.BindCollectionChanged((_, _) => filterAfterItemsChanged.Invalidate());
         }
 
         [BackgroundDependencyLoader]
@@ -290,22 +300,29 @@ namespace osu.Game.Graphics.Carousel
         private Task<IEnumerable<CarouselItem>> filterTask = Task.FromResult(Enumerable.Empty<CarouselItem>());
         private CancellationTokenSource cancellationSource = new CancellationTokenSource();
 
+        /// <summary>
+        /// For background re-filters, ensure we wait for the previous filter operation to complete before starting another.
+        /// This avoids the carousel never updating its display in high churn scenarios.
+        /// </summary>
+        private readonly Cached filterAfterItemsChanged = new Cached();
+
         private async Task<IEnumerable<CarouselItem>> performFilter()
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
             var cts = new CancellationTokenSource();
 
             var previousCancellationSource = Interlocked.Exchange(ref cancellationSource, cts);
-            await previousCancellationSource.CancelAsync().ConfigureAwait(false);
+            await previousCancellationSource.CancelAsync().ConfigureAwait(true);
 
             if (DebounceDelay > 0)
             {
                 log($"Filter operation queued, waiting for {DebounceDelay} ms debounce");
-                await Task.Delay(DebounceDelay, cts.Token).ConfigureAwait(false);
+                await Task.Delay(DebounceDelay, cts.Token).ConfigureAwait(true);
             }
 
             // Copy must be performed on update thread for now (see ConfigureAwait above).
             // Could potentially be optimised in the future if it becomes an issue.
+            Debug.Assert(ThreadSafety.IsUpdateThread);
             List<CarouselItem> items = new List<CarouselItem>(Items.Select(m => new CarouselItem(m)));
 
             await Task.Run(async () =>
@@ -524,6 +541,10 @@ namespace osu.Game.Graphics.Carousel
             do
             {
                 newIndex = (newIndex + direction + carouselItems.Count) % carouselItems.Count;
+
+                if (newIndex == originalIndex)
+                    break;
+
                 var newItem = carouselItems[newIndex];
 
                 if (CheckValidForGroupSelection(newItem))
@@ -531,7 +552,7 @@ namespace osu.Game.Graphics.Carousel
                     HandleItemActivated(newItem);
                     return;
                 }
-            } while (newIndex != originalIndex);
+            } while (true);
         }
 
         #endregion
@@ -611,13 +632,13 @@ namespace osu.Game.Graphics.Carousel
             {
                 var item = carouselItems[i];
 
-                updateItemYPosition(item, ref lastVisible, ref yPos);
-
                 if (CheckModelEquality(item.Model, currentKeyboardSelection.Model!))
                     currentKeyboardSelection = new Selection(currentKeyboardSelection.Model, item, item.CarouselYPosition, i);
 
                 if (CheckModelEquality(item.Model, currentSelection.Model!))
                     currentSelection = new Selection(currentSelection.Model, item, item.CarouselYPosition, i);
+
+                updateItemYPosition(item, ref lastVisible, ref yPos);
             }
 
             // If a keyboard selection is currently made, we want to keep the view stable around the selection.
@@ -721,6 +742,9 @@ namespace osu.Game.Graphics.Carousel
                 c.KeyboardSelected.Value = c.Item == currentKeyboardSelection?.CarouselItem;
                 c.Expanded.Value = c.Item.IsExpanded;
             }
+
+            if (!filterAfterItemsChanged.IsValid && !IsFiltering)
+                FilterAsync();
         }
 
         protected virtual float GetPanelXOffset(Drawable panel)
@@ -751,6 +775,9 @@ namespace osu.Game.Graphics.Carousel
         {
             Debug.Assert(carouselItems != null);
 
+            if (carouselItems.Count == 0)
+                return DisplayRange.EMPTY;
+
             // Find index range of all items that should be on-screen
             carouselBoundsItem.CarouselYPosition = visibleUpperBound - DistanceOffscreenToPreload;
             int firstIndex = carouselItems.BinarySearch(carouselBoundsItem);
@@ -770,7 +797,7 @@ namespace osu.Game.Graphics.Carousel
         {
             Debug.Assert(carouselItems != null);
 
-            List<CarouselItem> toDisplay = range.Last - range.First == 0
+            List<CarouselItem> toDisplay = range == DisplayRange.EMPTY
                 ? new List<CarouselItem>()
                 : carouselItems.GetRange(range.First, range.Last - range.First + 1);
 
@@ -889,7 +916,10 @@ namespace osu.Game.Graphics.Carousel
         /// <param name="Index">The index of the selection as of the last run of <see cref="Carousel{T}.refreshAfterSelection"/>. May be null if selection is not present as an item, or if <see cref="Carousel{T}.refreshAfterSelection"/> has not been run yet.</param>
         private record Selection(object? Model = null, CarouselItem? CarouselItem = null, double? YPosition = null, int? Index = null);
 
-        private record DisplayRange(int First, int Last);
+        private record DisplayRange(int First, int Last)
+        {
+            public static readonly DisplayRange EMPTY = new DisplayRange(-1, -1);
+        }
 
         /// <summary>
         /// Implementation of scroll container which handles very large vertical lists by internally using <c>double</c> precision

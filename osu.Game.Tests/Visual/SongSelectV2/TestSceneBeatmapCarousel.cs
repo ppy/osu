@@ -6,9 +6,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using osu.Framework.Testing;
+using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Screens.Select.Filter;
+using osu.Game.Screens.SelectV2;
 using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests.Visual.SongSelectV2
@@ -35,7 +38,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [Explicit]
         public void TestSorting()
         {
-            SortAndGroupBy(SortMode.Artist, GroupMode.NoGrouping);
+            SortAndGroupBy(SortMode.Artist, GroupMode.None);
             SortAndGroupBy(SortMode.Difficulty, GroupMode.Difficulty);
             SortAndGroupBy(SortMode.Artist, GroupMode.Artist);
         }
@@ -53,7 +56,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         public void TestLoadingDisplay()
         {
             AddStep("induce slow filtering", () => Carousel.FilterDelay = 2000);
-            SortAndGroupBy(SortMode.Artist, GroupMode.NoGrouping);
+            SortAndGroupBy(SortMode.Artist, GroupMode.None);
         }
 
         [Test]
@@ -93,6 +96,25 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         }
 
         [Test]
+        public void TestHighChurnUpdatesStillShowsPanels()
+        {
+            ScheduledDelegate updateTask = null!;
+
+            AddBeatmaps(1, 1);
+
+            AddStep("start constantly updating beatmap in background", () =>
+            {
+                updateTask = Scheduler.AddDelayed(() => { BeatmapSets.ReplaceRange(0, 1, [BeatmapSets.First()]); }, 1, true);
+            });
+
+            CreateCarousel();
+
+            AddUntilStep("panels loaded", () => Carousel.ChildrenOfType<Panel>(), () => Is.Not.Empty);
+
+            AddStep("end task", () => updateTask.Cancel());
+        }
+
+        [Test]
         [Explicit]
         public void TestPerformanceWithManyBeatmaps()
         {
@@ -115,6 +137,17 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddUntilStep("maybe they are done now", () => generated.Count, () => Is.EqualTo(count));
 
             AddStep("add all beatmaps", () => BeatmapSets.AddRange(generated));
+        }
+
+        [Test]
+        public void TestSingleItemDisplayed()
+        {
+            CreateCarousel();
+            RemoveAllBeatmaps();
+
+            SortAndGroupBy(SortMode.Difficulty, GroupMode.None);
+            AddBeatmaps(1, fixedDifficultiesPerSet: 1);
+            AddUntilStep("single item is shown", () => this.ChildrenOfType<PanelBeatmapStandalone>().Count(), () => Is.EqualTo(1));
         }
     }
 }

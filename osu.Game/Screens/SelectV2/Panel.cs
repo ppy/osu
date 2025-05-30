@@ -26,7 +26,7 @@ namespace osu.Game.Screens.SelectV2
     {
         private const float corner_radius = 10;
 
-        private const float active_x_offset = 50f;
+        private const float active_x_offset = 25f;
 
         protected const float DURATION = 400;
 
@@ -34,7 +34,6 @@ namespace osu.Game.Screens.SelectV2
 
         private Box backgroundBorder = null!;
         private Box backgroundGradient = null!;
-        private Box backgroundAccentGradient = null!;
         private Container backgroundLayerHorizontalPadding = null!;
         private Container backgroundContainer = null!;
         private Container iconContainer = null!;
@@ -65,7 +64,7 @@ namespace osu.Game.Screens.SelectV2
             set
             {
                 accentColour = value;
-                updateDisplay();
+                updateAccentColour();
             }
         }
 
@@ -95,8 +94,8 @@ namespace osu.Game.Screens.SelectV2
                 EdgeEffect = new EdgeEffectParameters
                 {
                     Type = EdgeEffectType.Shadow,
-                    Offset = new Vector2(1f),
-                    Radius = 10,
+                    Hollow = true,
+                    Radius = 2,
                 },
                 Children = new Drawable[]
                 {
@@ -108,7 +107,7 @@ namespace osu.Game.Screens.SelectV2
                             backgroundBorder = new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Colour = Color4.White,
+                                Colour = Color4.Black,
                             },
                             backgroundLayerHorizontalPadding = new Container
                             {
@@ -121,10 +120,6 @@ namespace osu.Game.Screens.SelectV2
                                     Children = new Drawable[]
                                     {
                                         backgroundGradient = new Box
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                        },
-                                        backgroundAccentGradient = new Box
                                         {
                                             RelativeSizeAxes = Axes.Both,
                                         },
@@ -158,10 +153,9 @@ namespace osu.Game.Screens.SelectV2
                     selectionLayer = new Box
                     {
                         Alpha = 0,
-                        Colour = ColourInfo.GradientHorizontal(colours.BlueDark.Opacity(0), colours.BlueDark.Opacity(0.6f)),
-                        Blending = BlendingParameters.Additive,
                         RelativeSizeAxes = Axes.Both,
-                        Width = 0.3f,
+                        Width = 0.6f,
+                        Blending = BlendingParameters.Additive,
                         Anchor = Anchor.TopRight,
                         Origin = Anchor.TopRight,
                     },
@@ -190,15 +184,15 @@ namespace osu.Game.Screens.SelectV2
         {
             base.LoadComplete();
 
-            Expanded.BindValueChanged(_ => updateDisplay(), true);
-
-            Selected.BindValueChanged(selected =>
+            Expanded.BindValueChanged(_ =>
             {
-                if (selected.NewValue)
-                    selectionLayer.FadeIn(100, Easing.OutQuint);
-                else
-                    selectionLayer.FadeOut(200, Easing.OutQuint);
+                updateSelectedState();
+                updateXOffset();
+            });
 
+            Selected.BindValueChanged(_ =>
+            {
+                updateSelectedState();
                 updateXOffset();
             }, true);
 
@@ -216,6 +210,9 @@ namespace osu.Game.Screens.SelectV2
         protected override void PrepareForUse()
         {
             base.PrepareForUse();
+
+            updateAccentColour();
+            updateXOffset();
 
             this.FadeIn(DURATION, Easing.OutQuint);
         }
@@ -236,18 +233,28 @@ namespace osu.Game.Screens.SelectV2
             return true;
         }
 
-        private void updateDisplay()
+        private void updateAccentColour()
         {
             var backgroundColour = accentColour ?? Color4.White;
+
+            backgroundBorder.Colour = backgroundColour;
+
+            selectionLayer.Colour = ColourInfo.GradientHorizontal(backgroundColour.Opacity(0), backgroundColour.Opacity(0.5f));
+
+            updateSelectedState(animated: false);
+        }
+
+        private void updateSelectedState(bool animated = true)
+        {
+            bool selectedOrExpanded = Expanded.Value || Selected.Value;
+
             var edgeEffectColour = accentColour ?? Color4Extensions.FromHex(@"4EBFFF");
+            TopLevelContent.FadeEdgeEffectTo(selectedOrExpanded ? edgeEffectColour.Opacity(0.8f) : Color4.Black.Opacity(0.4f), animated ? DURATION : 0, Easing.OutQuint);
 
-            backgroundAccentGradient.FadeColour(ColourInfo.GradientHorizontal(backgroundColour.Opacity(0.25f), backgroundColour.Opacity(0f)), DURATION, Easing.OutQuint);
-            backgroundBorder.FadeColour(backgroundColour, DURATION, Easing.OutQuint);
-
-            TopLevelContent.FadeEdgeEffectTo(Expanded.Value ? edgeEffectColour.Opacity(0.5f) : Color4.Black.Opacity(0.4f), DURATION, Easing.OutQuint);
-
-            updateXOffset();
-            updateHover();
+            if (selectedOrExpanded)
+                selectionLayer.FadeIn(100, Easing.OutQuint);
+            else
+                selectionLayer.FadeOut(200, Easing.OutQuint);
         }
 
         private void updateXOffset()
@@ -255,31 +262,28 @@ namespace osu.Game.Screens.SelectV2
             float x = PanelXOffset + corner_radius;
 
             if (!Expanded.Value && !Selected.Value)
-                x += active_x_offset;
+            {
+                if (this is PanelBeatmap)
+                    x += active_x_offset * 2;
+                else
+                    x += active_x_offset * 4;
+            }
 
             if (!KeyboardSelected.Value)
-                x += active_x_offset * 0.5f;
+                x += active_x_offset;
 
             TopLevelContent.MoveToX(x, DURATION, Easing.OutQuint);
         }
 
-        private void updateHover()
-        {
-            if (IsHovered)
-                hoverLayer.FadeIn(100, Easing.OutQuint);
-            else
-                hoverLayer.FadeOut(1000, Easing.OutQuint);
-        }
-
         protected override bool OnHover(HoverEvent e)
         {
-            updateHover();
+            hoverLayer.FadeIn(100, Easing.OutQuint);
             return true;
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            updateHover();
+            hoverLayer.FadeOut(1000, Easing.OutQuint);
             base.OnHoverLost(e);
         }
 

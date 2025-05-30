@@ -191,6 +191,58 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         }
 
         [Test]
+        public void TestSingleItemTraversal()
+        {
+            CheckNoSelection();
+            AddBeatmaps(1, 3);
+
+            WaitForSelection(0, 0);
+            CheckActivationCount(0);
+
+            SelectNextGroup();
+            WaitForSelection(0, 0);
+
+            // In the case of a grouped beatmap set, the header gets activated and re-selects the recommended difficulty.
+            // This is probably fine.
+            CheckActivationCount(1);
+            // We don't want it to request present though, which would start gameplay.
+            CheckRequestPresentCount(0);
+
+            SelectPrevGroup();
+            WaitForSelection(0, 0);
+
+            CheckActivationCount(1);
+            CheckRequestPresentCount(0);
+        }
+
+        [Test]
+        public void TestSingleItemTraversal_DifficultySplit()
+        {
+            SortBy(SortMode.Difficulty);
+
+            CheckNoSelection();
+            AddBeatmaps(1, 1);
+
+            WaitForSelection(0, 0);
+            CheckActivationCount(0);
+
+            SelectNextGroup();
+            WaitForSelection(0, 0);
+
+            // In the case of a grouped beatmap set, the header gets activated and re-selects the recommended difficulty.
+            // This is probably fine.
+            CheckActivationCount(0);
+            // We don't want it to request present though, which would start gameplay.
+            CheckRequestPresentCount(0);
+
+            SelectPrevGroup();
+            WaitForSelection(0, 0);
+
+            CheckActivationCount(0);
+            CheckRequestPresentCount(0);
+        }
+
+        [Test]
         public void TestEmptyTraversal()
         {
             SelectNextPanel();
@@ -243,7 +295,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddBeatmaps(2, 3);
             WaitForDrawablePanels();
 
-            SortAndGroupBy(SortMode.Difficulty, GroupMode.NoGrouping);
+            SortAndGroupBy(SortMode.Difficulty, GroupMode.None);
             WaitForFiltering();
 
             AddUntilStep("standalone panels displayed", () => GetVisiblePanels<PanelBeatmapStandalone>().Any());
