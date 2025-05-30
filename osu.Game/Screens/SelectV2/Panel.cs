@@ -26,7 +26,7 @@ namespace osu.Game.Screens.SelectV2
     {
         private const float corner_radius = 10;
 
-        private const float active_x_offset = 50f;
+        private const float active_x_offset = 25f;
 
         protected const float DURATION = 400;
 
@@ -34,7 +34,6 @@ namespace osu.Game.Screens.SelectV2
 
         private Box backgroundBorder = null!;
         private Box backgroundGradient = null!;
-        private Box backgroundAccentGradient = null!;
         private Container backgroundLayerHorizontalPadding = null!;
         private Container backgroundContainer = null!;
         private Container iconContainer = null!;
@@ -61,6 +60,7 @@ namespace osu.Game.Screens.SelectV2
 
         public Color4? AccentColour
         {
+            get => accentColour;
             set
             {
                 accentColour = value;
@@ -120,12 +120,6 @@ namespace osu.Game.Screens.SelectV2
                                     Children = new Drawable[]
                                     {
                                         backgroundGradient = new Box
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                        },
-                                        // TODO: this is only used by beatmap panels and should NOT be in this class.
-                                        // it's wasting fill rate.
-                                        backgroundAccentGradient = new Box
                                         {
                                             RelativeSizeAxes = Axes.Both,
                                         },
@@ -243,7 +237,6 @@ namespace osu.Game.Screens.SelectV2
         {
             var backgroundColour = accentColour ?? Color4.White;
 
-            backgroundAccentGradient.Colour = ColourInfo.GradientHorizontal(backgroundColour.Opacity(0.25f), backgroundColour.Opacity(0f));
             backgroundBorder.Colour = backgroundColour;
 
             selectionLayer.Colour = ColourInfo.GradientHorizontal(backgroundColour.Opacity(0), backgroundColour.Opacity(0.5f));
@@ -269,10 +262,15 @@ namespace osu.Game.Screens.SelectV2
             float x = PanelXOffset + corner_radius;
 
             if (!Expanded.Value && !Selected.Value)
-                x += active_x_offset;
+            {
+                if (this is PanelBeatmap)
+                    x += active_x_offset * 2;
+                else
+                    x += active_x_offset * 4;
+            }
 
             if (!KeyboardSelected.Value)
-                x += active_x_offset * 0.5f;
+                x += active_x_offset;
 
             TopLevelContent.MoveToX(x, DURATION, Easing.OutQuint);
         }

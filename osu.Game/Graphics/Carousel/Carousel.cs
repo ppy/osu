@@ -617,13 +617,13 @@ namespace osu.Game.Graphics.Carousel
             {
                 var item = carouselItems[i];
 
-                updateItemYPosition(item, ref lastVisible, ref yPos);
-
                 if (CheckModelEquality(item.Model, currentKeyboardSelection.Model!))
                     currentKeyboardSelection = new Selection(currentKeyboardSelection.Model, item, item.CarouselYPosition, i);
 
                 if (CheckModelEquality(item.Model, currentSelection.Model!))
                     currentSelection = new Selection(currentSelection.Model, item, item.CarouselYPosition, i);
+
+                updateItemYPosition(item, ref lastVisible, ref yPos);
             }
 
             // If a keyboard selection is currently made, we want to keep the view stable around the selection.
