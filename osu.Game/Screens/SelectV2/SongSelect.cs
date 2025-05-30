@@ -21,6 +21,7 @@ using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
+using osu.Game.Database;
 using osu.Game.Graphics.Carousel;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
@@ -70,15 +71,20 @@ namespace osu.Game.Screens.SelectV2
         /// </summary>
         protected bool ControlGlobalMusic { get; init; } = true;
 
-        private readonly ModSelectOverlay modSelectOverlay = new UserModSelectOverlay(OverlayColourScheme.Aquamarine)
+        // Colour scheme for mod overlay is left as default (green) to match mods button.
+        // Not sure about this, but we'll iterate based on feedback.
+        private readonly ModSelectOverlay modSelectOverlay = new UserModSelectOverlay
         {
             ShowPresets = true,
         };
 
         private ModSpeedHotkeyHandler modSpeedHotkeyHandler = null!;
 
+        // Blue is the most neutral choice, so I'm using that for now.
+        // Purple makes the most sense to match the "gameplay" flow, but it's a bit too strong for the current design.
+        // TODO: Colour scheme choice should probably be customisable by the user.
         [Cached]
-        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
+        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 
         private BeatmapCarousel carousel = null!;
 
@@ -148,7 +154,7 @@ namespace osu.Game.Screens.SelectV2
                                     {
                                         new Dimension(GridSizeMode.Relative, 0.5f, maxSize: 660),
                                         new Dimension(),
-                                        new Dimension(GridSizeMode.Relative, 0.5f, maxSize: 580),
+                                        new Dimension(GridSizeMode.Relative, 0.5f, maxSize: 620),
                                     },
                                     Content = new[]
                                     {
@@ -196,8 +202,13 @@ namespace osu.Game.Screens.SelectV2
                                             new Container
                                             {
                                                 RelativeSizeAxes = Axes.Both,
-                                                Children = new CompositeDrawable[]
+                                                Children = new Drawable[]
                                                 {
+                                                    new Box
+                                                    {
+                                                        Colour = ColourInfo.GradientHorizontal(Color4.Black.Opacity(0.0f), Color4.Black.Opacity(0.5f)),
+                                                        RelativeSizeAxes = Axes.Both,
+                                                    },
                                                     new Container
                                                     {
                                                         RelativeSizeAxes = Axes.Both,
@@ -218,7 +229,10 @@ namespace osu.Game.Screens.SelectV2
                                                                 RequestRecommendedSelection = selectRecommendedBeatmap,
                                                                 NewItemsPresented = newItemsPresented,
                                                             },
-                                                            noResultsPlaceholder = new NoResultsPlaceholder(),
+                                                            noResultsPlaceholder = new NoResultsPlaceholder
+                                                            {
+                                                                RequestClearFilterText = () => filterControl.Search(string.Empty)
+                                                            }
                                                         }
                                                     },
                                                     filterControl = new FilterControl
@@ -659,6 +673,12 @@ namespace osu.Game.Screens.SelectV2
 
         #region Beatmap management
 
+        [Resolved]
+        private ManageCollectionsDialog? manageCollectionsDialog { get; set; }
+
+        [Resolved]
+        private RealmAccess realm { get; set; } = null!;
+
         public virtual IEnumerable<OsuMenuItem> GetForwardActions(BeatmapInfo beatmap)
         {
             yield return new OsuMenuItem("Select", MenuItemType.Highlighted, () => SelectAndStart(beatmap))
@@ -675,6 +695,23 @@ namespace osu.Game.Screens.SelectV2
                 if (beatmap.GetOnlineURL(api, Ruleset.Value) is string url)
                     yield return new OsuMenuItem(CommonStrings.CopyLink, MenuItemType.Standard, () => (game as OsuGame)?.CopyToClipboard(url));
             }
+
+            yield return new OsuMenuItemSpacer();
+
+            foreach (var i in CreateCollectionMenuActions(beatmap))
+                yield return i;
+        }
+
+        protected IEnumerable<OsuMenuItem> CreateCollectionMenuActions(BeatmapInfo beatmap)
+        {
+            var collectionItems = realm.Realm.All<BeatmapCollection>()
+                                       .OrderBy(c => c.Name)
+                                       .AsEnumerable()
+                                       .Select(c => new CollectionToggleMenuItem(c.ToLive(realm), beatmap)).Cast<OsuMenuItem>().ToList();
+
+            collectionItems.Add(new OsuMenuItem("Manage...", MenuItemType.Standard, () => manageCollectionsDialog?.Show()));
+
+            yield return new OsuMenuItem("Collections") { Items = collectionItems };
         }
 
         public void ManageCollections() => collectionsDialog?.Show();
