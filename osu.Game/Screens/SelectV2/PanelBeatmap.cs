@@ -252,12 +252,10 @@ namespace osu.Game.Screens.SelectV2
             var beatmap = (BeatmapInfo)Item.Model;
 
             starDifficultyBindable = difficultyCache.GetBindableDifficulty(beatmap, starDifficultyCancellationSource.Token, SongSelect.SELECTION_DEBOUNCE);
-            starDifficultyBindable.BindValueChanged(_ =>
+            starDifficultyBindable.BindValueChanged(starDifficulty =>
             {
-                var starDifficulty = starDifficultyBindable?.Value ?? default;
-
-                starRatingDisplay.Current.Value = starDifficulty;
-                starCounter.Current = (float)starDifficulty.Stars;
+                starRatingDisplay.Current.Value = starDifficulty.NewValue;
+                starCounter.Current = (float)starDifficulty.NewValue.Stars;
             }, true);
         }
 
