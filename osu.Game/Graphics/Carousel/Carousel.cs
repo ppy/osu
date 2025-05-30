@@ -12,6 +12,7 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Caching;
+using osu.Framework.Development;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -309,16 +310,17 @@ namespace osu.Game.Graphics.Carousel
             var cts = new CancellationTokenSource();
 
             var previousCancellationSource = Interlocked.Exchange(ref cancellationSource, cts);
-            await previousCancellationSource.CancelAsync().ConfigureAwait(false);
+            await previousCancellationSource.CancelAsync().ConfigureAwait(true);
 
             if (DebounceDelay > 0)
             {
                 log($"Filter operation queued, waiting for {DebounceDelay} ms debounce");
-                await Task.Delay(DebounceDelay, cts.Token).ConfigureAwait(false);
+                await Task.Delay(DebounceDelay, cts.Token).ConfigureAwait(true);
             }
 
             // Copy must be performed on update thread for now (see ConfigureAwait above).
             // Could potentially be optimised in the future if it becomes an issue.
+            Debug.Assert(ThreadSafety.IsUpdateThread);
             List<CarouselItem> items = new List<CarouselItem>(Items.Select(m => new CarouselItem(m)));
 
             await Task.Run(async () =>

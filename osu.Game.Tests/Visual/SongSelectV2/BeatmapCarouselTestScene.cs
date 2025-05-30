@@ -409,10 +409,10 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             protected override async Task<IEnumerable<CarouselItem>> FilterAsync(bool clearExistingPanels = false)
             {
-                var items = await base.FilterAsync(clearExistingPanels);
+                var items = await base.FilterAsync(clearExistingPanels).ConfigureAwait(true);
 
                 if (FilterDelay != 0)
-                    await Task.Delay(FilterDelay);
+                    await Task.Delay(FilterDelay).ConfigureAwait(true);
 
                 PostFilterBeatmaps = items.Select(i => i.Model).OfType<BeatmapInfo>();
                 return items;
