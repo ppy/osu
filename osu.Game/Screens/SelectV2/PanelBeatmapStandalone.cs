@@ -248,6 +248,7 @@ namespace osu.Game.Screens.SelectV2
             difficultyLine.Show();
 
             computeStarRating();
+            updateKeyCount();
         }
 
         protected override void FreeAfterUse()
