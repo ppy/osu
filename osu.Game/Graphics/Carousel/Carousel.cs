@@ -706,14 +706,6 @@ namespace osu.Game.Graphics.Carousel
                 selectionValid.Validate();
             }
 
-            if (!scrollToSelection.IsValid)
-            {
-                if (currentKeyboardSelection.YPosition != null)
-                    Scroll.ScrollTo(currentKeyboardSelection.YPosition.Value - visibleHalfHeight + BleedTop);
-
-                scrollToSelection.Validate();
-            }
-
             var range = getDisplayRange();
 
             if (range != displayedRange)
@@ -749,6 +741,19 @@ namespace osu.Game.Graphics.Carousel
 
             if (!filterAfterItemsChanged.IsValid && !IsFiltering)
                 FilterAsync();
+        }
+
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+
+            if (!scrollToSelection.IsValid)
+            {
+                if (currentKeyboardSelection.YPosition != null)
+                    Scroll.ScrollTo(currentKeyboardSelection.YPosition.Value - visibleHalfHeight + BleedTop);
+
+                scrollToSelection.Validate();
+            }
         }
 
         protected virtual float GetPanelXOffset(Drawable panel)
