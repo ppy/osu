@@ -130,6 +130,7 @@ namespace osu.Game.Screens.SelectV2
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
                         Direction = FillDirection.Vertical,
+                        Padding = new MarginPadding { Bottom = 2 },
                         AutoSizeAxes = Axes.Both,
                         Children = new Drawable[]
                         {
