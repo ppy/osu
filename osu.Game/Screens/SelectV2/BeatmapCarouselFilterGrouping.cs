@@ -199,21 +199,19 @@ namespace osu.Game.Screens.SelectV2
                         return defineGroupByLength(length);
                     }, items);
 
-                case GroupMode.Collections:
-                    // TODO: needs implementation
-                    goto case GroupMode.None;
-
-                case GroupMode.Favourites:
-                    // TODO: needs implementation
-                    goto case GroupMode.None;
-
-                case GroupMode.MyMaps:
-                    // TODO: needs implementation
-                    goto case GroupMode.None;
-
-                case GroupMode.RankAchieved:
-                    // TODO: needs implementation
-                    goto case GroupMode.None;
+                // TODO: need implementation
+                //
+                // case GroupMode.Collections:
+                //     goto case GroupMode.None;
+                //
+                // case GroupMode.Favourites:
+                //     goto case GroupMode.None;
+                //
+                // case GroupMode.MyMaps:
+                //     goto case GroupMode.None;
+                //
+                // case GroupMode.RankAchieved:
+                //     goto case GroupMode.None;
 
                 default:
                     throw new ArgumentOutOfRangeException();

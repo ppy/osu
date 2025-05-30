@@ -19,8 +19,8 @@ namespace osu.Game.Screens.Select.Filter
         [Description("BPM")]
         BPM,
 
-        [Description("Collections")]
-        Collections,
+        // [Description("Collections")]
+        // Collections,
 
         [Description("Date Added")]
         DateAdded,
@@ -31,17 +31,17 @@ namespace osu.Game.Screens.Select.Filter
         [Description("Difficulty")]
         Difficulty,
 
-        [Description("Favourites")]
-        Favourites,
+        // [Description("Favourites")]
+        // Favourites,
 
         [Description("Length")]
         Length,
 
-        [Description("My Maps")]
-        MyMaps,
+        // [Description("My Maps")]
+        // MyMaps,
 
-        [Description("Rank Achieved")]
-        RankAchieved,
+        // [Description("Rank Achieved")]
+        // RankAchieved,
 
         [Description("Ranked Status")]
         RankedStatus,
