@@ -133,17 +133,25 @@ namespace osu.Game.IO.Serialization.Converters
 
         private static bool tryGetListItemType(Type objectType, [MaybeNullWhen(false)] out Type itemType)
         {
-            if (objectType.IsInterface && objectType.IsGenericType && objectType.GetGenericTypeDefinition() == typeof(IReadOnlyList<>))
+            if (objectType.IsInterface && isListType(objectType))
             {
                 itemType = objectType.GenericTypeArguments[0];
                 return true;
             }
 
-            var listType = objectType.GetInterfaces()
-                                     .FirstOrDefault(it => it.IsGenericType && it.GetGenericTypeDefinition() == typeof(IReadOnlyList<>));
+            var listType = objectType.GetInterfaces().FirstOrDefault(isListType);
 
             itemType = listType?.GenericTypeArguments.FirstOrDefault();
             return itemType != null;
+
+            bool isListType(Type type)
+            {
+                if (!type.IsGenericType)
+                    return false;
+
+                var genericTypeDefinition = type.GetGenericTypeDefinition();
+                return genericTypeDefinition == typeof(IReadOnlyList<>) || genericTypeDefinition == typeof(IList<>);
+            }
         }
     }
 }
