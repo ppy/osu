@@ -530,6 +530,10 @@ namespace osu.Game.Graphics.Carousel
             do
             {
                 newIndex = (newIndex + direction + carouselItems.Count) % carouselItems.Count;
+
+                if (newIndex == originalIndex)
+                    break;
+
                 var newItem = carouselItems[newIndex];
 
                 if (CheckValidForGroupSelection(newItem))
@@ -537,7 +541,7 @@ namespace osu.Game.Graphics.Carousel
                     HandleItemActivated(newItem);
                     return;
                 }
-            } while (newIndex != originalIndex);
+            } while (true);
         }
 
         #endregion
