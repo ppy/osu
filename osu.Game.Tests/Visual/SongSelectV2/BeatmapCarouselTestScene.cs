@@ -149,6 +149,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                         TextAnchor = Anchor.CentreLeft,
                     },
                 };
+
+                Carousel.Filter(new FilterCriteria());
             });
 
             // Prefer title sorting so that order of carousel panels match order of BeatmapSets bindable.
@@ -171,7 +173,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         {
             AddStep(description, () =>
             {
-                var criteria = Carousel.Criteria;
+                var criteria = Carousel.Criteria ?? new FilterCriteria();
                 apply?.Invoke(criteria);
                 Carousel.Filter(criteria);
             });

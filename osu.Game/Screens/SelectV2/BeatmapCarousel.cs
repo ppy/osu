@@ -50,8 +50,6 @@ namespace osu.Game.Screens.SelectV2
         private readonly BeatmapCarouselFilterMatching matching;
         private readonly BeatmapCarouselFilterGrouping grouping;
 
-        private bool waitingForInitialCriteria;
-
         /// <summary>
         /// Total number of beatmap difficulties displayed with the filter.
         /// </summary>
@@ -70,18 +68,16 @@ namespace osu.Game.Screens.SelectV2
             return -SPACING;
         }
 
-        public BeatmapCarousel(bool waitForInitialCriteria = false)
+        public BeatmapCarousel()
         {
-            waitingForInitialCriteria = waitForInitialCriteria;
-
             DebounceDelay = 100;
             DistanceOffscreenToPreload = 100;
 
             Filters = new ICarouselFilter[]
             {
-                matching = new BeatmapCarouselFilterMatching(() => Criteria),
-                new BeatmapCarouselFilterSorting(() => Criteria),
-                grouping = new BeatmapCarouselFilterGrouping(() => Criteria),
+                matching = new BeatmapCarouselFilterMatching(() => Criteria!),
+                new BeatmapCarouselFilterSorting(() => Criteria!),
+                grouping = new BeatmapCarouselFilterGrouping(() => Criteria!),
             };
 
             AddInternal(loading = new LoadingLayer());
@@ -472,14 +468,12 @@ namespace osu.Game.Screens.SelectV2
 
         #region Filtering
 
-        public FilterCriteria Criteria { get; private set; } = new FilterCriteria();
+        public FilterCriteria? Criteria { get; private set; }
 
         private ScheduledDelegate? loadingDebounce;
 
         public void Filter(FilterCriteria criteria)
         {
-            waitingForInitialCriteria = false;
-
             bool resetDisplay = grouping.BeatmapSetsGroupedTogether != BeatmapCarouselFilterGrouping.ShouldGroupBeatmapsTogether(criteria);
 
             Criteria = criteria;
@@ -502,7 +496,7 @@ namespace osu.Game.Screens.SelectV2
 
         protected override Task<IEnumerable<CarouselItem>> FilterAsync(bool clearExistingPanels = false)
         {
-            if (waitingForInitialCriteria)
+            if (Criteria == null)
                 return Task.FromResult(Enumerable.Empty<CarouselItem>());
 
             return base.FilterAsync(clearExistingPanels);
