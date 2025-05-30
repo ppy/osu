@@ -17,7 +17,6 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
-using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Select;
@@ -142,9 +141,9 @@ namespace osu.Game.Screens.SelectV2
                             RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
                             ColumnDimensions = new[]
                             {
-                                new Dimension(maxSize: 210),
+                                new Dimension(maxSize: 180),
                                 new Dimension(GridSizeMode.Absolute, 5),
-                                new Dimension(maxSize: 230),
+                                new Dimension(maxSize: 180),
                                 new Dimension(GridSizeMode.Absolute, 5),
                                 new Dimension(),
                             },
@@ -152,14 +151,14 @@ namespace osu.Game.Screens.SelectV2
                             {
                                 new[]
                                 {
-                                    sortDropdown = new ShearedDropdown<SortMode>(SortStrings.Default)
+                                    sortDropdown = new ShearedDropdown<SortMode>("Sort")
                                     {
                                         RelativeSizeAxes = Axes.X,
                                         Items = Enum.GetValues<SortMode>(),
                                     },
                                     Empty(),
                                     // todo: pending localisation
-                                    groupDropdown = new ShearedDropdown<GroupMode>("Group by")
+                                    groupDropdown = new ShearedDropdown<GroupMode>("Group")
                                     {
                                         RelativeSizeAxes = Axes.X,
                                         Items = Enum.GetValues<GroupMode>(),
