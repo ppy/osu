@@ -173,6 +173,7 @@ namespace osu.Game.Screens.Footer
             temporarilyHiddenButtons.Clear();
             overlays.Clear();
 
+            this.HidePopover();
             clearActiveOverlayContainer();
 
             var oldButtons = buttonsFlow.ToArray();
