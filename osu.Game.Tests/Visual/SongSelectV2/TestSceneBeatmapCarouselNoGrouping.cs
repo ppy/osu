@@ -266,8 +266,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             AddAssert("no beatmaps visible", () => !GetVisiblePanels<PanelBeatmap>().Any());
 
-            // Clicks just above the first group panel should not actuate any action.
-            ClickVisiblePanelWithOffset<PanelBeatmapSet>(0, new Vector2(0, -(PanelBeatmapSet.HEIGHT / 2 + 1)));
+            ClickVisiblePanelWithOffset<PanelBeatmapSet>(0, new Vector2(0, -(PanelBeatmapSet.HEIGHT / 2 + BeatmapCarousel.SPACING + 1)));
 
             AddAssert("no beatmaps visible", () => !GetVisiblePanels<PanelBeatmap>().Any());
 
