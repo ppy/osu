@@ -43,7 +43,7 @@ namespace osu.Game.IO.Serialization.Converters
         public override object ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
         {
             if (!tryGetListItemType(objectType, out var itemType))
-                throw new JsonSerializationException($"May not use {nameof(TypedListConverter)} on a type that does not implement {typeof(IReadOnlyList<>).Name}");
+                throw new JsonException($"May not use {nameof(TypedListConverter)} on a type that does not implement {typeof(IReadOnlyList<>).Name}");
 
             IList list = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(itemType))!;
 
