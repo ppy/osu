@@ -114,12 +114,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 );
 
             double multiplier = CalculateDifficultyMultiplier(mods, totalHits, spinnerCount);
+            double starRating = calculateStarRating(basePerformance, multiplier);
 
-            double starRating = basePerformance > 0.00001
-                ? Math.Cbrt(multiplier) * star_rating_multiplier * (Math.Cbrt(100000 / Math.Pow(2, 1 / 1.1) * basePerformance) + 4)
-                : 0;
-
-            double sliderNestedScorePerObject = LegacyScoreUtils.CalculateSliderNestedScorePerObject(beatmap, totalHits);
+            double sliderNestedScorePerObject = LegacyScoreUtils.CalculateNestedScorePerObject(beatmap, totalHits);
             double legacyScoreBaseMultiplier = LegacyScoreUtils.CalculateDifficultyPeppyStars(beatmap);
 
             var simulator = new OsuLegacyScoreSimulator();
@@ -146,7 +143,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 HitCircleCount = hitCircleCount,
                 SliderCount = sliderCount,
                 SpinnerCount = spinnerCount,
-                SliderNestedScorePerObject = sliderNestedScorePerObject,
+                NestedScorePerObject = sliderNestedScorePerObject,
                 LegacyScoreBaseMultiplier = legacyScoreBaseMultiplier,
                 MaximumLegacyComboScore = scoreAttributes.ComboScore
             };
@@ -159,7 +156,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (mods.Any(m => m is OsuModAutopilot))
                 return 0;
 
-            double aimRating = Math.Sqrt(aimDifficultyValue) * difficulty_multiplier;
+            double aimRating = calculateDifficultyRating(aimDifficultyValue);
 
             if (mods.Any(m => m is OsuModTouchDevice))
                 aimRating = Math.Pow(aimRating, 0.8);
@@ -186,7 +183,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (mods.Any(m => m is OsuModRelax))
                 return 0;
 
-            double speedRating = Math.Sqrt(speedDifficultyValue) * difficulty_multiplier;
+            double speedRating = calculateDifficultyRating(speedDifficultyValue);
 
             if (mods.Any(m => m is OsuModAutopilot))
                 speedRating *= 0.5;
@@ -207,7 +204,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double computeReadingRating(double readingDifficultyValue, Mod[] mods, double overallDifficulty)
         {
-            double readingRating = Math.Sqrt(readingDifficultyValue) * difficulty_multiplier;
+            double readingRating = calculateDifficultyRating(readingDifficultyValue);
 
             if (mods.Any(m => m is OsuModTouchDevice))
                 readingRating = Math.Pow(readingRating, 0.8);
@@ -236,7 +233,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (!mods.Any(m => m is OsuModFlashlight))
                 return 0;
 
-            double flashlightRating = Math.Sqrt(flashlightDifficultyValue) * difficulty_multiplier;
+            double flashlightRating = calculateDifficultyRating(flashlightDifficultyValue);
 
             if (mods.Any(m => m is OsuModTouchDevice))
                 flashlightRating = Math.Pow(flashlightRating, 0.8);
@@ -263,6 +260,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             return flashlightRating * Math.Sqrt(ratingMultiplier);
         }
+
+        private static double calculateStarRating(double basePerformance, double multiplier)
+        {
+            if (basePerformance <= 0.00001)
+                return 0;
+
+            return Math.Cbrt(multiplier) * star_rating_multiplier * (Math.Cbrt(100000 / Math.Pow(2, 1 / 1.1) * basePerformance) + 4);
+        }
+
+        private static double calculateDifficultyRating(double difficultyValue) => Math.Sqrt(difficultyValue) * difficulty_multiplier;
 
         protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
         {

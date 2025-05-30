@@ -84,8 +84,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         [JsonProperty("reading_difficult_note_count")]
         public double ReadingDifficultNoteCount { get; set; }
 
-        [JsonProperty("slider_nested_score_per_object")]
-        public double SliderNestedScorePerObject { get; set; }
+        [JsonProperty("nested_score_per_object")]
+        public double NestedScorePerObject { get; set; }
 
         [JsonProperty("legacy_score_base_multiplier")]
         public double LegacyScoreBaseMultiplier { get; set; }
@@ -133,7 +133,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             yield return (ATTRIB_ID_AIM_DIFFICULT_SLIDER_COUNT, AimDifficultSliderCount);
             yield return (ATTRIB_ID_AIM_TOP_WEIGHTED_SLIDER_FACTOR, AimTopWeightedSliderFactor);
             yield return (ATTRIB_ID_SPEED_TOP_WEIGHTED_SLIDER_FACTOR, SpeedTopWeightedSliderFactor);
-            yield return (ATTRIB_ID_SLIDER_NESTED_SCORE_PER_OBJECT, SliderNestedScorePerObject);
+            yield return (ATTRIB_ID_NESTED_SCORE_PER_OBJECT, NestedScorePerObject);
             yield return (ATTRIB_ID_LEGACY_SCORE_BASE_MULTIPLIER, LegacyScoreBaseMultiplier);
             yield return (ATTRIB_ID_MAXIMUM_LEGACY_COMBO_SCORE, MaximumLegacyComboScore);
         }
@@ -153,7 +153,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             AimDifficultSliderCount = values[ATTRIB_ID_AIM_DIFFICULT_SLIDER_COUNT];
             AimTopWeightedSliderFactor = values[ATTRIB_ID_AIM_TOP_WEIGHTED_SLIDER_FACTOR];
             SpeedTopWeightedSliderFactor = values[ATTRIB_ID_SPEED_TOP_WEIGHTED_SLIDER_FACTOR];
-            SliderNestedScorePerObject = values[ATTRIB_ID_SLIDER_NESTED_SCORE_PER_OBJECT];
+            NestedScorePerObject = values[ATTRIB_ID_NESTED_SCORE_PER_OBJECT];
             LegacyScoreBaseMultiplier = values[ATTRIB_ID_LEGACY_SCORE_BASE_MULTIPLIER];
             MaximumLegacyComboScore = values[ATTRIB_ID_MAXIMUM_LEGACY_COMBO_SCORE];
             DrainRate = onlineInfo.DrainRate;

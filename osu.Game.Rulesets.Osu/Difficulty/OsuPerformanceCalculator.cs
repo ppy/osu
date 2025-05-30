@@ -328,8 +328,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (effectiveMissCount > 0)
             {
-                double readingEstimatedSliderBreaks = calculateEstimatedSliderBreaks(attributes.AimTopWeightedSliderFactor, attributes);
-                readingValue *= calculateMissPenalty(effectiveMissCount + readingEstimatedSliderBreaks, attributes.ReadingDifficultNoteCount);
+                readingValue *= calculateMissPenalty(effectiveMissCount + aimEstimatedSliderBreaks, attributes.ReadingDifficultNoteCount);
             }
 
             // Scale the reading value with accuracy _harshly_.
