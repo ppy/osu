@@ -165,7 +165,7 @@ namespace osu.Game.Screens.SelectV2
                             Colour = colourProvider.Background4,
                             Font = OsuFont.Style.Caption1.With(weight: FontWeight.Bold),
                         },
-                        new HoverClickSounds(HoverSampleSet.Button),
+                        new HoverClickSounds(),
                     };
                 }
 
