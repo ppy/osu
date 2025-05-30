@@ -641,6 +641,10 @@ namespace osu.Game.Graphics.Carousel
                 updateItemYPosition(item, ref lastVisible, ref yPos);
             }
 
+            // Update the total height of all items (to make the scroll container scrollable through the full height even though
+            // most items are not displayed / loaded).
+            Scroll.SetLayoutHeight(yPos + visibleHalfHeight);
+
             // If a keyboard selection is currently made, we want to keep the view stable around the selection.
             // That means that we should offset the immediate scroll position by any change in Y position for the selection.
             if (prevKeyboard.YPosition != null && currentKeyboardSelection.YPosition != null && currentKeyboardSelection.YPosition != prevKeyboard.YPosition)
@@ -864,16 +868,6 @@ namespace osu.Game.Graphics.Carousel
                     }
                 }
             }
-
-            // Update the total height of all items (to make the scroll container scrollable through the full height even though
-            // most items are not displayed / loaded).
-            if (carouselItems.Count > 0)
-            {
-                var lastItem = carouselItems[^1];
-                Scroll.SetLayoutHeight((float)(lastItem.CarouselYPosition + lastItem.DrawHeight + visibleHalfHeight));
-            }
-            else
-                Scroll.SetLayoutHeight(0);
         }
 
         private void expirePanel(Drawable panel)
