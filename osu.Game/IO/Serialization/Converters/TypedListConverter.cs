@@ -93,10 +93,10 @@ namespace osu.Game.IO.Serialization.Converters
                 return;
             }
 
+            var list = (IEnumerable)value;
+
             var lookupTable = new List<string>();
             var objects = new List<JObject>();
-
-            var list = (IEnumerable)value;
 
             foreach (object item in list)
             {
