@@ -93,7 +93,7 @@ namespace osu.Game.Screens.SelectV2
             Icon = difficultyIcon = new ConstrainedIconContainer
             {
                 Size = new Vector2(9f),
-                Margin = new MarginPadding { Horizontal = 1.5f },
+                Margin = new MarginPadding { Left = 2.5f, Right = 1.5f },
                 Colour = colourProvider.Background5,
             };
 
