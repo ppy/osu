@@ -74,8 +74,6 @@ namespace osu.Game.IO.Serialization.Converters
                 if (!type.IsAssignableTo(itemType))
                     continue;
 
-                tok.ToObject(type, serializer);
-
                 object instance = Activator.CreateInstance(type)!;
                 serializer.Populate(itemReader, instance);
 
