@@ -129,33 +129,6 @@ namespace osu.Game.Screens.SelectV2
                         new FillFlowContainer
                         {
                             Direction = FillDirection.Horizontal,
-                            Spacing = new Vector2(3, 0),
-                            AutoSizeAxes = Axes.Both,
-                            Children = new Drawable[]
-                            {
-                                localRank = new PanelLocalRankDisplay
-                                {
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft,
-                                    Scale = new Vector2(0.65f)
-                                },
-                                starRatingDisplay = new StarRatingDisplay(default, StarRatingDisplaySize.Small, animated: true)
-                                {
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft,
-                                    Scale = new Vector2(0.875f),
-                                },
-                                starCounter = new StarCounter
-                                {
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft,
-                                    Scale = new Vector2(0.4f)
-                                }
-                            }
-                        },
-                        new FillFlowContainer
-                        {
-                            Direction = FillDirection.Horizontal,
                             AutoSizeAxes = Axes.Both,
                             Children = new[]
                             {
@@ -181,7 +154,34 @@ namespace osu.Game.Screens.SelectV2
                                     Origin = Anchor.BottomLeft
                                 }
                             }
-                        }
+                        },
+                        new FillFlowContainer
+                        {
+                            Direction = FillDirection.Horizontal,
+                            Spacing = new Vector2(3, 0),
+                            AutoSizeAxes = Axes.Both,
+                            Children = new Drawable[]
+                            {
+                                localRank = new PanelLocalRankDisplay
+                                {
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
+                                    Scale = new Vector2(0.65f)
+                                },
+                                starRatingDisplay = new StarRatingDisplay(default, StarRatingDisplaySize.Small, animated: true)
+                                {
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
+                                    Scale = new Vector2(0.875f),
+                                },
+                                starCounter = new StarCounter
+                                {
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
+                                    Scale = new Vector2(0.4f)
+                                }
+                            }
+                        },
                     }
                 },
             };
