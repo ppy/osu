@@ -97,10 +97,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// </summary>
         public virtual double CountTopWeightedNotes()
         {
-            if (noteDifficulties.Count == 0 || noteWeights.Sum() == 0)
+            if (noteDifficulties.Count == 0)
                 return 0.0;
 
             double consistentTopNote = DifficultyValue() / noteWeights.Sum(); // What would the top note be if all note values were identical
+
+            if (noteWeights.Sum() == 0)
+                return 0.0;
 
             if (consistentTopNote == 0)
                 return noteDifficulties.Count;
