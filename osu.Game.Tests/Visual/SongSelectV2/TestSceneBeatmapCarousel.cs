@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Testing;
+using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Screens.Select.Filter;
@@ -92,6 +93,25 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                     BeatmapSets.Add(set);
                 }
             });
+        }
+
+        [Test]
+        public void TestHighChurnUpdatesStillShowsPanels()
+        {
+            ScheduledDelegate updateTask = null!;
+
+            AddBeatmaps(1, 1);
+
+            AddStep("start constantly updating beatmap in background", () =>
+            {
+                updateTask = Scheduler.AddDelayed(() => { BeatmapSets.ReplaceRange(0, 1, [BeatmapSets.First()]); }, 1, true);
+            });
+
+            CreateCarousel();
+
+            AddUntilStep("panels loaded", () => Carousel.ChildrenOfType<Panel>(), () => Is.Not.Empty);
+
+            AddStep("end task", () => updateTask.Cancel());
         }
 
         [Test]
