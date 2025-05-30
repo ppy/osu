@@ -548,8 +548,11 @@ namespace osu.Game.Screens.SelectV2
 
         private void criteriaChanged(FilterCriteria criteria)
         {
+            // The first filter needs to be applied immediately as this triggers the initial carousel load.
+            double filterDelay = filterDebounce == null ? 0 : filter_delay;
+
             filterDebounce?.Cancel();
-            filterDebounce = Scheduler.AddDelayed(() => { carousel.Filter(criteria); }, filter_delay);
+            filterDebounce = Scheduler.AddDelayed(() => { carousel.Filter(criteria); }, filterDelay);
         }
 
         private void newItemsPresented(IEnumerable<CarouselItem> carouselItems)
