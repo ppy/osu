@@ -201,8 +201,13 @@ namespace osu.Game.Screens.SelectV2
                                             new Container
                                             {
                                                 RelativeSizeAxes = Axes.Both,
-                                                Children = new CompositeDrawable[]
+                                                Children = new Drawable[]
                                                 {
+                                                    new Box
+                                                    {
+                                                        Colour = ColourInfo.GradientHorizontal(Color4.Black.Opacity(0.0f), Color4.Black.Opacity(0.5f)),
+                                                        RelativeSizeAxes = Axes.Both,
+                                                    },
                                                     new Container
                                                     {
                                                         RelativeSizeAxes = Axes.Both,
