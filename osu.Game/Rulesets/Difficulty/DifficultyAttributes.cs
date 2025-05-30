@@ -28,11 +28,15 @@ namespace osu.Game.Rulesets.Difficulty
         protected const int ATTRIB_ID_AIM_DIFFICULT_SLIDER_COUNT = 31;
         protected const int ATTRIB_ID_AIM_TOP_WEIGHTED_SLIDER_FACTOR = 33;
         protected const int ATTRIB_ID_SPEED_TOP_WEIGHTED_SLIDER_FACTOR = 35;
-        protected const int ATTRIB_ID_SLIDER_NESTED_SCORE_PER_OBJECT = 37;
+        protected const int ATTRIB_ID_NESTED_SCORE_PER_OBJECT = 37;
         protected const int ATTRIB_ID_LEGACY_SCORE_BASE_MULTIPLIER = 39;
         protected const int ATTRIB_ID_MAXIMUM_LEGACY_COMBO_SCORE = 41;
-        protected const int ATTRIB_ID_SNAP_AIM_DIFFICULTY = 43;
-        protected const int ATTRIB_ID_FLOW_AIM_DIFFICULTY = 45;
+        protected const int ATTRIB_ID_MECHANICAL_DIFFICULTY = 43;
+        protected const int ATTRIB_ID_RHYTHM_DIFFICULTY = 45;
+        protected const int ATTRIB_ID_READING_DIFFICULTY = 47;
+        protected const int ATTRIB_ID_CONSISTENCY_FACTOR = 49;
+        protected const int ATTRIB_ID_SNAP_AIM_DIFFICULTY = 51;
+        protected const int ATTRIB_ID_FLOW_AIM_DIFFICULTY = 53;
 
         /// <summary>
         /// The mods which were applied to the beatmap.
