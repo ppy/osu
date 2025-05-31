@@ -373,6 +373,18 @@ namespace osu.Game.Screens.SelectV2
         #region Selection handling
 
         /// <summary>
+        /// Finalises selection on the given <see cref="BeatmapInfo"/>.
+        /// </summary>
+        public void SelectAndStart(BeatmapInfo beatmap)
+        {
+            if (!this.IsCurrentScreen())
+                return;
+
+            Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap);
+            OnStart();
+        }
+
+        /// <summary>
         /// Immediately flush any pending selection. Should be run before performing final actions such as leaving the screen.
         /// </summary>
         protected void FinaliseSelection()
@@ -558,12 +570,6 @@ namespace osu.Game.Screens.SelectV2
 
         private ScheduledDelegate? filterDebounce;
 
-        /// <summary>
-        /// Set the query to the search text box.
-        /// </summary>
-        /// <param name="query">The string to search.</param>
-        public void Search(string query) => filterControl.Search(query);
-
         private void criteriaChanged(FilterCriteria criteria)
         {
             // The first filter needs to be applied immediately as this triggers the initial carousel load.
@@ -660,11 +666,11 @@ namespace osu.Game.Screens.SelectV2
 
         #endregion
 
-        /// <summary>
-        /// Opens results screen with the given score.
-        /// This assumes active beatmap and ruleset selection matches the score.
-        /// </summary>
-        public void PresentScore(ScoreInfo score)
+        #region Implementation of ISongSelect
+
+        void ISongSelect.Search(string query) => filterControl.Search(query);
+
+        void ISongSelect.PresentScore(ScoreInfo score)
         {
             Debug.Assert(Beatmap.Value.BeatmapInfo.Equals(score.BeatmapInfo));
             Debug.Assert(Ruleset.Value.Equals(score.Ruleset));
@@ -672,17 +678,7 @@ namespace osu.Game.Screens.SelectV2
             this.Push(new SoloResultsScreen(score));
         }
 
-        /// <summary>
-        /// Finalises selection on the given <see cref="BeatmapInfo"/>.
-        /// </summary>
-        public void SelectAndStart(BeatmapInfo beatmap)
-        {
-            if (!this.IsCurrentScreen())
-                return;
-
-            Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap);
-            OnStart();
-        }
+        #endregion
 
         #region Beatmap management
 

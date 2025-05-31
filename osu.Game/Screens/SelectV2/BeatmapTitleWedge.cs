@@ -64,7 +64,7 @@ namespace osu.Game.Screens.SelectV2
         private Statistic bpmStatistic = null!;
 
         [Resolved]
-        private SongSelect? songSelect { get; set; }
+        private ISongSelect? songSelect { get; set; }
 
         [Resolved]
         private LocalisationManager localisation { get; set; } = null!;
