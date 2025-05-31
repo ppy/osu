@@ -194,7 +194,7 @@ namespace osu.Game.Screens.SelectV2
             public partial class TagsOverflowPopover : OsuPopover
             {
                 private readonly string[] tags;
-                private readonly SongSelect? songSelect;
+                private readonly ISongSelect? songSelect;
 
                 public TagsOverflowPopover(string[] tags, SongSelect? songSelect)
                 {
