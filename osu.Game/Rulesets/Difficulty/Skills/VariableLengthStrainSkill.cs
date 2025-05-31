@@ -10,8 +10,8 @@ using osu.Game.Rulesets.Mods;
 namespace osu.Game.Rulesets.Difficulty.Skills
 {
     /// <summary>
-    /// Used to processes strain values of <see cref="DifficultyHitObject"/>s, keep track of strain levels caused by the processed objects
-    /// and to calculate a final difficulty value representing the difficulty of hitting all the processed objects.
+    /// Similar to <see cref="StrainSkill"/>, but instead of strains having a fixed length, strains can be any length.
+    /// A new <see cref="Strain"/> is created for each <see cref="DifficultyHitObject"/>.
     /// </summary>
     public abstract class VariableLengthStrainSkill : Skill
     {
@@ -21,13 +21,16 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         protected virtual double DecayWeight => 0.9;
 
         /// <summary>
-        /// The length of each strain section.
+        /// The maximum length of each strain section.
         /// </summary>
         protected virtual int MaxSectionLength => 400;
 
         private double currentSectionPeak; // We also keep track of the peak strain level in the current section.
         private double currentSectionBegin;
 
+        /// <summary>
+        /// Used to store the difficulty of a section of a map.
+        /// </summary>
         public struct Strain : IComparable<Strain>
         {
             public Strain(double value, double sectionLength)
@@ -80,6 +83,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             double strain = StrainValueAt(current);
             currentSectionPeak = Math.Max(strain, currentSectionPeak);
 
+            // End the current strain, and create a new strain starting at the current hitobject
             if (current.Index > 0)
             {
                 saveCurrentPeak(deltaTime);
@@ -155,12 +159,18 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             // These sections will not contribute to the difficulty.
             var peaks = GetCurrentStrainPeaks().Where(p => p.Value > 0);
 
+            List<Strain> strains = peaks.OrderByDescending(p => (p.Value, p.SectionLength)).ToList();
+
+            // Time is measured in units of strains
+            double time = 0;
+
             // Difficulty is the weighted sum of the highest strains from every section.
             // We're sorting from highest to lowest strain.
-            foreach (Strain strain in peaks.OrderByDescending(p => (p.Value, p.SectionLength)))
+            for (int i = 0; i < strains.Count; i++)
             {
-                difficulty += strain.Value * weight;
-                weight *= DecayWeight;
+                difficulty += strains[i].Value * weight * strains[i].SectionLength / MaxSectionLength;
+                time += strains[i].SectionLength / MaxSectionLength;
+                weight = Math.Pow(DecayWeight, time);
             }
 
             return difficulty;
