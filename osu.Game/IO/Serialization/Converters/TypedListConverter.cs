@@ -1,13 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using osu.Framework.Extensions.ObjectExtensions;
 
 namespace osu.Game.IO.Serialization.Converters
 {
@@ -16,13 +16,12 @@ namespace osu.Game.IO.Serialization.Converters
     /// a lookup table for the types contained. The lookup table is used in deserialization to
     /// reconstruct the objects with their original types.
     /// </summary>
-    /// <typeparam name="T">The type of objects contained in the <see cref="IReadOnlyList{T}"/> this attribute is attached to.</typeparam>
-    public class TypedListConverter<T> : JsonConverter<IReadOnlyList<T>>
+    public class TypedListConverter : JsonConverter
     {
         private readonly bool requiresTypeVersion;
 
         /// <summary>
-        /// Constructs a new <see cref="TypedListConverter{T}"/>.
+        /// Constructs a new <see cref="TypedListConverter"/>.
         /// </summary>
         // ReSharper disable once UnusedMember.Global
         public TypedListConverter()
@@ -30,7 +29,7 @@ namespace osu.Game.IO.Serialization.Converters
         }
 
         /// <summary>
-        /// Constructs a new <see cref="TypedListConverter{T}"/>.
+        /// Constructs a new <see cref="TypedListConverter"/>.
         /// </summary>
         /// <param name="requiresTypeVersion">Whether the version of the type should be serialized.</param>
         // ReSharper disable once UnusedMember.Global (Used in Beatmap)
@@ -39,35 +38,45 @@ namespace osu.Game.IO.Serialization.Converters
             this.requiresTypeVersion = requiresTypeVersion;
         }
 
-        public override IReadOnlyList<T> ReadJson(JsonReader reader, Type objectType, IReadOnlyList<T> existingValue, bool hasExistingValue, JsonSerializer serializer)
+        public override bool CanConvert(Type objectType) => tryGetListItemType(objectType, out _);
+
+        public override object ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
         {
-            var list = new List<T>();
+            if (!tryGetListItemType(objectType, out var itemType))
+                throw new JsonException($"May not use {nameof(TypedListConverter)} on a type that does not implement {typeof(IReadOnlyList<>).Name}");
+
+            IList list = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(itemType))!;
 
             var obj = JObject.Load(reader);
 
             if (obj["$lookup_table"] == null)
                 return list;
 
-            var lookupTable = serializer.Deserialize<List<string>>(obj["$lookup_table"].CreateReader());
+            var lookupTable = serializer.Deserialize<List<string>>(obj["$lookup_table"]!.CreateReader());
             if (lookupTable == null)
                 return list;
 
             if (obj["$items"] == null)
                 return list;
 
-            foreach (var tok in obj["$items"])
+            foreach (var tok in obj["$items"]!)
             {
                 var itemReader = tok.CreateReader();
 
-                if (tok["$type"] == null)
+                int? typeIndex = tok["$type"]?.Value<int>();
+
+                if (typeIndex == null)
                     throw new JsonException("Expected $type token.");
 
+                if (typeIndex < 0 || typeIndex >= lookupTable.Count)
+                    throw new JsonException($"$type index {typeIndex} is out of range.");
+
                 // Prevent instantiation of types that do not inherit the type targetted by this converter
-                Type type = Type.GetType(lookupTable[(int)tok["$type"]]).AsNonNull();
-                if (!type.IsAssignableTo(typeof(T)))
+                Type type = Type.GetType(lookupTable[typeIndex.Value])!;
+                if (!type.IsAssignableTo(itemType))
                     continue;
 
-                var instance = (T)Activator.CreateInstance(type)!;
+                object instance = Activator.CreateInstance(type)!;
                 serializer.Populate(itemReader, instance);
 
                 list.Add(instance);
@@ -76,12 +85,20 @@ namespace osu.Game.IO.Serialization.Converters
             return list;
         }
 
-        public override void WriteJson(JsonWriter writer, IReadOnlyList<T> value, JsonSerializer serializer)
+        public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
         {
+            if (value == null)
+            {
+                writer.WriteNull();
+                return;
+            }
+
+            var list = (IEnumerable)value;
+
             var lookupTable = new List<string>();
             var objects = new List<JObject>();
 
-            foreach (var item in value)
+            foreach (object item in list)
             {
                 var type = item.GetType();
                 var assemblyName = type.Assembly.GetName();
@@ -112,6 +129,29 @@ namespace osu.Game.IO.Serialization.Converters
             serializer.Serialize(writer, objects);
 
             writer.WriteEndObject();
+        }
+
+        private static bool tryGetListItemType(Type objectType, [MaybeNullWhen(false)] out Type itemType)
+        {
+            if (objectType.IsInterface && isListType(objectType))
+            {
+                itemType = objectType.GenericTypeArguments[0];
+                return true;
+            }
+
+            var listType = objectType.GetInterfaces().FirstOrDefault(isListType);
+
+            itemType = listType?.GenericTypeArguments.FirstOrDefault();
+            return itemType != null;
+
+            bool isListType(Type type)
+            {
+                if (!type.IsGenericType)
+                    return false;
+
+                var genericTypeDefinition = type.GetGenericTypeDefinition();
+                return genericTypeDefinition == typeof(IReadOnlyList<>) || genericTypeDefinition == typeof(IList<>);
+            }
         }
     }
 }
