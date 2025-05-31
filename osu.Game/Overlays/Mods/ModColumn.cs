@@ -106,7 +106,7 @@ namespace osu.Game.Overlays.Mods
                     Origin = Anchor.CentreLeft,
                     Scale = new Vector2(0.8f),
                     RelativeSizeAxes = Axes.X,
-                    Shear = new Vector2(-OsuGame.SHEAR, 0)
+                    Shear = -OsuGame.SHEAR
                 });
                 ItemsFlow.Padding = new MarginPadding
                 {

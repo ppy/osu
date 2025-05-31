@@ -414,7 +414,7 @@ namespace osu.Game.Online.Leaderboards
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Font = OsuFont.GetFont(size: 20, italics: true),
-                    Text = rank == null ? "-" : rank.Value.FormatRank()
+                    Text = rank?.FormatRank() ?? "-"
                 };
             }
 

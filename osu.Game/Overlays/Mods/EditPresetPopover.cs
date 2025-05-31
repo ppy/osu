@@ -8,6 +8,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Database;
 using osu.Game.Graphics;
@@ -51,9 +52,11 @@ namespace osu.Game.Overlays.Mods
         [BackgroundDependencyLoader]
         private void load()
         {
+            const float content_width = 300;
+
             Child = new FillFlowContainer
             {
-                Width = 300,
+                Width = content_width,
                 AutoSizeAxes = Axes.Y,
                 Spacing = new Vector2(7),
                 Direction = FillDirection.Vertical,
@@ -75,42 +78,58 @@ namespace osu.Game.Overlays.Mods
                         TabbableContentContainer = this,
                         Current = { Value = preset.PerformRead(p => p.Description) },
                     },
-                    new OsuScrollContainer
+                    new Container
                     {
                         RelativeSizeAxes = Axes.X,
                         Height = 100,
-                        Padding = new MarginPadding(7),
-                        Child = scrollContent = new FillFlowContainer
+                        CornerRadius = 10,
+                        Masking = true,
+                        Children = new Drawable[]
                         {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Padding = new MarginPadding(7),
-                            Spacing = new Vector2(7),
+                            new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Colour = colourProvider.Background5,
+                            },
+                            new OsuScrollContainer
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Padding = new MarginPadding(7),
+                                Child = scrollContent = new FillFlowContainer
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Padding = new MarginPadding(7),
+                                    Spacing = new Vector2(7),
+                                }
+                            },
                         }
                     },
                     new FillFlowContainer
                     {
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
+                        AutoSizeAxes = Axes.Both,
                         Spacing = new Vector2(7),
+                        Direction = FillDirection.Vertical,
                         Children = new Drawable[]
                         {
-                            useCurrentModsButton = new ShearedButton
+                            useCurrentModsButton = new ShearedButton(content_width)
                             {
-                                Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre,
+                                // todo: for some very odd reason, this needs to be anchored to topright for the fill flow to be correctly sized to the AABB of the sheared button
+                                Anchor = Anchor.TopRight,
+                                Origin = Anchor.TopRight,
                                 Text = ModSelectOverlayStrings.UseCurrentMods,
                                 DarkerColour = colours.Blue1,
                                 LighterColour = colours.Blue0,
                                 TextColour = colourProvider.Background6,
                                 Action = useCurrentMods,
                             },
-                            saveButton = new ShearedButton
+                            saveButton = new ShearedButton(content_width)
                             {
-                                Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre,
+                                // todo: for some very odd reason, this needs to be anchored to topright for the fill flow to be correctly sized to the AABB of the sheared button
+                                Anchor = Anchor.TopRight,
+                                Origin = Anchor.TopRight,
                                 Text = Resources.Localisation.Web.CommonStrings.ButtonsSave,
                                 DarkerColour = colours.Orange1,
                                 LighterColour = colours.Orange0,

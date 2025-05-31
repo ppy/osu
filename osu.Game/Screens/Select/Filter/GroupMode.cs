@@ -7,8 +7,8 @@ namespace osu.Game.Screens.Select.Filter
 {
     public enum GroupMode
     {
-        [Description("All")]
-        All,
+        [Description("None")]
+        None,
 
         [Description("Artist")]
         Artist,
@@ -19,37 +19,37 @@ namespace osu.Game.Screens.Select.Filter
         [Description("BPM")]
         BPM,
 
-        [Description("Collections")]
-        Collections,
+        // [Description("Collections")]
+        // Collections,
 
         [Description("Date Added")]
         DateAdded,
 
+        [Description("Date Ranked")]
+        DateRanked,
+
         [Description("Difficulty")]
         Difficulty,
 
-        [Description("Favourites")]
-        Favourites,
+        // [Description("Favourites")]
+        // Favourites,
 
         [Description("Length")]
         Length,
 
-        [Description("My Maps")]
-        MyMaps,
+        // [Description("My Maps")]
+        // MyMaps,
 
-        [Description("No Grouping")]
-        NoGrouping,
-
-        [Description("Rank Achieved")]
-        RankAchieved,
+        // [Description("Rank Achieved")]
+        // RankAchieved,
 
         [Description("Ranked Status")]
         RankedStatus,
 
-        [Description("Recently Played")]
-        RecentlyPlayed,
+        [Description("Last Played")]
+        LastPlayed,
 
         [Description("Title")]
-        Title
+        Title,
     }
 }
