@@ -1,9 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Screens.Play.HUD;
 using osu.Game.Skinning;
+using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Argon
 {
@@ -18,6 +21,59 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
         {
             switch (lookup)
             {
+                case GlobalSkinnableContainerLookup containerLookup:
+                    // Only handle per ruleset defaults here.
+                    if (containerLookup.Ruleset == null)
+                        return base.GetDrawableComponent(lookup);
+
+                    switch (containerLookup.Lookup)
+                    {
+                        case GlobalSkinnableContainers.MainHUDComponents:
+                            return new DefaultSkinComponentsContainer(container =>
+                            {
+                                var leaderboard = container.OfType<DrawableGameplayLeaderboard>().FirstOrDefault();
+                                var comboCounter = container.OfType<ArgonComboCounter>().FirstOrDefault();
+                                var spectatorList = container.OfType<SpectatorList>().FirstOrDefault();
+
+                                if (leaderboard != null)
+                                {
+                                    leaderboard.Anchor = leaderboard.Origin = Anchor.BottomLeft;
+                                    leaderboard.Position = new Vector2(36, -140);
+                                    leaderboard.Height = 140;
+                                }
+
+                                if (comboCounter != null)
+                                    comboCounter.Position = new Vector2(36, -66);
+
+                                if (spectatorList != null)
+                                {
+                                    spectatorList.Position = new Vector2(320, -280);
+                                    spectatorList.Anchor = Anchor.BottomLeft;
+                                    spectatorList.Origin = Anchor.TopLeft;
+                                }
+                            })
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Children = new Drawable[]
+                                {
+                                    new DrawableGameplayLeaderboard(),
+                                    new ArgonComboCounter
+                                    {
+                                        Anchor = Anchor.BottomLeft,
+                                        Origin = Anchor.BottomLeft,
+                                        Scale = new Vector2(1.3f),
+                                    },
+                                    new SpectatorList
+                                    {
+                                        Anchor = Anchor.BottomLeft,
+                                        Origin = Anchor.BottomLeft,
+                                    }
+                                },
+                            };
+                    }
+
+                    return null;
+
                 case SkinComponentLookup<HitResult> resultComponent:
                     // This should eventually be moved to a skin setting, when supported.
                     if (Skin is ArgonProSkin && resultComponent.Component >= HitResult.Great)

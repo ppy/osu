@@ -10,9 +10,9 @@ using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
-using osu.Game.Overlays;
 using osu.Game.Localisation;
 using osu.Game.Models;
+using osu.Game.Overlays;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Utils;
 
@@ -98,11 +98,16 @@ namespace osu.Game.Screens.Edit.Setup
             if (!source.Exists)
                 return false;
 
-            TagLib.File? tagSource;
+            string artist;
+            string title;
 
             try
             {
-                tagSource = TagLib.File.Create(source.FullName);
+                using (var tagSource = TagLibUtils.GetTagLibFile(source.FullName))
+                {
+                    artist = tagSource.Tag.JoinedAlbumArtists ?? tagSource.Tag.JoinedPerformers;
+                    title = tagSource.Tag.Title;
+                }
             }
             catch (Exception e)
             {
@@ -116,15 +121,11 @@ namespace osu.Game.Screens.Edit.Setup
                 {
                     metadata.AudioFile = name;
 
-                    string artist = tagSource.Tag.JoinedAlbumArtists;
-
                     if (!string.IsNullOrWhiteSpace(artist))
                     {
                         metadata.ArtistUnicode = artist;
                         metadata.Artist = MetadataUtils.StripNonRomanisedCharacters(metadata.ArtistUnicode);
                     }
-
-                    string title = tagSource.Tag.Title;
 
                     if (!string.IsNullOrEmpty(title))
                     {
@@ -192,7 +193,7 @@ namespace osu.Game.Screens.Edit.Setup
                     // note that this triggers a full save flow, including triggering a difficulty calculation.
                     // this is not a cheap operation and should be reconsidered in the future.
                     var beatmapWorking = beatmaps.GetWorkingBeatmap(b);
-                    beatmaps.Save(b, beatmapWorking.Beatmap, beatmapWorking.GetSkin());
+                    beatmaps.Save(b, beatmapWorking.GetPlayableBeatmap(b.Ruleset), beatmapWorking.GetSkin());
                 }
             }
 

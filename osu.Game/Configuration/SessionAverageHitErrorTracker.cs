@@ -40,10 +40,10 @@ namespace osu.Game.Configuration
             if (newScore.Mods.Any(m => !m.UserPlayable || m is IHasNoTimedInputs))
                 return;
 
-            if (newScore.HitEvents.Count < 10)
+            if (newScore.HitEvents.Count < 50)
                 return;
 
-            if (newScore.HitEvents.CalculateAverageHitError() is not double averageError)
+            if (newScore.HitEvents.CalculateMedianHitError() is not double medianError)
                 return;
 
             // keep a sane maximum number of entries.
@@ -51,7 +51,7 @@ namespace osu.Game.Configuration
                 averageHitErrorHistory.RemoveAt(0);
 
             double globalOffset = configManager.Get<double>(OsuSetting.AudioOffset);
-            averageHitErrorHistory.Add(new DataPoint(averageError, globalOffset));
+            averageHitErrorHistory.Add(new DataPoint(medianError, globalOffset));
         }
 
         public void ClearHistory() => averageHitErrorHistory.Clear();

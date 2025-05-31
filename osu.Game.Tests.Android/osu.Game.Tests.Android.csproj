@@ -28,6 +28,7 @@
     <ProjectReference Include="..\osu.Game\osu.Game.csproj" />
   </ItemGroup>
   <ItemGroup Label="Package References">
+    <PackageReference Include="Bogus" Version="35.6.2" />
     <PackageReference Include="DeepEqual" Version="2.0.0" />
     <PackageReference Include="Moq" Version="4.17.2" />
   </ItemGroup>

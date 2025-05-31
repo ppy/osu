@@ -213,12 +213,12 @@ namespace osu.Game.Beatmaps
                     if (ae.InnerExceptions.FirstOrDefault() is TaskCanceledException)
                         return null;
 
-                    Logger.Error(ae, "Beatmap failed to load");
+                    Logger.Error(ae, $"Beatmap failed to load ({BeatmapInfo})");
                     return null;
                 }
                 catch (Exception e)
                 {
-                    Logger.Error(e, "Beatmap failed to load");
+                    Logger.Error(e, $"Beatmap failed to load ({BeatmapInfo})");
                     return null;
                 }
             }
