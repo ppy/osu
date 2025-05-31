@@ -27,6 +27,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
         private double currentSectionPeak; // We also keep track of the peak strain level in the current section.
         private double currentSectionBegin;
+        private double currentSectionEnd;
 
         /// <summary>
         /// Used to store the difficulty of a section of a map.
@@ -51,6 +52,15 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         private readonly List<Strain> strainPeaks = new List<Strain>();
         protected readonly List<double> ObjectStrains = new List<double>(); // Store individual strains
 
+        /// <summary>
+        /// Stores previous strains so that, if a high difficulty hit object is followed by a lower
+        /// difficulty hit object, the high difficulty hit object gets a full strain instead of being cut short.
+        /// <typeparam name="double">Strain difficulty</typeparam>
+        /// <typeparam name="double">Strain start time</typeparam>
+        /// <remarks>In the case that continuous strains is implemented, please remove this</remarks>
+        /// </summary>
+        private readonly PriorityQueue<double, double> strainPeakQueue = new PriorityQueue<double, double>();
+
         protected VariableLengthStrainSkill(Mod[] mods)
             : base(mods)
         {
@@ -68,31 +78,76 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         {
             // The first object doesn't generate a strain, so we begin with an incremented section end
             if (current.Index == 0)
+            {
                 currentSectionBegin = current.StartTime;
+                currentSectionEnd = currentSectionBegin + MaxSectionLength;
+            }
 
             double deltaTime = current.DeltaTime;
 
-            while (current.StartTime > currentSectionBegin + MaxSectionLength)
+            while (current.StartTime > currentSectionEnd)
             {
-                saveCurrentPeak(MaxSectionLength);
-                currentSectionBegin += MaxSectionLength;
-                deltaTime -= MaxSectionLength;
-                startNewSectionFrom(currentSectionBegin, current);
+                // Pull from queue if possible
+                if (strainPeakQueue.Count > 0)
+                {
+                    saveCurrentPeak(currentSectionEnd - currentSectionBegin);
+                    strainPeakQueue.TryDequeue(out double storedStrain, out double storedStrainStartTime);
+                    deltaTime -= currentSectionEnd - currentSectionBegin;
+                    currentSectionBegin = currentSectionEnd;
+                    currentSectionEnd = storedStrainStartTime + MaxSectionLength;
+                    startNewSectionFrom(currentSectionBegin, current);
+                    currentSectionPeak = Math.Max(currentSectionPeak, storedStrain);
+                }
+                else
+                {
+                    // Create new strains if queue is empty
+                    saveCurrentPeak(currentSectionEnd - currentSectionBegin);
+                    deltaTime -= currentSectionEnd - currentSectionBegin;
+                    currentSectionBegin = currentSectionEnd;
+                    currentSectionEnd = currentSectionBegin + MaxSectionLength;
+                    startNewSectionFrom(currentSectionBegin, current);
+                }
             }
 
             double strain = StrainValueAt(current);
-            currentSectionPeak = Math.Max(strain, currentSectionPeak);
-
-            // End the current strain, and create a new strain starting at the current hitobject
-            if (current.Index > 0)
-            {
-                saveCurrentPeak(deltaTime);
-                currentSectionBegin += deltaTime;
-                startNewSectionFrom(currentSectionBegin, current);
-            }
 
             // Store the strain value for the object
             ObjectStrains.Add(strain);
+
+            if (current.Index == 0)
+            {
+                currentSectionPeak = strain;
+            }
+            else if (strain > currentSectionPeak)
+            {
+                // Clear the queue
+                strainPeakQueue.Clear();
+
+                currentSectionPeak = strain;
+
+                // End the current strain, and create a new strain starting at the current hitobject
+                saveCurrentPeak(deltaTime);
+                currentSectionBegin += deltaTime;
+                currentSectionEnd = currentSectionBegin + MaxSectionLength;
+                startNewSectionFrom(currentSectionBegin, current);
+            }
+            else
+            {
+                // If the current strain is smaller than the current peak
+                // Empty the queue of smaller elements
+                while (strainPeakQueue.Count > 0 && strainPeakQueue.Peek() < strain)
+                {
+                    strainPeakQueue.Dequeue();
+                }
+
+                // Add current strain to queue since it's less than the current peak
+                strainPeakQueue.Enqueue(strain, current.StartTime);
+
+                // Make a new strain with the same value and end time as the old strain
+                // Yes, this is a little stupid
+                saveCurrentPeak(deltaTime);
+                currentSectionBegin += deltaTime;
+            }
         }
 
         /// <summary>
