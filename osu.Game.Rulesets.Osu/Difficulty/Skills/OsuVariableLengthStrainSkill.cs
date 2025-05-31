@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
     public abstract class OsuVariableLengthStrainSkill : VariableLengthStrainSkill
     {
-        protected double RawDifficultyMultiplier => 1.02;
+        protected double RawDifficultyMultiplier => 1.01;
 
         /// <summary>
         /// The number of sections with the highest strains, which the peak strain reductions will apply to.
