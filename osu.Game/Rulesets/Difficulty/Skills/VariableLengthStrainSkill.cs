@@ -85,13 +85,19 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
             double deltaTime = current.DeltaTime;
 
+            // Remove any strains from the queue that are too old
+            while (strainPeakQueue.TryPeek(out double storedStrain, out double storedStrainStartTime))
+            {
+                if (storedStrainStartTime + MaxSectionLength < currentSectionBegin) strainPeakQueue.Dequeue();
+                else break;
+            }
+
             while (current.StartTime > currentSectionEnd)
             {
                 // Pull from queue if possible
-                if (strainPeakQueue.Count > 0)
+                if (strainPeakQueue.TryDequeue(out double storedStrain, out double storedStrainStartTime))
                 {
                     saveCurrentPeak(currentSectionEnd - currentSectionBegin);
-                    strainPeakQueue.TryDequeue(out double storedStrain, out double storedStrainStartTime);
                     deltaTime -= currentSectionEnd - currentSectionBegin;
                     currentSectionBegin = currentSectionEnd;
                     currentSectionEnd = storedStrainStartTime + MaxSectionLength;
@@ -135,9 +141,10 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             {
                 // If the current strain is smaller than the current peak
                 // Empty the queue of smaller elements
-                while (strainPeakQueue.Count > 0 && strainPeakQueue.Peek() < strain)
+                while (strainPeakQueue.TryPeek(out double storedStrain, out double storedStrainStartTime))
                 {
-                    strainPeakQueue.Dequeue();
+                    if (storedStrain < strain) strainPeakQueue.Dequeue();
+                    else break;
                 }
 
                 // Add current strain to queue since it's less than the current peak
