@@ -4,7 +4,6 @@
 using System.Collections.Generic;
 using osu.Game.Rulesets.Edit.Checks.Components;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Rulesets.Edit.Checks
 {
@@ -21,7 +20,7 @@ namespace osu.Game.Rulesets.Edit.Checks
             new IssueTemplateConcurrentDifferent(this)
         };
 
-        public IEnumerable<Issue> Run(BeatmapVerifierContext context)
+        public virtual IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
             var hitObjects = context.Beatmap.HitObjects;
 
@@ -33,14 +32,9 @@ namespace osu.Game.Rulesets.Edit.Checks
                 {
                     var nextHitobject = hitObjects[j];
 
-                    // Accounts for rulesets with hitobjects separated by columns, such as Mania.
-                    // In these cases we only care about concurrent objects within the same column.
-                    if ((hitobject as IHasColumn)?.Column != (nextHitobject as IHasColumn)?.Column)
-                        continue;
-
                     // Two hitobjects cannot be concurrent without also being concurrent with all objects in between.
                     // So if the next object is not concurrent, then we know no future objects will be either.
-                    if (!areConcurrent(hitobject, nextHitobject))
+                    if (!AreConcurrent(hitobject, nextHitobject))
                         break;
 
                     if (hitobject.GetType() == nextHitobject.GetType())
@@ -51,7 +45,7 @@ namespace osu.Game.Rulesets.Edit.Checks
             }
         }
 
-        private bool areConcurrent(HitObject hitobject, HitObject nextHitobject) => nextHitobject.StartTime <= hitobject.GetEndTime() + ms_leniency;
+        protected bool AreConcurrent(HitObject hitobject, HitObject nextHitobject) => nextHitobject.StartTime <= hitobject.GetEndTime() + ms_leniency;
 
         public abstract class IssueTemplateConcurrent : IssueTemplate
         {

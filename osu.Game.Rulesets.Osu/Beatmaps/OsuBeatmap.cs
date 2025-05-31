@@ -1,10 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
-using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Beatmaps
@@ -16,26 +16,30 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
             int circles = HitObjects.Count(c => c is HitCircle);
             int sliders = HitObjects.Count(s => s is Slider);
             int spinners = HitObjects.Count(s => s is Spinner);
+            int sum = Math.Max(1, circles + sliders);
 
             return new[]
             {
                 new BeatmapStatistic
                 {
-                    Name = BeatmapsetsStrings.ShowStatsCountCircles,
+                    Name = "Circles",
                     Content = circles.ToString(),
                     CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Circles),
+                    BarDisplayLength = circles / (float)sum,
                 },
                 new BeatmapStatistic
                 {
-                    Name = BeatmapsetsStrings.ShowStatsCountSliders,
+                    Name = "Sliders",
                     Content = sliders.ToString(),
                     CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Sliders),
+                    BarDisplayLength = sliders / (float)sum,
                 },
                 new BeatmapStatistic
                 {
-                    Name = @"Spinner Count",
+                    Name = @"Spinners",
                     Content = spinners.ToString(),
                     CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Spinners),
+                    BarDisplayLength = Math.Min(spinners / 10f, 1),
                 }
             };
         }

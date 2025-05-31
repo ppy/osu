@@ -14,6 +14,7 @@ using osu.Game.Overlays;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
@@ -75,6 +76,11 @@ namespace osu.Game.Screens.Edit.GameplayTest
             foreach (var hitObject in enumerateHitObjects(DrawableRuleset.Objects, editorState.Time))
             {
                 var judgement = hitObject.Judgement;
+                // this is very dodgy because there's no guarantee that `JudgementResult` is the correct result type for the object.
+                // however, instantiating the correct one is difficult here, because `JudgementResult`s are constructed by DHOs
+                // and because of pooling we don't *have* a DHO to use here.
+                // this basically mostly attempts to fill holes in `ScoreProcessor` tallies
+                // so that gameplay can actually complete at the end of the map when entering gameplay test midway through it, and not much else.
                 var result = new JudgementResult(hitObject, judgement)
                 {
                     Type = judgement.MaxResult,
@@ -109,30 +115,28 @@ namespace osu.Game.Screens.Edit.GameplayTest
                 return;
             }
 
-            foreach (var drawableObjectEntry in enumerateDrawableEntries(
-                         DrawableRuleset.Playfield.AllHitObjects
-                                        .Select(ho => ho.Entry)
-                                        .Where(e => e != null)
-                                        .Cast<HitObjectLifetimeEntry>(), editorState.Time))
+            foreach (var drawableObject in enumerateDrawableObjects(DrawableRuleset.Playfield.AllHitObjects, editorState.Time))
             {
-                drawableObjectEntry.Result = new JudgementResult(drawableObjectEntry.HitObject, drawableObjectEntry.HitObject.Judgement)
-                {
-                    Type = drawableObjectEntry.HitObject.Judgement.MaxResult
-                };
+                if (drawableObject.Entry == null)
+                    continue;
+
+                var result = drawableObject.CreateResult(drawableObject.HitObject.Judgement);
+                result.Type = result.Judgement.MaxResult;
+                drawableObject.Entry.Result = result;
             }
 
-            static IEnumerable<HitObjectLifetimeEntry> enumerateDrawableEntries(IEnumerable<HitObjectLifetimeEntry> entries, double cutoffTime)
+            static IEnumerable<DrawableHitObject> enumerateDrawableObjects(IEnumerable<DrawableHitObject> drawableObjects, double cutoffTime)
             {
-                foreach (var entry in entries)
+                foreach (var drawableObject in drawableObjects)
                 {
-                    foreach (var nested in enumerateDrawableEntries(entry.NestedEntries, cutoffTime))
+                    foreach (var nested in enumerateDrawableObjects(drawableObject.NestedHitObjects, cutoffTime))
                     {
                         if (nested.HitObject.GetEndTime() < cutoffTime)
                             yield return nested;
                     }
 
-                    if (entry.HitObject.GetEndTime() < cutoffTime)
-                        yield return entry;
+                    if (drawableObject.HitObject.GetEndTime() < cutoffTime)
+                        yield return drawableObject;
                 }
             }
         }

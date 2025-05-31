@@ -69,7 +69,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             foreach (var rulesetInfo in rulesets.AvailableRulesets)
             {
                 var instance = rulesetInfo.CreateInstance();
-                var testBeatmap = createTestBeatmap(rulesetInfo);
+                var testBeatmap = CreateTestBeatmap(rulesetInfo);
 
                 beatmaps.Add(testBeatmap);
 
@@ -125,6 +125,12 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
+        public void TestTruncation()
+        {
+            selectBeatmap(CreateLongMetadata());
+        }
+
+        [Test]
         public void TestNullBeatmap()
         {
             selectBeatmap(null);
@@ -136,16 +142,10 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
-        public void TestTruncation()
-        {
-            selectBeatmap(createLongMetadata());
-        }
-
-        [Test]
         public void TestBPMUpdates()
         {
             const double bpm = 120;
-            IBeatmap beatmap = createTestBeatmap(new OsuRuleset().RulesetInfo);
+            IBeatmap beatmap = CreateTestBeatmap(new OsuRuleset().RulesetInfo);
             beatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = 60 * 1000 / bpm });
 
             OsuModDoubleTime doubleTime = null!;
@@ -163,11 +163,11 @@ namespace osu.Game.Tests.Visual.SongSelect
         [TestCase(120, 125, null, "120-125 (mostly 120)")]
         [TestCase(120, 120.6, null, "120-121 (mostly 120)")]
         [TestCase(120, 120.4, null, "120")]
-        [TestCase(120, 120.6, "DT", "180-182 (mostly 180)")]
-        [TestCase(120, 120.4, "DT", "180")]
+        [TestCase(120, 120.6, "DT", "180-181 (mostly 180)")]
+        [TestCase(120, 120.4, "DT", "180-181 (mostly 180)")]
         public void TestVaryingBPM(double commonBpm, double otherBpm, string? mod, string expectedDisplay)
         {
-            IBeatmap beatmap = createTestBeatmap(new OsuRuleset().RulesetInfo);
+            IBeatmap beatmap = CreateTestBeatmap(new OsuRuleset().RulesetInfo);
             beatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = 60 * 1000 / commonBpm });
             beatmap.ControlPointInfo.Add(100, new TimingControlPoint { BeatLength = 60 * 1000 / otherBpm });
             beatmap.ControlPointInfo.Add(200, new TimingControlPoint { BeatLength = 60 * 1000 / commonBpm });
@@ -191,7 +191,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         [TestCase]
         public void TestLengthUpdates()
         {
-            IBeatmap beatmap = createTestBeatmap(new OsuRuleset().RulesetInfo);
+            IBeatmap beatmap = CreateTestBeatmap(new OsuRuleset().RulesetInfo);
             double drain = beatmap.CalculateDrainLength();
             beatmap.BeatmapInfo.Length = drain;
 
@@ -248,7 +248,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddUntilStep("wait for async load", () => infoWedge.DisplayedContent != containerBefore);
         }
 
-        private IBeatmap createTestBeatmap(RulesetInfo ruleset)
+        public static IBeatmap CreateTestBeatmap(RulesetInfo ruleset)
         {
             List<HitObject> objects = new List<HitObject>();
             for (double i = 0; i < 50000; i += 1000)
@@ -274,7 +274,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             };
         }
 
-        private IBeatmap createLongMetadata()
+        public static IBeatmap CreateLongMetadata()
         {
             return new Beatmap
             {

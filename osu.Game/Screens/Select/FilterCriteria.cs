@@ -20,11 +20,6 @@ namespace osu.Game.Screens.Select
         public GroupMode Group;
         public SortMode Sort;
 
-        /// <summary>
-        /// Whether the display of beatmap sets should be split apart per-difficulty for the current criteria.
-        /// </summary>
-        public bool SplitOutDifficulties => Sort == SortMode.Difficulty;
-
         public BeatmapSetInfo? SelectedBeatmapSet;
 
         public OptionalRange<double> StarDifficulty;
