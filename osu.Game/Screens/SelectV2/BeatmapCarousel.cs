@@ -219,13 +219,7 @@ namespace osu.Game.Screens.SelectV2
                         return;
 
                     case BeatmapSetInfo setInfo:
-                        // Selecting a set isn't valid – let's re-select the first visible difficulty.
-                        if (grouping.SetItems.TryGetValue(setInfo, out var items))
-                        {
-                            var beatmaps = items.Select(i => i.Model).OfType<BeatmapInfo>();
-                            RequestRecommendedSelection(beatmaps);
-                        }
-
+                        selectRecommendedDifficultyForBeatmapSet(setInfo);
                         return;
 
                     case BeatmapInfo beatmapInfo:
@@ -282,6 +276,16 @@ namespace osu.Game.Screens.SelectV2
             // If a group was selected that is not the one containing the selection, reselect it.
             if (groupForReselection != null)
                 setExpandedGroup(groupForReselection);
+        }
+
+        private void selectRecommendedDifficultyForBeatmapSet(BeatmapSetInfo beatmapSet)
+        {
+            // Selecting a set isn't valid – let's re-select the first visible difficulty.
+            if (grouping.SetItems.TryGetValue(beatmapSet, out var items))
+            {
+                var beatmaps = items.Select(i => i.Model).OfType<BeatmapInfo>();
+                RequestRecommendedSelection(beatmaps);
+            }
         }
 
         /// <summary>
@@ -644,7 +648,7 @@ namespace osu.Game.Screens.SelectV2
             if (CurrentSelectionItem != null)
                 playSpinSample(distanceBetween(carouselItems.First(i => !ReferenceEquals(i.Model, set)), CurrentSelectionItem), visibleSets.Count);
 
-            RequestRecommendedSelection(set.Beatmaps.Where(b => !b.Hidden));
+            selectRecommendedDifficultyForBeatmapSet(set);
             return true;
         }
 
