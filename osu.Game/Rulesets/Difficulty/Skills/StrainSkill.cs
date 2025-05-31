@@ -23,28 +23,12 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// <summary>
         /// The length of each strain section.
         /// </summary>
-        protected virtual int MaxSectionLength => 400;
+        protected virtual int SectionLength => 400;
 
         private double currentSectionPeak; // We also keep track of the peak strain level in the current section.
-        private double currentSectionBegin;
+        private double currentSectionEnd;
 
-        public struct Strain : IComparable<Strain>
-        {
-            public Strain(double value, double sectionLength)
-            {
-                Value = value;
-                SectionLength = sectionLength;
-            }
-
-            public double Value { get; set; }
-            public double SectionLength { get; }
-            public int CompareTo(Strain other)
-            {
-                return Value.CompareTo(other.Value);
-            }
-        }
-
-        private readonly List<Strain> strainPeaks = new List<Strain>();
+        private readonly List<double> strainPeaks = new List<double>();
         protected readonly List<double> ObjectStrains = new List<double>(); // Store individual strains
 
         protected StrainSkill(Mod[] mods)
@@ -64,27 +48,17 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         {
             // The first object doesn't generate a strain, so we begin with an incremented section end
             if (current.Index == 0)
-                currentSectionBegin = current.StartTime;
+                currentSectionEnd = Math.Ceiling(current.StartTime / SectionLength) * SectionLength;
 
-            double deltaTime = current.DeltaTime;
-
-            while (current.StartTime > currentSectionBegin + MaxSectionLength)
+            while (current.StartTime > currentSectionEnd)
             {
-                saveCurrentPeak(MaxSectionLength);
-                currentSectionBegin += MaxSectionLength;
-                deltaTime -= MaxSectionLength;
-                startNewSectionFrom(currentSectionBegin, current);
+                saveCurrentPeak();
+                startNewSectionFrom(currentSectionEnd, current);
+                currentSectionEnd += SectionLength;
             }
 
             double strain = StrainValueAt(current);
             currentSectionPeak = Math.Max(strain, currentSectionPeak);
-
-            if (current.Index > 0)
-            {
-                saveCurrentPeak(deltaTime);
-                currentSectionBegin += deltaTime;
-                startNewSectionFrom(currentSectionBegin, current);
-            }
 
             // Store the strain value for the object
             ObjectStrains.Add(strain);
@@ -111,9 +85,9 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// <summary>
         /// Saves the current peak strain level to the list of strain peaks, which will be used to calculate an overall difficulty.
         /// </summary>
-        private void saveCurrentPeak(double sectionLength)
+        private void saveCurrentPeak()
         {
-            strainPeaks.Add(new Strain(currentSectionPeak, sectionLength));
+            strainPeaks.Add(currentSectionPeak);
         }
 
         /// <summary>
@@ -137,10 +111,10 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         protected abstract double CalculateInitialStrain(double time, DifficultyHitObject current);
 
         /// <summary>
-        /// Returns a live enumerable of the peak strains for each <see cref="MaxSectionLength"/> section of the beatmap,
+        /// Returns a live enumerable of the peak strains for each <see cref="SectionLength"/> section of the beatmap,
         /// including the peak of the current section.
         /// </summary>
-        public IEnumerable<Strain> GetCurrentStrainPeaks() => strainPeaks.Append(new Strain(currentSectionPeak, MaxSectionLength));
+        public IEnumerable<double> GetCurrentStrainPeaks() => strainPeaks.Append(currentSectionPeak);
 
         /// <summary>
         /// Returns the calculated difficulty value representing all <see cref="DifficultyHitObject"/>s that have been processed up to this point.
@@ -152,13 +126,13 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
             // Sections with 0 strain are excluded to avoid worst-case time complexity of the following sort (e.g. /b/2351871).
             // These sections will not contribute to the difficulty.
-            var peaks = GetCurrentStrainPeaks().Where(p => p.Value > 0);
+            var peaks = GetCurrentStrainPeaks().Where(p => p > 0);
 
             // Difficulty is the weighted sum of the highest strains from every section.
             // We're sorting from highest to lowest strain.
-            foreach (Strain strain in peaks.OrderByDescending(p => (p.Value, p.SectionLength)))
+            foreach (double strain in peaks.OrderDescending())
             {
-                difficulty += strain.Value * weight;
+                difficulty += strain * weight;
                 weight *= DecayWeight;
             }
 

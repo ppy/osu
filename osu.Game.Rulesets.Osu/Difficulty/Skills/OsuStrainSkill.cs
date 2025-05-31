@@ -10,7 +10,7 @@ using osu.Framework.Utils;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
-    public abstract class OsuStrainSkill : StrainSkill
+    public abstract class OsuVariableLengthStrainSkill : VariableLengthStrainSkill
     {
         protected double RawDifficultyMultiplier => 1.0727;
         /// <summary>
@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// </summary>
         protected virtual double ReducedStrainBaseline => 0.75;
 
-        protected OsuStrainSkill(Mod[] mods)
+        protected OsuVariableLengthStrainSkill(Mod[] mods)
             : base(mods)
         {
         }
