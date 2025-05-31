@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         private double currentSectionPeak; // We also keep track of the peak strain level in the current section.
         private double currentSectionBegin;
 
-        public struct Strain
+        public struct Strain : IComparable<Strain>
         {
             public Strain(double value, double sectionLength)
             {
@@ -38,6 +38,10 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
             public double Value { get; set; }
             public double SectionLength { get; }
+            public int CompareTo(Strain other)
+            {
+                return Value.CompareTo(other.Value);
+            }
         }
 
         private readonly List<Strain> strainPeaks = new List<Strain>();

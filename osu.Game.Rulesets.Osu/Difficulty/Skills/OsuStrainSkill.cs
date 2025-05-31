@@ -12,6 +12,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
     public abstract class OsuStrainSkill : StrainSkill
     {
+        protected double RawDifficultyMultiplier => 1.0727;
         /// <summary>
         /// The number of sections with the highest strains, which the peak strain reductions will apply to.
         /// This is done in order to decrease their impact on the overall difficulty of the map for this skill.
@@ -39,25 +40,30 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             List<Strain> strains = peaks.OrderByDescending(p => (p.Value, p.SectionLength)).ToList();
 
-            // We are reducing the highest strains first to account for extreme difficulty spikes
+            // Time is measured in units of strains
             double time = 0;
 
-            for (int i = 0; i < Math.Min(strains.Count, ReducedSectionCount); i++)
+            // We are reducing the highest strains first to account for extreme difficulty spikes
+            for (int i = 0; i < strains.Count && time < ReducedSectionCount; i++)
             {
                 double scale = Math.Log10(Interpolation.Lerp(1, 10, Math.Clamp((float)time / ReducedSectionCount, 0, 1)));
                 strains[i] = new Strain(strains[i].Value * Interpolation.Lerp(ReducedStrainBaseline, 1.0, scale), strains[i].SectionLength);
                 time += strains[i].SectionLength / MaxSectionLength;
             }
 
+            strains = strains.OrderByDescending(s => s.Value).ToList();
+            time = 0;
+
             // Difficulty is the weighted sum of the highest strains from every section.
             // We're sorting from highest to lowest strain.
             for (int i = 0; i < strains.Count; i++)
             {
-                difficulty += strains[i].Value * weight;
-                weight *= DecayWeight;
+                difficulty += strains[i].Value * weight * strains[i].SectionLength / MaxSectionLength;
+                time += strains[i].SectionLength / MaxSectionLength;
+                weight = Math.Pow(DecayWeight, time);
             }
 
-            return difficulty;
+            return difficulty * RawDifficultyMultiplier;
         }
 
         public static double DifficultyToPerformance(double difficulty) => Math.Pow(5.0 * Math.Max(1.0, difficulty / 0.0675) - 4.0, 3.0) / 100000.0;
