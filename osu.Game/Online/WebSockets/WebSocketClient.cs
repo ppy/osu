@@ -18,8 +18,7 @@ namespace osu.Game.Online.WebSockets
 
         private Task? process;
         private CancellationTokenSource? cts;
-
-        private readonly object sync = new object();
+        private bool stopping;
 
         public WebSocketClient(WebSocket socket)
         {
@@ -34,8 +33,8 @@ namespace osu.Game.Online.WebSockets
 
         public async Task StartAsync(CancellationToken token = default)
         {
-            if (cts != null || process != null)
-                return;
+            if (stopping || cts != null || process != null)
+                throw new InvalidOperationException(@"Can't start WebSocketClient a second time");
 
             if (socket is ClientWebSocket client && uri != null)
                 await client.ConnectAsync(uri, token).ConfigureAwait(false);
@@ -46,15 +45,21 @@ namespace osu.Game.Online.WebSockets
 
         public async Task StopAsync(CancellationToken token = default)
         {
-            if (cts == null || process == null)
+            if (cts == null || process == null || stopping)
                 return;
+            stopping = true;
 
             await OnClosing(token).ConfigureAwait(false);
-            await CloseAsync(socket, token).ConfigureAwait(false);
+            await CloseAsync(token).ConfigureAwait(false);
             await cts.CancelAsync().ConfigureAwait(false);
             await process.ConfigureAwait(false);
 
-            dispose();
+            socket.Dispose();
+
+            cts?.Dispose();
+            cts = null;
+
+            process = null;
         }
 
         public async Task SendAsync(ReadOnlyMemory<byte> data, CancellationToken token = default)
@@ -80,11 +85,13 @@ namespace osu.Game.Online.WebSockets
 
         protected virtual Task OnClosing(CancellationToken token = default) => Task.CompletedTask;
 
-        protected virtual Task CloseAsync(WebSocket socket, CancellationToken token)
+        protected virtual Task CloseAsync(CancellationToken token)
         {
             // When the close request is initiated by the client, WebSocket.CloseOutputAsync must be called so the websocket can transition
             // to the CloseSent state which is required to transition to the Closed state when the server acknowledges our close message.
             // See also: https://mcguirev10.com/2019/08/17/how-to-close-websocket-correctly.html
+            if (socket.State == WebSocketState.Closed || socket.State == WebSocketState.CloseSent || socket.State == WebSocketState.Aborted)
+                return Task.CompletedTask;
             return socket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, string.Empty, token);
         }
 
@@ -105,7 +112,7 @@ namespace osu.Game.Online.WebSockets
             {
                 while (!token.IsCancellationRequested)
                 {
-                    if (socket.State == WebSocketState.Closed)
+                    if (socket.State != WebSocketState.Open)
                         break;
 
                     var result = await socket.ReceiveAsync(buffer.Memory.Slice(bytesRead), token).ConfigureAwait(false);
@@ -140,18 +147,7 @@ namespace osu.Game.Online.WebSockets
             finally
             {
                 buffer.Dispose();
-                dispose();
             }
-        }
-
-        private void dispose()
-        {
-            socket.Dispose();
-
-            cts?.Dispose();
-            cts = null;
-
-            process = null;
         }
 
         private static ClientWebSocket createClientWebSocket(IDictionary<string, string>? headers = null)

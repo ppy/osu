@@ -18,12 +18,13 @@ namespace osu.Game.Online.WebSockets
         private HttpListener? listener;
         private Task? process;
         private CancellationTokenSource? cts;
+        private bool stopping;
         private readonly ConcurrentDictionary<int, WebSocketConnection> connections = new ConcurrentDictionary<int, WebSocketConnection>();
 
         public void Start(Uri uri)
         {
-            if (listener != null)
-                return;
+            if (stopping || listener != null)
+                throw new InvalidOperationException(@"Can't start WebSocketServer a second time");
 
             cts = new CancellationTokenSource();
 
@@ -36,8 +37,9 @@ namespace osu.Game.Online.WebSockets
 
         public async Task StopAsync(CancellationToken token = default)
         {
-            if (listener == null || process == null || cts == null)
+            if (stopping || listener == null || process == null || cts == null)
                 return;
+            stopping = true;
 
             try
             {
@@ -47,9 +49,9 @@ namespace osu.Game.Online.WebSockets
             {
             }
 
+            await cts.CancelAsync().ConfigureAwait(false);
             listener.Stop();
 
-            await cts.CancelAsync().ConfigureAwait(false);
             await process.ConfigureAwait(false);
 
             listener = null;
@@ -89,10 +91,17 @@ namespace osu.Game.Online.WebSockets
                 {
                     var context = await listener.GetContextAsync().ConfigureAwait(false);
 
-                    if (context.Request.IsWebSocketRequest)
+                    if (!token.IsCancellationRequested && context.Request.IsWebSocketRequest)
                     {
                         var wsContext = await context.AcceptWebSocketAsync(null).ConfigureAwait(false);
                         int next = Interlocked.Increment(ref id);
+
+                        if (token.IsCancellationRequested)
+                        {
+                            wsContext.WebSocket.Abort();
+                            wsContext.WebSocket.Dispose();
+                            break;
+                        }
 
                         var connection = new WebSocketConnection(this, id, wsContext.WebSocket);
                         connections.TryAdd(next, connection);
@@ -112,7 +121,7 @@ namespace osu.Game.Online.WebSockets
                 // An HttpListenerException with the error code 995 (ERROR_OPERATION_ABORTED) is thrown
                 // when we call HttpListener.Stop on another thread while HttpListener.GetContextAsync is
                 // blocking in this thread. It is safe to ignore.
-                if (!(ex is HttpListenerException hx && hx.ErrorCode == 995))
+                if (!(ex is HttpListenerException hx && hx.ErrorCode == 995 || ex is ObjectDisposedException))
                 {
                     throw;
                 }
@@ -141,14 +150,6 @@ namespace osu.Game.Online.WebSockets
                 server.connections.TryRemove(id, out _);
                 await server.OnDisconnect(id, token).ConfigureAwait(false);
                 await base.OnClosing(token).ConfigureAwait(false);
-            }
-
-            protected override async Task CloseAsync(WebSocket socket, CancellationToken token)
-            {
-                // When the close request is initiated by the server, CloseAsync must be called to notify the client
-                // that the socket is being closed from the server's side.
-                // See also: https://mcguirev10.com/2019/08/17/how-to-close-websocket-correctly.html
-                await socket.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, token).ConfigureAwait(false);
             }
         }
     }
