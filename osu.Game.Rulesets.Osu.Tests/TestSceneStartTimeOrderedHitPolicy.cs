@@ -476,15 +476,24 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private class TestHitWindows : HitWindows
         {
-            private static readonly DifficultyRange[] ranges =
-            {
-                new DifficultyRange(HitResult.Great, 500, 500, 500),
-                new DifficultyRange(HitResult.Miss, early_miss_window, early_miss_window, early_miss_window),
-            };
-
             public override bool IsHitResultAllowed(HitResult result) => result == HitResult.Great || result == HitResult.Miss;
 
-            protected override DifficultyRange[] GetRanges() => ranges;
+            public override void SetDifficulty(double difficulty) { }
+
+            public override double WindowFor(HitResult result)
+            {
+                switch (result)
+                {
+                    case HitResult.Great:
+                        return 500;
+
+                    case HitResult.Miss:
+                        return early_miss_window;
+
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(result), result, null);
+                }
+            }
         }
 
         private partial class ScoreAccessibleReplayPlayer : ReplayPlayer
