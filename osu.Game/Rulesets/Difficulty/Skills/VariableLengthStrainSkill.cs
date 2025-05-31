@@ -55,8 +55,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// <summary>
         /// Stores previous strains so that, if a high difficulty hit object is followed by a lower
         /// difficulty hit object, the high difficulty hit object gets a full strain instead of being cut short.
-        /// <typeparam name="double">Strain difficulty</typeparam>
-        /// <typeparam name="double">Strain start time</typeparam>
+        /// <value>double storedStrain, double storedStrainStartTime</value>
         /// <remarks>In the case that continuous strains is implemented, please remove this</remarks>
         /// </summary>
         private readonly PriorityQueue<double, double> strainPeakQueue = new PriorityQueue<double, double>();
@@ -83,22 +82,23 @@ namespace osu.Game.Rulesets.Difficulty.Skills
                 currentSectionEnd = currentSectionBegin + MaxSectionLength;
             }
 
-            double deltaTime = current.DeltaTime;
-
-            // Remove any strains from the queue that are too old
-            while (strainPeakQueue.TryPeek(out double storedStrain, out double storedStrainStartTime))
-            {
-                if (storedStrainStartTime + MaxSectionLength < currentSectionBegin) strainPeakQueue.Dequeue();
-                else break;
-            }
-
             while (current.StartTime > currentSectionEnd)
             {
+                // NOTE: Only use these variables after a TryPeak() or TryDequeue()
+                double storedStrain;
+                double storedStrainStartTime;
+
+                // Remove any strains from the queue that are too old
+                while (strainPeakQueue.TryPeek(out storedStrain, out storedStrainStartTime))
+                {
+                    if (storedStrainStartTime + MaxSectionLength < currentSectionBegin) strainPeakQueue.Dequeue();
+                    else break;
+                }
+
                 // Pull from queue if possible
-                if (strainPeakQueue.TryDequeue(out double storedStrain, out double storedStrainStartTime))
+                if (strainPeakQueue.TryDequeue(out storedStrain, out storedStrainStartTime))
                 {
                     saveCurrentPeak(currentSectionEnd - currentSectionBegin);
-                    deltaTime -= currentSectionEnd - currentSectionBegin;
                     currentSectionBegin = currentSectionEnd;
                     currentSectionEnd = storedStrainStartTime + MaxSectionLength;
                     startNewSectionFrom(currentSectionBegin, current);
@@ -108,7 +108,6 @@ namespace osu.Game.Rulesets.Difficulty.Skills
                 {
                     // Create new strains if queue is empty
                     saveCurrentPeak(currentSectionEnd - currentSectionBegin);
-                    deltaTime -= currentSectionEnd - currentSectionBegin;
                     currentSectionBegin = currentSectionEnd;
                     currentSectionEnd = currentSectionBegin + MaxSectionLength;
                     startNewSectionFrom(currentSectionBegin, current);
@@ -120,11 +119,14 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             // Store the strain value for the object
             ObjectStrains.Add(strain);
 
+            // If it's the first object, set the section peak and return
             if (current.Index == 0)
             {
                 currentSectionPeak = strain;
+                return;
             }
-            else if (strain > currentSectionPeak)
+            // If the strain is a new peak, clear the queue and start a new strain
+            if (strain > currentSectionPeak)
             {
                 // Clear the queue
                 strainPeakQueue.Clear();
@@ -132,16 +134,15 @@ namespace osu.Game.Rulesets.Difficulty.Skills
                 currentSectionPeak = strain;
 
                 // End the current strain, and create a new strain starting at the current hitobject
-                saveCurrentPeak(deltaTime);
-                currentSectionBegin += deltaTime;
+                saveCurrentPeak(current.StartTime - currentSectionBegin);
+                currentSectionBegin = current.StartTime;
                 currentSectionEnd = currentSectionBegin + MaxSectionLength;
-                startNewSectionFrom(currentSectionBegin, current);
             }
             else
             {
                 // If the current strain is smaller than the current peak
                 // Empty the queue of smaller elements
-                while (strainPeakQueue.TryPeek(out double storedStrain, out double storedStrainStartTime))
+                while (strainPeakQueue.TryPeek(out double storedStrain, out _))
                 {
                     if (storedStrain < strain) strainPeakQueue.Dequeue();
                     else break;
@@ -149,11 +150,6 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
                 // Add current strain to queue since it's less than the current peak
                 strainPeakQueue.Enqueue(strain, current.StartTime);
-
-                // Make a new strain with the same value and end time as the old strain
-                // Yes, this is a little stupid
-                saveCurrentPeak(deltaTime);
-                currentSectionBegin += deltaTime;
             }
         }
 
