@@ -47,6 +47,7 @@ namespace osu.Game.Online.WebSockets
         {
             if (cts == null || process == null || stopping)
                 return;
+
             stopping = true;
 
             await OnClosing(token).ConfigureAwait(false);
@@ -92,6 +93,7 @@ namespace osu.Game.Online.WebSockets
             // See also: https://mcguirev10.com/2019/08/17/how-to-close-websocket-correctly.html
             if (socket.State == WebSocketState.Closed || socket.State == WebSocketState.CloseSent || socket.State == WebSocketState.Aborted)
                 return Task.CompletedTask;
+
             return socket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, string.Empty, token);
         }
 

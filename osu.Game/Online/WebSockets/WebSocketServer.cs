@@ -39,6 +39,7 @@ namespace osu.Game.Online.WebSockets
         {
             if (stopping || listener == null || process == null || cts == null)
                 return;
+
             stopping = true;
 
             try
@@ -121,7 +122,7 @@ namespace osu.Game.Online.WebSockets
                 // An HttpListenerException with the error code 995 (ERROR_OPERATION_ABORTED) is thrown
                 // when we call HttpListener.Stop on another thread while HttpListener.GetContextAsync is
                 // blocking in this thread. It is safe to ignore.
-                if (!(ex is HttpListenerException hx && hx.ErrorCode == 995 || ex is ObjectDisposedException))
+                if (!((ex is HttpListenerException hx && hx.ErrorCode == 995) || ex is ObjectDisposedException))
                 {
                     throw;
                 }
