@@ -85,10 +85,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
             double offset = result.Time.Value - referenceTime;
 
             if (offset != 0)
+            {
                 Beatmap.PerformOnSelection(obj =>
                 {
                     new StartTimeChange(obj, obj.StartTime + offset).Apply(changeHandler);
                 });
+            }
         }
 
         protected override void AddBlueprintFor(HitObject item)
