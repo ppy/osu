@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             CurrentStrain = base.StrainValueAt(current);
 
             if (current.BaseObject is Slider)
-                sliderStrains.Add(currentStrain);
+                sliderStrains.Add(CurrentStrain);
 
             return CurrentStrain;
         }
