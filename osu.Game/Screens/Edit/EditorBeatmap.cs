@@ -92,6 +92,9 @@ namespace osu.Game.Screens.Edit
 
         private IBeatmapProcessor beatmapProcessor;
 
+        [CanBeNull]
+        private HitObjectChangeHandler changeHandler;
+
         private readonly Dictionary<HitObject, Bindable<double>> startTimeBindables = new Dictionary<HitObject, Bindable<double>>();
 
         public EditorBeatmap(IBeatmap playableBeatmap, ISkin beatmapSkin = null, BeatmapInfo beatmapInfo = null)
@@ -140,6 +143,7 @@ namespace osu.Game.Screens.Edit
 
         public void AddChangeHandler(HitObjectChangeHandler changeHandler)
         {
+            this.changeHandler = changeHandler;
             beatmapProcessor = new EditorBeatmapProcessor(this, PlayableBeatmap.BeatmapInfo.Ruleset.CreateInstance(), changeHandler);
         }
 
@@ -327,6 +331,7 @@ namespace osu.Game.Screens.Edit
             {
                 action(h);
                 Update(h);
+                changeHandler?.RecordUpdate(h);
             }
 
             EndChange();
