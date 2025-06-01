@@ -10,17 +10,24 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Game.Audio;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Screens.Edit.Changes;
+using osuTK.Input;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
     public partial class EditorSelectionHandler : SelectionHandler<HitObject>
     {
+        /// <summary>
+        /// Whether right click should delete even when shift is not held.
+        /// </summary>
+        public bool RightClickAlwaysQuickDeletes { get; set; }
+
         /// <summary>
         /// A special bank name that is only used in the editor UI.
         /// When selected and in placement mode, the bank of the last hit object will always be used.
@@ -39,6 +46,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
             EditorBeatmap.HitObjectUpdated += _ => Scheduler.AddOnce(UpdateTernaryStates);
 
             SelectedItems.CollectionChanged += onSelectedItemsChanged;
+        }
+
+        protected override bool ShouldQuickDelete(MouseButtonEvent e)
+        {
+            if (RightClickAlwaysQuickDeletes && e.Button == MouseButton.Right)
+                return true;
+
+            return base.ShouldQuickDelete(e);
         }
 
         protected override void DeleteItems(IEnumerable<HitObject> items) => new RemoveRangeHitObjectChange(EditorBeatmap, items).Apply(ChangeHandler, true);
@@ -267,6 +282,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
             SelectionAdditionBanksEnabled.Value = true;
             SelectionBankStates[HIT_BANK_AUTO].Value = TernaryState.True;
             SelectionAdditionBankStates[HIT_BANK_AUTO].Value = TernaryState.True;
+            foreach (var (_, sampleState) in SelectionSampleStates)
+                sampleState.Value = TernaryState.False;
         }
 
         /// <summary>
@@ -294,14 +311,15 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             foreach ((string bankName, var bindable) in SelectionAdditionBankStates)
             {
-                bindable.Value = GetStateFromSelection(samplesInSelection.SelectMany(s => s).Where(o => o.Name != HitSampleInfo.HIT_NORMAL), h => (bankName != HIT_BANK_AUTO && h.Bank == bankName && !h.EditorAutoBank) || (bankName == HIT_BANK_AUTO && h.EditorAutoBank));
+                bindable.Value = GetStateFromSelection(samplesInSelection.SelectMany(s => s).Where(o => o.Name != HitSampleInfo.HIT_NORMAL),
+                    h => (bankName != HIT_BANK_AUTO && h.Bank == bankName && !h.EditorAutoBank) || (bankName == HIT_BANK_AUTO && h.EditorAutoBank));
             }
         }
 
         private void onSelectedItemsChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             // Reset the ternary states when the selection is cleared.
-            if (e.OldStartingIndex >= 0 && e.NewStartingIndex < 0)
+            if (SelectedItems.Count == 0)
                 Scheduler.AddOnce(resetTernaryStates);
             else
                 Scheduler.AddOnce(UpdateTernaryStates);
@@ -356,9 +374,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     for (int i = 0; i < hasRepeats.NodeSamples.Count; ++i)
                         new NodeSamplesChange(hasRepeats, i, hasRepeats.NodeSamples[i].Select(s => s.Name == HitSampleInfo.HIT_NORMAL ? s.With(newBank: bankName) : s).ToList()).Apply(ChangeHandler);
                 }
-
-                EditorBeatmap.Update(h);
-                ChangeHandler?.RecordUpdate(h);
             });
         }
 
@@ -382,19 +397,23 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     return;
 
                 string normalBank = h.Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL)?.Bank ?? HitSampleInfo.BANK_SOFT;
-                new SamplesChange(h, h.Samples.Select(s => s.Name != HitSampleInfo.HIT_NORMAL ? bankName == HIT_BANK_AUTO ? s.With(newBank: normalBank, newEditorAutoBank: true) : s.With(newBank: bankName, newEditorAutoBank: false) : s).ToList()).Apply(ChangeHandler);
+                new SamplesChange(h, h.Samples.Select(s =>
+                                          s.Name != HitSampleInfo.HIT_NORMAL
+                                              ? bankName == HIT_BANK_AUTO ? s.With(newBank: normalBank, newEditorAutoBank: true) : s.With(newBank: bankName, newEditorAutoBank: false)
+                                              : s)
+                                      .ToList()).Apply(ChangeHandler);
 
                 if (h is IHasRepeats hasRepeats)
                 {
                     for (int i = 0; i < hasRepeats.NodeSamples.Count; ++i)
                     {
                         normalBank = hasRepeats.NodeSamples[i].FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL)?.Bank ?? HitSampleInfo.BANK_SOFT;
-                        new NodeSamplesChange(hasRepeats, i, hasRepeats.NodeSamples[i].Select(s => s.Name != HitSampleInfo.HIT_NORMAL ? bankName == HIT_BANK_AUTO ? s.With(newBank: normalBank, newEditorAutoBank: true) : s.With(newBank: bankName, newEditorAutoBank: false) : s).ToList()).Apply(ChangeHandler);
+                        new NodeSamplesChange(hasRepeats, i, hasRepeats.NodeSamples[i].Select(s =>
+                            s.Name != HitSampleInfo.HIT_NORMAL
+                                ? bankName == HIT_BANK_AUTO ? s.With(newBank: normalBank, newEditorAutoBank: true) : s.With(newBank: bankName, newEditorAutoBank: false)
+                                : s).ToList()).Apply(ChangeHandler);
                     }
                 }
-
-                EditorBeatmap.Update(h);
-                ChangeHandler?.RecordUpdate(h);
             });
         }
 
@@ -442,9 +461,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
                         new InsertSampleChange(node, node.Count, hitSample).Apply(ChangeHandler);
                     }
                 }
-
-                EditorBeatmap.Update(h);
-                ChangeHandler?.RecordUpdate(h);
             });
         }
 
@@ -466,9 +482,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     for (int i = 0; i < hasRepeats.NodeSamples.Count; ++i)
                         new NodeSamplesChange(hasRepeats, i, hasRepeats.NodeSamples[i].Where(s => s.Name != sampleName).ToList()).Apply(ChangeHandler);
                 }
-
-                EditorBeatmap.Update(h);
-                ChangeHandler?.RecordUpdate(h);
             });
         }
 
@@ -489,8 +502,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 if (comboInfo == null || comboInfo.NewCombo == state) return;
 
                 new NewComboChange(comboInfo, state).Apply(ChangeHandler);
-                EditorBeatmap.Update(h);
-                ChangeHandler?.RecordUpdate(h);
             });
         }
 

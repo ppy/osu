@@ -50,6 +50,9 @@ namespace osu.Game.Rulesets.Objects.Types
         /// </summary>
         new bool NewCombo { get; set; }
 
+        /// <inheritdoc cref="IHasCombo.ComboOffset"/>
+        new int ComboOffset { get; set; }
+
         /// <summary>
         /// Bindable exposure of <see cref="LastInCombo"/>.
         /// </summary>
@@ -84,19 +87,23 @@ namespace osu.Game.Rulesets.Objects.Types
         /// <param name="lastObj">The previous hitobject, or null if this is the first object in the beatmap.</param>
         void UpdateComboInformation(IHasComboInformation? lastObj)
         {
-            ComboIndex = lastObj?.ComboIndex ?? 0;
-            ComboIndexWithOffsets = lastObj?.ComboIndexWithOffsets ?? 0;
-            IndexInCurrentCombo = (lastObj?.IndexInCurrentCombo + 1) ?? 0;
+            int index = lastObj?.ComboIndex ?? 0;
+            int indexWithOffsets = lastObj?.ComboIndexWithOffsets ?? 0;
+            int inCurrentCombo = (lastObj?.IndexInCurrentCombo + 1) ?? 0;
 
             if (NewCombo || lastObj == null)
             {
-                IndexInCurrentCombo = 0;
-                ComboIndex++;
-                ComboIndexWithOffsets += ComboOffset + 1;
+                inCurrentCombo = 0;
+                index++;
+                indexWithOffsets += ComboOffset + 1;
 
                 if (lastObj != null)
                     lastObj.LastInCombo = true;
             }
+
+            ComboIndex = index;
+            ComboIndexWithOffsets = indexWithOffsets;
+            IndexInCurrentCombo = inCurrentCombo;
         }
     }
 }

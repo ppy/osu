@@ -18,12 +18,15 @@ using osu.Game.Online.Chat;
 using osu.Game.Overlays.Chat.Listing;
 using osu.Game.Users.Drawables;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Overlays.Chat.ChannelList
 {
     public partial class ChannelListItem : OsuClickableContainer, IFilterable
     {
         public event Action<Channel>? OnRequestSelect;
+
+        public bool CanLeave { get; init; } = true;
         public event Action<Channel>? OnRequestLeave;
 
         public readonly Channel Channel;
@@ -158,9 +161,20 @@ namespace osu.Game.Overlays.Chat.ChannelList
             };
         }
 
+        protected override bool OnMouseDown(MouseDownEvent e)
+        {
+            if (e.Button == MouseButton.Middle)
+            {
+                close?.TriggerClick();
+                return true;
+            }
+
+            return base.OnMouseDown(e);
+        }
+
         private ChannelListItemCloseButton? createCloseButton()
         {
-            if (isSelector)
+            if (isSelector || !CanLeave)
                 return null;
 
             return new ChannelListItemCloseButton

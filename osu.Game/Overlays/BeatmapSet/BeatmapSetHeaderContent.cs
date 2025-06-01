@@ -98,7 +98,7 @@ namespace osu.Game.Overlays.BeatmapSet
                         {
                             Vertical = BeatmapSetOverlay.Y_PADDING,
                             Left = WaveOverlayContainer.HORIZONTAL_PADDING,
-                            Right = WaveOverlayContainer.HORIZONTAL_PADDING + BeatmapSetOverlay.RIGHT_WIDTH,
+                            Right = WaveOverlayContainer.HORIZONTAL_PADDING + BeatmapSetOverlay.RIGHT_WIDTH + 10,
                         },
                         Children = new Drawable[]
                         {
@@ -177,7 +177,6 @@ namespace osu.Game.Overlays.BeatmapSet
                         {
                             onlineStatusPill = new BeatmapSetOnlineStatusPill
                             {
-                                AutoSizeAxes = Axes.Both,
                                 Anchor = Anchor.TopRight,
                                 Origin = Anchor.TopRight,
                                 TextSize = 14,

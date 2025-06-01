@@ -85,6 +85,11 @@ namespace osu.Game.Localisation
         public static LocalisableString RightMouseScroll => new TranslatableString(getKey(@"right_mouse_scroll"), @"Right mouse drag to absolute scroll");
 
         /// <summary>
+        /// "Show converts"
+        /// </summary>
+        public static LocalisableString ShowConverts => new TranslatableString(getKey(@"show_converts"), @"Show converts");
+
+        /// <summary>
         /// "Show converted beatmaps"
         /// </summary>
         public static LocalisableString ShowConvertedBeatmaps => new TranslatableString(getKey(@"show_converted_beatmaps"), @"Show converted beatmaps");

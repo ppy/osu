@@ -5,7 +5,6 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
-using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -18,6 +17,8 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
+using osu.Game.Screens.OnlinePlay;
+using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
 using osu.Game.Tests.Resources;
 using osuTK;
@@ -28,6 +29,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
     {
         private MultiplayerSpectateButton spectateButton = null!;
         private MatchStartControl startControl = null!;
+        private Room room = null!;
 
         private BeatmapSetInfo importedSet = null!;
         private BeatmapManager beatmaps = null!;
@@ -46,40 +48,52 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             base.SetUpSteps();
 
+            AddStep("create room", () => room = CreateDefaultRoom());
+            AddStep("join room", () => JoinRoom(room));
+            WaitForJoined();
+
             AddStep("create button", () =>
             {
-                PlaylistItem item = SelectedRoom.Value!.Playlist.First();
-
-                AvailabilityTracker.SelectedItem.Value = item;
-
                 importedSet = beatmaps.GetAllUsableBeatmapSets().First();
                 Beatmap.Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First());
 
-                Child = new PopoverContainer
+                MultiplayerBeatmapAvailabilityTracker tracker = new MultiplayerBeatmapAvailabilityTracker();
+
+                Child = new DependencyProvidingContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Child = new FillFlowContainer
-                    {
-                        AutoSizeAxes = Axes.Both,
-                        Direction = FillDirection.Vertical,
-                        Children = new Drawable[]
+                    CachedDependencies =
+                    [
+                        (typeof(OnlinePlayBeatmapAvailabilityTracker), tracker)
+                    ],
+                    Children =
+                    [
+                        tracker,
+                        new PopoverContainer
                         {
-                            spectateButton = new MultiplayerSpectateButton
+                            RelativeSizeAxes = Axes.Both,
+                            Child = new FillFlowContainer
                             {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                Size = new Vector2(200, 50),
-                                SelectedItem = new Bindable<PlaylistItem?>(item)
-                            },
-                            startControl = new MatchStartControl
-                            {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                Size = new Vector2(200, 50),
-                                SelectedItem = new Bindable<PlaylistItem?>(item)
+                                AutoSizeAxes = Axes.Both,
+                                Direction = FillDirection.Vertical,
+                                Children = new Drawable[]
+                                {
+                                    spectateButton = new MultiplayerSpectateButton
+                                    {
+                                        Anchor = Anchor.Centre,
+                                        Origin = Anchor.Centre,
+                                        Size = new Vector2(200, 50)
+                                    },
+                                    startControl = new MatchStartControl
+                                    {
+                                        Anchor = Anchor.Centre,
+                                        Origin = Anchor.Centre,
+                                        Size = new Vector2(200, 50)
+                                    }
+                                }
                             }
                         }
-                    }
+                    ]
                 };
             });
         }

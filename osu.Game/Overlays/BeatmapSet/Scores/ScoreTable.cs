@@ -160,7 +160,20 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 {
                     Size = new Vector2(19, 14),
                 },
-                username,
+                new FillFlowContainer
+                {
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Horizontal,
+                    Spacing = new Vector2(4),
+                    Children = new Drawable[]
+                    {
+                        new UpdateableTeamFlag(score.User.Team)
+                        {
+                            Size = new Vector2(28, 14),
+                        },
+                        username,
+                    }
+                },
 #pragma warning disable 618
                 new StatisticText(score.MaxCombo, score.BeatmapInfo!.MaxCombo, @"0\x"),
 #pragma warning restore 618
@@ -187,6 +200,8 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 content.Add(new StatisticText(count, maxCount, @"N0") { Colour = count == 0 ? Color4.Gray : Color4.White });
             }
 
+            // TODO: all this should be using the same sort of logic as `DrawableProfileScore` is, but that's not easily done
+            // unless the ENTIRE overlay can be weaned off of `ScoreInfo` and use `SoloScoreInfo` instead
             if (showPerformancePoints)
             {
                 if (!score.Ranked)

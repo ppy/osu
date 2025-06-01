@@ -277,14 +277,21 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             if (adjustVelocity)
             {
                 proposedVelocity = proposedDistance / oldDuration;
-                proposedDistance = MathHelper.Clamp(proposedDistance, 0.1 * oldDuration, 10 * oldDuration);
+                proposedDistance = Math.Clamp(proposedDistance, 0.1 * oldDuration, 10 * oldDuration);
             }
             else
             {
-                double minDistance = distanceSnapProvider?.GetBeatSnapDistanceAt(HitObject, false) * oldVelocityMultiplier ?? 1;
+                double minDistance = distanceSnapProvider?.GetBeatSnapDistance() * oldVelocityMultiplier ?? 1;
+                // do not allow the slider to extend beyond the path's calculated distance.
+                // this can happen in two specific circumstances:
+                // - floating point issues (`minDistance` is just ever so slightly larger than the calculated distance)
+                // - the slider was placed with a higher beat snap active than the current one,
+                //   therefore snapping it to the current beat snap distance would mean extrapolating it beyond its actual shape as defined by its control points
+                minDistance = Math.Min(minDistance, HitObject.Path.CalculatedDistance);
+
                 // Add a small amount to the proposed distance to make it easier to snap to the full length of the slider.
-                proposedDistance = distanceSnapProvider?.FindSnappedDistance(HitObject, (float)proposedDistance + 1, DistanceSnapTarget.Start) ?? proposedDistance;
-                proposedDistance = MathHelper.Clamp(proposedDistance, minDistance, HitObject.Path.CalculatedDistance);
+                proposedDistance = distanceSnapProvider?.FindSnappedDistance((float)proposedDistance + 1, HitObject.StartTime, HitObject) ?? proposedDistance;
+                proposedDistance = Math.Clamp(proposedDistance, minDistance, HitObject.Path.CalculatedDistance);
             }
 
             if (Precision.AlmostEquals(proposedDistance, HitObject.Path.Distance) && Precision.AlmostEquals(proposedVelocity, HitObject.SliderVelocityMultiplier))
@@ -484,7 +491,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             new SnapToChange<Slider>(HitObject, distanceSnapProvider).Apply(changeHandler);
 
             // If there are 0 or 1 remaining control points, or the slider has an invalid length, it is in a degenerate form and should be deleted
-            if (controlPoints.Count <= 1 || !HitObject.Path.HasValidLength)
+            if (controlPoints.Count <= 1 || !HitObject.Path.HasValidLengthForPlacement)
             {
                 placementHandler?.Delete(HitObject);
                 return;
@@ -636,7 +643,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
         {
-            if (BodyPiece.ReceivePositionalInputAt(screenSpacePos) && DrawableObject.Body.Alpha > 0)
+            if (BodyPiece.ReceivePositionalInputAt(screenSpacePos) && (IsSelected || DrawableObject.Body.Alpha > 0 || DrawableObject.HeadCircle.Alpha > 0))
                 return true;
 
             if (ControlPointVisualiser == null)

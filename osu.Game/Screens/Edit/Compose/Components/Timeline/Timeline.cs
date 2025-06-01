@@ -22,7 +22,7 @@ using osuTK.Input;
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
     [Cached]
-    public partial class Timeline : ZoomableScrollContainer, IPositionSnapProvider
+    public partial class Timeline : ZoomableScrollContainer
     {
         private const float timeline_height = 80;
 
@@ -55,7 +55,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         /// <summary>
         /// The timeline's scroll position in the last frame.
         /// </summary>
-        private float lastScrollPosition;
+        private double lastScrollPosition;
 
         /// <summary>
         /// The track time in the last frame.
@@ -322,7 +322,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         /// </summary>
         public double VisibleRange => editorClock.TrackLength / Zoom;
 
-        public double TimeAtPosition(float x)
+        public double TimeAtPosition(double x)
         {
             return x / Content.DrawWidth * editorClock.TrackLength;
         }
@@ -332,7 +332,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             return (float)(time / editorClock.TrackLength * Content.DrawWidth);
         }
 
-        public SnapResult FindSnappedPositionAndTime(Vector2 screenSpacePosition, SnapType snapType = SnapType.All)
+        public SnapResult FindSnappedPositionAndTime(Vector2 screenSpacePosition)
         {
             double time = TimeAtPosition(Content.ToLocalSpace(screenSpacePosition).X);
             return new SnapResult(screenSpacePosition, beatSnapProvider.SnapTime(time));

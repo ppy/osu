@@ -8,6 +8,7 @@ using ManagedBass.Fx;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
+using osu.Framework.Development;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -52,6 +53,9 @@ namespace osu.Game.Screens.Play
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 
         public override bool? AllowGlobalTrackControl => false;
+
+        // this makes the game stay in portrait mode when restarting gameplay rather than switching back to landscape.
+        public override bool RequiresPortraitOrientation => CurrentPlayer?.RequiresPortraitOrientation == true;
 
         public override float BackgroundParallaxAmount => quickRestart ? 0 : 1;
 
@@ -299,8 +303,7 @@ namespace osu.Game.Screens.Play
 
             Debug.Assert(CurrentPlayer != null);
 
-            highPerformanceSession?.Dispose();
-            highPerformanceSession = null;
+            endHighPerformance();
 
             // prepare for a retry.
             CurrentPlayer = null;
@@ -346,8 +349,7 @@ namespace osu.Game.Screens.Play
             BackgroundBrightnessReduction = false;
             Beatmap.Value.Track.RemoveAdjustment(AdjustableProperty.Volume, volumeAdjustment);
 
-            highPerformanceSession?.Dispose();
-            highPerformanceSession = null;
+            endHighPerformance();
 
             return base.OnExiting(e);
         }
@@ -562,6 +564,8 @@ namespace osu.Game.Screens.Play
 
         private void pushWhenLoaded()
         {
+            Debug.Assert(ThreadSafety.IsUpdateThread);
+
             if (!this.IsCurrentScreen()) return;
 
             if (!readyForPush)
@@ -584,7 +588,9 @@ namespace osu.Game.Screens.Play
             scheduledPushPlayer = Scheduler.AddDelayed(() =>
                 {
                     // ensure that once we have reached this "point of no return", readyForPush will be false for all future checks (until a new player instance is prepared).
-                    var consumedPlayer = consumePlayer();
+                    Player consumedPlayer = consumePlayer();
+
+                    consumedPlayer.OnShowingResults += endHighPerformance;
 
                     ContentOut();
 
@@ -620,6 +626,14 @@ namespace osu.Game.Screens.Play
             scheduledPushPlayer = null;
         }
 
+        private void endHighPerformance()
+        {
+            Debug.Assert(ThreadSafety.IsUpdateThread);
+
+            highPerformanceSession?.Dispose();
+            highPerformanceSession = null;
+        }
+
         #region Disposal
 
         protected override void Dispose(bool isDisposing)
@@ -632,8 +646,8 @@ namespace osu.Game.Screens.Play
                 DisposalTask = LoadTask?.ContinueWith(_ => CurrentPlayer?.Dispose());
             }
 
+            // This is only a failsafe; should be disposed more immediately by `endHighPerformance` call.
             highPerformanceSession?.Dispose();
-            highPerformanceSession = null;
         }
 
         #endregion
@@ -663,8 +677,6 @@ namespace osu.Game.Screens.Play
 
         private partial class MutedNotification : SimpleNotification
         {
-            public override bool IsImportant => true;
-
             public MutedNotification()
             {
                 Text = NotificationsStrings.GameVolumeTooLow;
@@ -716,8 +728,6 @@ namespace osu.Game.Screens.Play
 
         private partial class BatteryWarningNotification : SimpleNotification
         {
-            public override bool IsImportant => true;
-
             public BatteryWarningNotification()
             {
                 Text = NotificationsStrings.BatteryLow;

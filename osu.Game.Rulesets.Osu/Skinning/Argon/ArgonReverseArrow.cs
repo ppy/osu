@@ -85,9 +85,12 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
             {
                 double animDuration = Math.Min(300, drawableRepeat.HitObject.SpanDuration);
                 Scale = new Vector2(Interpolation.ValueAt(Time.Current, 1, 1.5f, drawableRepeat.HitStateUpdateTime, drawableRepeat.HitStateUpdateTime + animDuration, Easing.Out));
+
+                // When hit, don't animate further. This avoids a scale being applied on a scale and looking very weird.
+                return;
             }
-            else
-                Scale = Vector2.One;
+
+            Scale = Vector2.One;
 
             const float move_distance = -12;
             const float scale_amount = 1.3f;
