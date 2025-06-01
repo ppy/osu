@@ -10,7 +10,7 @@ namespace osu.Game.Screens.Edit.Changes
     /// <summary>
     /// Snaps the provided <see cref="HitObject"/>'s duration using the <see cref="IDistanceSnapProvider"/>.
     /// </summary>
-    public class SnapToChange<THitObject> : CompositeChange where THitObject : HitObject, IHasPath
+    public class SnapToChange<THitObject> : CompositeChange where THitObject : HitObject, IHasPath, IHasSliderVelocity
     {
         private readonly THitObject hitObject;
         private readonly IDistanceSnapProvider? snapProvider;
@@ -23,7 +23,7 @@ namespace osu.Game.Screens.Edit.Changes
 
         protected override void SubmitChanges()
         {
-            double newDistance = snapProvider?.FindSnappedDistance(hitObject, (float)hitObject.Path.CalculatedDistance, DistanceSnapTarget.Start) ?? hitObject.Path.CalculatedDistance;
+            double newDistance = snapProvider?.FindSnappedDistance((float)hitObject.Path.CalculatedDistance, hitObject.StartTime, hitObject) ?? hitObject.Path.CalculatedDistance;
             Submit(new ExpectedDistanceChange(hitObject.Path, newDistance));
         }
     }
