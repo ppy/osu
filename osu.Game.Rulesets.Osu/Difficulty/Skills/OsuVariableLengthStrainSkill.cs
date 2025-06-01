@@ -12,8 +12,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
     public abstract class OsuVariableLengthStrainSkill : VariableLengthStrainSkill
     {
-        protected double RawDifficultyMultiplier => 1.01;
-
+        private double RawDifficultyMultiplier => 1.04;
         /// <summary>
         /// The number of sections with the highest strains, which the peak strain reductions will apply to.
         /// This is done in order to decrease their impact on the overall difficulty of the map for this skill.
@@ -55,13 +54,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             strains = strains.OrderByDescending(s => s.Value).ToList();
             time = 0;
 
-            // Difficulty is the weighted sum of the highest strains from every section.
-            // We're sorting from highest to lowest strain.
+            // Difficulty is a continuous weighted sum of the sorted strains
+            // 9.49122 = Integrate[Power[0.9,x],{x,0,1}]
             for (int i = 0; i < strains.Count; i++)
             {
-                difficulty += strains[i].Value * weight * strains[i].SectionLength / MaxSectionLength;
+                weight = Math.Pow(0.9, time) * (9.49122 - 9.49122 * Math.Pow(0.9, strains[i].SectionLength / MaxSectionLength)); // f(a,b)=Integrate[Power[0.9,x],{x,a,a+b}]
+                difficulty += strains[i].Value * weight;
                 time += strains[i].SectionLength / MaxSectionLength;
-                weight = Math.Pow(DecayWeight, time);
             }
 
             return difficulty * RawDifficultyMultiplier;
