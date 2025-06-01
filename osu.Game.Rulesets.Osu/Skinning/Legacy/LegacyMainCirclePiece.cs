@@ -88,6 +88,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
+                    Alpha = priorityLookupPrefix == null ? 0.75f : 0.5f // TODO: this is kind of a dirty way to check if we're a hitcircle or a circle that's part of a slider.
                 },
                 OverlayLayer = new Container
                 {

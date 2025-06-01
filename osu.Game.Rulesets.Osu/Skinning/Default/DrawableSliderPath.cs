@@ -2,17 +2,23 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics.Lines;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
-    public abstract partial class DrawableSliderPath : SmoothPath
+    public abstract partial class DrawableSliderPath : BackdropBlurPath
     {
         public const float BORDER_PORTION = 0.128f;
         public const float GRADIENT_PORTION = 1 - BORDER_PORTION;
 
         private const float border_max_size = 8f;
         private const float border_min_size = 0f;
+
+        protected DrawableSliderPath()
+        {
+            EffectBufferScale = new Vector2(0.25f);
+        }
 
         private Color4 borderColour = Color4.White;
 
