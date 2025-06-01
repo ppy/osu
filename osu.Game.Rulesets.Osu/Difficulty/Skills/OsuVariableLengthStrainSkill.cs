@@ -13,6 +13,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     public abstract class OsuVariableLengthStrainSkill : VariableLengthStrainSkill
     {
         protected override double RawDifficultyMultiplier => 1.04;
+
         /// <summary>
         /// The number of sections with the highest strains, which the peak strain reductions will apply to.
         /// This is done in order to decrease their impact on the overall difficulty of the map for this skill.
@@ -38,7 +39,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             // These sections will not contribute to the difficulty.
             var peaks = GetCurrentStrainPeaks().Where(p => p.Value > 0);
 
-            List<Strain> strains = peaks.OrderByDescending(p => (p.Value, p.SectionLength)).ToList();
+            List<StrainPeak> strains = peaks.OrderByDescending(p => (p.Value, p.SectionLength)).ToList();
 
             // Time is measured in units of strains
             double time = 0;
@@ -47,7 +48,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             for (int i = 0; i < strains.Count && time < ReducedSectionCount; i++)
             {
                 double scale = Math.Log10(Interpolation.Lerp(1, 10, Math.Clamp((float)time / ReducedSectionCount, 0, 1)));
-                strains[i] = new Strain(strains[i].Value * Interpolation.Lerp(ReducedStrainBaseline, 1.0, scale), strains[i].SectionLength);
+                strains[i] = new StrainPeak(strains[i].Value * Interpolation.Lerp(ReducedStrainBaseline, 1.0, scale), strains[i].SectionLength);
                 time += strains[i].SectionLength / MaxSectionLength;
             }
 
