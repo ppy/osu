@@ -26,6 +26,7 @@ using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
 using osu.Game.Online.Placeholders;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Volume;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking.Expanded.Accuracy;
@@ -78,11 +79,10 @@ namespace osu.Game.Screens.Ranking
         public bool AllowWatchingReplay { get; init; } = true;
 
         /// <summary>
-        /// Whether the user's personal statistics should be shown on the extended statistics panel
-        /// after clicking the score panel associated with the <see cref="Score"/> being presented.
-        /// Requires <see cref="Score"/> to be present.
+        /// Whether the provided score is for a local user's play.
+        /// This will trigger elements like the user's ranking to display.
         /// </summary>
-        public bool ShowUserStatistics { get; init; }
+        public bool IsLocalPlay { get; init; }
 
         private Sample? popInSample;
 
@@ -119,11 +119,13 @@ namespace osu.Game.Screens.Ranking
                                     RelativeSizeAxes = Axes.Both,
                                     Children = new Drawable[]
                                     {
-                                        StatisticsPanel = createStatisticsPanel().With(panel =>
+                                        new GlobalScrollAdjustsVolume(),
+                                        StatisticsPanel = new StatisticsPanel
                                         {
-                                            panel.RelativeSizeAxes = Axes.Both;
-                                            panel.Score.BindTarget = SelectedScore;
-                                        }),
+                                            RelativeSizeAxes = Axes.Both,
+                                            Score = { BindTarget = SelectedScore },
+                                            AchievedScore = IsLocalPlay && Score != null ? Score : null,
+                                        },
                                         ScorePanelList = new ScorePanelList
                                         {
                                             RelativeSizeAxes = Axes.Both,
@@ -351,16 +353,6 @@ namespace osu.Game.Screens.Ranking
         /// <param name="direction">The fetch direction. -1 to fetch scores greater than the current start of the list, and 1 to fetch scores lower than the current end of the list.</param>
         protected virtual Task<ScoreInfo[]> FetchNextPage(int direction) => Task.FromResult<ScoreInfo[]>([]);
 
-        /// <summary>
-        /// Creates the <see cref="Statistics.StatisticsPanel"/> to be used to display extended information about scores.
-        /// </summary>
-        private StatisticsPanel createStatisticsPanel()
-        {
-            return ShowUserStatistics && Score != null
-                ? new UserStatisticsPanel(Score)
-                : new StatisticsPanel();
-        }
-
         private Task addScores(ScoreInfo[] scores)
         {
             var tcs = new TaskCompletionSource();
@@ -526,11 +518,23 @@ namespace osu.Game.Screens.Ranking
         {
         }
 
+        protected override bool OnScroll(ScrollEvent e)
+        {
+            // Match stable behaviour of only alt-scroll adjusting volume.
+            // This is the same behaviour as the song selection screen.
+            if (!e.CurrentState.Keyboard.AltPressed)
+                return true;
+
+            return base.OnScroll(e);
+        }
+
         protected partial class VerticalScrollContainer : OsuScrollContainer
         {
             protected override Container<Drawable> Content => content;
 
             private readonly Container content;
+
+            protected override bool OnScroll(ScrollEvent e) => !e.ControlPressed && !e.AltPressed && !e.ShiftPressed && !e.SuperPressed;
 
             public VerticalScrollContainer()
             {

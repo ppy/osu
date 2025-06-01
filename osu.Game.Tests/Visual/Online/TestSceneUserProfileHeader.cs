@@ -79,7 +79,7 @@ namespace osu.Game.Tests.Visual.Online
                 Id = 1001,
                 Username = "IAmOnline",
                 LastVisit = DateTimeOffset.Now,
-                IsOnline = true,
+                WasRecentlyOnline = true,
             }, new OsuRuleset().RulesetInfo));
 
             AddStep("Show offline user", () => header.User.Value = new UserProfileData(new APIUser
@@ -87,7 +87,7 @@ namespace osu.Game.Tests.Visual.Online
                 Id = 1002,
                 Username = "IAmOffline",
                 LastVisit = DateTimeOffset.Now.AddDays(-10),
-                IsOnline = false,
+                WasRecentlyOnline = false,
             }, new OsuRuleset().RulesetInfo));
         }
 
