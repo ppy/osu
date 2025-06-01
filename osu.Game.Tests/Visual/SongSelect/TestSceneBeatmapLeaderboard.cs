@@ -43,6 +43,8 @@ namespace osu.Game.Tests.Visual.SongSelect
         private BeatmapManager beatmapManager = null!;
         private PlaySongSelect songSelect = null!;
 
+        private LeaderboardManager leaderboardManager = null!;
+
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
             var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
@@ -51,6 +53,8 @@ namespace osu.Game.Tests.Visual.SongSelect
             dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, Realm, null, dependencies.Get<AudioManager>(), Resources, dependencies.Get<GameHost>(), Beatmap.Default));
             dependencies.Cache(scoreManager = new ScoreManager(rulesetStore, () => beatmapManager, LocalStorage, Realm, API));
             dependencies.CacheAs<Screens.Select.SongSelect>(songSelect = new PlaySongSelect());
+            dependencies.Cache(leaderboardManager = new LeaderboardManager());
+
             Dependencies.Cache(Realm);
 
             return dependencies;
@@ -60,6 +64,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         private void load()
         {
             LoadComponent(songSelect);
+            LoadComponent(leaderboardManager);
         }
 
         public TestSceneBeatmapLeaderboard()
@@ -110,6 +115,27 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             clearScores();
             checkDisplayedCount(0);
+        }
+
+        [Test]
+        public void TestLocalScoresDisplayWorksWhenStartingOffline()
+        {
+            BeatmapInfo beatmapInfo = null!;
+
+            AddStep("Log out", () => API.Logout());
+            AddStep(@"Set scope", () => leaderboard.Scope = BeatmapLeaderboardScope.Local);
+
+            AddStep(@"Set beatmap", () =>
+            {
+                beatmapManager.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
+                beatmapInfo = beatmapManager.GetAllUsableBeatmapSets().First().Beatmaps.First();
+
+                leaderboard.BeatmapInfo = beatmapInfo;
+            });
+
+            clearScores();
+            importMoreScores(() => beatmapInfo);
+            checkDisplayedCount(10);
         }
 
         [Test]
@@ -180,8 +206,8 @@ namespace osu.Game.Tests.Visual.SongSelect
         public void TestGlobalScoresDisplay()
         {
             AddStep(@"Set scope", () => leaderboard.Scope = BeatmapLeaderboardScope.Global);
-            AddStep(@"New Scores", () => leaderboard.SetScores(generateSampleScores(new BeatmapInfo())));
-            AddStep(@"New Scores with teams", () => leaderboard.SetScores(generateSampleScores(new BeatmapInfo()).Select(s =>
+            AddStep(@"New Scores", () => leaderboard.SetScores(GenerateSampleScores(new BeatmapInfo())));
+            AddStep(@"New Scores with teams", () => leaderboard.SetScores(GenerateSampleScores(new BeatmapInfo()).Select(s =>
             {
                 s.User.Team = new APITeam();
                 return s;
@@ -286,7 +312,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             AddStep(@"Import new scores", () =>
             {
-                foreach (var score in generateSampleScores(beatmapInfo()))
+                foreach (var score in GenerateSampleScores(beatmapInfo()))
                     scoreManager.Import(score);
             });
         }
@@ -302,7 +328,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         private void checkStoredCount(int expected) =>
             AddUntilStep($"Total scores stored is {expected}", () => Realm.Run(r => r.All<ScoreInfo>().Count(s => !s.DeletePending)), () => Is.EqualTo(expected));
 
-        private static ScoreInfo[] generateSampleScores(BeatmapInfo beatmapInfo)
+        public static ScoreInfo[] GenerateSampleScores(BeatmapInfo beatmapInfo)
         {
             return new[]
             {
@@ -316,7 +342,6 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Mods = new Mod[]
                     {
                         new OsuModHidden(),
-                        new OsuModHardRock(),
                         new OsuModFlashlight
                         {
                             FollowDelay = { Value = 200 },

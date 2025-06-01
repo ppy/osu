@@ -7,6 +7,7 @@ using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Online.Rooms;
@@ -41,6 +42,40 @@ namespace osu.Game.Screens.OnlinePlay
         private void load()
         {
             LeftArea.Padding = new MarginPadding { Top = Header.HEIGHT };
+        }
+
+        protected override bool OnStart()
+        {
+            FilterCriteria criteria = FilterControl.CreateCriteria();
+
+            // Beatmaps with too different of a duration are filtered away; this is just a final safety.
+            if (!criteria.Length.IsInRange(Beatmap.Value.BeatmapInfo.Length))
+            {
+                Logger.Log("The selected beatmap's duration differs too much from the host's selection.", level: LogLevel.Error);
+                return false;
+            }
+
+            // Beatmaps without a valid online ID are filtered away; this is just a final safety.
+            if (Beatmap.Value.BeatmapInfo.OnlineID < 0)
+            {
+                Logger.Log("The selected beatmap is not available online.", level: LogLevel.Error);
+                return false;
+            }
+
+            // Beatmaps from different sets are filtered away; this is just a final safety.
+            if (Beatmap.Value.BeatmapSetInfo.OnlineID != criteria.BeatmapSetId)
+            {
+                Logger.Log("The selected beatmap is from a different beatmap set.", level: LogLevel.Error);
+                return false;
+            }
+
+            if (Ruleset.Value.OnlineID < 0)
+            {
+                Logger.Log("The selected ruleset is not available online.", level: LogLevel.Error);
+                return false;
+            }
+
+            return true;
         }
 
         protected override FilterControl CreateFilterControl() => new DifficultySelectFilterControl(item);
