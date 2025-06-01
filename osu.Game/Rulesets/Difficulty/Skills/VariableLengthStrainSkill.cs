@@ -82,19 +82,20 @@ namespace osu.Game.Rulesets.Difficulty.Skills
                 currentSectionEnd = currentSectionBegin + MaxSectionLength;
             }
 
+            // NOTE: Only use these variables after a TryPeak() or TryDequeue()
+            double storedStrain;
+            double storedStrainStartTime;
+
+            // Remove any strains from the queue that are too old
+            while (strainPeakQueue.TryPeek(out storedStrain, out storedStrainStartTime))
+            {
+                if (storedStrainStartTime + MaxSectionLength < currentSectionBegin) strainPeakQueue.Dequeue();
+                else break;
+            }
+
+            // Fill in strains between previous object and current object
             while (current.StartTime > currentSectionEnd)
             {
-                // NOTE: Only use these variables after a TryPeak() or TryDequeue()
-                double storedStrain;
-                double storedStrainStartTime;
-
-                // Remove any strains from the queue that are too old
-                while (strainPeakQueue.TryPeek(out storedStrain, out storedStrainStartTime))
-                {
-                    if (storedStrainStartTime + MaxSectionLength < currentSectionBegin) strainPeakQueue.Dequeue();
-                    else break;
-                }
-
                 // Pull from queue if possible
                 if (strainPeakQueue.TryDequeue(out storedStrain, out storedStrainStartTime))
                 {
@@ -125,8 +126,22 @@ namespace osu.Game.Rulesets.Difficulty.Skills
                 currentSectionPeak = strain;
                 return;
             }
+
+            // If the current strain is smaller than the current peak, add it to the queue
+            if (strain < currentSectionPeak)
+            {
+                // Empty the queue of smaller elements
+                while (strainPeakQueue.TryPeek(out storedStrain, out _))
+                {
+                    if (storedStrain < strain) strainPeakQueue.Dequeue();
+                    else break;
+                }
+
+                // Add current strain to queue since it's less than the current peak
+                strainPeakQueue.Enqueue(strain, current.StartTime);
+            }
             // If the strain is a new peak, clear the queue and start a new strain
-            if (strain > currentSectionPeak)
+            else
             {
                 // Clear the queue
                 strainPeakQueue.Clear();
@@ -137,19 +152,6 @@ namespace osu.Game.Rulesets.Difficulty.Skills
                 saveCurrentPeak(current.StartTime - currentSectionBegin);
                 currentSectionBegin = current.StartTime;
                 currentSectionEnd = currentSectionBegin + MaxSectionLength;
-            }
-            else
-            {
-                // If the current strain is smaller than the current peak
-                // Empty the queue of smaller elements
-                while (strainPeakQueue.TryPeek(out double storedStrain, out _))
-                {
-                    if (storedStrain < strain) strainPeakQueue.Dequeue();
-                    else break;
-                }
-
-                // Add current strain to queue since it's less than the current peak
-                strainPeakQueue.Enqueue(strain, current.StartTime);
             }
         }
 
