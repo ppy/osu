@@ -141,7 +141,8 @@ namespace osu.Game.Screens.Edit
             BeatmapVersion = PlayableBeatmap.BeatmapVersion;
         }
 
-        public void AddChangeHandler(HitObjectChangeHandler changeHandler)
+        [BackgroundDependencyLoader]
+        private void load(HitObjectChangeHandler changeHandler)
         {
             this.changeHandler = changeHandler;
             beatmapProcessor = new EditorBeatmapProcessor(this, PlayableBeatmap.BeatmapInfo.Ruleset.CreateInstance(), changeHandler);

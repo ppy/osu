@@ -290,7 +290,7 @@ namespace osu.Game.Screens.Edit
             // todo: remove caching of this and consume via editorBeatmap?
             dependencies.Cache(beatDivisor);
 
-            AddInternal(editorBeatmap = new EditorBeatmap(playableBeatmap, loadableBeatmap.GetSkin(), loadableBeatmap.BeatmapInfo));
+            editorBeatmap = new EditorBeatmap(playableBeatmap, loadableBeatmap.GetSkin(), loadableBeatmap.BeatmapInfo);
             dependencies.CacheAs(editorBeatmap);
 
             editorBeatmap.UpdateInProgress.BindValueChanged(_ => updateSampleDisabledState());
@@ -306,8 +306,7 @@ namespace osu.Game.Screens.Edit
             newChangeHandler = new HitObjectChangeHandler(editorBeatmap, changeHandler);
             dependencies.CacheAs(newChangeHandler);
             AddInternal(newChangeHandler);
-
-            editorBeatmap.AddChangeHandler(newChangeHandler);
+            AddInternal(editorBeatmap);
 
             beatDivisor.SetArbitraryDivisor(editorBeatmap.BeatmapInfo.BeatDivisor);
             beatDivisor.BindValueChanged(divisor => editorBeatmap.BeatmapInfo.BeatDivisor = divisor.NewValue);
