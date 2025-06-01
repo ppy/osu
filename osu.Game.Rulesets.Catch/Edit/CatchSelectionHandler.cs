@@ -164,7 +164,6 @@ namespace osu.Game.Rulesets.Catch.Edit
                     new OriginalXChange(juiceStream, juiceStream.OriginalX + reverse.PositionalOffset.X).Apply(ChangeHandler);
                     new LegacyConvertedYChange(juiceStream, juiceStream.LegacyConvertedY + reverse.PositionalOffset.Y).Apply(ChangeHandler);
                     EditorBeatmap.Update(juiceStream);
-                    ChangeHandler?.RecordUpdate(juiceStream);
                 }
             }
 
@@ -222,7 +221,6 @@ namespace osu.Game.Rulesets.Catch.Edit
                         new PathControlPointPositionChange(point, point.Position * new Vector2(-1, 1)).Apply(ChangeHandler);
 
                     EditorBeatmap.Update(juiceStream);
-                    ChangeHandler?.RecordUpdate(juiceStream);
                     return true;
 
                 default:

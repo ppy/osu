@@ -57,7 +57,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             {
                 new StartTimeChange(h, h.StartTime + adjustment).Apply(ChangeHandler);
                 EditorBeatmap.Update(h);
-                ChangeHandler?.RecordUpdate(h);
             });
         }
 

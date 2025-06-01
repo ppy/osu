@@ -142,9 +142,9 @@ namespace osu.Game.Screens.Edit
         }
 
         [BackgroundDependencyLoader]
-        private void load(HitObjectChangeHandler changeHandler)
+        private void load(HitObjectChangeHandler hitObjectChangeHandler)
         {
-            this.changeHandler = changeHandler;
+            changeHandler = hitObjectChangeHandler;
             beatmapProcessor = new EditorBeatmapProcessor(this, PlayableBeatmap.BeatmapInfo.Ruleset.CreateInstance(), changeHandler);
         }
 
@@ -332,7 +332,6 @@ namespace osu.Game.Screens.Edit
             {
                 action(h);
                 Update(h);
-                changeHandler?.RecordUpdate(h);
             }
 
             EndChange();
@@ -388,6 +387,7 @@ namespace osu.Game.Screens.Edit
         {
             // updates are debounced regardless of whether a batch is active.
             batchPendingUpdates.Add(hitObject);
+            changeHandler?.RecordUpdate(hitObject);
 
             updateInProgress.Value = true;
         }
@@ -398,7 +398,10 @@ namespace osu.Game.Screens.Edit
         public void UpdateAllHitObjects()
         {
             foreach (var h in HitObjects)
+            {
                 batchPendingUpdates.Add(h);
+                changeHandler?.RecordUpdate(h);
+            }
 
             updateInProgress.Value = true;
         }

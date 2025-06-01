@@ -354,7 +354,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 {
                     updateAction(relevantHitObject, relevantSamples);
                     beatmap.Update(relevantHitObject);
-                    changeHandler?.RecordUpdate(relevantHitObject);
                 }
 
                 beatmap.EndChange();

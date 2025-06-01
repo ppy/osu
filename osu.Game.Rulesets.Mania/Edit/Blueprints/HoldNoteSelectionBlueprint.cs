@@ -66,7 +66,6 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
                         new StartTimeChange(HitObject, proposedStartTime).Apply(changeHandler);
                         new DurationChange(HitObject, proposedEndTime - HitObject.StartTime).Apply(changeHandler);
                         editorBeatmap?.Update(HitObject);
-                        changeHandler?.RecordUpdate(HitObject);
                     },
                     DragEnded = () => changeHandler?.EndChange(),
                 },
@@ -87,7 +86,6 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
                         new StartTimeChange(HitObject, proposedStartTime).Apply(changeHandler);
                         new DurationChange(HitObject, proposedEndTime - HitObject.StartTime).Apply(changeHandler);
                         editorBeatmap?.Update(HitObject);
-                        changeHandler?.RecordUpdate(HitObject);
                     },
                     DragEnded = () => changeHandler?.EndChange(),
                 },

@@ -134,7 +134,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     {
                         new SliderVelocityMultiplierChange((IHasSliderVelocity)h, val.NewValue.Value).Apply(changeHandler);
                         beatmap.Update(h);
-                        changeHandler?.RecordUpdate(h);
                     }
 
                     beatmap.EndChange();

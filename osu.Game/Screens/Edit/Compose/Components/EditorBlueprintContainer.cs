@@ -116,7 +116,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
             foreach (var blueprint in SelectionBlueprints)
             {
                 Beatmap.Update(blueprint.Item);
-                changeHandler?.RecordUpdate(blueprint.Item);
             }
         }
 

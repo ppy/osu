@@ -123,7 +123,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             pathVersion.BindValueChanged(_ =>
             {
                 editorBeatmap?.Update(HitObject);
-                changeHandler?.RecordUpdate(HitObject);
             });
 
             BodyPiece.UpdateFrom(HitObject);
@@ -299,7 +298,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             new SliderVelocityMultiplierChange(HitObject, proposedVelocity).Apply(changeHandler);
             new ExpectedDistanceChange(HitObject.Path, proposedDistance).Apply(changeHandler);
             editorBeatmap?.Update(HitObject);
-            changeHandler?.RecordUpdate(HitObject);
         }
 
         /// <summary>

@@ -129,7 +129,6 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
             hitObject.Path.ExpectedDistance.Value = (snappedEndTime - hitObject.StartTime) * localVelocity;
 
             EditorBeatmap?.Update(hitObject);
-            ChangeHandler?.RecordUpdate(hitObject);
         }
 
         public Vector2 ToRelativePosition(Vector2 screenSpacePosition)
