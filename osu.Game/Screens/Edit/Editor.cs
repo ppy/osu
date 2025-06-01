@@ -307,9 +307,9 @@ namespace osu.Game.Screens.Edit
             dependencies.CacheAs(newChangeHandler);
             AddInternal(newChangeHandler);
 
-            // EditorBeatmap has to be loaded here, because it has a dependency on the change handler.
+            // EditorBeatmap has a circular dependency on the change handler.
             // In the future, the change handler should be a child of EditorBeatmap, so all changes are handled through EditorBeatmap.
-            AddInternal(editorBeatmap);
+            editorBeatmap.AddChangeHandler(newChangeHandler);
 
             beatDivisor.SetArbitraryDivisor(editorBeatmap.BeatmapInfo.BeatDivisor);
             beatDivisor.BindValueChanged(divisor => editorBeatmap.BeatmapInfo.BeatDivisor = divisor.NewValue);
