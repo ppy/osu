@@ -86,7 +86,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// <value>double storedStrain, double storedStrainStartTime</value>
         /// <remarks>In the case that continuous strains is implemented, please remove this</remarks>
         /// </summary>
-        private Queue<StrainObject> queue = new Queue<StrainObject>();
+        private readonly LinkedList<StrainObject> queue = new LinkedList<StrainObject>();
 
         protected VariableLengthStrainSkill(Mod[] mods)
             : base(mods)
@@ -110,13 +110,10 @@ namespace osu.Game.Rulesets.Difficulty.Skills
                 currentSectionEnd = currentSectionBegin + MaxSectionLength;
             }
 
-            // NOTE: Only use these variables after a TryPeak() or TryDequeue()
-            StrainObject queueStrainObject;
-
             // Remove any strains from the queue that are too old
-            while (queue.TryPeek(out queueStrainObject))
+            while (queue.Count > 0 && queue.First != null)
             {
-                if (queueStrainObject.StartTime + MaxSectionLength < currentSectionBegin) queue.Dequeue();
+                if (queue.First.Value.StartTime + MaxSectionLength < currentSectionBegin) queue.RemoveFirst();
                 else break;
             }
 
@@ -124,8 +121,11 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             while (current.StartTime > currentSectionEnd)
             {
                 // Pull from queue if possible
-                if (queue.TryDequeue(out queueStrainObject))
+                if (queue.Count > 0 && queue.First != null)
                 {
+                    StrainObject queueStrainObject = queue.First.Value;
+                    queue.RemoveFirst();
+
                     saveCurrentPeak(currentSectionEnd - currentSectionBegin);
                     currentSectionBegin = currentSectionEnd;
                     currentSectionEnd = queueStrainObject.StartTime + MaxSectionLength;
@@ -193,15 +193,13 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// </summary>
         private void addObjectToQueue(double strain, double startTime)
         {
-            List<StrainObject> list = queue.ToList();
-
-            for (int i = 0; i < list.Count; i++)
+            // Ensure all previous strains are greater than or equal to the current strain
+            for (var iter = queue.First; iter != null; iter = iter.Next)
             {
-                if (list[i].Value < strain) list[i] = new StrainObject(strain, list[i].StartTime);
+                iter.ValueRef.Value = Math.Max(iter.ValueRef.Value, strain);
             }
 
-            list.Add(new StrainObject(strain, startTime));
-            queue = new Queue<StrainObject>(list);
+            queue.AddLast(new StrainObject(strain, startTime));
         }
 
         /// <summary>
@@ -249,7 +247,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
             // Difficulty is the weighted sum of the highest strains from every section.
             // We're sorting from highest to lowest strain.
-            for (int i = 0; i < strains.Count; i++)
+            for (int i = 0; i < strains.Count && time < 50; i++)
             {
                 difficulty += strains[i].Value * weight * strains[i].SectionLength / MaxSectionLength;
                 time += strains[i].SectionLength / MaxSectionLength;
