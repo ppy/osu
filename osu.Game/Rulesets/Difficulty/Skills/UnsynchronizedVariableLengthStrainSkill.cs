@@ -104,9 +104,6 @@ namespace osu.Game.Rulesets.Difficulty.Skills
                 currentSectionEnd = currentSectionBegin + MaxSectionLength;
             }
 
-            // Remove all obsolete items from queue
-            queue.RemoveAll(s => s.StartTime + MaxSectionLength <= currentSectionBegin);
-
             int usedQueueItems = 0;
 
             // Fill in strains between previous object and current object
