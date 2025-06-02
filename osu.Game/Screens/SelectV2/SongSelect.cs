@@ -92,6 +92,7 @@ namespace osu.Game.Screens.SelectV2
         private BeatmapTitleWedge titleWedge = null!;
         private BeatmapDetailsArea detailsArea = null!;
         private FillFlowContainer wedgesContainer = null!;
+        private Box rightGradientBackground = null!;
 
         private NoResultsPlaceholder noResultsPlaceholder = null!;
 
@@ -132,8 +133,8 @@ namespace osu.Game.Screens.SelectV2
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Width = 0.5f,
-                    Colour = ColourInfo.GradientHorizontal(Color4.Black.Opacity(0.5f), Color4.Black.Opacity(0f)),
+                    Width = 0.6f,
+                    Colour = ColourInfo.GradientHorizontal(Color4.Black.Opacity(0.3f), Color4.Black.Opacity(0f)),
                 },
                 new Container
                 {
@@ -204,8 +205,10 @@ namespace osu.Game.Screens.SelectV2
                                                 RelativeSizeAxes = Axes.Both,
                                                 Children = new Drawable[]
                                                 {
-                                                    new Box
+                                                    rightGradientBackground = new Box
                                                     {
+                                                        Anchor = Anchor.TopRight,
+                                                        Origin = Anchor.TopRight,
                                                         Colour = ColourInfo.GradientHorizontal(Color4.Black.Opacity(0.0f), Color4.Black.Opacity(0.5f)),
                                                         RelativeSizeAxes = Axes.Both,
                                                     },
@@ -368,6 +371,22 @@ namespace osu.Game.Screens.SelectV2
         private void ensureTrackLooping(IWorkingBeatmap beatmap, TrackChangeDirection changeDirection)
             => beatmap.PrepareTrackForPreview(true);
 
+        private IDisposable? trackDuck;
+
+        private void attachTrackDuckingIfShould()
+        {
+            bool shouldDuck = noResultsPlaceholder.State.Value == Visibility.Visible;
+
+            if (shouldDuck && trackDuck == null)
+                trackDuck = music.Duck(new DuckParameters { DuckVolumeTo = 1, DuckCutoffTo = 500 });
+        }
+
+        private void detachTrackDucking()
+        {
+            trackDuck?.Dispose();
+            trackDuck = null;
+        }
+
         #endregion
 
         #region Selection handling
@@ -421,18 +440,16 @@ namespace osu.Game.Screens.SelectV2
             carousel.CurrentSelection = beatmap.BeatmapInfo;
 
             if (this.IsCurrentScreen())
+            {
+                // If not the current screen, this will be applied in OnResuming.
                 ensurePlayingSelected();
 
-            // If not the current screen, this will be applied in OnResuming.
-            if (this.IsCurrentScreen())
-            {
                 ApplyToBackground(backgroundModeBeatmap =>
                 {
                     backgroundModeBeatmap.BlurAmount.Value = 0;
                     backgroundModeBeatmap.Beatmap = beatmap;
                     backgroundModeBeatmap.IgnoreUserSettings.Value = true;
                     backgroundModeBeatmap.DimWhenUserSettingsIgnored.Value = 0.1f;
-                    backgroundModeBeatmap.FadeColour(Color4.White, 250);
                 });
             }
         });
@@ -455,6 +472,7 @@ namespace osu.Game.Screens.SelectV2
             modSelectOverlay.SelectedMods.BindTo(Mods);
 
             beginLooping();
+            attachTrackDuckingIfShould();
 
             // force reselection if entering song select with a protected beatmap
             if (Beatmap.Value.BeatmapInfo.BeatmapSet!.Protected)
@@ -485,6 +503,7 @@ namespace osu.Game.Screens.SelectV2
             modSelectOverlay.SelectedMods.BindTo(Mods);
 
             beginLooping();
+            attachTrackDuckingIfShould();
 
             if (Beatmap.Value.BeatmapInfo.BeatmapSet!.Protected)
                 Beatmap.SetDefault();
@@ -506,6 +525,7 @@ namespace osu.Game.Screens.SelectV2
             carousel.VisuallyFocusSelected = true;
 
             endLooping();
+            detachTrackDucking();
 
             base.OnSuspending(e);
         }
@@ -519,6 +539,7 @@ namespace osu.Game.Screens.SelectV2
             filterControl.Hide();
 
             endLooping();
+            detachTrackDucking();
 
             return base.OnExiting(e);
         }
@@ -586,13 +607,7 @@ namespace osu.Game.Screens.SelectV2
 
             int count = carousel.MatchedBeatmapsCount;
 
-            if (count == 0)
-            {
-                noResultsPlaceholder.Show();
-                noResultsPlaceholder.Filter = carousel.Criteria;
-            }
-            else
-                noResultsPlaceholder.Hide();
+            updateNoResultsPlaceholder();
 
             // Intentionally not localised until we have proper support for this (see https://github.com/ppy/osu-framework/pull/4918
             // but also in this case we want support for formatting a number within a string).
@@ -613,6 +628,27 @@ namespace osu.Game.Screens.SelectV2
 
             if (Beatmap.IsDefault || currentBeatmapNotValid)
                 carousel.NextRandom();
+        }
+
+        private void updateNoResultsPlaceholder()
+        {
+            int count = carousel.MatchedBeatmapsCount;
+
+            if (count == 0)
+            {
+                noResultsPlaceholder.Show();
+                noResultsPlaceholder.Filter = carousel.Criteria!;
+
+                attachTrackDuckingIfShould();
+                rightGradientBackground.ResizeWidthTo(3, 1000, Easing.OutQuint);
+            }
+            else
+            {
+                noResultsPlaceholder.Hide();
+
+                detachTrackDucking();
+                rightGradientBackground.ResizeWidthTo(1, 500, Easing.OutQuint);
+            }
         }
 
         #endregion
