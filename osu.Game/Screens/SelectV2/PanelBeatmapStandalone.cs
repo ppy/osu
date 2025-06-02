@@ -71,22 +71,6 @@ namespace osu.Game.Screens.SelectV2
         private OsuSpriteText authorText = null!;
         private FillFlowContainer mainFill = null!;
 
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
-        {
-            var inputRectangle = TopLevelContent.DrawRectangle;
-
-            if (Selected.Value)
-            {
-                // Cover the gaps introduced by the spacing between BeatmapPanels so that clicks will not fall through the carousel.
-                //
-                // Caveat is that for simplicity, we are covering the full spacing, so panels with frontmost depth will have a slightly
-                // larger hit target.
-                inputRectangle = inputRectangle.Inflate(new MarginPadding { Vertical = BeatmapCarousel.SPACING * 2 });
-            }
-
-            return inputRectangle.Contains(TopLevelContent.ToLocalSpace(screenSpacePos));
-        }
-
         public PanelBeatmapStandalone()
         {
             PanelXOffset = 20;

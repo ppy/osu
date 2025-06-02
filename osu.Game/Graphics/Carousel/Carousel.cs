@@ -395,6 +395,10 @@ namespace osu.Game.Graphics.Carousel
             offset += spacing;
             item.CarouselYPosition = offset;
 
+            item.CarouselInputLenienceAbove = spacing / 2;
+            if (previousVisible != null)
+                previousVisible.CarouselInputLenienceBelow = item.CarouselInputLenienceAbove;
+
             if (item.IsVisible)
             {
                 offset += item.DrawHeight;
