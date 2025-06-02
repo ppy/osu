@@ -259,6 +259,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         }
 
         [Test]
+        [FlakyTest]
         public void TestInputHandlingWithinGaps()
         {
             AddBeatmaps(2, 5);

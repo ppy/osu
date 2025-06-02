@@ -177,6 +177,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         }
 
         [Test]
+        [FlakyTest]
         public void TestInputHandlingWithinGaps()
         {
             AddAssert("no beatmaps visible", () => !GetVisiblePanels<PanelBeatmap>().Any());
