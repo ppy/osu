@@ -117,7 +117,7 @@ namespace osu.Game.Screens.SelectV2
                         currentGroupItems?.Add(i);
                         currentSetItems?.Add(i);
 
-                        i.IsVisible = i.Model is GroupDefinition || (group == null && (i.Model is BeatmapSetInfo || currentSetItems == null));
+                        i.IsVisible = i.Model is GroupDefinition || (group == null && (i.Model is BeatmapSetInfo || !BeatmapSetsGroupedTogether));
                     }
                 }
 
