@@ -28,8 +28,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
         {
             int totalColumns = perColumnObjects.Length;
             this.perColumnObjects = perColumnObjects;
-            columnIndex = perColumnObjects[Column].Count;
             Column = BaseObject.Column;
+            columnIndex = perColumnObjects[Column].Count;
             PreviousHitObjects = new ManiaDifficultyHitObject[totalColumns];
             ColumnStrainTime = StartTime - PrevInColumn(0)?.StartTime ?? StartTime;
 
@@ -40,15 +40,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
                 for (int i = 0; i < prevNote.PreviousHitObjects.Length; i++)
                     PreviousHitObjects[i] = prevNote.PreviousHitObjects[i];
 
-                // Add all concurrent notes before this note
-                if (DeltaTime > 0)
-                {
-                    do
-                    {
-                        PreviousHitObjects[prevNote.Column] = prevNote;
-                        prevNote = (ManiaDifficultyHitObject?)prevNote.Previous(0);
-                    } while (prevNote?.DeltaTime == 0);
-                }
+                PreviousHitObjects[prevNote.Column] = prevNote;
             }
         }
 
