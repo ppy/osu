@@ -9,7 +9,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osuTK;
 
@@ -78,13 +77,9 @@ namespace osu.Game.Graphics.UserInterfaceV2.FileSelection
                 Flow.Height = 25;
                 Flow.Margin = new MarginPadding { Horizontal = 10, };
 
-                AddRangeInternal(new Drawable[]
+                AddInternal(new BackgroundLayer(0.5f)
                 {
-                    new BackgroundLayer(0.5f)
-                    {
-                        Depth = 1
-                    },
-                    new HoverClickSounds(),
+                    Depth = 1
                 });
 
                 Flow.Add(new SpriteIcon
