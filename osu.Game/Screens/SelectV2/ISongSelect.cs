@@ -29,9 +29,15 @@ namespace osu.Game.Screens.SelectV2
         void ManageCollections();
 
         /// <summary>
-        /// Present the provided score at the results screen.
+        /// Opens results screen with the given score.
+        /// This assumes active beatmap and ruleset selection matches the score.
         /// </summary>
         void PresentScore(ScoreInfo score);
+
+        /// <summary>
+        /// Set the current filter text query to the provided string.
+        /// </summary>
+        void Search(string query);
 
         /// <summary>
         /// Gets relevant actionable items for beatmap context menus, based on the type of song select.
