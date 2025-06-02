@@ -107,16 +107,11 @@ namespace osu.Game.Storyboards
         public bool HasVideo => GetLayer("Video").Elements.Count != 0;
 
         /// <summary>
-        /// Whether the beatmap background needs to be set as a storyboard element to fix alignment issues with storyboard that rely on the beatmap background.
-        /// </summary>
-        public bool NeedSetBackgroundInStoryboard => !AlreadyBackgroundInStoryboard && !Beatmap.WidescreenStoryboard && !HasVideo;
-
-        /// <summary>
         /// Add the beatmap background as an element of the storyboard if conditions are met.
         /// </summary>
         public void AddBeatmapBackgroundIfNeeded()
         {
-            if (NeedSetBackgroundInStoryboard)
+            if (!AlreadyBackgroundInStoryboard && !Beatmap.WidescreenStoryboard && !HasVideo)
             {
                 var backgroundLayer = GetLayer("Background");
                 backgroundLayer.Elements.Insert(0, new StoryboardBeatmapBackground(BeatmapInfo.Metadata.BackgroundFile));
