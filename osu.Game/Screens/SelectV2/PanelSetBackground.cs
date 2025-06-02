@@ -5,6 +5,7 @@ using System;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Extensions.PolygonExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -51,7 +52,9 @@ namespace osu.Game.Screens.SelectV2
         }
 
         public PanelSetBackground()
-            // : base(cachedFrameBuffer: true)
+            // TODO: for performance reasons we probably want this to be true
+            // for it to work we will need to move transforms accordingly.
+            : base(cachedFrameBuffer: false)
         {
             RelativeSizeAxes = Axes.Both;
         }
@@ -105,7 +108,7 @@ namespace osu.Game.Screens.SelectV2
         private void loadContentIfRequired()
         {
             // A load is already in progress if the cancellation token is non-null.
-            if (loadCancellation != null)
+            if (loadCancellation != null || working == null)
                 return;
 
             if (beatmapCarousel != null)
@@ -131,24 +134,37 @@ namespace osu.Game.Screens.SelectV2
 
             loadCancellation = new CancellationTokenSource();
 
-            var texture = working?.GetPanelBackground();
-
-            if (texture == null)
-                return;
-
-            LoadComponentAsync(new Sprite
+            LoadComponentAsync(new PanelBeatmapBackground(working)
             {
                 Depth = float.MaxValue,
                 RelativeSizeAxes = Axes.Both,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 FillMode = FillMode.Fill,
-                Texture = texture,
             }, s =>
             {
                 AddInternal(sprite = s);
-                sprite.FadeInFromZero(200, Easing.OutQuint);
+                bool spriteOnScreen = beatmapCarousel?.ScreenSpaceDrawQuad.Intersects(sprite.ScreenSpaceDrawQuad) != false;
+                sprite.FadeInFromZero(spriteOnScreen ? 400 : 0, Easing.OutQuint);
             }, loadCancellation.Token);
+        }
+
+        public partial class PanelBeatmapBackground : Sprite
+        {
+            private readonly IWorkingBeatmap working;
+
+            public PanelBeatmapBackground(IWorkingBeatmap working)
+            {
+                ArgumentNullException.ThrowIfNull(working);
+
+                this.working = working;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                Texture = working.GetPanelBackground();
+            }
         }
     }
 }
