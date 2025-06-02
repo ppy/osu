@@ -40,6 +40,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
                 for (int i = 0; i < prevNote.PreviousHitObjects.Length; i++)
                     PreviousHitObjects[i] = prevNote.PreviousHitObjects[i];
 
+                // intentionally depends on processing order to match live.
                 PreviousHitObjects[prevNote.Column] = prevNote;
             }
         }
