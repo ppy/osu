@@ -32,10 +32,10 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
         {
             var maniaCurrent = (ManiaDifficultyHitObject)current;
 
-            individualStrains[maniaCurrent.Column] *= applyDecay(individualStrains[maniaCurrent.Column], maniaCurrent.ColumnStrainTime, individual_decay_base);
+            individualStrains[maniaCurrent.Column] = applyDecay(individualStrains[maniaCurrent.Column], maniaCurrent.ColumnStrainTime, individual_decay_base);
             individualStrains[maniaCurrent.Column] += IndividualStrainEvaluator.EvaluateDifficultyOf(current);
 
-            overallStrain *= applyDecay(overallStrain, maniaCurrent.DeltaTime, overall_decay_base);
+            overallStrain = applyDecay(overallStrain, maniaCurrent.DeltaTime, overall_decay_base);
             overallStrain += OverallStrainEvaluator.EvaluateDifficultyOf(current);
 
             return individualStrains[maniaCurrent.Column] + overallStrain - CurrentStrain;
