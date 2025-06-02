@@ -296,7 +296,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 double middleStrainValue = (currMovementObj.StartTime + lastStartTime) / 2 - lastStartTime;
 
                 Vector2 currMovement = Vector2.Subtract(slider.StackedPositionAt(currentStrainValue / slider.SpanDuration), currCursorPosition);
-                double currMovementLength = scalingFactor * currMovement.Length;
+                double currMovementLength;
 
                 Vector2 additionalSliderPath = slider.StackedPositionAt(middleStrainValue / slider.SpanDuration);
 
