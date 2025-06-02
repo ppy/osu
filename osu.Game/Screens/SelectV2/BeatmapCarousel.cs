@@ -255,7 +255,9 @@ namespace osu.Game.Screens.SelectV2
 
                     if (containingGroup != null)
                         setExpandedGroup(containingGroup);
-                    setExpandedSet(beatmapInfo);
+
+                    if (grouping.BeatmapSetsGroupedTogether)
+                        setExpandedSet(beatmapInfo);
                     break;
             }
         }
