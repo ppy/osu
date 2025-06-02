@@ -68,10 +68,19 @@ namespace osu.Game.Screens.SelectV2
             }
         }
 
-        // content is offset by PanelXOffset, make sure we only handle input at the actual visible
-        // offset region.
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
-            TopLevelContent.ReceivePositionalInputAt(screenSpacePos);
+        public sealed override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
+        {
+            var inputRectangle = TopLevelContent.DrawRectangle;
+
+            // Cover the gaps introduced by the spacing between panels so that user mis-aims don't result in no-ops.
+            inputRectangle = inputRectangle.Inflate(new MarginPadding
+            {
+                Top = item!.CarouselInputLenienceAbove,
+                Bottom = item!.CarouselInputLenienceBelow,
+            });
+
+            return inputRectangle.Contains(TopLevelContent.ToLocalSpace(screenSpacePos));
+        }
 
         [Resolved]
         private BeatmapCarousel? carousel { get; set; }
