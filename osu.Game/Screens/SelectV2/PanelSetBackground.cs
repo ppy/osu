@@ -9,94 +9,100 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
-using osu.Game.Overlays;
 using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.SelectV2
 {
-    public partial class PanelSetBackground : ModelBackedDrawable<WorkingBeatmap>
+    public partial class PanelSetBackground : CompositeDrawable
     {
-        protected override double TransformDuration => 400;
+        private Sprite? sprite;
+
+        private WorkingBeatmap? working;
 
         public WorkingBeatmap? Beatmap
         {
-            get => Model;
-            set => Model = value;
+            get => working;
+            set
+            {
+                working = value;
+                loadNextBackground();
+            }
         }
 
-        protected override Drawable CreateDrawable(WorkingBeatmap? model) => new BackgroundSprite(model);
-
-        private partial class BackgroundSprite : CompositeDrawable
+        public PanelSetBackground()
         {
-            private readonly WorkingBeatmap? working;
+            RelativeSizeAxes = Axes.Both;
+        }
 
-            public BackgroundSprite(WorkingBeatmap? working)
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            InternalChildren = new Drawable[]
             {
-                this.working = working;
-
-                RelativeSizeAxes = Axes.Both;
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OverlayColourProvider colourProvider)
-            {
-                var texture = working?.GetPanelBackground();
-
-                if (texture != null)
+                new FillFlowContainer
                 {
-                    InternalChildren = new Drawable[]
+                    Depth = -1,
+                    RelativeSizeAxes = Axes.Both,
+                    Direction = FillDirection.Horizontal,
+                    // This makes the gradient not be perfectly horizontal, but diagonal at a ~40° angle
+                    Shear = new Vector2(0.8f, 0),
+                    Children = new[]
                     {
-                        new Sprite
+                        // The left half with no gradient applied
+                        new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            FillMode = FillMode.Fill,
-                            Texture = texture,
+                            Colour = Color4.Black.Opacity(0.5f),
+                            Width = 0.4f,
                         },
-                        new FillFlowContainer
+                        new Box
                         {
-                            Depth = -1,
                             RelativeSizeAxes = Axes.Both,
-                            Direction = FillDirection.Horizontal,
-                            // This makes the gradient not be perfectly horizontal, but diagonal at a ~40° angle
-                            Shear = new Vector2(0.8f, 0),
-                            Children = new[]
-                            {
-                                // The left half with no gradient applied
-                                new Box
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Colour = Color4.Black.Opacity(0.5f),
-                                    Width = 0.4f,
-                                },
-                                new Box
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Colour = ColourInfo.GradientHorizontal(Color4.Black.Opacity(0.5f), Color4.Black.Opacity(0.3f)),
-                                    Width = 0.2f,
-                                },
-                                new Box
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Colour = ColourInfo.GradientHorizontal(Color4.Black.Opacity(0.3f), Color4.Black.Opacity(0.2f)),
-                                    // Slightly more than 1.0 in total to account for shear.
-                                    Width = 0.45f,
-                                },
-                            }
+                            Colour = ColourInfo.GradientHorizontal(Color4.Black.Opacity(0.5f), Color4.Black.Opacity(0.3f)),
+                            Width = 0.2f,
                         },
-                    };
-                }
-                else
-                {
-                    InternalChild = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = colourProvider.Background6,
-                    };
-                }
+                        new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = ColourInfo.GradientHorizontal(Color4.Black.Opacity(0.3f), Color4.Black.Opacity(0.2f)),
+                            // Slightly more than 1.0 in total to account for shear.
+                            Width = 0.45f,
+                        },
+                    }
+                },
+            };
+        }
+
+        private void loadNextBackground()
+        {
+            const double transition_duration = 500;
+
+            var texture = working?.GetPanelBackground();
+
+            if (texture == null)
+            {
+                sprite?.FadeOut(transition_duration, Easing.OutQuint);
+                sprite = null;
+                return;
             }
+
+            LoadComponentAsync(new Sprite
+            {
+                Depth = float.MaxValue,
+                RelativeSizeAxes = Axes.Both,
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                FillMode = FillMode.Fill,
+                Texture = texture,
+            }, s =>
+            {
+                sprite?.Delay(transition_duration)
+                      .FadeOut();
+
+                AddInternal(sprite = s);
+                sprite.FadeInFromZero(transition_duration, Easing.OutQuint);
+            });
         }
     }
 }
