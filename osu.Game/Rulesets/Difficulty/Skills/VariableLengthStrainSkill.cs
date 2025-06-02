@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// </summary>
         public struct StrainPeak : IComparable<StrainPeak>
         {
-            public StrainPeak(double value, double sectionLength, bool fromNewObject)
+            public StrainPeak(double value, double sectionLength, bool fromNewObject = false)
             {
                 Value = value;
                 SectionLength = sectionLength;
@@ -105,13 +105,6 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             {
                 currentSectionBegin = current.StartTime;
                 currentSectionEnd = currentSectionBegin + MaxSectionLength;
-            }
-
-            // Remove any strains from the queue that are too old
-            while (queue.Count > 0 && queue.First != null)
-            {
-                if (queue.First.Value.StartTime + MaxSectionLength < currentSectionBegin) queue.RemoveFirst();
-                else break;
             }
 
             // Fill in strains between previous object and current object
@@ -223,7 +216,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// Returns a live enumerable of the peak strains for each <see cref="MaxSectionLength"/> section of the beatmap,
         /// including the peak of the current section.
         /// </summary>
-        public IEnumerable<StrainPeak> GetCurrentStrainPeaks() => strainPeaks.Append(new StrainPeak(currentSectionPeak, MaxSectionLength, false));
+        public IEnumerable<StrainPeak> GetCurrentStrainPeaks() => strainPeaks.Append(new StrainPeak(currentSectionPeak, MaxSectionLength));
 
         /// <summary>
         /// Returns the calculated difficulty value representing all <see cref="DifficultyHitObject"/>s that have been processed up to this point.

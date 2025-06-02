@@ -10,7 +10,7 @@ using osu.Framework.Utils;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
-    public abstract class OsuVariableLengthStrainSkill : UnsynchronizedVariableLengthStrainSkill
+    public abstract class OsuVariableLengthStrainSkill : VariableLengthStrainSkill
     {
         protected override double RawDifficultyMultiplier => 1.04727;
 
