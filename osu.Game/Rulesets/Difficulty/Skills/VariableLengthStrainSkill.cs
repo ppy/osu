@@ -40,14 +40,16 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// </summary>
         public struct StrainPeak : IComparable<StrainPeak>
         {
-            public StrainPeak(double value, double sectionLength)
+            public StrainPeak(double value, double sectionLength, bool fromNewObject)
             {
                 Value = value;
                 SectionLength = sectionLength;
+                FromNewObject = fromNewObject;
             }
 
             public double Value { get; set; }
             public double SectionLength { get; }
+            public bool FromNewObject { get; }
 
             public int CompareTo(StrainPeak other)
             {
@@ -69,6 +71,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
             public double Value { get; set; }
             public double StartTime { get; }
+            public bool FromNewObject { get; }
         }
 
         private readonly List<StrainPeak> strainPeaks = new List<StrainPeak>();
@@ -152,7 +155,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             currentSectionPeak = Math.Max(currentSectionPeak, strain);
 
             // End the current strain, and add the object to the queue
-            saveCurrentPeak(current.StartTime - currentSectionBegin);
+            saveCurrentPeak(current.StartTime - currentSectionBegin, true);
             currentSectionBegin = current.StartTime;
             addObjectToQueue(strain, current.StartTime);
         }
@@ -178,9 +181,9 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// <summary>
         /// Saves the current peak strain level to the list of strain peaks, which will be used to calculate an overall difficulty.
         /// </summary>
-        private void saveCurrentPeak(double sectionLength)
+        private void saveCurrentPeak(double sectionLength, bool fromNewObject = false)
         {
-            strainPeaks.Add(new StrainPeak(currentSectionPeak, sectionLength));
+            strainPeaks.Add(new StrainPeak(currentSectionPeak, sectionLength, fromNewObject));
         }
 
         /// <summary>
@@ -240,13 +243,13 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             // Time is measured in units of strains
             double time = 0;
 
-            // Difficulty is the weighted sum of the highest strains from every section.
-            // We're sorting from highest to lowest strain.
+            // Difficulty is a continuous weighted sum of the sorted strains
+            // 9.49122 = Integrate[Power[0.9,x],{x,0,1}]
             for (int i = 0; i < strains.Count && time < 50; i++)
             {
-                difficulty += strains[i].Value * weight * strains[i].SectionLength / MaxSectionLength;
+                weight = Math.Pow(0.9, time) * (9.49122 - 9.49122 * Math.Pow(0.9, strains[i].SectionLength / MaxSectionLength)); // f(a,b)=Integrate[Power[0.9,x],{x,a,a+b}]
+                difficulty += strains[i].Value * weight;
                 time += strains[i].SectionLength / MaxSectionLength;
-                weight = Math.Pow(DecayWeight, time);
             }
 
             return difficulty * RawDifficultyMultiplier;

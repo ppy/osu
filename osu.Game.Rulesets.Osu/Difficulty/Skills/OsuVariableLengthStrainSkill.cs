@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             for (int i = 0; i < strains.Count && time < ReducedSectionCount; i++)
             {
                 double scale = Math.Log10(Interpolation.Lerp(1, 10, Math.Clamp((float)time / ReducedSectionCount, 0, 1)));
-                strains[i] = new StrainPeak(strains[i].Value * Interpolation.Lerp(ReducedStrainBaseline, 1.0, scale), strains[i].SectionLength);
+                strains[i] = new StrainPeak(strains[i].Value * Interpolation.Lerp(ReducedStrainBaseline, 1.0, scale), strains[i].SectionLength, strains[i].FromNewObject);
                 time += strains[i].SectionLength / MaxSectionLength;
             }
 
