@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// Used to store the difficulty and start time of an object in a map.
         /// <remarks>Not to be confused with <see cref="StrainPeak"/></remarks>
         /// </summary>
-        public struct StrainObject : IComparable<StrainPeak>
+        public struct StrainObject
         {
             public StrainObject(double value, double startTime)
             {
@@ -69,11 +69,6 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
             public double Value { get; set; }
             public double StartTime { get; }
-
-            public int CompareTo(StrainPeak other)
-            {
-                return Value.CompareTo(other.Value);
-            }
         }
 
         private readonly List<StrainPeak> strainPeaks = new List<StrainPeak>();
@@ -194,9 +189,9 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         private void addObjectToQueue(double strain, double startTime)
         {
             // Ensure all previous strains are greater than or equal to the current strain
-            for (var iter = queue.First; iter != null; iter = iter.Next)
+            for (var iter = queue.Last; iter != null && iter.Value.Value < strain; iter = iter.Previous)
             {
-                iter.ValueRef.Value = Math.Max(iter.ValueRef.Value, strain);
+                iter.ValueRef.Value = strain;
             }
 
             queue.AddLast(new StrainObject(strain, startTime));
