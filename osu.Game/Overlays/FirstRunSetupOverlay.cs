@@ -6,7 +6,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Configuration;
 using osu.Game.Database;
-using osu.Game.Graphics;
 using osu.Game.Localisation;
 using osu.Game.Overlays.FirstRunSetup;
 using osu.Game.Overlays.Notifications;
@@ -35,7 +34,7 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(OsuColour colours, LegacyImportManager? legacyImportManager)
+        private void load(LegacyImportManager? legacyImportManager)
         {
             AddStep<ScreenWelcome>();
             AddStep<ScreenUIScale>();

@@ -31,7 +31,7 @@ namespace osu.Game.Scoring.Legacy
         private IBeatmap currentBeatmap;
         private Ruleset currentRuleset;
 
-        private float beatmapOffset;
+        private long beatmapOffset;
 
         public Score Parse(Stream stream)
         {
@@ -96,7 +96,7 @@ namespace osu.Game.Scoring.Legacy
                 scoreInfo.BeatmapInfo = currentBeatmap.BeatmapInfo;
 
                 // As this is baked into hitobject timing (see `LegacyBeatmapDecoder`) we also need to apply this to replay frame timing.
-                beatmapOffset = currentBeatmap.BeatmapInfo.BeatmapVersion < 5 ? LegacyBeatmapDecoder.EARLY_VERSION_TIMING_OFFSET : 0;
+                beatmapOffset = currentBeatmap.BeatmapVersion < 5 ? LegacyBeatmapDecoder.EARLY_VERSION_TIMING_OFFSET : 0;
 
                 /* score.HpGraphString = */
                 sr.ReadString();
@@ -262,7 +262,7 @@ namespace osu.Game.Scoring.Legacy
 
         private void readLegacyReplay(Replay replay, StreamReader reader)
         {
-            float lastTime = beatmapOffset;
+            long lastTime = beatmapOffset;
             var legacyFrames = new List<LegacyReplayFrame>();
 
             string[] frames = reader.ReadToEnd().Split(',');
@@ -283,7 +283,7 @@ namespace osu.Game.Scoring.Legacy
                 // In mania, mouseX encodes the pressed keys in the lower 20 bits
                 int mouseXParseLimit = currentRuleset.RulesetInfo.OnlineID == 3 ? (1 << 20) - 1 : Parsing.MAX_COORDINATE_VALUE;
 
-                float diff = Parsing.ParseFloat(split[0]);
+                int diff = Parsing.ParseInt(split[0]);
                 float mouseX = Parsing.ParseFloat(split[1], mouseXParseLimit);
                 float mouseY = Parsing.ParseFloat(split[2], Parsing.MAX_COORDINATE_VALUE);
 

@@ -49,6 +49,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                             {
                                 var keyCounter = container.OfType<LegacyKeyCounterDisplay>().FirstOrDefault();
                                 var spectatorList = container.OfType<SpectatorList>().FirstOrDefault();
+                                var leaderboard = container.OfType<DrawableGameplayLeaderboard>().FirstOrDefault();
 
                                 if (keyCounter != null)
                                 {
@@ -64,12 +65,20 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                                     spectatorList.Origin = Anchor.BottomLeft;
                                     spectatorList.Position = new Vector2(10, -10);
                                 }
+
+                                if (leaderboard != null)
+                                {
+                                    leaderboard.Anchor = Anchor.CentreLeft;
+                                    leaderboard.Origin = Anchor.CentreLeft;
+                                    leaderboard.X = 10;
+                                }
                             })
                             {
                                 Children = new Drawable[]
                                 {
                                     new LegacyKeyCounterDisplay(),
                                     new SpectatorList(),
+                                    new DrawableGameplayLeaderboard(),
                                 }
                             };
                     }

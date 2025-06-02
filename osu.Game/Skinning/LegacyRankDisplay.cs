@@ -2,10 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Scoring;
 using osuTK;
 
 namespace osu.Game.Skinning
@@ -20,13 +22,15 @@ namespace osu.Game.Skinning
         [Resolved]
         private ISkinSource source { get; set; } = null!;
 
-        private readonly Sprite rank;
+        private readonly Sprite rankDisplay;
+
+        private IBindable<ScoreRank> rank = null!;
 
         public LegacyRankDisplay()
         {
             AutoSizeAxes = Axes.Both;
 
-            AddInternal(rank = new Sprite
+            AddInternal(rankDisplay = new Sprite
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -35,11 +39,12 @@ namespace osu.Game.Skinning
 
         protected override void LoadComplete()
         {
-            scoreProcessor.Rank.BindValueChanged(v =>
+            rank = scoreProcessor.Rank.GetBoundCopy();
+            rank.BindValueChanged(r =>
             {
-                var texture = source.GetTexture($"ranking-{v.NewValue}-small");
+                var texture = source.GetTexture($"ranking-{r.NewValue}-small");
 
-                rank.Texture = texture;
+                rankDisplay.Texture = texture;
 
                 if (texture != null)
                 {
@@ -57,6 +62,7 @@ namespace osu.Game.Skinning
                                  .Expire();
                 }
             }, true);
+
             FinishTransforms(true);
         }
     }

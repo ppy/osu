@@ -426,7 +426,10 @@ namespace osu.Game.Screens.Select
             (beatmapOptionsButton = new FooterButtonOptions(), BeatmapOptions)
         };
 
-        protected virtual ModSelectOverlay CreateModSelectOverlay() => new SoloModSelectOverlay();
+        protected virtual ModSelectOverlay CreateModSelectOverlay() => new UserModSelectOverlay
+        {
+            ShowPresets = true,
+        };
 
         private DependencyContainer dependencies = null!;
 
@@ -521,12 +524,12 @@ namespace osu.Game.Screens.Select
 
         private ScheduledDelegate? selectionChangedDebounce;
 
-        private void updateCarouselSelection(ValueChangedEvent<WorkingBeatmap>? e = null)
+        private void updateCarouselSelection(ValueChangedEvent<WorkingBeatmap?> e = default)
         {
-            var beatmap = e?.NewValue ?? Beatmap.Value;
+            var beatmap = e.NewValue ?? Beatmap.Value;
             if (beatmap is DummyWorkingBeatmap || !this.IsCurrentScreen()) return;
 
-            if (beatmap.BeatmapSetInfo.Protected && e != null)
+            if (beatmap.BeatmapSetInfo.Protected)
             {
                 Logger.Log($"Denying working beatmap switch to protected beatmap {beatmap}");
                 Beatmap.Value = e.OldValue;
@@ -1151,11 +1154,6 @@ namespace osu.Game.Screens.Select
                 resetCarouselPosition?.Invoke();
                 return base.OnHover(e);
             }
-        }
-
-        internal partial class SoloModSelectOverlay : UserModSelectOverlay
-        {
-            protected override bool ShowPresets => true;
         }
     }
 }

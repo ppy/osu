@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Rulesets;
@@ -20,7 +19,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.Drawables
 {
-    public partial class DifficultyIcon : CompositeDrawable, IHasCustomTooltip<DifficultyIconTooltipContent>, IHasCurrentValue<StarDifficulty>
+    public partial class DifficultyIcon : CompositeDrawable, IHasCustomTooltip<DifficultyIconTooltipContent>
     {
         /// <summary>
         /// Size of this difficulty icon.
@@ -46,8 +45,12 @@ namespace osu.Game.Beatmaps.Drawables
 
         private readonly Container iconContainer;
 
+        [Resolved]
+        private OsuColour colours { get; set; } = null!;
+
         private readonly BindableWithCurrent<StarDifficulty> difficulty = new BindableWithCurrent<StarDifficulty>();
 
+        // TODO: remove this after old song select is gone.
         public virtual Bindable<StarDifficulty> Current
         {
             get => difficulty.Current;
@@ -64,28 +67,19 @@ namespace osu.Game.Beatmaps.Drawables
         /// <param name="mods">An array of mods to account for in the calculations</param>
         /// <param name="ruleset">An optional ruleset to be used for the icon display, in place of the beatmap's ruleset.</param>
         public DifficultyIcon(IBeatmapInfo beatmap, IRulesetInfo? ruleset = null, Mod[]? mods = null)
-            : this(ruleset ?? beatmap.Ruleset)
         {
             this.beatmap = beatmap;
             this.mods = mods;
+            this.ruleset = ruleset ?? beatmap.Ruleset;
 
             Current.Value = new StarDifficulty(beatmap.StarRating, 0);
-        }
-
-        /// <summary>
-        /// Creates a new <see cref="DifficultyIcon"/> without an associated beatmap.
-        /// </summary>
-        /// <param name="ruleset">The ruleset to be used for the icon display.</param>
-        public DifficultyIcon(IRulesetInfo ruleset)
-        {
-            this.ruleset = ruleset;
 
             AutoSizeAxes = Axes.Both;
             InternalChild = iconContainer = new Container { Size = new Vector2(20f) };
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
             iconContainer.Children = new Drawable[]
             {
@@ -115,8 +109,18 @@ namespace osu.Game.Beatmaps.Drawables
                     Icon = getRulesetIcon()
                 },
             };
+        }
 
-            Current.BindValueChanged(difficulty => background.Colour = colours.ForStarDifficulty(difficulty.NewValue.Stars), true);
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            Current.BindValueChanged(difficulty =>
+            {
+                background.FadeColour(colours.ForStarDifficulty(difficulty.NewValue.Stars), 200);
+            }, true);
+
+            background.FinishTransforms();
         }
 
         private Drawable getRulesetIcon()

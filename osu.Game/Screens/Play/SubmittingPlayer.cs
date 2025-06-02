@@ -21,6 +21,7 @@ using osu.Game.Online.Rooms;
 using osu.Game.Online.Spectator;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
+using osu.Game.Screens.Ranking;
 
 namespace osu.Game.Screens.Play
 {
@@ -185,6 +186,24 @@ namespace osu.Game.Screens.Play
         /// <returns>Whether gameplay should be immediately exited as a result. Returning false allows the gameplay session to continue. Defaults to true.</returns>
         protected virtual bool ShouldExitOnTokenRetrievalFailure(Exception exception) => true;
 
+        public override bool AllowCriticalSettingsAdjustment
+        {
+            get
+            {
+                // General limitations to ensure players don't do anything too weird.
+                // These match stable for now.
+
+                // TODO: the blocking conditions should probably display a message.
+                if (!IsBreakTime.Value && GameplayClockContainer.CurrentTime - GameplayClockContainer.GameplayStartTime > 10000)
+                    return false;
+
+                if (GameplayClockContainer.IsPaused.Value)
+                    return false;
+
+                return base.AllowCriticalSettingsAdjustment;
+            }
+        }
+
         protected override async Task PrepareScoreForResultsAsync(Score score)
         {
             await base.PrepareScoreForResultsAsync(score).ConfigureAwait(false);
@@ -323,5 +342,11 @@ namespace osu.Game.Screens.Play
             api.Queue(request);
             return scoreSubmissionSource.Task;
         }
+
+        protected override ResultsScreen CreateResults(ScoreInfo score) => new SoloResultsScreen(score)
+        {
+            AllowRetry = true,
+            IsLocalPlay = true,
+        };
     }
 }

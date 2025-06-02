@@ -103,7 +103,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
             hittingLayer.AccentColour.BindTo(holdNoteTail.HoldNote.AccentColour);
 
             hittingLayer.IsHitting.UnbindBindings();
-            ((IBindable<bool>)hittingLayer.IsHitting).BindTo(holdNoteTail.HoldNote.IsHitting);
+            ((IBindable<bool>)hittingLayer.IsHitting).BindTo(holdNoteTail.HoldNote.IsHolding);
         }
 
         private void onDirectionChanged(ValueChangedEvent<ScrollingDirection> direction)

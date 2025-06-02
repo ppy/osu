@@ -33,7 +33,10 @@ namespace osu.Game.Users
         protected virtual double UnloadDelay => 5000;
 
         protected override DelayedLoadWrapper CreateDelayedLoadWrapper(Func<Drawable> createContentFunc, double timeBeforeLoad)
-            => new DelayedLoadUnloadWrapper(createContentFunc, timeBeforeLoad, UnloadDelay);
+            => new DelayedLoadUnloadWrapper(createContentFunc, timeBeforeLoad, UnloadDelay)
+            {
+                RelativeSizeAxes = Axes.Both,
+            };
 
         [LongRunningLoad]
         private partial class Cover : CompositeDrawable
