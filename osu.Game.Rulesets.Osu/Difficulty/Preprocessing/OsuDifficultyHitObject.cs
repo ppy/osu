@@ -233,9 +233,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 //
 
                 const double slider_radius = NORMALISED_RADIUS * SLIDER_RADIUS_MULTIPLIER;
+                const double jump_slider_radius = NORMALISED_RADIUS * 1.62711864447; // magic number to match the previous calculation of jump distance.
 
                 float tailJumpDistance = Vector2.Subtract(lastSlider.TailCircle.StackedPosition, BaseObject.StackedPosition).Length * scalingFactor;
-                MinimumJumpDistance = Math.Max(0, Math.Min(LazyJumpDistance - slider_radius, tailJumpDistance - slider_radius));
+                MinimumJumpDistance = Math.Max(0, Math.Min(LazyJumpDistance - (slider_radius - jump_slider_radius), tailJumpDistance - slider_radius));
             }
 
             if (lastLastDifficultyObject != null && lastLastDifficultyObject.BaseObject is not Spinner)
