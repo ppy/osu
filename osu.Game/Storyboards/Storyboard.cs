@@ -80,7 +80,7 @@ namespace osu.Game.Storyboards
         /// <summary>
         /// Whether the beatmap's background should be hidden while this storyboard is being displayed.
         /// </summary>
-        public bool ReplacesBackground => AlreadyBackgroundInStoryboard || NeedSetBackgroundInStoryboard;
+        public bool ReplacesBackground => AlreadyBackgroundInStoryboard;
 
         /// <summary>
         /// Whether the beatmap's background is already displayed as an element in the storyboard.
