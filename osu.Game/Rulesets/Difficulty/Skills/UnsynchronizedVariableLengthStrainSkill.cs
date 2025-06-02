@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
     /// Similar to <see cref="StrainSkill"/>, but instead of strains having a fixed length, strains can be any length.
     /// A new <see cref="StrainPeak"/> is created for each <see cref="DifficultyHitObject"/>.
     /// </summary>
-    public abstract class VariableLengthStrainSkill : Skill
+    public abstract class UnsynchronizedVariableLengthStrainSkill : Skill
     {
         /// <summary>
         /// Used to account for star rating differences caused by migration from <see cref="StrainSkill"/>.
@@ -40,16 +40,14 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// </summary>
         public struct StrainPeak : IComparable<StrainPeak>
         {
-            public StrainPeak(double value, double sectionLength, bool fromNewObject)
+            public StrainPeak(double value, double sectionLength)
             {
                 Value = value;
                 SectionLength = sectionLength;
-                FromNewObject = fromNewObject;
             }
 
             public double Value { get; set; }
             public double SectionLength { get; }
-            public bool FromNewObject { get; }
 
             public int CompareTo(StrainPeak other)
             {
@@ -79,13 +77,12 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// <summary>
         /// Stores previous strains so that, if a high difficulty hit object is followed by a lower
         /// difficulty hit object, the high difficulty hit object gets a full strain instead of being cut short.
-        /// If an object is not larger than the current strain, it is stored here to be used once the current strain ends.
         /// <value>double storedStrain, double storedStrainStartTime</value>
         /// <remarks>In the case that continuous strains is implemented, please remove this</remarks>
         /// </summary>
-        private readonly LinkedList<StrainObject> queue = new LinkedList<StrainObject>();
+        private readonly List<StrainObject> queue = new List<StrainObject>();
 
-        protected VariableLengthStrainSkill(Mod[] mods)
+        protected UnsynchronizedVariableLengthStrainSkill(Mod[] mods)
             : base(mods)
         {
         }
@@ -107,27 +104,23 @@ namespace osu.Game.Rulesets.Difficulty.Skills
                 currentSectionEnd = currentSectionBegin + MaxSectionLength;
             }
 
-            // Remove any strains from the queue that are too old
-            while (queue.Count > 0 && queue.First != null)
-            {
-                if (queue.First.Value.StartTime + MaxSectionLength < currentSectionBegin) queue.RemoveFirst();
-                else break;
-            }
+            // Remove all obsolete items from queue
+            queue.RemoveAll(s => s.StartTime + MaxSectionLength <= currentSectionBegin);
+
+            int usedQueueItems = 0;
 
             // Fill in strains between previous object and current object
             while (current.StartTime > currentSectionEnd)
             {
                 // Pull from queue if possible
-                if (queue.Count > 0 && queue.First != null)
+                if (queue.Count > usedQueueItems)
                 {
-                    StrainObject queueStrainObject = queue.First.Value;
-                    queue.RemoveFirst();
-
                     saveCurrentPeak(currentSectionEnd - currentSectionBegin);
                     currentSectionBegin = currentSectionEnd;
-                    currentSectionEnd = queueStrainObject.StartTime + MaxSectionLength;
+                    currentSectionEnd = queue[usedQueueItems].StartTime + MaxSectionLength;
                     startNewSectionFrom(currentSectionBegin, current);
-                    currentSectionPeak = Math.Max(currentSectionPeak, queueStrainObject.Value);
+                    currentSectionPeak = Math.Max(currentSectionPeak, queue[usedQueueItems].Value);
+                    usedQueueItems++;
                 }
                 else
                 {
@@ -138,6 +131,9 @@ namespace osu.Game.Rulesets.Difficulty.Skills
                     startNewSectionFrom(currentSectionBegin, current);
                 }
             }
+
+            // Remove all obsolete items from queue at once
+            queue.RemoveRange(0, usedQueueItems);
 
             double strain = StrainValueAt(current);
 
@@ -151,12 +147,28 @@ namespace osu.Game.Rulesets.Difficulty.Skills
                 return;
             }
 
-            currentSectionPeak = Math.Max(currentSectionPeak, strain);
+            // If the current strain is smaller than the current peak, add it to the queue
+            if (strain < currentSectionPeak)
+            {
+                // Empty the queue of smaller elements
+                queue.RemoveAll(s => s.Value < strain);
 
-            // End the current strain, and add the object to the queue
-            saveCurrentPeak(current.StartTime - currentSectionBegin, true);
-            currentSectionBegin = current.StartTime;
-            addObjectToQueue(strain, current.StartTime);
+                // Add current strain to queue since it's less than the current peak
+                queue.Add(new StrainObject(strain, current.StartTime));
+            }
+            // If the strain is a new peak, clear the queue and start a new strain
+            else
+            {
+                // Clear the queue
+                queue.Clear();
+
+                currentSectionPeak = strain;
+
+                // End the current strain, and create a new strain starting at the current hitobject
+                saveCurrentPeak(current.StartTime - currentSectionBegin);
+                currentSectionBegin = current.StartTime;
+                currentSectionEnd = currentSectionBegin + MaxSectionLength;
+            }
         }
 
         /// <summary>
@@ -180,23 +192,9 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// <summary>
         /// Saves the current peak strain level to the list of strain peaks, which will be used to calculate an overall difficulty.
         /// </summary>
-        private void saveCurrentPeak(double sectionLength, bool fromNewObject = false)
+        private void saveCurrentPeak(double sectionLength)
         {
-            strainPeaks.Add(new StrainPeak(currentSectionPeak, sectionLength, fromNewObject));
-        }
-
-        /// <summary>
-        /// Adds the strain to the object queue, and ensures all preceding strains are greater than or equal to the new strain
-        /// </summary>
-        private void addObjectToQueue(double strain, double startTime)
-        {
-            // Ensure all previous strains are greater than or equal to the current strain
-            for (var iter = queue.Last; iter != null && iter.Value.Value < strain; iter = iter.Previous)
-            {
-                iter.ValueRef.Value = strain;
-            }
-
-            queue.AddLast(new StrainObject(strain, startTime));
+            strainPeaks.Add(new StrainPeak(currentSectionPeak, sectionLength));
         }
 
         /// <summary>
@@ -223,7 +221,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// Returns a live enumerable of the peak strains for each <see cref="MaxSectionLength"/> section of the beatmap,
         /// including the peak of the current section.
         /// </summary>
-        public IEnumerable<StrainPeak> GetCurrentStrainPeaks() => strainPeaks.Append(new StrainPeak(currentSectionPeak, MaxSectionLength, false));
+        public IEnumerable<StrainPeak> GetCurrentStrainPeaks() => strainPeaks.Append(new StrainPeak(currentSectionPeak, MaxSectionLength));
 
         /// <summary>
         /// Returns the calculated difficulty value representing all <see cref="DifficultyHitObject"/>s that have been processed up to this point.
