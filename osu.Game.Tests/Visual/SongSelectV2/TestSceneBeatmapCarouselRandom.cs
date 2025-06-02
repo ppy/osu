@@ -19,6 +19,24 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             CreateCarousel();
         }
 
+        [Test]
+        public void TestRandomObeysFiltering()
+        {
+            AddBeatmaps(2, 10, true);
+
+            ApplyToFilter("filter", c => c.SearchText = BeatmapSets[0].Beatmaps.Last().DifficultyName);
+            WaitForFiltering();
+
+            CheckDisplayedBeatmapSetsCount(1);
+            CheckDisplayedBeatmapsCount(1);
+
+            for (int i = 0; i < 10; i++)
+            {
+                nextRandom();
+                WaitForSelection(0, 9);
+            }
+        }
+
         /// <summary>
         /// Test random non-repeating algorithm
         /// </summary>
