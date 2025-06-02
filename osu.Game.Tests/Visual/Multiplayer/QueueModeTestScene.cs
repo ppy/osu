@@ -61,6 +61,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("import beatmap", () =>
             {
                 beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
+                Realm.Write(r =>
+                {
+                    foreach (var beatmapInfo in r.All<BeatmapInfo>())
+                        beatmapInfo.OnlineMD5Hash = beatmapInfo.MD5Hash;
+                });
                 importedSet = beatmaps.GetAllUsableBeatmapSets().First();
                 InitialBeatmap = importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0);
                 OtherBeatmap = importedSet.Beatmaps.Last(b => b.Ruleset.OnlineID == 0);
