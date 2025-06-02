@@ -179,7 +179,11 @@ namespace osu.Game.Screens.SelectV2
                 }
                 else
                 {
-                    statisticsFlow.ChildrenEnumerable = statistics.Select(d => new StatisticDifficulty { Value = d });
+                    statisticsFlow.ChildrenEnumerable = statistics.Select(d => new StatisticDifficulty
+                    {
+                        AccentColour = accentColour,
+                        Value = d
+                    });
                     updateStatisticsSizing();
                 }
             }
