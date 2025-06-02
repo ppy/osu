@@ -270,7 +270,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             double trackingEndTime = slider.StartTime + slider.Duration + endLeniency;
 
             const double slider_radius = NORMALISED_RADIUS * SLIDER_RADIUS_MULTIPLIER;
-            double followedSliderRadius = BaseObject.Radius * SLIDER_RADIUS_MULTIPLIER / 1.3; //We assume the player will follow a small portion of the slider radius.
+
+            double currentSliderRadius = BaseObject.Radius * SLIDER_RADIUS_MULTIPLIER;
 
             LazyTravelTime = trackingEndTime - slider.StartTime;
 
@@ -278,14 +279,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             Vector2 currCursorPosition = slider.StackedPosition;
 
-            double scalingFactor = NORMALISED_RADIUS / followedSliderRadius;
-
             double lastStartTime = slider.HeadCircle.StartTime;
             Vector2 lastCursorPosition = slider.HeadCircle.StackedPosition;
+
+            double scalingFactor = NORMALISED_RADIUS / currentSliderRadius;
 
             for (int i = 1; i < nestedObjects.Count; i++)
             {
                 OsuHitObject currMovementObj = nestedObjects[i];
+
+                // Amount of movement required so that the cursor position needs to be updated.
+                double requiredMovement = slider_radius;
 
                 double currentStrainValue = currMovementObj.StartTime - lastStartTime;
 
@@ -294,18 +298,23 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 Vector2 currMovement = Vector2.Subtract(slider.StackedPositionAt(currentStrainValue / slider.SpanDuration), currCursorPosition);
                 double currMovementLength = scalingFactor * currMovement.Length;
 
-                // Amount of movement required so that the cursor position needs to be updated.
-                double requiredMovement = slider_radius;
-
                 Vector2 additionalSliderPath = slider.StackedPositionAt(middleStrainValue / slider.SpanDuration);
+
+                if (nestedObjects[i - 1] is SliderRepeat)
+                    requiredMovement *= 1.74; // For SliderRepeat objects, we need to adjust the required movement.
 
                 double lastToMiddleMovementLength = Vector2.Subtract(lastCursorPosition, additionalSliderPath).Length * scalingFactor;
                 double middleToCurrMovementLength = Vector2.Subtract(additionalSliderPath, slider.StackedPositionAt(currentStrainValue / slider.SpanDuration)).Length * scalingFactor;
 
                 if (currMovementObj is SliderRepeat)
-                    requiredMovement = slider_radius * 20; // For a slider repeat, assume a tighter movement threshold to better assess repeat sliders.
+                {
+                    // For SliderRepeat objects, we need to ensure that the cursor position is updated only if the movement length is greater than the required movement.
+                    currMovementLength = Math.Max(lastToMiddleMovementLength + middleToCurrMovementLength - requiredMovement, 0);
+                }
                 else
+                {
                     currMovementLength = lastToMiddleMovementLength + middleToCurrMovementLength;
+                }
 
                 if (currMovementLength > requiredMovement)
                 {
