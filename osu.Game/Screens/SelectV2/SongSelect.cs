@@ -22,7 +22,6 @@ using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Database;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Carousel;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
@@ -93,6 +92,7 @@ namespace osu.Game.Screens.SelectV2
         private BeatmapTitleWedge titleWedge = null!;
         private BeatmapDetailsArea detailsArea = null!;
         private FillFlowContainer wedgesContainer = null!;
+        private Box rightGradientBackground = null!;
 
         private NoResultsPlaceholder noResultsPlaceholder = null!;
 
@@ -133,8 +133,8 @@ namespace osu.Game.Screens.SelectV2
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Width = 0.5f,
-                    Colour = ColourInfo.GradientHorizontal(Color4.Black.Opacity(0.5f), Color4.Black.Opacity(0f)),
+                    Width = 0.6f,
+                    Colour = ColourInfo.GradientHorizontal(Color4.Black.Opacity(0.3f), Color4.Black.Opacity(0f)),
                 },
                 new Container
                 {
@@ -205,8 +205,10 @@ namespace osu.Game.Screens.SelectV2
                                                 RelativeSizeAxes = Axes.Both,
                                                 Children = new Drawable[]
                                                 {
-                                                    new Box
+                                                    rightGradientBackground = new Box
                                                     {
+                                                        Anchor = Anchor.TopRight,
+                                                        Origin = Anchor.TopRight,
                                                         Colour = ColourInfo.GradientHorizontal(Color4.Black.Opacity(0.0f), Color4.Black.Opacity(0.5f)),
                                                         RelativeSizeAxes = Axes.Both,
                                                     },
@@ -387,49 +389,6 @@ namespace osu.Game.Screens.SelectV2
 
         #endregion
 
-        #region Background
-
-        private bool gradientDimApplied;
-
-        private void updateScreenBackground()
-        {
-            var beatmap = Beatmap.Value;
-
-            ApplyToBackground(backgroundModeBeatmap =>
-            {
-                backgroundModeBeatmap.BlurAmount.Value = 0;
-                backgroundModeBeatmap.Beatmap = beatmap;
-                backgroundModeBeatmap.IgnoreUserSettings.Value = true;
-                backgroundModeBeatmap.DimWhenUserSettingsIgnored.Value = 0.1f;
-
-                ColourInfo targetColour = gradientDimApplied
-                    ? ColourInfo.GradientHorizontal(OsuColour.Gray(0.8f), OsuColour.Gray(0.4f))
-                    : Color4.White;
-
-                backgroundModeBeatmap.FadeColour(targetColour, 300, Easing.OutQuint);
-            });
-        }
-
-        private void applyGradientDimToBackground()
-        {
-            gradientDimApplied = true;
-
-            // If not current, background will be updated later by OnEntering/OnResuming events.
-            if (this.IsCurrentScreen())
-                updateScreenBackground();
-        }
-
-        private void removeGradientDimFromBackground()
-        {
-            gradientDimApplied = false;
-
-            // If not current, background will be updated later by OnEntering/OnResuming events.
-            if (this.IsCurrentScreen())
-                updateScreenBackground();
-        }
-
-        #endregion
-
         #region Selection handling
 
         /// <summary>
@@ -465,11 +424,18 @@ namespace osu.Game.Screens.SelectV2
 
             carousel.CurrentSelection = beatmap.BeatmapInfo;
 
-            // If not the current screen, this will be applied in OnResuming.
             if (this.IsCurrentScreen())
             {
+                // If not the current screen, this will be applied in OnResuming.
                 ensurePlayingSelected();
-                updateScreenBackground();
+
+                ApplyToBackground(backgroundModeBeatmap =>
+                {
+                    backgroundModeBeatmap.BlurAmount.Value = 0;
+                    backgroundModeBeatmap.Beatmap = beatmap;
+                    backgroundModeBeatmap.IgnoreUserSettings.Value = true;
+                    backgroundModeBeatmap.DimWhenUserSettingsIgnored.Value = 0.1f;
+                });
             }
         });
 
@@ -665,14 +631,14 @@ namespace osu.Game.Screens.SelectV2
                 noResultsPlaceholder.Filter = carousel.Criteria!;
 
                 attachTrackDuckingIfShould();
-                applyGradientDimToBackground();
+                rightGradientBackground.ResizeWidthTo(3, 1000, Easing.OutQuint);
             }
             else
             {
                 noResultsPlaceholder.Hide();
 
                 detachTrackDucking();
-                removeGradientDimFromBackground();
+                rightGradientBackground.ResizeWidthTo(1, 500, Easing.OutQuint);
             }
         }
 
