@@ -575,6 +575,10 @@ namespace osu.Game.Screens.SelectV2
             backgroundModeBeatmap.Beatmap = Beatmap.Value;
             backgroundModeBeatmap.IgnoreUserSettings.Value = true;
             backgroundModeBeatmap.DimWhenUserSettingsIgnored.Value = 0.1f;
+
+            // Required to undo results screen dimming the background.
+            // Probably needs more thought because this needs to be in every `ApplyToBackground` currently to restore sane defaults.
+            backgroundModeBeatmap.FadeColour(Color4.White, 250);
         });
 
         #endregion
