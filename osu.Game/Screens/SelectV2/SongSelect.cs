@@ -227,7 +227,7 @@ namespace osu.Game.Screens.SelectV2
                                                                 BleedTop = FilterControl.HEIGHT_FROM_SCREEN_TOP + 5,
                                                                 BleedBottom = ScreenFooter.HEIGHT + 5,
                                                                 RelativeSizeAxes = Axes.Both,
-                                                                RequestPresentBeatmap = _ => OnStart(),
+                                                                RequestPresentBeatmap = b => SelectAndRun(b, OnStart),
                                                                 RequestSelection = selectBeatmap,
                                                                 RequestRecommendedSelection = selectRecommendedBeatmap,
                                                                 NewItemsPresented = newItemsPresented,
@@ -263,10 +263,11 @@ namespace osu.Game.Screens.SelectV2
         }
 
         /// <summary>
-        /// Called when a selection is made.
+        /// Called when a selection is made to progress away from the song select screen.
+        ///
+        /// This is the default action which should be provided to <see cref="SelectAndRun"/>.
         /// </summary>
-        /// <returns>If a resultant action occurred that takes the user away from SongSelect.</returns>
-        protected abstract bool OnStart();
+        protected abstract void OnStart();
 
         public override IReadOnlyList<ScreenFooterButton> CreateFooterButtons() => new ScreenFooterButton[]
         {
@@ -302,7 +303,7 @@ namespace osu.Game.Screens.SelectV2
                     .FadeTo(v.NewValue == Visibility.Visible ? 0f : 1f, 200, Easing.OutQuint);
             });
 
-            Beatmap.BindValueChanged(_ => updateSelection());
+            Beatmap.BindValueChanged(_ => EnsureValidSelection());
         }
 
         protected override void Update()
@@ -391,28 +392,36 @@ namespace osu.Game.Screens.SelectV2
 
         #region Selection handling
 
+        private ScheduledDelegate? selectionDebounce;
+
         /// <summary>
-        /// Finalises selection on the given <see cref="BeatmapInfo"/>.
+        /// Finalises selection on the given <see cref="BeatmapInfo"/> and runs the provided action if possible.
         /// </summary>
-        public void SelectAndStart(BeatmapInfo beatmap)
+        /// <param name="beatmap">The beatmap which should be selected. If not provided, the current globally selected beatmap will be used.</param>
+        /// <param name="startAction">The action to perform if conditions are met to be able to proceed. May not be invoked if in an invalid state.</param>
+        public void SelectAndRun(BeatmapInfo beatmap, Action startAction)
         {
+            selectionDebounce?.Cancel();
+
             if (!this.IsCurrentScreen())
                 return;
 
-            Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap);
-            OnStart();
-        }
+            // Forced refetch is important here to guarantee correct invalidation across all difficulties (editor specific).
+            Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap, true);
 
-        /// <summary>
-        /// Immediately flush any pending selection. Should be run before performing final actions such as leaving the screen.
-        /// </summary>
-        protected void FinaliseSelection()
-        {
-            if (selectionDebounce?.State == ScheduledDelegate.RunState.Waiting)
-                selectionDebounce.RunTask();
-        }
+            if (Beatmap.IsDefault)
+                return;
 
-        private ScheduledDelegate? selectionDebounce;
+            // EnsureValidSelection also performs these checks, but it will change the active selection on fail.
+            // We want no-op for such an edge case, so early return.
+            if (beatmap.BeatmapSet!.Protected || beatmap.BeatmapSet!.DeletePending)
+                return;
+
+            if (!EnsureValidSelection())
+                return;
+
+            startAction();
+        }
 
         private void selectRecommendedBeatmap(IEnumerable<BeatmapInfo> beatmaps)
         {
@@ -424,41 +433,41 @@ namespace osu.Game.Screens.SelectV2
             if (!this.IsCurrentScreen())
                 return;
 
-            if (beatmap.BeatmapSet!.Protected)
-                return;
-
             carousel.CurrentSelection = beatmap;
 
+            // Debounce consideration is to avoid beatmap churn on key repeat selection.
             selectionDebounce?.Cancel();
             selectionDebounce = Scheduler.AddDelayed(() => Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap), SELECTION_DEBOUNCE);
         }
 
-        private void ensureValidSelection()
+        protected bool EnsureValidSelection()
         {
-            // force reselection if entering song select with a protected beatmap
-            if (Beatmap.Value.BeatmapInfo.BeatmapSet!.Protected)
+            if (!this.IsCurrentScreen())
+                return false;
+
+            bool validSelection = true;
+
+            if (Beatmap.Value.BeatmapSetInfo.Protected || Beatmap.Value.BeatmapSetInfo.DeletePending)
             {
                 if (!carousel.NextRandom())
+                {
                     Beatmap.SetDefault();
+                    validSelection = false;
+                }
             }
-            else
-                updateSelection();
+
+            carousel.CurrentSelection = Beatmap.Value.BeatmapInfo;
+
+            ensurePlayingSelected();
+            updateBackgroundDim();
+
+            if (!validSelection)
+                return false;
+
+            // TODO: Add things here like ruleset validation. Or maybe a forced carousel filter.
+
+            return validSelection;
         }
-
-        private void updateSelection() => Scheduler.AddOnce(() =>
-        {
-            var beatmap = Beatmap.Value;
-
-            carousel.CurrentSelection = beatmap.BeatmapInfo;
-
-            if (this.IsCurrentScreen())
-            {
-                // If not the current screen, this will be applied in OnResuming.
-                ensurePlayingSelected();
-
-                updateBackgroundDim();
-            }
-        });
 
         #endregion
 
@@ -514,7 +523,7 @@ namespace osu.Game.Screens.SelectV2
             beginLooping();
             attachTrackDuckingIfShould();
 
-            ensureValidSelection();
+            EnsureValidSelection();
         }
 
         private void onLeavingScreen()
@@ -548,7 +557,7 @@ namespace osu.Game.Screens.SelectV2
 
             logo.Action = () =>
             {
-                OnStart();
+                SelectAndRun(Beatmap.Value.BeatmapInfo, OnStart);
                 return false;
             };
         }
@@ -724,7 +733,7 @@ namespace osu.Game.Screens.SelectV2
 
         public virtual IEnumerable<OsuMenuItem> GetForwardActions(BeatmapInfo beatmap)
         {
-            yield return new OsuMenuItem("Select", MenuItemType.Highlighted, () => SelectAndStart(beatmap))
+            yield return new OsuMenuItem("Select", MenuItemType.Highlighted, () => SelectAndRun(beatmap, OnStart))
             {
                 Icon = FontAwesome.Solid.Check
             };
