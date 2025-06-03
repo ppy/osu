@@ -129,8 +129,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double sliderFactor = aimRating > 0 ? aimRatingNoSliders / aimRating : 1;
 
-            double baseAimPerformance = OsuVariableLengthStrainSkill.DifficultyToPerformance(aimRating);
-            double baseSpeedPerformance = OsuVariableLengthStrainSkill.DifficultyToPerformance(speedRating);
+            double baseAimPerformance = OsuUnsynchronizedVariableLengthStrainSkill.DifficultyToPerformance(aimRating);
+            double baseSpeedPerformance = OsuUnsynchronizedVariableLengthStrainSkill.DifficultyToPerformance(speedRating);
             double baseFlashlightPerformance = Flashlight.DifficultyToPerformance(flashlightRating);
 
             double basePerformance =
@@ -320,8 +320,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private static double calculateMechanicalDifficultyRating(double aimDifficultyValue, double speedDifficultyValue)
         {
-            double aimValue = OsuVariableLengthStrainSkill.DifficultyToPerformance(calculateDifficultyRating(aimDifficultyValue));
-            double speedValue = OsuVariableLengthStrainSkill.DifficultyToPerformance(calculateDifficultyRating(speedDifficultyValue));
+            double aimValue = OsuUnsynchronizedVariableLengthStrainSkill.DifficultyToPerformance(calculateDifficultyRating(aimDifficultyValue));
+            double speedValue = OsuUnsynchronizedVariableLengthStrainSkill.DifficultyToPerformance(calculateDifficultyRating(speedDifficultyValue));
 
             double totalValue = Math.Pow(Math.Pow(aimValue, 1.1) + Math.Pow(speedValue, 1.1), 1 / 1.1);
 
