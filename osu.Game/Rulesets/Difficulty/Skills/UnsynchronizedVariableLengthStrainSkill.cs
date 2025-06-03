@@ -38,16 +38,19 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// Used to store the difficulty of a section of a map.
         /// <remarks>Not to be confused with <see cref="StrainObject"/></remarks>
         /// </summary>
-        public struct StrainPeak : IComparable<StrainPeak>
+        public readonly struct StrainPeak : IComparable<StrainPeak>
         {
             public StrainPeak(double value, double sectionLength)
             {
-                Value = value;
-                SectionLength = sectionLength;
+                this.value = (Half)value;
+                this.sectionLength = (short)sectionLength;
             }
 
-            public double Value { get; set; }
-            public double SectionLength { get; }
+            private readonly Half value;
+            private readonly short sectionLength;
+
+            public double Value => (double)value;
+            public double SectionLength => sectionLength;
 
             public int CompareTo(StrainPeak other)
             {

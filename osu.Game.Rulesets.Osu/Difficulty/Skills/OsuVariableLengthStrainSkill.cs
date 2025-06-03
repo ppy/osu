@@ -10,7 +10,7 @@ using osu.Framework.Utils;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
-    public abstract class OsuVariableLengthStrainSkill : UnsynchronizedVariableLengthStrainSkill
+    public abstract class OsuVariableLengthStrainSkill : VariableLengthStrainSkill
     {
         protected override double RawDifficultyMultiplier => 1.04727;
 
@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             // These sections will not contribute to the difficulty.
             var peaks = GetCurrentStrainPeaks().Where(p => p.Value > 0);
 
-            List<StrainPeak> strains = peaks.OrderByDescending(p => (p.Value, p.SectionLength)).ToList();
+            List<StrainPeak> strains = peaks.OrderByDescending(p => p.Value).ToList();
 
             // Time is measured in units of strains
             double time = 0;

@@ -38,22 +38,25 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// Used to store the difficulty of a section of a map.
         /// <remarks>Not to be confused with <see cref="StrainObject"/></remarks>
         /// </summary>
-        public struct StrainPeak : IComparable<StrainPeak>
+        public readonly struct StrainPeak : IComparable<StrainPeak>
         {
             public StrainPeak(double value, double sectionLength, bool fromNewObject = false)
             {
-                Value = value;
-                SectionLength = sectionLength;
-                FromNewObject = fromNewObject;
+                this.value = (Half)value;
+                this.sectionLength = (short)sectionLength;
+                if (fromNewObject) this.sectionLength *= -1;
             }
 
-            public double Value { get; set; }
-            public double SectionLength { get; }
-            public bool FromNewObject { get; }
+            private readonly Half value;
+            private readonly short sectionLength;
+
+            public double Value => (double)value;
+            public double SectionLength => Math.Abs((double)sectionLength);
+            public bool FromNewObject => Math.Sign(sectionLength) == -1;
 
             public int CompareTo(StrainPeak other)
             {
-                return Value.CompareTo(other.Value);
+                return value.CompareTo(other.value);
             }
         }
 
@@ -230,7 +233,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             // These sections will not contribute to the difficulty.
             var peaks = GetCurrentStrainPeaks().Where(p => p.Value > 0);
 
-            List<StrainPeak> strains = peaks.OrderByDescending(p => (p.Value, p.SectionLength)).ToList();
+            List<StrainPeak> strains = peaks.OrderByDescending(p => p.Value).ToList();
 
             // Time is measured in units of strains
             double time = 0;
