@@ -40,23 +40,21 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// </summary>
         public readonly struct StrainPeak : IComparable<StrainPeak>
         {
-            public StrainPeak(double value, double sectionLength, bool fromNewObject = false)
+            public StrainPeak(double value, double sectionLength)
             {
                 this.value = (float)value;
                 this.sectionLength = (short)sectionLength;
-                if (fromNewObject) this.sectionLength *= -1;
             }
 
             private readonly float value;
             private readonly short sectionLength;
 
             public double Value => value;
-            public double SectionLength => Math.Abs((double)sectionLength);
-            public bool FromNewObject => Math.Sign(sectionLength) == -1;
+            public double SectionLength => sectionLength;
 
             public int CompareTo(StrainPeak other)
             {
-                return value.CompareTo(other.value);
+                return Value.CompareTo(other.Value);
             }
         }
 
@@ -82,7 +80,6 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// <summary>
         /// Stores previous strains so that, if a high difficulty hit object is followed by a lower
         /// difficulty hit object, the high difficulty hit object gets a full strain instead of being cut short.
-        /// If an object is not larger than the current strain, it is stored here to be used once the current strain ends.
         /// <value>double storedStrain, double storedStrainStartTime</value>
         /// <remarks>In the case that continuous strains is implemented, please remove this</remarks>
         /// </summary>
@@ -147,12 +144,29 @@ namespace osu.Game.Rulesets.Difficulty.Skills
                 return;
             }
 
-            currentSectionPeak = Math.Max(currentSectionPeak, strain);
+            // If the current strain is smaller than the current peak, add it to the queue
+            if (strain < currentSectionPeak)
+            {
+                // Empty the queue of smaller elements
+                while (queue.Last != null && queue.Last.Value.Value < strain)
+                    queue.RemoveLast();
 
-            // End the current strain, and add the object to the queue
-            saveCurrentPeak(current.StartTime - currentSectionBegin, true);
-            currentSectionBegin = current.StartTime;
-            addObjectToQueue(strain, current.StartTime);
+                // Add current strain to queue since it's less than the current peak
+                queue.AddLast(new StrainObject(strain, current.StartTime));
+            }
+            // If the strain is a new peak, clear the queue and start a new strain
+            else
+            {
+                // Clear the queue
+                queue.Clear();
+
+                currentSectionPeak = strain;
+
+                // End the current strain, and create a new strain starting at the current hitobject
+                saveCurrentPeak(current.StartTime - currentSectionBegin);
+                currentSectionBegin = current.StartTime;
+                currentSectionEnd = currentSectionBegin + MaxSectionLength;
+            }
         }
 
         /// <summary>
@@ -176,23 +190,9 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// <summary>
         /// Saves the current peak strain level to the list of strain peaks, which will be used to calculate an overall difficulty.
         /// </summary>
-        private void saveCurrentPeak(double sectionLength, bool fromNewObject = false)
+        private void saveCurrentPeak(double sectionLength)
         {
-            strainPeaks.Add(new StrainPeak(currentSectionPeak, sectionLength, fromNewObject));
-        }
-
-        /// <summary>
-        /// Adds the strain to the object queue, and ensures all preceding strains are greater than or equal to the new strain
-        /// </summary>
-        private void addObjectToQueue(double strain, double startTime)
-        {
-            // Ensure all previous strains are greater than or equal to the current strain
-            for (var iter = queue.Last; iter != null && iter.Value.Value < strain; iter = iter.Previous)
-            {
-                iter.ValueRef.Value = strain;
-            }
-
-            queue.AddLast(new StrainObject(strain, startTime));
+            strainPeaks.Add(new StrainPeak(currentSectionPeak, sectionLength));
         }
 
         /// <summary>
@@ -233,7 +233,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             // These sections will not contribute to the difficulty.
             var peaks = GetCurrentStrainPeaks().Where(p => p.Value > 0);
 
-            List<StrainPeak> strains = peaks.OrderByDescending(p => p.Value).ToList();
+            List<StrainPeak> strains = peaks.OrderByDescending(p => (p.Value, p.SectionLength)).ToList();
 
             // Time is measured in units of strains
             double time = 0;

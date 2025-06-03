@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
     /// Used to processes strain values of <see cref="DifficultyHitObject"/>s, keep track of strain levels caused by the processed objects
     /// and to calculate a final difficulty value representing the difficulty of hitting all the processed objects.
     /// </summary>
-    public abstract class VariableLengthStrainDecaySkill : VariableLengthStrainSkill
+    public abstract class SynchronizedVariableLengthStrainDecaySkill : SynchronizedVariableLengthStrainSkill
     {
         /// <summary>
         /// Strain values are multiplied by this number for the given skill. Used to balance the value of different skills between each other.
@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// </summary>
         protected double CurrentStrain { get; private set; }
 
-        protected VariableLengthStrainDecaySkill(Mod[] mods)
+        protected SynchronizedVariableLengthStrainDecaySkill(Mod[] mods)
             : base(mods)
         {
         }
