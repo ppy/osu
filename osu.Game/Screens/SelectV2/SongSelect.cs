@@ -303,7 +303,7 @@ namespace osu.Game.Screens.SelectV2
                     .FadeTo(v.NewValue == Visibility.Visible ? 0f : 1f, 200, Easing.OutQuint);
             });
 
-            Beatmap.BindValueChanged(_ => EnsureValidSelection());
+            Beatmap.BindValueChanged(_ => ensureGlobalBeatmapValid());
         }
 
         protected override void Update()
@@ -406,18 +406,18 @@ namespace osu.Game.Screens.SelectV2
             if (!this.IsCurrentScreen())
                 return;
 
+            // `ensureGlobalBeatmapValid` also performs this checks, but it will change the active selection on fail.
+            // By checking locally first, we can correctly perform a no-op rather than changing selection.
+            if (!checkBeatmapValidForSelection(beatmap, carousel.Criteria))
+                return;
+
             // Forced refetch is important here to guarantee correct invalidation across all difficulties (editor specific).
             Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap, true);
 
             if (Beatmap.IsDefault)
                 return;
 
-            // EnsureValidSelection also performs these checks, but it will change the active selection on fail.
-            // We want no-op for such an edge case, so early return.
-            if (beatmap.BeatmapSet!.Protected || beatmap.BeatmapSet!.DeletePending)
-                return;
-
-            if (!EnsureValidSelection())
+            if (!ensureGlobalBeatmapValid())
                 return;
 
             startAction();
@@ -440,33 +440,57 @@ namespace osu.Game.Screens.SelectV2
             selectionDebounce = Scheduler.AddDelayed(() => Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap), SELECTION_DEBOUNCE);
         }
 
-        protected bool EnsureValidSelection()
+        private bool ensureGlobalBeatmapValid()
         {
             if (!this.IsCurrentScreen())
                 return false;
 
-            bool validSelection = true;
+            // While filtering, let's not ever attempt to change selection.
+            // This will be resolved after the filter completes, see `newItemsPresented`.
+            bool carouselStateIsValid = filterDebounce?.State != ScheduledDelegate.RunState.Waiting && !carousel.IsFiltering;
+            if (!carouselStateIsValid)
+                return false;
 
-            if (Beatmap.Value.BeatmapSetInfo.Protected || Beatmap.Value.BeatmapSetInfo.DeletePending)
+            // Refetch to be confident that the current selection is still valid. It may have been deleted or hidden.
+            var currentBeatmap = beatmaps.GetWorkingBeatmap(Beatmap.Value.BeatmapInfo, true);
+            bool validSelection = checkBeatmapValidForSelection(currentBeatmap.BeatmapInfo, carousel.Criteria);
+
+            if (Beatmap.IsDefault || !validSelection)
             {
-                if (!carousel.NextRandom())
-                {
-                    Beatmap.SetDefault();
-                    validSelection = false;
-                }
+                validSelection = carousel.NextRandom();
+                if (selectionDebounce?.State == ScheduledDelegate.RunState.Waiting)
+                    selectionDebounce?.RunTask();
             }
 
-            carousel.CurrentSelection = Beatmap.Value.BeatmapInfo;
+            if (validSelection)
+                carousel.CurrentSelection = Beatmap.Value.BeatmapInfo;
+            else
+                Beatmap.SetDefault();
 
             ensurePlayingSelected();
             updateBackgroundDim();
 
-            if (!validSelection)
+            return validSelection;
+        }
+
+        private bool checkBeatmapValidForSelection(BeatmapInfo beatmap, FilterCriteria? criteria)
+        {
+            if (criteria == null)
                 return false;
 
-            // TODO: Add things here like ruleset validation. Or maybe a forced carousel filter.
+            if (!beatmap.AllowGameplayWithRuleset(Ruleset.Value, criteria.AllowConvertedBeatmaps))
+                return false;
 
-            return validSelection;
+            if (beatmap.Hidden)
+                return false;
+
+            if (beatmap.BeatmapSet == null)
+                return false;
+
+            if (beatmap.BeatmapSet.Protected || beatmap.BeatmapSet.DeletePending)
+                return false;
+
+            return true;
         }
 
         #endregion
@@ -523,7 +547,7 @@ namespace osu.Game.Screens.SelectV2
             beginLooping();
             attachTrackDuckingIfShould();
 
-            EnsureValidSelection();
+            ensureGlobalBeatmapValid();
         }
 
         private void onLeavingScreen()
@@ -600,11 +624,15 @@ namespace osu.Game.Screens.SelectV2
 
         private void criteriaChanged(FilterCriteria criteria)
         {
-            // The first filter needs to be applied immediately as this triggers the initial carousel load.
-            double filterDelay = filterDebounce == null ? 0 : filter_delay;
-
             filterDebounce?.Cancel();
-            filterDebounce = Scheduler.AddDelayed(() => { carousel.Filter(criteria); }, filterDelay);
+
+            // The first filter needs to be applied immediately as this triggers the initial carousel load.
+            bool isFirstFilter = filterDebounce == null;
+
+            // Criteria change may have included a ruleset change which made the current selection invalid.
+            bool isSelectionValid = checkBeatmapValidForSelection(Beatmap.Value.BeatmapInfo, criteria);
+
+            filterDebounce = Scheduler.AddDelayed(() => { carousel.Filter(criteria, !isSelectionValid); }, isFirstFilter || !isSelectionValid ? 0 : filter_delay);
         }
 
         private void newItemsPresented(IEnumerable<CarouselItem> carouselItems)
@@ -620,21 +648,7 @@ namespace osu.Game.Screens.SelectV2
             // but also in this case we want support for formatting a number within a string).
             filterControl.StatusText = count != 1 ? $"{count:#,0} matches" : $"{count:#,0} match";
 
-            // Refetch to be confident that the current selection is still valid. It may have been deleted or hidden.
-            var currentBeatmap = beatmaps.GetWorkingBeatmap(Beatmap.Value.BeatmapInfo, true);
-            bool currentBeatmapNotValid = currentBeatmap.BeatmapInfo.Hidden || currentBeatmap.BeatmapSetInfo?.DeletePending == true;
-
-            // If all results are filtered away don't deselect the current global beatmap selection...
-            if (!carouselItems.Any())
-            {
-                // ...unless it has been deleted or hidden
-                if (currentBeatmapNotValid)
-                    Beatmap.SetDefault();
-                return;
-            }
-
-            if (Beatmap.IsDefault || currentBeatmapNotValid)
-                carousel.NextRandom();
+            ensureGlobalBeatmapValid();
         }
 
         private void updateNoResultsPlaceholder()
