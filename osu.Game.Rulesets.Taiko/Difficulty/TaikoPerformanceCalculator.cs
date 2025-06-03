@@ -56,9 +56,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
             estimatedUnstableRate = computeDeviationUpperBound() * 10;
 
-            // The effectiveMissCount is calculated by gaining a ratio for totalSuccessfulHits and increasing the miss penalty for shorter object counts lower than 1000.
-            if (totalSuccessfulHits > 0)
-                effectiveMissCount = Math.Max(1.0, 1000.0 / totalSuccessfulHits) * countMiss;
+            // Effective miss count punishes misses more on less consistently difficult maps
+            effectiveMissCount = totalHits * Math.Pow(
+                (double)countMiss / totalHits,
+                Math.Pow(taikoAttributes.ConsistencyFactor, 0.2)
+            );
 
             // Converts are detected and omitted from mod-specific bonuses due to the scope of current difficulty calculation.
             bool isConvert = score.BeatmapInfo!.Ruleset.OnlineID != 1;
@@ -99,7 +101,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             double lengthBonus = 1 + 0.1 * Math.Min(1.0, totalHits / 1500.0);
             difficultyValue *= lengthBonus;
 
-            difficultyValue *= Math.Pow(0.986, effectiveMissCount);
+            // Misses are punished more on maps with less total hits
+            double missPenalty = Math.Pow(0.5, 30.0 / totalHits);
+            difficultyValue *= Math.Pow(missPenalty, effectiveMissCount);
 
             if (score.Mods.Any(m => m is ModEasy))
                 difficultyValue *= 0.90;
