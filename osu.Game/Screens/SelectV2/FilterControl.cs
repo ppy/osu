@@ -31,7 +31,7 @@ namespace osu.Game.Screens.SelectV2
         // taken from draw visualiser. used for carousel alignment purposes.
         public const float HEIGHT_FROM_SCREEN_TOP = 141 - corner_radius;
 
-        private const float corner_radius = 8;
+        private const float corner_radius = 10;
 
         private SongSelectSearchTextBox searchTextBox = null!;
         private ShearedToggleButton showConvertedBeatmapsButton = null!;
