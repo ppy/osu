@@ -433,6 +433,18 @@ namespace osu.Game.Screens.SelectV2
             selectionDebounce = Scheduler.AddDelayed(() => Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap), SELECTION_DEBOUNCE);
         }
 
+        private void ensureValidSelection()
+        {
+            // force reselection if entering song select with a protected beatmap
+            if (Beatmap.Value.BeatmapInfo.BeatmapSet!.Protected)
+            {
+                if (!carousel.NextRandom())
+                    Beatmap.SetDefault();
+            }
+            else
+                updateSelection();
+        }
+
         private void updateSelection() => Scheduler.AddOnce(() =>
         {
             var beatmap = Beatmap.Value;
@@ -444,13 +456,7 @@ namespace osu.Game.Screens.SelectV2
                 // If not the current screen, this will be applied in OnResuming.
                 ensurePlayingSelected();
 
-                ApplyToBackground(backgroundModeBeatmap =>
-                {
-                    backgroundModeBeatmap.BlurAmount.Value = 0;
-                    backgroundModeBeatmap.Beatmap = beatmap;
-                    backgroundModeBeatmap.IgnoreUserSettings.Value = true;
-                    backgroundModeBeatmap.DimWhenUserSettingsIgnored.Value = 0.1f;
-                });
+                updateBackgroundDim();
             }
         });
 
@@ -463,25 +469,7 @@ namespace osu.Game.Screens.SelectV2
             base.OnEntering(e);
 
             this.FadeIn();
-
-            titleWedge.Show();
-            detailsArea.Show();
-            filterControl.Show();
-
-            modSelectOverlay.Beatmap.BindTo(Beatmap);
-            modSelectOverlay.SelectedMods.BindTo(Mods);
-
-            beginLooping();
-            attachTrackDuckingIfShould();
-
-            // force reselection if entering song select with a protected beatmap
-            if (Beatmap.Value.BeatmapInfo.BeatmapSet!.Protected)
-            {
-                if (!carousel.NextRandom())
-                    Beatmap.SetDefault();
-            }
-            else
-                updateSelection();
+            onArrivingAtScreen();
         }
 
         public override void OnResuming(ScreenTransitionEvent e)
@@ -489,43 +477,15 @@ namespace osu.Game.Screens.SelectV2
             base.OnResuming(e);
 
             this.FadeIn(fade_duration, Easing.OutQuint);
-
-            carousel.VisuallyFocusSelected = false;
-
-            titleWedge.Show();
-            detailsArea.Show();
-            filterControl.Show();
-
-            modSelectOverlay.Beatmap.BindTo(Beatmap);
-
-            // required due to https://github.com/ppy/osu-framework/issues/3218
-            modSelectOverlay.SelectedMods.Disabled = false;
-            modSelectOverlay.SelectedMods.BindTo(Mods);
-
-            beginLooping();
-            attachTrackDuckingIfShould();
-
-            if (Beatmap.Value.BeatmapInfo.BeatmapSet!.Protected)
-                Beatmap.SetDefault();
-            else
-                updateSelection();
+            onArrivingAtScreen();
         }
 
         public override void OnSuspending(ScreenTransitionEvent e)
         {
-            this.FadeOut(fade_duration, Easing.OutQuint);
-
-            modSelectOverlay.SelectedMods.UnbindFrom(Mods);
-            modSelectOverlay.Beatmap.UnbindFrom(Beatmap);
-
-            titleWedge.Hide();
-            detailsArea.Hide();
-            filterControl.Hide();
-
             carousel.VisuallyFocusSelected = true;
 
-            endLooping();
-            detachTrackDucking();
+            this.FadeOut(fade_duration, Easing.OutQuint);
+            onLeavingScreen();
 
             base.OnSuspending(e);
         }
@@ -533,6 +493,34 @@ namespace osu.Game.Screens.SelectV2
         public override bool OnExiting(ScreenExitEvent e)
         {
             this.FadeOut(fade_duration, Easing.OutQuint);
+            onLeavingScreen();
+
+            return base.OnExiting(e);
+        }
+
+        private void onArrivingAtScreen()
+        {
+            modSelectOverlay.Beatmap.BindTo(Beatmap);
+            // required due to https://github.com/ppy/osu-framework/issues/3218
+            modSelectOverlay.SelectedMods.Disabled = false;
+            modSelectOverlay.SelectedMods.BindTo(Mods);
+
+            carousel.VisuallyFocusSelected = false;
+
+            titleWedge.Show();
+            detailsArea.Show();
+            filterControl.Show();
+
+            beginLooping();
+            attachTrackDuckingIfShould();
+
+            ensureValidSelection();
+        }
+
+        private void onLeavingScreen()
+        {
+            modSelectOverlay.SelectedMods.UnbindFrom(Mods);
+            modSelectOverlay.Beatmap.UnbindFrom(Beatmap);
 
             titleWedge.Hide();
             detailsArea.Hide();
@@ -540,8 +528,6 @@ namespace osu.Game.Screens.SelectV2
 
             endLooping();
             detachTrackDucking();
-
-            return base.OnExiting(e);
         }
 
         protected override void LogoArriving(OsuLogo logo, bool resuming)
@@ -582,6 +568,18 @@ namespace osu.Game.Screens.SelectV2
             logo.ScaleTo(0.2f, 120, Easing.Out);
             logo.FadeOut(120, Easing.Out);
         }
+
+        private void updateBackgroundDim() => ApplyToBackground(backgroundModeBeatmap =>
+        {
+            backgroundModeBeatmap.BlurAmount.Value = 0;
+            backgroundModeBeatmap.Beatmap = Beatmap.Value;
+            backgroundModeBeatmap.IgnoreUserSettings.Value = true;
+            backgroundModeBeatmap.DimWhenUserSettingsIgnored.Value = 0.1f;
+
+            // Required to undo results screen dimming the background.
+            // Probably needs more thought because this needs to be in every `ApplyToBackground` currently to restore sane defaults.
+            backgroundModeBeatmap.FadeColour(Color4.White, 250);
+        });
 
         #endregion
 
