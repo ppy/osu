@@ -52,8 +52,9 @@ namespace osu.Game.Screens.SelectV2
         }
 
         public PanelSetBackground()
-            // TODO: for performance reasons we probably want this to be true
-            // for it to work we will need to move transforms accordingly.
+            // TODO: for performance reasons we may want this to be true.
+            // Setting to true will require that the buffered portion is moved to a child such that `FadeIn`/`FadeOut` transforms
+            // still work.
             : base(cachedFrameBuffer: false)
         {
             RelativeSizeAxes = Axes.Both;
@@ -115,14 +116,14 @@ namespace osu.Game.Screens.SelectV2
             {
                 Quad containingSsdq = beatmapCarousel.ScreenSpaceDrawQuad;
 
-                // Using DelayedLoadWrappers would only allow us to load content when on screen, but we want to preload while off-screen
-                // to provide a better user experience.
-
-                // This is tracking time that this drawable is updating since the last pool.
-                // This is intended to provide a debounce so very fast scrolls (from one end to the other of the carousel)
-                // don't cause huge overheads.
+                // One may ask why we are not using `DelayedLoadWrapper` for this delayed load logic.
                 //
-                // We increase the delay based on distance from centre, so the beatmaps the user is currently looking at load first.
+                // - Using `DelayedLoadWrapper` would only allow us to load content when on screen, but we want to preload while panels are off-screen.
+                //   This allows a more seamless experience when a user is scrolling at a moderate speed, as we are loading in backgrounds before they
+                //   enter the visible viewport.
+                // - By using a slightly customised formula to decide when to start the load, we can coerce the loading of backgrounds into an order that
+                //   prioritises panels which are closest to the centre of the screen. Basically, we want to load backgrounds "outwards" from the visual
+                //   centre to give the user the best experience possible.
                 float timeUpdatingBeforeLoad = 50 + Math.Abs(containingSsdq.Centre.Y - ScreenSpaceDrawQuad.Centre.Y) / containingSsdq.Height * 100;
 
                 timeSinceUnpool += Time.Elapsed;
