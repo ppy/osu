@@ -75,7 +75,7 @@ namespace osu.Game.Screens.SelectV2
 
         private readonly IBindable<LeaderboardScores?> fetchedScores = new Bindable<LeaderboardScores?>();
 
-        private const float personal_best_height = 100;
+        private const float personal_best_height = 112;
 
         [BackgroundDependencyLoader]
         private void load()
