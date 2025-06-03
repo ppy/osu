@@ -395,9 +395,14 @@ namespace osu.Game.Graphics.Carousel
             offset += spacing;
             item.CarouselYPosition = offset;
 
-            item.CarouselInputLenienceAbove = spacing / 2;
-            if (previousVisible != null)
-                previousVisible.CarouselInputLenienceBelow = item.CarouselInputLenienceAbove;
+            // ensure there are no input gaps where clicking will fall through the carousel.
+            // notably, only do this where there's positive spacing between panels (negative spacing means they overlap already and there is no gap to fill).
+            if (spacing > 0)
+            {
+                item.CarouselInputLenienceAbove = spacing / 2;
+                if (previousVisible != null)
+                    previousVisible.CarouselInputLenienceBelow = item.CarouselInputLenienceAbove;
+            }
 
             if (item.IsVisible)
             {
