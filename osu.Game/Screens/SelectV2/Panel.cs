@@ -70,13 +70,16 @@ namespace osu.Game.Screens.SelectV2
 
         public sealed override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
         {
+            if (item == null)
+                return TopLevelContent.ReceivePositionalInputAt(screenSpacePos);
+
             var inputRectangle = TopLevelContent.DrawRectangle;
 
             // Cover the gaps introduced by the spacing between panels so that user mis-aims don't result in no-ops.
             inputRectangle = inputRectangle.Inflate(new MarginPadding
             {
-                Top = item!.CarouselInputLenienceAbove,
-                Bottom = item!.CarouselInputLenienceBelow,
+                Top = item.CarouselInputLenienceAbove,
+                Bottom = item.CarouselInputLenienceBelow,
             });
 
             return inputRectangle.Contains(TopLevelContent.ToLocalSpace(screenSpacePos));
