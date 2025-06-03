@@ -263,7 +263,7 @@ namespace osu.Game.Screens.SelectV2
 
             if (!Expanded.Value && !Selected.Value)
             {
-                if (this is PanelBeatmap)
+                if (this is PanelBeatmap || this is PanelBeatmapStandalone)
                     x += active_x_offset * 2;
                 else
                     x += active_x_offset * 4;
