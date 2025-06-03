@@ -13,6 +13,7 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Caching;
 using osu.Framework.Development;
+using osu.Framework.Extensions.PolygonExtensions;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -845,6 +846,8 @@ namespace osu.Game.Graphics.Carousel
                     throw new InvalidOperationException($"Carousel panel drawables must implement {typeof(ICarouselPanel)}");
 
                 carouselPanel.Item = item;
+                carouselPanel.DrawYPosition = item.CarouselYPosition;
+
                 Scroll.Add(drawable);
             }
 
@@ -853,6 +856,7 @@ namespace osu.Game.Graphics.Carousel
                 // To make transitions of items appearing in the flow look good, do a pass and make sure newly added items spawn from
                 // just beneath the *current interpolated position* of the previous panel.
                 var orderedPanels = Scroll.Panels
+                                          .Where(p => Scroll.ScreenSpaceDrawQuad.Intersects(p.ScreenSpaceDrawQuad))
                                           .OfType<ICarouselPanel>()
                                           .Where(p => p.Item != null)
                                           .OrderBy(p => p.Item!.CarouselYPosition)
@@ -868,8 +872,6 @@ namespace osu.Game.Graphics.Carousel
                         // It's usually off-screen anyway.
                         if (i > 0 && i < orderedPanels.Count - 1)
                             panel.DrawYPosition = orderedPanels[i - 1].DrawYPosition;
-                        else
-                            panel.DrawYPosition = panel.Item!.CarouselYPosition;
                     }
                 }
             }
