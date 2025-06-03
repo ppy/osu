@@ -612,13 +612,6 @@ namespace osu.Game.Screens.SelectV2
             // If set grouping is available, this is the fastest way to retrieve sets for randomisation.
             ICollection<BeatmapSetInfo> visibleSets = grouping.SetItems.Keys;
 
-            // If not, we need to do an expensive copy.
-            //
-            // There's probably a more efficient way to handle this. Maybe the grouping filter should always expose grouped sets regardless
-            // as that process is done asynchronously.
-            if (!visibleSets.Any())
-                visibleSets = carouselItems.Select(i => i.Model).OfType<BeatmapInfo>().Select(b => b.BeatmapSet!).Distinct().ToList();
-
             if (CurrentSelection is BeatmapInfo beatmapInfo)
             {
                 randomSelectedBeatmaps.Add(beatmapInfo);
