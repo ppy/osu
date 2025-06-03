@@ -212,7 +212,9 @@ namespace osu.Game.Screens.SelectV2
             base.PrepareForUse();
 
             updateAccentColour();
-            updateXOffset();
+
+            updateXOffset(animated: false);
+            updateSelectedState(animated: false);
 
             this.FadeIn(DURATION, Easing.OutQuint);
         }
@@ -257,13 +259,13 @@ namespace osu.Game.Screens.SelectV2
                 selectionLayer.FadeOut(200, Easing.OutQuint);
         }
 
-        private void updateXOffset()
+        private void updateXOffset(bool animated = true)
         {
             float x = PanelXOffset + corner_radius;
 
             if (!Expanded.Value && !Selected.Value)
             {
-                if (this is PanelBeatmap)
+                if (this is PanelBeatmap || this is PanelBeatmapStandalone)
                     x += active_x_offset * 2;
                 else
                     x += active_x_offset * 4;
@@ -272,7 +274,7 @@ namespace osu.Game.Screens.SelectV2
             if (!KeyboardSelected.Value)
                 x += active_x_offset;
 
-            TopLevelContent.MoveToX(x, DURATION, Easing.OutQuint);
+            TopLevelContent.MoveToX(x, animated ? DURATION : 0, Easing.OutQuint);
         }
 
         protected override bool OnHover(HoverEvent e)
