@@ -65,6 +65,20 @@ namespace osu.Game.Beatmaps
         private static string getVersionString(IBeatmapInfo beatmapInfo) => string.IsNullOrEmpty(beatmapInfo.DifficultyName) ? string.Empty : $"[{beatmapInfo.DifficultyName}]";
 
         /// <summary>
+        /// Whether gameplay is allowed for this beatmap with the provided ruleset (via conversion or direct compatibility).
+        /// </summary>
+        public static bool AllowGameplayWithRuleset(this IBeatmapInfo beatmap, RulesetInfo ruleset, bool allowConversion)
+        {
+            if (beatmap.Ruleset.ShortName == ruleset.ShortName)
+                return true;
+
+            if (allowConversion && beatmap.Ruleset.OnlineID == 0 && ruleset.OnlineID != 0)
+                return true;
+
+            return false;
+        }
+
+        /// <summary>
         /// Get the beatmap info page URL, or <c>null</c> if unavailable.
         /// </summary>
         public static string? GetOnlineURL(this IBeatmapInfo beatmapInfo, IAPIProvider api, IRulesetInfo? ruleset = null)
