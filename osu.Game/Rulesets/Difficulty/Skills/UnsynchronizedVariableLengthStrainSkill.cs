@@ -80,7 +80,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// <value>double storedStrain, double storedStrainStartTime</value>
         /// <remarks>In the case that continuous strains is implemented, please remove this</remarks>
         /// </summary>
-        private readonly List<StrainObject> queue = new List<StrainObject>();
+        private readonly LinkedList<StrainObject> queue = new LinkedList<StrainObject>();
 
         protected UnsynchronizedVariableLengthStrainSkill(Mod[] mods)
             : base(mods)
@@ -104,20 +104,20 @@ namespace osu.Game.Rulesets.Difficulty.Skills
                 currentSectionEnd = currentSectionBegin + MaxSectionLength;
             }
 
-            int usedQueueItems = 0;
-
             // Fill in strains between previous object and current object
             while (current.StartTime > currentSectionEnd)
             {
                 // Pull from queue if possible
-                if (queue.Count > usedQueueItems)
+                if (queue.Count > 0 && queue.First != null)
                 {
+                    StrainObject queueStrainObject = queue.First.Value;
+                    queue.RemoveFirst();
+
                     saveCurrentPeak(currentSectionEnd - currentSectionBegin);
                     currentSectionBegin = currentSectionEnd;
-                    currentSectionEnd = queue[usedQueueItems].StartTime + MaxSectionLength;
+                    currentSectionEnd = queueStrainObject.StartTime + MaxSectionLength;
                     startNewSectionFrom(currentSectionBegin, current);
-                    currentSectionPeak = Math.Max(currentSectionPeak, queue[usedQueueItems].Value);
-                    usedQueueItems++;
+                    currentSectionPeak = Math.Max(currentSectionPeak, queueStrainObject.Value);
                 }
                 else
                 {
@@ -128,9 +128,6 @@ namespace osu.Game.Rulesets.Difficulty.Skills
                     startNewSectionFrom(currentSectionBegin, current);
                 }
             }
-
-            // Remove all obsolete items from queue at once
-            queue.RemoveRange(0, usedQueueItems);
 
             double strain = StrainValueAt(current);
 
@@ -148,10 +145,11 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             if (strain < currentSectionPeak)
             {
                 // Empty the queue of smaller elements
-                queue.RemoveAll(s => s.Value < strain);
+                while (queue.Last != null && queue.Last.Value.Value < strain)
+                    queue.RemoveLast();
 
                 // Add current strain to queue since it's less than the current peak
-                queue.Add(new StrainObject(strain, current.StartTime));
+                queue.AddLast(new StrainObject(strain, current.StartTime));
             }
             // If the strain is a new peak, clear the queue and start a new strain
             else
