@@ -42,15 +42,15 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         {
             public StrainPeak(double value, double sectionLength, bool fromNewObject = false)
             {
-                this.value = (Half)value;
+                this.value = (float)value;
                 this.sectionLength = (short)sectionLength;
                 if (fromNewObject) this.sectionLength *= -1;
             }
 
-            private readonly Half value;
+            private readonly float value;
             private readonly short sectionLength;
 
-            public double Value => (double)value;
+            public double Value => value;
             public double SectionLength => Math.Abs((double)sectionLength);
             public bool FromNewObject => Math.Sign(sectionLength) == -1;
 

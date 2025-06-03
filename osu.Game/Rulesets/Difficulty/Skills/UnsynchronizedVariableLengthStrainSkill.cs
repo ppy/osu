@@ -42,14 +42,14 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         {
             public StrainPeak(double value, double sectionLength)
             {
-                this.value = (Half)value;
+                this.value = (float)value;
                 this.sectionLength = (short)sectionLength;
             }
 
-            private readonly Half value;
+            private readonly float value;
             private readonly short sectionLength;
 
-            public double Value => (double)value;
+            public double Value => value;
             public double SectionLength => sectionLength;
 
             public int CompareTo(StrainPeak other)
