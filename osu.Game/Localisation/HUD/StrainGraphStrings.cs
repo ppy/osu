@@ -7,7 +7,7 @@ namespace osu.Game.Localisation.HUD
 {
     public class StrainGraphStrings
     {
-        private const string prefix = @"osu.Game.Resources.Localisation.StrainGraph";
+        private const string prefix = @"osu.Game.Resources.Localisation.HUD.StrainGraph";
 
         /// <summary>
         /// "Show background"
