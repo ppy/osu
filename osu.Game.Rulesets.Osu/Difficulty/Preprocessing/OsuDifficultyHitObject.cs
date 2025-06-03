@@ -110,6 +110,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// </summary>
         public double SmallCircleBonus { get; private set; }
 
+        /// <summary>
+        /// Selective bonus for maps with higher circle size.
+        /// </summary>
+        public double SliderTailVelocityVelocity { get; private set; }
+
         private readonly OsuDifficultyHitObject? lastLastDifficultyObject;
         private readonly OsuDifficultyHitObject? lastDifficultyObject;
 
@@ -186,10 +191,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
         private void setDistances(double clockRate)
         {
-            if (BaseObject is Slider currentSlider)
+            if (BaseObject is Slider)
             {
                 // Bonus for repeat sliders until a better per nested object strain system can be achieved.
-                TravelDistance = LazyTravelDistance * Math.Pow(1 + currentSlider.RepeatCount / 2.5, 1.0 / 2.5);
+                TravelDistance = LazyTravelDistance;
                 TravelTime = Math.Max(LazyTravelTime / clockRate, MIN_DELTA_TIME);
             }
 
@@ -238,7 +243,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
                 double tailJumpDistance = Vector2.Subtract(lastSlider.TailCircle.StackedPosition, BaseObject.StackedPosition).Length * scalingFactor;
                 MinimumJumpDistance = Math.Max(0, Math.Min(LazyJumpDistance - (slider_radius - jump_slider_radius), tailJumpDistance - slider_radius));
-                LazyJumpDistance -= slider_radius - jump_slider_radius;
             }
 
             if (lastLastDifficultyObject != null && lastLastDifficultyObject.BaseObject is not Spinner)
@@ -264,8 +268,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             double trackingEndTime = slider.StartTime + slider.Duration + endLeniency;
 
-            const double slider_radius = NORMALISED_RADIUS * SLIDER_RADIUS_MULTIPLIER;
-
             double currentSliderRadius = BaseObject.Radius * SLIDER_RADIUS_MULTIPLIER;
 
             LazyTravelTime = trackingEndTime - slider.StartTime;
@@ -279,22 +281,29 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             double scalingFactor = NORMALISED_RADIUS / currentSliderRadius;
 
-            double currMovementLength = 0;
+            double totalSliderValue = 0;
 
             for (int i = 1; i < nestedObjects.Count; i++)
             {
                 OsuHitObject currMovementObj = nestedObjects[i];
 
+                double currMovementLength = 0;
+
                 // Amount of movement required so that the cursor position needs to be updated.
-                double requiredMovement = slider_radius;
+                double requiredMovement = NORMALISED_RADIUS;
+
+                bool lastIsRepeat = nestedObjects[i - 1] is SliderRepeat;
+                bool lastIsHead = nestedObjects[i - 1] is SliderHeadCircle;
 
                 // For SliderRepeat objects, we need to adjust the required movement.
-                if (nestedObjects[i - 1] is SliderRepeat)
-                    requiredMovement *= 4;
+                if (lastIsRepeat)
+                    requiredMovement *= 1.75;
 
                 double currentStrainValue = currMovementObj.StartTime - lastStartTime;
 
                 double middleStrainValue = (currMovementObj.StartTime + lastStartTime) / 2 - lastStartTime;
+
+                double middleToCurrStrainValue = currentStrainValue - middleStrainValue;
 
                 Vector2 currMovement = Vector2.Subtract(slider.StackedPositionAt(currentStrainValue / slider.SpanDuration), currCursorPosition);
 
@@ -302,6 +311,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
                 double lastToMiddleMovementLength = Vector2.Subtract(lastCursorPosition, additionalSliderPath).Length * scalingFactor;
                 double middleToCurrMovementLength = Vector2.Subtract(additionalSliderPath, slider.StackedPositionAt(currentStrainValue / slider.SpanDuration)).Length * scalingFactor;
+
+                currMovementLength = lastToMiddleMovementLength + middleToCurrMovementLength;
+
+                double velocityChangeBonus = 1 + calcVelocityChange(lastToMiddleMovementLength / middleStrainValue, middleToCurrMovementLength / middleToCurrStrainValue);
 
                 double angle = Math.Abs(calculateAngle(lastCursorPosition, additionalSliderPath, currCursorPosition));
 
@@ -311,25 +324,33 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 angleAcutenessBonus -= DifficultyCalculationUtils.Smoothstep(angle, double.DegreesToRadians(70), double.DegreesToRadians(0));
                 angleWidenessBonus -= DifficultyCalculationUtils.Smoothstep(angle, double.DegreesToRadians(120), double.DegreesToRadians(180));
 
-                double angleBonus = (angleAcutenessBonus + angleWidenessBonus) / 2;
+                double angleBonus = Math.Max(angleAcutenessBonus + angleWidenessBonus, 0);
 
-                currMovementLength = lastToMiddleMovementLength + middleToCurrMovementLength;
+                if (lastIsRepeat || currMovementObj is SliderRepeat)
+                    velocityChangeBonus *= Math.Pow(0.73 + angleBonus, 2);
+                else if (lastIsHead && currMovementObj is SliderTailCircle)
+                    velocityChangeBonus *= Math.Pow(0.86 + angleBonus, 2);
+                else
+                    velocityChangeBonus *= Math.Pow(1 + angleBonus, 2);
 
-                currMovementLength *= Math.Pow(0.7 + angleBonus, 2);
-
-                if (currMovementLength > requiredMovement)
+                if (currMovementObj is SliderTailCircle)
                 {
                     // this finds the positional delta from the required radius and the current position, and updates the currCursorPosition accordingly, as well as rewarding distance.
                     currCursorPosition = slider.StackedPositionAt(currentStrainValue);
-                    currMovementLength += Math.Max(currMovementLength - requiredMovement, 0);
+                    currMovementLength = Math.Max(currMovementLength - requiredMovement, 0) * velocityChangeBonus;
+                    totalSliderValue += currMovementLength;
                 }
 
                 if (i == nestedObjects.Count - 1)
+                {
+                    SliderTailVelocityVelocity = middleToCurrMovementLength / middleToCurrStrainValue;
                     LazyEndPosition = currCursorPosition;
+                }
+
+                LazyTravelDistance += totalSliderValue;
 
                 lastStartTime = currMovementObj.StartTime;
             }
-            LazyTravelDistance = currMovementLength;
         }
 
         private Vector2 getEndCursorPosition(OsuDifficultyHitObject difficultyHitObject)
@@ -346,6 +367,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             float det = v1.X * v2.Y - v1.Y * v2.X;
 
             return Math.Atan2(det, dot);
+        }
+
+        private double calcVelocityChange(double prevVelocity, double currVelocity)
+        {
+            if (prevVelocity == 0 || currVelocity == 0)
+                return 0;
+            return DifficultyCalculationUtils.Smoothstep(Math.Abs(prevVelocity - currVelocity), 0, prevVelocity + currVelocity);
         }
     }
 }
