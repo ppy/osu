@@ -303,7 +303,17 @@ namespace osu.Game.Screens.SelectV2
                     .FadeTo(v.NewValue == Visibility.Visible ? 0f : 1f, 200, Easing.OutQuint);
             });
 
-            Beatmap.BindValueChanged(_ => ensureGlobalBeatmapValid());
+            Beatmap.BindValueChanged(_ =>
+            {
+                ensureGlobalBeatmapValid();
+                updateStateFromCurrentBeatmap();
+            });
+        }
+
+        private void updateStateFromCurrentBeatmap()
+        {
+            ensurePlayingSelected();
+            updateBackgroundDim();
         }
 
         protected override void Update()
@@ -467,9 +477,6 @@ namespace osu.Game.Screens.SelectV2
             else
                 Beatmap.SetDefault();
 
-            ensurePlayingSelected();
-            updateBackgroundDim();
-
             return validSelection;
         }
 
@@ -548,6 +555,8 @@ namespace osu.Game.Screens.SelectV2
             attachTrackDuckingIfShould();
 
             ensureGlobalBeatmapValid();
+
+            updateStateFromCurrentBeatmap();
         }
 
         private void onLeavingScreen()
