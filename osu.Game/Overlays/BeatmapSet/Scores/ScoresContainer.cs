@@ -249,6 +249,8 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             getScoresRequest = null;
 
             noScoresPlaceholder.Hide();
+            noTeamPlaceholder.Hide();
+            notSupporterPlaceholder.Hide();
 
             if (Beatmap.Value == null || Beatmap.Value.OnlineID <= 0 || (Beatmap.Value.Status <= BeatmapOnlineStatus.Pending))
             {
@@ -270,9 +272,6 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 notSupporterPlaceholder.Show();
                 return;
             }
-
-            noTeamPlaceholder.Hide();
-            notSupporterPlaceholder.Hide();
 
             Show();
             loading.Show();

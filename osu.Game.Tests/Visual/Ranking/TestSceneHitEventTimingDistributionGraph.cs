@@ -168,6 +168,19 @@ namespace osu.Game.Tests.Visual.Ranking
             };
         });
 
+        public static List<HitEvent> CreateHitEvents(double offset = 0, int count = 50)
+        {
+            var hitEvents = new List<HitEvent>();
+
+            for (int i = 0; i < count; i++)
+            {
+                for (int j = 0; j < count; j++)
+                    hitEvents.Add(new HitEvent(offset, 1.0, HitResult.Perfect, placeholder_object, placeholder_object, null));
+            }
+
+            return hitEvents;
+        }
+
         public static List<HitEvent> CreateDistributedHitEvents(double centre = 0, double range = 25)
         {
             var hitEvents = new List<HitEvent>();

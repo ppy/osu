@@ -201,7 +201,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (effectiveMissCount > 0)
             {
                 aimEstimatedSliderBreaks = calculateEstimatedSliderBreaks(attributes.AimTopWeightedSliderFactor, attributes);
-                aimValue *= calculateMissPenalty(effectiveMissCount + aimEstimatedSliderBreaks, attributes.AimDifficultStrainCount);
+
+                double relevantMissCount = Math.Min(effectiveMissCount + aimEstimatedSliderBreaks, totalImperfectHits + countSliderTickMiss);
+
+                aimValue *= calculateMissPenalty(relevantMissCount, attributes.AimDifficultStrainCount);
             }
 
             // TC bonuses are excluded when blinds is present as the increased visual difficulty is unimportant when notes cannot be seen.
@@ -209,8 +212,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 aimValue *= 1.3 + (totalHits * (0.0016 / (1 + 2 * effectiveMissCount)) * Math.Pow(accuracy, 16)) * (1 - 0.003 * attributes.DrainRate * attributes.DrainRate);
             else if (score.Mods.Any(m => m is OsuModTraceable))
             {
-                // We want to give more reward for lower AR when it comes to aim and HD. This nerfs high AR and buffs lower AR.
-                aimValue *= 1.0 + 0.04 * (12.0 - approachRate);
+                aimValue *= 1.0 + OsuDifficultyCalculator.CalculateVisibilityBonus(score.Mods, approachRate);
             }
 
             aimValue *= accuracy;
@@ -232,7 +234,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (effectiveMissCount > 0)
             {
                 speedEstimatedSliderBreaks = calculateEstimatedSliderBreaks(attributes.SpeedTopWeightedSliderFactor, attributes);
-                speedValue *= calculateMissPenalty(effectiveMissCount + speedEstimatedSliderBreaks, attributes.SpeedDifficultStrainCount);
+
+                double relevantMissCount = Math.Min(effectiveMissCount + speedEstimatedSliderBreaks, totalImperfectHits + countSliderTickMiss);
+
+                speedValue *= calculateMissPenalty(relevantMissCount, attributes.SpeedDifficultStrainCount);
             }
 
             // TC bonuses are excluded when blinds is present as the increased visual difficulty is unimportant when notes cannot be seen.
@@ -243,8 +248,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             }
             else if (score.Mods.Any(m => m is OsuModTraceable))
             {
-                // We want to give more reward for lower AR when it comes to aim and HD. This nerfs high AR and buffs lower AR.
-                speedValue *= 1.0 + 0.04 * (12.0 - approachRate);
+                speedValue *= 1.0 + OsuDifficultyCalculator.CalculateVisibilityBonus(score.Mods, approachRate);
             }
 
             double speedHighDeviationMultiplier = calculateSpeedHighDeviationNerf(attributes);
@@ -294,7 +298,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (score.Mods.Any(m => m is OsuModBlinds))
                 accuracyValue *= 1.14;
             else if (score.Mods.Any(m => m is OsuModHidden || m is OsuModTraceable))
-                accuracyValue *= 1.08;
+            {
+                // Decrease bonus for AR > 10
+                accuracyValue *= 1 + 0.08 * DifficultyCalculationUtils.ReverseLerp(approachRate, 11.5, 10);
+            }
 
             if (score.Mods.Any(m => m is OsuModFlashlight))
                 accuracyValue *= 1.02;
@@ -362,7 +369,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double missedComboPercent = 1.0 - (double)scoreMaxCombo / attributes.MaxCombo;
             double estimatedSliderBreaks = Math.Min(countOk, effectiveMissCount * topWeightedSliderFactor);
 
-            // scores with more oks are more likely to have slider breaks
+            // Scores with more Oks are more likely to have slider breaks.
             double okAdjustment = ((countOk - estimatedSliderBreaks) + 0.5) / countOk;
 
             // There is a low probability of extra slider breaks on effective miss counts close to 1, as score based calculations are good at indicating if only a single break occurred.

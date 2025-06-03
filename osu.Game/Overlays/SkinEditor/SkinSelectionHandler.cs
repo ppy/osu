@@ -22,7 +22,10 @@ namespace osu.Game.Overlays.SkinEditor
 {
     public partial class SkinSelectionHandler : SelectionHandler<ISerialisableDrawable>
     {
-        private OsuMenuItem originMenu = null!;
+        private OsuMenuItem? originMenu;
+
+        private TernaryStateRadioMenuItem? closestAnchor;
+        private AnchorMenuItem[]? fixedAnchors;
 
         [Resolved]
         private SkinEditor skinEditor { get; set; } = null!;
@@ -42,6 +45,38 @@ namespace osu.Game.Overlays.SkinEditor
             scaleHandler.PerformFlipFromScaleHandles += a => SelectionBox.PerformFlipFromScaleHandles(a);
 
             return scaleHandler;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            if (ChangeHandler != null)
+                ChangeHandler.OnStateChange += updateTernaryStates;
+            SelectedItems.BindCollectionChanged((_, _) => updateTernaryStates());
+        }
+
+        private void updateTernaryStates()
+        {
+            var usingClosestAnchor = GetStateFromSelection(SelectedBlueprints, c => !c.Item.UsesFixedAnchor);
+
+            if (closestAnchor != null)
+                closestAnchor.State.Value = usingClosestAnchor;
+
+            if (fixedAnchors != null)
+            {
+                foreach (var fixedAnchor in fixedAnchors)
+                    fixedAnchor.State.Value = GetStateFromSelection(SelectedBlueprints, c => c.Item.UsesFixedAnchor && ((Drawable)c.Item).Anchor == fixedAnchor.Anchor);
+            }
+
+            if (originMenu != null)
+            {
+                foreach (var origin in originMenu.Items.OfType<AnchorMenuItem>())
+                {
+                    origin.State.Value = GetStateFromSelection(SelectedBlueprints, c => ((Drawable)c.Item).Origin == origin.Anchor);
+                    origin.Action.Disabled = usingClosestAnchor == TernaryState.True;
+                }
+            }
         }
 
         public override bool HandleFlip(Direction direction, bool flipOverOrigin)
@@ -102,27 +137,17 @@ namespace osu.Game.Overlays.SkinEditor
 
         protected override IEnumerable<MenuItem> GetContextMenuItemsForSelection(IEnumerable<SelectionBlueprint<ISerialisableDrawable>> selection)
         {
-            var closestItem = new TernaryStateRadioMenuItem(SkinEditorStrings.Closest, MenuItemType.Standard, _ => applyClosestAnchors())
-            {
-                State = { Value = GetStateFromSelection(selection, c => !c.Item.UsesFixedAnchor) }
-            };
+            closestAnchor = new TernaryStateRadioMenuItem(SkinEditorStrings.Closest, MenuItemType.Standard, _ => applyClosestAnchors());
+            fixedAnchors = createAnchorItems(applyFixedAnchors).ToArray();
 
             yield return new OsuMenuItem(SkinEditorStrings.Anchor)
             {
-                Items = createAnchorItems((d, a) => d.UsesFixedAnchor && ((Drawable)d).Anchor == a, applyFixedAnchors)
-                        .Prepend(closestItem)
-                        .ToArray()
+                Items = fixedAnchors.Prepend(closestAnchor).ToArray()
             };
 
             yield return originMenu = new OsuMenuItem(SkinEditorStrings.Origin);
 
-            closestItem.State.BindValueChanged(s =>
-            {
-                // For UX simplicity, origin should only be user-editable when "closest" anchor mode is disabled.
-                originMenu.Items = s.NewValue == TernaryState.True
-                    ? Array.Empty<MenuItem>()
-                    : createAnchorItems((d, o) => ((Drawable)d).Origin == o, applyOrigins).ToArray();
-            }, true);
+            originMenu.Items = createAnchorItems(applyOrigins).ToArray();
 
             yield return new OsuMenuItemSpacer();
 
@@ -163,27 +188,37 @@ namespace osu.Game.Overlays.SkinEditor
             foreach (var item in base.GetContextMenuItemsForSelection(selection))
                 yield return item;
 
-            IEnumerable<TernaryStateMenuItem> createAnchorItems(Func<ISerialisableDrawable, Anchor, bool> checkFunction, Action<Anchor> applyFunction)
+            updateTernaryStates();
+        }
+
+        private IEnumerable<AnchorMenuItem> createAnchorItems(Action<Anchor> applyFunction)
+        {
+            var displayableAnchors = new[]
             {
-                var displayableAnchors = new[]
-                {
-                    Anchor.TopLeft,
-                    Anchor.TopCentre,
-                    Anchor.TopRight,
-                    Anchor.CentreLeft,
-                    Anchor.Centre,
-                    Anchor.CentreRight,
-                    Anchor.BottomLeft,
-                    Anchor.BottomCentre,
-                    Anchor.BottomRight,
-                };
-                return displayableAnchors.Select(a =>
-                {
-                    return new TernaryStateRadioMenuItem(a.ToString(), MenuItemType.Standard, _ => applyFunction(a))
-                    {
-                        State = { Value = GetStateFromSelection(selection, c => checkFunction(c.Item, a)) }
-                    };
-                });
+                Anchor.TopLeft,
+                Anchor.TopCentre,
+                Anchor.TopRight,
+                Anchor.CentreLeft,
+                Anchor.Centre,
+                Anchor.CentreRight,
+                Anchor.BottomLeft,
+                Anchor.BottomCentre,
+                Anchor.BottomRight,
+            };
+            return displayableAnchors.Select(a =>
+            {
+                return new AnchorMenuItem(a, _ => applyFunction(a));
+            });
+        }
+
+        private partial class AnchorMenuItem : TernaryStateRadioMenuItem
+        {
+            public readonly Anchor Anchor;
+
+            public AnchorMenuItem(Anchor anchor, Action<Anchor> applyFunction)
+                : base(anchor.ToString(), MenuItemType.Standard, _ => applyFunction(anchor))
+            {
+                Anchor = anchor;
             }
         }
 

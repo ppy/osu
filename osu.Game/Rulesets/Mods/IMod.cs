@@ -2,8 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
+using osu.Game.Configuration;
 
 namespace osu.Game.Rulesets.Mods
 {
@@ -42,7 +44,7 @@ namespace osu.Game.Rulesets.Mods
         IconUsage? Icon { get; }
 
         /// <summary>
-        /// Whether this mod is playable by an end user.
+        /// Whether this mod is playable by a real human user.
         /// Should be <c>false</c> for cases where the user is not interacting with the game (so it can be excluded from multiplayer selection, for example).
         /// </summary>
         bool UserPlayable { get; }
@@ -52,6 +54,12 @@ namespace osu.Game.Rulesets.Mods
         /// Should be <c>false</c> for mods that make gameplay duration dependent on user input (e.g. <see cref="ModAdaptiveSpeed"/>).
         /// </summary>
         bool ValidForMultiplayer { get; }
+
+        /// <summary>
+        /// Whether this mod is valid as a required mod when freestyle is enabled.
+        /// Should be <c>true</c> for mods that are guaranteed to be implemented across all rulesets.
+        /// </summary>
+        bool ValidForFreestyleAsRequiredMod { get; }
 
         /// <summary>
         /// Whether this mod is valid as a free mod in multiplayer matches.
@@ -75,5 +83,33 @@ namespace osu.Game.Rulesets.Mods
         /// Create a fresh <see cref="Mod"/> instance based on this mod.
         /// </summary>
         Mod CreateInstance() => (Mod)Activator.CreateInstance(GetType())!;
+
+        /// <summary>
+        /// Whether any user adjustable setting attached to this mod has a non-default value.
+        /// </summary>
+        /// <remarks>
+        /// This returns the instantaneous state of this mod. It may change over time.
+        /// For tracking changes on a dynamic display, make sure to setup a <see cref="ModSettingChangeTracker"/>.
+        /// </remarks>
+        bool HasNonDefaultSettings
+        {
+            get
+            {
+                bool hasAdjustments = false;
+
+                foreach (var (_, property) in this.GetSettingsSourceProperties())
+                {
+                    var bindable = (IBindable)property.GetValue(this)!;
+
+                    if (!bindable.IsDefault)
+                    {
+                        hasAdjustments = true;
+                        break;
+                    }
+                }
+
+                return hasAdjustments;
+            }
+        }
     }
 }
