@@ -609,7 +609,7 @@ namespace osu.Game.Screens.SelectV2
             if (carouselItems?.Any() != true)
                 return false;
 
-            // If set grouping is available, this is the fastest way to retrieve sets for randomisation.
+            // This is the fastest way to retrieve sets for randomisation.
             ICollection<BeatmapSetInfo> visibleSets = grouping.SetItems.Keys;
 
             if (CurrentSelection is BeatmapInfo beatmapInfo)
