@@ -309,16 +309,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             {
                 OsuHitObject currMovementObj = nestedObjects[i];
 
-                double currMovementLength = 0;
-
                 // Amount of movement required so that the cursor position needs to be updated.
                 double requiredMovement = NORMALISED_RADIUS;
 
                 bool lastIsRepeat = nestedObjects[i - 1] is SliderRepeat;
                 bool lastIsHead = nestedObjects[i - 1] is SliderHeadCircle;
 
-                double currentStrainValue = currMovementObj.StartTime - lastStartTime;
+                if (lastIsRepeat)
+                    requiredMovement *= 0.1;
 
+                double currentStrainValue = currMovementObj.StartTime - lastStartTime;
                 double middleStrainValue = (currMovementObj.StartTime + lastStartTime) / 2 - lastStartTime;
 
                 double middleToCurrStrainValue = currentStrainValue - middleStrainValue;
@@ -328,49 +328,39 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 double lastToMiddleMovementLength = Vector2.Subtract(lastCursorPosition, additionalSliderPath).Length * scalingFactor;
                 double middleToCurrMovementLength = Vector2.Subtract(additionalSliderPath, slider.StackedPositionAt(currentStrainValue / slider.SpanDuration)).Length * scalingFactor;
 
-                if (lastToMiddleMovementLength + middleToCurrMovementLength < currMovementLength * 2)
+                double currMovementLength = Vector2.Subtract(lastCursorPosition, slider.StackedPositionAt(currentStrainValue / slider.SpanDuration)).Length * scalingFactor;
+
+                if (lastToMiddleMovementLength + middleToCurrMovementLength < currMovementLength * 1.2)
                     currMovementLength = lastToMiddleMovementLength + middleToCurrMovementLength;
                 else
-                    currMovementLength = (lastToMiddleMovementLength + middleToCurrMovementLength) / 1.6;
+                    currMovementLength = (lastToMiddleMovementLength + middleToCurrMovementLength) / 4;
 
-                double velocityChangeBonus = 1 + calcVelocityChange(lastToMiddleMovementLength / middleStrainValue, middleToCurrMovementLength / middleToCurrStrainValue);
+                if (currMovementObj is SliderTailCircle)
+                    currMovementLength = sliderEndCheeseCalc(currMovementLength, scalingFactor, slider);
 
                 double angle = Math.Abs(calculateAngle(lastCursorPosition, additionalSliderPath, currCursorPosition));
 
-                double angleAcutenessBonus = DifficultyCalculationUtils.Smoothstep(angle, double.DegreesToRadians(140), double.DegreesToRadians(70));
-                double angleWidenessBonus = DifficultyCalculationUtils.Smoothstep(angle, double.DegreesToRadians(70), double.DegreesToRadians(140));
+                double angleAcutenessBonus = DifficultyCalculationUtils.Smoothstep(angle, double.DegreesToRadians(140), double.DegreesToRadians(70)) -
+                                             DifficultyCalculationUtils.Smoothstep(angle, double.DegreesToRadians(70), double.DegreesToRadians(0));
 
-                angleAcutenessBonus -= DifficultyCalculationUtils.Smoothstep(angle, double.DegreesToRadians(70), double.DegreesToRadians(0));
-                angleWidenessBonus -= DifficultyCalculationUtils.Smoothstep(angle, double.DegreesToRadians(140), double.DegreesToRadians(180));
+                double angleWidenessBonus = DifficultyCalculationUtils.Smoothstep(angle, double.DegreesToRadians(70), double.DegreesToRadians(140)) -
+                                            DifficultyCalculationUtils.Smoothstep(angle, double.DegreesToRadians(140), double.DegreesToRadians(180));
 
                 double angleBonus = Math.Max(angleAcutenessBonus + angleWidenessBonus, 0);
 
+                double velocityChangeBonus = 1 + calcVelocityChange(lastToMiddleMovementLength / middleStrainValue, middleToCurrMovementLength / middleToCurrStrainValue);
+
                 if (lastIsRepeat || currMovementObj is SliderRepeat)
                     velocityChangeBonus *= Math.Pow(0.73 + angleBonus, 2);
-                else if (lastIsHead && currMovementObj is SliderTailCircle)
-                    velocityChangeBonus *= Math.Pow(0.86 + angleBonus, 2);
                 else
                     velocityChangeBonus *= Math.Pow(1 + angleBonus, 2);
-
-
-                double shortestMovement = Vector2.Subtract(slider.StackedPositionAt(currentStrainValue / slider.SpanDuration), currCursorPosition).Length * scalingFactor;
-
-                double shortestMovementNormalized = DifficultyCalculationUtils.Smoothstep(shortestMovement, currentStrainValue / 2, 0);
-
-                double SuperCheesePathNerf = 1 - shortestMovementNormalized;
-
-                Vector2 visualEndPosition = slider.StackedPositionAt(LazyTravelTime - endLeniency / slider.SpanDuration);
-
-                bool aspireRealEnd = lastIsHead && LazyTravelTime < 5;
-
-                double minMovement = aspireRealEnd ? Vector2.Subtract(visualEndPosition, currCursorPosition).Length : currMovementLength;
-                middleToCurrMovementLength = aspireRealEnd ? minMovement : middleToCurrMovementLength;
 
                 if (currMovementLength > requiredMovement)
                 {
                     // this finds the positional delta from the required radius and the current position, and updates the currCursorPosition accordingly, as well as rewarding distance.
-                    currCursorPosition = aspireRealEnd ? visualEndPosition : slider.StackedPositionAt(currentStrainValue);
-                    currMovementLength = Math.Max(Math.Min(currMovementLength, minMovement) - requiredMovement, 0) * velocityChangeBonus;
+                    currCursorPosition = slider.StackedPositionAt(currentStrainValue);
+                    currMovementLength = Math.Max(currMovementLength - requiredMovement, 0) * velocityChangeBonus;
+
                     if (lastIsRepeat || currMovementObj is SliderRepeat)
                         totalSliderValue += currMovementLength / 2;
                     else
@@ -379,7 +369,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
                 if (currMovementObj is SliderTailCircle)
                 {
-                    SliderTailVelocityVelocity = middleToCurrMovementLength / middleToCurrStrainValue;
+                    if (Math.Max(currMovementLength - requiredMovement, 0) > 0)
+                        SliderTailVelocityVelocity = middleToCurrMovementLength / middleToCurrStrainValue;
+                    else
+                        SliderTailVelocityVelocity = 0;
                     LazyEndPosition = currCursorPosition;
 
                     tailSliderAngle = angle;
@@ -413,6 +406,25 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             if (prevVelocity == 0 || currVelocity == 0)
                 return 0;
             return DifficultyCalculationUtils.Smoothstep(Math.Abs(prevVelocity - currVelocity), 0, prevVelocity + currVelocity);
+        }
+
+        private double sliderEndCheeseCalc(double currMovement, double scalingFactor, Slider slider)
+        {
+
+            Vector2 lazyEndPosition = slider.StackedPosition + slider.Path.PositionAt(LazyTravelTime);
+
+            Vector2 currCursorPosition = slider.StackedPosition;
+
+            // The end of a slider has special aim rules due to the relaxed time constraint on position.
+            // There is both a lazy end position as well as the actual end slider position. We assume the player takes the simpler movement.
+            // For sliders that are circular, the lazy end position may actually be farther away than the sliders true end.
+            // This code is designed to prevent buffing situations where lazy end is actually a less efficient movement.
+            Vector2 lazyMovement = Vector2.Subtract(lazyEndPosition, currCursorPosition);
+
+            if (lazyMovement.Length < currMovement)
+                currMovement = lazyMovement.Length * scalingFactor;
+
+            return currMovement;
         }
     }
 }
