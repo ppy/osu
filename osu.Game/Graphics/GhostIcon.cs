@@ -10,10 +10,14 @@ using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Rendering.Vertices;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Shaders.Types;
+using osu.Framework.Graphics.Sprites;
 using osuTK;
 
 namespace osu.Game.Graphics
 {
+    /// <summary>
+    /// A (very cute) animated version of the <see cref="FontAwesome.Solid.Ghost"/> icon.
+    /// </summary>
     public partial class GhostIcon : Drawable
     {
         private IShader ghostShader = null!;
