@@ -617,17 +617,24 @@ namespace osu.Game.Screens.SelectV2
 
         private void updateWedgeVisibility()
         {
-            if (!carousel.VisuallyFocusSelected && checkBeatmapValidForSelection(Beatmap.Value.BeatmapInfo, filterControl.CreateCriteria()))
-            {
-                titleWedge.Show();
-                detailsArea.Show();
-                filterControl.Show();
-            }
-            else
+            // Ensure we don't show an invalid selection before the carousel has finished initially filtering.
+            // This avoids a flicker of a placeholder or invalid beatmap before a proper selection.
+            //
+            // After the carousel finishes filtering, it will attempt a selection then call this method again.
+            if (!carouselItemsPresented && !checkBeatmapValidForSelection(Beatmap.Value.BeatmapInfo, filterControl.CreateCriteria()))
+                return;
+
+            if (carousel.VisuallyFocusSelected)
             {
                 titleWedge.Hide();
                 detailsArea.Hide();
                 filterControl.Hide();
+            }
+            else
+            {
+                titleWedge.Show();
+                detailsArea.Show();
+                filterControl.Show();
             }
         }
 
@@ -646,6 +653,8 @@ namespace osu.Game.Screens.SelectV2
         #endregion
 
         #region Filtering
+
+        private bool carouselItemsPresented;
 
         private const double filter_delay = 250;
 
@@ -669,6 +678,8 @@ namespace osu.Game.Screens.SelectV2
             if (carousel.Criteria == null)
                 return;
 
+            carouselItemsPresented = true;
+
             int count = carousel.MatchedBeatmapsCount;
 
             updateNoResultsPlaceholder();
@@ -678,6 +689,8 @@ namespace osu.Game.Screens.SelectV2
             filterControl.StatusText = count != 1 ? $"{count:#,0} matches" : $"{count:#,0} match";
 
             ensureGlobalBeatmapValid();
+
+            updateWedgeVisibility();
         }
 
         private void updateNoResultsPlaceholder()
