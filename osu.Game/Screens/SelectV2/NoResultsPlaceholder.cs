@@ -27,7 +27,7 @@ namespace osu.Game.Screens.SelectV2
 
         private LinkFlowContainer textFlow = null!;
 
-        private SpriteIcon icon = null!;
+        private GhostIcon icon = null!;
 
         [Resolved]
         private BeatmapManager beatmaps { get; set; } = null!;
@@ -71,13 +71,9 @@ namespace osu.Game.Screens.SelectV2
                     AutoSizeAxes = Axes.Y,
                     Children = new Drawable[]
                     {
-                        icon = new SpriteIcon
+                        icon = new GhostIcon
                         {
-                            Icon = FontAwesome.Solid.Ghost,
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
-                            Margin = new MarginPadding(10),
-                            Size = new Vector2(50),
+                            RelativeSizeAxes = Axes.Both,
                         },
                         new OsuSpriteText
                         {
