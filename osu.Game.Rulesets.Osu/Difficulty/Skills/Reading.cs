@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             List<double> notes = peaks.ToList();
 
-            const double reduced_duration = 60 * 1000.0;
+            double reducedDuration = objectList[0].StartTime / clockRate + 60 * 1000.0; // Start time at first object
 
             const double reduced_base_line = 0.0; // Assume the first seconds are completely memorised
 
@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             foreach (var hitObject in objectList)
             {
-                if (hitObject.StartTime / clockRate > reduced_duration)
+                if (hitObject.StartTime / clockRate > reducedDuration)
                     break;
 
                 reducedNoteCount++;
