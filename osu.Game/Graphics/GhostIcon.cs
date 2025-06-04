@@ -129,6 +129,14 @@ namespace osu.Game.Graphics
                 public UniformFloat Time;
                 private UniformPadding12 pad;
             }
+
+            protected override void Dispose(bool isDisposing)
+            {
+                base.Dispose(isDisposing);
+
+                ghostParametersBuffer?.Dispose();
+                quadBatch?.Dispose();
+            }
         }
     }
 }
