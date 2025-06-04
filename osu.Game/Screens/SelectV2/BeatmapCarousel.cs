@@ -318,7 +318,12 @@ namespace osu.Game.Screens.SelectV2
                 }
             }
 
-            RequestRecommendedSelection(items.Select(i => i.Model).OfType<BeatmapInfo>());
+            var beatmaps = items.Select(i => i.Model).OfType<BeatmapInfo>();
+
+            if (beatmaps.Any(b => b.Equals(CurrentSelection as BeatmapInfo)))
+                return;
+
+            RequestRecommendedSelection(beatmaps);
         }
 
         protected override bool CheckValidForGroupSelection(CarouselItem item)
