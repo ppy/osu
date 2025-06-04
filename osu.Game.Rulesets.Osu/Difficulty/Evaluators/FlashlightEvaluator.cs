@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         private const double hidden_bonus = 0.2;
 
         private const double min_velocity = 0.5;
-        private const double slider_multiplier = 1.3;
+        private const double slider_multiplier = 0.3;
 
         private const double min_angle_multiplier = 0.2;
 
@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             for (int i = 0; i < Math.Min(current.Index, 10); i++)
             {
                 var currentObj = (OsuDifficultyHitObject)current.Previous(i);
-                var currentHitObject = (OsuHitObject)(currentObj.BaseObject);
+                var currentHitObject = (OsuHitObject)currentObj.BaseObject;
 
                 cumulativeStrainTime += lastObj.StrainTime;
 
@@ -105,7 +105,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                 // Nerf sliders with repeats, as less memorisation is required.
                 if (osuSlider.RepeatCount > 0)
-                    sliderBonus /= (osuSlider.RepeatCount + 1);
+                    sliderBonus /= osuSlider.RepeatCount + 1;
             }
 
             result += sliderBonus * slider_multiplier;
