@@ -463,7 +463,7 @@ namespace osu.Game.Screens.SelectV2
 
             // Refetch to be confident that the current selection is still valid. It may have been deleted or hidden.
             var currentBeatmap = beatmaps.GetWorkingBeatmap(Beatmap.Value.BeatmapInfo, true);
-            bool validSelection = checkBeatmapValidForSelection(currentBeatmap.BeatmapInfo, carousel.Criteria);
+            bool validSelection = checkBeatmapValidForSelection(currentBeatmap.BeatmapInfo, filterControl.CreateCriteria());
 
             if (Beatmap.IsDefault || !validSelection)
             {
