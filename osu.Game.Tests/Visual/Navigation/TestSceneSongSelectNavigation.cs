@@ -20,7 +20,7 @@ namespace osu.Game.Tests.Visual.Navigation
     /// Tests copied out of `TestSceneScreenNavigation` which are specific to song select.
     /// These are for SongSelectV2. Eventually, the tests in the above class should be deleted along with old song select.
     /// </summary>
-    public class TestSceneSongSelectNavigation : OsuGameTestScene
+    public partial class TestSceneSongSelectNavigation : OsuGameTestScene
     {
         [Test]
         public void TestPushSongSelectAndPressBackButtonImmediately()
