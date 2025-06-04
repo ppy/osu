@@ -53,15 +53,15 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Rhythm.Data
             HitObjects = hitObjects;
 
             // Cluster and normalise each hitobjects delta-time.
-            var normaliseDeltaTime = DeltaTimeNormaliser.Normalise(hitObjects, 5.0);
+            var normaliseHitObjects = DeltaTimeNormaliser.Normalise(hitObjects, 5.0);
 
-            var hitObjectDeltaTime = hitObjects
-                                     .Skip(1)
-                                     .Select(hitObject => normaliseDeltaTime[hitObject])
-                                     .ToList();
+            var normalisedhitObjectDeltaTime = hitObjects
+                                               .Skip(1)
+                                               .Select(hitObject => normaliseHitObjects[hitObject])
+                                               .ToList();
 
-            double modalDelta = hitObjectDeltaTime.Count > 0
-                ? hitObjectDeltaTime
+            double modalDelta = normalisedhitObjectDeltaTime.Count > 0
+                ? normalisedhitObjectDeltaTime
                   .Select(deltaTime => Math.Round(deltaTime))
                   .GroupBy(deltaTime => deltaTime)
                   .OrderByDescending(group => group.Count())
@@ -69,7 +69,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Rhythm.Data
                 : 0;
 
             // Calculate the average interval between hitobjects.
-            HitObjectInterval = hitObjectDeltaTime.Count > 0
+            HitObjectInterval = normalisedhitObjectDeltaTime.Count > 0
                 ? previous?.HitObjectInterval is double previousDelta && Math.Abs(modalDelta - previousDelta) <= snap_tolerance
                     ? previousDelta
                     : modalDelta

@@ -14,18 +14,15 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Utils
     public static class DeltaTimeNormaliser
     {
         /// <summary>
-        /// Combines deltaTime values that differ by at most <paramref name="tolerance"/>
-        /// and replaces each value with the median of its range.
+        /// Combines deltaTime values that differ by at most <paramref name="marginOfError"/>
+        /// and replaces each value with the median of its range. This is used to reduce timing noise
+        /// and improve rhythm grouping consistency, especially for maps with inconsistent or 'off-snapped' timing.
         /// </summary>
         public static Dictionary<TaikoDifficultyHitObject, double> Normalise(
             IReadOnlyList<TaikoDifficultyHitObject> hitObjects,
             double marginOfError)
         {
-            var deltaTimes = hitObjects
-                             .Select(h => h.DeltaTime)
-                             .Distinct()
-                             .OrderBy(d => d)
-                             .ToList();
+            var deltaTimes = hitObjects.Select(h => h.DeltaTime).Distinct().OrderBy(d => d).ToList();
 
             var sets = new List<List<double>>();
             List<double>? current = null;
