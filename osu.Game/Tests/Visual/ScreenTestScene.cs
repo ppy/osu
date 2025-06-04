@@ -44,11 +44,8 @@ namespace osu.Game.Tests.Visual
                     RelativeSizeAxes = Axes.Both
                 },
                 content = new Container { RelativeSizeAxes = Axes.Both },
-                overlayContent = new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Child = DialogOverlay = new DialogOverlay()
-                },
+                DialogOverlay = new DialogOverlay(),
+                overlayContent = new Container { RelativeSizeAxes = Axes.Both },
                 footer = new ScreenFooter(),
             });
 
@@ -72,7 +69,11 @@ namespace osu.Game.Tests.Visual
         {
             AddUntilStep("exit all screens", () =>
             {
-                if (Stack.CurrentScreen == null) return true;
+                // Immediately remove any overlays, because these are usually removed in async disposal.
+                overlayContent.Clear();
+
+                if (Stack.CurrentScreen == null)
+                    return true;
 
                 Stack.Exit();
                 return false;
