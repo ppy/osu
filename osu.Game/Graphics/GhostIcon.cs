@@ -65,7 +65,7 @@ namespace osu.Game.Graphics
                 drawRectangle = new Vector4(0, 0, Source.DrawWidth, Source.DrawHeight);
                 shader = Source.ghostShader;
                 blend = new Vector2(Math.Min(Source.DrawWidth, Source.DrawHeight) / Math.Min(screenSpaceDrawQuad.Width, screenSpaceDrawQuad.Height));
-                time = (float)(Source.Time.Current % 1000f) / Source.AnimationDuration;
+                time = (float)(Source.Time.Current / Source.AnimationDuration) % 1f;
             }
 
             private IUniformBuffer<GhostParameters>? ghostParametersBuffer;
