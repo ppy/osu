@@ -136,6 +136,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         private long lastPlaylistItemId;
         private bool isRoomJoined;
 
+        private MultiplayerParticipantsSortTabControl participantsSortControl = null!;
+
+        private ParticipantsList participantsList = null!;
         public MultiplayerMatchSubScreen(Room room)
         {
             this.room = room;
@@ -150,6 +153,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         private void load()
         {
             sampleStart = audio.Samples.Get(@"SongSelect/confirm-selection");
+
+            participantsSortControl = new MultiplayerParticipantsSortTabControl
+            {
+                Anchor = Anchor.TopLeft,
+                Origin = Anchor.TopLeft,
+                Margin = new MarginPadding { Bottom = 10 }
+            };
 
             InternalChild = new OsuContextMenuContainer
             {
@@ -224,7 +234,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                                                     RelativeSizeAxes = Axes.Both,
                                                                     RowDimensions = new[]
                                                                     {
-                                                                        new Dimension(GridSizeMode.AutoSize)
+                                                                        new Dimension(GridSizeMode.AutoSize),
+                                                                        new Dimension(GridSizeMode.AutoSize),
+                                                                        new Dimension(),
                                                                     },
                                                                     Content = new[]
                                                                     {
@@ -234,10 +246,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                                                         },
                                                                         new Drawable[]
                                                                         {
-                                                                            new ParticipantsList
+                                                                            participantsSortControl
+                                                                        },
+                                                                        new Drawable[]
+                                                                        {
+                                                                            participantsList = new ParticipantsList
                                                                             {
                                                                                 RelativeSizeAxes = Axes.Both
-                                                                            },
+                                                                            }
                                                                         }
                                                                     }
                                                                 },
@@ -418,6 +434,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             client.LoadRequested += onLoadRequested;
 
             beatmapAvailabilityTracker.Availability.BindValueChanged(onBeatmapAvailabilityChanged, true);
+
+            participantsSortControl.Current.BindValueChanged(_ => updateParticipantsSort(), true);
+            participantsSortControl.SortDirection.BindValueChanged(_ => updateParticipantsSort(), true);
 
             onRoomUpdated();
             updateGameplayState();
@@ -897,6 +916,20 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 client.UserModsChanged -= onUserModsChanged;
                 client.LoadRequested -= onLoadRequested;
             }
+        }
+        private void updateParticipantsSort()
+        {
+            if (client.Room == null)
+                return;
+
+            if (participantsList == null)
+                return;
+
+            // Pass the current sort mode and direction to the participants list
+            participantsList.UpdateParticipants(
+                participantsSortControl.Current.Value,
+                participantsSortControl.SortDirection.Value
+            );
         }
 
         public partial class AddItemButton : PurpleRoundedButton

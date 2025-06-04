@@ -2,12 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Overlays;
 using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
@@ -16,6 +18,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
     {
         private FillFlowContainer<ParticipantPanel> panels = null!;
         private ParticipantPanel? currentHostPanel;
+        private ParticipantsSortMode? currentSortMode;
+        private SortDirection? currentSortDirection;
 
         [Resolved]
         private MultiplayerClient client { get; set; } = null!;
@@ -46,7 +50,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
         }
 
         private void onRoomUpdated() => Scheduler.AddOnce(updateState);
-
         private void updateState()
         {
             if (client.Room == null)
@@ -82,6 +85,92 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                             panels.SetLayoutPosition(currentHostPanel, -1);
                     }
                 }
+
+                UpdateParticipants();
+            }
+        }
+        /// <summary>
+        /// Reorders existing panels based on sort criteria.
+        /// </summary>
+        /// <param name="sortMode">Optional sort mode to apply and store for future updates</param>
+        /// <param name="sortDirection">Optional sort direction to apply and store for future updates</param>
+        public void UpdateParticipants(ParticipantsSortMode? sortMode = null, SortDirection? sortDirection = null)
+        {
+            if (client.Room == null)
+                return;
+
+            // Update stored sort settings if provided
+            if (sortMode.HasValue)
+                currentSortMode = sortMode.Value;
+            if (sortDirection.HasValue)
+                currentSortDirection = sortDirection.Value;
+
+            // Only reorder if we have sort settings
+            if (!currentSortMode.HasValue || !currentSortDirection.HasValue)
+                return;
+
+            IList<MultiplayerRoomUser> sortedUsers = client.Room.Users.ToList();
+
+            switch (currentSortMode.Value)
+            {
+                case ParticipantsSortMode.Alphabetical:
+                    sortedUsers = currentSortDirection.Value == SortDirection.Ascending
+                        ? sortedUsers.OrderBy(u => u.User!.Username).ToList()
+                        : sortedUsers.OrderByDescending(u => u.User!.Username).ToList();
+                    break;
+
+                case ParticipantsSortMode.Country:
+                    sortedUsers = sortByCountryWithRankSecondary(sortedUsers);
+                    break;
+
+                case ParticipantsSortMode.Rank:
+                    sortedUsers = currentSortDirection.Value == SortDirection.Ascending
+                        ? sortedUsers.OrderBy(u => u.User!.Statistics?.GlobalRank ?? int.MaxValue).ToList()
+                        : sortedUsers.OrderByDescending(u => u.User!.Statistics?.GlobalRank ?? int.MaxValue).ToList();
+                    break;
+            }
+
+            // Reorder existing panels to match the sorted user list
+            for (int i = 0; i < sortedUsers.Count; i++)
+            {
+                var user = sortedUsers[i];
+                var panel = panels.FirstOrDefault(p => p.User.Equals(user));
+
+                if (panel != null)
+                    panels.SetLayoutPosition(panel, i);
+            }
+
+            // Ensure host is still positioned at the top (override sort for host)
+            if (client.Room?.Host != null)
+            {
+                var hostPanel = panels.FirstOrDefault(p => p.User.Equals(client.Room.Host));
+                if (hostPanel != null)
+                {
+                    currentHostPanel = hostPanel;
+                    panels.SetLayoutPosition(hostPanel, -1);
+                }
+            }
+        }
+        /// <summary>
+        /// Sorts users by country first, then by rank within each country (best rank first).
+        /// </summary>
+        private IList<MultiplayerRoomUser> sortByCountryWithRankSecondary(IList<MultiplayerRoomUser> users)
+        {
+            if (currentSortDirection!.Value == SortDirection.Ascending)
+            {
+                return users
+                    .GroupBy(u => u.User!.CountryCode.ToString())
+                    .OrderBy(g => g.Key)
+                    .SelectMany(g => g.OrderBy(u => u.User!.Statistics?.GlobalRank ?? int.MaxValue))
+                    .ToList();
+            }
+            else
+            {
+                return users
+                    .GroupBy(u => u.User!.CountryCode.ToString())
+                    .OrderByDescending(g => g.Key)
+                    .SelectMany(g => g.OrderBy(u => u.User!.Statistics?.GlobalRank ?? int.MaxValue))
+                    .ToList();
             }
         }
 
