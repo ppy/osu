@@ -306,14 +306,10 @@ namespace osu.Game.Screens.SelectV2
             Beatmap.BindValueChanged(_ =>
             {
                 ensureGlobalBeatmapValid();
-                updateStateFromCurrentBeatmap();
-            });
-        }
 
-        private void updateStateFromCurrentBeatmap()
-        {
-            ensurePlayingSelected();
-            updateBackgroundDim();
+                ensurePlayingSelected(true);
+                updateBackgroundDim();
+            });
         }
 
         protected override void Update()
@@ -334,7 +330,7 @@ namespace osu.Game.Screens.SelectV2
         /// Ensures some music is playing for the current track.
         /// Will resume playback from a manual user pause if the track has changed.
         /// </summary>
-        private void ensurePlayingSelected()
+        private void ensurePlayingSelected(bool restart)
         {
             if (!ControlGlobalMusic)
                 return;
@@ -346,7 +342,7 @@ namespace osu.Game.Screens.SelectV2
             if (!track.IsRunning && (music.UserPauseRequested != true || isNewTrack))
             {
                 Logger.Log($"Song select decided to {nameof(ensurePlayingSelected)}");
-                music.Play(true);
+                music.Play(restart);
             }
 
             lastTrack.SetTarget(track);
@@ -518,6 +514,14 @@ namespace osu.Game.Screens.SelectV2
 
             this.FadeIn(fade_duration, Easing.OutQuint);
             onArrivingAtScreen();
+
+            if (ControlGlobalMusic)
+            {
+                // restart playback on returning to song select, regardless.
+                // not sure this should be a permanent thing (we may want to leave a user pause paused even on returning)
+                music.ResetTrackAdjustments();
+                music.Play(requestedByUser: true);
+            }
         }
 
         public override void OnSuspending(ScreenTransitionEvent e)
@@ -556,7 +560,8 @@ namespace osu.Game.Screens.SelectV2
 
             ensureGlobalBeatmapValid();
 
-            updateStateFromCurrentBeatmap();
+            ensurePlayingSelected(false);
+            updateBackgroundDim();
         }
 
         private void onLeavingScreen()
