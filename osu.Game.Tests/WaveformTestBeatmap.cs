@@ -39,12 +39,6 @@ namespace osu.Game.Tests
             trackStore = audioManager.GetTrackStore(getZipReader());
         }
 
-        ~WaveformTestBeatmap()
-        {
-            // Remove the track store from the audio manager
-            trackStore?.Dispose();
-        }
-
         private static Stream getStream() => TestResources.GetTestBeatmapStream();
 
         private static ZipArchiveReader getZipReader() => new ZipArchiveReader(getStream());

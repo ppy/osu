@@ -56,9 +56,7 @@ namespace osu.Game.Screens.SelectV2
 
         private static bool checkCriteriaMatch(BeatmapInfo beatmap, FilterCriteria criteria)
         {
-            bool match = criteria.Ruleset == null ||
-                         beatmap.Ruleset.ShortName == criteria.Ruleset.ShortName ||
-                         (beatmap.Ruleset.OnlineID == 0 && criteria.Ruleset.OnlineID != 0 && criteria.AllowConvertedBeatmaps);
+            bool match = criteria.Ruleset == null || beatmap.AllowGameplayWithRuleset(criteria.Ruleset!, criteria.AllowConvertedBeatmaps);
 
             if (beatmap.BeatmapSet?.Equals(criteria.SelectedBeatmapSet) == true)
             {
