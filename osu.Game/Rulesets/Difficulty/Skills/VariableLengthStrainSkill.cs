@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Extensions;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
@@ -43,21 +44,21 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         {
             public StrainPeak(double value, double sectionLength)
             {
-                this.value = (float)value;
-                this.sectionLength = (short)sectionLength;
+                this.Value = value;
+                this.SectionLength = sectionLength;
             }
 
-            private readonly float value;
-            private readonly short sectionLength;
+            public double Value { get; }
 
-            public double Value => value;
-            public double SectionLength => sectionLength;
+            public double SectionLength { get; }
 
             public int CompareTo(StrainPeak other)
             {
                 return Value.CompareTo(other.Value);
             }
         }
+
+        private readonly Comparer<StrainPeak> descComparer = Comparer<StrainPeak>.Create((p1, p2) => p2.Value.CompareTo(p1.Value));
 
         /// <summary>
         /// Used to store the difficulty and start time of an object in a map.
@@ -162,10 +163,9 @@ namespace osu.Game.Rulesets.Difficulty.Skills
                 // Clear the queue
                 queue.Clear();
 
-                currentSectionPeak = strain;
-
                 // End the current strain, and create a new strain starting at the current hitobject
                 saveCurrentPeak(current.StartTime - currentSectionBegin);
+                currentSectionPeak = strain;
                 currentSectionBegin = current.StartTime;
                 currentSectionEnd = currentSectionBegin + MaxSectionLength;
             }
@@ -194,14 +194,22 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// </summary>
         private void saveCurrentPeak(double sectionLength)
         {
-            strainPeaks.AddInPlace(new StrainPeak(currentSectionPeak, sectionLength));
+            const bool debug = false;
+
+            if (debug)
+            {
+                strainPeaks.Add(new StrainPeak(currentSectionPeak, sectionLength));
+                return;
+            }
+
+            strainPeaks.AddInPlace(new StrainPeak(currentSectionPeak, sectionLength), descComparer);
             totalLength += sectionLength;
 
             // TODO: Figure out how to calc "good enough" const for Catch
             while (totalLength / MaxSectionLength > 50)
             {
-                totalLength -= strainPeaks[0].SectionLength;
-                strainPeaks.RemoveAt(0);
+                totalLength -= strainPeaks[^1].SectionLength;
+                strainPeaks.RemoveAt(strainPeaks.Count - 1);
             }
         }
 
@@ -229,7 +237,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// Returns a live enumerable of the peak strains for each <see cref="MaxSectionLength"/> section of the beatmap,
         /// including the peak of the current section.
         /// </summary>
-        public IEnumerable<StrainPeak> GetCurrentStrainPeaks() => strainPeaks.Append(new StrainPeak(currentSectionPeak, MaxSectionLength));
+        public IEnumerable<StrainPeak> GetCurrentStrainPeaks() => strainPeaks.Append(new StrainPeak(currentSectionPeak, currentSectionEnd - currentSectionBegin));
 
         /// <summary>
         /// Returns the calculated difficulty value representing all <see cref="DifficultyHitObject"/>s that have been processed up to this point.
