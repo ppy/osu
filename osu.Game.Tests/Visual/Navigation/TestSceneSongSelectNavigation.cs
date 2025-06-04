@@ -1,15 +1,21 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
+using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Screens;
 using osu.Game.Screens.Footer;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Ranking;
 using osu.Game.Screens.SelectV2;
 using osu.Game.Tests.Beatmaps.IO;
 using osuTK.Input;
@@ -22,6 +28,15 @@ namespace osu.Game.Tests.Visual.Navigation
     /// </summary>
     public partial class TestSceneSongSelectNavigation : OsuGameTestScene
     {
+        [Test]
+        public void TestRetryFromResults()
+        {
+            var getOriginalPlayer = playToResults();
+
+            AddStep("attempt to retry", () => ((ResultsScreen)Game.ScreenStack.CurrentScreen).ChildrenOfType<HotkeyRetryOverlay>().First().Action());
+            AddUntilStep("wait for player", () => Game.ScreenStack.CurrentScreen != getOriginalPlayer() && Game.ScreenStack.CurrentScreen is Player);
+        }
+
         [Test]
         public void TestPushSongSelectAndPressBackButtonImmediately()
         {
@@ -70,6 +85,48 @@ namespace osu.Game.Tests.Visual.Navigation
             AddUntilStep("wait for track playing", () => Game.MusicController.IsPlaying);
             AddAssert("Ensure time wasn't reset to preview point", () => Game.MusicController.CurrentTrack.CurrentTime < beatmap().BeatmapInfo.Metadata.PreviewTime);
         }
+
+        private Func<Player> playToResults()
+        {
+            var player = playToCompletion();
+            AddUntilStep("wait for results", () => (Game.ScreenStack.CurrentScreen as ResultsScreen)?.IsLoaded == true);
+            return player;
+        }
+
+        private Func<Player> playToCompletion()
+        {
+            Player? player = null;
+
+            IWorkingBeatmap beatmap() => Game.Beatmap.Value;
+
+            PushAndConfirm(() => new SoloSongSelect());
+
+            AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
+
+            AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
+
+            AddStep("set mods", () => Game.SelectedMods.Value = new Mod[] { new OsuModNoFail(), new OsuModDoubleTime { SpeedChange = { Value = 2 } } });
+
+            pushEnter();
+
+            AddUntilStep("wait for player", () =>
+            {
+                DismissAnyNotifications();
+                return (player = Game.ScreenStack.CurrentScreen as Player) != null;
+            });
+
+            AddUntilStep("wait for track playing", () => beatmap().Track.IsRunning);
+            AddStep("seek to near end", () => player.ChildrenOfType<GameplayClockContainer>().First().Seek(beatmap().Beatmap.HitObjects[^1].StartTime - 1000));
+            AddUntilStep("wait for complete", () => player?.GameplayState.HasPassed, () => Is.True);
+
+            return () => player!;
+        }
+
+        private void waitForScreen<T>() where T : OsuScreen =>
+            AddUntilStep($"Wait for {typeof(T).ReadableName()}", () => Game.ScreenStack.CurrentScreen is T screen && screen.IsLoaded);
+
+        private void pushEnter() =>
+            AddStep("Press enter", () => InputManager.Key(Key.Enter));
 
         private void pushEscape() =>
             AddStep("Press escape", () => InputManager.Key(Key.Escape));
