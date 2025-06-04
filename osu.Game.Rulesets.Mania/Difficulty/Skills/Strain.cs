@@ -36,8 +36,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
             individualStrains[maniaCurrent.Column] = applyDecay(individualStrains[maniaCurrent.Column], maniaCurrent.ColumnStrainTime, individual_decay_base);
             individualStrains[maniaCurrent.Column] += IndividualStrainEvaluator.EvaluateDifficultyOf(current);
 
-            Console.Write(maniaCurrent.Index + ": " + individualStrains[maniaCurrent.Column] + ", ");
-
             highestIndividualStrain = maniaCurrent.DeltaTime <= 1 ? Math.Max(highestIndividualStrain, individualStrains[maniaCurrent.Column]) : individualStrains[maniaCurrent.Column];
 
             overallStrain = applyDecay(overallStrain, maniaCurrent.DeltaTime, overall_decay_base);
