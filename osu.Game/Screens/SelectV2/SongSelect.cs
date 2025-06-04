@@ -309,6 +309,7 @@ namespace osu.Game.Screens.SelectV2
 
                 ensurePlayingSelected(true);
                 updateBackgroundDim();
+                updateWedgeVisibility();
             });
         }
 
@@ -515,6 +516,8 @@ namespace osu.Game.Screens.SelectV2
             this.FadeIn(fade_duration, Easing.OutQuint);
             onArrivingAtScreen();
 
+            ensureGlobalBeatmapValid();
+
             if (ControlGlobalMusic)
             {
                 // restart playback on returning to song select, regardless.
@@ -551,9 +554,7 @@ namespace osu.Game.Screens.SelectV2
 
             carousel.VisuallyFocusSelected = false;
 
-            titleWedge.Show();
-            detailsArea.Show();
-            filterControl.Show();
+            updateWedgeVisibility();
 
             beginLooping();
             attachTrackDuckingIfShould();
@@ -569,9 +570,7 @@ namespace osu.Game.Screens.SelectV2
             modSelectOverlay.SelectedMods.UnbindFrom(Mods);
             modSelectOverlay.Beatmap.UnbindFrom(Beatmap);
 
-            titleWedge.Hide();
-            detailsArea.Hide();
-            filterControl.Hide();
+            updateWedgeVisibility();
 
             endLooping();
             detachTrackDucking();
@@ -614,6 +613,22 @@ namespace osu.Game.Screens.SelectV2
 
             logo.ScaleTo(0.2f, 120, Easing.Out);
             logo.FadeOut(120, Easing.Out);
+        }
+
+        private void updateWedgeVisibility()
+        {
+            if (!carousel.VisuallyFocusSelected && checkBeatmapValidForSelection(Beatmap.Value.BeatmapInfo, filterControl.CreateCriteria()))
+            {
+                titleWedge.Show();
+                detailsArea.Show();
+                filterControl.Show();
+            }
+            else
+            {
+                titleWedge.Hide();
+                detailsArea.Hide();
+                filterControl.Hide();
+            }
         }
 
         private void updateBackgroundDim() => ApplyToBackground(backgroundModeBeatmap =>
