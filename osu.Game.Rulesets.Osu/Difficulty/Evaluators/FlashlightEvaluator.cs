@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         private const double hidden_bonus = 0.2;
 
         private const double min_velocity = 0.5;
-        private const double slider_multiplier = 0.3;
+        private const double slider_multiplier = 0.5;
 
         private const double min_angle_multiplier = 0.2;
 
@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 return 0;
 
             var osuCurrent = (OsuDifficultyHitObject)current;
-            var osuHitObject = (OsuHitObject)(osuCurrent.BaseObject);
+            var osuHitObject = (OsuHitObject)osuCurrent.BaseObject;
 
             double scalingFactor = 52.0 / osuHitObject.Radius;
             double smallDistNerf = 1.0;
