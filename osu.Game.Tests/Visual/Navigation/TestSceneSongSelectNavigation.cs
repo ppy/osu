@@ -13,6 +13,7 @@ using osu.Game.Overlays;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens;
+using osu.Game.Screens.Edit;
 using osu.Game.Screens.Footer;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
@@ -48,6 +49,28 @@ namespace osu.Game.Tests.Visual.Navigation
             AddStep("press back button", () => Game.ChildrenOfType<ScreenBackButton>().First().Action!.Invoke());
 
             ConfirmAtMainMenu();
+        }
+
+        [Test]
+        public void TestEditBeatmap()
+        {
+            PushAndConfirm(() => new SoloSongSelect());
+
+            AddStep("import beatmap", () => BeatmapImportHelper.LoadOszIntoOsu(Game, virtualTrack: true).WaitSafely());
+
+            AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
+
+            AddStep("open menu", () => InputManager.Key(Key.F3));
+            AddStep("trigger edit", () =>
+            {
+                // TODO: should be 5, not 4.
+                InputManager.Key(Key.Number4);
+            });
+
+            waitForScreen<Editor>();
+
+            pushEscape();
+            waitForScreen<SoloSongSelect>();
         }
 
         [TestCase(true)]
