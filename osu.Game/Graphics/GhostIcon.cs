@@ -22,6 +22,11 @@ namespace osu.Game.Graphics
     {
         private IShader ghostShader = null!;
 
+        /// <summary>
+        /// How long one complete loop of the ghost's animation takes, in milliseconds
+        /// </summary>
+        public float AnimationDuration = 2000;
+
         [BackgroundDependencyLoader]
         private void load(ShaderManager shaders)
         {
@@ -60,7 +65,7 @@ namespace osu.Game.Graphics
                 drawRectangle = new Vector4(0, 0, Source.DrawWidth, Source.DrawHeight);
                 shader = Source.ghostShader;
                 blend = new Vector2(Math.Min(Source.DrawWidth, Source.DrawHeight) / Math.Min(screenSpaceDrawQuad.Width, screenSpaceDrawQuad.Height));
-                time = (float)(Source.Time.Current % 1000f) * 0.0005f;
+                time = (float)(Source.Time.Current % 1000f) / Source.AnimationDuration;
             }
 
             private IUniformBuffer<GhostParameters>? ghostParametersBuffer;
