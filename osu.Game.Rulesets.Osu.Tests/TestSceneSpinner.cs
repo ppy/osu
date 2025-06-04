@@ -86,9 +86,12 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestSpinningSamplePitchShift()
         {
+            PausableSkinnableSound spinSample = null;
+
             AddStep("Add spinner", () => SetContents(_ => testSingle(5, true, 4000)));
-            AddUntilStep("Pitch starts low", () => getSpinningSample().Frequency.Value < 0.8);
-            AddUntilStep("Pitch increases", () => getSpinningSample().Frequency.Value > 0.8);
+            AddUntilStep("wait for spin sample", () => (spinSample = getSpinningSample()) != null);
+            AddUntilStep("Pitch starts low", () => spinSample.Frequency.Value < 0.8);
+            AddUntilStep("Pitch increases", () => spinSample.Frequency.Value > 0.8);
 
             PausableSkinnableSound getSpinningSample() =>
                 drawableSpinner.ChildrenOfType<PausableSkinnableSound>().FirstOrDefault(s => s.Samples.Any(i => i.LookupNames.Any(l => l.Contains("spinnerspin"))));

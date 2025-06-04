@@ -60,7 +60,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             return criteria;
         }
 
-        protected override void JoinInternal(Room room, string? password, Action<Room> onSuccess, Action<string> onFailure)
+        protected override void JoinInternal(Room room, string? password, Action<Room> onSuccess, Action<string, Exception?> onFailure)
         {
             var joinRoomRequest = new JoinRoomRequest(room, password);
 
@@ -68,7 +68,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             joinRoomRequest.Failure += exception =>
             {
                 if (exception is not OperationCanceledException)
-                    onFailure(exception.Message);
+                    onFailure($"Failed to open playlist. {exception.Message}", exception);
             };
 
             api.Queue(joinRoomRequest);
