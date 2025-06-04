@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Extensions;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Mods;
 
@@ -75,6 +76,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         }
 
         private readonly List<StrainPeak> strainPeaks = new List<StrainPeak>();
+        private double totalLength;
         protected readonly List<double> ObjectStrains = new List<double>(); // Store individual strains
 
         /// <summary>
@@ -192,7 +194,15 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// </summary>
         private void saveCurrentPeak(double sectionLength)
         {
-            strainPeaks.Add(new StrainPeak(currentSectionPeak, sectionLength));
+            strainPeaks.AddInPlace(new StrainPeak(currentSectionPeak, sectionLength));
+            totalLength += sectionLength;
+
+            // TODO: Figure out how to calc "good enough" const for Catch
+            while (totalLength / MaxSectionLength > 50)
+            {
+                totalLength -= strainPeaks[0].SectionLength;
+                strainPeaks.RemoveAt(0);
+            }
         }
 
         /// <summary>
@@ -240,7 +250,8 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
             // Difficulty is a continuous weighted sum of the sorted strains
             // 9.49122 = Integrate[Power[0.9,x],{x,0,1}]
-            for (int i = 0; i < strains.Count && time < 50; i++)
+            // TODO: Replace 9.49122 with variable calculated from DecayWeight so Catch can use this
+            for (int i = 0; i < strains.Count; i++)
             {
                 weight = Math.Pow(0.9, time) * (9.49122 - 9.49122 * Math.Pow(0.9, strains[i].SectionLength / MaxSectionLength)); // f(a,b)=Integrate[Power[0.9,x],{x,a,a+b}]
                 difficulty += strains[i].Value * weight;
