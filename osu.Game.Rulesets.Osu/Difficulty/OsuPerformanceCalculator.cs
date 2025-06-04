@@ -423,7 +423,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double deviation;
 
-            if (pLowerBound > 0)
+            // Tested max precision for the deviation calculation.
+            if (pLowerBound > 1e-06)
             {
                 // Compute deviation assuming greats and oks are normally distributed.
                 deviation = greatHitWindow / (Math.Sqrt(2) * DifficultyCalculationUtils.ErfInv(pLowerBound));
