@@ -793,15 +793,8 @@ namespace osu.Game.Tests.Visual.Navigation
         {
             AddStep("push song select", () => Game.ScreenStack.Push(new TestPlaySongSelect()));
             AddStep("press back button", () => Game.ChildrenOfType<BackButton>().First().Action!.Invoke());
-            AddWaitStep("wait two frames", 2);
-        }
 
-        [Test]
-        public void TestPushSongSelectAndPressBackButtonImmediatelyV2()
-        {
-            AddStep("push song select", () => Game.ScreenStack.Push(new TestPlaySongSelect()));
-            AddStep("press back button", () => Game.ChildrenOfType<BackButton>().First().Action!.Invoke());
-            AddWaitStep("wait two frames", 2);
+            ConfirmAtMainMenu();
         }
 
         [Test]
