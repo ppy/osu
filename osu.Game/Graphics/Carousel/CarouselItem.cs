@@ -20,9 +20,26 @@ namespace osu.Game.Graphics.Carousel
 
         /// <summary>
         /// The current Y position in the carousel.
+        ///
         /// This is managed by <see cref="Carousel{T}"/> and should not be set manually.
         /// </summary>
         public double CarouselYPosition { get; set; }
+
+        /// <summary>
+        /// The amount of input padding/lenience to be added to the area above this panel.
+        /// Calculated as half of the calculated spacing between this panel and the panel above it.
+        ///
+        /// This is managed by <see cref="Carousel{T}"/> and should not be set manually.
+        /// </summary>
+        public float CarouselInputLenienceAbove { get; set; }
+
+        /// <summary>
+        /// The amount of input padding/lenience to be added to the area below this panel.
+        /// Calculated as half of the calculated spacing between this panel and the panel below it.
+        ///
+        /// This is managed by <see cref="Carousel{T}"/> and should not be set manually.
+        /// </summary>
+        public float CarouselInputLenienceBelow { get; set; }
 
         /// <summary>
         /// The height this item will take when displayed. Defaults to <see cref="DEFAULT_HEIGHT"/>.
