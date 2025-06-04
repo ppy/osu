@@ -71,9 +71,16 @@ namespace osu.Game.Screens.SelectV2
                     AutoSizeAxes = Axes.Y,
                     Children = new Drawable[]
                     {
-                        icon = new GhostIcon
+                        new Container
                         {
-                            RelativeSizeAxes = Axes.Both,
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            Margin = new MarginPadding(10),
+                            Size = new Vector2(50),
+                            Child = icon = new GhostIcon
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                            },
                         },
                         new OsuSpriteText
                         {
@@ -97,6 +104,17 @@ namespace osu.Game.Screens.SelectV2
             };
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            icon.Loop(t =>
+                t.MoveToY(-10, 2000, Easing.InOutSine)
+                 .Then()
+                 .MoveToY(0, 2000, Easing.InOutSine)
+            );
+        }
+
         protected override void PopIn()
         {
             this.FadeIn(600, Easing.OutQuint);
@@ -116,9 +134,6 @@ namespace osu.Game.Screens.SelectV2
             // Bounce should play every time the filter criteria is updated.
             this.ScaleTo(0.9f)
                 .ScaleTo(1f, 1000, Easing.OutQuint);
-
-            icon.ScaleTo(new Vector2(-1, 1))
-                .ScaleTo(new Vector2(1, 1), 500, Easing.InOutSine);
 
             textFlow.FadeInFromZero(800, Easing.OutQuint);
 
