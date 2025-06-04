@@ -5,7 +5,6 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
-using osu.Game.Graphics.Carousel;
 using osu.Game.Screens.Select.Filter;
 using osu.Game.Screens.SelectV2;
 using osuTK;
@@ -259,7 +258,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         }
 
         [Test]
-        [Ignore("broken")]
         public void TestInputHandlingWithinGaps()
         {
             AddBeatmaps(2, 5);
@@ -278,14 +276,16 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             WaitForSelection(0, 0);
 
             // Beatmap panels expand their selection area to cover holes from spacing.
-            ClickVisiblePanelWithOffset<PanelBeatmap>(1, new Vector2(0, -(CarouselItem.DEFAULT_HEIGHT / 2 + 1)));
+            ClickVisiblePanelWithOffset<PanelBeatmap>(0, new Vector2(0, -(PanelBeatmap.HEIGHT / 2 + 1)));
             WaitForSelection(0, 0);
 
-            // Panels with higher depth will handle clicks in the gutters for simplicity.
-            ClickVisiblePanelWithOffset<PanelBeatmap>(2, new Vector2(0, (CarouselItem.DEFAULT_HEIGHT / 2 + 1)));
+            ClickVisiblePanelWithOffset<PanelBeatmap>(2, new Vector2(0, (PanelBeatmap.HEIGHT / 2 + 1)));
             WaitForSelection(0, 2);
 
-            ClickVisiblePanelWithOffset<PanelBeatmap>(3, new Vector2(0, (CarouselItem.DEFAULT_HEIGHT / 2 + 1)));
+            ClickVisiblePanelWithOffset<PanelBeatmap>(2, new Vector2(0, -(PanelBeatmap.HEIGHT / 2 + 1)));
+            WaitForSelection(0, 2);
+
+            ClickVisiblePanelWithOffset<PanelBeatmap>(3, new Vector2(0, (PanelBeatmap.HEIGHT / 2 + 1)));
             WaitForSelection(0, 3);
         }
 
