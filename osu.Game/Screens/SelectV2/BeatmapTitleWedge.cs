@@ -147,7 +147,8 @@ namespace osu.Game.Screens.SelectV2
                         new ShearAligningWrapper(statisticsFlow = new FillFlowContainer
                         {
                             Shear = -OsuGame.SHEAR,
-                            AutoSizeAxes = Axes.Both,
+                            AutoSizeAxes = Axes.X,
+                            Height = 30,
                             Direction = FillDirection.Horizontal,
                             Spacing = new Vector2(2f, 0f),
                             Children = new Drawable[]

@@ -96,7 +96,7 @@ namespace osu.Game.Screens.SelectV2
                                 Shear = -OsuGame.SHEAR,
                                 AlwaysPresent = true,
                                 RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y,
+                                Height = 20,
                                 Margin = new MarginPadding { Vertical = 5f },
                                 Padding = new MarginPadding { Left = SongSelect.WEDGE_CONTENT_MARGIN },
                                 RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
@@ -159,7 +159,7 @@ namespace osu.Game.Screens.SelectV2
                             {
                                 Shear = -OsuGame.SHEAR,
                                 RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y,
+                                Height = 53,
                                 Padding = new MarginPadding { Bottom = border_weight, Right = border_weight },
                                 Child = new Container
                                 {
