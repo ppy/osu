@@ -10,38 +10,6 @@ namespace osu.Game.Localisation.HUD
         private const string prefix = @"osu.Game.Resources.Localisation.HUD.StrainGraph";
 
         /// <summary>
-        /// "Show background"
-        /// </summary>
-        public static LocalisableString ShowBackground => new TranslatableString(getKey(@"show_background"), @"Show background");
-
-        /// <summary>
-        /// "Enable background gradient"
-        /// </summary>
-        public static LocalisableString EnableGradient => new TranslatableString(getKey(@"enable_gradient"), @"Enable background gradient");
-
-        /// <summary>
-        /// "When enabled, the background will be filled with the specified colour in a vertical gradient style."
-        /// </summary>
-        public static LocalisableString EnableGradientDescription => new TranslatableString(getKey(@"enable_gradient_description"),
-            @"When enabled, the background will be filled with the specified colour in a vertical gradient style.");
-
-        /// <summary>
-        /// "Use additive blending for strain graph"
-        /// </summary>
-        public static LocalisableString UseAdditiveBlending => new TranslatableString(getKey(@"use_additive_blending"), @"Use additive blending for strain graph");
-
-        /// <summary>
-        /// "When enabled, the additive mode would be used for graph blending. This can help make fancy visual effects, but would seem poor in some cases."
-        /// </summary>
-        public static LocalisableString AdditiveBlendingDescription => new TranslatableString(getKey(@"additive_blending_description"),
-            @"When enabled, the additive mode would be used for graph blending. This can help make fancy visual effects, but would seem poor in some cases.");
-
-        /// <summary>
-        /// "Background colour"
-        /// </summary>
-        public static LocalisableString BackgroundColour => new TranslatableString(getKey(@"background_colour"), @"Background colour");
-
-        /// <summary>
         /// "Line colour"
         /// </summary>
         public static LocalisableString LineColour => new TranslatableString(getKey(@"line_colour"), @"Line colour");

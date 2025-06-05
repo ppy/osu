@@ -18,7 +18,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public partial class ArgonStrainGraph : SongProgress
+    public partial class StrainGraph : SongProgress
     {
         [SettingSource(typeof(StrainGraphStrings), nameof(StrainGraphStrings.LineColour))]
         public BindableColour4 LineColour { get; } = new BindableColour4(Color4.White);
@@ -54,7 +54,7 @@ namespace osu.Game.Screens.Play.HUD
         private IEnumerable<HitObject>? hitObjects;
         private float[] values = new float[10];
 
-        public ArgonStrainGraph()
+        public StrainGraph()
         {
             AutoSizeAxes = Axes.Both;
 
