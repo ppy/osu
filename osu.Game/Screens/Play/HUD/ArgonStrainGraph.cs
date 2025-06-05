@@ -5,12 +5,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Lines;
-using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Localisation.HUD;
@@ -23,18 +20,6 @@ namespace osu.Game.Screens.Play.HUD
 {
     public partial class ArgonStrainGraph : SongProgress
     {
-        [SettingSource(typeof(StrainGraphStrings), nameof(StrainGraphStrings.ShowBackground))]
-        public BindableBool ShowBackground { get; } = new BindableBool(true);
-
-        [SettingSource(typeof(StrainGraphStrings), nameof(StrainGraphStrings.EnableGradient), nameof(StrainGraphStrings.EnableGradientDescription))]
-        public BindableBool UseBackgroundGradient { get; } = new BindableBool(true);
-
-        [SettingSource(typeof(StrainGraphStrings), nameof(StrainGraphStrings.UseAdditiveBlending), nameof(StrainGraphStrings.AdditiveBlendingDescription))]
-        public BindableBool UseAdditiveBlending { get; } = new BindableBool(true);
-
-        [SettingSource(typeof(StrainGraphStrings), nameof(StrainGraphStrings.BackgroundColour))]
-        public BindableColour4 BackgroundColour { get; } = new BindableColour4(Color4Extensions.FromHex("#66CCFF"));
-
         [SettingSource(typeof(StrainGraphStrings), nameof(StrainGraphStrings.LineColour))]
         public BindableColour4 LineColour { get; } = new BindableColour4(Color4.White);
 
@@ -61,7 +46,6 @@ namespace osu.Game.Screens.Play.HUD
 
         private const int highest_point = 5;
 
-        private readonly Box background;
         private readonly SliderPath path = new SliderPath();
         private readonly SmoothPath drawablePath;
         private readonly Container frontContainer;
@@ -83,11 +67,6 @@ namespace osu.Game.Screens.Play.HUD
                 AutoSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
-                    background = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Depth = float.MaxValue,
-                    },
                     new Container
                     {
                         AutoSizeAxes = Axes.Both,
@@ -112,7 +91,6 @@ namespace osu.Game.Screens.Play.HUD
                                     Origin = Anchor.BottomLeft,
                                     PathRadius = 2,
                                     Colour = LineColour.Value,
-                                    Blending = UseAdditiveBlending.Value ? BlendingParameters.Additive : BlendingParameters.Inherit,
                                 },
                             },
                         },
@@ -136,23 +114,12 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.LoadComplete();
 
-            updateBackground();
-
             HorizontalSpacing.BindValueChanged(_ => updateGraph());
             VerticalSpacing.BindValueChanged(_ => updateGraph());
             SectionGranularity.BindValueChanged(_ => refresh());
 
-            ShowBackground.BindValueChanged(e => background.FadeTo(e.NewValue ? 0.3f : 0, 300, Easing.OutQuint), true);
-            BackgroundColour.BindValueChanged(_ => updateBackground());
-            UseBackgroundGradient.BindValueChanged(_ => updateBackground());
             LineColour.BindValueChanged(e => frontPath.Colour = e.NewValue);
-            UseAdditiveBlending.BindValueChanged(e => frontPath.Blending = e.NewValue ? BlendingParameters.Additive : BlendingParameters.Inherit);
         }
-
-        private void updateBackground() => background.FadeColour(UseBackgroundGradient.Value
-                ? ColourInfo.GradientVertical(Color4.Black.Opacity(0), BackgroundColour.Value.Opacity(0.9f))
-                : BackgroundColour.Value.Opacity(0.9f),
-            300, Easing.OutQuint);
 
         private void refresh()
         {
