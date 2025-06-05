@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -21,6 +22,7 @@ using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
+using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Graphics.Carousel;
 using osu.Game.Graphics.Containers;
@@ -123,6 +125,11 @@ namespace osu.Game.Screens.SelectV2
 
         [Resolved]
         private IDialogOverlay? dialogOverlay { get; set; }
+
+        [Resolved]
+        private OsuConfigManager config { get; set; } = null!;
+
+        private Bindable<float> configBackgroundDim = null!;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -311,8 +318,17 @@ namespace osu.Game.Screens.SelectV2
                 ensureGlobalBeatmapValid();
 
                 ensurePlayingSelected(true);
-                updateBackgroundDim();
+                updateBackground();
                 updateWedgeVisibility();
+            });
+
+            configBackgroundDim = config.GetBindable<float>(OsuSetting.SongSelectBackgroundDim);
+            configBackgroundDim.BindValueChanged(e =>
+            {
+                if (!this.IsCurrentScreen())
+                    return;
+
+                updateBackground();
             });
         }
 
@@ -571,7 +587,7 @@ namespace osu.Game.Screens.SelectV2
             ensureGlobalBeatmapValid();
 
             ensurePlayingSelected(false);
-            updateBackgroundDim();
+            updateBackground();
         }
 
         private void onLeavingScreen()
@@ -647,15 +663,15 @@ namespace osu.Game.Screens.SelectV2
             }
         }
 
-        private void updateBackgroundDim() => ApplyToBackground(backgroundModeBeatmap =>
+        private void updateBackground() => ApplyToBackground(backgroundModeBeatmap =>
         {
             backgroundModeBeatmap.BlurAmount.Value = 0;
             backgroundModeBeatmap.Beatmap = Beatmap.Value;
             backgroundModeBeatmap.IgnoreUserSettings.Value = true;
-            backgroundModeBeatmap.DimWhenUserSettingsIgnored.Value = 0.1f;
+            backgroundModeBeatmap.DimWhenUserSettingsIgnored.Value = configBackgroundDim.Value;
 
             // Required to undo results screen dimming the background.
-            // Probably needs more thought because this needs to be in every `ApplyToBackground` currently to restore sane defaults.
+            // Probably needs more thought because this needs to be in every `ApplyToBackgrongound` currently to restore sane defaults.
             backgroundModeBeatmap.FadeColour(Color4.White, 250);
         });
 
