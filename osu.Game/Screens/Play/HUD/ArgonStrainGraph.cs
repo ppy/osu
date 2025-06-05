@@ -65,34 +65,27 @@ namespace osu.Game.Screens.Play.HUD
             Child = new Container
             {
                 AutoSizeAxes = Axes.Both,
+                Padding = new MarginPadding { Bottom = 3 },
                 Children = new Drawable[]
                 {
-                    new Container
+                    drawablePath = new SmoothPath
                     {
-                        AutoSizeAxes = Axes.Both,
-                        Padding = new MarginPadding { Bottom = 3 },
-                        Children = new Drawable[]
+                        Anchor = Anchor.BottomLeft,
+                        Origin = Anchor.BottomLeft,
+                        PathRadius = 2,
+                        Alpha = 0.5f,
+                    },
+                    frontContainer = new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Width = 0,
+                        Masking = true,
+                        Child = frontPath = new SmoothPath
                         {
-                            drawablePath = new SmoothPath
-                            {
-                                Anchor = Anchor.BottomLeft,
-                                Origin = Anchor.BottomLeft,
-                                PathRadius = 2,
-                                Alpha = 0.5f,
-                            },
-                            frontContainer = new Container
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Width = 0,
-                                Masking = true,
-                                Child = frontPath = new SmoothPath
-                                {
-                                    Anchor = Anchor.BottomLeft,
-                                    Origin = Anchor.BottomLeft,
-                                    PathRadius = 2,
-                                    Colour = LineColour.Value,
-                                },
-                            },
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
+                            PathRadius = 2,
+                            Colour = LineColour.Value,
                         },
                     },
                 },
