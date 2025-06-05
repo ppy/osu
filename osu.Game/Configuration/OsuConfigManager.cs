@@ -64,7 +64,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.ToolbarClockDisplayMode, ToolbarClockDisplayMode.Full);
 
             SetDefault(OsuSetting.SongSelectBackgroundBlur, true);
-            SetDefault(OsuSetting.SongSelectBackgroundDim, 0f, 0.1f, 0.8f, 0.01f);
+            SetDefault(OsuSetting.SongSelectBackgroundDim, 0.1f, 0.1f, 0.8f, 0.01f);
 
             // Online settings
             SetDefault(OsuSetting.Username, string.Empty);
