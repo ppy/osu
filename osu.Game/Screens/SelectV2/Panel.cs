@@ -206,7 +206,7 @@ namespace osu.Game.Screens.SelectV2
 
             public PulsatingBox()
             {
-                EarlyActivationMilliseconds = 50;
+                EarlyActivationMilliseconds = 120;
 
                 InternalChildren = new Drawable[]
                 {
@@ -229,7 +229,7 @@ namespace osu.Game.Screens.SelectV2
                 double length = timingPoint.BeatLength;
                 separation = 1;
 
-                while (length < 500)
+                while (length < 400)
                 {
                     length *= 2;
                     separation *= 2;
