@@ -23,20 +23,6 @@ namespace osu.Game.Screens.Play.HUD
         [SettingSource(typeof(StrainGraphStrings), nameof(StrainGraphStrings.LineColour))]
         public BindableColour4 LineColour { get; } = new BindableColour4(Color4.White);
 
-        [SettingSource(typeof(StrainGraphStrings), nameof(StrainGraphStrings.HorizontalSpacing))]
-        public BindableInt HorizontalSpacing { get; } = new BindableInt(5)
-        {
-            MinValue = 3,
-            MaxValue = 10,
-        };
-
-        [SettingSource(typeof(StrainGraphStrings), nameof(StrainGraphStrings.VerticalSpacing))]
-        public BindableInt VerticalSpacing { get; } = new BindableInt(10)
-        {
-            MinValue = 5,
-            MaxValue = 20,
-        };
-
         [SettingSource(typeof(StrainGraphStrings), nameof(StrainGraphStrings.SectionGranularity), nameof(StrainGraphStrings.SectionGranularityDescription))]
         public BindableInt SectionGranularity { get; } = new BindableInt(50)
         {
@@ -53,23 +39,25 @@ namespace osu.Game.Screens.Play.HUD
 
         private IEnumerable<HitObject>? hitObjects;
         private float[] values = new float[10];
+        private Vector2 lastSize = Vector2.Zero;
 
         public StrainGraph()
         {
-            AutoSizeAxes = Axes.Both;
-
             Anchor = Anchor.BottomCentre;
             Origin = Anchor.BottomCentre;
             Masking = true;
 
+            Size = new Vector2(400, 100);
+
             Child = new Container
             {
-                AutoSizeAxes = Axes.Both,
-                Padding = new MarginPadding { Bottom = 3 },
+                RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
                     backgroundPath = new SmoothPath
                     {
+                        AutoSizeAxes = Axes.None,
+                        RelativeSizeAxes = Axes.Both,
                         Anchor = Anchor.BottomLeft,
                         Origin = Anchor.BottomLeft,
                         PathRadius = 2,
@@ -82,6 +70,8 @@ namespace osu.Game.Screens.Play.HUD
                         Masking = true,
                         Child = frontPath = new SmoothPath
                         {
+                            AutoSizeAxes = Axes.None,
+                            RelativeSizeAxes = Axes.Both,
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
                             PathRadius = 2,
@@ -90,6 +80,17 @@ namespace osu.Game.Screens.Play.HUD
                     },
                 },
             };
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (DrawSize != lastSize)
+            {
+                updateGraph();
+                lastSize = DrawSize;
+            }
         }
 
         protected override void UpdateObjects(IEnumerable<HitObject> objects)
@@ -107,10 +108,7 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.LoadComplete();
 
-            HorizontalSpacing.BindValueChanged(_ => updateGraph());
-            VerticalSpacing.BindValueChanged(_ => updateGraph());
             SectionGranularity.BindValueChanged(_ => refresh());
-
             LineColour.BindValueChanged(e => frontPath.Colour = e.NewValue);
         }
 
@@ -175,6 +173,17 @@ namespace osu.Game.Screens.Play.HUD
 
                 values = smoothedValues;
             }
+
+            float min = values.Min();
+            float max = values.Max();
+
+            if (min == max)
+                return;
+
+            for (int i = 0; i < values.Length; i++)
+            {
+                values[i] = (values[i] - min) / (max - min);
+            }
         }
 
         private void updateGraph()
@@ -185,7 +194,8 @@ namespace osu.Game.Screens.Play.HUD
             {
                 path.ControlPoints.Add(new PathControlPoint
                 {
-                    Position = new Vector2(i * HorizontalSpacing.Value, -values[i] * VerticalSpacing.Value),
+                    // Manually add a vertical margin
+                    Position = new Vector2(i * DrawWidth / SectionGranularity.Value, -values[i] * (DrawHeight - 2)),
                     Type = PathType.BEZIER,
                 });
             }

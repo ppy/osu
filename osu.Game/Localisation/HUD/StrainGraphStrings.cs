@@ -15,16 +15,6 @@ namespace osu.Game.Localisation.HUD
         public static LocalisableString LineColour => new TranslatableString(getKey(@"line_colour"), @"Line colour");
 
         /// <summary>
-        /// "Horizontal spacing"
-        /// </summary>
-        public static LocalisableString HorizontalSpacing => new TranslatableString(getKey(@"horizontal_spacing"), @"Horizontal spacing");
-
-        /// <summary>
-        /// "Vertical spacing"
-        /// </summary>
-        public static LocalisableString VerticalSpacing => new TranslatableString(getKey(@"vertical_spacing"), @"Vertical spacing");
-
-        /// <summary>
         /// "Section granularity"
         /// </summary>
         public static LocalisableString SectionGranularity => new TranslatableString(getKey(@"section_granularity"), @"Section granularity");
