@@ -180,7 +180,7 @@ namespace osu.Game.Screens.SelectV2
                     keyboardSelectionLayer = new Box
                     {
                         Alpha = 0,
-                        Colour = colourProvider.Highlight1.Opacity(0.1f),
+                        Colour = ColourInfo.GradientHorizontal(colourProvider.Highlight1.Opacity(0.1f), colourProvider.Highlight1.Opacity(0.4f)),
                         Blending = BlendingParameters.Additive,
                         RelativeSizeAxes = Axes.Both,
                     },
@@ -262,7 +262,11 @@ namespace osu.Game.Screens.SelectV2
             KeyboardSelected.BindValueChanged(selected =>
             {
                 if (selected.NewValue)
-                    keyboardSelectionLayer.FadeIn(100, Easing.OutQuint);
+                {
+                    keyboardSelectionLayer.FadeIn(80, Easing.Out)
+                                          .Then()
+                                          .FadeTo(0.5f, 2000, Easing.OutQuint);
+                }
                 else
                     keyboardSelectionLayer.FadeOut(1000, Easing.OutQuint);
 
