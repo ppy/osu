@@ -370,6 +370,7 @@ namespace osu.Game.Screens.SelectV2
                                             },
                                             new TrianglesV2
                                             {
+                                                Shear = sheared ? -OsuGame.SHEAR : Vector2.Zero,
                                                 RelativeSizeAxes = Axes.Both,
                                                 Anchor = Anchor.TopRight,
                                                 Origin = Anchor.TopRight,
