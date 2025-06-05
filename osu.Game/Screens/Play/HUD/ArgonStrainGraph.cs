@@ -47,7 +47,7 @@ namespace osu.Game.Screens.Play.HUD
         private const int highest_point = 5;
 
         private readonly SliderPath path = new SliderPath();
-        private readonly SmoothPath drawablePath;
+        private readonly SmoothPath backgroundPath;
         private readonly Container frontContainer;
         private readonly SmoothPath frontPath;
 
@@ -68,7 +68,7 @@ namespace osu.Game.Screens.Play.HUD
                 Padding = new MarginPadding { Bottom = 3 },
                 Children = new Drawable[]
                 {
-                    drawablePath = new SmoothPath
+                    backgroundPath = new SmoothPath
                     {
                         Anchor = Anchor.BottomLeft,
                         Origin = Anchor.BottomLeft,
@@ -193,7 +193,7 @@ namespace osu.Game.Screens.Play.HUD
             List<Vector2> vertices = new List<Vector2>();
             path.GetPathToProgress(vertices, 0, 1);
 
-            drawablePath.Vertices = vertices;
+            backgroundPath.Vertices = vertices;
             frontPath.Vertices = vertices;
         }
     }
