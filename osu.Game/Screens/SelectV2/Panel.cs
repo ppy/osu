@@ -223,7 +223,7 @@ namespace osu.Game.Screens.SelectV2
             {
                 base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
 
-                if (beatIndex % separation != 0)
+                if ((beatIndex + 1) % separation != 0)
                     return;
 
                 double length = timingPoint.BeatLength;
