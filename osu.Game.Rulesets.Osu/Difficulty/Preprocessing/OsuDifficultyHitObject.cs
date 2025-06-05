@@ -198,7 +198,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             if (BaseObject is Slider)
             {
                 // Bonus for repeat sliders until a better per nested object strain system can be achieved.
-                TravelDistance = LazyTravelDistance;
+                bool lastIsSlider = LastObject is Slider;
+                bool lastLastIsSlider = lastLastDifficultyObject != null && lastLastDifficultyObject.BaseObject is Slider;
+
+                double lastMultiplier = lastIsSlider ? 0.1 : 0;
+                double lastLastMultiplier = lastLastIsSlider ? 0.1 : 0;
+                double totalMultiplier = 1 + lastMultiplier + lastLastMultiplier;
+
+                TravelDistance = LazyTravelDistance * totalMultiplier;
                 TravelTime = Math.Max(LazyTravelTime / clockRate, MIN_DELTA_TIME);
             }
 
@@ -215,17 +222,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             MinimumJumpTime = StrainTime;
             MinimumJumpDistance = LazyJumpDistance;
 
-            Vector2 lastObjStackedPosition = LastObject is Slider lastslider ? lastslider.TailCircle.StackedPosition : LastObject.StackedPosition;
+            Vector2 lastObjStackedPosition = LastObject.StackedPosition;
+
+            if (lastDifficultyObject is not null && lastDifficultyObject.BaseObject is Slider lastslider && lastDifficultyObject.TravelDistance > 0)
+                lastObjStackedPosition = lastslider.TailCircle.StackedPosition;
 
             if (lastLastDifficultyObject != null && lastLastDifficultyObject.BaseObject is not Spinner)
             {
-                bool sliderValidation = lastLastDifficultyObject.BaseObject is Slider &&
-                                        TravelDistance > 0;
+                bool sliderValidation = lastLastDifficultyObject.BaseObject is Slider && TravelDistance > 0;
                 Vector2 lastLastCursorPosition = sliderValidation ? lastCursorSliderPosition : getEndCursorPosition(lastLastDifficultyObject);
 
-                Angle = Math.Abs(calculateAngle(lastLastCursorPosition,
-                                                lastObjStackedPosition,
-                                                BaseObject.StackedPosition));
+                Angle = Math.Abs(calculateAngle(lastLastCursorPosition, lastObjStackedPosition, BaseObject.StackedPosition));
             }
 
             if (LastObject is Slider lastSlider && lastDifficultyObject != null)
