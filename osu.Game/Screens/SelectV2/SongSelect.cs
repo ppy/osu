@@ -305,6 +305,9 @@ namespace osu.Game.Screens.SelectV2
 
             Beatmap.BindValueChanged(_ =>
             {
+                if (!this.IsCurrentScreen())
+                    return;
+
                 ensureGlobalBeatmapValid();
 
                 ensurePlayingSelected(true);
