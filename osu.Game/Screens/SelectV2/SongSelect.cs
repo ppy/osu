@@ -703,14 +703,14 @@ namespace osu.Game.Screens.SelectV2
                 noResultsPlaceholder.Filter = carousel.Criteria!;
 
                 attachTrackDuckingIfShould();
-                rightGradientBackground.ResizeWidthTo(3, 1000, Easing.OutQuint);
+                rightGradientBackground.ResizeWidthTo(3, 1000, Easing.OutPow10);
             }
             else
             {
                 noResultsPlaceholder.Hide();
 
                 detachTrackDucking();
-                rightGradientBackground.ResizeWidthTo(1, 500, Easing.OutQuint);
+                rightGradientBackground.ResizeWidthTo(1, 400, Easing.OutPow10);
             }
         }
 
