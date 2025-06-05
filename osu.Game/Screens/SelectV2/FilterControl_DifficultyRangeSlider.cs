@@ -161,7 +161,7 @@ namespace osu.Game.Screens.SelectV2
                     NubText.Colour = OsuColour.ForegroundTextColourFor(nubColour);
 
                     if (value >= 6.5)
-                        NubText.Colour = colours.Yellow;
+                        NubText.Colour = colours.YellowLight;
 
                     base.UpdateDisplay(value);
                 }
