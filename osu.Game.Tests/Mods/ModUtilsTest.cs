@@ -354,6 +354,39 @@ namespace osu.Game.Tests.Mods
             });
         }
 
+        [Test]
+        public void TestModsValidForRequiredFreestyleAreConsistentlyCompatibleAcrossRulesets()
+        {
+            Dictionary<(string firstMod, string secondMod), bool> compatibilityMap = new Dictionary<(string, string), bool>();
+
+            Assert.Multiple(() =>
+            {
+                for (int rulesetId = 0; rulesetId < 4; ++rulesetId)
+                {
+                    var rulesetStore = new AssemblyRulesetStore();
+                    var ruleset = rulesetStore.GetRuleset(rulesetId)!.CreateInstance();
+
+                    var modsValidForFreestyleAsRequired = ruleset.CreateAllMods().Where(m => m.ValidForFreestyleAsRequiredMod).OrderBy(m => m.Acronym).ToList();
+
+                    for (int i = 0; i < modsValidForFreestyleAsRequired.Count; i++)
+                    {
+                        for (int j = i; j < modsValidForFreestyleAsRequired.Count; ++j)
+                        {
+                            var first = modsValidForFreestyleAsRequired[i];
+                            var second = modsValidForFreestyleAsRequired[j];
+
+                            bool compatible = ModUtils.CheckCompatibleSet([first, second]);
+
+                            if (!compatibilityMap.TryGetValue((first.Acronym, second.Acronym), out bool previousCompatible))
+                                compatibilityMap[(first.Acronym, second.Acronym)] = compatible;
+                            else if (previousCompatible != compatible)
+                                Assert.Fail($"{first.Acronym} and {second.Acronym} declare {nameof(Mod.ValidForFreestyleAsRequiredMod)} while not being consistently compatible in all four rulesets!");
+                        }
+                    }
+                }
+            });
+        }
+
         public abstract class CustomMod1 : Mod, IModCompatibilitySpecification
         {
         }
