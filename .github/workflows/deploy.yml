@@ -74,7 +74,7 @@ jobs:
           dotnet pack -c Release osu.Game.Rulesets.Taiko /p:Version=${{ github.ref_name }} /p:GenerateDocumentationFile=true /p:IncludeSymbols=true /p:SymbolPackageFormat=snupkg -o ${{steps.artifactsPath.outputs.nuget_artifacts}}
           dotnet pack -c Release osu.Game.Rulesets.Catch /p:Version=${{ github.ref_name }} /p:GenerateDocumentationFile=true /p:IncludeSymbols=true /p:SymbolPackageFormat=snupkg -o ${{steps.artifactsPath.outputs.nuget_artifacts}}
           dotnet pack -c Release osu.Game.Rulesets.Mania /p:Version=${{ github.ref_name }} /p:GenerateDocumentationFile=true /p:IncludeSymbols=true /p:SymbolPackageFormat=snupkg -o ${{steps.artifactsPath.outputs.nuget_artifacts}}
-          dotnet pack -c Release Templates /p:Version=${{ github.ref_name }} /p:GenerateDocumentationFile=true /p:IncludeSymbols=true /p:SymbolPackageFormat=snupkg -o ${{steps.artifactsPath.outputs.nuget_artifacts}}
+          dotnet pack -c Release Templates /p:Version=${{ github.ref_name }} -o ${{steps.artifactsPath.outputs.nuget_artifacts}}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
