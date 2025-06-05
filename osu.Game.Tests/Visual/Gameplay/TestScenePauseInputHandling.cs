@@ -401,6 +401,57 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
+        public void TestOsuSliderNotReceivingInputOnResume_PauseWhileHoldingSameKey()
+        {
+            KeyCounter counter = null!;
+
+            loadPlayer(() => new OsuRuleset());
+            AddStep("get key counter", () => counter = this.ChildrenOfType<KeyCounter>().Single(k => k.Trigger is KeyCounterActionTrigger<OsuAction> actionTrigger && actionTrigger.Action == OsuAction.LeftButton));
+
+            seekTo(10000);
+            AddStep("press Z", () => InputManager.PressKey(Key.Z));
+            AddAssert("circle hit", () => Player.ScoreProcessor.HighestCombo.Value, () => Is.EqualTo(1));
+            assertCountOfPressesInOsuReplay(OsuAction.LeftButton, 1);
+
+            seekTo(10050);
+            AddStep("pause", () => Player.Pause());
+            AddStep("release Z", () => InputManager.ReleaseKey(Key.Z));
+
+            AddStep("resume", () => Player.Resume());
+            AddStep("go to resume cursor", () => InputManager.MoveMouseTo(this.ChildrenOfType<OsuResumeOverlay.OsuClickToResumeCursor>().Single()));
+            AddStep("press and release Z to resume", () => InputManager.Key(Key.Z));
+
+            checkKeyCounterState(() => counter, 1, false);
+            assertCountOfPressesInOsuReplay(OsuAction.LeftButton, 1);
+        }
+
+        [Test]
+        public void TestOsuSliderNotReceivingInputOnResume_PauseWhileHoldingOtherKey()
+        {
+            loadPlayer(() => new OsuRuleset());
+
+            AddStep("press X", () => InputManager.PressKey(Key.X));
+
+            seekTo(10000);
+
+            AddStep("pause", () => Player.Pause());
+            AddStep("release X", () => InputManager.ReleaseKey(Key.X));
+
+            AddStep("resume", () => Player.Resume());
+            AddStep("go to resume cursor", () => InputManager.MoveMouseTo(this.ChildrenOfType<OsuResumeOverlay.OsuClickToResumeCursor>().Single()));
+            AddStep("press Z to resume", () => InputManager.PressKey(Key.Z));
+            AddStep("release Z", () => InputManager.ReleaseKey(Key.Z));
+
+            AddAssert("circle not hit", () => Player.ScoreProcessor.HighestCombo.Value, () => Is.EqualTo(0));
+            assertCountOfPressesInOsuReplay(OsuAction.LeftButton, 0);
+
+            AddStep("press X", () => InputManager.PressKey(Key.X));
+            AddStep("release X", () => InputManager.ReleaseKey(Key.X));
+
+            AddAssert("circle hit", () => Player.ScoreProcessor.HighestCombo.Value, () => Is.EqualTo(1));
+        }
+
+        [Test]
         public void TestOsuSliderContinuesTrackingOnResume([Values] bool resumeWithSameKey)
         {
             loadPlayer(() => new OsuRuleset());
