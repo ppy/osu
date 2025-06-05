@@ -330,7 +330,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("press Z to resume", () => InputManager.PressKey(Key.Z));
 
             checkKeyCounterState(() => counter, 0, false);
-            AddAssert("circle not hit", () => Player.ScoreProcessor.HighestCombo.Value, () => Is.EqualTo(0));
+            AddAssert("circle not hit", () => Player.ScoreProcessor.Combo.Value, () => Is.EqualTo(0));
             assertCountOfPressesInOsuReplay(OsuAction.LeftButton, 0);
 
             AddStep("release Z", () => InputManager.ReleaseKey(Key.Z));
@@ -346,7 +346,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("get key counter", () => counter = this.ChildrenOfType<KeyCounter>().Single(k => k.Trigger is KeyCounterActionTrigger<OsuAction> actionTrigger && actionTrigger.Action == OsuAction.LeftButton));
 
             AddStep("press Z", () => InputManager.PressKey(Key.Z));
-            AddAssert("circle hit", () => Player.ScoreProcessor.HighestCombo.Value, () => Is.EqualTo(1));
+            AddAssert("circle hit", () => Player.ScoreProcessor.Combo.Value, () => Is.EqualTo(1));
             assertCountOfPressesInOsuReplay(OsuAction.LeftButton, 1);
 
             seekTo(50);
@@ -365,7 +365,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("press Z", () => InputManager.PressKey(Key.Z));
 
             checkKeyCounterState(() => counter, 2, true);
-            AddAssert("circle hit", () => Player.ScoreProcessor.HighestCombo.Value, () => Is.EqualTo(2));
+            AddAssert("circle hit", () => Player.ScoreProcessor.Combo.Value, () => Is.EqualTo(2));
             assertCountOfPressesInOsuReplay(OsuAction.LeftButton, 2);
 
             AddStep("release Z", () => InputManager.ReleaseKey(Key.Z));
@@ -378,7 +378,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             loadPlayer(() => new OsuRuleset());
 
             AddStep("press X", () => InputManager.PressKey(Key.X));
-            AddAssert("circle hit", () => Player.ScoreProcessor.HighestCombo.Value, () => Is.EqualTo(1));
+            AddAssert("circle hit", () => Player.ScoreProcessor.Combo.Value, () => Is.EqualTo(1));
             assertCountOfPressesInOsuReplay(OsuAction.RightButton, 1);
 
             seekTo(5000);
@@ -391,13 +391,13 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("press Z to resume", () => InputManager.PressKey(Key.Z));
             AddStep("release Z", () => InputManager.ReleaseKey(Key.Z));
 
-            AddAssert("circle not hit", () => Player.ScoreProcessor.HighestCombo.Value, () => Is.EqualTo(1));
+            AddAssert("circle not hit", () => Player.ScoreProcessor.Combo.Value, () => Is.EqualTo(1));
             assertCountOfPressesInOsuReplay(OsuAction.LeftButton, 0);
 
             AddStep("press X", () => InputManager.PressKey(Key.X));
             AddStep("release X", () => InputManager.ReleaseKey(Key.X));
 
-            AddAssert("circle hit", () => Player.ScoreProcessor.HighestCombo.Value, () => Is.EqualTo(2));
+            AddAssert("circle hit", () => Player.ScoreProcessor.Combo.Value, () => Is.EqualTo(2));
         }
 
         [Test]
@@ -410,7 +410,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             seekTo(10000);
             AddStep("press Z", () => InputManager.PressKey(Key.Z));
-            AddAssert("circle hit", () => Player.ScoreProcessor.HighestCombo.Value, () => Is.EqualTo(1));
+            AddAssert("circle hit", () => Player.ScoreProcessor.Combo.Value, () => Is.EqualTo(1));
             assertCountOfPressesInOsuReplay(OsuAction.LeftButton, 1);
 
             seekTo(10050);
@@ -442,13 +442,13 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("press Z to resume", () => InputManager.PressKey(Key.Z));
             AddStep("release Z", () => InputManager.ReleaseKey(Key.Z));
 
-            AddAssert("circle not hit", () => Player.ScoreProcessor.HighestCombo.Value, () => Is.EqualTo(0));
+            AddAssert("circle not hit", () => Player.ScoreProcessor.Combo.Value, () => Is.EqualTo(0));
             assertCountOfPressesInOsuReplay(OsuAction.LeftButton, 0);
 
             AddStep("press X", () => InputManager.PressKey(Key.X));
             AddStep("release X", () => InputManager.ReleaseKey(Key.X));
 
-            AddAssert("circle hit", () => Player.ScoreProcessor.HighestCombo.Value, () => Is.EqualTo(1));
+            AddAssert("circle hit", () => Player.ScoreProcessor.Combo.Value, () => Is.EqualTo(1));
         }
 
         [Test]
@@ -458,7 +458,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             seekTo(10000);
             AddStep("press X", () => InputManager.PressKey(Key.X));
-            AddAssert("slider head hit", () => Player.ScoreProcessor.HighestCombo.Value, () => Is.EqualTo(1));
+            AddAssert("slider head hit", () => Player.ScoreProcessor.Combo.Value, () => Is.EqualTo(1));
             AddAssert("slider tracking", () => this.ChildrenOfType<SliderInputManager>().Single().Tracking, () => Is.True);
 
             // note operation ordering - gameplay paused while still holding X
@@ -495,7 +495,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             seekTo(10000);
             AddStep("press X", () => InputManager.PressKey(Key.X));
-            AddAssert("slider head hit", () => Player.ScoreProcessor.HighestCombo.Value, () => Is.EqualTo(1));
+            AddAssert("slider head hit", () => Player.ScoreProcessor.Combo.Value, () => Is.EqualTo(1));
             AddAssert("slider tracking", () => this.ChildrenOfType<SliderInputManager>().Single().Tracking, () => Is.True);
 
             // note operation ordering - gameplay paused while not holding anything
