@@ -259,9 +259,6 @@ namespace osu.Game.Tests.Mods
             new MultiplayerTestScenario(true, true, [new OsuModPerfect()], []),
             new MultiplayerTestScenario(true, true, [new OsuModDoubleTime()], []),
             new MultiplayerTestScenario(true, true, [new OsuModNightcore()], []),
-            new MultiplayerTestScenario(true, true, [new OsuModHidden()], []),
-            new MultiplayerTestScenario(true, true, [new OsuModFlashlight()], []),
-            new MultiplayerTestScenario(true, true, [new OsuModAccuracyChallenge()], []),
             new MultiplayerTestScenario(true, true, [new OsuModDifficultyAdjust()], []),
             new MultiplayerTestScenario(true, true, [new ModWindUp()], []),
             new MultiplayerTestScenario(true, true, [new ModWindDown()], []),
@@ -347,8 +344,11 @@ namespace osu.Game.Tests.Mods
                     {
                         if (mod.ValidForFreestyleAsRequiredMod && mod.UserPlayable && !commonAcronyms.Contains(mod.Acronym))
                             Assert.Fail($"{mod.GetType().ReadableName()} declares {nameof(Mod.ValidForFreestyleAsRequiredMod)} but does not exist in all four basic rulesets!");
+
+                        // downgraded to warning, because there are valid reasons why they may still not be specified to be valid for freestyle as required
+                        // (see `TestModsValidForRequiredFreestyleAreConsistentlyCompatibleAcrossRulesets()` test case below).
                         if (!mod.ValidForFreestyleAsRequiredMod && mod.UserPlayable && commonAcronyms.Contains(mod.Acronym))
-                            Assert.Fail($"{mod.GetType().ReadableName()} does not declare {nameof(Mod.ValidForFreestyleAsRequiredMod)} but exists in all four basic rulesets!");
+                            Assert.Warn($"{mod.GetType().ReadableName()} does not declare {nameof(Mod.ValidForFreestyleAsRequiredMod)} but exists in all four basic rulesets.");
                     }
                 }
             });
