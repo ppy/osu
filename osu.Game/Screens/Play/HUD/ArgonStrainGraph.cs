@@ -129,7 +129,7 @@ namespace osu.Game.Screens.Play.HUD
 
         protected override void UpdateProgress(double progress, bool isIntro)
         {
-            frontContainer.ResizeWidthTo((float)progress, 300, Easing.OutQuint);
+            frontContainer.ResizeWidthTo(isIntro ? 0 : (float)progress, 300, Easing.OutQuint);
         }
 
         protected override void LoadComplete()
