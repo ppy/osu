@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -13,8 +14,10 @@ using osu.Framework.Graphics.Pooling;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Carousel;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osuTK;
@@ -37,10 +40,13 @@ namespace osu.Game.Screens.SelectV2
         private Container backgroundLayerHorizontalPadding = null!;
         private Container backgroundContainer = null!;
         private Container iconContainer = null!;
-        private Box activationFlash = null!;
-        private Box hoverLayer = null!;
-        private Box keyboardSelectionLayer = null!;
-        private Box selectionLayer = null!;
+
+        private Drawable activationFlash = null!;
+        private Drawable hoverLayer = null!;
+
+        private Drawable keyboardSelectionLayer = null!;
+
+        private PulsatingBox selectionLayer = null!;
 
         public Container TopLevelContent { get; private set; } = null!;
 
@@ -109,7 +115,7 @@ namespace osu.Game.Screens.SelectV2
                     Hollow = true,
                     Radius = 2,
                 },
-                Children = new Drawable[]
+                Children = new[]
                 {
                     new BufferedContainer
                     {
@@ -162,11 +168,11 @@ namespace osu.Game.Screens.SelectV2
                         Blending = BlendingParameters.Additive,
                         RelativeSizeAxes = Axes.Both,
                     },
-                    selectionLayer = new Box
+                    selectionLayer = new PulsatingBox
                     {
                         Alpha = 0,
                         RelativeSizeAxes = Axes.Both,
-                        Width = 0.6f,
+                        Width = 0.8f,
                         Blending = BlendingParameters.Additive,
                         Anchor = Anchor.TopRight,
                         Origin = Anchor.TopRight,
@@ -190,6 +196,51 @@ namespace osu.Game.Screens.SelectV2
             };
 
             backgroundGradient.Colour = ColourInfo.GradientHorizontal(colourProvider.Background3, colourProvider.Background4);
+        }
+
+        public partial class PulsatingBox : BeatSyncedContainer
+        {
+            public double FlashOffset;
+
+            private readonly Box box;
+
+            public PulsatingBox()
+            {
+                EarlyActivationMilliseconds = 50;
+
+                InternalChildren = new Drawable[]
+                {
+                    box = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                    },
+                };
+            }
+
+            private int separation = 1;
+
+            protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
+            {
+                base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
+
+                if (beatIndex % separation != 0)
+                    return;
+
+                double length = timingPoint.BeatLength;
+                separation = 1;
+
+                while (length < 500)
+                {
+                    length *= 2;
+                    separation *= 2;
+                }
+
+                box
+                    .Delay(FlashOffset)
+                    .FadeTo(0.8f, length / 6, Easing.Out)
+                    .Then()
+                    .FadeTo(0.4f, length, Easing.Out);
+            }
         }
 
         protected override void LoadComplete()
@@ -222,6 +273,10 @@ namespace osu.Game.Screens.SelectV2
         protected override void PrepareForUse()
         {
             base.PrepareForUse();
+
+            // Slightly offset the flash animation based on the panel depth.
+            // This assumes a minimum depth of -2 (groups).
+            selectionLayer.FlashOffset = (2 + Item!.DepthLayer) * 50;
 
             updateAccentColour();
 
