@@ -3,8 +3,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
+using osu.Framework.Development;
 using osu.Framework.Extensions;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Mods;
@@ -77,6 +77,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         }
 
         private readonly List<StrainPeak> strainPeaks = new List<StrainPeak>();
+        private readonly List<StrainPeak> debugStrainPeaks = new List<StrainPeak>(); // Only ran in debug configurations
         private double totalLength;
         protected readonly List<double> ObjectStrains = new List<double>(); // Store individual strains
 
@@ -194,12 +195,9 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// </summary>
         private void saveCurrentPeak(double sectionLength)
         {
-            const bool debug = false;
-
-            if (debug)
+            if (DebugUtils.IsDebugBuild)
             {
-                strainPeaks.Add(new StrainPeak(currentSectionPeak, sectionLength));
-                return;
+                debugStrainPeaks.Add(new StrainPeak(currentSectionPeak, sectionLength));
             }
 
             strainPeaks.AddInPlace(new StrainPeak(currentSectionPeak, sectionLength), descComparer);
@@ -238,6 +236,16 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// including the peak of the current section.
         /// </summary>
         public IEnumerable<StrainPeak> GetCurrentStrainPeaks() => strainPeaks.Append(new StrainPeak(currentSectionPeak, currentSectionEnd - currentSectionBegin));
+
+        /// <summary>
+        /// Returns a live enumerable of the peak strains for each <see cref="MaxSectionLength"/> section of the beatmap,
+        /// including the peak of the current section.
+        /// </summary>
+        public IEnumerable<StrainPeak> GetDebugCurrentStrainPeaks()
+        {
+            if (!DebugUtils.IsDebugBuild) throw new InvalidOperationException("Cannot use this function in a non-debug build");
+            return debugStrainPeaks.Append(new StrainPeak(currentSectionPeak, currentSectionEnd - currentSectionBegin));
+        }
 
         /// <summary>
         /// Returns the calculated difficulty value representing all <see cref="DifficultyHitObject"/>s that have been processed up to this point.
