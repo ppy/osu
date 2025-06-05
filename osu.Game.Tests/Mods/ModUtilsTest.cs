@@ -259,9 +259,6 @@ namespace osu.Game.Tests.Mods
             new MultiplayerTestScenario(true, true, [new OsuModPerfect()], []),
             new MultiplayerTestScenario(true, true, [new OsuModDoubleTime()], []),
             new MultiplayerTestScenario(true, true, [new OsuModNightcore()], []),
-            new MultiplayerTestScenario(true, true, [new OsuModHidden()], []),
-            new MultiplayerTestScenario(true, true, [new OsuModFlashlight()], []),
-            new MultiplayerTestScenario(true, true, [new OsuModAccuracyChallenge()], []),
             new MultiplayerTestScenario(true, true, [new OsuModDifficultyAdjust()], []),
             new MultiplayerTestScenario(true, true, [new ModWindUp()], []),
             new MultiplayerTestScenario(true, true, [new ModWindDown()], []),
@@ -347,8 +344,44 @@ namespace osu.Game.Tests.Mods
                     {
                         if (mod.ValidForFreestyleAsRequiredMod && mod.UserPlayable && !commonAcronyms.Contains(mod.Acronym))
                             Assert.Fail($"{mod.GetType().ReadableName()} declares {nameof(Mod.ValidForFreestyleAsRequiredMod)} but does not exist in all four basic rulesets!");
+
+                        // downgraded to warning, because there are valid reasons why they may still not be specified to be valid for freestyle as required
+                        // (see `TestModsValidForRequiredFreestyleAreConsistentlyCompatibleAcrossRulesets()` test case below).
                         if (!mod.ValidForFreestyleAsRequiredMod && mod.UserPlayable && commonAcronyms.Contains(mod.Acronym))
-                            Assert.Fail($"{mod.GetType().ReadableName()} does not declare {nameof(Mod.ValidForFreestyleAsRequiredMod)} but exists in all four basic rulesets!");
+                            Assert.Warn($"{mod.GetType().ReadableName()} does not declare {nameof(Mod.ValidForFreestyleAsRequiredMod)} but exists in all four basic rulesets.");
+                    }
+                }
+            });
+        }
+
+        [Test]
+        public void TestModsValidForRequiredFreestyleAreConsistentlyCompatibleAcrossRulesets()
+        {
+            Dictionary<(string firstMod, string secondMod), bool> compatibilityMap = new Dictionary<(string, string), bool>();
+
+            Assert.Multiple(() =>
+            {
+                for (int rulesetId = 0; rulesetId < 4; ++rulesetId)
+                {
+                    var rulesetStore = new AssemblyRulesetStore();
+                    var ruleset = rulesetStore.GetRuleset(rulesetId)!.CreateInstance();
+
+                    var modsValidForFreestyleAsRequired = ruleset.CreateAllMods().Where(m => m.ValidForFreestyleAsRequiredMod).OrderBy(m => m.Acronym).ToList();
+
+                    for (int i = 0; i < modsValidForFreestyleAsRequired.Count; i++)
+                    {
+                        for (int j = i; j < modsValidForFreestyleAsRequired.Count; ++j)
+                        {
+                            var first = modsValidForFreestyleAsRequired[i];
+                            var second = modsValidForFreestyleAsRequired[j];
+
+                            bool compatible = ModUtils.CheckCompatibleSet([first, second]);
+
+                            if (!compatibilityMap.TryGetValue((first.Acronym, second.Acronym), out bool previousCompatible))
+                                compatibilityMap[(first.Acronym, second.Acronym)] = compatible;
+                            else if (previousCompatible != compatible)
+                                Assert.Fail($"{first.Acronym} and {second.Acronym} declare {nameof(Mod.ValidForFreestyleAsRequiredMod)} while not being consistently compatible in all four rulesets!");
+                        }
                     }
                 }
             });
