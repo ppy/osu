@@ -157,12 +157,22 @@ namespace osu.Game.Screens.Select
         internal IOverlayManager? OverlayManager { get; private set; }
 
         private Bindable<bool> configBackgroundBlur = null!;
+        private Bindable<float> configBackgroundDim = null!;
 
         [BackgroundDependencyLoader(true)]
         private void load(AudioManager audio, OsuColour colours, ManageCollectionsDialog? manageCollectionsDialog, DifficultyRecommender? recommender, OsuConfigManager config)
         {
             configBackgroundBlur = config.GetBindable<bool>(OsuSetting.SongSelectBackgroundBlur);
             configBackgroundBlur.BindValueChanged(e =>
+            {
+                if (!this.IsCurrentScreen())
+                    return;
+
+                ApplyToBackground(applyBlurToBackground);
+            });
+
+            configBackgroundDim = config.GetBindable<float>(OsuSetting.SongSelectBackgroundDim);
+            configBackgroundDim.BindValueChanged(e =>
             {
                 if (!this.IsCurrentScreen())
                     return;
@@ -908,7 +918,7 @@ namespace osu.Game.Screens.Select
         private void applyBlurToBackground(BackgroundScreenBeatmap backgroundModeBeatmap)
         {
             backgroundModeBeatmap.BlurAmount.Value = configBackgroundBlur.Value ? BACKGROUND_BLUR : 0f;
-            backgroundModeBeatmap.DimWhenUserSettingsIgnored.Value = configBackgroundBlur.Value ? 0 : 0.4f;
+            backgroundModeBeatmap.DimWhenUserSettingsIgnored.Value = configBackgroundDim.Value;
 
             wedgeBackground.FadeTo(configBackgroundBlur.Value ? 0.5f : 0.2f, UserDimContainer.BACKGROUND_FADE_DURATION, Easing.OutQuint);
         }
