@@ -21,7 +21,10 @@ namespace osu.Game.Screens.OnlinePlay
 
         protected override bool IsActive => Freestyle.Value;
 
-        public new Action Action { set => throw new NotSupportedException("The click action is handled by the button itself."); }
+        public new Action Action
+        {
+            set => throw new NotSupportedException("The click action is handled by the button itself.");
+        }
 
         private OsuSpriteText text = null!;
         private Circle circle = null!;

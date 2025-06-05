@@ -31,6 +31,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         private readonly Bindable<bool> expandedFromTextBoxFocus = new Bindable<bool>();
 
         private const float height = 100;
+        private const float width = 260;
 
         public override bool PropagateNonPositionalInputSubTree => true;
 

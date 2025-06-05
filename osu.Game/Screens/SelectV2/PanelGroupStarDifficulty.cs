@@ -1,17 +1,21 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osuTK;
 using osuTK.Graphics;
@@ -20,6 +24,8 @@ namespace osu.Game.Screens.SelectV2
 {
     public partial class PanelGroupStarDifficulty : Panel
     {
+        public const float HEIGHT = PanelGroup.HEIGHT;
+
         [Resolved]
         private OsuColour colours { get; set; } = null!;
 
@@ -29,6 +35,8 @@ namespace osu.Game.Screens.SelectV2
         private Drawable iconContainer = null!;
         private Box contentBackground = null!;
         private OsuSpriteText starRatingText = null!;
+        private CircularContainer countPill = null!;
+        private OsuSpriteText countText = null!;
         private TrianglesV2 triangles = null!;
         private Box glow = null!;
 
@@ -92,12 +100,12 @@ namespace osu.Game.Screens.SelectV2
                         }
                     }
                 },
-                new CircularContainer
+                countPill = new CircularContainer
                 {
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
                     Size = new Vector2(50f, 14f),
-                    Margin = new MarginPadding { Right = 20f },
+                    Margin = new MarginPadding { Right = 30f },
                     Masking = true,
                     Children = new Drawable[]
                     {
@@ -106,13 +114,11 @@ namespace osu.Game.Screens.SelectV2
                             RelativeSizeAxes = Axes.Both,
                             Colour = Color4.Black.Opacity(0.7f),
                         },
-                        new OsuSpriteText
+                        countText = new OsuSpriteText
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Font = OsuFont.Style.Caption1.With(weight: FontWeight.Bold),
-                            // TODO: requires Carousel/CarouselItem-side implementation
-                            Text = "43",
                             UseFullGlyphHeight = false,
                         }
                     },
@@ -135,7 +141,8 @@ namespace osu.Game.Screens.SelectV2
 
             Debug.Assert(Item != null);
 
-            int starNumber = (int)((GroupDefinition)Item.Model).Data;
+            var group = (StarDifficultyGroupDefinition)Item.Model;
+            int starNumber = (int)group.Difficulty.Stars;
 
             ratingColour = starNumber >= 9 ? OsuColour.Gray(0.2f) : colours.ForStarDifficulty(starNumber);
 
@@ -160,6 +167,7 @@ namespace osu.Game.Screens.SelectV2
 
             iconContainer.Colour = starNumber >= 7 ? colourProvider.Content1 : colourProvider.Background5;
             starRatingText.Colour = colourProvider.Content1;
+            starRatingText.Text = group.Title;
 
             ColourInfo colour;
 
@@ -169,6 +177,8 @@ namespace osu.Game.Screens.SelectV2
                 colour = ColourInfo.GradientHorizontal(ratingColour.Darken(0.6f), ratingColour.Darken(0.8f));
 
             triangles.Colour = colour;
+
+            countText.Text = Item.NestedItemCount.ToLocalisableString(@"N0");
 
             onExpanded();
         }
@@ -181,6 +191,28 @@ namespace osu.Game.Screens.SelectV2
             iconContainer.FadeTo(Expanded.Value ? 1f : 0f, duration, Easing.OutQuint);
 
             glow.FadeTo(Expanded.Value ? 0.4f : 0, duration, Easing.OutQuint);
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            // Move the count pill in the opposite direction to keep it pinned to the screen regardless of the X position of TopLevelContent.
+            countPill.X = -TopLevelContent.X;
+        }
+
+        public override MenuItem[] ContextMenuItems
+        {
+            get
+            {
+                if (Item == null)
+                    return Array.Empty<MenuItem>();
+
+                return new MenuItem[]
+                {
+                    new OsuMenuItem(Expanded.Value ? "Collapse" : "Expand", MenuItemType.Highlighted, () => TriggerClick())
+                };
+            }
         }
     }
 }

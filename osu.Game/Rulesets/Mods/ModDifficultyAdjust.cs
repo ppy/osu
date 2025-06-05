@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Extensions;
 
 namespace osu.Game.Rulesets.Mods
 {
@@ -26,6 +27,8 @@ namespace osu.Game.Rulesets.Mods
         public override double ScoreMultiplier => 0.5;
 
         public override bool RequiresConfiguration => true;
+
+        public override bool ValidForFreestyleAsRequiredMod => true;
 
         public override Type[] IncompatibleMods => new[] { typeof(ModEasy), typeof(ModHardRock) };
 
@@ -65,6 +68,22 @@ namespace osu.Game.Rulesets.Mods
             }
         }
 
+        public override string ExtendedIconInformation
+        {
+            get
+            {
+                if (UserAdjustedSettingsCount != 1)
+                    return string.Empty;
+
+                if (!OverallDifficulty.IsDefault) return format("OD", OverallDifficulty);
+                if (!DrainRate.IsDefault) return format("HP", DrainRate);
+
+                return string.Empty;
+
+                string format(string acronym, DifficultyBindable bindable) => $"{acronym}{bindable.Value!.Value.ToStandardFormattedString(1)}";
+            }
+        }
+
         public override IEnumerable<(LocalisableString setting, LocalisableString value)> SettingDescription
         {
             get
@@ -91,6 +110,27 @@ namespace osu.Game.Rulesets.Mods
         {
             if (DrainRate.Value != null) difficulty.DrainRate = DrainRate.Value.Value;
             if (OverallDifficulty.Value != null) difficulty.OverallDifficulty = OverallDifficulty.Value.Value;
+        }
+
+        /// <summary>
+        /// The number of settings on this mod instance which have been adjusted by the user from their default values.
+        /// </summary>
+        protected int UserAdjustedSettingsCount
+        {
+            get
+            {
+                int count = 0;
+
+                foreach (var (_, property) in this.GetSettingsSourceProperties())
+                {
+                    var bindable = (IBindable)property.GetValue(this)!;
+
+                    if (!bindable.IsDefault)
+                        count++;
+                }
+
+                return count;
+            }
         }
     }
 }

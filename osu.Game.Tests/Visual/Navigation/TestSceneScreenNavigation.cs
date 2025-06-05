@@ -22,6 +22,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Configuration;
 using osu.Game.Extensions;
+using osu.Game.Graphics.Carousel;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
@@ -52,11 +53,16 @@ using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Carousel;
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Screens.Select.Options;
+using osu.Game.Screens.SelectV2;
 using osu.Game.Tests.Beatmaps.IO;
 using osu.Game.Tests.Resources;
 using osu.Game.Utils;
 using osuTK;
 using osuTK.Input;
+using BeatmapCarousel = osu.Game.Screens.Select.BeatmapCarousel;
+using CollectionDropdown = osu.Game.Collections.CollectionDropdown;
+using FilterControl = osu.Game.Screens.Select.FilterControl;
+using FooterButtonRandom = osu.Game.Screens.Select.FooterButtonRandom;
 
 namespace osu.Game.Tests.Visual.Navigation
 {
@@ -272,6 +278,58 @@ namespace osu.Game.Tests.Visual.Navigation
             AddAssert("carousel moved", getCarouselScrollPosition, () => Is.Not.EqualTo(scrollPosition));
 
             double getCarouselScrollPosition() => Game.ChildrenOfType<UserTrackingScrollContainer<DrawableCarouselItem>>().Single().Current;
+        }
+
+        [Test]
+        public void TestNewSongSelectScrollHandling()
+        {
+            SoloSongSelect songSelect = null;
+            double scrollPosition = 0;
+
+            AddStep("set game volume to max", () => Game.Dependencies.Get<FrameworkConfigManager>().SetValue(FrameworkSetting.VolumeUniversal, 1d));
+            AddUntilStep("wait for volume overlay to hide", () => Game.ChildrenOfType<VolumeOverlay>().SingleOrDefault()?.State.Value, () => Is.EqualTo(Visibility.Hidden));
+            PushAndConfirm(() => songSelect = new SoloSongSelect());
+            AddUntilStep("wait for song select", () => songSelect.IsLoaded);
+            AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
+            AddUntilStep("wait for beatmap", () => Game.ChildrenOfType<PanelBeatmapSet>().Any());
+
+            AddWaitStep("wait for scroll", 10);
+
+            AddStep("store scroll position", () => scrollPosition = getCarouselScrollPosition());
+
+            AddStep("move to title wedge", () => InputManager.MoveMouseTo(
+                songSelect.ChildrenOfType<BeatmapTitleWedge>().Single()));
+            AddStep("scroll down", () => InputManager.ScrollVerticalBy(-1));
+            AddAssert("carousel didn't move", getCarouselScrollPosition, () => Is.EqualTo(scrollPosition));
+
+            AddRepeatStep("alt-scroll down", () =>
+            {
+                InputManager.PressKey(Key.AltLeft);
+                InputManager.ScrollVerticalBy(-1);
+                InputManager.ReleaseKey(Key.AltLeft);
+            }, 5);
+            AddAssert("game volume decreased", () => Game.Dependencies.Get<FrameworkConfigManager>().Get<double>(FrameworkSetting.VolumeUniversal), () => Is.LessThan(1));
+
+            AddStep("set game volume to max", () => Game.Dependencies.Get<FrameworkConfigManager>().SetValue(FrameworkSetting.VolumeUniversal, 1d));
+
+            AddStep("move to details area", () => InputManager.MoveMouseTo(
+                songSelect.ChildrenOfType<BeatmapDetailsArea>().Single()));
+            AddStep("scroll down", () => InputManager.ScrollVerticalBy(-1));
+            AddAssert("carousel didn't move", getCarouselScrollPosition, () => Is.EqualTo(scrollPosition));
+
+            AddRepeatStep("alt-scroll down", () =>
+            {
+                InputManager.PressKey(Key.AltLeft);
+                InputManager.ScrollVerticalBy(-1);
+                InputManager.ReleaseKey(Key.AltLeft);
+            }, 5);
+            AddAssert("game volume decreased", () => Game.Dependencies.Get<FrameworkConfigManager>().Get<double>(FrameworkSetting.VolumeUniversal), () => Is.LessThan(1));
+
+            AddStep("move to carousel", () => InputManager.MoveMouseTo(songSelect.ChildrenOfType<Screens.SelectV2.BeatmapCarousel>().Single()));
+            AddStep("scroll down", () => InputManager.ScrollVerticalBy(-1));
+            AddAssert("carousel moved", getCarouselScrollPosition, () => Is.Not.EqualTo(scrollPosition));
+
+            double getCarouselScrollPosition() => Game.ChildrenOfType<Carousel<BeatmapInfo>>().Single().ChildrenOfType<UserTrackingScrollContainer>().Single().Current;
         }
 
         /// <summary>
@@ -611,7 +669,7 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddAssert("ensure score is databased", () => Game.Realm.Run(r => r.Find<ScoreInfo>(score.ID)?.DeletePending == false));
 
-            AddStep("press back button", () => Game.ChildrenOfType<BackButton>().First().Action());
+            AddStep("press back button", () => Game.ChildrenOfType<BackButton>().First().Action!.Invoke());
 
             AddStep("show local scores",
                 () => Game.ChildrenOfType<BeatmapDetailAreaTabControl>().First().Current.Value = new BeatmapDetailAreaLeaderboardTabItem<BeatmapLeaderboardScope>(BeatmapLeaderboardScope.Local));
@@ -644,7 +702,7 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddAssert("ensure score is databased", () => Game.Realm.Run(r => r.Find<ScoreInfo>(score.ID)?.DeletePending == false));
 
-            AddStep("press back button", () => Game.ChildrenOfType<BackButton>().First().Action());
+            AddStep("press back button", () => Game.ChildrenOfType<BackButton>().First().Action!.Invoke());
 
             AddStep("show local scores",
                 () => Game.ChildrenOfType<BeatmapDetailAreaTabControl>().First().Current.Value = new BeatmapDetailAreaLeaderboardTabItem<BeatmapLeaderboardScope>(BeatmapLeaderboardScope.Local));
@@ -734,8 +792,9 @@ namespace osu.Game.Tests.Visual.Navigation
         public void TestPushSongSelectAndPressBackButtonImmediately()
         {
             AddStep("push song select", () => Game.ScreenStack.Push(new TestPlaySongSelect()));
-            AddStep("press back button", () => Game.ChildrenOfType<BackButton>().First().Action());
-            AddWaitStep("wait two frames", 2);
+            AddStep("press back button", () => Game.ChildrenOfType<BackButton>().First().Action!.Invoke());
+
+            ConfirmAtMainMenu();
         }
 
         [Test]
@@ -914,7 +973,7 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddUntilStep("wait for lounge", () => multiplayerComponents.ChildrenOfType<LoungeSubScreen>().SingleOrDefault()?.IsLoaded == true);
             AddStep("open room", () => multiplayerComponents.ChildrenOfType<LoungeSubScreen>().Single().Open());
-            AddStep("press back button", () => Game.ChildrenOfType<BackButton>().First().Action());
+            AddStep("press back button", () => Game.ChildrenOfType<BackButton>().First().Action!.Invoke());
             AddWaitStep("wait two frames", 2);
 
             AddStep("exit lounge", () => Game.ScreenStack.Exit());

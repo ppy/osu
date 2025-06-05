@@ -14,11 +14,13 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
+using osu.Framework.Testing;
 using osu.Framework.Threading;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
@@ -27,6 +29,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
 using osu.Game.IO;
+using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Dialog;
@@ -39,10 +42,11 @@ using osu.Game.Screens.OnlinePlay.DailyChallenge;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.OnlinePlay.Playlists;
 using osu.Game.Screens.Select;
+using osu.Game.Screens.SelectV2;
 using osu.Game.Seasonal;
 using osuTK;
 using osuTK.Graphics;
-using osu.Game.Localisation;
+using osuTK.Input;
 
 namespace osu.Game.Screens.Menu
 {
@@ -88,6 +92,8 @@ namespace osu.Game.Screens.Menu
         // used to stop kiai fountain samples when navigating to other screens
         IBindable<bool> ISamplePlaybackDisabler.SamplePlaybackDisabled => samplePlaybackDisabled;
         private readonly Bindable<bool> samplePlaybackDisabled = new Bindable<bool>();
+
+        private InputManager inputManager;
 
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenDefault();
 
@@ -154,7 +160,7 @@ namespace osu.Game.Screens.Menu
                             {
                                 skinEditor?.Show();
                             },
-                            OnSolo = loadSoloSongSelect,
+                            OnSolo = loadPreferredSongSelect,
                             OnMultiplayer = () => this.Push(new Multiplayer()),
                             OnPlaylists = () => this.Push(new Playlists()),
                             OnDailyChallenge = room =>
@@ -235,11 +241,22 @@ namespace osu.Game.Screens.Menu
             Buttons.OnBeatmapListing = () => beatmapListing?.ToggleVisibility();
 
             reappearSampleSwoosh = audio.Samples.Get(@"Menu/reappear-swoosh");
+            loadSongSelectV2Samples(audio);
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+            updateSongSelectV2HoldState();
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            inputManager = GetContainingInputManager();
         }
 
         public void ReturnToOsuLogo() => Buttons.State = ButtonSystemState.Initial;
-
-        private void loadSoloSongSelect() => this.Push(new PlaySongSelect());
 
         public override void OnEntering(ScreenTransitionEvent e)
         {
@@ -263,9 +280,6 @@ namespace osu.Game.Screens.Menu
         }
 
         [CanBeNull]
-        private Drawable proxiedLogo;
-
-        [CanBeNull]
         private ScheduledDelegate mobileDisclaimerSchedule;
 
         protected override void LogoArriving(OsuLogo logo, bool resuming)
@@ -277,7 +291,7 @@ namespace osu.Game.Screens.Menu
             logo.FadeColour(Color4.White, 100, Easing.OutQuint);
             logo.FadeIn(100, Easing.OutQuint);
 
-            proxiedLogo = logo.ProxyToContainer(logoTarget);
+            logo.ProxyToContainer(logoTarget);
 
             if (resuming)
             {
@@ -336,11 +350,7 @@ namespace osu.Game.Screens.Menu
             var seq = logo.FadeOut(300, Easing.InSine)
                           .ScaleTo(0.2f, 300, Easing.InSine);
 
-            if (proxiedLogo != null)
-            {
-                logo.ReturnProxy();
-                proxiedLogo = null;
-            }
+            logo.ReturnProxy();
 
             seq.OnComplete(_ => Buttons.SetOsuLogo(null));
             seq.OnAbort(_ => Buttons.SetOsuLogo(null));
@@ -350,11 +360,7 @@ namespace osu.Game.Screens.Menu
         {
             base.LogoExiting(logo);
 
-            if (proxiedLogo != null)
-            {
-                logo.ReturnProxy();
-                proxiedLogo = null;
-            }
+            logo.ReturnProxy();
         }
 
         public override void OnSuspending(ScreenTransitionEvent e)
@@ -457,7 +463,7 @@ namespace osu.Game.Screens.Menu
             Beatmap.Value = beatmap;
             Ruleset.Value = ruleset;
 
-            Schedule(loadSoloSongSelect);
+            Schedule(loadPreferredSongSelect);
         }
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
@@ -480,6 +486,78 @@ namespace osu.Game.Screens.Menu
         public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
         }
+
+        #region TEMPORARY: Song Select v2 easter egg
+
+        private const double required_hold_time = 500;
+
+        private double holdTime;
+        private bool ssv2Expanded;
+        private IDisposable ssv2Duck;
+        private Sample ssv2Sample;
+
+        private void loadPreferredSongSelect()
+        {
+            if (holdTime >= required_hold_time)
+            {
+                ssv2Sample?.Play();
+                this.Push(new SoloSongSelect());
+            }
+            else
+                this.Push(new PlaySongSelect());
+        }
+
+        private void loadSongSelectV2Samples(AudioManager audio)
+        {
+            ssv2Sample = audio.Samples.Get(@"UI/bss-complete");
+        }
+
+        private void updateSongSelectV2HoldState()
+        {
+            if (Buttons.State == ButtonSystemState.Play &&
+                inputManager.CurrentState.Mouse.IsPressed(MouseButton.Left) &&
+                inputManager.HoveredDrawables.Any(h => h is OsuLogo || (h is MainMenuButton b && b.TriggerKeys.Contains(Key.P))))
+                holdTime += Time.Elapsed;
+            else
+            {
+                var transformTarget = Game.ChildrenOfType<ScalingContainer>().First();
+                transformTarget.ScaleTo(1, 200, Easing.OutQuint)
+                               .RotateTo(0, 200, Easing.OutQuint)
+                               .FadeColour(OsuColour.Gray(1f), 200, Easing.OutQuint);
+
+                ssv2Duck?.Dispose();
+                ssv2Duck = null;
+
+                ssv2Expanded = false;
+                holdTime = 0;
+            }
+
+            if (holdTime >= required_hold_time && !ssv2Expanded)
+            {
+                var transformTarget = Game.ChildrenOfType<ScalingContainer>().First();
+
+                transformTarget.Anchor = Anchor.Centre;
+                transformTarget.Origin = Anchor.Centre;
+
+                transformTarget.ScaleTo(1.2f, 5000, Easing.OutPow10)
+                               .RotateTo(2, 5000, Easing.OutPow10)
+                               .FadeColour(Color4.BlueViolet, 10000, Easing.OutPow10);
+
+                ssv2Duck = musicController.Duck(new DuckParameters
+                {
+                    DuckDuration = 2000,
+                    DuckVolumeTo = 0.8f,
+                    DuckCutoffTo = 500,
+                    DuckEasing = Easing.OutQuint,
+                    RestoreDuration = 200,
+                    RestoreEasing = Easing.OutQuint
+                });
+
+                ssv2Expanded = true;
+            }
+        }
+
+        #endregion
 
         private partial class MobileDisclaimerDialog : PopupDialog
         {

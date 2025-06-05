@@ -34,16 +34,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 osuHeader.Dropdown = this;
                 osuHeader.LeftSideLabel = label;
             }
-        }
 
-        protected override void Update()
-        {
-            base.Update();
-
-            var header = (ShearedDropdownHeader)Header;
-            var menu = (ShearedDropdownMenu)Menu;
-
-            menu.Padding = new MarginPadding { Left = header.LabelContainer.DrawWidth - 10f, Right = 6f };
+            AddInternal(new HoverClickSounds());
         }
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
@@ -62,16 +54,15 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         protected partial class ShearedDropdownMenu : OsuDropdown<T>.OsuDropdownMenu
         {
-            public new MarginPadding Padding
-            {
-                get => base.Padding;
-                set => base.Padding = value;
-            }
-
             public ShearedDropdownMenu()
             {
                 Shear = OsuGame.SHEAR;
                 Margin = new MarginPadding { Top = 5f };
+                Padding = new MarginPadding
+                {
+                    Left = -6f,
+                    Right = 6f
+                };
             }
 
             protected override DrawableDropdownMenuItem CreateDrawableDropdownMenuItem(MenuItem item) => new ShearedMenuItem(item)
@@ -92,8 +83,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         public partial class ShearedDropdownHeader : DropdownHeader
         {
-            private const float corner_radius = 5f;
-
             private LocalisableString label;
 
             protected override LocalisableString Label
@@ -127,7 +116,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             public ShearedDropdownHeader()
             {
                 Shear = OsuGame.SHEAR;
-                CornerRadius = corner_radius;
+                CornerRadius = ShearedButton.CORNER_RADIUS;
                 Masking = true;
 
                 Foreground.Children = new Drawable[]
@@ -148,7 +137,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
                             {
                                 LabelContainer = new Container
                                 {
-                                    CornerRadius = corner_radius,
+                                    Depth = float.MaxValue,
+                                    CornerRadius = ShearedButton.CORNER_RADIUS,
                                     Masking = true,
                                     AutoSizeAxes = Axes.Both,
                                     Children = new Drawable[]
@@ -159,8 +149,13 @@ namespace osu.Game.Graphics.UserInterfaceV2
                                         },
                                         labelText = new OsuSpriteText
                                         {
-                                            Margin = new MarginPadding { Horizontal = 10f, Vertical = 8f },
-                                            Font = OsuFont.Torus.With(size: 16.8f, weight: FontWeight.SemiBold),
+                                            Margin = new MarginPadding
+                                            {
+                                                Horizontal = 10f,
+                                                // Chosen specifically so the height of these dropdowns matches ShearedToggleButton (30).
+                                                Vertical = 7f
+                                            },
+                                            Font = OsuFont.Style.Body.With(weight: FontWeight.SemiBold),
                                             Shear = -OsuGame.SHEAR,
                                         },
                                     },
@@ -180,7 +175,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                                             Anchor = Anchor.CentreLeft,
                                             Origin = Anchor.CentreLeft,
                                             Padding = new MarginPadding { Right = 15f },
-                                            Font = OsuFont.Torus.With(size: 16.8f, weight: FontWeight.SemiBold),
+                                            Font = OsuFont.Style.Body,
                                             RelativeSizeAxes = Axes.X,
                                         },
                                         chevron = new SpriteIcon
@@ -197,8 +192,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
                         }
                     },
                 };
-
-                AddInternal(LabelContainer.CreateProxy());
             }
 
             [BackgroundDependencyLoader]
@@ -223,7 +216,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 searchBar.Padding = new MarginPadding { Left = LabelContainer.DrawWidth };
 
                 // By limiting the width we avoid this box showing up as an outline around the drawables that are on top of it.
-                Background.Padding = new MarginPadding { Left = LabelContainer.DrawWidth - corner_radius };
+                Background.Padding = new MarginPadding { Left = LabelContainer.DrawWidth - ShearedButton.CORNER_RADIUS };
             }
 
             protected override bool OnHover(HoverEvent e)

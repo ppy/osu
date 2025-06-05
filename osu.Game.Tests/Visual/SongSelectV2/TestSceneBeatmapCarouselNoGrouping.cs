@@ -5,8 +5,6 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
-using osu.Game.Graphics.Carousel;
-using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
 using osu.Game.Screens.SelectV2;
 using osuTK;
@@ -22,7 +20,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         {
             RemoveAllBeatmaps();
             CreateCarousel();
-            SortBy(new FilterCriteria { Sort = SortMode.Title });
         }
 
         /// <summary>
@@ -193,6 +190,58 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         }
 
         [Test]
+        public void TestSingleItemTraversal()
+        {
+            CheckNoSelection();
+            AddBeatmaps(1, 3);
+
+            WaitForSelection(0, 0);
+            CheckActivationCount(0);
+
+            SelectNextGroup();
+            WaitForSelection(0, 0);
+
+            // In the case of a grouped beatmap set, the header gets activated and re-selects the recommended difficulty.
+            // This is probably fine.
+            CheckActivationCount(1);
+            // We don't want it to request present though, which would start gameplay.
+            CheckRequestPresentCount(0);
+
+            SelectPrevGroup();
+            WaitForSelection(0, 0);
+
+            CheckActivationCount(1);
+            CheckRequestPresentCount(0);
+        }
+
+        [Test]
+        public void TestSingleItemTraversal_DifficultySplit()
+        {
+            SortBy(SortMode.Difficulty);
+
+            CheckNoSelection();
+            AddBeatmaps(1, 1);
+
+            WaitForSelection(0, 0);
+            CheckActivationCount(0);
+
+            SelectNextGroup();
+            WaitForSelection(0, 0);
+
+            // In the case of a grouped beatmap set, the header gets activated and re-selects the recommended difficulty.
+            // This is probably fine.
+            CheckActivationCount(0);
+            // We don't want it to request present though, which would start gameplay.
+            CheckRequestPresentCount(0);
+
+            SelectPrevGroup();
+            WaitForSelection(0, 0);
+
+            CheckActivationCount(0);
+            CheckRequestPresentCount(0);
+        }
+
+        [Test]
         public void TestEmptyTraversal()
         {
             SelectNextPanel();
@@ -216,26 +265,106 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             AddAssert("no beatmaps visible", () => !GetVisiblePanels<PanelBeatmap>().Any());
 
-            // Clicks just above the first group panel should not actuate any action.
-            ClickVisiblePanelWithOffset<PanelBeatmapSet>(0, new Vector2(0, -(PanelBeatmapSet.HEIGHT / 2 + 1)));
+            ClickVisiblePanelWithOffset<PanelBeatmapSet>(0, new Vector2(0, -(PanelBeatmapSet.HEIGHT / 2 + BeatmapCarousel.SPACING + 1)));
 
             AddAssert("no beatmaps visible", () => !GetVisiblePanels<PanelBeatmap>().Any());
 
-            ClickVisiblePanelWithOffset<PanelBeatmapSet>(0, new Vector2(0, -(PanelBeatmapSet.HEIGHT / 2)));
+            // add lenience to avoid floating-point inaccuracies at edge.
+            ClickVisiblePanelWithOffset<PanelBeatmapSet>(0, new Vector2(0, -(PanelBeatmapSet.HEIGHT / 2 - 1)));
 
             AddUntilStep("wait for beatmaps visible", () => GetVisiblePanels<PanelBeatmap>().Any());
             WaitForSelection(0, 0);
 
             // Beatmap panels expand their selection area to cover holes from spacing.
-            ClickVisiblePanelWithOffset<PanelBeatmap>(1, new Vector2(0, -(CarouselItem.DEFAULT_HEIGHT / 2 + 1)));
+            ClickVisiblePanelWithOffset<PanelBeatmap>(0, new Vector2(0, -(PanelBeatmap.HEIGHT / 2 + 1)));
             WaitForSelection(0, 0);
 
-            // Panels with higher depth will handle clicks in the gutters for simplicity.
-            ClickVisiblePanelWithOffset<PanelBeatmap>(2, new Vector2(0, (CarouselItem.DEFAULT_HEIGHT / 2 + 1)));
+            ClickVisiblePanelWithOffset<PanelBeatmap>(2, new Vector2(0, (PanelBeatmap.HEIGHT / 2 + 1)));
             WaitForSelection(0, 2);
 
-            ClickVisiblePanelWithOffset<PanelBeatmap>(3, new Vector2(0, (CarouselItem.DEFAULT_HEIGHT / 2 + 1)));
+            ClickVisiblePanelWithOffset<PanelBeatmap>(2, new Vector2(0, -(PanelBeatmap.HEIGHT / 2 + 1)));
+            WaitForSelection(0, 2);
+
+            ClickVisiblePanelWithOffset<PanelBeatmap>(3, new Vector2(0, (PanelBeatmap.HEIGHT / 2 + 1)));
             WaitForSelection(0, 3);
+        }
+
+        [Test]
+        public void TestDifficultySortingWithNoGroups()
+        {
+            AddBeatmaps(2, 3);
+            WaitForDrawablePanels();
+
+            SortAndGroupBy(SortMode.Difficulty, GroupMode.None);
+            WaitForFiltering();
+
+            AddUntilStep("standalone panels displayed", () => GetVisiblePanels<PanelBeatmapStandalone>().Any());
+
+            SelectNextGroup();
+            // both sets have a difficulty with 0.00* star rating.
+            // in the case of a tie when sorting, the first tie-breaker is `DateAdded` descending, which will pick the last set added (see `TestResources.CreateTestBeatmapSetInfo()`).
+            WaitForSelection(1, 0);
+
+            SelectNextGroup();
+            WaitForSelection(0, 0);
+
+            SelectNextPanel();
+            Select();
+            WaitForSelection(1, 1);
+        }
+
+        [Test]
+        public void TestPanelChangesFromStandaloneToNormal()
+        {
+            AddBeatmaps(1, 3);
+            WaitForDrawablePanels();
+
+            SortBy(SortMode.Difficulty);
+            WaitForFiltering();
+
+            AddUntilStep("standalone panels displayed", () => GetVisiblePanels<PanelBeatmapStandalone>().Count(), () => Is.EqualTo(3));
+
+            WaitForSelection(0, 0);
+
+            SortBy(SortMode.Title);
+
+            AddUntilStep("set panel displayed", () => GetVisiblePanels<PanelBeatmapSet>().Count(), () => Is.EqualTo(1));
+            AddUntilStep("normal panels displayed", () => GetVisiblePanels<PanelBeatmap>().Count(), () => Is.EqualTo(3));
+            AddUntilStep("standalone panels not displayed", () => GetVisiblePanels<PanelBeatmapStandalone>().Count(), () => Is.EqualTo(0));
+        }
+
+        [Test]
+        public void TestRecommendedSelection()
+        {
+            AddBeatmaps(5, 3);
+            WaitForDrawablePanels();
+
+            AddStep("set recommendation algorithm", () => BeatmapRecommendationFunction = beatmaps => beatmaps.Last());
+
+            SelectPrevGroup();
+
+            // check recommended was selected
+            SelectNextGroup();
+            WaitForSelection(0, 2);
+
+            // change away from recommended
+            SelectPrevPanel();
+            Select();
+            WaitForSelection(0, 1);
+
+            // next set, check recommended
+            SelectNextGroup();
+            WaitForSelection(1, 2);
+
+            // next set, check recommended
+            SelectNextGroup();
+            WaitForSelection(2, 2);
+
+            // go back to first set and ensure user selection was retained
+            // todo: we don't do that yet. not sure if we will continue to have this.
+            // SelectPrevGroup();
+            // SelectPrevGroup();
+            // WaitForSelection(0, 1);
         }
 
         private void checkSelectionIterating(bool isIterating)

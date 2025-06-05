@@ -24,6 +24,11 @@ namespace osu.Game.Beatmaps.Drawables
         /// </summary>
         public bool ShowUnknownStatus { get; init; }
 
+        /// <summary>
+        /// Whether changing status performs transition transforms.
+        /// </summary>
+        public bool Animated { get; init; } = true;
+
         public BeatmapOnlineStatus Status
         {
             get => status;
@@ -98,9 +103,11 @@ namespace osu.Game.Beatmaps.Drawables
 
         private void updateState()
         {
+            double duration = Animated ? animation_duration : 0;
+
             if (Status == BeatmapOnlineStatus.None && !ShowUnknownStatus)
             {
-                this.FadeOut(animation_duration, Easing.OutQuint);
+                this.FadeOut(duration, Easing.OutQuint);
                 return;
             }
 
@@ -109,15 +116,16 @@ namespace osu.Game.Beatmaps.Drawables
             // after we have a valid size.
             if (Height > 0)
             {
-                AutoSizeDuration = (float)animation_duration;
+                AutoSizeDuration = (float)duration;
                 AutoSizeEasing = Easing.OutQuint;
             }
 
-            this.FadeIn(animation_duration, Easing.OutQuint);
+            this.FadeIn(duration, Easing.OutQuint);
 
             // Handle the case where transition from hidden to non-hidden may cause
             // a fade from a colour that doesn't make sense (due to not being able to see the previous colour).
-            double duration = Alpha > 0 ? animation_duration : 0;
+            if (Alpha == 0)
+                duration = 0;
 
             Color4 statusTextColour;
 

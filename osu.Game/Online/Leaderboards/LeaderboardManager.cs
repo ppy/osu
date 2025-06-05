@@ -5,10 +5,10 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Extensions;
@@ -30,8 +30,6 @@ namespace osu.Game.Online.Leaderboards
         public LeaderboardCriteria? CurrentCriteria { get; private set; }
 
         private IDisposable? localScoreSubscription;
-        private TaskCompletionSource<LeaderboardScores?>? localFetchCompletionSource;
-        private TaskCompletionSource<LeaderboardScores?>? lastFetchCompletionSource;
         private GetScoresRequest? inFlightOnlineRequest;
 
         [Resolved]
@@ -43,55 +41,70 @@ namespace osu.Game.Online.Leaderboards
         [Resolved]
         private RulesetStore rulesets { get; set; } = null!;
 
-        public Task<LeaderboardScores?> FetchWithCriteriaAsync(LeaderboardCriteria newCriteria)
+        /// <summary>
+        /// Fetch leaderboard content with the new criteria specified in the background.
+        /// On completion, <see cref="Scores"/> will be updated with the results from this call (unless a more recent call with a different criteria has completed).
+        /// </summary>
+        public void FetchWithCriteria(LeaderboardCriteria newCriteria, bool forceRefresh = false)
         {
-            if (CurrentCriteria?.Equals(newCriteria) == true && lastFetchCompletionSource?.Task.IsFaulted == false)
-                return lastFetchCompletionSource?.Task ?? Task.FromResult(Scores.Value);
+            if (!forceRefresh && CurrentCriteria?.Equals(newCriteria) == true && scores.Value?.FailState == null)
+                return;
 
             CurrentCriteria = newCriteria;
             localScoreSubscription?.Dispose();
             inFlightOnlineRequest?.Cancel();
-            lastFetchCompletionSource?.TrySetCanceled();
             scores.Value = null;
 
             if (newCriteria.Beatmap == null || newCriteria.Ruleset == null)
-                return Task.FromResult<LeaderboardScores?>(scores.Value = LeaderboardScores.Failure(LeaderboardFailState.NoneSelected));
+            {
+                scores.Value = LeaderboardScores.Failure(LeaderboardFailState.NoneSelected);
+                return;
+            }
 
             switch (newCriteria.Scope)
             {
                 case BeatmapLeaderboardScope.Local:
                 {
-                    // this task completion source will be marked completed in the `localScoresChanged()` below.
-                    // yes it's twisty, but such are the costs of trying to reconcile data-push / subscription and data-pull / explicit fetch flows.
-                    lastFetchCompletionSource = localFetchCompletionSource = new TaskCompletionSource<LeaderboardScores?>();
                     localScoreSubscription = realm.RegisterForNotifications(r =>
                         r.All<ScoreInfo>().Filter($"{nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.ID)} == $0"
                                                   + $" AND {nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.Hash)} == {nameof(ScoreInfo.BeatmapHash)}"
                                                   + $" AND {nameof(ScoreInfo.Ruleset)}.{nameof(RulesetInfo.ShortName)} == $1"
                                                   + $" AND {nameof(ScoreInfo.DeletePending)} == false"
                             , newCriteria.Beatmap.ID, newCriteria.Ruleset.ShortName), localScoresChanged);
-                    return localFetchCompletionSource.Task;
+                    return;
                 }
 
                 default:
                 {
                     if (!api.IsLoggedIn)
-                        return Task.FromResult<LeaderboardScores?>(scores.Value = LeaderboardScores.Failure(LeaderboardFailState.NotLoggedIn));
+                    {
+                        scores.Value = LeaderboardScores.Failure(LeaderboardFailState.NotLoggedIn);
+                        return;
+                    }
 
                     if (!newCriteria.Ruleset.IsLegacyRuleset())
-                        return Task.FromResult<LeaderboardScores?>(scores.Value = LeaderboardScores.Failure(LeaderboardFailState.RulesetUnavailable));
+                    {
+                        scores.Value = LeaderboardScores.Failure(LeaderboardFailState.RulesetUnavailable);
+                        return;
+                    }
 
                     if (newCriteria.Beatmap.OnlineID <= 0 || newCriteria.Beatmap.Status <= BeatmapOnlineStatus.Pending)
-                        return Task.FromResult<LeaderboardScores?>(scores.Value = LeaderboardScores.Failure(LeaderboardFailState.BeatmapUnavailable));
+                    {
+                        scores.Value = LeaderboardScores.Failure(LeaderboardFailState.BeatmapUnavailable);
+                        return;
+                    }
 
                     if ((newCriteria.Scope.RequiresSupporter(newCriteria.ExactMods != null)) && !api.LocalUser.Value.IsSupporter)
-                        return Task.FromResult<LeaderboardScores?>(scores.Value = LeaderboardScores.Failure(LeaderboardFailState.NotSupporter));
+                    {
+                        scores.Value = LeaderboardScores.Failure(LeaderboardFailState.NotSupporter);
+                        return;
+                    }
 
                     if (newCriteria.Scope == BeatmapLeaderboardScope.Team && api.LocalUser.Value.Team == null)
-                        return Task.FromResult<LeaderboardScores?>(scores.Value = LeaderboardScores.Failure(LeaderboardFailState.NoTeam));
-
-                    var onlineFetchCompletionSource = new TaskCompletionSource<LeaderboardScores?>();
-                    lastFetchCompletionSource = onlineFetchCompletionSource;
+                    {
+                        scores.Value = LeaderboardScores.Failure(LeaderboardFailState.NoTeam);
+                        return;
+                    }
 
                     IReadOnlyList<Mod>? requestMods = null;
 
@@ -112,16 +125,29 @@ namespace osu.Game.Online.Leaderboards
 
                         var result = LeaderboardScores.Success
                         (
-                            response.Scores.Select(s => s.ToScoreInfo(rulesets, newCriteria.Beatmap)).OrderByTotalScore(),
+                            response.Scores.Select(s => s.ToScoreInfo(rulesets, newCriteria.Beatmap))
+                                    .OrderByTotalScore()
+                                    .Select((s, idx) =>
+                                    {
+                                        s.Position = idx + 1;
+                                        return s;
+                                    })
+                                    .ToArray(),
+                            response.ScoresCount,
                             response.UserScore?.CreateScoreInfo(rulesets, newCriteria.Beatmap)
                         );
                         inFlightOnlineRequest = null;
-                        if (onlineFetchCompletionSource.TrySetResult(result))
-                            scores.Value = result;
+                        scores.Value = result;
                     };
-                    newRequest.Failure += _ => onlineFetchCompletionSource.TrySetResult(LeaderboardScores.Failure(LeaderboardFailState.NetworkFailure));
+                    newRequest.Failure += ex =>
+                    {
+                        Logger.Log($@"Failed to fetch leaderboards when displaying results: {ex}", LoggingTarget.Network);
+                        if (ex is not OperationCanceledException)
+                            scores.Value = LeaderboardScores.Failure(LeaderboardFailState.NetworkFailure);
+                    };
+
                     api.Queue(inFlightOnlineRequest = newRequest);
-                    return onlineFetchCompletionSource.Task;
+                    break;
                 }
             }
         }
@@ -156,13 +182,8 @@ namespace osu.Game.Online.Leaderboards
 
             newScores = newScores.Detach().OrderByTotalScore();
 
-            scores.Value = LeaderboardScores.Success(newScores, null);
-
-            if (localFetchCompletionSource != null && localFetchCompletionSource == lastFetchCompletionSource)
-            {
-                localFetchCompletionSource.SetResult(scores.Value);
-                localFetchCompletionSource = lastFetchCompletionSource = null;
-            }
+            var newScoresArray = newScores.ToArray();
+            scores.Value = LeaderboardScores.Success(newScoresArray, newScoresArray.Length, null);
         }
     }
 
@@ -175,7 +196,8 @@ namespace osu.Game.Online.Leaderboards
 
     public record LeaderboardScores
     {
-        public IEnumerable<ScoreInfo> TopScores { get; }
+        public ICollection<ScoreInfo> TopScores { get; }
+        public int TotalScores { get; }
         public ScoreInfo? UserScore { get; }
         public LeaderboardFailState? FailState { get; }
 
@@ -191,15 +213,16 @@ namespace osu.Game.Online.Leaderboards
             }
         }
 
-        private LeaderboardScores(IEnumerable<ScoreInfo> topScores, ScoreInfo? userScore, LeaderboardFailState? failState)
+        private LeaderboardScores(ICollection<ScoreInfo> topScores, int totalScores, ScoreInfo? userScore, LeaderboardFailState? failState)
         {
             TopScores = topScores;
+            TotalScores = totalScores;
             UserScore = userScore;
             FailState = failState;
         }
 
-        public static LeaderboardScores Success(IEnumerable<ScoreInfo> topScores, ScoreInfo? userScore) => new LeaderboardScores(topScores, userScore, null);
-        public static LeaderboardScores Failure(LeaderboardFailState failState) => new LeaderboardScores([], null, failState);
+        public static LeaderboardScores Success(ICollection<ScoreInfo> topScores, int totalScores, ScoreInfo? userScore) => new LeaderboardScores(topScores, totalScores, userScore, null);
+        public static LeaderboardScores Failure(LeaderboardFailState failState) => new LeaderboardScores([], 0, null, failState);
     }
 
     public enum LeaderboardFailState

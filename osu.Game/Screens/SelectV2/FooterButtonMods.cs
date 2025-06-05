@@ -14,6 +14,7 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
@@ -27,11 +28,14 @@ using osu.Game.Screens.Play.HUD;
 using osu.Game.Utils;
 using osuTK;
 using osuTK.Graphics;
+using osuTK.Input;
 
 namespace osu.Game.Screens.SelectV2
 {
     public partial class FooterButtonMods : ScreenFooterButton, IHasCurrentValue<IReadOnlyList<Mod>>
     {
+        public Action? RequestDeselectAllMods { get; init; }
+
         private const float bar_height = 30f;
         private const float mod_display_portion = 0.65f;
 
@@ -50,7 +54,7 @@ namespace osu.Game.Screens.SelectV2
         private ModDisplay modDisplay = null!;
         private OsuSpriteText modCountText = null!;
 
-        protected OsuSpriteText MultiplierText { get; private set; } = null!;
+        private OsuSpriteText multiplierText { get; set; } = null!;
 
         [Resolved]
         private OsuColour colours { get; set; } = null!;
@@ -79,7 +83,7 @@ namespace osu.Game.Screens.SelectV2
                     Depth = float.MaxValue,
                     Origin = Anchor.BottomLeft,
                     Shear = OsuGame.SHEAR,
-                    CornerRadius = CORNER_RADIUS,
+                    CornerRadius = Y_OFFSET,
                     Size = new Vector2(BUTTON_WIDTH, bar_height),
                     Masking = true,
                     EdgeEffect = new EdgeEffectParameters
@@ -104,7 +108,7 @@ namespace osu.Game.Screens.SelectV2
                             RelativeSizeAxes = Axes.Both,
                             Width = 1f - mod_display_portion,
                             Masking = true,
-                            Child = MultiplierText = new OsuSpriteText
+                            Child = multiplierText = new OsuSpriteText
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
@@ -115,7 +119,7 @@ namespace osu.Game.Screens.SelectV2
                         },
                         new Container
                         {
-                            CornerRadius = CORNER_RADIUS,
+                            CornerRadius = Y_OFFSET,
                             RelativeSizeAxes = Axes.Both,
                             Width = mod_display_portion,
                             Masking = true,
@@ -172,6 +176,18 @@ namespace osu.Game.Screens.SelectV2
             FinishTransforms(true);
         }
 
+        protected override bool OnMouseDown(MouseDownEvent e)
+        {
+            // should probably be OnClick but right mouse button clicks isn't setup well.
+            if (e.Button == MouseButton.Right)
+            {
+                RequestDeselectAllMods?.Invoke();
+                return true;
+            }
+
+            return base.OnMouseDown(e);
+        }
+
         private const double duration = 240;
         private const Easing easing = Easing.OutQuint;
 
@@ -221,14 +237,14 @@ namespace osu.Game.Screens.SelectV2
             }
 
             double multiplier = Current.Value?.Aggregate(1.0, (current, mod) => current * mod.ScoreMultiplier) ?? 1;
-            MultiplierText.Text = ModUtils.FormatScoreMultiplier(multiplier);
+            multiplierText.Text = ModUtils.FormatScoreMultiplier(multiplier);
 
             if (multiplier > 1)
-                MultiplierText.FadeColour(colours.Red1, duration, easing);
+                multiplierText.FadeColour(colours.Red1, duration, easing);
             else if (multiplier < 1)
-                MultiplierText.FadeColour(colours.Lime1, duration, easing);
+                multiplierText.FadeColour(colours.Lime1, duration, easing);
             else
-                MultiplierText.FadeColour(Color4.White, duration, easing);
+                multiplierText.FadeColour(Color4.White, duration, easing);
         }
 
         private partial class ModCountText : OsuSpriteText, IHasCustomTooltip<IReadOnlyList<Mod>>
@@ -264,7 +280,7 @@ namespace osu.Game.Screens.SelectV2
                 private void load()
                 {
                     AutoSizeAxes = Axes.Both;
-                    CornerRadius = CORNER_RADIUS;
+                    CornerRadius = Y_OFFSET;
                     Masking = true;
 
                     InternalChildren = new Drawable[]
@@ -306,7 +322,7 @@ namespace osu.Game.Screens.SelectV2
                 Depth = float.MaxValue;
                 Origin = Anchor.BottomLeft;
                 Shear = OsuGame.SHEAR;
-                CornerRadius = CORNER_RADIUS;
+                CornerRadius = Y_OFFSET;
                 AutoSizeAxes = Axes.X;
                 Height = bar_height;
                 Masking = true;

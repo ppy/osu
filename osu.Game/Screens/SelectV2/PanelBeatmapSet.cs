@@ -1,19 +1,29 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
+using osu.Game.Collections;
+using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Carousel;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
+using osu.Game.Online.API;
 using osu.Game.Overlays;
+using osu.Game.Rulesets;
 using osuTK;
 
 namespace osu.Game.Screens.SelectV2
@@ -35,7 +45,22 @@ namespace osu.Game.Screens.SelectV2
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
         [Resolved]
+        private BeatmapSetOverlay? beatmapOverlay { get; set; }
+
+        [Resolved]
         private BeatmapManager beatmaps { get; set; } = null!;
+
+        [Resolved]
+        private ISongSelect? songSelect { get; set; }
+
+        [Resolved]
+        private OsuGame? game { get; set; }
+
+        [Resolved]
+        private IAPIProvider api { get; set; } = null!;
+
+        [Resolved]
+        private IBindable<RulesetInfo> ruleset { get; set; } = null!;
 
         public PanelBeatmapSet()
         {
@@ -55,7 +80,7 @@ namespace osu.Game.Screens.SelectV2
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Icon = FontAwesome.Solid.ChevronRight,
-                    Size = new Vector2(12),
+                    Size = new Vector2(8),
                     X = 1f,
                     Colour = colourProvider.Background5,
                 },
@@ -77,17 +102,17 @@ namespace osu.Game.Screens.SelectV2
                     {
                         titleText = new OsuSpriteText
                         {
-                            Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 22, italics: true),
+                            Font = OsuFont.Style.Heading1.With(typeface: Typeface.TorusAlternate),
                         },
                         artistText = new OsuSpriteText
                         {
-                            Font = OsuFont.GetFont(weight: FontWeight.SemiBold, size: 17, italics: true),
+                            Font = OsuFont.Style.Body.With(weight: FontWeight.SemiBold),
                         },
                         new FillFlowContainer
                         {
                             Direction = FillDirection.Horizontal,
                             AutoSizeAxes = Axes.Both,
-                            Margin = new MarginPadding { Top = 5f },
+                            Margin = new MarginPadding { Top = 4f },
                             Children = new Drawable[]
                             {
                                 updateButton = new PanelUpdateBeatmapButton
@@ -100,9 +125,9 @@ namespace osu.Game.Screens.SelectV2
                                 {
                                     Origin = Anchor.CentreLeft,
                                     Anchor = Anchor.CentreLeft,
-                                    TextSize = 11,
-                                    TextPadding = new MarginPadding { Horizontal = 8, Vertical = 2 },
+                                    TextSize = OsuFont.Style.Caption2.Size,
                                     Margin = new MarginPadding { Right = 5f },
+                                    Animated = false,
                                 },
                                 difficultiesDisplay = new DifficultySpectrumDisplay
                                 {
@@ -163,6 +188,104 @@ namespace osu.Game.Screens.SelectV2
             background.Beatmap = null;
             updateButton.BeatmapSet = null;
             difficultiesDisplay.BeatmapSet = null;
+        }
+
+        [Resolved]
+        private RealmAccess realm { get; set; } = null!;
+
+        [Resolved]
+        private ManageCollectionsDialog? manageCollectionsDialog { get; set; }
+
+        public override MenuItem[] ContextMenuItems
+        {
+            get
+            {
+                if (Item == null)
+                    return Array.Empty<MenuItem>();
+
+                var beatmapSet = (BeatmapSetInfo)Item.Model;
+
+                List<MenuItem> items = new List<MenuItem>();
+
+                if (!Expanded.Value)
+                {
+                    items.Add(new OsuMenuItem("Expand", MenuItemType.Highlighted, () => TriggerClick()));
+                    items.Add(new OsuMenuItemSpacer());
+                }
+
+                if (beatmapSet.OnlineID > 0)
+                {
+                    items.Add(new OsuMenuItem("Details...", MenuItemType.Standard, () => beatmapOverlay?.FetchAndShowBeatmapSet(beatmapSet.OnlineID)));
+
+                    if (beatmapSet.GetOnlineURL(api, ruleset.Value) is string url)
+                        items.Add(new OsuMenuItem(CommonStrings.CopyLink, MenuItemType.Standard, () => game?.CopyToClipboard(url)));
+
+                    items.Add(new OsuMenuItemSpacer());
+                }
+
+                var collectionItems = realm.Realm.All<BeatmapCollection>()
+                                           .OrderBy(c => c.Name)
+                                           .AsEnumerable()
+                                           .Select(createCollectionMenuItem)
+                                           .ToList();
+
+                if (manageCollectionsDialog != null)
+                    collectionItems.Add(new OsuMenuItem("Manage...", MenuItemType.Standard, manageCollectionsDialog.Show));
+
+                items.Add(new OsuMenuItem("Collections") { Items = collectionItems });
+
+                if (beatmapSet.Beatmaps.Any(b => b.Hidden))
+                    items.Add(new OsuMenuItem("Restore all hidden", MenuItemType.Standard, () => songSelect?.RestoreAllHidden(beatmapSet)));
+
+                items.Add(new OsuMenuItem("Delete...", MenuItemType.Destructive, () => songSelect?.Delete(beatmapSet)));
+                return items.ToArray();
+            }
+        }
+
+        private MenuItem createCollectionMenuItem(BeatmapCollection collection)
+        {
+            var beatmapSet = (BeatmapSetInfo)Item!.Model;
+
+            Debug.Assert(beatmapSet != null);
+
+            TernaryState state;
+
+            int countExisting = beatmapSet.Beatmaps.Count(b => collection.BeatmapMD5Hashes.Contains(b.MD5Hash));
+
+            if (countExisting == beatmapSet.Beatmaps.Count)
+                state = TernaryState.True;
+            else if (countExisting > 0)
+                state = TernaryState.Indeterminate;
+            else
+                state = TernaryState.False;
+
+            var liveCollection = collection.ToLive(realm);
+
+            return new TernaryStateToggleMenuItem(collection.Name, MenuItemType.Standard, s =>
+            {
+                liveCollection.PerformWrite(c =>
+                {
+                    foreach (var b in beatmapSet.Beatmaps)
+                    {
+                        switch (s)
+                        {
+                            case TernaryState.True:
+                                if (c.BeatmapMD5Hashes.Contains(b.MD5Hash))
+                                    continue;
+
+                                c.BeatmapMD5Hashes.Add(b.MD5Hash);
+                                break;
+
+                            case TernaryState.False:
+                                c.BeatmapMD5Hashes.Remove(b.MD5Hash);
+                                break;
+                        }
+                    }
+                });
+            })
+            {
+                State = { Value = state }
+            };
         }
     }
 }

@@ -62,7 +62,7 @@ namespace osu.Game.Screens.Select.Leaderboards
             }
         }
 
-        private readonly Bindable<LeaderboardScores?> fetchedScores = new Bindable<LeaderboardScores?>();
+        private readonly IBindable<LeaderboardScores?> fetchedScores = new Bindable<LeaderboardScores?>();
 
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; } = null!;
@@ -82,8 +82,9 @@ namespace osu.Game.Screens.Select.Leaderboards
                 if (filterMods)
                     RefetchScores();
             };
-            ((IBindable<LeaderboardScores?>)fetchedScores).BindTo(leaderboardManager.Scores);
         }
+
+        private bool initialFetchComplete;
 
         protected override bool IsOnlineScope => Scope != BeatmapLeaderboardScope.Local;
 
@@ -92,28 +93,36 @@ namespace osu.Game.Screens.Select.Leaderboards
             var fetchBeatmapInfo = BeatmapInfo;
             var fetchRuleset = ruleset.Value ?? fetchBeatmapInfo?.Ruleset;
 
-            leaderboardManager.FetchWithCriteriaAsync(new LeaderboardCriteria(fetchBeatmapInfo, fetchRuleset, Scope, filterMods ? mods.Value.ToArray() : null))
-                              .ContinueWith(t =>
-                              {
-                                  if (t.Exception != null && !t.IsCanceled)
-                                  {
-                                      Schedule(() => SetErrorState(LeaderboardState.NetworkFailure));
-                                      return;
-                                  }
+            // Without this check, an initial fetch will be performed and clear global cache.
+            if (fetchBeatmapInfo == null)
+                return null;
 
-                                  fetchedScores.UnbindEvents();
-                                  fetchedScores.BindValueChanged(scores =>
-                                  {
-                                      if (scores.NewValue == null) return;
+            // For now, we forcefully refresh to keep things simple.
+            // In the future, removing this requirement may be deemed useful, but will need ample testing of edge case scenarios
+            // (like returning from gameplay after setting a new score, returning to song select after main menu).
+            leaderboardManager.FetchWithCriteria(new LeaderboardCriteria(fetchBeatmapInfo, fetchRuleset, Scope, filterMods ? mods.Value.Where(m => m.UserPlayable).ToArray() : null), forceRefresh: true);
 
-                                      if (scores.NewValue.FailState == null)
-                                          Schedule(() => SetScores(scores.NewValue.TopScores, scores.NewValue.UserScore));
-                                      else
-                                          Schedule(() => SetErrorState((LeaderboardState)scores.NewValue.FailState));
-                                  }, true);
-                              }, cancellationToken);
+            if (!initialFetchComplete)
+            {
+                // only bind this after the first fetch to avoid reading stale scores.
+                fetchedScores.BindTo(leaderboardManager.Scores);
+                fetchedScores.BindValueChanged(_ => updateScores(), true);
+                initialFetchComplete = true;
+            }
 
             return null;
+        }
+
+        private void updateScores()
+        {
+            var scores = fetchedScores.Value;
+
+            if (scores == null) return;
+
+            if (scores.FailState == null)
+                Schedule(() => SetScores(scores.TopScores, scores.UserScore));
+            else
+                Schedule(() => SetErrorState((LeaderboardState)scores.FailState));
         }
 
         protected override LeaderboardScore CreateDrawableScore(ScoreInfo model, int index) => new LeaderboardScore(model, index, IsOnlineScope, Scope != BeatmapLeaderboardScope.Friend)
