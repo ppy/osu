@@ -14,6 +14,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -192,33 +193,40 @@ namespace osu.Game.Screens.SelectV2
 
         private bool initialFetchComplete;
 
+        private ScheduledDelegate? refetchOperation;
+
         private void refetchScores()
         {
-            SetScores(Array.Empty<ScoreInfo>());
-
-            if (beatmap.IsDefault)
+            refetchOperation?.Cancel();
+            refetchOperation = Scheduler.AddDelayed(() =>
             {
-                SetState(LeaderboardState.NoneSelected);
-                return;
-            }
+                SetScores(Array.Empty<ScoreInfo>());
 
-            SetState(LeaderboardState.Retrieving);
+                if (beatmap.IsDefault)
+                {
+                    SetState(LeaderboardState.NoneSelected);
+                    return;
+                }
 
-            var fetchBeatmapInfo = beatmap.Value.BeatmapInfo;
-            var fetchRuleset = ruleset.Value ?? fetchBeatmapInfo.Ruleset;
+                SetState(LeaderboardState.Retrieving);
 
-            // For now, we forcefully refresh to keep things simple.
-            // In the future, removing this requirement may be deemed useful, but will need ample testing of edge case scenarios
-            // (like returning from gameplay after setting a new score, returning to song select after main menu).
-            leaderboardManager.FetchWithCriteria(new LeaderboardCriteria(fetchBeatmapInfo, fetchRuleset, Scope.Value, FilterBySelectedMods.Value ? mods.Value.ToArray() : null), forceRefresh: true);
+                var fetchBeatmapInfo = beatmap.Value.BeatmapInfo;
+                var fetchRuleset = ruleset.Value ?? fetchBeatmapInfo.Ruleset;
 
-            if (!initialFetchComplete)
-            {
-                // only bind this after the first fetch to avoid reading stale scores.
-                fetchedScores.BindTo(leaderboardManager.Scores);
-                fetchedScores.BindValueChanged(_ => updateScores(), true);
-                initialFetchComplete = true;
-            }
+                // For now, we forcefully refresh to keep things simple.
+                // In the future, removing this requirement may be deemed useful, but will need ample testing of edge case scenarios
+                // (like returning from gameplay after setting a new score, returning to song select after main menu).
+                leaderboardManager.FetchWithCriteria(new LeaderboardCriteria(fetchBeatmapInfo, fetchRuleset, Scope.Value, FilterBySelectedMods.Value ? mods.Value.ToArray() : null),
+                    forceRefresh: true);
+
+                if (!initialFetchComplete)
+                {
+                    // only bind this after the first fetch to avoid reading stale scores.
+                    fetchedScores.BindTo(leaderboardManager.Scores);
+                    fetchedScores.BindValueChanged(_ => updateScores(), true);
+                    initialFetchComplete = true;
+                }
+            }, initialFetchComplete ? 200 : 0);
         }
 
         private void updateScores()
