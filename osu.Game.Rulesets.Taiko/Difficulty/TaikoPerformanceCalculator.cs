@@ -56,8 +56,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
             estimatedUnstableRate = computeDeviationUpperBound() * 10;
 
-            // Effective miss count is calculated by raising the fraction of hits missed to a power based on the map's consistency factor
-            // This is because in less consistently difficult maps, each miss removes more of the map's total difficulty
+            // Effective miss count is calculated by raising the fraction of hits missed to a power based on the map's consistency factor.
+            // This is because in less consistently difficult maps, each miss removes more of the map's total difficulty.
             effectiveMissCount = totalHits * Math.Pow(
                 (double)countMiss / totalHits,
                 Math.Pow(taikoAttributes.ConsistencyFactor, 0.2)
@@ -102,7 +102,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             double lengthBonus = 1 + 0.1 * Math.Min(1.0, totalHits / 1500.0);
             difficultyValue *= lengthBonus;
 
-            // The penalty applied for each miss scales with the number of total hits, making misses more punishing on shorter maps than longer ones
+            // Scales miss penalty by the total hits of a map, making misses more punishing on maps with fewer objects.
             double missPenalty = Math.Pow(0.5, 30.0 / totalHits);
             difficultyValue *= Math.Pow(missPenalty, effectiveMissCount);
 
