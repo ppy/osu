@@ -330,7 +330,11 @@ namespace osu.Game.Screens.SelectV2
                                                             Origin = Anchor.CentreRight,
                                                             AutoSizeAxes = Axes.Both,
                                                             Direction = FillDirection.Horizontal,
-                                                            Children = getStatistics(score).Select(s => new ScoreComponentLabel(s, score)).ToList(),
+                                                            Children = new Drawable[]
+                                                            {
+                                                                new ScoreComponentLabel(BeatmapsetsStrings.ShowScoreboardHeadersCombo.ToUpper(), $"{score.MaxCombo.ToString()}x", score.MaxCombo == score.GetMaximumAchievableCombo(), 60),
+                                                                new ScoreComponentLabel(BeatmapsetsStrings.ShowScoreboardHeadersAccuracy.ToUpper(), score.DisplayAccuracy, score.Accuracy == 1, 55),
+                                                            },
                                                             Alpha = 0,
                                                         }
                                                     }
@@ -640,48 +644,50 @@ namespace osu.Game.Screens.SelectV2
 
         private partial class ScoreComponentLabel : Container
         {
-            private readonly (LocalisableString Name, LocalisableString Value) statisticInfo;
-            private readonly ScoreInfo score;
+            private readonly LocalisableString name;
+            private readonly LocalisableString value;
+            private readonly bool perfect;
+            private readonly float minWidth;
 
             private FillFlowContainer content = null!;
             public override bool Contains(Vector2 screenSpacePos) => content.Contains(screenSpacePos);
 
-            public ScoreComponentLabel((LocalisableString Name, LocalisableString Value) statisticInfo, ScoreInfo score)
+            public ScoreComponentLabel(LocalisableString name, LocalisableString value, bool perfect, float minWidth)
             {
-                this.statisticInfo = statisticInfo;
-                this.score = score;
+                this.name = name;
+                this.value = value;
+                this.perfect = perfect;
+                this.minWidth = minWidth;
             }
 
             [BackgroundDependencyLoader]
             private void load(OsuColour colours, OverlayColourProvider colourProvider)
             {
                 AutoSizeAxes = Axes.Both;
-                OsuSpriteText value;
                 Child = content = new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
                     Direction = FillDirection.Vertical,
-                    Children = new Drawable[]
+                    Children = new[]
                     {
                         new OsuSpriteText
                         {
                             Colour = colourProvider.Content2,
-                            Text = statisticInfo.Name,
+                            Text = name,
                             Font = OsuFont.Style.Caption2.With(weight: FontWeight.SemiBold),
                         },
-                        value = new OsuSpriteText
+                        new OsuSpriteText
                         {
                             // We don't want the value setting the horizontal size, since it leads to wonky accuracy container length,
                             // since the accuracy is sometimes longer than its name.
                             BypassAutoSizeAxes = Axes.X,
-                            Text = statisticInfo.Value,
+                            Text = value,
                             Font = OsuFont.Style.Body,
-                        }
+                            Colour = perfect ? colours.Lime1 : Color4.White,
+                        },
+                        Empty().With(d => d.Width = minWidth),
                     }
                 };
-
-                if (score.Combo != score.MaxCombo && statisticInfo.Name == BeatmapsetsStrings.ShowScoreboardHeadersCombo)
-                    value.Colour = colours.Lime1;
             }
         }
 
