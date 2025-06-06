@@ -447,7 +447,13 @@ namespace osu.Game.Screens.SelectV2
 
             // Debounce consideration is to avoid beatmap churn on key repeat selection.
             selectionDebounce?.Cancel();
-            selectionDebounce = Scheduler.AddDelayed(() => Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap), SELECTION_DEBOUNCE);
+            selectionDebounce = Scheduler.AddDelayed(() =>
+            {
+                if (Beatmap.Value.BeatmapInfo.Equals(beatmap))
+                    return;
+
+                Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap);
+            }, SELECTION_DEBOUNCE);
         }
 
         private bool ensureGlobalBeatmapValid()
