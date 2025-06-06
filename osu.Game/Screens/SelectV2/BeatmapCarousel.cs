@@ -119,8 +119,15 @@ namespace osu.Game.Screens.SelectV2
 
         #region Beatmap source hookup
 
-        private void beatmapSetsChanged(object? beatmaps, NotifyCollectionChangedEventArgs changed)
+        private void beatmapSetsChanged(object? beatmaps, NotifyCollectionChangedEventArgs changed) => Schedule(() =>
         {
+            // This callback is scheduled to ensure there's no added overhead during gameplay.
+            // If this ever becomes an issue, it's important to note that the actual carousel filtering is already
+            // implemented in a way it will only run when at song select.
+            //
+            // The overhead we are avoiding here is that of this method directly – things like Items.IndexOf calls
+            // that can be slow for very large beatmap libraries. There are definitely ways to optimise this further.
+
             // TODO: moving management of BeatmapInfo tracking to BeatmapStore might be something we want to consider.
             // right now we are managing this locally which is a bit of added overhead.
             IEnumerable<BeatmapSetInfo>? newItems = changed.NewItems?.Cast<BeatmapSetInfo>();
@@ -191,7 +198,7 @@ namespace osu.Game.Screens.SelectV2
                     Items.Clear();
                     break;
             }
-        }
+        });
 
         #endregion
 
