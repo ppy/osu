@@ -16,6 +16,7 @@ using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.UI;
 using osu.Game.Rulesets.UI;
+using osu.Game.Screens.Play;
 using osu.Game.Utils;
 
 namespace osu.Game.Rulesets.Taiko.Mods
@@ -71,7 +72,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
                 Reset();
             }
         }
-        
+
         protected DrawableTaikoHitObject? GetNextHitObject()
         {
             DrawableHitObject? hitObject = Playfield.HitObjectContainer.AliveObjects.FirstOrDefault(h => h.Result?.HasResult != true);
