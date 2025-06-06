@@ -166,6 +166,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected override void OnMouseUp(MouseUpEvent e)
         {
+            // Ensure that only left MouseUpEvents are considered when an object is being dragged.
             if (e.Button != MouseButton.Left)
                 return;
 
