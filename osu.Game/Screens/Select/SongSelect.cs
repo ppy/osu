@@ -918,7 +918,7 @@ namespace osu.Game.Screens.Select
         private void applyBlurToBackground(BackgroundScreenBeatmap backgroundModeBeatmap)
         {
             backgroundModeBeatmap.BlurAmount.Value = configBackgroundBlur.Value ? BACKGROUND_BLUR : 0f;
-            backgroundModeBeatmap.DimWhenUserSettingsIgnored.Value = configBackgroundDim.Value;
+            backgroundModeBeatmap.DimWhenUserSettingsIgnored.Value = configBackgroundBlur.Value ? 0f : configBackgroundDim.Value;
 
             wedgeBackground.FadeTo(configBackgroundBlur.Value ? 0.5f : 0.2f, UserDimContainer.BACKGROUND_FADE_DURATION, Easing.OutQuint);
         }
