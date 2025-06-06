@@ -3,6 +3,7 @@
 
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
@@ -12,6 +13,7 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -88,17 +90,24 @@ namespace osu.Game.Screens.SelectV2
                 private DrawableDate relativeDate = null!;
                 private FillFlowContainer statistics = null!;
 
+                private readonly Bindable<bool> prefer24HourTime = new Bindable<bool>();
+
                 [Resolved]
                 private OsuColour colours { get; set; } = null!;
 
                 [Resolved]
                 private OverlayColourProvider colourProvider { get; set; } = null!;
 
+                private ScoreInfo score = null!;
+
                 public ScoreInfo Score
                 {
+                    get => score;
                     set
                     {
-                        absoluteDate.Text = value.Date.ToLocalisableString(@"dd MMMM yyyy h:mm tt");
+                        score = value;
+
+                        updateAbsoluteDate();
                         relativeDate.Date = value.Date;
 
                         var judgementsStatistics = value.GetStatisticsForDisplay().Select(s =>
@@ -131,7 +140,7 @@ namespace osu.Game.Screens.SelectV2
                 }
 
                 [BackgroundDependencyLoader]
-                private void load()
+                private void load(OsuConfigManager configManager)
                 {
                     RelativeSizeAxes = Axes.X;
                     AutoSizeAxes = Axes.Y;
@@ -205,7 +214,19 @@ namespace osu.Game.Screens.SelectV2
                             },
                         },
                     };
+
+                    configManager.BindWith(OsuSetting.Prefer24HourTime, prefer24HourTime);
                 }
+
+                protected override void LoadComplete()
+                {
+                    base.LoadComplete();
+
+                    prefer24HourTime.BindValueChanged(_ => updateAbsoluteDate(), true);
+                }
+
+                private void updateAbsoluteDate()
+                    => absoluteDate.Text = score.Date.ToLocalTime().ToLocalisableString(prefer24HourTime.Value ? @"d MMMM yyyy HH:mm" : @"d MMMM yyyy h:mm tt");
             }
 
             private partial class StatisticRow : CompositeDrawable
