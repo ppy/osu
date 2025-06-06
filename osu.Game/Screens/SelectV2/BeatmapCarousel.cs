@@ -553,7 +553,7 @@ namespace osu.Game.Screens.SelectV2
             AddInternal(setPanelPool);
         }
 
-        protected override bool CheckModelEquality(object x, object y)
+        protected override bool CheckModelEquality(object? x, object? y)
         {
             // In the confines of the carousel logic, we assume that CurrentSelection (and all items) are using non-stale
             // BeatmapInfo reference, and that we can match based on beatmap / beatmapset (GU)IDs.
