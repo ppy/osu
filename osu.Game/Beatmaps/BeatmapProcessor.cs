@@ -3,6 +3,7 @@
 
 using System.Linq;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Screens.Edit;
 
 namespace osu.Game.Beatmaps
 {
@@ -13,9 +14,12 @@ namespace osu.Game.Beatmaps
     {
         public IBeatmap Beatmap { get; }
 
-        public BeatmapProcessor(IBeatmap beatmap)
+        protected HitObjectChangeHandler? ChangeHandler { get; }
+
+        public BeatmapProcessor(IBeatmap beatmap, HitObjectChangeHandler? changeHandler = null)
         {
             Beatmap = beatmap;
+            ChangeHandler = changeHandler;
         }
 
         public virtual void PreProcess()

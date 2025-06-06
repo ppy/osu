@@ -13,6 +13,7 @@ using osu.Game.Beatmaps.Legacy;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Screens.Edit;
 using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
@@ -29,15 +30,19 @@ namespace osu.Game.Beatmaps.Formats
 
         private readonly int onlineRulesetID;
 
+        private readonly bool changeHandlerMode;
+
         /// <summary>
         /// Creates a new <see cref="LegacyBeatmapEncoder"/>.
         /// </summary>
         /// <param name="beatmap">The beatmap to encode.</param>
         /// <param name="skin">The beatmap's skin, used for encoding combo colours.</param>
-        public LegacyBeatmapEncoder(IBeatmap beatmap, ISkin? skin)
+        /// <param name="changeHandlerMode">Whether to only encode the parts necessary for <see cref="BeatmapEditorChangeHandler"/></param>
+        public LegacyBeatmapEncoder(IBeatmap beatmap, ISkin? skin, bool changeHandlerMode = false)
         {
             this.beatmap = beatmap;
             this.skin = skin;
+            this.changeHandlerMode = changeHandlerMode;
 
             onlineRulesetID = beatmap.BeatmapInfo.Ruleset.OnlineID;
 
@@ -70,8 +75,11 @@ namespace osu.Game.Beatmaps.Formats
             writer.WriteLine();
             handleColours(writer);
 
-            writer.WriteLine();
-            handleHitObjects(writer);
+            if (!changeHandlerMode)
+            {
+                writer.WriteLine();
+                handleHitObjects(writer);
+            }
         }
 
         private void handleGeneral(TextWriter writer)
@@ -176,9 +184,12 @@ namespace osu.Game.Beatmaps.Formats
             // In that case, a scrolling speed change is a global effect and per-hit object difficulty control points are ignored.
             bool scrollSpeedEncodedAsSliderVelocity = onlineRulesetID == 1 || onlineRulesetID == 3;
 
-            // iterate over hitobjects and pull out all required sample and difficulty changes
-            extractDifficultyControlPoints(beatmap.HitObjects);
-            extractSampleControlPoints(beatmap.HitObjects);
+            if (!changeHandlerMode)
+            {
+                // iterate over hitobjects and pull out all required sample and difficulty changes
+                extractDifficultyControlPoints(beatmap.HitObjects);
+                extractSampleControlPoints(beatmap.HitObjects);
+            }
 
             if (scrollSpeedEncodedAsSliderVelocity)
             {

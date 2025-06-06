@@ -90,7 +90,10 @@ namespace osu.Game.Screens.Edit
 
         public BindableInt PreviewTime { get; }
 
-        private readonly IBeatmapProcessor beatmapProcessor;
+        private IBeatmapProcessor beatmapProcessor;
+
+        [CanBeNull]
+        private HitObjectChangeHandler changeHandler;
 
         private readonly Dictionary<HitObject, Bindable<double>> startTimeBindables = new Dictionary<HitObject, Bindable<double>>();
 
@@ -107,7 +110,7 @@ namespace osu.Game.Screens.Edit
                 BeatmapSkin.BeatmapSkinChanged += SaveState;
             }
 
-            beatmapProcessor = new EditorBeatmapProcessor(this, playableBeatmap.BeatmapInfo.Ruleset.CreateInstance());
+            beatmapProcessor = new EditorBeatmapProcessor(this, PlayableBeatmap.BeatmapInfo.Ruleset.CreateInstance());
 
             foreach (var obj in HitObjects)
                 trackStartTime(obj);
@@ -136,6 +139,12 @@ namespace osu.Game.Screens.Edit
             });
 
             BeatmapVersion = PlayableBeatmap.BeatmapVersion;
+        }
+
+        public void AddChangeHandler(HitObjectChangeHandler hitObjectChangeHandler)
+        {
+            changeHandler = hitObjectChangeHandler;
+            beatmapProcessor = new EditorBeatmapProcessor(this, PlayableBeatmap.BeatmapInfo.Ruleset.CreateInstance(), changeHandler);
         }
 
         /// <summary>
@@ -377,6 +386,7 @@ namespace osu.Game.Screens.Edit
         {
             // updates are debounced regardless of whether a batch is active.
             batchPendingUpdates.Add(hitObject);
+            changeHandler?.RecordUpdate(hitObject);
 
             updateInProgress.Value = true;
         }
@@ -387,7 +397,10 @@ namespace osu.Game.Screens.Edit
         public void UpdateAllHitObjects()
         {
             foreach (var h in HitObjects)
+            {
                 batchPendingUpdates.Add(h);
+                changeHandler?.RecordUpdate(h);
+            }
 
             updateInProgress.Value = true;
         }

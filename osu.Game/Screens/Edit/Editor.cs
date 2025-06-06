@@ -90,16 +90,7 @@ namespace osu.Game.Screens.Edit
 
         protected override bool PlayExitSound => !ExitConfirmed && !switchingDifficulty;
 
-        protected bool HasUnsavedChanges
-        {
-            get
-            {
-                if (!canSave)
-                    return false;
-
-                return lastSavedHash != changeHandler?.CurrentStateHash;
-            }
-        }
+        protected bool HasUnsavedChanges => lastSavedState != newChangeHandler.CurrentState;
 
         [Resolved]
         private BeatmapManager beatmapManager { get; set; }
@@ -163,7 +154,7 @@ namespace osu.Game.Screens.Edit
 
         private bool switchingDifficulty;
 
-        private string lastSavedHash;
+        private Guid lastSavedState;
         private EditorMenuItem discardChangesMenuItem;
 
         private ScreenContainer screenContainer;
@@ -183,6 +174,8 @@ namespace osu.Game.Screens.Edit
 
         [CanBeNull] // Should be non-null once it can support custom rulesets.
         private EditorChangeHandler changeHandler;
+
+        private HitObjectChangeHandler newChangeHandler;
 
         private DependencyContainer dependencies;
 
@@ -310,10 +303,19 @@ namespace osu.Game.Screens.Edit
                 dependencies.CacheAs<IEditorChangeHandler>(changeHandler);
             }
 
+            newChangeHandler = new HitObjectChangeHandler(editorBeatmap, changeHandler);
+            dependencies.CacheAs(newChangeHandler);
+            AddInternal(newChangeHandler);
+
+            // EditorBeatmap has a circular dependency on the change handler.
+            // In the future, the change handler should be a child of EditorBeatmap, so all changes are handled through EditorBeatmap.
+            editorBeatmap.AddChangeHandler(newChangeHandler);
+
             beatDivisor.SetArbitraryDivisor(editorBeatmap.BeatmapInfo.BeatDivisor);
             beatDivisor.BindValueChanged(divisor => editorBeatmap.BeatmapInfo.BeatDivisor = divisor.NewValue);
 
-            updateLastSavedHash();
+            updateLastSavedState();
+            changeHandler?.EnsureStateSaved();
 
             Schedule(() =>
             {
@@ -471,8 +473,8 @@ namespace osu.Game.Screens.Edit
                 }
             });
 
-            changeHandler?.CanUndo.BindValueChanged(v => undoMenuItem.Action.Disabled = !v.NewValue, true);
-            changeHandler?.CanRedo.BindValueChanged(v => redoMenuItem.Action.Disabled = !v.NewValue, true);
+            newChangeHandler.CanUndo.BindValueChanged(v => undoMenuItem.Action.Disabled = !v.NewValue, true);
+            newChangeHandler.CanRedo.BindValueChanged(v => redoMenuItem.Action.Disabled = !v.NewValue, true);
 
             editorBackgroundDim.BindValueChanged(_ => setUpBackground());
         }
@@ -601,7 +603,7 @@ namespace osu.Game.Screens.Edit
 
             // no longer new after first user-triggered save.
             isNewBeatmap = false;
-            updateLastSavedHash();
+            updateLastSavedState();
             onScreenDisplay?.Display(new BeatmapEditorToast(ToastStrings.BeatmapSaved, editorBeatmap.BeatmapInfo.GetDisplayTitle()));
             Saved?.Invoke();
             return true;
@@ -1014,9 +1016,9 @@ namespace osu.Game.Screens.Edit
 
         #endregion
 
-        protected void Undo() => changeHandler?.RestoreState(-1);
+        protected void Undo() => newChangeHandler.Undo();
 
-        protected void Redo() => changeHandler?.RestoreState(1);
+        protected void Redo() => newChangeHandler.Redo();
 
         protected void DiscardUnsavedChanges()
         {
@@ -1027,7 +1029,7 @@ namespace osu.Game.Screens.Edit
             // and therefore there's no guarantee that it even *has* the beatmap's last saved state in its history still.
             dialogOverlay.Push(new DiscardUnsavedChangesDialog(() =>
             {
-                updateLastSavedHash(); // without this a second dialog will show (the standard "save unsaved changes" one that shows on exit).
+                updateLastSavedState(); // without this a second dialog will show (the standard "save unsaved changes" one that shows on exit).
                 SwitchToDifficulty(editorBeatmap.BeatmapInfo);
             }));
         }
@@ -1265,9 +1267,9 @@ namespace osu.Game.Screens.Edit
                 clock.SeekForward(!trackPlaying, amount);
         }
 
-        private void updateLastSavedHash()
+        private void updateLastSavedState()
         {
-            lastSavedHash = changeHandler?.CurrentStateHash;
+            lastSavedState = newChangeHandler.CurrentState;
         }
 
         private IEnumerable<MenuItem> createFileMenuItems()
@@ -1448,7 +1450,7 @@ namespace osu.Game.Screens.Edit
                 // this is generally undesirable and also ends up leaving the user in a broken state.
                 // therefore, just update the last saved hash to make the exit flow think the deleted beatmap is not dirty,
                 // so that it will not show the save dialog on exit.
-                updateLastSavedHash();
+                updateLastSavedState();
 
                 beatmapManager.DeleteDifficultyImmediately(difficultyToDelete);
 
