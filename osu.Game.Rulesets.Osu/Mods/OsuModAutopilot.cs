@@ -81,7 +81,6 @@ namespace osu.Game.Rulesets.Osu.Mods
                     fieldPos = (slider.RepeatCount % 2 == 0)
                         ? sliderDrawable.Position + (pathEnd * sliderDrawable.Scale)
                         : slider.HeadCircle.Position;
-
                 }
 
                 lastHitInfo = (fieldPos, result.TimeAbsolute);
@@ -228,7 +227,6 @@ namespace osu.Game.Rulesets.Osu.Mods
                 double hitWindowEnd = start + spinner.Duration - hitwindow_end_offset;
 
                 double lifetimeStart = spinnerDrawable.Entry?.LifetimeStart ?? lastHitInfo.Time;
-
 
                 double duration = handleTime(hitWindowStart, hitWindowEnd, lifetimeStart);
 
