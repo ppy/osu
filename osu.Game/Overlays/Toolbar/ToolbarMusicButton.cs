@@ -16,6 +16,7 @@ using osu.Framework.Threading;
 using osu.Game.Input.Bindings;
 using osuTK.Graphics;
 using osuTK.Input;
+using static osu.Game.Audio.DecibelScaling;
 
 namespace osu.Game.Overlays.Toolbar
 {
@@ -78,7 +79,7 @@ namespace osu.Game.Overlays.Toolbar
             base.LoadComplete();
 
             globalVolume = audio.Volume.GetBoundCopy();
-            globalVolume.BindValueChanged(v => volumeBar.ResizeHeightTo((float)v.NewValue, 200, Easing.OutQuint), true);
+            globalVolume.BindValueChanged(v => volumeBar.ResizeHeightTo((float)((DecibelFromLinear(v.NewValue) - DB_MIN) / (DB_MAX - DB_MIN)), 200, Easing.OutQuint), true);
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)
