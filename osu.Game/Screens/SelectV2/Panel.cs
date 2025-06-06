@@ -69,6 +69,9 @@ namespace osu.Game.Screens.SelectV2
             get => accentColour;
             set
             {
+                if (value == accentColour)
+                    return;
+
                 accentColour = value;
                 updateAccentColour();
             }
