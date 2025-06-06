@@ -108,7 +108,7 @@ namespace osu.Game.Graphics.Carousel
             get => currentSelection.Model;
             set
             {
-                if (currentSelection.Model != value)
+                if (!CheckModelEquality(currentSelection.Model, value))
                 {
                     HandleItemSelected(value);
 
@@ -210,7 +210,7 @@ namespace osu.Game.Graphics.Carousel
         /// <summary>
         /// Check whether two models are the same for display purposes.
         /// </summary>
-        protected virtual bool CheckModelEquality(object x, object y) => ReferenceEquals(x, y);
+        protected virtual bool CheckModelEquality(object? x, object? y) => ReferenceEquals(x, y);
 
         /// <summary>
         /// Create a drawable for the given carousel item so it can be displayed.
