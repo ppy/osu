@@ -111,7 +111,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
             double accuracyValue = Math.Pow(70 / estimatedUnstableRate.Value, 1.1) * Math.Pow(attributes.StarRating, 0.4) * 100.0;
 
-            if (score.Mods.Any(m => m is ModHidden))
+            if (score.Mods.Any(m => m is ModHidden) && !isConvert)
                 accuracyValue *= 1.075;
 
             double lengthBonus = Math.Min(1.15, Math.Pow(totalHits / 1500.0, 0.3));
