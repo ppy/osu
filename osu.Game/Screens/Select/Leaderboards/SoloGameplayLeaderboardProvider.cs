@@ -40,12 +40,14 @@ namespace osu.Game.Screens.Select.Leaderboards
             if (globalScores != null)
             {
                 foreach (var topScore in globalScores.AllScores.OrderByTotalScore())
-                    newScores.Add(new GameplayLeaderboardScore(topScore, false));
+                {
+                    newScores.Add(new GameplayLeaderboardScore(topScore, false, GameplayLeaderboardScore.ComboDisplayMode.Highest));
+                }
             }
 
             if (gameplayState != null)
             {
-                var localScore = new GameplayLeaderboardScore(gameplayState.Score.ScoreInfo.User, gameplayState.ScoreProcessor, true)
+                var localScore = new GameplayLeaderboardScore(gameplayState, tracked: true, GameplayLeaderboardScore.ComboDisplayMode.Highest)
                 {
                     // Local score should always show lower than any existing scores in cases of ties.
                     TotalScoreTiebreaker = long.MaxValue
