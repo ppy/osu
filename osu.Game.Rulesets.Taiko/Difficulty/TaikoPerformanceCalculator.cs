@@ -63,21 +63,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             // Converts are detected and omitted from mod-specific bonuses due to the scope of current difficulty calculation.
             bool isConvert = score.BeatmapInfo!.Ruleset.OnlineID != 1;
 
-            double multiplier = 1.13;
-
-            if (score.Mods.Any(m => m is ModHidden) && !isConvert)
-                multiplier *= 1.075;
-
-            if (score.Mods.Any(m => m is ModEasy))
-                multiplier *= 0.950;
-
-            double difficultyValue = computeDifficultyValue(score, taikoAttributes);
-            double accuracyValue = computeAccuracyValue(score, taikoAttributes, isConvert);
-            double totalValue =
-                Math.Pow(
-                    Math.Pow(difficultyValue, 1.1) +
-                    Math.Pow(accuracyValue, 1.1), 1.0 / 1.1
-                ) * multiplier;
+            double difficultyValue = computeDifficultyValue(score, taikoAttributes) * 1.08;
+            double accuracyValue = computeAccuracyValue(score, taikoAttributes, isConvert) * 1.1;
 
             return new TaikoPerformanceAttributes
             {
@@ -85,7 +72,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 Accuracy = accuracyValue,
                 EffectiveMissCount = effectiveMissCount,
                 EstimatedUnstableRate = estimatedUnstableRate,
-                Total = totalValue
+                Total = difficultyValue + accuracyValue
             };
         }
 
@@ -101,11 +88,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
             difficultyValue *= Math.Pow(0.986, effectiveMissCount);
 
-            if (score.Mods.Any(m => m is ModEasy))
-                difficultyValue *= 0.90;
-
             if (score.Mods.Any(m => m is ModHidden))
-                difficultyValue *= 1.025;
+                difficultyValue *= 1.1;
 
             if (score.Mods.Any(m => m is ModFlashlight<TaikoHitObject>))
                 difficultyValue *= Math.Max(1, 1.050 - Math.Min(attributes.MonoStaminaFactor / 50, 1) * lengthBonus);
@@ -126,6 +110,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 return 0;
 
             double accuracyValue = Math.Pow(70 / estimatedUnstableRate.Value, 1.1) * Math.Pow(attributes.StarRating, 0.4) * 100.0;
+
+            if (score.Mods.Any(m => m is ModHidden))
+                accuracyValue *= 1.075;
 
             double lengthBonus = Math.Min(1.15, Math.Pow(totalHits / 1500.0, 0.3));
 
