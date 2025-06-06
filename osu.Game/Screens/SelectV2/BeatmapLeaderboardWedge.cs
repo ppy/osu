@@ -22,6 +22,7 @@ using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
+using osu.Game.Online.API;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Online.Placeholders;
 using osu.Game.Overlays;
@@ -59,6 +60,9 @@ namespace osu.Game.Screens.SelectV2
 
         [Resolved]
         private ISongSelect? songSelect { get; set; }
+
+        [Resolved]
+        private IAPIProvider api { get; set; } = null!;
 
         private Container<Placeholder> placeholderContainer = null!;
         private Placeholder? placeholder;
@@ -255,12 +259,22 @@ namespace osu.Game.Screens.SelectV2
                 return;
             }
 
-            LoadComponentsAsync(scores.Select((s, i) => new BeatmapLeaderboardScore(s)
+            LoadComponentsAsync(scores.Select((s, i) =>
             {
-                Rank = i + 1,
-                IsPersonalBest = s.OnlineID == userScore?.OnlineID,
-                SelectedMods = { BindTarget = mods },
-                Action = () => onLeaderboardScoreClicked(s),
+                BeatmapLeaderboardScore.HighlightType? highlightType = null;
+
+                if (s.OnlineID == userScore?.OnlineID)
+                    highlightType = BeatmapLeaderboardScore.HighlightType.Own;
+                else if (api.Friends.Any(r => r.TargetID == s.UserID) && Scope.Value != BeatmapLeaderboardScope.Friend)
+                    highlightType = BeatmapLeaderboardScore.HighlightType.Friend;
+
+                return new BeatmapLeaderboardScore(s)
+                {
+                    Rank = i + 1,
+                    Highlight = highlightType,
+                    SelectedMods = { BindTarget = mods },
+                    Action = () => onLeaderboardScoreClicked(s),
+                };
             }), loadedScores =>
             {
                 int delay = 200;
@@ -293,7 +307,7 @@ namespace osu.Game.Screens.SelectV2
                 personalBestDisplay.FadeIn(600, Easing.OutQuint);
                 personalBestScoreContainer.Child = new BeatmapLeaderboardScore(userScore)
                 {
-                    IsPersonalBest = true,
+                    Highlight = BeatmapLeaderboardScore.HighlightType.Own,
                     Rank = userScore.Position,
                     SelectedMods = { BindTarget = mods },
                     Action = () => onLeaderboardScoreClicked(userScore),
