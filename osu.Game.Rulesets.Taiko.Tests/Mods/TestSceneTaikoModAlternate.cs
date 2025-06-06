@@ -16,9 +16,9 @@ namespace osu.Game.Rulesets.Taiko.Tests.Mods
     public partial class TestSceneTaikoModAlternate : TaikoModTestScene
     {
         [Test]
-        public void TestInputAlternate() => CreateModTest(new ModTestData
+        public void TestInputAlternateHands() => CreateModTest(new ModTestData
         {
-            Mod = new TaikoModAlternate(),
+            Mod = new TaikoModAlternate { Style = { Value = TaikoModAlternate.Playstyle.AlternateHands } },
             Autoplay = false,
             CreateBeatmap = () => new Beatmap
             {
@@ -61,9 +61,9 @@ namespace osu.Game.Rulesets.Taiko.Tests.Mods
         });
 
         [Test]
-        public void TestInputSameKey([Values] bool alternateFingers) => CreateModTest(new ModTestData
+        public void TestInputSameKey([Values] TaikoModAlternate.Playstyle playstyle) => CreateModTest(new ModTestData
         {
-            Mod = new TaikoModAlternate { AlternateFingers = { Value = alternateFingers } },
+            Mod = new TaikoModAlternate { Style = { Value = playstyle } },
             Autoplay = false,
             CreateBeatmap = () => new Beatmap
             {
@@ -106,9 +106,9 @@ namespace osu.Game.Rulesets.Taiko.Tests.Mods
         });
 
         [Test]
-        public void TestInputIntro([Values] bool alternateFingers) => CreateModTest(new ModTestData
+        public void TestInputIntro([Values] TaikoModAlternate.Playstyle playstyle) => CreateModTest(new ModTestData
         {
-            Mod = new TaikoModAlternate { AlternateFingers = { Value = alternateFingers } },
+            Mod = new TaikoModAlternate { Style = { Value = playstyle } },
             Autoplay = false,
             CreateBeatmap = () => new Beatmap
             {
@@ -132,9 +132,9 @@ namespace osu.Game.Rulesets.Taiko.Tests.Mods
         });
 
         [Test]
-        public void TestInputStrong([Values] bool alternateFingers) => CreateModTest(new ModTestData
+        public void TestInputStrong([Values] TaikoModAlternate.Playstyle playstyle) => CreateModTest(new ModTestData
         {
-            Mod = new TaikoModAlternate { AlternateFingers = { Value = alternateFingers } },
+            Mod = new TaikoModAlternate { Style = { Value = playstyle } },
             Autoplay = false,
             CreateBeatmap = () => new Beatmap
             {
@@ -166,9 +166,9 @@ namespace osu.Game.Rulesets.Taiko.Tests.Mods
         });
 
         [Test]
-        public void TestInputSpecialObjects([Values] bool alternateFingers) => CreateModTest(new ModTestData
+        public void TestInputSpecialObjects([Values] TaikoModAlternate.Playstyle playstyle) => CreateModTest(new ModTestData
         {
-            Mod = new TaikoModAlternate { AlternateFingers = { Value = alternateFingers } },
+            Mod = new TaikoModAlternate { Style = { Value = playstyle } },
             Autoplay = false,
             CreateBeatmap = () => new Beatmap
             {
@@ -242,9 +242,9 @@ namespace osu.Game.Rulesets.Taiko.Tests.Mods
         });
 
         [Test]
-        public void TestInputBreaks([Values] bool alternateFingers) => CreateModTest(new ModTestData
+        public void TestInputBreaks([Values] TaikoModAlternate.Playstyle playstyle) => CreateModTest(new ModTestData
         {
-            Mod = new TaikoModAlternate { AlternateFingers = { Value = alternateFingers } },
+            Mod = new TaikoModAlternate { Style = { Value = playstyle } },
             Autoplay = false,
             CreateBeatmap = () => new Beatmap
             {
@@ -285,7 +285,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Mods
         {
             CreateModTest(new ModTestData
             {
-                Mod = new TaikoModAlternate { AlternateFingers = { Value = true } },
+                Mod = new TaikoModAlternate { Style = { Value = TaikoModAlternate.Playstyle.AlternateFingers } },
                 Autoplay = false,
                 CreateBeatmap = () => new Beatmap
                 {

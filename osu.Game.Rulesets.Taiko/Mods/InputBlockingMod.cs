@@ -71,7 +71,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
                 Reset();
             }
         }
-
+        
         protected DrawableTaikoHitObject? GetNextHitObject()
         {
             DrawableHitObject? hitObject = Playfield.HitObjectContainer.AliveObjects.FirstOrDefault(h => h.Result?.HasResult != true);

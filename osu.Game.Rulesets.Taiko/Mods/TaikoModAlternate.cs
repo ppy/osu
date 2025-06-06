@@ -4,10 +4,10 @@
 using osu.Framework.Localisation;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Game.Configuration;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.Objects.Drawables;
@@ -23,13 +23,13 @@ namespace osu.Game.Rulesets.Taiko.Mods
         public override double ScoreMultiplier => 1.0;
         public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(TaikoModSingleTap) }).ToArray();
 
-        [SettingSource("Alternate Fingers", "For ddkk or kkdd players who alternate fingers instead of hands.")]
-        public Bindable<bool> AlternateFingers { get; } = new BindableBool();
+        [SettingSource("Playstyle", "Preferred alternate playstyle")]
+        public Bindable<Playstyle> Style { get; } = new Bindable<Playstyle>();
 
         private Side? lastAcceptedSide;
         private TaikoAction? lastAcceptedAction;
 
-        private readonly Dictionary<Side, TaikoAction[]> sideActions = new Dictionary<Side, TaikoAction[]>()
+        private readonly Dictionary<Side, TaikoAction[]> sideActions = new Dictionary<Side, TaikoAction[]>
         {
             [Side.Left] = [TaikoAction.LeftCentre, TaikoAction.LeftRim],
             [Side.Right] = [TaikoAction.RightCentre, TaikoAction.RightRim],
@@ -41,9 +41,8 @@ namespace osu.Game.Rulesets.Taiko.Mods
             lastAcceptedAction = null;
         }
 
-        protected override bool CheckCorrectAction(TaikoAction action)
+        private bool shouldAltReset()
         {
-            // Some objects are traditionally ignore for alternating and thus allows you to reset your alternation pattern.
             bool altReset = false;
             TaikoHitObject? nextHitObject = GetNextHitObject()?.HitObject;
             TaikoHitObject? lastHitObject = getLastHitObject()?.HitObject;
@@ -57,39 +56,50 @@ namespace osu.Game.Rulesets.Taiko.Mods
             altReset |= nextHitObject is Swell or DrumRoll;
             altReset |= lastHitObject is Swell or DrumRoll;
 
-            if (altReset)
+            return altReset;
+        }
+
+        protected override bool CheckCorrectAction(TaikoAction action)
+        {
+            // Some objects are traditionally ignored for alternating and thus allows you to reset your alternation pattern.
+            if (shouldAltReset())
             {
-                lastAcceptedSide = null;
-                lastAcceptedAction = null;
+                Reset();
                 return true;
             }
 
-            // If there's no previous side, accept everything.
-            if (lastAcceptedSide == null)
+            // If there's no previous state, accept everything.
+            if (lastAcceptedSide == null || lastAcceptedAction == null)
             {
                 lastAcceptedSide = getSideForAction(action);
                 lastAcceptedAction = action;
                 return true;
             }
 
-            if (AlternateFingers.Value)
+            switch (Style.Value)
             {
-                if (action != lastAcceptedAction)
-                {
-                    lastAcceptedAction = action;
-                    return true;
-                }
-            }
-            else
-            {
-                Side targetSide = getOppositeSide(lastAcceptedSide.Value);
-                TaikoAction[] acceptableActions = sideActions[targetSide];
+                case Playstyle.AlternateFingers:
+                    if (action != lastAcceptedAction)
+                    {
+                        lastAcceptedSide = getSideForAction(action);
+                        lastAcceptedAction = action;
+                        return true;
+                    }
 
-                if (acceptableActions.Contains(action))
-                {
-                    lastAcceptedSide = targetSide;
-                    return true;
-                }
+                    break;
+
+                case Playstyle.AlternateHands:
+                    Side targetSide = getOppositeSide(lastAcceptedSide.Value);
+                    TaikoAction[] acceptableActions = sideActions[targetSide];
+
+                    if (acceptableActions.Contains(action))
+                    {
+                        lastAcceptedSide = targetSide;
+                        lastAcceptedAction = action;
+                        return true;
+                    }
+
+                    break;
             }
 
             return false;
@@ -102,12 +112,29 @@ namespace osu.Game.Rulesets.Taiko.Mods
         }
 
         private Side getSideForAction(TaikoAction action) => sideActions[Side.Left].Contains(action) ? Side.Left : Side.Right;
+        private Side getOppositeSide(Side side) => side == Side.Left ? Side.Right : Side.Left;
+
+        public enum Playstyle
+        {
+            /// <summary>
+            /// Each hand has a rim and a centre button, so alternating is done by changing hands.
+            /// Also known in community vernacular as "kddk".
+            /// </summary>
+            [Description(@"Alternate hands (""kddk"")")]
+            AlternateHands,
+
+            /// <summary>
+            /// One hand has both rim buttons and the other both centre buttons.
+            /// Alternating is done using fingers only.
+            /// Also known in community vernacular as "kkdd".
+            /// </summary>
+            [Description(@"Alternate fingers (""kkdd"")")]
+            AlternateFingers
+        }
 
         private enum Side
         {
             Left, Right
         }
-
-        private Side getOppositeSide(Side side) => side == Side.Left ? Side.Right : Side.Left;
     }
 }
