@@ -53,6 +53,9 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private (Vector2 Position, double Time) lastHitInfo = (default, 0);
 
+        // Clueless on how to set mouse position when fully initalized, I decided that I would set it during the first tick during the Update method. Not necessary, but nice to have.
+        private bool firstTick = true;
+
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
             // Grab the input manager to disable the user's cursor, and for future use
@@ -66,8 +69,8 @@ namespace osu.Game.Rulesets.Osu.Mods
             // We want to save the position and time when the HitObject was judged for movement calculations.
             playfield.NewResult += (drawableHitObject, result) =>
             {
-                Vector2 screenCenter = drawableHitObject.ScreenSpaceDrawQuad.Centre;
-                Vector2 fieldPos = playfield.ScreenSpaceToGamefield(screenCenter);
+                Vector2 mousePos = inputManager.CurrentState.Mouse.Position;
+                Vector2 fieldPos = playfield.ScreenSpaceToGamefield(mousePos);
 
                 if (drawableHitObject is DrawableSlider sliderDrawable)
                 {
@@ -80,18 +83,10 @@ namespace osu.Game.Rulesets.Osu.Mods
                     : slider.HeadCircle.Position;
 
                 }
-                else
-                {
-                    // fallback: centre of any other hit-object drawable
-                    screenCenter = drawableHitObject.ScreenSpaceDrawQuad.Centre;
-                    fieldPos = playfield.ScreenSpaceToGamefield(screenCenter);
-                }
 
                 lastHitInfo = (fieldPos, result.TimeAbsolute);
             };
         }
-
-        private bool firstTick = true;
 
         public void Update(Playfield playfield)
         {
@@ -102,11 +97,35 @@ namespace osu.Game.Rulesets.Osu.Mods
             if (nextObject == null)
                 return;
 
+            double start = nextObject.HitObject.StartTime;
+
+            // Reduce calculations during replay.
+            if (hasReplayLoaded.Value)
+            {
+                if (nextObject is DrawableSpinner replaySpinner)
+                {
+                    var spinner = replaySpinner.HitObject;
+                    replaySpinner.HandleUserInput = false;
+
+                    double elapsed = currentTime - start;
+
+                    // Don't start spinning until position is reached.
+                    if (elapsed >= 0)
+                    {
+                        double calculatedSpeed = 1.01 * (spinner.MaximumBonusSpins + spinner.SpinsRequiredForBonus) / spinner.Duration;
+                        double rate = calculatedSpeed / playfield.Clock.Rate;
+                        spinSpinner(replaySpinner, rate);
+                    }
+                }
+
+                return;
+            }
+
             // Set the mouse cursor on the first tick, then to be never used again during gameplay. :P
             if (firstTick)
             {
-                Vector2 screenStart = inputManager.CurrentState.Mouse.Position;
-                Vector2 fieldStart = playfield.ScreenSpaceToGamefield(screenStart);
+                Vector2 mousePos = inputManager.CurrentState.Mouse.Position;
+                Vector2 fieldStart = playfield.ScreenSpaceToGamefield(mousePos);
                 double timeStart = playfield.Clock.CurrentTime;
 
                 lastHitInfo = (fieldStart, timeStart);
@@ -121,8 +140,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             var target = nextObject.Position;
 
-            double start = nextObject.HitObject.StartTime;
-
             switch (nextObject)
             {
                 case DrawableSpinner spinnerDrawable:
@@ -130,7 +147,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                     return;
 
                 case DrawableSlider sliderDrawable:
-                    if (!sliderDrawable.HeadCircle.Judged || hasReplayLoaded.Value)
+                    if (!sliderDrawable.HeadCircle.Judged)
                         break;
 
                     var slider = sliderDrawable.HitObject;
@@ -150,9 +167,6 @@ namespace osu.Game.Rulesets.Osu.Mods
                     return;
             }
 
-            if (hasReplayLoaded.Value)
-                return;
-
             double hitWindowStart = start - mehWindow - hitwindow_start_offset;
             double hitWindowEnd = start + mehWindow - hitwindow_end_offset;
 
@@ -160,11 +174,12 @@ namespace osu.Game.Rulesets.Osu.Mods
                 ? lastHitInfo.Time
                 : nextObject.Entry.LifetimeStart;
 
-                // Compute how many ms remain for cursor movement toward the hit-object
-                double availableTime = handleTime(hitWindowStart, hitWindowEnd, lifetimeStart);
+            // Compute how many ms remain for cursor movement toward the hit-object
+            double availableTime = handleTime(hitWindowStart, hitWindowEnd, lifetimeStart);
 
             moveTowards(target, availableTime);
         }
+
 
         private double handleTime(double hitWindowStart, double hitWindowEnd, double lifetimeStart)
         {
@@ -200,14 +215,12 @@ namespace osu.Game.Rulesets.Osu.Mods
         private void handleSpinner(DrawableSpinner spinnerDrawable, double currentTime, double start)
         {
             var spinner = spinnerDrawable.HitObject;
-
-            spinnerDrawable.RotationTracker.Tracking = spinnerDrawable.RotationTracker.IsSpinnableTime;
             spinnerDrawable.HandleUserInput = false;
 
             double elapsed = currentTime - start;
 
             // Before spinner starts, move to position.
-            if (elapsed < 0 && !hasReplayLoaded.Value)
+            if (elapsed < 0)
             {
                 Vector2 spinnerTargetPosition = spinner.Position + new Vector2(
                     -(float)Math.Sin(0) * spinner_radius,
@@ -229,13 +242,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             double calculatedSpeed = 1.01 * (spinner.MaximumBonusSpins + spinner.SpinsRequiredForBonus) / spinner.Duration;
             double rate = calculatedSpeed / playfield.Clock.Rate;
-            double elapsedTime = playfield.Clock.ElapsedFrameTime;
 
-            // Automatically spin spinner.
-            spinnerDrawable.RotationTracker.AddRotation(float.RadiansToDegrees((float)elapsedTime * (float)rate * MathF.PI * 2.0f));
-
-            if (hasReplayLoaded.Value)
-                return;
+            spinSpinner(spinnerDrawable, rate);
 
             double angle = 2 * Math.PI * (elapsed * rate);
             Vector2 circPos = spinner.Position + new Vector2(
@@ -243,6 +251,19 @@ namespace osu.Game.Rulesets.Osu.Mods
                 -(float)Math.Cos(angle) * spinner_radius);
 
             applyCursor(circPos);
+        }
+
+        private void spinSpinner(DrawableSpinner spinnerDrawable, double rate)
+        {
+            var spinner = spinnerDrawable.HitObject;
+
+            spinnerDrawable.RotationTracker.Tracking = spinnerDrawable.RotationTracker.IsSpinnableTime;
+            spinnerDrawable.HandleUserInput = false;
+
+            double elapsedTime = playfield.Clock.ElapsedFrameTime;
+
+            // Automatically spin spinner.
+            spinnerDrawable.RotationTracker.AddRotation(float.RadiansToDegrees((float)elapsedTime * (float)rate * MathF.PI * 2.0f));
         }
 
         private void moveTowards(Vector2 target, double timeMs)
@@ -256,13 +277,13 @@ namespace osu.Game.Rulesets.Osu.Mods
             // Example: If the percentage of time is around 40%, the cursor should travel atleast 40% of the distance.
             float frac = (float)Math.Clamp(elapsed / timeMs, 0, 1);
 
-            // compute the new cursor position by Lerp
+            // Compute the new cursor position by Lerp
             Vector2 newPos = Vector2.Lerp(lastHitPosition, target, frac);
 
             float distanceToCursor = Vector2.Distance(lastHitPosition, newPos);
             float distanceToTarget = Vector2.Distance(lastHitPosition, target);
 
-            // if we’re effectively at (or beyond) the target, snap there
+            // If we’re effectively at (or beyond) the target, snap there
             if (frac >= 1 || distanceToCursor >= distanceToTarget)
                 newPos = target;
 
