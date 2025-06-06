@@ -79,8 +79,8 @@ namespace osu.Game.Rulesets.Osu.Mods
                     Vector2 pathEnd = slider.Path.PositionAt(1);
 
                     fieldPos = (slider.RepeatCount % 2 == 0)
-                    ? sliderDrawable.Position + (pathEnd * sliderDrawable.Scale)
-                    : slider.HeadCircle.Position;
+                        ? sliderDrawable.Position + (pathEnd * sliderDrawable.Scale)
+                        : slider.HeadCircle.Position;
 
                 }
 
@@ -170,16 +170,13 @@ namespace osu.Game.Rulesets.Osu.Mods
             double hitWindowStart = start - mehWindow - hitwindow_start_offset;
             double hitWindowEnd = start + mehWindow - hitwindow_end_offset;
 
-            double lifetimeStart = nextObject.Entry == null
-                ? lastHitInfo.Time
-                : nextObject.Entry.LifetimeStart;
+            double lifetimeStart = nextObject.Entry?.LifetimeStart ?? lastHitInfo.Time;
 
             // Compute how many ms remain for cursor movement toward the hit-object
             double availableTime = handleTime(hitWindowStart, hitWindowEnd, lifetimeStart);
 
             moveTowards(target, availableTime);
         }
-
 
         private double handleTime(double hitWindowStart, double hitWindowEnd, double lifetimeStart)
         {
@@ -189,7 +186,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             // If the hitobject doesn't appear during the time it was judged, the cursor will teleport.
             // So, we want to save the time when the hitobject first appears so the cursor can travel smoothly.
-            var lastJudgedTime = lastHitInfo.Time;
+            double lastJudgedTime = lastHitInfo.Time;
+
             if (lastHitInfo.Time < lifetimeStart)
             {
                 lastHitInfo.Time = lifetimeStart;
@@ -229,9 +227,8 @@ namespace osu.Game.Rulesets.Osu.Mods
                 double hitWindowStart = start - hitwindow_start_offset;
                 double hitWindowEnd = start + spinner.Duration - hitwindow_end_offset;
 
-                double lifetimeStart = spinnerDrawable.Entry == null
-                    ? lastHitInfo.Time
-                    : spinnerDrawable.Entry.LifetimeStart;
+                double lifetimeStart = spinnerDrawable.Entry?.LifetimeStart ?? lastHitInfo.Time;
+
 
                 double duration = handleTime(hitWindowStart, hitWindowEnd, lifetimeStart);
 
@@ -255,8 +252,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private void spinSpinner(DrawableSpinner spinnerDrawable, double rate)
         {
-            var spinner = spinnerDrawable.HitObject;
-
             spinnerDrawable.RotationTracker.Tracking = spinnerDrawable.RotationTracker.IsSpinnableTime;
             spinnerDrawable.HandleUserInput = false;
 
