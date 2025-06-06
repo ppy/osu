@@ -188,7 +188,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Mods
                     },
 
                     // Swell
-                    new Swell()
+                    new Swell
                     {
                         StartTime = 700,
                         EndTime = 900,
@@ -201,7 +201,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Mods
                     },
 
                     // Drumroll
-                    new DrumRoll()
+                    new DrumRoll
                     {
                         StartTime = 1100,
                         EndTime = 1400,
