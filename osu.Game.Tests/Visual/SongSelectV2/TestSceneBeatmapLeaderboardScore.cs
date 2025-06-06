@@ -66,10 +66,23 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
                 foreach (var scoreInfo in getTestScores())
                 {
+                    BeatmapLeaderboardScore.HighlightType? highlightType = null;
+
+                    switch (scoreInfo.User.Id)
+                    {
+                        case 2:
+                            highlightType = BeatmapLeaderboardScore.HighlightType.Own;
+                            break;
+
+                        case 1541390:
+                            highlightType = BeatmapLeaderboardScore.HighlightType.Friend;
+                            break;
+                    }
+
                     fillFlow.Add(new BeatmapLeaderboardScore(scoreInfo)
                     {
                         Rank = scoreInfo.Position,
-                        IsPersonalBest = scoreInfo.User.Id == 2,
+                        Highlight = highlightType,
                         Shear = Vector2.Zero,
                     });
                 }
@@ -104,10 +117,23 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
                 foreach (var scoreInfo in getTestScores())
                 {
+                    BeatmapLeaderboardScore.HighlightType? highlightType = null;
+
+                    switch (scoreInfo.User.Id)
+                    {
+                        case 2:
+                            highlightType = BeatmapLeaderboardScore.HighlightType.Own;
+                            break;
+
+                        case 1541390:
+                            highlightType = BeatmapLeaderboardScore.HighlightType.Friend;
+                            break;
+                    }
+
                     fillFlow.Add(new BeatmapLeaderboardScore(scoreInfo, sheared: false)
                     {
                         Rank = scoreInfo.Position,
-                        IsPersonalBest = scoreInfo.User.Id == 2,
+                        Highlight = highlightType,
                     });
                 }
 
