@@ -136,7 +136,6 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             IBindableList<GameplayLeaderboardScore> IGameplayLeaderboardProvider.Scores => Scores;
             public BindableList<GameplayLeaderboardScore> Scores { get; } = new BindableList<GameplayLeaderboardScore>();
-            public bool IsPartial { get; } = false;
 
             public TestGameplayLeaderboardProvider()
             {
@@ -147,8 +146,8 @@ namespace osu.Game.Tests.Visual.Gameplay
                         User = new APIUser { Username = $"User {i}" },
                         TotalScore = (20 - i) * 50_000,
                         Accuracy = i * 0.05,
-                        Combo = i * 50
-                    }, i == 19));
+                        MaxCombo = i * 50,
+                    }, i == 19, GameplayLeaderboardScore.ComboDisplayMode.Highest));
                 }
             }
         }
