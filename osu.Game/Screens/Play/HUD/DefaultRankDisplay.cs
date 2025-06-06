@@ -6,11 +6,13 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Audio;
+using osu.Game.Configuration;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
 using osuTK;
+using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Play.HUD
 {
@@ -18,6 +20,9 @@ namespace osu.Game.Screens.Play.HUD
     {
         [Resolved]
         private ScoreProcessor scoreProcessor { get; set; } = null!;
+
+        [SettingSource(typeof(DefaultRankDisplayStrings), nameof(DefaultRankDisplayStrings.PlaySamplesOnRankChange))]
+        public BindableBool PlaySamples { get; set; } = new BindableBool(true);
 
         public bool UsesFixedAnchor { get; set; }
 
@@ -55,7 +60,7 @@ namespace osu.Game.Screens.Play.HUD
             rank.BindValueChanged(r =>
             {
                 // Don't play rank-down sfx on quit/retry
-                if (r.NewValue != r.OldValue && r.NewValue > ScoreRank.F)
+                if (r.NewValue != r.OldValue && r.NewValue > ScoreRank.F && PlaySamples.Value)
                 {
                     if (r.NewValue > rankDisplay.Rank)
                         rankUpSample.Play();
