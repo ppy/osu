@@ -47,7 +47,14 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
                     LabelText = GameplaySettingsStrings.BackgroundBlur,
                     Current = config.GetBindable<bool>(OsuSetting.SongSelectBackgroundBlur),
                     ClassicDefault = false,
-                }
+                },
+                new SettingsSlider<float>
+                {
+                    LabelText = GameplaySettingsStrings.BackgroundDim,
+                    Current = config.GetBindable<float>(OsuSetting.SongSelectBackgroundDim),
+                    KeyboardStep = 0.01f,
+                    DisplayAsPercentage = true
+                },
             };
         }
     }
