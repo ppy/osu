@@ -133,7 +133,7 @@ namespace osu.Game.Screens.SelectV2
                 private OverlayColourProvider colourProvider { get; set; } = null!;
 
                 [Resolved]
-                private SongSelect? songSelect { get; set; }
+                private ISongSelect? songSelect { get; set; }
 
                 public float LineBaseHeight => text.LineBaseHeight;
 
@@ -196,7 +196,7 @@ namespace osu.Game.Screens.SelectV2
                 private readonly string[] tags;
                 private readonly ISongSelect? songSelect;
 
-                public TagsOverflowPopover(string[] tags, SongSelect? songSelect)
+                public TagsOverflowPopover(string[] tags, ISongSelect? songSelect)
                 {
                     this.tags = tags;
                     this.songSelect = songSelect;
