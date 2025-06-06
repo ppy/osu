@@ -63,7 +63,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             // Converts are detected and omitted from mod-specific bonuses due to the scope of current difficulty calculation.
             bool isConvert = score.BeatmapInfo!.Ruleset.OnlineID != 1;
 
-            double difficultyValue = computeDifficultyValue(score, taikoAttributes) * 1.08;
+            double difficultyValue = computeDifficultyValue(score, taikoAttributes, isConvert) * 1.08;
             double accuracyValue = computeAccuracyValue(score, taikoAttributes, isConvert) * 1.1;
 
             return new TaikoPerformanceAttributes
@@ -76,7 +76,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             };
         }
 
-        private double computeDifficultyValue(ScoreInfo score, TaikoDifficultyAttributes attributes)
+        private double computeDifficultyValue(ScoreInfo score, TaikoDifficultyAttributes attributes, bool isConvert)
         {
             double baseDifficulty = 5 * Math.Max(1.0, attributes.StarRating / 0.110) - 4.0;
             double difficultyValue = Math.Min(Math.Pow(baseDifficulty, 3) / 69052.51, Math.Pow(baseDifficulty, 2.25) / 1250.0);
@@ -89,7 +89,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             difficultyValue *= Math.Pow(0.986, effectiveMissCount);
 
             if (score.Mods.Any(m => m is ModHidden))
-                difficultyValue *= 1.1;
+                difficultyValue *= (isConvert) ? 1.025 : 1.1;
 
             if (score.Mods.Any(m => m is ModFlashlight<TaikoHitObject>))
                 difficultyValue *= Math.Max(1, 1.050 - Math.Min(attributes.MonoStaminaFactor / 50, 1) * lengthBonus);
