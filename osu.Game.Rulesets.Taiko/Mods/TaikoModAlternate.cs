@@ -88,6 +88,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
             if (nonGameplayPeriods.IsInAny(gameplayClock.CurrentTime))
             {
                 lastAcceptedSide = null;
+                lastAcceptedAction = null;
             }
         }
 
