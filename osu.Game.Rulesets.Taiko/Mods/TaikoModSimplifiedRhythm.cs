@@ -108,7 +108,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
                                 if (indexInPattern % 3 == 1)
                                     taikoBeatmap.HitObjects.Remove(hits[j]);
                                 else if (indexInPattern % 3 == 2)
-                                    hits[j].StartTime = hits[j + 1].StartTime - controlPointInfo.TimingPointAt(hits[j].StartTime).BeatLength / adjustedRhythm;
+                                    hits[j].StartTime = hits[j - 2].StartTime + controlPointInfo.TimingPointAt(hits[j].StartTime).BeatLength / adjustedRhythm;
 
                                 break;
                             }
