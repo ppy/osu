@@ -104,15 +104,15 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             // Set the mouse cursor on the first tick, then to be never used again during gameplay. :P
             if (firstTick)
-                {
-                    Vector2 screenStart = inputManager.CurrentState.Mouse.Position;
-                    Vector2 fieldStart = playfield.ScreenSpaceToGamefield(screenStart);
-                    double timeStart = playfield.Clock.CurrentTime;
+            {
+                Vector2 screenStart = inputManager.CurrentState.Mouse.Position;
+                Vector2 fieldStart = playfield.ScreenSpaceToGamefield(screenStart);
+                double timeStart = playfield.Clock.CurrentTime;
 
-                    lastHitInfo = (fieldStart, timeStart);
+                lastHitInfo = (fieldStart, timeStart);
 
-                    firstTick = false;
-                }
+                firstTick = false;
+            }
 
             // Sliders do not have hitwindows except for the HeadCircle, so we need to check for sliders.
             double mehWindow = nextObject is DrawableSlider checkForSld
@@ -156,8 +156,12 @@ namespace osu.Game.Rulesets.Osu.Mods
             double hitWindowStart = start - mehWindow - hitwindow_start_offset;
             double hitWindowEnd = start + mehWindow - hitwindow_end_offset;
 
-            // Compute how many ms remain for cursor movement toward the hit-object
-            double availableTime = handleTime(hitWindowStart, hitWindowEnd, nextObject.Entry.LifetimeStart);
+            double lifetimeStart = nextObject.Entry == null
+                ? lastHitInfo.Time
+                : nextObject.Entry.LifetimeStart;
+
+                // Compute how many ms remain for cursor movement toward the hit-object
+                double availableTime = handleTime(hitWindowStart, hitWindowEnd, lifetimeStart);
 
             moveTowards(target, availableTime);
         }
@@ -212,7 +216,11 @@ namespace osu.Game.Rulesets.Osu.Mods
                 double hitWindowStart = start - hitwindow_start_offset;
                 double hitWindowEnd = start + spinner.Duration - hitwindow_end_offset;
 
-                double duration = handleTime(hitWindowStart, hitWindowEnd, spinnerDrawable.Entry.LifetimeStart);
+                double lifetimeStart = spinnerDrawable.Entry == null
+                    ? lastHitInfo.Time
+                    : spinnerDrawable.Entry.LifetimeStart;
+
+                double duration = handleTime(hitWindowStart, hitWindowEnd, lifetimeStart);
 
                 moveTowards(spinnerTargetPosition, duration);
 
@@ -251,8 +259,11 @@ namespace osu.Game.Rulesets.Osu.Mods
             // compute the new cursor position by Lerp
             Vector2 newPos = Vector2.Lerp(lastHitPosition, target, frac);
 
+            float distanceToCursor = Vector2.Distance(lastHitPosition, newPos);
+            float distanceToTarget = Vector2.Distance(lastHitPosition, target);
+
             // if we’re effectively at (or beyond) the target, snap there
-            if (frac >= 1 || Vector2.Distance(lastHitPosition, newPos) >= Vector2.Distance(lastHitPosition, target))
+            if (frac >= 1 || distanceToCursor >= distanceToTarget)
                 newPos = target;
 
             applyCursor(newPos);
