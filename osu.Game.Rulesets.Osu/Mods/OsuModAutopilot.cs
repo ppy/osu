@@ -63,6 +63,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             hasReplayLoaded.BindTo(drawableRuleset.HasReplayLoaded);
 
+            // We want to save the position and time when the HitObject was judged for movement calculations.
             playfield.NewResult += (drawableHitObject, result) =>
             {
                 Vector2 screenCenter = drawableHitObject.ScreenSpaceDrawQuad.Centre;
@@ -167,8 +168,8 @@ namespace osu.Game.Rulesets.Osu.Mods
             // However, when it's inside the HitWindow, we want to the cursor to be fast enough
             // where the player can't tap it, but slow enough so it doesn't seem like the cursor is teleporting.
 
-            // If the hitobject doesn't appear during the time it was judged, it will teleport.
-            // So, we want to save the time when the hitobject first appears.
+            // If the hitobject doesn't appear during the time it was judged, the cursor will teleport.
+            // So, we want to save the time when the hitobject first appears so the cursor can travel smoothly.
             var lastJudgedTime = lastHitInfo.Time;
             if (lastHitInfo.Time < lifetimeStart)
             {
@@ -244,6 +245,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             double elapsed = currentTime - lastJudgedTime;
 
             // The percentage of time between the lastJudgedObject and the time to reach the next HitObject's HitWindow.
+            // Example: If the percentage of time is around 40%, the cursor should travel atleast 40% of the distance.
             float frac = (float)Math.Clamp(elapsed / timeMs, 0, 1);
 
             // compute the new cursor position by Lerp
