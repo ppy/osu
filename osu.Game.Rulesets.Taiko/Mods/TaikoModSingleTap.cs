@@ -3,7 +3,7 @@
 
 using osu.Framework.Localisation;
 using System;
-using osu.Game.Rulesets.Mods;
+using System.Linq;
 using osu.Game.Rulesets.Taiko.Objects;
 
 namespace osu.Game.Rulesets.Taiko.Mods
@@ -15,8 +15,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
         public override LocalisableString Description => @"One key for dons, one key for kats.";
 
         public override double ScoreMultiplier => 1.0;
-        public override Type[] IncompatibleMods => new[] { typeof(ModAutoplay), typeof(ModRelax), typeof(TaikoModCinema), typeof(TaikoModAlternate) };
-        public override ModType Type => ModType.Conversion;
+        public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(TaikoModAlternate) }).ToArray();
 
         private TaikoAction? lastAcceptedCentreAction { get; set; }
         private TaikoAction? lastAcceptedRimAction { get; set; }

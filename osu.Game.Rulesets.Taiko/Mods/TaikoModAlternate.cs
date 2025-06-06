@@ -21,8 +21,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
         public override LocalisableString Description => @"Don't use the same side twice in a row!";
 
         public override double ScoreMultiplier => 1.0;
-        public override Type[] IncompatibleMods => new[] { typeof(ModAutoplay), typeof(ModRelax), typeof(TaikoModCinema), typeof(TaikoModSingleTap) };
-        public override ModType Type => ModType.Conversion;
+        public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(TaikoModSingleTap) }).ToArray();
 
         [SettingSource("Alternate Fingers", "For ddkk or kkdd players who alternate fingers instead of hands.")]
         public Bindable<bool> AlternateFingers { get; } = new BindableBool();
