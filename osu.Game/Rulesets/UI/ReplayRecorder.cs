@@ -86,9 +86,8 @@ namespace osu.Game.Rulesets.UI
 
             if (frame != null)
             {
-                // only keep the last recorded frame for a given timestamp.
                 // this reduces redundancy of frames in the resulting replay.
-                if (last?.Time == frame.Time)
+                if (last?.IsEquivalentTo(frame) == true)
                     target.Replay.Frames[^1] = frame;
                 else
                     target.Replay.Frames.Add(frame);
