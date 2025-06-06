@@ -40,7 +40,7 @@ namespace osu.Game.Graphics.UserInterface
             Child = MainContents = new Container
             {
                 RelativeSizeAxes = Axes.Both,
-                Masking = true,
+                Masking = withBox,
                 CornerRadius = 20,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
