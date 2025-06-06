@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
             var taikoBeatmap = (TaikoBeatmap)beatmap;
             var controlPointInfo = taikoBeatmap.ControlPointInfo;
 
-            Hit[] hits = taikoBeatmap.HitObjects.Where(obj => obj is Hit).Cast<Hit>().ToArray();
+            Hit[] hits = taikoBeatmap.HitObjects.OfType<Hit>().ToArray();
 
             if (hits.Length == 0)
                 return;
@@ -61,10 +61,10 @@ namespace osu.Game.Rulesets.Taiko.Mods
                     if (inPattern)
                     {
                         // pattern continues
-                        if (snapValue == baseRhythm) continue;
+                        if (snapValue == baseRhythm)
+                            continue;
 
                         inPattern = false;
-
                         processPattern(i);
                     }
                     else
