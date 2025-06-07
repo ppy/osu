@@ -38,6 +38,13 @@ namespace osu.Game.Rulesets.Osu.Edit
             Precision = 0.0001f
         };
 
+        public BindableDouble SliderVelocity { get; } = new BindableDouble(1.00)
+        {
+            MinValue = 0.1,
+            MaxValue = 10,
+            Precision = 0.01,
+        };
+
         // We map internal ranges to a more standard range of values for display to the user.
         private readonly BindableInt displayTolerance = new BindableInt(90)
         {
@@ -57,6 +64,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             MaxValue = 100
         };
 
+        private ExpandableSlider<double> sliderVelocitySlider = null!;
         private ExpandableSlider<int> toleranceSlider = null!;
         private ExpandableSlider<int> cornerThresholdSlider = null!;
         private ExpandableSlider<int> circleThresholdSlider = null!;
@@ -66,6 +74,10 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             Children = new Drawable[]
             {
+                sliderVelocitySlider = new ExpandableSlider<double>
+                {
+                    Current = SliderVelocity
+                },
                 toleranceSlider = new ExpandableSlider<int>
                 {
                     Current = displayTolerance
@@ -84,6 +96,14 @@ namespace osu.Game.Rulesets.Osu.Edit
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            SliderVelocity.BindValueChanged(velocity =>
+            {
+                sliderVelocitySlider.ContractedLabelText = $"S. V.: {velocity.NewValue:N2}";
+                sliderVelocitySlider.ExpandedLabelText = $"Slider Velocity: {velocity.NewValue:N2}";
+
+                SliderVelocity.Value = velocity.NewValue;
+            }, true);
 
             displayTolerance.BindValueChanged(tolerance =>
             {

@@ -133,7 +133,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                                                      .HitObjects
                                                      .LastOrDefault(h => h is Slider && h.GetEndTime() < HitObject.StartTime) as Slider)?.SliderVelocityMultiplier;
 
-                    HitObject.SliderVelocityMultiplier = nearestSliderVelocity ?? 1;
+                    HitObject.SliderVelocityMultiplier = freehandToolboxGroup?.SliderVelocity.Value ?? 1;
                     HitObject.Position = ToLocalSpace(result.ScreenSpacePosition);
 
                     // Replacing the DifficultyControlPoint above doesn't trigger any kind of invalidation.
