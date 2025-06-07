@@ -33,6 +33,11 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 },
                 new SettingsCheckbox
                 {
+                    LabelText = GraphicsSettingsStrings.HitAnimations,
+                    Current = config.GetBindable<bool>(OsuSetting.HitAnimations)
+                },
+                new SettingsCheckbox
+                {
                     LabelText = GameplaySettingsStrings.StarFountains,
                     Current = config.GetBindable<bool>(OsuSetting.StarFountains)
                 },

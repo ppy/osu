@@ -140,6 +140,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.LightenDuringBreaks, true);
 
             SetDefault(OsuSetting.HitLighting, true);
+            SetDefault(OsuSetting.HitAnimations, true);
             SetDefault(OsuSetting.StarFountains, true);
 
             SetDefault(OsuSetting.HUDVisibilityMode, HUDVisibilityMode.Always);
@@ -424,6 +425,7 @@ namespace osu.Game.Configuration
         NotifyOnFriendPresenceChange,
         UIHoldActivationDelay,
         HitLighting,
+        HitAnimations,
         StarFountains,
         MenuBackgroundSource,
         GameplayDisableWinKey,

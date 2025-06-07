@@ -8,6 +8,7 @@ using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -37,6 +38,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
         private SkinnableSpriteText hitCircleText = null!;
 
+        private Bindable<bool> configHitAnimations = null!;
+
         private readonly Bindable<Color4> accentColour = new Bindable<Color4>();
         private readonly IBindable<int> indexInCurrentCombo = new Bindable<int>();
 
@@ -55,7 +58,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuConfigManager config)
         {
             const string base_lookup = @"hitcircle";
 
@@ -124,6 +127,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 accentColour.BindTo(drawableOsuObject.AccentColour);
                 indexInCurrentCombo.BindTo(drawableOsuObject.IndexInCurrentComboBindable);
             }
+
+            configHitAnimations = config.GetBindable<bool>(OsuSetting.HitAnimations);
         }
 
         protected override void LoadComplete()
@@ -164,11 +169,22 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 switch (state)
                 {
                     case ArmedState.Hit:
-                        CircleSprite.FadeOut(legacy_fade_duration);
-                        CircleSprite.ScaleTo(1.4f, legacy_fade_duration, Easing.Out);
+                        if (configHitAnimations.Value)
+                        {
+                            CircleSprite.FadeOut(legacy_fade_duration);
+                            CircleSprite.ScaleTo(1.4f, legacy_fade_duration, Easing.Out);
 
-                        OverlaySprite.FadeOut(legacy_fade_duration);
-                        OverlaySprite.ScaleTo(1.4f, legacy_fade_duration, Easing.Out);
+                            OverlaySprite.FadeOut(legacy_fade_duration);
+                            OverlaySprite.ScaleTo(1.4f, legacy_fade_duration, Easing.Out);
+                        }
+                        else
+                        {
+                            CircleSprite.FadeOut(0);
+                            CircleSprite.ScaleTo(1f, 0, Easing.Out);
+
+                            OverlaySprite.FadeOut(0);
+                            OverlaySprite.ScaleTo(1f, 0, Easing.Out);
+                        }
 
                         if (hasNumber)
                         {
