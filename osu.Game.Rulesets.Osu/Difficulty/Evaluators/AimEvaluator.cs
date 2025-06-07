@@ -123,15 +123,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                         wideAngleBonus *= 1 - 0.35 * (1 - distance);
                     }
                 }
-
-                // If we're coming from a slider we can't reliably guarantee that player travelled from the end position of a slider
-                // That makes angle potentially look harder than it was to play since players will always try to take the easiest route possible
-                // Therefore we nerf the angle bonus
-                if (osuLastObj.BaseObject is Slider)
-                {
-                    wideAngleBonus = Math.Log(1 + wideAngleBonus);
-                    wiggleBonus = Math.Log(1 + wiggleBonus);
-                }
             }
 
             if (Math.Max(prevVelocity, currVelocity) != 0)
