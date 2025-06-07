@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         private const double wide_angle_multiplier = 1.5;
         private const double acute_angle_multiplier = 2.6;
         private const double slider_multiplier = 1.35;
-        private const double velocity_change_multiplier = 0.75;
+        private const double velocity_change_multiplier = 0.7;
         private const double wiggle_multiplier = 1.02;
 
         /// <summary>
@@ -147,9 +147,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             }
 
             aimStrain += wiggleBonus * wiggle_multiplier;
+            aimStrain += velocityChangeBonus * velocity_change_multiplier;
 
-            // Add in acute angle bonus or wide angle bonus + velocity change bonus, whichever is larger.
-            aimStrain += Math.Max(acuteAngleBonus * acute_angle_multiplier, wideAngleBonus * wide_angle_multiplier + velocityChangeBonus * velocity_change_multiplier);
+            // Add in acute angle bonus or wide angle bonus, whichever is larger.
+            aimStrain += Math.Max(acuteAngleBonus * acute_angle_multiplier, wideAngleBonus * wide_angle_multiplier);
 
             // Add in additional slider velocity bonus.
             if (withSliderTravelDistance)
