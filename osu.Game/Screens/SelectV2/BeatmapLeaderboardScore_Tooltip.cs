@@ -120,18 +120,11 @@ namespace osu.Game.Screens.SelectV2
 
                         var generalStatistics = new[]
                         {
+                            new PerformanceStatisticRow(BeatmapsetsStrings.ShowScoreboardHeaderspp.ToUpper(), colourProvider.Content2, score),
                             new StatisticRow("Score Multiplier", colourProvider.Content2, ModUtils.FormatScoreMultiplier(multiplier)),
                             new StatisticRow(BeatmapsetsStrings.ShowScoreboardHeadersCombo, colourProvider.Content2, value.MaxCombo.ToLocalisableString(@"0\x")),
                             new StatisticRow(BeatmapsetsStrings.ShowScoreboardHeadersAccuracy, colourProvider.Content2, value.Accuracy.FormatAccuracy()),
                         };
-
-                        if (value.PP != null)
-                        {
-                            generalStatistics = new[]
-                            {
-                                new StatisticRow(BeatmapsetsStrings.ShowScoreboardHeaderspp.ToUpper(), colourProvider.Content2, value.PP.ToLocalisableString("N0"))
-                            }.Concat(generalStatistics).ToArray();
-                        }
 
                         statistics.ChildrenEnumerable = judgementsStatistics
                                                         .Append(Empty().With(d => d.Height = 20))
@@ -229,8 +222,10 @@ namespace osu.Game.Screens.SelectV2
                     => absoluteDate.Text = score.Date.ToLocalTime().ToLocalisableString(prefer24HourTime.Value ? @"d MMMM yyyy HH:mm" : @"d MMMM yyyy h:mm tt");
             }
 
-            private partial class StatisticRow : CompositeDrawable
+            public partial class StatisticRow : CompositeDrawable
             {
+                protected OsuSpriteText ValueLabel;
+
                 public StatisticRow(LocalisableString label, Color4 labelColour, LocalisableString value)
                 {
                     RelativeSizeAxes = Axes.X;
@@ -244,7 +239,7 @@ namespace osu.Game.Screens.SelectV2
                             Colour = labelColour,
                             Font = OsuFont.Style.Caption2.With(weight: FontWeight.SemiBold),
                         },
-                        new OsuSpriteText
+                        ValueLabel = new OsuSpriteText
                         {
                             Anchor = Anchor.TopRight,
                             Origin = Anchor.TopRight,
