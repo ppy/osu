@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
 
             if (index > 0)
             {
-                ManiaDifficultyHitObject? prevNote = (ManiaDifficultyHitObject)objects[index - 1];
+                ManiaDifficultyHitObject prevNote = (ManiaDifficultyHitObject)objects[index - 1];
 
                 for (int i = 0; i < prevNote.PreviousHitObjects.Length; i++)
                     PreviousHitObjects[i] = prevNote.PreviousHitObjects[i];
