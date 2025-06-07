@@ -96,7 +96,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                             Action = () =>
                             {
                                 if (SuggestedOffset.Value.HasValue)
-                                    current.Value = SuggestedOffset.Value.Value;
+                                    current.Value = SuggestedOffset.Value.Value == 0 ? 0 : SuggestedOffset.Value.Value;
                                 hitErrorTracker.ClearHistory();
                             }
                         }
