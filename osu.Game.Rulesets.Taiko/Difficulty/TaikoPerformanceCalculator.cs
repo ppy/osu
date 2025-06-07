@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Audio.Track;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Difficulty.Utils;
@@ -13,6 +12,7 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.Scoring;
 using osu.Game.Scoring;
+using osu.Game.Utils;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty
 {
@@ -43,9 +43,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             countMeh = score.Statistics.GetValueOrDefault(HitResult.Meh);
             countMiss = score.Statistics.GetValueOrDefault(HitResult.Miss);
 
-            var track = new TrackVirtual(10000);
-            score.Mods.OfType<IApplicableToTrack>().ForEach(m => m.ApplyToTrack(track));
-            clockRate = track.Rate;
+            clockRate = ModUtils.CalculateRateWithMods(score.Mods);
 
             var difficulty = score.BeatmapInfo!.Difficulty.Clone();
 
@@ -69,9 +67,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
             if (score.Mods.Any(m => m is ModHidden) && !isConvert)
                 multiplier *= 1.075;
-
-            if (score.Mods.Any(m => m is ModEasy))
-                multiplier *= 0.950;
 
             double difficultyValue = computeDifficultyValue(score, taikoAttributes);
             double accuracyValue = computeAccuracyValue(score, taikoAttributes, isConvert);
@@ -102,9 +97,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             difficultyValue *= lengthBonus;
 
             difficultyValue *= Math.Pow(0.986, effectiveMissCount);
-
-            if (score.Mods.Any(m => m is ModEasy))
-                difficultyValue *= 0.90;
 
             if (score.Mods.Any(m => m is ModHidden))
                 difficultyValue *= 1.025;

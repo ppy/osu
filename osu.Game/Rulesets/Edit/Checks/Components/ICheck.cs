@@ -13,17 +13,17 @@ namespace osu.Game.Rulesets.Edit.Checks.Components
         /// <summary>
         /// The metadata for this check.
         /// </summary>
-        public CheckMetadata Metadata { get; }
+        CheckMetadata Metadata { get; }
 
         /// <summary>
         /// All possible templates for issues that this check may return.
         /// </summary>
-        public IEnumerable<IssueTemplate> PossibleTemplates { get; }
+        IEnumerable<IssueTemplate> PossibleTemplates { get; }
 
         /// <summary>
         /// Runs this check and returns any issues detected for the provided beatmap.
         /// </summary>
         /// <param name="context">The beatmap verifier context associated with the beatmap.</param>
-        public IEnumerable<Issue> Run(BeatmapVerifierContext context);
+        IEnumerable<Issue> Run(BeatmapVerifierContext context);
     }
 }

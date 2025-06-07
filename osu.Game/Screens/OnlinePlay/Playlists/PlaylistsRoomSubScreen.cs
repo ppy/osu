@@ -110,8 +110,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         [Resolved]
         private IDialogOverlay? dialogOverlay { get; set; }
 
-        [Cached]
-        private readonly OnlinePlayBeatmapAvailabilityTracker beatmapAvailabilityTracker = new OnlinePlayBeatmapAvailabilityTracker();
+        [Cached(typeof(OnlinePlayBeatmapAvailabilityTracker))]
+        private readonly PlaylistsBeatmapAvailabilityTracker beatmapAvailabilityTracker;
 
         protected readonly Bindable<PlaylistItem?> SelectedItem = new Bindable<PlaylistItem?>();
         protected readonly Bindable<BeatmapInfo?> UserBeatmap = new Bindable<BeatmapInfo?>();
@@ -146,6 +146,11 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             Activity.Value = new UserActivity.InLobby(room);
 
             Padding = new MarginPadding { Top = Header.HEIGHT };
+
+            beatmapAvailabilityTracker = new PlaylistsBeatmapAvailabilityTracker
+            {
+                PlaylistItem = { BindTarget = SelectedItem }
+            };
         }
 
         [BackgroundDependencyLoader]
@@ -186,9 +191,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                 {
                                     new Drawable[]
                                     {
-                                        new DrawableMatchRoom(room, false)
+                                        new PlaylistsRoomPanel(room)
                                         {
-                                            OnEdit = () => settingsOverlay.Show(),
                                             SelectedItem = SelectedItem
                                         }
                                     },
@@ -246,12 +250,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                                             SelectedItem = { BindTarget = SelectedItem },
                                                                             AllowSelection = true,
                                                                             AllowShowingResults = true,
-                                                                            RequestResults = item =>
-                                                                            {
-                                                                                Debug.Assert(room.RoomID != null);
-                                                                                parentScreen?.Push(new PlaylistItemUserBestResultsScreen(room.RoomID.Value, item,
-                                                                                    api.LocalUser.Value.Id));
-                                                                            }
+                                                                            RequestResults = showResults
                                                                         }
                                                                     },
                                                                     new Drawable[]
@@ -438,6 +437,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             {
                 SelectedItem = { BindTarget = SelectedItem },
                 SelectedMods = { BindTarget = UserMods },
+                Beatmap = { BindTarget = Beatmap },
                 IsValidMod = _ => false
             });
         }
@@ -451,12 +451,9 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             room.PropertyChanged += onRoomPropertyChanged;
 
             isIdle.BindValueChanged(_ => updatePollingRate(), true);
-
-            SelectedItem.BindValueChanged(onSelectedItemChanged);
-
-            beatmapAvailabilityTracker.SelectedItem.BindTo(SelectedItem);
             beatmapAvailabilityTracker.Availability.BindValueChanged(_ => updateGameplayState());
 
+            SelectedItem.BindValueChanged(onSelectedItemChanged);
             UserBeatmap.BindValueChanged(_ => updateGameplayState());
             UserMods.BindValueChanged(_ => updateGameplayState());
             UserRuleset.BindValueChanged(_ =>
@@ -468,6 +465,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             });
 
             updateSetupState();
+            updateUserScore();
             updateGameplayState();
         }
 
@@ -482,6 +480,10 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             {
                 case nameof(Room.RoomID):
                     updateSetupState();
+                    break;
+
+                case nameof(Room.UserScore):
+                    updateUserScore();
                     break;
             }
         }
@@ -510,9 +512,29 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                     progressSection.Alpha = room.MaxAttempts != null ? 1 : 0;
                     drawablePlaylist.Items.ReplaceRange(0, drawablePlaylist.Items.Count, room.Playlist);
 
+                    updateUserScore();
+
                     // Select an initial item for the user to help them get into a playable state quicker.
                     SelectedItem.Value = room.Playlist.FirstOrDefault();
                 });
+            }
+        }
+
+        /// <summary>
+        /// Responds to changes in <see cref="Room.UserScore"/> to mark playlist items as completed.
+        /// </summary>
+        private void updateUserScore()
+        {
+            if (room.UserScore == null)
+                return;
+
+            if (drawablePlaylist.Items.Count == 0)
+                return;
+
+            foreach (var item in room.UserScore.PlaylistItemAttempts)
+            {
+                if (item.Passed)
+                    drawablePlaylist.Items.Single(i => i.ID == item.PlaylistItemID).MarkCompleted();
             }
         }
 
@@ -551,30 +573,17 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         }
 
         /// <summary>
-        /// Lists the <see cref="Mod"/>s that are valid to be selected for the user mod style.
-        /// </summary>
-        private Mod[] listAllowedMods()
-        {
-            if (SelectedItem.Value == null)
-                return [];
-
-            PlaylistItem item = SelectedItem.Value;
-
-            RulesetInfo gameplayRuleset = UserRuleset.Value ?? rulesets.GetRuleset(item.RulesetID)!;
-            Ruleset rulesetInstance = gameplayRuleset.CreateInstance();
-
-            if (item.Freestyle)
-                return rulesetInstance.AllMods.OfType<Mod>().Where(m => ModUtils.IsValidFreeModForMatchType(m, room.Type)).ToArray();
-
-            return item.AllowedMods.Select(m => m.ToMod(rulesetInstance)).ToArray();
-        }
-
-        /// <summary>
         /// Validates the user mod style against the selected item and ruleset style.
         /// </summary>
         private void validateUserMods()
         {
-            Mod[] allowedMods = listAllowedMods();
+            if (SelectedItem.Value == null)
+                return;
+
+            PlaylistItem item = SelectedItem.Value;
+            RulesetInfo gameplayRuleset = UserRuleset.Value ?? rulesets.GetRuleset(item.RulesetID)!;
+            Mod[] allowedMods = ModUtils.EnumerateUserSelectableFreeMods(MatchType.Playlists, item.RequiredMods, item.AllowedMods, item.Freestyle, gameplayRuleset.CreateInstance());
+
             UserMods.Value = UserMods.Value.Where(m => allowedMods.Any(a => m.GetType() == a.GetType())).ToArray();
         }
 
@@ -591,18 +600,17 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             IBeatmapInfo gameplayBeatmap = UserBeatmap.Value ?? item.Beatmap;
             RulesetInfo gameplayRuleset = UserRuleset.Value ?? rulesets.GetRuleset(item.RulesetID)!;
             Ruleset rulesetInstance = gameplayRuleset.CreateInstance();
-            Mod[] allowedMods = listAllowedMods();
+            Mod[] allowedMods = ModUtils.EnumerateUserSelectableFreeMods(MatchType.Playlists, item.RequiredMods, item.AllowedMods, item.Freestyle, gameplayRuleset.CreateInstance());
 
             // Update global gameplay state to correspond to the new selection.
             // Retrieve the corresponding local beatmap, since we can't directly use the playlist's beatmap info
-            int beatmapId = gameplayBeatmap.OnlineID;
-            var localBeatmap = beatmapManager.QueryBeatmap(b => b.OnlineID == beatmapId);
+            var localBeatmap = beatmapManager.QueryBeatmap($@"{nameof(BeatmapInfo.OnlineID)} == $0 AND {nameof(BeatmapInfo.MD5Hash)} == {nameof(BeatmapInfo.OnlineMD5Hash)}", gameplayBeatmap.OnlineID);
             Beatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
             Ruleset.Value = gameplayRuleset;
             Mods.Value = UserMods.Value.Concat(item.RequiredMods.Select(m => m.ToMod(rulesetInstance))).ToArray();
 
             // Update UI elements to reflect the new selection.
-            bool freemods = allowedMods.Length > 0;
+            bool freemods = item.Freestyle || allowedMods.Length > 0;
             bool freestyle = item.Freestyle;
 
             if (freemods)
@@ -687,6 +695,21 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 Beatmap = { BindTarget = UserBeatmap },
                 Ruleset = { BindTarget = UserRuleset }
             });
+        }
+
+        /// <summary>
+        /// Shows the results screen for a playlist item.
+        /// </summary>
+        private void showResults(PlaylistItem item)
+        {
+            if (!this.IsCurrentScreen())
+                return;
+
+            Debug.Assert(room.RoomID != null);
+
+            // fallback is to allow this class to operate when there is no parent OnlineScreen (testing purposes).
+            var targetScreen = (Screen?)parentScreen ?? this;
+            targetScreen.Push(new PlaylistItemUserBestResultsScreen(room.RoomID.Value, item, api.LocalUser.Value.OnlineID));
         }
 
         /// <summary>

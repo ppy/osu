@@ -89,7 +89,7 @@ namespace osu.Game.Screens.Select.Options
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both,
-                    Shear = new Vector2(0.2f, 0f),
+                    Shear = OsuGame.SHEAR,
                     Masking = true,
                     EdgeEffect = new EdgeEffectParameters
                     {
