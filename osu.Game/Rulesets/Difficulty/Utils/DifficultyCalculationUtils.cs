@@ -102,5 +102,8 @@ namespace osu.Game.Rulesets.Difficulty.Utils
         {
             return Math.Clamp((x - start) / (end - start), 0.0, 1.0);
         }
+
+        public static double SmoothstepTwoDirectional(double x, double y, double lowerMultiplier, double higherMultiplier) => Smoothstep(x, y * lowerMultiplier, y * higherMultiplier) * Smoothstep(y, x * lowerMultiplier, x * higherMultiplier);
+        public static double ReverseLerpTwoDirectional(double x, double y, double lowerMultiplier, double higherMultiplier) => ReverseLerp(x, y * lowerMultiplier, y * higherMultiplier) * ReverseLerp(y, x * lowerMultiplier, x * higherMultiplier);
     }
 }
