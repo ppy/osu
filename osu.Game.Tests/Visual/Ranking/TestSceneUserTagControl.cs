@@ -100,7 +100,7 @@ namespace osu.Game.Tests.Visual.Ranking
             Child = new PopoverContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = new UserTagControl(Beatmap.Value.BeatmapInfo)
+                Child = new UserTagControl(Beatmap.Value.BeatmapInfo, true)
                 {
                     Width = 700,
                     Anchor = Anchor.Centre,
