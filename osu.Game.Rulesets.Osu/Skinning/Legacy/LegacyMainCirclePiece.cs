@@ -179,11 +179,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         }
                         else
                         {
-                            CircleSprite.FadeOut(0);
-                            CircleSprite.ScaleTo(1f, 0, Easing.Out);
-
-                            OverlaySprite.FadeOut(0);
-                            OverlaySprite.ScaleTo(1f, 0, Easing.Out);
+                            CircleSprite.FadeOut();
+                            OverlaySprite.FadeOut();
                         }
 
                         if (hasNumber)
