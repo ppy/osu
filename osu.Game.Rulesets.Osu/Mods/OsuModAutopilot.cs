@@ -72,6 +72,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 Vector2 mousePos = inputManager.CurrentState.Mouse.Position;
                 Vector2 fieldPos = playfield.ScreenSpaceToGamefield(mousePos);
 
+                // If it's a slider, we want the cursor position to be at the start or end of the slider
                 if (drawableHitObject is DrawableSlider sliderDrawable)
                 {
                     var slider = sliderDrawable.HitObject;
@@ -97,6 +98,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 return;
 
             double start = nextObject.HitObject.StartTime;
+            double elapsed = currentTime - start;
 
             // Reduce calculations during replay.
             if (hasReplayLoaded.Value)
@@ -105,8 +107,6 @@ namespace osu.Game.Rulesets.Osu.Mods
                 {
                     var spinner = replaySpinner.HitObject;
                     replaySpinner.HandleUserInput = false;
-
-                    double elapsed = currentTime - start;
 
                     // Don't start spinning until position is reached.
                     if (elapsed >= 0)
@@ -137,12 +137,20 @@ namespace osu.Game.Rulesets.Osu.Mods
                 ? checkForSld.HeadCircle.HitObject.HitWindows.WindowFor(HitResult.Meh)
                 : nextObject.HitObject.HitWindows.WindowFor(HitResult.Meh);
 
+            // The position of the current alive object.
             var target = nextObject.Position;
 
+            // If the hitobject doesn't appear during the time it was judged, the cursor will teleport.
+            // So, we want to save the time when the hitobject first appears so the cursor can travel smoothly.
+            lastHitInfo.Time = nextObject.Entry?.LifetimeStart > lastHitInfo.Time
+                ? nextObject.Entry.LifetimeStart
+                : lastHitInfo.Time;
+
+            // Based on the hit object type, things work differently.
             switch (nextObject)
             {
                 case DrawableSpinner spinnerDrawable:
-                    handleSpinner(spinnerDrawable, currentTime, start);
+                    handleSpinner(spinnerDrawable, currentTime, start, elapsed);
                     return;
 
                 case DrawableSlider sliderDrawable:
@@ -150,7 +158,6 @@ namespace osu.Game.Rulesets.Osu.Mods
                         break;
 
                     var slider = sliderDrawable.HitObject;
-                    double elapsed = currentTime - start;
 
                     if (elapsed + mehWindow >= 0 && elapsed < slider.Duration)
                     {
@@ -169,29 +176,18 @@ namespace osu.Game.Rulesets.Osu.Mods
             double hitWindowStart = start - mehWindow - hitwindow_start_offset;
             double hitWindowEnd = start + mehWindow - hitwindow_end_offset;
 
-            double lifetimeStart = nextObject.Entry?.LifetimeStart ?? lastHitInfo.Time;
-
             // Compute how many ms remain for cursor movement toward the hit-object
-            double availableTime = handleTime(hitWindowStart, hitWindowEnd, lifetimeStart);
+            double availableTime = handleTime(hitWindowStart, hitWindowEnd);
 
             moveTowards(target, availableTime);
         }
 
-        private double handleTime(double hitWindowStart, double hitWindowEnd, double lifetimeStart)
+        private double handleTime(double hitWindowStart, double hitWindowEnd)
         {
             // We want the cursor to eventually reach the center of the HitCircle.
             // However, when it's inside the HitWindow, we want to the cursor to be fast enough
             // where the player can't tap it, but slow enough so it doesn't seem like the cursor is teleporting.
-
-            // If the hitobject doesn't appear during the time it was judged, the cursor will teleport.
-            // So, we want to save the time when the hitobject first appears so the cursor can travel smoothly.
             double lastJudgedTime = lastHitInfo.Time;
-
-            if (lastHitInfo.Time < lifetimeStart)
-            {
-                lastHitInfo.Time = lifetimeStart;
-                lastJudgedTime = lifetimeStart;
-            }
 
             // Compute scale from 0 to 1, then multiply by an offset. This will be used if we are inside between hitWindowStart and hitWindowEnd so we can prevent sudden cursor teleportation.
             double scaledTime = 1 + (Math.Clamp((hitWindowEnd - lastJudgedTime) / (hitWindowEnd - hitWindowStart), 0, 1) * (hitwindow_start_offset - 1));
@@ -209,12 +205,10 @@ namespace osu.Game.Rulesets.Osu.Mods
             return Math.Max(timeLeft, 1);
         }
 
-        private void handleSpinner(DrawableSpinner spinnerDrawable, double currentTime, double start)
+        private void handleSpinner(DrawableSpinner spinnerDrawable, double currentTime, double start, double elapsed)
         {
             var spinner = spinnerDrawable.HitObject;
             spinnerDrawable.HandleUserInput = false;
-
-            double elapsed = currentTime - start;
 
             // Before spinner starts, move to position.
             if (elapsed < 0)
@@ -226,9 +220,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 double hitWindowStart = start - hitwindow_start_offset;
                 double hitWindowEnd = start + spinner.Duration - hitwindow_end_offset;
 
-                double lifetimeStart = spinnerDrawable.Entry?.LifetimeStart ?? lastHitInfo.Time;
-
-                double duration = handleTime(hitWindowStart, hitWindowEnd, lifetimeStart);
+                double duration = handleTime(hitWindowStart, hitWindowEnd);
 
                 moveTowards(spinnerTargetPosition, duration);
 
@@ -250,9 +242,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private void spinSpinner(DrawableSpinner spinnerDrawable, double rate)
         {
-            spinnerDrawable.RotationTracker.Tracking = spinnerDrawable.RotationTracker.IsSpinnableTime;
-            spinnerDrawable.HandleUserInput = false;
-
             double elapsedTime = playfield.Clock.ElapsedFrameTime;
 
             // Automatically spin spinner.
