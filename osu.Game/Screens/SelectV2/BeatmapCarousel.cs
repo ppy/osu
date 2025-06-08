@@ -168,9 +168,12 @@ namespace osu.Game.Screens.SelectV2
                         int previousIndex = Items.IndexOf(beatmap);
                         Debug.Assert(previousIndex >= 0);
 
+                        // we're intentionally being lenient with there being two difficulties with equal online ID or difficulty name.
+                        // this can be the case when the user modifies the beatmap using the editor's "external edit" feature.
+                        // TODO: this should probably be fixed somewhere, this doesn't make sense as it is.
                         BeatmapInfo? matchingNewBeatmap =
-                            newSetBeatmaps.SingleOrDefault(b => b.OnlineID > 0 && b.OnlineID == beatmap.OnlineID) ??
-                            newSetBeatmaps.SingleOrDefault(b => b.DifficultyName == beatmap.DifficultyName && b.Ruleset.Equals(beatmap.Ruleset));
+                            newSetBeatmaps.FirstOrDefault(b => b.OnlineID > 0 && b.OnlineID == beatmap.OnlineID) ??
+                            newSetBeatmaps.FirstOrDefault(b => b.DifficultyName == beatmap.DifficultyName && b.Ruleset.Equals(beatmap.Ruleset));
 
                         if (matchingNewBeatmap != null)
                         {
