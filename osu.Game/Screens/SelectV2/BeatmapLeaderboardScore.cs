@@ -446,18 +446,14 @@ namespace osu.Game.Screens.SelectV2
                                                                     Font = OsuFont.Style.Subtitle.With(weight: FontWeight.Light, fixedWidth: true),
                                                                     Shear = sheared ? -OsuGame.SHEAR : Vector2.Zero,
                                                                 },
-                                                                new InputBlockingContainer
+                                                                modsContainer = new FillFlowContainer<Drawable>
                                                                 {
                                                                     Anchor = Anchor.TopRight,
                                                                     Origin = Anchor.TopRight,
                                                                     AutoSizeAxes = Axes.Both,
-                                                                    Child = modsContainer = new FillFlowContainer<Drawable>
-                                                                    {
-                                                                        AutoSizeAxes = Axes.Both,
-                                                                        Direction = FillDirection.Horizontal,
-                                                                        Spacing = new Vector2(-10, 0),
-                                                                        Shear = sheared ? -OsuGame.SHEAR : Vector2.Zero,
-                                                                    },
+                                                                    Direction = FillDirection.Horizontal,
+                                                                    Spacing = new Vector2(-10, 0),
+                                                                    Shear = sheared ? -OsuGame.SHEAR : Vector2.Zero,
                                                                 },
                                                             }
                                                         }
