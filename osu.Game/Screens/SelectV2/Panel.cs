@@ -120,35 +120,28 @@ namespace osu.Game.Screens.SelectV2
                 },
                 Children = new[]
                 {
-                    new BufferedContainer
+                    backgroundBorder = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Children = new Drawable[]
+                        Colour = Color4.Black,
+                    },
+                    backgroundLayerHorizontalPadding = new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Child = new Container
                         {
-                            backgroundBorder = new Box
+                            RelativeSizeAxes = Axes.Both,
+                            Masking = true,
+                            CornerRadius = corner_radius,
+                            Children = new Drawable[]
                             {
-                                RelativeSizeAxes = Axes.Both,
-                                Colour = Color4.Black,
-                            },
-                            backgroundLayerHorizontalPadding = new Container
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Child = new Container
+                                backgroundGradient = new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Masking = true,
-                                    CornerRadius = corner_radius,
-                                    Children = new Drawable[]
-                                    {
-                                        backgroundGradient = new Box
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                        },
-                                        backgroundContainer = new Container
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                        },
-                                    }
+                                },
+                                backgroundContainer = new Container
+                                {
+                                    RelativeSizeAxes = Axes.Both,
                                 },
                             }
                         },
