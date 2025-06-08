@@ -26,6 +26,7 @@ namespace osu.Game.Screens.Select
         private OsuSpriteText randomSpriteText;
         private OsuSpriteText rewindSpriteText;
         private bool rewindSearch;
+        private bool fromKeyBinding;
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
@@ -114,7 +115,11 @@ namespace osu.Game.Screens.Select
             try
             {
                 // this uses OR to handle rewinding when clicks are triggered by other sources (i.e. right button in OnMouseUp).
-                rewindSearch |= e.ShiftPressed;
+                if (!fromKeyBinding)
+                {
+                    rewindSearch |= e.ShiftPressed;
+                }
+                fromKeyBinding = false;
                 return base.OnClick(e);
             }
             finally
@@ -145,6 +150,7 @@ namespace osu.Game.Screens.Select
                 return false;
             }
 
+            fromKeyBinding = true;
             if (!e.Repeat)
                 TriggerClick();
             return true;
