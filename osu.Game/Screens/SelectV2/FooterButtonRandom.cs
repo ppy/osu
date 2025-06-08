@@ -115,6 +115,7 @@ namespace osu.Game.Screens.SelectV2
                 {
                     rewindSearch |= e.ShiftPressed;
                 }
+
                 fromKeyBinding = false;
                 return base.OnClick(e);
             }
