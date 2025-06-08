@@ -123,6 +123,9 @@ namespace osu.Game.Rulesets.Mods
 
                 foreach (var (_, property) in this.GetSettingsSourceProperties())
                 {
+                    if (property.Name == nameof(ExtendedLimits))
+                        continue;
+
                     var bindable = (IBindable)property.GetValue(this)!;
 
                     if (!bindable.IsDefault)
