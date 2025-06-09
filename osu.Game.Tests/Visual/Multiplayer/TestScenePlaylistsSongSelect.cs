@@ -56,6 +56,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             base.SetUpSteps();
 
+            AddUntilStep("wait for mod select removed", () => this.ChildrenOfType<FreeModSelectOverlay>().Count(), () => Is.Zero);
+
             AddStep("reset", () =>
             {
                 room = new Room();
