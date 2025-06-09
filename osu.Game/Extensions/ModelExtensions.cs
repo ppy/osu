@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.IO;
-using System.Text.RegularExpressions;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.IO;
@@ -16,8 +15,6 @@ namespace osu.Game.Extensions
 {
     public static class ModelExtensions
     {
-        private static readonly Regex invalid_filename_chars = new Regex(@"(?!$)[^A-Za-z0-9_()[\]. \-]", RegexOptions.Compiled);
-
         /// <summary>
         /// Get the relative path in osu! storage for this file.
         /// </summary>
@@ -156,15 +153,34 @@ namespace osu.Game.Extensions
             return instance.OnlineID.Equals(other.OnlineID);
         }
 
+        // intentionally chosen to match stable.
+        // see https://referencesource.microsoft.com/#mscorlib/system/io/path.cs,88
+        private static readonly char[] invalid_filename_chars =
+        {
+            '\"', '<', '>', '|', '\0', (char)1, (char)2, (char)3, (char)4, (char)5, (char)6, (char)7, (char)8, (char)9, (char)10, (char)11, (char)12, (char)13, (char)14, (char)15, (char)16, (char)17,
+            (char)18, (char)19, (char)20, (char)21, (char)22, (char)23, (char)24, (char)25, (char)26, (char)27, (char)28, (char)29, (char)30, (char)31, ':', '*', '?', '\\', '/'
+        };
+
         /// <summary>
         /// Create a valid filename which should work across all platforms.
         /// </summary>
         /// <remarks>
-        /// This function replaces all characters not included in a very pessimistic list which should be compatible
-        /// across all operating systems. We are using this in place of <see cref="Path.GetInvalidFileNameChars"/> as
-        /// that function does not have per-platform considerations (and is only made to work on windows).
+        /// <para>
+        /// We are using this in place of <see cref="Path.GetInvalidFileNameChars"/>
+        /// as that function works per-platform, and therefore returns a different set of characters on different OSes.
+        /// </para>
+        /// <para>
+        /// Note that the behaviour of this method is LOAD-BEARING for things such as interoperability of beatmap exports with stable,
+        /// especially with respect to beatmap submission.
+        /// DO NOT CHANGE THE SEMANTICS OF THIS METHOD unless you know well what you are doing.
+        /// </para>
         /// </remarks>
-        public static string GetValidFilename(this string filename) => invalid_filename_chars.Replace(filename, "_");
+        public static string GetValidFilename(this string filename)
+        {
+            foreach (char c in invalid_filename_chars)
+                filename = filename.Replace(c.ToString(), string.Empty);
+            return filename;
+        }
 
         public static bool RequiresSupporter(this BeatmapLeaderboardScope scope, bool filterMods)
         {
