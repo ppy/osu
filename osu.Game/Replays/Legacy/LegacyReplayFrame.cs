@@ -64,5 +64,12 @@ namespace osu.Game.Replays.Legacy
         {
             return $"{Time}\t({MouseX},{MouseY})\t{MouseLeft}\t{MouseRight}\t{MouseLeft1}\t{MouseRight1}\t{MouseLeft2}\t{MouseRight2}\t{ButtonState}";
         }
+
+        public override bool IsEquivalentTo(ReplayFrame other)
+            => other is LegacyReplayFrame legacyFrame
+               && Time == legacyFrame.Time
+               && MouseX == legacyFrame.MouseX
+               && MouseY == legacyFrame.MouseY
+               && ButtonState == legacyFrame.ButtonState;
     }
 }

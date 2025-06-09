@@ -32,6 +32,8 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osuTK;
 using osuTK.Graphics;
+using CommonStrings = osu.Game.Localisation.CommonStrings;
+using WebCommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
 
 namespace osu.Game.Screens.Select.Carousel
 {
@@ -86,7 +88,10 @@ namespace osu.Game.Screens.Select.Carousel
         [Resolved]
         private OsuGame? game { get; set; }
 
-        private IBindable<StarDifficulty?> starDifficultyBindable = null!;
+        [Resolved]
+        private BeatmapManager? manager { get; set; }
+
+        private IBindable<StarDifficulty> starDifficultyBindable = null!;
         private CancellationTokenSource? starDifficultyCancellationSource;
 
         public DrawableCarouselBeatmap(CarouselBeatmap panel)
@@ -96,7 +101,7 @@ namespace osu.Game.Screens.Select.Carousel
         }
 
         [BackgroundDependencyLoader]
-        private void load(BeatmapManager? manager, SongSelect? songSelect)
+        private void load(SongSelect? songSelect)
         {
             Header.Height = height;
 
@@ -241,12 +246,11 @@ namespace osu.Game.Screens.Select.Carousel
             if (Item?.State.Value != CarouselItemState.Collapsed)
             {
                 // We've potentially cancelled the computation above so a new bindable is required.
-                starDifficultyBindable = difficultyCache.GetBindableDifficulty(beatmapInfo, (starDifficultyCancellationSource = new CancellationTokenSource()).Token);
+                starDifficultyBindable = difficultyCache.GetBindableDifficulty(beatmapInfo, (starDifficultyCancellationSource = new CancellationTokenSource()).Token, 200);
                 starDifficultyBindable.BindValueChanged(d =>
                 {
-                    starCounter.Current = (float)(d.NewValue?.Stars ?? 0);
-                    if (d.NewValue != null)
-                        difficultyIcon.Current.Value = d.NewValue.Value;
+                    starCounter.Current = (float)(d.NewValue.Stars);
+                    difficultyIcon.Current.Value = d.NewValue;
                 }, true);
 
                 updateKeyCount();
@@ -296,10 +300,13 @@ namespace osu.Game.Screens.Select.Carousel
                 items.Add(new OsuMenuItem("Collections") { Items = collectionItems });
 
                 if (beatmapInfo.GetOnlineURL(api, ruleset.Value) is string url)
-                    items.Add(new OsuMenuItem("Copy link", MenuItemType.Standard, () => game?.CopyUrlToClipboard(url)));
+                    items.Add(new OsuMenuItem(CommonStrings.CopyLink, MenuItemType.Standard, () => game?.CopyToClipboard(url)));
+
+                if (manager != null)
+                    items.Add(new OsuMenuItem("Mark as played", MenuItemType.Standard, () => manager.MarkPlayed(beatmapInfo)));
 
                 if (hideRequested != null)
-                    items.Add(new OsuMenuItem(CommonStrings.ButtonsHide.ToSentence(), MenuItemType.Destructive, () => hideRequested(beatmapInfo)));
+                    items.Add(new OsuMenuItem(WebCommonStrings.ButtonsHide.ToSentence(), MenuItemType.Destructive, () => hideRequested(beatmapInfo)));
 
                 return items.ToArray();
             }

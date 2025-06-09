@@ -66,6 +66,8 @@ namespace osu.Game.Screens.Select.Carousel
             match &= !criteria.OverallDifficulty.HasFilter || criteria.OverallDifficulty.IsInRange(BeatmapInfo.Difficulty.OverallDifficulty);
             match &= !criteria.Length.HasFilter || criteria.Length.IsInRange(BeatmapInfo.Length);
             match &= !criteria.LastPlayed.HasFilter || criteria.LastPlayed.IsInRange(BeatmapInfo.LastPlayed ?? DateTimeOffset.MinValue);
+            match &= !criteria.DateRanked.HasFilter || (BeatmapInfo.BeatmapSet?.DateRanked != null && criteria.DateRanked.IsInRange(BeatmapInfo.BeatmapSet.DateRanked.Value));
+            match &= !criteria.DateSubmitted.HasFilter || (BeatmapInfo.BeatmapSet?.DateSubmitted != null && criteria.DateSubmitted.IsInRange(BeatmapInfo.BeatmapSet.DateSubmitted.Value));
             match &= !criteria.BPM.HasFilter || criteria.BPM.IsInRange(BeatmapInfo.BPM);
 
             match &= !criteria.BeatDivisor.HasFilter || criteria.BeatDivisor.IsInRange(BeatmapInfo.BeatDivisor);
@@ -79,6 +81,7 @@ namespace osu.Game.Screens.Select.Carousel
             match &= !criteria.Title.HasFilter || criteria.Title.Matches(BeatmapInfo.Metadata.Title) ||
                      criteria.Title.Matches(BeatmapInfo.Metadata.TitleUnicode);
             match &= !criteria.DifficultyName.HasFilter || criteria.DifficultyName.Matches(BeatmapInfo.DifficultyName);
+            match &= !criteria.Source.HasFilter || criteria.Source.Matches(BeatmapInfo.Metadata.Source);
             match &= !criteria.UserStarDifficulty.HasFilter || criteria.UserStarDifficulty.IsInRange(BeatmapInfo.StarRating);
 
             if (!match) return false;
@@ -86,6 +89,12 @@ namespace osu.Game.Screens.Select.Carousel
             match &= criteria.CollectionBeatmapMD5Hashes?.Contains(BeatmapInfo.MD5Hash) ?? true;
             if (match && criteria.RulesetCriteria != null)
                 match &= criteria.RulesetCriteria.Matches(BeatmapInfo, criteria);
+
+            if (match && criteria.HasOnlineID == true)
+                match &= BeatmapInfo.OnlineID >= 0;
+
+            if (match && criteria.BeatmapSetId != null)
+                match &= criteria.BeatmapSetId == BeatmapInfo.BeatmapSet?.OnlineID;
 
             return match;
         }

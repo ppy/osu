@@ -104,6 +104,8 @@ namespace osu.Game.Rulesets.Objects
         /// <param name="cancellationToken">The cancellation token.</param>
         public void ApplyDefaults(ControlPointInfo controlPointInfo, IBeatmapDifficultyInfo difficulty, CancellationToken cancellationToken = default)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
             nestedHitObjects.Clear();
@@ -114,6 +116,8 @@ namespace osu.Game.Rulesets.Objects
             {
                 foreach (HitObject hitObject in nestedHitObjects)
                 {
+                    cancellationToken.ThrowIfCancellationRequested();
+
                     if (hitObject is IHasComboInformation n)
                     {
                         n.ComboIndexBindable.BindTo(hasCombo.ComboIndexBindable);
@@ -233,7 +237,7 @@ namespace osu.Game.Rulesets.Objects
 
             // Fall back to using the normal sample bank otherwise.
             if (Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL) is HitSampleInfo existingNormal)
-                return existingNormal.With(newName: sampleName);
+                return existingNormal.With(newName: sampleName, newEditorAutoBank: true);
 
             return new HitSampleInfo(sampleName);
         }

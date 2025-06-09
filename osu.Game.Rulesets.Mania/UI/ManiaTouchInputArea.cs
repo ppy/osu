@@ -18,6 +18,8 @@ namespace osu.Game.Rulesets.Mania.UI
     /// </summary>
     public partial class ManiaTouchInputArea : VisibilityContainer
     {
+        private readonly DrawableManiaRuleset drawableRuleset;
+
         // visibility state affects our child. we always want to handle input.
         public override bool PropagatePositionalInputSubTree => true;
         public override bool PropagateNonPositionalInputSubTree => true;
@@ -38,13 +40,12 @@ namespace osu.Game.Rulesets.Mania.UI
             MaxValue = 1
         };
 
-        [Resolved]
-        private DrawableManiaRuleset drawableRuleset { get; set; } = null!;
-
         private GridContainer gridContainer = null!;
 
-        public ManiaTouchInputArea()
+        public ManiaTouchInputArea(DrawableManiaRuleset drawableRuleset)
         {
+            this.drawableRuleset = drawableRuleset;
+
             Anchor = Anchor.BottomCentre;
             Origin = Anchor.BottomCentre;
 
@@ -70,7 +71,11 @@ namespace osu.Game.Rulesets.Mania.UI
                         receptorGridDimensions.Add(new Dimension(GridSizeMode.AutoSize));
                     }
 
-                    receptorGridContent.Add(new ColumnInputReceptor { Action = { BindTarget = column.Action } });
+                    receptorGridContent.Add(new ColumnInputReceptor
+                    {
+                        Action = { BindTarget = column.Action },
+                        Spacing = { BindTarget = Spacing },
+                    });
                     receptorGridDimensions.Add(new Dimension());
 
                     first = false;
@@ -118,6 +123,7 @@ namespace osu.Game.Rulesets.Mania.UI
         public partial class ColumnInputReceptor : CompositeDrawable
         {
             public readonly IBindable<ManiaAction> Action = new Bindable<ManiaAction>();
+            public readonly IBindable<float> Spacing = new BindableFloat();
 
             private readonly Box highlightOverlay;
 
@@ -154,6 +160,10 @@ namespace osu.Game.Rulesets.Mania.UI
                     }
                 };
             }
+
+            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
+                // Extend input coverage to the gaps close to this receptor.
+                => DrawRectangle.Inflate(new Vector2(Spacing.Value / 2, 0)).Contains(ToLocalSpace(screenSpacePos));
 
             protected override bool OnTouchDown(TouchDownEvent e)
             {

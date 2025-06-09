@@ -45,6 +45,11 @@ namespace osu.Game.Localisation
         public static LocalisableString CheckUpdate => new TranslatableString(getKey(@"check_update"), @"Check for updates");
 
         /// <summary>
+        /// "Checking for updates"
+        /// </summary>
+        public static LocalisableString CheckingForUpdates => new TranslatableString(getKey(@"checking_for_updates"), @"Checking for updates");
+
+        /// <summary>
         /// "Open osu! folder"
         /// </summary>
         public static LocalisableString OpenOsuFolder => new TranslatableString(getKey(@"open_osu_folder"), @"Open osu! folder");
@@ -73,6 +78,18 @@ namespace osu.Game.Localisation
         /// "Check out the feature comparison and FAQ"
         /// </summary>
         public static LocalisableString LearnMoreAboutLazerTooltip => new TranslatableString(getKey(@"check_out_the_feature_comparison"), @"Check out the feature comparison and FAQ");
+
+        /// <summary>
+        /// "Are you sure you want to run a potentially unstable version of the game?"
+        /// </summary>
+        public static LocalisableString ChangeReleaseStreamConfirmation => new TranslatableString(getKey(@"change_release stream_confirmation"),
+            @"Are you sure you want to run a potentially unstable version of the game?");
+
+        /// <summary>
+        /// "If you run into issues starting the game, you can usually run the installer from the official site to recover."
+        /// </summary>
+        public static LocalisableString ChangeReleaseStreamConfirmationInfo => new TranslatableString(getKey(@"change_release stream_confirmation_info"),
+            @"If you run into issues starting the game, you can usually run the installer from the official site to recover.");
 
         /// <summary>
         /// "You are running the latest release ({0})"

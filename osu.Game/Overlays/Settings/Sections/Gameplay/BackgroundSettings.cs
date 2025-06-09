@@ -42,7 +42,8 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 new SettingsCheckbox
                 {
                     LabelText = GameplaySettingsStrings.LightenDuringBreaks,
-                    Current = config.GetBindable<bool>(OsuSetting.LightenDuringBreaks)
+                    Current = config.GetBindable<bool>(OsuSetting.LightenDuringBreaks),
+                    Keywords = new[] { "dim", "level" }
                 },
                 new SettingsCheckbox
                 {

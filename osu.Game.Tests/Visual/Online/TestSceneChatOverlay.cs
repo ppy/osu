@@ -216,6 +216,32 @@ namespace osu.Game.Tests.Visual.Online
         }
 
         [Test]
+        public void TestChannelCloseViaMiddleClick()
+        {
+            var testPMChannel = new Channel(testUser);
+
+            AddStep("Show overlay", () => chatOverlay.Show());
+            joinTestChannel(0);
+            joinChannel(testPMChannel);
+            AddStep("Select PM channel", () => clickDrawable(getChannelListItem(testPMChannel)));
+            AddStep("Middle click", () =>
+            {
+                var item = getChannelListItem(testPMChannel);
+                InputManager.MoveMouseTo(item);
+                InputManager.Click(MouseButton.Middle);
+            });
+            AddAssert("PM channel closed", () => !channelManager.JoinedChannels.Contains(testPMChannel));
+            AddStep("Select normal channel", () => clickDrawable(getChannelListItem(testChannel1)));
+            AddStep("Click close button", () =>
+            {
+                var item = getChannelListItem(testChannel1);
+                InputManager.MoveMouseTo(item);
+                InputManager.Click(MouseButton.Middle);
+            });
+            AddAssert("Normal channel closed", () => !channelManager.JoinedChannels.Contains(testChannel1));
+        }
+
+        [Test]
         public void TestChannelCloseButton()
         {
             var testPMChannel = new Channel(testUser);
@@ -458,6 +484,61 @@ namespace osu.Game.Tests.Visual.Online
         }
 
         [Test]
+        public void TestPublicChannelsSortedByName()
+        {
+            // Intentionally join back to front.
+            AddStep("Show overlay with channel 2", () =>
+            {
+                channelManager.CurrentChannel.Value = channelManager.JoinChannel(testChannel2);
+                chatOverlay.Show();
+            });
+            AddUntilStep("second channel is at top of list", () => getFirstVisiblePublicChannel().Channel == testChannel2);
+
+            AddStep("Join channel 1", () => channelManager.JoinChannel(testChannel1));
+            AddUntilStep("first channel is at top of list", () => getFirstVisiblePublicChannel().Channel == testChannel1);
+
+            AddStep("message in channel 2", () =>
+            {
+                testChannel2.AddNewMessages(new Message(1) { Content = "hi!", Sender = new APIUser { Username = "person" } });
+            });
+            AddUntilStep("first channel still at top of list", () => getFirstVisiblePublicChannel().Channel == testChannel1);
+
+            ChannelListItem getFirstVisiblePublicChannel() =>
+                chatOverlay.ChildrenOfType<ChannelList>().Single().PublicChannelGroup.ItemFlow.FlowingChildren.OfType<ChannelListItem>().First(item => item.Channel.Type == ChannelType.Public);
+        }
+
+        [Test]
+        public void TestPrivateChannelsSortedByRecent()
+        {
+            Channel pmChannel1 = createPrivateChannel();
+            Channel pmChannel2 = createPrivateChannel();
+
+            joinChannel(pmChannel1);
+            joinChannel(pmChannel2);
+
+            AddStep("Show overlay", () => chatOverlay.Show());
+
+            AddUntilStep("first channel is at top of list", () => getFirstVisiblePMChannel().Channel == pmChannel1);
+
+            AddStep("message in channel 2", () =>
+            {
+                pmChannel2.AddNewMessages(new Message(1) { Content = "hi!", Sender = new APIUser { Username = "person" } });
+            });
+
+            AddUntilStep("wait for first channel raised to top of list", () => getFirstVisiblePMChannel().Channel == pmChannel2);
+
+            AddStep("message in channel 1", () =>
+            {
+                pmChannel1.AddNewMessages(new Message(1) { Content = "hi!", Sender = new APIUser { Username = "person" } });
+            });
+
+            AddUntilStep("wait for first channel raised to top of list", () => getFirstVisiblePMChannel().Channel == pmChannel1);
+
+            ChannelListItem getFirstVisiblePMChannel() =>
+                chatOverlay.ChildrenOfType<ChannelList>().Single().PrivateChannelGroup.ItemFlow.FlowingChildren.OfType<ChannelListItem>().First(item => item.Channel.Type == ChannelType.PM);
+        }
+
+        [Test]
         public void TestKeyboardNewChannel()
         {
             AddStep("Show overlay with channel 1", () =>
@@ -646,6 +727,34 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Complete request", () => requestLock.Set());
             AddUntilStep("Request sent", () => request != null);
             AddUntilStep("Info message displayed", () => channelManager.CurrentChannel.Value.Messages.Last(), () => Is.InstanceOf(typeof(InfoMessage)));
+        }
+
+        [Test]
+        public void TestFiltering()
+        {
+            AddStep("Show overlay", () => chatOverlay.Show());
+            joinTestChannel(1);
+            joinTestChannel(3);
+            joinTestChannel(5);
+            joinChannel(new Channel(new APIUser { Id = 2001, Username = "alice" }));
+            joinChannel(new Channel(new APIUser { Id = 2002, Username = "bob" }));
+            joinChannel(new Channel(new APIUser { Id = 2003, Username = "charley the plant" }));
+
+            AddStep("filter to \"c\"", () => chatOverlay.ChildrenOfType<SearchTextBox>().Single().Text = "c");
+            AddUntilStep("bob filtered out", () => chatOverlay.ChildrenOfType<ChannelListItem>().Count(i => i.Alpha > 0), () => Is.EqualTo(5));
+
+            AddStep("filter to \"channel\"", () => chatOverlay.ChildrenOfType<SearchTextBox>().Single().Text = "channel");
+            AddUntilStep("only public channels left", () => chatOverlay.ChildrenOfType<ChannelListItem>().Count(i => i.Alpha > 0), () => Is.EqualTo(3));
+
+            AddStep("commit textbox", () =>
+            {
+                chatOverlay.ChildrenOfType<SearchTextBox>().Single().TakeFocus();
+                Schedule(() => InputManager.PressKey(Key.Enter));
+            });
+            AddUntilStep("#channel-2 active", () => channelManager.CurrentChannel.Value.Name, () => Is.EqualTo("#channel-2"));
+
+            AddStep("filter to \"channel-3\"", () => chatOverlay.ChildrenOfType<SearchTextBox>().Single().Text = "channel-3");
+            AddUntilStep("no channels left", () => chatOverlay.ChildrenOfType<ChannelListItem>().Count(i => i.Alpha > 0), () => Is.EqualTo(0));
         }
 
         private void joinTestChannel(int i)

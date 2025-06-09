@@ -5,16 +5,21 @@ using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Events;
+using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components.RadioButtons;
+using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Edit
@@ -25,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         private readonly OsuGridToolboxGroup gridToolbox;
 
-        private readonly Bindable<PreciseScaleInfo> scaleInfo = new Bindable<PreciseScaleInfo>(new PreciseScaleInfo(1, ScaleOrigin.GridCentre, true, true));
+        private readonly Bindable<PreciseScaleInfo> scaleInfo = new Bindable<PreciseScaleInfo>(new PreciseScaleInfo(1, EditorOrigin.GridCentre, true, true));
 
         private SliderWithTextBoxInput<float> scaleInput = null!;
         private BindableNumber<float> scaleInputBindable = null!;
@@ -38,6 +43,8 @@ namespace osu.Game.Rulesets.Osu.Edit
         private OsuCheckbox xCheckBox = null!;
         private OsuCheckbox yCheckBox = null!;
 
+        private Bindable<EditorOrigin> configScaleOrigin = null!;
+
         private BindableList<HitObject> selectedItems { get; } = new BindableList<HitObject>();
 
         public PreciseScalePopover(OsuSelectionScaleHandler scaleHandler, OsuGridToolboxGroup gridToolbox)
@@ -49,9 +56,11 @@ namespace osu.Game.Rulesets.Osu.Edit
         }
 
         [BackgroundDependencyLoader]
-        private void load(EditorBeatmap editorBeatmap)
+        private void load(EditorBeatmap editorBeatmap, OsuConfigManager config)
         {
             selectedItems.BindTo(editorBeatmap.SelectedHitObjects);
+
+            configScaleOrigin = config.GetBindable<EditorOrigin>(OsuSetting.EditorScaleOrigin);
 
             Child = new FillFlowContainer
             {
@@ -64,12 +73,13 @@ namespace osu.Game.Rulesets.Osu.Edit
                     {
                         Current = scaleInputBindable = new BindableNumber<float>
                         {
-                            MinValue = 0.5f,
+                            MinValue = 0.05f,
                             MaxValue = 2,
                             Precision = 0.001f,
                             Value = 1,
                             Default = 1,
                         },
+                        KeyboardStep = 0.01f,
                         Instantaneous = true
                     },
                     scaleOrigin = new EditorRadioButtonCollection
@@ -78,13 +88,13 @@ namespace osu.Game.Rulesets.Osu.Edit
                         Items = new[]
                         {
                             gridCentreButton = new RadioButton("Grid centre",
-                                () => setOrigin(ScaleOrigin.GridCentre),
+                                () => setOrigin(EditorOrigin.GridCentre),
                                 () => new SpriteIcon { Icon = FontAwesome.Regular.PlusSquare }),
                             playfieldCentreButton = new RadioButton("Playfield centre",
-                                () => setOrigin(ScaleOrigin.PlayfieldCentre),
+                                () => setOrigin(EditorOrigin.PlayfieldCentre),
                                 () => new SpriteIcon { Icon = FontAwesome.Regular.Square }),
                             selectionCentreButton = new RadioButton("Selection centre",
-                                () => setOrigin(ScaleOrigin.SelectionCentre),
+                                () => setOrigin(EditorOrigin.SelectionCentre),
                                 () => new SpriteIcon { Icon = FontAwesome.Solid.VectorSquare })
                         }
                     },
@@ -129,21 +139,84 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             base.LoadComplete();
 
-            ScheduleAfterChildren(() =>
-            {
-                scaleInput.TakeFocus();
-                scaleInput.SelectAll();
-            });
+            ScheduleAfterChildren(() => scaleInput.TakeFocus());
             scaleInput.Current.BindValueChanged(scale => scaleInfo.Value = scaleInfo.Value with { Scale = scale.NewValue });
 
-            xCheckBox.Current.BindValueChanged(x => setAxis(x.NewValue, yCheckBox.Current.Value));
-            yCheckBox.Current.BindValueChanged(y => setAxis(xCheckBox.Current.Value, y.NewValue));
+            xCheckBox.Current.BindValueChanged(_ =>
+            {
+                if (!xCheckBox.Current.Value && !yCheckBox.Current.Value)
+                {
+                    yCheckBox.Current.Value = true;
+                    return;
+                }
+
+                updateAxes();
+            });
+            yCheckBox.Current.BindValueChanged(_ =>
+            {
+                if (!xCheckBox.Current.Value && !yCheckBox.Current.Value)
+                {
+                    xCheckBox.Current.Value = true;
+                    return;
+                }
+
+                updateAxes();
+            });
 
             selectionCentreButton.Selected.Disabled = !(scaleHandler.CanScaleX.Value || scaleHandler.CanScaleY.Value);
             playfieldCentreButton.Selected.Disabled = scaleHandler.IsScalingSlider.Value && !selectionCentreButton.Selected.Disabled;
             gridCentreButton.Selected.Disabled = playfieldCentreButton.Selected.Disabled;
 
-            scaleOrigin.Items.First(b => !b.Selected.Disabled).Select();
+            bool didSelect = false;
+
+            configScaleOrigin.BindValueChanged(val =>
+            {
+                switch (configScaleOrigin.Value)
+                {
+                    case EditorOrigin.GridCentre:
+                        if (!gridCentreButton.Selected.Disabled)
+                        {
+                            gridCentreButton.Select();
+                            didSelect = true;
+                        }
+
+                        break;
+
+                    case EditorOrigin.PlayfieldCentre:
+                        if (!playfieldCentreButton.Selected.Disabled)
+                        {
+                            playfieldCentreButton.Select();
+                            didSelect = true;
+                        }
+
+                        break;
+
+                    case EditorOrigin.SelectionCentre:
+                        if (!selectionCentreButton.Selected.Disabled)
+                        {
+                            selectionCentreButton.Select();
+                            didSelect = true;
+                        }
+
+                        break;
+                }
+            }, true);
+
+            if (!didSelect)
+                scaleOrigin.Items.First(b => !b.Selected.Disabled).Select();
+
+            gridCentreButton.Selected.BindValueChanged(b =>
+            {
+                if (b.NewValue) configScaleOrigin.Value = EditorOrigin.GridCentre;
+            });
+            playfieldCentreButton.Selected.BindValueChanged(b =>
+            {
+                if (b.NewValue) configScaleOrigin.Value = EditorOrigin.PlayfieldCentre;
+            });
+            selectionCentreButton.Selected.BindValueChanged(b =>
+            {
+                if (b.NewValue) configScaleOrigin.Value = EditorOrigin.SelectionCentre;
+            });
 
             scaleInfo.BindValueChanged(scale =>
             {
@@ -152,9 +225,15 @@ namespace osu.Game.Rulesets.Osu.Edit
             });
         }
 
+        private void updateAxes()
+        {
+            scaleInfo.Value = scaleInfo.Value with { XAxis = xCheckBox.Current.Value, YAxis = yCheckBox.Current.Value };
+            updateMinMaxScale();
+        }
+
         private void updateAxisCheckBoxesEnabled()
         {
-            if (scaleInfo.Value.Origin != ScaleOrigin.SelectionCentre)
+            if (scaleInfo.Value.Origin != EditorOrigin.SelectionCentre)
             {
                 toggleAxisAvailable(xCheckBox.Current, true);
                 toggleAxisAvailable(yCheckBox.Current, true);
@@ -175,12 +254,14 @@ namespace osu.Game.Rulesets.Osu.Edit
             axisBindable.Disabled = !available;
         }
 
-        private void updateMaxScale()
+        private void updateMinMaxScale()
         {
             if (!scaleHandler.OriginalSurroundingQuad.HasValue)
                 return;
 
+            const float min_scale = 0.05f;
             const float max_scale = 10;
+
             var scale = scaleHandler.ClampScaleToPlayfieldBounds(new Vector2(max_scale), getOriginPosition(scaleInfo.Value), getAdjustAxis(scaleInfo.Value), getRotation(scaleInfo.Value));
 
             if (!scaleInfo.Value.XAxis)
@@ -189,12 +270,21 @@ namespace osu.Game.Rulesets.Osu.Edit
                 scale.Y = max_scale;
 
             scaleInputBindable.MaxValue = MathF.Max(1, MathF.Min(scale.X, scale.Y));
+
+            scale = scaleHandler.ClampScaleToPlayfieldBounds(new Vector2(min_scale), getOriginPosition(scaleInfo.Value), getAdjustAxis(scaleInfo.Value), getRotation(scaleInfo.Value));
+
+            if (!scaleInfo.Value.XAxis)
+                scale.X = min_scale;
+            if (!scaleInfo.Value.YAxis)
+                scale.Y = min_scale;
+
+            scaleInputBindable.MinValue = MathF.Min(1, MathF.Max(scale.X, scale.Y));
         }
 
-        private void setOrigin(ScaleOrigin origin)
+        private void setOrigin(EditorOrigin origin)
         {
             scaleInfo.Value = scaleInfo.Value with { Origin = origin };
-            updateMaxScale();
+            updateMinMaxScale();
             updateAxisCheckBoxesEnabled();
         }
 
@@ -202,13 +292,13 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             switch (scale.Origin)
             {
-                case ScaleOrigin.GridCentre:
+                case EditorOrigin.GridCentre:
                     return gridToolbox.StartPosition.Value;
 
-                case ScaleOrigin.PlayfieldCentre:
+                case EditorOrigin.PlayfieldCentre:
                     return OsuPlayfield.BASE_SIZE / 2;
 
-                case ScaleOrigin.SelectionCentre:
+                case EditorOrigin.SelectionCentre:
                     if (selectedItems.Count == 1 && selectedItems.First() is Slider slider)
                         return slider.Position;
 
@@ -219,21 +309,26 @@ namespace osu.Game.Rulesets.Osu.Edit
             }
         }
 
-        private Axes getAdjustAxis(PreciseScaleInfo scale) => scale.XAxis ? scale.YAxis ? Axes.Both : Axes.X : Axes.Y;
-
-        private float getRotation(PreciseScaleInfo scale) => scale.Origin == ScaleOrigin.GridCentre ? gridToolbox.GridLinesRotation.Value : 0;
-
-        private void setAxis(bool x, bool y)
+        private Axes getAdjustAxis(PreciseScaleInfo scale)
         {
-            scaleInfo.Value = scaleInfo.Value with { XAxis = x, YAxis = y };
-            updateMaxScale();
+            var result = Axes.None;
+
+            if (scale.XAxis)
+                result |= Axes.X;
+
+            if (scale.YAxis)
+                result |= Axes.Y;
+
+            return result;
         }
+
+        private float getRotation(PreciseScaleInfo scale) => scale.Origin == EditorOrigin.GridCentre ? gridToolbox.GridLinesRotation.Value : 0;
 
         protected override void PopIn()
         {
             base.PopIn();
             scaleHandler.Begin();
-            updateMaxScale();
+            updateMinMaxScale();
         }
 
         protected override void PopOut()
@@ -242,14 +337,18 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             if (IsLoaded) scaleHandler.Commit();
         }
+
+        public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+        {
+            if (e.Action == GlobalAction.Select && !e.Repeat)
+            {
+                this.HidePopover();
+                return true;
+            }
+
+            return base.OnPressed(e);
+        }
     }
 
-    public enum ScaleOrigin
-    {
-        GridCentre,
-        PlayfieldCentre,
-        SelectionCentre
-    }
-
-    public record PreciseScaleInfo(float Scale, ScaleOrigin Origin, bool XAxis, bool YAxis);
+    public record PreciseScaleInfo(float Scale, EditorOrigin Origin, bool XAxis, bool YAxis);
 }

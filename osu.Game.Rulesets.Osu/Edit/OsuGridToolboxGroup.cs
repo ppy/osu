@@ -38,6 +38,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             MinValue = 0f,
             MaxValue = OsuPlayfield.BASE_SIZE.X,
+            Precision = 0.01f,
         };
 
         /// <summary>
@@ -47,6 +48,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             MinValue = 0f,
             MaxValue = OsuPlayfield.BASE_SIZE.Y,
+            Precision = 0.01f,
         };
 
         /// <summary>
@@ -55,7 +57,8 @@ namespace osu.Game.Rulesets.Osu.Edit
         public BindableFloat Spacing { get; } = new BindableFloat(4f)
         {
             MinValue = 4f,
-            MaxValue = 128f,
+            MaxValue = 256f,
+            Precision = 0.01f,
         };
 
         /// <summary>
@@ -65,6 +68,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             MinValue = -180f,
             MaxValue = 180f,
+            Precision = 0.01f,
         };
 
         /// <summary>
@@ -166,7 +170,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                 },
             };
 
-            Spacing.Value = editorBeatmap.BeatmapInfo.GridSize;
+            Spacing.Value = editorBeatmap.GridSize;
         }
 
         protected override void LoadComplete()
@@ -200,7 +204,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                 spacingSlider.ContractedLabelText = $"S: {spacing.NewValue:#,0.##}";
                 spacingSlider.ExpandedLabelText = $"Spacing: {spacing.NewValue:#,0.##}";
                 SpacingVector.Value = new Vector2(spacing.NewValue);
-                editorBeatmap.BeatmapInfo.GridSize = (int)spacing.NewValue;
+                editorBeatmap.GridSize = (int)spacing.NewValue;
             }, true);
 
             GridLinesRotation.BindValueChanged(rotation =>
@@ -212,6 +216,8 @@ namespace osu.Game.Rulesets.Osu.Edit
             GridType.BindValueChanged(v =>
             {
                 GridLinesRotation.Disabled = v.NewValue == PositionSnapGridType.Circle;
+
+                gridTypeButtons.Items[(int)v.NewValue].Select();
 
                 switch (v.NewValue)
                 {
@@ -241,17 +247,16 @@ namespace osu.Game.Rulesets.Osu.Edit
             return ((rotation + 360 + period * 0.5f) % period) - period * 0.5f;
         }
 
-        private void nextGridSize()
-        {
-            Spacing.Value = Spacing.Value * 2 >= max_automatic_spacing ? Spacing.Value / 8 : Spacing.Value * 2;
-        }
-
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
             switch (e.Action)
             {
-                case GlobalAction.EditorCycleGridDisplayMode:
-                    nextGridSize();
+                case GlobalAction.EditorCycleGridSpacing:
+                    Spacing.Value = Spacing.Value * 2 >= max_automatic_spacing ? Spacing.Value / 8 : Spacing.Value * 2;
+                    return true;
+
+                case GlobalAction.EditorCycleGridType:
+                    GridType.Value = (PositionSnapGridType)(((int)GridType.Value + 1) % Enum.GetValues<PositionSnapGridType>().Length);
                     return true;
             }
 

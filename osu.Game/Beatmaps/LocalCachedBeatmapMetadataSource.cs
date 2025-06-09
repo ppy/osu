@@ -90,8 +90,7 @@ namespace osu.Game.Beatmaps
             }
 
             if (string.IsNullOrEmpty(beatmapInfo.MD5Hash)
-                && string.IsNullOrEmpty(beatmapInfo.Path)
-                && beatmapInfo.OnlineID <= 0)
+                && string.IsNullOrEmpty(beatmapInfo.Path))
             {
                 onlineMetadata = null;
                 return false;
@@ -105,15 +104,35 @@ namespace osu.Game.Beatmaps
 
                     switch (getCacheVersion(db))
                     {
-                        case 1:
-                            // will eventually become irrelevant due to the monthly recycling of local caches
-                            // can be removed 20250221
-                            return queryCacheVersion1(db, beatmapInfo, out onlineMetadata);
-
                         case 2:
                             return queryCacheVersion2(db, beatmapInfo, out onlineMetadata);
                     }
                 }
+
+                onlineMetadata = null;
+                return false;
+            }
+            catch (SqliteException sqliteException)
+            {
+                onlineMetadata = null;
+
+                // There have been cases where the user's local database is corrupt.
+                // Let's attempt to identify these cases and re-initialise the local cache.
+                switch (sqliteException.SqliteErrorCode)
+                {
+                    case 26: // SQLITE_NOTADB
+                    case 11: // SQLITE_CORRUPT
+                        // only attempt purge & re-download if there is no other refetch in progress
+                        if (cacheDownloadRequest != null)
+                            return false;
+
+                        tryPurgeCache();
+                        prepareLocalCache();
+                        return false;
+                }
+
+                logForModel(beatmapInfo.BeatmapSet, $@"Cached local retrieval for {beatmapInfo} failed with unhandled sqlite error {sqliteException}.");
+                return false;
             }
             catch (Exception ex)
             {
@@ -121,9 +140,22 @@ namespace osu.Game.Beatmaps
                 onlineMetadata = null;
                 return false;
             }
+        }
 
-            onlineMetadata = null;
-            return false;
+        private void tryPurgeCache()
+        {
+            log(@"Local metadata cache is corrupted; attempting purge.");
+
+            try
+            {
+                File.Delete(storage.GetFullPath(cache_database_name));
+            }
+            catch (Exception ex)
+            {
+                log($@"Failed to purge local metadata cache: {ex}");
+            }
+
+            log(@"Local metadata cache purged due to corruption.");
         }
 
         private SqliteConnection getConnection() =>
@@ -233,43 +265,6 @@ namespace osu.Game.Beatmaps
             }
         }
 
-        private bool queryCacheVersion1(SqliteConnection db, BeatmapInfo beatmapInfo, out OnlineBeatmapMetadata? onlineMetadata)
-        {
-            Debug.Assert(beatmapInfo.BeatmapSet != null);
-
-            using var cmd = db.CreateCommand();
-
-            cmd.CommandText =
-                @"SELECT beatmapset_id, beatmap_id, approved, user_id, checksum, last_update FROM osu_beatmaps WHERE checksum = @MD5Hash OR beatmap_id = @OnlineID OR filename = @Path";
-
-            cmd.Parameters.Add(new SqliteParameter(@"@MD5Hash", beatmapInfo.MD5Hash));
-            cmd.Parameters.Add(new SqliteParameter(@"@OnlineID", beatmapInfo.OnlineID));
-            cmd.Parameters.Add(new SqliteParameter(@"@Path", beatmapInfo.Path));
-
-            using var reader = cmd.ExecuteReader();
-
-            if (reader.Read())
-            {
-                logForModel(beatmapInfo.BeatmapSet, $@"Cached local retrieval for {beatmapInfo} (cache version 1).");
-
-                onlineMetadata = new OnlineBeatmapMetadata
-                {
-                    BeatmapSetID = reader.GetInt32(0),
-                    BeatmapID = reader.GetInt32(1),
-                    BeatmapStatus = (BeatmapOnlineStatus)reader.GetByte(2),
-                    BeatmapSetStatus = (BeatmapOnlineStatus)reader.GetByte(2),
-                    AuthorID = reader.GetInt32(3),
-                    MD5Hash = reader.GetString(4),
-                    LastUpdated = reader.GetDateTimeOffset(5),
-                    // TODO: DateSubmitted and DateRanked are not provided by local cache in this version.
-                };
-                return true;
-            }
-
-            onlineMetadata = null;
-            return false;
-        }
-
         private bool queryCacheVersion2(SqliteConnection db, BeatmapInfo beatmapInfo, out OnlineBeatmapMetadata? onlineMetadata)
         {
             Debug.Assert(beatmapInfo.BeatmapSet != null);
@@ -281,11 +276,14 @@ namespace osu.Game.Beatmaps
                 SELECT `b`.`beatmapset_id`, `b`.`beatmap_id`, `b`.`approved`, `b`.`user_id`, `b`.`checksum`, `b`.`last_update`, `s`.`submit_date`, `s`.`approved_date`
                 FROM `osu_beatmaps` AS `b`
                 JOIN `osu_beatmapsets` AS `s` ON `s`.`beatmapset_id` = `b`.`beatmapset_id`
-                WHERE `b`.`checksum` = @MD5Hash OR `b`.`beatmap_id` = @OnlineID OR `b`.`filename` = @Path
+                WHERE (`b`.`checksum` = @MD5Hash OR `b`.`filename` = @Path)
+                AND `b`.`approved` in (1, 2, 4)
                 """;
+            // approved conditional can theoretically be removed as it was fixed in
+            // https://github.com/ppy/osu-onlinedb-generator/commit/489ac000775c3ff63bc914efb83cad0f6fbde261
+            // but it's also safe to leave it (should not affect performance).
 
             cmd.Parameters.Add(new SqliteParameter(@"@MD5Hash", beatmapInfo.MD5Hash));
-            cmd.Parameters.Add(new SqliteParameter(@"@OnlineID", beatmapInfo.OnlineID));
             cmd.Parameters.Add(new SqliteParameter(@"@Path", beatmapInfo.Path));
 
             using var reader = cmd.ExecuteReader();

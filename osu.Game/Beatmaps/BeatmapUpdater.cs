@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
@@ -15,10 +14,7 @@ using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Beatmaps
 {
-    /// <summary>
-    /// Handles all processing required to ensure a local beatmap is in a consistent state with any changes.
-    /// </summary>
-    public class BeatmapUpdater : IDisposable
+    public class BeatmapUpdater : IBeatmapUpdater
     {
         private readonly IWorkingBeatmapCache workingBeatmapCache;
 
@@ -38,11 +34,6 @@ namespace osu.Game.Beatmaps
             metadataLookup = new BeatmapUpdaterMetadataLookup(api, storage);
         }
 
-        /// <summary>
-        /// Queue a beatmap for background processing.
-        /// </summary>
-        /// <param name="beatmapSet">The managed beatmap set to update. A transaction will be opened to apply changes.</param>
-        /// <param name="lookupScope">The preferred scope to use for metadata lookup.</param>
         public void Queue(Live<BeatmapSetInfo> beatmapSet, MetadataLookupScope lookupScope = MetadataLookupScope.LocalCacheFirst)
         {
             Logger.Log($"Queueing change for local beatmap {beatmapSet}");
@@ -50,55 +41,53 @@ namespace osu.Game.Beatmaps
                 updateScheduler);
         }
 
-        /// <summary>
-        /// Run all processing on a beatmap immediately.
-        /// </summary>
-        /// <param name="beatmapSet">The managed beatmap set to update. A transaction will be opened to apply changes.</param>
-        /// <param name="lookupScope">The preferred scope to use for metadata lookup.</param>
-        public void Process(BeatmapSetInfo beatmapSet, MetadataLookupScope lookupScope = MetadataLookupScope.LocalCacheFirst) => beatmapSet.Realm!.Write(_ =>
+        public void Process(BeatmapSetInfo beatmapSet, MetadataLookupScope lookupScope = MetadataLookupScope.LocalCacheFirst)
         {
-            // Before we use below, we want to invalidate.
-            workingBeatmapCache.Invalidate(beatmapSet);
-
-            if (lookupScope != MetadataLookupScope.None)
-                metadataLookup.Update(beatmapSet, lookupScope == MetadataLookupScope.OnlineFirst);
-
-            foreach (var beatmap in beatmapSet.Beatmaps)
+            beatmapSet.Realm!.Write(_ =>
             {
-                difficultyCache.Invalidate(beatmap);
+                // Before we use below, we want to invalidate.
+                workingBeatmapCache.Invalidate(beatmapSet);
 
-                var working = workingBeatmapCache.GetWorkingBeatmap(beatmap);
-                var ruleset = working.BeatmapInfo.Ruleset.CreateInstance();
+                if (lookupScope != MetadataLookupScope.None)
+                    metadataLookup.Update(beatmapSet, lookupScope == MetadataLookupScope.OnlineFirst);
 
-                Debug.Assert(ruleset != null);
+                foreach (BeatmapInfo beatmap in beatmapSet.Beatmaps)
+                {
+                    difficultyCache.Invalidate(beatmap);
 
-                var calculator = ruleset.CreateDifficultyCalculator(working);
+                    var working = workingBeatmapCache.GetWorkingBeatmap(beatmap);
+                    var ruleset = working.BeatmapInfo.Ruleset.CreateInstance();
 
-                beatmap.StarRating = calculator.Calculate().StarRating;
-                beatmap.Length = working.Beatmap.CalculatePlayableLength();
-                beatmap.BPM = 60000 / working.Beatmap.GetMostCommonBeatLength();
-                beatmap.EndTimeObjectCount = working.Beatmap.HitObjects.Count(h => h is IHasDuration);
-                beatmap.TotalObjectCount = working.Beatmap.HitObjects.Count;
-            }
+                    Debug.Assert(ruleset != null);
 
-            // And invalidate again afterwards as re-fetching the most up-to-date database metadata will be required.
-            workingBeatmapCache.Invalidate(beatmapSet);
-        });
+                    var calculator = ruleset.CreateDifficultyCalculator(working);
 
-        public void ProcessObjectCounts(BeatmapInfo beatmapInfo, MetadataLookupScope lookupScope = MetadataLookupScope.LocalCacheFirst) => beatmapInfo.Realm!.Write(_ =>
+                    beatmap.StarRating = calculator.Calculate().StarRating;
+                    beatmap.UpdateStatisticsFromBeatmap(working.Beatmap);
+                }
+
+                // And invalidate again afterwards as re-fetching the most up-to-date database metadata will be required.
+                workingBeatmapCache.Invalidate(beatmapSet);
+            });
+        }
+
+        public void ProcessObjectCounts(BeatmapInfo beatmapInfo, MetadataLookupScope lookupScope = MetadataLookupScope.LocalCacheFirst)
         {
-            // Before we use below, we want to invalidate.
-            workingBeatmapCache.Invalidate(beatmapInfo);
+            beatmapInfo.Realm!.Write(_ =>
+            {
+                // Before we use below, we want to invalidate.
+                workingBeatmapCache.Invalidate(beatmapInfo);
 
-            var working = workingBeatmapCache.GetWorkingBeatmap(beatmapInfo);
-            var beatmap = working.Beatmap;
+                var working = workingBeatmapCache.GetWorkingBeatmap(beatmapInfo);
+                var beatmap = working.Beatmap;
 
-            beatmapInfo.EndTimeObjectCount = beatmap.HitObjects.Count(h => h is IHasDuration);
-            beatmapInfo.TotalObjectCount = beatmap.HitObjects.Count;
+                beatmapInfo.EndTimeObjectCount = beatmap.HitObjects.Count(h => h is IHasDuration);
+                beatmapInfo.TotalObjectCount = beatmap.HitObjects.Count;
 
-            // And invalidate again afterwards as re-fetching the most up-to-date database metadata will be required.
-            workingBeatmapCache.Invalidate(beatmapInfo);
-        });
+                // And invalidate again afterwards as re-fetching the most up-to-date database metadata will be required.
+                workingBeatmapCache.Invalidate(beatmapInfo);
+            });
+        }
 
         #region Implementation of IDisposable
 

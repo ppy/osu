@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Game.Localisation;
 using osuTK;
 using osuTK.Graphics;
 
@@ -77,7 +78,7 @@ namespace osu.Game.Graphics.UserInterface
                 if (Link != null)
                 {
                     items.Add(new OsuMenuItem("Open", MenuItemType.Highlighted, () => game?.OpenUrlExternally(Link)));
-                    items.Add(new OsuMenuItem("Copy link", MenuItemType.Standard, copyUrl));
+                    items.Add(new OsuMenuItem(CommonStrings.CopyLink, MenuItemType.Standard, copyUrl));
                 }
 
                 return items.ToArray();
@@ -88,7 +89,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             if (Link == null) return;
 
-            game?.CopyUrlToClipboard(Link);
+            game?.CopyToClipboard(Link);
         }
     }
 }

@@ -103,18 +103,6 @@ namespace osu.Game.Screens.Backgrounds
             }
         }
 
-        /// <summary>
-        /// Reloads beatmap's background.
-        /// </summary>
-        public void RefreshBackground()
-        {
-            Schedule(() =>
-            {
-                cancellationSource?.Cancel();
-                LoadComponentAsync(CreateBeatmapBackground(beatmap), switchBackground, (cancellationSource = new CancellationTokenSource()).Token);
-            });
-        }
-
         private void switchBackground(BeatmapBackground b)
         {
             float newDepth = 0;
@@ -122,12 +110,12 @@ namespace osu.Game.Screens.Backgrounds
             if (Background != null)
             {
                 newDepth = Background.Depth + 1;
-                Background.FinishTransforms();
                 Background.FadeOut(250);
                 Background.Expire();
             }
 
             b.Depth = newDepth;
+            b.FadeInFromZero(500, Easing.OutQuint);
             Background = dimmable.BeatmapBackground = b;
         }
 

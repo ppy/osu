@@ -82,13 +82,23 @@ jobs:
         run: dotnet build -c Debug -warnaserror osu.Desktop.slnf
 
       - name: Test
-        run: dotnet test $pwd/**/*.Tests/bin/Debug/*/*.Tests.dll --logger "trx;LogFileName=TestResults-${{matrix.os.prettyname}}-${{matrix.threadingMode}}.trx" -- NUnit.ConsoleOut=0
-        shell: pwsh
+        run: >
+          dotnet test
+          osu.Game.Tests/bin/Debug/**/osu.Game.Tests.dll
+          osu.Game.Rulesets.Osu.Tests/bin/Debug/**/osu.Game.Rulesets.Osu.Tests.dll
+          osu.Game.Rulesets.Taiko.Tests/bin/Debug/**/osu.Game.Rulesets.Taiko.Tests.dll
+          osu.Game.Rulesets.Catch.Tests/bin/Debug/**/osu.Game.Rulesets.Catch.Tests.dll
+          osu.Game.Rulesets.Mania.Tests/bin/Debug/**/osu.Game.Rulesets.Mania.Tests.dll
+          osu.Game.Tournament.Tests/bin/Debug/**/osu.Game.Tournament.Tests.dll
+          Templates/**/*.Tests/bin/Debug/**/*.Tests.dll
+          --logger "trx;LogFileName=TestResults-${{matrix.os.prettyname}}-${{matrix.threadingMode}}.trx"
+          --
+          NUnit.ConsoleOut=0
 
       # Attempt to upload results even if test fails.
       # https://docs.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions#always
       - name: Upload Test Results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: ${{ always() }}
         with:
           name: osu-test-results-${{matrix.os.prettyname}}-${{matrix.threadingMode}}
@@ -114,7 +124,7 @@ jobs:
           dotnet-version: "8.0.x"
 
       - name: Install .NET workloads
-        run: dotnet workload install maui-android
+        run: dotnet workload install android
 
       - name: Compile
         run: dotnet build -c Debug osu.Android.slnf
@@ -136,4 +146,4 @@ jobs:
         run: dotnet workload install ios --from-rollback-file https://raw.githubusercontent.com/ppy/osu-framework/refs/heads/master/workloads.json
 
       - name: Build
-        run: dotnet build -c Debug osu.iOS
+        run: dotnet build -c Debug osu.iOS.slnf

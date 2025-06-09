@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Extensions;
+using osu.Game.Graphics;
 using osu.Game.IO;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.HUD.HitErrorMeters;
@@ -67,10 +68,6 @@ namespace osu.Game.Skinning
             switch (lookup)
             {
                 case GlobalSkinnableContainerLookup containerLookup:
-                    // Only handle global level defaults for now.
-                    if (containerLookup.Ruleset != null)
-                        return null;
-
                     switch (containerLookup.Lookup)
                     {
                         case GlobalSkinnableContainers.SongSelect:
@@ -82,6 +79,44 @@ namespace osu.Game.Skinning
                             return songSelectComponents;
 
                         case GlobalSkinnableContainers.MainHUDComponents:
+                            // elements default to beneath the health bar
+                            const float score_vertical_offset = 30;
+                            const float horizontal_padding = 20;
+
+                            const float screen_edge_padding = 10;
+
+                            // Hard to find this at runtime, so taken from the most expanded state during replay.
+                            const float song_progress_offset_height = 73;
+
+                            if (containerLookup.Ruleset != null)
+                            {
+                                return new DefaultSkinComponentsContainer(container =>
+                                {
+                                    var leaderboard = container.OfType<DrawableGameplayLeaderboard>().FirstOrDefault();
+                                    var spectatorList = container.OfType<SpectatorList>().FirstOrDefault();
+
+                                    if (leaderboard != null)
+                                        leaderboard.Position = new Vector2(40, 60);
+
+                                    if (spectatorList != null)
+                                    {
+                                        spectatorList.HeaderFont.Value = Typeface.Venera;
+                                        spectatorList.HeaderColour.Value = new OsuColour().BlueLighter;
+                                        spectatorList.Anchor = Anchor.BottomLeft;
+                                        spectatorList.Origin = Anchor.BottomLeft;
+                                        spectatorList.Position = new Vector2(screen_edge_padding, -(song_progress_offset_height + screen_edge_padding));
+                                    }
+                                })
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Children = new Drawable[]
+                                    {
+                                        new DrawableGameplayLeaderboard(),
+                                        new SpectatorList(),
+                                    },
+                                };
+                            }
+
                             var skinnableTargetWrapper = new DefaultSkinComponentsContainer(container =>
                             {
                                 var score = container.OfType<DefaultScoreCounter>().FirstOrDefault();
@@ -96,12 +131,7 @@ namespace osu.Game.Skinning
                                     score.Anchor = Anchor.TopCentre;
                                     score.Origin = Anchor.TopCentre;
 
-                                    // elements default to beneath the health bar
-                                    const float vertical_offset = 30;
-
-                                    const float horizontal_padding = 20;
-
-                                    score.Position = new Vector2(0, vertical_offset);
+                                    score.Position = new Vector2(0, score_vertical_offset);
 
                                     if (ppCounter != null)
                                     {
@@ -112,13 +142,13 @@ namespace osu.Game.Skinning
 
                                     if (accuracy != null)
                                     {
-                                        accuracy.Position = new Vector2(-accuracy.ScreenSpaceDeltaToParentSpace(score.ScreenSpaceDrawQuad.Size).X / 2 - horizontal_padding, vertical_offset + 5);
+                                        accuracy.Position = new Vector2(-accuracy.ScreenSpaceDeltaToParentSpace(score.ScreenSpaceDrawQuad.Size).X / 2 - horizontal_padding, score_vertical_offset + 5);
                                         accuracy.Origin = Anchor.TopRight;
                                         accuracy.Anchor = Anchor.TopCentre;
 
                                         if (combo != null)
                                         {
-                                            combo.Position = new Vector2(accuracy.ScreenSpaceDeltaToParentSpace(score.ScreenSpaceDrawQuad.Size).X / 2 + horizontal_padding, vertical_offset + 5);
+                                            combo.Position = new Vector2(accuracy.ScreenSpaceDeltaToParentSpace(score.ScreenSpaceDrawQuad.Size).X / 2 + horizontal_padding, score_vertical_offset + 5);
                                             combo.Anchor = Anchor.TopCentre;
                                         }
                                     }
@@ -144,14 +174,9 @@ namespace osu.Game.Skinning
 
                                 if (songProgress != null && keyCounter != null)
                                 {
-                                    const float padding = 10;
-
-                                    // Hard to find this at runtime, so taken from the most expanded state during replay.
-                                    const float song_progress_offset_height = 73;
-
                                     keyCounter.Anchor = Anchor.BottomRight;
                                     keyCounter.Origin = Anchor.BottomRight;
-                                    keyCounter.Position = new Vector2(-padding, -(song_progress_offset_height + padding));
+                                    keyCounter.Position = new Vector2(-screen_edge_padding, -(song_progress_offset_height + screen_edge_padding));
                                 }
                             })
                             {
@@ -165,7 +190,7 @@ namespace osu.Game.Skinning
                                     new DefaultKeyCounterDisplay(),
                                     new BarHitErrorMeter(),
                                     new BarHitErrorMeter(),
-                                    new TrianglesPerformancePointsCounter()
+                                    new TrianglesPerformancePointsCounter(),
                                 }
                             };
 

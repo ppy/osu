@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.LocalisationExtensions;
@@ -18,37 +17,26 @@ namespace osu.Game.Beatmaps.Drawables
 {
     public partial class DifficultySpectrumDisplay : CompositeDrawable
     {
-        private Vector2 dotSize = new Vector2(4, 8);
+        private IBeatmapSetInfo? beatmapSet;
 
-        public Vector2 DotSize
+        public IBeatmapSetInfo? BeatmapSet
         {
-            get => dotSize;
+            get => beatmapSet;
             set
             {
-                dotSize = value;
+                beatmapSet = value;
 
                 if (IsLoaded)
-                    updateDotDimensions();
+                    updateDisplay();
             }
         }
 
-        private float dotSpacing = 1;
+        private FillFlowContainer<RulesetDifficultyGroup> flow = null!;
 
-        public float DotSpacing
-        {
-            get => dotSpacing;
-            set
-            {
-                dotSpacing = value;
+        private const int max_difficulties_before_collapsing = 12;
 
-                if (IsLoaded)
-                    updateDotDimensions();
-            }
-        }
-
-        private readonly FillFlowContainer<RulesetDifficultyGroup> flow;
-
-        public DifficultySpectrumDisplay(IBeatmapSetInfo beatmapSet)
+        [BackgroundDependencyLoader]
+        private void load()
         {
             AutoSizeAxes = Axes.Both;
 
@@ -58,54 +46,80 @@ namespace osu.Game.Beatmaps.Drawables
                 Spacing = new Vector2(10, 0),
                 Direction = FillDirection.Horizontal,
             };
-
-            // matching web: https://github.com/ppy/osu-web/blob/d06d8c5e735eb1f48799b1654b528e9a7afb0a35/resources/assets/lib/beatmapset-panel.tsx#L127
-            bool collapsed = beatmapSet.Beatmaps.Count() > 12;
-
-            foreach (var rulesetGrouping in beatmapSet.Beatmaps.GroupBy(beatmap => beatmap.Ruleset).OrderBy(group => group.Key))
-                flow.Add(new RulesetDifficultyGroup(rulesetGrouping.Key.OnlineID, rulesetGrouping, collapsed));
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            updateDotDimensions();
+            updateDisplay();
         }
 
-        private void updateDotDimensions()
+        private void updateDisplay()
         {
             foreach (var group in flow)
+                group.Alpha = 0;
+
+            if (beatmapSet == null)
             {
-                group.DotSize = DotSize;
-                group.DotSpacing = DotSpacing;
+                foreach (var group in flow)
+                    group.Beatmaps = [];
+                return;
+            }
+
+            // matching web: https://github.com/ppy/osu-web/blob/d06d8c5e735eb1f48799b1654b528e9a7afb0a35/resources/assets/lib/beatmapset-panel.tsx#L127
+            bool collapsed = beatmapSet.Beatmaps.Count() > max_difficulties_before_collapsing;
+
+            foreach (var rulesetGrouping in beatmapSet.Beatmaps.GroupBy(beatmap => beatmap.Ruleset).OrderBy(group => group.Key))
+            {
+                int rulesetId = rulesetGrouping.Key.OnlineID;
+
+                var group = flow.SingleOrDefault(rg => rg.RulesetId == rulesetId);
+
+                if (group == null)
+                {
+                    group = new RulesetDifficultyGroup(rulesetId);
+                    flow.Add(group);
+                    flow.SetLayoutPosition(group, rulesetId);
+                }
+
+                group.Alpha = 1;
+                group.Beatmaps = rulesetGrouping.ToArray();
+                group.Collapsed = collapsed;
             }
         }
 
         private partial class RulesetDifficultyGroup : FillFlowContainer
         {
-            private readonly int rulesetId;
-            private readonly IEnumerable<IBeatmapInfo> beatmapInfos;
-            private readonly bool collapsed;
+            public readonly int RulesetId;
 
-            public RulesetDifficultyGroup(int rulesetId, IEnumerable<IBeatmapInfo> beatmapInfos, bool collapsed)
-            {
-                this.rulesetId = rulesetId;
-                this.beatmapInfos = beatmapInfos;
-                this.collapsed = collapsed;
-            }
+            private IBeatmapInfo[] beatmaps = [];
 
-            public Vector2 DotSize
+            public IBeatmapInfo[] Beatmaps
             {
                 set
                 {
-                    foreach (var dot in Children.OfType<DifficultyDot>())
-                        dot.Size = value;
+                    beatmaps = value.OrderBy(bi => bi.StarRating).ToArray();
+                    updateDisplay();
                 }
             }
 
-            public float DotSpacing
+            private bool collapsed;
+
+            public bool Collapsed
             {
-                set => Spacing = new Vector2(value, 0);
+                get => collapsed;
+                set
+                {
+                    collapsed = value;
+                    updateDisplay();
+                }
+            }
+
+            private OsuSpriteText countText = null!;
+
+            public RulesetDifficultyGroup(int rulesetId)
+            {
+                RulesetId = rulesetId;
             }
 
             [BackgroundDependencyLoader]
@@ -115,52 +129,83 @@ namespace osu.Game.Beatmaps.Drawables
                 Spacing = new Vector2(1, 0);
                 Direction = FillDirection.Horizontal;
 
-                var icon = rulesets.GetRuleset(rulesetId)?.CreateInstance().CreateIcon() ?? new SpriteIcon { Icon = FontAwesome.Regular.QuestionCircle };
+                var icon = rulesets.GetRuleset(RulesetId)?.CreateInstance().CreateIcon() ?? new SpriteIcon { Icon = FontAwesome.Regular.QuestionCircle };
                 Add(icon.With(i =>
                 {
                     i.Size = new Vector2(14);
                     i.Anchor = i.Origin = Anchor.Centre;
                 }));
 
-                if (!collapsed)
+                for (int i = 0; i < max_difficulties_before_collapsing; i++)
+                    Add(new DifficultyDot());
+
+                Add(countText = new OsuSpriteText
                 {
-                    foreach (var beatmapInfo in beatmapInfos.OrderBy(bi => bi.StarRating))
-                        Add(new DifficultyDot(beatmapInfo.StarRating));
-                }
-                else
+                    Font = OsuFont.Style.Caption1,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Padding = new MarginPadding { Bottom = 1 }
+                });
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                updateDisplay();
+            }
+
+            private void updateDisplay()
+            {
+                countText.Alpha = collapsed ? 1 : 0;
+                countText.Text = beatmaps.Length.ToLocalisableString(@"N0");
+
+                var dots = this.OfType<DifficultyDot>().ToArray();
+
+                for (int i = 0; i < max_difficulties_before_collapsing; i++)
                 {
-                    Add(new OsuSpriteText
+                    var dot = dots[i];
+
+                    if (collapsed || i >= beatmaps.Length)
                     {
-                        Text = beatmapInfos.Count().ToLocalisableString(@"N0"),
-                        Font = OsuFont.Default.With(size: 12),
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Padding = new MarginPadding { Bottom = 1 }
-                    });
+                        dot.Alpha = 0;
+                        continue;
+                    }
+
+                    dot.Alpha = 1;
+                    dot.StarDifficulty = beatmaps[i].StarRating;
                 }
             }
         }
 
-        private partial class DifficultyDot : CircularContainer
+        private partial class DifficultyDot : Circle
         {
-            private readonly double starDifficulty;
+            private double starDifficulty;
 
-            public DifficultyDot(double starDifficulty)
+            public double StarDifficulty
             {
-                this.starDifficulty = starDifficulty;
+                get => starDifficulty;
+                set
+                {
+                    starDifficulty = value;
+                    updateColour();
+                }
             }
 
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                Anchor = Origin = Anchor.Centre;
-                Masking = true;
+            [Resolved]
+            private OsuColour colours { get; set; } = null!;
 
-                Child = new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = colours.ForStarDifficulty(starDifficulty)
-                };
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                Size = new Vector2(5, 10);
+                Anchor = Origin = Anchor.Centre;
+
+                updateColour();
+            }
+
+            private void updateColour()
+            {
+                Colour = colours.ForStarDifficulty(starDifficulty);
             }
         }
     }

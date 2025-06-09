@@ -3,9 +3,11 @@
 
 #nullable disable
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input.Events;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit;
@@ -24,6 +26,10 @@ namespace osu.Game.Tests.Visual
         protected PlacementBlueprintTestScene()
         {
             base.Content.Add(HitObjectContainer = CreateHitObjectContainer().With(c => c.Clock = new FramedClock(new StopwatchClock())));
+            base.Content.Add(new MouseMovementInterceptor
+            {
+                MouseMoved = UpdatePlacementTimeAndPosition,
+            });
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
@@ -45,7 +51,9 @@ namespace osu.Game.Tests.Visual
 
         protected virtual IBeatmap GetPlayableBeatmap()
         {
-            var playable = Beatmap.Value.GetPlayableBeatmap(Beatmap.Value.BeatmapInfo.Ruleset);
+            var rulesetInfo = CreateRuleset()!.RulesetInfo;
+            var playable = Beatmap.Value.GetPlayableBeatmap(rulesetInfo);
+            playable.BeatmapInfo.Ruleset = rulesetInfo;
             playable.Difficulty.CircleSize = 2;
             return playable;
         }
@@ -53,20 +61,20 @@ namespace osu.Game.Tests.Visual
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
             ResetPlacement();
         }
 
-        public void BeginPlacement(HitObject hitObject)
+        public void ShowPlacement(HitObject hitObject)
         {
         }
 
-        public void EndPlacement(HitObject hitObject, bool commit)
+        public void HidePlacement()
         {
-            if (commit)
-                AddHitObject(CreateHitObject(hitObject));
+        }
 
-            ResetPlacement();
+        public void CommitPlacement(HitObject hitObject)
+        {
+            AddHitObject(CreateHitObject(hitObject));
         }
 
         protected void ResetPlacement()
@@ -84,11 +92,13 @@ namespace osu.Game.Tests.Visual
         {
             base.Update();
 
-            CurrentBlueprint.UpdateTimeAndPosition(SnapForBlueprint(CurrentBlueprint));
+            if (CurrentBlueprint.PlacementActive == PlacementBlueprint.PlacementState.Finished)
+                ResetPlacement();
+
+            UpdatePlacementTimeAndPosition();
         }
 
-        protected virtual SnapResult SnapForBlueprint(HitObjectPlacementBlueprint blueprint) =>
-            new SnapResult(InputManager.CurrentState.Mouse.Position, null);
+        protected virtual void UpdatePlacementTimeAndPosition() => CurrentBlueprint.UpdateTimeAndPosition(InputManager.CurrentState.Mouse.Position, 0);
 
         public override void Add(Drawable drawable)
         {
@@ -97,7 +107,7 @@ namespace osu.Game.Tests.Visual
             if (drawable is HitObjectPlacementBlueprint blueprint)
             {
                 blueprint.Show();
-                blueprint.UpdateTimeAndPosition(SnapForBlueprint(blueprint));
+                UpdatePlacementTimeAndPosition();
             }
         }
 
@@ -107,5 +117,22 @@ namespace osu.Game.Tests.Visual
 
         protected abstract DrawableHitObject CreateHitObject(HitObject hitObject);
         protected abstract HitObjectPlacementBlueprint CreateBlueprint();
+
+        private partial class MouseMovementInterceptor : Drawable
+        {
+            public Action MouseMoved;
+
+            public MouseMovementInterceptor()
+            {
+                RelativeSizeAxes = Axes.Both;
+                Depth = float.MinValue;
+            }
+
+            protected override bool OnMouseMove(MouseMoveEvent e)
+            {
+                MouseMoved?.Invoke();
+                return base.OnMouseMove(e);
+            }
+        }
     }
 }

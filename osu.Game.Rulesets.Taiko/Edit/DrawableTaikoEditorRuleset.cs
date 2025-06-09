@@ -7,6 +7,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Taiko.UI;
+using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Rulesets.Taiko.Edit
@@ -19,6 +20,8 @@ namespace osu.Game.Rulesets.Taiko.Edit
             : base(ruleset, beatmap, mods)
         {
         }
+
+        protected override Playfield CreatePlayfield() => new TaikoEditorPlayfield();
 
         protected override void LoadComplete()
         {

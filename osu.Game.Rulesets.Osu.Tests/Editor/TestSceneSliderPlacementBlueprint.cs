@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Input;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Edit;
@@ -22,6 +23,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 {
     public partial class TestSceneSliderPlacementBlueprint : PlacementBlueprintTestScene
     {
+        protected sealed override Ruleset CreateRuleset() => new OsuRuleset();
+
         [SetUp]
         public void Setup() => Schedule(() =>
         {
@@ -393,6 +396,29 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         }
 
         [Test]
+        public void TestSliderDrawingViaTouch()
+        {
+            Vector2 startPoint = new Vector2(200);
+
+            AddStep("move mouse to a random point", () => InputManager.MoveMouseTo(InputManager.ToScreenSpace(Vector2.Zero)));
+            AddStep("begin touch at start point", () => InputManager.BeginTouch(new Touch(TouchSource.Touch1, InputManager.ToScreenSpace(startPoint))));
+
+            for (int i = 1; i < 20; i++)
+                addTouchMovementStep(startPoint + new Vector2(i * 40, MathF.Sin(i * MathF.PI / 5) * 50));
+
+            AddStep("release touch at end point", () => InputManager.EndTouch(new Touch(TouchSource.Touch1, InputManager.CurrentState.Touch.GetTouchPosition(TouchSource.Touch1)!.Value)));
+
+            assertPlaced(true);
+            assertLength(808, tolerance: 10);
+            assertControlPointCount(5);
+            assertFinalControlPointType(0, PathType.BSpline(4));
+            assertFinalControlPointType(1, null);
+            assertFinalControlPointType(2, null);
+            assertFinalControlPointType(3, null);
+            assertFinalControlPointType(4, null);
+        }
+
+        [Test]
         public void TestPlacePerfectCurveSegmentAlmostLinearlyExterior()
         {
             Vector2 startPosition = new Vector2(200);
@@ -491,6 +517,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         }
 
         private void addMovementStep(Vector2 position) => AddStep($"move mouse to {position}", () => InputManager.MoveMouseTo(InputManager.ToScreenSpace(position)));
+
+        private void addTouchMovementStep(Vector2 position) => AddStep($"move touch1 to {position}", () => InputManager.MoveTouchTo(new Touch(TouchSource.Touch1, InputManager.ToScreenSpace(position))));
 
         private void addClickStep(MouseButton button)
         {

@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Setup
                 {
                     Caption = "Use special (N+1) style",
                     HintText = "Changes one column to act as a classic \"scratch\" or \"special\" column, which can be moved around by the user's skin (to the left/right/centre). Generally used in 6K (5+1) or 8K (7+1) configurations.",
-                    Current = { Value = Beatmap.BeatmapInfo.SpecialStyle }
+                    Current = { Value = Beatmap.SpecialStyle }
                 },
                 healthDrainSlider = new FormSliderBar<float>
                 {
@@ -89,6 +89,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Setup
                 {
                     Caption = EditorSetupStrings.BaseVelocity,
                     HintText = EditorSetupStrings.BaseVelocityDescription,
+                    KeyboardStep = 0.1f,
                     Current = new BindableDouble(Beatmap.Difficulty.SliderMultiplier)
                     {
                         Default = 1.4,
@@ -103,6 +104,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Setup
                 {
                     Caption = EditorSetupStrings.TickRate,
                     HintText = EditorSetupStrings.TickRateDescription,
+                    KeyboardStep = 1,
                     Current = new BindableDouble(Beatmap.Difficulty.SliderTickRate)
                     {
                         Default = 1,
@@ -134,7 +136,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Setup
 
             updatingKeyCount = true;
 
-            editor.Reload().ContinueWith(t =>
+            editor.SaveAndReload().ContinueWith(t =>
             {
                 if (!t.GetResultSafely())
                 {
@@ -157,7 +159,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Setup
             // for now, update these on commit rather than making BeatmapMetadata bindables.
             // after switching database engines we can reconsider if switching to bindables is a good direction.
             Beatmap.Difficulty.CircleSize = keyCountSlider.Current.Value;
-            Beatmap.BeatmapInfo.SpecialStyle = specialStyle.Current.Value;
+            Beatmap.SpecialStyle = specialStyle.Current.Value;
             Beatmap.Difficulty.DrainRate = healthDrainSlider.Current.Value;
             Beatmap.Difficulty.OverallDifficulty = overallDifficultySlider.Current.Value;
             Beatmap.Difficulty.SliderMultiplier = baseVelocitySlider.Current.Value;

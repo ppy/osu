@@ -42,14 +42,14 @@ namespace osu.Game.Tests.Visual.Menus
                         beatmap.OnlineID = 1001;
                         getRoomRequest.TriggerSuccess(new Room
                         {
-                            RoomID = { Value = 1234 },
-                            Name = { Value = "Aug 8, 2024" },
+                            RoomID = 1234,
+                            Name = "Aug 8, 2024",
                             Playlist =
-                            {
+                            [
                                 new PlaylistItem(beatmap)
-                            },
-                            StartDate = { Value = DateTimeOffset.Now.AddMinutes(-30) },
-                            EndDate = { Value = DateTimeOffset.Now.AddSeconds(60) }
+                            ],
+                            StartDate = DateTimeOffset.Now.AddMinutes(-30),
+                            EndDate = DateTimeOffset.Now.AddSeconds(60)
                         });
                         return true;
 
@@ -80,7 +80,7 @@ namespace osu.Game.Tests.Visual.Menus
                     new APIMenuImage
                     {
                         Image = @"https://assets.ppy.sh/main-menu/project-loved-2@2x.png",
-                        Url = $@"{API.WebsiteRootUrl}/home/news/2023-12-21-project-loved-december-2023",
+                        Url = $@"{API.Endpoints.WebsiteUrl}/home/news/2023-12-21-project-loved-december-2023",
                     }
                 }
             });

@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Linq;
 using osu.Game.Rulesets.Replays;
 using osuTK;
 
@@ -17,5 +18,8 @@ namespace osu.Game.Rulesets.EmptyFreeform.Replays
             if (button.HasValue)
                 Actions.Add(button.Value);
         }
+
+        public override bool IsEquivalentTo(ReplayFrame other)
+            => other is EmptyFreeformReplayFrame freeformFrame && Time == freeformFrame.Time && Position == freeformFrame.Position && Actions.SequenceEqual(freeformFrame.Actions);
     }
 }

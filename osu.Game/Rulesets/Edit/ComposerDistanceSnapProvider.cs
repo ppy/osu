@@ -14,9 +14,9 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Framework.Utils;
-using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osu.Game.Overlays.OSD;
@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Edit
         private EditorClock editorClock { get; set; } = null!;
 
         [Resolved]
-        private EditorBeatmap editorBeatmap { get; set; } = null!;
+        protected EditorBeatmap EditorBeatmap { get; private set; } = null!;
 
         [Resolved]
         private IBeatSnapProvider beatSnapProvider { get; set; } = null!;
@@ -100,7 +100,7 @@ namespace osu.Game.Rulesets.Edit
                 }
             });
 
-            DistanceSpacingMultiplier.Value = editorBeatmap.BeatmapInfo.DistanceSpacing;
+            DistanceSpacingMultiplier.Value = EditorBeatmap.DistanceSpacing;
             DistanceSpacingMultiplier.BindValueChanged(multiplier =>
             {
                 distanceSpacingSlider.ContractedLabelText = $"D. S. ({multiplier.NewValue:0.##x})";
@@ -109,7 +109,7 @@ namespace osu.Game.Rulesets.Edit
                 if (multiplier.NewValue != multiplier.OldValue)
                     onScreenDisplay?.Display(new DistanceSpacingToast(multiplier.NewValue.ToLocalisableString(@"0.##x"), multiplier));
 
-                editorBeatmap.BeatmapInfo.DistanceSpacing = multiplier.NewValue;
+                EditorBeatmap.DistanceSpacing = multiplier.NewValue;
             }, true);
 
             DistanceSpacingMultiplier.BindDisabledChanged(disabled => distanceSpacingSlider.Alpha = disabled ? 0 : 1, true);
@@ -163,7 +163,7 @@ namespace osu.Game.Rulesets.Edit
             return (lastBefore, firstAfter);
         }
 
-        protected abstract double ReadCurrentDistanceSnap(HitObject before, HitObject after);
+        public abstract double ReadCurrentDistanceSnap(HitObject before, HitObject after);
 
         protected override void Update()
         {
@@ -191,9 +191,14 @@ namespace osu.Game.Rulesets.Edit
             }
         }
 
-        public IEnumerable<TernaryButton> CreateTernaryButtons() => new[]
+        public IEnumerable<DrawableTernaryButton> CreateTernaryButtons() => new[]
         {
-            new TernaryButton(DistanceSnapToggle, "Distance Snap", () => new SpriteIcon { Icon = OsuIcon.EditorDistanceSnap })
+            new DrawableTernaryButton
+            {
+                Current = DistanceSnapToggle,
+                Description = "Distance Snap",
+                CreateIcon = () => new SpriteIcon { Icon = OsuIcon.EditorDistanceSnap },
+            }
         };
 
         public void HandleToggleViaKey(KeyboardEvent key)
@@ -260,57 +265,38 @@ namespace osu.Game.Rulesets.Edit
 
         #region IDistanceSnapProvider
 
-        public virtual float GetBeatSnapDistanceAt(HitObject referenceObject, bool useReferenceSliderVelocity = true)
+        public virtual float GetBeatSnapDistance(IHasSliderVelocity? withVelocity = null)
         {
-            return (float)(100 * (useReferenceSliderVelocity && referenceObject is IHasSliderVelocity hasSliderVelocity ? hasSliderVelocity.SliderVelocityMultiplier : 1) * editorBeatmap.Difficulty.SliderMultiplier * 1
+            return (float)(100 * (withVelocity?.SliderVelocityMultiplier ?? 1) * EditorBeatmap.Difficulty.SliderMultiplier * 1
                            / beatSnapProvider.BeatDivisor);
         }
 
-        public virtual float DurationToDistance(HitObject referenceObject, double duration)
+        public virtual float DurationToDistance(double duration, double timingReference, IHasSliderVelocity? withVelocity = null)
         {
-            double beatLength = beatSnapProvider.GetBeatLengthAtTime(referenceObject.StartTime);
-            return (float)(duration / beatLength * GetBeatSnapDistanceAt(referenceObject));
+            double beatLength = beatSnapProvider.GetBeatLengthAtTime(timingReference);
+            return (float)(duration / beatLength * GetBeatSnapDistance(withVelocity));
         }
 
-        public virtual double DistanceToDuration(HitObject referenceObject, float distance)
+        public virtual double DistanceToDuration(float distance, double timingReference, IHasSliderVelocity? withVelocity = null)
         {
-            double beatLength = beatSnapProvider.GetBeatLengthAtTime(referenceObject.StartTime);
-            return distance / GetBeatSnapDistanceAt(referenceObject) * beatLength;
+            double beatLength = beatSnapProvider.GetBeatLengthAtTime(timingReference);
+            return distance / GetBeatSnapDistance(withVelocity) * beatLength;
         }
 
-        public virtual double FindSnappedDuration(HitObject referenceObject, float distance)
-            => beatSnapProvider.SnapTime(referenceObject.StartTime + DistanceToDuration(referenceObject, distance), referenceObject.StartTime) - referenceObject.StartTime;
-
-        public virtual float FindSnappedDistance(HitObject referenceObject, float distance, DistanceSnapTarget target)
+        public virtual float FindSnappedDistance(float distance, double snapReferenceTime, IHasSliderVelocity? withVelocity = null)
         {
-            double referenceTime;
+            double actualDuration = snapReferenceTime + DistanceToDuration(distance, snapReferenceTime, withVelocity);
 
-            switch (target)
-            {
-                case DistanceSnapTarget.Start:
-                    referenceTime = referenceObject.StartTime;
-                    break;
+            double snappedTime = beatSnapProvider.SnapTime(actualDuration, snapReferenceTime);
 
-                case DistanceSnapTarget.End:
-                    referenceTime = referenceObject.GetEndTime();
-                    break;
-
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(target), target, $"Unknown {nameof(DistanceSnapTarget)} value");
-            }
-
-            double actualDuration = referenceTime + DistanceToDuration(referenceObject, distance);
-
-            double snappedTime = beatSnapProvider.SnapTime(actualDuration, referenceTime);
-
-            double beatLength = beatSnapProvider.GetBeatLengthAtTime(referenceTime);
+            double beatLength = beatSnapProvider.GetBeatLengthAtTime(snapReferenceTime);
 
             // we don't want to exceed the actual duration and snap to a point in the future.
             // as we are snapping to beat length via SnapTime (which will round-to-nearest), check for snapping in the forward direction and reverse it.
             if (snappedTime > actualDuration + 1)
                 snappedTime -= beatLength;
 
-            return DurationToDistance(referenceObject, snappedTime - referenceTime);
+            return DurationToDistance(snappedTime - snapReferenceTime, snapReferenceTime, withVelocity);
         }
 
         #endregion
@@ -326,9 +312,9 @@ namespace osu.Game.Rulesets.Edit
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuConfigManager config)
+            private void load(RealmKeyBindingStore keyBindingStore)
             {
-                ShortcutText.Text = config.LookupKeyBindings(getAction(change)).ToUpper();
+                ShortcutText.Text = keyBindingStore.GetBindingsStringFor(getAction(change)).ToUpper();
             }
 
             private static GlobalAction getAction(ValueChangedEvent<double> change) => change.NewValue - change.OldValue > 0

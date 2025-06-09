@@ -15,7 +15,9 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Screens.Play.HUD;
 using osu.Game.Skinning;
+using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 {
@@ -95,6 +97,8 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                             return new DefaultSkinComponentsContainer(container =>
                             {
                                 var combo = container.ChildrenOfType<LegacyManiaComboCounter>().FirstOrDefault();
+                                var spectatorList = container.OfType<SpectatorList>().FirstOrDefault();
+                                var leaderboard = container.OfType<DrawableGameplayLeaderboard>().FirstOrDefault();
 
                                 if (combo != null)
                                 {
@@ -102,9 +106,25 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                                     combo.Origin = Anchor.Centre;
                                     combo.Y = this.GetManiaSkinConfig<float>(LegacyManiaSkinConfigurationLookups.ComboPosition)?.Value ?? 0;
                                 }
+
+                                if (spectatorList != null)
+                                {
+                                    spectatorList.Anchor = Anchor.BottomLeft;
+                                    spectatorList.Origin = Anchor.BottomLeft;
+                                    spectatorList.Position = new Vector2(10, -10);
+                                }
+
+                                if (leaderboard != null)
+                                {
+                                    leaderboard.Anchor = Anchor.CentreLeft;
+                                    leaderboard.Origin = Anchor.CentreLeft;
+                                    leaderboard.X = 10;
+                                }
                             })
                             {
                                 new LegacyManiaComboCounter(),
+                                new SpectatorList(),
+                                new DrawableGameplayLeaderboard(),
                             };
                     }
 
@@ -152,7 +172,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                             return new LegacyStageForeground();
 
                         case ManiaSkinComponents.BarLine:
-                            return null; // Not yet implemented.
+                            return new LegacyBarLine();
 
                         default:
                             throw new UnsupportedSkinComponentException(lookup);
@@ -164,10 +184,10 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 
         private Drawable getResult(HitResult result)
         {
-            if (!hit_result_mapping.ContainsKey(result))
+            if (!hit_result_mapping.TryGetValue(result, out var value))
                 return null;
 
-            string filename = this.GetManiaSkinConfig<string>(hit_result_mapping[result])?.Value
+            string filename = this.GetManiaSkinConfig<string>(value)?.Value
                               ?? default_hit_result_skin_filenames[result];
 
             var animation = this.GetAnimation(filename, true, true, frameLength: 1000 / 20d);

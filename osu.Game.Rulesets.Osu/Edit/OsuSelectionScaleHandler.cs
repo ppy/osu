@@ -180,7 +180,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             Quad scaledQuad = GeometryUtils.GetSurroundingQuad(new OsuHitObject[] { slider });
             (bool xInBounds, bool yInBounds) = isQuadInBounds(scaledQuad);
 
-            if (xInBounds && yInBounds && slider.Path.HasValidLength)
+            if (xInBounds && yInBounds && slider.Path.HasValidLengthForPlacement)
                 return;
 
             for (int i = 0; i < slider.Path.ControlPoints.Count; i++)
@@ -240,38 +240,73 @@ namespace osu.Game.Rulesets.Osu.Edit
                 points = originalConvexHull!;
 
             foreach (var point in points)
-            {
-                scale = clampToBound(scale, point, Vector2.Zero);
-                scale = clampToBound(scale, point, OsuPlayfield.BASE_SIZE);
-            }
+                scale = clampToBounds(scale, point, Vector2.Zero, OsuPlayfield.BASE_SIZE);
 
-            return Vector2.ComponentMax(scale, new Vector2(Precision.FLOAT_EPSILON));
+            return scale;
 
-            float minPositiveComponent(Vector2 v) => MathF.Min(v.X < 0 ? float.PositiveInfinity : v.X, v.Y < 0 ? float.PositiveInfinity : v.Y);
-
-            Vector2 clampToBound(Vector2 s, Vector2 p, Vector2 bound)
+            // Clamps the scale vector s such that the point p scaled by s is within the rectangle defined by lowerBounds and upperBounds
+            Vector2 clampToBounds(Vector2 s, Vector2 p, Vector2 lowerBounds, Vector2 upperBounds)
             {
                 p -= actualOrigin;
-                bound -= actualOrigin;
+                lowerBounds -= actualOrigin;
+                upperBounds -= actualOrigin;
+                // a.X is the rotated X component of p with respect to the X bounds
+                // a.Y is the rotated X component of p with respect to the Y bounds
+                // b.X is the rotated Y component of p with respect to the X bounds
+                // b.Y is the rotated Y component of p with respect to the Y bounds
                 var a = new Vector2(cos * cos * p.X - sin * cos * p.Y, -sin * cos * p.X + sin * sin * p.Y);
                 var b = new Vector2(sin * sin * p.X + sin * cos * p.Y, sin * cos * p.X + cos * cos * p.Y);
+
+                float sLowerBound, sUpperBound;
 
                 switch (adjustAxis)
                 {
                     case Axes.X:
-                        s.X = MathF.Min(scale.X, minPositiveComponent(Vector2.Divide(bound - b, a)));
+                        (sLowerBound, sUpperBound) = computeBounds(lowerBounds - b, upperBounds - b, a);
+                        s.X = Math.Clamp(s.X, sLowerBound, sUpperBound);
                         break;
 
                     case Axes.Y:
-                        s.Y = MathF.Min(scale.Y, minPositiveComponent(Vector2.Divide(bound - a, b)));
+                        (sLowerBound, sUpperBound) = computeBounds(lowerBounds - a, upperBounds - a, b);
+                        s.Y = Math.Clamp(s.Y, sLowerBound, sUpperBound);
                         break;
 
                     case Axes.Both:
-                        s = Vector2.ComponentMin(s, s * minPositiveComponent(Vector2.Divide(bound, a * s.X + b * s.Y)));
+                        // Here we compute the bounds for the magnitude multiplier of the scale vector
+                        // Therefore the ratio s.X / s.Y will be maintained
+                        (sLowerBound, sUpperBound) = computeBounds(lowerBounds, upperBounds, a * s.X + b * s.Y);
+                        s.X = s.X < 0
+                            ? Math.Clamp(s.X, s.X * sUpperBound, s.X * sLowerBound)
+                            : Math.Clamp(s.X, s.X * sLowerBound, s.X * sUpperBound);
+                        s.Y = s.Y < 0
+                            ? Math.Clamp(s.Y, s.Y * sUpperBound, s.Y * sLowerBound)
+                            : Math.Clamp(s.Y, s.Y * sLowerBound, s.Y * sUpperBound);
                         break;
                 }
 
                 return s;
+            }
+
+            // Computes the bounds for the magnitude of the scaled point p with respect to the bounds lowerBounds and upperBounds
+            (float, float) computeBounds(Vector2 lowerBounds, Vector2 upperBounds, Vector2 p)
+            {
+                var sLowerBounds = Vector2.Divide(lowerBounds, p);
+                var sUpperBounds = Vector2.Divide(upperBounds, p);
+
+                // If the point is negative, then the bounds are flipped
+                if (p.X < 0)
+                    (sLowerBounds.X, sUpperBounds.X) = (sUpperBounds.X, sLowerBounds.X);
+                if (p.Y < 0)
+                    (sLowerBounds.Y, sUpperBounds.Y) = (sUpperBounds.Y, sLowerBounds.Y);
+
+                // If the point is at zero, then any scale will have no effect on the point so the bounds are infinite
+                // The float division would already give us infinity for the bounds, but the sign is not consistent so we have to manually set it
+                if (Precision.AlmostEquals(p.X, 0))
+                    (sLowerBounds.X, sUpperBounds.X) = (float.NegativeInfinity, float.PositiveInfinity);
+                if (Precision.AlmostEquals(p.Y, 0))
+                    (sLowerBounds.Y, sUpperBounds.Y) = (float.NegativeInfinity, float.PositiveInfinity);
+
+                return (MathF.Max(sLowerBounds.X, sLowerBounds.Y), MathF.Min(sUpperBounds.X, sUpperBounds.Y));
             }
         }
 

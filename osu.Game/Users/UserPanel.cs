@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -13,6 +14,8 @@ using osu.Game.Overlays;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterface;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Framework.Screens;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API;
@@ -20,7 +23,10 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Localisation;
+using osu.Game.Online.API.Requests;
+using osu.Game.Online.Metadata;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Overlays.Notifications;
 using osu.Game.Screens;
 using osu.Game.Screens.Play;
 using osu.Game.Users.Drawables;
@@ -28,7 +34,7 @@ using osuTK;
 
 namespace osu.Game.Users
 {
-    public abstract partial class UserPanel : OsuClickableContainer, IHasContextMenu
+    public abstract partial class UserPanel : OsuClickableContainer, IHasContextMenu, IFilterable
     {
         public readonly APIUser User;
 
@@ -73,6 +79,12 @@ namespace osu.Game.Users
 
         [Resolved]
         private MultiplayerClient? multiplayerClient { get; set; }
+
+        [Resolved]
+        private MetadataClient? metadataClient { get; set; }
+
+        [Resolved]
+        private INotificationOverlay? notifications { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -128,6 +140,11 @@ namespace osu.Game.Users
             Action = Action,
         };
 
+        protected Drawable CreateTeamLogo() => new UpdateableTeamFlag(User.Team)
+        {
+            Size = new Vector2(52, 26),
+        };
+
         public MenuItem[] ContextMenuItems
         {
             get
@@ -146,21 +163,70 @@ namespace osu.Game.Users
                     chatOverlay?.Show();
                 }));
 
-                if (User.IsOnline)
+                items.Add(isUserBlocked()
+                    ? new OsuMenuItem(UsersStrings.BlocksButtonUnblock, MenuItemType.Standard, () => toggleBlock(false))
+                    : new OsuMenuItem(UsersStrings.BlocksButtonBlock, MenuItemType.Destructive, () => toggleBlock(true)));
+
+                if (isUserOnline())
                 {
                     items.Add(new OsuMenuItem(ContextMenuStrings.SpectatePlayer, MenuItemType.Standard, () =>
                     {
-                        performer?.PerformFromScreen(s => s.Push(new SoloSpectatorScreen(User)));
+                        if (isUserOnline())
+                            performer?.PerformFromScreen(s => s.Push(new SoloSpectatorScreen(User)));
                     }));
 
-                    if (multiplayerClient?.Room?.Users.All(u => u.UserID != User.Id) == true)
+                    if (canInviteUser())
                     {
-                        items.Add(new OsuMenuItem(ContextMenuStrings.InvitePlayer, MenuItemType.Standard, () => multiplayerClient.InvitePlayer(User.Id)));
+                        items.Add(new OsuMenuItem(ContextMenuStrings.InvitePlayer, MenuItemType.Standard, () =>
+                        {
+                            if (canInviteUser())
+                                multiplayerClient!.InvitePlayer(User.Id);
+                        }));
                     }
                 }
 
                 return items.ToArray();
+
+                bool isUserOnline() => metadataClient?.GetPresence(User.OnlineID) != null;
+                bool canInviteUser() => isUserOnline() && multiplayerClient?.Room?.Users.All(u => u.UserID != User.Id) == true;
+                bool isUserBlocked() => api.Blocks.Any(b => b.TargetID == User.OnlineID);
             }
         }
+
+        private void toggleBlock(bool block)
+        {
+            APIRequest req = block ? new BlockUserRequest(User.OnlineID) : new UnblockUserRequest(User.OnlineID);
+
+            req.Success += () =>
+            {
+                api.UpdateLocalBlocks();
+            };
+
+            req.Failure += e =>
+            {
+                notifications?.Post(new SimpleNotification
+                {
+                    Text = e.Message,
+                    Icon = FontAwesome.Solid.Times,
+                });
+            };
+
+            api.Queue(req);
+        }
+
+        public IEnumerable<LocalisableString> FilterTerms => [User.Username];
+
+        public bool MatchingFilter
+        {
+            set
+            {
+                if (value)
+                    Show();
+                else
+                    Hide();
+            }
+        }
+
+        public bool FilteringActive { get; set; }
     }
 }
