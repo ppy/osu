@@ -81,8 +81,17 @@ namespace osu.Game.Screens.Ranking
                     Score.Position = clonedScore.Position;
                     sortedScores.Add(Score);
                 }
-                else if (criteria.Scope == BeatmapLeaderboardScope.Local || clonedScore.UserID != api.LocalUser.Value.OnlineID || clonedScore.TotalScore > Score.TotalScore)
+                else
+                {
+                    bool isOnlineLeaderboard = criteria.Scope != BeatmapLeaderboardScope.Local;
+                    bool presentingLocalUserScore = Score.UserID == api.LocalUser.Value.OnlineID;
+                    bool presentedLocalUserScoreIsBetter = presentingLocalUserScore && clonedScore.UserID == api.LocalUser.Value.OnlineID && clonedScore.TotalScore < Score.TotalScore;
+
+                    if (isOnlineLeaderboard && presentedLocalUserScoreIsBetter)
+                        continue;
+
                     sortedScores.Add(clonedScore);
+                }
             }
 
             // if we haven't encountered a match for the presented score, we still need to attach it.
