@@ -153,9 +153,9 @@ namespace osu.Game.Screens.SelectV2
                                     RelativeSizeAxes = Axes.Both,
                                     ColumnDimensions = new[]
                                     {
-                                        new Dimension(GridSizeMode.Relative, 0.5f, maxSize: 660),
+                                        new Dimension(GridSizeMode.Relative, 0.5f, maxSize: 700),
                                         new Dimension(),
-                                        new Dimension(GridSizeMode.Relative, 0.5f, maxSize: 620),
+                                        new Dimension(GridSizeMode.Relative, 0.5f, maxSize: 660),
                                     },
                                     Content = new[]
                                     {
