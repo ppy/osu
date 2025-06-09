@@ -202,7 +202,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                     -(float)Math.Cos(0) * spinner_radius);
 
                 // Since spinner's don't have hit window, we need to add the duration.
-                hitWindow.HitWindowEnd += spinner.Duration;
+                hitWindow.HitWindowEnd = hitWindow.HitWindowStart + spinner.Duration;
                 double duration = handleTime();
 
                 moveTowards(spinnerTargetPosition, duration);
