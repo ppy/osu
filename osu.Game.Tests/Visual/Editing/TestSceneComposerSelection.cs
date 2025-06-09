@@ -625,21 +625,13 @@ namespace osu.Game.Tests.Visual.Editing
             moveMouseToObject(() => EditorBeatmap.HitObjects[0]);
 
             AddStep("hold left click", () => InputManager.PressButton(MouseButton.Left));
-
             AddStep("drag hitobject to different position", () => InputManager.MoveMouseTo(blueprintContainer.ScreenSpaceDrawQuad.BottomRight));
-
             AddStep("click middle mouse button", () => InputManager.Click(MouseButton.Middle));
-
             AddStep("release left click", () => InputManager.ReleaseButton(MouseButton.Left));
+            AddAssert("no hitobjects in beatmap", () => EditorBeatmap.HitObjects.Count, () => Is.Zero);
 
-            AddAssert("no hitobjects in beatmap", () => EditorBeatmap.HitObjects.Count == 0);
-
-            AddStep("hold ctrl", () => InputManager.PressKey(Key.ControlLeft));
-            AddStep("press z", () => InputManager.PressKey(Key.Z));
-            AddStep("release ctrl", () => InputManager.ReleaseKey(Key.ControlLeft));
-            AddStep("release z", () => InputManager.ReleaseKey(Key.Z));
-
-            AddAssert("one hitobject in beatmap", () => EditorBeatmap.HitObjects.Count == 1);
+            AddStep("undo", () => Editor.Undo());
+            AddAssert("one hitobject in beatmap", () => EditorBeatmap.HitObjects.Count, () => Is.EqualTo(1));
         }
 
         [Test]
