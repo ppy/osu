@@ -139,6 +139,8 @@ namespace osu.Game.Tests.Visual.SongSelect
                 });
             });
 
+            assertCollectionCount(2);
+
             AddStep("remove first collection", () => Realm.Write(r => r.Remove(first)));
             assertCollectionCount(1);
             assertCollectionName(0, "2");
