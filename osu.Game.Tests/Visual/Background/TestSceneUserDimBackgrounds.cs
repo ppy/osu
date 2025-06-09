@@ -148,7 +148,7 @@ namespace osu.Game.Tests.Visual.Background
                 player.StoryboardReplacesBackground.Value = true;
                 player.StoryboardEnabled.Value = true;
             });
-            AddUntilStep("Background is black, storyboard is visible", () => songSelect.IsBackgroundVisible() && songSelect.IsBackgroundBlack() && player.IsStoryboardVisible);
+            AddUntilStep("Background is fully dimmed, storyboard is visible", () => songSelect.IsBackgroundVisible() && songSelect.IsBackgroundFullyDimmed() && player.IsStoryboardVisible);
             AddStep("Disable Storyboard", () =>
             {
                 player.StoryboardReplacesBackground.Value = false;
