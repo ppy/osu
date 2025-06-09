@@ -94,12 +94,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                 double wideVelocityBase = Math.Min(currDistance / osuCurrObj.StrainTime, prevVelocity); // Don't reward wide angle bonus to sliders
 
+                // Nerf high spaced wide angles to compensate part of wide angled bonus being in snapping difficulty
                 double velocityThreshold = diameter * 2.3 / osuCurrObj.StrainTime;
-
-                if (wideVelocityBase > velocityThreshold) // Nerf high spaced squares to compensate total square buff
-                {
-                    wideVelocityBase = velocityThreshold + 0.4 * (wideVelocityBase - velocityThreshold);
-                }
+                wideVelocityBase = Math.Min(wideVelocityBase, velocityThreshold + 0.4 * (wideVelocityBase - velocityThreshold));
 
                 // Potentially wide should also use fasterRhythmMultiplier, but there are some unwanted buffs alongside the wanted ones
                 wideAngleBonus = differentRhythmMultiplier * CalcWideAngleBonus(currAngle);
