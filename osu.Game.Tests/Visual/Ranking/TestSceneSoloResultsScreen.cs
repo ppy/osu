@@ -90,6 +90,7 @@ namespace osu.Game.Tests.Visual.Ranking
                 localScore = TestResources.CreateTestScoreInfo(importedBeatmap);
                 localScore.TotalScore = 151_000;
                 localScore.Position = null;
+                localScore.User = API.LocalUser.Value;
                 scoreManager.Import(localScore);
                 localScore = localScore.Detach();
             });
@@ -119,6 +120,7 @@ namespace osu.Game.Tests.Visual.Ranking
                 localScore.TotalScore = 151_000;
                 localScore.OnlineID = 30;
                 localScore.Position = null;
+                localScore.User = API.LocalUser.Value;
                 scoreManager.Import(localScore);
                 localScore = localScore.Detach();
             });
@@ -161,6 +163,7 @@ namespace osu.Game.Tests.Visual.Ranking
                 localScore = TestResources.CreateTestScoreInfo(importedBeatmap);
                 localScore.TotalScore = 151_000;
                 localScore.Position = null;
+                localScore.User = API.LocalUser.Value;
                 LoadScreen(new SoloResultsScreen(localScore));
             });
             AddUntilStep("wait for loaded", () => ((Drawable)Stack.CurrentScreen).IsLoaded);
@@ -211,6 +214,7 @@ namespace osu.Game.Tests.Visual.Ranking
                 localScore = TestResources.CreateTestScoreInfo(importedBeatmap);
                 localScore.TotalScore = 151_000;
                 localScore.Position = null;
+                localScore.User = API.LocalUser.Value;
                 LoadScreen(new SoloResultsScreen(localScore));
             });
             AddUntilStep("wait for loaded", () => ((Drawable)Stack.CurrentScreen).IsLoaded);
@@ -308,6 +312,7 @@ namespace osu.Game.Tests.Visual.Ranking
                 localScore = TestResources.CreateTestScoreInfo(importedBeatmap);
                 localScore.TotalScore = 151_000;
                 localScore.Position = null;
+                localScore.User = API.LocalUser.Value;
                 LoadScreen(new SoloResultsScreen(localScore));
             });
             AddUntilStep("wait for loaded", () => ((Drawable)Stack.CurrentScreen).IsLoaded);
@@ -359,6 +364,7 @@ namespace osu.Game.Tests.Visual.Ranking
                 localScore = TestResources.CreateTestScoreInfo(importedBeatmap);
                 localScore.TotalScore = 31_000;
                 localScore.Position = null;
+                localScore.User = API.LocalUser.Value;
                 LoadScreen(new SoloResultsScreen(localScore));
             });
             AddUntilStep("wait for loaded", () => ((Drawable)Stack.CurrentScreen).IsLoaded);
@@ -412,6 +418,7 @@ namespace osu.Game.Tests.Visual.Ranking
                 localScore = TestResources.CreateTestScoreInfo(importedBeatmap);
                 localScore.TotalScore = 151_000;
                 localScore.Position = null;
+                localScore.User = API.LocalUser.Value;
                 LoadScreen(new SoloResultsScreen(localScore));
             });
             AddUntilStep("wait for loaded", () => ((Drawable)Stack.CurrentScreen).IsLoaded);
@@ -465,6 +472,7 @@ namespace osu.Game.Tests.Visual.Ranking
                 localScore = TestResources.CreateTestScoreInfo(importedBeatmap);
                 localScore.TotalScore = 651_000;
                 localScore.Position = null;
+                localScore.User = API.LocalUser.Value;
                 LoadScreen(new SoloResultsScreen(localScore));
             });
             AddUntilStep("wait for loaded", () => ((Drawable)Stack.CurrentScreen).IsLoaded);
@@ -516,6 +524,7 @@ namespace osu.Game.Tests.Visual.Ranking
                 localScore.TotalScore = 151_000;
                 localScore.OnlineID = 12345;
                 localScore.Position = null;
+                localScore.User = API.LocalUser.Value;
                 LoadScreen(new SoloResultsScreen(localScore));
             });
             AddUntilStep("wait for loaded", () => ((Drawable)Stack.CurrentScreen).IsLoaded);
