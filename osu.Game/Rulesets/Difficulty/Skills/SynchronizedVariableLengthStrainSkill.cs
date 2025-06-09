@@ -42,21 +42,21 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         {
             public StrainPeak(double value, double sectionLength, bool fromNewObject = false)
             {
-                this.value = (float)value;
-                this.sectionLength = (short)sectionLength;
+                Value = value;
+                this.sectionLength = sectionLength;
                 if (fromNewObject) this.sectionLength *= -1;
             }
 
-            private readonly float value;
-            private readonly short sectionLength;
+            private readonly double sectionLength;
 
-            public double Value => value;
-            public double SectionLength => Math.Abs((double)sectionLength);
+            public double Value { get; }
+
+            public double SectionLength => Math.Abs(sectionLength);
             public bool FromNewObject => Math.Sign(sectionLength) == -1;
 
             public int CompareTo(StrainPeak other)
             {
-                return value.CompareTo(other.value);
+                return Value.CompareTo(other.Value);
             }
         }
 

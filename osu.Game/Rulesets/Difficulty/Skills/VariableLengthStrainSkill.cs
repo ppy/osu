@@ -42,15 +42,19 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// </summary>
         public readonly struct StrainPeak : IComparable<StrainPeak>
         {
-            public StrainPeak(double value, double sectionLength)
+            public StrainPeak(double value, double sectionLength, bool fromNewObject = false)
             {
-                this.Value = value;
-                this.SectionLength = sectionLength;
+                Value = value;
+                this.sectionLength = Math.Round(sectionLength);
+                if (fromNewObject) this.sectionLength *= -1;
             }
+
+            private readonly double sectionLength;
 
             public double Value { get; }
 
-            public double SectionLength { get; }
+            public double SectionLength => Math.Abs(sectionLength);
+            public bool FromNewObject => Math.Sign(sectionLength) == -1;
 
             public int CompareTo(StrainPeak other)
             {
@@ -193,18 +197,18 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// <summary>
         /// Saves the current peak strain level to the list of strain peaks, which will be used to calculate an overall difficulty.
         /// </summary>
-        private void saveCurrentPeak(double sectionLength)
+        private void saveCurrentPeak(double sectionLength, bool fromNewObject = false)
         {
             if (DebugUtils.IsDebugBuild)
             {
-                debugStrainPeaks.Add(new StrainPeak(currentSectionPeak, sectionLength));
+                debugStrainPeaks.Add(new StrainPeak(currentSectionPeak, sectionLength, fromNewObject));
             }
 
-            strainPeaks.AddInPlace(new StrainPeak(currentSectionPeak, sectionLength), descComparer);
+            strainPeaks.AddInPlace(new StrainPeak(currentSectionPeak, sectionLength, fromNewObject), descComparer);
             totalLength += sectionLength;
 
             // TODO: Figure out how to calc "good enough" const for Catch
-            while (totalLength / MaxSectionLength > 50)
+            while (totalLength / MaxSectionLength > 100)
             {
                 totalLength -= strainPeaks[^1].SectionLength;
                 strainPeaks.RemoveAt(strainPeaks.Count - 1);
@@ -238,12 +242,13 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         public IEnumerable<StrainPeak> GetCurrentStrainPeaks() => strainPeaks.Append(new StrainPeak(currentSectionPeak, currentSectionEnd - currentSectionBegin));
 
         /// <summary>
-        /// Returns a live enumerable of the peak strains for each <see cref="MaxSectionLength"/> section of the beatmap,
+        /// Returns a live enumerable of the real peak strains for each <see cref="MaxSectionLength"/> section of the beatmap,
         /// including the peak of the current section.
         /// </summary>
         public IEnumerable<StrainPeak> GetDebugCurrentStrainPeaks()
         {
             if (!DebugUtils.IsDebugBuild) throw new InvalidOperationException("Cannot use this function in a non-debug build");
+
             return debugStrainPeaks.Append(new StrainPeak(currentSectionPeak, currentSectionEnd - currentSectionBegin));
         }
 
