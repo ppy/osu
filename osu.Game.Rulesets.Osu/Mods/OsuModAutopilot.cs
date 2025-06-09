@@ -52,9 +52,8 @@ namespace osu.Game.Rulesets.Osu.Mods
         private readonly IBindable<bool> hasReplayLoaded = new Bindable<bool>();
 
         private (Vector2 Position, double Time) lastHitInfo = (default, 0);
-
-        // Clueless on how to set mouse position when fully initalized, I decided that I would set it during the first tick during the Update method. Not necessary, but nice to have.
-        private bool firstTick = true;
+        private (double HitWindowStart, double HitWindowEnd) hitWindow = (0, 0);
+        private double timeElapsedBetweenHitObjects = 0;
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
@@ -65,6 +64,16 @@ namespace osu.Game.Rulesets.Osu.Mods
             playfield = drawableRuleset.Playfield;
 
             hasReplayLoaded.BindTo(drawableRuleset.HasReplayLoaded);
+
+            playfield.OnLoadComplete += _ =>
+            {
+                // When fully initialized, let's set the last position where the player placed their cursor before the game loaded.
+                Vector2 screenStart = inputManager.CurrentState.Mouse.Position;
+                Vector2 fieldStart = playfield.ScreenSpaceToGamefield(screenStart);
+                double timeStart = playfield.Clock.CurrentTime;
+
+                lastHitInfo = (fieldStart, timeStart);
+            };
 
             // We want to save the position and time when the HitObject was judged for movement calculations.
             playfield.NewResult += (drawableHitObject, result) =>
@@ -98,7 +107,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 return;
 
             double start = nextObject.HitObject.StartTime;
-            double elapsed = currentTime - start;
+            timeElapsedBetweenHitObjects = currentTime - start;
 
             // Reduce calculations during replay.
             if (hasReplayLoaded.Value)
@@ -109,7 +118,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                     replaySpinner.HandleUserInput = false;
 
                     // Don't start spinning until position is reached.
-                    if (elapsed >= 0)
+                    if (timeElapsedBetweenHitObjects >= 0)
                     {
                         double calculatedSpeed = 1.01 * (spinner.MaximumBonusSpins + spinner.SpinsRequiredForBonus) / spinner.Duration;
                         double rate = calculatedSpeed / playfield.Clock.Rate;
@@ -120,22 +129,12 @@ namespace osu.Game.Rulesets.Osu.Mods
                 return;
             }
 
-            // Set the mouse cursor on the first tick, then to be never used again during gameplay. :P
-            if (firstTick)
-            {
-                Vector2 mousePos = inputManager.CurrentState.Mouse.Position;
-                Vector2 fieldStart = playfield.ScreenSpaceToGamefield(mousePos);
-                double timeStart = playfield.Clock.CurrentTime;
-
-                lastHitInfo = (fieldStart, timeStart);
-
-                firstTick = false;
-            }
-
             // Sliders do not have hitwindows except for the HeadCircle, so we need to check for sliders.
             double mehWindow = nextObject is DrawableSlider checkForSld
                 ? checkForSld.HeadCircle.HitObject.HitWindows.WindowFor(HitResult.Meh)
                 : nextObject.HitObject.HitWindows.WindowFor(HitResult.Meh);
+
+            hitWindow = (start - mehWindow - hitwindow_start_offset, start + mehWindow - hitwindow_end_offset);
 
             // The position of the current alive object.
             var target = nextObject.Position;
@@ -150,7 +149,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             switch (nextObject)
             {
                 case DrawableSpinner spinnerDrawable:
-                    handleSpinner(spinnerDrawable, currentTime, start, elapsed);
+                    handleSpinner(spinnerDrawable);
                     return;
 
                 case DrawableSlider sliderDrawable:
@@ -159,10 +158,10 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                     var slider = sliderDrawable.HitObject;
 
-                    if (elapsed + mehWindow >= 0 && elapsed < slider.Duration)
+                    if (timeElapsedBetweenHitObjects + mehWindow >= 0 && timeElapsedBetweenHitObjects < slider.Duration)
                     {
-                        double prog = Math.Clamp(elapsed / slider.Duration, 0, 1);
-                        double spans = (prog * (slider.RepeatCount + 1));
+                        double prog = Math.Clamp(timeElapsedBetweenHitObjects / slider.Duration, 0, 1);
+                        double spans = prog * (slider.RepeatCount + 1);
                         spans = (spans > 1 && spans % 2 > 1) ? 1 - (spans % 1) : spans % 1;
 
                         Vector2 pathPos = sliderDrawable.Position + (slider.Path.PositionAt(spans) * sliderDrawable.Scale);
@@ -173,29 +172,26 @@ namespace osu.Game.Rulesets.Osu.Mods
                     return;
             }
 
-            double hitWindowStart = start - mehWindow - hitwindow_start_offset;
-            double hitWindowEnd = start + mehWindow - hitwindow_end_offset;
-
             // Compute how many ms remain for cursor movement toward the hit-object
-            double availableTime = handleTime(hitWindowStart, hitWindowEnd);
+            double availableTime = handleTime();
 
             moveTowards(target, availableTime);
         }
 
-        private double handleTime(double hitWindowStart, double hitWindowEnd)
+        private double handleTime()
         {
             // We want the cursor to eventually reach the center of the HitCircle.
             // However, when it's inside the HitWindow, we want to the cursor to be fast enough
             // where the player can't tap it, but slow enough so it doesn't seem like the cursor is teleporting.
+            double hitWindowStart = hitWindow.HitWindowStart;
+            double hitWindowEnd = hitWindow.HitWindowEnd;
             double lastJudgedTime = lastHitInfo.Time;
 
             // Compute scale from 0 to 1, then multiply by an offset. This will be used if we are inside between hitWindowStart and hitWindowEnd so we can prevent sudden cursor teleportation.
             double scaledTime = 1 + (Math.Clamp((hitWindowEnd - lastJudgedTime) / (hitWindowEnd - hitWindowStart), 0, 1) * (hitwindow_start_offset - 1));
 
-            // Edge case where the cursor may not reach the hitobject in time.
-            scaledTime = scaledTime > (hitWindowEnd - lastJudgedTime)
-                ? hitWindowEnd - lastJudgedTime
-                : scaledTime;
+            // Edge case where the cursor may not reach the hitobject in time, so we set it to which takes less time.
+            scaledTime = Math.Min(scaledTime, hitWindowEnd - lastJudgedTime);
 
             double timeLeft = lastJudgedTime >= hitWindowStart
                 ? scaledTime
@@ -205,22 +201,19 @@ namespace osu.Game.Rulesets.Osu.Mods
             return Math.Max(timeLeft, 1);
         }
 
-        private void handleSpinner(DrawableSpinner spinnerDrawable, double currentTime, double start, double elapsed)
+        private void handleSpinner(DrawableSpinner spinnerDrawable)
         {
             var spinner = spinnerDrawable.HitObject;
             spinnerDrawable.HandleUserInput = false;
 
             // Before spinner starts, move to position.
-            if (elapsed < 0)
+            if (timeElapsedBetweenHitObjects < 0)
             {
                 Vector2 spinnerTargetPosition = spinner.Position + new Vector2(
                     -(float)Math.Sin(0) * spinner_radius,
                     -(float)Math.Cos(0) * spinner_radius);
 
-                double hitWindowStart = start - hitwindow_start_offset;
-                double hitWindowEnd = start + spinner.Duration - hitwindow_end_offset;
-
-                double duration = handleTime(hitWindowStart, hitWindowEnd);
+                double duration = handleTime();
 
                 moveTowards(spinnerTargetPosition, duration);
 
@@ -232,7 +225,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             spinSpinner(spinnerDrawable, rate);
 
-            double angle = 2 * Math.PI * (elapsed * rate);
+            double angle = 2 * Math.PI * (timeElapsedBetweenHitObjects * rate);
             Vector2 circPos = spinner.Position + new Vector2(
                 -(float)Math.Sin(angle) * spinner_radius,
                 -(float)Math.Cos(angle) * spinner_radius);
@@ -242,10 +235,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private void spinSpinner(DrawableSpinner spinnerDrawable, double rate)
         {
-            double elapsedTime = playfield.Clock.ElapsedFrameTime;
-
             // Automatically spin spinner.
-            spinnerDrawable.RotationTracker.AddRotation(float.RadiansToDegrees((float)elapsedTime * (float)rate * MathF.PI * 2.0f));
+            spinnerDrawable.RotationTracker.AddRotation(float.RadiansToDegrees((float)playfield.Clock.ElapsedFrameTime * (float)rate * MathF.PI * 2.0f));
         }
 
         private void moveTowards(Vector2 target, double timeMs)
