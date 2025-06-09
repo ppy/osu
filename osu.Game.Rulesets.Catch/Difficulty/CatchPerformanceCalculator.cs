@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             // Combo scaling
             if (catchAttributes.MaxCombo > 0)
-                value *= Math.Min(Math.Pow(score.MaxCombo, 0.8) / Math.Pow(catchAttributes.MaxCombo, 0.8), 1.0);
+                value *= Math.Min(Math.Pow(score.MaxCombo, 0.35) / Math.Pow(catchAttributes.MaxCombo, 0.35), 1.0);
 
             var difficulty = score.BeatmapInfo!.Difficulty.Clone();
 
