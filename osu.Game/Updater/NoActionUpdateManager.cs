@@ -1,10 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Configuration;
 using osu.Game.Online.API;
 using osu.Game.Overlays.Notifications;
 
@@ -16,6 +18,8 @@ namespace osu.Game.Updater
     /// </summary>
     public partial class NoActionUpdateManager : UpdateManager
     {
+        private static ReleaseStream? externalReleaseStream => Enum.TryParse(Environment.GetEnvironmentVariable("OSU_EXTERNAL_UPDATE_STREAM"), out ReleaseStream stream) ? stream : null;
+
         private string version = string.Empty;
 
         [BackgroundDependencyLoader]
@@ -28,7 +32,8 @@ namespace osu.Game.Updater
         {
             try
             {
-                bool includePrerelease = ReleaseStream.Value == Configuration.ReleaseStream.Tachyon;
+                ReleaseStream stream = externalReleaseStream ?? ReleaseStream.Value;
+                bool includePrerelease = stream == Configuration.ReleaseStream.Tachyon;
 
                 OsuJsonWebRequest<GitHubRelease[]> releasesRequest = new OsuJsonWebRequest<GitHubRelease[]>("https://api.github.com/repos/ppy/osu/releases?per_page=10&page=1");
                 await releasesRequest.PerformAsync().ConfigureAwait(false);
