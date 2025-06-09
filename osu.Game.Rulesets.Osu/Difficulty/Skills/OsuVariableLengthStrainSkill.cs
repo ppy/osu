@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
     public abstract class OsuVariableLengthStrainSkill : VariableLengthStrainSkill
     {
-        protected override double RawDifficultyMultiplier => 1.059129;
+        protected override double RawDifficultyMultiplier => 1.058;
 
         /// <summary>
         /// The number of sections with the highest strains, which the peak strain reductions will apply to.
@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// <summary>
         /// The baseline multiplier applied to the section with the biggest strain.
         /// </summary>
-        protected virtual double ReducedStrainBaseline => 0.75;
+        protected virtual double ReducedStrainBaseline => 0.727;
 
         protected OsuVariableLengthStrainSkill(Mod[] mods)
             : base(mods)
@@ -42,18 +42,37 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             List<StrainPeak> strains = peaks.OrderByDescending(p => p.Value).ToList();
 
-            // Time is measured in units of strains
-            double time = 0;
+            // Create list of strains to nerf
+            List<StrainPeak> strainsToReduce = new List<StrainPeak>();
+            int indexToRemove = 0;
+            const int chunkSize = 20;
+
+            double time = 0; // Time is measured in units of strains
 
             // We are reducing the highest strains first to account for extreme difficulty spikes
-            for (int i = 0; i < strains.Count && time < ReducedSectionCount; i++)
+            // Split the strain into 20ms chunks to try to mitigate inconsistencies caused by reducing strains
+            foreach (StrainPeak strain in strains)
             {
-                double scale = Math.Log10(Interpolation.Lerp(1, 10, Math.Clamp((float)time / ReducedSectionCount, 0, 1)));
-                strains[i] = new StrainPeak(strains[i].Value * Interpolation.Lerp(ReducedStrainBaseline, 1.0, scale), strains[i].SectionLength);
-                time += strains[i].SectionLength / MaxSectionLength;
+                double addedTime = 0;
+
+                while (addedTime < strain.SectionLength)
+                {
+                    double scale = Math.Log10(Interpolation.Lerp(1, 10, Math.Clamp((time + addedTime) / MaxSectionLength / ReducedSectionCount, 0, 1)));
+
+                    strainsToReduce.Add(new StrainPeak(strain.Value * Interpolation.Lerp(ReducedStrainBaseline, 1.0, scale), Math.Min(chunkSize, strain.SectionLength - addedTime)));
+                    addedTime += chunkSize;
+                }
+
+                time += strain.SectionLength;
+                indexToRemove++;
+                if (time / MaxSectionLength > ReducedSectionCount) break;
             }
 
-            strains = strains.OrderByDescending(s => s.Value).ToList();
+            strains.RemoveRange(0, indexToRemove);
+
+            time = 0;
+
+            strains = strains.Concat(strainsToReduce).OrderByDescending(s => s.Value).ToList();
             time = 0;
 
             // Difficulty is a continuous weighted sum of the sorted strains
