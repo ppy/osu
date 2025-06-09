@@ -139,6 +139,65 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddAssert("visible panel is updateable beatmap", () => GetSelectedPanel()?.Item?.Model, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
         }
 
+        [Test] // Checks that we don't crash if there exists a difficulty with the same name as the selected difficulty.
+        public void TestDifferentDifficultiesWithSameName()
+        {
+            SelectNextGroup();
+
+            WaitForSelection(1, 0);
+            AddAssert("selection is updateable beatmap", () => Carousel.CurrentSelection, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
+            AddAssert("visible panel is updateable beatmap", () => GetSelectedPanel()?.Item?.Model, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
+
+            // This scenario is pretty much silly, but it's possible to do.
+            // Remove original selected difficulty, and add two difficulties with same name but different valid online IDs.
+            updateBeatmap(null, bs =>
+            {
+                string selectedName = bs.Beatmaps[0].DifficultyName;
+                int selectedOnlineID = bs.Beatmaps[0].OnlineID;
+                bs.Beatmaps.RemoveAt(0);
+
+                var newBeatmap = createBeatmap(bs);
+                newBeatmap.DifficultyName = selectedName;
+                newBeatmap.OnlineID = selectedOnlineID + 1;
+                bs.Beatmaps.Add(newBeatmap);
+
+                newBeatmap = createBeatmap(bs);
+                newBeatmap.DifficultyName = selectedName;
+                newBeatmap.OnlineID = selectedOnlineID + 2;
+                bs.Beatmaps.Add(newBeatmap);
+            });
+
+            WaitForFiltering();
+
+            AddAssert("selection is updateable beatmap", () => Carousel.CurrentSelection, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
+            AddAssert("visible panel is updateable beatmap", () => GetSelectedPanel()?.Item?.Model, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
+        }
+
+        [Test] // Checks that we don't crash if there exists a difficulty with the same online ID as the selected difficulty.
+        public void TestDifferentDifficultiesWithSameOnlineID()
+        {
+            SelectNextGroup();
+
+            WaitForSelection(1, 0);
+            AddAssert("selection is updateable beatmap", () => Carousel.CurrentSelection, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
+            AddAssert("visible panel is updateable beatmap", () => GetSelectedPanel()?.Item?.Model, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
+
+            // This scenario is also equally silly as the test above this one, but it's also possible to do.
+            // Add another difficulty with the same online ID but different name.
+            updateBeatmap(null, bs =>
+            {
+                var newBeatmap = createBeatmap(bs);
+                newBeatmap.DifficultyName = "Copy";
+                newBeatmap.OnlineID = baseTestBeatmap.Beatmaps[0].OnlineID;
+                bs.Beatmaps.Add(newBeatmap);
+            });
+
+            WaitForFiltering();
+
+            AddAssert("selection is updateable beatmap", () => Carousel.CurrentSelection, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
+            AddAssert("visible panel is updateable beatmap", () => GetSelectedPanel()?.Item?.Model, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
+        }
+
         /// <summary>
         /// Ensures stability is maintained on different sort modes while an item is removed and then immediately re-added.
         /// </summary>
@@ -275,26 +334,9 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                     Protected = baseTestBeatmap.Protected,
                 };
 
-                updateSet?.Invoke(updatedSet);
-
                 var updatedBeatmaps = baseTestBeatmap.Beatmaps.Select(b =>
                 {
-                    var updatedBeatmap = new BeatmapInfo
-                    {
-                        ID = b.ID,
-                        Metadata = b.Metadata,
-                        Ruleset = b.Ruleset,
-                        DifficultyName = b.DifficultyName,
-                        BeatmapSet = updatedSet,
-                        Status = b.Status,
-                        OnlineID = b.OnlineID,
-                        Length = b.Length,
-                        BPM = b.BPM,
-                        Hash = b.Hash,
-                        StarRating = b.StarRating,
-                        MD5Hash = b.MD5Hash,
-                        OnlineMD5Hash = b.OnlineMD5Hash,
-                    };
+                    var updatedBeatmap = createBeatmap(updatedSet, b);
 
                     updateBeatmap?.Invoke(updatedBeatmap);
 
@@ -303,10 +345,36 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
                 updatedSet.Beatmaps.AddRange(updatedBeatmaps);
 
+                updateSet?.Invoke(updatedSet);
+
                 int originalIndex = BeatmapSets.IndexOf(baseTestBeatmap);
 
                 BeatmapSets.ReplaceRange(originalIndex, 1, [updatedSet]);
             });
+        }
+
+        private BeatmapInfo createBeatmap(BeatmapSetInfo set, BeatmapInfo? reference = null)
+        {
+            reference ??= baseTestBeatmap.Beatmaps.First();
+
+            var updatedBeatmap = new BeatmapInfo
+            {
+                ID = reference.ID,
+                Metadata = reference.Metadata,
+                Ruleset = reference.Ruleset,
+                DifficultyName = reference.DifficultyName,
+                BeatmapSet = set,
+                Status = reference.Status,
+                OnlineID = reference.OnlineID,
+                Length = reference.Length,
+                BPM = reference.BPM,
+                Hash = reference.Hash,
+                StarRating = reference.StarRating,
+                MD5Hash = reference.MD5Hash,
+                OnlineMD5Hash = reference.OnlineMD5Hash,
+            };
+
+            return updatedBeatmap;
         }
     }
 }
