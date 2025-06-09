@@ -43,6 +43,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             // Calculate the velocity to the current hitobject, which starts with a base distance / time assuming the last object is a hitcircle.
             double currDistance = adjustSnapDistance(osuCurrObj.LazyJumpDistance, osuCurrObj, osuLastObj);
             double currVelocity = currDistance / osuCurrObj.StrainTime;
+            double sliderlessCurrVelocity = currVelocity;
 
             // But if the last object is a slider, then we extend the travel velocity through the slider into the current object.
             if (osuLastObj.BaseObject is Slider && withSliderTravelDistance)
@@ -92,7 +93,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 acuteVelocityBase = double.Lerp(acuteVelocityBase, currVelocity,
                     Math.Pow(DifficultyCalculationUtils.Smoothstep(osuCurrObj.StrainTime, osuLastObj.StrainTime, osuLastObj.StrainTime * 1.75), 2));
 
-                double wideVelocityBase = Math.Min(currDistance / osuCurrObj.StrainTime, prevVelocity); // Don't reward wide angle bonus to sliders
+                double wideVelocityBase = Math.Min(sliderlessCurrVelocity, prevVelocity); // Don't reward wide angle bonus to sliders
 
                 // Nerf high spaced wide angles to compensate part of wide angled bonus being in snapping difficulty
                 double velocityThreshold = diameter * 2.3 / osuCurrObj.StrainTime;
