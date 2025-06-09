@@ -16,6 +16,7 @@ using osu.Game.Rulesets.Mania.Mods;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.Select.Filter;
+using osu.Game.Screens.SelectV2;
 using FilterControl = osu.Game.Screens.SelectV2.FilterControl;
 using NoResultsPlaceholder = osu.Game.Screens.SelectV2.NoResultsPlaceholder;
 
@@ -63,6 +64,28 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddStep("return", () => SongSelect.MakeCurrent());
             AddUntilStep("wait for current", () => SongSelect.IsCurrentScreen());
             AddAssert("filter count is 0", () => filterOperationsCount, () => Is.EqualTo(0));
+        }
+
+        [Test]
+        public void TestFilterSingleResult_RetainsSelectedDifficulty()
+        {
+            LoadSongSelect();
+
+            ImportBeatmapForRuleset(0);
+
+            AddUntilStep("wait for single set", () => Carousel.ChildrenOfType<PanelBeatmapSet>().Count(), () => Is.EqualTo(1));
+
+            AddStep("select last difficulty", () =>
+            {
+                Beatmap.Value = Beatmaps.GetWorkingBeatmap(Beatmaps.GetAllUsableBeatmapSets().First().Beatmaps.Last());
+            });
+
+            AddStep("set filter text", () => filterTextBox.Current.Value = " ");
+
+            AddWaitStep("wait for debounce", 5);
+            AddUntilStep("wait for filter", () => !Carousel.IsFiltering);
+
+            AddAssert("selection unchanged", () => Beatmap.Value.BeatmapInfo, () => Is.EqualTo(Beatmaps.GetAllUsableBeatmapSets().First().Beatmaps.Last()));
         }
 
         [Test]
@@ -200,6 +223,21 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             AddUntilStep("star filter reset", () => Config.Get<double>(OsuSetting.DisplayStarsMinimum) == 0.0);
             AddUntilStep("wait for placeholder visible", () => getPlaceholder()?.State.Value == Visibility.Hidden);
+        }
+
+        [Test]
+        public void TestSelectionRetainedWhenFilteringAllPanelsAway()
+        {
+            ImportBeatmapForRuleset(0);
+
+            LoadSongSelect();
+
+            AddAssert("has selection", () => Beatmap.IsDefault, () => Is.False);
+
+            AddStep("change star filter", () => Config.SetValue(OsuSetting.DisplayStarsMinimum, 10.0));
+            AddUntilStep("wait for placeholder visible", () => getPlaceholder()?.State.Value == Visibility.Visible);
+
+            AddAssert("still has selection", () => Beatmap.IsDefault, () => Is.False);
         }
 
         [Test]

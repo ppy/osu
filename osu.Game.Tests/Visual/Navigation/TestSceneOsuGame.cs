@@ -25,6 +25,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Menu;
 using osu.Game.Skinning;
+using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Navigation
@@ -83,6 +84,7 @@ namespace osu.Game.Tests.Visual.Navigation
         [Test]
         public void TestCursorHidesWhenIdle()
         {
+            AddStep("move mouse inside game bounds", () => InputManager.MoveMouseTo(Game.ScreenSpaceDrawQuad.TopLeft + new Vector2(20)));
             AddStep("click mouse", () => InputManager.Click(MouseButton.Left));
             AddUntilStep("wait until idle", () => Game.IsIdle.Value);
             AddUntilStep("menu cursor hidden", () => Game.GlobalCursorDisplay.MenuCursor.ActiveCursor.Alpha == 0);

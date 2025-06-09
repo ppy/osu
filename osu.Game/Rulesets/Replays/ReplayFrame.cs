@@ -30,5 +30,10 @@ namespace osu.Game.Rulesets.Replays
         {
             Time = time;
         }
+
+        /// <summary>
+        /// Whether this frame is equivalent to <paramref name="other"/> with respect to replay recording.
+        /// </summary>
+        public virtual bool IsEquivalentTo(ReplayFrame other) => Time == other.Time;
     }
 }

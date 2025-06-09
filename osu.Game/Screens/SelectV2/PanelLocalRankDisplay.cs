@@ -48,6 +48,8 @@ namespace osu.Game.Screens.SelectV2
 
         private readonly UpdateableRank updateable;
 
+        public bool HasRank => updateable.Rank != null;
+
         public PanelLocalRankDisplay(BeatmapInfo? beatmap = null)
         {
             AutoSizeAxes = Axes.Both;

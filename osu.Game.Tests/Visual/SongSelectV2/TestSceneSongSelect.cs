@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Online.API;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Overlays.Mods;
@@ -16,6 +17,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Scoring;
+using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Select;
@@ -75,6 +77,66 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 InputManager.Click(MouseButton.Left);
             });
             AddUntilStep("wait for results screen", () => Stack.CurrentScreen is ResultsScreen);
+        }
+
+        [Test]
+        public void TestSingleFilterWhenEntering()
+        {
+            ImportBeatmapForRuleset(0);
+            LoadSongSelect();
+
+            AddAssert("single filter", () => Carousel.FilterCount, () => Is.EqualTo(1));
+        }
+
+        [Test]
+        public void TestCookieDoesNothingIfNothingSelected()
+        {
+            var screensPushed = new List<IScreen>();
+
+            LoadSongSelect();
+            AddStep("subscribe to screen pushed", () => Stack.ScreenPushed += onScreenPushed);
+            AddStep("click osu! cookie", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<OsuLogo>().Single());
+                InputManager.Click(MouseButton.Left);
+            });
+            AddAssert("no screens pushed", () => screensPushed, () => Is.Empty);
+            AddStep("unsubscribe from screen pushed", () => Stack.ScreenPushed -= onScreenPushed);
+
+            void onScreenPushed(IScreen lastScreen, IScreen newScreen) => screensPushed.Add(lastScreen);
+        }
+
+        [Test]
+        public void TestInvalidRulesetDoesNotEnterGameplay()
+        {
+            var screensPushed = new List<IScreen>();
+
+            ImportBeatmapForRuleset(0);
+            ImportBeatmapForRuleset(1);
+
+            LoadSongSelect();
+            AddStep("subscribe to screen pushed", () => Stack.ScreenPushed += onScreenPushed);
+
+            AddStep("change ruleset to taiko", () => Ruleset.Value = Rulesets.AvailableRulesets.Single(r => r.OnlineID == 1));
+
+            AddStep("disable converts", () => Config.SetValue(OsuSetting.ShowConvertedBeatmaps, false));
+
+            AddUntilStep("wait for taiko beatmap selected", () => Beatmap.Value.BeatmapInfo.Ruleset.OnlineID, () => Is.EqualTo(1));
+
+            AddStep("change ruleset back and start gameplay immediately", () =>
+            {
+                Ruleset.Value = Rulesets.AvailableRulesets.Single(r => r.OnlineID == 0);
+
+                InputManager.MoveMouseTo(this.ChildrenOfType<OsuLogo>().Single());
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddAssert("no screens pushed", () => screensPushed, () => Is.Empty);
+            AddStep("unsubscribe from screen pushed", () => Stack.ScreenPushed -= onScreenPushed);
+
+            AddUntilStep("wait for osu beatmap selected", () => Beatmap.Value.BeatmapInfo.Ruleset.OnlineID, () => Is.EqualTo(0));
+
+            void onScreenPushed(IScreen lastScreen, IScreen newScreen) => screensPushed.Add(lastScreen);
         }
 
         #region Hotkeys
@@ -316,6 +378,30 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddUntilStep("wait for return to ss", () => SongSelect.IsCurrentScreen());
 
             AddAssert("relax returned", () => SongSelect.Mods.Value.Single() is ModRelax);
+        }
+
+        [Test]
+        public void TestModSelectCannotBeOpenedAfterConfirmingSelection()
+        {
+            ImportBeatmapForRuleset(0);
+
+            LoadSongSelect();
+            AddStep("press right", () => InputManager.Key(Key.Right)); // press right to select in carousel, also remove.
+            AddAssert("beatmap selected", () => !Beatmap.IsDefault);
+
+            ChangeMods(new OsuModAutoplay());
+
+            AddStep("press ctrl+enter", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Key(Key.Enter);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+            AddStep("press F1", () => InputManager.PressKey(Key.F1));
+            AddAssert("mod select not visible", () => this.ChildrenOfType<ModSelectOverlay>().Single().State.Value, () => Is.EqualTo(Visibility.Hidden));
+
+            AddUntilStep("wait for player", () => Stack.CurrentScreen is PlayerLoader);
+            AddAssert("osu! cookie visible", () => this.ChildrenOfType<OsuLogo>().Single().Alpha, () => Is.Not.Zero);
         }
 
         #endregion

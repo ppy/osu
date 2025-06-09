@@ -3,15 +3,18 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.PolygonExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -19,6 +22,7 @@ using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
+using osu.Game.Online.API;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Online.Placeholders;
 using osu.Game.Overlays;
@@ -27,11 +31,14 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Select.Leaderboards;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.SelectV2
 {
     public partial class BeatmapLeaderboardWedge : VisibilityContainer
     {
+        public const float SPACING_BETWEEN_SCORES = 4;
+
         public IBindable<BeatmapLeaderboardScope> Scope { get; } = new Bindable<BeatmapLeaderboardScope>();
 
         public IBindable<bool> FilterBySelectedMods { get; } = new BindableBool();
@@ -54,6 +61,9 @@ namespace osu.Game.Screens.SelectV2
         [Resolved]
         private ISongSelect? songSelect { get; set; }
 
+        [Resolved]
+        private IAPIProvider api { get; set; } = null!;
+
         private Container<Placeholder> placeholderContainer = null!;
         private Placeholder? placeholder;
 
@@ -70,7 +80,7 @@ namespace osu.Game.Screens.SelectV2
 
         private readonly IBindable<LeaderboardScores?> fetchedScores = new Bindable<LeaderboardScores?>();
 
-        private const float personal_best_height = 80;
+        private const float personal_best_height = 112;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -109,7 +119,10 @@ namespace osu.Game.Screens.SelectV2
                         RelativeSizeAxes = Axes.X,
                         Height = personal_best_height,
                         Shear = OsuGame.SHEAR,
-                        Margin = new MarginPadding { Left = -40f },
+                        Margin = new MarginPadding
+                        {
+                            Left = -40f,
+                        },
                         CornerRadius = 10f,
                         Masking = true,
                         // push the personal best 1px down to hide masking issues
@@ -118,11 +131,7 @@ namespace osu.Game.Screens.SelectV2
                         Alpha = 0f,
                         Children = new Drawable[]
                         {
-                            new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Colour = colourProvider.Background4,
-                            },
+                            new WedgeBackground(),
                             new Container
                             {
                                 RelativeSizeAxes = Axes.X,
@@ -188,33 +197,40 @@ namespace osu.Game.Screens.SelectV2
 
         private bool initialFetchComplete;
 
+        private ScheduledDelegate? refetchOperation;
+
         private void refetchScores()
         {
-            SetScores(Array.Empty<ScoreInfo>());
-
-            if (beatmap.IsDefault)
+            refetchOperation?.Cancel();
+            refetchOperation = Scheduler.AddDelayed(() =>
             {
-                SetState(LeaderboardState.NoneSelected);
-                return;
-            }
+                SetScores(Array.Empty<ScoreInfo>());
 
-            SetState(LeaderboardState.Retrieving);
+                if (beatmap.IsDefault)
+                {
+                    SetState(LeaderboardState.NoneSelected);
+                    return;
+                }
 
-            var fetchBeatmapInfo = beatmap.Value.BeatmapInfo;
-            var fetchRuleset = ruleset.Value ?? fetchBeatmapInfo.Ruleset;
+                SetState(LeaderboardState.Retrieving);
 
-            // For now, we forcefully refresh to keep things simple.
-            // In the future, removing this requirement may be deemed useful, but will need ample testing of edge case scenarios
-            // (like returning from gameplay after setting a new score, returning to song select after main menu).
-            leaderboardManager.FetchWithCriteria(new LeaderboardCriteria(fetchBeatmapInfo, fetchRuleset, Scope.Value, FilterBySelectedMods.Value ? mods.Value.ToArray() : null), forceRefresh: true);
+                var fetchBeatmapInfo = beatmap.Value.BeatmapInfo;
+                var fetchRuleset = ruleset.Value ?? fetchBeatmapInfo.Ruleset;
 
-            if (!initialFetchComplete)
-            {
-                // only bind this after the first fetch to avoid reading stale scores.
-                fetchedScores.BindTo(leaderboardManager.Scores);
-                fetchedScores.BindValueChanged(_ => updateScores(), true);
-                initialFetchComplete = true;
-            }
+                // For now, we forcefully refresh to keep things simple.
+                // In the future, removing this requirement may be deemed useful, but will need ample testing of edge case scenarios
+                // (like returning from gameplay after setting a new score, returning to song select after main menu).
+                leaderboardManager.FetchWithCriteria(new LeaderboardCriteria(fetchBeatmapInfo, fetchRuleset, Scope.Value, FilterBySelectedMods.Value ? mods.Value.ToArray() : null),
+                    forceRefresh: true);
+
+                if (!initialFetchComplete)
+                {
+                    // only bind this after the first fetch to avoid reading stale scores.
+                    fetchedScores.BindTo(leaderboardManager.Scores);
+                    fetchedScores.BindValueChanged(_ => updateScores(), true);
+                    initialFetchComplete = true;
+                }
+            }, initialFetchComplete ? 200 : 0);
         }
 
         private void updateScores()
@@ -243,12 +259,22 @@ namespace osu.Game.Screens.SelectV2
                 return;
             }
 
-            LoadComponentsAsync(scores.Select((s, i) => new BeatmapLeaderboardScore(s)
+            LoadComponentsAsync(scores.Select((s, i) =>
             {
-                Rank = i + 1,
-                IsPersonalBest = s.OnlineID == userScore?.OnlineID,
-                SelectedMods = { BindTarget = mods },
-                Action = () => onLeaderboardScoreClicked(s),
+                BeatmapLeaderboardScore.HighlightType? highlightType = null;
+
+                if (s.OnlineID == userScore?.OnlineID)
+                    highlightType = BeatmapLeaderboardScore.HighlightType.Own;
+                else if (api.Friends.Any(r => r.TargetID == s.UserID) && Scope.Value != BeatmapLeaderboardScope.Friend)
+                    highlightType = BeatmapLeaderboardScore.HighlightType.Friend;
+
+                return new BeatmapLeaderboardScore(s)
+                {
+                    Rank = i + 1,
+                    Highlight = highlightType,
+                    SelectedMods = { BindTarget = mods },
+                    Action = () => onLeaderboardScoreClicked(s),
+                };
             }), loadedScores =>
             {
                 int delay = 200;
@@ -256,10 +282,10 @@ namespace osu.Game.Screens.SelectV2
 
                 foreach (var d in loadedScores)
                 {
-                    d.Y = (BeatmapLeaderboardScore.HEIGHT + 4f) * i;
+                    d.Y = (BeatmapLeaderboardScore.HEIGHT + SPACING_BETWEEN_SCORES) * i;
 
                     // This is a bit of a weird one. We're already in a sheared state and don't want top-level
-                    // shear applied, but still need the `BeatmapLeadeboardScore` to be in "sheared" mode (see ctor).
+                    // shear applied, but still need the `BeatmapLeaderboardScore` to be in "sheared" mode (see ctor).
                     d.Shear = Vector2.Zero;
 
                     scoresContainer.Add(d);
@@ -281,7 +307,7 @@ namespace osu.Game.Screens.SelectV2
                 personalBestDisplay.FadeIn(600, Easing.OutQuint);
                 personalBestScoreContainer.Child = new BeatmapLeaderboardScore(userScore)
                 {
-                    IsPersonalBest = true,
+                    Highlight = BeatmapLeaderboardScore.HighlightType.Own,
                     Rank = userScore.Position,
                     SelectedMods = { BindTarget = mods },
                     Action = () => onLeaderboardScoreClicked(userScore),
@@ -351,6 +377,59 @@ namespace osu.Game.Screens.SelectV2
             placeholder.ScaleTo(0.8f).Then().ScaleTo(1, 900, Easing.OutQuint);
             placeholder.FadeInFromZero(300, Easing.OutQuint);
         }
+
+        #region Fade handling
+
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+
+            const int height = BeatmapLeaderboardScore.HEIGHT;
+
+            float fadeBottom = (float)(scoresScroll.Current + scoresScroll.DrawHeight);
+            float fadeTop = (float)(scoresScroll.Current);
+
+            if (!scoresScroll.IsScrolledToStart())
+                fadeTop += height;
+
+            foreach (var c in scoresContainer)
+            {
+                float topY = c.ToSpaceOfOtherDrawable(Vector2.Zero, scoresContainer).Y;
+                float bottomY = topY + height;
+
+                bool requireBottomFade = bottomY >= fadeBottom;
+                bool requireTopFade = topY < fadeTop;
+
+                if (!requireBottomFade && !requireTopFade)
+                {
+                    c.Colour = Color4.White;
+                    continue;
+                }
+
+                if (topY > fadeBottom + height || bottomY < fadeTop - height)
+                {
+                    c.Colour = Color4.Transparent;
+                    continue;
+                }
+
+                if (requireBottomFade)
+                {
+                    c.Colour = ColourInfo.GradientVertical(
+                        Color4.White.Opacity(Math.Min(1 - (topY - fadeBottom) / height, 1)),
+                        Color4.White.Opacity(Math.Min(1 - (bottomY - fadeBottom) / height, 1)));
+                }
+                else
+                {
+                    Debug.Assert(requireTopFade);
+
+                    c.Colour = ColourInfo.GradientVertical(
+                        Color4.White.Opacity(Math.Min(1 - (fadeTop - topY) / height, 1)),
+                        Color4.White.Opacity(Math.Min(1 - (fadeTop - bottomY) / height, 1)));
+                }
+            }
+        }
+
+        #endregion
 
         private Placeholder? getPlaceholderFor(LeaderboardState state)
         {

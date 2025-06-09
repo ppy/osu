@@ -137,7 +137,7 @@ namespace osu.Game.Screens.SelectV2
                     return;
 
                 float flowWidth = statisticsFlow[0].Width * statisticsFlow.Count + statisticsFlow.Spacing.X * (statisticsFlow.Count - 1);
-                bool tiny = !autoSize && DrawWidth < flowWidth;
+                bool tiny = !autoSize && DrawWidth < flowWidth - 20;
 
                 if (displayedTinyStatistics != tiny)
                 {
@@ -179,7 +179,11 @@ namespace osu.Game.Screens.SelectV2
                 }
                 else
                 {
-                    statisticsFlow.ChildrenEnumerable = statistics.Select(d => new StatisticDifficulty { Value = d });
+                    statisticsFlow.ChildrenEnumerable = statistics.Select(d => new StatisticDifficulty
+                    {
+                        AccentColour = accentColour,
+                        Value = d
+                    });
                     updateStatisticsSizing();
                 }
             }

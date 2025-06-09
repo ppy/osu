@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -34,22 +35,28 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             isPartial = leaderboardManager?.CurrentCriteria?.Scope != BeatmapLeaderboardScope.Local && globalScores?.TopScores.Count >= 50;
 
+            List<GameplayLeaderboardScore> newScores = new List<GameplayLeaderboardScore>();
+
             if (globalScores != null)
             {
                 foreach (var topScore in globalScores.AllScores.OrderByTotalScore())
-                    scores.Add(new GameplayLeaderboardScore(topScore, false));
+                {
+                    newScores.Add(new GameplayLeaderboardScore(topScore, false, GameplayLeaderboardScore.ComboDisplayMode.Highest));
+                }
             }
 
             if (gameplayState != null)
             {
-                var localScore = new GameplayLeaderboardScore(gameplayState.Score.ScoreInfo.User, gameplayState.ScoreProcessor, true)
+                var localScore = new GameplayLeaderboardScore(gameplayState, tracked: true, GameplayLeaderboardScore.ComboDisplayMode.Highest)
                 {
                     // Local score should always show lower than any existing scores in cases of ties.
                     TotalScoreTiebreaker = long.MaxValue
                 };
                 localScore.TotalScore.BindValueChanged(_ => sorting.Invalidate());
-                scores.Add(localScore);
+                newScores.Add(localScore);
             }
+
+            scores.AddRange(newScores);
 
             Scheduler.AddDelayed(sort, 1000, true);
         }

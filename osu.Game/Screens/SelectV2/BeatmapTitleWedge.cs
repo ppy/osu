@@ -64,7 +64,7 @@ namespace osu.Game.Screens.SelectV2
         private Statistic bpmStatistic = null!;
 
         [Resolved]
-        private SongSelect? songSelect { get; set; }
+        private ISongSelect? songSelect { get; set; }
 
         [Resolved]
         private LocalisationManager localisation { get; set; } = null!;
@@ -147,7 +147,8 @@ namespace osu.Game.Screens.SelectV2
                         new ShearAligningWrapper(statisticsFlow = new FillFlowContainer
                         {
                             Shear = -OsuGame.SHEAR,
-                            AutoSizeAxes = Axes.Both,
+                            AutoSizeAxes = Axes.X,
+                            Height = 30,
                             Direction = FillDirection.Horizontal,
                             Spacing = new Vector2(2f, 0f),
                             Children = new Drawable[]
