@@ -165,9 +165,15 @@ namespace osu.Game.Extensions
         /// Create a valid filename which should work across all platforms.
         /// </summary>
         /// <remarks>
-        /// This function replaces all characters not included in a very pessimistic list which should be compatible
-        /// across all operating systems. We are using this in place of <see cref="Path.GetInvalidFileNameChars"/> as
-        /// that function does not have per-platform considerations (and is only made to work on windows).
+        /// <para>
+        /// We are using this in place of <see cref="Path.GetInvalidFileNameChars"/>
+        /// as that function works per-platform, and therefore returns a different set of characters on different OSes.
+        /// </para>
+        /// <para>
+        /// Note that the behaviour of this method is LOAD-BEARING for things such as interoperability of beatmap exports with stable,
+        /// especially with respect to beatmap submission.
+        /// DO NOT CHANGE THE SEMANTICS OF THIS METHOD unless you know well what you are doing.
+        /// </para>
         /// </remarks>
         public static string GetValidFilename(this string filename)
         {
