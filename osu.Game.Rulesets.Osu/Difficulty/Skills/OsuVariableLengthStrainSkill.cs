@@ -33,7 +33,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         public override double DifficultyValue()
         {
             double difficulty = 0;
-            double weight = 1;
             double decayWeightIntegral = (DecayWeight - 1) / Math.Log(DecayWeight) * (1.0 / (1 - DecayWeight));
 
             // Sections with 0 strain are excluded to avoid worst-case time complexity of the following sort (e.g. /b/2351871).
@@ -45,7 +44,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             // Create list of strains to nerf
             List<StrainPeak> strainsToReduce = new List<StrainPeak>();
             int indexToRemove = 0;
-            const int chunkSize = 20;
+            const int chunk_size = 20;
 
             double time = 0; // Time is measured in units of strains
 
@@ -59,8 +58,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 {
                     double scale = Math.Log10(Interpolation.Lerp(1, 10, Math.Clamp((time + addedTime) / MaxSectionLength / ReducedSectionCount, 0, 1)));
 
-                    strainsToReduce.Add(new StrainPeak(strain.Value * Interpolation.Lerp(ReducedStrainBaseline, 1.0, scale), Math.Min(chunkSize, strain.SectionLength - addedTime)));
-                    addedTime += chunkSize;
+                    strainsToReduce.Add(new StrainPeak(strain.Value * Interpolation.Lerp(ReducedStrainBaseline, 1.0, scale), Math.Min(chunk_size, strain.SectionLength - addedTime)));
+                    addedTime += chunk_size;
                 }
 
                 time += strain.SectionLength;
@@ -70,15 +69,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             strains.RemoveRange(0, indexToRemove);
 
-            time = 0;
-
             strains = strains.Concat(strainsToReduce).OrderByDescending(s => s.Value).ToList();
             time = 0;
 
             // Difficulty is a continuous weighted sum of the sorted strains
             for (int i = 0; i < strains.Count; i++)
             {
-                weight = Math.Pow(DecayWeight, time) * (decayWeightIntegral - decayWeightIntegral * Math.Pow(DecayWeight, strains[i].SectionLength / MaxSectionLength)); // f(a,b)=Integrate[Power[0.9,x],{x,a,a+b}]
+                double weight = Math.Pow(DecayWeight, time) * (decayWeightIntegral - decayWeightIntegral * Math.Pow(DecayWeight, strains[i].SectionLength / MaxSectionLength));
                 difficulty += strains[i].Value * weight;
                 time += strains[i].SectionLength / MaxSectionLength;
             }
