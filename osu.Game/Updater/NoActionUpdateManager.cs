@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
@@ -18,7 +16,7 @@ namespace osu.Game.Updater
     /// </summary>
     public partial class NoActionUpdateManager : UpdateManager
     {
-        private string version;
+        private string version = string.Empty;
 
         [BackgroundDependencyLoader]
         private void load(OsuGameBase game)
@@ -30,11 +28,16 @@ namespace osu.Game.Updater
         {
             try
             {
-                var releases = new OsuJsonWebRequest<GitHubRelease>("https://api.github.com/repos/ppy/osu/releases/latest");
+                bool includePrerelease = ReleaseStream.Value == Configuration.ReleaseStream.Tachyon;
 
-                await releases.PerformAsync().ConfigureAwait(false);
+                OsuJsonWebRequest<GitHubRelease[]> releasesRequest = new OsuJsonWebRequest<GitHubRelease[]>("https://api.github.com/repos/ppy/osu/releases?per_page=10&page=1");
+                await releasesRequest.PerformAsync().ConfigureAwait(false);
 
-                var latest = releases.ResponseObject;
+                GitHubRelease[] releases = releasesRequest.ResponseObject;
+                GitHubRelease? latest = releases.OrderByDescending(r => r.PublishedAt).FirstOrDefault(r => includePrerelease || !r.Prerelease);
+
+                if (latest == null)
+                    return false;
 
                 // avoid any discrepancies due to build suffixes for now.
                 // eventually we will want to support release streams and consider these.
