@@ -39,6 +39,7 @@ namespace osu.Game.Skinning
             LayeredHitSounds,
             AllowSliderBallTint,
             InputOverlayText,
+            HitAnimations,
         }
 
         public static List<Color4> DefaultComboColours { get; } = new List<Color4>

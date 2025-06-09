@@ -164,27 +164,35 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 switch (state)
                 {
                     case ArmedState.Hit:
+                        decimal? legacyVersion = skin.GetConfig<SkinConfiguration.LegacySetting, decimal>(SkinConfiguration.LegacySetting.Version)?.Value;
+
+                        bool hitAnimations = skin.GetConfig<SkinConfiguration.LegacySetting, bool>(SkinConfiguration.LegacySetting.HitAnimations)?.Value ?? true;
+
+                        if (legacyVersion > 2.7m && !hitAnimations)
+                        {
+                            // legacy skins of version 2.8 and newer on lazer have an option to only apply very short fade out to the circle.
+                            this.FadeOut(legacy_fade_duration / 4);
+                            break;
+                        }
+
                         CircleSprite.FadeOut(legacy_fade_duration);
                         CircleSprite.ScaleTo(1.4f, legacy_fade_duration, Easing.Out);
 
                         OverlaySprite.FadeOut(legacy_fade_duration);
                         OverlaySprite.ScaleTo(1.4f, legacy_fade_duration, Easing.Out);
 
-                        if (hasNumber)
-                        {
-                            decimal? legacyVersion = skin.GetConfig<SkinConfiguration.LegacySetting, decimal>(SkinConfiguration.LegacySetting.Version)?.Value;
+                        if (!hasNumber) break;
 
-                            if (legacyVersion > 1.0m)
-                                // legacy skins of version 2.0 and newer only apply very short fade out to the number piece.
-                                hitCircleText.FadeOut(legacy_fade_duration / 4);
-                            else
-                            {
-                                // old skins scale and fade it normally along other pieces.
-                                hitCircleText.FadeOut(legacy_fade_duration);
-                                hitCircleText.ScaleTo(1.4f, legacy_fade_duration, Easing.Out);
-                            }
+                        if (legacyVersion > 1.0m)
+                        {
+                            // legacy skins of version 2.0 and newer only apply very short fade out to the number piece.
+                            hitCircleText.FadeOut(legacy_fade_duration / 4);
+                            break;
                         }
 
+                        // old skins scale and fade it normally along other pieces.
+                        hitCircleText.FadeOut(legacy_fade_duration);
+                        hitCircleText.ScaleTo(1.4f, legacy_fade_duration, Easing.Out);
                         break;
                 }
             }
