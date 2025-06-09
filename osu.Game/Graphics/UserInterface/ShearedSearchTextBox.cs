@@ -21,38 +21,38 @@ namespace osu.Game.Graphics.UserInterface
         private const float corner_radius = 7;
 
         private readonly Box background;
-        private readonly SearchTextBox textBox;
+        protected readonly InnerSearchTextBox TextBox;
 
         public Bindable<string> Current
         {
-            get => textBox.Current;
-            set => textBox.Current = value;
+            get => TextBox.Current;
+            set => TextBox.Current = value;
         }
 
         public bool HoldFocus
         {
-            get => textBox.HoldFocus;
-            set => textBox.HoldFocus = value;
+            get => TextBox.HoldFocus;
+            set => TextBox.HoldFocus = value;
         }
 
         public LocalisableString PlaceholderText
         {
-            get => textBox.PlaceholderText;
-            set => textBox.PlaceholderText = value;
+            get => TextBox.PlaceholderText;
+            set => TextBox.PlaceholderText = value;
         }
 
-        public new bool HasFocus => textBox.HasFocus;
+        public new bool HasFocus => TextBox.HasFocus;
 
-        public void TakeFocus() => textBox.TakeFocus();
+        public void TakeFocus() => TextBox.TakeFocus();
 
-        public void KillFocus() => textBox.KillFocus();
+        public void KillFocus() => TextBox.KillFocus();
 
-        public bool SelectAll() => textBox.SelectAll();
+        public bool SelectAll() => TextBox.SelectAll();
 
         public ShearedSearchTextBox()
         {
             Height = 42;
-            Shear = new Vector2(OsuGame.SHEAR, 0);
+            Shear = OsuGame.SHEAR;
             Masking = true;
             CornerRadius = corner_radius;
 
@@ -69,13 +69,7 @@ namespace osu.Game.Graphics.UserInterface
                     {
                         new Drawable[]
                         {
-                            textBox = new InnerSearchTextBox
-                            {
-                                Anchor = Anchor.CentreLeft,
-                                Origin = Anchor.CentreLeft,
-                                RelativeSizeAxes = Axes.Both,
-                                Size = Vector2.One
-                            },
+                            TextBox = CreateInnerTextBox(),
                             new SpriteIcon
                             {
                                 Icon = FontAwesome.Solid.Search,
@@ -101,10 +95,20 @@ namespace osu.Game.Graphics.UserInterface
             background.Colour = colourProvider.Background3;
         }
 
-        public override bool HandleNonPositionalInput => textBox.HandleNonPositionalInput;
+        public override bool HandleNonPositionalInput => TextBox.HandleNonPositionalInput;
 
-        private partial class InnerSearchTextBox : SearchTextBox
+        protected virtual InnerSearchTextBox CreateInnerTextBox() => new InnerSearchTextBox();
+
+        protected partial class InnerSearchTextBox : SearchTextBox
         {
+            public InnerSearchTextBox()
+            {
+                Anchor = Anchor.CentreLeft;
+                Origin = Anchor.CentreLeft;
+                RelativeSizeAxes = Axes.Both;
+                Size = Vector2.One;
+            }
+
             [BackgroundDependencyLoader]
             private void load(OverlayColourProvider colourProvider)
             {
@@ -115,7 +119,7 @@ namespace osu.Game.Graphics.UserInterface
                 PlaceholderText = CommonStrings.InputSearch;
 
                 CornerRadius = corner_radius;
-                TextContainer.Shear = new Vector2(-OsuGame.SHEAR, 0);
+                TextContainer.Shear = -OsuGame.SHEAR;
             }
 
             protected override SpriteText CreatePlaceholder() => new SearchPlaceholder();

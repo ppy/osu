@@ -58,7 +58,10 @@ namespace osu.Game.Utils
             Logger.NewEntry += processLogEntry;
         }
 
-        ~SentryLogger() => Dispose(false);
+        ~SentryLogger()
+        {
+            Dispose(false);
+        }
 
         public void AttachUser(IBindable<APIUser> user)
         {

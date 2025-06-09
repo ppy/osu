@@ -90,6 +90,12 @@ namespace osu.Game.Beatmaps
             return ID == other.ID;
         }
 
+        public override int GetHashCode()
+        {
+            // ReSharper disable once NonReadonlyMemberInGetHashCode
+            return ID.GetHashCode();
+        }
+
         public override string ToString() => Metadata.GetDisplayString();
 
         public bool Equals(IBeatmapSetInfo? other) => other is BeatmapSetInfo b && Equals(b);

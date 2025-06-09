@@ -32,6 +32,9 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"playcount")]
         public int PlayCount { get; set; }
 
+        [JsonProperty(@"current_user_playcount")]
+        public int UserPlayCount { get; set; }
+
         [JsonProperty(@"passcount")]
         public int PassCount { get; set; }
 

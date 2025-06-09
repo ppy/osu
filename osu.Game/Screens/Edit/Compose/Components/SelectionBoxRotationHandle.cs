@@ -127,7 +127,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private void applyRotation(bool shouldSnap)
         {
             float newRotation = shouldSnap ? snap(rawCumulativeRotation, snap_step) : MathF.Round(rawCumulativeRotation);
-            newRotation = (newRotation - 180) % 360 + 180;
+            newRotation = ((newRotation + 360 + 180) % 360) - 180;
+            if (MathF.Abs(newRotation) == 180)
+                newRotation = 180;
 
             cumulativeRotation.Value = newRotation;
 
