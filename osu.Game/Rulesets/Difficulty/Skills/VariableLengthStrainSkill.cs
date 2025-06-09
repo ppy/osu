@@ -259,6 +259,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         {
             double difficulty = 0;
             double weight = 1;
+            double decayWeightIntegral = (DecayWeight - 1) / Math.Log(DecayWeight) * (1.0 / (1 - DecayWeight));
 
             // Sections with 0 strain are excluded to avoid worst-case time complexity of the following sort (e.g. /b/2351871).
             // These sections will not contribute to the difficulty.
@@ -270,11 +271,9 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             double time = 0;
 
             // Difficulty is a continuous weighted sum of the sorted strains
-            // 9.49122 = Integrate[Power[0.9,x],{x,0,1}]
-            // TODO: Replace 9.49122 with variable calculated from DecayWeight so Catch can use this
             for (int i = 0; i < strains.Count; i++)
             {
-                weight = Math.Pow(0.9, time) * (9.49122 - 9.49122 * Math.Pow(0.9, strains[i].SectionLength / MaxSectionLength)); // f(a,b)=Integrate[Power[0.9,x],{x,a,a+b}]
+                weight = Math.Pow(DecayWeight, time) * (decayWeightIntegral - decayWeightIntegral * Math.Pow(DecayWeight, strains[i].SectionLength / MaxSectionLength)); // f(a,b)=Integrate[Power[0.9,x],{x,a,a+b}]
                 difficulty += strains[i].Value * weight;
                 time += strains[i].SectionLength / MaxSectionLength;
             }
