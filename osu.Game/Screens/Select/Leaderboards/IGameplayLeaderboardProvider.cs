@@ -15,4 +15,9 @@ namespace osu.Game.Screens.Select.Leaderboards
         /// </summary>
         IBindableList<GameplayLeaderboardScore> Scores { get; }
     }
+
+    public class EmptyGameplayLeaderboardProvider : IGameplayLeaderboardProvider
+    {
+        public IBindableList<GameplayLeaderboardScore> Scores { get; } = new BindableList<GameplayLeaderboardScore>();
+    }
 }
