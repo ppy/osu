@@ -14,7 +14,7 @@ namespace osu.Game.Skinning
     {
         public readonly SkinInfo SkinInfo = new SkinInfo();
 
-        public const decimal LATEST_VERSION = 2.7m;
+        public const decimal LATEST_VERSION = 2.8m;
 
         /// <summary>
         /// Whether to allow <see cref="DefaultComboColours"/> as a fallback list for when no combo colours are provided.

@@ -158,6 +158,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         private void updateStateTransforms(DrawableHitObject drawableHitObject, ArmedState state)
         {
             const double legacy_fade_duration = 240;
+            const double legacy_short_fade_duration = 60;
 
             using (BeginAbsoluteSequence(drawableObject.AsNonNull().HitStateUpdateTime))
             {
@@ -171,7 +172,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         if (legacyVersion > 2.7m && !hitAnimations)
                         {
                             // legacy skins of version 2.8 and newer on lazer have an option to only apply very short fade out to the circle.
-                            this.FadeOut(legacy_fade_duration / 4);
+                            this.FadeOut(legacy_short_fade_duration);
                             break;
                         }
 
@@ -186,7 +187,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         if (legacyVersion > 1.0m)
                         {
                             // legacy skins of version 2.0 and newer only apply very short fade out to the number piece.
-                            hitCircleText.FadeOut(legacy_fade_duration / 4);
+                            hitCircleText.FadeOut(legacy_short_fade_duration);
                             break;
                         }
 
