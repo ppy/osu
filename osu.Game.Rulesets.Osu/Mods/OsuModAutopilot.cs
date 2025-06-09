@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private (Vector2 Position, double Time) lastHitInfo = (default, 0);
         private (double HitWindowStart, double HitWindowEnd) hitWindow = (0, 0);
-        private double timeElapsedBetweenHitObjects = 0;
+        private double timeElapsedBetweenHitObjects;
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
@@ -81,18 +81,6 @@ namespace osu.Game.Rulesets.Osu.Mods
                 Vector2 mousePos = inputManager.CurrentState.Mouse.Position;
                 Vector2 fieldPos = playfield.ScreenSpaceToGamefield(mousePos);
 
-                // If it's a slider, we want the cursor position to be at the start or end of the slider
-                if (drawableHitObject is DrawableSlider sliderDrawable)
-                {
-                    var slider = sliderDrawable.HitObject;
-
-                    Vector2 pathEnd = slider.Path.PositionAt(1);
-
-                    fieldPos = (slider.RepeatCount % 2 == 0)
-                        ? sliderDrawable.Position + (pathEnd * sliderDrawable.Scale)
-                        : slider.HeadCircle.Position;
-                }
-
                 lastHitInfo = (fieldPos, result.TimeAbsolute);
             };
         }
@@ -115,7 +103,6 @@ namespace osu.Game.Rulesets.Osu.Mods
                 if (nextObject is DrawableSpinner replaySpinner)
                 {
                     var spinner = replaySpinner.HitObject;
-                    replaySpinner.HandleUserInput = false;
 
                     // Don't start spinning until position is reached.
                     if (timeElapsedBetweenHitObjects >= 0)
@@ -158,7 +145,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                     var slider = sliderDrawable.HitObject;
 
-                    if (timeElapsedBetweenHitObjects + mehWindow >= 0 && timeElapsedBetweenHitObjects < slider.Duration)
+                    // This if statement is needed or else the cursor will teleport to the HeadCircle of slider.
+                    if (timeElapsedBetweenHitObjects < slider.Duration)
                     {
                         double prog = Math.Clamp(timeElapsedBetweenHitObjects / slider.Duration, 0, 1);
                         double spans = prog * (slider.RepeatCount + 1);
@@ -213,6 +201,8 @@ namespace osu.Game.Rulesets.Osu.Mods
                     -(float)Math.Sin(0) * spinner_radius,
                     -(float)Math.Cos(0) * spinner_radius);
 
+                // Since spinner's don't have hit window, we need to add the duration.
+                hitWindow.HitWindowEnd += spinner.Duration;
                 double duration = handleTime();
 
                 moveTowards(spinnerTargetPosition, duration);
