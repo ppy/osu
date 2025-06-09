@@ -37,6 +37,11 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         private double currentSectionEnd;
 
         /// <summary>
+        /// The number of strains calculated such that 99.999% of the true pp value is preserved
+        /// </summary>
+        private double cutOffTime = -1;
+
+        /// <summary>
         /// Used to store the difficulty of a section of a map.
         /// <remarks>Not to be confused with <see cref="StrainObject"/></remarks>
         /// </summary>
@@ -155,6 +160,12 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             // If the current strain is smaller than the current peak, add it to the queue
             if (strain < currentSectionPeak)
             {
+                // Calculate cut off time if not yet calculated
+                if (cutOffTime == -1)
+                {
+                    cutOffTime = 5 * Math.Log(10) / Math.Log(DecayWeight);
+                }
+
                 // Empty the queue of smaller elements
                 while (queue.Last != null && queue.Last.Value.Value < strain)
                     queue.RemoveLast();
