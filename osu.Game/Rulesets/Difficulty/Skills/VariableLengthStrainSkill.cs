@@ -218,7 +218,6 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             strainPeaks.AddInPlace(new StrainPeak(currentSectionPeak, sectionLength, fromNewObject), descComparer);
             totalLength += sectionLength;
 
-            // TODO: Figure out how to calc "good enough" const for Catch
             while (totalLength / MaxSectionLength > 100)
             {
                 totalLength -= strainPeaks[^1].SectionLength;
