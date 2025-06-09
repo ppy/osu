@@ -219,6 +219,63 @@ namespace osu.Game.Tests.Visual.Ranking
         }
 
         [Test]
+        public void TestOnlineLeaderboardWithLessThan50Scores_ShowingAnotherUserScore()
+        {
+            var scores = new List<ScoreInfo>();
+            var soloScores = new List<SoloScoreInfo>();
+
+            AddStep("set leaderboard to global", () => leaderboardManager.FetchWithCriteria(new LeaderboardCriteria(importedBeatmap, importedBeatmap.Ruleset, BeatmapLeaderboardScope.Global, null)));
+            AddStep("set up request handling", () =>
+            {
+                for (int i = 0; i < 30; ++i)
+                {
+                    var score = TestResources.CreateTestScoreInfo(importedBeatmap);
+                    score.TotalScore = 10_000 * (30 - i);
+                    score.Position = i + 1;
+                    score.User = new APIUser { Id = i };
+                    score.BeatmapInfo = new BeatmapInfo
+                    {
+                        OnlineID = 123123,
+                        Status = BeatmapOnlineStatus.Ranked,
+                    };
+                    score.OnlineID = i;
+                    scores.Add(score);
+
+                    var soloScore = SoloScoreInfo.ForSubmission(score);
+                    soloScore.ID = (ulong)i;
+                    soloScores.Add(soloScore);
+                }
+
+                scores[^1].User = API.LocalUser.Value;
+                soloScores[^1].UserID = API.LocalUser.Value.OnlineID;
+
+                dummyAPI.HandleRequest = req =>
+                {
+                    switch (req)
+                    {
+                        case GetScoresRequest getScoresRequest:
+                            getScoresRequest.TriggerSuccess(new APIScoresCollection
+                            {
+                                Scores = soloScores,
+                                UserScore = new APIScoreWithPosition
+                                {
+                                    Score = soloScores[^1],
+                                    Position = 30
+                                }
+                            });
+                            return true;
+                    }
+
+                    return false;
+                };
+            });
+
+            AddStep("show results", () => LoadScreen(new SoloResultsScreen(scores[0])));
+            AddUntilStep("wait for loaded", () => ((Drawable)Stack.CurrentScreen).IsLoaded);
+            AddAssert("local user best shown", () => this.ChildrenOfType<ScorePanel>().Any(p => p.Score.UserID == API.LocalUser.Value.Id));
+        }
+
+        [Test]
         public void TestOnlineLeaderboardWithLessThan50Scores_UserIsLast()
         {
             ScoreInfo localScore = null!;
