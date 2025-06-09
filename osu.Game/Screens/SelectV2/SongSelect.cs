@@ -469,21 +469,59 @@ namespace osu.Game.Screens.SelectV2
 
             // Refetch to be confident that the current selection is still valid. It may have been deleted or hidden.
             var currentBeatmap = beatmaps.GetWorkingBeatmap(Beatmap.Value.BeatmapInfo, true);
-            bool validSelection = checkBeatmapValidForSelection(currentBeatmap.BeatmapInfo, filterControl.CreateCriteria());
+            bool validSelection = !Beatmap.IsDefault && checkBeatmapValidForSelection(currentBeatmap.BeatmapInfo, filterControl.CreateCriteria());
 
-            if (Beatmap.IsDefault || !validSelection)
+            if (validSelection)
+            {
+                carousel.CurrentSelection = currentBeatmap.BeatmapInfo;
+                return true;
+            }
+
+            // If there was no beatmap selected, pick a random one.
+            if (Beatmap.IsDefault)
             {
                 validSelection = carousel.NextRandom();
                 if (selectionDebounce?.State == ScheduledDelegate.RunState.Waiting)
                     selectionDebounce?.RunTask();
+
+                return validSelection;
             }
 
-            if (validSelection)
-                carousel.CurrentSelection = Beatmap.Value.BeatmapInfo;
-            else
-                Beatmap.SetDefault();
+            // Even if the beatmap was deleted or hidden, the set might still have valid beatmaps.
+            if (!validSelection)
+            {
+                var activeSet = currentBeatmap.BeatmapSetInfo;
+                BeatmapInfo? nextValidBeatmap = findNextValidBeatmap(activeSet.Beatmaps, currentBeatmap.BeatmapInfo);
+
+                if (nextValidBeatmap != null)
+                {
+                    selectBeatmap(nextValidBeatmap);
+                    return true;
+                }
+            }
+
+            // If all else fails, use the default beatmap.
+            Beatmap.SetDefault();
+            if (selectionDebounce?.State == ScheduledDelegate.RunState.Waiting)
+                selectionDebounce?.RunTask();
 
             return validSelection;
+        }
+
+        private BeatmapInfo? findNextValidBeatmap(IEnumerable<BeatmapInfo> beatmaps, BeatmapInfo current)
+        {
+            beatmaps = beatmaps.OrderBy(b => b.StarRating).ToList();
+            var criteria = filterControl.CreateCriteria();
+
+            // Find the first valid beatmap after `current`.
+            BeatmapInfo? nextValidBeatmap = beatmaps.Reverse()
+                                                    .TakeWhile(b => !b.Equals(current))
+                                                    .LastOrDefault(b => checkBeatmapValidForSelection(b, criteria));
+
+            // If `current` is the last beatmap, we need to get the new last beatmap.
+            nextValidBeatmap ??= beatmaps.LastOrDefault(b => !b.Equals(current) && checkBeatmapValidForSelection(b, criteria));
+
+            return nextValidBeatmap;
         }
 
         private bool checkBeatmapValidForSelection(BeatmapInfo beatmap, FilterCriteria? criteria)
