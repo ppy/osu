@@ -15,13 +15,15 @@ namespace osu.Game.Graphics.UserInterface
     /// </summary>
     public partial class LoadingSpinner : VisibilityContainer
     {
+        public const float TRANSITION_DURATION = 500;
+
         private readonly SpriteIcon spinner;
 
         protected override bool StartHidden => true;
 
-        protected Container MainContents;
+        protected Drawable MainContents;
 
-        public const float TRANSITION_DURATION = 500;
+        private readonly Container? roundedContent;
 
         private const float spin_duration = 900;
 
@@ -37,32 +39,46 @@ namespace osu.Game.Graphics.UserInterface
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
-            Child = MainContents = new Container
+            if (withBox)
             {
-                RelativeSizeAxes = Axes.Both,
-                Masking = true,
-                CornerRadius = 20,
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Children = new Drawable[]
+                Child = MainContents = roundedContent = new Container
                 {
-                    new Box
+                    RelativeSizeAxes = Axes.Both,
+                    Masking = true,
+                    CornerRadius = 20,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Children = new Drawable[]
                     {
-                        Colour = inverted ? Color4.White : Color4.Black,
-                        RelativeSizeAxes = Axes.Both,
-                        Alpha = withBox ? 0.7f : 0
-                    },
-                    spinner = new SpriteIcon
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Colour = inverted ? Color4.Black : Color4.White,
-                        Scale = new Vector2(withBox ? 0.6f : 1),
-                        RelativeSizeAxes = Axes.Both,
-                        Icon = FontAwesome.Solid.CircleNotch
+                        new Box
+                        {
+                            Colour = inverted ? Color4.White : Color4.Black,
+                            RelativeSizeAxes = Axes.Both,
+                            Alpha = 0.7f,
+                        },
+                        spinner = new SpriteIcon
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Colour = inverted ? Color4.Black : Color4.White,
+                            Scale = new Vector2(0.6f),
+                            RelativeSizeAxes = Axes.Both,
+                            Icon = FontAwesome.Solid.CircleNotch
+                        }
                     }
-                }
-            };
+                };
+            }
+            else
+            {
+                Child = MainContents = spinner = new SpriteIcon
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Colour = inverted ? Color4.Black : Color4.White,
+                    RelativeSizeAxes = Axes.Both,
+                    Icon = FontAwesome.Solid.CircleNotch
+                };
+            }
         }
 
         protected override void LoadComplete()
@@ -76,7 +92,8 @@ namespace osu.Game.Graphics.UserInterface
         {
             base.Update();
 
-            MainContents.CornerRadius = MainContents.DrawWidth / 4;
+            if (roundedContent != null)
+                roundedContent.CornerRadius = MainContents.DrawWidth / 4;
         }
 
         protected override void PopIn()

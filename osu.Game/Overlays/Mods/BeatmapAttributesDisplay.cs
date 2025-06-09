@@ -87,9 +87,9 @@ namespace osu.Game.Overlays.Mods
             RightContent.AddRange(new Drawable[]
             {
                 circleSizeDisplay = new VerticalAttributeDisplay("CS") { Shear = -OsuGame.SHEAR, },
-                drainRateDisplay = new VerticalAttributeDisplay("HP") { Shear = -OsuGame.SHEAR, },
-                overallDifficultyDisplay = new VerticalAttributeDisplay("OD") { Shear = -OsuGame.SHEAR, },
                 approachRateDisplay = new VerticalAttributeDisplay("AR") { Shear = -OsuGame.SHEAR, },
+                overallDifficultyDisplay = new VerticalAttributeDisplay("OD") { Shear = -OsuGame.SHEAR, },
+                drainRateDisplay = new VerticalAttributeDisplay("HP") { Shear = -OsuGame.SHEAR, },
             });
         }
 

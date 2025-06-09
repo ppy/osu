@@ -66,10 +66,23 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
                 foreach (var scoreInfo in getTestScores())
                 {
+                    BeatmapLeaderboardScore.HighlightType? highlightType = null;
+
+                    switch (scoreInfo.User.Id)
+                    {
+                        case 2:
+                            highlightType = BeatmapLeaderboardScore.HighlightType.Own;
+                            break;
+
+                        case 1541390:
+                            highlightType = BeatmapLeaderboardScore.HighlightType.Friend;
+                            break;
+                    }
+
                     fillFlow.Add(new BeatmapLeaderboardScore(scoreInfo)
                     {
                         Rank = scoreInfo.Position,
-                        IsPersonalBest = scoreInfo.User.Id == 2,
+                        Highlight = highlightType,
                         Shear = Vector2.Zero,
                     });
                 }
@@ -104,10 +117,23 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
                 foreach (var scoreInfo in getTestScores())
                 {
+                    BeatmapLeaderboardScore.HighlightType? highlightType = null;
+
+                    switch (scoreInfo.User.Id)
+                    {
+                        case 2:
+                            highlightType = BeatmapLeaderboardScore.HighlightType.Own;
+                            break;
+
+                        case 1541390:
+                            highlightType = BeatmapLeaderboardScore.HighlightType.Friend;
+                            break;
+                    }
+
                     fillFlow.Add(new BeatmapLeaderboardScore(scoreInfo, sheared: false)
                     {
                         Rank = scoreInfo.Position,
-                        IsPersonalBest = scoreInfo.User.Id == 2,
+                        Highlight = highlightType,
                     });
                 }
 
@@ -205,7 +231,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                     Position = 999,
                     Rank = ScoreRank.X,
                     Accuracy = 1,
-                    MaxCombo = 244,
+                    MaxCombo = 3000,
                     TotalScore = RNG.Next(1_800_000, 2_000_000),
                     MaximumStatistics = { { HitResult.Great, 3000 } },
                     Ruleset = new OsuRuleset().RulesetInfo,
@@ -223,7 +249,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                     Position = 22333,
                     Rank = ScoreRank.S,
                     Accuracy = 0.1f,
-                    MaxCombo = 32040,
+                    MaxCombo = 2204,
                     TotalScore = RNG.Next(1_200_000, 1_500_000),
                     MaximumStatistics = { { HitResult.Great, 3000 } },
                     Ruleset = new OsuRuleset().RulesetInfo,

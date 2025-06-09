@@ -219,7 +219,7 @@ namespace osu.Game.Overlays.SkinEditor
             }
         }
 
-        public partial class DependencyBorrowingContainer : Container
+        private partial class DependencyBorrowingContainer : Container
         {
             protected override bool ShouldBeConsideredForInput(Drawable child) => false;
 
@@ -232,8 +232,19 @@ namespace osu.Game.Overlays.SkinEditor
                 this.donor = donor;
             }
 
-            protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
-                new DependencyContainer(donor?.Dependencies ?? base.CreateChildDependencies(parent));
+            protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
+            {
+                var baseDependencies = base.CreateChildDependencies(parent);
+                if (donor == null)
+                    return baseDependencies;
+
+                var dependencies = new DependencyContainer(donor.Dependencies);
+                // inject `SkinEditor` again *on top* of the borrowed dependencies.
+                // this is designed to let components know when they are being displayed in the context of the skin editor
+                // via attempting to resolve `SkinEditor`.
+                dependencies.CacheAs(baseDependencies.Get<SkinEditor>());
+                return dependencies;
+            }
         }
     }
 }

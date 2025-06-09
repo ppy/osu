@@ -48,7 +48,7 @@ namespace osu.Game.Screens.SelectV2
                 var criteria = getCriteria();
                 var newItems = new List<CarouselItem>();
 
-                BeatmapSetsGroupedTogether = criteria.Sort != SortMode.Difficulty && criteria.Group != GroupMode.Difficulty;
+                BeatmapSetsGroupedTogether = ShouldGroupBeatmapsTogether(criteria);
 
                 var groups = getGroups((List<CarouselItem>)items, criteria);
 
@@ -76,15 +76,18 @@ namespace osu.Game.Screens.SelectV2
                     {
                         var beatmap = (BeatmapInfo)item.Model;
 
+                        bool newBeatmapSet = lastBeatmap?.BeatmapSet!.ID != beatmap.BeatmapSet!.ID;
+
+                        if (newBeatmapSet)
+                        {
+                            if (!setMap.TryGetValue(beatmap.BeatmapSet!, out currentSetItems))
+                                setMap[beatmap.BeatmapSet!] = currentSetItems = new HashSet<CarouselItem>();
+                        }
+
                         if (BeatmapSetsGroupedTogether)
                         {
-                            bool newBeatmapSet = lastBeatmap?.BeatmapSet!.ID != beatmap.BeatmapSet!.ID;
-
                             if (newBeatmapSet)
                             {
-                                if (!setMap.TryGetValue(beatmap.BeatmapSet!, out currentSetItems))
-                                    setMap[beatmap.BeatmapSet!] = currentSetItems = new HashSet<CarouselItem>();
-
                                 if (groupItem != null)
                                     groupItem.NestedItemCount++;
 
@@ -114,7 +117,7 @@ namespace osu.Game.Screens.SelectV2
                         currentGroupItems?.Add(i);
                         currentSetItems?.Add(i);
 
-                        i.IsVisible = i.Model is GroupDefinition || (group == null && (i.Model is BeatmapSetInfo || currentSetItems == null));
+                        i.IsVisible = i.Model is GroupDefinition || (group == null && (i.Model is BeatmapSetInfo || !BeatmapSetsGroupedTogether));
                     }
                 }
 
@@ -122,11 +125,24 @@ namespace osu.Game.Screens.SelectV2
             }, cancellationToken).ConfigureAwait(false);
         }
 
+        public static bool ShouldGroupBeatmapsTogether(FilterCriteria criteria)
+        {
+            // In certain cases, we intentionally split out difficulties
+            // where it's more relevant or convenient to view them as individual items.
+            if (criteria.Sort == SortMode.Difficulty || criteria.Group == GroupMode.Difficulty)
+                return false;
+            if (criteria.Sort == SortMode.LastPlayed && criteria.Group == GroupMode.LastPlayed)
+                return false;
+
+            // In the majority case we group sets together for display.
+            return true;
+        }
+
         private List<GroupMapping> getGroups(List<CarouselItem> items, FilterCriteria criteria)
         {
             switch (criteria.Group)
             {
-                case GroupMode.NoGrouping:
+                case GroupMode.None:
                     return new List<GroupMapping> { new GroupMapping(null, items) };
 
                 case GroupMode.Artist:
@@ -147,12 +163,15 @@ namespace osu.Game.Screens.SelectV2
                 case GroupMode.LastPlayed:
                     return getGroupsBy(b =>
                     {
-                        DateTimeOffset? maxLastPlayed = aggregateMax(b, items, bb => bb.LastPlayed);
+                        var date = b.LastPlayed;
 
-                        if (maxLastPlayed == null)
+                        if (BeatmapSetsGroupedTogether)
+                            date = aggregateMax(b, static b => (b.LastPlayed ?? DateTimeOffset.MinValue));
+
+                        if (date == null || date == DateTimeOffset.MinValue)
                             return new GroupDefinition(int.MaxValue, "Never");
 
-                        return defineGroupByDate(maxLastPlayed.Value);
+                        return defineGroupByDate(date.Value);
                     }, items);
 
                 case GroupMode.RankedStatus:
@@ -161,8 +180,12 @@ namespace osu.Game.Screens.SelectV2
                 case GroupMode.BPM:
                     return getGroupsBy(b =>
                     {
-                        double maxBPM = aggregateMax(b, items, bb => bb.BPM);
-                        return defineGroupByBPM(maxBPM);
+                        double bpm = b.BPM;
+
+                        if (BeatmapSetsGroupedTogether)
+                            bpm = aggregateMax(b, bb => bb.BPM);
+
+                        return defineGroupByBPM(bpm);
                     }, items);
 
                 case GroupMode.Difficulty:
@@ -171,25 +194,27 @@ namespace osu.Game.Screens.SelectV2
                 case GroupMode.Length:
                     return getGroupsBy(b =>
                     {
-                        double maxLength = aggregateMax(b, items, bb => bb.Length);
-                        return defineGroupByLength(maxLength);
+                        double length = b.Length;
+
+                        if (BeatmapSetsGroupedTogether)
+                            length = aggregateMax(b, bb => bb.Length);
+
+                        return defineGroupByLength(length);
                     }, items);
 
-                case GroupMode.Collections:
-                    // TODO: needs implementation
-                    goto case GroupMode.NoGrouping;
-
-                case GroupMode.Favourites:
-                    // TODO: needs implementation
-                    goto case GroupMode.NoGrouping;
-
-                case GroupMode.MyMaps:
-                    // TODO: needs implementation
-                    goto case GroupMode.NoGrouping;
-
-                case GroupMode.RankAchieved:
-                    // TODO: needs implementation
-                    goto case GroupMode.NoGrouping;
+                // TODO: need implementation
+                //
+                // case GroupMode.Collections:
+                //     goto case GroupMode.None;
+                //
+                // case GroupMode.Favourites:
+                //     goto case GroupMode.None;
+                //
+                // case GroupMode.MyMaps:
+                //     goto case GroupMode.None;
+                //
+                // case GroupMode.RankAchieved:
+                //     goto case GroupMode.None;
 
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -329,10 +354,10 @@ namespace osu.Game.Screens.SelectV2
             return new GroupDefinition(11, "Over 10 minutes");
         }
 
-        private static T? aggregateMax<T>(BeatmapInfo b, IEnumerable<CarouselItem> items, Func<BeatmapInfo, T> func)
+        private static T? aggregateMax<T>(BeatmapInfo b, Func<BeatmapInfo, T> func)
         {
-            var matchedBeatmaps = items.Select(i => i.Model).Cast<BeatmapInfo>().Where(beatmap => beatmap.BeatmapSet!.Equals(b.BeatmapSet));
-            return matchedBeatmaps.Max(func);
+            var beatmaps = b.BeatmapSet!.Beatmaps.Where(bb => !bb.Hidden);
+            return beatmaps.Max(func);
         }
 
         private record GroupMapping(GroupDefinition? Group, List<CarouselItem> ItemsInGroup);

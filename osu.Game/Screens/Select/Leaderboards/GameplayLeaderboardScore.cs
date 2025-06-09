@@ -8,6 +8,7 @@ using osu.Game.Online.Spectator;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
+using osu.Game.Screens.Play;
 using osu.Game.Users;
 
 namespace osu.Game.Screens.Select.Leaderboards
@@ -40,7 +41,8 @@ namespace osu.Game.Screens.Select.Leaderboards
         public BindableDouble Accuracy { get; } = new BindableDouble();
 
         /// <summary>
-        /// The current combo of the score.
+        /// The combo of the score to display.
+        /// Can be either highest combo or current combo, depending on constructor parameters.
         /// </summary>
         public BindableInt Combo { get; } = new BindableInt();
 
@@ -87,33 +89,35 @@ namespace osu.Game.Screens.Select.Leaderboards
         /// </summary>
         public Bindable<long> DisplayOrder { get; } = new BindableLong();
 
-        public GameplayLeaderboardScore(IUser user, ScoreProcessor scoreProcessor, bool tracked)
+        public GameplayLeaderboardScore(GameplayState gameplayState, bool tracked, ComboDisplayMode comboMode)
+        {
+            User = gameplayState.Score.ScoreInfo.User;
+            Tracked = tracked;
+
+            var scoreProcessor = gameplayState.ScoreProcessor;
+            TotalScore.BindTarget = scoreProcessor.TotalScore;
+            Accuracy.BindTarget = scoreProcessor.Accuracy;
+            Combo.BindTarget = comboMode == ComboDisplayMode.Current ? scoreProcessor.Combo : scoreProcessor.HighestCombo;
+            GetDisplayScore = scoreProcessor.GetDisplayScore;
+        }
+
+        public GameplayLeaderboardScore(IUser user, SpectatorScoreProcessor scoreProcessor, bool tracked, ComboDisplayMode comboMode)
         {
             User = user;
             Tracked = tracked;
             TotalScore.BindTarget = scoreProcessor.TotalScore;
             Accuracy.BindTarget = scoreProcessor.Accuracy;
-            Combo.BindTarget = scoreProcessor.Combo;
+            Combo.BindTarget = comboMode == ComboDisplayMode.Current ? scoreProcessor.Combo : scoreProcessor.HighestCombo;
             GetDisplayScore = scoreProcessor.GetDisplayScore;
         }
 
-        public GameplayLeaderboardScore(IUser user, SpectatorScoreProcessor scoreProcessor, bool tracked)
-        {
-            User = user;
-            Tracked = tracked;
-            TotalScore.BindTarget = scoreProcessor.TotalScore;
-            Accuracy.BindTarget = scoreProcessor.Accuracy;
-            Combo.BindTarget = scoreProcessor.Combo;
-            GetDisplayScore = scoreProcessor.GetDisplayScore;
-        }
-
-        public GameplayLeaderboardScore(ScoreInfo scoreInfo, bool tracked)
+        public GameplayLeaderboardScore(ScoreInfo scoreInfo, bool tracked, ComboDisplayMode comboMode)
         {
             User = scoreInfo.User;
             Tracked = tracked;
             TotalScore.Value = scoreInfo.TotalScore;
             Accuracy.Value = scoreInfo.Accuracy;
-            Combo.Value = scoreInfo.MaxCombo;
+            Combo.Value = comboMode == ComboDisplayMode.Current ? scoreInfo.Combo : scoreInfo.MaxCombo;
             TotalScoreTiebreaker = scoreInfo.OnlineID > 0 ? scoreInfo.OnlineID : scoreInfo.Date.ToUnixTimeSeconds();
             GetDisplayScore = scoreInfo.GetDisplayScore;
             InitialPosition = scoreInfo.Position;
@@ -128,6 +132,12 @@ namespace osu.Game.Screens.Select.Leaderboards
             Tracked = tracked;
             TotalScore.BindTarget = displayScore;
             GetDisplayScore = _ => displayScore.Value;
+        }
+
+        public enum ComboDisplayMode
+        {
+            Current,
+            Highest,
         }
     }
 }

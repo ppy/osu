@@ -3,12 +3,15 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osuTK;
 
@@ -68,6 +71,8 @@ namespace osu.Game.Screens.SelectV2
 
             protected partial class TabItem : TabItem<T>
             {
+                private Sample? selectSample;
+
                 [Resolved]
                 private OverlayColourProvider colourProvider { get; set; } = null!;
 
@@ -78,7 +83,7 @@ namespace osu.Game.Screens.SelectV2
                 {
                     AutoSizeAxes = Axes.Both;
 
-                    Children = new[]
+                    Children = new Drawable[]
                     {
                         Text = new OsuSpriteText
                         {
@@ -87,7 +92,14 @@ namespace osu.Game.Screens.SelectV2
                             Text = value.ToString(),
                             Font = OsuFont.Style.Body,
                         },
+                        new HoverSounds(HoverSampleSet.TabSelect)
                     };
+                }
+
+                [BackgroundDependencyLoader]
+                private void load(AudioManager audio)
+                {
+                    selectSample = audio.Samples.Get(@"UI/tabselect-select");
                 }
 
                 protected override void LoadComplete()
@@ -95,6 +107,8 @@ namespace osu.Game.Screens.SelectV2
                     base.LoadComplete();
                     updateDisplay();
                 }
+
+                protected override void OnActivatedByUser() => selectSample?.Play();
 
                 protected override void OnActivated() => updateDisplay();
 
