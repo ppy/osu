@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using osu.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -39,14 +40,17 @@ namespace osu.Game.Updater
         [Resolved]
         protected INotificationOverlay Notifications { get; private set; } = null!;
 
+        protected IBindable<ReleaseStream> ReleaseStream => releaseStream;
+
+        private readonly Bindable<ReleaseStream> releaseStream = new Bindable<ReleaseStream>();
+        private readonly object updateTaskLock = new object();
+        private Task<bool>? updateCheckTask;
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            Schedule(() => Task.Run(CheckForUpdateAsync));
-
             string version = game.Version;
-
             string lastVersion = config.Get<string>(OsuSetting.Version);
 
             if (game.IsDeployedBuild && version != lastVersion)
@@ -62,11 +66,14 @@ namespace osu.Game.Updater
             // debug / local compilations will reset to a non-release string.
             // can be useful to check when an install has transitioned between release and otherwise (see OsuConfigManager's migrations).
             config.SetValue(OsuSetting.Version, version);
+
+            config.BindWith(OsuSetting.ReleaseStream, releaseStream);
+            releaseStream.BindValueChanged(_ => scheduleUpdateCheck());
+
+            scheduleUpdateCheck();
         }
 
-        private readonly object updateTaskLock = new object();
-
-        private Task<bool>? updateCheckTask;
+        private void scheduleUpdateCheck() => Schedule(() => Task.Run(CheckForUpdateAsync));
 
         public async Task<bool> CheckForUpdateAsync()
         {

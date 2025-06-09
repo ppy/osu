@@ -4,7 +4,6 @@
 using System;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Logging;
 using osu.Game;
 using osu.Game.Configuration;
@@ -27,35 +26,26 @@ namespace osu.Desktop.Updater
         [Resolved]
         private ILocalUserPlayInfo? localUserInfo { get; set; }
 
-        [Resolved]
-        private OsuConfigManager osuConfigManager { get; set; } = null!;
-
         private bool isInGameplay => localUserInfo?.PlayingState.Value != LocalUserPlayingState.NotPlaying;
 
-        private readonly Bindable<ReleaseStream> releaseStream = new Bindable<ReleaseStream>();
         private UpdateManager? updateManager;
         private UpdateInfo? pendingUpdate;
+        private ReleaseStream? lastReleaseStream;
 
-        protected override void LoadComplete()
+        protected override async Task<bool> PerformUpdateCheck()
         {
-            // Used by the base implementation.
-            osuConfigManager.BindWith(OsuSetting.ReleaseStream, releaseStream);
-            releaseStream.BindValueChanged(_ => onReleaseStreamChanged(), true);
-
-            base.LoadComplete();
-        }
-
-        private void onReleaseStreamChanged()
-        {
-            updateManager = new UpdateManager(new GithubSource(@"https://github.com/ppy/osu", null, releaseStream.Value == ReleaseStream.Tachyon), new UpdateOptions
+            if (ReleaseStream.Value != lastReleaseStream)
             {
-                AllowVersionDowngrade = true,
-            });
+                updateManager = new UpdateManager(new GithubSource(@"https://github.com/ppy/osu", null, ReleaseStream.Value == Game.Configuration.ReleaseStream.Tachyon), new UpdateOptions
+                {
+                    AllowVersionDowngrade = true,
+                });
 
-            Schedule(() => Task.Run(CheckForUpdateAsync));
+                lastReleaseStream = ReleaseStream.Value;
+            }
+
+            return await checkForUpdateAsync().ConfigureAwait(false);
         }
-
-        protected override async Task<bool> PerformUpdateCheck() => await checkForUpdateAsync().ConfigureAwait(false);
 
         private async Task<bool> checkForUpdateAsync()
         {
