@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Logging;
-using osu.Game.Beatmaps;
 using osu.Game.Extensions;
 using osu.Game.Online.API;
 using osu.Game.Online.Leaderboards;
@@ -41,9 +40,6 @@ namespace osu.Game.Screens.Ranking
         protected override async Task<ScoreInfo[]> FetchScores()
         {
             Debug.Assert(Score != null);
-
-            if (Score.BeatmapInfo!.OnlineID <= 0 || Score.BeatmapInfo.Status <= BeatmapOnlineStatus.Pending)
-                return [];
 
             var criteria = new LeaderboardCriteria(
                 Score.BeatmapInfo!,
