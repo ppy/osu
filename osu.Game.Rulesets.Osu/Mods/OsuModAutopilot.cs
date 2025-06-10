@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.StateChanges;
 using osu.Framework.Localisation;
@@ -64,8 +65,13 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             hasReplayLoaded.BindTo(drawableRuleset.HasReplayLoaded);
 
-            playfield.OnLoadComplete += _ =>
+            Action<Drawable> onLoadCompleteHandler = _ => { };
+
+            onLoadCompleteHandler += _ =>
             {
+                // When playfield gets fully initialized at the start, we dont need to use this again.
+                playfield.OnLoadComplete -= onLoadCompleteHandler;
+
                 // When fully initialized, let's set the last position where the player placed their cursor before the game loaded.
                 Vector2 screenStart = inputManager.CurrentState.Mouse.Position;
                 Vector2 fieldStart = playfield.ScreenSpaceToGamefield(screenStart);
@@ -73,6 +79,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                 lastHitInfo = (fieldStart, timeStart);
             };
+
+            playfield.OnLoadComplete += onLoadCompleteHandler;
 
             // We want to save the position and time when the HitObject was judged for movement calculations.
             playfield.NewResult += (drawableHitObject, result) =>
