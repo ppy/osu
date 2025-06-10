@@ -45,7 +45,8 @@ namespace osu.Game.Screens.Ranking
                 Score.BeatmapInfo!,
                 Score.Ruleset,
                 leaderboardManager.CurrentCriteria?.Scope ?? BeatmapLeaderboardScope.Global,
-                leaderboardManager.CurrentCriteria?.ExactMods
+                leaderboardManager.CurrentCriteria?.ExactMods,
+                leaderboardManager.CurrentCriteria?.Sorting ?? RankingsSort.Score
             );
             var requestTaskSource = new TaskCompletionSource<LeaderboardScores>();
             globalScores.BindValueChanged(_ =>
