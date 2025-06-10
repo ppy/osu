@@ -13,6 +13,7 @@ using osu.Game.Rulesets;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
+using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Users;
 
 namespace osu.Game.Screens.OnlinePlay.Playlists
@@ -22,6 +23,10 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         public Action? Exited;
 
         protected override UserActivity InitialActivity => new UserActivity.InPlaylistGame(Beatmap.Value.BeatmapInfo, Ruleset.Value);
+
+        // TODO: should be replaced with a provider providing scores from the `PlaylistItem`
+        [Cached(typeof(IGameplayLeaderboardProvider))]
+        private EmptyGameplayLeaderboardProvider leaderboardProvider = new EmptyGameplayLeaderboardProvider();
 
         public PlaylistsPlayer(Room room, PlaylistItem playlistItem, PlayerConfiguration? configuration = null)
             : base(room, playlistItem, configuration)
