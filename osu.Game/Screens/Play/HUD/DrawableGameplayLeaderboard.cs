@@ -33,7 +33,7 @@ namespace osu.Game.Screens.Play.HUD
         private Player? player { get; set; }
 
         [Resolved]
-        private IGameplayLeaderboardProvider? leaderboardProvider { get; set; }
+        private IGameplayLeaderboardProvider leaderboardProvider { get; set; } = null!;
 
         private readonly IBindableList<GameplayLeaderboardScore> scores = new BindableList<GameplayLeaderboardScore>();
         private readonly Bindable<bool> configVisibility = new Bindable<bool>();
@@ -86,16 +86,13 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.LoadComplete();
 
-            if (leaderboardProvider != null)
+            scores.BindTo(leaderboardProvider.Scores);
+            scores.BindCollectionChanged((_, _) =>
             {
-                scores.BindTo(leaderboardProvider.Scores);
-                scores.BindCollectionChanged((_, _) =>
-                {
-                    Clear();
-                    foreach (var score in scores)
-                        Add(score);
-                }, true);
-            }
+                Clear();
+                foreach (var score in scores)
+                    Add(score);
+            }, true);
 
             configVisibility.BindValueChanged(_ => Scheduler.AddOnce(updateState));
             userPlayingState.BindValueChanged(_ => Scheduler.AddOnce(updateState));
