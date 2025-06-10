@@ -70,7 +70,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 // this function is meant to reduce rhythm bonus for deltas that are multiples of each other (i.e 100 and 200)
                 double reverseDeltaDifferenceRatio = Math.Max(prevDelta, currDelta) / Math.Min(prevDelta, currDelta);
 
-                // Take value in range [0, 1]
+                // Take only the fractional part of the value since we're only interested in punishing multiples
                 double deltaDifferenceFraction = reverseDeltaDifferenceRatio - Math.Truncate(reverseDeltaDifferenceRatio);
 
                 double currRatio = 1.0 + rhythm_ratio_multiplier * Math.Min(0.5, DifficultyCalculationUtils.SmoothstepBellCurve(deltaDifferenceFraction));
