@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Mania.Mods
     {
         public override LocalisableString Description => @"Shuffle around the keys!";
 
-        [SettingSource("What to randomize")]
+        [SettingSource("Randomization type")]
         public Bindable<RandomizationType> Randomizer { get; } = new Bindable<RandomizationType>();
 
         public void ApplyToBeatmap(IBeatmap beatmap)
