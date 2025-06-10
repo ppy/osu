@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Testing;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Tests.Resources;
 using osu.Game.Users;
 using osu.Game.Users.Drawables;
 using osuTK;
@@ -30,9 +31,9 @@ namespace osu.Game.Tests.Visual.Online
                 Spacing = new Vector2(10f),
                 Children = new[]
                 {
-                    generateUser(@"peppy", 2, CountryCode.AU, @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg", false, "99EB47"),
-                    generateUser(@"flyte", 3103765, CountryCode.JP, @"https://osu.ppy.sh/images/headers/profile-covers/c6.jpg", true),
-                    generateUser(@"joshika39", 17032217, CountryCode.RS, @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg", false),
+                    generateUser(@"peppy", 2, CountryCode.AU, TestResources.COVER_IMAGE_3, false, "99EB47"),
+                    generateUser(@"flyte", 3103765, CountryCode.JP, TestResources.COVER_IMAGE_4, true),
+                    generateUser(@"joshika39", 17032217, CountryCode.RS, TestResources.COVER_IMAGE_3, false),
                     new UpdateableAvatar(),
                     new UpdateableAvatar()
                 },

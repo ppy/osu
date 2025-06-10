@@ -58,6 +58,7 @@ namespace osu.Game.Online.API
 
         public IBindable<APIUser> LocalUser => localUser;
         public IBindableList<APIRelation> Friends => friends;
+        public IBindableList<APIRelation> Blocks => blocks;
 
         public INotificationsClient NotificationsClient { get; }
 
@@ -66,10 +67,13 @@ namespace osu.Game.Online.API
         private Bindable<APIUser> localUser { get; } = new Bindable<APIUser>(createGuestUser());
 
         private BindableList<APIRelation> friends { get; } = new BindableList<APIRelation>();
+        private BindableList<APIRelation> blocks { get; } = new BindableList<APIRelation>();
 
         protected bool HasLogin => authentication.Token.Value != null || (!string.IsNullOrEmpty(ProvidedUsername) && !string.IsNullOrEmpty(password));
 
         private readonly Bindable<UserStatus> configStatus = new Bindable<UserStatus>();
+        private readonly Bindable<bool> configSupporter = new Bindable<bool>();
+
         private readonly CancellationTokenSource cancellationToken = new CancellationTokenSource();
         private readonly Logger log;
 
@@ -102,6 +106,7 @@ namespace osu.Game.Online.API
             authentication.Token.ValueChanged += onTokenChanged;
 
             config.BindWith(OsuSetting.UserOnlineStatus, configStatus);
+            config.BindWith(OsuSetting.WasSupporter, configSupporter);
 
             if (HasLogin)
             {
@@ -331,6 +336,7 @@ namespace osu.Game.Online.API
                         Debug.Assert(ThreadSafety.IsUpdateThread);
 
                         localUser.Value = me;
+                        configSupporter.Value = me.IsSupporter;
                         state.Value = me.SessionVerified ? APIState.Online : APIState.RequiresSecondFactorAuth;
                         failureCount = 0;
                     };
@@ -366,7 +372,8 @@ namespace osu.Game.Online.API
 
             localUser.Value = new APIUser
             {
-                Username = ProvidedUsername
+                Username = ProvidedUsername,
+                IsSupporter = configSupporter.Value,
             };
         }
 
@@ -605,6 +612,7 @@ namespace osu.Game.Online.API
             Schedule(() =>
             {
                 localUser.Value = createGuestUser();
+                configSupporter.Value = false;
                 friends.Clear();
             });
 
@@ -636,6 +644,35 @@ namespace osu.Game.Online.API
             };
 
             Queue(friendsReq);
+        }
+
+        public void UpdateLocalBlocks()
+        {
+            if (!IsLoggedIn)
+                return;
+
+            var blocksReq = new GetBlocksRequest();
+            blocksReq.Failure += ex =>
+            {
+                if (ex is not WebRequestFlushedException)
+                    state.Value = APIState.Failing;
+            };
+            blocksReq.Success += res =>
+            {
+                var existingBlocks = blocks.Select(f => f.TargetID).ToHashSet();
+                var updatedBlocks = res.Select(f => f.TargetID).ToHashSet();
+
+                // Add new blocked users to local list.
+                blocks.AddRange(res.Where(r => !existingBlocks.Contains(r.TargetID)));
+
+                // Remove non-blocked users from local list.
+                blocks.RemoveAll(b => !updatedBlocks.Contains(b.TargetID));
+
+                // Remove friends who got blocked since last check.
+                friends.RemoveAll(f => updatedBlocks.Contains(f.TargetID));
+            };
+
+            Queue(blocksReq);
         }
 
         private static APIUser createGuestUser() => new GuestUser();

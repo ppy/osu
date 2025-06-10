@@ -121,6 +121,12 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty("ranked")]
         public bool Ranked { get; set; }
 
+        [JsonProperty("preserve")]
+        public bool Preserve { get; set; }
+
+        [JsonProperty("processed")]
+        public bool Processed { get; set; }
+
         // These properties are calculated or not relevant to any external usage.
         public bool ShouldSerializeID() => false;
         public bool ShouldSerializeUser() => false;
@@ -129,6 +135,8 @@ namespace osu.Game.Online.API.Requests.Responses
         public bool ShouldSerializePP() => false;
         public bool ShouldSerializeOnlineID() => false;
         public bool ShouldSerializeHasReplay() => false;
+        public bool ShouldSerializePreserve() => false;
+        public bool ShouldSerializeProcessed() => false;
 
         // These fields only need to be serialised if they hold values.
         // Generally this is required because this model may be used by server-side components, but

@@ -95,9 +95,6 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                     Child = buttons = new Container<BeatmapCardIconButton>
                     {
                         RelativeSizeAxes = Axes.Both,
-                        // Padding of 4 avoids touching the card borders when in the expanded (ie. showing difficulties) state.
-                        // Left override allows the buttons to visually be wider and look better.
-                        Padding = new MarginPadding(4) { Left = 2 },
                         Children = new BeatmapCardIconButton[]
                         {
                             new FavouriteButton(beatmapSet)
@@ -106,7 +103,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
                                 RelativeSizeAxes = Axes.Both,
-                                Height = 0.48f,
+                                Height = 0.5f,
                             },
                             new DownloadButton(beatmapSet)
                             {
@@ -114,7 +111,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                                 Origin = Anchor.BottomCentre,
                                 State = { BindTarget = downloadTracker.State },
                                 RelativeSizeAxes = Axes.Both,
-                                Height = 0.48f,
+                                Height = 0.5f,
                             },
                             new GoToBeatmapButton(beatmapSet)
                             {
@@ -122,7 +119,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                                 Origin = Anchor.BottomCentre,
                                 State = { BindTarget = downloadTracker.State },
                                 RelativeSizeAxes = Axes.Both,
-                                Height = 0.48f,
+                                Height = 0.5f,
                             }
                         }
                     }

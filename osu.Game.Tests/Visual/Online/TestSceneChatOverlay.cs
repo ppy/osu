@@ -216,6 +216,32 @@ namespace osu.Game.Tests.Visual.Online
         }
 
         [Test]
+        public void TestChannelCloseViaMiddleClick()
+        {
+            var testPMChannel = new Channel(testUser);
+
+            AddStep("Show overlay", () => chatOverlay.Show());
+            joinTestChannel(0);
+            joinChannel(testPMChannel);
+            AddStep("Select PM channel", () => clickDrawable(getChannelListItem(testPMChannel)));
+            AddStep("Middle click", () =>
+            {
+                var item = getChannelListItem(testPMChannel);
+                InputManager.MoveMouseTo(item);
+                InputManager.Click(MouseButton.Middle);
+            });
+            AddAssert("PM channel closed", () => !channelManager.JoinedChannels.Contains(testPMChannel));
+            AddStep("Select normal channel", () => clickDrawable(getChannelListItem(testChannel1)));
+            AddStep("Click close button", () =>
+            {
+                var item = getChannelListItem(testChannel1);
+                InputManager.MoveMouseTo(item);
+                InputManager.Click(MouseButton.Middle);
+            });
+            AddAssert("Normal channel closed", () => !channelManager.JoinedChannels.Contains(testChannel1));
+        }
+
+        [Test]
         public void TestChannelCloseButton()
         {
             var testPMChannel = new Channel(testUser);
