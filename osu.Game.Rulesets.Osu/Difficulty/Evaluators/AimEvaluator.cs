@@ -100,7 +100,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 wideVelocityBase = Math.Min(wideVelocityBase, velocityThreshold + 0.4 * (wideVelocityBase - velocityThreshold));
 
                 // Potentially wide should also use fasterRhythmMultiplier, but there are some unwanted buffs alongside the wanted ones
-                wideAngleBonus = CalcWideAngleBonus(currAngle);
+                wideAngleBonus = differentRhythmMultiplier * CalcWideAngleBonus(currAngle);
                 acuteAngleBonus = fasterRhythmMultiplier * CalcAcuteAngleBonus(currAngle);
 
                 // Penalize angle repetition. Ideally this thing should be removed, but it breaks balance so I've just make it weaker by taking min between angles
