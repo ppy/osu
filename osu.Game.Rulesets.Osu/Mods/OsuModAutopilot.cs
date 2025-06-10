@@ -37,11 +37,10 @@ namespace osu.Game.Rulesets.Osu.Mods
             typeof(ModTouchDevice)
         };
 
-        // When currentTime equals the start of the hitwindow minus the start offset, we start reducing availableTime
-        // from this value down to 1 when currentTime equals the end of the hitwindow minus the end offset.
-        // This ensures that, if we enter the window late, we still have some room for natural cursor movement.
+        // Think of this constant as this way.
+        // If we are "hitwindow_start_offset" ms or less away from the start of the hitwindow, we switch to the variable scaledTime
+        // in handleTime.
         private const double hitwindow_start_offset = 40;
-        private const double hitwindow_end_offset = 5;
 
         // The spinner radius value from OsuAutoGeneratorBase
         private const float spinner_radius = 50;
@@ -97,7 +96,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             double start = nextObject.HitObject.StartTime;
             timeElapsedBetweenHitObjects = currentTime - start;
 
-            // Reduce calculations during replay.
+            // Reduce calculations during replay, since this mod interferes with the actual replay.
             if (hasReplayLoaded.Value)
             {
                 if (nextObject is DrawableSpinner replaySpinner)
@@ -121,7 +120,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 ? checkForSld.HeadCircle.HitObject.HitWindows.WindowFor(HitResult.Meh)
                 : nextObject.HitObject.HitWindows.WindowFor(HitResult.Meh);
 
-            hitWindow = (start - mehWindow - hitwindow_start_offset, start + mehWindow - hitwindow_end_offset);
+            hitWindow = (start - mehWindow, start + mehWindow);
 
             // The position of the current alive object.
             var target = nextObject.Position;
@@ -175,13 +174,14 @@ namespace osu.Game.Rulesets.Osu.Mods
             double hitWindowEnd = hitWindow.HitWindowEnd;
             double lastJudgedTime = lastHitInfo.Time;
 
-            // Compute scale from 0 to 1, then multiply by an offset. This will be used if we are inside between hitWindowStart and hitWindowEnd so we can prevent sudden cursor teleportation.
-            double scaledTime = 1 + (Math.Clamp((hitWindowEnd - lastJudgedTime) / (hitWindowEnd - hitWindowStart), 0, 1) * (hitwindow_start_offset - 1));
+            // In scaledTime, the time given isn't how many milliseconds we are from something, but the percentage we passed from hitWindowStart
+            // to hitWindowEnd which the percentage is applied to give a time from 1 ms to hitwindow_start_offset.
+            // By the logic that we add hitwindow_start_offset to hitWindowStart, it should always reach the circle before
+            // judgement has passed, even if we literally have zero milliseconds of time in the hitwindow.
+            double scaledTime = 1 + (Math.Clamp((hitWindowEnd - lastJudgedTime) / (hitWindowEnd - hitWindowStart + hitwindow_start_offset), 0, 1) * (hitwindow_start_offset - 1));
 
-            // Edge case where the cursor may not reach the hitobject in time, so we set it to which takes less time.
-            scaledTime = Math.Min(scaledTime, hitWindowEnd - lastJudgedTime);
-
-            double timeLeft = lastJudgedTime >= hitWindowStart
+            // If we are too close to the hitWindow, switch to scaledTime.
+            double timeLeft = lastJudgedTime >= hitWindowStart - hitwindow_start_offset
                 ? scaledTime
                 : hitWindowStart - lastJudgedTime;
 
@@ -238,17 +238,10 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             // The percentage of time between the lastJudgedObject and the time to reach the next HitObject's HitWindow.
             // Example: If the percentage of time is around 40%, the cursor should travel atleast 40% of the distance.
-            float frac = (float)Math.Clamp(elapsed / timeMs, 0, 1);
+            double progress = Math.Clamp(elapsed / timeMs, 0, 1);
 
-            // Compute the new cursor position by Lerp
-            Vector2 newPos = Vector2.Lerp(lastHitPosition, target, frac);
-
-            float distanceToCursor = Vector2.Distance(lastHitPosition, newPos);
-            float distanceToTarget = Vector2.Distance(lastHitPosition, target);
-
-            // If we’re effectively at (or beyond) the target, snap there
-            if (frac >= 1 || distanceToCursor >= distanceToTarget)
-                newPos = target;
+            // Compute the new cursor position by Lerp.
+            Vector2 newPos = Vector2.Lerp(lastHitPosition, target, (float)progress);
 
             applyCursor(newPos);
         }
