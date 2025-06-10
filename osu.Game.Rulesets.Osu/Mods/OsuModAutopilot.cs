@@ -127,9 +127,13 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             // If the hitobject doesn't appear during the time it was judged, the cursor will teleport.
             // So, we want to save the time when the hitobject first appears so the cursor can travel smoothly.
-            lastHitInfo.Time = nextObject.Entry?.LifetimeStart > lastHitInfo.Time
-                ? nextObject.Entry.LifetimeStart
-                : lastHitInfo.Time;
+            if (nextObject.Entry?.LifetimeStart > lastHitInfo.Time)
+            {
+                lastHitInfo.Time = nextObject.Entry.LifetimeStart;
+
+                // For cases (like the barrel roll mod), set last hit position again.
+                lastHitInfo.Position = playfield.ToLocalSpace(inputManager.CurrentState.Mouse.Position);
+            }
 
             // Based on the hit object type, things work differently.
             switch (nextObject)
