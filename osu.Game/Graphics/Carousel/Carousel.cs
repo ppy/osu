@@ -506,7 +506,7 @@ namespace osu.Game.Graphics.Carousel
 
                 if (newItem.IsVisible)
                 {
-                    if (currentSelection.Model != newItem.Model && ShouldActivateOnKeyboardSelection(newItem))
+                    if (!CheckModelEquality(currentSelection.Model, newItem.Model) && ShouldActivateOnKeyboardSelection(newItem))
                         Activate(newItem);
                     else
                     {
