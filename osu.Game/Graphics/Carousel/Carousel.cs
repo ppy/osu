@@ -241,6 +241,12 @@ namespace osu.Game.Graphics.Carousel
         protected virtual bool CheckValidForGroupSelection(CarouselItem item) => true;
 
         /// <summary>
+        /// Keyboard selection usually does not automatically activate an item. There may be exceptions to this rule.
+        /// Returning <c>true</c> here will make keyboard traversal act like group traversal for the target item.
+        /// </summary>
+        protected virtual bool ShouldActivateOnKeyboardSelection(CarouselItem item) => false;
+
+        /// <summary>
         /// Called after an item becomes the <see cref="CurrentSelection"/>.
         /// Should be used to handle any group expansion, item visibility changes, etc.
         /// </summary>
@@ -500,8 +506,14 @@ namespace osu.Game.Graphics.Carousel
 
                 if (newItem.IsVisible)
                 {
-                    playTraversalSound();
-                    setKeyboardSelection(newItem.Model);
+                    if (currentSelection.Model != newItem.Model && ShouldActivateOnKeyboardSelection(newItem))
+                        Activate(newItem);
+                    else
+                    {
+                        playTraversalSound();
+                        setKeyboardSelection(newItem.Model);
+                    }
+
                     return;
                 }
             } while (newIndex != originalIndex);

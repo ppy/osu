@@ -171,15 +171,9 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             WaitForSelection(3, 0);
 
             SelectNextPanel();
-            WaitForSelection(3, 0);
-
-            Select();
             WaitForSelection(3, 1);
 
             SelectNextPanel();
-            WaitForSelection(3, 1);
-
-            Select();
             WaitForSelection(3, 2);
 
             SelectNextPanel();

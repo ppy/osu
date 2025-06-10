@@ -163,13 +163,17 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             SelectNextGroup();
             WaitForGroupSelection(0, 1);
 
+            // Difficulties should get immediate selection even when using up and down traversal.
             SelectNextPanel();
+            WaitForGroupSelection(0, 2);
             SelectNextPanel();
+            WaitForGroupSelection(0, 3);
+
             SelectNextPanel();
-            SelectNextPanel();
+            WaitForGroupSelection(0, 3);
 
             SelectNextGroup();
-            WaitForGroupSelection(0, 1);
+            WaitForGroupSelection(0, 5);
 
             SelectNextPanel();
             SelectNextGroup();
