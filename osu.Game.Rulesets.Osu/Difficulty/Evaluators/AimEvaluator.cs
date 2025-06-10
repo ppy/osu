@@ -100,7 +100,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 wideVelocityBase = Math.Min(wideVelocityBase, velocityThreshold + 0.4 * (wideVelocityBase - velocityThreshold));
 
                 // Potentially wide should also use fasterRhythmMultiplier, but there are some unwanted buffs alongside the wanted ones
-                wideAngleBonus = differentRhythmMultiplier * CalcWideAngleBonus(currAngle);
+                wideAngleBonus = CalcWideAngleBonus(currAngle);
                 acuteAngleBonus = fasterRhythmMultiplier * CalcAcuteAngleBonus(currAngle);
 
                 // Penalize angle repetition. Ideally this thing should be removed, but it breaks balance so I've just make it weaker by taking min between angles
@@ -120,7 +120,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 // Apply wiggle bonus for jumps that are [radius, 3*diameter] in distance, with < 110 angle
                 // https://www.desmos.com/calculator/dp0v0nvowc
                 wiggleBonus = acuteVelocityBase
-                                * fasterRhythmMultiplier
                                 * DifficultyCalculationUtils.Smootherstep(currDistance, radius, diameter)
                                 * Math.Pow(DifficultyCalculationUtils.ReverseLerp(currDistance, diameter * 3, diameter), 1.8)
                                 * DifficultyCalculationUtils.Smootherstep(currAngle, double.DegreesToRadians(110), double.DegreesToRadians(60))
