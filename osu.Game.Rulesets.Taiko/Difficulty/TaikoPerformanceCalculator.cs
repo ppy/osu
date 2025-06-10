@@ -126,11 +126,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             double lengthBonus = 1 + 0.4 * totalDifficultHits / (totalDifficultHits + 4000);
             accuracyValue *= lengthBonus;
 
-            // Slight HDFL Bonus for accuracy. A clamp is used to prevent against negative values.
-            double lengthBonusHDFL = Math.Min(1.15, Math.Pow(totalHits / 1500.0, 0.3));
+            // Applies a bonus to maps with more total memory required with HDFL.
+            double memoryLengthBonus = Math.Min(1.15, Math.Pow(totalHits / 1500.0, 0.3));
 
             if (score.Mods.Any(m => m is ModFlashlight<TaikoHitObject>) && score.Mods.Any(m => m is ModHidden) && !isConvert)
-                accuracyValue *= Math.Max(1.0, 1.05 * lengthBonusHDFL);
+                accuracyValue *= Math.Max(1.0, 1.05 * memoryLengthBonus);
 
             return accuracyValue;
         }
