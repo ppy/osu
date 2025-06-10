@@ -3,10 +3,12 @@
 
 using System;
 using System.Linq;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mods;
@@ -17,15 +19,33 @@ namespace osu.Game.Rulesets.Mania.Mods
     {
         public override LocalisableString Description => @"Shuffle around the keys!";
 
+        [SettingSource("What to randomize")]
+        public Bindable<RandomizationType> Randomizer { get; } = new Bindable<RandomizationType>();
+
         public void ApplyToBeatmap(IBeatmap beatmap)
         {
             Seed.Value ??= RNG.Next();
             var rng = new Random((int)Seed.Value);
 
-            int availableColumns = ((ManiaBeatmap)beatmap).TotalColumns;
-            var shuffledColumns = Enumerable.Range(0, availableColumns).OrderBy(_ => rng.Next()).ToList();
+            if (Randomizer.Value is RandomizationType.Columns or RandomizationType.Both)
+            {
+                int availableColumns = ((ManiaBeatmap)beatmap).TotalColumns;
+                var shuffledColumns = Enumerable.Range(0, availableColumns).OrderBy(_ => rng.Next()).ToList();
 
-            beatmap.HitObjects.OfType<ManiaHitObject>().ForEach(h => h.Column = shuffledColumns[h.Column]);
+                beatmap.HitObjects.OfType<ManiaHitObject>().ForEach(h => h.Column = shuffledColumns[h.Column]);
+            }
+
+            if (Randomizer.Value is RandomizationType.Notes or RandomizationType.Both)
+            {
+                // WIP
+            }
+        }
+
+        public enum RandomizationType
+        {
+            Columns,
+            Notes,
+            Both
         }
     }
 }
