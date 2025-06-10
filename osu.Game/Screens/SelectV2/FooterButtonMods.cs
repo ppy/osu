@@ -57,7 +57,7 @@ namespace osu.Game.Screens.SelectV2
 
         private Container modContainer = null!;
 
-        private Container overflowModCountDisplay = null!;
+        private ModCountText overflowModCountDisplay = null!;
 
         [Resolved]
         private OsuColour colours { get; set; } = null!;
@@ -142,27 +142,7 @@ namespace osu.Game.Screens.SelectV2
                                     Current = { BindTarget = Current },
                                     ExpansionMode = ExpansionMode.AlwaysContracted,
                                 },
-                                overflowModCountDisplay = new Container
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Children = new Drawable[]
-                                    {
-                                        new Box
-                                        {
-                                            Colour = colourProvider.Background3,
-                                            Alpha = 0.8f,
-                                            RelativeSizeAxes = Axes.Both,
-                                        },
-                                        new ModCountText
-                                        {
-                                            Anchor = Anchor.Centre,
-                                            Origin = Anchor.Centre,
-                                            Shear = -OsuGame.SHEAR,
-                                            Font = OsuFont.Torus.With(size: 14f, weight: FontWeight.Bold),
-                                            Mods = { BindTarget = Current },
-                                        }
-                                    }
-                                },
+                                overflowModCountDisplay = new ModCountText { Mods = { BindTarget = Current }, },
                             }
                         },
                     }
@@ -269,9 +249,11 @@ namespace osu.Game.Screens.SelectV2
                 overflowModCountDisplay.Hide();
         }
 
-        private partial class ModCountText : OsuSpriteText, IHasCustomTooltip<IReadOnlyList<Mod>>
+        private partial class ModCountText : CompositeDrawable, IHasCustomTooltip<IReadOnlyList<Mod>>
         {
             public readonly Bindable<IReadOnlyList<Mod>> Mods = new Bindable<IReadOnlyList<Mod>>();
+
+            private OsuSpriteText text = null!;
 
             [Resolved]
             private OverlayColourProvider colourProvider { get; set; } = null!;
@@ -279,7 +261,27 @@ namespace osu.Game.Screens.SelectV2
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                Mods.BindValueChanged(v => Text = ModSelectOverlayStrings.Mods(v.NewValue.Count).ToUpper(), true);
+
+                RelativeSizeAxes = Axes.Both;
+
+                InternalChildren = new Drawable[]
+                {
+                    new Box
+                    {
+                        Colour = colourProvider.Background3,
+                        Alpha = 0.8f,
+                        RelativeSizeAxes = Axes.Both,
+                    },
+                    text = new OsuSpriteText
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Font = OsuFont.Torus.With(size: 14f, weight: FontWeight.Bold),
+                        Shear = -OsuGame.SHEAR,
+                    }
+                };
+
+                Mods.BindValueChanged(v => text.Text = ModSelectOverlayStrings.Mods(v.NewValue.Count).ToUpper(), true);
             }
 
             public ITooltip<IReadOnlyList<Mod>> GetCustomTooltip() => new ModOverflowTooltip(colourProvider);
