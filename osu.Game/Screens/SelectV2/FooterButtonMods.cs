@@ -52,9 +52,12 @@ namespace osu.Game.Screens.SelectV2
         private Drawable unrankedBadge = null!;
 
         private ModDisplay modDisplay = null!;
-        private OsuSpriteText modCountText = null!;
 
         private OsuSpriteText multiplierText { get; set; } = null!;
+
+        private Container modContainer = null!;
+
+        private Container overflowModCountDisplay = null!;
 
         [Resolved]
         private OsuColour colours { get; set; } = null!;
@@ -117,7 +120,7 @@ namespace osu.Game.Screens.SelectV2
                                 Font = OsuFont.Torus.With(size: 14f, weight: FontWeight.Bold)
                             }
                         },
-                        new Container
+                        modContainer = new Container
                         {
                             CornerRadius = Y_OFFSET,
                             RelativeSizeAxes = Axes.Both,
@@ -130,7 +133,7 @@ namespace osu.Game.Screens.SelectV2
                                     Colour = colourProvider.Background3,
                                     RelativeSizeAxes = Axes.Both,
                                 },
-                                modDisplay = new ModDisplay(showExtendedInformation: false)
+                                modDisplay = new ModDisplay(showExtendedInformation: true)
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
@@ -139,14 +142,27 @@ namespace osu.Game.Screens.SelectV2
                                     Current = { BindTarget = Current },
                                     ExpansionMode = ExpansionMode.AlwaysContracted,
                                 },
-                                modCountText = new ModCountText
+                                overflowModCountDisplay = new Container
                                 {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    Shear = -OsuGame.SHEAR,
-                                    Font = OsuFont.Torus.With(size: 14f, weight: FontWeight.Bold),
-                                    Mods = { BindTarget = Current },
-                                }
+                                    RelativeSizeAxes = Axes.Both,
+                                    Children = new Drawable[]
+                                    {
+                                        new Box
+                                        {
+                                            Colour = colourProvider.Background3,
+                                            Alpha = 0.8f,
+                                            RelativeSizeAxes = Axes.Both,
+                                        },
+                                        new ModCountText
+                                        {
+                                            Anchor = Anchor.Centre,
+                                            Origin = Anchor.Centre,
+                                            Shear = -OsuGame.SHEAR,
+                                            Font = OsuFont.Torus.With(size: 14f, weight: FontWeight.Bold),
+                                            Mods = { BindTarget = Current },
+                                        }
+                                    }
+                                },
                             }
                         },
                     }
@@ -198,7 +214,7 @@ namespace osu.Game.Screens.SelectV2
                 modDisplayBar.MoveToY(20, duration, easing);
                 modDisplayBar.FadeOut(duration, easing);
                 modDisplay.FadeOut(duration, easing);
-                modCountText.FadeOut(duration, easing);
+                overflowModCountDisplay.FadeOut(duration, easing);
 
                 unrankedBadge.MoveToY(20, duration, easing);
                 unrankedBadge.FadeOut(duration, easing);
@@ -208,14 +224,6 @@ namespace osu.Game.Screens.SelectV2
             }
             else
             {
-                modDisplay.Hide();
-                modCountText.Hide();
-
-                if (Current.Value.Count >= 5)
-                    modCountText.Show();
-                else
-                    modDisplay.Show();
-
                 if (Current.Value.Any(m => !m.Ranked))
                 {
                     unrankedBadge.MoveToX(0, duration, easing);
@@ -234,6 +242,7 @@ namespace osu.Game.Screens.SelectV2
                 modDisplayBar.MoveToY(-5, duration, Easing.OutQuint);
                 unrankedBadge.MoveToY(-5, duration, easing);
                 modDisplayBar.FadeIn(duration, easing);
+                modDisplay.FadeIn(duration, easing);
             }
 
             double multiplier = Current.Value?.Aggregate(1.0, (current, mod) => current * mod.ScoreMultiplier) ?? 1;
@@ -245,6 +254,19 @@ namespace osu.Game.Screens.SelectV2
                 multiplierText.FadeColour(colours.Lime1, duration, easing);
             else
                 multiplierText.FadeColour(Color4.White, duration, easing);
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (Current.Value.Count == 0)
+                return;
+
+            if (modDisplay.DrawWidth * modDisplay.Scale.X > modContainer.DrawWidth)
+                overflowModCountDisplay.Show();
+            else
+                overflowModCountDisplay.Hide();
         }
 
         private partial class ModCountText : OsuSpriteText, IHasCustomTooltip<IReadOnlyList<Mod>>
