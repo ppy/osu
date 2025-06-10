@@ -67,7 +67,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             for (int i = 0; i < Math.Min(notes.Count, reducedNoteCount); i++)
             {
-                double scale = Math.Log10(Interpolation.Lerp(1, 10, Math.Clamp((float)i / reducedNoteCount, 0, 1)));
+                double scale = Math.Log10(Interpolation.Lerp(1, 10, Math.Clamp(i / reducedNoteCount, 0, 1)));
                 double mult = Interpolation.Lerp(reduced_base_line, 1.0, scale);
                 notes[i] *= mult;
             }
@@ -95,7 +95,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// <summary>
         /// Returns the number of relevant objects weighted against the top note.
         /// </summary>
-        public virtual double CountTopWeightedNotes()
+        public double CountTopWeightedNotes()
         {
             if (noteDifficulties.Count == 0)
                 return 0.0;
