@@ -518,17 +518,26 @@ namespace osu.Game.Overlays
 
             CurrentTrack = queuedTrack;
 
+            // Some users report a clipping artifact if a new track is started playback with a non-zero volume.
+            // This adds some level of safety against this.
+            const double delay_before_fading_in = 50;
+
             // At this point we may potentially be in an async context from tests. This is extremely dangerous but we have to make do for now.
             // CurrentTrack is immediately updated above for situations where a immediate knowledge about the new track is required,
             // but the mutation of the hierarchy is scheduled to avoid exceptions.
             Schedule(() =>
             {
-                lastTrack.VolumeTo(0, 500, Easing.Out).Expire();
+                lastTrack
+                    .Delay(delay_before_fading_in)
+                    .VolumeTo(0, 500, Easing.Out).Expire();
 
                 if (queuedTrack == CurrentTrack)
                 {
                     AddInternal(queuedTrack);
-                    queuedTrack.VolumeTo(0).Then().VolumeTo(1, 300, Easing.Out);
+                    queuedTrack.VolumeTo(0)
+                               .Delay(delay_before_fading_in)
+                               .Then()
+                               .VolumeTo(1, 300, Easing.Out);
                 }
                 else
                 {
