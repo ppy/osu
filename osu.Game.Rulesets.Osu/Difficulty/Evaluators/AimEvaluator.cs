@@ -93,7 +93,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     // Apply acute angle bonus for BPM above 300 1/2 and distance more than one diameter
                     acuteAngleBonus *= angleBonus *
                                     (DifficultyCalculationUtils.MillisecondsToBPM(osuCurrObj.StrainTime, 2) > 350 ?
-                                    0.015 * (DifficultyCalculationUtils.MillisecondsToBPM(osuCurrObj.StrainTime, 2) - 350) + 0.5 :
+                                    (DifficultyCalculationUtils.MillisecondsToBPM(osuCurrObj.StrainTime, 2) - 350) * 0.015 + 0.5 :
                                     DifficultyCalculationUtils.Smoothstep(DifficultyCalculationUtils.MillisecondsToBPM(osuCurrObj.StrainTime, 2), 300, 400)) *
                                     DifficultyCalculationUtils.Smootherstep(osuCurrObj.LazyJumpDistance, diameter, diameter * 2);
 
