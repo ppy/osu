@@ -71,7 +71,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double reverseDeltaDifferenceRatio = Math.Max(prevDelta, currDelta) / Math.Min(prevDelta, currDelta);
 
                 // Take value in range [0, 1]
-                double deltaDifferenceFraction = reverseDeltaDifferenceRatio - (long)reverseDeltaDifferenceRatio;
+                double deltaDifferenceFraction = reverseDeltaDifferenceRatio - Math.Truncate(reverseDeltaDifferenceRatio);
 
                 double currRatio = 1.0 + rhythm_ratio_multiplier * Math.Min(0.5, DifficultyCalculationUtils.SmoothstepBellCurve(deltaDifferenceFraction));
 
