@@ -69,7 +69,6 @@ namespace osu.Game.Screens.SelectV2
 
             Content.Anchor = Anchor.Centre;
             Content.Origin = Anchor.Centre;
-            Content.Shear = OsuGame.SHEAR;
 
             Content.AddRange(new Drawable[]
             {
@@ -87,7 +86,6 @@ namespace osu.Game.Screens.SelectV2
                     AutoSizeAxes = Axes.Both,
                     Direction = FillDirection.Horizontal,
                     Spacing = new Vector2(4),
-                    Shear = -OsuGame.SHEAR,
                     Children = new Drawable[]
                     {
                         new Container
