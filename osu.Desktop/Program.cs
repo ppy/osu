@@ -184,7 +184,7 @@ namespace osu.Desktop
 
             var app = VelopackApp.Build();
 
-            app.WithFirstRun(_ => isFirstRun = true);
+            app.OnFirstRun(_ => isFirstRun = true);
 
             if (OperatingSystem.IsWindows())
                 configureWindows(app);
@@ -195,9 +195,9 @@ namespace osu.Desktop
         [SupportedOSPlatform("windows")]
         private static void configureWindows(VelopackApp app)
         {
-            app.WithFirstRun(_ => WindowsAssociationManager.InstallAssociations());
-            app.WithAfterUpdateFastCallback(_ => WindowsAssociationManager.UpdateAssociations());
-            app.WithBeforeUninstallFastCallback(_ => WindowsAssociationManager.UninstallAssociations());
+            app.OnFirstRun(_ => WindowsAssociationManager.InstallAssociations());
+            app.OnAfterUpdateFastCallback(_ => WindowsAssociationManager.UpdateAssociations());
+            app.OnBeforeUninstallFastCallback(_ => WindowsAssociationManager.UninstallAssociations());
         }
     }
 }
