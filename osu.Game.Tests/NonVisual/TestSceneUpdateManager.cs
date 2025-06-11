@@ -59,10 +59,17 @@ namespace osu.Game.Tests.NonVisual
             AddStep("complete check", () => manager.Complete());
             AddUntilStep("2 checks completed", () => manager.Completions, () => Is.EqualTo(2));
             AddUntilStep("no check pending", () => !manager.IsPending);
+
+            AddStep("change release stream", () => config.SetValue(OsuSetting.ReleaseStream, ReleaseStream.Lazer));
+
+            AddUntilStep("check pending", () => manager.IsPending);
+            AddStep("complete check", () => manager.Complete());
+            AddUntilStep("3 checks completed", () => manager.Completions, () => Is.EqualTo(3));
+            AddUntilStep("no check pending", () => !manager.IsPending);
         }
 
         /// <summary>
-        /// Updates should be checked once more if the release stream is changed during an going check
+        /// Updates should be checked once more if the release stream is changed during an going check.
         /// </summary>
         [Test]
         public void TestReleaseStreamChangedDuringCheck()
@@ -92,8 +99,18 @@ namespace osu.Game.Tests.NonVisual
             AddStep("complete check", () => manager.Complete());
             AddUntilStep("2 checks completed", () => manager.Completions, () => Is.EqualTo(2));
             AddUntilStep("no check pending", () => !manager.IsPending);
+
+            AddStep("request check", () => manager.CheckForUpdateAsync());
+
+            AddUntilStep("check pending", () => manager.IsPending);
+            AddStep("complete check", () => manager.Complete());
+            AddUntilStep("3 checks completed", () => manager.Completions, () => Is.EqualTo(3));
+            AddUntilStep("no check pending", () => !manager.IsPending);
         }
 
+        /// <summary>
+        /// Any ongoing request should be returned when the user requests a new one.
+        /// </summary>
         [Test]
         public void TestUserRequestReturnsExistingCheck()
         {
