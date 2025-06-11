@@ -1009,6 +1009,29 @@ namespace osu.Game.Graphics.Carousel
                     d.Y = (float)(((ICarouselPanel)d).DrawYPosition + scrollableExtent);
             }
 
+            #region Scrollbar padding
+
+            public float ScrollbarPaddingTop { get; set; } = 5;
+            public float ScrollbarPaddingBottom { get; set; } = 5;
+
+            protected override float ToScrollbarPosition(double scrollPosition)
+            {
+                if (Precision.AlmostEquals(0, ScrollableExtent))
+                    return 0;
+
+                return (float)(ScrollbarPaddingTop + (ScrollbarMovementExtent - (ScrollbarPaddingTop + ScrollbarPaddingBottom)) * (scrollPosition / ScrollableExtent));
+            }
+
+            protected override float FromScrollbarPosition(float scrollbarPosition)
+            {
+                if (Precision.AlmostEquals(0, ScrollbarMovementExtent))
+                    return 0;
+
+                return (float)(ScrollableExtent * ((scrollbarPosition - ScrollbarPaddingTop) / (ScrollbarMovementExtent - (ScrollbarPaddingTop + ScrollbarPaddingBottom))));
+            }
+
+            #endregion
+
             #region Absolute scrolling
 
             private bool absoluteScrolling;
