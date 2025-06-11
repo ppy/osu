@@ -31,24 +31,45 @@ namespace osu.Game.Rulesets.Mania.Mods
             int availableColumns = maniaBeatmap.TotalColumns;
             var shuffledColumns = Enumerable.Range(0, availableColumns).OrderBy(_ => rng.Next()).ToList();
 
-            if (Randomizer.Value == RandomizationType.Columns)
-            {
-                beatmap.HitObjects.OfType<ManiaHitObject>().ForEach(h => h.Column = shuffledColumns[h.Column]);
-            }
-
-            if (Randomizer.Value == RandomizationType.Notes)
+            if (Randomizer.Value is RandomizationType.Notes or RandomizationType.Both)
             {
                 var newObjects = new List<ManiaHitObject>();
+                int lastRandomColumn = -1;
+                double lastStartTime = -1;
+                double lastEndTime = -1;
+                var availableColumnsList = Enumerable.Range(0, availableColumns).ToList();
+                var removedColumnsList = new List<int> {};
 
                 foreach (var h in beatmap.HitObjects.OfType<ManiaHitObject>())
                 {
-                    h.Column = rng.Next(0, availableColumns);
+                    double startTime = h.StartTime;
+
+                    // Reset available columns if we're on a new time group
+                    if (startTime != lastStartTime)
+                    {
+                        availableColumnsList = Enumerable.Range(0, availableColumns).ToList();
+                    }
+
+                    // Ensure we still have options
+                    if (availableColumnsList.Count == 0)
+                        continue; // Or handle differently (e.g., assign default column)
+
+                    int randomIndex = rng.Next(availableColumnsList.Count);
+                    int randomColumn = availableColumnsList[randomIndex];
+
+                    h.Column = randomColumn;
+
+                    // Remove the used column to avoid reuse for this time group
+                    availableColumnsList.Remove(randomColumn);
+
+                    lastRandomColumn = randomColumn;
+                    lastStartTime = startTime;
                 }
 
                 maniaBeatmap.HitObjects = maniaBeatmap.HitObjects.Concat(newObjects).OrderBy(h => h.StartTime).ToList();
             }
 
-            if (Randomizer.Value == RandomizationType.Both)
+            if (Randomizer.Value is RandomizationType.Columns or RandomizationType.Both)
             {
                 beatmap.HitObjects.OfType<ManiaHitObject>().ForEach(h => h.Column = shuffledColumns[h.Column]);
             }
