@@ -101,27 +101,22 @@ namespace osu.Game.Overlays.Dashboard.CurrentlyOnline
 
         private OnlineUserPanel createUserPanel(APIUser user)
         {
-            OnlineUserPanel panel;
-
             switch (style)
             {
                 default:
                 case OverlayPanelDisplayStyle.Card:
-                    panel = new OnlineUserGridPanel(user);
-                    break;
+                    return new OnlineUserGridPanel(user)
+                    {
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre
+                    };
 
                 case OverlayPanelDisplayStyle.List:
-                    panel = new OnlineUserListPanel(user);
-                    break;
+                    return new OnlineUserListPanel(user);
 
                 case OverlayPanelDisplayStyle.Brick:
-                    panel = new OnlineUserBrickPanel(user);
-                    break;
+                    return new OnlineUserBrickPanel(user);
             }
-
-            panel.Anchor = Anchor.TopCentre;
-            panel.Origin = Anchor.TopCentre;
-            return panel;
         }
 
         private partial class OnlineUserSearchContainer : SearchContainer<OnlineUserPanel>
