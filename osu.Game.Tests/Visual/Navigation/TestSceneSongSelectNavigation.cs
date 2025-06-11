@@ -39,6 +39,23 @@ namespace osu.Game.Tests.Visual.Navigation
         }
 
         [Test]
+        public void TestPushSongSelectAndClickBottomLeftCorner()
+        {
+            AddStep("push song select", () => Game.ScreenStack.Push(new SoloSongSelect()));
+
+            // TODO: without this step, a critical bug will be hit, see inline comment in `OsuGame.handleBackButton`.
+            AddUntilStep("Wait for song select", () => Game.ScreenStack.CurrentScreen is SoloSongSelect select && select.IsLoaded);
+
+            AddStep("click in corner", () =>
+            {
+                InputManager.MoveMouseTo(Game.ScreenSpaceDrawQuad.BottomLeft);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            ConfirmAtMainMenu();
+        }
+
+        [Test]
         public void TestPushSongSelectAndPressBackButtonImmediately()
         {
             AddStep("push song select", () => Game.ScreenStack.Push(new SoloSongSelect()));
