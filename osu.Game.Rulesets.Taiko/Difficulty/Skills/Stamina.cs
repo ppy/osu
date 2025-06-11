@@ -48,13 +48,16 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             var currentObject = current as TaikoDifficultyHitObject;
             int index = currentObject?.ColourData.MonoStreak?.HitObjects.IndexOf(currentObject) ?? 0;
 
-            double monolengthBonus = isConvert ? 1.0 : 1.0 + Math.Clamp((index - 5) / 50.0, 0.0, 0.3);
+            double monolengthBonus = isConvert ? 1.0 : 1.0 + 0.3 * DifficultyCalculationUtils.ReverseLerp(index, 5, 20);
 
+            // Mono-streak bonus is only applied to colour-based stamina to reward longer sequences of same-colour hits within patterns.
             if (!SingleColourStamina)
                 staminaDifficulty *= monolengthBonus;
 
             currentStrain += staminaDifficulty;
 
+            // For converted maps, difficulty often comes entirely from long mono streams with no colour variation.
+            // To avoid over-rewarding these maps based purely on stamina strain, we dampen the strain value once the index exceeds 10.
             return SingleColourStamina ? DifficultyCalculationUtils.Logistic(-(index - 10) / 2.0, currentStrain) : currentStrain;
         }
 
