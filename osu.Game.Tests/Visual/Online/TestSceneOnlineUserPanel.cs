@@ -52,13 +52,13 @@ namespace osu.Game.Tests.Visual.Online
                         Spacing = new Vector2(10f),
                         Children = new Drawable[]
                         {
-                            new UserBrickPanel(new APIUser
+                            new OnlineUserBrickPanel(new APIUser
                             {
                                 Username = @"flyte",
                                 Id = 3103765,
                                 CoverUrl = @"https://assets.ppy.sh/user-cover-presets/1/df28696b58541a9e67f6755918951d542d93bdf1da41720fcca2fd2c1ea8cf51.jpeg",
                             }),
-                            new UserBrickPanel(new APIUser
+                            new OnlineUserBrickPanel(new APIUser
                             {
                                 Username = @"peppy",
                                 Id = 2,
