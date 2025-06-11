@@ -24,7 +24,7 @@ namespace osu.Game.Overlays.Dashboard.CurrentlyOnline
         public readonly IBindable<string> SearchText = new Bindable<string>();
 
         private readonly IBindableDictionary<int, UserPresence> onlineUserPresences = new BindableDictionary<int, UserPresence>();
-        private readonly Dictionary<int, OnlineUserGridPanel> userPanels = new Dictionary<int, OnlineUserGridPanel>();
+        private readonly Dictionary<int, OnlineUserPanel> userPanels = new Dictionary<int, OnlineUserPanel>();
         private readonly OverlayPanelDisplayStyle style;
 
         private OnlineUserSearchContainer searchContainer = null!;
@@ -104,14 +104,32 @@ namespace osu.Game.Overlays.Dashboard.CurrentlyOnline
             }
         });
 
-        private OnlineUserGridPanel createUserPanel(APIUser user) =>
-            new OnlineUserGridPanel(user).With(panel =>
-            {
-                panel.Anchor = Anchor.TopCentre;
-                panel.Origin = Anchor.TopCentre;
-            });
+        private OnlineUserPanel createUserPanel(APIUser user)
+        {
+            OnlineUserPanel panel;
 
-        private partial class OnlineUserSearchContainer : SearchContainer<OnlineUserGridPanel>
+            switch (style)
+            {
+                default:
+                case OverlayPanelDisplayStyle.Card:
+                    panel = new OnlineUserGridPanel(user);
+                    break;
+
+                case OverlayPanelDisplayStyle.List:
+                    panel = new OnlineUserListPanel(user);
+                    break;
+
+                case OverlayPanelDisplayStyle.Brick:
+                    panel = new OnlineUserBrickPanel(user);
+                    break;
+            }
+
+            panel.Anchor = Anchor.TopCentre;
+            panel.Origin = Anchor.TopCentre;
+            return panel;
+        }
+
+        private partial class OnlineUserSearchContainer : SearchContainer<OnlineUserPanel>
         {
             public readonly IBindable<UserSortCriteria> SortCriteria = new Bindable<UserSortCriteria>();
 
@@ -125,7 +143,7 @@ namespace osu.Game.Overlays.Dashboard.CurrentlyOnline
             {
                 get
                 {
-                    IEnumerable<OnlineUserGridPanel> panels = base.FlowingChildren.OfType<OnlineUserGridPanel>();
+                    IEnumerable<OnlineUserPanel> panels = base.FlowingChildren.OfType<OnlineUserPanel>();
 
                     switch (SortCriteria.Value)
                     {
