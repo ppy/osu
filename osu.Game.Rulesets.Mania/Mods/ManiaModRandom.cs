@@ -13,6 +13,7 @@ using osu.Game.Configuration;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Mania.Mods
 {
@@ -34,36 +35,36 @@ namespace osu.Game.Rulesets.Mania.Mods
             if (Randomizer.Value is RandomizationType.Notes or RandomizationType.Both)
             {
                 var newObjects = new List<ManiaHitObject>();
-                int lastRandomColumn = -1;
+                double[] columnEndTimes = new double[availableColumns];
                 double lastStartTime = -1;
-                double lastEndTime = -1;
-                var availableColumnsList = Enumerable.Range(0, availableColumns).ToList();
-                var removedColumnsList = new List<int> {};
+                var availableColumnsList = new List<int>();
+
+                const double release_buffer = 1.5; // Minimum gap to avoid conflict at end of HoldNote
 
                 foreach (var h in beatmap.HitObjects.OfType<ManiaHitObject>())
                 {
-                    double startTime = h.StartTime;
+                    double currentStartTime = h.StartTime;
 
-                    // Reset available columns if we're on a new time group
-                    if (startTime != lastStartTime)
+                    if (currentStartTime != lastStartTime)
                     {
-                        availableColumnsList = Enumerable.Range(0, availableColumns).ToList();
+                        availableColumnsList = Enumerable.Range(0, availableColumns)
+                                                         .Where(i => columnEndTimes[i] < currentStartTime - release_buffer)
+                                                         .ToList();
                     }
 
-                    // Ensure we still have options
                     if (availableColumnsList.Count == 0)
-                        continue; // Or handle differently (e.g., assign default column)
+                        continue; // Skip if no free columns for aspire maps
 
                     int randomIndex = rng.Next(availableColumnsList.Count);
                     int randomColumn = availableColumnsList[randomIndex];
 
                     h.Column = randomColumn;
-
-                    // Remove the used column to avoid reuse for this time group
                     availableColumnsList.Remove(randomColumn);
 
-                    lastRandomColumn = randomColumn;
-                    lastStartTime = startTime;
+                    if (h is HoldNote hold)
+                        columnEndTimes[randomColumn] = hold.GetEndTime();
+
+                    lastStartTime = currentStartTime;
                 }
 
                 maniaBeatmap.HitObjects = maniaBeatmap.HitObjects.Concat(newObjects).OrderBy(h => h.StartTime).ToList();
