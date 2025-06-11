@@ -15,6 +15,7 @@ using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Dashboard.Friends;
 using osu.Game.Overlays.Mods.Input;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Edit.Compose.Components;
@@ -227,6 +228,9 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.EditorSubmissionLoadInBrowserAfterSubmission, true);
 
             SetDefault(OsuSetting.WasSupporter, false);
+
+            SetDefault(OsuSetting.DashboardSortMode, UserSortCriteria.LastVisit);
+            SetDefault(OsuSetting.DashboardDisplayStyle, OverlayPanelDisplayStyle.Card);
         }
 
         protected override bool CheckLookupContainsPrivateInformation(OsuSetting lookup)
@@ -473,6 +477,9 @@ namespace osu.Game.Configuration
         /// Cached state of whether local user is a supporter.
         /// Used to allow early checks (ie for startup samples) to be in the correct state, even if the API authentication process has not completed.
         /// </summary>
-        WasSupporter
+        WasSupporter,
+
+        DashboardSortMode,
+        DashboardDisplayStyle
     }
 }
