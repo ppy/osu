@@ -43,7 +43,7 @@ namespace osu.Game.Updater
         protected IBindable<ReleaseStream> ReleaseStream => releaseStream;
 
         private readonly Bindable<ReleaseStream> releaseStream = new Bindable<ReleaseStream>();
-        private readonly object updateTaskLock = new object();
+        private bool updateCheckRequested;
         private Task<bool>? updateCheckTask;
 
         protected override void LoadComplete()
@@ -73,24 +73,50 @@ namespace osu.Game.Updater
             scheduleUpdateCheck();
         }
 
-        private void scheduleUpdateCheck() => Schedule(() => Task.Run(CheckForUpdateAsync));
-
-        public async Task<bool> CheckForUpdateAsync()
+        protected override void Update()
         {
-            if (!CanCheckForUpdate)
-                return false;
+            base.Update();
+            processScheduledUpdateCheck();
+        }
 
-            Task<bool> waitTask;
+        /// <summary>
+        /// Schedules a request to check for new updates to begin as soon as any existing check completes.
+        /// </summary>
+        private void scheduleUpdateCheck()
+        {
+            updateCheckRequested = true;
+        }
 
-            lock (updateTaskLock)
-                waitTask = (updateCheckTask ??= PerformUpdateCheck());
+        /// <summary>
+        /// Processes an ongoing request to check for new updates.
+        /// </summary>
+        private void processScheduledUpdateCheck()
+        {
+            if (!updateCheckRequested)
+                return;
 
-            bool hasUpdates = await waitTask.ConfigureAwait(false);
+            if (updateCheckTask?.IsCompleted == false)
+                return;
 
-            lock (updateTaskLock)
-                updateCheckTask = null;
+            if (CanCheckForUpdate)
+                updateCheckTask = PerformUpdateCheck();
 
-            return hasUpdates;
+            updateCheckRequested = false;
+        }
+
+        /// <summary>
+        /// Immediately checks for any available updates, or returns the existing update task.
+        /// </summary>
+        /// <returns><c>true</c> if any updates are available, <c>false</c> otherwise.</returns>
+        public Task<bool> CheckForUpdateAsync()
+        {
+            if (updateCheckTask?.IsCompleted == false)
+                return updateCheckTask;
+
+            scheduleUpdateCheck();
+            processScheduledUpdateCheck();
+
+            return updateCheckTask ?? Task.FromResult(false);
         }
 
         /// <summary>
