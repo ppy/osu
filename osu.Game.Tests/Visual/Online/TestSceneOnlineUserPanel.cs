@@ -28,7 +28,7 @@ namespace osu.Game.Tests.Visual.Online
         private IRulesetStore rulesetStore { get; set; } = null!;
 
         private TestMetadataClient metadataClient = null!;
-        private TestUserListPanel panel = null!;
+        private OnlineUserListPanel panel = null!;
 
         [SetUp]
         public void SetUp() => Schedule(() =>
@@ -82,7 +82,7 @@ namespace osu.Game.Tests.Visual.Online
                                 IsSupporter = true,
                                 SupportLevel = 3,
                             }),
-                            new TestUserListPanel(new APIUser
+                            new OnlineUserListPanel(new APIUser
                             {
                                 Username = @"flyte",
                                 Id = 3103765,
@@ -90,7 +90,7 @@ namespace osu.Game.Tests.Visual.Online
                                 CoverUrl = @"https://assets.ppy.sh/user-cover-presets/1/df28696b58541a9e67f6755918951d542d93bdf1da41720fcca2fd2c1ea8cf51.jpeg",
                                 WasRecentlyOnline = true
                             }),
-                            panel = new TestUserListPanel(new APIUser
+                            panel = new OnlineUserListPanel(new APIUser
                             {
                                 Username = @"peppy",
                                 Id = 2,
@@ -119,14 +119,6 @@ namespace osu.Game.Tests.Visual.Online
                 metadataClient.UserPresenceUpdated(userId ?? panel.User.OnlineID, null);
             else
                 metadataClient.UserPresenceUpdated(userId ?? panel.User.OnlineID, new UserPresence { Status = status, Activity = activity });
-        }
-
-        private partial class TestUserListPanel : UserListPanel
-        {
-            public TestUserListPanel(APIUser user)
-                : base(user)
-            {
-            }
         }
     }
 }

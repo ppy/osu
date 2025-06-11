@@ -7,40 +7,42 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Users;
-using osuTK;
 
 namespace osu.Game.Overlays.Dashboard.CurrentlyOnline
 {
-    internal partial class OnlineUserGridPanel : OnlineUserPanel
+    public class OnlineUserListPanel : OnlineUserPanel
     {
-        public OnlineUserGridPanel(APIUser user)
+        public OnlineUserListPanel(APIUser user)
             : base(user)
         {
-            AutoSizeAxes = Axes.Both;
+            RelativeSizeAxes = Axes.X;
+            AutoSizeAxes = Axes.Y;
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChildren = new Drawable[]
+            InternalChild = new GridContainer
             {
-                new FillFlowContainer
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                ColumnDimensions = new[]
                 {
-                    AutoSizeAxes = Axes.Y,
-                    Direction = FillDirection.Vertical,
-                    Spacing = new Vector2(2),
-                    Width = 290,
-                    Children = new Drawable[]
+                    new Dimension(),
+                    new Dimension(GridSizeMode.AutoSize)
+                },
+                RowDimensions = new[]
+                {
+                    new Dimension(GridSizeMode.AutoSize)
+                },
+                Content = new[]
+                {
+                    new Drawable[]
                     {
-                        new UserGridPanel(User)
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre
-                        },
+                        new UserListPanel(User),
                         new PurpleRoundedButton
                         {
-                            RelativeSizeAxes = Axes.X,
+                            Width = 100,
                             Text = "Spectate",
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
@@ -48,7 +50,7 @@ namespace osu.Game.Overlays.Dashboard.CurrentlyOnline
                             Action = BeginSpectating
                         }
                     }
-                },
+                }
             };
         }
     }
