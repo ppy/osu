@@ -76,8 +76,9 @@ namespace osu.Game.Overlays.Dashboard.CurrentlyOnline
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
-                    Icon = FontAwesome.Solid.Eye,
+                    Icon = FontAwesome.Solid.Video,
                     Size = new Vector2(20, 13),
+                    IconScale = new Vector2(0.5f),
                     Alpha = 0,
                     AlwaysPresent = true,
                     Enabled = { BindTarget = CanSpectate },
