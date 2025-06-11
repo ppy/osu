@@ -17,7 +17,7 @@ using osu.Game.Updater;
 namespace osu.Game.Tests.NonVisual
 {
     [HeadlessTest]
-    public class TestSceneUpdateManager : OsuTestScene
+    public partial class TestSceneUpdateManager : OsuTestScene
     {
         [Cached(typeof(INotificationOverlay))]
         private readonly INotificationOverlay notifications = new TestNotificationOverlay();
@@ -128,7 +128,7 @@ namespace osu.Game.Tests.NonVisual
             AddUntilStep("no check pending", () => !manager.IsPending);
         }
 
-        private class TestUpdateManager : UpdateManager
+        private partial class TestUpdateManager : UpdateManager
         {
             public bool IsPending { get; private set; }
             public int Completions { get; private set; }
@@ -161,7 +161,7 @@ namespace osu.Game.Tests.NonVisual
             }
         }
 
-        private class TestNotificationOverlay : INotificationOverlay
+        private partial class TestNotificationOverlay : INotificationOverlay
         {
             public void Post(Notification notification)
             {
