@@ -15,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Dashboard.CurrentlyOnline
 {
-    public class OnlineUserBrickPanel : OnlineUserPanel
+    public partial class OnlineUserBrickPanel : OnlineUserPanel
     {
         public OnlineUserBrickPanel(APIUser user)
             : base(user)

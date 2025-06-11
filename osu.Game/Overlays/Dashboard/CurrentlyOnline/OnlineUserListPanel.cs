@@ -10,7 +10,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Overlays.Dashboard.CurrentlyOnline
 {
-    public class OnlineUserListPanel : OnlineUserPanel
+    public partial class OnlineUserListPanel : OnlineUserPanel
     {
         public OnlineUserListPanel(APIUser user)
             : base(user)
