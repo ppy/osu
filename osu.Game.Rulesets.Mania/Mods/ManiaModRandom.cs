@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
@@ -26,18 +27,30 @@ namespace osu.Game.Rulesets.Mania.Mods
         {
             Seed.Value ??= RNG.Next();
             var rng = new Random((int)Seed.Value);
+            var maniaBeatmap = (ManiaBeatmap)beatmap;
+            int availableColumns = maniaBeatmap.TotalColumns;
+            var shuffledColumns = Enumerable.Range(0, availableColumns).OrderBy(_ => rng.Next()).ToList();
 
-            if (Randomizer.Value is RandomizationType.Columns or RandomizationType.Both)
+            if (Randomizer.Value == RandomizationType.Columns)
             {
-                int availableColumns = ((ManiaBeatmap)beatmap).TotalColumns;
-                var shuffledColumns = Enumerable.Range(0, availableColumns).OrderBy(_ => rng.Next()).ToList();
-
                 beatmap.HitObjects.OfType<ManiaHitObject>().ForEach(h => h.Column = shuffledColumns[h.Column]);
             }
 
-            if (Randomizer.Value is RandomizationType.Notes or RandomizationType.Both)
+            if (Randomizer.Value == RandomizationType.Notes)
             {
-                // WIP
+                var newObjects = new List<ManiaHitObject>();
+
+                foreach (var h in beatmap.HitObjects.OfType<ManiaHitObject>())
+                {
+                    h.Column = rng.Next(0, availableColumns);
+                }
+
+                maniaBeatmap.HitObjects = maniaBeatmap.HitObjects.Concat(newObjects).OrderBy(h => h.StartTime).ToList();
+            }
+
+            if (Randomizer.Value == RandomizationType.Both)
+            {
+                beatmap.HitObjects.OfType<ManiaHitObject>().ForEach(h => h.Column = shuffledColumns[h.Column]);
             }
         }
 
