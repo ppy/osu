@@ -44,7 +44,7 @@ namespace osu.Game.Updater
 
         private readonly Bindable<ReleaseStream> releaseStream = new Bindable<ReleaseStream>();
         private bool updateCheckRequested;
-        private Task<bool>? updateCheckTask;
+        private Task<bool> updateCheckTask = Task.FromResult(false);
 
         protected override void LoadComplete()
         {
@@ -95,7 +95,7 @@ namespace osu.Game.Updater
             if (!updateCheckRequested)
                 return;
 
-            if (updateCheckTask?.IsCompleted == false)
+            if (!updateCheckTask.IsCompleted)
                 return;
 
             if (CanCheckForUpdate)
@@ -110,13 +110,13 @@ namespace osu.Game.Updater
         /// <returns><c>true</c> if any updates are available, <c>false</c> otherwise.</returns>
         public Task<bool> CheckForUpdateAsync()
         {
-            if (updateCheckTask?.IsCompleted == false)
+            if (!updateCheckTask.IsCompleted)
                 return updateCheckTask;
 
             scheduleUpdateCheck();
             processScheduledUpdateCheck();
 
-            return updateCheckTask ?? Task.FromResult(false);
+            return updateCheckTask;
         }
 
         /// <summary>
