@@ -45,6 +45,44 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("No calibration button", () => !offsetControl.ChildrenOfType<SettingsButton>().Any());
         }
 
+        /// <summary>
+        /// When a beatmap offset was already set, the calibration should take it into account.
+        /// </summary>
+        [Test]
+        public void TestTooShortToDisplay_HasPreviousValidScore()
+        {
+            const double average_error = -4.5;
+            const double initial_offset = -2;
+
+            AddStep("Set offset non-neutral", () => offsetControl.Current.Value = initial_offset);
+            AddAssert("No calibration button", () => !offsetControl.ChildrenOfType<SettingsButton>().Any());
+
+            AddStep("Set reference score", () =>
+            {
+                offsetControl.ReferenceScore.Value = new ScoreInfo
+                {
+                    HitEvents = TestSceneHitEventTimingDistributionGraph.CreateDistributedHitEvents(average_error),
+                    BeatmapInfo = Beatmap.Value.BeatmapInfo,
+                };
+            });
+
+            AddUntilStep("Has calibration button", () => offsetControl.ChildrenOfType<SettingsButton>().Any());
+
+            AddStep("Set short reference score", () =>
+            {
+                offsetControl.ReferenceScore.Value = new ScoreInfo
+                {
+                    HitEvents = TestSceneHitEventTimingDistributionGraph.CreateDistributedHitEvents(0, 2),
+                    BeatmapInfo = Beatmap.Value.BeatmapInfo,
+                };
+            });
+
+            AddUntilStep("Still calibration button", () => offsetControl.ChildrenOfType<SettingsButton>().Any());
+
+            AddStep("Press button", () => offsetControl.ChildrenOfType<SettingsButton>().Single().TriggerClick());
+            AddAssert("Offset is adjusted", () => offsetControl.Current.Value == initial_offset - average_error);
+        }
+
         [Test]
         public void TestNotEnoughTimedHitEvents()
         {
