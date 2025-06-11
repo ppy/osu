@@ -208,6 +208,9 @@ namespace osu.Game.Screens.SelectV2
 
         protected BeatmapSetInfo? ExpandedBeatmapSet { get; private set; }
 
+        protected override bool ShouldActivateOnKeyboardSelection(CarouselItem item) =>
+            grouping.BeatmapSetsGroupedTogether && item.Model is BeatmapInfo;
+
         protected override void HandleItemActivated(CarouselItem item)
         {
             try
