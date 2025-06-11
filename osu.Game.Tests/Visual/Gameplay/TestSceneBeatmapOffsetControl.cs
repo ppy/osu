@@ -46,7 +46,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         /// <summary>
-        /// When a beatmap offset was already set, the calibration should take it into account.
+        /// If we already have an old score with enough hit events and the new score doesn't have enough, continue displaying the old one rather than showing the user "play too short" message.
         /// </summary>
         [Test]
         public void TestTooShortToDisplay_HasPreviousValidScore()

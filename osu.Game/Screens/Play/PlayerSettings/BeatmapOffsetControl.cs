@@ -200,7 +200,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
             // i.e. one that it *makes sense to use* when doing anything with timing and offsets.
             bool hasEnoughUsableEvents = hitEvents.Count(HitEventExtensions.AffectsUnstableRate) >= 50;
 
-            // If we are already displaying a score, continue displaying it rather than showing the user "play too short" message.
+            // If we already have an old score with enough hit events and the new score doesn't have enough, continue displaying the old one rather than showing the user "play too short" message.
             if (lastValidScore != null && !hasEnoughUsableEvents)
                 return;
 
