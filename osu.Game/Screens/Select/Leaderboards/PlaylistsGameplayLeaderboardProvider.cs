@@ -7,61 +7,65 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Caching;
 using osu.Framework.Graphics;
-using osu.Game.Online.Leaderboards;
-using osu.Game.Scoring;
+using osu.Game.Online.API;
+using osu.Game.Online.Rooms;
 using osu.Game.Screens.Play;
 
 namespace osu.Game.Screens.Select.Leaderboards
 {
-    public partial class SoloGameplayLeaderboardProvider : Component, IGameplayLeaderboardProvider
+    [LongRunningLoad]
+    public partial class PlaylistsGameplayLeaderboardProvider : Component, IGameplayLeaderboardProvider
     {
         public IBindableList<GameplayLeaderboardScore> Scores => scores;
         private readonly BindableList<GameplayLeaderboardScore> scores = new BindableList<GameplayLeaderboardScore>();
 
-        [Resolved]
-        private LeaderboardManager? leaderboardManager { get; set; }
-
-        [Resolved]
-        private GameplayState? gameplayState { get; set; }
+        private readonly Room room;
+        private readonly PlaylistItem playlistItem;
 
         private readonly Cached sorting = new Cached();
         private bool isPartial;
 
-        protected override void LoadComplete()
+        public PlaylistsGameplayLeaderboardProvider(Room room, PlaylistItem playlistItem)
         {
-            base.LoadComplete();
+            this.room = room;
+            this.playlistItem = playlistItem;
+        }
 
-            var globalScores = leaderboardManager?.Scores.Value;
-
-            isPartial = leaderboardManager?.CurrentCriteria?.Scope != BeatmapLeaderboardScope.Local && globalScores?.TopScores.Count >= 50;
-
-            List<GameplayLeaderboardScore> newScores = new List<GameplayLeaderboardScore>();
-
-            if (globalScores != null)
+        [BackgroundDependencyLoader]
+        private void load(IAPIProvider api, GameplayState? gameplayState)
+        {
+            var scoresRequest = new IndexPlaylistScoresRequest(room.RoomID!.Value, playlistItem.ID);
+            scoresRequest.Success += response =>
             {
-                foreach (var topScore in globalScores.AllScores.OrderByTotalScore())
+                var newScores = new List<GameplayLeaderboardScore>();
+
+                isPartial = response.Scores.Count < response.TotalScores;
+
+                for (int i = 0; i < response.Scores.Count; i++)
                 {
-                    newScores.Add(new GameplayLeaderboardScore(topScore, false, GameplayLeaderboardScore.ComboDisplayMode.Highest));
+                    var score = response.Scores[i];
+                    score.Position = i + 1;
+                    newScores.Add(new GameplayLeaderboardScore(score, tracked: false, GameplayLeaderboardScore.ComboDisplayMode.Highest));
                 }
-            }
+
+                if (response.UserScore != null && response.Scores.All(s => s.ID != response.UserScore.ID))
+                    newScores.Add(new GameplayLeaderboardScore(response.UserScore, tracked: false, GameplayLeaderboardScore.ComboDisplayMode.Highest));
+
+                scores.AddRange(newScores);
+            };
+            api.Perform(scoresRequest);
 
             if (gameplayState != null)
             {
-                var localScore = new GameplayLeaderboardScore(gameplayState, tracked: true, GameplayLeaderboardScore.ComboDisplayMode.Highest)
-                {
-                    // Local score should always show lower than any existing scores in cases of ties.
-                    TotalScoreTiebreaker = long.MaxValue
-                };
+                var localScore = new GameplayLeaderboardScore(gameplayState, tracked: true, GameplayLeaderboardScore.ComboDisplayMode.Highest);
                 localScore.TotalScore.BindValueChanged(_ => sorting.Invalidate());
-                newScores.Add(localScore);
+                scores.Add(localScore);
             }
-
-            scores.AddRange(newScores);
 
             Scheduler.AddDelayed(sort, 1000, true);
         }
 
-        // logic shared with PlaylistsGameplayLeaderboardProvider
+        // logic shared with SoloGameplayLeaderboardProvider
         private void sort()
         {
             if (sorting.IsValid)
