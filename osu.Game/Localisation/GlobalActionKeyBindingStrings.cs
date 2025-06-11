@@ -150,6 +150,11 @@ namespace osu.Game.Localisation
         public static LocalisableString ExpandNextGroup => new TranslatableString(getKey(@"expand_next_group"), @"Expand next group");
 
         /// <summary>
+        /// "Toggle expansion of current group"
+        /// </summary>
+        public static LocalisableString ToggleCurrentGroup => new TranslatableString(getKey(@"toggle_current_group"), @"Toggle expansion of current group");
+
+        /// <summary>
         /// "Home"
         /// </summary>
         public static LocalisableString Home => new TranslatableString(getKey(@"home"), @"Home");

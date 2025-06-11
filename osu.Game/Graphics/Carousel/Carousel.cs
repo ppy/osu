@@ -482,6 +482,20 @@ namespace osu.Game.Graphics.Carousel
                 case GlobalAction.ExpandNextGroup:
                     Scheduler.AddOnce(traverseGroupSelection, 1);
                     return true;
+
+                case GlobalAction.ToggleCurrentGroup:
+                    if (currentKeyboardSelection.CarouselItem != null && CheckValidForGroupSelection(currentKeyboardSelection.CarouselItem))
+                    {
+                        // If keyboard selection is a group, toggle group and then change keyboard selection to actual selection.
+                        Activate(currentKeyboardSelection.CarouselItem);
+                    }
+                    else
+                    {
+                        // If current keyboard selection is not a group, toggle closest group and move keyboard selection to that group.
+                        traverseSelection(-1, CheckValidForGroupSelection, false);
+                    }
+
+                    return true;
             }
 
             return false;
@@ -563,7 +577,7 @@ namespace osu.Game.Graphics.Carousel
             traverseSelection(direction, CheckValidForSetSelection);
         }
 
-        private void traverseSelection(int direction, Func<CarouselItem, bool> predicate)
+        private void traverseSelection(int direction, Func<CarouselItem, bool> predicate, bool skipFirst = true)
         {
             if (carouselItems == null || carouselItems.Count == 0) return;
 
@@ -579,12 +593,15 @@ namespace osu.Game.Graphics.Carousel
             {
                 newIndex = originalIndex = currentKeyboardSelection.Index.Value;
 
-                // As a second special case, if we're set selecting backwards and the current selection isn't a set,
-                // make sure to go back to the set header this item belongs to, so that the block below doesn't find it and stop too early.
-                if (direction < 0)
+                if (skipFirst)
                 {
-                    while (newIndex > 0 && !predicate(carouselItems[newIndex]))
-                        newIndex--;
+                    // As a second special case, if we're set selecting backwards and the current selection isn't a set,
+                    // make sure to go back to the set header this item belongs to, so that the block below doesn't find it and stop too early.
+                    if (direction < 0)
+                    {
+                        while (newIndex > 0 && !predicate(carouselItems[newIndex]))
+                            newIndex--;
+                    }
                 }
             }
 
