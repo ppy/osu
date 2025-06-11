@@ -78,9 +78,6 @@ namespace osu.Game.Rulesets.Edit
                 expandOnHover = requireContracting;
                 Expanded.Value = !expandOnHover;
             }
-
-            if (scrollContainer.TargetDrawable != null && !TransformsForTargetMember(nameof(Width)).Any())
-                scrollContainer.TargetDrawable = null;
         }
 
         protected override bool OnMouseDown(MouseDownEvent e) => true;
