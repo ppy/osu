@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -59,6 +60,7 @@ namespace osu.Game.Overlays.Profile.Sections
             Direction = FillDirection.Vertical,
             Children = new Drawable[]
             {
+                new DelayedLoadUnloadWrapper(() => new OnScreenIndicator(subsectionOnScreen)),
                 // reverse ID flow is required for correct Z-ordering of the items (last item should be front-most).
                 // particularly important in PaginatedBeatmapContainer, as it uses beatmap cards, which have expandable overhanging content.
                 ItemsContainer = new ReverseChildIDFillFlowContainer<Drawable>
@@ -82,7 +84,7 @@ namespace osu.Game.Overlays.Profile.Sections
                     Font = OsuFont.GetFont(size: 15),
                     Text = missingText ?? string.Empty,
                     Alpha = 0,
-                }
+                },
             }
         };
 
@@ -91,6 +93,8 @@ namespace osu.Game.Overlays.Profile.Sections
             base.LoadComplete();
             User.BindValueChanged(onUserChanged, true);
         }
+
+        private bool pendingRequestOnVisibility;
 
         private void onUserChanged(ValueChangedEvent<UserProfileData?> e)
         {
@@ -102,9 +106,20 @@ namespace osu.Game.Overlays.Profile.Sections
 
             if (e.NewValue?.User != null)
             {
-                showMore();
+                pendingRequestOnVisibility = true;
                 SetCount(GetCount(e.NewValue.User));
             }
+        }
+
+        /// <summary>
+        /// Invoked when this subsection became visible on the screen (i.e. not masked away).
+        /// </summary>
+        private void subsectionOnScreen()
+        {
+            if (pendingRequestOnVisibility)
+                showMore();
+
+            pendingRequestOnVisibility = false;
         }
 
         private void showMore()
@@ -168,6 +183,22 @@ namespace osu.Game.Overlays.Profile.Sections
             retrievalRequest?.Cancel();
             loadCancellation?.Cancel();
             base.Dispose(isDisposing);
+        }
+
+        private partial class OnScreenIndicator : Component
+        {
+            private readonly Action subsectionOnScreen;
+
+            public OnScreenIndicator(Action subsectionOnScreen)
+            {
+                this.subsectionOnScreen = subsectionOnScreen;
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                subsectionOnScreen();
+            }
         }
     }
 }
