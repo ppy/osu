@@ -63,7 +63,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [Test]
         public void TestCarouselRemembersSelection()
         {
-            SelectNextGroup();
+            SelectNextSet();
 
             object? selection = null;
 
@@ -98,28 +98,28 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [Test]
         public void TestGroupSelectionOnHeaderKeyboard()
         {
-            SelectNextGroup();
-            WaitForGroupSelection(0, 0);
+            SelectNextSet();
+            WaitForBeatmapSelection(0, 0);
 
             SelectPrevPanel();
             AddAssert("keyboard selected panel is expanded", () => GetKeyboardSelectedPanel()?.Expanded.Value, () => Is.True);
 
-            SelectPrevGroup();
+            SelectPrevSet();
 
-            WaitForGroupSelection(0, 0);
+            WaitForBeatmapSelection(0, 0);
             AddAssert("keyboard selected panel is contracted", () => GetKeyboardSelectedPanel()?.Expanded.Value, () => Is.False);
 
-            SelectPrevGroup();
+            SelectPrevSet();
 
-            WaitForGroupSelection(0, 0);
+            WaitForBeatmapSelection(0, 0);
             AddAssert("keyboard selected panel is expanded", () => GetKeyboardSelectedPanel()?.Expanded.Value, () => Is.True);
         }
 
         [Test]
         public void TestGroupSelectionOnHeaderMouse()
         {
-            SelectNextGroup();
-            WaitForGroupSelection(0, 0);
+            SelectNextSet();
+            WaitForBeatmapSelection(0, 0);
 
             AddAssert("keyboard selected panel is beatmap", GetKeyboardSelectedPanel, Is.TypeOf<PanelBeatmapStandalone>);
             AddAssert("selected panel is beatmap", GetSelectedPanel, Is.TypeOf<PanelBeatmapStandalone>);
@@ -151,22 +151,22 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             SelectNextPanel();
             Select();
-            WaitForGroupSelection(0, 0);
+            WaitForBeatmapSelection(0, 0);
 
-            SelectNextGroup();
-            WaitForGroupSelection(0, 1);
+            SelectNextSet();
+            WaitForBeatmapSelection(0, 1);
 
-            SelectNextGroup();
-            WaitForGroupSelection(0, 2);
+            SelectNextSet();
+            WaitForBeatmapSelection(0, 2);
 
-            SelectPrevGroup();
-            WaitForGroupSelection(0, 1);
+            SelectPrevSet();
+            WaitForBeatmapSelection(0, 1);
 
-            SelectPrevGroup();
-            WaitForGroupSelection(0, 0);
+            SelectPrevSet();
+            WaitForBeatmapSelection(0, 0);
 
-            SelectPrevGroup();
-            WaitForGroupSelection(2, 9);
+            SelectPrevSet();
+            WaitForBeatmapSelection(2, 9);
         }
 
         [Test]
@@ -187,10 +187,10 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             // Beatmap panels expand their selection area to cover holes from spacing.
             ClickVisiblePanelWithOffset<PanelBeatmapStandalone>(0, new Vector2(0, -(CarouselItem.DEFAULT_HEIGHT / 2 + 1)));
-            WaitForGroupSelection(0, 0);
+            WaitForBeatmapSelection(0, 0);
 
             ClickVisiblePanelWithOffset<PanelBeatmapStandalone>(1, new Vector2(0, (CarouselItem.DEFAULT_HEIGHT / 2 + 1)));
-            WaitForGroupSelection(0, 1);
+            WaitForBeatmapSelection(0, 1);
         }
 
         [Test]
@@ -203,11 +203,11 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             CheckDisplayedBeatmapsCount(3);
 
             // Single result gets selected automatically
-            WaitForGroupSelection(0, 0);
+            WaitForBeatmapSelection(0, 0);
 
             SelectNextPanel();
             Select();
-            WaitForGroupSelection(0, 0);
+            WaitForBeatmapSelection(0, 0);
 
             for (int i = 0; i < 5; i++)
                 SelectNextPanel();
@@ -216,7 +216,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             SelectNextPanel();
             Select();
 
-            WaitForGroupSelection(1, 0);
+            WaitForBeatmapSelection(1, 0);
 
             ApplyToFilter("remove filter", c => c.SearchText = string.Empty);
             WaitForFiltering();
@@ -228,15 +228,15 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [Test]
         public void TestExpandedGroupStillExpandedAfterFilter()
         {
-            SelectPrevGroup();
+            SelectPrevSet();
 
-            WaitForGroupSelection(2, 9);
+            WaitForBeatmapSelection(2, 9);
             AddAssert("expanded group is last", () => (Carousel.ExpandedGroup as StarDifficultyGroupDefinition)?.Difficulty.Stars, () => Is.EqualTo(6));
 
             SelectNextPanel();
             Select();
 
-            WaitForGroupSelection(2, 9);
+            WaitForBeatmapSelection(2, 9);
             AddAssert("expanded group is first", () => (Carousel.ExpandedGroup as StarDifficultyGroupDefinition)?.Difficulty.Stars, () => Is.EqualTo(0));
 
             // doesn't actually filter anything away, but triggers a filter.

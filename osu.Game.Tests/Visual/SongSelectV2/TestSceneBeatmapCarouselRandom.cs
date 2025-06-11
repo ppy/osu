@@ -33,7 +33,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             for (int i = 0; i < 10; i++)
             {
                 nextRandom();
-                WaitForSelection(0, 9);
+                WaitForSetSelection(0, 9);
             }
         }
 
@@ -110,7 +110,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddBeatmaps(local_set_count, 3, true);
             WaitForDrawablePanels();
 
-            SelectNextGroup();
+            SelectNextSet();
 
             for (int i = 0; i < random_select_count; i++)
                 nextRandom();
