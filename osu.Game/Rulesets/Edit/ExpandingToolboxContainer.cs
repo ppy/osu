@@ -58,6 +58,8 @@ namespace osu.Game.Rulesets.Edit
             {
                 Expanded.BindValueChanged(_ =>
                 {
+                    // When state changes from expanded -> collapsed the mouse is no longer within the toolbox so there would be no
+                    // hovered children if we used the mouse position directly
                     var position = new Vector2(ScreenSpaceDrawQuad.Centre.X, inputManager.CurrentState.Mouse.Position.Y);
 
                     scrollContainer.TargetDrawable = Children.FirstOrDefault(it => it.Contains(position));
