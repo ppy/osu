@@ -8,11 +8,14 @@ using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
+using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Taiko;
+using osu.Game.Scoring;
 using osu.Game.Tests.Resources;
 using osu.Game.Users;
 
@@ -81,6 +84,51 @@ namespace osu.Game.Tests.Visual.Online
                 dummyAPI.Login("username", "password");
                 dummyAPI.AuthenticateSecondFactor("abcdefgh");
             });
+        }
+
+        [Test]
+        public void TestAPIRequests()
+        {
+            bool scoresRequested = false;
+
+            AddStep("set up request handling", () =>
+            {
+                scoresRequested = false;
+
+                dummyAPI.HandleRequest = req =>
+                {
+                    if (req is GetUserRequest getUserRequest)
+                    {
+                        getUserRequest.TriggerSuccess(TEST_USER);
+                        return true;
+                    }
+
+                    if (req is GetUserScoresRequest getUserScoresRequest && getUserScoresRequest.Type == ScoreType.Firsts)
+                    {
+                        scoresRequested = true;
+                        getUserScoresRequest.TriggerSuccess(new List<SoloScoreInfo>
+                        {
+                            CreateSoloScoreInfo(),
+                            CreateSoloScoreInfo(),
+                            CreateSoloScoreInfo(),
+                        });
+                    }
+
+                    return false;
+                };
+            });
+
+            AddStep("show user", () => profile.ShowUser(new APIUser { Id = 1 }));
+            AddAssert("scores not requested", () => !scoresRequested);
+            AddWaitStep("wait", 5);
+            AddAssert("scores not requested", () => !scoresRequested);
+
+            AddStep("scroll to end", () =>
+            {
+                var scroll = profile.ChildrenOfType<OverlayScrollContainer>().Single();
+                scroll.ScrollToEnd(false);
+            });
+            AddUntilStep("scores requested", () => scoresRequested);
         }
 
         [Test]
@@ -231,6 +279,33 @@ namespace osu.Game.Tests.Visual.Online
                 PlayMode = "osu",
             }));
         }
+
+        public static SoloScoreInfo CreateSoloScoreInfo() => new SoloScoreInfo
+        {
+            PP = 1047.21,
+            Rank = ScoreRank.SH,
+            Beatmap = new APIBeatmap
+            {
+                BeatmapSet = new APIBeatmapSet
+                {
+                    Title = "JUSTadICE (TV Size)",
+                    Artist = "Oomori Seiko",
+                },
+                DifficultyName = "Extreme",
+                Status = BeatmapOnlineStatus.Ranked,
+            },
+            EndedAt = DateTimeOffset.Now,
+            Mods = new[]
+            {
+                new APIMod { Acronym = new OsuModHidden().Acronym },
+                new APIMod { Acronym = new OsuModHardRock().Acronym },
+                new APIMod { Acronym = new OsuModDoubleTime().Acronym },
+            },
+            Accuracy = 0.9813,
+            Ranked = true,
+            Preserve = true,
+            Processed = true,
+        };
 
         public static readonly APIUser TEST_USER = new APIUser
         {
