@@ -17,15 +17,18 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
 
             double holdFactor = 1.0; // Factor to all additional strains in case something else is held
 
-            for (int i = 0; i < maniaCurrent.PreviousHitObjects.Length; ++i)
+            // We award a bonus if this note starts and ends before the end of another hold note.
+            foreach (var maniaPrevious in maniaCurrent.PreviousHitObjects)
             {
-                if (maniaCurrent.PreviousHitObjects[i] is null)
+                if (maniaPrevious is null)
                     continue;
 
-                // We give a slight bonus to everything if something is held meanwhile
-                if (Precision.DefinitelyBigger(maniaCurrent.PreviousHitObjects[i]!.EndTime, endTime, 1) &&
-                    Precision.DefinitelyBigger(startTime, maniaCurrent.PreviousHitObjects[i]!.StartTime, 1))
+                if (Precision.DefinitelyBigger(maniaPrevious.EndTime, endTime, 1) &&
+                    Precision.DefinitelyBigger(startTime, maniaPrevious.StartTime, 1))
+                {
                     holdFactor = 1.25;
+                    break;
+                }
             }
 
             return 2.0 * holdFactor;

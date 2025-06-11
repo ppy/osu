@@ -36,11 +36,13 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
             individualStrains[maniaCurrent.Column] = applyDecay(individualStrains[maniaCurrent.Column], maniaCurrent.ColumnStrainTime, individual_decay_base);
             individualStrains[maniaCurrent.Column] += IndividualStrainEvaluator.EvaluateDifficultyOf(current);
 
+            // For concurrent individual strains, we keep the highest value to ensure that we always add the same amount to the highest overallStrain value no matter the processing order.
             highestIndividualStrain = maniaCurrent.DeltaTime <= 1 ? Math.Max(highestIndividualStrain, individualStrains[maniaCurrent.Column]) : individualStrains[maniaCurrent.Column];
 
             overallStrain = applyDecay(overallStrain, maniaCurrent.DeltaTime, overall_decay_base);
             overallStrain += OverallStrainEvaluator.EvaluateDifficultyOf(current);
 
+            // By subtracting CurrentStrain, this skill effectively only considers the maximum strain of any one hitobject within each strain section.
             return highestIndividualStrain + overallStrain - CurrentStrain;
         }
 

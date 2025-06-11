@@ -24,10 +24,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
             double holdFactor = 1.0; // Factor to all additional strains in case something else is held
             double holdAddition = 0; // Addition to the current note in case it's a hold and has to be released awkwardly
 
-            for (int i = 0; i < maniaCurrent.PreviousHitObjects.Length; ++i)
+            foreach (var maniaPrevious in maniaCurrent.PreviousHitObjects)
             {
-                var maniaPrevious = maniaCurrent.PreviousHitObjects[i];
-
                 if (maniaPrevious is null)
                     continue;
 
