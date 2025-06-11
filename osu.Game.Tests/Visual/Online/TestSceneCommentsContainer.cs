@@ -141,19 +141,20 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestPost()
         {
+            const string written_text = "comm";
+
             setUpCommentsResponse(new CommentBundle { Comments = new List<Comment>() });
             AddStep("show comments", () => commentsContainer.ShowComments(CommentableType.Beatmapset, 123));
             AddAssert("no comments placeholder shown", () => commentsContainer.ChildrenOfType<CommentsContainer.NoCommentsPlaceholder>().Any());
 
             setUpPostResponse();
-            AddStep("enter text", () => editorTextBox.Current.Value = "comm");
+            AddStep("enter text", () => editorTextBox.Current.Value = written_text);
             AddStep("submit", () => commentsContainer.ChildrenOfType<RoundedButton>().First().TriggerClick());
 
             AddUntilStep("comment sent", () =>
             {
-                string writtenText = editorTextBox.Current.Value;
                 var comment = commentsContainer.ChildrenOfType<DrawableComment>().LastOrDefault();
-                return comment != null && comment.ChildrenOfType<SpriteText>().Any(y => y.Text == writtenText);
+                return comment != null && comment.ChildrenOfType<SpriteText>().Any(y => y.Text == written_text);
             });
             AddAssert("no comments placeholder removed", () => !commentsContainer.ChildrenOfType<CommentsContainer.NoCommentsPlaceholder>().Any());
         }
@@ -161,38 +162,40 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestPostWithExistingComments()
         {
+            const string written_text = "comm";
+
             setUpCommentsResponse(getExampleComments());
             AddStep("show comments", () => commentsContainer.ShowComments(CommentableType.Beatmapset, 123));
             AddUntilStep("comments shown", () => commentsContainer.ChildrenOfType<DrawableComment>().Any());
 
             setUpPostResponse();
-            AddStep("enter text", () => editorTextBox.Current.Value = "comm");
+            AddStep("enter text", () => editorTextBox.Current.Value = written_text);
             AddStep("submit", () => commentsContainer.ChildrenOfType<CommentEditor>().Single().ChildrenOfType<RoundedButton>().First().TriggerClick());
 
             AddUntilStep("comment sent", () =>
             {
-                string writtenText = editorTextBox.Current.Value;
                 var comment = commentsContainer.ChildrenOfType<DrawableComment>().LastOrDefault();
-                return comment != null && comment.ChildrenOfType<SpriteText>().Any(y => y.Text == writtenText);
+                return comment != null && comment.ChildrenOfType<SpriteText>().Any(y => y.Text == written_text);
             });
         }
 
         [Test]
         public void TestPostAsOwner()
         {
+            const string written_text = "comm";
+
             setUpCommentsResponse(getExampleComments());
             AddStep("show comments", () => commentsContainer.ShowComments(CommentableType.Beatmapset, 123));
             AddUntilStep("comments shown", () => commentsContainer.ChildrenOfType<DrawableComment>().Any());
 
             setUpPostResponse(true);
-            AddStep("enter text", () => editorTextBox.Current.Value = "comm");
+            AddStep("enter text", () => editorTextBox.Current.Value = written_text);
             AddStep("submit", () => commentsContainer.ChildrenOfType<CommentEditor>().Single().ChildrenOfType<RoundedButton>().First().TriggerClick());
 
             AddUntilStep("comment sent", () =>
             {
-                string writtenText = editorTextBox.Current.Value;
                 var comment = commentsContainer.ChildrenOfType<DrawableComment>().LastOrDefault();
-                return comment != null && comment.ChildrenOfType<SpriteText>().Any(y => y.Text == writtenText) && comment.ChildrenOfType<SpriteText>().Any(y => y.Text == "MAPPER");
+                return comment != null && comment.ChildrenOfType<SpriteText>().Any(y => y.Text == written_text) && comment.ChildrenOfType<SpriteText>().Any(y => y.Text == "MAPPER");
             });
         }
 
