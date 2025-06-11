@@ -16,6 +16,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Input.StateChanges;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
@@ -735,12 +736,16 @@ namespace osu.Game.Screens.SelectV2
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
-            // I don't know why this works but it does.
+            // I don't know why this works, but it does.
             // If the carousel panels are hovered, hovered no longer contains the screen.
-            // Maybe there's a better way of doing this, but I couldn't immeidately find a good setup.
+            // Maybe there's a better way of doing this, but I couldn't immediately find a good setup.
             bool mouseDownPriority = GetContainingInputManager()!.HoveredDrawables.Contains(this);
 
-            if (e.Button == MouseButton.Left && mouseDownPriority)
+            // Touch input synthesises right clicks, which allow absolute scroll of the carousel.
+            // For simplicity, disable this functionality on mobile.
+            bool isTouchInput = e.CurrentState.Mouse.LastSource is ISourcedFromTouch;
+
+            if (e.Button == MouseButton.Left && !isTouchInput && mouseDownPriority)
             {
                 revealingBackground = Scheduler.AddDelayed(() =>
                 {
