@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Dashboard.CurrentlyOnline
     {
         public readonly APIUser User;
 
-        protected IBindable<bool> CanSpectate => canSpectate;
+        public IBindable<bool> CanSpectate => canSpectate;
         private readonly Bindable<bool> canSpectate = new Bindable<bool>();
 
         [Resolved]
