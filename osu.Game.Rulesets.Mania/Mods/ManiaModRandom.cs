@@ -34,7 +34,6 @@ namespace osu.Game.Rulesets.Mania.Mods
 
             if (Randomizer.Value is RandomizationType.Notes or RandomizationType.Both)
             {
-                var newObjects = new List<ManiaHitObject>();
                 double[] columnEndTimes = new double[availableColumns];
                 double lastStartTime = -1;
                 var availableColumnsList = new List<int>();
@@ -67,7 +66,7 @@ namespace osu.Game.Rulesets.Mania.Mods
                     lastStartTime = currentStartTime;
                 }
 
-                maniaBeatmap.HitObjects = maniaBeatmap.HitObjects.Concat(newObjects).OrderBy(h => h.StartTime).ToList();
+                maniaBeatmap.HitObjects = maniaBeatmap.HitObjects.OrderBy(h => h.StartTime).ToList();
             }
 
             if (Randomizer.Value is RandomizationType.Columns or RandomizationType.Both)
