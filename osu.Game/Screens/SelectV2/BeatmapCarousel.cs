@@ -339,7 +339,7 @@ namespace osu.Game.Screens.SelectV2
             RequestRecommendedSelection(beatmaps);
         }
 
-        protected override bool CheckValidForGroupSelection(CarouselItem item)
+        protected override bool CheckValidForSetSelection(CarouselItem item)
         {
             switch (item.Model)
             {
