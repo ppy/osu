@@ -125,6 +125,37 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         }
 
         [Test]
+        public void TestKeyboardGroupToggleCollapse_SelectionContained()
+        {
+            SelectNextSet();
+            WaitForBeatmapSelection(0, 0);
+            checkBeatmapIsKeyboardSelected();
+
+            ToggleGroupCollapse();
+            checkGroupKeyboardSelected(0);
+
+            ToggleGroupCollapse();
+            checkBeatmapIsKeyboardSelected();
+        }
+
+        [Test]
+        public void TestKeyboardGroupToggleCollapse_SelectionNotContained()
+        {
+            SelectNextSet();
+            WaitForBeatmapSelection(0, 0);
+            checkBeatmapIsKeyboardSelected();
+
+            SelectNextGroup();
+            checkGroupKeyboardSelected(1);
+
+            ToggleGroupCollapse();
+            checkGroupKeyboardSelected(1);
+
+            ToggleGroupCollapse();
+            checkGroupKeyboardSelected(1);
+        }
+
+        [Test]
         public void TestKeyboardGroupTraversal()
         {
             SelectNextSet();

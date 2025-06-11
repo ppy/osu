@@ -230,6 +230,11 @@ namespace osu.Game.Screens.SelectV2
                         }
 
                         setExpandedGroup(group);
+
+                        // If the active selection is within this group, it should get keyboard focus immediately.
+                        if (CurrentSelectionItem?.IsVisible == true && CurrentSelection is BeatmapInfo info)
+                            RequestSelection(info);
+
                         return;
 
                     case BeatmapSetInfo setInfo:
