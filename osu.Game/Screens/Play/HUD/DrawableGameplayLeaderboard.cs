@@ -29,6 +29,9 @@ namespace osu.Game.Screens.Play.HUD
 
         public DrawableGameplayLeaderboardScore? TrackedScore { get; private set; }
 
+        [SettingSource("Collapse during gameplay", "If enabled, the leaderboard will become more compact during active gameplay.")]
+        public Bindable<bool> CollapseDuringGameplay { get; } = new BindableBool(true);
+
         [Resolved]
         private Player? player { get; set; }
 
@@ -98,6 +101,7 @@ namespace osu.Game.Screens.Play.HUD
             userPlayingState.BindValueChanged(_ => Scheduler.AddOnce(updateState));
             holdingForHUD.BindValueChanged(_ => Scheduler.AddOnce(updateState));
             ForceExpand.BindValueChanged(_ => Scheduler.AddOnce(updateState));
+            CollapseDuringGameplay.BindValueChanged(_ => Scheduler.AddOnce(updateState));
             updateState();
         }
 
@@ -108,7 +112,7 @@ namespace osu.Game.Screens.Play.HUD
                 scroll.ScrollToStart(false);
 
             Flow.FadeTo(player?.Configuration.ShowLeaderboard != false && configVisibility.Value ? 1 : 0, 100, Easing.OutQuint);
-            expanded.Value = ForceExpand.Value || userPlayingState.Value != LocalUserPlayingState.Playing || holdingForHUD.Value;
+            expanded.Value = !CollapseDuringGameplay.Value || ForceExpand.Value || userPlayingState.Value != LocalUserPlayingState.Playing || holdingForHUD.Value;
         }
 
         /// <summary>
