@@ -265,8 +265,9 @@ namespace osu.Game.Screens.Ranking.Statistics
 
                 if (preventTaggingReason == null)
                 {
-                    yield return new StatisticItem("Tag the beatmap!", () => new UserTagControl(newScore.BeatmapInfo, true)
+                    yield return new StatisticItem("Tag the beatmap!", () => new UserTagControl(newScore.BeatmapInfo)
                     {
+                        Writable = true,
                         RelativeSizeAxes = Axes.X,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
@@ -287,8 +288,9 @@ namespace osu.Game.Screens.Ranking.Statistics
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
                             },
-                            new UserTagControl(newScore.BeatmapInfo, false)
+                            new UserTagControl(newScore.BeatmapInfo)
                             {
+                                Writable = false,
                                 RelativeSizeAxes = Axes.X,
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
