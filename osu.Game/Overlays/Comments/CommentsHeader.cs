@@ -50,12 +50,13 @@ namespace osu.Game.Overlays.Comments
                             Origin = Anchor.CentreLeft,
                             Current = Sort
                         },
-                        new ShowDeletedButton
-                        {
-                            Anchor = Anchor.CentreRight,
-                            Origin = Anchor.CentreRight,
-                            Checked = { BindTarget = ShowDeleted }
-                        }
+                        // TODO: This should eventually be visible for moderators.
+                        // new ShowDeletedButton
+                        // {
+                        //     Anchor = Anchor.CentreRight,
+                        //     Origin = Anchor.CentreRight,
+                        //     Checked = { BindTarget = ShowDeleted }
+                        // }
                     }
                 }
             });
