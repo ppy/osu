@@ -43,7 +43,7 @@ namespace osu.Game.Updater
         {
             base.LoadComplete();
 
-            Schedule(() => Task.Run(CheckForUpdateAsync));
+            Schedule(() => Task.Run(() => CheckForUpdateAsync()));
 
             string version = game.Version;
 
@@ -68,7 +68,12 @@ namespace osu.Game.Updater
 
         private Task<bool>? updateCheckTask;
 
-        public async Task<bool> CheckForUpdateAsync()
+        /// <summary>
+        /// Performs an asynchronous check for application updates.
+        /// </summary>
+        /// <param name="checkingNotification">An existing "checking for update" notification. If not null, this should be removed when an update is found.</param>
+        /// <returns></returns>
+        public async Task<bool> CheckForUpdateAsync(Notification? checkingNotification = null)
         {
             if (!CanCheckForUpdate)
                 return false;
@@ -89,8 +94,9 @@ namespace osu.Game.Updater
         /// <summary>
         /// Performs an asynchronous check for application updates.
         /// </summary>
+        /// <param name="checkingNotification">An existing "checking for update" notification. If not null, this should be removed when an update is found.</param>
         /// <returns>Whether any update is waiting. May return true if an error occured (there is potentially an update available).</returns>
-        protected virtual Task<bool> PerformUpdateCheck() => Task.FromResult(false);
+        protected virtual Task<bool> PerformUpdateCheck(ProgressNotification? checkingNotification = null) => Task.FromResult(false);
 
         private partial class UpdateCompleteNotification : SimpleNotification
         {
@@ -174,12 +180,6 @@ namespace osu.Game.Updater
                 State = ProgressNotificationState.Active;
                 Progress = 0;
                 Text = NotificationsStrings.DownloadingUpdate;
-            }
-
-            public void FailDownload()
-            {
-                State = ProgressNotificationState.Cancelled;
-                Close(false);
             }
         }
     }
