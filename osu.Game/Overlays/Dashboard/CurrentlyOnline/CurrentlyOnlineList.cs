@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -75,11 +74,10 @@ namespace osu.Game.Overlays.Dashboard.CurrentlyOnline
             switch (e.Action)
             {
                 case NotifyDictionaryChangedAction.Add:
-                    Debug.Assert(e.NewItems != null);
-
-                    foreach (var kvp in e.NewItems)
+                    foreach ((int userId, _) in e.NewItems!)
                     {
-                        int userId = kvp.Key;
+                        if (userPanels.ContainsKey(userId))
+                            continue;
 
                         users.GetUserAsync(userId).ContinueWith(task =>
                         {
@@ -91,11 +89,8 @@ namespace osu.Game.Overlays.Dashboard.CurrentlyOnline
                     break;
 
                 case NotifyDictionaryChangedAction.Remove:
-                    Debug.Assert(e.OldItems != null);
-
-                    foreach (var kvp in e.OldItems)
+                    foreach ((int userId, _) in e.OldItems!)
                     {
-                        int userId = kvp.Key;
                         if (userPanels.Remove(userId, out var userPanel))
                             userPanel.Expire();
                     }

@@ -26,10 +26,14 @@ namespace osu.Game.Overlays.Dashboard.CurrentlyOnline
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChild = new BrickPanelWithSpectateButton(User)
+            InternalChild = new DelayedLoadWrapper(() => new BrickPanelWithSpectateButton(User)
             {
                 CanSpectate = { BindTarget = CanSpectate },
                 OnSpectate = BeginSpectating
+            }, 0)
+            {
+                // These are approximate metrics - DLW will adopt the content's sizing mode after load.
+                Size = new Vector2(50, 20)
             };
         }
 

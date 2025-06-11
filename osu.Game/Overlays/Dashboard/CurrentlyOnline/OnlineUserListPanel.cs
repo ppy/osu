@@ -22,7 +22,7 @@ namespace osu.Game.Overlays.Dashboard.CurrentlyOnline
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChild = new GridContainer
+            InternalChild = new DelayedLoadWrapper(() => new GridContainer
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
@@ -51,6 +51,11 @@ namespace osu.Game.Overlays.Dashboard.CurrentlyOnline
                         }
                     }
                 }
+            }, 0)
+            {
+                // These are approximate metrics - DLW will adopt the content's sizing mode after load.
+                RelativeSizeAxes = Axes.X,
+                Height = 40
             };
         }
     }

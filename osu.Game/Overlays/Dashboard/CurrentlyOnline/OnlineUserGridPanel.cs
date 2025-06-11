@@ -16,39 +16,42 @@ namespace osu.Game.Overlays.Dashboard.CurrentlyOnline
         public OnlineUserGridPanel(APIUser user)
             : base(user)
         {
-            AutoSizeAxes = Axes.Both;
+            AutoSizeAxes = Axes.Y;
+            Width = 290;
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChildren = new Drawable[]
+            InternalChild = new DelayedLoadWrapper(() => new FillFlowContainer
             {
-                new FillFlowContainer
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Direction = FillDirection.Vertical,
+                Spacing = new Vector2(2),
+                Children = new Drawable[]
                 {
-                    AutoSizeAxes = Axes.Y,
-                    Direction = FillDirection.Vertical,
-                    Spacing = new Vector2(2),
-                    Width = 290,
-                    Children = new Drawable[]
+                    new UserGridPanel(User)
                     {
-                        new UserGridPanel(User)
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre
-                        },
-                        new PurpleRoundedButton
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Text = "Spectate",
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
-                            Enabled = { BindTarget = CanSpectate },
-                            Action = BeginSpectating
-                        }
+                        RelativeSizeAxes = Axes.X,
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre
+                    },
+                    new PurpleRoundedButton
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Text = "Spectate",
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
+                        Enabled = { BindTarget = CanSpectate },
+                        Action = BeginSpectating
                     }
-                },
+                }
+            }, 0)
+            {
+                // These are approximate metrics - DLW will adopt the content's sizing mode after load.
+                RelativeSizeAxes = Axes.X,
+                Height = 160
             };
         }
     }
