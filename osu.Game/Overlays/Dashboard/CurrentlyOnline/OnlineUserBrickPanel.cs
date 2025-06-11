@@ -79,6 +79,7 @@ namespace osu.Game.Overlays.Dashboard.CurrentlyOnline
                     Icon = FontAwesome.Solid.Video,
                     Size = new Vector2(20, 13),
                     IconScale = new Vector2(0.5f),
+                    TooltipText = "Spectate",
                     Alpha = 0,
                     AlwaysPresent = true,
                     Enabled = { BindTarget = CanSpectate },
