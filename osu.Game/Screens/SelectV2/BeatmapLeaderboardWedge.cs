@@ -201,19 +201,19 @@ namespace osu.Game.Screens.SelectV2
 
         private void refetchScores()
         {
+            SetScores(Array.Empty<ScoreInfo>());
+
+            if (beatmap.IsDefault)
+            {
+                SetState(LeaderboardState.NoneSelected);
+                return;
+            }
+
+            SetState(LeaderboardState.Retrieving);
+
             refetchOperation?.Cancel();
             refetchOperation = Scheduler.AddDelayed(() =>
             {
-                SetScores(Array.Empty<ScoreInfo>());
-
-                if (beatmap.IsDefault)
-                {
-                    SetState(LeaderboardState.NoneSelected);
-                    return;
-                }
-
-                SetState(LeaderboardState.Retrieving);
-
                 var fetchBeatmapInfo = beatmap.Value.BeatmapInfo;
                 var fetchRuleset = ruleset.Value ?? fetchBeatmapInfo.Ruleset;
 
@@ -230,7 +230,7 @@ namespace osu.Game.Screens.SelectV2
                     fetchedScores.BindValueChanged(_ => updateScores(), true);
                     initialFetchComplete = true;
                 }
-            }, initialFetchComplete ? 200 : 0);
+            }, initialFetchComplete ? 300 : 0);
         }
 
         private void updateScores()
