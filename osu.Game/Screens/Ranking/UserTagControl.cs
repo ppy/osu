@@ -47,15 +47,14 @@ namespace osu.Game.Screens.Ranking
         /// <summary>
         /// Determines whether the user can modify the contained tags
         /// </summary>
-        private readonly bool writable;
+        public bool Writable { get; init; }
 
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
 
-        public UserTagControl(BeatmapInfo beatmapInfo, bool writable)
+        public UserTagControl(BeatmapInfo beatmapInfo)
         {
             this.beatmapInfo = beatmapInfo;
-            this.writable = writable;
         }
 
         [BackgroundDependencyLoader]
@@ -94,7 +93,7 @@ namespace osu.Game.Screens.Ranking
                                         AutoSizeAxes = Axes.Y,
                                         Direction = FillDirection.Full,
                                         Spacing = new Vector2(4),
-                                        Children = writable
+                                        Children = Writable
                                             ?
                                             [
                                                 addNewTagUserTag = new AddNewTagUserTag
@@ -202,7 +201,7 @@ namespace osu.Game.Screens.Ranking
                 case NotifyCollectionChangedAction.Reset:
                 {
                     tagFlow.Clear();
-                    if (writable) tagFlow.Add(addNewTagUserTag!);
+                    if (Writable) tagFlow.Add(addNewTagUserTag!);
                     break;
                 }
             }
@@ -210,7 +209,7 @@ namespace osu.Game.Screens.Ranking
 
         private void toggleVote(UserTag tag)
         {
-            if (!writable)
+            if (!Writable)
                 return;
 
             if (tag.Updating.Value)
