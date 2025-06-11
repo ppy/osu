@@ -91,6 +91,9 @@ namespace osu.Game.Screens.SelectV2
             DebounceDelay = 100;
             DistanceOffscreenToPreload = 100;
 
+            // Account for the osu! logo being in the way.
+            Scroll.ScrollbarPaddingBottom = 70;
+
             Filters = new ICarouselFilter[]
             {
                 matching = new BeatmapCarouselFilterMatching(() => Criteria!),
