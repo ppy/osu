@@ -190,6 +190,9 @@ namespace osu.Game.Screens.Play.HUD
         {
             path.ControlPoints.Clear();
 
+            if (hitObjects == null || !hitObjects.Any())
+                return;
+
             for (int i = 0; i < SectionGranularity.Value; i++)
             {
                 path.ControlPoints.Add(new PathControlPoint
