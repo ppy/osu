@@ -3,38 +3,36 @@
 
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Framework.Screens;
 using osu.Game.Database;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Metadata;
-using osu.Game.Resources.Localisation.Web;
+using osu.Game.Overlays.Dashboard.Friends;
 using osu.Game.Screens;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Screens.Play;
 using osu.Game.Users;
 using osuTK;
 
-namespace osu.Game.Overlays.Dashboard
+namespace osu.Game.Overlays.Dashboard.CurrentlyOnline
 {
-    internal partial class CurrentlyOnlineDisplay : CompositeDrawable
+    internal partial class CurrentlyOnlineList : CompositeDrawable
     {
-        private const float search_textbox_height = 40;
-        private const float padding = 10;
+        public readonly IBindable<UserSortCriteria> SortCriteria = new Bindable<UserSortCriteria>();
+        public readonly IBindable<string> SearchText = new Bindable<string>();
 
         private readonly IBindableDictionary<int, UserPresence> onlineUserPresences = new BindableDictionary<int, UserPresence>();
         private readonly Dictionary<int, OnlineUserPanel> userPanels = new Dictionary<int, OnlineUserPanel>();
+        private readonly OverlayPanelDisplayStyle style;
 
-        private SearchContainer<OnlineUserPanel> userFlow = null!;
-        private BasicSearchTextBox searchTextBox = null!;
+        private OnlineUserSearchContainer searchContainer = null!;
 
         [Resolved]
         private MetadataClient metadataClient { get; set; } = null!;
@@ -42,51 +40,24 @@ namespace osu.Game.Overlays.Dashboard
         [Resolved]
         private UserLookupCache users { get; set; } = null!;
 
-        [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
+        public CurrentlyOnlineList(OverlayPanelDisplayStyle style)
         {
+            this.style = style;
+
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
+        }
 
-            InternalChildren = new Drawable[]
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            InternalChild = searchContainer = new OnlineUserSearchContainer
             {
-                new Box
-                {
-                    RelativeSizeAxes = Axes.X,
-                    Height = padding * 2 + search_textbox_height,
-                    Colour = colourProvider.Background4,
-                },
-                new Container<BasicSearchTextBox>
-                {
-                    RelativeSizeAxes = Axes.X,
-                    Padding = new MarginPadding { Horizontal = WaveOverlayContainer.HORIZONTAL_PADDING, Vertical = padding },
-                    Child = searchTextBox = new BasicSearchTextBox
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopCentre,
-                        Height = search_textbox_height,
-                        ReleaseFocusOnCommit = false,
-                        HoldFocus = true,
-                        PlaceholderText = HomeStrings.SearchPlaceholder,
-                    },
-                },
-                userFlow = new SearchContainer<OnlineUserPanel>
-                {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Spacing = new Vector2(10),
-                    Padding = new MarginPadding
-                    {
-                        Top = padding * 3 + search_textbox_height,
-                        Bottom = padding,
-                        Right = padding,
-                        Left = padding,
-                    },
-                },
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Spacing = new Vector2(style == OverlayPanelDisplayStyle.Card ? 10 : 2),
+                SortCriteria = { BindTarget = SortCriteria },
             };
-
-            searchTextBox.Current.ValueChanged += text => userFlow.SearchTerm = text.NewValue;
         }
 
         protected override void LoadComplete()
@@ -95,13 +66,13 @@ namespace osu.Game.Overlays.Dashboard
 
             onlineUserPresences.BindTo(metadataClient.UserPresences);
             onlineUserPresences.BindCollectionChanged(onUserPresenceUpdated, true);
+
+            SearchText.BindValueChanged(onSearchTextChanged, true);
         }
 
-        protected override void OnFocus(FocusEvent e)
+        private void onSearchTextChanged(ValueChangedEvent<string> search)
         {
-            base.OnFocus(e);
-
-            searchTextBox.TakeFocus();
+            searchContainer.SearchTerm = search.NewValue;
         }
 
         private void onUserPresenceUpdated(object? sender, NotifyDictionaryChangedEventArgs<int, UserPresence> e) => Schedule(() =>
@@ -118,7 +89,7 @@ namespace osu.Game.Overlays.Dashboard
                         users.GetUserAsync(userId).ContinueWith(task =>
                         {
                             if (task.GetResultSafely() is APIUser user)
-                                Schedule(() => userFlow.Add(userPanels[userId] = createUserPanel(user)));
+                                Schedule(() => searchContainer.Add(userPanels[userId] = createUserPanel(user)));
                         });
                     }
 
@@ -144,6 +115,40 @@ namespace osu.Game.Overlays.Dashboard
                 panel.Anchor = Anchor.TopCentre;
                 panel.Origin = Anchor.TopCentre;
             });
+
+        private partial class OnlineUserSearchContainer : SearchContainer<OnlineUserPanel>
+        {
+            public readonly IBindable<UserSortCriteria> SortCriteria = new Bindable<UserSortCriteria>();
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                SortCriteria.BindValueChanged(_ => InvalidateLayout(), true);
+            }
+
+            public override IEnumerable<Drawable> FlowingChildren
+            {
+                get
+                {
+                    IEnumerable<OnlineUserPanel> panels = base.FlowingChildren.OfType<OnlineUserPanel>();
+
+                    switch (SortCriteria.Value)
+                    {
+                        default:
+                        case UserSortCriteria.LastVisit:
+                            // Todo: Last visit time is not currently updated according to realtime user presence.
+                            return panels.OrderByDescending(panel => panel.User.LastVisit);
+
+                        case UserSortCriteria.Rank:
+                            // Todo: Statistics are not currently updated according to realtime user statistics, but it's also not currently displayed in the panels.
+                            return panels.OrderByDescending(panel => panel.User.Statistics.GlobalRank.HasValue).ThenBy(panel => panel.User.Statistics.GlobalRank ?? 0);
+
+                        case UserSortCriteria.Username:
+                            return panels.OrderBy(panel => panel.User.Username);
+                    }
+                }
+            }
+        }
 
         public partial class OnlineUserPanel : CompositeDrawable, IFilterable
         {
