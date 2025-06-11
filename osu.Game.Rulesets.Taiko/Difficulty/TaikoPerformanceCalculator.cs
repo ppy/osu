@@ -86,7 +86,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
             difficultyValue *= 1 + 0.10 * Math.Max(0, attributes.StarRating - 10);
 
-            double lengthBonus = 1 + 0.1 * Math.Min(1.0, totalHits / 1500.0);
+            // Applies a bonus to maps with more total difficulty, calculating this with a map's total hits and consistency factor.
+            double totalDifficultHits = totalHits * Math.Pow(attributes.ConsistencyFactor, 0.5);
+            double lengthBonus = 1 + 0.25 * totalDifficultHits / (totalDifficultHits + 4000);
             difficultyValue *= lengthBonus;
 
             // Scales miss penalty by the total hits of a map, making misses more punishing on maps with fewer objects.
@@ -119,11 +121,16 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             if (score.Mods.Any(m => m is ModHidden) && !isConvert)
                 accuracyValue *= 1.075;
 
-            double lengthBonus = Math.Min(1.15, Math.Pow(totalHits / 1500.0, 0.3));
+            // Applies a bonus to maps with more total difficulty, calculating this with a map's total hits and consistency factor.
+            double totalDifficultHits = totalHits * Math.Pow(attributes.ConsistencyFactor, 0.5);
+            double lengthBonus = 1 + 0.4 * totalDifficultHits / (totalDifficultHits + 4000);
+            accuracyValue *= lengthBonus;
 
-            // Slight HDFL Bonus for accuracy. A clamp is used to prevent against negative values.
+            // Applies a bonus to maps with more total memory required with HDFL.
+            double memoryLengthBonus = Math.Min(1.15, Math.Pow(totalHits / 1500.0, 0.3));
+
             if (score.Mods.Any(m => m is ModFlashlight<TaikoHitObject>) && score.Mods.Any(m => m is ModHidden) && !isConvert)
-                accuracyValue *= Math.Max(1.0, 1.05 * lengthBonus);
+                accuracyValue *= Math.Max(1.0, 1.05 * memoryLengthBonus);
 
             return accuracyValue;
         }
