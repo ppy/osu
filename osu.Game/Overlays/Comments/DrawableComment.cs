@@ -407,8 +407,7 @@ namespace osu.Game.Overlays.Comments
                 actionsLoading.Hide();
                 makeDeleted();
                 WasDeleted = true;
-                if (!ShowDeleted.Value)
-                    Hide();
+                updateVisibility();
             });
             request.Failure += e => Schedule(() =>
             {
@@ -417,6 +416,13 @@ namespace osu.Game.Overlays.Comments
                 actionsContainer.Show();
             });
             api.Queue(request);
+        }
+
+        private void updateVisibility()
+        {
+            // intentionally not checking deleted state of inner replies recursively. this matches web.
+            bool visible = !WasDeleted || Replies.Any(r => !r.WasDeleted) || ShowDeleted.Value;
+            this.FadeTo(visible ? 1 : 0);
         }
 
         private void copyUrl()
@@ -450,14 +456,16 @@ namespace osu.Game.Overlays.Comments
 
         protected override void LoadComplete()
         {
-            ShowDeleted.BindValueChanged(show =>
-            {
-                if (WasDeleted)
-                    this.FadeTo(show.NewValue ? 1 : 0);
-            }, true);
-            childrenExpanded.BindValueChanged(expanded => childCommentsVisibilityContainer.FadeTo(expanded.NewValue ? 1 : 0), true);
-            updateButtonsState();
             base.LoadComplete();
+
+            ShowDeleted.BindValueChanged(_ => updateVisibility(), true);
+
+            childrenExpanded.BindValueChanged(expanded =>
+            {
+                childCommentsVisibilityContainer.FadeTo(expanded.NewValue ? 1 : 0);
+            }, true);
+
+            updateButtonsState();
         }
 
         private void onRepliesAdded(IEnumerable<DrawableComment> replies)
