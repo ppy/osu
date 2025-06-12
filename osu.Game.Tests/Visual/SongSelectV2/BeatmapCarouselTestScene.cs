@@ -150,26 +150,25 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                     },
                 };
 
-                Carousel.Filter(new FilterCriteria());
+                // Prefer title sorting so that order of carousel panels match order of BeatmapSets bindable.
+                Carousel.Filter(new FilterCriteria { Sort = SortMode.Title });
             });
-
-            // Prefer title sorting so that order of carousel panels match order of BeatmapSets bindable.
-            SortBy(SortMode.Title);
         }
 
-        protected void SortBy(SortMode mode) => ApplyToFilter($"sort by {mode.GetDescription().ToLowerInvariant()}", c => c.Sort = mode);
-        protected void GroupBy(GroupMode mode) => ApplyToFilter($"group by {mode.GetDescription().ToLowerInvariant()}", c => c.Group = mode);
+        protected void SortBy(SortMode mode) => ApplyToFilterAndWaitForFilter($"sort by {mode.GetDescription().ToLowerInvariant()}", c => c.Sort = mode);
+
+        protected void GroupBy(GroupMode mode) => ApplyToFilterAndWaitForFilter($"group by {mode.GetDescription().ToLowerInvariant()}", c => c.Group = mode);
 
         protected void SortAndGroupBy(SortMode sort, GroupMode group)
         {
-            ApplyToFilter($"sort by {sort.GetDescription().ToLowerInvariant()} & group by {group.GetDescription().ToLowerInvariant()}", c =>
+            ApplyToFilterAndWaitForFilter($"sort by {sort.GetDescription().ToLowerInvariant()} & group by {group.GetDescription().ToLowerInvariant()}", c =>
             {
                 c.Sort = sort;
                 c.Group = group;
             });
         }
 
-        protected void ApplyToFilter(string description, Action<FilterCriteria>? apply)
+        protected void ApplyToFilterAndWaitForFilter(string description, Action<FilterCriteria>? apply)
         {
             AddStep(description, () =>
             {
@@ -177,6 +176,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 apply?.Invoke(criteria);
                 Carousel.Filter(criteria);
             });
+
+            WaitForFiltering();
         }
 
         protected void WaitForDrawablePanels() => AddUntilStep("drawable panels loaded", () => Carousel.ChildrenOfType<ICarouselPanel>().Count(), () => Is.GreaterThan(0));

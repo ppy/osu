@@ -196,8 +196,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [Test]
         public void TestBasicFiltering()
         {
-            ApplyToFilter("filter", c => c.SearchText = BeatmapSets[2].Metadata.Title);
-            WaitForFiltering();
+            ApplyToFilterAndWaitForFilter("filter", c => c.SearchText = BeatmapSets[2].Metadata.Title);
 
             CheckDisplayedGroupsCount(3);
             CheckDisplayedBeatmapsCount(3);
@@ -218,8 +217,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             WaitForBeatmapSelection(1, 0);
 
-            ApplyToFilter("remove filter", c => c.SearchText = string.Empty);
-            WaitForFiltering();
+            ApplyToFilterAndWaitForFilter("remove filter", c => c.SearchText = string.Empty);
 
             CheckDisplayedGroupsCount(3);
             CheckDisplayedBeatmapsCount(30);
@@ -240,7 +238,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddAssert("expanded group is first", () => (Carousel.ExpandedGroup as StarDifficultyGroupDefinition)?.Difficulty.Stars, () => Is.EqualTo(0));
 
             // doesn't actually filter anything away, but triggers a filter.
-            ApplyToFilter("filter", c => c.SearchText = "Some");
+            ApplyToFilterAndWaitForFilter("filter", c => c.SearchText = "Some");
 
             AddAssert("expanded group is still first", () => (Carousel.ExpandedGroup as StarDifficultyGroupDefinition)?.Difficulty.Stars, () => Is.EqualTo(0));
         }

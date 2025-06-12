@@ -290,7 +290,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             WaitForDrawablePanels();
 
             SortAndGroupBy(SortMode.Difficulty, GroupMode.None);
-            WaitForFiltering();
 
             AddUntilStep("standalone panels displayed", () => GetVisiblePanels<PanelBeatmapStandalone>().Any());
 
@@ -314,7 +313,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             WaitForDrawablePanels();
 
             SortBy(SortMode.Difficulty);
-            WaitForFiltering();
 
             AddUntilStep("standalone panels displayed", () => GetVisiblePanels<PanelBeatmapStandalone>().Count(), () => Is.EqualTo(3));
 

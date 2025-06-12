@@ -172,7 +172,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             Guid[] originalOrder = null!;
 
             SortBy(SortMode.Artist);
-            WaitForFiltering();
 
             AddAssert("Items in descending added order", () => Carousel.PostFilterBeatmaps.Select(b => b.BeatmapSet!.DateAdded), () => Is.Ordered.Descending);
             AddStep("Save order", () => originalOrder = Carousel.PostFilterBeatmaps.Select(b => b.ID).ToArray());
@@ -188,7 +187,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddAssert("Order didn't change", () => Carousel.PostFilterBeatmaps.Select(b => b.ID), () => Is.EqualTo(originalOrder));
 
             SortBy(SortMode.Title);
-            WaitForFiltering();
 
             AddAssert("Order didn't change", () => Carousel.PostFilterBeatmaps.Select(b => b.ID), () => Is.EqualTo(originalOrder));
         }
@@ -225,7 +223,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             Guid[] originalOrder = null!;
 
             SortBy(SortMode.Artist);
-            WaitForFiltering();
 
             AddAssert("Items in descending added order", () => Carousel.PostFilterBeatmaps.Select(b => b.BeatmapSet!.DateAdded), () => Is.Ordered.Descending);
             AddStep("Save order", () => originalOrder = Carousel.PostFilterBeatmaps.Select(b => b.ID).ToArray());
@@ -252,7 +249,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddAssert("Order didn't change", () => Carousel.PostFilterBeatmaps.Select(b => b.ID), () => Is.EqualTo(originalOrder));
 
             SortBy(SortMode.Title);
-            WaitForFiltering();
 
             AddAssert("Order didn't change", () => Carousel.PostFilterBeatmaps.Select(b => b.ID), () => Is.EqualTo(originalOrder));
         }
