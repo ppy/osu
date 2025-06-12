@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
+using osu.Game.Localisation.SkinComponents;
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Skinning;
 using osuTK;
@@ -27,7 +28,7 @@ namespace osu.Game.Screens.Play.HUD
 
         public DrawableGameplayLeaderboardScore? TrackedScore { get; private set; }
 
-        [SettingSource("Collapse during gameplay", "If enabled, the leaderboard will become more compact during active gameplay.")]
+        [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.CollapseDuringGameplay), nameof(SkinnableComponentStrings.CollapseDuringGameplayDescription))]
         public Bindable<bool> CollapseDuringGameplay { get; } = new BindableBool(true);
 
         [Resolved]
