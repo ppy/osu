@@ -436,8 +436,8 @@ namespace osu.Game.Overlays.SkinEditor
 
             headerText.Clear();
 
-            headerText.AddParagraph(SkinEditorStrings.SkinEditor, cp => cp.Font = OsuFont.Default.With(size: 16));
-            headerText.NewParagraph();
+            headerText.AddText(SkinEditorStrings.SkinEditor, cp => cp.Font = OsuFont.Default.With(size: 16));
+            headerText.NewLine();
             headerText.AddText(SkinEditorStrings.CurrentlyEditing, cp =>
             {
                 cp.Font = OsuFont.Default.With(size: 12);
