@@ -65,9 +65,6 @@ namespace osu.Game.Graphics.Containers
         }
 
         /// <summary>
-        /// Stops the logo assigned in <see cref="StartTracking"/> from tracking the facade's position.
-        /// </summary>
-        /// <summary>
         /// Gets the position that the logo should move to with respect to the <see cref="LogoFacade"/>.
         /// Manually performs a conversion of the Facade's position to the Logo's parent's relative space.
         /// </summary>
