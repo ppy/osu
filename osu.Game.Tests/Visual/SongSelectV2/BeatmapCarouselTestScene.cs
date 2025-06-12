@@ -273,16 +273,16 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
         protected void WaitForSetSelection(int set, int? diff = null)
         {
-            AddUntilStep($"selected is set{set}{(diff.HasValue ? $" diff{diff.Value}" : "")}", () =>
+            if (diff != null)
             {
-                if (diff != null)
-                {
-                    return (Carousel.CurrentSelection as BeatmapInfo)?
-                        .Equals(BeatmapSets[set].Beatmaps[diff.Value]) == true;
-                }
-
-                return BeatmapSets[set].Beatmaps.Contains(Carousel.CurrentSelection);
-            });
+                AddUntilStep($"selected is set{set} diff{diff.Value}",
+                    () => (Carousel.CurrentSelection as BeatmapInfo),
+                    () => Is.EqualTo(BeatmapSets[set].Beatmaps[diff.Value]));
+            }
+            else
+            {
+                AddUntilStep($"selected is set{set}", () => BeatmapSets[set].Beatmaps.Contains(Carousel.CurrentSelection));
+            }
         }
 
         protected IEnumerable<T> GetVisiblePanels<T>()
