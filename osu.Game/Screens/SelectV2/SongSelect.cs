@@ -16,6 +16,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Input.StateChanges;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
@@ -93,6 +94,7 @@ namespace osu.Game.Screens.SelectV2
         private BeatmapDetailsArea detailsArea = null!;
         private FillFlowContainer wedgesContainer = null!;
         private Box rightGradientBackground = null!;
+        private Container mainContent = null!;
 
         private NoResultsPlaceholder noResultsPlaceholder = null!;
 
@@ -130,14 +132,10 @@ namespace osu.Game.Screens.SelectV2
             AddRangeInternal(new Drawable[]
             {
                 new GlobalScrollAdjustsVolume(),
-                new Box
+                mainContent = new Container
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Width = 0.6f,
-                    Colour = ColourInfo.GradientHorizontal(Color4.Black.Opacity(0.3f), Color4.Black.Opacity(0f)),
-                },
-                new Container
-                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both,
                     Padding = new MarginPadding { Bottom = ScreenFooter.HEIGHT },
                     Child = new OsuContextMenuContainer
@@ -148,6 +146,12 @@ namespace osu.Game.Screens.SelectV2
                             RelativeSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
+                                new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Width = 0.6f,
+                                    Colour = ColourInfo.GradientHorizontal(Color4.Black.Opacity(0.3f), Color4.Black.Opacity(0f)),
+                                },
                                 new GridContainer // used for max width implementation
                                 {
                                     RelativeSizeAxes = Axes.Both,
@@ -575,6 +579,8 @@ namespace osu.Game.Screens.SelectV2
 
         private void onLeavingScreen()
         {
+            restoreBackground();
+
             modSelectOverlay.SelectedMods.UnbindFrom(Mods);
             modSelectOverlay.Beatmap.UnbindFrom(Beatmap);
 
@@ -724,7 +730,67 @@ namespace osu.Game.Screens.SelectV2
 
         #endregion
 
-        #region Hotkeys
+        #region Input
+
+        private ScheduledDelegate? revealingBackground;
+
+        protected override bool OnMouseDown(MouseDownEvent e)
+        {
+            var containingInputManager = GetContainingInputManager();
+
+            // I don't know why this works, but it does.
+            // If the carousel panels are hovered, hovered no longer contains the screen.
+            // Maybe there's a better way of doing this, but I couldn't immediately find a good setup.
+            bool mouseDownPriority = containingInputManager!.HoveredDrawables.Contains(this);
+
+            // Touch input synthesises right clicks, which allow absolute scroll of the carousel.
+            // For simplicity, disable this functionality on mobile.
+            bool isTouchInput = e.CurrentState.Mouse.LastSource is ISourcedFromTouch;
+
+            if (e.Button == MouseButton.Left && !isTouchInput && mouseDownPriority)
+            {
+                revealingBackground = Scheduler.AddDelayed(() =>
+                {
+                    if (containingInputManager.DraggedDrawable != null)
+                    {
+                        revealingBackground = null;
+                        return;
+                    }
+
+                    mainContent.ResizeWidthTo(1.2f, 600, Easing.OutQuint);
+                    mainContent.ScaleTo(1.2f, 600, Easing.OutQuint);
+                    mainContent.FadeOut(200, Easing.OutQuint);
+
+                    Footer?.Hide();
+                }, 200);
+            }
+
+            return base.OnMouseDown(e);
+        }
+
+        protected override void OnMouseUp(MouseUpEvent e)
+        {
+            restoreBackground();
+            base.OnMouseUp(e);
+        }
+
+        private void restoreBackground()
+        {
+            if (revealingBackground == null)
+                return;
+
+            if (revealingBackground.State == ScheduledDelegate.RunState.Complete)
+            {
+                mainContent.ResizeWidthTo(1f, 500, Easing.OutQuint);
+                mainContent.ScaleTo(1, 500, Easing.OutQuint);
+                mainContent.FadeIn(500, Easing.OutQuint);
+
+                Footer?.Show();
+            }
+
+            revealingBackground.Cancel();
+            revealingBackground = null;
+        }
 
         public virtual bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
