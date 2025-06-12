@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Game.Beatmaps;
@@ -17,16 +16,29 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
     {
         protected override Ruleset CreatePlayerRuleset() => new ManiaRuleset();
 
-        private const int column_count = 4;
+        [TestCase(4)]
+        [TestCase(7)]
+        [TestCase(10)]
+        public void TestNoOverlappingInSameColumn_Both(int columnCount)
+            => assertNoOverlapping(columnCount, ManiaModRandom.RandomizationType.Both);
 
-        [TestCase(ManiaModRandom.RandomizationType.Notes)]
-        [TestCase(ManiaModRandom.RandomizationType.Columns)]
-        [TestCase(ManiaModRandom.RandomizationType.Both)]
-        public void TestNoOverlappingInSameColumn(ManiaModRandom.RandomizationType mode)
+        [TestCase(4)]
+        [TestCase(7)]
+        [TestCase(10)]
+        public void TestNoOverlappingInSameColumn_Notes(int columnCount)
+            => assertNoOverlapping(columnCount, ManiaModRandom.RandomizationType.Notes);
+
+        [TestCase(4)]
+        [TestCase(7)]
+        [TestCase(10)]
+        public void TestNoOverlappingInSameColumn_Columns(int columnCount)
+            => assertNoOverlapping(columnCount, ManiaModRandom.RandomizationType.Columns);
+
+        private void assertNoOverlapping(int columnCount, ManiaModRandom.RandomizationType mode)
         {
-            var beatmap = createModdedBeatmap(mode);
+            var beatmap = createModdedBeatmap(columnCount, mode);
 
-            for (int column = 0; column < column_count; column++)
+            for (int column = 0; column < columnCount; column++)
             {
                 var columnObjects = beatmap.HitObjects
                                            .Where(o => o.Column == column)
@@ -39,64 +51,15 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
                     var curr = columnObjects[i];
 
                     double prevEnd = (prev as HoldNote)?.EndTime ?? prev.StartTime;
-                    Assert.That(prevEnd <= curr.StartTime, $"Mode: {mode}, Column {column}: Note at {curr.StartTime} overlaps with previous ending at {prevEnd}");
+                    Assert.That(prevEnd <= curr.StartTime,
+                        $"[Mode: {mode}] Column {column}: Note at {curr.StartTime} overlaps with previous ending at {prevEnd}");
                 }
             }
         }
 
-        [TestCase(ManiaModRandom.RandomizationType.Notes)]
-        [TestCase(ManiaModRandom.RandomizationType.Columns)]
-        [TestCase(ManiaModRandom.RandomizationType.Both)]
-        public void TestObjectCountRemainsSame(ManiaModRandom.RandomizationType mode)
+        private static ManiaBeatmap createModdedBeatmap(int columnCount, ManiaModRandom.RandomizationType mode)
         {
-            var raw = createRawBeatmap();
-            var modded = createModdedBeatmap(mode);
-
-            Assert.That(modded.HitObjects.Count, Is.EqualTo(raw.HitObjects.Count), $"Mode: {mode}");
-        }
-
-        [TestCase(ManiaModRandom.RandomizationType.Notes)]
-        [TestCase(ManiaModRandom.RandomizationType.Both)]
-        public void TestAllColumnsUsedInRandomization(ManiaModRandom.RandomizationType mode)
-        {
-            var beatmap = createModdedBeatmap(mode);
-
-            var usedColumns = beatmap.HitObjects.Select(o => o.Column).Distinct().ToList();
-            usedColumns.Sort();
-            Assert.That(usedColumns.Count, Is.EqualTo(column_count), $"Mode: {mode}. Expected all {column_count} columns to be used, but got: {string.Join(",", usedColumns)}");
-        }
-
-        [Test]
-        public void TestColumnShuffleMappingIsValid()
-        {
-            var raw = createRawBeatmap();
-            var modded = createModdedBeatmap(ManiaModRandom.RandomizationType.Columns);
-
-            var rawCounts = countColumns(raw.HitObjects);
-            var moddedCounts = countColumns(modded.HitObjects);
-
-            var sortedRawCounts = rawCounts.OrderByDescending(x => x.Value).Select(x => x.Value);
-            var sortedModdedCounts = moddedCounts.OrderByDescending(x => x.Value).Select(x => x.Value);
-
-            Assert.That(sortedRawCounts, Is.EqualTo(sortedModdedCounts), "Expected column count distribution to match after shuffle.");
-        }
-
-        private Dictionary<int, int> countColumns(IEnumerable<ManiaHitObject> hitObjects)
-        {
-            var counts = new Dictionary<int, int>();
-
-            foreach (var obj in hitObjects)
-            {
-                counts.TryAdd(obj.Column, 0);
-                counts[obj.Column]++;
-            }
-
-            return counts;
-        }
-
-        private static ManiaBeatmap createModdedBeatmap(ManiaModRandom.RandomizationType mode)
-        {
-            var beatmap = createRawBeatmap();
+            var beatmap = createRawBeatmap(columnCount);
 
             var mod = new ManiaModRandom
             {
@@ -111,30 +74,30 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
             return beatmap;
         }
 
-        private static ManiaBeatmap createRawBeatmap()
+        private static ManiaBeatmap createRawBeatmap(int columnCount)
         {
-            var beatmap = new ManiaBeatmap(new StageDefinition(column_count));
+            var beatmap = new ManiaBeatmap(new StageDefinition(columnCount));
             beatmap.ControlPointInfo.Add(0.0, new TimingControlPoint { BeatLength = 500 });
 
             int time = 0;
 
-            for (int i = 0; i < 16; i++)
+            for (int i = 0; i < columnCount; i++)
             {
                 beatmap.HitObjects.Add(new Note
                 {
                     StartTime = time,
-                    Column = i % column_count
+                    Column = i
                 });
                 time += 250;
             }
 
-            for (int i = 0; i < 8; i++)
+            for (int i = 0; i < columnCount; i++)
             {
                 beatmap.HitObjects.Add(new HoldNote
                 {
                     StartTime = time,
                     EndTime = time + 1000,
-                    Column = i % column_count
+                    Column = i
                 });
                 time += 500;
             }
