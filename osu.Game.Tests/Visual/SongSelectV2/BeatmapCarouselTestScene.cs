@@ -183,10 +183,24 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         protected void WaitForFiltering() => AddUntilStep("filtering finished", () => Carousel.IsFiltering, () => Is.False);
         protected void WaitForScrolling() => AddUntilStep("scroll finished", () => Scroll.Current, () => Is.EqualTo(Scroll.Target));
 
+        protected void SelectNextGroup() => AddStep("select next group", () =>
+        {
+            InputManager.PressKey(Key.ShiftLeft);
+            InputManager.Key(Key.Right);
+            InputManager.ReleaseKey(Key.ShiftLeft);
+        });
+
+        protected void SelectPrevGroup() => AddStep("select prev group", () =>
+        {
+            InputManager.PressKey(Key.ShiftLeft);
+            InputManager.Key(Key.Left);
+            InputManager.ReleaseKey(Key.ShiftLeft);
+        });
+
         protected void SelectNextPanel() => AddStep("select next panel", () => InputManager.Key(Key.Down));
         protected void SelectPrevPanel() => AddStep("select prev panel", () => InputManager.Key(Key.Up));
-        protected void SelectNextGroup() => AddStep("select next group", () => InputManager.Key(Key.Right));
-        protected void SelectPrevGroup() => AddStep("select prev group", () => InputManager.Key(Key.Left));
+        protected void SelectNextSet() => AddStep("select next set", () => InputManager.Key(Key.Right));
+        protected void SelectPrevSet() => AddStep("select prev set", () => InputManager.Key(Key.Left));
 
         protected void Select() => AddStep("select", () => InputManager.Key(Key.Enter));
 
@@ -228,7 +242,21 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         protected ICarouselPanel? GetSelectedPanel() => Carousel.ChildrenOfType<ICarouselPanel>().SingleOrDefault(p => p.Selected.Value);
         protected ICarouselPanel? GetKeyboardSelectedPanel() => Carousel.ChildrenOfType<ICarouselPanel>().SingleOrDefault(p => p.KeyboardSelected.Value);
 
-        protected void WaitForGroupSelection(int group, int panel)
+        protected void WaitForExpandedGroup(int group)
+        {
+            AddUntilStep($"group {group} is expanded", () =>
+            {
+                var groupingFilter = Carousel.Filters.OfType<BeatmapCarouselFilterGrouping>().Single();
+
+                GroupDefinition g = groupingFilter.GroupItems.Keys.ElementAt(group);
+                // offset by one because the group itself is included in the items list.
+                CarouselItem item = groupingFilter.GroupItems[g].ElementAt(0);
+
+                return item.Model is GroupDefinition def && def == Carousel.ExpandedGroup;
+            });
+        }
+
+        protected void WaitForBeatmapSelection(int group, int panel)
         {
             AddUntilStep($"selected is group{group} panel{panel}", () =>
             {
@@ -243,7 +271,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             });
         }
 
-        protected void WaitForSelection(int set, int? diff = null)
+        protected void WaitForSetSelection(int set, int? diff = null)
         {
             AddUntilStep($"selected is set{set}{(diff.HasValue ? $" diff{diff.Value}" : "")}", () =>
             {

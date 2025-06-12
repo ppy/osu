@@ -94,9 +94,9 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [Test]
         public void TestSelectionHeld()
         {
-            SelectNextGroup();
+            SelectNextSet();
 
-            WaitForSelection(1, 0);
+            WaitForSetSelection(1, 0);
             AddAssert("selection is updateable beatmap", () => Carousel.CurrentSelection, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
             AddAssert("visible panel is updateable beatmap", () => GetSelectedPanel()?.Item?.Model, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
 
@@ -110,9 +110,9 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [Test] // Checks that we keep selection based on online ID where possible.
         public void TestSelectionHeldDifficultyNameChanged()
         {
-            SelectNextGroup();
+            SelectNextSet();
 
-            WaitForSelection(1, 0);
+            WaitForSetSelection(1, 0);
             AddAssert("selection is updateable beatmap", () => Carousel.CurrentSelection, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
             AddAssert("visible panel is updateable beatmap", () => GetSelectedPanel()?.Item?.Model, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
 
@@ -126,9 +126,9 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [Test] // Checks that we fallback to keeping selection based on difficulty name.
         public void TestSelectionHeldDifficultyOnlineIDChanged()
         {
-            SelectNextGroup();
+            SelectNextSet();
 
-            WaitForSelection(1, 0);
+            WaitForSetSelection(1, 0);
             AddAssert("selection is updateable beatmap", () => Carousel.CurrentSelection, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
             AddAssert("visible panel is updateable beatmap", () => GetSelectedPanel()?.Item?.Model, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
 
