@@ -432,6 +432,7 @@ namespace osu.Game.Screens.Menu
 
                             logo.ScaleTo(0.5f, 200, Easing.In);
 
+                            logoTracking?.Dispose();
                             logoTracking = logoTrackingContainer.StartTracking(logo, 200, Easing.In);
 
                             logoDelayedAction?.Cancel();
@@ -446,7 +447,10 @@ namespace osu.Game.Screens.Menu
 
                         default:
                             logo.ClearTransforms(targetMember: nameof(Position));
-                            logoTrackingContainer.StartTracking(logo, 0, Easing.In);
+
+                            logoTracking?.Dispose();
+                            logoTracking = logoTrackingContainer.StartTracking(logo, 0, Easing.In);
+
                             logo.ScaleTo(0.5f, 200, Easing.OutQuint);
                             break;
                     }
@@ -454,6 +458,7 @@ namespace osu.Game.Screens.Menu
                     break;
 
                 case ButtonSystemState.EnteringMode:
+                    logoTracking?.Dispose();
                     logoTracking = logoTrackingContainer.StartTracking(logo, lastState == ButtonSystemState.Initial ? MainMenu.FADE_OUT_DURATION : 0, Easing.InSine);
                     break;
             }
