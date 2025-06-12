@@ -45,7 +45,7 @@ namespace osu.Game.Graphics.Containers
                 throw new InvalidOperationException($"Cannot track an instance of {typeof(OsuLogo)} to multiple {typeof(LogoTrackingContainer)}s");
 
             if (logo.IsTracking)
-                throw new InvalidOperationException($"A previous tracking operation is still active. Dispose of its return value before starting a new tracking operation.");
+                throw new InvalidOperationException("A previous tracking operation is still active. Dispose of its return value before starting a new tracking operation.");
 
             Logo = logo;
             Logo.IsTracking = true;
