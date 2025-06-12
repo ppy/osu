@@ -1,10 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Drawing;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -42,13 +39,9 @@ namespace osu.Game.Tournament.Screens.Setup
         [Resolved]
         private TournamentSceneManager? sceneManager { get; set; }
 
-        private Bindable<Size> windowSize = null!;
-
         [BackgroundDependencyLoader]
-        private void load(FrameworkConfigManager frameworkConfig)
+        private void load()
         {
-            windowSize = frameworkConfig.GetBindable<Size>(FrameworkSetting.WindowedSize);
-
             InternalChildren = new Drawable[]
             {
                 new Box
@@ -129,15 +122,7 @@ namespace osu.Game.Tournament.Screens.Setup
                 {
                     Label = "Stream area resolution",
                     ButtonText = "Set height",
-                    Action = height =>
-                    {
-                        Size previousSize = windowSize.Value;
-                        Size newSize = new Size((int)(height * aspect_ratio / TournamentSceneManager.STREAM_AREA_WIDTH * TournamentSceneManager.REQUIRED_WIDTH), height);
-                        if (previousSize == newSize) return;
-
-                        windowSize.Value = newSize;
-                        AddInternal(new ResolutionConfirmationPopup(revertAction: () => windowSize.Value = previousSize));
-                    }
+                    Action = height => sceneManager?.SetHeight(height),
                 },
                 new LabelledSwitchButton
                 {
@@ -153,8 +138,6 @@ namespace osu.Game.Tournament.Screens.Setup
                 },
             };
         }
-
-        private const float aspect_ratio = 16f / 9f;
 
         protected override void Update()
         {
