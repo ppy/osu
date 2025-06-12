@@ -144,6 +144,7 @@ namespace osu.Game.Screens.Play
         private bool playerConsumed;
 
         private LogoTrackingContainer content = null!;
+        private IDisposable? logoTracking;
 
         private bool hideOverlays;
 
@@ -379,21 +380,26 @@ namespace osu.Game.Screens.Play
             Scheduler.AddDelayed(() =>
             {
                 if (this.IsCurrentScreen())
-                    content.StartTracking(logo, resuming ? 0 : 500, Easing.InOutExpo);
+                    logoTracking = content.StartTracking(logo, resuming ? 0 : 500, Easing.InOutExpo);
             }, resuming ? 0 : 250);
         }
 
         protected override void LogoExiting(OsuLogo logo)
         {
             base.LogoExiting(logo);
-            content.StopTracking();
+
+            logoTracking?.Dispose();
+            logoTracking = null;
+
             osuLogo = null;
         }
 
         protected override void LogoSuspending(OsuLogo logo)
         {
             base.LogoSuspending(logo);
-            content.StopTracking();
+
+            logoTracking?.Dispose();
+            logoTracking = null;
 
             logo
                 .FadeOut(CONTENT_OUT_DURATION / 2, Easing.OutQuint)
@@ -538,7 +544,8 @@ namespace osu.Game.Screens.Play
         protected virtual void ContentOut()
         {
             // Ensure the logo is no longer tracking before we scale the content
-            content.StopTracking();
+            logoTracking?.Dispose();
+            logoTracking = null;
 
             content.ScaleTo(0.7f, CONTENT_OUT_DURATION * 2, Easing.OutQuint);
             content.FadeOut(CONTENT_OUT_DURATION, Easing.OutQuint)
