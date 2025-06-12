@@ -199,6 +199,109 @@ namespace osu.Game.Tests.Visual.Online
             });
         }
 
+        [Test]
+        public void TestDeletedCommentNotVisible()
+        {
+            var bundle = getExampleComments();
+            bundle.Comments.Add(new Comment
+            {
+                Id = 1337,
+                LegacyName = "BadUser",
+                CreatedAt = DateTimeOffset.Now,
+                DeletedAt = DateTimeOffset.Now,
+            });
+            setUpCommentsResponse(bundle);
+            AddStep("show comments", () => commentsContainer.ShowComments(CommentableType.Beatmapset, 123));
+            AddUntilStep("comments shown", () => commentsContainer.ChildrenOfType<DrawableComment>().Any());
+
+            AddAssert("deleted comment not visible", () =>
+            {
+                var deleted = this.ChildrenOfType<DrawableComment>().Single(c => c.Comment.LegacyName == "BadUser");
+                return !deleted.IsPresent;
+            });
+        }
+
+        [Test]
+        public void TestRepliesOfDeletedCommentVisible()
+        {
+            var bundle = getExampleComments();
+
+            Comment deleted;
+
+            bundle.Comments.Add(deleted = new Comment
+            {
+                Id = 1337,
+                LegacyName = "BadUser",
+                CreatedAt = DateTimeOffset.Now,
+                DeletedAt = DateTimeOffset.Now,
+                RepliesCount = 1,
+            });
+
+            bundle.Comments.Add(new Comment
+            {
+                Id = 1338,
+                Message = "This is a reply to a deleted comment",
+                LegacyName = "GoodUser",
+                CreatedAt = DateTimeOffset.Now,
+                ParentId = deleted.Id,
+            });
+
+            setUpCommentsResponse(bundle);
+            AddStep("show comments", () => commentsContainer.ShowComments(CommentableType.Beatmapset, 123));
+            AddUntilStep("comments shown", () => commentsContainer.ChildrenOfType<DrawableComment>().Any());
+
+            AddAssert("deleted comment visible", () =>
+            {
+                var deletedDrawable = this.ChildrenOfType<DrawableComment>().Single(c => c.Comment.LegacyName == "BadUser");
+                return deletedDrawable.IsPresent;
+            });
+
+            AddAssert("reply comment visible", () =>
+            {
+                var replyDrawable = this.ChildrenOfType<DrawableComment>().Single(c => c.Comment.LegacyName == "GoodUser");
+                return replyDrawable.IsPresent;
+            });
+        }
+
+        [Test]
+        public void TestDeletedCommentWithDeletedRepliesStillNotVisible()
+        {
+            var bundle = getExampleComments();
+
+            Comment deleted;
+
+            bundle.Comments.Add(deleted = new Comment
+            {
+                Id = 1337,
+                LegacyName = "BadUser",
+                CreatedAt = DateTimeOffset.Now,
+                DeletedAt = DateTimeOffset.Now,
+                RepliesCount = 1,
+            });
+
+            bundle.Comments.Add(new Comment
+            {
+                Id = 1338,
+                Message = "This is a reply to a deleted comment",
+                LegacyName = "GoodUser",
+                CreatedAt = DateTimeOffset.Now,
+                DeletedAt = DateTimeOffset.Now,
+                ParentId = deleted.Id,
+            });
+
+            setUpCommentsResponse(bundle);
+            AddStep("show comments", () => commentsContainer.ShowComments(CommentableType.Beatmapset, 123));
+            AddUntilStep("comments shown", () => commentsContainer.ChildrenOfType<DrawableComment>().Any());
+
+            AddAssert("deleted comment not visible", () =>
+            {
+                var deletedDrawable = this.ChildrenOfType<DrawableComment>().Single(c => c.Comment.LegacyName == "BadUser");
+                return !deletedDrawable.IsPresent;
+            });
+
+            // we don't have to check IsPresent state of reply comment, since it's a child of the parent comment, which is already not present.
+        }
+
         private void setUpCommentsResponse(CommentBundle commentBundle)
             => AddStep("set up response", () =>
             {
