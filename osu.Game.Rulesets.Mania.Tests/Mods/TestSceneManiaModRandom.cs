@@ -19,12 +19,6 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
         [TestCase(4)]
         [TestCase(7)]
         [TestCase(10)]
-        public void TestNoOverlappingInSameColumn_Both(int columnCount)
-            => assertNoOverlapping(columnCount, ManiaModRandom.RandomizationType.Both);
-
-        [TestCase(4)]
-        [TestCase(7)]
-        [TestCase(10)]
         public void TestNoOverlappingInSameColumn_Notes(int columnCount)
             => assertNoOverlapping(columnCount, ManiaModRandom.RandomizationType.Notes);
 

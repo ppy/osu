@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Mania.Mods
             int availableColumns = maniaBeatmap.TotalColumns;
             var shuffledColumns = Enumerable.Range(0, availableColumns).OrderBy(_ => rng.Next()).ToList();
 
-            if (Randomizer.Value is RandomizationType.Notes or RandomizationType.Both)
+            if (Randomizer.Value == RandomizationType.Notes)
             {
                 double[] columnEndTimes = new double[availableColumns];
                 double lastStartTime = -1;
@@ -69,7 +69,7 @@ namespace osu.Game.Rulesets.Mania.Mods
                 maniaBeatmap.HitObjects = maniaBeatmap.HitObjects.OrderBy(h => h.StartTime).ToList();
             }
 
-            if (Randomizer.Value is RandomizationType.Columns or RandomizationType.Both)
+            if (Randomizer.Value == RandomizationType.Columns)
             {
                 beatmap.HitObjects.OfType<ManiaHitObject>().ForEach(h => h.Column = shuffledColumns[h.Column]);
             }
@@ -78,8 +78,7 @@ namespace osu.Game.Rulesets.Mania.Mods
         public enum RandomizationType
         {
             Columns,
-            Notes,
-            Both
+            Notes
         }
     }
 }
