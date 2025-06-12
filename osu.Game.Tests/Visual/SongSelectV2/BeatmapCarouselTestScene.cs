@@ -150,26 +150,25 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                     },
                 };
 
-                Carousel.Filter(new FilterCriteria());
+                // Prefer title sorting so that order of carousel panels match order of BeatmapSets bindable.
+                Carousel.Filter(new FilterCriteria { Sort = SortMode.Title });
             });
-
-            // Prefer title sorting so that order of carousel panels match order of BeatmapSets bindable.
-            SortBy(SortMode.Title);
         }
 
-        protected void SortBy(SortMode mode) => ApplyToFilter($"sort by {mode.GetDescription().ToLowerInvariant()}", c => c.Sort = mode);
-        protected void GroupBy(GroupMode mode) => ApplyToFilter($"group by {mode.GetDescription().ToLowerInvariant()}", c => c.Group = mode);
+        protected void SortBy(SortMode mode) => ApplyToFilterAndWaitForFilter($"sort by {mode.GetDescription().ToLowerInvariant()}", c => c.Sort = mode);
+
+        protected void GroupBy(GroupMode mode) => ApplyToFilterAndWaitForFilter($"group by {mode.GetDescription().ToLowerInvariant()}", c => c.Group = mode);
 
         protected void SortAndGroupBy(SortMode sort, GroupMode group)
         {
-            ApplyToFilter($"sort by {sort.GetDescription().ToLowerInvariant()} & group by {group.GetDescription().ToLowerInvariant()}", c =>
+            ApplyToFilterAndWaitForFilter($"sort by {sort.GetDescription().ToLowerInvariant()} & group by {group.GetDescription().ToLowerInvariant()}", c =>
             {
                 c.Sort = sort;
                 c.Group = group;
             });
         }
 
-        protected void ApplyToFilter(string description, Action<FilterCriteria>? apply)
+        protected void ApplyToFilterAndWaitForFilter(string description, Action<FilterCriteria>? apply)
         {
             AddStep(description, () =>
             {
@@ -177,6 +176,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 apply?.Invoke(criteria);
                 Carousel.Filter(criteria);
             });
+
+            WaitForFiltering();
         }
 
         protected void WaitForDrawablePanels() => AddUntilStep("drawable panels loaded", () => Carousel.ChildrenOfType<ICarouselPanel>().Count(), () => Is.GreaterThan(0));
@@ -273,16 +274,16 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
         protected void WaitForSetSelection(int set, int? diff = null)
         {
-            AddUntilStep($"selected is set{set}{(diff.HasValue ? $" diff{diff.Value}" : "")}", () =>
+            if (diff != null)
             {
-                if (diff != null)
-                {
-                    return (Carousel.CurrentSelection as BeatmapInfo)?
-                        .Equals(BeatmapSets[set].Beatmaps[diff.Value]) == true;
-                }
-
-                return BeatmapSets[set].Beatmaps.Contains(Carousel.CurrentSelection);
-            });
+                AddUntilStep($"selected is set{set} diff{diff.Value}",
+                    () => (Carousel.CurrentSelection as BeatmapInfo),
+                    () => Is.EqualTo(BeatmapSets[set].Beatmaps[diff.Value]));
+            }
+            else
+            {
+                AddUntilStep($"selected is set{set}", () => BeatmapSets[set].Beatmaps.Contains(Carousel.CurrentSelection));
+            }
         }
 
         protected IEnumerable<T> GetVisiblePanels<T>()
@@ -334,8 +335,12 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         /// <param name="randomMetadata">Whether to randomise the metadata to make groupings more uniform.</param>
         protected void AddBeatmaps(int count, int? fixedDifficultiesPerSet = null, bool randomMetadata = false) => AddStep($"add {count} beatmaps{(randomMetadata ? " with random data" : "")}", () =>
         {
+            var beatmaps = new List<BeatmapSetInfo>();
+
             for (int i = 0; i < count; i++)
-                BeatmapSets.Add(CreateTestBeatmapSetInfo(fixedDifficultiesPerSet, randomMetadata));
+                beatmaps.Add(CreateTestBeatmapSetInfo(fixedDifficultiesPerSet, randomMetadata));
+
+            BeatmapSets.AddRange(beatmaps);
         });
 
         protected static BeatmapSetInfo CreateTestBeatmapSetInfo(int? fixedDifficultiesPerSet, bool randomMetadata)
