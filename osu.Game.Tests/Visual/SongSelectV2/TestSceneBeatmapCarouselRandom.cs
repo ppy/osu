@@ -24,8 +24,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         {
             AddBeatmaps(2, 10, true);
 
-            ApplyToFilter("filter", c => c.SearchText = BeatmapSets[0].Beatmaps.Last().DifficultyName);
-            WaitForFiltering();
+            ApplyToFilterAndWaitForFilter("filter", c => c.SearchText = BeatmapSets[0].Beatmaps.Last().DifficultyName);
 
             CheckDisplayedBeatmapSetsCount(1);
             CheckDisplayedBeatmapsCount(1);

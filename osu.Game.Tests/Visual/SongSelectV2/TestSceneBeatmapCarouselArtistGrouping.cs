@@ -217,8 +217,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [Test]
         public void TestBasicFiltering()
         {
-            ApplyToFilter("filter", c => c.SearchText = BeatmapSets[2].Metadata.Title);
-            WaitForFiltering();
+            ApplyToFilterAndWaitForFilter("filter", c => c.SearchText = BeatmapSets[2].Metadata.Title);
 
             CheckDisplayedGroupsCount(1);
             CheckDisplayedBeatmapSetsCount(1);
@@ -237,8 +236,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             WaitForBeatmapSelection(0, 3);
 
-            ApplyToFilter("remove filter", c => c.SearchText = string.Empty);
-            WaitForFiltering();
+            ApplyToFilterAndWaitForFilter("remove filter", c => c.SearchText = string.Empty);
 
             CheckDisplayedGroupsCount(5);
             CheckDisplayedBeatmapSetsCount(10);
