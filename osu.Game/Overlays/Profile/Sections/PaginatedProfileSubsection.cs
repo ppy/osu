@@ -60,7 +60,6 @@ namespace osu.Game.Overlays.Profile.Sections
             Direction = FillDirection.Vertical,
             Children = new Drawable[]
             {
-                new DelayedLoadUnloadWrapper(() => new OnScreenIndicator(subsectionOnScreen)),
                 // reverse ID flow is required for correct Z-ordering of the items (last item should be front-most).
                 // particularly important in PaginatedBeatmapContainer, as it uses beatmap cards, which have expandable overhanging content.
                 ItemsContainer = new ReverseChildIDFillFlowContainer<Drawable>
@@ -94,8 +93,6 @@ namespace osu.Game.Overlays.Profile.Sections
             User.BindValueChanged(onUserChanged, true);
         }
 
-        private bool pendingRequestOnVisibility;
-
         private void onUserChanged(ValueChangedEvent<UserProfileData?> e)
         {
             loadCancellation?.Cancel();
@@ -106,20 +103,26 @@ namespace osu.Game.Overlays.Profile.Sections
 
             if (e.NewValue?.User != null)
             {
-                pendingRequestOnVisibility = true;
+                showMoreWhenOnScreen();
                 SetCount(GetCount(e.NewValue.User));
             }
         }
 
-        /// <summary>
-        /// Invoked when this subsection became visible on the screen (i.e. not masked away).
-        /// </summary>
-        private void subsectionOnScreen()
-        {
-            if (pendingRequestOnVisibility)
-                showMore();
+        private DelayedLoadWrapper? onScreenWrapper;
 
-            pendingRequestOnVisibility = false;
+        /// <summary>
+        /// Invokes <see cref="showMore"/> when the subsection is visible to the user for enough time.
+        /// This works by adding a temporary <see cref="DelayedLoadWrapper"/> with a component that, once loaded, invokes the <see cref="showMore"/> method.
+        /// </summary>
+        private void showMoreWhenOnScreen()
+        {
+            onScreenWrapper?.RemoveAndDisposeImmediately();
+            onScreenWrapper = new DelayedLoadWrapper(() => new OnScreenIndicator
+            {
+                BecameOnScreen = showMore,
+            });
+
+            AddInternal(onScreenWrapper);
         }
 
         private void showMore()
@@ -185,19 +188,18 @@ namespace osu.Game.Overlays.Profile.Sections
             base.Dispose(isDisposing);
         }
 
+        /// <summary>
+        /// Temporary component that should be wrapped inside a <see cref="DelayedLoadWrapper"/>
+        /// so that the given action is invoked when this subsection is visible to the user.
+        /// </summary>
         private partial class OnScreenIndicator : Component
         {
-            private readonly Action subsectionOnScreen;
-
-            public OnScreenIndicator(Action subsectionOnScreen)
-            {
-                this.subsectionOnScreen = subsectionOnScreen;
-            }
+            public required Action BecameOnScreen { get; init; }
 
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                subsectionOnScreen();
+                BecameOnScreen();
             }
         }
     }
