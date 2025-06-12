@@ -334,8 +334,12 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         /// <param name="randomMetadata">Whether to randomise the metadata to make groupings more uniform.</param>
         protected void AddBeatmaps(int count, int? fixedDifficultiesPerSet = null, bool randomMetadata = false) => AddStep($"add {count} beatmaps{(randomMetadata ? " with random data" : "")}", () =>
         {
+            var beatmaps = new List<BeatmapSetInfo>();
+
             for (int i = 0; i < count; i++)
-                BeatmapSets.Add(CreateTestBeatmapSetInfo(fixedDifficultiesPerSet, randomMetadata));
+                beatmaps.Add(CreateTestBeatmapSetInfo(fixedDifficultiesPerSet, randomMetadata));
+
+            BeatmapSets.AddRange(beatmaps);
         });
 
         protected static BeatmapSetInfo CreateTestBeatmapSetInfo(int? fixedDifficultiesPerSet, bool randomMetadata)
