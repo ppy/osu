@@ -76,6 +76,8 @@ namespace osu.Game.Screens.Play.HUD
                         rankUpSample.Play();
                     else
                         rankDownSample.Play();
+
+                    lastSamplePlaybackTime.Value = Time.Current;
                 }
 
                 rankDisplay.Rank = r.NewValue;
