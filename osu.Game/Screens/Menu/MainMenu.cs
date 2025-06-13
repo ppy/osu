@@ -503,7 +503,7 @@ namespace osu.Game.Screens.Menu
 
         private void loadPreferredSongSelect()
         {
-            if (config.GetBindable<bool>(OsuSetting.OsuSetting.SongSelectV2))
+            if (OsuConfigManager.config.GetBindable<bool>(OsuSetting.SongSelectV2))
             {
                 if (holdTime >= required_hold_time)
                     this.Push(new PlaySongSelect());
