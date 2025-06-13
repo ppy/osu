@@ -115,6 +115,7 @@ namespace osu.Game.Screens.Menu
         private MenuTipDisplay menuTipDisplay;
         private FillFlowContainer bottomElementsFlow;
         private SupporterDisplay supporterDisplay;
+        private Bindable<bool> songSelectV2;
 
         private Sample reappearSampleSwoosh;
 
@@ -124,6 +125,7 @@ namespace osu.Game.Screens.Menu
         [BackgroundDependencyLoader(true)]
         private void load(BeatmapListingOverlay beatmapListing, SettingsOverlay settings, OsuConfigManager config, SessionStatics statics, AudioManager audio)
         {
+            songSelectV2 = config.GetBindable<bool>(OsuSetting.SongSelectV2);
             holdDelay = config.GetBindable<double>(OsuSetting.UIHoldActivationDelay);
             loginDisplayed = statics.GetBindable<bool>(Static.LoginOverlayDisplayed);
             showMobileDisclaimer = config.GetBindable<bool>(OsuSetting.ShowMobileDisclaimer);
@@ -501,9 +503,11 @@ namespace osu.Game.Screens.Menu
         [CanBeNull]
         private IDisposable logoProxy;
 
+
         private void loadPreferredSongSelect()
         {
-            if (OsuConfigManager.config.GetBindable<bool>(OsuSetting.SongSelectV2))
+            if (songSelectV2.Value)
+
             {
                 if (holdTime >= required_hold_time)
                     this.Push(new PlaySongSelect());
