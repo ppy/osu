@@ -3,6 +3,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -265,11 +266,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 Id = id,
                 Username = username,
                 CountryCode = country,
-                Statistics = new UserStatistics
+                RulesetsStatistics = new Dictionary<string, UserStatistics>
                 {
-                    GlobalRank = rank,
-                    PP = rank.HasValue ? 10000 - rank.Value : 0,
-                    RankedScore = 1000000
+                    ["osu"] = new UserStatistics
+                    {
+                        GlobalRank = rank,
+                        PP = rank.HasValue ? 10000 - rank.Value : 0,
+                        RankedScore = 1000000
+                    }
                 }
             };
             // Add to room

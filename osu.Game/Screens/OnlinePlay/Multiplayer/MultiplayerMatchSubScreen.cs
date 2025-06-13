@@ -154,13 +154,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
             sampleStart = audio.Samples.Get(@"SongSelect/confirm-selection");
 
-            participantsSortControl = new MultiplayerParticipantsSortTabControl
-            {
-                Anchor = Anchor.TopLeft,
-                Origin = Anchor.TopLeft,
-                Margin = new MarginPadding { Bottom = 10 }
-            };
-
             InternalChild = new OsuContextMenuContainer
             {
                 RelativeSizeAxes = Axes.Both,
@@ -246,7 +239,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                                                         },
                                                                         new Drawable[]
                                                                         {
-                                                                            participantsSortControl
+                                                                            participantsSortControl = new MultiplayerParticipantsSortTabControl
+                                                                            {
+                                                                                Anchor = Anchor.TopLeft,
+                                                                                Origin = Anchor.TopLeft,
+                                                                                Margin = new MarginPadding { Bottom = 10 }
+                                                                            }
                                                                         },
                                                                         new Drawable[]
                                                                         {
@@ -254,7 +252,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                                                             {
                                                                                 RelativeSizeAxes = Axes.Both
                                                                             }
-                                                                        }
+                                                                        },
                                                                     }
                                                                 },
                                                                 null,
@@ -435,8 +433,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             beatmapAvailabilityTracker.Availability.BindValueChanged(onBeatmapAvailabilityChanged, true);
 
-            participantsSortControl.Current.BindValueChanged(_ => updateParticipantsSort(), true);
-            participantsSortControl.SortDirection.BindValueChanged(_ => updateParticipantsSort(), true);
+            participantsList.SortMode.BindTo(participantsSortControl.Current);
+            participantsList.SortDirection.BindTo(participantsSortControl.SortDirection);
 
             onRoomUpdated();
             updateGameplayState();
@@ -916,20 +914,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 client.UserModsChanged -= onUserModsChanged;
                 client.LoadRequested -= onLoadRequested;
             }
-        }
-        private void updateParticipantsSort()
-        {
-            if (client.Room == null)
-                return;
-
-            if (participantsList == null)
-                return;
-
-            // Pass the current sort mode and direction to the participants list
-            participantsList.UpdateParticipants(
-                participantsSortControl.Current.Value,
-                participantsSortControl.SortDirection.Value
-            );
         }
 
         public partial class AddItemButton : PurpleRoundedButton

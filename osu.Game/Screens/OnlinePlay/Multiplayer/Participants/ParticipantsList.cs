@@ -10,7 +10,9 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
+using osu.Game.Rulesets;
 using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
@@ -19,11 +21,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
     {
         private BindableList<MultiplayerRoomUser> participants => RowData;
         private MultiplayerRoomUser? currentHost;
-        private ParticipantsSortMode? currentSortMode;
-        private SortDirection? currentSortDirection;
+        public readonly Bindable<ParticipantsSortMode> SortMode = new Bindable<ParticipantsSortMode>();
+        public readonly Bindable<SortDirection> SortDirection = new Bindable<SortDirection>();
 
         [Resolved]
         private MultiplayerClient client { get; set; } = null!;
+
+        [Resolved]
+        private IRulesetStore rulesets { get; set; } = null!;
 
         public ParticipantsList()
             : base(ParticipantPanel.HEIGHT, initialPoolSize: 20)
@@ -40,6 +45,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
             base.LoadComplete();
 
             client.RoomUpdated += onRoomUpdated;
+
+            SortMode.BindValueChanged(_ => updateParticipants());
+            SortDirection.BindValueChanged(_ => updateParticipants());
+
             updateState();
         }
 
@@ -81,35 +90,24 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                     }
                 }
 
-                UpdateParticipants();
+                updateParticipants();
             }
         }
+
         /// <summary>
         /// Reorders existing panels based on sort criteria.
         /// </summary>
-        /// <param name="sortMode">Optional sort mode to apply and store for future updates</param>
-        /// <param name="sortDirection">Optional sort direction to apply and store for future updates</param>
-        public void UpdateParticipants(ParticipantsSortMode? sortMode = null, SortDirection? sortDirection = null)
+        private void updateParticipants()
         {
             if (client.Room == null)
                 return;
 
-            // Update stored sort settings if provided
-            if (sortMode.HasValue)
-                currentSortMode = sortMode.Value;
-            if (sortDirection.HasValue)
-                currentSortDirection = sortDirection.Value;
-
-            // Only reorder if we have sort settings
-            if (!currentSortMode.HasValue || !currentSortDirection.HasValue)
-                return;
-
             IList<MultiplayerRoomUser> sortedUsers = client.Room.Users.ToList();
 
-            switch (currentSortMode.Value)
+            switch (SortMode.Value)
             {
                 case ParticipantsSortMode.Alphabetical:
-                    sortedUsers = currentSortDirection.Value == SortDirection.Ascending
+                    sortedUsers = SortDirection.Value == Overlays.SortDirection.Ascending
                         ? sortedUsers.OrderBy(u => u.User!.Username).ToList()
                         : sortedUsers.OrderByDescending(u => u.User!.Username).ToList();
                     break;
@@ -119,9 +117,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                     break;
 
                 case ParticipantsSortMode.Rank:
-                    sortedUsers = currentSortDirection.Value == SortDirection.Ascending
-                        ? sortedUsers.OrderBy(u => u.User!.Statistics?.GlobalRank ?? int.MaxValue).ToList()
-                        : sortedUsers.OrderByDescending(u => u.User!.Statistics?.GlobalRank ?? int.MaxValue).ToList();
+                    sortedUsers = sortByRankForCurrentRuleset(sortedUsers);
                     break;
             }
             // Reorder existing participants to match the sorted user list
@@ -145,17 +141,18 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                 }
             }
         }
+
         /// <summary>
         /// Sorts users by country first, then by rank within each country (best rank first).
         /// </summary>
         private IList<MultiplayerRoomUser> sortByCountryWithRankSecondary(IList<MultiplayerRoomUser> users)
         {
-            if (currentSortDirection!.Value == SortDirection.Ascending)
+            if (SortDirection.Value == Overlays.SortDirection.Ascending)
             {
                 return users
                     .GroupBy(u => u.User!.CountryCode.ToString())
                     .OrderBy(g => g.Key)
-                    .SelectMany(g => g.OrderBy(u => u.User!.Statistics?.GlobalRank ?? int.MaxValue))
+                    .SelectMany(g => g.OrderBy(u => getCurrentRulesetRank(u)))
                     .ToList();
             }
             else
@@ -163,9 +160,42 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                 return users
                     .GroupBy(u => u.User!.CountryCode.ToString())
                     .OrderByDescending(g => g.Key)
-                    .SelectMany(g => g.OrderBy(u => u.User!.Statistics?.GlobalRank ?? int.MaxValue))
+                    .SelectMany(g => g.OrderBy(u => getCurrentRulesetRank(u)))
                     .ToList();
             }
+        }
+
+        /// <summary>
+        /// Sorts users by their rank in the current ruleset.
+        /// </summary>
+        private IList<MultiplayerRoomUser> sortByRankForCurrentRuleset(IList<MultiplayerRoomUser> users)
+        {
+            if (SortDirection.Value == Overlays.SortDirection.Ascending)
+            {
+                return users.OrderBy(u => getCurrentRulesetRank(u)).ToList();
+            }
+            else
+            {
+                return users.OrderByDescending(u => getCurrentRulesetRank(u)).ToList();
+            }
+        }
+
+        /// <summary>
+        /// Gets the current ruleset rank for a user, similar to how ParticipantPanel does it.
+        /// </summary>
+        private int getCurrentRulesetRank(MultiplayerRoomUser user)
+        {
+            if (client.Room?.GetCurrentItem() is not MultiplayerPlaylistItem currentItem)
+                return int.MaxValue;
+
+            int userRulesetId = user.RulesetId ?? currentItem.RulesetID;
+            Ruleset? userRuleset = rulesets.GetRuleset(userRulesetId)?.CreateInstance();
+
+            if (userRuleset == null)
+                return int.MaxValue;
+
+            int? currentModeRank = user.User?.RulesetsStatistics?.GetValueOrDefault(userRuleset.ShortName)?.GlobalRank;
+            return currentModeRank ?? int.MaxValue;
         }
 
         protected override void Dispose(bool isDisposing)
