@@ -13,7 +13,10 @@
       "osu.Game.Tests.iOS\\osu.Game.Tests.iOS.csproj",
       "osu.Game.Tests\\osu.Game.Tests.csproj",
       "osu.Game\\osu.Game.csproj",
-      "osu.iOS\\osu.iOS.csproj"
+      "osu.iOS\\osu.iOS.csproj",
+      "../osu-framework/osu.Framework/osu.Framework.csproj",
+      "../osu-framework/osu.Framework.NativeLibs/osu.Framework.NativeLibs.csproj",
+      "../osu-framework/osu.Framework.iOS/osu.Framework.iOS.csproj"
     ]
   }
 }
