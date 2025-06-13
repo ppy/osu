@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework;
 using osu.Framework.Allocation;
@@ -43,8 +44,6 @@ namespace osu.Game.Updater
         protected IBindable<ReleaseStream> ReleaseStream => releaseStream;
 
         private readonly Bindable<ReleaseStream> releaseStream = new Bindable<ReleaseStream>();
-        private bool updateCheckRequested;
-        private Task<bool> updateCheckTask = Task.FromResult(false);
 
         protected override void LoadComplete()
         {
@@ -68,41 +67,12 @@ namespace osu.Game.Updater
             config.SetValue(OsuSetting.Version, version);
 
             config.BindWith(OsuSetting.ReleaseStream, releaseStream);
-            releaseStream.BindValueChanged(_ => scheduleUpdateCheck());
+            releaseStream.BindValueChanged(_ => CheckForUpdateAsync());
 
-            scheduleUpdateCheck();
+            CheckForUpdateAsync();
         }
 
-        protected override void Update()
-        {
-            base.Update();
-            processScheduledUpdateCheck();
-        }
-
-        /// <summary>
-        /// Schedules a request to check for new updates to begin as soon as any existing check completes.
-        /// </summary>
-        private void scheduleUpdateCheck()
-        {
-            updateCheckRequested = true;
-        }
-
-        /// <summary>
-        /// Processes an ongoing request to check for new updates.
-        /// </summary>
-        private void processScheduledUpdateCheck()
-        {
-            if (!updateCheckRequested)
-                return;
-
-            if (!updateCheckTask.IsCompleted)
-                return;
-
-            if (CanCheckForUpdate)
-                updateCheckTask = PerformUpdateCheck();
-
-            updateCheckRequested = false;
-        }
+        private CancellationTokenSource? updateCheckCancellation;
 
         /// <summary>
         /// Immediately checks for any available updates, or returns the existing update task.
@@ -110,20 +80,22 @@ namespace osu.Game.Updater
         /// <returns><c>true</c> if any updates are available, <c>false</c> otherwise.</returns>
         public Task<bool> CheckForUpdateAsync()
         {
-            if (!updateCheckTask.IsCompleted)
-                return updateCheckTask;
-
-            scheduleUpdateCheck();
-            processScheduledUpdateCheck();
-
-            return updateCheckTask;
+            updateCheckCancellation?.Cancel();
+            updateCheckCancellation = new CancellationTokenSource();
+            return PerformUpdateCheck(updateCheckCancellation.Token);
         }
 
         /// <summary>
         /// Performs an asynchronous check for application updates.
         /// </summary>
         /// <returns>Whether any update is waiting. May return true if an error occured (there is potentially an update available).</returns>
-        protected virtual Task<bool> PerformUpdateCheck() => Task.FromResult(false);
+        protected virtual Task<bool> PerformUpdateCheck(CancellationToken cancellationToken) => Task.FromResult(false);
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            updateCheckCancellation?.Cancel();
+        }
 
         private partial class UpdateCompleteNotification : SimpleNotification
         {
@@ -150,20 +122,14 @@ namespace osu.Game.Updater
             }
         }
 
-        public partial class UpdateApplicationCompleteNotification : ProgressCompletionNotification
+        public partial class UpdateDownloadProgressNotification : ProgressNotification
         {
-            public UpdateApplicationCompleteNotification()
-            {
-                Text = NotificationsStrings.UpdateReadyToInstall;
-            }
-        }
+            private readonly CancellationToken cancellationToken;
 
-        public partial class UpdateProgressNotification : ProgressNotification
-        {
-            protected override Notification CreateCompletionNotification() => new UpdateApplicationCompleteNotification
+            public UpdateDownloadProgressNotification(CancellationToken cancellationToken)
             {
-                Activated = CompletionClickAction
-            };
+                this.cancellationToken = cancellationToken;
+            }
 
             [BackgroundDependencyLoader]
             private void load()
@@ -182,24 +148,12 @@ namespace osu.Game.Updater
                 });
             }
 
-            protected override void LoadComplete()
+            protected override void Update()
             {
-                base.LoadComplete();
-                StartDownload();
-            }
+                base.Update();
 
-            public override void Close(bool runFlingAnimation)
-            {
-                // cancelling updates is not currently supported by the underlying updater.
-                // only allow dismissing for now.
-
-                switch (State)
-                {
-                    case ProgressNotificationState.Cancelled:
-                    case ProgressNotificationState.Completed:
-                        base.Close(runFlingAnimation);
-                        break;
-                }
+                if (cancellationToken.IsCancellationRequested)
+                    FailDownload();
             }
 
             public void StartDownload()
@@ -213,6 +167,55 @@ namespace osu.Game.Updater
             {
                 State = ProgressNotificationState.Cancelled;
                 Close(false);
+            }
+
+            protected override Notification CreateCompletionNotification() => new UpdateReadyNotification(cancellationToken)
+            {
+                Activated = () =>
+                {
+                    if (cancellationToken.IsCancellationRequested)
+                        return true;
+
+                    return CompletionClickAction?.Invoke() ?? true;
+                }
+            };
+        }
+
+        public partial class UpdateReadyNotification : ProgressCompletionNotification
+        {
+            private readonly CancellationToken cancellationToken;
+
+            public UpdateReadyNotification(CancellationToken cancellationToken)
+            {
+                this.cancellationToken = cancellationToken;
+                Text = NotificationsStrings.UpdateReadyToInstall;
+            }
+
+            protected override void Update()
+            {
+                base.Update();
+
+                if (cancellationToken.IsCancellationRequested)
+                    Close(false);
+            }
+        }
+
+        public partial class UpdateAvailableNotification : SimpleNotification
+        {
+            private readonly CancellationToken cancellationToken;
+
+            public UpdateAvailableNotification(CancellationToken cancellationToken)
+            {
+                this.cancellationToken = cancellationToken;
+                Icon = FontAwesome.Solid.Download;
+            }
+
+            protected override void Update()
+            {
+                base.Update();
+
+                if (cancellationToken.IsCancellationRequested)
+                    Close(false);
             }
         }
     }

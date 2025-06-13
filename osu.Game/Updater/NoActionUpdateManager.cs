@@ -3,12 +3,11 @@
 
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Configuration;
 using osu.Game.Online.API;
-using osu.Game.Overlays.Notifications;
 
 namespace osu.Game.Updater
 {
@@ -28,7 +27,7 @@ namespace osu.Game.Updater
             version = game.Version;
         }
 
-        protected override async Task<bool> PerformUpdateCheck()
+        protected override async Task<bool> PerformUpdateCheck(CancellationToken cancellationToken)
         {
             try
             {
@@ -36,7 +35,7 @@ namespace osu.Game.Updater
                 bool includePrerelease = stream == Configuration.ReleaseStream.Tachyon;
 
                 OsuJsonWebRequest<GitHubRelease[]> releasesRequest = new OsuJsonWebRequest<GitHubRelease[]>("https://api.github.com/repos/ppy/osu/releases?per_page=10&page=1");
-                await releasesRequest.PerformAsync().ConfigureAwait(false);
+                await releasesRequest.PerformAsync(cancellationToken).ConfigureAwait(false);
 
                 GitHubRelease[] releases = releasesRequest.ResponseObject;
                 GitHubRelease? latest = releases.OrderByDescending(r => r.PublishedAt).FirstOrDefault(r => includePrerelease || !r.Prerelease);
@@ -51,11 +50,10 @@ namespace osu.Game.Updater
 
                 if (latestTagName != version)
                 {
-                    Notifications.Post(new SimpleNotification
+                    Notifications.Post(new UpdateAvailableNotification(cancellationToken)
                     {
                         Text = $"A newer release of osu! has been found ({version} → {latestTagName}).\n\n"
                                + "Check with your package manager / provider to bring osu! up-to-date!",
-                        Icon = FontAwesome.Solid.Download,
                     });
 
                     return true;

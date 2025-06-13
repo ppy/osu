@@ -4,13 +4,13 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Platform;
 using osu.Game.Online.API;
-using osu.Game.Overlays.Notifications;
 
 namespace osu.Game.Updater
 {
@@ -31,13 +31,13 @@ namespace osu.Game.Updater
             version = game.Version;
         }
 
-        protected override async Task<bool> PerformUpdateCheck()
+        protected override async Task<bool> PerformUpdateCheck(CancellationToken cancellationToken)
         {
             try
             {
                 var releases = new OsuJsonWebRequest<GitHubRelease>("https://api.github.com/repos/ppy/osu/releases/latest");
 
-                await releases.PerformAsync().ConfigureAwait(false);
+                await releases.PerformAsync(cancellationToken).ConfigureAwait(false);
 
                 var latest = releases.ResponseObject;
 
@@ -48,7 +48,7 @@ namespace osu.Game.Updater
 
                 if (latestTagName != version && tryGetBestUrl(latest, out string? url))
                 {
-                    Notifications.Post(new SimpleNotification
+                    Notifications.Post(new UpdateAvailableNotification(cancellationToken)
                     {
                         Text = $"A newer release of osu! has been found ({version} → {latestTagName}).\n\n"
                                + "Click here to download the new version, which can be installed over the top of your existing installation",
