@@ -2,11 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Logging;
+using osu.Framework.Threading;
 using osu.Game;
-using osu.Game.Configuration;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Screens.Play;
@@ -28,132 +29,109 @@ namespace osu.Desktop.Updater
 
         private bool isInGameplay => localUserInfo?.PlayingState.Value != LocalUserPlayingState.NotPlaying;
 
-        private UpdateManager? updateManager;
-        private UpdateInfo? pendingUpdate;
-        private ReleaseStream? lastReleaseStream;
+        private ScheduledDelegate? scheduledBackgroundCheck;
 
-        protected override async Task<bool> PerformUpdateCheck()
+        private void scheduleNextUpdateCheck()
         {
-            if (ReleaseStream.Value != lastReleaseStream)
+            scheduledBackgroundCheck?.Cancel();
+            scheduledBackgroundCheck = Scheduler.AddDelayed(() =>
             {
-                updateManager = new UpdateManager(new GithubSource(@"https://github.com/ppy/osu", null, ReleaseStream.Value == Game.Configuration.ReleaseStream.Tachyon), new UpdateOptions
-                {
-                    AllowVersionDowngrade = true,
-                });
-
-                lastReleaseStream = ReleaseStream.Value;
-            }
-
-            return await checkForUpdateAsync().ConfigureAwait(false);
+                Logger.Log("Running scheduled background update check...");
+                Task.Run(CheckForUpdateAsync);
+            }, 60000 * 30);
         }
 
-        private async Task<bool> checkForUpdateAsync()
+        protected override async Task<bool> PerformUpdateCheck(CancellationToken cancellationToken)
         {
-            // whether to check again in 30 minutes. generally only if there's an error or no update was found (yet).
-            bool scheduleRecheck = false;
+            scheduledBackgroundCheck?.Cancel();
 
-            try
+            if (isInGameplay)
             {
-                // Avoid any kind of update checking while gameplay is running.
-                if (isInGameplay)
-                {
-                    scheduleRecheck = true;
-                    return true;
-                }
-
-                // TODO: we should probably be checking if there's a more recent update, rather than shortcutting here.
-                // Velopack does support this scenario (see https://github.com/ppy/osu/pull/28743#discussion_r1743495975).
-                if (pendingUpdate != null)
-                {
-                    // If there is an update pending restart, show the notification to restart again.
-                    notificationOverlay.Post(new UpdateApplicationCompleteNotification
-                    {
-                        Activated = () =>
-                        {
-                            Task.Run(restartToApplyUpdate);
-                            return true;
-                        }
-                    });
-
-                    return true;
-                }
-
-                if (updateManager == null)
-                {
-                    scheduleRecheck = true;
-                    return false;
-                }
-
-                pendingUpdate = await updateManager.CheckForUpdatesAsync().ConfigureAwait(false);
-
-                // No update is available. We'll check again later.
-                if (pendingUpdate == null)
-                {
-                    scheduleRecheck = true;
-                    return false;
-                }
-
-                // An update is found, let's notify the user and start downloading it.
-                UpdateProgressNotification notification = new UpdateProgressNotification
-                {
-                    CompletionClickAction = () =>
-                    {
-                        Task.Run(restartToApplyUpdate);
-                        return true;
-                    },
-                };
-
-                runOutsideOfGameplay(() => notificationOverlay.Post(notification));
-                notification.StartDownload();
-
-                try
-                {
-                    await updateManager.DownloadUpdatesAsync(pendingUpdate, p => notification.Progress = p / 100f).ConfigureAwait(false);
-                    runOutsideOfGameplay(() => notification.State = ProgressNotificationState.Completed);
-                }
-                catch (Exception e)
-                {
-                    // In the case of an error, a separate notification will be displayed.
-                    scheduleRecheck = true;
-                    notification.FailDownload();
-                    Logger.Error(e, @"update failed!");
-                }
-            }
-            catch (Exception e)
-            {
-                // we'll ignore this and retry later. can be triggered by no internet connection or thread abortion.
-                scheduleRecheck = true;
-                Logger.Log($@"update check failed ({e.Message})");
-            }
-            finally
-            {
-                if (scheduleRecheck)
-                {
-                    Scheduler.AddDelayed(() => Task.Run(async () => await checkForUpdateAsync().ConfigureAwait(false)), 60000 * 30);
-                }
+                Logger.Log("Update check cancelled - user is in gameplay");
+                scheduleNextUpdateCheck();
+                return false;
             }
 
+            IUpdateSource updateSource = new GithubSource(@"https://github.com/ppy/osu", null, ReleaseStream.Value == Game.Configuration.ReleaseStream.Tachyon);
+            UpdateManager updateManager = new UpdateManager(updateSource, new UpdateOptions
+            {
+                AllowVersionDowngrade = true
+            });
+
+            UpdateInfo? update = await updateManager.CheckForUpdatesAsync().ConfigureAwait(false);
+
+            if (update == null)
+            {
+                // No update is available.
+                Logger.Log("No update found");
+                scheduleNextUpdateCheck();
+                return false;
+            }
+
+            Logger.Log($"New update available: {update.TargetFullRelease.Version}");
+
+            // Download update in the background while notifying awaiters of the update being available.
+            downloadUpdate(updateManager, update, cancellationToken);
             return true;
         }
 
-        private void runOutsideOfGameplay(Action action)
+        private void downloadUpdate(UpdateManager updateManager, UpdateInfo update, CancellationToken cancellationToken) => Task.Run(async () =>
         {
+            Logger.Log($"Beginning download of update {update.TargetFullRelease.Version}...");
+
+            UpdateDownloadProgressNotification progressNotification = new UpdateDownloadProgressNotification(cancellationToken)
+            {
+                CompletionClickAction = () =>
+                {
+                    restartToApplyUpdate(updateManager, update);
+                    return true;
+                }
+            };
+
+            try
+            {
+                using (var cts = CancellationTokenSource.CreateLinkedTokenSource(progressNotification.CancellationToken, cancellationToken))
+                {
+                    progressNotification.StartDownload();
+                    runOutsideOfGameplay(() => notificationOverlay.Post(progressNotification), cts.Token);
+
+                    await updateManager.DownloadUpdatesAsync(update, p => progressNotification.Progress = p / 100f, false, cts.Token).ConfigureAwait(false);
+                    runOutsideOfGameplay(() => progressNotification.State = ProgressNotificationState.Completed, cts.Token);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                progressNotification.FailDownload();
+                Logger.Log(@"Update cancelled");
+            }
+            catch (Exception e)
+            {
+                // In the case of an error, a separate notification will be displayed.
+                progressNotification.FailDownload();
+                Logger.Error(e, @"Update failed!");
+            }
+
+            return true;
+        }, cancellationToken);
+
+        private void runOutsideOfGameplay(Action action, CancellationToken cancellationToken)
+        {
+            if (cancellationToken.IsCancellationRequested)
+                return;
+
             if (isInGameplay)
             {
-                Scheduler.AddDelayed(() => runOutsideOfGameplay(action), 1000);
+                Scheduler.AddDelayed(() => runOutsideOfGameplay(action, cancellationToken), 1000);
                 return;
             }
 
             action();
         }
 
-        private async Task restartToApplyUpdate()
+        private void restartToApplyUpdate(UpdateManager updateManager, UpdateInfo update) => Task.Run(async () =>
         {
-            if (updateManager == null)
-                return;
-
-            await updateManager.WaitExitThenApplyUpdatesAsync(pendingUpdate?.TargetFullRelease).ConfigureAwait(false);
+            await updateManager.WaitExitThenApplyUpdatesAsync(update.TargetFullRelease).ConfigureAwait(false);
             Schedule(() => game.AttemptExit());
-        }
+        });
     }
 }

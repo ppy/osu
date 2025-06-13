@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -69,21 +70,18 @@ namespace osu.Game.Tests.NonVisual
         }
 
         /// <summary>
-        /// Updates should be checked once more if the release stream is changed during an going check.
+        /// Changing the release stream should start a new invocation and cancel the existing one.
         /// </summary>
         [Test]
-        public void TestReleaseStreamChangedDuringCheck()
+        public void TestNewInvocationOnReleaseStreamChanged()
         {
             AddStep("change release stream", () => config.SetValue(OsuSetting.ReleaseStream, ReleaseStream.Tachyon));
             AddUntilStep("check pending", () => manager.IsPending);
             AddStep("change release stream", () => config.SetValue(OsuSetting.ReleaseStream, ReleaseStream.Lazer));
+            AddUntilStep("3 invocations", () => manager.Invocations, () => Is.EqualTo(3));
 
             AddStep("complete check", () => manager.Complete());
             AddUntilStep("2 checks completed", () => manager.Completions, () => Is.EqualTo(2));
-
-            AddUntilStep("check pending", () => manager.IsPending);
-            AddStep("complete one check", () => manager.Complete());
-            AddUntilStep("3 checks completed", () => manager.Completions, () => Is.EqualTo(3));
             AddUntilStep("no check pending", () => !manager.IsPending);
         }
 
@@ -109,21 +107,18 @@ namespace osu.Game.Tests.NonVisual
         }
 
         /// <summary>
-        /// Any ongoing request should be returned when the user requests a new one.
+        /// User requests should start a new invocation and cancel the existing one.
         /// </summary>
         [Test]
-        public void TestUserRequestReturnsExistingCheck()
+        public void TestUserRequestOverridesExistingCheck()
         {
-            Task task1 = null!;
-            Task task2 = null!;
-
             // This part covering double user input is not really possible because the settings button is disabled during the check,
             // but it's kept here for sanity in-case the update manager is used as a standalone object elsewhere.
 
-            AddStep("request check", () => task1 = manager.CheckForUpdateAsync());
+            AddStep("request check", () => manager.CheckForUpdateAsync());
             AddUntilStep("check pending", () => manager.IsPending);
-            AddStep("request check", () => task2 = manager.CheckForUpdateAsync());
-            AddAssert("second request returned original task", () => task2 == task1);
+            AddStep("request check", () => manager.CheckForUpdateAsync());
+            AddUntilStep("3 invocations", () => manager.Invocations, () => Is.EqualTo(3));
 
             AddStep("complete check", () => manager.Complete());
             AddUntilStep("2 checks completed", () => manager.Completions, () => Is.EqualTo(2));
@@ -133,12 +128,8 @@ namespace osu.Game.Tests.NonVisual
 
             AddStep("change release stream", () => config.SetValue(OsuSetting.ReleaseStream, ReleaseStream.Tachyon));
             AddUntilStep("check pending", () => manager.IsPending);
-            AddStep("request check", () =>
-            {
-                task1 = manager.CurrentTask;
-                task2 = manager.CheckForUpdateAsync();
-            });
-            AddAssert("second request returned original task", () => task2 == task1);
+            AddStep("request check", () => manager.CheckForUpdateAsync());
+            AddUntilStep("5 invocations", () => manager.Invocations, () => Is.EqualTo(5));
 
             AddStep("complete check", () => manager.Complete());
             AddUntilStep("3 checks completed", () => manager.Completions, () => Is.EqualTo(3));
@@ -148,28 +139,28 @@ namespace osu.Game.Tests.NonVisual
         private partial class TestUpdateManager : UpdateManager
         {
             public bool IsPending { get; private set; }
+            public int Invocations { get; private set; }
             public int Completions { get; private set; }
-
-            public Task CurrentTask { get; private set; } = Task.CompletedTask;
 
             private TaskCompletionSource<bool>? pendingCheck;
 
-            protected override Task<bool> PerformUpdateCheck()
+            protected override async Task<bool> PerformUpdateCheck(CancellationToken cancellationToken)
             {
-                var task = Task.Run(async () =>
+                Invocations++;
+
+                var check = pendingCheck = new TaskCompletionSource<bool>();
+                IsPending = true;
+
+                try
                 {
-                    var check = pendingCheck = new TaskCompletionSource<bool>();
-                    IsPending = true;
-
-                    bool result = await check.Task.ConfigureAwait(false);
-                    IsPending = false;
+                    bool result = await check.Task.WaitAsync(cancellationToken).ConfigureAwait(false);
                     Completions++;
-
                     return result;
-                });
-
-                CurrentTask = task;
-                return task;
+                }
+                finally
+                {
+                    IsPending = false;
+                }
             }
 
             public void Complete()
