@@ -105,6 +105,14 @@ namespace osu.Game.Updater
         /// <returns>Whether any update is waiting. May return true if an error occured (there is potentially an update available).</returns>
         protected virtual Task<bool> PerformUpdateCheck(CancellationToken cancellationToken) => Task.FromResult(false);
 
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            updateCancellation.Cancel();
+            updateCancellation.Dispose();
+        }
+
         private partial class UpdateCompleteNotification : SimpleNotification
         {
             private readonly string version;
