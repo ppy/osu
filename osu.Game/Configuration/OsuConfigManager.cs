@@ -65,6 +65,8 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.SongSelectBackgroundBlur, true);
 
+            SetDefault(OsuSetting.SongSelectV2, false);
+
             // Online settings
             SetDefault(OsuSetting.Username, string.Empty);
             SetDefault(OsuSetting.Token, string.Empty);
@@ -398,6 +400,7 @@ namespace osu.Game.Configuration
         BeatmapListingCardSize,
         ToolbarClockDisplayMode,
         SongSelectBackgroundBlur,
+        SongSelectV2,
         Version,
         ShowFirstRunSetup,
         ShowConvertedBeatmaps,
