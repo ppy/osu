@@ -101,7 +101,7 @@ namespace osu.Desktop.Updater
                     progressNotification.StartDownload();
                     runOutsideOfGameplay(() => notificationOverlay.Post(progressNotification), cts.Token);
 
-                    await updateManager.DownloadUpdatesAsync(update, p => progressNotification.Progress = p / 100f, false, cts.Token).ConfigureAwait(false);
+                    await updateManager.DownloadUpdatesAsync(update, p => progressNotification.Progress = p / 100f, cts.Token).ConfigureAwait(false);
                     runOutsideOfGameplay(() => progressNotification.State = ProgressNotificationState.Completed, cts.Token);
                 }
             }
