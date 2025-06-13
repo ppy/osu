@@ -519,7 +519,7 @@ namespace osu.Game
                     else
                     {
                         string[] changelogArgs = argString.Split("/");
-                        ShowChangelogBuild(changelogArgs[0], changelogArgs[1]);
+                        ShowChangelogBuild($"{changelogArgs[1]}-{changelogArgs[0]}");
                     }
 
                     break;
@@ -600,9 +600,8 @@ namespace osu.Game
         /// <summary>
         /// Show changelog's build as an overlay
         /// </summary>
-        /// <param name="updateStream">The update stream name</param>
-        /// <param name="version">The build version of the update stream</param>
-        public void ShowChangelogBuild(string updateStream, string version) => waitForReady(() => changelogOverlay, _ => changelogOverlay.ShowBuild(updateStream, version));
+        /// <param name="version">The build version, including stream suffix.</param>
+        public void ShowChangelogBuild(string version) => waitForReady(() => changelogOverlay, _ => changelogOverlay.ShowBuild(version));
 
         /// <summary>
         /// Joins a multiplayer or playlists room with the given <paramref name="id"/>.
