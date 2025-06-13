@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -9,11 +10,9 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
-using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Online.Chat;
 using osuTK;
 
 namespace osu.Game.Screens.SelectV2
@@ -49,12 +48,6 @@ namespace osu.Game.Screens.SelectV2
         private IAPIProvider api { get; set; } = null!;
 
         private IBindable<APIState> apiState = null!;
-
-        [Resolved]
-        private ILinkHandler? linkHandler { get; set; }
-
-        [Resolved]
-        private ISongSelect? songSelect { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -289,16 +282,11 @@ namespace osu.Game.Screens.SelectV2
             var metadata = beatmap.Value.Metadata;
             var beatmapSetInfo = beatmap.Value.BeatmapSetInfo;
 
-            creator.Data = (metadata.Author.Username, () => linkHandler?.HandleLink(new LinkDetails(LinkAction.OpenUserProfile, metadata.Author)));
-
-            if (!string.IsNullOrEmpty(metadata.Source))
-                source.Data = (metadata.Source, () => songSelect?.Search(metadata.Source));
-            else
-                source.Data = ("-", null);
-
-            mapperTags.Tags = (metadata.Tags.Split(' '), t => songSelect?.Search(t));
-            submitted.Date = beatmapSetInfo.DateSubmitted;
-            ranked.Date = beatmapSetInfo.DateRanked;
+            creator.SetUser(metadata.Author);
+            source.SetText(metadata.Source);
+            submitted.SetDate(beatmapSetInfo.DateSubmitted);
+            ranked.SetDate(beatmapSetInfo.DateRanked);
+            mapperTags.SetTags(metadata.Tags.Split(' ', StringSplitOptions.RemoveEmptyEntries));
 
             if (currentOnlineBeatmapSet == null || currentOnlineBeatmapSet.OnlineID != beatmapSetInfo.OnlineID)
                 refetchBeatmapSet();
@@ -336,16 +324,16 @@ namespace osu.Game.Screens.SelectV2
         {
             if (currentRequest?.CompletionState == APIRequestCompletionState.Waiting)
             {
-                genre.Data = null;
-                language.Data = null;
-                userTags.Tags = null;
+                genre.SetLoading();
+                language.SetLoading();
+                userTags.SetLoading();
                 return;
             }
 
             if (currentOnlineBeatmapSet == null)
             {
-                genre.Data = ("-", null);
-                language.Data = ("-", null);
+                genre.SetHyphen();
+                language.SetHyphen();
             }
             else
             {
@@ -354,8 +342,8 @@ namespace osu.Game.Screens.SelectV2
                 var onlineBeatmapSet = currentOnlineBeatmapSet;
                 var onlineBeatmap = onlineBeatmapSet.Beatmaps.SingleOrDefault(b => b.OnlineID == beatmapInfo.OnlineID);
 
-                genre.Data = (onlineBeatmapSet.Genre.Name, () => songSelect?.Search(onlineBeatmapSet.Genre.Name));
-                language.Data = (onlineBeatmapSet.Language.Name, () => songSelect?.Search(onlineBeatmapSet.Language.Name));
+                genre.SetText(onlineBeatmapSet.Genre.Name);
+                language.SetText(onlineBeatmapSet.Language.Name);
 
                 if (onlineBeatmap != null)
                 {
@@ -393,7 +381,7 @@ namespace osu.Game.Screens.SelectV2
                                                   .ToArray();
 
             userTags.FadeIn(transition_duration, Easing.OutQuint);
-            userTags.Tags = (userTagsArray, t => songSelect?.Search(t));
+            userTags.SetTags(userTagsArray);
         }
     }
 }
