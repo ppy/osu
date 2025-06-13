@@ -234,21 +234,27 @@ namespace osu.Game.Graphics.Carousel
             Scroll.Panels.SingleOrDefault(p => ((ICarouselPanel)p).Item == item);
 
         /// <summary>
-        /// When a user is traversing the carousel via group selection keys, assert whether the item provided is a valid target.
+        /// When a user is traversing the carousel via set selection keys, assert whether the item provided is a valid target.
         /// </summary>
         /// <param name="item">The candidate item.</param>
-        /// <returns>Whether the provided item is a valid group target. If <c>false</c>, more panels will be checked in the user's requested direction until a valid target is found.</returns>
-        protected virtual bool CheckValidForGroupSelection(CarouselItem item) => true;
+        /// <returns>Whether the provided item is a valid set target. If <c>false</c>, more panels will be checked in the user's requested direction until a valid target is found.</returns>
+        protected virtual bool CheckValidForSetSelection(CarouselItem item) => true;
+
+        /// <summary>
+        /// Keyboard selection usually does not automatically activate an item. There may be exceptions to this rule.
+        /// Returning <c>true</c> here will make keyboard traversal act like set traversal for the target item.
+        /// </summary>
+        protected virtual bool ShouldActivateOnKeyboardSelection(CarouselItem item) => false;
 
         /// <summary>
         /// Called after an item becomes the <see cref="CurrentSelection"/>.
-        /// Should be used to handle any group expansion, item visibility changes, etc.
+        /// Should be used to handle any set expansion, item visibility changes, etc.
         /// </summary>
         protected virtual void HandleItemSelected(object? model) { }
 
         /// <summary>
         /// Called when the <see cref="CurrentSelection"/> changes to a new selection.
-        /// Should be used to handle any group expansion, item visibility changes, etc.
+        /// Should be used to handle any set expansion, item visibility changes, etc.
         /// </summary>
         protected virtual void HandleItemDeselected(object? model) { }
 
@@ -454,12 +460,12 @@ namespace osu.Game.Graphics.Carousel
                     Scheduler.AddOnce(traverseKeyboardSelection, -1);
                     return true;
 
-                case GlobalAction.SelectNextGroup:
-                    Scheduler.AddOnce(traverseGroupSelection, 1);
+                case GlobalAction.ActivateNextSet:
+                    Scheduler.AddOnce(traverseSetSelection, 1);
                     return true;
 
-                case GlobalAction.SelectPreviousGroup:
-                    Scheduler.AddOnce(traverseGroupSelection, -1);
+                case GlobalAction.ActivatePreviousSet:
+                    Scheduler.AddOnce(traverseSetSelection, -1);
                     return true;
             }
 
@@ -500,8 +506,14 @@ namespace osu.Game.Graphics.Carousel
 
                 if (newItem.IsVisible)
                 {
-                    playTraversalSound();
-                    setKeyboardSelection(newItem.Model);
+                    if (!CheckModelEquality(currentSelection.Model, newItem.Model) && ShouldActivateOnKeyboardSelection(newItem))
+                        Activate(newItem);
+                    else
+                    {
+                        playTraversalSound();
+                        setKeyboardSelection(newItem.Model);
+                    }
+
                     return;
                 }
             } while (newIndex != originalIndex);
@@ -513,12 +525,12 @@ namespace osu.Game.Graphics.Carousel
         /// </summary>
         /// <param name="direction">Positive for downwards, negative for upwards.</param>
         /// <returns>Whether selection was possible.</returns>
-        private void traverseGroupSelection(int direction)
+        private void traverseSetSelection(int direction)
         {
             if (carouselItems == null || carouselItems.Count == 0) return;
 
             // If the user has a different keyboard selection and requests
-            // group selection, first transfer the keyboard selection to actual selection.
+            // set selection, first transfer the keyboard selection to actual selection.
             if (currentKeyboardSelection.CarouselItem != null && currentSelection.CarouselItem != currentKeyboardSelection.CarouselItem)
             {
                 Activate(currentKeyboardSelection.CarouselItem);
@@ -537,11 +549,11 @@ namespace osu.Game.Graphics.Carousel
             {
                 newIndex = originalIndex = currentKeyboardSelection.Index.Value;
 
-                // As a second special case, if we're group selecting backwards and the current selection isn't a group,
-                // make sure to go back to the group header this item belongs to, so that the block below doesn't find it and stop too early.
+                // As a second special case, if we're set selecting backwards and the current selection isn't a set,
+                // make sure to go back to the set header this item belongs to, so that the block below doesn't find it and stop too early.
                 if (direction < 0)
                 {
-                    while (newIndex > 0 && !CheckValidForGroupSelection(carouselItems[newIndex]))
+                    while (newIndex > 0 && !CheckValidForSetSelection(carouselItems[newIndex]))
                         newIndex--;
                 }
             }
@@ -557,7 +569,7 @@ namespace osu.Game.Graphics.Carousel
 
                 var newItem = carouselItems[newIndex];
 
-                if (CheckValidForGroupSelection(newItem))
+                if (CheckValidForSetSelection(newItem))
                 {
                     HandleItemActivated(newItem);
                     return;
@@ -996,6 +1008,29 @@ namespace osu.Game.Graphics.Carousel
                 foreach (var d in Panels)
                     d.Y = (float)(((ICarouselPanel)d).DrawYPosition + scrollableExtent);
             }
+
+            #region Scrollbar padding
+
+            public float ScrollbarPaddingTop { get; set; } = 5;
+            public float ScrollbarPaddingBottom { get; set; } = 5;
+
+            protected override float ToScrollbarPosition(double scrollPosition)
+            {
+                if (Precision.AlmostEquals(0, ScrollableExtent))
+                    return 0;
+
+                return (float)(ScrollbarPaddingTop + (ScrollbarMovementExtent - (ScrollbarPaddingTop + ScrollbarPaddingBottom)) * (scrollPosition / ScrollableExtent));
+            }
+
+            protected override float FromScrollbarPosition(float scrollbarPosition)
+            {
+                if (Precision.AlmostEquals(0, ScrollbarMovementExtent))
+                    return 0;
+
+                return (float)(ScrollableExtent * ((scrollbarPosition - ScrollbarPaddingTop) / (ScrollbarMovementExtent - (ScrollbarPaddingTop + ScrollbarPaddingBottom))));
+            }
+
+            #endregion
 
             #region Absolute scrolling
 

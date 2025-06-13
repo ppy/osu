@@ -124,7 +124,7 @@ namespace osu.Game.Updater
                 Activated = delegate
                 {
                     notificationOverlay.Hide();
-                    changelog.ShowBuild(OsuGameBase.CLIENT_STREAM_NAME, version);
+                    changelog.ShowBuild(version);
                     return true;
                 };
             }

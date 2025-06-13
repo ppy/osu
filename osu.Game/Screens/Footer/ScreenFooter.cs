@@ -48,7 +48,9 @@ namespace osu.Game.Screens.Footer
         private FillFlowContainer<ScreenFooterButton> buttonsFlow = null!;
         private Container footerContentContainer = null!;
         private Container<ScreenFooterButton> hiddenButtonsContainer = null!;
+
         private LogoTrackingContainer logoTrackingContainer = null!;
+        private IDisposable? logoTracking;
 
         // TODO: This has some weird update logic local in this class, but it only works for overlay containers.
         // This is not what we want. The footer is to be displayed on *screens* with different colour schemes.
@@ -145,13 +147,14 @@ namespace osu.Game.Screens.Footer
             changeLogoDepthDelegate?.Cancel();
             changeLogoDepthDelegate = null;
 
-            logoTrackingContainer.StartTracking(logo, duration, easing);
+            logoTracking = logoTrackingContainer.StartTracking(logo, duration, easing);
             RequestLogoInFront?.Invoke(true);
         }
 
         public void StopTrackingLogo()
         {
-            logoTrackingContainer.StopTracking();
+            logoTracking?.Dispose();
+            logoTracking = null;
 
             changeLogoDepthDelegate = Scheduler.AddDelayed(() => RequestLogoInFront?.Invoke(false), transition_duration);
         }

@@ -83,8 +83,6 @@ namespace osu.Game
 
         public const string OSU_PROTOCOL = "osu://";
 
-        public const string CLIENT_STREAM_NAME = @"lazer";
-
         /// <summary>
         /// The filename of the main client database.
         /// </summary>
@@ -120,8 +118,6 @@ namespace osu.Game
 
         public bool IsDeployedBuild => AssemblyVersion.Major > 0;
 
-        internal const string BUILD_SUFFIX = "lazer";
-
         public virtual string Version
         {
             get
@@ -129,8 +125,16 @@ namespace osu.Game
                 if (!IsDeployedBuild)
                     return @"local " + (DebugUtils.IsDebugBuild ? @"debug" : @"release");
 
-                var version = AssemblyVersion;
-                return $@"{version.Major}.{version.Minor}.{version.Build}-{BUILD_SUFFIX}";
+                string informationalVersion = Assembly.GetEntryAssembly()?
+                    .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?
+                    .InformationalVersion;
+
+                // Example: [assembly: AssemblyInformationalVersion("2025.613.0-tachyon+d934e574b2539e8787956c3c9ecce9dadebb10ee")]
+                if (!string.IsNullOrEmpty(informationalVersion))
+                    return informationalVersion.Split('+').First();
+
+                Version version = AssemblyVersion;
+                return $@"{version.Major}.{version.Minor}.{version.Build}-lazer";
             }
         }
 
