@@ -36,7 +36,16 @@ namespace osu.Game.Utils
         /// Formats the supplied star rating in a consistent, simplified way.
         /// </summary>
         /// <param name="starRating">The star rating to be formatted.</param>
-        public static LocalisableString FormatStarRating(this double starRating) => starRating.ToLocalisableString("0.00");
+        public static LocalisableString FormatStarRating(this double starRating)
+        {
+            // for the sake of display purposes, we don't want to show a user a "rounded up" star rating to the next whole number.
+            // i.e. a beatmap which has a star rating of 6.9999* should never show as 7.00*.
+            // this matters for star rating medals which use hard cutoffs at whole numbers,
+            // which then confuses users when they beat a 6.9999* beatmap but don't get the 7-star medal.
+            starRating = Math.Floor(starRating * 100) / 100;
+
+            return starRating.ToLocalisableString("0.00");
+        }
 
         /// <summary>
         /// Finds the number of digits after the decimal.
