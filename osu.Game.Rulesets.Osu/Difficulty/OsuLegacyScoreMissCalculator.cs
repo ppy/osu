@@ -74,7 +74,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double objectsHit = (totalHits - countMiss) * combo / attributes.MaxCombo;
 
             // Score also has a non-combo portion we need to create the final score value.
-            double nonComboScore = (300 + attributes.SliderNestedScorePerObject) * score.Accuracy * objectsHit;
+            double nonComboScore = (300 + attributes.NestedScorePerObject) * score.Accuracy * objectsHit;
 
             return comboScore + nonComboScore;
         }

@@ -40,10 +40,10 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         private readonly Bindable<Room?> selectedRoom = new Bindable<Room?>();
 
-        public IReadOnlyList<DrawableRoom> DrawableRooms => roomFlow.FlowingChildren.Cast<DrawableRoom>().ToArray();
+        public IReadOnlyList<RoomPanel> DrawableRooms => roomFlow.FlowingChildren.Cast<RoomPanel>().ToArray();
 
         private readonly ScrollContainer<Drawable> scroll;
-        private readonly FillFlowContainer<DrawableLoungeRoom> roomFlow;
+        private readonly FillFlowContainer<LoungeRoomPanel> roomFlow;
 
         private const float display_scale = 0.8f;
 
@@ -65,7 +65,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Child = roomFlow = new FillFlowContainer<DrawableLoungeRoom>
+                    Child = roomFlow = new FillFlowContainer<LoungeRoomPanel>
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
@@ -128,7 +128,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 return true;
             }
 
-            static bool matchPermissions(DrawableLoungeRoom room, RoomPermissionsFilter accessType)
+            static bool matchPermissions(LoungeRoomPanel room, RoomPermissionsFilter accessType)
             {
                 switch (accessType)
                 {
@@ -183,7 +183,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         {
             foreach (var room in rooms)
             {
-                var drawableRoom = new DrawableLoungeRoom(room)
+                var drawableRoom = new LoungeRoomPanel(room)
                 {
                     SelectedRoom = selectedRoom,
                     Anchor = Anchor.Centre,

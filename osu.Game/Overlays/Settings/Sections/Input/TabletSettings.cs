@@ -37,13 +37,13 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         private readonly Bindable<Vector2> areaSize = new Bindable<Vector2>();
         private readonly IBindable<TabletInfo> tablet = new Bindable<TabletInfo>();
 
-        private readonly BindableNumber<float> offsetX = new BindableNumber<float> { MinValue = 0 };
-        private readonly BindableNumber<float> offsetY = new BindableNumber<float> { MinValue = 0 };
+        private readonly BindableNumber<float> offsetX = new BindableNumber<float> { MinValue = 0, Precision = 1 };
+        private readonly BindableNumber<float> offsetY = new BindableNumber<float> { MinValue = 0, Precision = 1 };
 
-        private readonly BindableNumber<float> sizeX = new BindableNumber<float> { MinValue = 10 };
-        private readonly BindableNumber<float> sizeY = new BindableNumber<float> { MinValue = 10 };
+        private readonly BindableNumber<float> sizeX = new BindableNumber<float> { MinValue = 10, Precision = 1 };
+        private readonly BindableNumber<float> sizeY = new BindableNumber<float> { MinValue = 10, Precision = 1 };
 
-        private readonly BindableNumber<float> rotation = new BindableNumber<float> { MinValue = 0, MaxValue = 360 };
+        private readonly BindableNumber<float> rotation = new BindableNumber<float> { MinValue = 0, MaxValue = 360, Precision = 1 };
 
         private readonly BindableNumber<float> pressureThreshold = new BindableNumber<float> { MinValue = 0.0f, MaxValue = 1.0f, Precision = 0.005f };
 

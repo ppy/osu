@@ -13,9 +13,10 @@ namespace osu.Game.Tests.Visual.UserInterface
 {
     public partial class TestSceneBackButton : OsuTestScene
     {
+        private readonly BackButton? button;
+
         public TestSceneBackButton()
         {
-            BackButton button;
             ScreenFooter.BackReceptor receptor = new ScreenFooter.BackReceptor();
 
             Child = new Container
@@ -34,13 +35,12 @@ namespace osu.Game.Tests.Visual.UserInterface
                     },
                     button = new BackButton(receptor)
                     {
+                        Action = () => button?.Hide(),
                         Anchor = Anchor.BottomLeft,
                         Origin = Anchor.BottomLeft,
                     }
                 }
             };
-
-            button.Action = () => button.Hide();
 
             AddStep("show button", () => button.Show());
             AddStep("hide button", () => button.Hide());

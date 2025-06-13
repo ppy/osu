@@ -14,9 +14,9 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Framework.Utils;
-using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osu.Game.Overlays.OSD;
@@ -312,9 +312,9 @@ namespace osu.Game.Rulesets.Edit
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuConfigManager config)
+            private void load(RealmKeyBindingStore keyBindingStore)
             {
-                ShortcutText.Text = config.LookupKeyBindings(getAction(change)).ToUpper();
+                ShortcutText.Text = keyBindingStore.GetBindingsStringFor(getAction(change)).ToUpper();
             }
 
             private static GlobalAction getAction(ValueChangedEvent<double> change) => change.NewValue - change.OldValue > 0

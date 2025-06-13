@@ -177,7 +177,6 @@ namespace osu.Game.Overlays.BeatmapSet
                         {
                             onlineStatusPill = new BeatmapSetOnlineStatusPill
                             {
-                                AutoSizeAxes = Axes.Both,
                                 Anchor = Anchor.TopRight,
                                 Origin = Anchor.TopRight,
                                 TextSize = 14,

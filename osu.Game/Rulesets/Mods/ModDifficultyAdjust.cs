@@ -2,12 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
+using System.Collections.Generic;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Extensions;
 
 namespace osu.Game.Rulesets.Mods
 {
@@ -26,6 +27,8 @@ namespace osu.Game.Rulesets.Mods
         public override double ScoreMultiplier => 0.5;
 
         public override bool RequiresConfiguration => true;
+
+        public override bool ValidForFreestyleAsRequiredMod => true;
 
         public override Type[] IncompatibleMods => new[] { typeof(ModEasy), typeof(ModHardRock) };
 
@@ -65,18 +68,31 @@ namespace osu.Game.Rulesets.Mods
             }
         }
 
-        public override string SettingDescription
+        public override string ExtendedIconInformation
         {
             get
             {
-                string drainRate = DrainRate.IsDefault ? string.Empty : $"HP {DrainRate.Value:N1}";
-                string overallDifficulty = OverallDifficulty.IsDefault ? string.Empty : $"OD {OverallDifficulty.Value:N1}";
+                if (UserAdjustedSettingsCount != 1)
+                    return string.Empty;
 
-                return string.Join(", ", new[]
-                {
-                    drainRate,
-                    overallDifficulty
-                }.Where(s => !string.IsNullOrEmpty(s)));
+                if (!OverallDifficulty.IsDefault) return format("OD", OverallDifficulty);
+                if (!DrainRate.IsDefault) return format("HP", DrainRate);
+
+                return string.Empty;
+
+                string format(string acronym, DifficultyBindable bindable) => $"{acronym}{bindable.Value!.Value.ToStandardFormattedString(1)}";
+            }
+        }
+
+        public override IEnumerable<(LocalisableString setting, LocalisableString value)> SettingDescription
+        {
+            get
+            {
+                if (!DrainRate.IsDefault)
+                    yield return ("HP drain", $"{DrainRate.Value:N1}");
+
+                if (!OverallDifficulty.IsDefault)
+                    yield return ("Accuracy", $"{OverallDifficulty.Value:N1}");
             }
         }
 
@@ -94,6 +110,27 @@ namespace osu.Game.Rulesets.Mods
         {
             if (DrainRate.Value != null) difficulty.DrainRate = DrainRate.Value.Value;
             if (OverallDifficulty.Value != null) difficulty.OverallDifficulty = OverallDifficulty.Value.Value;
+        }
+
+        /// <summary>
+        /// The number of settings on this mod instance which have been adjusted by the user from their default values.
+        /// </summary>
+        protected int UserAdjustedSettingsCount
+        {
+            get
+            {
+                int count = 0;
+
+                foreach (var (_, property) in this.GetSettingsSourceProperties())
+                {
+                    var bindable = (IBindable)property.GetValue(this)!;
+
+                    if (!bindable.IsDefault)
+                        count++;
+                }
+
+                return count;
+            }
         }
     }
 }

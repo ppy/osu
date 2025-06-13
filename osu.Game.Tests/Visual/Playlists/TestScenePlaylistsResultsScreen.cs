@@ -416,7 +416,7 @@ namespace osu.Game.Tests.Visual.Playlists
                     {
                         Id = 2 + i,
                         Username = $"peppy{i}",
-                        CoverUrl = "https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
+                        CoverUrl = TestResources.COVER_IMAGE_3,
                     },
                 });
 
@@ -432,7 +432,7 @@ namespace osu.Game.Tests.Visual.Playlists
                     {
                         Id = 2 + i,
                         Username = $"peppy{i}",
-                        CoverUrl = "https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
+                        CoverUrl = TestResources.COVER_IMAGE_3,
                     },
                 });
 
@@ -497,7 +497,7 @@ namespace osu.Game.Tests.Visual.Playlists
                     {
                         Id = 2 + i,
                         Username = $"peppy{i}",
-                        CoverUrl = "https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
+                        CoverUrl = TestResources.COVER_IMAGE_3,
                     },
                 });
 

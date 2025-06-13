@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             var spinner = (DrawableSpinner)drawable;
 
-            spinner.RotationTracker.Tracking = true;
+            spinner.RotationTracker.Tracking = spinner.RotationTracker.IsSpinnableTime;
 
             // early-return if we were paused to avoid division-by-zero in the subsequent calculations.
             if (Precision.AlmostEquals(spinner.Clock.Rate, 0))

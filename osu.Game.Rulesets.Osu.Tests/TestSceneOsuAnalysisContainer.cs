@@ -8,6 +8,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
+using osu.Framework.Timing;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Osu.Replays;
@@ -26,6 +27,8 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Cached]
         private OsuRulesetConfigManager config = new OsuRulesetConfigManager(null, new OsuRuleset().RulesetInfo);
 
+        private readonly StopwatchClock clock = new StopwatchClock();
+
         [SetUpSteps]
         public void SetUpSteps()
         {
@@ -35,7 +38,10 @@ namespace osu.Game.Rulesets.Osu.Tests
                 {
                     new OsuPlayfieldAdjustmentContainer
                     {
-                        Child = analysisContainer = new TestReplayAnalysisOverlay(fabricateReplay()),
+                        Child = analysisContainer = new TestReplayAnalysisOverlay(fabricateReplay())
+                        {
+                            Clock = new FramedClock(clock)
+                        },
                     },
                     settings = new ReplayAnalysisSettings(config),
                 };
@@ -55,11 +61,23 @@ namespace osu.Game.Rulesets.Osu.Tests
                 settings.ShowAimMarkers.Value = true;
                 settings.ShowCursorPath.Value = true;
             });
+            AddToggleStep("toggle pause", running =>
+            {
+                if (running)
+                    clock.Stop();
+                else
+                    clock.Start();
+            });
         }
 
         [Test]
         public void TestHitMarkers()
         {
+            AddStep("stop at 2000", () =>
+            {
+                clock.Stop();
+                clock.Seek(2000);
+            });
             AddStep("enable hit markers", () => settings.ShowClickMarkers.Value = true);
             AddUntilStep("hit markers visible", () => analysisContainer.HitMarkersVisible);
             AddStep("disable hit markers", () => settings.ShowClickMarkers.Value = false);
@@ -69,6 +87,11 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestAimMarker()
         {
+            AddStep("stop at 2000", () =>
+            {
+                clock.Stop();
+                clock.Seek(2000);
+            });
             AddStep("enable aim markers", () => settings.ShowAimMarkers.Value = true);
             AddUntilStep("aim markers visible", () => analysisContainer.AimMarkersVisible);
             AddStep("disable aim markers", () => settings.ShowAimMarkers.Value = false);
@@ -78,6 +101,11 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestAimLines()
         {
+            AddStep("stop at 2000", () =>
+            {
+                clock.Stop();
+                clock.Seek(2000);
+            });
             AddStep("enable aim lines", () => settings.ShowCursorPath.Value = true);
             AddUntilStep("aim lines visible", () => analysisContainer.AimLinesVisible);
             AddStep("disable aim lines", () => settings.ShowCursorPath.Value = false);
@@ -87,7 +115,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         private Replay fabricateReplay()
         {
             var frames = new List<ReplayFrame>();
-            var random = new Random();
+            var random = new Random(20250522);
             int posX = 250;
             int posY = 250;
 
@@ -109,7 +137,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
                 frames.Add(new OsuReplayFrame
                 {
-                    Time = Time.Current + i * 15,
+                    Time = i * 15,
                     Position = new Vector2(posX, posY),
                     Actions = actions.ToList(),
                 });

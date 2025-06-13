@@ -60,8 +60,9 @@ namespace osu.Game.Rulesets.Mania.UI
         private readonly BindableDouble configScrollSpeed = new BindableDouble();
         private readonly Bindable<ManiaMobileLayout> mobileLayout = new Bindable<ManiaMobileLayout>();
 
+        public double TargetTimeRange { get; protected set; }
+
         private double currentTimeRange;
-        protected double TargetTimeRange;
 
         // Stores the current speed adjustment active in gameplay.
         private readonly Track speedAdjustmentTrack = new TrackVirtual(0);
@@ -109,7 +110,13 @@ namespace osu.Game.Rulesets.Mania.UI
             configDirection.BindValueChanged(direction => Direction.Value = (ScrollingDirection)direction.NewValue, true);
 
             Config.BindWith(ManiaRulesetSetting.ScrollSpeed, configScrollSpeed);
-            configScrollSpeed.BindValueChanged(speed => TargetTimeRange = ComputeScrollTime(speed.NewValue));
+            configScrollSpeed.BindValueChanged(speed =>
+            {
+                if (!AllowScrollSpeedAdjustment)
+                    return;
+
+                TargetTimeRange = ComputeScrollTime(speed.NewValue);
+            });
 
             TimeRange.Value = TargetTimeRange = currentTimeRange = ComputeScrollTime(configScrollSpeed.Value);
 

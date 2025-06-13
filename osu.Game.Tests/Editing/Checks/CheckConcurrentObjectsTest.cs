@@ -114,36 +114,6 @@ namespace osu.Game.Tests.Editing.Checks
             Assert.That(issues.Any(issue => issue.Template is CheckConcurrentObjects.IssueTemplateConcurrentSame));
         }
 
-        [Test]
-        public void TestHoldNotesSeparateOnSameColumn()
-        {
-            assertOk(new List<HitObject>
-            {
-                getHoldNoteMock(startTime: 100, endTime: 400.75d, column: 1).Object,
-                getHoldNoteMock(startTime: 500, endTime: 900.75d, column: 1).Object
-            });
-        }
-
-        [Test]
-        public void TestHoldNotesConcurrentOnDifferentColumns()
-        {
-            assertOk(new List<HitObject>
-            {
-                getHoldNoteMock(startTime: 100, endTime: 400.75d, column: 1).Object,
-                getHoldNoteMock(startTime: 300, endTime: 700.75d, column: 2).Object
-            });
-        }
-
-        [Test]
-        public void TestHoldNotesConcurrentOnSameColumn()
-        {
-            assertConcurrentSame(new List<HitObject>
-            {
-                getHoldNoteMock(startTime: 100, endTime: 400.75d, column: 1).Object,
-                getHoldNoteMock(startTime: 300, endTime: 700.75d, column: 1).Object
-            });
-        }
-
         private Mock<Slider> getSliderMock(double startTime, double endTime, int repeats = 0)
         {
             var mock = new Mock<Slider>();

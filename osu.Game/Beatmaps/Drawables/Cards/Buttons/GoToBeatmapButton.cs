@@ -20,15 +20,14 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
         public GoToBeatmapButton(APIBeatmapSet beatmapSet)
         {
             this.beatmapSet = beatmapSet;
-
-            Icon.Icon = FontAwesome.Solid.AngleDoubleRight;
-            TooltipText = "Go to beatmap";
         }
 
         [BackgroundDependencyLoader(true)]
         private void load(OsuGame? game)
         {
             Action = () => game?.PresentBeatmap(beatmapSet);
+            Icon.Icon = FontAwesome.Solid.AngleDoubleRight;
+            TooltipText = "Go to beatmap";
         }
 
         protected override void LoadComplete()
