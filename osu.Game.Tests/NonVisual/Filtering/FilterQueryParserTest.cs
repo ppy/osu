@@ -102,7 +102,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
         [Test]
         public void TestStarQueriesInclusive()
         {
-            const string query = $"stars>=6";
+            const string query = "stars>=6";
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
             Assert.AreEqual(filterCriteria.StarDifficulty.Min, 6.00d);
