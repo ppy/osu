@@ -52,7 +52,7 @@ namespace osu.Game.Utils
                 options.IsGlobalModeEnabled = true;
                 options.CacheDirectoryPath = storage?.GetFullPath(string.Empty);
                 // The reported release needs to match version as reported to Sentry in .github/workflows/sentry-release.yml
-                options.Release = $"osu@{game.Version.Replace($@"-{OsuGameBase.BUILD_SUFFIX}", string.Empty)}";
+                options.Release = $"osu@{game.Version.Split('-').First()}";
             });
 
             Logger.NewEntry += processLogEntry;

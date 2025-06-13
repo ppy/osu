@@ -107,7 +107,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 Version = "2018.712.0",
                 DisplayVersion = "2018.712.0",
-                UpdateStream = streams[OsuGameBase.CLIENT_STREAM_NAME],
+                UpdateStream = streams["lazer"],
                 CreatedAt = new DateTime(2018, 7, 12),
                 ChangelogEntries = new List<APIChangelogEntry>
                 {
