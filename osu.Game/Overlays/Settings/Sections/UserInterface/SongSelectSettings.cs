@@ -47,7 +47,8 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
                     LabelText = GameplaySettingsStrings.BackgroundBlur,
                     Current = config.GetBindable<bool>(OsuSetting.SongSelectBackgroundBlur),
                     ClassicDefault = false,
-                },                new SettingsCheckbox
+                },
+                new SettingsCheckbox
                 {
                     LabelText = GameplaySettingsStrings.SongSelectV2,
                     Current = config.GetBindable<bool>(OsuSetting.SongSelectV2),
