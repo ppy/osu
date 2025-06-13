@@ -37,7 +37,7 @@ namespace osu.Desktop.Updater
             scheduledBackgroundCheck = Scheduler.AddDelayed(() =>
             {
                 Logger.Log("Running scheduled background update check...");
-                Task.Run(CheckForUpdateAsync);
+                CheckForUpdate();
             }, 60000 * 30);
         }
 
@@ -60,6 +60,13 @@ namespace osu.Desktop.Updater
 
             UpdateInfo? update = await updateManager.CheckForUpdatesAsync().ConfigureAwait(false);
 
+            if (cancellationToken.IsCancellationRequested)
+            {
+                Logger.Log("Update check cancelled");
+                scheduleNextUpdateCheck();
+                return true;
+            }
+
             if (update == null)
             {
                 // No update is available.
@@ -68,9 +75,8 @@ namespace osu.Desktop.Updater
                 return false;
             }
 
-            Logger.Log($"New update available: {update.TargetFullRelease.Version}");
-
             // Download update in the background while notifying awaiters of the update being available.
+            Logger.Log($"New update available: {update.TargetFullRelease.Version}");
             downloadUpdate(updateManager, update, cancellationToken);
             return true;
         }

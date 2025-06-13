@@ -44,6 +44,7 @@ namespace osu.Game.Updater
         protected IBindable<ReleaseStream> ReleaseStream => releaseStream;
 
         private readonly Bindable<ReleaseStream> releaseStream = new Bindable<ReleaseStream>();
+        private CancellationTokenSource updateCancellation = new CancellationTokenSource();
 
         protected override void LoadComplete()
         {
@@ -67,22 +68,35 @@ namespace osu.Game.Updater
             config.SetValue(OsuSetting.Version, version);
 
             config.BindWith(OsuSetting.ReleaseStream, releaseStream);
-            releaseStream.BindValueChanged(_ => CheckForUpdateAsync());
+            releaseStream.BindValueChanged(_ => CheckForUpdate());
 
-            CheckForUpdateAsync();
+            CheckForUpdate();
         }
 
-        private CancellationTokenSource? updateCheckCancellation;
+        /// <summary>
+        /// Immediately checks for any available update.
+        /// </summary>
+        public void CheckForUpdate()
+        {
+            _ = CheckForUpdateAsync();
+        }
 
         /// <summary>
-        /// Immediately checks for any available updates, or returns the existing update task.
+        /// Immediately checks for any available update.
         /// </summary>
         /// <returns><c>true</c> if any updates are available, <c>false</c> otherwise.</returns>
-        public Task<bool> CheckForUpdateAsync()
+        public async Task<bool> CheckForUpdateAsync(CancellationToken cancellationToken = default)
         {
-            updateCheckCancellation?.Cancel();
-            updateCheckCancellation = new CancellationTokenSource();
-            return PerformUpdateCheck(updateCheckCancellation.Token);
+            var cancellation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            var lastCancellation = Interlocked.Exchange(ref updateCancellation, cancellation);
+
+            using (lastCancellation)
+            {
+                // This serves a dual purpose of nullifying the last update, closing any existing notifications as stale.
+                await lastCancellation.CancelAsync().ConfigureAwait(false);
+            }
+
+            return await PerformUpdateCheck(cancellation.Token).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -90,12 +104,6 @@ namespace osu.Game.Updater
         /// </summary>
         /// <returns>Whether any update is waiting. May return true if an error occured (there is potentially an update available).</returns>
         protected virtual Task<bool> PerformUpdateCheck(CancellationToken cancellationToken) => Task.FromResult(false);
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-            updateCheckCancellation?.Cancel();
-        }
 
         private partial class UpdateCompleteNotification : SimpleNotification
         {
