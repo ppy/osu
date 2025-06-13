@@ -87,6 +87,9 @@ namespace osu.Game.Updater
         /// <returns><c>true</c> if any updates are available, <c>false</c> otherwise.</returns>
         public async Task<bool> CheckForUpdateAsync(CancellationToken cancellationToken = default)
         {
+            if (!CanCheckForUpdate)
+                return false;
+
             var cancellation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             var lastCancellation = Interlocked.Exchange(ref updateCancellation, cancellation);
 
