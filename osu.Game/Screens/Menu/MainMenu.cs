@@ -503,15 +503,28 @@ namespace osu.Game.Screens.Menu
 
         private void loadPreferredSongSelect()
         {
-            if (holdTime >= required_hold_time)
+            if (OsuSetting.SongSelectV2)
             {
-                ssv2Sample?.Play();
-                this.Push(new SoloSongSelect());
+                if (holdTime >= required_hold_time)
+                    this.Push(new PlaySongSelect());
+                else
+                {
+                    ssv2Sample?.Play();
+                    this.Push(new SoloSongSelect());
+                }
             }
             else
-                this.Push(new PlaySongSelect());
+            {
+                if (holdTime >= required_hold_time)
+                {
+                    ssv2Sample?.Play();
+                    this.Push(new SoloSongSelect());
+                }
+                else
+                    this.Push(new PlaySongSelect());
+            }
         }
-
+        
         private void loadSongSelectV2Samples(AudioManager audio)
         {
             ssv2Sample = audio.Samples.Get(@"UI/bss-complete");
