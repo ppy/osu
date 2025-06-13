@@ -91,14 +91,14 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestUserRequest()
         {
-            AddStep("request check", () => manager.CheckForUpdateAsync());
+            AddStep("request check", () => manager.CheckForUpdate());
 
             AddUntilStep("check pending", () => manager.IsPending);
             AddStep("complete check", () => manager.Complete());
             AddUntilStep("2 checks completed", () => manager.Completions, () => Is.EqualTo(2));
             AddUntilStep("no check pending", () => !manager.IsPending);
 
-            AddStep("request check", () => manager.CheckForUpdateAsync());
+            AddStep("request check", () => manager.CheckForUpdate());
 
             AddUntilStep("check pending", () => manager.IsPending);
             AddStep("complete check", () => manager.Complete());
@@ -115,9 +115,9 @@ namespace osu.Game.Tests.NonVisual
             // This part covering double user input is not really possible because the settings button is disabled during the check,
             // but it's kept here for sanity in-case the update manager is used as a standalone object elsewhere.
 
-            AddStep("request check", () => manager.CheckForUpdateAsync());
+            AddStep("request check", () => manager.CheckForUpdate());
             AddUntilStep("check pending", () => manager.IsPending);
-            AddStep("request check", () => manager.CheckForUpdateAsync());
+            AddStep("request check", () => manager.CheckForUpdate());
             AddUntilStep("3 invocations", () => manager.Invocations, () => Is.EqualTo(3));
 
             AddStep("complete check", () => manager.Complete());
@@ -128,7 +128,7 @@ namespace osu.Game.Tests.NonVisual
 
             AddStep("change release stream", () => config.SetValue(OsuSetting.ReleaseStream, ReleaseStream.Tachyon));
             AddUntilStep("check pending", () => manager.IsPending);
-            AddStep("request check", () => manager.CheckForUpdateAsync());
+            AddStep("request check", () => manager.CheckForUpdate());
             AddUntilStep("5 invocations", () => manager.Invocations, () => Is.EqualTo(5));
 
             AddStep("complete check", () => manager.Complete());
