@@ -36,7 +36,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
             individualStrains[maniaCurrent.Column] = applyDecay(individualStrains[maniaCurrent.Column], maniaCurrent.ColumnStrainTime, individual_decay_base);
             individualStrains[maniaCurrent.Column] += IndividualStrainEvaluator.EvaluateDifficultyOf(current);
 
-            // For concurrent individual strains, we keep the highest value to ensure that we always add the same amount to the highest overallStrain value no matter the processing order.
+            // Take the hardest individualStrain for notes that happen at the same time (in a chord).
+            // This is to ensure the order in which the notes are processed does not affect the resultant total strain.
             highestIndividualStrain = maniaCurrent.DeltaTime <= 1 ? Math.Max(highestIndividualStrain, individualStrains[maniaCurrent.Column]) : individualStrains[maniaCurrent.Column];
 
             overallStrain = applyDecay(overallStrain, maniaCurrent.DeltaTime, overall_decay_base);
