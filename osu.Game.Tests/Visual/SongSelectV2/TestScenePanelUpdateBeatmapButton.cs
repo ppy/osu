@@ -24,23 +24,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         });
 
         [Test]
-        public void TestNullBeatmap()
-        {
-            AddStep("null beatmap", () => button.BeatmapSet = null);
-            AddAssert("button invisible", () => button.Alpha == 0f);
-        }
-
-        [Test]
-        public void TestUpdatedBeatmap()
-        {
-            AddStep("updated beatmap", () => button.BeatmapSet = new BeatmapSetInfo
-            {
-                Beatmaps = { new BeatmapInfo() }
-            });
-            AddAssert("button invisible", () => button.Alpha == 0f);
-        }
-
-        [Test]
         public void TestNonUpdatedBeatmap()
         {
             AddStep("non-updated beatmap", () => button.BeatmapSet = new BeatmapSetInfo
@@ -57,6 +40,23 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             });
 
             AddAssert("button visible", () => button.Alpha == 1f);
+        }
+
+        [Test]
+        public void TestNullBeatmap()
+        {
+            AddStep("null beatmap", () => button.BeatmapSet = null);
+            AddAssert("button invisible", () => button.Alpha == 0f);
+        }
+
+        [Test]
+        public void TestUpdatedBeatmap()
+        {
+            AddStep("updated beatmap", () => button.BeatmapSet = new BeatmapSetInfo
+            {
+                Beatmaps = { new BeatmapInfo() }
+            });
+            AddAssert("button invisible", () => button.Alpha == 0f);
         }
     }
 }

@@ -13,6 +13,7 @@ using osu.Game.Rulesets;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
+using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Users;
 
 namespace osu.Game.Screens.OnlinePlay.Playlists
@@ -21,11 +22,18 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
     {
         public Action? Exited;
 
+        [Cached(typeof(IGameplayLeaderboardProvider))]
+        private readonly PlaylistsGameplayLeaderboardProvider leaderboardProvider;
+
         protected override UserActivity InitialActivity => new UserActivity.InPlaylistGame(Beatmap.Value.BeatmapInfo, Ruleset.Value);
 
-        public PlaylistsPlayer(Room room, PlaylistItem playlistItem, PlayerConfiguration? configuration = null)
-            : base(room, playlistItem, configuration)
+        public PlaylistsPlayer(Room room, PlaylistItem playlistItem)
+            : base(room, playlistItem, new PlayerConfiguration
+            {
+                ShowLeaderboard = true,
+            })
         {
+            leaderboardProvider = new PlaylistsGameplayLeaderboardProvider(room, playlistItem);
         }
 
         [BackgroundDependencyLoader]
@@ -41,6 +49,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             var requiredLocalMods = PlaylistItem.RequiredMods.Select(m => m.ToMod(GameplayState.Ruleset));
             if (!requiredLocalMods.All(m => Mods.Value.Any(m.Equals)))
                 throw new InvalidOperationException("Current Mods do not match PlaylistItem's RequiredMods");
+
+            LoadComponentAsync(leaderboardProvider, AddInternal);
         }
 
         public override bool OnExiting(ScreenExitEvent e)

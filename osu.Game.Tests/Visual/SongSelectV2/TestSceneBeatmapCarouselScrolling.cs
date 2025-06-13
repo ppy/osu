@@ -97,8 +97,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddStep("scroll to end", () => Scroll.ScrollToEnd());
             WaitForScrolling();
 
-            ApplyToFilter("search", f => f.SearchText = "Some");
-            WaitForFiltering();
+            ApplyToFilterAndWaitForFilter("search", f => f.SearchText = "Some");
 
             AddUntilStep("select screen position returned to selection", () => Carousel.ChildrenOfType<PanelBeatmap>().Single(p => p.Selected.Value).ScreenSpaceDrawQuad,
                 () => Is.EqualTo(positionBefore));
@@ -121,8 +120,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             AddStep("save selected screen position", () => positionBefore = Carousel.ChildrenOfType<PanelBeatmap>().FirstOrDefault(p => p.Selected.Value)!.ScreenSpaceDrawQuad);
 
-            ApplyToFilter("search", f => f.SearchText = "Some");
-            WaitForFiltering();
+            ApplyToFilterAndWaitForFilter("search", f => f.SearchText = "Some");
 
             AddUntilStep("select screen position returned to selection", () => Carousel.ChildrenOfType<PanelBeatmap>().Single(p => p.Selected.Value).ScreenSpaceDrawQuad,
                 () => Is.EqualTo(positionBefore));

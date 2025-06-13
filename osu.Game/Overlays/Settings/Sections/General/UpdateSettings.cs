@@ -55,6 +55,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 {
                     LabelText = GeneralSettingsStrings.ReleaseStream,
                     Current = { Value = configReleaseStream.Value },
+                    Keywords = new[] { @"version" },
                 });
 
                 Add(checkForUpdatesButton = new SettingsButton

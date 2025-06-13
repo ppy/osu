@@ -291,7 +291,7 @@ namespace osu.Game.Screens.Menu
             logo.FadeColour(Color4.White, 100, Easing.OutQuint);
             logo.FadeIn(100, Easing.OutQuint);
 
-            logo.ProxyToContainer(logoTarget);
+            logoProxy = logo.ProxyToContainer(logoTarget);
 
             if (resuming)
             {
@@ -350,7 +350,8 @@ namespace osu.Game.Screens.Menu
             var seq = logo.FadeOut(300, Easing.InSine)
                           .ScaleTo(0.2f, 300, Easing.InSine);
 
-            logo.ReturnProxy();
+            logoProxy?.Dispose();
+            logoProxy = null;
 
             seq.OnComplete(_ => Buttons.SetOsuLogo(null));
             seq.OnAbort(_ => Buttons.SetOsuLogo(null));
@@ -360,7 +361,8 @@ namespace osu.Game.Screens.Menu
         {
             base.LogoExiting(logo);
 
-            logo.ReturnProxy();
+            logoProxy?.Dispose();
+            logoProxy = null;
         }
 
         public override void OnSuspending(ScreenTransitionEvent e)
@@ -495,6 +497,9 @@ namespace osu.Game.Screens.Menu
         private bool ssv2Expanded;
         private IDisposable ssv2Duck;
         private Sample ssv2Sample;
+
+        [CanBeNull]
+        private IDisposable logoProxy;
 
         private void loadPreferredSongSelect()
         {

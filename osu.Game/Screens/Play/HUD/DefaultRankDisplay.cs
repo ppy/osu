@@ -32,6 +32,8 @@ namespace osu.Game.Screens.Play.HUD
         private SkinnableSound rankDownSample = null!;
         private SkinnableSound rankUpSample = null!;
 
+        private Bindable<double?> lastSamplePlaybackTime = null!;
+
         private IBindable<ScoreRank> rank = null!;
 
         public DefaultRankDisplay()
@@ -40,7 +42,7 @@ namespace osu.Game.Screens.Play.HUD
         }
 
         [BackgroundDependencyLoader]
-        private void load(SkinEditor? skinEditor)
+        private void load(SkinEditor? skinEditor, SessionStatics statics)
         {
             InternalChildren = new Drawable[]
             {
@@ -54,6 +56,8 @@ namespace osu.Game.Screens.Play.HUD
 
             if (skinEditor != null)
                 PlaySamples.Value = false;
+
+            lastSamplePlaybackTime = statics.GetBindable<double?>(Static.LastRankChangeSamplePlaybackTime);
         }
 
         protected override void LoadComplete()
@@ -63,13 +67,17 @@ namespace osu.Game.Screens.Play.HUD
             rank = scoreProcessor.Rank.GetBoundCopy();
             rank.BindValueChanged(r =>
             {
+                bool enoughTimeElapsed = !lastSamplePlaybackTime.Value.HasValue || Time.Current - lastSamplePlaybackTime.Value >= OsuGameBase.SAMPLE_DEBOUNCE_TIME;
+
                 // Don't play rank-down sfx on quit/retry
-                if (r.NewValue != r.OldValue && r.NewValue > ScoreRank.F && PlaySamples.Value)
+                if (r.NewValue != r.OldValue && r.NewValue > ScoreRank.F && PlaySamples.Value && enoughTimeElapsed)
                 {
                     if (r.NewValue > rankDisplay.Rank)
                         rankUpSample.Play();
                     else
                         rankDownSample.Play();
+
+                    lastSamplePlaybackTime.Value = Time.Current;
                 }
 
                 rankDisplay.Rank = r.NewValue;

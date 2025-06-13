@@ -26,6 +26,7 @@ using osu.Game.Localisation;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.Metadata;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Overlays.Dialog;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Screens;
 using osu.Game.Screens.Play;
@@ -67,6 +68,9 @@ namespace osu.Game.Users
 
         [Resolved]
         private ChatOverlay? chatOverlay { get; set; }
+
+        [Resolved]
+        private IDialogOverlay? dialogOverlay { get; set; }
 
         [Resolved]
         protected OverlayColourProvider? ColourProvider { get; private set; }
@@ -163,9 +167,15 @@ namespace osu.Game.Users
                     chatOverlay?.Show();
                 }));
 
-                items.Add(isUserBlocked()
-                    ? new OsuMenuItem(UsersStrings.BlocksButtonUnblock, MenuItemType.Standard, () => toggleBlock(false))
-                    : new OsuMenuItem(UsersStrings.BlocksButtonBlock, MenuItemType.Destructive, () => toggleBlock(true)));
+                items.Add(!isUserBlocked()
+                    ? new OsuMenuItem(UsersStrings.BlocksButtonBlock, MenuItemType.Destructive, () =>
+                    {
+                        dialogOverlay?.Push(new ConfirmBlockActionDialog(ContextMenuStrings.ConfirmBlockUser(User.Username), () => toggleBlock(true)));
+                    })
+                    : new OsuMenuItem(UsersStrings.BlocksButtonUnblock, MenuItemType.Standard, () =>
+                    {
+                        dialogOverlay?.Push(new ConfirmBlockActionDialog(ContextMenuStrings.ConfirmUnblockUser(User.Username), () => toggleBlock(false)));
+                    }));
 
                 if (isUserOnline())
                 {
@@ -228,5 +238,14 @@ namespace osu.Game.Users
         }
 
         public bool FilteringActive { get; set; }
+
+        private partial class ConfirmBlockActionDialog : DangerousActionDialog
+        {
+            public ConfirmBlockActionDialog(LocalisableString text, Action? action = null)
+            {
+                BodyText = text;
+                DangerousAction = action;
+            }
+        }
     }
 }

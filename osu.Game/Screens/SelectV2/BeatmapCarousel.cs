@@ -91,6 +91,9 @@ namespace osu.Game.Screens.SelectV2
             DebounceDelay = 100;
             DistanceOffscreenToPreload = 100;
 
+            // Account for the osu! logo being in the way.
+            Scroll.ScrollbarPaddingBottom = 70;
+
             Filters = new ICarouselFilter[]
             {
                 matching = new BeatmapCarouselFilterMatching(() => Criteria!),
@@ -207,6 +210,9 @@ namespace osu.Game.Screens.SelectV2
         protected GroupDefinition? ExpandedGroup { get; private set; }
 
         protected BeatmapSetInfo? ExpandedBeatmapSet { get; private set; }
+
+        protected override bool ShouldActivateOnKeyboardSelection(CarouselItem item) =>
+            grouping.BeatmapSetsGroupedTogether && item.Model is BeatmapInfo;
 
         protected override void HandleItemActivated(CarouselItem item)
         {
@@ -333,7 +339,7 @@ namespace osu.Game.Screens.SelectV2
             RequestRecommendedSelection(beatmaps);
         }
 
-        protected override bool CheckValidForGroupSelection(CarouselItem item)
+        protected override bool CheckValidForSetSelection(CarouselItem item)
         {
             switch (item.Model)
             {
