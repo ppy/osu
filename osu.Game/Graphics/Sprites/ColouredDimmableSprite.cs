@@ -28,10 +28,6 @@ namespace osu.Game.Graphics.Sprites
             return result;
         }
 
-        public ColouredDimmableSprite()
-        {
-        }
-
         [BackgroundDependencyLoader]
         private void load(ShaderManager shaders)
         {
@@ -64,7 +60,7 @@ namespace osu.Game.Graphics.Sprites
             {
                 dimParametersBuffer ??= renderer.CreateUniformBuffer<DimParameters>();
 
-                dimParametersBuffer.Data = dimParametersBuffer.Data with
+                dimParametersBuffer.Data = new DimParameters
                 {
                     DimColour = new UniformVector4
                     {

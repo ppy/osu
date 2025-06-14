@@ -86,7 +86,7 @@ namespace osu.Game.Graphics.Sprites
             {
                 dimParametersBuffer ??= renderer.CreateUniformBuffer<DimParameters>();
 
-                dimParametersBuffer.Data = dimParametersBuffer.Data with
+                dimParametersBuffer.Data = new DimParameters
                 {
                     DimColour = new UniformVector4
                     {

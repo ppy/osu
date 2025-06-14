@@ -204,7 +204,7 @@ namespace osu.Game.Storyboards.Drawables
 
                         dimParametersBuffer ??= renderer.CreateUniformBuffer<DimParameters>();
 
-                        dimParametersBuffer.Data = dimParametersBuffer.Data with
+                        dimParametersBuffer.Data = new DimParameters
                         {
                             DimColour = new UniformVector4
                             {
