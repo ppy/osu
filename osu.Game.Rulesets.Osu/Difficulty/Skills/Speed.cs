@@ -9,8 +9,8 @@ using osu.Game.Rulesets.Osu.Difficulty.Evaluators;
 using osu.Game.Rulesets.Osu.Objects;
 using System.Linq;
 using osu.Game.Rulesets.Difficulty.Skills;
+using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
-using osu.Game.Rulesets.Osu.Difficulty.Utils;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
@@ -112,6 +112,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return noteDifficulties.Sum(strain => 1.0 / (1.0 + Math.Exp(-(strain / consistentTopNote * 12.0 - 6.0))));
         }
 
-        public double CountTopWeightedSliders() => OsuStrainUtils.CountTopWeightedSliders(sliderStrains, DifficultyValue());
+        public double CountTopWeightedSliders()
+        {
+            if (sliderStrains.Count == 0)
+                return 0;
+
+            double consistentTopNote = DifficultyValue() / noteWeights.Sum(); // What would the top strain be if all strain values were identical
+
+            if (consistentTopNote == 0)
+                return 0;
+
+            // Use a weighted sum of all strains. Constants are arbitrary and give nice values
+            return sliderStrains.Sum(s => DifficultyCalculationUtils.Logistic(s / consistentTopNote, 0.88, 10, 1.1));
+        }
     }
 }
