@@ -14,7 +14,7 @@ using osu.Framework.Layout;
 
 namespace osu.Game.Graphics.Sprites
 {
-    public partial class DimmableSprite : Sprite, IColouredDimmable
+    public partial class ColouredDimmableSprite : Sprite, IColouredDimmable
     {
         protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
         {
@@ -28,7 +28,7 @@ namespace osu.Game.Graphics.Sprites
             return result;
         }
 
-        public DimmableSprite()
+        public ColouredDimmableSprite()
         {
         }
 
@@ -38,13 +38,13 @@ namespace osu.Game.Graphics.Sprites
             TextureShader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, "ColouredDimmableTexture");
         }
 
-        protected override DrawNode CreateDrawNode() => new BeatmapBackgroundSpriteDrawNode(this);
+        protected override DrawNode CreateDrawNode() => new ColouredDimmableSpriteDrawNode(this);
 
-        public class BeatmapBackgroundSpriteDrawNode : SpriteDrawNode
+        public class ColouredDimmableSpriteDrawNode : SpriteDrawNode
         {
-            public new DimmableSprite Source => (DimmableSprite)base.Source;
+            public new ColouredDimmableSprite Source => (ColouredDimmableSprite)base.Source;
 
-            public BeatmapBackgroundSpriteDrawNode(DimmableSprite source)
+            public ColouredDimmableSpriteDrawNode(ColouredDimmableSprite source)
                 : base(source)
             {
             }

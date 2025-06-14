@@ -14,7 +14,7 @@ using osu.Framework.Layout;
 
 namespace osu.Game.Graphics.Sprites
 {
-    public partial class DimmableBufferedContainer : BufferedContainer, IColouredDimmable
+    public partial class ColouredDimmableBufferedContainer : BufferedContainer, IColouredDimmable
     {
         protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
         {
@@ -32,7 +32,7 @@ namespace osu.Game.Graphics.Sprites
             return result;
         }
 
-        public DimmableBufferedContainer(RenderBufferFormat[] formats = null, bool pixelSnapping = false, bool cachedFrameBuffer = false)
+        public ColouredDimmableBufferedContainer(RenderBufferFormat[] formats = null, bool pixelSnapping = false, bool cachedFrameBuffer = false)
             : base(formats, pixelSnapping, cachedFrameBuffer)
         {
         }
@@ -60,13 +60,13 @@ namespace osu.Game.Graphics.Sprites
         // Children should not receive the true colour to avoid colour doubling when the frame-buffers are rendered to the back-buffer.
         public Colour4 DrawColourOffset => Colour4.Black;
 
-        protected override DrawNode CreateDrawNode() => new DimmableBufferedContainerDrawNode(this, SharedData);
+        protected override DrawNode CreateDrawNode() => new ColouredDimmableBufferedContainerDrawNode(this, SharedData);
 
-        protected class DimmableBufferedContainerDrawNode : BufferedContainerDrawNode
+        protected class ColouredDimmableBufferedContainerDrawNode : BufferedContainerDrawNode
         {
-            public new DimmableBufferedContainer Source => (DimmableBufferedContainer)base.Source;
+            public new ColouredDimmableBufferedContainer Source => (ColouredDimmableBufferedContainer)base.Source;
 
-            public DimmableBufferedContainerDrawNode(DimmableBufferedContainer source, BufferedContainerDrawNodeSharedData sharedData)
+            public ColouredDimmableBufferedContainerDrawNode(ColouredDimmableBufferedContainer source, BufferedContainerDrawNodeSharedData sharedData)
                 : base(source, sharedData)
             {
             }

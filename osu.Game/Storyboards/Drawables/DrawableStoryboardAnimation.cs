@@ -70,7 +70,7 @@ namespace osu.Game.Storyboards.Drawables
             }
         }
 
-        protected override Sprite CreateSprite() => new DimmableSprite
+        protected override Sprite CreateSprite() => new ColouredDimmableSprite
         {
             RelativeSizeAxes = Axes.Both,
             Anchor = Anchor.Centre,

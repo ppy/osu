@@ -789,7 +789,7 @@ namespace osu.Game.Tests.Visual.Background
             }
         }
 
-        private partial class TestDimmableBufferedContainer : DimmableBufferedContainer
+        private partial class TestDimmableBufferedContainer : ColouredDimmableBufferedContainer
         {
             // Ideally this one would be tracked inside of the DrawNode and set to true
             // when framebuffer is redrawn, but DrawNode's are a bit broken in the
@@ -928,7 +928,7 @@ namespace osu.Game.Tests.Visual.Background
 
             public partial class TestDrawableStoryboardAnimation : DrawableStoryboardAnimation
             {
-                private DimmableSprite dimmableSprite;
+                private ColouredDimmableSprite dimmableSprite;
 
                 public TestDrawableStoryboardAnimation(StoryboardAnimation storyboardAnimation)
                     : base(storyboardAnimation)
@@ -937,7 +937,7 @@ namespace osu.Game.Tests.Visual.Background
 
                 public Colour4? GetDrawColourOffset() => (dimmableSprite as IColouredDimmable)?.DrawColourOffset;
 
-                protected override Sprite CreateSprite() => dimmableSprite = new DimmableSprite
+                protected override Sprite CreateSprite() => dimmableSprite = new ColouredDimmableSprite
                 {
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
