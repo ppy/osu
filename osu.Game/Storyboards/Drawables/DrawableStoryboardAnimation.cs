@@ -13,7 +13,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Backgrounds;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Skinning;
 using osuTK;
 
@@ -70,7 +70,7 @@ namespace osu.Game.Storyboards.Drawables
             }
         }
 
-        protected override Sprite CreateSprite() => new BeatmapBackground.DimmableSprite
+        protected override Sprite CreateSprite() => new DimmableSprite
         {
             RelativeSizeAxes = Axes.Both,
             Anchor = Anchor.Centre,

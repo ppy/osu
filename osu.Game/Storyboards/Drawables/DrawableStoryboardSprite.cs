@@ -7,13 +7,13 @@ using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Utils;
-using osu.Game.Graphics.Backgrounds;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Skinning;
 using osuTK;
 
 namespace osu.Game.Storyboards.Drawables
 {
-    public partial class DrawableStoryboardSprite : BeatmapBackground.DimmableSprite, IFlippable, IVectorScalable
+    public partial class DrawableStoryboardSprite : DimmableSprite, IFlippable, IVectorScalable
     {
         public StoryboardSprite Sprite { get; }
 

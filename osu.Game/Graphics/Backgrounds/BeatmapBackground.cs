@@ -14,6 +14,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Layout;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Graphics.Backgrounds
 {
@@ -133,84 +134,6 @@ namespace osu.Game.Graphics.Backgrounds
                     base.ApplyState();
 
                     drawColourOffset = Source.FrameBufferDrawColourOffset;
-                }
-
-                private IUniformBuffer<DimParameters> dimParametersBuffer;
-
-                protected override void BindUniformResources(IShader shader, IRenderer renderer)
-                {
-                    dimParametersBuffer ??= renderer.CreateUniformBuffer<DimParameters>();
-
-                    dimParametersBuffer.Data = dimParametersBuffer.Data with
-                    {
-                        DimColour = new UniformVector4
-                        {
-                            X = drawColourOffset.R,
-                            Y = drawColourOffset.G,
-                            Z = drawColourOffset.B,
-                            W = drawColourOffset.A
-                        },
-                    };
-
-                    shader.BindUniformBlock("m_DimParameters", dimParametersBuffer);
-                }
-
-                protected override void Dispose(bool isDisposing)
-                {
-                    base.Dispose(isDisposing);
-                    dimParametersBuffer?.Dispose();
-                }
-
-                [StructLayout(LayoutKind.Sequential, Pack = 1)]
-                private record struct DimParameters
-                {
-                    public UniformVector4 DimColour;
-                }
-            }
-        }
-
-        public partial class DimmableSprite : Sprite, IColouredDimmable
-        {
-            protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
-            {
-                bool result = base.OnInvalidate(invalidation, source);
-
-                if ((invalidation & Invalidation.Colour) > 0)
-                {
-                    result |= Invalidate(Invalidation.DrawNode);
-                }
-
-                return result;
-            }
-
-            public DimmableSprite()
-            {
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(ShaderManager shaders)
-            {
-                TextureShader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, "ColouredDimmableTexture");
-            }
-
-            protected override DrawNode CreateDrawNode() => new BeatmapBackgroundSpriteDrawNode(this);
-
-            public class BeatmapBackgroundSpriteDrawNode : SpriteDrawNode
-            {
-                public new DimmableSprite Source => (DimmableSprite)base.Source;
-
-                public BeatmapBackgroundSpriteDrawNode(DimmableSprite source)
-                    : base(source)
-                {
-                }
-
-                private Colour4 drawColourOffset;
-
-                public override void ApplyState()
-                {
-                    base.ApplyState();
-
-                    drawColourOffset = (Source as IColouredDimmable).DrawColourOffset;
                 }
 
                 private IUniformBuffer<DimParameters> dimParametersBuffer;

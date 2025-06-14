@@ -928,7 +928,7 @@ namespace osu.Game.Tests.Visual.Background
 
             public partial class TestDrawableStoryboardAnimation : DrawableStoryboardAnimation
             {
-                private BeatmapBackground.DimmableSprite dimmableSprite;
+                private DimmableSprite dimmableSprite;
 
                 public TestDrawableStoryboardAnimation(StoryboardAnimation storyboardAnimation)
                     : base(storyboardAnimation)
@@ -937,7 +937,7 @@ namespace osu.Game.Tests.Visual.Background
 
                 public Colour4? GetDrawColourOffset() => (dimmableSprite as IColouredDimmable)?.DrawColourOffset;
 
-                protected override Sprite CreateSprite() => dimmableSprite = new BeatmapBackground.DimmableSprite
+                protected override Sprite CreateSprite() => dimmableSprite = new DimmableSprite
                 {
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
