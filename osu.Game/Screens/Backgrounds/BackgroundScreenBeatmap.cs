@@ -116,7 +116,7 @@ namespace osu.Game.Screens.Backgrounds
 
             b.Depth = newDepth;
             b.FadeInFromZero(500, Easing.OutQuint);
-            Background = dimmable.BeatmapBackground = b;
+            Background = dimmable.Background = b;
         }
 
         public override bool Equals(BackgroundScreen other)
@@ -138,9 +138,7 @@ namespace osu.Game.Screens.Backgrounds
 
             public readonly Bindable<bool> StoryboardReplacesBackground = new Bindable<bool>();
 
-            public Background Background => background;
-
-            public BeatmapBackground BeatmapBackground
+            public BeatmapBackground Background
             {
                 get => background;
                 set
@@ -148,7 +146,6 @@ namespace osu.Game.Screens.Backgrounds
                     background?.Expire();
 
                     base.Add(background = value);
-
                     background.BlurTo(blurTarget, 0, Easing.OutQuint);
                 }
             }
@@ -163,7 +160,7 @@ namespace osu.Game.Screens.Backgrounds
                 ArgumentNullException.ThrowIfNull(drawable);
 
                 if (drawable is Background)
-                    throw new InvalidOperationException($"Use {nameof(BeatmapBackground)} to set a background.");
+                    throw new InvalidOperationException($"Use {nameof(Background)} to set a background.");
 
                 base.Add(drawable);
             }
