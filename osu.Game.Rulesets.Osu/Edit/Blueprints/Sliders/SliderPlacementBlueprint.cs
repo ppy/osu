@@ -111,9 +111,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             }
         }
 
-        [Resolved]
-        private EditorBeatmap editorBeatmap { get; set; } = null!;
-
         public override SnapResult UpdateTimeAndPosition(Vector2 screenSpacePosition, double fallbackTime)
         {
             var result = composer?.TrySnapToNearbyObjects(screenSpacePosition, fallbackTime);
