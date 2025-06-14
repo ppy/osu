@@ -789,7 +789,7 @@ namespace osu.Game.Tests.Visual.Background
             }
         }
 
-        private partial class TestDimmableBufferedContainer : BeatmapBackground.DimmableBufferedContainer
+        private partial class TestDimmableBufferedContainer : DimmableBufferedContainer
         {
             // Ideally this one would be tracked inside of the DrawNode and set to true
             // when framebuffer is redrawn, but DrawNode's are a bit broken in the
