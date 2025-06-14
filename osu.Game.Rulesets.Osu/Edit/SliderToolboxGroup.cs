@@ -6,13 +6,14 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays.Settings.Sections;
 using osu.Game.Rulesets.Edit;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
-    public partial class FreehandSliderToolboxGroup : EditorToolboxGroup
+    public partial class SliderToolboxGroup : EditorToolboxGroup
     {
-        public FreehandSliderToolboxGroup()
+        public SliderToolboxGroup()
             : base("slider")
         {
         }
@@ -38,6 +39,13 @@ namespace osu.Game.Rulesets.Osu.Edit
             Precision = 0.0001f
         };
 
+        public BindableDouble SliderVelocity { get; } = new BindableDouble(1.00)
+        {
+            MinValue = 0.1,
+            MaxValue = 10,
+            Precision = 0.01,
+        };
+
         // We map internal ranges to a more standard range of values for display to the user.
         private readonly BindableInt displayTolerance = new BindableInt(90)
         {
@@ -57,6 +65,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             MaxValue = 100
         };
 
+        private ExpandableSlider<double, SizeSlider<double>> sliderVelocitySlider = null!;
         private ExpandableSlider<int> toleranceSlider = null!;
         private ExpandableSlider<int> cornerThresholdSlider = null!;
         private ExpandableSlider<int> circleThresholdSlider = null!;
@@ -66,6 +75,11 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             Children = new Drawable[]
             {
+                sliderVelocitySlider = new ExpandableSlider<double, SizeSlider<double>>
+                {
+                    Current = SliderVelocity,
+                    KeyboardStep = 0.1f,
+                },
                 toleranceSlider = new ExpandableSlider<int>
                 {
                     Current = displayTolerance
@@ -84,6 +98,12 @@ namespace osu.Game.Rulesets.Osu.Edit
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            SliderVelocity.BindValueChanged(velocity =>
+            {
+                sliderVelocitySlider.ContractedLabelText = $"S. V.: {velocity.NewValue:0.##x}";
+                sliderVelocitySlider.ExpandedLabelText = $"Slider Velocity: {velocity.NewValue:0.##x}";
+            }, true);
 
             displayTolerance.BindValueChanged(tolerance =>
             {
