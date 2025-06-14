@@ -140,11 +140,11 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
                 // End the current section with the new peak
                 saveCurrentPeak(current.StartTime - currentSectionBegin);
-                currentSectionPeak = strain;
 
-                // Set up the new section to start at the current object
+                // Set up the new section to start at the current object with the current strain
                 currentSectionBegin = current.StartTime;
                 currentSectionEnd = currentSectionBegin + MaxSectionLength;
+                currentSectionPeak = strain;
             }
         }
 
