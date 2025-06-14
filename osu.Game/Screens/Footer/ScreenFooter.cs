@@ -40,7 +40,7 @@ namespace osu.Game.Screens.Footer
 
         private const int padding = 60;
         private const float delay_per_button = 30;
-        private const double transition_duration = 400;
+        private const double transition_duration = 500;
 
         private readonly List<OverlayContainer> overlays = new List<OverlayContainer>();
 
@@ -63,7 +63,10 @@ namespace osu.Game.Screens.Footer
         public ScreenFooter(BackReceptor? receptor = null)
         {
             RelativeSizeAxes = Axes.X;
-            Height = HEIGHT;
+
+            // For masking and transition purposes, take up the full height of displayed buttons.
+            Height = ScreenFooterButton.HEIGHT;
+
             Anchor = Anchor.BottomLeft;
             Origin = Anchor.BottomLeft;
 
@@ -80,13 +83,23 @@ namespace osu.Game.Screens.Footer
             {
                 background = new Box
                 {
-                    RelativeSizeAxes = Axes.Both,
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                    Height = HEIGHT,
+                    RelativeSizeAxes = Axes.X,
                     Colour = colourProvider.Background5
                 },
                 new GridContainer
                 {
-                    RelativeSizeAxes = Axes.Both,
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
                     Padding = new MarginPadding { Left = OsuGame.SCREEN_EDGE_MARGIN + ScreenBackButton.BUTTON_WIDTH + padding },
+                    RowDimensions = new[]
+                    {
+                        new Dimension(GridSizeMode.AutoSize)
+                    },
                     ColumnDimensions = new[]
                     {
                         new Dimension(GridSizeMode.AutoSize),
@@ -100,7 +113,7 @@ namespace osu.Game.Screens.Footer
                             {
                                 Anchor = Anchor.BottomLeft,
                                 Origin = Anchor.BottomLeft,
-                                Y = ScreenFooterButton.Y_OFFSET,
+                                Y = ScreenFooterButton.CORNER_RADIUS,
                                 Direction = FillDirection.Horizontal,
                                 Spacing = new Vector2(7, 0),
                                 AutoSizeAxes = Axes.Both,
@@ -123,7 +136,7 @@ namespace osu.Game.Screens.Footer
                 hiddenButtonsContainer = new Container<ScreenFooterButton>
                 {
                     Margin = new MarginPadding { Left = OsuGame.SCREEN_EDGE_MARGIN + ScreenBackButton.BUTTON_WIDTH + padding },
-                    Y = ScreenFooterButton.Y_OFFSET,
+                    Y = ScreenFooterButton.CORNER_RADIUS,
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                     AutoSizeAxes = Axes.Both,
@@ -162,13 +175,14 @@ namespace osu.Game.Screens.Footer
         protected override void PopIn()
         {
             this.MoveToY(0, transition_duration, Easing.OutQuint)
-                .FadeIn(transition_duration, Easing.OutQuint);
+                .FadeIn();
         }
 
         protected override void PopOut()
         {
-            this.MoveToY(HEIGHT, transition_duration, Easing.OutQuint)
-                .FadeOut(transition_duration, Easing.OutQuint);
+            this.MoveToY(Height, transition_duration, Easing.OutQuint)
+                .Then()
+                .FadeOut();
         }
 
         public void SetButtons(IReadOnlyList<ScreenFooterButton> buttons)
