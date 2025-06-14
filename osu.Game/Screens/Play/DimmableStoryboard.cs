@@ -11,7 +11,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Configuration;
-using osu.Game.Graphics.Backgrounds;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Storyboards;

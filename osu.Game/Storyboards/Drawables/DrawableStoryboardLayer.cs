@@ -6,7 +6,7 @@ using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Graphics.Backgrounds;
+using osu.Game.Graphics;
 using osuTK;
 
 namespace osu.Game.Storyboards.Drawables

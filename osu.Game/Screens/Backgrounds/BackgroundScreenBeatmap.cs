@@ -11,6 +11,7 @@ using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Backgrounds;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Screens.Play;
 using osuTK;

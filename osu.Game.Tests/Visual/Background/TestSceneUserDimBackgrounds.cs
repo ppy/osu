@@ -28,6 +28,7 @@ using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;

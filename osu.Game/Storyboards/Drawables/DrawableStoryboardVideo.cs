@@ -17,7 +17,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.Video;
 using osu.Framework.Layout;
 using osu.Framework.Utils;
-using osu.Game.Graphics.Backgrounds;
+using osu.Game.Graphics;
 using osuTK;
 
 namespace osu.Game.Storyboards.Drawables

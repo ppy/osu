@@ -17,29 +17,6 @@ using osu.Game.Beatmaps;
 
 namespace osu.Game.Graphics.Backgrounds
 {
-    public interface IColouredDimmable : IDrawable
-    {
-        Colour4 DrawColourOffset
-        {
-            get
-            {
-                if (DrawColourInfo.Blending == BlendingParameters.Additive)
-                    // Additive sprites shouldn't have any offset, because things underneath them
-                    // already have it added to them. This does rely on the fact that there is
-                    // something non-additive behind this sprite. Need to check that. TODO
-                    return Colour4.Black;
-
-                if (Parent is IColouredDimmable colouredDimmableParent)
-                    return colouredDimmableParent.DrawColourOffset;
-                else if (Parent?.Parent is IColouredDimmable colouredDimmableGrandparent)
-                    // Needed to skip intermediate containers.
-                    return colouredDimmableGrandparent.DrawColourOffset;
-
-                return Colour4.Black;
-            }
-        }
-    }
-
     /// <summary>
     /// A background which offers dimming using a custom shader with ability to change dim colour.
     /// </summary>
