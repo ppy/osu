@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Development;
 using osu.Framework.Extensions;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Mods;
@@ -32,71 +31,28 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// </summary>
         protected virtual int MaxSectionLength => 400;
 
-        private double currentSectionPeak; // We also keep track of the peak strain level in the current section.
+        private double currentSectionPeak; // We also keep track of the peak strain in the current section.
         private double currentSectionBegin;
         private double currentSectionEnd;
 
-        /// <summary>
-        /// The number of strains calculated such that 99.999% of the true pp value is preserved
-        /// </summary>
-        private double cutOffTime = -1;
+        private static readonly Comparer<StrainPeak> strain_peak_comparer = Comparer<StrainPeak>.Create((p1, p2) => p2.Value.CompareTo(p1.Value));
 
         /// <summary>
-        /// Used to store the difficulty of a section of a map.
-        /// <remarks>Not to be confused with <see cref="StrainObject"/></remarks>
+        /// The number of `MaxSectionLength` sections calculated such that 99.999% of the difficulty value is preserved.
         /// </summary>
-        public readonly struct StrainPeak : IComparable<StrainPeak>
-        {
-            public StrainPeak(double value, double sectionLength, bool fromNewObject = false)
-            {
-                Value = value;
-                this.sectionLength = Math.Round(sectionLength);
-                if (fromNewObject) this.sectionLength *= -1;
-            }
-
-            private readonly double sectionLength;
-
-            public double Value { get; }
-
-            public double SectionLength => Math.Abs(sectionLength);
-            public bool FromNewObject => Math.Sign(sectionLength) == -1;
-
-            public int CompareTo(StrainPeak other)
-            {
-                return Value.CompareTo(other.Value);
-            }
-        }
-
-        private readonly Comparer<StrainPeak> descComparer = Comparer<StrainPeak>.Create((p1, p2) => p2.Value.CompareTo(p1.Value));
-
-        /// <summary>
-        /// Used to store the difficulty and start time of an object in a map.
-        /// <remarks>Not to be confused with <see cref="StrainPeak"/></remarks>
-        /// </summary>
-        public struct StrainObject
-        {
-            public StrainObject(double value, double startTime)
-            {
-                Value = value;
-                StartTime = startTime;
-            }
-
-            public double Value { get; set; }
-            public double StartTime { get; }
-        }
+        private double cutOffTime => -5 * Math.Log(10) / Math.Log(DecayWeight);
 
         private readonly List<StrainPeak> strainPeaks = new List<StrainPeak>();
-        private readonly List<StrainPeak> debugStrainPeaks = new List<StrainPeak>(); // Only ran in debug configurations
+
         private double totalLength;
+
         protected readonly List<double> ObjectStrains = new List<double>(); // Store individual strains
 
         /// <summary>
         /// Stores previous strains so that, if a high difficulty hit object is followed by a lower
         /// difficulty hit object, the high difficulty hit object gets a full strain instead of being cut short.
-        /// <value>double storedStrain, double storedStrainStartTime</value>
-        /// <remarks>In the case that continuous strains is implemented, please remove this</remarks>
         /// </summary>
-        private readonly LinkedList<StrainObject> queue = new LinkedList<StrainObject>();
+        private readonly LinkedList<StrainObject> queuedStrains = new LinkedList<StrainObject>();
 
         protected VariableLengthStrainSkill(Mod[] mods)
             : base(mods)
@@ -113,33 +69,45 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// </summary>
         public sealed override void Process(DifficultyHitObject current)
         {
-            // The first object doesn't generate a strain, so we begin with an incremented section end
+            // If we're on the first object, set up the first section to end `MaxSectionLength` after it.
             if (current.Index == 0)
             {
                 currentSectionBegin = current.StartTime;
                 currentSectionEnd = currentSectionBegin + MaxSectionLength;
             }
 
-            // Fill in strains between previous object and current object
+            // If the current object starts after the current section ends
+            // then we want to start a new section without any harsh drop-off.
+            // If we have previous strains that influence the current difficulty we will prioritise those first.
+            // Otherwise, start with the current object's initial strain.
             while (current.StartTime > currentSectionEnd)
             {
-                // Pull from queue if possible
-                if (queue.Count > 0 && queue.First != null)
-                {
-                    StrainObject queueStrainObject = queue.First.Value;
-                    queue.RemoveFirst();
+                // Save the current peak, marking the end of the section.
+                saveCurrentPeak(currentSectionEnd - currentSectionBegin);
+                currentSectionBegin = currentSectionEnd;
 
-                    saveCurrentPeak(currentSectionEnd - currentSectionBegin);
-                    currentSectionBegin = currentSectionEnd;
-                    currentSectionEnd = queueStrainObject.StartTime + MaxSectionLength;
+                // If we have any strains queued, then we will use those until the object falls into the new section.
+                if (queuedStrains.First != null)
+                {
+                    StrainObject queuedStrain = queuedStrains.First.Value;
+                    queuedStrains.RemoveFirst();
+
+                    // We want the section to end `MaxSectionLength` after the strain we're using as an influence.
+                    // This effectively means the queued strain will exist in its own section if the gap between the queued strain and current object is large enough.
+                    // This is required to make sure there's no harsh difficulty difference between 2 sections if there was a large gap.
+                    currentSectionEnd = queuedStrain.StartTime + MaxSectionLength;
                     startNewSectionFrom(currentSectionBegin, current);
-                    currentSectionPeak = Math.Max(currentSectionPeak, queueStrainObject.Value);
+
+                    // If the current object's peak was higher, we don't want to override it with a lower strain.
+                    // Only use the queued strain if it contributes more difficulty.
+                    currentSectionPeak = Math.Max(currentSectionPeak, queuedStrain.Value);
                 }
+                // If the queue is empty then we should start the section from the current object instead.
+                // The queue can be empty if we're starting off of the back of a new peak, or if we drained through all the queue
+                // and the current object is still later than the section end.
                 else
                 {
-                    // Create new strains if queue is empty
-                    saveCurrentPeak(currentSectionEnd - currentSectionBegin);
-                    currentSectionBegin = currentSectionEnd;
+                    // We don't have any prior strains to take as a reference, so end the new section `MaxSectionLength` after it starts.
                     currentSectionEnd = currentSectionBegin + MaxSectionLength;
                     startNewSectionFrom(currentSectionBegin, current);
                 }
@@ -147,10 +115,9 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
             double strain = StrainValueAt(current);
 
-            // Store the strain value for the object
             ObjectStrains.Add(strain);
 
-            // If it's the first object, set the section peak and return
+            // If it's the first object, we don't want to end the section since it's always going to be the new peak.
             if (current.Index == 0)
             {
                 currentSectionPeak = strain;
@@ -160,22 +127,22 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             // If the current strain is smaller than the current peak, add it to the queue
             if (strain < currentSectionPeak)
             {
-                // Empty the queue of smaller elements
-                while (queue.Last != null && queue.Last.Value.Value < strain)
-                    queue.RemoveLast();
+                // Empty the queue of smaller elements as they won't be relevant to difficulty
+                while (queuedStrains.Last != null && queuedStrains.Last.Value.Value < strain)
+                    queuedStrains.RemoveLast();
 
-                // Add current strain to queue since it's less than the current peak
-                queue.AddLast(new StrainObject(strain, current.StartTime));
+                queuedStrains.AddLast(new StrainObject(strain, current.StartTime));
             }
-            // If the strain is a new peak, clear the queue and start a new strain
             else
             {
-                // Clear the queue
-                queue.Clear();
+                // Clear the queue since none of the strains inside of it will be contributing to the difficulty.
+                queuedStrains.Clear();
 
-                // End the current strain, and create a new strain starting at the current hitobject
+                // End the current section with the new peak
                 saveCurrentPeak(current.StartTime - currentSectionBegin);
                 currentSectionPeak = strain;
+
+                // Set up the new section to start at the current object
                 currentSectionBegin = current.StartTime;
                 currentSectionEnd = currentSectionBegin + MaxSectionLength;
             }
@@ -202,23 +169,14 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// <summary>
         /// Saves the current peak strain level to the list of strain peaks, which will be used to calculate an overall difficulty.
         /// </summary>
-        private void saveCurrentPeak(double sectionLength, bool fromNewObject = false)
+        private void saveCurrentPeak(double sectionLength)
         {
-            // Calculate cut off time if not yet calculated
-            if (cutOffTime == -1)
-            {
-                cutOffTime = 5 * Math.Log(10) / Math.Log(DecayWeight);
-            }
-
-            if (DebugUtils.IsDebugBuild)
-            {
-                debugStrainPeaks.Add(new StrainPeak(currentSectionPeak, sectionLength, fromNewObject));
-            }
-
-            strainPeaks.AddInPlace(new StrainPeak(currentSectionPeak, sectionLength, fromNewObject), descComparer);
+            strainPeaks.AddInPlace(new StrainPeak(currentSectionPeak, sectionLength), strain_peak_comparer);
             totalLength += sectionLength;
 
-            while (totalLength / MaxSectionLength > 100)
+            // Remove from the back of our strain peaks if there's any which are too deep to contribute to difficulty.
+            // `cutOffTime` dictates for us how many sections will preserve at least 99.999% of the difficulty value.
+            while (totalLength / MaxSectionLength > cutOffTime)
             {
                 totalLength -= strainPeaks[^1].SectionLength;
                 strainPeaks.RemoveAt(strainPeaks.Count - 1);
@@ -252,17 +210,6 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         public IEnumerable<StrainPeak> GetCurrentStrainPeaks() => strainPeaks.Append(new StrainPeak(currentSectionPeak, currentSectionEnd - currentSectionBegin));
 
         /// <summary>
-        /// Returns a live enumerable of the real peak strains for each <see cref="MaxSectionLength"/> section of the beatmap,
-        /// including the peak of the current section.
-        /// </summary>
-        public IEnumerable<StrainPeak> GetDebugCurrentStrainPeaks()
-        {
-            if (!DebugUtils.IsDebugBuild) throw new InvalidOperationException("Cannot use this function in a non-debug build");
-
-            return debugStrainPeaks.Append(new StrainPeak(currentSectionPeak, currentSectionEnd - currentSectionBegin));
-        }
-
-        /// <summary>
         /// Returns the calculated difficulty value representing all <see cref="DifficultyHitObject"/>s that have been processed up to this point.
         /// </summary>
         public override double DifficultyValue()
@@ -288,6 +235,43 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             }
 
             return difficulty * RawDifficultyMultiplier;
+        }
+
+        /// <summary>
+        /// Used to store the difficulty of a section of a map.
+        /// <remarks>Not to be confused with <see cref="StrainObject"/></remarks>
+        /// </summary>
+        public readonly struct StrainPeak : IComparable<StrainPeak>
+        {
+            public StrainPeak(double value, double sectionLength)
+            {
+                Value = value;
+                SectionLength = Math.Round(sectionLength);
+            }
+
+            public double Value { get; }
+            public double SectionLength { get; }
+
+            public int CompareTo(StrainPeak other)
+            {
+                return Value.CompareTo(other.Value);
+            }
+        }
+
+        /// <summary>
+        /// Used to store the difficulty and start time of an object in a map.
+        /// <remarks>Not to be confused with <see cref="StrainPeak"/></remarks>
+        /// </summary>
+        private readonly struct StrainObject
+        {
+            public StrainObject(double value, double startTime)
+            {
+                Value = value;
+                StartTime = startTime;
+            }
+
+            public double Value { get; }
+            public double StartTime { get; }
         }
     }
 }
