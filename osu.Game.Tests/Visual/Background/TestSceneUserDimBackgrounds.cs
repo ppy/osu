@@ -855,14 +855,14 @@ namespace osu.Game.Tests.Visual.Background
             public Colour4? GetAnimationColourOffset() => testStoryboardAnimation?.GetDrawColourOffset();
             public Colour4? GetVideoColourOffset() => testStoryboardVideo?.GetDrawColourOffset();
 
-            public override DrawableStoryboard CreateDrawable(IReadOnlyList<Mod>? mods = null)
+            public override DrawableStoryboard CreateDrawable(IReadOnlyList<Mod> mods = null)
             {
                 return new TestDrawableStoryboard(this, mods);
             }
 
             private partial class TestDrawableStoryboard : DrawableStoryboard
             {
-                public TestDrawableStoryboard(TestStoryboard storyboard, IReadOnlyList<Mod>? mods)
+                public TestDrawableStoryboard(TestStoryboard storyboard, IReadOnlyList<Mod> mods)
                     : base(storyboard, mods)
                 {
                 }
