@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays.Settings.Sections;
 using osu.Game.Rulesets.Edit;
 
 namespace osu.Game.Rulesets.Osu.Edit
@@ -64,7 +65,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             MaxValue = 100
         };
 
-        private ExpandableSlider<double> sliderVelocitySlider = null!;
+        private ExpandableSlider<double, SizeSlider<double>> sliderVelocitySlider = null!;
         private ExpandableSlider<int> toleranceSlider = null!;
         private ExpandableSlider<int> cornerThresholdSlider = null!;
         private ExpandableSlider<int> circleThresholdSlider = null!;
@@ -74,9 +75,10 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             Children = new Drawable[]
             {
-                sliderVelocitySlider = new ExpandableSlider<double>
+                sliderVelocitySlider = new ExpandableSlider<double, SizeSlider<double>>
                 {
-                    Current = SliderVelocity
+                    Current = SliderVelocity,
+                    KeyboardStep = 0.1f,
                 },
                 toleranceSlider = new ExpandableSlider<int>
                 {
@@ -99,8 +101,8 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             SliderVelocity.BindValueChanged(velocity =>
             {
-                sliderVelocitySlider.ContractedLabelText = $"S. V.: {velocity.NewValue:N2}";
-                sliderVelocitySlider.ExpandedLabelText = $"Slider Velocity: {velocity.NewValue:N2}";
+                sliderVelocitySlider.ContractedLabelText = $"S. V.: {velocity.NewValue:0.##x}";
+                sliderVelocitySlider.ExpandedLabelText = $"Slider Velocity: {velocity.NewValue:0.##x}";
             }, true);
 
             displayTolerance.BindValueChanged(tolerance =>
