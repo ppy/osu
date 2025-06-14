@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     /// </summary>
     public class Speed : Skill
     {
-        private double skillMultiplier => 1.3;
+        private double skillMultiplier => 0.95;
 
         private readonly List<double> noteDifficulties = new List<double>();
 
@@ -68,7 +68,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 // Use a harmonic sum for note which effectively buffs maps with more notes, especially if note difficulties are consistent.
                 // Constants are arbitrary and give good values.
                 // https://www.desmos.com/calculator/gquji01mlg
-                double weight = (1.0 + (10.0 / (1 + index))) / (Math.Pow(index, 0.9) + 1.0 + (10.0 / (1.0 + index)));
+                double weight = (1.0 + (20.0 / (1 + index))) / (Math.Pow(index, 0.85) + 1.0 + (20.0 / (1.0 + index)));
 
                 noteWeights.Add(weight);
 
