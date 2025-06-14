@@ -101,7 +101,6 @@ namespace osu.Game.Rulesets.Osu.Edit
             {
                 sliderVelocitySlider.ContractedLabelText = $"S. V.: {velocity.NewValue:N2}";
                 sliderVelocitySlider.ExpandedLabelText = $"Slider Velocity: {velocity.NewValue:N2}";
-
             }, true);
 
             displayTolerance.BindValueChanged(tolerance =>
