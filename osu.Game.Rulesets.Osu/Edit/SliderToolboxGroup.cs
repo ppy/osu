@@ -10,9 +10,9 @@ using osu.Game.Rulesets.Edit;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
-    public partial class FreehandSliderToolboxGroup : EditorToolboxGroup
+    public partial class SliderToolboxGroup : EditorToolboxGroup
     {
-        public FreehandSliderToolboxGroup()
+        public SliderToolboxGroup()
             : base("slider")
         {
         }
@@ -102,7 +102,6 @@ namespace osu.Game.Rulesets.Osu.Edit
                 sliderVelocitySlider.ContractedLabelText = $"S. V.: {velocity.NewValue:N2}";
                 sliderVelocitySlider.ExpandedLabelText = $"Slider Velocity: {velocity.NewValue:N2}";
 
-                SliderVelocity.Value = velocity.NewValue;
             }, true);
 
             displayTolerance.BindValueChanged(tolerance =>

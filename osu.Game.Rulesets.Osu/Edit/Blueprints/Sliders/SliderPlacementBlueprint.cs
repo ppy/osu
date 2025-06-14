@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         private IDistanceSnapProvider? distanceSnapProvider { get; set; }
 
         [Resolved]
-        private FreehandSliderToolboxGroup? freehandToolboxGroup { get; set; }
+        private SliderToolboxGroup? sliderToolboxGroup { get; set; }
 
         [Resolved]
         private EditorClock? editorClock { get; set; }
@@ -90,21 +90,21 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
             inputManager = GetContainingInputManager()!;
 
-            if (freehandToolboxGroup != null)
+            if (sliderToolboxGroup != null)
             {
-                freehandToolboxGroup.Tolerance.BindValueChanged(e =>
+                sliderToolboxGroup.Tolerance.BindValueChanged(e =>
                 {
                     bSplineBuilder.Tolerance = e.NewValue;
                     Scheduler.AddOnce(updateSliderPathFromBSplineBuilder);
                 }, true);
 
-                freehandToolboxGroup.CornerThreshold.BindValueChanged(e =>
+                sliderToolboxGroup.CornerThreshold.BindValueChanged(e =>
                 {
                     bSplineBuilder.CornerThreshold = e.NewValue;
                     Scheduler.AddOnce(updateSliderPathFromBSplineBuilder);
                 }, true);
 
-                freehandToolboxGroup.CircleThreshold.BindValueChanged(e =>
+                sliderToolboxGroup.CircleThreshold.BindValueChanged(e =>
                 {
                     Scheduler.AddOnce(updateSliderPathFromBSplineBuilder);
                 }, true);
@@ -126,7 +126,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 case SliderPlacementState.Initial:
                     BeginPlacement();
 
-                    HitObject.SliderVelocityMultiplier = freehandToolboxGroup?.SliderVelocity.Value ?? 1;
+                    HitObject.SliderVelocityMultiplier = sliderToolboxGroup?.SliderVelocity.Value ?? 1;
                     HitObject.Position = ToLocalSpace(result.ScreenSpacePosition);
                     break;
 
@@ -470,7 +470,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         private Vector2[]? tryCircleArc(List<Vector2> segment)
         {
-            if (segment.Count < 3 || freehandToolboxGroup?.CircleThreshold.Value == 0) return null;
+            if (segment.Count < 3 || sliderToolboxGroup?.CircleThreshold.Value == 0) return null;
 
             // Assume the segment creates a reasonable circular arc and then check if it reasonable
             var points = PathApproximator.BSplineToPiecewiseLinear(segment.ToArray(), bSplineBuilder.Degree);
@@ -543,7 +543,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
             loss /= points.Count;
 
-            return loss > freehandToolboxGroup?.CircleThreshold.Value || totalWinding > MathHelper.TwoPi ? null : circleArcControlPoints;
+            return loss > sliderToolboxGroup?.CircleThreshold.Value || totalWinding > MathHelper.TwoPi ? null : circleArcControlPoints;
         }
 
         private enum SliderPlacementState
