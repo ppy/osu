@@ -127,7 +127,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
 
             try
             {
-                bool foundUpdate = await updateManager.CheckForUpdateAsync().ConfigureAwait(true);
+                bool foundUpdate = await updateManager.CheckForUpdateAsync(checkingNotification).ConfigureAwait(true);
 
                 if (!foundUpdate)
                 {
@@ -143,9 +143,8 @@ namespace osu.Game.Overlays.Settings.Sections.General
             }
             finally
             {
-                // This sequence allows the notification to be immediately dismissed.
-                checkingNotification.State = ProgressNotificationState.Cancelled;
-                checkingNotification.Close(false);
+                // Ensure the checking notification is dismissed even if it has already been dismissed by CheckForUpdateAsync.
+                checkingNotification.CloseImmediately();
                 checkForUpdatesButton.Enabled.Value = true;
             }
         }

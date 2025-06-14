@@ -52,12 +52,12 @@ namespace osu.Desktop.Updater
                 AllowVersionDowngrade = true,
             });
 
-            Schedule(() => Task.Run(CheckForUpdateAsync));
+            Schedule(() => Task.Run(() => CheckForUpdateAsync()));
         }
 
-        protected override async Task<bool> PerformUpdateCheck() => await checkForUpdateAsync().ConfigureAwait(false);
+        protected override async Task<bool> PerformUpdateCheck(ProgressNotification? checkingNotification = null) => await checkForUpdateAsync(checkingNotification).ConfigureAwait(false);
 
-        private async Task<bool> checkForUpdateAsync()
+        private async Task<bool> checkForUpdateAsync(ProgressNotification? checkingNotification = null)
         {
             // whether to check again in 30 minutes. generally only if there's an error or no update was found (yet).
             bool scheduleRecheck = false;
@@ -113,6 +113,8 @@ namespace osu.Desktop.Updater
                     },
                 };
 
+                checkingNotification?.CloseImmediately();
+
                 runOutsideOfGameplay(() => notificationOverlay.Post(notification));
                 notification.StartDownload();
 
@@ -125,7 +127,7 @@ namespace osu.Desktop.Updater
                 {
                     // In the case of an error, a separate notification will be displayed.
                     scheduleRecheck = true;
-                    notification.FailDownload();
+                    notification.CloseImmediately();
                     Logger.Error(e, @"update failed!");
                 }
             }

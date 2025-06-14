@@ -31,7 +31,7 @@ namespace osu.Game.Updater
             version = game.Version;
         }
 
-        protected override async Task<bool> PerformUpdateCheck()
+        protected override async Task<bool> PerformUpdateCheck(ProgressNotification? checkingNotification = null)
         {
             try
             {
@@ -48,6 +48,8 @@ namespace osu.Game.Updater
 
                 if (latestTagName != version && tryGetBestUrl(latest, out string? url))
                 {
+                    checkingNotification?.CloseImmediately();
+
                     Notifications.Post(new SimpleNotification
                     {
                         Text = $"A newer release of osu! has been found ({version} → {latestTagName}).\n\n"

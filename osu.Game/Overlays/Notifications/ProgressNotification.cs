@@ -252,6 +252,11 @@ namespace osu.Game.Overlays.Notifications
             cancelSample = audioManager.Samples.Get(@"UI/notification-cancel");
         }
 
+        /// <summary>
+        /// Dismisses the notification immediately without any animation.
+        /// </summary>
+        public void CloseImmediately() => base.Close(false);
+
         public override void Close(bool runFlingAnimation)
         {
             switch (State)
