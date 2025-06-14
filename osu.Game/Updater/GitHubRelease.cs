@@ -3,7 +3,9 @@
 
 #nullable disable
 
+using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 using Newtonsoft.Json;
 
 namespace osu.Game.Updater
@@ -18,5 +20,11 @@ namespace osu.Game.Updater
 
         [JsonProperty("assets")]
         public List<GitHubAsset> Assets { get; set; }
+
+        [JsonProperty("prerelease")]
+        public bool Prerelease { get; set; }
+
+        [JsonPropertyName("published_at")]
+        public DateTime? PublishedAt { get; set; }
     }
 }
