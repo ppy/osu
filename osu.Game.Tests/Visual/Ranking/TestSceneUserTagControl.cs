@@ -102,6 +102,7 @@ namespace osu.Game.Tests.Visual.Ranking
                 RelativeSizeAxes = Axes.Both,
                 Child = new UserTagControl(Beatmap.Value.BeatmapInfo)
                 {
+                    Writable = true,
                     Width = 700,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
