@@ -56,7 +56,5 @@ namespace osu.Game.Rulesets.Edit
         }
 
         protected override bool OnMouseDown(MouseDownEvent e) => true;
-
-        protected override bool OnClick(ClickEvent e) => true;
     }
 }
