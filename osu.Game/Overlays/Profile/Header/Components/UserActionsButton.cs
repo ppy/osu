@@ -167,22 +167,23 @@ namespace osu.Game.Overlays.Profile.Header.Components
                         RelativeSizeAxes = Axes.X,
                         Padding = new MarginPadding { Horizontal = 25, Vertical = 5 },
                         Direction = FillDirection.Horizontal,
-                        Spacing = new Vector2(3, 0),
+                        Spacing = new Vector2(5, 0),
                         Children = new Drawable[]
                         {
                             new SpriteIcon
                             {
                                 Icon = icon,
-                                Size = new Vector2(14),
+                                Size = new Vector2(11),
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
                             },
                             new OsuSpriteText
                             {
                                 Text = caption,
-                                Font = OsuFont.Style.Caption1,
+                                Font = OsuFont.Style.Body,
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
+                                UseFullGlyphHeight = false,
                             }
                         }
                     }
