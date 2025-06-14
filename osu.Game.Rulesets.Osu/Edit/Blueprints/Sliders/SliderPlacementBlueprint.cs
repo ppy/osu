@@ -129,16 +129,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 case SliderPlacementState.Initial:
                     BeginPlacement();
 
-                    double? nearestSliderVelocity = (editorBeatmap
-                                                     .HitObjects
-                                                     .LastOrDefault(h => h is Slider && h.GetEndTime() < HitObject.StartTime) as Slider)?.SliderVelocityMultiplier;
-
                     HitObject.SliderVelocityMultiplier = freehandToolboxGroup?.SliderVelocity.Value ?? 1;
                     HitObject.Position = ToLocalSpace(result.ScreenSpacePosition);
-
-                    // Replacing the DifficultyControlPoint above doesn't trigger any kind of invalidation.
-                    // Without re-applying defaults, velocity won't be updated.
-                    ApplyDefaultsToHitObject();
                     break;
 
                 case SliderPlacementState.ControlPoints:
