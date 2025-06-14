@@ -83,9 +83,6 @@ namespace osu.Game.Users
         [Resolved]
         private MetadataClient? metadataClient { get; set; }
 
-        [Resolved]
-        private INotificationOverlay? notifications { get; set; }
-
         [BackgroundDependencyLoader]
         private void load()
         {
