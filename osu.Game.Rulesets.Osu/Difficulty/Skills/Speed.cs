@@ -93,7 +93,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 return noteDifficulties.Count;
 
             // Use a weighted sum of all notes. Constants are arbitrary and give nice values
-            return noteDifficulties.Sum(s => 1.1 / (1 + Math.Exp(-10 * (s / consistentTopNote - 0.88))));
+            return noteDifficulties.Sum(s => 1.1 / (1 + Math.Exp(-5 * (s / consistentTopNote - 2))));
         }
 
         public double RelevantNoteCount()
@@ -123,7 +123,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 return 0;
 
             // Use a weighted sum of all strains. Constants are arbitrary and give nice values
-            return sliderStrains.Sum(s => DifficultyCalculationUtils.Logistic(s / consistentTopNote, 0.88, 10, 1.1));
+            return sliderStrains.Sum(s => DifficultyCalculationUtils.Logistic(s / consistentTopNote, 2, 5, 1.1));
         }
     }
 }
