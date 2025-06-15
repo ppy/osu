@@ -13,7 +13,6 @@ using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
-using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 {
@@ -72,7 +71,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                 // Add panels for all users new to the room.
                 foreach (var user in client.Room.Users.Except(participants))
                     participants.Add(user);
-                    if (currentHost == null || !ReferenceEquals(currentHost, client.Room.Host))
+
+                if (currentHost == null || !ReferenceEquals(currentHost, client.Room.Host))
                 {
                     currentHost = null;
 
