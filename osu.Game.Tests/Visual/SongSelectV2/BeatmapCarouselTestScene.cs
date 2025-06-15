@@ -184,6 +184,13 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         protected void WaitForFiltering() => AddUntilStep("filtering finished", () => Carousel.IsFiltering, () => Is.False);
         protected void WaitForScrolling() => AddUntilStep("scroll finished", () => Scroll.Current, () => Is.EqualTo(Scroll.Target));
 
+        protected void ToggleGroupCollapse() => AddStep("toggle group collapse", () =>
+        {
+            InputManager.PressKey(Key.ShiftLeft);
+            InputManager.Key(Key.Enter);
+            InputManager.ReleaseKey(Key.ShiftLeft);
+        });
+
         protected void SelectNextGroup() => AddStep("select next group", () =>
         {
             InputManager.PressKey(Key.ShiftLeft);

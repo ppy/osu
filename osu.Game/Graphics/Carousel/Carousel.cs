@@ -234,6 +234,13 @@ namespace osu.Game.Graphics.Carousel
             Scroll.Panels.SingleOrDefault(p => ((ICarouselPanel)p).Item == item);
 
         /// <summary>
+        /// When a user is traversing the carousel via group selection keys, assert whether the item provided is a valid target.
+        /// </summary>
+        /// <param name="item">The candidate item.</param>
+        /// <returns>Whether the provided item is a valid group target. If <c>false</c>, more panels will be checked in the user's requested direction until a valid target is found.</returns>
+        protected virtual bool CheckValidForGroupSelection(CarouselItem item) => false;
+
+        /// <summary>
         /// When a user is traversing the carousel via set selection keys, assert whether the item provided is a valid target.
         /// </summary>
         /// <param name="item">The candidate item.</param>
@@ -467,6 +474,28 @@ namespace osu.Game.Graphics.Carousel
                 case GlobalAction.ActivatePreviousSet:
                     Scheduler.AddOnce(traverseSetSelection, -1);
                     return true;
+
+                case GlobalAction.ExpandPreviousGroup:
+                    Scheduler.AddOnce(traverseGroupSelection, -1);
+                    return true;
+
+                case GlobalAction.ExpandNextGroup:
+                    Scheduler.AddOnce(traverseGroupSelection, 1);
+                    return true;
+
+                case GlobalAction.ToggleCurrentGroup:
+                    if (currentKeyboardSelection.CarouselItem != null && CheckValidForGroupSelection(currentKeyboardSelection.CarouselItem))
+                    {
+                        // If keyboard selection is a group, toggle group and then change keyboard selection to actual selection.
+                        Activate(currentKeyboardSelection.CarouselItem);
+                    }
+                    else
+                    {
+                        // If current keyboard selection is not a group, toggle closest group and move keyboard selection to that group.
+                        traverseSelection(-1, CheckValidForGroupSelection, false);
+                    }
+
+                    return true;
             }
 
             return false;
@@ -520,22 +549,37 @@ namespace osu.Game.Graphics.Carousel
         }
 
         /// <summary>
-        /// Select the next valid selection relative to a current selection.
+        /// Select the next valid group selection relative to a current selection.
+        /// This is generally for keyboard based traversal.
+        /// </summary>
+        /// <param name="direction">Positive for downwards, negative for upwards.</param>
+        /// <returns>Whether selection was possible.</returns>
+        private void traverseGroupSelection(int direction) => traverseSelection(direction, CheckValidForGroupSelection);
+
+        /// <summary>
+        /// Select the next valid set selection relative to a current selection.
         /// This is generally for keyboard based traversal.
         /// </summary>
         /// <param name="direction">Positive for downwards, negative for upwards.</param>
         /// <returns>Whether selection was possible.</returns>
         private void traverseSetSelection(int direction)
         {
-            if (carouselItems == null || carouselItems.Count == 0) return;
-
             // If the user has a different keyboard selection and requests
             // set selection, first transfer the keyboard selection to actual selection.
+            //
+            // It is assumed that selecting a set will immediately change selection to one of its children.
             if (currentKeyboardSelection.CarouselItem != null && currentSelection.CarouselItem != currentKeyboardSelection.CarouselItem)
             {
                 Activate(currentKeyboardSelection.CarouselItem);
                 return;
             }
+
+            traverseSelection(direction, CheckValidForSetSelection);
+        }
+
+        private void traverseSelection(int direction, Func<CarouselItem, bool> predicate, bool skipFirst = true)
+        {
+            if (carouselItems == null || carouselItems.Count == 0) return;
 
             int originalIndex;
             int newIndex;
@@ -549,12 +593,15 @@ namespace osu.Game.Graphics.Carousel
             {
                 newIndex = originalIndex = currentKeyboardSelection.Index.Value;
 
-                // As a second special case, if we're set selecting backwards and the current selection isn't a set,
-                // make sure to go back to the set header this item belongs to, so that the block below doesn't find it and stop too early.
-                if (direction < 0)
+                if (skipFirst)
                 {
-                    while (newIndex > 0 && !CheckValidForSetSelection(carouselItems[newIndex]))
-                        newIndex--;
+                    // As a second special case, if we're set selecting backwards and the current selection isn't a set,
+                    // make sure to go back to the set header this item belongs to, so that the block below doesn't find it and stop too early.
+                    if (direction < 0)
+                    {
+                        while (newIndex > 0 && !predicate(carouselItems[newIndex]))
+                            newIndex--;
+                    }
                 }
             }
 
@@ -569,9 +616,9 @@ namespace osu.Game.Graphics.Carousel
 
                 var newItem = carouselItems[newIndex];
 
-                if (CheckValidForSetSelection(newItem))
+                if (predicate(newItem))
                 {
-                    HandleItemActivated(newItem);
+                    Activate(newItem);
                     return;
                 }
             } while (true);
