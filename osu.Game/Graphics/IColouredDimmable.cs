@@ -18,8 +18,8 @@ namespace osu.Game.Graphics
                 if (DrawColourInfo.Blending == BlendingParameters.Additive)
                     // Additive Drawables shouldn't have any offset, because things underneath them
                     // already have it added to them. This does rely on the fact that there is
-                    // something non-additive behind this sprite, which seems to be the case
-                    // with storyboards, as beatmap background is always enabled.
+                    // something non-additive (but still IColouredDimmable) behind this sprite,
+                    // which seems to be the case with storyboards, as beatmap background is always enabled.
                     return Colour4.Black;
 
                 if (Parent is IColouredDimmable colouredDimmableParent)

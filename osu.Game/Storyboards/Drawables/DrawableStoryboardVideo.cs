@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-//#nullable disable
-
 using System;
 using System.IO;
 using System.Linq;
@@ -155,6 +153,7 @@ namespace osu.Game.Storyboards.Drawables
                 {
                     bool result = base.OnInvalidate(invalidation, source);
 
+                    // Needed because DrawColourOffset is handled by the DrawNode
                     if ((invalidation & Invalidation.Colour) > 0)
                     {
                         result |= Invalidate(Invalidation.DrawNode);
