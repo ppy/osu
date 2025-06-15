@@ -1,10 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
+using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Screens.Edit;
@@ -21,6 +24,7 @@ namespace osu.Game.Rulesets.Edit
         private readonly Bindable<bool> contractSidebars = new Bindable<bool>();
 
         private bool expandOnHover;
+        private OffsetMaintainingScrollContainer scrollContainer = null!;
 
         [Resolved]
         private Editor? editor { get; set; }
@@ -42,6 +46,27 @@ namespace osu.Game.Rulesets.Edit
             config.BindWith(OsuSetting.EditorContractSidebars, contractSidebars);
         }
 
+        protected override OsuScrollContainer CreateScrollContainer() => scrollContainer = new OffsetMaintainingScrollContainer();
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            var inputManager = GetContainingInputManager();
+
+            if (inputManager != null)
+            {
+                Expanded.BindValueChanged(_ =>
+                {
+                    // When state changes from expanded -> collapsed the mouse is no longer within the toolbox so there would be no
+                    // hovered children if we used the mouse position directly
+                    var position = new Vector2(ScreenSpaceDrawQuad.Centre.X, inputManager.CurrentState.Mouse.Position.Y);
+
+                    scrollContainer.TargetDrawable = Children.FirstOrDefault(it => it.Contains(position));
+                });
+            }
+        }
+
         protected override void Update()
         {
             base.Update();
@@ -58,5 +83,49 @@ namespace osu.Game.Rulesets.Edit
         protected override bool OnMouseDown(MouseDownEvent e) => true;
 
         protected override bool OnClick(ClickEvent e) => true;
+
+        private partial class OffsetMaintainingScrollContainer : OsuScrollContainer
+        {
+            private Drawable? targetDrawable;
+            private float targetPosition;
+
+            public Drawable? TargetDrawable
+            {
+                get => targetDrawable;
+                set
+                {
+                    targetDrawable = value;
+
+                    if (value != null)
+                        targetPosition = ToLocalSpace(value.ScreenSpaceDrawQuad.TopLeft).Y;
+                }
+            }
+
+            protected override void UpdateAfterChildren()
+            {
+                if (targetDrawable != null)
+                {
+                    float currentPosition = ToLocalSpace(targetDrawable.ScreenSpaceDrawQuad.TopLeft).Y;
+
+                    if (!Precision.AlmostEquals(targetPosition, currentPosition))
+                    {
+                        double offset = currentPosition - targetPosition;
+
+                        double scrollTarget = Math.Clamp(Current + offset, 0, ScrollableExtent);
+
+                        ScrollTo(scrollTarget, false, double.PositiveInfinity);
+                    }
+                }
+
+                base.UpdateAfterChildren();
+            }
+
+            protected override void OnUserScroll(double value, bool animated = true, double? distanceDecay = null)
+            {
+                targetDrawable = null;
+
+                base.OnUserScroll(value, animated, distanceDecay);
+            }
+        }
     }
 }
