@@ -20,6 +20,7 @@ namespace osu.Game.Graphics.Sprites
         {
             bool result = base.OnInvalidate(invalidation, source);
 
+            // Needed because DrawColourOffset is handled by the DrawNode
             if ((invalidation & Invalidation.Colour) > 0)
             {
                 result |= Invalidate(Invalidation.DrawNode);

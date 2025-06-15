@@ -18,16 +18,18 @@ namespace osu.Game.Graphics.Sprites
     {
         protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
         {
-            // Colour is handled by BufferedContainer, no need to propagate it to children
-            // Perhaps this needs to be moved into base class
-            invalidation &= ~Invalidation.Colour;
+            bool result = false;
 
-            bool result = base.OnInvalidate(invalidation, source);
-
+            // Needed because DrawColourOffset is handled by the DrawNode
             if ((invalidation & Invalidation.Colour) > 0)
             {
                 result |= Invalidate(Invalidation.DrawNode);
             }
+
+            // Colour is handled by ColouredDimmableBufferedContainer, no need to propagate it to children
+            invalidation &= ~Invalidation.Colour;
+
+            result |= base.OnInvalidate(invalidation, source);
 
             return result;
         }
