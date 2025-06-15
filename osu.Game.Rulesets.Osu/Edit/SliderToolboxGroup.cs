@@ -2,12 +2,15 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings.Sections;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Screens.Edit;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
@@ -66,9 +69,16 @@ namespace osu.Game.Rulesets.Osu.Edit
         };
 
         private ExpandableSlider<double, SizeSlider<double>> sliderVelocitySlider = null!;
+        private ExpandableButton previousSliderVelocityButton = null!;
         private ExpandableSlider<int> toleranceSlider = null!;
         private ExpandableSlider<int> cornerThresholdSlider = null!;
         private ExpandableSlider<int> circleThresholdSlider = null!;
+
+        [Resolved]
+        private EditorBeatmap editorBeatmap { get; set; } = null!;
+
+        [Resolved]
+        private EditorClock editorClock { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -79,6 +89,16 @@ namespace osu.Game.Rulesets.Osu.Edit
                 {
                     Current = SliderVelocity,
                     KeyboardStep = 0.1f,
+                },
+                previousSliderVelocityButton = new ExpandableButton
+                {
+                    Action = () =>
+                    {
+                        double? previousSliderVelocity = getPreviousSliderVelocityMultiplier();
+
+                        SliderVelocity.Value = previousSliderVelocity ?? 1;
+                    },
+                    RelativeSizeAxes = Axes.X,
                 },
                 toleranceSlider = new ExpandableSlider<int>
                 {
@@ -147,6 +167,32 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             float displayToInternalCircleThreshold(float v) => v / 20000f;
             int internalToDisplayCircleThreshold(float v) => (int)Math.Round(v * 20000f);
+        }
+
+        protected override void Update()
+        {
+            double? previousSliderVelocity = getPreviousSliderVelocityMultiplier();
+
+            if (previousSliderVelocity != null)
+            {
+                // If the previous slider's velocity is the same the s.v. slider's current value, there's no point in having the button enabled.
+                previousSliderVelocityButton.Enabled.Value = !(previousSliderVelocity == SliderVelocity.Value);
+                previousSliderVelocityButton.ExpandedLabelText = $"Use previous: ({previousSliderVelocity:0.##x})";
+                previousSliderVelocityButton.ContractedLabelText = $"Previous: ({previousSliderVelocity:0.##x})";
+            }
+            else
+            {
+                previousSliderVelocityButton.Enabled.Value = false;
+                previousSliderVelocityButton.ExpandedLabelText = "Use previous (unavailable)";
+                previousSliderVelocityButton.ContractedLabelText = string.Empty;
+            }
+        }
+
+        private double? getPreviousSliderVelocityMultiplier()
+        {
+            return (editorBeatmap
+                    .HitObjects
+                    .LastOrDefault(h => h is Slider && h.StartTime < editorClock.CurrentTime) as Slider)?.SliderVelocityMultiplier;
         }
     }
 }
