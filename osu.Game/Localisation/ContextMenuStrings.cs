@@ -20,6 +20,11 @@ namespace osu.Game.Localisation
         public static LocalisableString ViewBeatmap => new TranslatableString(getKey(@"view_beatmap"), @"View beatmap");
 
         /// <summary>
+        /// "Search online"
+        /// </summary>
+        public static LocalisableString SearchOnline => new TranslatableString(getKey(@"search_online"), @"Search online");
+
+        /// <summary>
         /// "Invite to room"
         /// </summary>
         public static LocalisableString InvitePlayer => new TranslatableString(getKey(@"invite_player"), @"Invite to room");
