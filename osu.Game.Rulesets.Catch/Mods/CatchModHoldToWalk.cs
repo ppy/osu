@@ -21,6 +21,7 @@ namespace osu.Game.Rulesets.Catch.Mods
         public override string Name => "Hold to Walk";
         public override string Acronym => "HW";
         public override LocalisableString Description => "Hold the Dash key to walk!";
+        public override ModType Type => ModType.Conversion;
         public override double ScoreMultiplier => 1;
         public override IconUsage? Icon => FontAwesome.Solid.Running;
         public override Type[] IncompatibleMods => new[] { typeof(ModAutoplay), typeof(ModRelax) };
