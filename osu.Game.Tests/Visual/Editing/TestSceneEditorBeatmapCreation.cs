@@ -773,7 +773,7 @@ namespace osu.Game.Tests.Visual.Editing
             AddAssert("other audio not removed", () => Beatmap.Value.BeatmapSetInfo.Files.Any(f => f.Filename == "audio (1).mp3"));
         }
 
-        private void ensureEditorLoaded() => AddUntilStep("wait for editor load", () => Editor.IsLoaded && DialogOverlay.IsLoaded);
+        private void ensureEditorLoaded() => AddUntilStep("wait for editor load", () => Editor.ReadyForUse && DialogOverlay.IsLoaded);
 
         private void createNewDifficulty()
         {
