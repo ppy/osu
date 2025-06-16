@@ -22,9 +22,6 @@ namespace osu.Game.Graphics.UserInterface
     {
         private readonly bool blockInput;
 
-        [CanBeNull]
-        protected Box BackgroundDimLayer { get; }
-
         /// <summary>
         /// Construct a new loading spinner.
         /// </summary>
@@ -42,11 +39,11 @@ namespace osu.Game.Graphics.UserInterface
 
             if (dimBackground)
             {
-                AddInternal(BackgroundDimLayer = new Box
+                AddInternal(new Box
                 {
                     Depth = float.MaxValue,
                     Colour = Color4.Black,
-                    Alpha = 0,
+                    Alpha = 0.5f,
                     RelativeSizeAxes = Axes.Both,
                 });
             }
@@ -72,18 +69,6 @@ namespace osu.Game.Graphics.UserInterface
             }
 
             return true;
-        }
-
-        protected override void PopIn()
-        {
-            BackgroundDimLayer?.FadeTo(0.5f, TRANSITION_DURATION * 2, Easing.OutQuint);
-            base.PopIn();
-        }
-
-        protected override void PopOut()
-        {
-            BackgroundDimLayer?.FadeOut(TRANSITION_DURATION, Easing.OutQuint);
-            base.PopOut();
         }
 
         protected override void Update()
