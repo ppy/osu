@@ -232,8 +232,8 @@ namespace osu.Game.Tests.Visual.Editing
                 EditorBeatmap.ControlPointInfo.Add(1500, new EffectControlPoint { KiaiMode = false, ScrollSpeed = 0.3 });
             });
 
+            ensureEditorLoaded();
             AddStep("save beatmap", () => Editor.Save());
-
             AddStep("create new difficulty", () => Editor.CreateNewDifficulty(new ManiaRuleset().RulesetInfo));
 
             AddUntilStep("wait for dialog", () => DialogOverlay.CurrentDialog is CreateNewDifficultyDialog);
@@ -293,8 +293,8 @@ namespace osu.Game.Tests.Visual.Editing
                 EditorBeatmap.ControlPointInfo.Add(1500, new EffectControlPoint { KiaiMode = false, ScrollSpeed = 0.3 });
             });
 
+            ensureEditorLoaded();
             AddStep("save beatmap", () => Editor.Save());
-
             AddStep("create new difficulty", () => Editor.CreateNewDifficulty(new TaikoRuleset().RulesetInfo));
 
             AddUntilStep("wait for created", () =>
@@ -637,6 +637,8 @@ namespace osu.Game.Tests.Visual.Editing
                     StartTime = 1000
                 }
             }));
+
+            ensureEditorLoaded();
             AddStep("save beatmap", () => Editor.Save());
             AddStep("try to create new catch difficulty", () => Editor.CreateNewDifficulty(new CatchRuleset().RulesetInfo));
 
