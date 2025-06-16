@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Diagnostics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -24,11 +25,13 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool StartHidden => true;
 
-        protected Drawable MainContents;
-
-        private readonly Container? roundedContent;
+        protected Container MainContents;
 
         private readonly TrianglesV2 triangles;
+
+        private readonly Container? trianglesMasking;
+
+        private readonly bool withBox;
 
         private const float spin_duration = 900;
 
@@ -39,6 +42,8 @@ namespace osu.Game.Graphics.UserInterface
         /// <param name="inverted">Whether colours should be inverted (black spinner instead of white).</param>
         public LoadingSpinner(bool withBox = false, bool inverted = false)
         {
+            this.withBox = withBox;
+
             Size = new Vector2(60);
 
             Anchor = Anchor.Centre;
@@ -46,7 +51,7 @@ namespace osu.Game.Graphics.UserInterface
 
             if (withBox)
             {
-                Child = MainContents = roundedContent = new Container
+                Child = MainContents = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
                     Masking = true,
@@ -86,46 +91,49 @@ namespace osu.Game.Graphics.UserInterface
             }
             else
             {
-                Child = MainContents = new Container
+                Children = new[]
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Both,
-                    Children = new Drawable[]
+                    MainContents = new Container
                     {
-                        new Container
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        RelativeSizeAxes = Axes.Both,
+                        Children = new Drawable[]
                         {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            RelativeSizeAxes = Axes.Both,
-                            Size = new Vector2(0.8f),
-                            Masking = true,
-                            CornerRadius = 20,
-                            Children = new Drawable[]
+                            spinner = new SpriteIcon
                             {
-                                triangles = new TrianglesV2
-                                {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    Alpha = 0.4f,
-                                    Colour = ColourInfo.GradientVertical(
-                                        inverted ? Color4.Black.Opacity(0) : Color4.White.Opacity(0),
-                                        inverted ? Color4.Black : Color4.White),
-                                    RelativeSizeAxes = Axes.Both,
-                                    ScaleAdjust = 0.4f,
-                                    SpawnRatio = 4,
-                                },
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Colour = inverted ? Color4.Black : Color4.White,
+                                RelativeSizeAxes = Axes.Both,
+                                Icon = FontAwesome.Solid.CircleNotch
                             }
-                        },
-                        spinner = new SpriteIcon
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Colour = inverted ? Color4.Black : Color4.White,
-                            RelativeSizeAxes = Axes.Both,
-                            Icon = FontAwesome.Solid.CircleNotch
                         }
-                    }
+                    },
+                    trianglesMasking = new Container
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        RelativeSizeAxes = Axes.Both,
+                        Size = new Vector2(0.8f),
+                        Masking = true,
+                        CornerRadius = 20,
+                        Children = new Drawable[]
+                        {
+                            triangles = new TrianglesV2
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Alpha = 0.4f,
+                                Colour = ColourInfo.GradientVertical(
+                                    inverted ? Color4.Black.Opacity(0) : Color4.White.Opacity(0),
+                                    inverted ? Color4.Black : Color4.White),
+                                RelativeSizeAxes = Axes.Both,
+                                ScaleAdjust = 0.4f,
+                                SpawnRatio = 4,
+                            },
+                        }
+                    },
                 };
             }
         }
@@ -137,19 +145,20 @@ namespace osu.Game.Graphics.UserInterface
             rotate();
         }
 
-        protected override void Update()
-        {
-            base.Update();
-
-            if (roundedContent != null)
-                roundedContent.CornerRadius = MainContents.DrawWidth / 4;
-        }
-
         protected override void UpdateAfterChildren()
         {
             base.UpdateAfterChildren();
 
-            triangles.Rotation = -MainContents.Rotation;
+            if (withBox)
+            {
+                MainContents.CornerRadius = MainContents.DrawWidth / 4;
+                triangles.Rotation = -MainContents.Rotation;
+            }
+            else
+            {
+                Debug.Assert(trianglesMasking != null);
+                trianglesMasking.CornerRadius = MainContents.DrawWidth / 2;
+            }
         }
 
         protected override void PopIn()

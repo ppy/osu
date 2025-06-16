@@ -4,7 +4,6 @@
 #nullable disable
 
 using System;
-using JetBrains.Annotations;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
