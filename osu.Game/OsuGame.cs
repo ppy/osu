@@ -1263,7 +1263,7 @@ namespace osu.Game
                 };
             }
 
-            // eventually informational overlays should be displayed in a stack, but for now let's only allow one to stay open at a time.
+            // eventually informational overlays should be displayed in a stack, but for now each overlay only has one instance.
             var informationalOverlays = new OverlayContainer[] { beatmapSetOverlay, userProfile };
 
             foreach (var overlay in informationalOverlays)
@@ -1271,7 +1271,7 @@ namespace osu.Game
                 overlay.State.ValueChanged += state =>
                 {
                     if (state.NewValue != Visibility.Hidden)
-                        showOverlayAboveOthers(overlay, informationalOverlays);
+                        showOverlayAboveOthers(overlay, Array.Empty<OverlayContainer>(), true);
                 };
             }
 
@@ -1339,7 +1339,7 @@ namespace osu.Game
             }
         }
 
-        private void showOverlayAboveOthers(OverlayContainer overlay, OverlayContainer[] otherOverlays)
+        private void showOverlayAboveOthers(OverlayContainer overlay, OverlayContainer[] otherOverlays, bool bringToFront = false)
         {
             otherOverlays.Where(o => o != overlay).ForEach(o => o.Hide());
 
@@ -1347,7 +1347,7 @@ namespace osu.Game
             Notifications.Hide();
 
             // Partially visible so leave it at the current depth.
-            if (overlay.IsPresent)
+            if (overlay.IsPresent && !bringToFront)
                 return;
 
             // Show above all other overlays.
