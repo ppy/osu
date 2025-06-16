@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private readonly double clockRate;
         private readonly bool hasHiddenMod;
         private readonly double preempt;
-        private double skillMultiplier => 23.0;
+        private double skillMultiplier => 7.0;
 
         public Reading(IBeatmap beatmap, Mod[] mods, double clockRate)
             : base(mods)
@@ -37,9 +37,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             objectList = beatmap.HitObjects;
         }
 
-        public static double DifficultyToPerformance(double difficulty) => 25 * Math.Pow(difficulty, 2);
+        private double currentDifficulty;
+        private double strainDecayBase => 0.3;
 
-        public override void Process(DifficultyHitObject current) => noteDifficulties.Add(ReadingEvaluator.EvaluateDifficultyOf(objectList.Count, current, clockRate, preempt, hasHiddenMod) * skillMultiplier);
+        public static double DifficultyToPerformance(double difficulty) => 25 * Math.Pow(difficulty, 2);
+        private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
+
+        public override void Process(DifficultyHitObject current)
+        {
+            currentDifficulty *= strainDecay(current.DeltaTime);
+
+            currentDifficulty += ReadingEvaluator.EvaluateDifficultyOf(objectList.Count, current, clockRate, preempt, hasHiddenMod) * skillMultiplier;
+
+            noteDifficulties.Add(currentDifficulty);
+        }
 
         public override double DifficultyValue()
         {
