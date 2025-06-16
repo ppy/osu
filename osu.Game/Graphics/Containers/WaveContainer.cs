@@ -120,6 +120,17 @@ namespace osu.Game.Graphics.Containers
             });
         }
 
+        public void ReplayPopInAnimation()
+        {
+            foreach (var w in wavesContainer)
+                w.ReplayPopInAnimation();
+
+            contentContainer.MoveToY(2);
+            contentContainer.MoveToY(0, APPEAR_DURATION, Easing.OutQuint);
+            samplePopIn?.Play();
+            wasShown = true;
+        }
+
         protected override void PopIn()
         {
             foreach (var w in wavesContainer)
@@ -179,6 +190,12 @@ namespace osu.Game.Graphics.Containers
                 // We can not use RelativeSizeAxes for Height, because the height
                 // of our parent diminishes as the content moves up.
                 Height = Parent!.Parent!.DrawSize.Y * 1.5f;
+            }
+
+            public void ReplayPopInAnimation()
+            {
+                this.MoveToY(Parent!.Parent!.DrawSize.Y);
+                this.MoveToY(FinalPosition, APPEAR_DURATION, easing_show);
             }
 
             protected override void PopIn() => Schedule(() => this.MoveToY(FinalPosition, APPEAR_DURATION, easing_show));

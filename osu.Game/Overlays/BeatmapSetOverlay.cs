@@ -89,21 +89,31 @@ namespace osu.Game.Overlays
 
         public void FetchAndShowBeatmap(int beatmapId)
         {
+            var previousState = State.Value;
+
             lastLookup = (BeatmapSetLookupType.BeatmapId, beatmapId);
             beatmapSet.Value = null;
 
             performFetch();
             Show();
+            // If the overlay was previously visible, we need to replay the popIn animation.
+            if (previousState == Visibility.Visible)
+                ReplayPopInAnimation();
         }
 
         public void FetchAndShowBeatmapSet(int beatmapSetId)
         {
+            var previousState = State.Value;
+
             lastLookup = (BeatmapSetLookupType.SetId, beatmapSetId);
 
             beatmapSet.Value = null;
 
             performFetch();
             Show();
+            // If the overlay was previously visible, we need to replay the popIn animation.
+            if (previousState == Visibility.Visible)
+                ReplayPopInAnimation();
         }
 
         /// <summary>

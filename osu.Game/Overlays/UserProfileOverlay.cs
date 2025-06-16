@@ -90,10 +90,16 @@ namespace osu.Game.Overlays
             if (userToShow.OnlineID == APIUser.SYSTEM_USER_ID)
                 return;
 
+            var previousState = State.Value;
+
             user = userToShow;
             ruleset = userRuleset;
 
             Show();
+            // If the overlay was previously visible, we need to replay the popIn animation.
+            if (previousState == Visibility.Visible)
+                ReplayPopInAnimation();
+
             Scheduler.AddOnce(fetchAndSetContent);
         }
 

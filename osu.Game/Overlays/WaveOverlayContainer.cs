@@ -32,6 +32,11 @@ namespace osu.Game.Overlays
             });
         }
 
+        public void ReplayPopInAnimation()
+        {
+            Waves.ReplayPopInAnimation();
+        }
+
         protected override void PopIn()
         {
             Waves.Show();
