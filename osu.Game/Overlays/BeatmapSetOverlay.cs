@@ -89,6 +89,9 @@ namespace osu.Game.Overlays
 
         public void FetchAndShowBeatmap(int beatmapId)
         {
+            if (this.State.Value == Visibility.Visible)
+                Hide();
+
             lastLookup = (BeatmapSetLookupType.BeatmapId, beatmapId);
             beatmapSet.Value = null;
 
@@ -98,6 +101,9 @@ namespace osu.Game.Overlays
 
         public void FetchAndShowBeatmapSet(int beatmapSetId)
         {
+            if (this.State.Value == Visibility.Visible)
+                Hide();
+
             lastLookup = (BeatmapSetLookupType.SetId, beatmapSetId);
 
             beatmapSet.Value = null;

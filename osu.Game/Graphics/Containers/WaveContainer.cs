@@ -125,6 +125,9 @@ namespace osu.Game.Graphics.Containers
             foreach (var w in wavesContainer)
                 w.Show();
 
+            // In UserProfileOverlay and BeatmapSetOverlay, we call Hide() then Show() in sequence.
+            // Using FinishTransforms ensures the complete popIn animation plays correctly.
+            contentContainer.FinishTransforms();
             contentContainer.MoveToY(0, APPEAR_DURATION, Easing.OutQuint);
             samplePopIn?.Play();
             wasShown = true;
@@ -181,7 +184,16 @@ namespace osu.Game.Graphics.Containers
                 Height = Parent!.Parent!.DrawSize.Y * 1.5f;
             }
 
-            protected override void PopIn() => Schedule(() => this.MoveToY(FinalPosition, APPEAR_DURATION, easing_show));
+            protected override void PopIn()
+            {
+                Schedule(() =>
+                {
+                    // In UserProfileOverlay and BeatmapSetOverlay, we call Hide() then Show() in sequence.
+                    // Using FinishTransforms ensures the complete popIn animation plays correctly.
+                    this.FinishTransforms();
+                    this.MoveToY(FinalPosition, APPEAR_DURATION, easing_show);
+                });
+            }
 
             protected override void PopOut()
             {

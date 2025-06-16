@@ -90,6 +90,9 @@ namespace osu.Game.Overlays
             if (userToShow.OnlineID == APIUser.SYSTEM_USER_ID)
                 return;
 
+            if (this.State.Value == Visibility.Visible)
+                Hide();
+
             user = userToShow;
             ruleset = userRuleset;
 
