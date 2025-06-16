@@ -40,6 +40,12 @@ namespace osu.Game.Rulesets.Mania
                     Current = config.GetBindable<double>(ManiaRulesetSetting.ScrollSpeed),
                     KeyboardStep = 1
                 },
+                new SettingsSlider<float>
+                {
+                    LabelText = RulesetSettingsStrings.NoteWidth,
+                    Current = config.GetBindable<float>(ManiaRulesetSetting.NoteWidth),
+                    KeyboardStep = 0.1f,
+                },
                 new SettingsCheckbox
                 {
                     Keywords = new[] { "color" },

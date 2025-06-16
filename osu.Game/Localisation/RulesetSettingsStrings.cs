@@ -75,6 +75,11 @@ namespace osu.Game.Localisation
         public static LocalisableString ScrollSpeed => new TranslatableString(getKey(@"scroll_speed"), @"Scroll speed");
 
         /// <summary>
+        /// "Note width"
+        /// </summary>
+        public static LocalisableString NoteWidth => new TranslatableString(getKey(@"notewidth"), @"Note width");
+
+        /// <summary>
         /// "Timing-based note colouring"
         /// </summary>
         public static LocalisableString TimingBasedColouring => new TranslatableString(getKey(@"Timing_based_colouring"), @"Timing-based note colouring");
