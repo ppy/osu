@@ -11,7 +11,7 @@ namespace osu.Game.Tests.Visual.UserInterface
     public partial class TestSceneLoadingSpinner : OsuGridTestScene
     {
         public TestSceneLoadingSpinner()
-            : base(2, 2)
+            : base(2, 3)
         {
             LoadingSpinner loading;
 
@@ -52,6 +52,29 @@ namespace osu.Game.Tests.Visual.UserInterface
             loading.Show();
 
             Cell(3).AddRange(new Drawable[]
+            {
+                new Box
+                {
+                    Colour = Color4.White,
+                    RelativeSizeAxes = Axes.Both
+                },
+                loading = new LoadingSpinner(false, true)
+            });
+
+            loading.Show();
+
+            Cell(4).AddRange(new Drawable[]
+            {
+                new Box
+                {
+                    Colour = Color4.Black,
+                    RelativeSizeAxes = Axes.Both
+                },
+                loading = new LoadingSpinner(true, true)
+            });
+            loading.Show();
+
+            Cell(5).AddRange(new Drawable[]
             {
                 loading = new LoadingSpinner()
             });
