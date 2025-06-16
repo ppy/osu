@@ -122,6 +122,28 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         }
 
         [Test]
+        public void TestRandomThenRewindSameFrame()
+        {
+            AddBeatmaps(10, 3, true);
+            WaitForDrawablePanels();
+
+            BeatmapInfo? originalSelected = null;
+
+            nextRandom();
+
+            CheckHasSelection();
+            AddStep("store selection", () => originalSelected = (BeatmapInfo)Carousel.CurrentSelection!);
+
+            AddStep("random then rewind", () =>
+            {
+                Carousel.NextRandom();
+                Carousel.PreviousRandom();
+            });
+
+            AddAssert("selection not changed", () => Carousel.CurrentSelection, () => Is.EqualTo(originalSelected));
+        }
+
+        [Test]
         public void TestRewindToDeletedBeatmap()
         {
             AddBeatmaps(10, 3, true);
