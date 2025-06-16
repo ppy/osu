@@ -691,7 +691,10 @@ namespace osu.Game.Screens.SelectV2
                     if (randomAlgorithm.Value == RandomSelectAlgorithm.RandomPermutation)
                         previouslyVisitedRandomSets.Remove(beatmapInfo.BeatmapSet!);
 
-                    playSpinSample(distanceBetween(previousBeatmapItem, CurrentSelectionItem!), carouselItems.Count);
+                    if (CurrentSelectionItem == null)
+                        playSpinSample(0, carouselItems.Count);
+                    else
+                        playSpinSample(distanceBetween(previousBeatmapItem, CurrentSelectionItem), carouselItems.Count);
                 }
 
                 RequestSelection(previousBeatmap);
