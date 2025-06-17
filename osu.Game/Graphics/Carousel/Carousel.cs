@@ -491,8 +491,8 @@ namespace osu.Game.Graphics.Carousel
                     }
                     else
                     {
-                        // If current keyboard selection is not a group, toggle closest group and move keyboard selection to that group.
-                        traverseSelection(-1, CheckValidForGroupSelection, false);
+                        // If current keyboard selection is not a group, toggle the closest group and move keyboard selection to that group.
+                        traverseSelection(-1, CheckValidForGroupSelection, skipFirst: false, activateExpandedItems: true);
                     }
 
                     return true;
@@ -577,7 +577,7 @@ namespace osu.Game.Graphics.Carousel
             traverseSelection(direction, CheckValidForSetSelection);
         }
 
-        private void traverseSelection(int direction, Func<CarouselItem, bool> predicate, bool skipFirst = true)
+        private void traverseSelection(int direction, Func<CarouselItem, bool> predicate, bool skipFirst = true, bool activateExpandedItems = false)
         {
             if (carouselItems == null || carouselItems.Count == 0) return;
 
@@ -616,7 +616,7 @@ namespace osu.Game.Graphics.Carousel
 
                 var newItem = carouselItems[newIndex];
 
-                if (!newItem.IsExpanded && predicate(newItem))
+                if ((activateExpandedItems || !newItem.IsExpanded) && predicate(newItem))
                 {
                     Activate(newItem);
                     return;
