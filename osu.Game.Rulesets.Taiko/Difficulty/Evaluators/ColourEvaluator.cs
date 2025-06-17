@@ -58,10 +58,12 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
 
             if (recentRatios.Count <= 1) return 1.0;
 
-            // As a fallback, calculate the maximum deviation from the average ratio of the recent ratios to ensure slightly off-snapped objects don't bypass the penalty.
+            // As a fallback, calculate the maximum deviation from the average of the recent ratios to ensure slightly off-snapped objects don't bypass the penalty.
             double maxRatioDeviation = recentRatios.Max(r => Math.Abs(r - recentRatios.Average()));
 
-            return maxRatioDeviation <= 0.5 ? 0.7 : 1.0;
+            double consistentRatioPenalty = 0.7 + 0.3 * DifficultyCalculationUtils.Smootherstep(maxRatioDeviation, 0.0, 1.0);
+
+            return consistentRatioPenalty;
         }
 
         /// <summary>
