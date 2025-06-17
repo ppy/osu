@@ -39,35 +39,32 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             List<StrainPeak> strains = peaks.OrderByDescending(p => p.Value).ToList();
 
-            // Create list of strains to nerf
-            List<StrainPeak> strainsToReduce = new List<StrainPeak>();
-            int indexToRemove = 0;
-            const int chunk_size = 20;
-
             double time = 0; // Time is measured in units of strains
+            const int chunk_size = 20;
+            int strainsToRemove = 0;
 
             // We are reducing the highest strains first to account for extreme difficulty spikes
             // Split the strain into 20ms chunks to try to mitigate inconsistencies caused by reducing strains
-            foreach (StrainPeak strain in strains)
+            while (time / MaxSectionLength < ReducedSectionCount)
             {
+                StrainPeak strain = strains[strainsToRemove];
                 double addedTime = 0;
 
                 while (addedTime < strain.SectionLength)
                 {
                     double scale = Math.Log10(Interpolation.Lerp(1, 10, Math.Clamp((time + addedTime) / MaxSectionLength / ReducedSectionCount, 0, 1)));
 
-                    strainsToReduce.Add(new StrainPeak(strain.Value * Interpolation.Lerp(ReducedStrainBaseline, 1.0, scale), Math.Min(chunk_size, strain.SectionLength - addedTime)));
+                    strains.Add(new StrainPeak(strain.Value * Interpolation.Lerp(ReducedStrainBaseline, 1.0, scale), Math.Min(chunk_size, strain.SectionLength - addedTime)));
                     addedTime += chunk_size;
                 }
 
                 time += strain.SectionLength;
-                indexToRemove++;
-                if (time / MaxSectionLength > ReducedSectionCount) break;
+                strainsToRemove++;
             }
 
-            strains.RemoveRange(0, indexToRemove);
+            strains.RemoveRange(0, strainsToRemove);
 
-            strains = strains.Concat(strainsToReduce).OrderByDescending(s => s.Value).ToList();
+            strains = strains.OrderByDescending(s => s.Value).ToList();
             time = 0;
 
             // Difficulty is a continuous weighted sum of the sorted strains
