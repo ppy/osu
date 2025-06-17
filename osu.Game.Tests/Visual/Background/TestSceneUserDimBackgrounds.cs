@@ -397,6 +397,32 @@ namespace osu.Game.Tests.Visual.Background
             verifyAdditiveSpriteIsNotOffset();
         }
 
+        [Test]
+        public void TestStoryboardBackgroundNotOffsetWhenReplacedButNotDimmed()
+        {
+            performFullSetup();
+            createFakeStoryboard();
+
+            AddStep("Enable undimmed storyboard with replaced background", () =>
+            {
+                player.StoryboardReplacesBackground.Value = true;
+                player.StoryboardEnabled.Value = true;
+                player.DimmableStoryboard.IgnoreUserSettings.Value = false;
+                songSelect.DimLevel.Value = 0f;
+                songSelect.DimColour.Value = 1f;
+            });
+
+            AddUntilStep("Background is black", () => songSelect.IsBackgroundBlack());
+
+            AddStep("Enable dimming", () =>
+            {
+                songSelect.DimLevel.Value = 0.5f;
+            });
+
+            AddUntilStep("Background's colour is offset", () => songSelect.IsBackgroundColourOffset());
+        }
+
+
         private void createFakeStoryboard() => AddStep("Create storyboard", () =>
         {
             player.StoryboardEnabled.Value = false;
