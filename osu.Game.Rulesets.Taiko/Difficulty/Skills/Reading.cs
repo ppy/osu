@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             var taikoObject = (TaikoDifficultyHitObject)current;
 
             // Penalise repetitive patterns by decaying notes based on their index in the alternating mono pattern.
-            int index = taikoObject.NoteIndex - taikoObject.ColourData.AlternatingMonoPattern.FirstHitObject.NoteIndex;
+            int index = taikoObject.NoteIndex - (taikoObject.ColourData.AlternatingMonoPattern?.FirstHitObject.NoteIndex ?? taikoObject.NoteIndex);
             double simplePatternPenalty = DifficultyCalculationUtils.Logistic(index, 5, -1);
 
             currentStrain *= StrainDecayBase;
