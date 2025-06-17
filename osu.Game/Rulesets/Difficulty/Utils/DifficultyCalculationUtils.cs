@@ -163,12 +163,12 @@ namespace osu.Game.Rulesets.Difficulty.Utils
             double t1 = 2 / (Math.PI * a) + ln / 2;
             double t2 = ln / a;
             double baseApprox = Math.Sqrt(t1 * t1 - t2) - t1;
-            double erfInv = sgn * Math.Sqrt(baseApprox);
 
             // Correction reduces max error from -0.005 to -0.00045.
             double c = x >= 0.85 ? Math.Pow((x - 0.85) / 0.293, 8) : 0;
+            double erfInv = sgn * (Math.Sqrt(baseApprox) + c);
 
-            return erfInv + c;
+            return erfInv;
         }
 
         /// <summary>
