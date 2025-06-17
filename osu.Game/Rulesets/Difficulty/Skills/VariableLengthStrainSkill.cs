@@ -22,6 +22,11 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         protected virtual double DecayWeight => 0.9;
 
         /// <summary>
+        /// Integral from 0 to infinity of DecayWeight^x dx
+        /// </summary>
+        private double decayWeightIntegral => (DecayWeight - 1) / Math.Log(DecayWeight) * (1.0 / (1 - DecayWeight));
+
+        /// <summary>
         /// The maximum length of each strain section.
         /// </summary>
         protected virtual int MaxSectionLength => 400;
@@ -152,7 +157,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             if (ObjectStrains.Count == 0)
                 return 0.0;
 
-            double consistentTopStrain = DifficultyValue() / 10; // What would the top strain be if all strain values were identical
+            double consistentTopStrain = DifficultyValue() / decayWeightIntegral; // What would the top strain be if all strain values were identical
 
             if (consistentTopStrain == 0)
                 return ObjectStrains.Count;
@@ -210,7 +215,6 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         public override double DifficultyValue()
         {
             double difficulty = 0;
-            double decayWeightIntegral = (DecayWeight - 1) / Math.Log(DecayWeight) * (1.0 / (1 - DecayWeight));
 
             // Sections with 0 strain are excluded to avoid worst-case time complexity of the following sort (e.g. /b/2351871).
             // These sections will not contribute to the difficulty.
