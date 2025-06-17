@@ -208,7 +208,9 @@ namespace osu.Game.Screens.Backgrounds
                     if (IgnoreUserSettings.Value)
                         return Colour4.Black;
 
-                    float grayscaleDimColour = (float)userDimColour.Value * DimLevel;
+                    // Using base.DimLevel instead of DimLevel here to ensure that DimColour is not affected by
+                    // the storyboard replacing the background, only by user settings.
+                    float grayscaleDimColour = (float)userDimColour.Value * base.DimLevel;
                     return new Colour4(grayscaleDimColour, grayscaleDimColour, grayscaleDimColour, 1.0f);
                 }
             }

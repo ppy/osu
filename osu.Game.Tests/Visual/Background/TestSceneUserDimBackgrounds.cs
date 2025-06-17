@@ -422,7 +422,6 @@ namespace osu.Game.Tests.Visual.Background
             AddUntilStep("Background's colour is offset", () => songSelect.IsBackgroundColourOffset());
         }
 
-
         private void createFakeStoryboard() => AddStep("Create storyboard", () =>
         {
             player.StoryboardEnabled.Value = false;
