@@ -35,12 +35,13 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             }
 
             var taikoObject = (TaikoDifficultyHitObject)current;
-            int index = taikoObject.ColourData.MonoStreak?.HitObjects.IndexOf(taikoObject) ?? 0;
 
-            currentStrain *= DifficultyCalculationUtils.Logistic(index, 4, -1 / 25.0, 0.5) + 0.5;
+            // Penalise repetitive patterns by decaying notes based on their index in the alternating mono pattern.
+            int index = taikoObject.NoteIndex - taikoObject.ColourData.AlternatingMonoPattern.FirstHitObject.NoteIndex;
+            double simplePatternPenalty = DifficultyCalculationUtils.Logistic(index, 5, -1);
 
             currentStrain *= StrainDecayBase;
-            currentStrain += ReadingEvaluator.EvaluateDifficultyOf(taikoObject) * SkillMultiplier;
+            currentStrain += ReadingEvaluator.EvaluateDifficultyOf(taikoObject) * SkillMultiplier * simplePatternPenalty;
 
             return currentStrain;
         }
