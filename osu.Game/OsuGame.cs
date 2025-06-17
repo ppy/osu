@@ -1752,7 +1752,12 @@ namespace osu.Game
                     if (newOsuScreen.IsLoaded)
                         updateFooterButtons();
                     else
+                    {
+                        // ensure the current buttons are immediately disabled on screen change (so they can't be pressed).
+                        ScreenFooter.SetButtons(Array.Empty<ScreenFooterButton>());
+
                         newOsuScreen.OnLoadComplete += _ => updateFooterButtons();
+                    }
 
                     void updateFooterButtons()
                     {
