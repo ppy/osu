@@ -30,7 +30,7 @@ namespace osu.Game.Utils
         /// Formats the supplied rank/leaderboard position in a consistent, simplified way.
         /// </summary>
         /// <param name="rank">The rank/position to be formatted.</param>
-        public static string FormatRank(this int rank) => rank.ToMetric(decimals: rank < 100_000 ? 1 : 0);
+        public static string FormatRank(this int rank) => rank.ToMetric(decimals: rank < 10_000 ? 1 : 0);
 
         /// <summary>
         /// Formats the supplied star rating in a consistent, simplified way.
