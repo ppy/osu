@@ -17,11 +17,6 @@ namespace osu.Game.Rulesets.Difficulty.Skills
     public abstract class VariableLengthStrainSkill : Skill
     {
         /// <summary>
-        /// Used to account for star rating differences caused by migration from <see cref="StrainSkill"/>.
-        /// </summary>
-        protected virtual double RawDifficultyMultiplier => 1.0;
-
-        /// <summary>
         /// The weight by which each strain value decays.
         /// </summary>
         protected virtual double DecayWeight => 0.9;
@@ -234,7 +229,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
                 time += strains[i].SectionLength / MaxSectionLength;
             }
 
-            return difficulty * RawDifficultyMultiplier;
+            return difficulty;
         }
 
         /// <summary>

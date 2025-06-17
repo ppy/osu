@@ -12,7 +12,19 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
     public abstract class OsuVariableLengthStrainSkill : VariableLengthStrainSkill
     {
-        protected override double RawDifficultyMultiplier => 1.058;
+        /// <summary>
+        /// This multiplier is here for <see cref="VariableLengthStrainSkill.CountTopWeightedStrains"/> which
+        /// uses <see cref="DifficultyValue"/> directly compared against the values in <see cref="VariableLengthStrainSkill.ObjectStrains"/>.
+        /// Below are some options which would be better, but do not work.
+        /// <list type="bullet">
+        /// <item>Changing skill multipliers - Changing individual skill multipliers changes the relation
+        /// between <see cref="DifficultyValue"/> and individual strains, which affects miss penalty.</item>
+        /// <item>Changing <see cref="OsuDifficultyCalculator.difficulty_multiplier"/> in <see cref="OsuDifficultyCalculator"/>
+        /// - Changing any multipliers in <see cref="OsuDifficultyCalculator"/>
+        /// does not affect <see cref="VariableLengthStrainSkill.CountTopWeightedStrains"/>.</item>
+        /// </list>
+        /// </summary>
+        private double rawDifficultyMultiplier => 1.058;
 
         /// <summary>
         /// The number of sections with the highest strains, which the peak strain reductions will apply to.
@@ -80,7 +92,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 time += strains[i].SectionLength / MaxSectionLength;
             }
 
-            return difficulty * RawDifficultyMultiplier;
+            return difficulty * rawDifficultyMultiplier;
         }
 
         public static double DifficultyToPerformance(double difficulty) => Math.Pow(5.0 * Math.Max(1.0, difficulty / 0.0675) - 4.0, 3.0) / 100000.0;
