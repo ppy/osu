@@ -195,16 +195,13 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             SelectNextSet();
             WaitForSetSelection(0, 0);
 
-            // In the case of a grouped beatmap set, the header gets activated and re-selects the recommended difficulty.
-            // This is probably fine.
-            CheckActivationCount(1);
-            // We don't want it to request present though, which would start gameplay.
+            CheckActivationCount(0);
             CheckRequestPresentCount(0);
 
             SelectPrevSet();
             WaitForSetSelection(0, 0);
 
-            CheckActivationCount(1);
+            CheckActivationCount(0);
             CheckRequestPresentCount(0);
         }
 

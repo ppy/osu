@@ -156,6 +156,21 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         }
 
         [Test]
+        public void TestKeyboardGroupTraversalSingleGroup()
+        {
+            RemoveAllBeatmaps();
+            AddBeatmaps(1, 1);
+
+            WaitForBeatmapSelection(0, 0);
+
+            SelectNextGroup();
+            checkBeatmapIsKeyboardSelected();
+
+            SelectPrevGroup();
+            checkBeatmapIsKeyboardSelected();
+        }
+
+        [Test]
         public void TestKeyboardGroupTraversal()
         {
             SelectNextSet();

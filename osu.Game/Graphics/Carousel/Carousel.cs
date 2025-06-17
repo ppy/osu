@@ -616,7 +616,7 @@ namespace osu.Game.Graphics.Carousel
 
                 var newItem = carouselItems[newIndex];
 
-                if (predicate(newItem))
+                if (!newItem.IsExpanded && predicate(newItem))
                 {
                     Activate(newItem);
                     return;
