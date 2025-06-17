@@ -49,6 +49,8 @@ namespace osu.Game.Rulesets.Osu.Edit
             Precision = 0.01,
         };
 
+        private double? previousSliderVelocity = null;
+
         // We map internal ranges to a more standard range of values for display to the user.
         private readonly BindableInt displayTolerance = new BindableInt(90)
         {
@@ -94,9 +96,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                 {
                     Action = () =>
                     {
-                        double? previousSliderVelocity = getPreviousSliderVelocityMultiplier();
-
-                        SliderVelocity.Value = previousSliderVelocity ?? 1;
+                        SliderVelocity.Value = previousSliderVelocity!.Value;
                     },
                     RelativeSizeAxes = Axes.X,
                 },
@@ -171,11 +171,13 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         protected override void Update()
         {
-            double? previousSliderVelocity = getPreviousSliderVelocityMultiplier();
+            previousSliderVelocity = (editorBeatmap
+                                     .HitObjects
+                                     .LastOrDefault(h => h is Slider && h.StartTime <= editorClock.CurrentTime) as Slider)?.SliderVelocityMultiplier;
 
             if (previousSliderVelocity != null)
             {
-                // If the previous slider's velocity is the same the s.v. slider's current value, there's no point in having the button enabled.
+                // If the previous slider's velocity is the same as the s.v. slider's current value, there's no point in having the button enabled.
                 previousSliderVelocityButton.Enabled.Value = !(previousSliderVelocity == SliderVelocity.Value);
                 previousSliderVelocityButton.ExpandedLabelText = $"Use previous: ({previousSliderVelocity:0.##x})";
                 previousSliderVelocityButton.ContractedLabelText = $"Previous: ({previousSliderVelocity:0.##x})";
@@ -186,13 +188,6 @@ namespace osu.Game.Rulesets.Osu.Edit
                 previousSliderVelocityButton.ExpandedLabelText = "Use previous (unavailable)";
                 previousSliderVelocityButton.ContractedLabelText = string.Empty;
             }
-        }
-
-        private double? getPreviousSliderVelocityMultiplier()
-        {
-            return (editorBeatmap
-                    .HitObjects
-                    .LastOrDefault(h => h is Slider && h.StartTime < editorClock.CurrentTime) as Slider)?.SliderVelocityMultiplier;
         }
     }
 }
