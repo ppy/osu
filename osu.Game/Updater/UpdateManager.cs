@@ -44,7 +44,8 @@ namespace osu.Game.Updater
         protected IBindable<ReleaseStream> ReleaseStream => releaseStream;
 
         private readonly Bindable<ReleaseStream> releaseStream = new Bindable<ReleaseStream>();
-        private CancellationTokenSource updateCancellation = new CancellationTokenSource();
+
+        private CancellationTokenSource updateCancellationSource = new CancellationTokenSource();
 
         protected override void LoadComplete()
         {
@@ -90,16 +91,13 @@ namespace osu.Game.Updater
             if (!CanCheckForUpdate)
                 return false;
 
-            var cancellation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-            var lastCancellation = Interlocked.Exchange(ref updateCancellation, cancellation);
+            var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
-            using (lastCancellation)
-            {
-                // This serves a dual purpose of nullifying the last update, closing any existing notifications as stale.
-                await lastCancellation.CancelAsync().ConfigureAwait(false);
-            }
+            // Cancels the last update and closes any existing notifications as stale.
+            using (var lastCts = Interlocked.Exchange(ref updateCancellationSource, cts))
+                await lastCts.CancelAsync().ConfigureAwait(false);
 
-            return await PerformUpdateCheck(cancellation.Token).ConfigureAwait(false);
+            return await PerformUpdateCheck(cts.Token).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -112,8 +110,8 @@ namespace osu.Game.Updater
         {
             base.Dispose(isDisposing);
 
-            updateCancellation.Cancel();
-            updateCancellation.Dispose();
+            updateCancellationSource.Cancel();
+            updateCancellationSource.Dispose();
         }
 
         private partial class UpdateCompleteNotification : SimpleNotification
