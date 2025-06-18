@@ -66,8 +66,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             hasReplayLoaded.BindTo(drawableRuleset.HasReplayLoaded);
 
             // Is not needed, but simply sets the cursor location for autopilot as where the player left it before loading in gameplay.
-            Action<Drawable>? onLoadCompleteHandler = null;
-            onLoadCompleteHandler = (drawable) =>
+            void onLoadCompleteHandler(Drawable drawable)
             {
                 Vector2 screenStart = inputManager.CurrentState.Mouse.Position;
                 Vector2 fieldStart = playfield.ScreenSpaceToGamefield(screenStart);
@@ -75,7 +74,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 lastHitInfo = (fieldStart, timeStart);
 
                 playfield.OnLoadComplete -= onLoadCompleteHandler;
-            };
+            }
 
             playfield.OnLoadComplete += onLoadCompleteHandler;
 
