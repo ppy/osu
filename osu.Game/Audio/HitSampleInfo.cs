@@ -84,10 +84,12 @@ namespace osu.Game.Audio
             {
                 if (!string.IsNullOrEmpty(Suffix))
                     yield return $"Gameplay/{Bank}-{Name}{Suffix}";
+                else
+                {
+                    yield return $"Gameplay/{Bank}-{Name}";
 
-                yield return $"Gameplay/{Bank}-{Name}";
-
-                yield return $"Gameplay/{Name}";
+                    yield return $"Gameplay/{Name}";
+                }
             }
         }
 
