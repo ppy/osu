@@ -261,7 +261,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         Task ICanAcceptFiles.Import(params string[] paths)
         {
-            Schedule(() => Current.Value = new FileInfo(paths.First()));
+            Schedule(() => OnFileSelected(new FileInfo(paths.First())));
             return Task.CompletedTask;
         }
 
