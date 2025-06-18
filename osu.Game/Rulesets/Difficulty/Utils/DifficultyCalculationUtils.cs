@@ -123,8 +123,17 @@ namespace osu.Game.Rulesets.Difficulty.Utils
         /// <param name="x">Value to calculate the function for</param>
         public static double Erf(double x)
         {
-            if (x == 0) return 0;
-            if (double.IsPositiveInfinity(x)) return 1;
+            if (x == 0)
+                return 0;
+
+            if (double.IsPositiveInfinity(x))
+                return 1;
+
+            if (double.IsNegativeInfinity(x))
+                return -1;
+
+            if (double.IsNaN(x))
+                return double.NaN;
 
             // Constants for approximation (Abramowitz and Stegun formula 7.1.26)
             double t = 1.0 / (1.0 + 0.3275911 * Math.Abs(x));
@@ -151,9 +160,14 @@ namespace osu.Game.Rulesets.Difficulty.Utils
         /// <param name="x">Value to calculate the function for</param>
         public static double ErfInv(double x)
         {
-            if (x <= -1) return double.NegativeInfinity;
-            if (x >= 1) return double.PositiveInfinity;
-            if (x == 0) return 0;
+            if (x <= -1)
+                return double.NegativeInfinity;
+
+            if (x >= 1)
+                return double.PositiveInfinity;
+
+            if (x == 0)
+                return 0;
 
             const double a = 0.147;
             double sgn = Math.Sign(x);
