@@ -55,8 +55,6 @@ namespace osu.Game.Rulesets.Osu.Mods
         private (double HitWindowStart, double HitWindowEnd) hitWindow = (0, 0);
         private double timeElapsedBetweenHitObjects;
 
-        private Action<Drawable> onLoadCompleteHandler = _ => { };
-
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
             // Grab the input manager to disable the user's cursor, and for future use
@@ -67,16 +65,16 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             hasReplayLoaded.BindTo(drawableRuleset.HasReplayLoaded);
 
-            onLoadCompleteHandler += _ =>
+            // Is not needed, but simply sets the cursor location for autopilot as where the player left it before loading in gameplay.
+            Action<Drawable>? onLoadCompleteHandler = null;
+            onLoadCompleteHandler = (drawable) =>
             {
-                // When fully initialized, let's set the last position where the player placed their cursor before the game loaded.
                 Vector2 screenStart = inputManager.CurrentState.Mouse.Position;
                 Vector2 fieldStart = playfield.ScreenSpaceToGamefield(screenStart);
                 double timeStart = playfield.Clock.CurrentTime;
-
                 lastHitInfo = (fieldStart, timeStart);
 
-                UnsubscribeOnLoadComplete();
+                playfield.OnLoadComplete -= onLoadCompleteHandler;
             };
 
             playfield.OnLoadComplete += onLoadCompleteHandler;
@@ -89,11 +87,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                 lastHitInfo = (fieldPos, result.TimeAbsolute);
             };
-        }
-
-        public void UnsubscribeOnLoadComplete()
-        {
-            playfield.OnLoadComplete -= onLoadCompleteHandler;
         }
 
         public void Update(Playfield playfield)
