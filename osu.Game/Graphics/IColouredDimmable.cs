@@ -10,9 +10,22 @@ namespace osu.Game.Graphics
     /// </summary>
     public interface IColouredDimmable : IDrawable
     {
+        IColouredDimmable DrawColourOffsetSource
+        {
+            get
+            {
+                if (Parent is IColouredDimmable colouredDimmableParent)
+                    return colouredDimmableParent.DrawColourOffsetSource;
+                else if (Parent?.Parent is IColouredDimmable colouredDimmableGrandparent)
+                    // Needed to skip intermediate containers.
+                    return colouredDimmableGrandparent.DrawColourOffsetSource;
+
+                return this;
+            }
+        }
+
         Colour4 DrawColourOffset
         {
-            // Default implementation for Drawables that inherit DrawColourOffset from their parent.
             get
             {
                 if (DrawColourInfo.Blending == BlendingParameters.Additive)
@@ -22,11 +35,10 @@ namespace osu.Game.Graphics
                     // which seems to be the case with storyboards, as beatmap background is always enabled.
                     return Colour4.Black;
 
-                if (Parent is IColouredDimmable colouredDimmableParent)
-                    return colouredDimmableParent.DrawColourOffset;
-                else if (Parent?.Parent is IColouredDimmable colouredDimmableGrandparent)
-                    // Needed to skip intermediate containers.
-                    return colouredDimmableGrandparent.DrawColourOffset;
+                IColouredDimmable source = DrawColourOffsetSource;
+
+                if (source != null && source != this)
+                    return source.DrawColourOffset;
 
                 return Colour4.Black;
             }
