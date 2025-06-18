@@ -6,6 +6,7 @@ using NUnit.Framework;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Screens.Select.Filter;
+using osu.Game.Screens.SelectV2;
 
 namespace osu.Game.Tests.Visual.SongSelectV2
 {
@@ -47,25 +48,42 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddBeatmaps(10, 3, true);
             WaitForDrawablePanels();
 
+            GroupDefinition? expanded = null;
+
+            for (int i = 0; i < 2; i++)
+            {
+                nextRandom();
+                expanded ??= storeExpandedGroup();
+
+                ensureRandomDidNotRepeat();
+                checkExpandedGroupUnchanged();
+            }
+
             nextRandom();
-            ensureRandomDidNotRepeat();
-            nextRandom();
-            ensureRandomDidNotRepeat();
-            nextRandom();
-            ensureRandomDidNotRepeat();
+            ensureRandomDidRepeat();
+            checkExpandedGroupUnchanged();
 
             prevRandom();
             checkRewindCorrectSet();
+            checkExpandedGroupUnchanged();
             prevRandom();
             checkRewindCorrectSet();
+            checkExpandedGroupUnchanged();
 
             nextRandom();
             ensureRandomDidNotRepeat();
+            checkExpandedGroupUnchanged();
             nextRandom();
-            ensureRandomDidNotRepeat();
+            ensureRandomDidRepeat();
+            checkExpandedGroupUnchanged();
 
-            nextRandom();
-            AddAssert("ensure repeat", () => BeatmapSetRequestedSelections.Contains(Carousel.SelectedBeatmapSet!));
+            GroupDefinition? storeExpandedGroup()
+            {
+                AddStep("store open group", () => expanded = Carousel.ExpandedGroup);
+                return null;
+            }
+
+            void checkExpandedGroupUnchanged() => AddAssert("expanded did not change", () => Carousel.ExpandedGroup, () => Is.EqualTo(expanded));
         }
 
         /// <summary>
@@ -76,28 +94,47 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         {
             SortAndGroupBy(SortMode.Difficulty, GroupMode.Difficulty);
 
-            AddBeatmaps(10, 3, true);
+            AddBeatmaps(3, 3, true);
             WaitForDrawablePanels();
 
+            GroupDefinition? expanded = null;
+
+            for (int i = 0; i < 3; i++)
+            {
+                nextRandom();
+                expanded ??= storeExpandedGroup();
+
+                ensureRandomDidNotRepeat();
+                checkExpandedGroupUnchanged();
+            }
+
             nextRandom();
-            ensureRandomDidNotRepeat();
-            nextRandom();
-            ensureRandomDidNotRepeat();
-            nextRandom();
-            ensureRandomDidNotRepeat();
+            ensureRandomDidRepeat();
+            checkExpandedGroupUnchanged();
 
             prevRandom();
             checkRewindCorrectSet();
+            checkExpandedGroupUnchanged();
+
             prevRandom();
             checkRewindCorrectSet();
+            checkExpandedGroupUnchanged();
 
             nextRandom();
             ensureRandomDidNotRepeat();
-            nextRandom();
-            ensureRandomDidNotRepeat();
+            checkExpandedGroupUnchanged();
 
             nextRandom();
-            AddAssert("ensure repeat", () => BeatmapSetRequestedSelections.Contains(Carousel.SelectedBeatmapSet!));
+            ensureRandomDidRepeat();
+            checkExpandedGroupUnchanged();
+
+            GroupDefinition? storeExpandedGroup()
+            {
+                AddStep("store open group", () => expanded = Carousel.ExpandedGroup);
+                return null;
+            }
+
+            void checkExpandedGroupUnchanged() => AddAssert("expanded did not change", () => Carousel.ExpandedGroup, () => Is.EqualTo(expanded));
         }
 
         [Test]
@@ -173,6 +210,9 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
         private void nextRandom() =>
             AddStep("select random next", () => Carousel.NextRandom());
+
+        private void ensureRandomDidRepeat() =>
+            AddAssert("did repeat", () => BeatmapSetRequestedSelections.Distinct().Count(), () => Is.LessThan(BeatmapSetRequestedSelections.Count));
 
         private void ensureRandomDidNotRepeat() =>
             AddAssert("no repeats", () => BeatmapSetRequestedSelections.Distinct().Count(), () => Is.EqualTo(BeatmapSetRequestedSelections.Count));

@@ -634,6 +634,26 @@ namespace osu.Game.Screens.SelectV2
             // This is the fastest way to retrieve sets for randomisation.
             ICollection<BeatmapSetInfo> visibleSets = grouping.SetItems.Keys;
 
+            if (ExpandedGroup != null)
+            {
+                // In the case of grouping, users expect random to only operate on the expanded group.
+                // This is going to incur some overhead as we don't have a group-beatmapset mapping currently.
+                //
+                // If this becomes an issue, we could either store a mapping, or run the random algorithm many times
+                // using the `SetItems` method until we get a group HIT.
+                if (grouping.BeatmapSetsGroupedTogether)
+                    visibleSets = grouping.GroupItems[ExpandedGroup].Select(i => i.Model).OfType<BeatmapSetInfo>().ToArray();
+                else
+                {
+                    // Note that this is probably not correct in all cases.
+                    // When we aren't grouping sets together, we might want to randomise by beatmaps, not sets.
+                    //
+                    // Imagine the scenario where a single beatmap set has multiple difficulties in the same difficulty grouping, where this
+                    // would always choose the set's user recommended difficulty rather than the visible ones.
+                    visibleSets = grouping.GroupItems[ExpandedGroup].Select(i => i.Model).OfType<BeatmapInfo>().Select(b => b.BeatmapSet!).Distinct().ToArray();
+                }
+            }
+
             if (CurrentSelection is BeatmapInfo beatmapInfo)
             {
                 randomSelectedBeatmaps.Add(beatmapInfo);
