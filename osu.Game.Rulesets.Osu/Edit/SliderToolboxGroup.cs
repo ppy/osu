@@ -172,8 +172,8 @@ namespace osu.Game.Rulesets.Osu.Edit
         protected override void Update()
         {
             previousSliderVelocity = (editorBeatmap
-                                    .HitObjects
-                                    .LastOrDefault(h => h is Slider && h.StartTime <= editorClock.CurrentTime) as Slider)?.SliderVelocityMultiplier;
+                                      .HitObjects
+                                      .LastOrDefault(h => h is Slider && h.StartTime <= editorClock.CurrentTime) as Slider)?.SliderVelocityMultiplier;
 
             if (previousSliderVelocity != null)
             {
