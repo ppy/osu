@@ -129,7 +129,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             private void load(OverlayColourProvider overlayColourProvider)
             {
                 DefaultBackgroundColour = overlayColourProvider.Colour3;
-                triangleGradientSecondColour ??= overlayColourProvider.Colour1;
+                triangleGradientSecondColour ??= DefaultBackgroundColour.Lighten(0.2f);
 
                 if (Text == default)
                 {
