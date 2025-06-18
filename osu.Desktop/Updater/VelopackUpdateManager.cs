@@ -13,10 +13,11 @@ using osu.Game.Overlays.Notifications;
 using osu.Game.Screens.Play;
 using Velopack;
 using Velopack.Sources;
+using UpdateManager = osu.Game.Updater.UpdateManager;
 
 namespace osu.Desktop.Updater
 {
-    public partial class VelopackUpdateManager : Game.Updater.UpdateManager
+    public partial class VelopackUpdateManager : UpdateManager
     {
         [Resolved]
         private INotificationOverlay notificationOverlay { get; set; } = null!;
@@ -36,7 +37,7 @@ namespace osu.Desktop.Updater
             scheduledBackgroundCheck?.Cancel();
             scheduledBackgroundCheck = Scheduler.AddDelayed(() =>
             {
-                Logger.Log("Running scheduled background update check...");
+                log("Running scheduled background update check...");
                 CheckForUpdate();
             }, 60000 * 30);
         }
@@ -47,13 +48,13 @@ namespace osu.Desktop.Updater
 
             if (isInGameplay)
             {
-                Logger.Log("Update check cancelled - user is in gameplay");
+                log("Update check cancelled - user is in gameplay");
                 scheduleNextUpdateCheck();
                 return false;
             }
 
             IUpdateSource updateSource = new GithubSource(@"https://github.com/ppy/osu", null, ReleaseStream.Value == Game.Configuration.ReleaseStream.Tachyon);
-            UpdateManager updateManager = new UpdateManager(updateSource, new UpdateOptions
+            Velopack.UpdateManager updateManager = new Velopack.UpdateManager(updateSource, new UpdateOptions
             {
                 AllowVersionDowngrade = true
             });
@@ -62,7 +63,7 @@ namespace osu.Desktop.Updater
 
             if (cancellationToken.IsCancellationRequested)
             {
-                Logger.Log("Update check cancelled");
+                log("Update check cancelled");
                 scheduleNextUpdateCheck();
                 return true;
             }
@@ -70,20 +71,20 @@ namespace osu.Desktop.Updater
             if (update == null)
             {
                 // No update is available.
-                Logger.Log("No update found");
+                log("No update found");
                 scheduleNextUpdateCheck();
                 return false;
             }
 
             // Download update in the background while notifying awaiters of the update being available.
-            Logger.Log($"New update available: {update.TargetFullRelease.Version}");
+            log($"New update available: {update.TargetFullRelease.Version}");
             downloadUpdate(updateManager, update, cancellationToken);
             return true;
         }
 
-        private void downloadUpdate(UpdateManager updateManager, UpdateInfo update, CancellationToken cancellationToken) => Task.Run(async () =>
+        private void downloadUpdate(Velopack.UpdateManager updateManager, UpdateInfo update, CancellationToken cancellationToken) => Task.Run(async () =>
         {
-            Logger.Log($"Beginning download of update {update.TargetFullRelease.Version}...");
+            log($"Beginning download of update {update.TargetFullRelease.Version}...");
 
             UpdateDownloadProgressNotification progressNotification = new UpdateDownloadProgressNotification(cancellationToken)
             {
@@ -108,7 +109,7 @@ namespace osu.Desktop.Updater
             catch (OperationCanceledException)
             {
                 progressNotification.FailDownload();
-                Logger.Log(@"Update cancelled");
+                log(@"Update cancelled");
             }
             catch (Exception e)
             {
@@ -134,10 +135,12 @@ namespace osu.Desktop.Updater
             action();
         }
 
-        private void restartToApplyUpdate(UpdateManager updateManager, UpdateInfo update) => Task.Run(async () =>
+        private void restartToApplyUpdate(Velopack.UpdateManager updateManager, UpdateInfo update) => Task.Run(async () =>
         {
             await updateManager.WaitExitThenApplyUpdatesAsync(update.TargetFullRelease).ConfigureAwait(false);
             Schedule(() => game.AttemptExit());
         });
+
+        private static void log(string text) => Logger.Log($"VelopackUpdateManager: {text}");
     }
 }
