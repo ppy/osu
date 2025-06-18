@@ -59,7 +59,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                     Scale = new Vector2(1),
                     LowerBound = customStart,
                     UpperBound = customEnd,
-                    TooltipSuffix = "suffix",
                     NubWidth = 32,
                     MinRange = 0.1f,
                 }

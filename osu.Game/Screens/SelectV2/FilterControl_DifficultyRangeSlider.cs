@@ -5,11 +5,13 @@ using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Layout;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
@@ -35,10 +37,7 @@ namespace osu.Game.Screens.SelectV2
                 : base("Star Rating")
             {
                 NubWidth = ShearedNub.HEIGHT * 1.16f;
-                TooltipSuffix = "stars";
-                DefaultStringLowerBound = "0.0";
                 DefaultStringUpperBound = "∞";
-                DefaultTooltipUpperBound = UserInterfaceStrings.NoLimit;
 
                 AddLayout(drawSizeLayout);
             }
@@ -124,6 +123,17 @@ namespace osu.Game.Screens.SelectV2
                 private readonly bool isUpper;
 
                 protected override bool FocusIndicator => false;
+
+                public override LocalisableString TooltipText
+                {
+                    get
+                    {
+                        if (Current.IsDefault && isUpper)
+                            return UserInterfaceStrings.NoLimit;
+
+                        return SongSelectStrings.Stars(Current.Value.ToLocalisableString(@"0.##"));
+                    }
+                }
 
                 public DifficultyBoundSliderBar(ShearedRangeSlider slider, bool isUpper)
                     : base(slider, isUpper)

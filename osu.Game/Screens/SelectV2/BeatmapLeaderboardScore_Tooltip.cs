@@ -1,8 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
@@ -12,6 +17,8 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
+using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -88,17 +95,24 @@ namespace osu.Game.Screens.SelectV2
                 private DrawableDate relativeDate = null!;
                 private FillFlowContainer statistics = null!;
 
+                private readonly Bindable<bool> prefer24HourTime = new Bindable<bool>();
+
                 [Resolved]
                 private OsuColour colours { get; set; } = null!;
 
                 [Resolved]
                 private OverlayColourProvider colourProvider { get; set; } = null!;
 
+                private ScoreInfo score = null!;
+
                 public ScoreInfo Score
                 {
+                    get => score;
                     set
                     {
-                        absoluteDate.Text = value.Date.ToLocalisableString(@"dd MMMM yyyy h:mm tt");
+                        score = value;
+
+                        updateAbsoluteDate();
                         relativeDate.Date = value.Date;
 
                         var judgementsStatistics = value.GetStatisticsForDisplay().Select(s =>
@@ -111,18 +125,11 @@ namespace osu.Game.Screens.SelectV2
 
                         var generalStatistics = new[]
                         {
+                            new PerformanceStatisticRow(BeatmapsetsStrings.ShowScoreboardHeaderspp.ToUpper(), colourProvider.Content2, score),
                             new StatisticRow("Score Multiplier", colourProvider.Content2, ModUtils.FormatScoreMultiplier(multiplier)),
                             new StatisticRow(BeatmapsetsStrings.ShowScoreboardHeadersCombo, colourProvider.Content2, value.MaxCombo.ToLocalisableString(@"0\x")),
                             new StatisticRow(BeatmapsetsStrings.ShowScoreboardHeadersAccuracy, colourProvider.Content2, value.Accuracy.FormatAccuracy()),
                         };
-
-                        if (value.PP != null)
-                        {
-                            generalStatistics = new[]
-                            {
-                                new StatisticRow(BeatmapsetsStrings.ShowScoreboardHeaderspp.ToUpper(), colourProvider.Content2, value.PP.ToLocalisableString("N0"))
-                            }.Concat(generalStatistics).ToArray();
-                        }
 
                         statistics.ChildrenEnumerable = judgementsStatistics
                                                         .Append(Empty().With(d => d.Height = 20))
@@ -131,7 +138,7 @@ namespace osu.Game.Screens.SelectV2
                 }
 
                 [BackgroundDependencyLoader]
-                private void load()
+                private void load(OsuConfigManager configManager)
                 {
                     RelativeSizeAxes = Axes.X;
                     AutoSizeAxes = Axes.Y;
@@ -205,11 +212,25 @@ namespace osu.Game.Screens.SelectV2
                             },
                         },
                     };
+
+                    configManager.BindWith(OsuSetting.Prefer24HourTime, prefer24HourTime);
                 }
+
+                protected override void LoadComplete()
+                {
+                    base.LoadComplete();
+
+                    prefer24HourTime.BindValueChanged(_ => updateAbsoluteDate(), true);
+                }
+
+                private void updateAbsoluteDate()
+                    => absoluteDate.Text = score.Date.ToLocalTime().ToLocalisableString(prefer24HourTime.Value ? @"d MMMM yyyy HH:mm" : @"d MMMM yyyy h:mm tt");
             }
 
-            private partial class StatisticRow : CompositeDrawable
+            public partial class StatisticRow : CompositeDrawable
             {
+                protected OsuSpriteText ValueLabel;
+
                 public StatisticRow(LocalisableString label, Color4 labelColour, LocalisableString value)
                 {
                     RelativeSizeAxes = Axes.X;
@@ -223,7 +244,7 @@ namespace osu.Game.Screens.SelectV2
                             Colour = labelColour,
                             Font = OsuFont.Style.Caption2.With(weight: FontWeight.SemiBold),
                         },
-                        new OsuSpriteText
+                        ValueLabel = new OsuSpriteText
                         {
                             Anchor = Anchor.TopRight,
                             Origin = Anchor.TopRight,
@@ -232,6 +253,65 @@ namespace osu.Game.Screens.SelectV2
                             Font = OsuFont.Style.Caption2,
                         },
                     };
+                }
+            }
+
+            public partial class PerformanceStatisticRow : StatisticRow
+            {
+                private readonly ScoreInfo score;
+
+                public PerformanceStatisticRow(LocalisableString label, Color4 labelColour, ScoreInfo score)
+                    : base(label, labelColour, 0.ToLocalisableString("N0"))
+                {
+                    this.score = score;
+                }
+
+                [BackgroundDependencyLoader]
+                private void load(BeatmapDifficultyCache difficultyCache, CancellationToken? cancellationToken)
+                {
+                    if (score.PP.HasValue)
+                    {
+                        setPerformanceValue(score, score.PP.Value);
+                        return;
+                    }
+
+                    Task.Run(async () =>
+                    {
+                        var attributes = await difficultyCache.GetDifficultyAsync(score.BeatmapInfo!, score.Ruleset, score.Mods, cancellationToken ?? default).ConfigureAwait(false);
+                        var performanceCalculator = score.Ruleset.CreateInstance().CreatePerformanceCalculator();
+
+                        // Performance calculation requires the beatmap and ruleset to be locally available. If not, return a default value.
+                        if (attributes?.DifficultyAttributes == null || performanceCalculator == null)
+                            return;
+
+                        var result = await performanceCalculator.CalculateAsync(score, attributes.Value.DifficultyAttributes, cancellationToken ?? default).ConfigureAwait(false);
+
+                        Schedule(() => setPerformanceValue(score, result.Total));
+                    }, cancellationToken ?? default);
+                }
+
+                private void setPerformanceValue(ScoreInfo scoreInfo, double? pp)
+                {
+                    if (pp.HasValue)
+                    {
+                        int ppValue = (int)Math.Round(pp.Value, MidpointRounding.AwayFromZero);
+                        ValueLabel.Text = ppValue.ToLocalisableString("N0");
+
+                        if (!scoreInfo.BeatmapInfo!.Status.GrantsPerformancePoints() || hasUnrankedMods(scoreInfo))
+                            Alpha = 0.5f;
+                        else
+                            Alpha = 1f;
+                    }
+                }
+
+                private static bool hasUnrankedMods(ScoreInfo scoreInfo)
+                {
+                    IEnumerable<Mod> modsToCheck = scoreInfo.Mods;
+
+                    if (scoreInfo.IsLegacyScore)
+                        modsToCheck = modsToCheck.Where(m => m is not ModClassic);
+
+                    return modsToCheck.Any(m => !m.Ranked);
                 }
             }
 
