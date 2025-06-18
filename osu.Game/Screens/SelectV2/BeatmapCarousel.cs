@@ -618,8 +618,8 @@ namespace osu.Game.Screens.SelectV2
         #region Random selection handling
 
         private readonly Bindable<RandomSelectAlgorithm> randomAlgorithm = new Bindable<RandomSelectAlgorithm>();
-        private readonly List<BeatmapSetInfo> previouslyVisitedRandomSets = new List<BeatmapSetInfo>();
-        private readonly List<BeatmapInfo> randomSelectedBeatmaps = new List<BeatmapInfo>();
+        private readonly List<BeatmapInfo> previouslyVisitedRandomBeatmaps = new List<BeatmapInfo>();
+        private readonly List<BeatmapInfo> randomHistory = new List<BeatmapInfo>();
 
         private Sample? spinSample;
         private Sample? randomSelectSample;
@@ -631,59 +631,129 @@ namespace osu.Game.Screens.SelectV2
             if (carouselItems?.Any() != true)
                 return false;
 
-            // This is the fastest way to retrieve sets for randomisation.
-            ICollection<BeatmapSetInfo> visibleSets = grouping.SetItems.Keys;
+            var selectionBefore = CurrentSelectionItem;
+            var beatmapBefore = selectionBefore?.Model as BeatmapInfo;
 
-            if (ExpandedGroup != null)
+            bool success;
+
+            if (beatmapBefore != null)
             {
+                // keep track of visited beatmaps and sets for rewind
+                randomHistory.Add(beatmapBefore);
+                // keep track of visited beatmaps for "RandomPermutation" random tracking.
+                // note that this is reset when we run out of beatmaps, while `randomHistory` is not.
+                previouslyVisitedRandomBeatmaps.Add(beatmapBefore);
+            }
+
+            if (grouping.BeatmapSetsGroupedTogether)
+                success = nextRandomSet();
+            else
+                success = nextRandomBeatmap();
+
+            if (!success)
+            {
+                if (beatmapBefore != null)
+                    randomHistory.RemoveAt(randomHistory.Count - 1);
+                return false;
+            }
+
+            Scheduler.Add(() =>
+            {
+                if (selectionBefore != null && CurrentSelectionItem != null)
+                    playSpinSample(distanceBetween(selectionBefore, CurrentSelectionItem), carouselItems.Count);
+            });
+
+            return true;
+        }
+
+        private bool nextRandomBeatmap()
+        {
+            ICollection<BeatmapInfo> visibleBeatmaps = ExpandedGroup != null
                 // In the case of grouping, users expect random to only operate on the expanded group.
                 // This is going to incur some overhead as we don't have a group-beatmapset mapping currently.
                 //
                 // If this becomes an issue, we could either store a mapping, or run the random algorithm many times
                 // using the `SetItems` method until we get a group HIT.
-                if (grouping.BeatmapSetsGroupedTogether)
-                    visibleSets = grouping.GroupItems[ExpandedGroup].Select(i => i.Model).OfType<BeatmapSetInfo>().ToArray();
-                else
-                {
-                    // Note that this is probably not correct in all cases.
-                    // When we aren't grouping sets together, we might want to randomise by beatmaps, not sets.
-                    //
-                    // Imagine the scenario where a single beatmap set has multiple difficulties in the same difficulty grouping, where this
-                    // would always choose the set's user recommended difficulty rather than the visible ones.
-                    visibleSets = grouping.GroupItems[ExpandedGroup].Select(i => i.Model).OfType<BeatmapInfo>().Select(b => b.BeatmapSet!).Distinct().ToArray();
-                }
-            }
+                ? grouping.GroupItems[ExpandedGroup].Select(i => i.Model).OfType<BeatmapInfo>().ToArray()
+                : GetCarouselItems()!.Select(i => i.Model).OfType<BeatmapInfo>().ToArray();
 
-            if (CurrentSelection is BeatmapInfo beatmapInfo)
+            BeatmapInfo beatmap;
+
+            switch (randomAlgorithm.Value)
             {
-                randomSelectedBeatmaps.Add(beatmapInfo);
+                case RandomSelectAlgorithm.RandomPermutation:
+                {
+                    ICollection<BeatmapInfo> notYetVisitedBeatmaps = visibleBeatmaps.Except(previouslyVisitedRandomBeatmaps).ToList();
 
-                // when performing a random, we want to add the current set to the previously visited list
-                // else the user may be "randomised" to the existing selection.
-                if (previouslyVisitedRandomSets.LastOrDefault()?.Equals(beatmapInfo.BeatmapSet) != true)
-                    previouslyVisitedRandomSets.Add(beatmapInfo.BeatmapSet!);
+                    if (!notYetVisitedBeatmaps.Any())
+                    {
+                        previouslyVisitedRandomBeatmaps.RemoveAll(b => visibleBeatmaps.Contains(b));
+                        notYetVisitedBeatmaps = visibleBeatmaps;
+                        if (CurrentSelection is BeatmapInfo beatmapInfo)
+                            notYetVisitedBeatmaps = notYetVisitedBeatmaps.Except([beatmapInfo]).ToList();
+                    }
+
+                    if (notYetVisitedBeatmaps.Count == 0)
+                        return false;
+
+                    beatmap = notYetVisitedBeatmaps.ElementAt(RNG.Next(notYetVisitedBeatmaps.Count));
+                    break;
+                }
+
+                case RandomSelectAlgorithm.Random:
+                    beatmap = visibleBeatmaps.ElementAt(RNG.Next(visibleBeatmaps.Count));
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
+
+            RequestSelection(beatmap);
+            return true;
+        }
+
+        private bool nextRandomSet()
+        {
+            ICollection<BeatmapSetInfo> visibleSets = ExpandedGroup != null
+                // In the case of grouping, users expect random to only operate on the expanded group.
+                // This is going to incur some overhead as we don't have a group-beatmapset mapping currently.
+                //
+                // If this becomes an issue, we could either store a mapping, or run the random algorithm many times
+                // using the `SetItems` method until we get a group HIT.
+                ? grouping.GroupItems[ExpandedGroup].Select(i => i.Model).OfType<BeatmapSetInfo>().ToArray()
+                // This is the fastest way to retrieve sets for randomisation.
+                : grouping.SetItems.Keys;
 
             BeatmapSetInfo set;
 
-            if (randomAlgorithm.Value == RandomSelectAlgorithm.RandomPermutation)
+            switch (randomAlgorithm.Value)
             {
-                ICollection<BeatmapSetInfo> notYetVisitedSets = visibleSets.Except(previouslyVisitedRandomSets).ToList();
-
-                if (!notYetVisitedSets.Any())
+                case RandomSelectAlgorithm.RandomPermutation:
                 {
-                    previouslyVisitedRandomSets.RemoveAll(s => visibleSets.Contains(s));
-                    notYetVisitedSets = visibleSets;
+                    ICollection<BeatmapSetInfo> notYetVisitedSets = visibleSets.Except(previouslyVisitedRandomBeatmaps.Select(b => b.BeatmapSet!)).ToList();
+
+                    if (!notYetVisitedSets.Any())
+                    {
+                        previouslyVisitedRandomBeatmaps.RemoveAll(b => visibleSets.Contains(b.BeatmapSet!));
+                        notYetVisitedSets = visibleSets;
+                        if (CurrentSelection is BeatmapInfo beatmapInfo)
+                            notYetVisitedSets = notYetVisitedSets.Except([beatmapInfo.BeatmapSet!]).ToList();
+                    }
+
+                    if (notYetVisitedSets.Count == 0)
+                        return false;
+
+                    set = notYetVisitedSets.ElementAt(RNG.Next(notYetVisitedSets.Count));
+                    break;
                 }
 
-                set = notYetVisitedSets.ElementAt(RNG.Next(notYetVisitedSets.Count));
-                previouslyVisitedRandomSets.Add(set);
-            }
-            else
-                set = visibleSets.ElementAt(RNG.Next(visibleSets.Count));
+                case RandomSelectAlgorithm.Random:
+                    set = visibleSets.ElementAt(RNG.Next(visibleSets.Count));
+                    break;
 
-            if (CurrentSelectionItem != null)
-                playSpinSample(distanceBetween(carouselItems.First(i => !ReferenceEquals(i.Model, set)), CurrentSelectionItem), visibleSets.Count);
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
 
             selectRecommendedDifficultyForBeatmapSet(set);
             return true;
@@ -696,10 +766,10 @@ namespace osu.Game.Screens.SelectV2
             if (carouselItems?.Any() != true)
                 return;
 
-            while (randomSelectedBeatmaps.Any())
+            while (randomHistory.Any())
             {
-                var previousBeatmap = randomSelectedBeatmaps[^1];
-                randomSelectedBeatmaps.RemoveAt(randomSelectedBeatmaps.Count - 1);
+                var previousBeatmap = randomHistory[^1];
+                randomHistory.RemoveAt(randomHistory.Count - 1);
 
                 var previousBeatmapItem = carouselItems.FirstOrDefault(i => i.Model is BeatmapInfo b && b.Equals(previousBeatmap));
 
@@ -709,7 +779,7 @@ namespace osu.Game.Screens.SelectV2
                 if (CurrentSelection is BeatmapInfo beatmapInfo)
                 {
                     if (randomAlgorithm.Value == RandomSelectAlgorithm.RandomPermutation)
-                        previouslyVisitedRandomSets.Remove(beatmapInfo.BeatmapSet!);
+                        previouslyVisitedRandomBeatmaps.Remove(beatmapInfo);
 
                     if (CurrentSelectionItem == null)
                         playSpinSample(0, carouselItems.Count);

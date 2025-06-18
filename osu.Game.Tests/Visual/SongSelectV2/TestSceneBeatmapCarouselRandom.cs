@@ -55,26 +55,26 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 nextRandom();
                 expanded ??= storeExpandedGroup();
 
-                ensureRandomDidNotRepeat();
+                ensureSetRandomDidNotRepeat();
                 checkExpandedGroupUnchanged();
             }
 
             nextRandom();
-            ensureRandomDidRepeat();
+            ensureSetRandomDidRepeat();
             checkExpandedGroupUnchanged();
 
-            prevRandom();
+            prevRandomSet();
             checkRewindCorrectSet();
             checkExpandedGroupUnchanged();
-            prevRandom();
+            prevRandomSet();
             checkRewindCorrectSet();
             checkExpandedGroupUnchanged();
 
             nextRandom();
-            ensureRandomDidNotRepeat();
+            ensureSetRandomDidNotRepeat();
             checkExpandedGroupUnchanged();
             nextRandom();
-            ensureRandomDidRepeat();
+            ensureSetRandomDidRepeat();
             checkExpandedGroupUnchanged();
 
             GroupDefinition? storeExpandedGroup()
@@ -90,7 +90,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         /// Test random non-repeating algorithm
         /// </summary>
         [Test]
-        public void TestRandomDifficultyGrouping()
+        public void TestRandomDifficultyGroupingRewindsCorrectly()
         {
             SortAndGroupBy(SortMode.Difficulty, GroupMode.Difficulty);
 
@@ -108,25 +108,71 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 checkExpandedGroupUnchanged();
             }
 
-            nextRandom();
-            ensureRandomDidRepeat();
-            checkExpandedGroupUnchanged();
+            for (int i = 0; i < 2; i++)
+            {
+                prevRandom();
+                checkRewindCorrect();
+                checkExpandedGroupUnchanged();
+            }
 
-            prevRandom();
-            checkRewindCorrectSet();
-            checkExpandedGroupUnchanged();
-
-            prevRandom();
-            checkRewindCorrectSet();
-            checkExpandedGroupUnchanged();
-
-            nextRandom();
-            ensureRandomDidNotRepeat();
-            checkExpandedGroupUnchanged();
+            for (int i = 0; i < 2; i++)
+            {
+                nextRandom();
+                ensureRandomDidNotRepeat();
+                checkExpandedGroupUnchanged();
+            }
 
             nextRandom();
             ensureRandomDidRepeat();
             checkExpandedGroupUnchanged();
+
+            GroupDefinition? storeExpandedGroup()
+            {
+                AddStep("store open group", () => expanded = Carousel.ExpandedGroup);
+                return null;
+            }
+
+            void checkExpandedGroupUnchanged() => AddAssert("expanded did not change", () => Carousel.ExpandedGroup, () => Is.EqualTo(expanded));
+        }
+
+        /// <summary>
+        /// Test random non-repeating algorithm
+        /// </summary>
+        [Test]
+        public void TestRandomDifficultyGroupingRepeatsWhenExhausted()
+        {
+            SortAndGroupBy(SortMode.Difficulty, GroupMode.Difficulty);
+
+            AddBeatmaps(3, 3, true);
+            WaitForDrawablePanels();
+
+            GroupDefinition? expanded = null;
+
+            for (int i = 0; i < 3; i++)
+            {
+                nextRandom();
+                expanded ??= storeExpandedGroup();
+
+                ensureRandomDidNotRepeat();
+                checkExpandedGroupUnchanged();
+            }
+
+            for (int i = 0; i < 3; i++)
+            {
+                nextRandom();
+                ensureRandomDidRepeat();
+            }
+
+            for (int i = 0; i < 5; i++)
+            {
+                prevRandom();
+                checkRewindCorrect();
+                checkExpandedGroupUnchanged();
+            }
+
+            nextRandom();
+            checkExpandedGroupUnchanged();
+            // can't assert repeat or otherwise as we went through multiple permutations.
 
             GroupDefinition? storeExpandedGroup()
             {
@@ -153,7 +199,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             for (int i = 0; i < random_select_count; i++)
             {
-                prevRandom();
+                prevRandomSet();
                 checkRewindCorrectSet();
             }
         }
@@ -204,7 +250,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             AddAssert("selection not changed", () => Carousel.CurrentSelection, () => Is.EqualTo(postRandomSelection));
 
-            prevRandom();
+            prevRandomSet();
             AddAssert("selection not changed", () => Carousel.CurrentSelection, () => Is.EqualTo(postRandomSelection));
         }
 
@@ -212,15 +258,32 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddStep("select random next", () => Carousel.NextRandom());
 
         private void ensureRandomDidRepeat() =>
-            AddAssert("did repeat", () => BeatmapSetRequestedSelections.Distinct().Count(), () => Is.LessThan(BeatmapSetRequestedSelections.Count));
+            AddAssert("did repeat", () => BeatmapRequestedSelections.Distinct().Count(), () => Is.LessThan(BeatmapRequestedSelections.Count));
 
         private void ensureRandomDidNotRepeat() =>
+            AddAssert("no repeats", () => BeatmapRequestedSelections.Distinct().Count(), () => Is.EqualTo(BeatmapRequestedSelections.Count));
+
+        private void ensureSetRandomDidRepeat() =>
+            AddAssert("did repeat", () => BeatmapSetRequestedSelections.Distinct().Count(), () => Is.LessThan(BeatmapSetRequestedSelections.Count));
+
+        private void ensureSetRandomDidNotRepeat() =>
             AddAssert("no repeats", () => BeatmapSetRequestedSelections.Distinct().Count(), () => Is.EqualTo(BeatmapSetRequestedSelections.Count));
+
+        private void checkRewindCorrect() =>
+            AddAssert("rewind matched expected beatmap", () => BeatmapRequestedSelections.Peek(), () => Is.EqualTo(Carousel.SelectedBeatmapInfo));
 
         private void checkRewindCorrectSet() =>
             AddAssert("rewind matched expected set", () => BeatmapSetRequestedSelections.Peek(), () => Is.EqualTo(Carousel.SelectedBeatmapSet));
 
-        private void prevRandom() => AddStep("select random last", () =>
+        private void prevRandom() => AddStep("select last random", () =>
+        {
+            Carousel.PreviousRandom();
+            BeatmapRequestedSelections.Pop();
+            // Pop twice because the PreviousRandom call also requests selection.
+            BeatmapRequestedSelections.Pop();
+        });
+
+        private void prevRandomSet() => AddStep("select last random set", () =>
         {
             Carousel.PreviousRandom();
             BeatmapSetRequestedSelections.Pop();
