@@ -15,6 +15,11 @@ namespace osu.Game.Localisation
         public static LocalisableString ViewProfile => new TranslatableString(getKey(@"view_profile"), @"View profile");
 
         /// <summary>
+        /// "Download beatmap"
+        /// </summary>
+        public static LocalisableString DownloadBeatmap => new TranslatableString(getKey(@"download_beatmap"), @"Download beatmap");
+
+        /// <summary>
         /// "View beatmap"
         /// </summary>
         public static LocalisableString ViewBeatmap => new TranslatableString(getKey(@"view_beatmap"), @"View beatmap");
