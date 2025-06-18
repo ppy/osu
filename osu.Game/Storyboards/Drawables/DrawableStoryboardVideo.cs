@@ -147,6 +147,8 @@ namespace osu.Game.Storyboards.Drawables
 
             protected partial class DrawableVideoSprite : VideoSprite, IColouredDimmable
             {
+                private readonly LayoutValue<IColouredDimmable> drawColourOffsetSource = new LayoutValue<IColouredDimmable>(Invalidation.Parent);
+
                 private readonly Video video;
 
                 protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
@@ -166,12 +168,34 @@ namespace osu.Game.Storyboards.Drawables
                     : base(video)
                 {
                     this.video = video;
+                    AddLayout(drawColourOffsetSource);
                 }
 
                 [BackgroundDependencyLoader]
                 private void load(ShaderManager shaders)
                 {
                     TextureShader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, "ColouredDimmableVideo");
+                }
+
+                public Colour4 DrawColourOffset
+                {
+                    get
+                    {
+                        if (DrawColourInfo.Blending == BlendingParameters.Additive)
+                            // Additive Drawables shouldn't have any offset, because things underneath them
+                            // already have it added to them. This does rely on the fact that there is
+                            // something non-additive (but still IColouredDimmable) behind this sprite,
+                            // which seems to be the case with storyboards, as beatmap background is always enabled.
+                            return Colour4.Black;
+
+                        if (!drawColourOffsetSource.IsValid)
+                            drawColourOffsetSource.Value = (this as IColouredDimmable).DrawColourOffsetSource;
+
+                        if (drawColourOffsetSource.Value != null && drawColourOffsetSource.Value != this)
+                            return drawColourOffsetSource.Value.DrawColourOffset;
+
+                        return Colour4.Black;
+                    }
                 }
 
                 protected override DrawNode CreateDrawNode() => new DrawableVideoSpriteDrawNode(this, video);

@@ -230,6 +230,8 @@ namespace osu.Game.Screens.Backgrounds
                 }
             }
 
+            public IColouredDimmable DrawColourOffsetSource => this;
+
             public Colour4 DrawColourOffset => ColourOffset * DrawColourInfo.Colour;
 
             protected override void UpdateVisuals()

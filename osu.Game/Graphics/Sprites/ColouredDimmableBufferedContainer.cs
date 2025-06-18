@@ -16,6 +16,8 @@ namespace osu.Game.Graphics.Sprites
 {
     public partial class ColouredDimmableBufferedContainer : BufferedContainer, IColouredDimmable
     {
+        private readonly LayoutValue<IColouredDimmable> drawColourOffsetSource = new LayoutValue<IColouredDimmable>(Invalidation.Parent);
+
         protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
         {
             bool result = false;
@@ -37,6 +39,7 @@ namespace osu.Game.Graphics.Sprites
         public ColouredDimmableBufferedContainer(RenderBufferFormat[] formats = null, bool pixelSnapping = false, bool cachedFrameBuffer = false)
             : base(formats, pixelSnapping, cachedFrameBuffer)
         {
+            AddLayout(drawColourOffsetSource);
         }
 
         [BackgroundDependencyLoader]
@@ -45,22 +48,29 @@ namespace osu.Game.Graphics.Sprites
             TextureShader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, "ColouredDimmableTexture");
         }
 
+        // Children should not receive the true colour to avoid colour doubling when the frame-buffers are rendered to the back-buffer.
+        public Colour4 DrawColourOffset => Colour4.Black;
+
         public Colour4 FrameBufferDrawColourOffset
         {
             get
             {
-                if (Parent is IColouredDimmable colouredDimmableParent)
-                    return colouredDimmableParent.DrawColourOffset;
-                else if (Parent?.Parent is IColouredDimmable colouredDimmableGrandparent)
-                    // Needed to skip intermediate containers.
-                    return colouredDimmableGrandparent.DrawColourOffset;
+                if (DrawColourInfo.Blending == BlendingParameters.Additive)
+                    // Additive Drawables shouldn't have any offset, because things underneath them
+                    // already have it added to them. This does rely on the fact that there is
+                    // something non-additive (but still IColouredDimmable) behind this sprite,
+                    // which seems to be the case with storyboards, as beatmap background is always enabled.
+                    return Colour4.Black;
+
+                if (!drawColourOffsetSource.IsValid)
+                    drawColourOffsetSource.Value = (this as IColouredDimmable).DrawColourOffsetSource;
+
+                if (drawColourOffsetSource.Value != null && drawColourOffsetSource.Value != this)
+                    return drawColourOffsetSource.Value.DrawColourOffset;
 
                 return Colour4.Black;
             }
         }
-
-        // Children should not receive the true colour to avoid colour doubling when the frame-buffers are rendered to the back-buffer.
-        public Colour4 DrawColourOffset => Colour4.Black;
 
         protected override DrawNode CreateDrawNode() => new ColouredDimmableBufferedContainerDrawNode(this, SharedData);
 

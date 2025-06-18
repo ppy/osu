@@ -16,6 +16,8 @@ namespace osu.Game.Graphics.Sprites
 {
     public partial class ColouredDimmableSprite : Sprite, IColouredDimmable
     {
+        private readonly LayoutValue<IColouredDimmable> drawColourOffsetSource = new LayoutValue<IColouredDimmable>(Invalidation.Parent);
+
         protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
         {
             bool result = base.OnInvalidate(invalidation, source);
@@ -29,10 +31,37 @@ namespace osu.Game.Graphics.Sprites
             return result;
         }
 
+        public ColouredDimmableSprite()
+            : base()
+        {
+            AddLayout(drawColourOffsetSource);
+        }
+
         [BackgroundDependencyLoader]
         private void load(ShaderManager shaders)
         {
             TextureShader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, "ColouredDimmableTexture");
+        }
+
+        public Colour4 DrawColourOffset
+        {
+            get
+            {
+                if (DrawColourInfo.Blending == BlendingParameters.Additive)
+                    // Additive Drawables shouldn't have any offset, because things underneath them
+                    // already have it added to them. This does rely on the fact that there is
+                    // something non-additive (but still IColouredDimmable) behind this sprite,
+                    // which seems to be the case with storyboards, as beatmap background is always enabled.
+                    return Colour4.Black;
+
+                if (!drawColourOffsetSource.IsValid)
+                    drawColourOffsetSource.Value = (this as IColouredDimmable).DrawColourOffsetSource;
+
+                if (drawColourOffsetSource.Value != null && drawColourOffsetSource.Value != this)
+                    return drawColourOffsetSource.Value.DrawColourOffset;
+
+                return Colour4.Black;
+            }
         }
 
         protected override DrawNode CreateDrawNode() => new ColouredDimmableSpriteDrawNode(this);
