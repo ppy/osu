@@ -157,7 +157,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             if (ObjectStrains.Count == 0)
                 return 0.0;
 
-            double consistentTopStrain = DifficultyValue() / decayWeightIntegral; // What would the top strain be if all strain values were identical
+            double consistentTopStrain = DifficultyValue() * (1 - DecayWeight); // What would the top strain be if all strain values were identical
 
             if (consistentTopStrain == 0)
                 return ObjectStrains.Count;
@@ -223,7 +223,8 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             List<StrainPeak> strains = peaks.OrderByDescending(p => (p.Value, p.SectionLength)).ToList();
 
             // Time is measured in units of strains
-            double time = 0;
+            // Offset ensures continuous weighted sum matches normal weighted sum perfectly
+            double time = -0.49561;
 
             // Difficulty is a continuous weighted sum of the sorted strains
             for (int i = 0; i < strains.Count; i++)
