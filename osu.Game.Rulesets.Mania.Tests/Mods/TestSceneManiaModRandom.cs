@@ -51,6 +51,43 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
             }
         }
 
+        [TestCase(2)]
+        [TestCase(3)]
+        [TestCase(4)]
+        [TestCase(5)]
+        [TestCase(10)]
+        public void TestColumnRandomizationVaryingSeeds(int columnCount)
+        {
+            var original = createRawBeatmap(columnCount);
+            var originalColumns = original.HitObjects.Cast<ManiaHitObject>().Select(h => h.Column).ToList();
+
+            int unchangedCount = 0;
+
+            for (int seed = 0; seed < 10000; seed++)
+            {
+                var beatmap = createRawBeatmap(columnCount);
+
+                var mod = new ManiaModRandom
+                {
+                    Seed = { Value = seed },
+                    Randomizer = { Value = ManiaModRandom.RandomizationType.Columns }
+                };
+
+                foreach (var obj in beatmap.HitObjects)
+                    obj.ApplyDefaults(beatmap.ControlPointInfo, new BeatmapDifficulty());
+
+                mod.ApplyToBeatmap(beatmap);
+
+                var newColumns = beatmap.HitObjects.Cast<ManiaHitObject>().Select(h => h.Column).ToList();
+
+                if (newColumns.SequenceEqual(originalColumns))
+                    unchangedCount++;
+            }
+
+            Assert.That(unchangedCount < 10000, $"Expected at least one seed to produce different column assignments, but all 10000 seeds were unchanged.");
+            TestContext.WriteLine($"{10000 - unchangedCount} out of 10000 seeds produced different column assignments.");
+        }
+
         private static ManiaBeatmap createModdedBeatmap(int columnCount, ManiaModRandom.RandomizationType mode)
         {
             var beatmap = createRawBeatmap(columnCount);
