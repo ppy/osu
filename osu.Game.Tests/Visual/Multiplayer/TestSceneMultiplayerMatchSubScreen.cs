@@ -59,9 +59,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
             importedSet = beatmaps.GetAllUsableBeatmapSets().First();
         }
 
-        [SetUpSteps]
-        public void SetupSteps()
+        public override void SetUpSteps()
         {
+            base.SetUpSteps();
+
+            AddUntilStep("wait for mod select removed", () => this.ChildrenOfType<MultiplayerUserModSelectOverlay>().Count(), () => Is.Zero);
+
             AddStep("load match", () =>
             {
                 room = new Room { Name = "Test Room" };

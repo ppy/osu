@@ -18,7 +18,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.SelectV2
 {
-    public partial class PanelSetBackground : BufferedContainer
+    public partial class PanelSetBackground : Container
     {
         [Resolved]
         private BeatmapCarousel? beatmapCarousel { get; set; }
@@ -52,10 +52,6 @@ namespace osu.Game.Screens.SelectV2
         }
 
         public PanelSetBackground()
-            // TODO: for performance reasons we may want this to be true.
-            // Setting to true will require that the buffered portion is moved to a child such that `FadeIn`/`FadeOut` transforms
-            // still work.
-            : base(cachedFrameBuffer: false)
         {
             RelativeSizeAxes = Axes.Both;
         }

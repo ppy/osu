@@ -519,7 +519,7 @@ namespace osu.Game
                     else
                     {
                         string[] changelogArgs = argString.Split("/");
-                        ShowChangelogBuild(changelogArgs[0], changelogArgs[1]);
+                        ShowChangelogBuild($"{changelogArgs[1]}-{changelogArgs[0]}");
                     }
 
                     break;
@@ -600,9 +600,8 @@ namespace osu.Game
         /// <summary>
         /// Show changelog's build as an overlay
         /// </summary>
-        /// <param name="updateStream">The update stream name</param>
-        /// <param name="version">The build version of the update stream</param>
-        public void ShowChangelogBuild(string updateStream, string version) => waitForReady(() => changelogOverlay, _ => changelogOverlay.ShowBuild(updateStream, version));
+        /// <param name="version">The build version, including stream suffix.</param>
+        public void ShowChangelogBuild(string version) => waitForReady(() => changelogOverlay, _ => changelogOverlay.ShowBuild(version));
 
         /// <summary>
         /// Joins a multiplayer or playlists room with the given <paramref name="id"/>.
@@ -1024,6 +1023,10 @@ namespace osu.Game
 
             if (RuntimeInfo.EntryAssembly.GetCustomAttribute<OfficialBuildAttribute>() == null)
                 Logger.Log(NotificationsStrings.NotOfficialBuild.ToString());
+
+            // Make sure the release stream setting matches the build which was just run.
+            if (Enum.TryParse<ReleaseStream>(Version.Split('-').Last(), true, out var releaseStream))
+                LocalConfig.SetValue(OsuSetting.ReleaseStream, releaseStream);
 
             var languages = Enum.GetValues<Language>();
 
@@ -1749,7 +1752,12 @@ namespace osu.Game
                     if (newOsuScreen.IsLoaded)
                         updateFooterButtons();
                     else
+                    {
+                        // ensure the current buttons are immediately disabled on screen change (so they can't be pressed).
+                        ScreenFooter.SetButtons(Array.Empty<ScreenFooterButton>());
+
                         newOsuScreen.OnLoadComplete += _ => updateFooterButtons();
+                    }
 
                     void updateFooterButtons()
                     {
