@@ -36,6 +36,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
     public abstract partial class BeatmapCarouselTestScene : OsuManualInputManagerTestScene
     {
         protected readonly Stack<BeatmapSetInfo> BeatmapSetRequestedSelections = new Stack<BeatmapSetInfo>();
+        protected readonly Stack<BeatmapInfo> BeatmapRequestedSelections = new Stack<BeatmapInfo>();
 
         protected readonly BindableList<BeatmapSetInfo> BeatmapSets = new BindableList<BeatmapSetInfo>();
 
@@ -73,6 +74,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         {
             AddStep("create components", () =>
             {
+                BeatmapRequestedSelections.Clear();
                 BeatmapSetRequestedSelections.Clear();
                 BeatmapRecommendationFunction = null;
                 NewItemsPresentedInvocationCount = 0;
@@ -113,6 +115,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                                     NewItemsPresented = _ => NewItemsPresentedInvocationCount++,
                                     RequestSelection = b =>
                                     {
+                                        BeatmapRequestedSelections.Push(b);
                                         Carousel.CurrentSelection = b;
                                     },
                                     RequestRecommendedSelection = beatmaps =>
