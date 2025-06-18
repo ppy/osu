@@ -2,10 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Testing;
+using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
 using osuTK.Graphics;
@@ -14,6 +16,9 @@ namespace osu.Game.Tests.Visual.UserInterface
 {
     public partial class TestSceneFPSCounter : OsuTestScene
     {
+        [Resolved]
+        private OsuConfigManager config { get; set; } = null!;
+
         [SetUpSteps]
         public void SetUpSteps()
         {
@@ -41,6 +46,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     },
                 };
             });
+            AddToggleStep("toggle show", b => config.SetValue(OsuSetting.ShowFpsDisplay, b));
         }
 
         [Test]

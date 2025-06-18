@@ -4,6 +4,7 @@
 using System.Threading.Tasks;
 using osu.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
@@ -13,6 +14,7 @@ using osu.Framework.Statistics;
 using osu.Game.Configuration;
 using osu.Game.Localisation;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Overlays.Dialog;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Overlays.Settings.Sections.Maintenance;
 using osu.Game.Updater;
@@ -27,6 +29,9 @@ namespace osu.Game.Overlays.Settings.Sections.General
 
         private SettingsButton checkForUpdatesButton = null!;
 
+        private readonly Bindable<ReleaseStream> configReleaseStream = new Bindable<ReleaseStream>();
+        private SettingsEnumDropdown<ReleaseStream> releaseStreamDropdown = null!;
+
         [Resolved]
         private UpdateManager? updateManager { get; set; }
 
@@ -40,20 +45,46 @@ namespace osu.Game.Overlays.Settings.Sections.General
         private OsuGame? game { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(OsuConfigManager config, IDialogOverlay? dialogOverlay)
         {
-            Add(new SettingsEnumDropdown<ReleaseStream>
-            {
-                LabelText = GeneralSettingsStrings.ReleaseStream,
-                Current = config.GetBindable<ReleaseStream>(OsuSetting.ReleaseStream),
-            });
+            config.BindWith(OsuSetting.ReleaseStream, configReleaseStream);
 
             if (updateManager?.CanCheckForUpdate == true)
             {
+                Add(releaseStreamDropdown = new SettingsEnumDropdown<ReleaseStream>
+                {
+                    LabelText = GeneralSettingsStrings.ReleaseStream,
+                    Current = { Value = configReleaseStream.Value },
+                    Keywords = new[] { @"version" },
+                });
+
                 Add(checkForUpdatesButton = new SettingsButton
                 {
                     Text = GeneralSettingsStrings.CheckUpdate,
                     Action = () => checkForUpdates().FireAndForget()
+                });
+
+                releaseStreamDropdown.Current.BindValueChanged(stream =>
+                {
+                    if (stream.NewValue == ReleaseStream.Tachyon)
+                    {
+                        dialogOverlay?.Push(new ConfirmDialog(GeneralSettingsStrings.ChangeReleaseStreamConfirmation,
+                            () =>
+                            {
+                                configReleaseStream.Value = ReleaseStream.Tachyon;
+                            },
+                            () =>
+                            {
+                                releaseStreamDropdown.Current.Value = ReleaseStream.Lazer;
+                            })
+                        {
+                            BodyText = GeneralSettingsStrings.ChangeReleaseStreamConfirmationInfo
+                        });
+
+                        return;
+                    }
+
+                    configReleaseStream.Value = stream.NewValue;
                 });
             }
 
@@ -96,7 +127,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
 
             try
             {
-                bool foundUpdate = await updateManager.CheckForUpdateAsync().ConfigureAwait(true);
+                bool foundUpdate = await updateManager.CheckForUpdateAsync(checkingNotification.CancellationToken).ConfigureAwait(true);
 
                 if (!foundUpdate)
                 {
@@ -112,8 +143,9 @@ namespace osu.Game.Overlays.Settings.Sections.General
             }
             finally
             {
-                // This sequence allows the notification to be immediately dismissed.
-                checkingNotification.State = ProgressNotificationState.Cancelled;
+                // This sequence allows the notification to be immediately dismissed without posting a continuation message.
+                checkingNotification.CompletionTarget = null;
+                checkingNotification.State = ProgressNotificationState.Completed;
                 checkingNotification.Close(false);
                 checkForUpdatesButton.Enabled.Value = true;
             }

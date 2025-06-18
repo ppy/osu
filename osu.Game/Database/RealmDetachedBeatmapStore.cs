@@ -30,7 +30,8 @@ namespace osu.Game.Database
         public override IBindableList<BeatmapSetInfo> GetBeatmapSets(CancellationToken? cancellationToken)
         {
             loaded.Wait(cancellationToken ?? CancellationToken.None);
-            return detachedBeatmapSets.GetBoundCopy();
+            lock (detachedBeatmapSets)
+                return detachedBeatmapSets.GetBoundCopy();
         }
 
         [BackgroundDependencyLoader]
@@ -65,8 +66,11 @@ namespace osu.Game.Database
                         {
                             var detached = frozenSets.Detach();
 
-                            detachedBeatmapSets.Clear();
-                            detachedBeatmapSets.AddRange(detached);
+                            lock (detachedBeatmapSets)
+                            {
+                                detachedBeatmapSets.Clear();
+                                detachedBeatmapSets.AddRange(detached);
+                            }
                         });
                     }
                     finally
@@ -116,22 +120,28 @@ namespace osu.Game.Database
             if (!loaded.IsSet)
                 return;
 
-            // If this ever leads to performance issues, we could dequeue a limited number of operations per update frame.
-            while (pendingOperations.TryDequeue(out var op))
+            if (pendingOperations.Count == 0)
+                return;
+
+            lock (detachedBeatmapSets)
             {
-                switch (op.Type)
+                // If this ever leads to performance issues, we could dequeue a limited number of operations per update frame.
+                while (pendingOperations.TryDequeue(out var op))
                 {
-                    case OperationType.Insert:
-                        detachedBeatmapSets.Insert(op.Index, op.BeatmapSet!);
-                        break;
+                    switch (op.Type)
+                    {
+                        case OperationType.Insert:
+                            detachedBeatmapSets.Insert(op.Index, op.BeatmapSet!);
+                            break;
 
-                    case OperationType.Update:
-                        detachedBeatmapSets.ReplaceRange(op.Index, 1, new[] { op.BeatmapSet! });
-                        break;
+                        case OperationType.Update:
+                            detachedBeatmapSets.ReplaceRange(op.Index, 1, new[] { op.BeatmapSet! });
+                            break;
 
-                    case OperationType.Remove:
-                        detachedBeatmapSets.RemoveAt(op.Index);
-                        break;
+                        case OperationType.Remove:
+                            detachedBeatmapSets.RemoveAt(op.Index);
+                            break;
+                    }
                 }
             }
         }

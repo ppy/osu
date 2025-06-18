@@ -47,6 +47,8 @@ namespace osu.Game.Screens
 
         public virtual bool HideMenuCursorOnNonMouseInput => false;
 
+        public virtual bool RequiresPortraitOrientation => false;
+
         /// <summary>
         /// The initial overlay activation mode to use when this screen is entered for the first time.
         /// </summary>
@@ -114,6 +116,8 @@ namespace osu.Game.Screens
         private bool? modTrackAdjustmentStateAtSuspend;
 
         internal void CreateLeasedDependencies(IReadOnlyDependencyContainer dependencies) => createDependencies(dependencies);
+
+        internal void LoadComponentsAgainstScreenDependencies(IEnumerable<Drawable> components) => LoadComponents(components);
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {

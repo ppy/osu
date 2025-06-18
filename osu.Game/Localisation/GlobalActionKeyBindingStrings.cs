@@ -130,14 +130,14 @@ namespace osu.Game.Localisation
         public static LocalisableString SelectNext => new TranslatableString(getKey(@"select_next"), @"Next selection");
 
         /// <summary>
-        /// "Select previous group"
+        /// "Activate previous set"
         /// </summary>
-        public static LocalisableString SelectPreviousGroup => new TranslatableString(getKey(@"select_previous_group"), @"Select previous group");
+        public static LocalisableString ActivatePreviousSet => new TranslatableString(getKey(@"activate_previous_set"), @"Activate previous set");
 
         /// <summary>
-        /// "Select next group"
+        /// "Activate next set"
         /// </summary>
-        public static LocalisableString SelectNextGroup => new TranslatableString(getKey(@"select_next_group"), @"Select next group");
+        public static LocalisableString ActivateNextSet => new TranslatableString(getKey(@"activate_next_set"), @"Activate next set");
 
         /// <summary>
         /// "Home"
@@ -458,6 +458,11 @@ namespace osu.Game.Localisation
         /// "Toggle movement control"
         /// </summary>
         public static LocalisableString EditorToggleMoveControl => new TranslatableString(getKey(@"editor_toggle_move_control"), @"Toggle movement control");
+
+        /// <summary>
+        /// "Discard unsaved changes"
+        /// </summary>
+        public static LocalisableString EditorDiscardUnsavedChanges => new TranslatableString(getKey(@"editor_discard_unsaved_changes"), @"Discard unsaved changes");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

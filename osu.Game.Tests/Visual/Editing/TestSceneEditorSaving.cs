@@ -208,5 +208,11 @@ namespace osu.Game.Tests.Visual.Editing
             AddAssert("Beatmap still has correct beat divisor", () => EditorBeatmap.BeatmapInfo.BeatDivisor, () => Is.EqualTo(7));
             AddAssert("Correct beat divisor actually active", () => Editor.BeatDivisor, () => Is.EqualTo(7));
         }
+
+        [Test]
+        public void TestBeatmapVersionPopulatedCorrectly()
+        {
+            AddAssert("beatmap version is populated", () => EditorBeatmap.BeatmapVersion > 0);
+        }
     }
 }

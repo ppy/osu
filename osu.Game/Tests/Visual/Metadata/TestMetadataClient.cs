@@ -16,9 +16,6 @@ namespace osu.Game.Tests.Visual.Metadata
         public override IBindable<bool> IsConnected => isConnected;
         private readonly BindableBool isConnected = new BindableBool(true);
 
-        public override IBindable<bool> IsWatchingUserPresence => isWatchingUserPresence;
-        private readonly BindableBool isWatchingUserPresence = new BindableBool();
-
         public override UserPresence LocalUserPresence => localUserPresence;
         private UserPresence localUserPresence;
 
@@ -34,15 +31,18 @@ namespace osu.Game.Tests.Visual.Metadata
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
 
-        public override Task BeginWatchingUserPresence()
+        public event Action? OnBeginWatchingUserPresence;
+        public event Action? OnEndWatchingUserPresence;
+
+        protected override Task BeginWatchingUserPresenceInternal()
         {
-            isWatchingUserPresence.Value = true;
+            OnBeginWatchingUserPresence?.Invoke();
             return Task.CompletedTask;
         }
 
-        public override Task EndWatchingUserPresence()
+        protected override Task EndWatchingUserPresenceInternal()
         {
-            isWatchingUserPresence.Value = false;
+            OnEndWatchingUserPresence?.Invoke();
             return Task.CompletedTask;
         }
 
@@ -50,7 +50,7 @@ namespace osu.Game.Tests.Visual.Metadata
         {
             localUserPresence = localUserPresence with { Activity = activity };
 
-            if (isWatchingUserPresence.Value)
+            if (IsWatchingUserPresence)
             {
                 if (userPresences.ContainsKey(api.LocalUser.Value.Id))
                     userPresences[api.LocalUser.Value.Id] = localUserPresence;
@@ -63,7 +63,7 @@ namespace osu.Game.Tests.Visual.Metadata
         {
             localUserPresence = localUserPresence with { Status = status };
 
-            if (isWatchingUserPresence.Value)
+            if (IsWatchingUserPresence)
             {
                 if (userPresences.ContainsKey(api.LocalUser.Value.Id))
                     userPresences[api.LocalUser.Value.Id] = localUserPresence;
@@ -74,7 +74,7 @@ namespace osu.Game.Tests.Visual.Metadata
 
         public override Task UserPresenceUpdated(int userId, UserPresence? presence)
         {
-            if (isWatchingUserPresence.Value)
+            if (IsWatchingUserPresence)
             {
                 if (presence?.Status != null)
                 {

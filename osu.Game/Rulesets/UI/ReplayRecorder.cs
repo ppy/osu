@@ -40,8 +40,6 @@ namespace osu.Game.Rulesets.UI
             this.target = target;
 
             RelativeSizeAxes = Axes.Both;
-
-            Depth = float.MinValue;
         }
 
         protected override void LoadComplete()
@@ -53,29 +51,29 @@ namespace osu.Game.Rulesets.UI
         protected override void Update()
         {
             base.Update();
-            recordFrame(false);
+            RecordFrame(false);
         }
 
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
-            recordFrame(false);
+            RecordFrame(false);
             return base.OnMouseMove(e);
         }
 
         public bool OnPressed(KeyBindingPressEvent<T> e)
         {
             pressedActions.Add(e.Action);
-            recordFrame(true);
+            RecordFrame(true);
             return false;
         }
 
         public void OnReleased(KeyBindingReleaseEvent<T> e)
         {
             pressedActions.Remove(e.Action);
-            recordFrame(true);
+            RecordFrame(true);
         }
 
-        private void recordFrame(bool important)
+        public override void RecordFrame(bool important)
         {
             var last = target.Replay.Frames.LastOrDefault();
 
@@ -88,8 +86,14 @@ namespace osu.Game.Rulesets.UI
 
             if (frame != null)
             {
-                target.Replay.Frames.Add(frame);
+                // this reduces redundancy of frames in the resulting replay.
+                if (last?.IsEquivalentTo(frame) == true)
+                    target.Replay.Frames[^1] = frame;
+                else
+                    target.Replay.Frames.Add(frame);
 
+                // the above de-duplication is done at `FrameDataBundle` level in `SpectatorClient`.
+                // it's not 100% matching because of the possibility of duplicated frames crossing a bundle boundary, but it's close and simple enough.
                 spectatorClient?.HandleFrame(frame);
             }
         }
@@ -100,5 +104,7 @@ namespace osu.Game.Rulesets.UI
     public abstract partial class ReplayRecorder : Component
     {
         public Func<Vector2, Vector2> ScreenSpaceToGamefield;
+
+        public abstract void RecordFrame(bool important);
     }
 }

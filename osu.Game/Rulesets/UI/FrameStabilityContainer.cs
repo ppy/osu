@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.UI
 
         private readonly Bindable<bool> waitingOnFrames = new Bindable<bool>();
 
-        private readonly double gameplayStartTime;
+        public double GameplayStartTime { get; }
 
         private IGameplayClock? parentGameplayClock;
 
@@ -85,7 +85,7 @@ namespace osu.Game.Rulesets.UI
 
             framedClock = new FramedClock(manualClock = new ManualClock());
 
-            this.gameplayStartTime = gameplayStartTime;
+            GameplayStartTime = gameplayStartTime;
         }
 
         [BackgroundDependencyLoader(true)]
@@ -257,8 +257,8 @@ namespace osu.Game.Rulesets.UI
                 return;
             }
 
-            if (manualClock.CurrentTime < gameplayStartTime)
-                manualClock.CurrentTime = proposedTime = Math.Min(gameplayStartTime, proposedTime);
+            if (manualClock.CurrentTime < GameplayStartTime)
+                manualClock.CurrentTime = proposedTime = Math.Min(GameplayStartTime, proposedTime);
             else if (Math.Abs(manualClock.CurrentTime - proposedTime) > sixty_frame_time * 1.2f)
             {
                 proposedTime = proposedTime > manualClock.CurrentTime

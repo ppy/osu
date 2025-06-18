@@ -60,18 +60,16 @@ namespace osu.Game.Screens.Play.PlayerSettings
         [Resolved]
         private Player? player { get; set; }
 
-        [Resolved]
-        private IGameplayClock? gameplayClock { get; set; }
-
-        private double lastPlayAverage;
+        private double lastPlayMedian;
         private double lastPlayBeatmapOffset;
         private HitEventTimingDistributionGraph? lastPlayGraph;
 
-        private SettingsButton? useAverageButton;
+        private SettingsButton? calibrateFromLastPlayButton;
 
         private IDisposable? beatmapOffsetSubscription;
 
         private Task? realmWriteTask;
+        private ScoreInfo? lastValidScore;
 
         public BeatmapOffsetControl()
         {
@@ -121,7 +119,11 @@ namespace osu.Game.Screens.Play.PlayerSettings
                     // At the point we reach here, it's not guaranteed that all realm writes have taken place (there may be some in-flight).
                     // We are only aware of writes that originated from our own flow, so if we do see one that's active we can avoid handling the feedback value arriving.
                     if (realmWriteTask == null)
+                    {
+                        Current.Disabled = false;
                         Current.Value = val;
+                        Current.Disabled = allowOffsetAdjust;
+                    }
 
                     if (realmWriteTask?.IsCompleted == true)
                     {
@@ -134,15 +136,15 @@ namespace osu.Game.Screens.Play.PlayerSettings
             ReferenceScore.BindValueChanged(scoreChanged, true);
         }
 
+        // the last play graph is relative to the offset at the point of the last play, so we need to factor that out for some usages.
+        private double adjustmentSinceLastPlay => lastPlayBeatmapOffset - Current.Value;
+
         private void currentChanged(ValueChangedEvent<double> offset)
         {
             Scheduler.AddOnce(updateOffset);
 
             void updateOffset()
             {
-                // the last play graph is relative to the offset at the point of the last play, so we need to factor that out.
-                double adjustmentSinceLastPlay = lastPlayBeatmapOffset - Current.Value;
-
                 // Negative is applied here because the play graph is considering a hit offset, not track (as we currently use for clocks).
                 lastPlayGraph?.UpdateOffset(-adjustmentSinceLastPlay);
 
@@ -151,11 +153,6 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 {
                     Scheduler.AddOnce(updateOffset);
                     return;
-                }
-
-                if (useAverageButton != null)
-                {
-                    useAverageButton.Enabled.Value = !Precision.AlmostEquals(lastPlayAverage, adjustmentSinceLastPlay, Current.Precision / 2);
                 }
 
                 realmWriteTask = realm.WriteAsync(r =>
@@ -181,8 +178,6 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
         private void scoreChanged(ValueChangedEvent<ScoreInfo?> score)
         {
-            referenceScoreContainer.Clear();
-
             if (score.NewValue == null)
                 return;
 
@@ -197,7 +192,16 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
             var hitEvents = score.NewValue.HitEvents;
 
-            if (!(hitEvents.CalculateAverageHitError() is double average))
+            if (!(hitEvents.CalculateMedianHitError() is double median))
+                return;
+
+            // affecting unstable rate here is used as a substitute of determining if a hit event represents a *timed* hit event,
+            // i.e. an user input that the user had to *time to the track*,
+            // i.e. one that it *makes sense to use* when doing anything with timing and offsets.
+            bool hasEnoughUsableEvents = hitEvents.Count(HitEventExtensions.AffectsUnstableRate) >= 50;
+
+            // If we already have an old score with enough hit events and the new score doesn't have enough, continue displaying the old one rather than showing the user "play too short" message.
+            if (lastValidScore != null && !hasEnoughUsableEvents)
                 return;
 
             referenceScoreContainer.Children = new Drawable[]
@@ -208,10 +212,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 },
             };
 
-            // affecting unstable rate here is used as a substitute of determining if a hit event represents a *timed* hit event,
-            // i.e. an user input that the user had to *time to the track*,
-            // i.e. one that it *makes sense to use* when doing anything with timing and offsets.
-            if (hitEvents.Count(HitEventExtensions.AffectsUnstableRate) < 10)
+            if (!hasEnoughUsableEvents)
             {
                 referenceScoreContainer.AddRange(new Drawable[]
                 {
@@ -227,7 +228,8 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 return;
             }
 
-            lastPlayAverage = average;
+            lastValidScore = score.NewValue!;
+            lastPlayMedian = median;
             lastPlayBeatmapOffset = Current.Value;
 
             LinkFlowContainer globalOffsetText;
@@ -240,15 +242,17 @@ namespace osu.Game.Screens.Play.PlayerSettings
                     Height = 50,
                 },
                 new AverageHitError(hitEvents),
-                useAverageButton = new SettingsButton
+                calibrateFromLastPlayButton = new SettingsButton
                 {
                     Text = BeatmapOffsetControlStrings.CalibrateUsingLastPlay,
                     Action = () =>
                     {
-                        Current.Value = lastPlayBeatmapOffset - lastPlayAverage;
-                        lastAppliedScore.Value = ReferenceScore.Value;
+                        if (Current.Disabled)
+                            return;
+
+                        Current.Value = lastPlayBeatmapOffset - lastPlayMedian;
+                        lastAppliedScore.Value = lastValidScore;
                     },
-                    Enabled = { Value = !Precision.AlmostEquals(lastPlayAverage, 0, Current.Precision / 2) }
                 },
                 globalOffsetText = new LinkFlowContainer
                 {
@@ -277,30 +281,16 @@ namespace osu.Game.Screens.Play.PlayerSettings
         protected override void Update()
         {
             base.Update();
-            Current.Disabled = !allowOffsetAdjust;
+
+            bool allow = allowOffsetAdjust;
+
+            if (calibrateFromLastPlayButton != null)
+                calibrateFromLastPlayButton.Enabled.Value = allow && !Precision.AlmostEquals(lastPlayMedian, adjustmentSinceLastPlay, Current.Precision / 2);
+
+            Current.Disabled = !allow;
         }
 
-        private bool allowOffsetAdjust
-        {
-            get
-            {
-                // General limitations to ensure players don't do anything too weird.
-                // These match stable for now.
-                if (player is SubmittingPlayer)
-                {
-                    Debug.Assert(gameplayClock != null);
-
-                    // TODO: the blocking conditions should probably display a message.
-                    if (!player.IsBreakTime.Value && gameplayClock.CurrentTime - gameplayClock.StartTime > 10000)
-                        return false;
-
-                    if (gameplayClock.IsPaused.Value)
-                        return false;
-                }
-
-                return true;
-            }
-        }
+        private bool allowOffsetAdjust => player?.AllowCriticalSettingsAdjustment != false;
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {

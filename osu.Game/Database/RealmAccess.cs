@@ -11,7 +11,6 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Development;
 using osu.Framework.Extensions;
@@ -97,8 +96,10 @@ namespace osu.Game.Database
         /// 44   2024-11-22    Removed several properties from BeatmapInfo which did not need to be persisted to realm.
         /// 45   2024-12-23    Change beat snap divisor adjust defaults to be Ctrl+Scroll instead of Ctrl+Shift+Scroll, if not already changed by user.
         /// 46   2024-12-26    Change beat snap divisor bindings to match stable directionality ¯\_(ツ)_/¯.
+        /// 47   2025-01-21    Remove right mouse button binding for absolute scroll. Never use mouse buttons (or scroll) for global actions.
+        /// 48   2025-03-19    Clear online status for all qualified beatmaps (some were stuck in a qualified state due to local caching issues).
         /// </summary>
-        private const int schema_version = 46;
+        private const int schema_version = 48;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking realm retrieval during blocking periods.
@@ -317,6 +318,17 @@ namespace osu.Game.Database
 
             try
             {
+                // Some platforms' realm implementation (including windows) don't update modified time on open.
+                // Let's do this explicitly as some users may depend on it roughly aligning to usage expectations.
+                string fullPath = storage.GetFullPath(Filename);
+                var fi = new FileInfo(fullPath);
+                if (fi.Exists)
+                    fi.LastWriteTime = DateTime.Now;
+            }
+            catch { }
+
+            try
+            {
                 return getRealmInstance();
             }
             catch (Exception e)
@@ -413,18 +425,7 @@ namespace osu.Game.Database
         /// Compact this realm.
         /// </summary>
         /// <returns></returns>
-        public bool Compact()
-        {
-            try
-            {
-                return Realm.Compact(getConfiguration());
-            }
-            // Catch can be removed along with entity framework. Is specifically to allow a failure message to arrive to the user (see similar catches in EFToRealmMigrator).
-            catch (AggregateException ae) when (RuntimeInfo.OS == RuntimeInfo.Platform.macOS && ae.Flatten().InnerException is TypeInitializationException)
-            {
-                return true;
-            }
-        }
+        public bool Compact() => Realm.Compact(getConfiguration());
 
         /// <summary>
         /// Run work on realm with a return value.
@@ -719,11 +720,6 @@ namespace osu.Game.Database
                 realm_instances_created.Value++;
 
                 return Realm.GetInstance(getConfiguration());
-            }
-            // Catch can be removed along with entity framework. Is specifically to allow a failure message to arrive to the user (see similar catches in EFToRealmMigrator).
-            catch (AggregateException ae) when (RuntimeInfo.OS == RuntimeInfo.Platform.macOS && ae.Flatten().InnerException is TypeInitializationException)
-            {
-                return Realm.GetInstance();
             }
             finally
             {
@@ -1239,6 +1235,26 @@ namespace osu.Game.Database
 
                     break;
                 }
+
+                case 47:
+                {
+                    var keyBindings = migration.NewRealm.All<RealmKeyBinding>();
+
+                    var existingBinding = keyBindings.FirstOrDefault(k => k.ActionInt == (int)GlobalAction.AbsoluteScrollSongList);
+                    if (existingBinding != null && existingBinding.KeyCombination.Keys.SequenceEqual(new[] { InputKey.MouseRight }))
+                        migration.NewRealm.Remove(existingBinding);
+
+                    break;
+                }
+
+                case 48:
+                    const int qualified = (int)BeatmapOnlineStatus.Qualified;
+
+                    var beatmaps = migration.NewRealm.All<BeatmapInfo>().Where(b => b.StatusInt == qualified);
+
+                    foreach (var beatmap in beatmaps)
+                        beatmap.ResetOnlineInfo(resetOnlineId: false);
+                    break;
             }
 
             Logger.Log($"Migration completed in {stopwatch.ElapsedMilliseconds}ms");

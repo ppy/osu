@@ -45,25 +45,59 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("No calibration button", () => !offsetControl.ChildrenOfType<SettingsButton>().Any());
         }
 
+        /// <summary>
+        /// If we already have an old score with enough hit events and the new score doesn't have enough, continue displaying the old one rather than showing the user "play too short" message.
+        /// </summary>
+        [Test]
+        public void TestTooShortToDisplay_HasPreviousValidScore()
+        {
+            const double average_error = -4.5;
+            const double initial_offset = -2;
+
+            AddStep("Set offset non-neutral", () => offsetControl.Current.Value = initial_offset);
+            AddAssert("No calibration button", () => !offsetControl.ChildrenOfType<SettingsButton>().Any());
+
+            AddStep("Set reference score", () =>
+            {
+                offsetControl.ReferenceScore.Value = new ScoreInfo
+                {
+                    HitEvents = TestSceneHitEventTimingDistributionGraph.CreateDistributedHitEvents(average_error),
+                    BeatmapInfo = Beatmap.Value.BeatmapInfo,
+                };
+            });
+
+            AddUntilStep("Has calibration button", () => offsetControl.ChildrenOfType<SettingsButton>().Any());
+
+            AddStep("Set short reference score", () =>
+            {
+                offsetControl.ReferenceScore.Value = new ScoreInfo
+                {
+                    HitEvents = TestSceneHitEventTimingDistributionGraph.CreateDistributedHitEvents(0, 2),
+                    BeatmapInfo = Beatmap.Value.BeatmapInfo,
+                };
+            });
+
+            AddUntilStep("Still calibration button", () => offsetControl.ChildrenOfType<SettingsButton>().Any());
+
+            AddStep("Press button", () => offsetControl.ChildrenOfType<SettingsButton>().Single().TriggerClick());
+            AddAssert("Offset is adjusted", () => offsetControl.Current.Value == initial_offset - average_error);
+        }
+
         [Test]
         public void TestNotEnoughTimedHitEvents()
         {
             AddStep("Set short reference score", () =>
             {
+                // 50 events total. one of them (head circle) being timed / having hitwindows, rest having no hitwindows
                 List<HitEvent> hitEvents =
                 [
-                    // 10 events total. one of them (head circle) being timed / having hitwindows, rest having no hitwindows
                     new HitEvent(30, 1, HitResult.LargeTickHit, new SliderHeadCircle { ClassicSliderBehaviour = true }, null, null),
-                    new HitEvent(0, 1, HitResult.LargeTickHit, new SliderTick(), null, null),
-                    new HitEvent(0, 1, HitResult.LargeTickHit, new SliderTick(), null, null),
-                    new HitEvent(0, 1, HitResult.LargeTickHit, new SliderTick(), null, null),
-                    new HitEvent(0, 1, HitResult.LargeTickHit, new SliderTick(), null, null),
-                    new HitEvent(0, 1, HitResult.LargeTickHit, new SliderTick(), null, null),
-                    new HitEvent(0, 1, HitResult.LargeTickHit, new SliderTick(), null, null),
-                    new HitEvent(0, 1, HitResult.LargeTickHit, new SliderTick(), null, null),
-                    new HitEvent(0, 1, HitResult.LargeTickHit, new SliderTick(), null, null),
-                    new HitEvent(0, 1, HitResult.LargeTickHit, new SliderTick(), null, null),
                 ];
+
+                for (int i = 0; i < 49; i++)
+                {
+                    hitEvents.Add(new HitEvent(0, 1, HitResult.LargeTickHit, new SliderTick(), null, null));
+                }
 
                 foreach (var ev in hitEvents)
                     ev.HitObject.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
@@ -129,10 +163,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("Has calibration button", () => offsetControl.ChildrenOfType<SettingsButton>().Any());
             AddStep("Press button", () => offsetControl.ChildrenOfType<SettingsButton>().Single().TriggerClick());
             AddAssert("Offset is adjusted", () => offsetControl.Current.Value == -average_error);
-
             AddUntilStep("Button is disabled", () => !offsetControl.ChildrenOfType<SettingsButton>().Single().Enabled.Value);
-            AddStep("Remove reference score", () => offsetControl.ReferenceScore.Value = null);
-            AddAssert("No calibration button", () => !offsetControl.ChildrenOfType<SettingsButton>().Any());
 
             recreateControl();
             AddStep("Set same reference score", () => offsetControl.ReferenceScore.Value = referenceScore);
@@ -145,6 +176,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestCalibrationFromNonZero()
         {
+            ScoreInfo referenceScore = null!;
             const double average_error = -4.5;
             const double initial_offset = -2;
 
@@ -152,7 +184,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("No calibration button", () => !offsetControl.ChildrenOfType<SettingsButton>().Any());
             AddStep("Set reference score", () =>
             {
-                offsetControl.ReferenceScore.Value = new ScoreInfo
+                offsetControl.ReferenceScore.Value = referenceScore = new ScoreInfo
                 {
                     HitEvents = TestSceneHitEventTimingDistributionGraph.CreateDistributedHitEvents(average_error),
                     BeatmapInfo = Beatmap.Value.BeatmapInfo,
@@ -162,9 +194,10 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("Has calibration button", () => offsetControl.ChildrenOfType<SettingsButton>().Any());
             AddStep("Press button", () => offsetControl.ChildrenOfType<SettingsButton>().Single().TriggerClick());
             AddAssert("Offset is adjusted", () => offsetControl.Current.Value == initial_offset - average_error);
-
             AddUntilStep("Button is disabled", () => !offsetControl.ChildrenOfType<SettingsButton>().Single().Enabled.Value);
-            AddStep("Remove reference score", () => offsetControl.ReferenceScore.Value = null);
+
+            recreateControl();
+            AddStep("Set same reference score", () => offsetControl.ReferenceScore.Value = referenceScore);
             AddAssert("No calibration button", () => !offsetControl.ChildrenOfType<SettingsButton>().Any());
         }
 
@@ -213,10 +246,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("Has calibration button", () => offsetControl.ChildrenOfType<SettingsButton>().Any());
             AddStep("Press button", () => offsetControl.ChildrenOfType<SettingsButton>().Single().TriggerClick());
             AddAssert("Offset is adjusted", () => offsetControl.Current.Value, () => Is.EqualTo(initial_offset - average_error));
-
             AddUntilStep("Button is disabled", () => !offsetControl.ChildrenOfType<SettingsButton>().Single().Enabled.Value);
-            AddStep("Remove reference score", () => offsetControl.ReferenceScore.Value = null);
-            AddAssert("No calibration button", () => !offsetControl.ChildrenOfType<SettingsButton>().Any());
 
             AddStep("Clean up beatmap", () => Realm.Write(r => r.RemoveAll<BeatmapInfo>()));
         }
@@ -240,10 +270,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("Has calibration button", () => offsetControl.ChildrenOfType<SettingsButton>().Any());
             AddStep("Press button", () => offsetControl.ChildrenOfType<SettingsButton>().Single().TriggerClick());
             AddAssert("Offset is adjusted", () => offsetControl.Current.Value == -average_error);
-
             AddUntilStep("Button is disabled", () => !offsetControl.ChildrenOfType<SettingsButton>().Single().Enabled.Value);
-            AddStep("Remove reference score", () => offsetControl.ReferenceScore.Value = null);
-            AddAssert("No calibration button", () => !offsetControl.ChildrenOfType<SettingsButton>().Any());
         }
 
         private void recreateControl()
