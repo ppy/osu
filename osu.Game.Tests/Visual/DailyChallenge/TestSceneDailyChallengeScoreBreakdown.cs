@@ -39,25 +39,26 @@ namespace osu.Game.Tests.Visual.DailyChallenge
                     Colour = colourProvider.Background4,
                 },
                 breakdown = new DailyChallengeScoreBreakdown(
-                new Room
-                {
-                    Name = "Daily Challenge: Febuary 31, 2069",
-                    Playlist =
-                    [
-                        new PlaylistItem(TestResources.CreateTestBeatmapSetInfo().Beatmaps.First())
-                        {
-                            RequiredMods = [new APIMod(new OsuModTraceable())],
-                            AllowedMods = [new APIMod(new OsuModDoubleTime()),
-                                new APIMod(new OsuModFlashlight()),
-                                new APIMod(new OsuModNightcore()),
-                                new APIMod(new OsuModBlinds()),
-                                new APIMod(new OsuModHidden())
-                            ]
-                        }
-                    ],
-                    EndDate = DateTimeOffset.Now.AddHours(12),
-                    Category = RoomCategory.DailyChallenge
-                })
+                    new Room
+                    {
+                        Name = "Daily Challenge: Febuary 31, 2069",
+                        Playlist =
+                        [
+                            new PlaylistItem(TestResources.CreateTestBeatmapSetInfo().Beatmaps.First())
+                            {
+                                RequiredMods = [new APIMod(new OsuModTraceable())],
+                                AllowedMods = [
+                                    new APIMod(new OsuModDoubleTime()),
+                                    new APIMod(new OsuModFlashlight()),
+                                    new APIMod(new OsuModNightcore()),
+                                    new APIMod(new OsuModBlinds()),
+                                    new APIMod(new OsuModHidden())
+                                ]
+                            }
+                        ],
+                        EndDate = DateTimeOffset.Now.AddHours(12),
+                        Category = RoomCategory.DailyChallenge
+                    })
                 {
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
@@ -81,7 +82,6 @@ namespace osu.Game.Tests.Visual.DailyChallenge
         }
 
         [Test]
-
         public void TestScaledAppearance()
         {
             AddStep("add score", () =>
@@ -110,6 +110,7 @@ namespace osu.Game.Tests.Visual.DailyChallenge
                 breakdown.RescaleBar(13, 1_00_000);
             });
         }
+
         [Test]
         public void TestBasicAppearance()
         {

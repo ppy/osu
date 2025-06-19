@@ -3,7 +3,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Data;
+// using System.Data;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -36,13 +36,13 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
         private long[] bins = null!;
 
         private PlaylistItem item = null!;
-        private Room room = null!;
-        [Resolved]
-        private RulesetStore rulesets { get; set; } = null!;
+        private readonly Room room = null!;
+
         public DailyChallengeScoreBreakdown(Room room)
         {
             this.room = room;
         }
+
         [BackgroundDependencyLoader]
         private void load(RulesetStore rulesets)
         {
@@ -61,18 +61,21 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             };
             item = room.Playlist.Single();
             var rulesetInstance = rulesets.GetRuleset(item.RulesetID)!.CreateInstance();
-            IEnumerable<Mod>? allowedMods = item.AllowedMods.Select(m => m.ToMod(rulesetInstance));
-            IEnumerable<Mod>? requiredMods = item.RequiredMods.Select(m => m.ToMod(rulesetInstance));
+            IEnumerable<Mod> allowedMods = item.AllowedMods.Select(m => m.ToMod(rulesetInstance));
+            IEnumerable<Mod> requiredMods = item.RequiredMods.Select(m => m.ToMod(rulesetInstance));
             List<Mod> bestMods = [];
+
             foreach (Mod allowedMod in allowedMods)
             {
-                if (allowedMod.ScoreMultiplier > 1 && allowedMod.Ranked == true)
+                if (allowedMod.ScoreMultiplier > 1 && allowedMod.Ranked)
                 {
                     bestMods.Add(allowedMod);
                 }
             }
+
             bestMods = bestMods.OrderByDescending(mod => mod.ScoreMultiplier).ToList();
             bestMods.InsertRange(0, requiredMods);
+
             for (int i = 0; i < bestMods.Count; i++)
             {
                 foreach (Type type in bestMods[i].IncompatibleMods)
@@ -81,24 +84,29 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                     {
                         if (invalid == bestMods[i])
                             continue;
+
                         bestMods.Remove(invalid);
                     }
                 }
             }
+
             if (!ModUtils.CheckCompatibleSet(bestMods, out var invalidMods))
             {
                 throw new InvalidOperationException($"incompatibe mods found. Invalid mods: {string.Join(", ", invalidMods.Select(m => m.Name))}");
             }
+
             // there is a small edge case where this is not the actual max score
             // for example, if mod A and B were both 1.15x and mod C was 1.16x and was incompatible with A and B
             // then A and B would be removed, and if they were incompatible only with C, then a higher score
             // would be possible with those two rather than just C, but it seems very unlikely to happen
             int theoreticalMax = 1_000_000;
             double multiplier = 1;
+
             foreach (Mod bestMod in bestMods)
             {
                 multiplier *= bestMod.ScoreMultiplier;
             }
+
             theoreticalMax = (int)(theoreticalMax * multiplier);
             Console.WriteLine(theoreticalMax);
             // barRangeValue is set to 100_000 but implementation for other ranges is implemented
@@ -149,12 +157,14 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                 barsContainer.Clear();
                 bins = new long[this.numberOfBars];
             }
+
             if (barRangeValue.HasValue)
             {
                 this.barRangeValue = barRangeValue.Value;
                 barsContainer.Clear();
                 bins = new long[this.numberOfBars];
             }
+
             for (int bar = 0; bar < this.numberOfBars; bar++)
             {
                 barsContainer.Add(new Bar(this.barRangeValue * bar, this.barRangeValue * (bar + 1) - 1, bar)
@@ -213,6 +223,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             {
                 // just adds values in the shape of sort of a bell curve ig
                 counts = new long[numberOfBars];
+
                 for (int i = 0; i < Math.Round((float)numberOfBars / 2, MidpointRounding.AwayFromZero); i++)
                 {
                     counts[i] = i * i;
