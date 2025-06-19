@@ -178,17 +178,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             if (osuLast0Obj == null || osuLast1Obj == null || osuLast2Obj == null)
                 return 1.0;
 
-            const int radius = OsuDifficultyHitObject.NORMALISED_RADIUS;
             const int diameter = OsuDifficultyHitObject.NORMALISED_DIAMETER;
 
             // Two doubletaps in a row
-            double doubletappability = DifficultyCalculationUtils.Smoothstep(osuLast0Obj.LazyJumpDistance, diameter, radius)
-                                       * DifficultyCalculationUtils.Smoothstep(osuLast2Obj.LazyJumpDistance, diameter, radius);
+            double doubletappability = DifficultyCalculationUtils.Smoothstep(osuLast0Obj.LazyJumpDistance, diameter, 0)
+                                       * DifficultyCalculationUtils.Smoothstep(osuLast2Obj.LazyJumpDistance, diameter, 0);
 
             // Don't nerf stream maps
-            doubletappability *= DifficultyCalculationUtils.Smoothstep(osuLast1Obj.LazyJumpDistance, radius, diameter);
+            doubletappability *= DifficultyCalculationUtils.Smoothstep(osuLast1Obj.LazyJumpDistance, 0, diameter);
 
-            // This part is not great, but it keeps stream maps and alt maps with doubles from being nerfed
+            // This part is not great, but it keeps alt maps with doubles from being too nerfed
             doubletappability *= 0.5 + 0.5 * DifficultyCalculationUtils.ReverseLerp(osuCurrObj.LazyJumpDistance, diameter * 1.5, diameter * 3)
                                  * DifficultyCalculationUtils.ReverseLerp(osuLast1Obj.LazyJumpDistance, diameter * 1.5, diameter * 3);
 
