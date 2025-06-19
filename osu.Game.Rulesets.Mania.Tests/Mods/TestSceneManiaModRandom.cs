@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
         public void TestColumnRandomizationVaryingSeeds(int columnCount)
         {
             var original = createRawBeatmap(columnCount);
-            var originalColumns = original.HitObjects.Cast<ManiaHitObject>().Select(h => h.Column).ToList();
+            var originalColumns = original.HitObjects.Select(h => h.Column).ToList();
 
             int unchangedCount = 0;
 
@@ -78,13 +78,13 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
 
                 mod.ApplyToBeatmap(beatmap);
 
-                var newColumns = beatmap.HitObjects.Cast<ManiaHitObject>().Select(h => h.Column).ToList();
+                var newColumns = beatmap.HitObjects.Select(h => h.Column).ToList();
 
                 if (newColumns.SequenceEqual(originalColumns))
                     unchangedCount++;
             }
 
-            Assert.That(unchangedCount < 10000, $"Expected at least one seed to produce different column assignments, but all 10000 seeds were unchanged.");
+            Assert.That(unchangedCount < 10000, "Expected at least one seed to produce different column assignments, but all 10000 seeds were unchanged.");
             TestContext.WriteLine($"{10000 - unchangedCount} out of 10000 seeds produced different column assignments.");
         }
 
