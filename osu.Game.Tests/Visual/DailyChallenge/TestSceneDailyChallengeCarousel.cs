@@ -95,7 +95,7 @@ namespace osu.Game.Tests.Visual.DailyChallenge
                                 Children = new Drawable[]
                                 {
                                     new DailyChallengeTimeRemainingRing(room.Value),
-                                    breakdown = new DailyChallengeScoreBreakdown(),
+                                    breakdown = new DailyChallengeScoreBreakdown(room.Value),
                                 }
                             }
                         },

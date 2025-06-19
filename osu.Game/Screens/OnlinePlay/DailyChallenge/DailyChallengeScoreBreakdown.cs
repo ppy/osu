@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -14,11 +15,14 @@ using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.Metadata;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Screens.OnlinePlay.DailyChallenge.Events;
 using osuTK;
+using osu.Game.Rulesets;
+using osu.Framework.Extensions.ObjectExtensions;
+using osu.Game.Utils;
+using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 {
@@ -27,12 +31,20 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
         public Bindable<MultiplayerScore?> UserBestScore { get; } = new Bindable<MultiplayerScore?>();
 
         private FillFlowContainer<Bar> barsContainer = null!;
+        private int numberOfBars;
+        private int barRangeValue;
+        private long[] bins = null!;
 
-        private const int bin_count = MultiplayerPlaylistItemStats.TOTAL_SCORE_DISTRIBUTION_BINS;
-        private long[] bins = new long[bin_count];
-
+        private PlaylistItem item = null!;
+        private Room room = null!;
+        [Resolved]
+        private RulesetStore rulesets { get; set; } = null!;
+        public DailyChallengeScoreBreakdown(Room room)
+        {
+            this.room = room;
+        }
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(RulesetStore rulesets)
         {
             InternalChildren = new Drawable[]
             {
@@ -47,12 +59,59 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                     Origin = Anchor.BottomCentre,
                 }
             };
-
-            for (int i = 0; i < bin_count; ++i)
+            item = room.Playlist.Single();
+            var rulesetInstance = rulesets.GetRuleset(item.RulesetID)!.CreateInstance();
+            IEnumerable<Mod>? allowedMods = item.AllowedMods.Select(m => m.ToMod(rulesetInstance));
+            IEnumerable<Mod>? requiredMods = item.RequiredMods.Select(m => m.ToMod(rulesetInstance));
+            List<Mod> bestMods = [];
+            foreach (Mod allowedMod in allowedMods)
             {
-                barsContainer.Add(new Bar(100_000 * i, 100_000 * (i + 1) - 1)
+                if (allowedMod.ScoreMultiplier > 1 && allowedMod.Ranked == true)
                 {
-                    Width = 1f / bin_count,
+                    bestMods.Add(allowedMod);
+                }
+            }
+            bestMods = bestMods.OrderByDescending(mod => mod.ScoreMultiplier).ToList();
+            bestMods.InsertRange(0, requiredMods);
+            for (int i = 0; i < bestMods.Count; i++)
+            {
+                foreach (Type type in bestMods[i].IncompatibleMods)
+                {
+                    foreach (var invalid in bestMods.Where(m => type.IsInstanceOfType(m)).ToList())
+                    {
+                        if (invalid == bestMods[i])
+                            continue;
+                        bestMods.Remove(invalid);
+                    }
+                }
+            }
+            if (!ModUtils.CheckCompatibleSet(bestMods, out var invalidMods))
+            {
+                throw new InvalidOperationException($"incompatibe mods found. Invalid mods: {string.Join(", ", invalidMods.Select(m => m.Name))}");
+            }
+            // there is a small edge case where this is not the actual max score
+            // for example, if mod A and B were both 1.15x and mod C was 1.16x and was incompatible with A and B
+            // then A and B would be removed, and if they were incompatible only with C, then a higher score
+            // would be possible with those two rather than just C, but it seems very unlikely to happen
+            int theoreticalMax = 1_000_000;
+            double multiplier = 1;
+            foreach (Mod bestMod in bestMods)
+            {
+                multiplier *= bestMod.ScoreMultiplier;
+            }
+            theoreticalMax = (int)(theoreticalMax * multiplier);
+            Console.WriteLine(theoreticalMax);
+            // barRangeValue is set to 100_000 but implementation for other ranges is implemented
+            // However, the server always sends the scores in 13 bins, so I'm unable to accomadate any other ranges
+            // If it is made possible to request bin ranges to the server, the code could be changed to accomadate that
+            (numberOfBars, barRangeValue) = (theoreticalMax / 100_000 + 1, 100_000);
+            bins = new long[numberOfBars];
+
+            for (int i = 0; i < numberOfBars; i++)
+            {
+                barsContainer.Add(new Bar(barRangeValue * i, barRangeValue * (i + 1) - 1, i)
+                {
+                    Width = 1f / numberOfBars,
                 });
             }
         }
@@ -77,8 +136,31 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             // ensure things don't get too out-of-hand.
             if (newScores.Count > 25)
             {
-                bins[getTargetBin(newScores.Dequeue())] += 1;
+                bins[getTargetBin(newScores.Dequeue(), numberOfBars, barRangeValue)] += 1;
                 Scheduler.AddOnce(updateCounts);
+            }
+        }
+
+        public void RescaleBar(int? numberOfBars = null, int? barRangeValue = null)
+        {
+            if (numberOfBars.HasValue)
+            {
+                this.numberOfBars = numberOfBars.Value;
+                barsContainer.Clear();
+                bins = new long[this.numberOfBars];
+            }
+            if (barRangeValue.HasValue)
+            {
+                this.barRangeValue = barRangeValue.Value;
+                barsContainer.Clear();
+                bins = new long[this.numberOfBars];
+            }
+            for (int bar = 0; bar < this.numberOfBars; bar++)
+            {
+                barsContainer.Add(new Bar(this.barRangeValue * bar, this.barRangeValue * (bar + 1) - 1, bar)
+                {
+                    Width = 1f / this.numberOfBars,
+                });
             }
         }
 
@@ -93,7 +175,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                 if (lastScoreDisplay < Time.Current)
                     lastScoreDisplay = Time.Current;
 
-                int targetBin = getTargetBin(newScore);
+                int targetBin = getTargetBin(newScore, numberOfBars, barRangeValue);
                 bins[targetBin] += 1;
 
                 updateCounts();
@@ -105,7 +187,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                     Origin = Anchor.BottomCentre,
                     Font = OsuFont.Default.With(size: 30),
                     RelativePositionAxes = Axes.X,
-                    X = (targetBin + 0.5f) / bin_count - 0.5f,
+                    X = (targetBin + 0.5f) / numberOfBars - 0.5f,
                     Alpha = 0,
                 };
                 AddInternal(text);
@@ -125,22 +207,47 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             }
         }
 
-        public void SetInitialCounts(long[] counts)
+        public void SetInitialCounts(long[]? counts = null, bool fits = false)
         {
-            if (counts.Length != bin_count)
+            if (counts.IsNull())
+            {
+                // just adds values in the shape of sort of a bell curve ig
+                counts = new long[numberOfBars];
+                for (int i = 0; i < Math.Round((float)numberOfBars / 2, MidpointRounding.AwayFromZero); i++)
+                {
+                    counts[i] = i * i;
+                    counts[numberOfBars - i - 1] = i * i;
+                }
+            }
+            else if (!fits)
+            {
+                if (counts.Length < numberOfBars)
+                {
+                    long[] temp = new long[numberOfBars];
+                    Array.Copy(counts, temp, counts.Length);
+                    counts = temp;
+                }
+                else if (counts.Length >= numberOfBars)
+                {
+                    counts = counts.Take(numberOfBars).ToArray();
+                }
+            }
+            else if (fits && counts.Length != numberOfBars)
+            {
                 throw new ArgumentException(@"Incorrect number of bins.", nameof(counts));
+            }
 
             bins = counts;
             updateCounts();
         }
 
-        private static int getTargetBin(NewScoreEvent score) =>
-            (int)Math.Clamp(Math.Floor((float)score.TotalScore / 100000), 0, bin_count - 1);
+        private static int getTargetBin(NewScoreEvent score, int binCount, int range) =>
+            (int)Math.Clamp(Math.Floor((float)score.TotalScore / range), 0, binCount - 1);
 
         private void updateCounts()
         {
             long max = Math.Max(bins.Max(), 1);
-            for (int i = 0; i < bin_count; ++i)
+            for (int i = 0; i < numberOfBars; ++i)
                 barsContainer[i].UpdateCounts(bins[i], max);
         }
 
@@ -150,6 +257,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
             public readonly int BinStart;
             public readonly int BinEnd;
+            public readonly int BinNumber;
 
             private long count;
             private long max;
@@ -160,10 +268,11 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             private Box flashLayer = null!;
             private OsuSpriteText userIndicator = null!;
 
-            public Bar(int binStart, int binEnd)
+            public Bar(int binStart, int binEnd, int binNumber)
             {
                 BinStart = binStart;
                 BinEnd = binEnd;
+                BinNumber = binNumber;
             }
 
             [Resolved]
@@ -226,18 +335,16 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
                 string? label = null;
 
-                switch (BinStart)
+                if (BinNumber % 2 == 0 && BinNumber != 0)
                 {
-                    case 200_000:
-                    case 400_000:
-                    case 600_000:
-                    case 800_000:
-                        label = @$"{BinStart / 1000}k";
-                        break;
-
-                    case 1_000_000:
-                        label = @"1M";
-                        break;
+                    if (BinStart < 1_000_000)
+                    {
+                        label = @$"{BinStart / 1_000}k";
+                    }
+                    else if (BinStart >= 1_000_000)
+                    {
+                        label = @$"{BinStart / 1_000_000f}M";
+                    }
                 }
 
                 if (label != null)

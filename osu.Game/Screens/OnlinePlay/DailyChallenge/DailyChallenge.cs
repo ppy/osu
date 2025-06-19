@@ -221,7 +221,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                                                                         Children = new Drawable[]
                                                                         {
                                                                             new DailyChallengeTimeRemainingRing(room),
-                                                                            breakdown = new DailyChallengeScoreBreakdown(),
+                                                                            breakdown = new DailyChallengeScoreBreakdown(room),
                                                                             totals = new DailyChallengeTotalsDisplay(),
                                                                         }
                                                                     }
