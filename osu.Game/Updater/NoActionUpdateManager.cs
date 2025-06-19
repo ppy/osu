@@ -17,7 +17,7 @@ namespace osu.Game.Updater
     /// </summary>
     public partial class NoActionUpdateManager : UpdateManager
     {
-        private static ReleaseStream? externalReleaseStream => Enum.TryParse(Environment.GetEnvironmentVariable("OSU_EXTERNAL_UPDATE_STREAM"), out ReleaseStream stream) ? stream : null;
+        private static ReleaseStream? externalReleaseStream => Enum.TryParse(Environment.GetEnvironmentVariable("OSU_EXTERNAL_UPDATE_STREAM"), true, out ReleaseStream stream) ? stream : null;
 
         private string version = string.Empty;
 
