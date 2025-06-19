@@ -592,7 +592,7 @@ namespace osu.Game.Graphics.Carousel
             traverseSelection(direction, CheckValidForSetSelection);
         }
 
-        private void traverseSelection(int direction, Func<CarouselItem, bool> predicate, bool skipFirst = true)
+        private void traverseSelection(int direction, Func<CarouselItem, bool> predicate)
         {
             if (carouselItems == null || carouselItems.Count == 0) return;
 
@@ -608,15 +608,12 @@ namespace osu.Game.Graphics.Carousel
             {
                 newIndex = originalIndex = currentKeyboardSelection.Index.Value;
 
-                if (skipFirst)
+                // As a second special case, if we're set selecting backwards and the current selection isn't a set,
+                // make sure to go back to the set header this item belongs to, so that the block below doesn't find it and stop too early.
+                if (direction < 0)
                 {
-                    // As a second special case, if we're set selecting backwards and the current selection isn't a set,
-                    // make sure to go back to the set header this item belongs to, so that the block below doesn't find it and stop too early.
-                    if (direction < 0)
-                    {
-                        while (newIndex > 0 && !predicate(carouselItems[newIndex]))
-                            newIndex--;
-                    }
+                    while (newIndex > 0 && !predicate(carouselItems[newIndex]))
+                        newIndex--;
                 }
             }
 
