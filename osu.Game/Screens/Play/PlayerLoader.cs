@@ -715,6 +715,10 @@ namespace osu.Game.Screens.Play
 
         #region Low battery warning
 
+        /// <summary>
+        /// This is intentionally higher than 20%, which is usually when OS level notifications
+        /// interrupt the active application to warn the user.
+        /// </summary>
         private const double low_battery_threshold = 0.25;
 
         private Bindable<bool> batteryWarningShownOnce = null!;
