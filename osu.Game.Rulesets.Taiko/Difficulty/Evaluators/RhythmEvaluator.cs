@@ -62,6 +62,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
                 }
             }
 
+            // If the pattern is a doublet, return no difficulty as the interval of doublets can be ignored while playing.
+            if (sameRhythmGroupedHitObjects?.HitObjects.Count == 2 && sameRhythmGroupedHitObjects?.HitObjects[0] == sameRhythmGroupedHitObjects?.FirstHitObject)
+                return 0;
+
             // Penalise patterns that can be hit within a single hit window.
             intervalDifficulty *= DifficultyCalculationUtils.Logistic(
                 sameRhythmGroupedHitObjects.Duration / hitWindow,
