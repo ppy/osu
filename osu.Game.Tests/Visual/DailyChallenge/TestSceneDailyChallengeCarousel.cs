@@ -10,13 +10,16 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Utils;
+using osu.Game.Online.API;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.OnlinePlay.DailyChallenge;
 using osu.Game.Screens.OnlinePlay.DailyChallenge.Events;
 using osu.Game.Tests.Resources;
+using System.Linq;
 
 namespace osu.Game.Tests.Visual.DailyChallenge
 {
@@ -25,7 +28,27 @@ namespace osu.Game.Tests.Visual.DailyChallenge
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Plum);
 
-        private readonly Bindable<Room> room = new Bindable<Room>(new Room());
+        private readonly Bindable<Room> room = new(new Room
+        {
+            Name = "Daily Challenge: Febuary 31, 2069",
+            Playlist =
+            [
+                new PlaylistItem(TestResources.CreateTestBeatmapSetInfo().Beatmaps.First())
+                {
+                    RequiredMods = [new APIMod(new OsuModTraceable())],
+                    AllowedMods =
+                    [
+                        new APIMod(new OsuModDoubleTime()),
+                        new APIMod(new OsuModFlashlight()),
+                        new APIMod(new OsuModNightcore()),
+                        new APIMod(new OsuModBlinds()),
+                        new APIMod(new OsuModHidden())
+                    ]
+                }
+            ],
+            EndDate = DateTimeOffset.Now.AddHours(12),
+            Category = RoomCategory.DailyChallenge
+        });
 
         [Test]
         public void TestBasicAppearance()
@@ -147,6 +170,7 @@ namespace osu.Game.Tests.Visual.DailyChallenge
 
                 feed.AddNewScore(ev);
                 breakdown.AddNewScore(ev);
+                breakdown.UserBestScore.Value = new MultiplayerScore { TotalScore = ev.TotalScore };
             });
         }
 
