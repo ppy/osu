@@ -28,7 +28,7 @@ namespace osu.Game.Tests.Visual.DailyChallenge
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Plum);
 
-        private readonly Bindable<Room> room = new(new Room
+        private readonly Bindable<Room> room = new Bindable<Room>(new Room
         {
             Name = "Daily Challenge: Febuary 31, 2069",
             Playlist =
