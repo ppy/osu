@@ -1,12 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Diagnostics;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
@@ -18,10 +14,8 @@ using osu.Framework.Localisation;
 using osu.Framework.Screens;
 using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Metadata;
-using osu.Game.Online.Spectator;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Screens;
 using osu.Game.Screens.OnlinePlay.Match.Components;
@@ -36,21 +30,17 @@ namespace osu.Game.Overlays.Dashboard
         private const float search_textbox_height = 40;
         private const float padding = 10;
 
-        private readonly IBindableList<int> playingUsers = new BindableList<int>();
-        private readonly IBindableDictionary<int, UserPresence> onlineUsers = new BindableDictionary<int, UserPresence>();
+        private readonly IBindableDictionary<int, UserPresence> onlineUserPresences = new BindableDictionary<int, UserPresence>();
         private readonly Dictionary<int, OnlineUserPanel> userPanels = new Dictionary<int, OnlineUserPanel>();
 
-        private SearchContainer<OnlineUserPanel> userFlow;
-        private BasicSearchTextBox searchTextBox;
+        private SearchContainer<OnlineUserPanel> userFlow = null!;
+        private BasicSearchTextBox searchTextBox = null!;
 
         [Resolved]
-        private IAPIProvider api { get; set; }
+        private MetadataClient metadataClient { get; set; } = null!;
 
         [Resolved]
-        private SpectatorClient spectatorClient { get; set; }
-
-        [Resolved]
-        private MetadataClient metadataClient { get; set; }
+        private UserLookupCache users { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
@@ -99,18 +89,12 @@ namespace osu.Game.Overlays.Dashboard
             searchTextBox.Current.ValueChanged += text => userFlow.SearchTerm = text.NewValue;
         }
 
-        [Resolved]
-        private UserLookupCache users { get; set; }
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            onlineUsers.BindTo(metadataClient.UserStates);
-            onlineUsers.BindCollectionChanged(onUserUpdated, true);
-
-            playingUsers.BindTo(spectatorClient.PlayingUsers);
-            playingUsers.BindCollectionChanged(onPlayingUsersChanged, true);
+            onlineUserPresences.BindTo(metadataClient.UserPresences);
+            onlineUserPresences.BindCollectionChanged(onUserPresenceUpdated, true);
         }
 
         protected override void OnFocus(FocusEvent e)
@@ -120,7 +104,7 @@ namespace osu.Game.Overlays.Dashboard
             searchTextBox.TakeFocus();
         }
 
-        private void onUserUpdated(object sender, NotifyDictionaryChangedEventArgs<int, UserPresence> e) => Schedule(() =>
+        private void onUserPresenceUpdated(object? sender, NotifyDictionaryChangedEventArgs<int, UserPresence> e) => Schedule(() =>
         {
             switch (e.Action)
             {
@@ -133,38 +117,9 @@ namespace osu.Game.Overlays.Dashboard
 
                         users.GetUserAsync(userId).ContinueWith(task =>
                         {
-                            APIUser user = task.GetResultSafely();
-
-                            if (user == null)
-                                return;
-
-                            Schedule(() =>
-                            {
-                                // explicitly refetch the user's status.
-                                // things may have changed in between the time of scheduling and the time of actual execution.
-                                if (onlineUsers.TryGetValue(userId, out var updatedStatus))
-                                {
-                                    user.Activity.Value = updatedStatus.Activity;
-                                    user.Status.Value = updatedStatus.Status;
-                                }
-
-                                userFlow.Add(userPanels[userId] = createUserPanel(user));
-                            });
+                            if (task.GetResultSafely() is APIUser user)
+                                Schedule(() => userFlow.Add(userPanels[userId] = createUserPanel(user)));
                         });
-                    }
-
-                    break;
-
-                case NotifyDictionaryChangedAction.Replace:
-                    Debug.Assert(e.NewItems != null);
-
-                    foreach (var kvp in e.NewItems)
-                    {
-                        if (userPanels.TryGetValue(kvp.Key, out var panel))
-                        {
-                            panel.User.Activity.Value = kvp.Value.Activity;
-                            panel.User.Status.Value = kvp.Value.Status;
-                        }
                     }
 
                     break;
@@ -183,52 +138,26 @@ namespace osu.Game.Overlays.Dashboard
             }
         });
 
-        private void onPlayingUsersChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            switch (e.Action)
-            {
-                case NotifyCollectionChangedAction.Add:
-                    Debug.Assert(e.NewItems != null);
-
-                    foreach (int userId in e.NewItems)
-                    {
-                        if (userPanels.TryGetValue(userId, out var panel))
-                            panel.CanSpectate.Value = userId != api.LocalUser.Value.Id;
-                    }
-
-                    break;
-
-                case NotifyCollectionChangedAction.Remove:
-                    Debug.Assert(e.OldItems != null);
-
-                    foreach (int userId in e.OldItems)
-                    {
-                        if (userPanels.TryGetValue(userId, out var panel))
-                            panel.CanSpectate.Value = false;
-                    }
-
-                    break;
-            }
-        }
-
         private OnlineUserPanel createUserPanel(APIUser user) =>
             new OnlineUserPanel(user).With(panel =>
             {
                 panel.Anchor = Anchor.TopCentre;
                 panel.Origin = Anchor.TopCentre;
-                panel.CanSpectate.Value = playingUsers.Contains(user.Id);
             });
 
         public partial class OnlineUserPanel : CompositeDrawable, IFilterable
         {
             public readonly APIUser User;
 
-            public BindableBool CanSpectate { get; } = new BindableBool();
+            private PurpleRoundedButton spectateButton = null!;
 
             public IEnumerable<LocalisableString> FilterTerms { get; }
 
-            [Resolved(canBeNull: true)]
-            private IPerformFromScreenRunner performer { get; set; }
+            [Resolved]
+            private IPerformFromScreenRunner? performer { get; set; }
+
+            [Resolved]
+            private MetadataClient? metadataClient { get; set; }
 
             public bool FilteringActive { set; get; }
 
@@ -252,6 +181,27 @@ namespace osu.Game.Overlays.Dashboard
                 AutoSizeAxes = Axes.Both;
             }
 
+            protected override void Update()
+            {
+                base.Update();
+
+                // TODO: we probably don't want to do this every frame.
+                var activity = metadataClient?.GetPresence(User.Id)?.Activity;
+
+                switch (activity)
+                {
+                    default:
+                        spectateButton.Enabled.Value = false;
+                        break;
+
+                    case UserActivity.InSoloGame:
+                    case UserActivity.InMultiplayerGame:
+                    case UserActivity.InPlaylistGame:
+                        spectateButton.Enabled.Value = true;
+                        break;
+                }
+            }
+
             [BackgroundDependencyLoader]
             private void load()
             {
@@ -269,19 +219,15 @@ namespace osu.Game.Overlays.Dashboard
                             {
                                 RelativeSizeAxes = Axes.X,
                                 Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre,
-                                // this is SHOCKING
-                                Activity = { BindTarget = User.Activity },
-                                Status = { BindTarget = User.Status },
+                                Origin = Anchor.TopCentre
                             },
-                            new PurpleRoundedButton
+                            spectateButton = new PurpleRoundedButton
                             {
                                 RelativeSizeAxes = Axes.X,
                                 Text = "Spectate",
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
                                 Action = () => performer?.PerformFromScreen(s => s.Push(new SoloSpectatorScreen(User))),
-                                Enabled = { BindTarget = CanSpectate }
                             }
                         }
                     },

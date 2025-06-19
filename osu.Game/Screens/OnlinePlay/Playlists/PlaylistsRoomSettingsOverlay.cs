@@ -76,9 +76,6 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             private PurpleRoundedButton editPlaylistButton = null!;
 
             [Resolved]
-            private IRoomManager? manager { get; set; }
-
-            [Resolved]
             private IAPIProvider api { get; set; } = null!;
 
             [Resolved]
@@ -440,7 +437,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 if (!ApplyButton.Enabled.Value)
                     return;
 
-                hideError();
+                ErrorText.FadeOut(50);
 
                 room.Name = NameField.Text;
                 room.Availability = AvailabilityPicker.Current.Value;
@@ -449,12 +446,12 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 room.Duration = DurationField.Current.Value;
 
                 loadingLayer.Show();
-                manager?.CreateRoom(room, onSuccess, onError);
+
+                var req = new CreateRoomRequest(room);
+                req.Success += _ => loadingLayer.Hide();
+                req.Failure += e => onError(req.Response?.Error ?? e.Message);
+                api.Queue(req);
             }
-
-            private void hideError() => ErrorText.FadeOut(50);
-
-            private void onSuccess(Room room) => loadingLayer.Hide();
 
             private void onError(string text)
             {

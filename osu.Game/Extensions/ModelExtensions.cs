@@ -9,6 +9,7 @@ using osu.Game.IO;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
+using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Users;
 
 namespace osu.Game.Extensions
@@ -164,5 +165,20 @@ namespace osu.Game.Extensions
         /// that function does not have per-platform considerations (and is only made to work on windows).
         /// </remarks>
         public static string GetValidFilename(this string filename) => invalid_filename_chars.Replace(filename, "_");
+
+        public static bool RequiresSupporter(this BeatmapLeaderboardScope scope, bool filterMods)
+        {
+            switch (scope)
+            {
+                case BeatmapLeaderboardScope.Local:
+                    return false;
+
+                case BeatmapLeaderboardScope.Country:
+                case BeatmapLeaderboardScope.Friend:
+                    return true;
+            }
+
+            return filterMods;
+        }
     }
 }

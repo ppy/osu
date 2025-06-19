@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input;
@@ -10,7 +8,7 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osu.Game.Scoring;
-using osu.Game.Screens.Play;
+using osu.Game.Users;
 
 namespace osu.Game.Configuration
 {
@@ -27,9 +25,12 @@ namespace osu.Game.Configuration
             SetDefault(Static.FeaturedArtistDisclaimerShownOnce, false);
             SetDefault(Static.LastHoverSoundPlaybackTime, (double?)null);
             SetDefault(Static.LastModSelectPanelSamplePlaybackTime, (double?)null);
-            SetDefault<APISeasonalBackgrounds>(Static.SeasonalBackgrounds, null);
+            SetDefault<APISeasonalBackgrounds?>(Static.SeasonalBackgrounds, null);
             SetDefault(Static.TouchInputActive, RuntimeInfo.IsMobile);
-            SetDefault<ScoreInfo>(Static.LastLocalUserScore, null);
+            SetDefault<ScoreInfo?>(Static.LastLocalUserScore, null);
+            SetDefault<ScoreInfo?>(Static.LastAppliedOffsetScore, null);
+            SetDefault<UserActivity?>(Static.UserOnlineActivity, null);
+            SetDefault<APITag[]?>(Static.AllBeatmapTags, null);
         }
 
         /// <summary>
@@ -78,15 +79,26 @@ namespace osu.Game.Configuration
         TouchInputActive,
 
         /// <summary>
-        /// Contains the local user's last score (can be completed or aborted) after exiting <see cref="Player"/>.
-        /// Will be cleared to <c>null</c> when leaving <see cref="PlayerLoader"/>.
+        /// Stores the local user's last score (can be completed or aborted).
         /// </summary>
         LastLocalUserScore,
+
+        /// <summary>
+        /// Stores the local user's last score which was used to apply an offset.
+        /// </summary>
+        LastAppliedOffsetScore,
 
         /// <summary>
         /// Whether the intro animation for the daily challenge screen has been played once.
         /// This is reset when a new challenge is up.
         /// </summary>
         DailyChallengeIntroPlayed,
+
+        /// <summary>
+        /// The activity for the current user to broadcast to other players.
+        /// </summary>
+        UserOnlineActivity,
+
+        AllBeatmapTags,
     }
 }

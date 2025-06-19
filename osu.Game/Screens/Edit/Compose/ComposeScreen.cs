@@ -31,6 +31,9 @@ namespace osu.Game.Screens.Edit.Compose
         [Resolved]
         private IGameplaySettings globalGameplaySettings { get; set; }
 
+        [Resolved]
+        private IBeatSnapProvider beatSnapProvider { get; set; }
+
         private Bindable<string> clipboard { get; set; }
 
         private HitObjectComposer composer;
@@ -150,7 +153,7 @@ namespace osu.Game.Screens.Edit.Compose
 
             Debug.Assert(objects.Any());
 
-            double timeOffset = clock.CurrentTime - objects.Min(o => o.StartTime);
+            double timeOffset = beatSnapProvider.SnapTime(clock.CurrentTime) - objects.Min(o => o.StartTime);
 
             foreach (var h in objects)
                 h.StartTime += timeOffset;

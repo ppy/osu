@@ -34,6 +34,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         private void load(OsuConfigManager config, ISkinSource skinSource)
         {
             cursorSize = config.GetBindable<float>(OsuSetting.GameplayCursorSize).GetBoundCopy();
+            AllowPartRotation = skin.GetConfig<OsuSkinConfiguration, bool>(OsuSkinConfiguration.CursorTrailRotate)?.Value ?? true;
 
             Texture = skin.GetTexture("cursortrail");
 

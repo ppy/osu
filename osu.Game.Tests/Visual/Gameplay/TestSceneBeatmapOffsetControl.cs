@@ -27,18 +27,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [SetUpSteps]
         public void SetUpSteps()
         {
-            AddStep("Create control", () =>
-            {
-                Child = new PlayerSettingsGroup("Some settings")
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Children = new Drawable[]
-                    {
-                        offsetControl = new BeatmapOffsetControl()
-                    }
-                };
-            });
+            recreateControl();
         }
 
         [Test]
@@ -61,20 +50,16 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddStep("Set short reference score", () =>
             {
+                // 50 events total. one of them (head circle) being timed / having hitwindows, rest having no hitwindows
                 List<HitEvent> hitEvents =
                 [
-                    // 10 events total. one of them (head circle) being timed / having hitwindows, rest having no hitwindows
                     new HitEvent(30, 1, HitResult.LargeTickHit, new SliderHeadCircle { ClassicSliderBehaviour = true }, null, null),
-                    new HitEvent(0, 1, HitResult.LargeTickHit, new SliderTick(), null, null),
-                    new HitEvent(0, 1, HitResult.LargeTickHit, new SliderTick(), null, null),
-                    new HitEvent(0, 1, HitResult.LargeTickHit, new SliderTick(), null, null),
-                    new HitEvent(0, 1, HitResult.LargeTickHit, new SliderTick(), null, null),
-                    new HitEvent(0, 1, HitResult.LargeTickHit, new SliderTick(), null, null),
-                    new HitEvent(0, 1, HitResult.LargeTickHit, new SliderTick(), null, null),
-                    new HitEvent(0, 1, HitResult.LargeTickHit, new SliderTick(), null, null),
-                    new HitEvent(0, 1, HitResult.LargeTickHit, new SliderTick(), null, null),
-                    new HitEvent(0, 1, HitResult.LargeTickHit, new SliderTick(), null, null),
                 ];
+
+                for (int i = 0; i < 49; i++)
+                {
+                    hitEvents.Add(new HitEvent(0, 1, HitResult.LargeTickHit, new SliderTick(), null, null));
+                }
 
                 foreach (var ev in hitEvents)
                     ev.HitObject.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
@@ -123,13 +108,14 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestCalibrationFromZero()
         {
+            ScoreInfo referenceScore = null!;
             const double average_error = -4.5;
 
             AddAssert("Offset is neutral", () => offsetControl.Current.Value == 0);
             AddAssert("No calibration button", () => !offsetControl.ChildrenOfType<SettingsButton>().Any());
             AddStep("Set reference score", () =>
             {
-                offsetControl.ReferenceScore.Value = new ScoreInfo
+                offsetControl.ReferenceScore.Value = referenceScore = new ScoreInfo
                 {
                     HitEvents = TestSceneHitEventTimingDistributionGraph.CreateDistributedHitEvents(average_error),
                     BeatmapInfo = Beatmap.Value.BeatmapInfo,
@@ -142,6 +128,10 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddUntilStep("Button is disabled", () => !offsetControl.ChildrenOfType<SettingsButton>().Single().Enabled.Value);
             AddStep("Remove reference score", () => offsetControl.ReferenceScore.Value = null);
+            AddAssert("No calibration button", () => !offsetControl.ChildrenOfType<SettingsButton>().Any());
+
+            recreateControl();
+            AddStep("Set same reference score", () => offsetControl.ReferenceScore.Value = referenceScore);
             AddAssert("No calibration button", () => !offsetControl.ChildrenOfType<SettingsButton>().Any());
         }
 
@@ -250,6 +240,22 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("Button is disabled", () => !offsetControl.ChildrenOfType<SettingsButton>().Single().Enabled.Value);
             AddStep("Remove reference score", () => offsetControl.ReferenceScore.Value = null);
             AddAssert("No calibration button", () => !offsetControl.ChildrenOfType<SettingsButton>().Any());
+        }
+
+        private void recreateControl()
+        {
+            AddStep("Create control", () =>
+            {
+                Child = new PlayerSettingsGroup("Some settings")
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Children = new Drawable[]
+                    {
+                        offsetControl = new BeatmapOffsetControl()
+                    }
+                };
+            });
         }
     }
 }

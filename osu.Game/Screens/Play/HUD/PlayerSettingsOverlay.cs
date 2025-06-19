@@ -122,7 +122,10 @@ namespace osu.Game.Screens.Play.HUD
         {
             float screenMouseX = inputManager.CurrentState.Mouse.Position.X;
 
-            Expanded.Value = screenMouseX >= button.ScreenSpaceDrawQuad.TopLeft.X && screenMouseX <= ToScreenSpace(new Vector2(DrawWidth + EXPANDED_WIDTH, 0)).X;
+            Expanded.Value =
+                (screenMouseX >= button.ScreenSpaceDrawQuad.TopLeft.X && screenMouseX <= ToScreenSpace(new Vector2(DrawWidth + EXPANDED_WIDTH, 0)).X)
+                // Stay expanded if the user is dragging a slider.
+                || inputManager.DraggedDrawable != null;
         }
 
         protected override void OnHoverLost(HoverLostEvent e)

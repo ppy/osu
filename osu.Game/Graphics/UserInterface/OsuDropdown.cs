@@ -53,7 +53,7 @@ namespace osu.Game.Graphics.UserInterface
 
         #region OsuDropdownMenu
 
-        protected partial class OsuDropdownMenu : DropdownMenu
+        public partial class OsuDropdownMenu : DropdownMenu
         {
             public override bool HandleNonPositionalInput => State == MenuState.Open;
 
@@ -252,6 +252,7 @@ namespace osu.Game.Graphics.UserInterface
                                 Size = new Vector2(8),
                                 Alpha = 0,
                                 X = chevron_offset,
+                                Y = 1,
                                 Margin = new MarginPadding { Left = 3, Right = 3 },
                                 Origin = Anchor.CentreLeft,
                                 Anchor = Anchor.CentreLeft,
