@@ -732,9 +732,7 @@ namespace osu.Game.Graphics.Carousel
 
             if (range != displayedRange)
             {
-                Logger.Log($"Updating displayed range of carousel from {displayedRange} to {range}");
                 displayedRange = range;
-
                 updateDisplayedRange(range);
             }
 
