@@ -519,46 +519,51 @@ namespace osu.Game.Screens.Menu
 
         private void updateSongSelectV2HoldState()
         {
-            if (Buttons.State == ButtonSystemState.Play &&
-                inputManager.CurrentState.Mouse.IsPressed(MouseButton.Left) &&
-                inputManager.HoveredDrawables.Any(h => h is OsuLogo || (h is MainMenuButton b && b.TriggerKeys.Contains(Key.P))))
-                holdTime += Time.Elapsed;
-            else
+            bool isValidHoverState = Buttons.State == ButtonSystemState.Play &&
+                                     inputManager.CurrentState.Mouse.IsPressed(MouseButton.Left) &&
+                                     inputManager.HoveredDrawables.Any(h => h is OsuLogo || (h is MainMenuButton b && b.TriggerKeys.Contains(Key.P)));
+
+            if (isValidHoverState)
             {
-                var transformTarget = Game.ChildrenOfType<ScalingContainer>().First();
-                transformTarget.ScaleTo(1, 200, Easing.OutQuint)
-                               .RotateTo(0, 200, Easing.OutQuint)
-                               .FadeColour(OsuColour.Gray(1f), 200, Easing.OutQuint);
+                holdTime += Time.Elapsed;
+
+                if (holdTime >= required_hold_time && !ssv2Expanded)
+                {
+                    var transformTarget = Game.ChildrenOfType<ScalingContainer>().First();
+
+                    transformTarget.Anchor = Anchor.Centre;
+                    transformTarget.Origin = Anchor.Centre;
+
+                    transformTarget.ScaleTo(1.2f, 5000, Easing.OutPow10)
+                                   .RotateTo(2, 5000, Easing.OutPow10)
+                                   .FadeColour(Color4.BlueViolet, 10000, Easing.OutPow10);
+
+                    ssv2Duck = musicController.Duck(new DuckParameters
+                    {
+                        DuckDuration = 2000,
+                        DuckVolumeTo = 0.8f,
+                        DuckCutoffTo = 500,
+                        DuckEasing = Easing.OutQuint,
+                        RestoreDuration = 200,
+                        RestoreEasing = Easing.OutQuint
+                    });
+
+                    ssv2Expanded = true;
+                }
+            }
+            else if (holdTime > 0)
+            {
+                var transformTarget = Game.ChildrenOfType<ScalingContainer>().FirstOrDefault();
+
+                transformTarget.ScaleTo(1, 500, Easing.OutQuint)
+                               .RotateTo(0, 500, Easing.OutQuint)
+                               .FadeColour(OsuColour.Gray(1f), 500, Easing.OutQuint);
 
                 ssv2Duck?.Dispose();
                 ssv2Duck = null;
 
                 ssv2Expanded = false;
                 holdTime = 0;
-            }
-
-            if (holdTime >= required_hold_time && !ssv2Expanded)
-            {
-                var transformTarget = Game.ChildrenOfType<ScalingContainer>().First();
-
-                transformTarget.Anchor = Anchor.Centre;
-                transformTarget.Origin = Anchor.Centre;
-
-                transformTarget.ScaleTo(1.2f, 5000, Easing.OutPow10)
-                               .RotateTo(2, 5000, Easing.OutPow10)
-                               .FadeColour(Color4.BlueViolet, 10000, Easing.OutPow10);
-
-                ssv2Duck = musicController.Duck(new DuckParameters
-                {
-                    DuckDuration = 2000,
-                    DuckVolumeTo = 0.8f,
-                    DuckCutoffTo = 500,
-                    DuckEasing = Easing.OutQuint,
-                    RestoreDuration = 200,
-                    RestoreEasing = Easing.OutQuint
-                });
-
-                ssv2Expanded = true;
             }
         }
 
