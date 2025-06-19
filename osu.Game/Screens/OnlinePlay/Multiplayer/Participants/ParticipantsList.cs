@@ -52,6 +52,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
         }
 
         private void onRoomUpdated() => Scheduler.AddOnce(updateState);
+
         private void updateState()
         {
             if (client.Room == null)
@@ -120,11 +121,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                     sortedUsers = sortByRankForCurrentRuleset(sortedUsers);
                     break;
             }
+
             // Reorder existing participants to match the sorted user list
             for (int i = 0; i < sortedUsers.Count; i++)
             {
                 var user = sortedUsers[i];
-                var existingIndex = participants.IndexOf(user);
+                int existingIndex = participants.IndexOf(user);
 
                 if (existingIndex != -1 && existingIndex != i)
                     participants.Move(existingIndex, i);
@@ -133,7 +135,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
             // Ensure host is still positioned at the top (override sort for host)
             if (client.Room?.Host != null)
             {
-                var hostIndex = participants.IndexOf(client.Room.Host);
+                int hostIndex = participants.IndexOf(client.Room.Host);
+
                 if (hostIndex > 0)
                 {
                     participants.Move(hostIndex, 0);
@@ -150,18 +153,18 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
             if (SortDirection.Value == Overlays.SortDirection.Ascending)
             {
                 return users
-                    .GroupBy(u => u.User!.CountryCode.ToString())
-                    .OrderBy(g => g.Key)
-                    .SelectMany(g => g.OrderBy(u => getCurrentRulesetRank(u)))
-                    .ToList();
+                            .GroupBy(u => u.User!.CountryCode.ToString())
+                            .OrderBy(g => g.Key)
+                            .SelectMany(g => g.OrderBy(getCurrentRulesetRank))
+                            .ToList();
             }
             else
             {
                 return users
-                    .GroupBy(u => u.User!.CountryCode.ToString())
-                    .OrderByDescending(g => g.Key)
-                    .SelectMany(g => g.OrderBy(u => getCurrentRulesetRank(u)))
-                    .ToList();
+                            .GroupBy(u => u.User!.CountryCode.ToString())
+                            .OrderByDescending(g => g.Key)
+                            .SelectMany(g => g.OrderBy(getCurrentRulesetRank))
+                            .ToList();
             }
         }
 
@@ -172,11 +175,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
         {
             if (SortDirection.Value == Overlays.SortDirection.Ascending)
             {
-                return users.OrderBy(u => getCurrentRulesetRank(u)).ToList();
+                return users.OrderBy(getCurrentRulesetRank).ToList();
             }
             else
             {
-                return users.OrderByDescending(u => getCurrentRulesetRank(u)).ToList();
+                return users.OrderByDescending(getCurrentRulesetRank).ToList();
             }
         }
 

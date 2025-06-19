@@ -39,8 +39,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
         // method to register users
         public void RegisterUser(APIUser user)
         {
-            if (!knownUsers.ContainsKey(user.Id))
-                knownUsers[user.Id] = user;
+            knownUsers.TryAdd(user.Id, user);
         }
 
         /// <summary>
@@ -228,19 +227,19 @@ namespace osu.Game.Tests.Visual.OnlinePlay
                                                    ? null
                                                         : knownUsers.TryGetValue(id, out var user)
                                                         ? user
-                                                           : new APIUser
-                                                           {
-                                                               Id = id,
-                                                               Username = $"User {id}",
-                                                               Team = RNG.NextBool()
-                                                                   ? new APITeam
-                                                                   {
-                                                                       Name = "Collective Wangs",
-                                                                       ShortName = "WANG",
-                                                                       FlagUrl = "https://assets.ppy.sh/teams/flag/1/wanglogo.jpg",
-                                                                   }
-                                                                   : null,
-                                                           })
+                                                            : new APIUser
+                                                            {
+                                                                Id = id,
+                                                                Username = $"User {id}",
+                                                                Team = RNG.NextBool()
+                                                                    ? new APITeam
+                                                                    {
+                                                                        Name = "Collective Wangs",
+                                                                        ShortName = "WANG",
+                                                                        FlagUrl = "https://assets.ppy.sh/teams/flag/1/wanglogo.jpg",
+                                                                    }
+                                                                    : null,
+                                                            })
                                                        .Where(u => u != null).ToList(),
                     });
                     return true;

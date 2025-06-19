@@ -139,6 +139,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         private MultiplayerParticipantsSortTabControl participantsSortControl = null!;
 
         private ParticipantsList participantsList = null!;
+
         public MultiplayerMatchSubScreen(Room room)
         {
             this.room = room;
