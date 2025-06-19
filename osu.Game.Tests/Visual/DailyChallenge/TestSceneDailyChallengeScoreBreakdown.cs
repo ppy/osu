@@ -47,7 +47,8 @@ namespace osu.Game.Tests.Visual.DailyChallenge
                             new PlaylistItem(TestResources.CreateTestBeatmapSetInfo().Beatmaps.First())
                             {
                                 RequiredMods = [new APIMod(new OsuModTraceable())],
-                                AllowedMods = [
+                                AllowedMods =
+                                [
                                     new APIMod(new OsuModDoubleTime()),
                                     new APIMod(new OsuModFlashlight()),
                                     new APIMod(new OsuModNightcore()),

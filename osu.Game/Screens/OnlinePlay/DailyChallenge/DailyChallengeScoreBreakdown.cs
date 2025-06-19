@@ -36,7 +36,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
         private long[] bins = null!;
 
         private PlaylistItem item = null!;
-        private readonly Room room = null!;
+        private readonly Room room;
 
         public DailyChallengeScoreBreakdown(Room room)
         {
