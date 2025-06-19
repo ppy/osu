@@ -467,6 +467,9 @@ namespace osu.Game.Screens.SelectV2
             if (!this.IsCurrentScreen())
                 return false;
 
+            if (selectionDebounce?.State == ScheduledDelegate.RunState.Waiting)
+                selectionDebounce?.RunTask();
+
             // While filtering, let's not ever attempt to change selection.
             // This will be resolved after the filter completes, see `newItemsPresented`.
             bool carouselStateIsValid = filterDebounce?.State != ScheduledDelegate.RunState.Waiting && !carousel.IsFiltering;
