@@ -484,7 +484,13 @@ namespace osu.Game.Graphics.Carousel
                     return true;
 
                 case GlobalAction.ToggleCurrentGroup:
-                    if (currentKeyboardSelection.CarouselItem != null && CheckValidForGroupSelection(currentKeyboardSelection.CarouselItem))
+                    if (carouselItems == null || carouselItems.Count == 0)
+                        return true;
+
+                    if (currentKeyboardSelection.CarouselItem == null || currentKeyboardSelection.Index == null)
+                        return true;
+
+                    if (CheckValidForGroupSelection(currentKeyboardSelection.CarouselItem))
                     {
                         // If keyboard selection is a group, toggle group and then change keyboard selection to actual selection.
                         Activate(currentKeyboardSelection.CarouselItem);
@@ -492,7 +498,16 @@ namespace osu.Game.Graphics.Carousel
                     else
                     {
                         // If current keyboard selection is not a group, toggle the closest group and move keyboard selection to that group.
-                        traverseSelection(-1, CheckValidForGroupSelection, skipFirst: false, activateExpandedItems: true);
+                        for (int i = currentKeyboardSelection.Index.Value; i >= 0; i--)
+                        {
+                            var newItem = carouselItems[i];
+
+                            if (CheckValidForGroupSelection(newItem))
+                            {
+                                Activate(newItem);
+                                return true;
+                            }
+                        }
                     }
 
                     return true;
@@ -577,7 +592,7 @@ namespace osu.Game.Graphics.Carousel
             traverseSelection(direction, CheckValidForSetSelection);
         }
 
-        private void traverseSelection(int direction, Func<CarouselItem, bool> predicate, bool skipFirst = true, bool activateExpandedItems = false)
+        private void traverseSelection(int direction, Func<CarouselItem, bool> predicate, bool skipFirst = true)
         {
             if (carouselItems == null || carouselItems.Count == 0) return;
 
@@ -616,7 +631,7 @@ namespace osu.Game.Graphics.Carousel
 
                 var newItem = carouselItems[newIndex];
 
-                if ((activateExpandedItems || !newItem.IsExpanded) && predicate(newItem))
+                if (!newItem.IsExpanded && predicate(newItem))
                 {
                     Activate(newItem);
                     return;
