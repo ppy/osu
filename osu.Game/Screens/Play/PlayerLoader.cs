@@ -715,7 +715,7 @@ namespace osu.Game.Screens.Play
 
         #region Low battery warning
 
-        private const double low_battery_threshold = 0.25;
+        private const double low_battery_threshold = 0.2;
 
         private Bindable<bool> batteryWarningShownOnce = null!;
 
