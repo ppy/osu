@@ -69,7 +69,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double wiggleBonus = 0;
 
             double aimStrain = currVelocity; // Start strain with regular velocity.
-            aimStrain *= calcAimDoubletapMultiplier(current);
 
             if (osuCurrObj.Angle != null && osuLastObj.Angle != null)
             {
@@ -155,6 +154,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             // Add in acute angle bonus or wide angle bonus, whichever is larger.
             aimStrain += Math.Max(acuteAngleBonus * acute_angle_multiplier, wideAngleBonus * wide_angle_multiplier);
+
+            aimStrain *= calcAimDoubletapMultiplier(current);
 
             // Add in additional slider velocity bonus.
             if (withSliderTravelDistance)
