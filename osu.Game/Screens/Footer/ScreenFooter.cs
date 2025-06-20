@@ -40,7 +40,11 @@ namespace osu.Game.Screens.Footer
 
         private const int padding = 60;
         private const float delay_per_button = 30;
-        private const double transition_duration = 400;
+        private const double transition_duration = 500;
+
+        // Disable masking because it breaks due to the height of this container being less than the displayed content.
+        // The height being set as it is is required for transition purposes.
+        public override bool UpdateSubTreeMasking() => false;
 
         private readonly List<OverlayContainer> overlays = new List<OverlayContainer>();
 
@@ -162,13 +166,14 @@ namespace osu.Game.Screens.Footer
         protected override void PopIn()
         {
             this.MoveToY(0, transition_duration, Easing.OutQuint)
-                .FadeIn(transition_duration, Easing.OutQuint);
+                .FadeIn();
         }
 
         protected override void PopOut()
         {
-            this.MoveToY(HEIGHT, transition_duration, Easing.OutQuint)
-                .FadeOut(transition_duration, Easing.OutQuint);
+            this.MoveToY(ScreenFooterButton.HEIGHT, transition_duration, Easing.OutQuint)
+                .Then()
+                .FadeOut();
         }
 
         public void SetButtons(IReadOnlyList<ScreenFooterButton> buttons)

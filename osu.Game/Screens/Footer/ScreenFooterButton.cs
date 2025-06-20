@@ -27,7 +27,7 @@ namespace osu.Game.Screens.Footer
     {
         public const int CORNER_RADIUS = 10;
 
-        protected const int BUTTON_HEIGHT = 75;
+        public const int HEIGHT = 75;
         protected const int BUTTON_WIDTH = 116;
 
         public Bindable<Visibility> OverlayState = new Bindable<Visibility>();
@@ -75,7 +75,7 @@ namespace osu.Game.Screens.Footer
         {
             Overlay = overlay;
 
-            Size = new Vector2(BUTTON_WIDTH, BUTTON_HEIGHT);
+            Size = new Vector2(BUTTON_WIDTH, HEIGHT);
 
             Children = new Drawable[]
             {
