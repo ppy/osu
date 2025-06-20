@@ -224,7 +224,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
                     getUsersRequest.TriggerSuccess(new GetUsersResponse
                     {
                         Users = getUsersRequest.UserIds.Select(id => id == TestUserLookupCache.UNRESOLVED_USER_ID
-                                                   ? null
+                                                    ? null
                                                         : knownUsers.TryGetValue(id, out var user)
                                                         ? user
                                                             : new APIUser
@@ -240,7 +240,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
                                                                     }
                                                                     : null,
                                                             })
-                                                       .Where(u => u != null).ToList(),
+                                                        .Where(u => u != null).ToList(),
                     });
                     return true;
                 }

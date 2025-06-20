@@ -153,18 +153,18 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
             if (SortDirection.Value == Overlays.SortDirection.Ascending)
             {
                 return users
-                            .GroupBy(u => u.User!.CountryCode.ToString())
-                            .OrderBy(g => g.Key)
-                            .SelectMany(g => g.OrderBy(getCurrentRulesetRank))
-                            .ToList();
+                .GroupBy(u => u.User!.CountryCode.ToString())
+                .OrderBy(g => g.Key)
+                .SelectMany(g => g.OrderBy(getCurrentRulesetRank))
+                .ToList();
             }
             else
             {
                 return users
-                            .GroupBy(u => u.User!.CountryCode.ToString())
-                            .OrderByDescending(g => g.Key)
-                            .SelectMany(g => g.OrderBy(getCurrentRulesetRank))
-                            .ToList();
+                .GroupBy(u => u.User!.CountryCode.ToString())
+                .OrderByDescending(g => g.Key)
+                .SelectMany(g => g.OrderBy(getCurrentRulesetRank))
+                .ToList();
             }
         }
 
