@@ -18,15 +18,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     public class Reading : Skill
     {
         private readonly List<double> noteDifficulties = new List<double>();
-
-        private readonly List<double> noteWeights = new List<double>();
-
         private readonly IReadOnlyList<HitObject> objectList;
 
         private readonly double clockRate;
         private readonly bool hasHiddenMod;
         private readonly double preempt;
-        private double skillMultiplier => 7.0;
+        private double skillMultiplier => 5.0;
 
         public Reading(IBeatmap beatmap, Mod[] mods, double clockRate)
             : base(mods)
@@ -38,7 +35,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         }
 
         private double currentDifficulty;
-        private double strainDecayBase => 0.3;
+        private double noteWeightSum;
+        private double strainDecayBase => 0.5;
 
         public static double DifficultyToPerformance(double difficulty) => 25 * Math.Pow(difficulty, 2);
         private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
@@ -94,7 +92,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 // https://www.desmos.com/calculator/gquji01mlg
                 double weight = (1.0 + (1.0 / (1 + index))) / (Math.Pow(index, 0.8) + 1.0 + (1.0 / (1.0 + index)));
 
-                noteWeights.Add(weight);
+                noteWeightSum += weight;
 
                 difficulty += note * weight;
                 index += 1;
@@ -111,9 +109,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             if (noteDifficulties.Count == 0)
                 return 0.0;
 
-            double consistentTopNote = DifficultyValue() / noteWeights.Sum(); // What would the top note be if all note values were identical
+            double consistentTopNote = DifficultyValue() / noteWeightSum; // What would the top note be if all note values were identical
 
-            if (noteWeights.Sum() == 0)
+            if (noteWeightSum == 0)
                 return 0.0;
 
             if (consistentTopNote == 0)

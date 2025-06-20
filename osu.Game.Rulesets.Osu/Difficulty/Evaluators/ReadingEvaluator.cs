@@ -15,8 +15,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
     public static class ReadingEvaluator
     {
         private const double reading_window_size = 3000; // 3 seconds
-        private const double density_difficulty_base_max = 1.5;
-        private const double hidden_balancing_factor = 12000;
+        private const double density_difficulty_base_max = 0.8;
+        private const double hidden_multiplier = 0.015;
         private const double preempt_balancing_factor = 160000;
 
         public static double EvaluateDifficultyOf(int totalObjects, DifficultyHitObject current, double clockRate, double preempt, bool hidden)
@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                 // Small distances means objects may be cheesed, so it doesn't matter whether they are arranged confusingly.
                 // https://www.desmos.com/calculator/gioagbaopk
-                loopDifficulty *= DifficultyCalculationUtils.Logistic(-(loopObj.LazyJumpDistance - 75) / 15);
+                loopDifficulty *= DifficultyCalculationUtils.Logistic(-(loopObj.LazyJumpDistance - 80) / 15);
 
                 // Account less for objects close to the max reading window
                 double timeBetweenCurrAndLoopObj = currObj.StartTime - loopObj.StartTime;
@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             }
 
             // Make density more sensitive to higher approach rates as you have a lot less time to react to information
-            double densityDifficultyBase = 1.5 + DifficultyCalculationUtils.Logistic(-(preempt - 360) / 15, density_difficulty_base_max);
+            double densityDifficultyBase = 2.2 + DifficultyCalculationUtils.Logistic(-(preempt - 360) / 15, density_difficulty_base_max);
 
             // Award only denser than average maps.
             double noteDensityDifficulty = Math.Max(0, pastObjectDifficultyInfluence - densityDifficultyBase);
@@ -60,14 +60,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             {
                 double timeSpentInvisible = getDurationSpentInvisible(currObj) / clockRate;
 
-                // Nerf extremely high times as you begin to rely more on memory the longer a note is invisible.
-                double timeSpentInvisibleFactor = Math.Min(timeSpentInvisible, 1000) + (timeSpentInvisible > 1000 ? 1500 * Math.Log10(timeSpentInvisible / 1000) : 0);
-
                 // Buff current note if upcoming notes are dense
                 // This is on the basis that part of hidden difficulty is the uncertainty of the current cursor position in relation to future notes
-                double visibleObjectFactor = Math.Max(1, Math.Pow(getCurrentVisibleObjectFactor(totalObjects, currObj, preempt), 0.8) * 1.5);
+                double visibleObjectFactor = Math.Max(1, Math.Pow(getCurrentVisibleObjectFactor(totalObjects, currObj, preempt), 1.6));
 
-                hiddenDifficulty += visibleObjectFactor * timeSpentInvisibleFactor * pastObjectDifficultyInfluence / hidden_balancing_factor;
+                hiddenDifficulty += (timeSpentInvisible * 0.04 + visibleObjectFactor * pastObjectDifficultyInfluence) * hidden_multiplier;
 
                 hiddenDifficulty *= constantAngleNerfFactor * velocity;
 
@@ -76,7 +73,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 hiddenDifficulty += currObj.LazyJumpDistance == 0 &&
                                     currObj.OpacityAt(previousObj.BaseObject.StartTime + preempt, hidden) == 0 &&
                                     previousObj.StartTime + preempt > currObj.StartTime
-                    ? timeSpentInvisibleFactor / (hidden_balancing_factor * 0.025)
+                    ? timeSpentInvisible / (17000 * hidden_multiplier)
                     : 0;
             }
 
