@@ -80,6 +80,11 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty("artist_unicode")]
         public string ArtistUnicode { get; set; } = string.Empty;
 
+        /// <summary>
+        /// In the beatmap search API, this property is not provided.
+        /// In such cases, the following two properties will be used to provide the Author information.
+        /// </summary>
+        [JsonProperty(@"user")]
         public APIUser Author = new APIUser();
 
         /// <summary>
