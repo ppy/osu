@@ -5,15 +5,18 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
+using osu.Game.Localisation;
 using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
+using osu.Game.Resources.Localisation.Web;
 using osuTK;
 
 namespace osu.Game.Screens.SelectV2
@@ -124,8 +127,8 @@ namespace osu.Game.Screens.SelectV2
                                                             Spacing = new Vector2(0f, 10f),
                                                             Children = new[]
                                                             {
-                                                                creator = new MetadataDisplay("Creator"),
-                                                                genre = new MetadataDisplay("Genre"),
+                                                                creator = new MetadataDisplay(EditorSetupStrings.Creator),
+                                                                genre = new MetadataDisplay(BeatmapsetsStrings.ShowInfoGenre),
                                                             },
                                                         },
                                                         new FillFlowContainer
@@ -136,8 +139,8 @@ namespace osu.Game.Screens.SelectV2
                                                             Spacing = new Vector2(0f, 10f),
                                                             Children = new[]
                                                             {
-                                                                source = new MetadataDisplay("Source"),
-                                                                language = new MetadataDisplay("Language"),
+                                                                source = new MetadataDisplay(BeatmapsetsStrings.ShowInfoSource),
+                                                                language = new MetadataDisplay(BeatmapsetsStrings.ShowInfoLanguage),
                                                             },
                                                         },
                                                         new FillFlowContainer
@@ -148,18 +151,18 @@ namespace osu.Game.Screens.SelectV2
                                                             Spacing = new Vector2(0f, 10f),
                                                             Children = new[]
                                                             {
-                                                                submitted = new MetadataDisplay("Submitted"),
-                                                                ranked = new MetadataDisplay("Ranked"),
+                                                                submitted = new MetadataDisplay(BeatmapsetsStrings.ShowDetailsDateSubmitted("").ToSentence()),
+                                                                ranked = new MetadataDisplay(BeatmapsetsStrings.ShowDetailsDateRanked("").ToSentence()),
                                                             },
                                                         },
                                                     },
                                                 },
                                             },
-                                            userTags = new MetadataDisplay("User Tags")
+                                            userTags = new MetadataDisplay(BeatmapsetsStrings.ShowInfoUserTags)
                                             {
                                                 Alpha = 0,
                                             },
-                                            mapperTags = new MetadataDisplay("Mapper Tags"),
+                                            mapperTags = new MetadataDisplay(BeatmapsetsStrings.ShowInfoMapperTags),
                                         },
                                     },
                                 },
