@@ -156,6 +156,38 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         }
 
         [Test]
+        public void TestMultipleKeyboardOperationsPerFrame()
+        {
+            AddBeatmaps(10, 3);
+            WaitForDrawablePanels();
+
+            SelectNextSet();
+            WaitForSetSelection(0, 0);
+
+            SelectNextPanel();
+            SelectNextPanel();
+            SelectNextPanel();
+
+            AddStep("Press two keys at once", () =>
+            {
+                InputManager.Key(Key.Down);
+                InputManager.Key(Key.Right);
+            });
+
+            // Second key is respected, so only set selection changes.
+            WaitForSetSelection(1, 0);
+
+            AddStep("Press two keys at once", () =>
+            {
+                InputManager.Key(Key.Left);
+                InputManager.Key(Key.Up);
+            });
+
+            // Second key is respected, so only keyboard selection changes.
+            WaitForSetSelection(1, 0);
+        }
+
+        [Test]
         public void TestKeyboardSelection()
         {
             AddBeatmaps(10, 3);

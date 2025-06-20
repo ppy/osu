@@ -458,29 +458,28 @@ namespace osu.Game.Graphics.Carousel
                 // if the selection is changed more than once during an update frame,
                 // which can happen if repeat inputs are enqueued for processing at a rate faster than the update refresh rate.
                 // `refreshAfterSelection()` is the method responsible for updating the index of the selected item here which runs once per frame.
+                case GlobalAction.SelectPrevious:
+                    Scheduler.AddOnce(traverseFromKey, new TraversalOperation(TraversalType.Keyboard, -1));
+                    return true;
 
                 case GlobalAction.SelectNext:
-                    Scheduler.AddOnce(traverseKeyboardSelection, 1);
-                    return true;
-
-                case GlobalAction.SelectPrevious:
-                    Scheduler.AddOnce(traverseKeyboardSelection, -1);
-                    return true;
-
-                case GlobalAction.ActivateNextSet:
-                    Scheduler.AddOnce(traverseSetSelection, 1);
+                    Scheduler.AddOnce(traverseFromKey, new TraversalOperation(TraversalType.Keyboard, 1));
                     return true;
 
                 case GlobalAction.ActivatePreviousSet:
-                    Scheduler.AddOnce(traverseSetSelection, -1);
+                    Scheduler.AddOnce(traverseFromKey, new TraversalOperation(TraversalType.Set, -1));
+                    return true;
+
+                case GlobalAction.ActivateNextSet:
+                    Scheduler.AddOnce(traverseFromKey, new TraversalOperation(TraversalType.Set, 1));
                     return true;
 
                 case GlobalAction.ExpandPreviousGroup:
-                    Scheduler.AddOnce(traverseGroupSelection, -1);
+                    Scheduler.AddOnce(traverseFromKey, new TraversalOperation(TraversalType.Group, -1));
                     return true;
 
                 case GlobalAction.ExpandNextGroup:
-                    Scheduler.AddOnce(traverseGroupSelection, 1);
+                    Scheduler.AddOnce(traverseFromKey, new TraversalOperation(TraversalType.Group, 1));
                     return true;
 
                 case GlobalAction.ToggleCurrentGroup:
@@ -514,7 +513,32 @@ namespace osu.Game.Graphics.Carousel
             }
 
             return false;
+
+            void traverseFromKey(TraversalOperation traversal)
+            {
+                switch (traversal.Type)
+                {
+                    case TraversalType.Keyboard:
+                        traverseKeyboardSelection(traversal.Direction);
+                        break;
+
+                    case TraversalType.Set:
+                        traverseSetSelection(traversal.Direction);
+                        break;
+
+                    case TraversalType.Group:
+                        traverseGroupSelection(traversal.Direction);
+                        break;
+
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
         }
+
+        private enum TraversalType { Keyboard, Set, Group }
+
+        private record TraversalOperation(TraversalType Type, int Direction);
 
         public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
