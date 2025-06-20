@@ -81,15 +81,21 @@ namespace osu.Game.Online.API.Requests.Responses
         public string ArtistUnicode { get; set; } = string.Empty;
 
         /// <summary>
-        /// In the beatmap search API, this property is not provided.
-        /// In such cases, the following two properties will be used to provide the Author information.
+        /// The creator of this beatmap set.
         /// </summary>
+        /// <remarks>
+        /// This is not included when the set is retrieved via <see cref="SearchBeatmapSetsRequest"/>,
+        /// but the creator's ID and username will be filled in this property from the <see cref="AuthorID"/> and <see cref="AuthorString"/> properties.
+        /// </remarks>
         [JsonProperty(@"user")]
         public APIUser Author = new APIUser();
 
         /// <summary>
-        /// Helper property to deserialize a username to <see cref="APIUser"/>.
+        /// The ID of the beatmap set's creator.
         /// </summary>
+        /// <remarks>
+        /// Helper property to deserialize the ID to <see cref="Author"/>.
+        /// </remarks>
         [JsonProperty(@"user_id")]
         public int AuthorID
         {
@@ -98,8 +104,11 @@ namespace osu.Game.Online.API.Requests.Responses
         }
 
         /// <summary>
-        /// Helper property to deserialize a username to <see cref="APIUser"/>.
+        /// The username of the beatmap set's creator.
         /// </summary>
+        /// <remarks>
+        /// Helper property to deserialize the username to <see cref="Author"/>.
+        /// </remarks>
         [JsonProperty(@"creator")]
         public string AuthorString
         {
