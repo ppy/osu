@@ -136,7 +136,7 @@ namespace osu.Game.Screens.SelectV2
                                                 {
                                                     Anchor = Anchor.BottomLeft,
                                                     Origin = Anchor.BottomLeft,
-                                                    Text = " mapped by ",
+                                                    Text = BeatmapsStrings.DiscussionsShowTitle("", ""),
                                                     Font = OsuFont.Style.Body,
                                                 },
                                                 mapperLink = new MapperLinkContainer
