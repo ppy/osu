@@ -359,7 +359,7 @@ namespace osu.Game.Tests.Gameplay
             }
 
             public override Judgement CreateJudgement() => new TestJudgement(maxResult);
-            protected override HitWindows CreateHitWindows() => new HitWindows();
+            protected override HitWindows CreateHitWindows() => HitWindows.Empty;
 
             private class TestJudgement : Judgement
             {
