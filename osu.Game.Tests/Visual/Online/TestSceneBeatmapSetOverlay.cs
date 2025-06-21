@@ -244,6 +244,17 @@ namespace osu.Game.Tests.Visual.Online
         }
 
         [Test]
+        public void TestBeatmapSetHasVideo()
+        {
+            AddStep("show beatmapset with video", () =>
+            {
+                var beatmapSet = getBeatmapSet();
+                beatmapSet.HasVideo = true;
+                overlay.ShowBeatmapSet(beatmapSet);
+            });
+        }
+
+        [Test]
         public void TestSelectedModsDontAffectStatistics()
         {
             AddStep("show map", () => overlay.ShowBeatmapSet(getBeatmapSet()));
