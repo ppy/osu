@@ -143,10 +143,21 @@ namespace osu.Game.Screens.SelectV2
                     break;
 
                 case NotifyCollectionChangedAction.Remove:
+                    int previousSelectionIndex = CurrentSelection != null ? IndexOfItem((BeatmapInfo)CurrentSelection) : -1;
+                    object? previousSelection = CurrentSelection;
+
                     foreach (var set in oldItems!)
                     {
                         foreach (var beatmap in set.Beatmaps)
                             Items.RemoveAll(i => i is BeatmapInfo bi && beatmap.Equals(bi));
+                    }
+
+                    // TODO: should this exist in song select instead of here?
+                    if (!Items.Contains(previousSelection) && previousSelectionIndex != -1)
+                    {
+                        var newBeatmap = Items.ElementAtOrDefault(previousSelectionIndex);
+                        if (newBeatmap != null)
+                            RequestSelection(newBeatmap);
                     }
 
                     break;
