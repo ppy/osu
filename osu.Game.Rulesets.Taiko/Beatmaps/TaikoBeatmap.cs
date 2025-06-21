@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
+using osu.Game.Localisation;
 using osu.Game.Rulesets.Taiko.Objects;
 
 namespace osu.Game.Rulesets.Taiko.Beatmaps
@@ -22,21 +23,21 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
             {
                 new BeatmapStatistic
                 {
-                    Name = @"Hits",
+                    Name = BeatmapStatisticStrings.Hits,
                     CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Circles),
                     Content = hits.ToString(),
                     BarDisplayLength = hits / (float)sum,
                 },
                 new BeatmapStatistic
                 {
-                    Name = @"Drumrolls",
+                    Name = BeatmapStatisticStrings.Drumrolls,
                     CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Sliders),
                     Content = drumRolls.ToString(),
                     BarDisplayLength = drumRolls / (float)sum,
                 },
                 new BeatmapStatistic
                 {
-                    Name = @"Swells",
+                    Name = BeatmapStatisticStrings.Swells,
                     CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Spinners),
                     Content = swells.ToString(),
                     BarDisplayLength = Math.Min(swells / 10f, 1),
