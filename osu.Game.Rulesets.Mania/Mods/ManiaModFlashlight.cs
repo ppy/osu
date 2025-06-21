@@ -16,14 +16,17 @@ namespace osu.Game.Rulesets.Mania.Mods
         public override double ScoreMultiplier => 1;
         public override Type[] IncompatibleMods => new[] { typeof(ModHidden) };
 
-        public override BindableFloat SizeMultiplier { get; } = new BindableFloat(1)
+        public ManiaModFlashlight()
+        {
+            FinalFlashlightSize.Default = 1;
+        }
+
+        public override BindableFloat StartingFlashlightSize { get; } = new BindableFloat(1)
         {
             MinValue = 0.5f,
             MaxValue = 3f,
             Precision = 0.1f
         };
-
-        public override BindableBool ComboBasedSize { get; } = new BindableBool();
 
         public override float DefaultFlashlightSize => 50;
 

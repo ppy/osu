@@ -16,14 +16,12 @@ namespace osu.Game.Rulesets.Taiko.Mods
     {
         public override double ScoreMultiplier => UsesDefaultConfiguration ? 1.12 : 1;
 
-        public override BindableFloat SizeMultiplier { get; } = new BindableFloat(1)
+        public override BindableFloat StartingFlashlightSize { get; } = new BindableFloat(1)
         {
             MinValue = 0.5f,
             MaxValue = 1.5f,
             Precision = 0.1f
         };
-
-        public override BindableBool ComboBasedSize { get; } = new BindableBool(true);
 
         public override float DefaultFlashlightSize => 200;
 

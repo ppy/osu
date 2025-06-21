@@ -38,15 +38,53 @@ namespace osu.Game.Rulesets.Mods
         public override LocalisableString Description => "Restricted view area.";
         public override bool Ranked => UsesDefaultConfiguration;
 
-        [SettingSource("Flashlight size", "Multiplier applied to the default flashlight size.")]
-        public abstract BindableFloat SizeMultiplier { get; }
+        private float ceilSnap(int value, float step) => MathF.Ceiling(value / step) * step;
 
-        [SettingSource("Change size based on combo", "Decrease the flashlight size as combo increases.")]
-        public abstract BindableBool ComboBasedSize { get; }
+        protected ModFlashlight()
+        {
+            // Required because some rulesets have different default values for the final flashlight size.
+            FinalFlashlightSize.DefaultChanged += _ => FinalFlashlightSize.SetDefault();
+
+            ChangeSizeComboDivisor.BindValueChanged(e =>
+            {
+                int newChangeSizeComboDivisor = e.NewValue;
+
+                FinalChangeSizeCombo.Precision = newChangeSizeComboDivisor;
+                FinalChangeSizeCombo.MinValue = newChangeSizeComboDivisor;
+
+                // The previously triggered bindable events may cause the bindable value to overflow a rounded snap, so we must account to the worst case by ceiling.
+                FinalChangeSizeCombo.MaxValue = ceilSnap(ChangeSizeComboDivisor.MaxValue, newChangeSizeComboDivisor);
+            }, true);
+
+            // The final flashlight size shouldn't exceed the starting flashlight size.
+            StartingFlashlightSize.BindValueChanged(e =>
+            {
+                FinalFlashlightSize.MaxValue = e.NewValue;
+            }, true);
+        }
+
+        [SettingSource("Starting flashlight size", "Multiplier applied to the default flashlight size.")]
+        public abstract BindableFloat StartingFlashlightSize { get; }
+
+        [SettingSource("Final flashlight size", "Multiplier applied to the starting flashlight size after the max flashlight combo is reached.")]
+        public BindableFloat FinalFlashlightSize { get; } = new BindableFloat(0.625f)
+        {
+            MinValue = 0.5f,
+            Precision = 0.05f
+        };
+
+        [SettingSource("Change size combo divisor", "Changes the combo divisor where the flashlight size is changed.")]
+        public BindableInt ChangeSizeComboDivisor { get; } = new BindableInt(100)
+        {
+            MinValue = 1,
+            MaxValue = 300
+        };
+
+        [SettingSource("Final change size combo", "Changes the combo where the flashlight size stops being changed.")]
+        public BindableFloat FinalChangeSizeCombo { get; } = new BindableFloat(200);
 
         /// <summary>
         /// The default size of the flashlight in ruleset-appropriate dimensions.
-        /// <see cref="SizeMultiplier"/> and <see cref="ComboBasedSize"/> will apply their adjustments on top of this size.
         /// </summary>
         public abstract float DefaultFlashlightSize { get; }
     }
@@ -111,17 +149,21 @@ namespace osu.Game.Rulesets.Mods
 
             public override bool RemoveCompletedTransforms => false;
 
-            internal Func<Vector2>? GetPlayfieldScale;
+            private readonly float appliedFlashlightSize;
+            private readonly float changeSizeDecreaseRatio;
 
-            private readonly float defaultFlashlightSize;
-            private readonly float sizeMultiplier;
-            private readonly bool comboBasedSize;
+            private readonly float maxSizeChanges;
+            private readonly float changeSizeCombo;
+
+            internal Func<Vector2>? GetPlayfieldScale;
 
             protected Flashlight(ModFlashlight modFlashlight)
             {
-                defaultFlashlightSize = modFlashlight.DefaultFlashlightSize;
-                sizeMultiplier = modFlashlight.SizeMultiplier.Value;
-                comboBasedSize = modFlashlight.ComboBasedSize.Value;
+                changeSizeCombo = modFlashlight.ChangeSizeComboDivisor.Value;
+                maxSizeChanges = modFlashlight.FinalChangeSizeCombo.Value / changeSizeCombo;
+
+                appliedFlashlightSize = modFlashlight.DefaultFlashlightSize * modFlashlight.StartingFlashlightSize.Value;
+                changeSizeDecreaseRatio = (1 - modFlashlight.FinalFlashlightSize.Value) / maxSizeChanges;
             }
 
             [BackgroundDependencyLoader]
@@ -154,7 +196,7 @@ namespace osu.Game.Rulesets.Mods
 
             public float GetSize()
             {
-                float size = defaultFlashlightSize * sizeMultiplier;
+                float scale = 1;
 
                 if (GetPlayfieldScale != null)
                 {
@@ -162,25 +204,18 @@ namespace osu.Game.Rulesets.Mods
 
                     Debug.Assert(Precision.AlmostEquals(Math.Abs(playfieldScale.X), Math.Abs(playfieldScale.Y)),
                         @"Playfield has non-proportional scaling. Flashlight implementations should be revisited with regard to balance.");
-                    size *= Math.Abs(playfieldScale.X);
+                    scale *= Math.Abs(playfieldScale.X);
                 }
 
                 if (isBreakTime.Value)
-                    size *= 2.5f;
-                else if (comboBasedSize)
-                    size *= GetComboScaleFor(Combo.Value);
+                    scale = 2.5f;
+                else
+                {
+                    float sizeChangeCount = MathF.Min(maxSizeChanges, MathF.Floor(Combo.Value / changeSizeCombo));
+                    scale -= sizeChangeCount * changeSizeDecreaseRatio;
+                }
 
-                return size;
-            }
-
-            protected virtual float GetComboScaleFor(int combo)
-            {
-                if (combo >= 200)
-                    return 0.625f;
-                if (combo >= 100)
-                    return 0.8125f;
-
-                return 1.0f;
+                return appliedFlashlightSize * scale;
             }
 
             private Vector2 flashlightPosition;

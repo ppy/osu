@@ -16,10 +16,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Mods
         [TestCase(0.5f)]
         [TestCase(1.25f)]
         [TestCase(1.5f)]
-        public void TestSizeMultiplier(float sizeMultiplier) => CreateModTest(new ModTestData { Mod = new TaikoModFlashlight { SizeMultiplier = { Value = sizeMultiplier } }, PassCondition = () => true });
-
-        [Test]
-        public void TestComboBasedSize([Values] bool comboBasedSize) => CreateModTest(new ModTestData { Mod = new TaikoModFlashlight { ComboBasedSize = { Value = comboBasedSize } }, PassCondition = () => true });
+        public void TestSizeMultiplier(float sizeMultiplier) => CreateModTest(new ModTestData { Mod = new TaikoModFlashlight { StartingFlashlightSize = { Value = sizeMultiplier } }, PassCondition = () => true });
 
         [Test]
         public void TestFlashlightAlwaysHasNonZeroSize()
@@ -28,7 +25,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Mods
 
             CreateModTest(new ModTestData
             {
-                Mod = new TestTaikoModFlashlight { ComboBasedSize = { Value = true } },
+                Mod = new TestTaikoModFlashlight(),
                 Autoplay = false,
                 PassCondition = () =>
                 {
