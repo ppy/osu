@@ -151,8 +151,8 @@ namespace osu.Game.Screens.SelectV2
                                                             Spacing = new Vector2(0f, 10f),
                                                             Children = new[]
                                                             {
-                                                                submitted = new MetadataDisplay(BeatmapsetsStrings.ShowDetailsDateSubmitted("").ToSentence()),
-                                                                ranked = new MetadataDisplay(BeatmapsetsStrings.ShowDetailsDateRanked("").ToSentence()),
+                                                                submitted = new MetadataDisplay(BeatmapsetsStrings.ShowDetailsDateSubmitted(string.Empty).ToSentence()),
+                                                                ranked = new MetadataDisplay(BeatmapsetsStrings.ShowDetailsDateRanked(string.Empty).ToSentence()),
                                                             },
                                                         },
                                                     },
