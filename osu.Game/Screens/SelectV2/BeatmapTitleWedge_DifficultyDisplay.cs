@@ -130,8 +130,6 @@ namespace osu.Game.Screens.SelectV2
                                                 {
                                                     Anchor = Anchor.BottomLeft,
                                                     Origin = Anchor.BottomLeft,
-                                                    // margin to replicate the missing leading space in `ShowDetailsMappedBy` string
-                                                    Padding = new MarginPadding { Right = 3f },
                                                     Font = OsuFont.Style.Body.With(weight: FontWeight.SemiBold),
                                                 },
                                                 mappedByText = new OsuSpriteText
