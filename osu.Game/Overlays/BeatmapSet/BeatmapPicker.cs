@@ -38,6 +38,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
         public readonly Bindable<APIBeatmap?> Beatmap = new Bindable<APIBeatmap?>();
         private APIBeatmapSet? beatmapSet;
+        private readonly Box background;
 
         public APIBeatmapSet? BeatmapSet
         {
@@ -68,12 +69,31 @@ namespace osu.Game.Overlays.BeatmapSet
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
-                        Difficulties = new DifficultiesContainer
+                        new Container
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
                             Margin = new MarginPadding { Left = -(tile_icon_padding + tile_spacing / 2), Bottom = 10 },
-                            OnLostHover = () => showBeatmap(Beatmap.Value, withStarRating: false),
+                            Children = new Drawable[]
+                            {
+                                new Container
+                                {
+                                    Masking = true,
+                                    CornerRadius = 10,
+                                    RelativeSizeAxes = Axes.Both,
+                                    Child = background = new Box
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        Alpha = 0.5f
+                                    }
+                                },
+                                Difficulties = new DifficultiesContainer
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    OnLostHover = () => showBeatmap(Beatmap.Value, withStarRating: false),
+                                },
+                            }
                         },
                         infoContainer = new LinkFlowContainer(t => t.Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 11))
                         {
@@ -108,9 +128,10 @@ namespace osu.Game.Overlays.BeatmapSet
         private IBindable<RulesetInfo> ruleset { get; set; } = null!;
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OverlayColourProvider colourProvider)
         {
             updateDisplay();
+            background.Colour = colourProvider.Background3;
         }
 
         protected override void LoadComplete()
@@ -240,8 +261,8 @@ namespace osu.Game.Overlays.BeatmapSet
         public partial class DifficultySelectorButton : OsuClickableContainer, IStateful<DifficultySelectorState>
         {
             private const float transition_duration = 100;
-            private const float size = 54;
-            private const float background_size = size - 2;
+            private const float size = 40;
+            private const float background_size = size - 1;
 
             private readonly Container background;
             private readonly Box backgroundBox;
@@ -276,7 +297,6 @@ namespace osu.Game.Overlays.BeatmapSet
             {
                 Beatmap = beatmapInfo;
                 Size = new Vector2(size);
-                Margin = new MarginPadding { Horizontal = tile_spacing / 2 };
 
                 Children = new Drawable[]
                 {
@@ -284,7 +304,8 @@ namespace osu.Game.Overlays.BeatmapSet
                     {
                         Size = new Vector2(background_size),
                         Masking = true,
-                        CornerRadius = 4,
+                        CornerRadius = 10,
+                        BorderThickness = 3,
                         Child = backgroundBox = new Box
                         {
                             RelativeSizeAxes = Axes.Both,
@@ -338,6 +359,7 @@ namespace osu.Game.Overlays.BeatmapSet
             private void load(OverlayColourProvider colourProvider)
             {
                 backgroundBox.Colour = colourProvider.Background6;
+                background.BorderColour = colourProvider.Light2;
             }
         }
 
