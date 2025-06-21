@@ -62,9 +62,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                 // Buff current note if upcoming notes are dense
                 // This is on the basis that part of hidden difficulty is the uncertainty of the current cursor position in relation to future notes
-                double visibleObjectFactor = Math.Max(1, Math.Pow(getCurrentVisibleObjectFactor(totalObjects, currObj, preempt), 1.6));
+                double visibleObjectFactor = Math.Max(0, getCurrentVisibleObjectFactor(totalObjects, currObj, preempt) - 2);
 
-                hiddenDifficulty += (timeSpentInvisible * 0.04 + visibleObjectFactor * pastObjectDifficultyInfluence) * hidden_multiplier;
+                hiddenDifficulty += (timeSpentInvisible * 0.035 + Math.Pow(Math.Max(1, visibleObjectFactor + pastObjectDifficultyInfluence), 2)) * hidden_multiplier;
 
                 hiddenDifficulty *= constantAngleNerfFactor * velocity;
 
@@ -73,7 +73,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 hiddenDifficulty += currObj.LazyJumpDistance == 0 &&
                                     currObj.OpacityAt(previousObj.BaseObject.StartTime + preempt, hidden) == 0 &&
                                     previousObj.StartTime + preempt > currObj.StartTime
-                    ? timeSpentInvisible / (17000 * hidden_multiplier)
+                    ? timeSpentInvisible * hidden_multiplier / 3.7
                     : 0;
             }
 
