@@ -60,7 +60,7 @@ namespace osu.Game.Online.Leaderboards
 
         private APIRequest? fetchScoresRequest;
 
-        private LeaderboardState state;
+        public LeaderboardState State { get; private set; }
 
         [Resolved(CanBeNull = true)]
         private IAPIProvider? api { get; set; }
@@ -305,7 +305,7 @@ namespace osu.Game.Online.Leaderboards
 
         private void setState(LeaderboardState state)
         {
-            if (state == this.state)
+            if (state == State)
                 return;
 
             if (state == LeaderboardState.Retrieving)
@@ -313,7 +313,7 @@ namespace osu.Game.Online.Leaderboards
             else
                 loading.Hide();
 
-            this.state = state;
+            State = state;
 
             placeholder?.FadeOut(150, Easing.OutQuint).Expire();
 
