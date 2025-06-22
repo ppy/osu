@@ -244,12 +244,25 @@ namespace osu.Game.Tests.Visual.Online
         }
 
         [Test]
-        public void TestBeatmapSetHasVideo()
+        public void TestBeatmapSetHasVideoOrStoryboard()
         {
             AddStep("show beatmapset with video", () =>
             {
                 var beatmapSet = getBeatmapSet();
                 beatmapSet.HasVideo = true;
+                overlay.ShowBeatmapSet(beatmapSet);
+            });
+            AddStep("show beatmapset with storyboard", () =>
+            {
+                var beatmapSet = getBeatmapSet();
+                beatmapSet.HasStoryboard = true;
+                overlay.ShowBeatmapSet(beatmapSet);
+            });
+            AddStep("show beatmapset with video and storyboard", () =>
+            {
+                var beatmapSet = getBeatmapSet();
+                beatmapSet.HasVideo = true;
+                beatmapSet.HasStoryboard = true;
                 overlay.ShowBeatmapSet(beatmapSet);
             });
         }
