@@ -54,7 +54,8 @@ namespace osu.Game.Screens.Ranking
                 if (globalScores.Value != null && leaderboardManager.CurrentCriteria?.Equals(criteria) == true)
                     requestTaskSource.TrySetResult(globalScores.Value);
             });
-            leaderboardManager.FetchWithCriteria(criteria, forceRefresh: true);
+
+            Schedule(() => leaderboardManager.FetchWithCriteria(criteria, forceRefresh: true));
 
             var result = await requestTaskSource.Task.ConfigureAwait(false);
 
