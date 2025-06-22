@@ -65,6 +65,11 @@ namespace osu.Game.Screens.SelectV2
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
+        [Resolved]
+        private LocalisationManager localisationManager { get; set; } = null!;
+
+        private IBindable<LocalisationParameters> currentParameters = null!;
+
         public FooterButtonMods(ModSelectOverlay overlay)
             : base(overlay)
         {
@@ -155,6 +160,11 @@ namespace osu.Game.Screens.SelectV2
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            // Update on localisation changes to resize the button according to the localised text.
+            // Use ScheduleAfterChildren to wait for text to be resized before resizing the button.
+            currentParameters = localisationManager.CurrentParameters.GetBoundCopy();
+            currentParameters.BindValueChanged(_ => ScheduleAfterChildren(updateDisplay));
 
             Current.BindValueChanged(m =>
             {
