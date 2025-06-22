@@ -16,6 +16,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
+using osu.Game.Beatmaps.Drawables.Cards;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
@@ -46,7 +47,8 @@ namespace osu.Game.Overlays.BeatmapSet
         private readonly Box coverGradient;
         private readonly LinkFlowContainer title, artist;
         private readonly AuthorInfo author;
-        private readonly BeatmapSetHasVideoBadge beatmapSetVideoBadge;
+        private readonly VideoIconPill videoIconPill;
+        private readonly StoryboardIconPill storyboardIconPill;
 
         private ExternalLinkButton externalLink;
 
@@ -191,10 +193,23 @@ namespace osu.Game.Overlays.BeatmapSet
                                         TextSize = 14,
                                         TextPadding = new MarginPadding { Horizontal = 35, Vertical = 10 }
                                     },
-                                    beatmapSetVideoBadge = new BeatmapSetHasVideoBadge
+                                    videoIconPill = new VideoIconPill
                                     {
+                                        AutoSizeAxes = Axes.X,
+                                        RelativeSizeAxes = Axes.Y,
                                         Anchor = Anchor.TopRight,
                                         Origin = Anchor.TopRight,
+                                        IconSize = new Vector2(34),
+                                        IconPadding = new MarginPadding(10),
+                                    },
+                                    storyboardIconPill = new StoryboardIconPill
+                                    {
+                                        AutoSizeAxes = Axes.X,
+                                        RelativeSizeAxes = Axes.Y,
+                                        Anchor = Anchor.TopRight,
+                                        Origin = Anchor.TopRight,
+                                        IconSize = new Vector2(34),
+                                        IconPadding = new MarginPadding(10),
                                     },
                                 }
                             },
@@ -235,7 +250,8 @@ namespace osu.Game.Overlays.BeatmapSet
                 if (setInfo.NewValue == null)
                 {
                     onlineStatusPill.FadeTo(0.5f, 500, Easing.OutQuint);
-                    beatmapSetVideoBadge.Hide();
+                    videoIconPill.Hide();
+                    storyboardIconPill.Hide();
                     fadeContent.Hide();
 
                     loading.Show();
@@ -254,9 +270,14 @@ namespace osu.Game.Overlays.BeatmapSet
                     loading.Hide();
 
                     if (setInfo.NewValue.HasVideo)
-                        beatmapSetVideoBadge.Show();
+                        videoIconPill.Show();
                     else
-                        beatmapSetVideoBadge.Hide();
+                        videoIconPill.Hide();
+
+                    if (setInfo.NewValue.HasStoryboard)
+                        storyboardIconPill.Show();
+                    else
+                        storyboardIconPill.Hide();
 
                     var titleText = new RomanisableString(setInfo.NewValue.TitleUnicode, setInfo.NewValue.Title);
                     var artistText = new RomanisableString(setInfo.NewValue.ArtistUnicode, setInfo.NewValue.Artist);
