@@ -16,6 +16,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Utils;
 using osuTK.Graphics;
 
@@ -34,7 +35,7 @@ namespace osu.Game.Screens.SelectV2
                                                                           .Prepend((0.0f, OsuColour.STAR_DIFFICULTY_SPECTRUM.ElementAt(1).Item2)).ToArray();
 
             public DifficultyRangeSlider()
-                : base("Star Rating")
+                : base(BeatmapsetsStrings.ShowStatsStars)
             {
                 NubWidth = ShearedNub.HEIGHT * 1.16f;
                 DefaultStringUpperBound = "∞";

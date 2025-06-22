@@ -904,7 +904,7 @@ namespace osu.Game.Screens.SelectV2
 
             collectionItems.Add(new OsuMenuItem("Manage...", MenuItemType.Standard, () => manageCollectionsDialog?.Show()));
 
-            yield return new OsuMenuItem("Collections") { Items = collectionItems };
+            yield return new OsuMenuItem(CommonStrings.Collections) { Items = collectionItems };
         }
 
         public void ManageCollections() => collectionsDialog?.Show();
