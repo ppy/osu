@@ -106,9 +106,6 @@ namespace osu.Game.Screens.SelectV2
                                 Top = 5,
                                 // Left padding offsets the shear to create a visually appealing list display.
                                 Left = 80f,
-                                // Bottom padding ensures the last entry's full width is displayed
-                                // (ie it is fully on screen after shear is considered).
-                                Bottom = BeatmapLeaderboardScore.HEIGHT * 3
                             },
                         },
                     },
@@ -384,10 +381,18 @@ namespace osu.Game.Screens.SelectV2
         {
             base.UpdateAfterChildren();
 
+            // Bottom padding ensures the last entry's full width is displayed (ie it is fully on screen after shear is considered).
+            // The padding is computed such that the leaderboard can be scrolled until the score is in the fifth position from the top (which is fully visible on screen).
+            // On high UI scales, the fifth position may be off-screen. A minimum sane value is set in place to handle this case (ensuring the last score sits above the footer by reasonable gap).
+            scoresContainer.Padding = scoresContainer.Padding with
+            {
+                Bottom = Math.Max(BeatmapLeaderboardScore.HEIGHT + 5, scoresScroll.DisplayableContent - BeatmapLeaderboardScore.HEIGHT * 5)
+            };
+
             const int height = BeatmapLeaderboardScore.HEIGHT;
 
             float fadeBottom = (float)(scoresScroll.Current + scoresScroll.DrawHeight);
-            float fadeTop = (float)(scoresScroll.Current);
+            float fadeTop = (float)scoresScroll.Current;
 
             if (!scoresScroll.IsScrolledToStart())
                 fadeTop += height;
