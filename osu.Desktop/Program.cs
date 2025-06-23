@@ -56,7 +56,7 @@ namespace osu.Desktop
                             "Your operating system is too old to run osu!(lazer)"u8,
                             "osu!(lazer) requires at least Windows 8.1 to run.\n"u8
                             + "Please upgrade your operating system or consider using osu!stable.\n\n"u8
-                            + "If you are running a newer version of windows, please check you don't have \"Compatibility mode\" turned on for osu!(lazer)"u8, null);
+                            + "If you are running a newer version of Windows, please make sure you don't have \"Compatibility mode\" turned on for osu!(lazer)."u8, null);
                         return;
                     }
                 }
