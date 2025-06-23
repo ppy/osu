@@ -193,7 +193,7 @@ namespace osu.Game.Overlays.BeatmapSet
                                         TextSize = 14,
                                         TextPadding = new MarginPadding { Horizontal = 35, Vertical = 10 }
                                     },
-                                    videoIconPill = new VideoIconPill
+                                    storyboardIconPill = new StoryboardIconPill
                                     {
                                         AutoSizeAxes = Axes.X,
                                         RelativeSizeAxes = Axes.Y,
@@ -202,7 +202,7 @@ namespace osu.Game.Overlays.BeatmapSet
                                         IconSize = new Vector2(34),
                                         IconPadding = new MarginPadding(10),
                                     },
-                                    storyboardIconPill = new StoryboardIconPill
+                                    videoIconPill = new VideoIconPill
                                     {
                                         AutoSizeAxes = Axes.X,
                                         RelativeSizeAxes = Axes.Y,
