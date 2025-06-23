@@ -64,17 +64,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             strains.RemoveRange(0, strainsToRemove);
 
-            strains = strains.OrderByDescending(s => s.Value).ToList();
-
             // Reset time for summing
             time = WeightedSumTimeOffset;
 
             // Difficulty is a continuous weighted sum of the sorted strains
-            for (int i = 0; i < strains.Count; i++)
+            foreach (StrainPeak strain in strains.OrderByDescending(s => s.Value))
             {
-                double weight = Math.Pow(DecayWeight, time) * (decayWeightIntegral - decayWeightIntegral * Math.Pow(DecayWeight, strains[i].SectionLength / MaxSectionLength));
-                difficulty += strains[i].Value * weight;
-                time += strains[i].SectionLength / MaxSectionLength;
+                double weight = Math.Pow(DecayWeight, time) * (decayWeightIntegral - decayWeightIntegral * Math.Pow(DecayWeight, strain.SectionLength / MaxSectionLength));
+                difficulty += strain.Value * weight;
+                time += strain.SectionLength / MaxSectionLength;
             }
 
             return difficulty;
