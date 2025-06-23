@@ -231,17 +231,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             double currVelocity = osuCurrObj.LazyJumpDistance / osuCurrObj.StrainTime;
             double prevVelocity = osuLast0Obj.LazyJumpDistance / osuLast0Obj.StrainTime;
-            double prev1Velocity = osuLast1Obj.LazyJumpDistance / osuLast1Obj.StrainTime;
 
             double minVelocity = Math.Min(currVelocity, prevVelocity);
             double maxVelocity = Math.Max(currVelocity, prevVelocity);
 
             double deltaVelocity = maxVelocity - minVelocity;
-            double deltaPrevVelocity = Math.Abs(prevVelocity - prev1Velocity);
-
-            // Don't buff slight consistent changes
-            if (minVelocity > 0)
-                deltaVelocity -= Math.Min(deltaVelocity, deltaPrevVelocity) * DifficultyCalculationUtils.ReverseLerp(Math.Max(deltaVelocity, deltaPrevVelocity), minVelocity * 0.3, minVelocity * 0.2);
 
             // Don't buff velocity increase if previous note was slower
             if (currVelocity > prevVelocity)
