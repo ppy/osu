@@ -109,7 +109,7 @@ namespace osu.Game.Screens.SelectV2
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.CentreLeft,
                 Spacing = new Vector2(5),
-                Margin = new MarginPadding { Left = 6.5f, Bottom = 3.5f },
+                Margin = new MarginPadding { Left = 6.5f },
                 Direction = FillDirection.Horizontal,
                 Children = new Drawable[]
                 {
@@ -125,6 +125,7 @@ namespace osu.Game.Screens.SelectV2
                         Origin = Anchor.CentreLeft,
                         Direction = FillDirection.Vertical,
                         AutoSizeAxes = Axes.Both,
+                        Margin = new MarginPadding { Bottom = 3.5f },
                         Children = new Drawable[]
                         {
                             new FillFlowContainer
