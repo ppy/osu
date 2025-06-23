@@ -67,8 +67,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             strains = strains.OrderByDescending(s => s.Value).ToList();
 
             // Reset time for summing
-            // Offset ensures continuous weighted sum matches normal weighted sum perfectly
-            time = -0.49561;
+            time = WeightedSumTimeOffset;
 
             // Difficulty is a continuous weighted sum of the sorted strains
             for (int i = 0; i < strains.Count; i++)
