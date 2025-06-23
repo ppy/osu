@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             // We are reducing the highest strains first to account for extreme difficulty spikes
             // Split the strain into 20ms chunks to try to mitigate inconsistencies caused by reducing strains
-            while (time / MaxSectionLength < ReducedSectionCount)
+            while (strains.Count > strainsToRemove && time / MaxSectionLength < ReducedSectionCount)
             {
                 StrainPeak strain = strains[strainsToRemove];
                 double addedTime = 0;
