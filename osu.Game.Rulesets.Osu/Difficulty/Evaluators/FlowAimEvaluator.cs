@@ -148,14 +148,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double currAngleBonus = AimEvaluator.CalcAcuteAngleBonus(currAngle);
             double prevAngleBonus = AimEvaluator.CalcAcuteAngleBonus(last2Angle);
 
-            double result = currAngleBonus;
-
-            result *= Math.Min(osuCurrObj.LazyJumpDistance, osuLast0Obj.LazyJumpDistance) / Math.Max(osuCurrObj.StrainTime, osuLast0Obj.StrainTime);
+            double currVelocity = osuCurrObj.LazyJumpDistance / osuCurrObj.StrainTime;
+            double acuteAngleBonus = currVelocity * currAngleBonus;
 
             // Nerf acute angle if previous notes were slower
             // IMPORTANT INFORMATION: removing this limitation buffs many alt maps
             // BUT it also  buffs ReLief. So it's should be explored how to keep this buff for actually hard patterns but not for ReLief
-            result *= DifficultyCalculationUtils.ReverseLerp(osuCurrObj.StrainTime, osuLast0Obj.StrainTime * 0.55, osuLast0Obj.StrainTime * 0.75);
+            acuteAngleBonus *= DifficultyCalculationUtils.ReverseLerp(osuCurrObj.StrainTime, osuLast0Obj.StrainTime * 0.55, osuLast0Obj.StrainTime * 0.75);
 
             // Decrease angle bonus if angle changes are slower than 1 in 4 notes
             double deltaAngle = Math.Abs(last1Angle - last2Angle);
@@ -165,9 +164,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             // Decrease buffs from angle bonus if it's not repeating too often
             // Multiply nerf by difference in bonus to not nerf repeating high angle bonuse
-            result *= 1 - 0.5 * isSameAngle * (1 - angleBonusDifference);
+            acuteAngleBonus *= 1 - 0.5 * isSameAngle * (1 - angleBonusDifference);
 
-            return result;
+            return acuteAngleBonus;
         }
 
         // This bonus accounts for flow aim being harder when angle is changing. There's extra bonus for changes occuring more often than once in 4 notes.
@@ -190,8 +189,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double currAngle = osuCurrObj.AngleSigned.Value;
             double lastAngle = osuLast0Obj.AngleSigned.Value;
 
-            double minVelocity = Math.Min(currVelocity, prevVelocity);
-            double angleChangeBonus = Math.Pow(Math.Sin((currAngle - lastAngle) / 2), 2) * minVelocity;
+            // Use reasonable value between min and curr velocity as a base
+            double baseVelocity = double.Lerp(Math.Min(currVelocity, prevVelocity), currVelocity, 0.25);
+            double angleChangeBonus = Math.Pow(Math.Sin((currAngle - lastAngle) / 2), 2) * baseVelocity;
 
             // Remove angle change if previous 2 notes were slower
             // IMPORTANT INFORMATION: removing this limitation significantly buffs almost all tech, alt, underweight maps in general
@@ -237,6 +237,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             double deltaVelocity = maxVelocity - minVelocity;
 
+            // Buff acceleration 2 times more than decceleration
+            if (currVelocity > prevVelocity) deltaVelocity *= 2;
+
             // Don't buff velocity increase if previous note was slower
             if (currVelocity > prevVelocity)
                 deltaVelocity *= DifficultyCalculationUtils.Smoothstep(osuCurrObj.StrainTime, osuLast0Obj.StrainTime * 0.55, osuLast0Obj.StrainTime * 0.75);
@@ -252,7 +255,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double distanceFactor = 0.5 + 0.5 * DifficultyCalculationUtils.ReverseLerp(Math.Max(prev1Distance, prev2Distance), diameter * 1.5, diameter * 0.75);
             // There also should be something like angleFactor, because if it has aim-control difficulty - you can't really speed-up flow aim that easily
 
-            deltaVelocity *= 1 - 0.65 * distanceSimilarityFactor * distanceFactor;
+            deltaVelocity *= 1 - 0.67 * distanceSimilarityFactor * distanceFactor;
 
             // Decrease buff on doubles that go back and forth, because in this case angle change bonuses account for all added difficulty
             // Add radius to account for distance potenitally being very small
