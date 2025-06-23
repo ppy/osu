@@ -108,8 +108,8 @@ namespace osu.Game.Screens.SelectV2
                 AutoSizeAxes = Axes.Both,
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.CentreLeft,
-                Spacing = new Vector2(3),
-                Margin = new MarginPadding { Left = 5 },
+                Spacing = new Vector2(5),
+                Margin = new MarginPadding { Left = 6.5f, Bottom = 3.5f },
                 Direction = FillDirection.Horizontal,
                 Children = new Drawable[]
                 {
