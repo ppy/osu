@@ -232,7 +232,7 @@ namespace osu.Game.Screens.SelectV2
                 if (manageCollectionsDialog != null)
                     collectionItems.Add(new OsuMenuItem("Manage...", MenuItemType.Standard, manageCollectionsDialog.Show));
 
-                items.Add(new OsuMenuItem("Collections") { Items = collectionItems });
+                items.Add(new OsuMenuItem(CommonStrings.Collections) { Items = collectionItems });
 
                 if (beatmapSet.Beatmaps.Any(b => b.Hidden))
                     items.Add(new OsuMenuItem("Restore all hidden", MenuItemType.Standard, () => songSelect?.RestoreAllHidden(beatmapSet)));
