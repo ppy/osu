@@ -106,6 +106,19 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        public void TestMarkCompleted()
+        {
+            createPlaylist();
+            AddStep("mark some items as complete", () =>
+            {
+                playlist.Items[0].MarkCompleted();
+                playlist.Items[2].MarkCompleted();
+                playlist.Items[3].MarkCompleted();
+                playlist.Items[5].MarkCompleted();
+            });
+        }
+
+        [Test]
         public void TestSelectable()
         {
             createPlaylist(p => p.AllowSelection = true);

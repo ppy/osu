@@ -19,6 +19,9 @@ namespace osu.Game.Tests.Visual.Beatmaps
 {
     public partial class TestSceneBeatmapSetOnlineStatusPill : ThemeComparisonTestScene
     {
+        private bool showUnknownStatus;
+        private bool animated = true;
+
         protected override Drawable CreateContent() => new FillFlowContainer
         {
             AutoSizeAxes = Axes.Both,
@@ -26,12 +29,21 @@ namespace osu.Game.Tests.Visual.Beatmaps
             Origin = Anchor.Centre,
             Direction = FillDirection.Vertical,
             Spacing = new Vector2(0, 10),
-            ChildrenEnumerable = Enum.GetValues(typeof(BeatmapOnlineStatus)).Cast<BeatmapOnlineStatus>().Select(status => new BeatmapSetOnlineStatusPill
+            ChildrenEnumerable = Enum.GetValues(typeof(BeatmapOnlineStatus)).Cast<BeatmapOnlineStatus>().Select(status => new Container
             {
-                AutoSizeAxes = Axes.Both,
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Status = status
+                RelativeSizeAxes = Axes.X,
+                Height = 20,
+                Children = new Drawable[]
+                {
+                    new BeatmapSetOnlineStatusPill
+                    {
+                        ShowUnknownStatus = showUnknownStatus,
+                        Animated = animated,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Status = status
+                    },
+                }
             })
         };
 
@@ -48,6 +60,18 @@ namespace osu.Game.Tests.Visual.Beatmaps
                 pill.Width = 90;
             }));
 
+            AddStep("toggle show unknown", () =>
+            {
+                showUnknownStatus = !showUnknownStatus;
+                CreateThemedContent(OverlayColourScheme.Red);
+            });
+
+            AddStep("toggle animate", () =>
+            {
+                animated = !animated;
+                CreateThemedContent(OverlayColourScheme.Red);
+            });
+
             AddStep("unset fixed width", () => statusPills.ForEach(pill => pill.AutoSizeAxes = Axes.Both));
         }
 
@@ -63,11 +87,6 @@ namespace osu.Game.Tests.Visual.Beatmaps
                         // cycle at end
                         case BeatmapOnlineStatus.Loved:
                             pill.Status = BeatmapOnlineStatus.LocallyModified;
-                            break;
-
-                        // skip none
-                        case BeatmapOnlineStatus.LocallyModified:
-                            pill.Status = BeatmapOnlineStatus.Graveyard;
                             break;
 
                         default:

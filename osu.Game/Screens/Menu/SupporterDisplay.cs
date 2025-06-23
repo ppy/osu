@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Threading;
+using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API;
@@ -53,7 +54,7 @@ namespace osu.Game.Screens.Menu
                 backgroundBox = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Alpha = 0.4f,
+                    Alpha = 0.6f,
                 },
                 supportFlow = new LinkFlowContainer
                 {
@@ -111,7 +112,7 @@ namespace osu.Game.Screens.Menu
 
             this
                 .FadeOut()
-                .Delay(1000)
+                .Delay(RNG.Next(800, 4000))
                 .FadeInFromZero(800, Easing.OutQuint);
 
             scheduleDismissal();
@@ -128,13 +129,13 @@ namespace osu.Game.Screens.Menu
 
         protected override bool OnHover(HoverEvent e)
         {
-            backgroundBox.FadeTo(0.6f, 500, Easing.OutQuint);
+            backgroundBox.FadeTo(0.8f, 500, Easing.OutQuint);
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            backgroundBox.FadeTo(0.4f, 500, Easing.OutQuint);
+            backgroundBox.FadeTo(0.6f, 500, Easing.OutQuint);
             base.OnHoverLost(e);
         }
 
@@ -160,7 +161,7 @@ namespace osu.Game.Screens.Menu
                 this
                     .Delay(200)
                     .FadeOut(750, Easing.Out);
-            }, 6000);
+            }, 8000);
         }
     }
 }

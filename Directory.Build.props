@@ -3,6 +3,10 @@
   <PropertyGroup Label="C#">
     <LangVersion>12.0</LangVersion>
     <Nullable>enable</Nullable>
+    <!-- Stabilises hot reload, see: https://platform.uno/docs/articles/studio/Hot%20Reload/hot-reload-overview.html?tabs=vswin%2Cwindows%2Cskia-desktop%2Ccommon-issues -->
+    <GenerateAssemblyInfo Condition="'$(Configuration)'=='Debug'">false</GenerateAssemblyInfo>
+    <!-- Required due to the above  -->
+    <NoWarn Condition="'$(Configuration)'=='Debug'">$(NoWarn);CA1416</NoWarn>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationManifest>$(MSBuildThisFileDirectory)app.manifest</ApplicationManifest>

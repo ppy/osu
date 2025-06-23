@@ -24,6 +24,11 @@ namespace osu.Game.Online.API
         IBindableList<APIRelation> Friends { get; }
 
         /// <summary>
+        /// The users blocked by the local user.
+        /// </summary>
+        IBindableList<APIRelation> Blocks { get; }
+
+        /// <summary>
         /// The language supplied by this provider to API requests.
         /// </summary>
         Language Language { get; }
@@ -117,6 +122,11 @@ namespace osu.Game.Online.API
         /// Update the friends status of the current user.
         /// </summary>
         void UpdateLocalFriends();
+
+        /// <summary>
+        /// Update the list of users blocked by the current user.
+        /// </summary>
+        void UpdateLocalBlocks();
 
         /// <summary>
         /// Schedule a callback to run on the update thread.

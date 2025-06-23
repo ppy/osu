@@ -19,6 +19,7 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
+using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Ranking;
 
 namespace osu.Game.Screens.OnlinePlay.Playlists
@@ -34,6 +35,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
         private MultiplayerScores? higherScores;
         private MultiplayerScores? lowerScores;
+        private WorkingBeatmap itemBeatmap = null!;
 
         [Resolved]
         protected IAPIProvider API { get; private set; } = null!;
@@ -60,6 +62,10 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         [BackgroundDependencyLoader]
         private void load()
         {
+            var localBeatmap = beatmapManager.QueryBeatmap($@"{nameof(BeatmapInfo.OnlineID)} == $0 AND {nameof(BeatmapInfo.MD5Hash)} == {nameof(BeatmapInfo.OnlineMD5Hash)}",
+                PlaylistItem.Beatmap.OnlineID);
+            itemBeatmap = beatmapManager.GetWorkingBeatmap(localBeatmap);
+
             AddInternal(new Container
             {
                 RelativeSizeAxes = Axes.Both,
@@ -306,6 +312,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 s.Position = pivotPosition;
             }
         }
+
+        protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(itemBeatmap);
 
         private partial class PanelListLoadingSpinner : LoadingSpinner
         {

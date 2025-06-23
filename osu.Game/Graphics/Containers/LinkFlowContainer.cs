@@ -134,7 +134,7 @@ namespace osu.Game.Graphics.Containers
 
         protected virtual DrawableLinkCompiler CreateLinkCompiler(ITextPart textPart) => new DrawableLinkCompiler(textPart);
 
-        protected override FillFlowContainer CreateFlow() => new LinkFlow();
+        protected override InnerFlow CreateFlow() => new LinkFlow();
 
         private partial class LinkFlow : InnerFlow
         {

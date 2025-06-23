@@ -334,7 +334,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             popoverContainer.HidePopover();
         }
 
-        public void Join(Room room, string? password, Action<Room>? onSuccess = null, Action<string>? onFailure = null) => Schedule(() =>
+        public void Join(Room room, string? password, Action<Room>? onSuccess = null, Action<string, Exception?>? onFailure = null) => Schedule(() =>
         {
             if (joiningRoomOperation != null)
                 return;
@@ -347,19 +347,19 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                 joiningRoomOperation?.Dispose();
                 joiningRoomOperation = null;
                 onSuccess?.Invoke(room);
-            }, error =>
+            }, (message, exception) =>
             {
                 joiningRoomOperation?.Dispose();
                 joiningRoomOperation = null;
 
                 if (onFailure != null)
-                    onFailure(error);
+                    onFailure(message, exception);
                 else
-                    Logger.Log(error, level: LogLevel.Error);
+                    Logger.Error(exception, message);
             });
         });
 
-        protected abstract void JoinInternal(Room room, string? password, Action<Room> onSuccess, Action<string> onFailure);
+        protected abstract void JoinInternal(Room room, string? password, Action<Room> onSuccess, Action<string, Exception?> onFailure);
 
         public void OpenCopy(Room room)
         {

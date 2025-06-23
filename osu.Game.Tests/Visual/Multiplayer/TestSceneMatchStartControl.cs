@@ -101,15 +101,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [SetUpSteps]
         public void SetUpSteps()
         {
-            PlaylistItem item = null!;
-
             AddStep("reset state", () =>
             {
                 multiplayerClient.Invocations.Clear();
 
                 beatmapAvailability.Value = BeatmapAvailability.LocallyAvailable();
 
-                item = new PlaylistItem(Beatmap.Value.BeatmapInfo)
+                PlaylistItem item = new PlaylistItem(Beatmap.Value.BeatmapInfo)
                 {
                     RulesetID = Beatmap.Value.BeatmapInfo.Ruleset.OnlineID
                 };
@@ -139,8 +137,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Size = new Vector2(250, 50),
-                    SelectedItem = new Bindable<PlaylistItem?>(item)
+                    Size = new Vector2(250, 50)
                 };
             });
         }
