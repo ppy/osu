@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
+using osu.Game.Localisation.SkinComponents;
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Skinning;
 using osuTK;
@@ -20,14 +21,15 @@ namespace osu.Game.Screens.Play.HUD
 {
     public partial class DrawableGameplayLeaderboard : CompositeDrawable, ISerialisableDrawable
     {
-        public readonly Bindable<bool> ForceExpand = new Bindable<bool>();
-
         protected readonly FillFlowContainer<DrawableGameplayLeaderboardScore> Flow;
 
         private bool requiresScroll;
         private readonly OsuScrollContainer scroll;
 
         public DrawableGameplayLeaderboardScore? TrackedScore { get; private set; }
+
+        [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.CollapseDuringGameplay), nameof(SkinnableComponentStrings.CollapseDuringGameplayDescription))]
+        public Bindable<bool> CollapseDuringGameplay { get; } = new BindableBool(true);
 
         [Resolved]
         private Player? player { get; set; }
@@ -97,7 +99,7 @@ namespace osu.Game.Screens.Play.HUD
             configVisibility.BindValueChanged(_ => Scheduler.AddOnce(updateState));
             userPlayingState.BindValueChanged(_ => Scheduler.AddOnce(updateState));
             holdingForHUD.BindValueChanged(_ => Scheduler.AddOnce(updateState));
-            ForceExpand.BindValueChanged(_ => Scheduler.AddOnce(updateState));
+            CollapseDuringGameplay.BindValueChanged(_ => Scheduler.AddOnce(updateState));
             updateState();
         }
 
@@ -108,7 +110,7 @@ namespace osu.Game.Screens.Play.HUD
                 scroll.ScrollToStart(false);
 
             Flow.FadeTo(player?.Configuration.ShowLeaderboard != false && configVisibility.Value ? 1 : 0, 100, Easing.OutQuint);
-            expanded.Value = ForceExpand.Value || userPlayingState.Value != LocalUserPlayingState.Playing || holdingForHUD.Value;
+            expanded.Value = !CollapseDuringGameplay.Value || userPlayingState.Value != LocalUserPlayingState.Playing || holdingForHUD.Value;
         }
 
         /// <summary>

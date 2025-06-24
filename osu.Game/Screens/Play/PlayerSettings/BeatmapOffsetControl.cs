@@ -69,6 +69,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
         private IDisposable? beatmapOffsetSubscription;
 
         private Task? realmWriteTask;
+        private ScoreInfo? lastValidScore;
 
         public BeatmapOffsetControl()
         {
@@ -177,8 +178,6 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
         private void scoreChanged(ValueChangedEvent<ScoreInfo?> score)
         {
-            referenceScoreContainer.Clear();
-
             if (score.NewValue == null)
                 return;
 
@@ -196,6 +195,15 @@ namespace osu.Game.Screens.Play.PlayerSettings
             if (!(hitEvents.CalculateMedianHitError() is double median))
                 return;
 
+            // affecting unstable rate here is used as a substitute of determining if a hit event represents a *timed* hit event,
+            // i.e. an user input that the user had to *time to the track*,
+            // i.e. one that it *makes sense to use* when doing anything with timing and offsets.
+            bool hasEnoughUsableEvents = hitEvents.Count(HitEventExtensions.AffectsUnstableRate) >= 50;
+
+            // If we already have an old score with enough hit events and the new score doesn't have enough, continue displaying the old one rather than showing the user "play too short" message.
+            if (lastValidScore != null && !hasEnoughUsableEvents)
+                return;
+
             referenceScoreContainer.Children = new Drawable[]
             {
                 new OsuSpriteText
@@ -204,10 +212,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 },
             };
 
-            // affecting unstable rate here is used as a substitute of determining if a hit event represents a *timed* hit event,
-            // i.e. an user input that the user had to *time to the track*,
-            // i.e. one that it *makes sense to use* when doing anything with timing and offsets.
-            if (hitEvents.Count(HitEventExtensions.AffectsUnstableRate) < 50)
+            if (!hasEnoughUsableEvents)
             {
                 referenceScoreContainer.AddRange(new Drawable[]
                 {
@@ -223,6 +228,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 return;
             }
 
+            lastValidScore = score.NewValue!;
             lastPlayMedian = median;
             lastPlayBeatmapOffset = Current.Value;
 
@@ -245,7 +251,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                             return;
 
                         Current.Value = lastPlayBeatmapOffset - lastPlayMedian;
-                        lastAppliedScore.Value = ReferenceScore.Value;
+                        lastAppliedScore.Value = lastValidScore;
                     },
                 },
                 globalOffsetText = new LinkFlowContainer

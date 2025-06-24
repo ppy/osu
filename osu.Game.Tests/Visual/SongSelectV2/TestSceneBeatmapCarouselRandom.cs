@@ -24,8 +24,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         {
             AddBeatmaps(2, 10, true);
 
-            ApplyToFilter("filter", c => c.SearchText = BeatmapSets[0].Beatmaps.Last().DifficultyName);
-            WaitForFiltering();
+            ApplyToFilterAndWaitForFilter("filter", c => c.SearchText = BeatmapSets[0].Beatmaps.Last().DifficultyName);
 
             CheckDisplayedBeatmapSetsCount(1);
             CheckDisplayedBeatmapsCount(1);
@@ -33,7 +32,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             for (int i = 0; i < 10; i++)
             {
                 nextRandom();
-                WaitForSelection(0, 9);
+                WaitForSetSelection(0, 9);
             }
         }
 
@@ -110,7 +109,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddBeatmaps(local_set_count, 3, true);
             WaitForDrawablePanels();
 
-            SelectNextGroup();
+            SelectNextSet();
 
             for (int i = 0; i < random_select_count; i++)
                 nextRandom();
@@ -120,6 +119,28 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 prevRandom();
                 checkRewindCorrectSet();
             }
+        }
+
+        [Test]
+        public void TestRandomThenRewindSameFrame()
+        {
+            AddBeatmaps(10, 3, true);
+            WaitForDrawablePanels();
+
+            BeatmapInfo? originalSelected = null;
+
+            nextRandom();
+
+            CheckHasSelection();
+            AddStep("store selection", () => originalSelected = (BeatmapInfo)Carousel.CurrentSelection!);
+
+            AddStep("random then rewind", () =>
+            {
+                Carousel.NextRandom();
+                Carousel.PreviousRandom();
+            });
+
+            AddAssert("selection not changed", () => Carousel.CurrentSelection, () => Is.EqualTo(originalSelected));
         }
 
         [Test]

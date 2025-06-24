@@ -14,7 +14,6 @@ using osu.Game.Overlays;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterface;
 using osu.Framework.Graphics.Cursor;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Framework.Screens;
 using osu.Game.Graphics.Containers;
@@ -23,11 +22,8 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Localisation;
-using osu.Game.Online.API.Requests;
 using osu.Game.Online.Metadata;
 using osu.Game.Online.Multiplayer;
-using osu.Game.Overlays.Dialog;
-using osu.Game.Overlays.Notifications;
 using osu.Game.Screens;
 using osu.Game.Screens.Play;
 using osu.Game.Users.Drawables;
@@ -86,9 +82,6 @@ namespace osu.Game.Users
 
         [Resolved]
         private MetadataClient? metadataClient { get; set; }
-
-        [Resolved]
-        private INotificationOverlay? notifications { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -168,14 +161,8 @@ namespace osu.Game.Users
                 }));
 
                 items.Add(!isUserBlocked()
-                    ? new OsuMenuItem(UsersStrings.BlocksButtonBlock, MenuItemType.Destructive, () =>
-                    {
-                        dialogOverlay?.Push(new ConfirmBlockActionDialog(ContextMenuStrings.ConfirmBlockUser(User.Username), () => toggleBlock(true)));
-                    })
-                    : new OsuMenuItem(UsersStrings.BlocksButtonUnblock, MenuItemType.Standard, () =>
-                    {
-                        dialogOverlay?.Push(new ConfirmBlockActionDialog(ContextMenuStrings.ConfirmUnblockUser(User.Username), () => toggleBlock(false)));
-                    }));
+                    ? new OsuMenuItem(UsersStrings.BlocksButtonBlock, MenuItemType.Destructive, () => dialogOverlay?.Push(ConfirmBlockActionDialog.Block(User)))
+                    : new OsuMenuItem(UsersStrings.BlocksButtonUnblock, MenuItemType.Standard, () => dialogOverlay?.Push(ConfirmBlockActionDialog.Unblock(User))));
 
                 if (isUserOnline())
                 {
@@ -203,27 +190,6 @@ namespace osu.Game.Users
             }
         }
 
-        private void toggleBlock(bool block)
-        {
-            APIRequest req = block ? new BlockUserRequest(User.OnlineID) : new UnblockUserRequest(User.OnlineID);
-
-            req.Success += () =>
-            {
-                api.UpdateLocalBlocks();
-            };
-
-            req.Failure += e =>
-            {
-                notifications?.Post(new SimpleNotification
-                {
-                    Text = e.Message,
-                    Icon = FontAwesome.Solid.Times,
-                });
-            };
-
-            api.Queue(req);
-        }
-
         public IEnumerable<LocalisableString> FilterTerms => [User.Username];
 
         public bool MatchingFilter
@@ -238,14 +204,5 @@ namespace osu.Game.Users
         }
 
         public bool FilteringActive { get; set; }
-
-        private partial class ConfirmBlockActionDialog : DangerousActionDialog
-        {
-            public ConfirmBlockActionDialog(LocalisableString text, Action? action = null)
-            {
-                BodyText = text;
-                DangerousAction = action;
-            }
-        }
     }
 }

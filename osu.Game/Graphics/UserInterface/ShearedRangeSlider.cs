@@ -5,6 +5,7 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -54,20 +55,14 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         /// <summary>
-        /// Lower bound display for when it is set to its default value.
+        /// Lower bound display for when it is set to its default value, or null to display the value directly.
         /// </summary>
-        public string DefaultStringLowerBound { get; init; } = string.Empty;
+        public LocalisableString? DefaultStringLowerBound { get; init; }
 
         /// <summary>
-        /// Upper bound display for when it is set to its default value.
+        /// Upper bound display for when it is set to its default value, or null to display the value directly.
         /// </summary>
-        public string DefaultStringUpperBound { get; init; } = string.Empty;
-
-        public LocalisableString DefaultTooltipLowerBound { get; init; } = string.Empty;
-
-        public LocalisableString DefaultTooltipUpperBound { get; init; } = string.Empty;
-
-        public string TooltipSuffix { get; init; } = string.Empty;
+        public LocalisableString? DefaultStringUpperBound { get; init; }
 
         private float minRange = 0.1f;
 
@@ -144,9 +139,7 @@ namespace osu.Game.Graphics.UserInterface
                                 {
                                     d.KeyboardStep = 0.1f;
                                     d.RelativeSizeAxes = Axes.X;
-                                    d.TooltipSuffix = TooltipSuffix;
                                     d.DefaultString = DefaultStringUpperBound;
-                                    d.DefaultTooltip = DefaultTooltipUpperBound;
                                     d.NubWidth = NubWidth;
                                     d.Current = upperBound;
                                 }),
@@ -154,9 +147,7 @@ namespace osu.Game.Graphics.UserInterface
                                 {
                                     d.KeyboardStep = 0.1f;
                                     d.RelativeSizeAxes = Axes.X;
-                                    d.TooltipSuffix = TooltipSuffix;
                                     d.DefaultString = DefaultStringLowerBound;
-                                    d.DefaultTooltip = DefaultTooltipLowerBound;
                                     d.NubWidth = NubWidth;
                                     d.Current = lowerBound;
                                 }),
@@ -188,14 +179,20 @@ namespace osu.Game.Graphics.UserInterface
 
             public new ShearedNub Nub => base.Nub;
 
-            public string? DefaultString;
-            public LocalisableString? DefaultTooltip;
-            public string? TooltipSuffix;
+            public LocalisableString? DefaultString;
 
             public float NubWidth { get; set; } = ShearedNub.HEIGHT;
 
-            public override LocalisableString TooltipText =>
-                (Current.IsDefault ? DefaultTooltip : Current.Value.ToString($@"0.## {TooltipSuffix}")) ?? Current.Value.ToString($@"0.## {TooltipSuffix}");
+            public override LocalisableString TooltipText
+            {
+                get
+                {
+                    if (Current.IsDefault)
+                        return string.Empty;
+
+                    return Current.Value.ToLocalisableString(@"N1");
+                }
+            }
 
             protected OsuSpriteText NubText { get; private set; } = null!;
 
@@ -245,8 +242,10 @@ namespace osu.Game.Graphics.UserInterface
 
             protected virtual void UpdateDisplay(double value)
             {
-                string defaultString = DefaultString ?? value.ToString("N1");
-                NubText.Text = Current.IsDefault ? defaultString : value.ToString("N1");
+                if (Current.IsDefault && DefaultString != null)
+                    NubText.Text = DefaultString.Value;
+                else
+                    NubText.Text = value.ToLocalisableString(@"N1");
             }
 
             public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
