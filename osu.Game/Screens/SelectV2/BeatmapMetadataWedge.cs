@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -298,7 +299,11 @@ namespace osu.Game.Screens.SelectV2
             else
                 source.Data = ("-", null);
 
-            mapperTags.Tags = (metadata.Tags.Split(' '), t => songSelect?.Search(t));
+            if (!string.IsNullOrEmpty(metadata.Tags))
+                mapperTags.Tags = (metadata.Tags.Split(' '), t => songSelect?.Search(t));
+            else
+                mapperTags.Tags = (Array.Empty<string>(), _ => { });
+
             submitted.Date = beatmapSetInfo.DateSubmitted;
             ranked.Date = beatmapSetInfo.DateRanked;
 
