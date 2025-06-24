@@ -8,7 +8,6 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Utils;
@@ -84,7 +83,7 @@ namespace osu.Game.Rulesets.UI
 
         private Drawable adjustmentMarker = null!;
 
-        private Circle cogBackground = null!;
+        private SpriteIcon cogBackground = null!;
         private SpriteIcon cog = null!;
 
         private ModSettingChangeTracker? modSettingsChangeTracker;
@@ -178,11 +177,12 @@ namespace osu.Game.Rulesets.UI
                             Position = new Vector2(64, 14),
                             Children = new Drawable[]
                             {
-                                cogBackground = new Circle
+                                cogBackground = new SpriteIcon
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
                                     RelativeSizeAxes = Axes.Both,
+                                    Icon = FontAwesome.Solid.Circle,
                                 },
                                 cog = new SpriteIcon
                                 {

@@ -91,6 +91,9 @@ namespace osu.Game.Screens.SelectV2
             DebounceDelay = 100;
             DistanceOffscreenToPreload = 100;
 
+            // Account for the osu! logo being in the way.
+            Scroll.ScrollbarPaddingBottom = 70;
+
             Filters = new ICarouselFilter[]
             {
                 matching = new BeatmapCarouselFilterMatching(() => Criteria!),
@@ -208,6 +211,9 @@ namespace osu.Game.Screens.SelectV2
 
         protected BeatmapSetInfo? ExpandedBeatmapSet { get; private set; }
 
+        protected override bool ShouldActivateOnKeyboardSelection(CarouselItem item) =>
+            grouping.BeatmapSetsGroupedTogether && item.Model is BeatmapInfo;
+
         protected override void HandleItemActivated(CarouselItem item)
         {
             try
@@ -224,6 +230,11 @@ namespace osu.Game.Screens.SelectV2
                         }
 
                         setExpandedGroup(group);
+
+                        // If the active selection is within this group, it should get keyboard focus immediately.
+                        if (CurrentSelectionItem?.IsVisible == true && CurrentSelection is BeatmapInfo info)
+                            RequestSelection(info);
+
                         return;
 
                     case BeatmapSetInfo setInfo:
@@ -333,7 +344,9 @@ namespace osu.Game.Screens.SelectV2
             RequestRecommendedSelection(beatmaps);
         }
 
-        protected override bool CheckValidForGroupSelection(CarouselItem item)
+        protected override bool CheckValidForGroupSelection(CarouselItem item) => item.Model is GroupDefinition;
+
+        protected override bool CheckValidForSetSelection(CarouselItem item)
         {
             switch (item.Model)
             {
@@ -685,7 +698,10 @@ namespace osu.Game.Screens.SelectV2
                     if (randomAlgorithm.Value == RandomSelectAlgorithm.RandomPermutation)
                         previouslyVisitedRandomSets.Remove(beatmapInfo.BeatmapSet!);
 
-                    playSpinSample(distanceBetween(previousBeatmapItem, CurrentSelectionItem!), carouselItems.Count);
+                    if (CurrentSelectionItem == null)
+                        playSpinSample(0, carouselItems.Count);
+                    else
+                        playSpinSample(distanceBetween(previousBeatmapItem, CurrentSelectionItem), carouselItems.Count);
                 }
 
                 RequestSelection(previousBeatmap);

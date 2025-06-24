@@ -55,6 +55,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 {
                     LabelText = GeneralSettingsStrings.ReleaseStream,
                     Current = { Value = configReleaseStream.Value },
+                    Keywords = new[] { @"version" },
                 });
 
                 Add(checkForUpdatesButton = new SettingsButton
@@ -126,7 +127,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
 
             try
             {
-                bool foundUpdate = await updateManager.CheckForUpdateAsync().ConfigureAwait(true);
+                bool foundUpdate = await updateManager.CheckForUpdateAsync(checkingNotification.CancellationToken).ConfigureAwait(true);
 
                 if (!foundUpdate)
                 {
@@ -142,8 +143,9 @@ namespace osu.Game.Overlays.Settings.Sections.General
             }
             finally
             {
-                // This sequence allows the notification to be immediately dismissed.
-                checkingNotification.State = ProgressNotificationState.Cancelled;
+                // This sequence allows the notification to be immediately dismissed without posting a continuation message.
+                checkingNotification.CompletionTarget = null;
+                checkingNotification.State = ProgressNotificationState.Completed;
                 checkingNotification.Close(false);
                 checkForUpdatesButton.Enabled.Value = true;
             }
