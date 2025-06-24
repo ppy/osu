@@ -67,6 +67,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         public LoungeRoomPanel(Room room)
             : base(room)
         {
+            ShowExternalLink = false;
         }
 
         [BackgroundDependencyLoader]
