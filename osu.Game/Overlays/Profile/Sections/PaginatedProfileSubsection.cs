@@ -39,6 +39,8 @@ namespace osu.Game.Overlays.Profile.Sections
 
         protected ReverseChildIDFillFlowContainer<Drawable> ItemsContainer { get; private set; } = null!;
 
+        private LoadingLayer loading = null!;
+
         private APIRequest<List<TModel>>? retrievalRequest;
         private CancellationTokenSource? loadCancellation;
 
@@ -59,15 +61,27 @@ namespace osu.Game.Overlays.Profile.Sections
             Direction = FillDirection.Vertical,
             Children = new Drawable[]
             {
-                // reverse ID flow is required for correct Z-ordering of the items (last item should be front-most).
-                // particularly important in PaginatedBeatmapContainer, as it uses beatmap cards, which have expandable overhanging content.
-                ItemsContainer = new ReverseChildIDFillFlowContainer<Drawable>
+                new Container
                 {
                     AutoSizeAxes = Axes.Y,
                     RelativeSizeAxes = Axes.X,
-                    Spacing = new Vector2(0, 2),
+                    // apply corner radius for loading layer dimming.
+                    Masking = true,
+                    CornerRadius = 6,
                     // ensure the container and its contents are in front of the "more" button.
-                    Depth = float.MinValue
+                    Depth = float.MinValue,
+                    // reverse ID flow is required for correct Z-ordering of the items (last item should be front-most).
+                    // particularly important in PaginatedBeatmapContainer, as it uses beatmap cards, which have expandable overhanging content.
+                    Children = new Drawable[]
+                    {
+                        ItemsContainer = new ReverseChildIDFillFlowContainer<Drawable>
+                        {
+                            AutoSizeAxes = Axes.Y,
+                            RelativeSizeAxes = Axes.X,
+                            Spacing = new Vector2(0, 2),
+                        },
+                        loading = new LoadingLayer(true),
+                    }
                 },
                 moreButton = new ShowMoreButton
                 {
@@ -89,21 +103,30 @@ namespace osu.Game.Overlays.Profile.Sections
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            User.BindValueChanged(onUserChanged, true);
+            User.BindValueChanged(_ => Refresh(clearPrevious: true), true);
         }
 
-        private void onUserChanged(ValueChangedEvent<UserProfileData?> e)
+        private bool shouldClearPreviousItems;
+
+        public void Refresh(bool clearPrevious)
         {
             loadCancellation?.Cancel();
             retrievalRequest?.Cancel();
 
             CurrentPage = null;
-            ItemsContainer.Clear();
 
-            if (e.NewValue?.User != null)
+            if (clearPrevious)
+                ItemsContainer.Clear();
+            else
+            {
+                loading.Show();
+                shouldClearPreviousItems = true;
+            }
+
+            if (User.Value?.User != null)
             {
                 showMore();
-                SetCount(GetCount(e.NewValue.User));
+                SetCount(GetCount(User.Value.User));
             }
         }
 
@@ -128,6 +151,7 @@ namespace osu.Game.Overlays.Profile.Sections
             {
                 moreButton.Hide();
                 moreButton.IsLoading = false;
+                clearPreviousItemsIfShould();
 
                 if (missingText.HasValue)
                     missing.Show();
@@ -148,10 +172,21 @@ namespace osu.Game.Overlays.Profile.Sections
 
                 moreButton.FadeTo(hasMore ? 1 : 0);
                 moreButton.IsLoading = false;
+                clearPreviousItemsIfShould();
 
                 ItemsContainer.AddRange(drawables);
             }, cancellationTokenSource.Token);
         });
+
+        private void clearPreviousItemsIfShould()
+        {
+            if (!shouldClearPreviousItems)
+                return;
+
+            loading.Hide();
+            ItemsContainer.Clear();
+            shouldClearPreviousItems = false;
+        }
 
         protected virtual int GetCount(APIUser user) => 0;
 
