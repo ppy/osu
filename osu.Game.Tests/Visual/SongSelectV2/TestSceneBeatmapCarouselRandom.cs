@@ -66,6 +66,15 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 checkExpandedGroupUnchanged();
             }
 
+            SortAndGroupBy(SortMode.Artist, GroupMode.None);
+            WaitForFiltering();
+
+            for (int i = 0; i < 5; i++)
+            {
+                nextRandom();
+                ensureRandomDidNotRepeat();
+            }
+
             void storeExpandedGroup() => AddStep("store open group", () => expanded = Carousel.ExpandedGroup);
 
             void checkExpandedGroupUnchanged() => AddAssert("expanded did not change", () => Carousel.ExpandedGroup, () => Is.EqualTo(expanded));
