@@ -54,11 +54,15 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         protected readonly Bindable<PlaylistItem?> SelectedItem = new Bindable<PlaylistItem?>();
         protected Container ButtonsContainer { get; private set; } = null!;
 
+        protected bool ShowExternalLink { get; init; } = true;
+
         private DrawableRoomParticipantsList? drawableRoomParticipantsList;
         private RoomSpecialCategoryPill? specialCategoryPill;
         private PasswordProtectedIcon? passwordIcon;
         private EndDateInfo? endDateInfo;
+        private FillFlowContainer? roomNameFlow;
         private SpriteText? roomName;
+        private ExternalLinkButton? linkButton;
         private DelayedLoadWrapper wrapper = null!;
         private CancellationTokenSource? beatmapLookupCancellation;
 
@@ -204,10 +208,27 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                                                 Direction = FillDirection.Vertical,
                                                                 Children = new Drawable[]
                                                                 {
-                                                                    roomName = new TruncatingSpriteText
+                                                                    roomNameFlow = new FillFlowContainer
                                                                     {
                                                                         RelativeSizeAxes = Axes.X,
-                                                                        Font = OsuFont.GetFont(size: 28)
+                                                                        AutoSizeAxes = Axes.Y,
+                                                                        Direction = FillDirection.Horizontal,
+                                                                        Children = new Drawable[]
+                                                                        {
+                                                                            roomName = new TruncatingSpriteText
+                                                                            {
+                                                                                Anchor = Anchor.BottomLeft,
+                                                                                Origin = Anchor.BottomLeft,
+                                                                                Font = OsuFont.GetFont(size: 28),
+                                                                            },
+                                                                            linkButton = new ExternalLinkButton(formatRoomUrl(Room.RoomID ?? 0))
+                                                                            {
+                                                                                Anchor = Anchor.BottomLeft,
+                                                                                Origin = Anchor.BottomLeft,
+                                                                                Margin = new MarginPadding { Horizontal = 6, Bottom = 4 },
+                                                                                Alpha = ShowExternalLink && Room.RoomID.HasValue ? 1 : 0,
+                                                                            },
+                                                                        },
                                                                     },
                                                                     new RoomStatusText(Room)
                                                                     {
@@ -286,6 +307,14 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             };
 
             SelectedItem.BindValueChanged(onSelectedItemChanged, true);
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (roomName != null)
+                roomName.MaxWidth = (roomNameFlow?.DrawWidth ?? 0) - (linkButton?.LayoutSize.X ?? 0);
         }
 
         private void onRoomPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -390,10 +419,10 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 }
 
                 return items.ToArray();
-
-                string formatRoomUrl(long id) => $@"{api.Endpoints.WebsiteUrl}/multiplayer/rooms/{id}";
             }
         }
+
+        private string formatRoomUrl(long id) => $@"{api.Endpoints.WebsiteUrl}/multiplayer/rooms/{id}";
 
         protected virtual UpdateableBeatmapBackgroundSprite CreateBackground() => new UpdateableBeatmapBackgroundSprite();
 
