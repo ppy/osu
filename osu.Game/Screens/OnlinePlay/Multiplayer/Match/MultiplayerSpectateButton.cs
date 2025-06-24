@@ -111,10 +111,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
         private CancellationTokenSource? downloadCheckCancellation;
 
+        private int? lastDownloadCheckedBeatmapId;
+
         private void checkForAutomaticDownload()
         {
-            downloadCheckCancellation?.Cancel();
-
             if (client.Room == null)
                 return;
 
@@ -131,6 +131,17 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 return;
 
             MultiplayerPlaylistItem item = client.Room.CurrentPlaylistItem;
+
+            // This method is called every time anything changes in the room.
+            // This could result in download requests firing far too often, when we only expect them to fire once per beatmap.
+            //
+            // Without this check, we would see especially egregious behaviour when a user has hit the download rate limit.
+            if (lastDownloadCheckedBeatmapId == item.BeatmapID)
+                return;
+
+            lastDownloadCheckedBeatmapId = item.BeatmapID;
+
+            downloadCheckCancellation?.Cancel();
 
             // In a perfect world we'd use BeatmapAvailability, but there's no event-driven flow for when a selection changes.
             // ie. if selection changes from "not downloaded" to another "not downloaded" we wouldn't get a value changed raised.
