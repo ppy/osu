@@ -267,8 +267,7 @@ namespace osu.Game.Screens.SelectV2
                     // Find any containing group. There should never be too many groups so iterating is efficient enough.
                     GroupDefinition? containingGroup = grouping.GroupItems.SingleOrDefault(kvp => kvp.Value.Any(i => CheckModelEquality(i.Model, beatmapInfo))).Key;
 
-                    if (containingGroup != null)
-                        setExpandedGroup(containingGroup);
+                    setExpandedGroup(containingGroup);
 
                     if (grouping.BeatmapSetsGroupedTogether)
                         setExpandedSet(beatmapInfo);
@@ -362,8 +361,11 @@ namespace osu.Game.Screens.SelectV2
         {
             if (ExpandedGroup != null)
                 setExpansionStateOfGroup(ExpandedGroup, false);
+
             ExpandedGroup = group;
-            setExpansionStateOfGroup(group, true);
+
+            if (ExpandedGroup != null)
+                setExpansionStateOfGroup(group, true);
         }
 
         private void setExpansionStateOfGroup(GroupDefinition group, bool expanded)
