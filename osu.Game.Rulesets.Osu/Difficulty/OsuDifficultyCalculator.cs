@@ -51,13 +51,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             var aimWithoutSliders = skills.OfType<Aim>().Single(a => !a.IncludeSliders);
             var speed = skills.OfType<Speed>().Single();
             var flashlight = skills.OfType<Flashlight>().SingleOrDefault();
-            var reading = skills.OfType<Reading>().SingleOrDefault();
+            var reading = skills.OfType<Reading>().Single();
 
             double speedNotes = speed.RelevantNoteCount();
 
             double aimDifficultStrainCount = aim.CountTopWeightedStrains();
             double speedDifficultStrainCount = speed.CountTopWeightedStrains();
-            double readingDifficultNoteCount = reading?.CountTopWeightedNotes() ?? 0.0;
+            double readingDifficultNoteCount = reading.CountTopWeightedNotes();
 
             double aimNoSlidersTopWeightedSliderCount = aimWithoutSliders.CountTopWeightedSliders();
             double aimNoSlidersDifficultStrainCount = aimWithoutSliders.CountTopWeightedStrains();
@@ -87,11 +87,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double aimRating = computeAimRating(aim.DifficultyValue(), mods, overallDifficulty);
             double aimRatingNoSliders = computeAimRating(aimWithoutSliders.DifficultyValue(), mods, overallDifficulty);
             double speedRating = computeSpeedRating(speed.DifficultyValue(), mods, overallDifficulty);
-
-            double readingRating = 0.0;
-
-            if (reading is not null)
-                readingRating = computeReadingRating(reading.DifficultyValue(), mods, overallDifficulty);
+            double readingRating = computeReadingRating(reading.DifficultyValue(), mods, overallDifficulty);
 
             double flashlightRating = 0.0;
 

@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
     {
         private const double reading_window_size = 3000; // 3 seconds
         private const double density_difficulty_base_max = 0.8;
-        private const double hidden_multiplier = 0.015;
+        private const double hidden_multiplier = 0.013;
         private const double preempt_balancing_factor = 160000;
 
         public static double EvaluateDifficultyOf(int totalObjects, DifficultyHitObject current, double clockRate, double preempt, bool hidden)
@@ -64,9 +64,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 // This is on the basis that part of hidden difficulty is the uncertainty of the current cursor position in relation to future notes
                 double visibleObjectFactor = Math.Max(0, getCurrentVisibleObjectFactor(totalObjects, currObj, preempt) - 2);
 
-                hiddenDifficulty += (timeSpentInvisible * 0.035 + Math.Pow(Math.Max(1, visibleObjectFactor + pastObjectDifficultyInfluence), 2)) * hidden_multiplier;
+                hiddenDifficulty += (Math.Pow(timeSpentInvisible, 1.65) * 0.001 + Math.Pow(Math.Max(1, visibleObjectFactor + pastObjectDifficultyInfluence), 2)) * hidden_multiplier;
 
                 hiddenDifficulty *= constantAngleNerfFactor * velocity;
+
+                // Apply a soft cap to general HD reading to account for partial memorization
+                hiddenDifficulty = Math.Pow(hiddenDifficulty, 0.85);
 
                 // Buff perfect stacks only if current note is completely invisible at the time you click the previous note.
                 var previousObj = currObj.Previous(0);
