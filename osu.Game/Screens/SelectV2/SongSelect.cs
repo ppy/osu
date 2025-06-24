@@ -449,9 +449,6 @@ namespace osu.Game.Screens.SelectV2
             if (Beatmap.IsDefault)
                 return;
 
-            if (!ensureGlobalBeatmapValid())
-                return;
-
             startAction();
         }
 
