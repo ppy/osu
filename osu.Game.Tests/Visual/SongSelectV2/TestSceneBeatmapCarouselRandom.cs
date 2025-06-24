@@ -40,6 +40,9 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [Test]
         public void TestGroupingModeChangeStillWorks()
         {
+            BeatmapInfo originalSelected = null!;
+            GroupDefinition? expanded = null;
+
             SortAndGroupBy(SortMode.Artist, GroupMode.Artist);
             AddBeatmaps(10, 3, true);
             WaitForDrawablePanels();
@@ -47,11 +50,25 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             nextRandom();
             ensureRandomDidNotRepeat();
 
-            SortAndGroupBy(SortMode.Artist, GroupMode.None);
+            AddStep("store selection", () => originalSelected = (BeatmapInfo)Carousel.CurrentSelection!);
+
+            SortAndGroupBy(SortMode.Artist, GroupMode.Difficulty);
             WaitForFiltering();
 
-            nextRandom();
-            ensureRandomDidNotRepeat();
+            AddAssert("selection not changed", () => Carousel.CurrentSelection, () => Is.EqualTo(originalSelected));
+
+            storeExpandedGroup();
+
+            for (int i = 0; i < 5; i++)
+            {
+                nextRandom();
+                ensureRandomDidNotRepeat();
+                checkExpandedGroupUnchanged();
+            }
+
+            void storeExpandedGroup() => AddStep("store open group", () => expanded = Carousel.ExpandedGroup);
+
+            void checkExpandedGroupUnchanged() => AddAssert("expanded did not change", () => Carousel.ExpandedGroup, () => Is.EqualTo(expanded));
         }
 
         /// <summary>
