@@ -7,6 +7,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Osu.Configuration;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
@@ -62,8 +63,12 @@ namespace osu.Game.Rulesets.Osu.Edit
         private ExpandableSlider<int> circleThresholdSlider = null!;
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuRulesetConfigManager? config)
         {
+            config?.BindWith(OsuRulesetSetting.EditorFreehandSliderTolerance, displayTolerance);
+            config?.BindWith(OsuRulesetSetting.EditorFreehandSliderCornerThreshold, displayCornerThreshold);
+            config?.BindWith(OsuRulesetSetting.EditorFreehandSliderCircleThreshold, displayCircleThreshold);
+
             Children = new Drawable[]
             {
                 toleranceSlider = new ExpandableSlider<int>
