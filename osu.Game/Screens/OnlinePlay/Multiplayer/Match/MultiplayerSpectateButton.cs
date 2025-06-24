@@ -115,8 +115,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
         private void checkForAutomaticDownload()
         {
-            downloadCheckCancellation?.Cancel();
-
             if (client.Room == null)
                 return;
 
@@ -142,6 +140,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 return;
 
             lastDownloadCheckedBeatmapId = item.BeatmapID;
+
+            downloadCheckCancellation?.Cancel();
 
             // In a perfect world we'd use BeatmapAvailability, but there's no event-driven flow for when a selection changes.
             // ie. if selection changes from "not downloaded" to another "not downloaded" we wouldn't get a value changed raised.
