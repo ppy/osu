@@ -97,7 +97,9 @@ namespace osu.Game.Screens.SelectV2
                 {
                     AutoSizeAxes = Axes.Both,
                     Direction = FillDirection.Vertical,
-                    Padding = new MarginPadding { Top = 7.5f, Left = 15, Bottom = 5 },
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                    Padding = new MarginPadding { Top = 7.5f, Left = 15, Bottom = 13 },
                     Children = new Drawable[]
                     {
                         titleText = new OsuSpriteText
