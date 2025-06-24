@@ -37,6 +37,23 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             }
         }
 
+        [Test]
+        public void TestGroupingModeChangeStillWorks()
+        {
+            SortAndGroupBy(SortMode.Artist, GroupMode.Artist);
+            AddBeatmaps(10, 3, true);
+            WaitForDrawablePanels();
+
+            nextRandom();
+            ensureRandomDidNotRepeat();
+
+            SortAndGroupBy(SortMode.Artist, GroupMode.None);
+            WaitForFiltering();
+
+            nextRandom();
+            ensureRandomDidNotRepeat();
+        }
+
         /// <summary>
         /// Test random non-repeating algorithm
         /// </summary>
