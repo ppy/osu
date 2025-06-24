@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -12,6 +13,8 @@ using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Input;
+using osu.Game.Input.Bindings;
 using osuTK;
 using osuTK.Graphics;
 using osu.Game.Localisation;
@@ -26,6 +29,9 @@ namespace osu.Game.Screens.Menu
         private LinkFlowContainer textFlow = null!;
 
         private Bindable<bool> showMenuTips = null!;
+
+        [Resolved]
+        private RealmKeyBindingStore keyBindingStore { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -101,13 +107,13 @@ namespace osu.Game.Screens.Menu
         {
             LocalisableString[] tips =
             {
-                MenuTipStrings.ToggleToolbarShortcut,
-                MenuTipStrings.GameSettingsShortcut,
+                MenuTipStrings.ToggleToolbarShortcut(keyBindingStore.GetReadableKeyCombinationsFor(GlobalAction.ToggleToolbar).FirstOrDefault("Ctrl+T")),
+                MenuTipStrings.GameSettingsShortcut(keyBindingStore.GetReadableKeyCombinationsFor(GlobalAction.ToggleSettings).FirstOrDefault("Ctrl+O")),
                 MenuTipStrings.DynamicSettings,
                 MenuTipStrings.NewFeaturesAreComingOnline,
                 MenuTipStrings.UIScalingSettings,
                 MenuTipStrings.ScreenScalingSettings,
-                MenuTipStrings.FreeOsuDirect,
+                MenuTipStrings.FreeOsuDirect(keyBindingStore.GetReadableKeyCombinationsFor(GlobalAction.ToggleBeatmapListing).FirstOrDefault("Ctrl+B")),
                 MenuTipStrings.ReplaySeeking,
                 MenuTipStrings.MultithreadingSupport,
                 MenuTipStrings.TryNewMods,
@@ -117,15 +123,15 @@ namespace osu.Game.Screens.Menu
                 MenuTipStrings.DiscoverPlaylists,
                 MenuTipStrings.ToggleAdvancedFPSCounter,
                 MenuTipStrings.GlobalStatisticsShortcut,
-                MenuTipStrings.ReplayPausing,
+                MenuTipStrings.ReplayPausing(keyBindingStore.GetReadableKeyCombinationsFor(GlobalAction.TogglePauseReplay).FirstOrDefault("Space")),
                 MenuTipStrings.ConfigurableHotkeys,
-                MenuTipStrings.PeekHUDWhenHidden,
-                MenuTipStrings.SkinEditor,
+                MenuTipStrings.PeekHUDWhenHidden(keyBindingStore.GetReadableKeyCombinationsFor(GlobalAction.HoldForHUD).FirstOrDefault("Ctrl")),
+                MenuTipStrings.SkinEditor(keyBindingStore.GetReadableKeyCombinationsFor(GlobalAction.ToggleSkinEditor).FirstOrDefault("Ctrl+Shift+S")),
                 MenuTipStrings.DragAndDropImageInSkinEditor,
                 MenuTipStrings.ModPresets,
                 MenuTipStrings.ModCustomisationSettings,
-                MenuTipStrings.RandomSkinShortcut,
-                MenuTipStrings.ToggleReplaySettingsShortcut,
+                MenuTipStrings.RandomSkinShortcut(keyBindingStore.GetReadableKeyCombinationsFor(GlobalAction.RandomSkin).FirstOrDefault("Ctrl+Shift+R")),
+                MenuTipStrings.ToggleReplaySettingsShortcut(keyBindingStore.GetReadableKeyCombinationsFor(GlobalAction.ToggleReplaySettings).FirstOrDefault("Ctrl+H")),
                 MenuTipStrings.CopyModsFromScore,
                 MenuTipStrings.AutoplayBeatmapShortcut,
                 MenuTipStrings.LazerIsNotAWord
