@@ -128,6 +128,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
                     HitObject.SliderVelocityMultiplier = sliderToolboxGroup?.SliderVelocity.Value ?? 1;
                     HitObject.Position = ToLocalSpace(result.ScreenSpacePosition);
+
+                    // If defaults aren't re-applied, the slider may display an incorrect length in the timeline
+                    // while being placed in certain scenarios (e.g., if the slider placement tool is selected,
+                    // and then slider velocity is changed through the slider toolbox).
+                    ApplyDefaultsToHitObject();
                     break;
 
                 case SliderPlacementState.ControlPoints:
