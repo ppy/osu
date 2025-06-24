@@ -290,13 +290,9 @@ namespace osu.Game.Screens.SelectV2
             HandleItemSelected(CurrentSelection);
 
             // If a group was selected that is not the one containing the selection, attempt to reselect it.
-            if (groupForReselection != null)
-            {
-                if (!grouping.GroupItems.TryGetValue(groupForReselection, out _))
-                    ExpandedGroup = null;
-                else
-                    setExpandedGroup(groupForReselection);
-            }
+            // If the original group was not found, ExpandedGroup will already have been updated to a valid value in `HandleItemSelected` above.
+            if (groupForReselection != null && grouping.GroupItems.TryGetValue(groupForReselection, out _))
+                setExpandedGroup(groupForReselection);
         }
 
         private void selectRecommendedDifficultyForBeatmapSet(BeatmapSetInfo beatmapSet)
