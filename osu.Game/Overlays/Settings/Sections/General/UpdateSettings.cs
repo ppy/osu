@@ -28,9 +28,9 @@ namespace osu.Game.Overlays.Settings.Sections.General
         protected override LocalisableString Header => GeneralSettingsStrings.UpdateHeader;
 
         private SettingsButton checkForUpdatesButton = null!;
+        private SettingsEnumDropdown<ReleaseStream> releaseStreamDropdown = null!;
 
         private readonly Bindable<ReleaseStream> configReleaseStream = new Bindable<ReleaseStream>();
-        private SettingsEnumDropdown<ReleaseStream> releaseStreamDropdown = null!;
 
         [Resolved]
         private UpdateManager? updateManager { get; set; }
@@ -58,11 +58,16 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     Keywords = new[] { @"version" },
                 });
 
-                Add(checkForUpdatesButton = new SettingsButton
+                if (updateManager.FixedReleaseStream != null)
                 {
-                    Text = GeneralSettingsStrings.CheckUpdate,
-                    Action = () => checkForUpdates().FireAndForget()
-                });
+                    configReleaseStream.Value = updateManager.FixedReleaseStream.Value;
+
+                    releaseStreamDropdown.ShowsDefaultIndicator = false;
+                    releaseStreamDropdown.Items = [updateManager.FixedReleaseStream.Value];
+                    releaseStreamDropdown.SetNoticeText(RuntimeInfo.IsDesktop
+                        ? GeneralSettingsStrings.ChangeReleaseStreamPackageManagerWarning
+                        : GeneralSettingsStrings.ChangeReleaseStreamMobileWarning);
+                }
 
                 releaseStreamDropdown.Current.BindValueChanged(stream =>
                 {
@@ -85,6 +90,12 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     }
 
                     configReleaseStream.Value = stream.NewValue;
+                });
+
+                Add(checkForUpdatesButton = new SettingsButton
+                {
+                    Text = GeneralSettingsStrings.CheckUpdate,
+                    Action = () => checkForUpdates().FireAndForget()
                 });
             }
 
