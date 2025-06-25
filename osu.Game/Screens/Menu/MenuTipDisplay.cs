@@ -103,11 +103,11 @@ namespace osu.Game.Screens.Menu
                 .FadeOutFromOne(2000, Easing.OutQuint);
         }
 
-        private const int availableTips = 28;
+        private const int available_tips = 28;
 
         private LocalisableString getRandomTip()
         {
-            int tipIndex = RNG.Next(0, availableTips);
+            int tipIndex = RNG.Next(0, available_tips);
 
             switch (tipIndex)
             {
