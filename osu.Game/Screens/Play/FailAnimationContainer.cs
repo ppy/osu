@@ -226,6 +226,9 @@ namespace osu.Game.Screens.Play
         /// </summary>
         /// <param name="hitObject">The specific DHO to apply the TransformSequence to.</param>
         /// <param name="rotation">The random amount the DHO will be rotated if applicable.</param>
-        protected virtual TransformSequence<DrawableHitObject> CreateHitObjectTransforms(DrawableHitObject hitObject, float rotation) => hitObject.FadeOutFromOne(DURATION);
+        protected virtual void CreateHitObjectTransforms(DrawableHitObject hitObject, float rotation)
+        {
+            hitObject.FadeOutFromOne(DURATION);
+        }
     }
 }

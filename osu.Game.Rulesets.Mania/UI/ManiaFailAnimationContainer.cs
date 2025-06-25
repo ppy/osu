@@ -16,12 +16,10 @@ namespace osu.Game.Rulesets.Mania.UI
         {
         }
 
-        protected override TransformSequence<DrawableHitObject> CreateHitObjectTransforms(DrawableHitObject hitObject, float rotation)
+        protected override void CreateHitObjectTransforms(DrawableHitObject hitObject, float rotation)
         {
-            Vector2 originalScale = hitObject.Scale;
-
-            return hitObject.RotateTo(rotation, DURATION)
-                            .ScaleTo(originalScale * 0.5f, DURATION);
+            hitObject.RotateTo(rotation, DURATION)
+                     .ScaleTo(hitObject.Scale * 0.5f, DURATION);
         }
     }
 }

@@ -16,14 +16,11 @@ namespace osu.Game.Rulesets.Osu.UI
         {
         }
 
-        protected override TransformSequence<DrawableHitObject> CreateHitObjectTransforms(DrawableHitObject hitObject, float rotation)
+        protected override void CreateHitObjectTransforms(DrawableHitObject hitObject, float rotation)
         {
-            Vector2 originalPosition = hitObject.Position;
-            Vector2 originalScale = hitObject.Scale;
-
-            return hitObject.RotateTo(rotation, DURATION)
-                            .ScaleTo(originalScale * 0.5f, DURATION)
-                            .MoveTo(originalPosition + new Vector2(0, 400), DURATION);
+            hitObject.RotateTo(rotation, DURATION)
+                     .ScaleTo(hitObject.Scale * 0.5f, DURATION)
+                     .MoveTo(hitObject.Position + new Vector2(0, 400), DURATION);
         }
     }
 }
