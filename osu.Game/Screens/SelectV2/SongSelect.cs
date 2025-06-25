@@ -233,8 +233,8 @@ namespace osu.Game.Screens.SelectV2
                                                                 BleedBottom = ScreenFooter.HEIGHT + 5,
                                                                 RelativeSizeAxes = Axes.Both,
                                                                 RequestPresentBeatmap = b => SelectAndRun(b, OnStart),
-                                                                RequestSelection = selectBeatmap,
-                                                                RequestRecommendedSelection = selectRecommendedBeatmap,
+                                                                RequestSelection = queueBeatmapSelection,
+                                                                RequestRecommendedSelection = b => queueBeatmapSelection(difficultyRecommender?.GetRecommendedBeatmap(b) ?? b.First()),
                                                                 NewItemsPresented = newItemsPresented,
                                                             },
                                                             noResultsPlaceholder = new NoResultsPlaceholder
@@ -417,8 +417,6 @@ namespace osu.Game.Screens.SelectV2
         /// <param name="startAction">The action to perform if conditions are met to be able to proceed. May not be invoked if in an invalid state.</param>
         public void SelectAndRun(BeatmapInfo beatmap, Action startAction)
         {
-            selectionDebounce?.Cancel();
-
             if (!this.IsCurrentScreen())
                 return;
 
@@ -426,6 +424,10 @@ namespace osu.Game.Screens.SelectV2
             // By checking locally first, we can correctly perform a no-op rather than changing selection.
             if (!checkBeatmapValidForSelection(beatmap, carousel.Criteria))
                 return;
+
+            // To ensure sanity, cancel any pending selection as we are about to force a selection.
+            // Carousel selection will update to the forced selection via a call of `ensureGlobalBeatmapValid` below, or when song select becomes current again.
+            selectionDebounce?.Cancel();
 
             // Forced refetch is important here to guarantee correct invalidation across all difficulties (editor specific).
             Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap, true);
@@ -439,12 +441,18 @@ namespace osu.Game.Screens.SelectV2
             startAction();
         }
 
-        private void selectRecommendedBeatmap(IEnumerable<BeatmapInfo> beatmaps)
-        {
-            selectBeatmap(difficultyRecommender?.GetRecommendedBeatmap(beatmaps) ?? beatmaps.First());
-        }
-
-        private void selectBeatmap(BeatmapInfo beatmap)
+        /// <summary>
+        /// Prepares the proposed beatmap for global selection based on a carousel user-performed action.
+        /// </summary>
+        /// <remarks>
+        /// Calling this method will:
+        /// - Immediately update the selection the carousel.
+        /// - After <see cref="SELECTION_DEBOUNCE"/>, update the global beatmap. This in turn causes song select visuals (title, details, leaderboard) to update.
+        ///   This debounce is intended to avoid high overheads from churning lookups while a user is changing selection via rapid keyboard operations.
+        ///   To complete the operation immediately, call <see cref="finaliseBeatmapSelection"/>.
+        /// </remarks>
+        /// <param name="beatmap">The beatmap to be selected.</param>
+        private void queueBeatmapSelection(BeatmapInfo beatmap)
         {
             if (!this.IsCurrentScreen())
                 return;
@@ -462,13 +470,21 @@ namespace osu.Game.Screens.SelectV2
             }, SELECTION_DEBOUNCE);
         }
 
+        /// <summary>
+        /// If any pending selection exists from <see cref="queueBeatmapSelection"/>, run it immediately.
+        /// </summary>
+        private void finaliseBeatmapSelection()
+        {
+            if (selectionDebounce?.State == ScheduledDelegate.RunState.Waiting)
+                selectionDebounce?.RunTask();
+        }
+
         private bool ensureGlobalBeatmapValid()
         {
             if (!this.IsCurrentScreen())
                 return false;
 
-            if (selectionDebounce?.State == ScheduledDelegate.RunState.Waiting)
-                selectionDebounce?.RunTask();
+            finaliseBeatmapSelection();
 
             // While filtering, let's not ever attempt to change selection.
             // This will be resolved after the filter completes, see `newItemsPresented`.
@@ -483,8 +499,7 @@ namespace osu.Game.Screens.SelectV2
             if (Beatmap.IsDefault || !validSelection)
             {
                 validSelection = carousel.NextRandom();
-                if (selectionDebounce?.State == ScheduledDelegate.RunState.Waiting)
-                    selectionDebounce?.RunTask();
+                finaliseBeatmapSelection();
             }
 
             if (validSelection)
