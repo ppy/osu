@@ -207,7 +207,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                                                 Direction = FillDirection.Vertical,
                                                                 Children = new Drawable[]
                                                                 {
-                                                                    roomName = new RoomNameLine(getRoomUrl(), ShowExternalLink),
+                                                                    roomName = new RoomNameLine(),
                                                                     new RoomStatusText(Room)
                                                                     {
                                                                         Beatmap = { BindTarget = currentBeatmap }
@@ -278,6 +278,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
                 wrapper.FadeInFromZero(200);
 
+                updateRoomID();
                 updateRoomName();
                 updateRoomCategory();
                 updateRoomType();
@@ -291,6 +292,10 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         {
             switch (e.PropertyName)
             {
+                case nameof(Room.RoomID):
+                    updateRoomID();
+                    break;
+
                 case nameof(Room.Name):
                     updateRoomName();
                     break;
@@ -332,6 +337,12 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                   if (!cancellationSource.IsCancellationRequested)
                                       currentBeatmap.Value = task.GetResultSafely();
                               }), cancellationSource.Token);
+        }
+
+        private void updateRoomID()
+        {
+            if (roomName != null && ShowExternalLink)
+                roomName.Link = Room.GetOnlineURL(api);
         }
 
         private void updateRoomName()
@@ -558,11 +569,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         public partial class RoomNameLine : FillFlowContainer
         {
-            private readonly string? roomUrl;
-            private readonly bool showExternalLink;
-
             private TruncatingSpriteText spriteText = null!;
-            private ExternalLinkButton link = null!;
+            private ExternalLinkButton linkButton = null!;
 
             public LocalisableString Text
             {
@@ -570,10 +578,16 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 set => spriteText.Text = value;
             }
 
-            public RoomNameLine(string? roomUrl, bool showExternalLink)
+            private string? link;
+
+            public string? Link
             {
-                this.roomUrl = roomUrl;
-                this.showExternalLink = showExternalLink;
+                get => link;
+                set
+                {
+                    link = value;
+                    updateLink();
+                }
             }
 
             [BackgroundDependencyLoader]
@@ -591,20 +605,31 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                         Origin = Anchor.BottomLeft,
                         Font = OsuFont.GetFont(size: 28),
                     },
-                    link = new ExternalLinkButton(roomUrl)
+                    linkButton = new ExternalLinkButton
                     {
                         Anchor = Anchor.BottomLeft,
                         Origin = Anchor.BottomLeft,
                         Margin = new MarginPadding { Horizontal = 6, Bottom = 4 },
-                        Alpha = showExternalLink ? 1 : 0,
+                        Alpha = 0f,
                     },
                 };
+            }
+
+            private void updateLink()
+            {
+                if (link == null)
+                    linkButton.Hide();
+                else
+                {
+                    linkButton.Show();
+                    linkButton.Link = link;
+                }
             }
 
             protected override void Update()
             {
                 base.Update();
-                spriteText.MaxWidth = DrawWidth - link.LayoutSize.X;
+                spriteText.MaxWidth = DrawWidth - linkButton.LayoutSize.X;
             }
         }
     }
