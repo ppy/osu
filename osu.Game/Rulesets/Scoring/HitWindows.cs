@@ -22,9 +22,16 @@ namespace osu.Game.Rulesets.Scoring
 
         protected HitWindows()
         {
-            var availableWindows = GetAllAvailableWindows();
+            ensureValidHitWindows();
+        }
+
+        [Conditional("DEBUG")]
+        private void ensureValidHitWindows()
+        {
+            var availableWindows = GetAllAvailableWindows().ToList();
             Debug.Assert(availableWindows.Any(r => r.result == HitResult.Miss), $"{nameof(GetAllAvailableWindows)} should always contain {nameof(HitResult.Miss)}");
-            Debug.Assert(availableWindows.Any(r => r.result != HitResult.Miss), $"{nameof(GetAllAvailableWindows)} should always contain at least one result type other than {nameof(HitResult.Miss)}.");
+            Debug.Assert(availableWindows.Any(r => r.result != HitResult.Miss),
+                $"{nameof(GetAllAvailableWindows)} should always contain at least one result type other than {nameof(HitResult.Miss)}.");
         }
 
         /// <summary>
