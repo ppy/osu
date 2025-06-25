@@ -501,10 +501,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             performTest(new List<ReplayFrame>
                 {
                     new OsuReplayFrame { Position = Vector2.Zero, Actions = { OsuAction.LeftButton }, Time = time_slider_start },
-                    // This frame is weird because the "up" frame can be skipped if the current time passes it (and is thus no longer in an important section).
-                    // So the idea is to instead generate another important frame at the intended time without yet hitting the next circle.
-                    new OsuReplayFrame { Position = new Vector2(100, 0), Actions = { OsuAction.RightButton }, Time = last_tick_time + 5 },
-                    new OsuReplayFrame { Position = new Vector2(140, 0), Actions = { OsuAction.LeftButton }, Time = last_tick_time + 20 },
+                    new OsuReplayFrame { Position = new Vector2(140, 0), Actions = { OsuAction.RightButton }, Time = last_tick_time + 20 },
                 },
                 [
                     new Slider
