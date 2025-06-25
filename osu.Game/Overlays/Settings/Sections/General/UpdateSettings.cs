@@ -49,7 +49,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
         {
             config.BindWith(OsuSetting.ReleaseStream, configReleaseStream);
 
-            if (updateManager?.CanCheckForUpdate == true)
+            if (updateManager?.CanCheckForUpdate == true && !RuntimeInfo.IsMobile)
             {
                 Add(releaseStreamDropdown = new SettingsEnumDropdown<ReleaseStream>
                 {
@@ -64,9 +64,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
 
                     releaseStreamDropdown.ShowsDefaultIndicator = false;
                     releaseStreamDropdown.Items = [updateManager.FixedReleaseStream.Value];
-                    releaseStreamDropdown.SetNoticeText(RuntimeInfo.IsDesktop
-                        ? GeneralSettingsStrings.ChangeReleaseStreamPackageManagerWarning
-                        : GeneralSettingsStrings.ChangeReleaseStreamMobileWarning);
+                    releaseStreamDropdown.SetNoticeText(GeneralSettingsStrings.ChangeReleaseStreamPackageManagerWarning);
                 }
 
                 releaseStreamDropdown.Current.BindValueChanged(stream =>
