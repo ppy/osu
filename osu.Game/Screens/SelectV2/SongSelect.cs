@@ -95,6 +95,7 @@ namespace osu.Game.Screens.SelectV2
         private FillFlowContainer wedgesContainer = null!;
         private Box rightGradientBackground = null!;
         private Container mainContent = null!;
+        private SkinnableContainer skinnableContent = null!;
 
         private NoResultsPlaceholder noResultsPlaceholder = null!;
 
@@ -268,8 +269,10 @@ namespace osu.Game.Screens.SelectV2
                         },
                     }
                 },
-                new SkinnableContainer(new GlobalSkinnableContainerLookup(GlobalSkinnableContainers.SongSelect))
+                skinnableContent = new SkinnableContainer(new GlobalSkinnableContainerLookup(GlobalSkinnableContainers.SongSelect))
                 {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both,
                 },
                 modSpeedHotkeyHandler = new ModSpeedHotkeyHandler(),
@@ -474,6 +477,9 @@ namespace osu.Game.Screens.SelectV2
         {
             if (!this.IsCurrentScreen())
                 return false;
+
+            if (selectionDebounce?.State == ScheduledDelegate.RunState.Waiting)
+                selectionDebounce?.RunTask();
 
             // While filtering, let's not ever attempt to change selection.
             // This will be resolved after the filter completes, see `newItemsPresented`.
@@ -772,6 +778,10 @@ namespace osu.Game.Screens.SelectV2
                     mainContent.ScaleTo(1.2f, 600, Easing.OutQuint);
                     mainContent.FadeOut(200, Easing.OutQuint);
 
+                    skinnableContent.ResizeWidthTo(1.2f, 600, Easing.OutQuint);
+                    skinnableContent.ScaleTo(1.2f, 600, Easing.OutQuint);
+                    skinnableContent.FadeOut(200, Easing.OutQuint);
+
                     Footer?.Hide();
                 }, 200);
             }
@@ -795,6 +805,10 @@ namespace osu.Game.Screens.SelectV2
                 mainContent.ResizeWidthTo(1f, 500, Easing.OutQuint);
                 mainContent.ScaleTo(1, 500, Easing.OutQuint);
                 mainContent.FadeIn(500, Easing.OutQuint);
+
+                skinnableContent.ResizeWidthTo(1f, 500, Easing.OutQuint);
+                skinnableContent.ScaleTo(1, 500, Easing.OutQuint);
+                skinnableContent.FadeIn(500, Easing.OutQuint);
 
                 Footer?.Show();
             }
@@ -904,7 +918,7 @@ namespace osu.Game.Screens.SelectV2
 
             collectionItems.Add(new OsuMenuItem("Manage...", MenuItemType.Standard, () => manageCollectionsDialog?.Show()));
 
-            yield return new OsuMenuItem("Collections") { Items = collectionItems };
+            yield return new OsuMenuItem(CommonStrings.Collections) { Items = collectionItems };
         }
 
         public void ManageCollections() => collectionsDialog?.Show();

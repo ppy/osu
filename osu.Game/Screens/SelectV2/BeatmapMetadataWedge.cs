@@ -13,6 +13,8 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Localisation;
+using osu.Game.Resources.Localisation.Web;
 using osuTK;
 
 namespace osu.Game.Screens.SelectV2
@@ -117,8 +119,8 @@ namespace osu.Game.Screens.SelectV2
                                                             Spacing = new Vector2(0f, 10f),
                                                             Children = new[]
                                                             {
-                                                                creator = new MetadataDisplay("Creator"),
-                                                                genre = new MetadataDisplay("Genre"),
+                                                                creator = new MetadataDisplay(EditorSetupStrings.Creator),
+                                                                genre = new MetadataDisplay(BeatmapsetsStrings.ShowInfoGenre),
                                                             },
                                                         },
                                                         new FillFlowContainer
@@ -129,8 +131,8 @@ namespace osu.Game.Screens.SelectV2
                                                             Spacing = new Vector2(0f, 10f),
                                                             Children = new[]
                                                             {
-                                                                source = new MetadataDisplay("Source"),
-                                                                language = new MetadataDisplay("Language"),
+                                                                source = new MetadataDisplay(BeatmapsetsStrings.ShowInfoSource),
+                                                                language = new MetadataDisplay(BeatmapsetsStrings.ShowInfoLanguage),
                                                             },
                                                         },
                                                         new FillFlowContainer
@@ -141,18 +143,18 @@ namespace osu.Game.Screens.SelectV2
                                                             Spacing = new Vector2(0f, 10f),
                                                             Children = new[]
                                                             {
-                                                                submitted = new MetadataDisplay("Submitted"),
-                                                                ranked = new MetadataDisplay("Ranked"),
+                                                                submitted = new MetadataDisplay(SongSelectStrings.Submitted),
+                                                                ranked = new MetadataDisplay(SongSelectStrings.Ranked),
                                                             },
                                                         },
                                                     },
                                                 },
                                             },
-                                            userTags = new MetadataDisplay("User Tags")
+                                            userTags = new MetadataDisplay(BeatmapsetsStrings.ShowInfoUserTags)
                                             {
                                                 Alpha = 0,
                                             },
-                                            mapperTags = new MetadataDisplay("Mapper Tags"),
+                                            mapperTags = new MetadataDisplay(BeatmapsetsStrings.ShowInfoMapperTags),
                                         },
                                     },
                                 },
@@ -286,7 +288,10 @@ namespace osu.Game.Screens.SelectV2
             source.SetText(metadata.Source);
             submitted.SetDate(beatmapSetInfo.DateSubmitted);
             ranked.SetDate(beatmapSetInfo.DateRanked);
-            mapperTags.SetTags(metadata.Tags.Split(' ', StringSplitOptions.RemoveEmptyEntries));
+
+            // ReSharper disable once ConditionalAccessQualifierIsNonNullableAccordingToAPIContract
+            // todo: Tags may be null, but the property is defined as non-nullable.
+            mapperTags.SetTags(metadata.Tags?.Split(' ', StringSplitOptions.RemoveEmptyEntries));
 
             if (currentOnlineBeatmapSet == null || currentOnlineBeatmapSet.OnlineID != beatmapSetInfo.OnlineID)
                 refetchBeatmapSet();

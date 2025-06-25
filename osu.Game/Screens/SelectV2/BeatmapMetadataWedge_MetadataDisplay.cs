@@ -112,9 +112,9 @@ namespace osu.Game.Screens.SelectV2
                 contentContainer.Child = new DrawableDate(date.Value, OsuFont.Style.Caption1.Size, false);
             }
 
-            public void SetTags(string[] tags)
+            public void SetTags(string[]? tags)
             {
-                if (!tags.Any())
+                if (tags == null || !tags.Any())
                 {
                     SetHyphen();
                     return;
