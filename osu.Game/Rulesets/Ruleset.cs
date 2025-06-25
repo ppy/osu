@@ -208,6 +208,8 @@ namespace osu.Game.Rulesets
 
         public ModTouchDevice? GetTouchDeviceMod() => CreateMod<ModTouchDevice>();
 
+        public virtual ModClassic? GetClassicModForScore(ScoreInfo score) => CreateMod<ModClassic>();
+
         /// <summary>
         /// Create a transformer which adds lookups specific to a ruleset to skin sources.
         /// </summary>

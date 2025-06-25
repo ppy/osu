@@ -13,6 +13,7 @@ using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
@@ -33,7 +34,7 @@ namespace osu.Game.Tests.NonVisual
         public void TestResultIfOnlyParentHitWindowIsEmpty()
         {
             var testObject = new TestHitObject(HitWindows.Empty);
-            HitObject nested = new TestHitObject(new HitWindows());
+            HitObject nested = new TestHitObject(new OsuHitWindows());
             testObject.AddNested(nested);
             testDrawableRuleset.HitObjects = new List<HitObject> { testObject };
 
@@ -43,8 +44,8 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestResultIfParentHitWindowsIsNotEmpty()
         {
-            var testObject = new TestHitObject(new HitWindows());
-            HitObject nested = new TestHitObject(new HitWindows());
+            var testObject = new TestHitObject(new OsuHitWindows());
+            HitObject nested = new TestHitObject(new OsuHitWindows());
             testObject.AddNested(nested);
             testDrawableRuleset.HitObjects = new List<HitObject> { testObject };
 
@@ -58,7 +59,7 @@ namespace osu.Game.Tests.NonVisual
             HitObject nested = new TestHitObject(HitWindows.Empty);
             firstObject.AddNested(nested);
 
-            var secondObject = new TestHitObject(new HitWindows());
+            var secondObject = new TestHitObject(new OsuHitWindows());
             testDrawableRuleset.HitObjects = new List<HitObject> { firstObject, secondObject };
 
             Assert.AreSame(testDrawableRuleset.FirstAvailableHitWindows, secondObject.HitWindows);
