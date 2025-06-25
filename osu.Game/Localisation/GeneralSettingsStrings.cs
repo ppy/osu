@@ -85,11 +85,6 @@ namespace osu.Game.Localisation
         public static LocalisableString ChangeReleaseStreamPackageManagerWarning => new TranslatableString(getKey(@"change_release_stream_package_warning"), @"Check with your package manager / provider for other release streams.");
 
         /// <summary>
-        /// "Check with your app store (testflight, etc) for other release streams."
-        /// </summary>
-        public static LocalisableString ChangeReleaseStreamMobileWarning => new TranslatableString(getKey(@"change_release_stream_mobile_warning"), @"Check with your app store (testflight, etc) for other release streams.");
-
-        /// <summary>
         /// "Are you sure you want to run a potentially unstable version of the game?"
         /// </summary>
         public static LocalisableString ChangeReleaseStreamConfirmation => new TranslatableString(getKey(@"change_release_stream_confirmation"), @"Are you sure you want to run a potentially unstable version of the game?");
