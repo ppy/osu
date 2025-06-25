@@ -17,6 +17,7 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Database;
@@ -60,9 +61,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         private RoomSpecialCategoryPill? specialCategoryPill;
         private PasswordProtectedIcon? passwordIcon;
         private EndDateInfo? endDateInfo;
-        private FillFlowContainer? roomNameFlow;
-        private SpriteText? roomName;
-        private ExternalLinkButton? linkButton;
+        private RoomNameLine? roomName;
         private DelayedLoadWrapper wrapper = null!;
         private CancellationTokenSource? beatmapLookupCancellation;
 
@@ -208,28 +207,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                                                 Direction = FillDirection.Vertical,
                                                                 Children = new Drawable[]
                                                                 {
-                                                                    roomNameFlow = new FillFlowContainer
-                                                                    {
-                                                                        RelativeSizeAxes = Axes.X,
-                                                                        AutoSizeAxes = Axes.Y,
-                                                                        Direction = FillDirection.Horizontal,
-                                                                        Children = new Drawable[]
-                                                                        {
-                                                                            roomName = new TruncatingSpriteText
-                                                                            {
-                                                                                Anchor = Anchor.BottomLeft,
-                                                                                Origin = Anchor.BottomLeft,
-                                                                                Font = OsuFont.GetFont(size: 28),
-                                                                            },
-                                                                            linkButton = new ExternalLinkButton(formatRoomUrl(Room.RoomID ?? 0))
-                                                                            {
-                                                                                Anchor = Anchor.BottomLeft,
-                                                                                Origin = Anchor.BottomLeft,
-                                                                                Margin = new MarginPadding { Horizontal = 6, Bottom = 4 },
-                                                                                Alpha = ShowExternalLink && Room.RoomID.HasValue ? 1 : 0,
-                                                                            },
-                                                                        },
-                                                                    },
+                                                                    roomName = new RoomNameLine(getRoomUrl(), ShowExternalLink),
                                                                     new RoomStatusText(Room)
                                                                     {
                                                                         Beatmap = { BindTarget = currentBeatmap }
@@ -307,14 +285,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             };
 
             SelectedItem.BindValueChanged(onSelectedItemChanged, true);
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            if (roomName != null)
-                roomName.MaxWidth = (roomNameFlow?.DrawWidth ?? 0) - (linkButton?.LayoutSize.X ?? 0);
         }
 
         private void onRoomPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -413,8 +383,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 if (Room.RoomID.HasValue)
                 {
                     items.AddRange([
-                        new OsuMenuItem("View in browser", MenuItemType.Standard, () => game?.OpenUrlExternally(formatRoomUrl(Room.RoomID.Value))),
-                        new OsuMenuItem("Copy link", MenuItemType.Standard, () => game?.CopyToClipboard(formatRoomUrl(Room.RoomID.Value)))
+                        new OsuMenuItem("View in browser", MenuItemType.Standard, () => game?.OpenUrlExternally(getRoomUrl())),
+                        new OsuMenuItem("Copy link", MenuItemType.Standard, () => game?.CopyToClipboard(getRoomUrl()))
                     ]);
                 }
 
@@ -422,7 +392,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             }
         }
 
-        private string formatRoomUrl(long id) => $@"{api.Endpoints.WebsiteUrl}/multiplayer/rooms/{id}";
+        private string? getRoomUrl() => !Room.RoomID.HasValue ? null : $@"{api.Endpoints.WebsiteUrl}/multiplayer/rooms/{Room.RoomID.Value}";
 
         protected virtual UpdateableBeatmapBackgroundSprite CreateBackground() => new UpdateableBeatmapBackgroundSprite();
 
@@ -583,6 +553,58 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                         Size = new Vector2(14),
                     }
                 };
+            }
+        }
+
+        public partial class RoomNameLine : FillFlowContainer
+        {
+            private readonly string? roomUrl;
+            private readonly bool showExternalLink;
+
+            private TruncatingSpriteText spriteText = null!;
+            private ExternalLinkButton link = null!;
+
+            public LocalisableString Text
+            {
+                get => spriteText.Text;
+                set => spriteText.Text = value;
+            }
+
+            public RoomNameLine(string? roomUrl, bool showExternalLink)
+            {
+                this.roomUrl = roomUrl;
+                this.showExternalLink = showExternalLink;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                RelativeSizeAxes = Axes.X;
+                AutoSizeAxes = Axes.Y;
+                Direction = FillDirection.Horizontal;
+
+                Children = new Drawable[]
+                {
+                    spriteText = new TruncatingSpriteText
+                    {
+                        Anchor = Anchor.BottomLeft,
+                        Origin = Anchor.BottomLeft,
+                        Font = OsuFont.GetFont(size: 28),
+                    },
+                    link = new ExternalLinkButton(roomUrl)
+                    {
+                        Anchor = Anchor.BottomLeft,
+                        Origin = Anchor.BottomLeft,
+                        Margin = new MarginPadding { Horizontal = 6, Bottom = 4 },
+                        Alpha = showExternalLink ? 1 : 0,
+                    },
+                };
+            }
+
+            protected override void Update()
+            {
+                base.Update();
+                spriteText.MaxWidth = DrawWidth - link.LayoutSize.X;
             }
         }
     }
