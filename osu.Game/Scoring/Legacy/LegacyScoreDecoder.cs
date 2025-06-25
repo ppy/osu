@@ -110,6 +110,9 @@ namespace osu.Game.Scoring.Legacy
                 else if (version >= 20121008)
                     scoreInfo.LegacyOnlineID = sr.ReadInt32();
 
+                if (scoreInfo.LegacyOnlineID == 0)
+                    scoreInfo.LegacyOnlineID = -1;
+
                 byte[] compressedScoreInfo = null;
 
                 if (version >= 30000001)
