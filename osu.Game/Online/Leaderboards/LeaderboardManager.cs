@@ -24,7 +24,12 @@ namespace osu.Game.Online.Leaderboards
 {
     public partial class LeaderboardManager : Component
     {
+        /// <summary>
+        /// The latest leaderboard scores fetched by the criteria in <see cref="CurrentCriteria"/>.
+        /// Updates to this bindable strictly occur in the update thread.
+        /// </summary>
         public IBindable<LeaderboardScores?> Scores => scores;
+
         private readonly Bindable<LeaderboardScores?> scores = new Bindable<LeaderboardScores?>();
 
         public LeaderboardCriteria? CurrentCriteria { get; private set; }
@@ -53,11 +58,12 @@ namespace osu.Game.Online.Leaderboards
             CurrentCriteria = newCriteria;
             localScoreSubscription?.Dispose();
             inFlightOnlineRequest?.Cancel();
-            scores.Value = null;
+
+            Schedule(() => scores.Value = null);
 
             if (newCriteria.Beatmap == null || newCriteria.Ruleset == null)
             {
-                scores.Value = LeaderboardScores.Failure(LeaderboardFailState.NoneSelected);
+                Schedule(() => scores.Value = LeaderboardScores.Failure(LeaderboardFailState.NoneSelected));
                 return;
             }
 
@@ -78,31 +84,31 @@ namespace osu.Game.Online.Leaderboards
                 {
                     if (!api.IsLoggedIn)
                     {
-                        scores.Value = LeaderboardScores.Failure(LeaderboardFailState.NotLoggedIn);
+                        Schedule(() => scores.Value = LeaderboardScores.Failure(LeaderboardFailState.NotLoggedIn));
                         return;
                     }
 
                     if (!newCriteria.Ruleset.IsLegacyRuleset())
                     {
-                        scores.Value = LeaderboardScores.Failure(LeaderboardFailState.RulesetUnavailable);
+                        Schedule(() => scores.Value = LeaderboardScores.Failure(LeaderboardFailState.RulesetUnavailable));
                         return;
                     }
 
                     if (newCriteria.Beatmap.OnlineID <= 0 || newCriteria.Beatmap.Status <= BeatmapOnlineStatus.Pending)
                     {
-                        scores.Value = LeaderboardScores.Failure(LeaderboardFailState.BeatmapUnavailable);
+                        Schedule(() => scores.Value = LeaderboardScores.Failure(LeaderboardFailState.BeatmapUnavailable));
                         return;
                     }
 
                     if ((newCriteria.Scope.RequiresSupporter(newCriteria.ExactMods != null)) && !api.LocalUser.Value.IsSupporter)
                     {
-                        scores.Value = LeaderboardScores.Failure(LeaderboardFailState.NotSupporter);
+                        Schedule(() => scores.Value = LeaderboardScores.Failure(LeaderboardFailState.NotSupporter));
                         return;
                     }
 
                     if (newCriteria.Scope == BeatmapLeaderboardScope.Team && api.LocalUser.Value.Team == null)
                     {
-                        scores.Value = LeaderboardScores.Failure(LeaderboardFailState.NoTeam);
+                        Schedule(() => scores.Value = LeaderboardScores.Failure(LeaderboardFailState.NoTeam));
                         return;
                     }
 
