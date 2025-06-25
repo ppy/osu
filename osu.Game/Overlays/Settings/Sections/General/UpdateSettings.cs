@@ -116,8 +116,12 @@ namespace osu.Game.Overlays.Settings.Sections.General
             if (stream.NewValue == ReleaseStream.Tachyon)
             {
                 dialogOverlay?.Push(
-                    new ConfirmDialog(GeneralSettingsStrings.ChangeReleaseStreamConfirmation, () => { configReleaseStream.Value = ReleaseStream.Tachyon; },
-                        () => { releaseStreamDropdown.Current.Value = ReleaseStream.Lazer; }) { BodyText = GeneralSettingsStrings.ChangeReleaseStreamConfirmationInfo });
+                    new ConfirmDialog(GeneralSettingsStrings.ChangeReleaseStreamConfirmation,
+                        () => configReleaseStream.Value = ReleaseStream.Tachyon,
+                        () => releaseStreamDropdown.Current.Value = ReleaseStream.Lazer)
+                    {
+                        BodyText = GeneralSettingsStrings.ChangeReleaseStreamConfirmationInfo
+                    });
 
                 return;
             }
