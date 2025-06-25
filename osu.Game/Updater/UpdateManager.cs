@@ -32,6 +32,8 @@ namespace osu.Game.Updater
                                          // only implementations will actually check for updates.
                                          GetType() != typeof(UpdateManager);
 
+        public virtual ReleaseStream? FixedReleaseStream => null;
+
         [Resolved]
         private OsuConfigManager config { get; set; } = null!;
 

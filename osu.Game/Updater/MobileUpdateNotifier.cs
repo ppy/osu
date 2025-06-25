@@ -10,6 +10,7 @@ using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Platform;
+using osu.Game.Configuration;
 using osu.Game.Online.API;
 
 namespace osu.Game.Updater
@@ -20,6 +21,8 @@ namespace osu.Game.Updater
     /// </summary>
     public partial class MobileUpdateNotifier : UpdateManager
     {
+        public override ReleaseStream? FixedReleaseStream => Configuration.ReleaseStream.Lazer;
+
         private string version = null!;
 
         [Resolved]
