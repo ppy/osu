@@ -5,6 +5,8 @@
 
 using System.ComponentModel;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
+using osu.Game.Localisation;
 
 namespace osu.Game.Graphics
 {
@@ -177,31 +179,37 @@ namespace osu.Game.Graphics
         /// <summary>
         /// Equivalent to weight 300.
         /// </summary>
+        [LocalisableDescription(typeof(FontStrings), nameof(FontStrings.Light))]
         Light = 300,
 
         /// <summary>
         /// Equivalent to weight 400.
         /// </summary>
+        [LocalisableDescription(typeof(FontStrings), nameof(FontStrings.Regular))]
         Regular = 400,
 
         /// <summary>
         /// Equivalent to weight 500.
         /// </summary>
+        [LocalisableDescription(typeof(FontStrings), nameof(FontStrings.Medium))]
         Medium = 500,
 
         /// <summary>
         /// Equivalent to weight 600.
         /// </summary>
+        [LocalisableDescription(typeof(FontStrings), nameof(FontStrings.SemiBold))]
         SemiBold = 600,
 
         /// <summary>
         /// Equivalent to weight 700.
         /// </summary>
+        [LocalisableDescription(typeof(FontStrings), nameof(FontStrings.Bold))]
         Bold = 700,
 
         /// <summary>
         /// Equivalent to weight 900.
         /// </summary>
+        [LocalisableDescription(typeof(FontStrings), nameof(FontStrings.Black))]
         Black = 900
     }
 }
