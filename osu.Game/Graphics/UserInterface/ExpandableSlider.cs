@@ -132,7 +132,7 @@ namespace osu.Game.Graphics.UserInterface
             label.Text = Expanded.Value ? expandedLabelText : contractedLabelText;
             slider.FadeTo(Current.Disabled ? 0.3f : 1f, animated ? 500 : 0, Easing.OutQuint);
 
-            // some sliders update their own alpha internally based on disabled state, so the fade needs to be done on a parent drawable to avoid race conditions
+            // some sliders update their own alpha internally based on disabled state, so the fade needs to be done on a parent drawable
             sliderContainer.FadeTo(Expanded.Value ? 1 : 0, animated ? 500 : 0, Easing.OutQuint);
             sliderContainer.BypassAutoSizeAxes = !Expanded.Value ? Axes.Y : Axes.None;
         }
