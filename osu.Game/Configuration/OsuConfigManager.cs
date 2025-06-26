@@ -42,7 +42,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.Skin, SkinInfo.ARGON_SKIN.ToString());
 
             SetDefault(OsuSetting.BeatmapDetailTab, BeatmapDetailTab.Local);
-            SetDefault(OsuSetting.BeatmapRankingsSort, RankingsSort.Score);
+            SetDefault(OsuSetting.BeatmapLeaderboardSortMode, LeaderboardSortMode.Score);
             SetDefault(OsuSetting.BeatmapDetailModsFilter, false);
 
             SetDefault(OsuSetting.ShowConvertedBeatmaps, true);
@@ -384,7 +384,7 @@ namespace osu.Game.Configuration
         MenuParallax,
         Prefer24HourTime,
         BeatmapDetailTab,
-        BeatmapRankingsSort,
+        BeatmapLeaderboardSortMode,
         BeatmapDetailModsFilter,
         Username,
         ReleaseStream,

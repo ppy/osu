@@ -3,7 +3,7 @@
 
 namespace osu.Game.Screens.Select.Leaderboards
 {
-    public enum RankingsSort
+    public enum LeaderboardSortMode
     {
         Score,
         Accuracy,

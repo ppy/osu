@@ -192,7 +192,7 @@ namespace osu.Game.Online.Leaderboards
         RulesetInfo? Ruleset,
         BeatmapLeaderboardScope Scope,
         Mod[]? ExactMods,
-        RankingsSort Sorting = RankingsSort.Score
+        LeaderboardSortMode Sorting = LeaderboardSortMode.Score
     );
 
     public record LeaderboardScores

@@ -28,28 +28,28 @@ namespace osu.Game.Scoring
                      .ThenBy(s => s.Date);
 
         /// <summary>
-        /// Orders an array of <see cref="ScoreInfo"/>s by the selected <see cref="RankingsSort"/>.
+        /// Orders an array of <see cref="ScoreInfo"/>s by the selected <see cref="LeaderboardSortMode"/>.
         /// </summary>
         /// <param name="scores">The array of <see cref="ScoreInfo"/>s to reorder.</param>
-        /// <param name="rankingSort">The attribute to sort the scores by.</param>
+        /// <param name="leaderboardSortMode">The attribute to sort the scores by.</param>
         /// <returns>The given <paramref name="scores"/> ordered by the selected mode.</returns>
-        public static IEnumerable<ScoreInfo> OrderByCriteria(this IEnumerable<ScoreInfo> scores, RankingsSort rankingSort)
+        public static IEnumerable<ScoreInfo> OrderByCriteria(this IEnumerable<ScoreInfo> scores, LeaderboardSortMode leaderboardSortMode)
         {
-            switch (rankingSort)
+            switch (leaderboardSortMode)
             {
-                case RankingsSort.Score:
+                case LeaderboardSortMode.Score:
                     return scores.OrderByDescending(s => s.TotalScore);
 
-                case RankingsSort.Accuracy:
+                case LeaderboardSortMode.Accuracy:
                     return scores.OrderByDescending(s => s.Accuracy).ThenByDescending(s => s.TotalScore);
 
-                case RankingsSort.Combo:
+                case LeaderboardSortMode.Combo:
                     return scores.OrderByDescending(s => s.MaxCombo).ThenByDescending(s => s.TotalScore);
 
-                case RankingsSort.Misses:
+                case LeaderboardSortMode.Misses:
                     return scores.OrderBy(s => s.Statistics.GetValueOrDefault(HitResult.Miss, 0)).ThenByDescending(s => s.TotalScore);
 
-                case RankingsSort.Date:
+                case LeaderboardSortMode.Date:
                     return scores.OrderByDescending(s => s.Date);
 
                 default: return scores;

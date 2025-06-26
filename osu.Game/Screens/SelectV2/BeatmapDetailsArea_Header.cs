@@ -24,7 +24,7 @@ namespace osu.Game.Screens.SelectV2
             private FillFlowContainer leaderboardControls = null!;
 
             private ShearedDropdown<BeatmapLeaderboardScope> scopeDropdown = null!;
-            private ShearedDropdown<RankingsSort> sortDropdown = null!;
+            private ShearedDropdown<LeaderboardSortMode> sortDropdown = null!;
             private ShearedToggleButton selectedModsToggle = null!;
 
             public IBindable<Selection> Type => tabControl.Current;
@@ -33,9 +33,9 @@ namespace osu.Game.Screens.SelectV2
 
             private readonly Bindable<BeatmapDetailTab> configDetailTab = new Bindable<BeatmapDetailTab>();
 
-            public IBindable<RankingsSort> Sorting => sortDropdown.Current;
+            public IBindable<LeaderboardSortMode> Sorting => sortDropdown.Current;
 
-            private readonly Bindable<RankingsSort> configRankingsSort = new Bindable<RankingsSort>();
+            private readonly Bindable<LeaderboardSortMode> configLeaderboardSortMode = new Bindable<LeaderboardSortMode>();
 
             public IBindable<bool> FilterBySelectedMods => selectedModsToggle.Active;
 
@@ -75,10 +75,10 @@ namespace osu.Game.Screens.SelectV2
                                         RelativeSizeAxes = Axes.X,
                                         Current = { Value = BeatmapLeaderboardScope.Global },
                                     },
-                                    sortDropdown = new ShearedDropdown<RankingsSort>("Sort")
+                                    sortDropdown = new ShearedDropdown<LeaderboardSortMode>("Sort")
                                     {
                                         RelativeSizeAxes = Axes.X,
-                                        Items = Enum.GetValues<RankingsSort>(),
+                                        Items = Enum.GetValues<LeaderboardSortMode>(),
                                     },
                                 },
                             },
@@ -100,7 +100,7 @@ namespace osu.Game.Screens.SelectV2
                 };
 
                 config.BindWith(OsuSetting.BeatmapDetailTab, configDetailTab);
-                config.BindWith(OsuSetting.BeatmapRankingsSort, configRankingsSort);
+                config.BindWith(OsuSetting.BeatmapLeaderboardSortMode, configLeaderboardSortMode);
                 config.BindWith(OsuSetting.BeatmapDetailModsFilter, selectedModsToggle.Active);
             }
 
@@ -111,8 +111,8 @@ namespace osu.Game.Screens.SelectV2
                 scopeDropdown.Current.Value = tryMapDetailTabToLeaderboardScope(configDetailTab.Value) ?? scopeDropdown.Current.Value;
                 scopeDropdown.Current.BindValueChanged(_ => updateConfigDetailTab());
 
-                sortDropdown.Current.Value = configRankingsSort.Value;
-                sortDropdown.Current.BindValueChanged(v => configRankingsSort.Value = v.NewValue);
+                sortDropdown.Current.Value = configLeaderboardSortMode.Value;
+                sortDropdown.Current.BindValueChanged(v => configLeaderboardSortMode.Value = v.NewValue);
 
                 tabControl.Current.Value = configDetailTab.Value == BeatmapDetailTab.Details ? Selection.Details : Selection.Ranking;
                 tabControl.Current.BindValueChanged(v =>
