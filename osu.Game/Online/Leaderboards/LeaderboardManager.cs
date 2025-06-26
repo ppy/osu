@@ -59,11 +59,11 @@ namespace osu.Game.Online.Leaderboards
             localScoreSubscription?.Dispose();
             inFlightOnlineRequest?.Cancel();
 
-            Schedule(() => scores.Value = null);
+            updateScores(null);
 
             if (newCriteria.Beatmap == null || newCriteria.Ruleset == null)
             {
-                Schedule(() => scores.Value = LeaderboardScores.Failure(LeaderboardFailState.NoneSelected));
+                updateScores(LeaderboardScores.Failure(LeaderboardFailState.NoneSelected));
                 return;
             }
 
@@ -84,31 +84,31 @@ namespace osu.Game.Online.Leaderboards
                 {
                     if (!api.IsLoggedIn)
                     {
-                        Schedule(() => scores.Value = LeaderboardScores.Failure(LeaderboardFailState.NotLoggedIn));
+                        updateScores(LeaderboardScores.Failure(LeaderboardFailState.NotLoggedIn));
                         return;
                     }
 
                     if (!newCriteria.Ruleset.IsLegacyRuleset())
                     {
-                        Schedule(() => scores.Value = LeaderboardScores.Failure(LeaderboardFailState.RulesetUnavailable));
+                        updateScores(LeaderboardScores.Failure(LeaderboardFailState.RulesetUnavailable));
                         return;
                     }
 
                     if (newCriteria.Beatmap.OnlineID <= 0 || newCriteria.Beatmap.Status <= BeatmapOnlineStatus.Pending)
                     {
-                        Schedule(() => scores.Value = LeaderboardScores.Failure(LeaderboardFailState.BeatmapUnavailable));
+                        updateScores(LeaderboardScores.Failure(LeaderboardFailState.BeatmapUnavailable));
                         return;
                     }
 
                     if ((newCriteria.Scope.RequiresSupporter(newCriteria.ExactMods != null)) && !api.LocalUser.Value.IsSupporter)
                     {
-                        Schedule(() => scores.Value = LeaderboardScores.Failure(LeaderboardFailState.NotSupporter));
+                        updateScores(LeaderboardScores.Failure(LeaderboardFailState.NotSupporter));
                         return;
                     }
 
                     if (newCriteria.Scope == BeatmapLeaderboardScope.Team && api.LocalUser.Value.Team == null)
                     {
-                        Schedule(() => scores.Value = LeaderboardScores.Failure(LeaderboardFailState.NoTeam));
+                        updateScores(LeaderboardScores.Failure(LeaderboardFailState.NoTeam));
                         return;
                     }
 
@@ -143,13 +143,13 @@ namespace osu.Game.Online.Leaderboards
                             response.UserScore?.CreateScoreInfo(rulesets, newCriteria.Beatmap)
                         );
                         inFlightOnlineRequest = null;
-                        scores.Value = result;
+                        updateScores(result);
                     };
                     newRequest.Failure += ex =>
                     {
                         Logger.Log($@"Failed to fetch leaderboards when displaying results: {ex}", LoggingTarget.Network);
                         if (ex is not OperationCanceledException)
-                            scores.Value = LeaderboardScores.Failure(LeaderboardFailState.NetworkFailure);
+                            updateScores(LeaderboardScores.Failure(LeaderboardFailState.NetworkFailure));
                     };
 
                     api.Queue(inFlightOnlineRequest = newRequest);
@@ -189,8 +189,10 @@ namespace osu.Game.Online.Leaderboards
             newScores = newScores.Detach().OrderByTotalScore();
 
             var newScoresArray = newScores.ToArray();
-            scores.Value = LeaderboardScores.Success(newScoresArray, newScoresArray.Length, null);
+            updateScores(LeaderboardScores.Success(newScoresArray, newScoresArray.Length, null));
         }
+
+        private void updateScores(LeaderboardScores? newScores) => Scheduler.AddOnce(v => scores.Value = v, newScores);
     }
 
     public record LeaderboardCriteria(
