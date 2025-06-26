@@ -29,11 +29,17 @@ namespace osu.Game.Tests.Visual.Ranking
         private ScoreManager scoreManager = null!;
         private RulesetStore rulesetStore = null!;
         private BeatmapManager beatmapManager = null!;
-
-        private LeaderboardManager leaderboardManager = null!;
         private BeatmapInfo importedBeatmap = null!;
 
+        [Cached]
+        private readonly LeaderboardManager leaderboardManager;
+
         private DummyAPIAccess dummyAPI => (DummyAPIAccess)API;
+
+        public TestSceneSoloResultsScreen()
+        {
+            Add(leaderboardManager = new LeaderboardManager());
+        }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
@@ -42,7 +48,6 @@ namespace osu.Game.Tests.Visual.Ranking
             dependencies.Cache(rulesetStore = new RealmRulesetStore(Realm));
             dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, Realm, null, dependencies.Get<AudioManager>(), Resources, dependencies.Get<GameHost>(), Beatmap.Default));
             dependencies.Cache(scoreManager = new ScoreManager(rulesetStore, () => beatmapManager, LocalStorage, Realm, API));
-            dependencies.Cache(leaderboardManager = new LeaderboardManager());
 
             Dependencies.Cache(Realm);
 
@@ -53,8 +58,6 @@ namespace osu.Game.Tests.Visual.Ranking
         public override void SetUpSteps()
         {
             base.SetUpSteps();
-
-            AddStep("load leaderboard manager", () => LoadComponent(leaderboardManager));
 
             AddStep(@"set beatmap", () =>
             {

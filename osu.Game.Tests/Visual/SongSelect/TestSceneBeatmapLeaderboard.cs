@@ -35,6 +35,9 @@ namespace osu.Game.Tests.Visual.SongSelect
     {
         private readonly FailableLeaderboard leaderboard;
 
+        [Cached]
+        private readonly LeaderboardManager leaderboardManager;
+
         [Cached(typeof(IDialogOverlay))]
         private readonly DialogOverlay dialogOverlay;
 
@@ -42,8 +45,6 @@ namespace osu.Game.Tests.Visual.SongSelect
         private RulesetStore rulesetStore = null!;
         private BeatmapManager beatmapManager = null!;
         private PlaySongSelect songSelect = null!;
-
-        private LeaderboardManager leaderboardManager = null!;
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
@@ -53,7 +54,6 @@ namespace osu.Game.Tests.Visual.SongSelect
             dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, Realm, null, dependencies.Get<AudioManager>(), Resources, dependencies.Get<GameHost>(), Beatmap.Default));
             dependencies.Cache(scoreManager = new ScoreManager(rulesetStore, () => beatmapManager, LocalStorage, Realm, API));
             dependencies.CacheAs<Screens.Select.SongSelect>(songSelect = new PlaySongSelect());
-            dependencies.Cache(leaderboardManager = new LeaderboardManager());
 
             Dependencies.Cache(Realm);
 
@@ -64,7 +64,6 @@ namespace osu.Game.Tests.Visual.SongSelect
         private void load()
         {
             LoadComponent(songSelect);
-            LoadComponent(leaderboardManager);
         }
 
         public TestSceneBeatmapLeaderboard()
@@ -74,6 +73,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
+                    leaderboardManager = new LeaderboardManager(),
                     dialogOverlay = new DialogOverlay
                     {
                         Depth = -1
