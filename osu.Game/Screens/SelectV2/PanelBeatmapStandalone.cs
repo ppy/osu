@@ -63,13 +63,13 @@ namespace osu.Game.Screens.SelectV2
         private BeatmapSetOnlineStatusPill statusPill = null!;
 
         private ConstrainedIconContainer difficultyIcon = null!;
-        private FillFlowContainer difficultyLine = null!;
         private StarRatingDisplay starRatingDisplay = null!;
         private StarCounter starCounter = null!;
         private PanelLocalRankDisplay localRank = null!;
         private OsuSpriteText keyCountText = null!;
         private OsuSpriteText difficultyText = null!;
         private OsuSpriteText authorText = null!;
+        private FillFlowContainer mainFill = null!;
 
         public PanelBeatmapStandalone()
         {
@@ -83,8 +83,8 @@ namespace osu.Game.Screens.SelectV2
 
             Icon = difficultyIcon = new ConstrainedIconContainer
             {
-                Size = new Vector2(16),
-                Margin = new MarginPadding { Horizontal = 5f },
+                Size = new Vector2(12),
+                Margin = new MarginPadding { Left = 4f, Right = 3f },
                 Colour = colourProvider.Background5,
             };
 
@@ -95,93 +95,105 @@ namespace osu.Game.Screens.SelectV2
 
             Content.Child = new FillFlowContainer
             {
+                AutoSizeAxes = Axes.Both,
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.CentreLeft,
-                Padding = new MarginPadding { Left = 10f },
-                Direction = FillDirection.Vertical,
-                AutoSizeAxes = Axes.Both,
+                Spacing = new Vector2(5),
+                Margin = new MarginPadding { Left = 6.5f },
+                Direction = FillDirection.Horizontal,
                 Children = new Drawable[]
                 {
-                    titleText = new OsuSpriteText
+                    localRank = new PanelLocalRankDisplay
                     {
-                        Font = OsuFont.Style.Heading2.With(typeface: Typeface.TorusAlternate, weight: FontWeight.Bold),
+                        Scale = new Vector2(0.8f),
+                        Origin = Anchor.CentreLeft,
+                        Anchor = Anchor.CentreLeft,
                     },
-                    artistText = new OsuSpriteText
+                    mainFill = new FillFlowContainer
                     {
-                        Font = OsuFont.Style.Caption1.With(weight: FontWeight.SemiBold),
-                        Padding = new MarginPadding { Top = -2 },
-                    },
-                    difficultyLine = new FillFlowContainer
-                    {
-                        Direction = FillDirection.Horizontal,
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
+                        Direction = FillDirection.Vertical,
+                        Padding = new MarginPadding { Bottom = 4.8f },
                         AutoSizeAxes = Axes.Both,
-                        Padding = new MarginPadding { Top = 4 },
                         Children = new Drawable[]
                         {
-                            statusPill = new BeatmapSetOnlineStatusPill
+                            titleText = new OsuSpriteText
                             {
-                                Animated = false,
-                                Origin = Anchor.CentreLeft,
-                                Anchor = Anchor.CentreLeft,
-                                TextSize = OsuFont.Style.Caption2.Size,
-                                Margin = new MarginPadding { Right = 5f },
+                                Font = OsuFont.Style.Heading2.With(typeface: Typeface.TorusAlternate, weight: FontWeight.Bold),
                             },
-                            updateButton = new PanelUpdateBeatmapButton
+                            artistText = new OsuSpriteText
                             {
-                                Scale = new Vector2(0.7f),
-                                Anchor = Anchor.CentreLeft,
-                                Origin = Anchor.CentreLeft,
-                                Margin = new MarginPadding { Right = 5f, Top = -2f },
-                            },
-                            keyCountText = new OsuSpriteText
-                            {
-                                Font = OsuFont.Style.Body.With(weight: FontWeight.SemiBold),
-                                Anchor = Anchor.BottomLeft,
-                                Origin = Anchor.BottomLeft,
-                                Alpha = 0,
-                            },
-                            difficultyText = new OsuSpriteText
-                            {
-                                Font = OsuFont.Style.Body.With(weight: FontWeight.SemiBold),
-                                Anchor = Anchor.BottomLeft,
-                                Origin = Anchor.BottomLeft,
-                                Margin = new MarginPadding { Right = 3f },
-                            },
-                            authorText = new OsuSpriteText
-                            {
-                                Colour = colourProvider.Content2,
                                 Font = OsuFont.Style.Caption1.With(weight: FontWeight.SemiBold),
-                                Anchor = Anchor.BottomLeft,
-                                Origin = Anchor.BottomLeft
+                                Padding = new MarginPadding { Top = -2 },
+                            },
+                            new FillFlowContainer
+                            {
+                                Direction = FillDirection.Horizontal,
+                                AutoSizeAxes = Axes.Both,
+                                Padding = new MarginPadding { Top = 2, Bottom = 2 },
+                                Children = new Drawable[]
+                                {
+                                    statusPill = new BeatmapSetOnlineStatusPill
+                                    {
+                                        Animated = false,
+                                        Origin = Anchor.BottomLeft,
+                                        Anchor = Anchor.BottomLeft,
+                                        TextSize = OsuFont.Style.Caption2.Size,
+                                        Margin = new MarginPadding { Right = 4f },
+                                    },
+                                    updateButton = new PanelUpdateBeatmapButton
+                                    {
+                                        Scale = new Vector2(0.8f),
+                                        Anchor = Anchor.BottomLeft,
+                                        Origin = Anchor.BottomLeft,
+                                        Margin = new MarginPadding { Right = 4f, Bottom = -1f },
+                                    },
+                                    keyCountText = new OsuSpriteText
+                                    {
+                                        Font = OsuFont.Style.Body.With(weight: FontWeight.SemiBold),
+                                        Anchor = Anchor.BottomLeft,
+                                        Origin = Anchor.BottomLeft,
+                                        Alpha = 0,
+                                    },
+                                    difficultyText = new OsuSpriteText
+                                    {
+                                        Font = OsuFont.Style.Body.With(weight: FontWeight.SemiBold),
+                                        Anchor = Anchor.BottomLeft,
+                                        Origin = Anchor.BottomLeft,
+                                        Margin = new MarginPadding { Right = 3f },
+                                    },
+                                    authorText = new OsuSpriteText
+                                    {
+                                        Colour = colourProvider.Content2,
+                                        Font = OsuFont.Style.Caption1.With(weight: FontWeight.SemiBold),
+                                        Anchor = Anchor.BottomLeft,
+                                        Origin = Anchor.BottomLeft
+                                    }
+                                }
+                            },
+                            new FillFlowContainer
+                            {
+                                Direction = FillDirection.Horizontal,
+                                Spacing = new Vector2(3),
+                                AutoSizeAxes = Axes.Both,
+                                Children = new Drawable[]
+                                {
+                                    starRatingDisplay = new StarRatingDisplay(default, StarRatingDisplaySize.Small, animated: true)
+                                    {
+                                        Origin = Anchor.CentreLeft,
+                                        Anchor = Anchor.CentreLeft,
+                                        Scale = new Vector2(0.875f),
+                                    },
+                                    starCounter = new StarCounter
+                                    {
+                                        Anchor = Anchor.CentreLeft,
+                                        Origin = Anchor.CentreLeft,
+                                        Scale = new Vector2(0.4f)
+                                    }
+                                },
                             }
                         }
-                    },
-                    new FillFlowContainer
-                    {
-                        Direction = FillDirection.Horizontal,
-                        Spacing = new Vector2(3),
-                        AutoSizeAxes = Axes.Both,
-                        Children = new Drawable[]
-                        {
-                            localRank = new PanelLocalRankDisplay
-                            {
-                                Scale = new Vector2(0.65f),
-                                Origin = Anchor.CentreLeft,
-                                Anchor = Anchor.CentreLeft,
-                            },
-                            starRatingDisplay = new StarRatingDisplay(default, StarRatingDisplaySize.Small, animated: true)
-                            {
-                                Origin = Anchor.CentreLeft,
-                                Anchor = Anchor.CentreLeft,
-                                Scale = new Vector2(0.875f),
-                            },
-                            starCounter = new StarCounter
-                            {
-                                Anchor = Anchor.CentreLeft,
-                                Origin = Anchor.CentreLeft,
-                                Scale = new Vector2(0.4f)
-                            }
-                        },
                     }
                 }
             };
@@ -229,9 +241,9 @@ namespace osu.Game.Screens.SelectV2
             localRank.Beatmap = beatmap;
             difficultyText.Text = beatmap.DifficultyName;
             authorText.Text = BeatmapsetsStrings.ShowDetailsMappedBy(beatmap.Metadata.Author.Username);
-            difficultyLine.Show();
 
             computeStarRating();
+            updateKeyCount();
         }
 
         protected override void FreeAfterUse()
@@ -257,12 +269,10 @@ namespace osu.Game.Screens.SelectV2
             var beatmap = (BeatmapInfo)Item.Model;
 
             starDifficultyBindable = difficultyCache.GetBindableDifficulty(beatmap, starDifficultyCancellationSource.Token, SongSelect.SELECTION_DEBOUNCE);
-            starDifficultyBindable.BindValueChanged(_ =>
+            starDifficultyBindable.BindValueChanged(starDifficulty =>
             {
-                var starDifficulty = starDifficultyBindable?.Value ?? default;
-
-                starRatingDisplay.Current.Value = starDifficulty;
-                starCounter.Current = (float)starDifficulty.Stars;
+                starRatingDisplay.Current.Value = starDifficulty.NewValue;
+                starCounter.Current = (float)starDifficulty.NewValue.Stars;
             }, true);
         }
 
@@ -278,7 +288,7 @@ namespace osu.Game.Screens.SelectV2
 
             // Dirty hack to make sure we don't take up spacing in parent fill flow when not displaying a rank.
             // I can't find a better way to do this.
-            starRatingDisplay.Margin = new MarginPadding { Left = 1 / starRatingDisplay.Scale.X * (localRank.HasRank ? 0 : -3) };
+            mainFill.Margin = new MarginPadding { Left = 1 / starRatingDisplay.Scale.X * (localRank.HasRank ? 0 : -3) };
 
             var diffColour = starRatingDisplay.DisplayedDifficultyColour;
 

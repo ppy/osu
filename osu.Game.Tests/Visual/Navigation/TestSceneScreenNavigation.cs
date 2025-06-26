@@ -312,8 +312,8 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddStep("set game volume to max", () => Game.Dependencies.Get<FrameworkConfigManager>().SetValue(FrameworkSetting.VolumeUniversal, 1d));
 
-            AddStep("move to metadata wedge", () => InputManager.MoveMouseTo(
-                songSelect.ChildrenOfType<BeatmapMetadataWedge>().Single()));
+            AddStep("move to details area", () => InputManager.MoveMouseTo(
+                songSelect.ChildrenOfType<BeatmapDetailsArea>().Single()));
             AddStep("scroll down", () => InputManager.ScrollVerticalBy(-1));
             AddAssert("carousel didn't move", getCarouselScrollPosition, () => Is.EqualTo(scrollPosition));
 
@@ -793,7 +793,8 @@ namespace osu.Game.Tests.Visual.Navigation
         {
             AddStep("push song select", () => Game.ScreenStack.Push(new TestPlaySongSelect()));
             AddStep("press back button", () => Game.ChildrenOfType<BackButton>().First().Action!.Invoke());
-            AddWaitStep("wait two frames", 2);
+
+            ConfirmAtMainMenu();
         }
 
         [Test]

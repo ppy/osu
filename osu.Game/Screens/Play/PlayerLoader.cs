@@ -26,12 +26,14 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Input;
 using osu.Game.Localisation;
+using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Overlays.Volume;
 using osu.Game.Performance;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play.PlayerSettings;
+using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Skinning;
 using osu.Game.Users;
 using osu.Game.Utils;
@@ -144,6 +146,7 @@ namespace osu.Game.Screens.Play
         private bool playerConsumed;
 
         private LogoTrackingContainer content = null!;
+        private IDisposable? logoTracking;
 
         private bool hideOverlays;
 
@@ -173,6 +176,9 @@ namespace osu.Game.Screens.Play
 
         [Resolved]
         private IHighPerformanceSessionManager? highPerformanceSessionManager { get; set; }
+
+        [Resolved]
+        private LeaderboardManager? leaderboardManager { get; set; }
 
         public PlayerLoader(Func<Player> createPlayer)
         {
@@ -268,6 +274,12 @@ namespace osu.Game.Screens.Play
 
             showStoryboards.BindValueChanged(val => epilepsyWarning?.FadeTo(val.NewValue ? 1 : 0, 250, Easing.OutQuint), true);
             epilepsyWarning?.FinishTransforms(true);
+
+            leaderboardManager?.FetchWithCriteria(new LeaderboardCriteria(
+                Beatmap.Value.BeatmapInfo,
+                Ruleset.Value,
+                leaderboardManager?.CurrentCriteria?.Scope ?? BeatmapLeaderboardScope.Global,
+                leaderboardManager?.CurrentCriteria?.ExactMods));
         }
 
         #region Screen handling
@@ -379,21 +391,26 @@ namespace osu.Game.Screens.Play
             Scheduler.AddDelayed(() =>
             {
                 if (this.IsCurrentScreen())
-                    content.StartTracking(logo, resuming ? 0 : 500, Easing.InOutExpo);
+                    logoTracking = content.StartTracking(logo, resuming ? 0 : 500, Easing.InOutExpo);
             }, resuming ? 0 : 250);
         }
 
         protected override void LogoExiting(OsuLogo logo)
         {
             base.LogoExiting(logo);
-            content.StopTracking();
+
+            logoTracking?.Dispose();
+            logoTracking = null;
+
             osuLogo = null;
         }
 
         protected override void LogoSuspending(OsuLogo logo)
         {
             base.LogoSuspending(logo);
-            content.StopTracking();
+
+            logoTracking?.Dispose();
+            logoTracking = null;
 
             logo
                 .FadeOut(CONTENT_OUT_DURATION / 2, Easing.OutQuint)
@@ -538,7 +555,8 @@ namespace osu.Game.Screens.Play
         protected virtual void ContentOut()
         {
             // Ensure the logo is no longer tracking before we scale the content
-            content.StopTracking();
+            logoTracking?.Dispose();
+            logoTracking = null;
 
             content.ScaleTo(0.7f, CONTENT_OUT_DURATION * 2, Easing.OutQuint);
             content.FadeOut(CONTENT_OUT_DURATION, Easing.OutQuint)
@@ -708,6 +726,10 @@ namespace osu.Game.Screens.Play
 
         #region Low battery warning
 
+        /// <summary>
+        /// This is intentionally higher than 20%, which is usually when OS level notifications
+        /// interrupt the active application to warn the user.
+        /// </summary>
         private const double low_battery_threshold = 0.25;
 
         private Bindable<bool> batteryWarningShownOnce = null!;

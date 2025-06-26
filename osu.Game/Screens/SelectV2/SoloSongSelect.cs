@@ -54,11 +54,13 @@ namespace osu.Game.Screens.SelectV2
         private void load(AudioManager audio)
         {
             sampleConfirmSelection = audio.Samples.Get(@"SongSelect/confirm-selection");
+
+            AddInternal(new SongSelectTouchInputDetector());
         }
 
         public override IEnumerable<OsuMenuItem> GetForwardActions(BeatmapInfo beatmap)
         {
-            yield return new OsuMenuItem(ButtonSystemStrings.Play.ToSentence(), MenuItemType.Highlighted, () => SelectAndStart(beatmap)) { Icon = FontAwesome.Solid.Check };
+            yield return new OsuMenuItem(ButtonSystemStrings.Play.ToSentence(), MenuItemType.Highlighted, () => SelectAndRun(beatmap, OnStart)) { Icon = FontAwesome.Solid.Check };
             yield return new OsuMenuItem(ButtonSystemStrings.Edit.ToSentence(), MenuItemType.Standard, () => edit(beatmap)) { Icon = FontAwesome.Solid.PencilAlt };
 
             yield return new OsuMenuItemSpacer();
@@ -73,6 +75,9 @@ namespace osu.Game.Screens.SelectV2
                 yield return new OsuMenuItemSpacer();
             }
 
+            foreach (var i in CreateCollectionMenuActions(beatmap))
+                yield return i;
+
             // TODO: replace with "remove from played" button when beatmap is already played.
             yield return new OsuMenuItem(SongSelectStrings.MarkAsPlayed, MenuItemType.Standard, () => beatmaps.MarkPlayed(beatmap)) { Icon = FontAwesome.Solid.TimesCircle };
             yield return new OsuMenuItem(SongSelectStrings.ClearAllLocalScores, MenuItemType.Standard, () => dialogOverlay?.Push(new BeatmapClearScoresDialog(beatmap)))
@@ -82,15 +87,11 @@ namespace osu.Game.Screens.SelectV2
             yield return new OsuMenuItem(WebCommonStrings.ButtonsHide.ToSentence(), MenuItemType.Destructive, () => beatmaps.Hide(beatmap));
         }
 
-        protected override bool OnStart()
+        protected override void OnStart()
         {
-            if (playerLoader != null) return false;
-            if (!this.IsCurrentScreen()) return false;
-            if (Beatmap.IsDefault) return false;
+            if (playerLoader != null) return;
 
-            FinaliseSelection();
-
-            modsAtGameplayStart = Mods.Value;
+            modsAtGameplayStart = Mods.Value.Select(m => m.DeepClone()).ToArray();
 
             // Ctrl+Enter should start map with autoplay enabled.
             if (GetContainingInputManager()?.CurrentState?.Keyboard.ControlPressed == true)
@@ -103,7 +104,7 @@ namespace osu.Game.Screens.SelectV2
                     {
                         Text = NotificationsStrings.NoAutoplayMod
                     });
-                    return false;
+                    return;
                 }
 
                 var mods = Mods.Value.Append(autoInstance).ToArray();
@@ -117,7 +118,6 @@ namespace osu.Game.Screens.SelectV2
             sampleConfirmSelection?.Play();
 
             this.Push(playerLoader = new PlayerLoader(createPlayer));
-            return true;
 
             Player createPlayer()
             {
@@ -140,12 +140,10 @@ namespace osu.Game.Screens.SelectV2
 
         private void edit(BeatmapInfo beatmap)
         {
-            FinaliseSelection();
+            if (!this.IsCurrentScreen())
+                return;
 
-            // Forced refetch is important here to guarantee correct invalidation across all difficulties.
-            Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap, true);
-
-            this.Push(new EditorLoader());
+            SelectAndRun(beatmap, () => this.Push(new EditorLoader()));
         }
 
         public override void OnResuming(ScreenTransitionEvent e)

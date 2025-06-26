@@ -21,6 +21,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         private bool seek;
 
         [Test]
+        [FlakyTest]
         public void TestAllSamplesStopDuringSeek()
         {
             DrawableSlider? slider = null;

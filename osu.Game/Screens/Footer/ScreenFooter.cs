@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -39,7 +40,11 @@ namespace osu.Game.Screens.Footer
 
         private const int padding = 60;
         private const float delay_per_button = 30;
-        private const double transition_duration = 400;
+        private const double transition_duration = 500;
+
+        // Disable masking because it breaks due to the height of this container being less than the displayed content.
+        // The height being set as it is is required for transition purposes.
+        public override bool UpdateSubTreeMasking() => false;
 
         private readonly List<OverlayContainer> overlays = new List<OverlayContainer>();
 
@@ -47,10 +52,17 @@ namespace osu.Game.Screens.Footer
         private FillFlowContainer<ScreenFooterButton> buttonsFlow = null!;
         private Container footerContentContainer = null!;
         private Container<ScreenFooterButton> hiddenButtonsContainer = null!;
-        private LogoTrackingContainer logoTrackingContainer = null!;
 
+        private LogoTrackingContainer logoTrackingContainer = null!;
+        private IDisposable? logoTracking;
+
+        // TODO: This has some weird update logic local in this class, but it only works for overlay containers.
+        // This is not what we want. The footer is to be displayed on *screens* with different colour schemes.
+        // It needs to update on screen switch.
+        //
+        // For now it's locked to Blue to match song select (the most prominent usage).
         [Cached]
-        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
+        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 
         public ScreenFooter(BackReceptor? receptor = null)
         {
@@ -92,7 +104,7 @@ namespace osu.Game.Screens.Footer
                             {
                                 Anchor = Anchor.BottomLeft,
                                 Origin = Anchor.BottomLeft,
-                                Y = ScreenFooterButton.Y_OFFSET,
+                                Y = ScreenFooterButton.CORNER_RADIUS,
                                 Direction = FillDirection.Horizontal,
                                 Spacing = new Vector2(7, 0),
                                 AutoSizeAxes = Axes.Both,
@@ -115,7 +127,7 @@ namespace osu.Game.Screens.Footer
                 hiddenButtonsContainer = new Container<ScreenFooterButton>
                 {
                     Margin = new MarginPadding { Left = OsuGame.SCREEN_EDGE_MARGIN + ScreenBackButton.BUTTON_WIDTH + padding },
-                    Y = ScreenFooterButton.Y_OFFSET,
+                    Y = ScreenFooterButton.CORNER_RADIUS,
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                     AutoSizeAxes = Axes.Both,
@@ -139,13 +151,14 @@ namespace osu.Game.Screens.Footer
             changeLogoDepthDelegate?.Cancel();
             changeLogoDepthDelegate = null;
 
-            logoTrackingContainer.StartTracking(logo, duration, easing);
+            logoTracking = logoTrackingContainer.StartTracking(logo, duration, easing);
             RequestLogoInFront?.Invoke(true);
         }
 
         public void StopTrackingLogo()
         {
-            logoTrackingContainer.StopTracking();
+            logoTracking?.Dispose();
+            logoTracking = null;
 
             changeLogoDepthDelegate = Scheduler.AddDelayed(() => RequestLogoInFront?.Invoke(false), transition_duration);
         }
@@ -153,13 +166,14 @@ namespace osu.Game.Screens.Footer
         protected override void PopIn()
         {
             this.MoveToY(0, transition_duration, Easing.OutQuint)
-                .FadeIn(transition_duration, Easing.OutQuint);
+                .FadeIn();
         }
 
         protected override void PopOut()
         {
-            this.MoveToY(HEIGHT, transition_duration, Easing.OutQuint)
-                .FadeOut(transition_duration, Easing.OutQuint);
+            this.MoveToY(ScreenFooterButton.HEIGHT, transition_duration, Easing.OutQuint)
+                .Then()
+                .FadeOut();
         }
 
         public void SetButtons(IReadOnlyList<ScreenFooterButton> buttons)
@@ -167,6 +181,7 @@ namespace osu.Game.Screens.Footer
             temporarilyHiddenButtons.Clear();
             overlays.Clear();
 
+            this.HidePopover();
             clearActiveOverlayContainer();
 
             var oldButtons = buttonsFlow.ToArray();
@@ -312,6 +327,8 @@ namespace osu.Game.Screens.Footer
 
         private void showOverlay(OverlayContainer overlay)
         {
+            this.HidePopover();
+
             foreach (var o in overlays.Where(o => o != overlay))
                 o.Hide();
 
