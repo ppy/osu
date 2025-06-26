@@ -37,10 +37,7 @@ namespace osu.Game.Skinning
 
             Font.BindValueChanged(e =>
             {
-                // We only have bold weight for venera, so let's force that.
-                FontWeight fontWeight = e.NewValue == Typeface.Venera ? FontWeight.Bold : FontWeight.Regular;
-
-                FontUsage f = OsuFont.GetFont(e.NewValue, weight: fontWeight);
+                FontUsage f = OsuFont.GetFont(e.NewValue, weight: FontWeight.Regular);
                 SetFont(f);
             }, true);
 
