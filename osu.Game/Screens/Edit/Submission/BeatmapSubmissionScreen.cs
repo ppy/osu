@@ -8,6 +8,8 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Development;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
@@ -81,8 +83,10 @@ namespace osu.Game.Screens.Edit.Submission
 
         private Live<BeatmapSetInfo>? importedSet;
 
+        private Sample completedSample = null!;
+
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(AudioManager audio)
         {
             AddRangeInternal(new Drawable[]
             {
@@ -118,24 +122,28 @@ namespace osu.Game.Screens.Edit.Submission
                                 createSetStep = new SubmissionStageProgress
                                 {
                                     StageDescription = BeatmapSubmissionStrings.Preparing,
+                                    StageIndex = 0,
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
                                 },
                                 exportStep = new SubmissionStageProgress
                                 {
                                     StageDescription = BeatmapSubmissionStrings.Exporting,
+                                    StageIndex = 1,
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
                                 },
                                 uploadStep = new SubmissionStageProgress
                                 {
                                     StageDescription = BeatmapSubmissionStrings.Uploading,
+                                    StageIndex = 2,
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
                                 },
                                 updateStep = new SubmissionStageProgress
                                 {
                                     StageDescription = BeatmapSubmissionStrings.Finishing,
+                                    StageIndex = 3,
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
                                 },
@@ -181,19 +189,30 @@ namespace osu.Game.Screens.Edit.Submission
                     }
                 }
             });
+
+            completedSample = audio.Samples.Get(@"UI/bss-complete");
         }
 
         private void createBeatmapSet()
         {
             bool beatmapHasOnlineId = Beatmap.Value.BeatmapSetInfo.OnlineID > 0;
 
-            var createRequest = beatmapHasOnlineId
-                ? PutBeatmapSetRequest.UpdateExisting(
+            PutBeatmapSetRequest createRequest;
+
+            if (beatmapHasOnlineId)
+            {
+                createRequest = PutBeatmapSetRequest.UpdateExisting(
                     (uint)Beatmap.Value.BeatmapSetInfo.OnlineID,
                     Beatmap.Value.BeatmapSetInfo.Beatmaps.Where(b => b.OnlineID > 0).Select(b => (uint)b.OnlineID).ToArray(),
                     (uint)Beatmap.Value.BeatmapSetInfo.Beatmaps.Count(b => b.OnlineID <= 0),
-                    settings)
-                : PutBeatmapSetRequest.CreateNew((uint)Beatmap.Value.BeatmapSetInfo.Beatmaps.Count, settings);
+                    settings);
+                log($"Updating existing beatmap set (id:{createRequest.BeatmapSetID} beatmapsToKeep:[{string.Join(",", createRequest.BeatmapsToKeep)}] beatmapsToCreate:{createRequest.BeatmapsToCreate})");
+            }
+            else
+            {
+                createRequest = PutBeatmapSetRequest.CreateNew((uint)Beatmap.Value.BeatmapSetInfo.Beatmaps.Count, settings);
+                log($"Creating new beatmap set (beatmapsToCreate:{createRequest.BeatmapsToCreate})");
+            }
 
             createRequest.Success += async response =>
             {
@@ -218,7 +237,7 @@ namespace osu.Game.Screens.Edit.Submission
             createRequest.Failure += ex =>
             {
                 createSetStep.SetFailed(ex.Message);
-                Logger.Log($"Beatmap set submission failed on creation: {ex}");
+                log($"Beatmap set creation/update failed: {ex}");
                 allowExit();
             };
 
@@ -247,7 +266,7 @@ namespace osu.Game.Screens.Edit.Submission
             {
                 exportStep.SetFailed(ex.Message);
                 exportProgressNotification = null;
-                Logger.Log($"Beatmap set submission failed on export: {ex}");
+                log($"Export failed: {ex}");
                 allowExit();
                 return;
             }
@@ -267,6 +286,7 @@ namespace osu.Game.Screens.Edit.Submission
         {
             Debug.Assert(beatmapSetId != null);
             Debug.Assert(beatmapPackageStream != null);
+            log("Determining list of files to patch...");
 
             var onlineFilesByFilename = onlineFiles.ToDictionary(f => f.Filename, f => f.SHA2Hash);
 
@@ -281,12 +301,16 @@ namespace osu.Game.Screens.Edit.Submission
 
                 if (!onlineFilesByFilename.Remove(filename, out string? onlineHash))
                 {
+                    log($@"new file: {filename}");
                     filesToUpdate.Add(filename);
                     continue;
                 }
 
                 if (!localHash.Equals(onlineHash, StringComparison.OrdinalIgnoreCase))
+                {
+                    log($@"changed file: {filename} (localHash:{localHash} onlineHash:{onlineHash})");
                     filesToUpdate.Add(filename);
+                }
             }
 
             var changedFiles = new Dictionary<string, byte[]>();
@@ -297,14 +321,18 @@ namespace osu.Game.Screens.Edit.Submission
             var patchRequest = new PatchBeatmapPackageRequest(beatmapSetId.Value);
             patchRequest.FilesChanged.AddRange(changedFiles);
             patchRequest.FilesDeleted.AddRange(onlineFilesByFilename.Keys);
+
+            foreach (string file in patchRequest.FilesDeleted)
+                log($@"deleted file: {file}");
+
             patchRequest.Success += uploadCompleted;
             patchRequest.Failure += ex =>
             {
                 uploadStep.SetFailed(ex.Message);
-                Logger.Log($"Beatmap submission failed on upload: {ex}");
+                log($"Upload failed: {ex}");
                 allowExit();
             };
-            patchRequest.Progressed += (current, total) => uploadStep.SetInProgress((float)current / total);
+            patchRequest.Progressed += (current, total) => uploadStep.SetInProgress(total > 0 ? (float)current / total : null);
 
             api.Queue(patchRequest);
             uploadStep.SetInProgress();
@@ -312,6 +340,8 @@ namespace osu.Game.Screens.Edit.Submission
 
         private void replaceBeatmapSet()
         {
+            log("Peforming full package upload...");
+
             Debug.Assert(beatmapSetId != null);
             Debug.Assert(beatmapPackageStream != null);
 
@@ -321,7 +351,7 @@ namespace osu.Game.Screens.Edit.Submission
             uploadRequest.Failure += ex =>
             {
                 uploadStep.SetFailed(ex.Message);
-                Logger.Log($"Beatmap submission failed on upload: {ex}");
+                log($"Full package upload failed: {ex}");
                 allowExit();
             };
             uploadRequest.Progressed += (current, total) => uploadStep.SetInProgress((float)current / Math.Max(total, 1));
@@ -338,6 +368,8 @@ namespace osu.Game.Screens.Edit.Submission
 
         private async Task updateLocalBeatmap()
         {
+            log(@"Updating local beatmap set...");
+
             Debug.Assert(beatmapSetId != null);
             Debug.Assert(beatmapPackageStream != null);
 
@@ -354,7 +386,7 @@ namespace osu.Game.Screens.Edit.Submission
             catch (Exception ex)
             {
                 updateStep.SetFailed(ex.Message);
-                Logger.Log($"Beatmap submission failed on local update: {ex}");
+                log($@"Local update failed: {ex}");
                 allowExit();
                 return;
             }
@@ -382,6 +414,8 @@ namespace osu.Game.Screens.Edit.Submission
                     successContainer.Add(loaded);
                     flashLayer.FadeOutFromOne(2000, Easing.OutQuint);
                 });
+
+                completedSample.Play();
             };
 
             api.Queue(getBeatmapSetRequest);
@@ -436,6 +470,9 @@ namespace osu.Game.Screens.Edit.Submission
 
             overlay.Show();
         }
+
+        private static void log(string message)
+            => Logger.Log($@"[{nameof(BeatmapSubmissionScreen)}] {message}", LoggingTarget.Database);
 
         protected override void Dispose(bool isDisposing)
         {

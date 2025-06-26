@@ -48,7 +48,7 @@ namespace osu.Game.Skinning.Components
         private BeatmapDifficultyCache difficultyCache { get; set; } = null!;
 
         private readonly OsuSpriteText text;
-        private IBindable<StarDifficulty?>? difficultyBindable;
+        private IBindable<StarDifficulty>? difficultyBindable;
         private CancellationTokenSource? difficultyCancellationSource;
         private ModSettingChangeTracker? modSettingTracker;
         private StarDifficulty? starDifficulty;

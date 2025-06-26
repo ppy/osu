@@ -760,11 +760,7 @@ namespace osu.Game.Overlays.SkinEditor
 
         #region Delegation of IEditorChangeHandler
 
-        public event Action? OnStateChange
-        {
-            add => throw new NotImplementedException();
-            remove => throw new NotImplementedException();
-        }
+        public event Action? OnStateChange;
 
         private IEditorChangeHandler? beginChangeHandler;
 
@@ -773,6 +769,9 @@ namespace osu.Game.Overlays.SkinEditor
             // Change handler may change between begin and end, which can cause unbalanced operations.
             // Let's track the one that was used when beginning the change so we can call EndChange on it specifically.
             (beginChangeHandler = changeHandler)?.BeginChange();
+
+            if (beginChangeHandler != null)
+                beginChangeHandler.OnStateChange += OnStateChange;
         }
 
         public void EndChange() => beginChangeHandler?.EndChange();

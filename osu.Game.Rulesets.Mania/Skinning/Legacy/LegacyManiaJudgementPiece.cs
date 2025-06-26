@@ -24,7 +24,6 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
             this.result = result;
             this.animation = animation;
 
-            Anchor = Anchor.BottomCentre;
             Origin = Anchor.Centre;
 
             AutoSizeAxes = Axes.Both;
@@ -53,10 +52,18 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
             float hitPosition = skin.GetManiaSkinConfig<float>(LegacyManiaSkinConfigurationLookups.HitPosition)?.Value ?? 0;
             float scorePosition = skin.GetManiaSkinConfig<float>(LegacyManiaSkinConfigurationLookups.ScorePosition)?.Value ?? 0;
 
-            float absoluteHitPosition = 480f * LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR - hitPosition;
-            float finalPosition = scorePosition - absoluteHitPosition;
+            float hitPositionFromTop = 480f * LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR - hitPosition;
 
-            Y = direction.Value == ScrollingDirection.Up ? -finalPosition : finalPosition;
+            if (scorePosition > hitPositionFromTop / 2f)
+            {
+                Anchor = direction.Value == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre;
+                Y = direction.Value == ScrollingDirection.Up ? hitPositionFromTop - scorePosition : scorePosition - hitPositionFromTop;
+            }
+            else
+            {
+                Anchor = direction.Value == ScrollingDirection.Up ? Anchor.BottomCentre : Anchor.TopCentre;
+                Y = direction.Value == ScrollingDirection.Up ? -scorePosition : scorePosition;
+            }
         }
 
         public void PlayAnimation()

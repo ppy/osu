@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
     {
         private const int history_time_max = 5 * 1000; // 5 seconds
         private const int history_objects_max = 32;
-        private const double rhythm_overall_multiplier = 0.95;
+        private const double rhythm_overall_multiplier = 1.0;
         private const double rhythm_ratio_multiplier = 12.0;
 
         /// <summary>
@@ -68,16 +68,19 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                 // calculate how much current delta difference deserves a rhythm bonus
                 // this function is meant to reduce rhythm bonus for deltas that are multiples of each other (i.e 100 and 200)
-                double deltaDifferenceRatio = Math.Min(prevDelta, currDelta) / Math.Max(prevDelta, currDelta);
-                double currRatio = 1.0 + rhythm_ratio_multiplier * Math.Min(0.5, Math.Pow(Math.Sin(Math.PI / deltaDifferenceRatio), 2));
+                double deltaDifference = Math.Max(prevDelta, currDelta) / Math.Min(prevDelta, currDelta);
+
+                // Take only the fractional part of the value since we're only interested in punishing multiples
+                double deltaDifferenceFraction = deltaDifference - Math.Truncate(deltaDifference);
+
+                double currRatio = 1.0 + rhythm_ratio_multiplier * Math.Min(0.5, DifficultyCalculationUtils.SmoothstepBellCurve(deltaDifferenceFraction));
 
                 // reduce ratio bonus if delta difference is too big
-                double fraction = Math.Max(prevDelta / currDelta, currDelta / prevDelta);
-                double fractionMultiplier = Math.Clamp(2.0 - fraction / 8.0, 0.0, 1.0);
+                double differenceMultiplier = Math.Clamp(2.0 - deltaDifference / 8.0, 0.0, 1.0);
 
                 double windowPenalty = Math.Min(1, Math.Max(0, Math.Abs(prevDelta - currDelta) - deltaDifferenceEpsilon) / deltaDifferenceEpsilon);
 
-                double effectiveRatio = windowPenalty * currRatio * fractionMultiplier;
+                double effectiveRatio = windowPenalty * currRatio * differenceMultiplier;
 
                 if (firstDeltaSwitch)
                 {

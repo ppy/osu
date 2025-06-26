@@ -1,11 +1,14 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Overlays.Settings.Sections.Audio;
@@ -71,15 +74,53 @@ namespace osu.Game.Tests.Visual.Settings
         }
 
         [Test]
+        public void TestRounding()
+        {
+            AddStep("set new score", () => statics.SetValue(Static.LastLocalUserScore, new ScoreInfo
+            {
+                HitEvents = TestSceneHitEventTimingDistributionGraph.CreateHitEvents(0.6),
+                BeatmapInfo = Beatmap.Value.BeatmapInfo,
+            }));
+
+            checkButtonEnabled();
+            AddStep("click button", () => adjustControl.ChildrenOfType<Button>().Single().TriggerClick());
+            checkButtonDisabled();
+            AddAssert("global offset set correctly", () => localConfig.Get<double>(OsuSetting.AudioOffset), () => Is.EqualTo(-1));
+        }
+
+        [Test]
+        public void TestNegligibleChangeNotApplicable()
+        {
+            AddStep("set new score", () => statics.SetValue(Static.LastLocalUserScore, new ScoreInfo
+            {
+                HitEvents = TestSceneHitEventTimingDistributionGraph.CreateHitEvents(0.5),
+                BeatmapInfo = Beatmap.Value.BeatmapInfo,
+            }));
+            checkButtonDisabled();
+
+            AddStep("adjust global offset", () => localConfig.SetValue(OsuSetting.AudioOffset, 50.0));
+            checkButtonEnabled();
+
+            AddStep("click button", () => adjustControl.ChildrenOfType<Button>().Single().TriggerClick());
+            checkButtonDisabled();
+            AddAssert("global offset set correctly", () => localConfig.Get<double>(OsuSetting.AudioOffset), () => Is.EqualTo(0));
+            AddStep("clear history", () => tracker.ClearHistory());
+        }
+
+        [Test]
         public void TestBehaviour()
         {
             AddStep("set score with -20ms", () => setScore(-20));
             AddAssert("suggested global offset is 20ms", () => adjustControl.SuggestedOffset.Value, () => Is.EqualTo(20));
+            checkButtonEnabled();
             AddStep("clear history", () => tracker.ClearHistory());
+            checkButtonDisabled();
 
             AddStep("set score with 40ms", () => setScore(40));
+            checkButtonEnabled();
             AddAssert("suggested global offset is -40ms", () => adjustControl.SuggestedOffset.Value, () => Is.EqualTo(-40));
             AddStep("clear history", () => tracker.ClearHistory());
+            checkButtonDisabled();
         }
 
         [Test]
@@ -109,6 +150,16 @@ namespace osu.Game.Tests.Visual.Settings
             AddStep("set score with 10ms", () => setScore(10));
             AddAssert("suggested global offset is 20ms", () => adjustControl.SuggestedOffset.Value, () => Is.EqualTo(20));
             AddStep("clear history", () => tracker.ClearHistory());
+        }
+
+        private void checkButtonDisabled()
+        {
+            AddAssert("button is disabled", () => adjustControl.ChildrenOfType<Button>().Single().Enabled.Value, () => Is.False);
+        }
+
+        private void checkButtonEnabled()
+        {
+            AddAssert("button is enabled", () => adjustControl.ChildrenOfType<Button>().Single().Enabled.Value, () => Is.True);
         }
 
         private void setScore(double averageHitError)

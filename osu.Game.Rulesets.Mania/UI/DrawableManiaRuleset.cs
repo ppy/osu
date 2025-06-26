@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public IEnumerable<BarLine> BarLines;
 
-        public override bool RequiresPortraitOrientation => Beatmap.Stages.Count == 1;
+        public override bool RequiresPortraitOrientation => Beatmap.Stages.Count == 1 && mobileLayout.Value == ManiaMobileLayout.Portrait;
 
         protected override bool RelativeScaleBeatLengths => true;
 
@@ -58,9 +58,11 @@ namespace osu.Game.Rulesets.Mania.UI
 
         private readonly Bindable<ManiaScrollingDirection> configDirection = new Bindable<ManiaScrollingDirection>();
         private readonly BindableDouble configScrollSpeed = new BindableDouble();
+        private readonly Bindable<ManiaMobileLayout> mobileLayout = new Bindable<ManiaMobileLayout>();
+
+        public double TargetTimeRange { get; protected set; }
 
         private double currentTimeRange;
-        protected double TargetTimeRange;
 
         // Stores the current speed adjustment active in gameplay.
         private readonly Track speedAdjustmentTrack = new TrackVirtual(0);
@@ -108,9 +110,37 @@ namespace osu.Game.Rulesets.Mania.UI
             configDirection.BindValueChanged(direction => Direction.Value = (ScrollingDirection)direction.NewValue, true);
 
             Config.BindWith(ManiaRulesetSetting.ScrollSpeed, configScrollSpeed);
-            configScrollSpeed.BindValueChanged(speed => TargetTimeRange = ComputeScrollTime(speed.NewValue));
+            configScrollSpeed.BindValueChanged(speed =>
+            {
+                if (!AllowScrollSpeedAdjustment)
+                    return;
+
+                TargetTimeRange = ComputeScrollTime(speed.NewValue);
+            });
 
             TimeRange.Value = TargetTimeRange = currentTimeRange = ComputeScrollTime(configScrollSpeed.Value);
+
+            Config.BindWith(ManiaRulesetSetting.MobileLayout, mobileLayout);
+            mobileLayout.BindValueChanged(_ => updateMobileLayout(), true);
+        }
+
+        private ManiaTouchInputArea? touchInputArea;
+
+        private void updateMobileLayout()
+        {
+            switch (mobileLayout.Value)
+            {
+                case ManiaMobileLayout.LandscapeWithOverlay:
+                    KeyBindingInputManager.Add(touchInputArea = new ManiaTouchInputArea(this));
+                    break;
+
+                default:
+                    if (touchInputArea != null)
+                        KeyBindingInputManager.Remove(touchInputArea, true);
+
+                    touchInputArea = null;
+                    break;
+            }
         }
 
         protected override void AdjustScrollSpeed(int amount) => configScrollSpeed.Value += amount;

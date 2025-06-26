@@ -8,8 +8,6 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Users.Drawables;
 using osuTK;
@@ -62,12 +60,10 @@ namespace osu.Game.Screens.Ranking.Expanded
                         CornerExponent = 2.5f,
                         Masking = true,
                     },
-                    new OsuSpriteText
+                    new ClickableUsername(user)
                     {
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
-                        Text = user.Username,
-                        Font = OsuFont.Torus.With(size: 16, weight: FontWeight.SemiBold)
                     }
                 }
             };

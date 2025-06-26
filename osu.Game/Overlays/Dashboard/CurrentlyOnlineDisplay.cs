@@ -2,9 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Diagnostics;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
@@ -16,10 +14,8 @@ using osu.Framework.Localisation;
 using osu.Framework.Screens;
 using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Metadata;
-using osu.Game.Online.Spectator;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Screens;
 using osu.Game.Screens.OnlinePlay.Match.Components;
@@ -34,18 +30,11 @@ namespace osu.Game.Overlays.Dashboard
         private const float search_textbox_height = 40;
         private const float padding = 10;
 
-        private readonly IBindableList<int> playingUsers = new BindableList<int>();
         private readonly IBindableDictionary<int, UserPresence> onlineUserPresences = new BindableDictionary<int, UserPresence>();
         private readonly Dictionary<int, OnlineUserPanel> userPanels = new Dictionary<int, OnlineUserPanel>();
 
         private SearchContainer<OnlineUserPanel> userFlow = null!;
         private BasicSearchTextBox searchTextBox = null!;
-
-        [Resolved]
-        private IAPIProvider api { get; set; } = null!;
-
-        [Resolved]
-        private SpectatorClient spectatorClient { get; set; } = null!;
 
         [Resolved]
         private MetadataClient metadataClient { get; set; } = null!;
@@ -106,9 +95,6 @@ namespace osu.Game.Overlays.Dashboard
 
             onlineUserPresences.BindTo(metadataClient.UserPresences);
             onlineUserPresences.BindCollectionChanged(onUserPresenceUpdated, true);
-
-            playingUsers.BindTo(spectatorClient.PlayingUsers);
-            playingUsers.BindCollectionChanged(onPlayingUsersChanged, true);
         }
 
         protected override void OnFocus(FocusEvent e)
@@ -152,52 +138,26 @@ namespace osu.Game.Overlays.Dashboard
             }
         });
 
-        private void onPlayingUsersChanged(object? sender, NotifyCollectionChangedEventArgs e)
-        {
-            switch (e.Action)
-            {
-                case NotifyCollectionChangedAction.Add:
-                    Debug.Assert(e.NewItems != null);
-
-                    foreach (int userId in e.NewItems)
-                    {
-                        if (userPanels.TryGetValue(userId, out var panel))
-                            panel.CanSpectate.Value = userId != api.LocalUser.Value.Id;
-                    }
-
-                    break;
-
-                case NotifyCollectionChangedAction.Remove:
-                    Debug.Assert(e.OldItems != null);
-
-                    foreach (int userId in e.OldItems)
-                    {
-                        if (userPanels.TryGetValue(userId, out var panel))
-                            panel.CanSpectate.Value = false;
-                    }
-
-                    break;
-            }
-        }
-
         private OnlineUserPanel createUserPanel(APIUser user) =>
             new OnlineUserPanel(user).With(panel =>
             {
                 panel.Anchor = Anchor.TopCentre;
                 panel.Origin = Anchor.TopCentre;
-                panel.CanSpectate.Value = playingUsers.Contains(user.Id);
             });
 
         public partial class OnlineUserPanel : CompositeDrawable, IFilterable
         {
             public readonly APIUser User;
 
-            public BindableBool CanSpectate { get; } = new BindableBool();
+            private PurpleRoundedButton spectateButton = null!;
 
             public IEnumerable<LocalisableString> FilterTerms { get; }
 
             [Resolved]
             private IPerformFromScreenRunner? performer { get; set; }
+
+            [Resolved]
+            private MetadataClient? metadataClient { get; set; }
 
             public bool FilteringActive { set; get; }
 
@@ -221,6 +181,27 @@ namespace osu.Game.Overlays.Dashboard
                 AutoSizeAxes = Axes.Both;
             }
 
+            protected override void Update()
+            {
+                base.Update();
+
+                // TODO: we probably don't want to do this every frame.
+                var activity = metadataClient?.GetPresence(User.Id)?.Activity;
+
+                switch (activity)
+                {
+                    default:
+                        spectateButton.Enabled.Value = false;
+                        break;
+
+                    case UserActivity.InSoloGame:
+                    case UserActivity.InMultiplayerGame:
+                    case UserActivity.InPlaylistGame:
+                        spectateButton.Enabled.Value = true;
+                        break;
+                }
+            }
+
             [BackgroundDependencyLoader]
             private void load()
             {
@@ -240,14 +221,13 @@ namespace osu.Game.Overlays.Dashboard
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre
                             },
-                            new PurpleRoundedButton
+                            spectateButton = new PurpleRoundedButton
                             {
                                 RelativeSizeAxes = Axes.X,
                                 Text = "Spectate",
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
                                 Action = () => performer?.PerformFromScreen(s => s.Push(new SoloSpectatorScreen(User))),
-                                Enabled = { BindTarget = CanSpectate }
                             }
                         }
                     },

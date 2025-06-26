@@ -48,11 +48,6 @@ namespace osu.Game.Online.Spectator
         public IBindableList<SpectatorUser> WatchingUsers => watchingUsers;
 
         /// <summary>
-        /// A global list of all players currently playing.
-        /// </summary>
-        public IBindableList<int> PlayingUsers => playingUsers;
-
-        /// <summary>
         /// Whether the local user is playing.
         /// </summary>
         private bool isPlaying { get; set; }
@@ -91,7 +86,6 @@ namespace osu.Game.Online.Spectator
         private readonly BindableDictionary<int, SpectatorState> watchedUserStates = new BindableDictionary<int, SpectatorState>();
 
         private readonly BindableList<SpectatorUser> watchingUsers = new BindableList<SpectatorUser>();
-        private readonly BindableList<int> playingUsers = new BindableList<int>();
         private readonly SpectatorState currentState = new SpectatorState();
 
         private IBeatmap? currentBeatmap;
@@ -101,7 +95,7 @@ namespace osu.Game.Online.Spectator
 
         private readonly Queue<FrameDataBundle> pendingFrameBundles = new Queue<FrameDataBundle>();
 
-        private readonly Queue<LegacyReplayFrame> pendingFrames = new Queue<LegacyReplayFrame>();
+        private readonly List<LegacyReplayFrame> pendingFrames = new List<LegacyReplayFrame>();
 
         private double lastPurgeTime;
 
@@ -134,7 +128,6 @@ namespace osu.Game.Online.Spectator
                 }
                 else
                 {
-                    playingUsers.Clear();
                     watchedUserStates.Clear();
                     watchingUsers.Clear();
                 }
@@ -145,9 +138,6 @@ namespace osu.Game.Online.Spectator
         {
             Schedule(() =>
             {
-                if (!playingUsers.Contains(userId))
-                    playingUsers.Add(userId);
-
                 if (watchedUsersRefCounts.ContainsKey(userId))
                     watchedUserStates[userId] = state;
 
@@ -161,8 +151,6 @@ namespace osu.Game.Online.Spectator
         {
             Schedule(() =>
             {
-                playingUsers.Remove(userId);
-
                 if (watchedUsersRefCounts.ContainsKey(userId))
                     watchedUserStates[userId] = state;
 
@@ -256,7 +244,18 @@ namespace osu.Game.Online.Spectator
             if (frame is IConvertibleReplayFrame convertible)
             {
                 Debug.Assert(currentBeatmap != null);
-                pendingFrames.Enqueue(convertible.ToLegacy(currentBeatmap));
+
+                var convertedFrame = convertible.ToLegacy(currentBeatmap);
+
+                // only keep the last recorded frame for a given timestamp.
+                // this reduces redundancy of frames in the resulting replay.
+                //
+                // this is also done at `ReplayRecorded`, but needs to be done here as well
+                // due to the flow being handled differently.
+                if (pendingFrames.LastOrDefault()?.Time == convertedFrame.Time)
+                    pendingFrames[^1] = convertedFrame;
+                else
+                    pendingFrames.Add(convertedFrame);
             }
 
             if (pendingFrames.Count > max_pending_frames)

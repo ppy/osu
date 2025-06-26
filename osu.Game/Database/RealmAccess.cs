@@ -97,8 +97,9 @@ namespace osu.Game.Database
         /// 45   2024-12-23    Change beat snap divisor adjust defaults to be Ctrl+Scroll instead of Ctrl+Shift+Scroll, if not already changed by user.
         /// 46   2024-12-26    Change beat snap divisor bindings to match stable directionality ¯\_(ツ)_/¯.
         /// 47   2025-01-21    Remove right mouse button binding for absolute scroll. Never use mouse buttons (or scroll) for global actions.
+        /// 48   2025-03-19    Clear online status for all qualified beatmaps (some were stuck in a qualified state due to local caching issues).
         /// </summary>
-        private const int schema_version = 47;
+        private const int schema_version = 48;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking realm retrieval during blocking periods.
@@ -314,6 +315,17 @@ namespace osu.Game.Database
                 Logger.Log(@"A newer realm database has been found, attempting recovery...", LoggingTarget.Database);
                 attemptRecoverFromFile(newerVersionFilename);
             }
+
+            try
+            {
+                // Some platforms' realm implementation (including windows) don't update modified time on open.
+                // Let's do this explicitly as some users may depend on it roughly aligning to usage expectations.
+                string fullPath = storage.GetFullPath(Filename);
+                var fi = new FileInfo(fullPath);
+                if (fi.Exists)
+                    fi.LastWriteTime = DateTime.Now;
+            }
+            catch { }
 
             try
             {
@@ -1234,6 +1246,15 @@ namespace osu.Game.Database
 
                     break;
                 }
+
+                case 48:
+                    const int qualified = (int)BeatmapOnlineStatus.Qualified;
+
+                    var beatmaps = migration.NewRealm.All<BeatmapInfo>().Where(b => b.StatusInt == qualified);
+
+                    foreach (var beatmap in beatmaps)
+                        beatmap.ResetOnlineInfo(resetOnlineId: false);
+                    break;
             }
 
             Logger.Log($"Migration completed in {stopwatch.ElapsedMilliseconds}ms");
