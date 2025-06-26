@@ -41,7 +41,7 @@ namespace osu.Game.Screens.SelectV2
 
         public IBindable<BeatmapLeaderboardScope> Scope { get; } = new Bindable<BeatmapLeaderboardScope>();
 
-        public IBindable<RankingsSort> Sorting { get; } = new Bindable<RankingsSort>();
+        public IBindable<LeaderboardSortMode> Sorting { get; } = new Bindable<LeaderboardSortMode>();
 
         public IBindable<bool> FilterBySelectedMods { get; } = new BindableBool();
 
