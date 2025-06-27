@@ -13,7 +13,6 @@ using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Replays;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Tests.Visual;
 using osuTK;
@@ -22,21 +21,6 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
 {
     public partial class TestSceneOsuModRelax : OsuModTestScene
     {
-        private readonly HitCircle hitObject;
-        private readonly HitWindows hitWindows = new OsuHitWindows();
-
-        public TestSceneOsuModRelax()
-        {
-            hitWindows.SetDifficulty(9);
-
-            hitObject = new HitCircle
-            {
-                StartTime = 1000,
-                Position = new Vector2(100, 100),
-                HitWindows = hitWindows
-            };
-        }
-
         protected override TestPlayer CreateModPlayer(Ruleset ruleset) => new ModRelaxTestPlayer(CurrentTestData, AllowFail);
 
         [Test]
@@ -46,12 +30,21 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
             Autoplay = false,
             CreateBeatmap = () => new Beatmap
             {
-                HitObjects = new List<HitObject> { hitObject }
+                Difficulty = { OverallDifficulty = 9 },
+                HitObjects = new List<HitObject>
+                {
+                    new HitCircle
+                    {
+                        StartTime = 1000,
+                        Position = new Vector2(100, 100),
+                        HitWindows = new OsuHitWindows()
+                    }
+                }
             },
             ReplayFrames = new List<ReplayFrame>
             {
                 new OsuReplayFrame(0, new Vector2()),
-                new OsuReplayFrame(hitObject.StartTime, hitObject.Position),
+                new OsuReplayFrame(100, new Vector2(100)),
             },
             PassCondition = () => Player.ScoreProcessor.Combo.Value == 1
         });
@@ -63,13 +56,22 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
             Autoplay = false,
             CreateBeatmap = () => new Beatmap
             {
-                HitObjects = new List<HitObject> { hitObject }
+                Difficulty = { OverallDifficulty = 9 },
+                HitObjects = new List<HitObject>
+                {
+                    new HitCircle
+                    {
+                        StartTime = 1000,
+                        Position = new Vector2(100, 100),
+                        HitWindows = new OsuHitWindows()
+                    }
+                }
             },
             ReplayFrames = new List<ReplayFrame>
             {
-                new OsuReplayFrame(0, new Vector2(hitObject.X - 22, hitObject.Y - 22)), // must be an edge hit for the cursor to not stay on the object for too long
-                new OsuReplayFrame(hitObject.StartTime - OsuModRelax.RELAX_LENIENCY, new Vector2(hitObject.X - 22, hitObject.Y - 22)),
-                new OsuReplayFrame(hitObject.StartTime, new Vector2(0)),
+                new OsuReplayFrame(0, new Vector2(78, 78)), // must be an edge hit for the cursor to not stay on the object for too long
+                new OsuReplayFrame(1000 - OsuModRelax.RELAX_LENIENCY, new Vector2(78, 78)),
+                new OsuReplayFrame(1000, new Vector2(0)),
             },
             PassCondition = () => Player.ScoreProcessor.Combo.Value == 1
         });
