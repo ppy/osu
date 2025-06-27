@@ -127,7 +127,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (flashlight is not null)
                 flashlightRating = computeFlashlightRating(flashlight.DifficultyValue(), mods, totalHits, overallDifficulty);
 
-            double sliderFactor = aimRating > 0 ? aimRatingNoSliders / aimRating : 1;
+            double sliderFactor = aimRating > 0 ? Math.Min(aimRating, aimRatingNoSliders) / aimRating : 1;
 
             double baseAimPerformance = OsuStrainSkill.DifficultyToPerformance(aimRating);
             double baseSpeedPerformance = OsuStrainSkill.DifficultyToPerformance(speedRating);
