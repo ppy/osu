@@ -67,31 +67,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             if (mods.OfType<OsuModAutopilot>().Any())
                 distanceBonus = 0;
 
-            double sliderStreamBonus = getSliderStreamBonus(osuCurrObj, osuPrevObj) * sliderstream_multiplier;
+            double sliderStreamBonus = 1 + osuCurrObj.SliderJumpBonus * sliderstream_multiplier;
 
             // Base difficulty with all bonuses
-            double difficulty = (1 + speedBonus + distanceBonus) * (1 + sliderStreamBonus) * 1000 / strainTime;
+            double difficulty = (1 + speedBonus + distanceBonus) * sliderStreamBonus * 1000 / strainTime;
 
             // Apply penalty if there's doubletappable doubles
             return difficulty * doubletapness;
-        }
-
-        private static double getSliderStreamBonus(OsuDifficultyHitObject osuCurrObj, OsuDifficultyHitObject? osuLastObj)
-        {
-            if (osuCurrObj.BaseObject is not Slider slider || osuLastObj?.BaseObject is not Slider)
-                return 0;
-
-            double sliderStreamBonus = 1.0;
-
-            // Don't buff burst into 2 sliders case
-            sliderStreamBonus *= DifficultyCalculationUtils.ReverseLerp(osuLastObj.StrainTime, osuCurrObj.StrainTime * 0.55, osuCurrObj.StrainTime * 0.75);
-
-            // Punish too short sliders to prevent cheesing
-            double sliderLength = slider.Velocity * slider.SpanDuration;
-            if (sliderLength < slider.Radius / 2)
-                sliderStreamBonus *= sliderLength / (slider.Radius / 2);
-
-            return sliderStreamBonus;
         }
     }
 }

@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
@@ -41,10 +40,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             const int radius = OsuDifficultyHitObject.NORMALISED_RADIUS;
             const int diameter = OsuDifficultyHitObject.NORMALISED_DIAMETER;
 
-            double sliderJumpBonus = getSliderJumpBonus(osuCurrObj, osuLastObj, osuLastLastObj) * slider_jump_multiplier;
-
             // Calculate the velocity to the current hitobject, which starts with a base distance / time assuming the last object is a hitcircle.
-            double currVelocity = osuCurrObj.LazyJumpDistance / osuCurrObj.StrainTime * (1 + sliderJumpBonus);
+            double currVelocity = osuCurrObj.LazyJumpDistance / osuCurrObj.StrainTime * (1 + osuCurrObj.SliderJumpBonus * slider_jump_multiplier);
 
             // But if the last object is a slider, then we extend the travel velocity through the slider into the current object.
             if (osuLastObj.BaseObject is Slider && withSliderTravelDistance)
@@ -167,35 +164,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             aimStrain *= osuCurrObj.SmallCircleBonus;
 
             return aimStrain;
-        }
-
-        private static double getSliderJumpBonus(OsuDifficultyHitObject osuCurrObj, OsuDifficultyHitObject osuLastObj, OsuDifficultyHitObject osuLastLastObj)
-        {
-            Slider? sliderCurr = osuLastObj.BaseObject as Slider;
-            Slider? sliderLast = osuLastLastObj.BaseObject as Slider;
-
-            // Any of 2 previous objects should be a slider to buff alternating sliderjump-jump-sliderjump-jump case as much as normal sliderjumps
-            if (sliderCurr == null && sliderLast == null)
-                return 0.0;
-
-            double sliderJumpBonus = 1.0;
-
-            // Punish the cases where 1/2 slider going into 1/2 note
-            sliderJumpBonus *= DifficultyCalculationUtils.ReverseLerp(osuLastObj.StrainTime, osuCurrObj.StrainTime * 0.55, osuCurrObj.StrainTime * 0.75);
-
-            // Punish the cases where 1/2 slider going into two 1/2 notes
-            if (sliderCurr == null)
-                sliderJumpBonus *= DifficultyCalculationUtils.ReverseLerp(osuCurrObj.StrainTime, osuLastObj.StrainTime * 0.55, osuLastObj.StrainTime * 0.75);
-
-            // Punish too short sliders to prevent cheesing
-            static double length(Slider? slider) => slider.IsNotNull() ? slider.Velocity * slider.SpanDuration : 0;
-            double sliderLength = Math.Max(length(sliderCurr), length(sliderLast));
-
-            double threshold = ((OsuHitObject)osuCurrObj.BaseObject).Radius / 2;
-            if (sliderLength < threshold)
-                sliderJumpBonus *= sliderLength / threshold;
-
-            return sliderJumpBonus;
         }
 
         private static double calcWideAngleBonus(double angle) => DifficultyCalculationUtils.Smoothstep(angle, double.DegreesToRadians(40), double.DegreesToRadians(140));
