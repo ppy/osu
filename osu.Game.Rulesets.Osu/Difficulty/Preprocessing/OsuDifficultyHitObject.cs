@@ -207,8 +207,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             Vector2 lastCursorPosition = lastDifficultyObject != null ? getEndCursorPosition(lastDifficultyObject) : LastObject.StackedPosition;
 
-            JumpDistance = (lastObject.StackedPosition - BaseObject.StackedPosition).Length * scalingFactor;
-            LazyJumpFromEndDistance = (BaseObject.StackedPosition * scalingFactor - lastCursorPosition * scalingFactor).Length;
+            JumpDistance = (LastObject.StackedPosition - BaseObject.StackedPosition).Length * scalingFactor;
+            LazyJumpFromEndDistance = (BaseObject.StackedPosition - lastCursorPosition).Length * scalingFactor;
             MinimumJumpTime = StrainTime;
             MinimumJumpDistance = LazyJumpFromEndDistance;
 
