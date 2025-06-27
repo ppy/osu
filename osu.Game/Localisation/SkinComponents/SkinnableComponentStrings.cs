@@ -85,11 +85,6 @@ namespace osu.Game.Localisation.SkinComponents
         public static LocalisableString TextWeight => new TranslatableString(getKey(@"text_weight"), @"Text weight");
 
         /// <summary>
-        /// "The weight of the text."
-        /// </summary>
-        public static LocalisableString TextWeightDescription => new TranslatableString(getKey(@"text_weight_description"), @"The weight of the text.");
-
-        /// <summary>
         /// "Use relative size"
         /// </summary>
         public static LocalisableString UseRelativeSize => new TranslatableString(getKey(@"use_relative_size"), @"Use relative size");
