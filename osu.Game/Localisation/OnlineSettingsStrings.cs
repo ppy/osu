@@ -30,6 +30,16 @@ namespace osu.Game.Localisation
         public static LocalisableString NotifyOnPrivateMessage => new TranslatableString(getKey(@"notify_on_private_message"), @"Show a notification when you receive a private message");
 
         /// <summary>
+        /// "Show notification popups when friends change status"
+        /// </summary>
+        public static LocalisableString NotifyOnFriendPresenceChange => new TranslatableString(getKey(@"notify_on_friend_presence_change"), @"Show notification popups when friends change status");
+
+        /// <summary>
+        /// "Notifications will be shown when friends go online/offline."
+        /// </summary>
+        public static LocalisableString NotifyOnFriendPresenceChangeTooltip => new TranslatableString(getKey(@"notify_on_friend_presence_change_tooltip"), @"Notifications will be shown when friends go online/offline.");
+
+        /// <summary>
         /// "Integrations"
         /// </summary>
         public static LocalisableString IntegrationsHeader => new TranslatableString(getKey(@"integrations_header"), @"Integrations");
@@ -84,6 +94,6 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString HideCountryFlags => new TranslatableString(getKey(@"hide_country_flags"), @"Hide country flags");
 
-        private static string getKey(string key) => $"{prefix}:{key}";
+        private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

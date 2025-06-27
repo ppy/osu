@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Logging;
 using osu.Game.Graphics;
@@ -62,6 +63,7 @@ namespace osu.Game.Overlays.Login
                                 },
                                 codeTextBox = new OsuTextBox
                                 {
+                                    InputProperties = new TextInputProperties(TextInputType.Code),
                                     PlaceholderText = "Enter code",
                                     RelativeSizeAxes = Axes.X,
                                     TabbableContentContainer = this,
@@ -96,7 +98,7 @@ namespace osu.Game.Overlays.Login
             explainText.AddParagraph(UserVerificationStrings.BoxInfoCheckSpam);
             // We can't support localisable strings with nested links yet. Not sure if we even can (probably need to allow markdown link formatting or something).
             explainText.AddParagraph("If you can't access your email or have forgotten what you used, please follow the ");
-            explainText.AddLink(UserVerificationStrings.BoxInfoRecoverLink, $"{api.WebsiteRootUrl}/home/password-reset");
+            explainText.AddLink(UserVerificationStrings.BoxInfoRecoverLink, $"{api.Endpoints.WebsiteUrl}/home/password-reset");
             explainText.AddText(". You can also ");
             explainText.AddLink(UserVerificationStrings.BoxInfoReissueLink, () =>
             {
@@ -121,9 +123,11 @@ namespace osu.Game.Overlays.Login
 
             codeTextBox.Current.BindValueChanged(code =>
             {
-                if (code.NewValue.Length == 8)
+                string trimmedCode = code.NewValue.Trim();
+
+                if (trimmedCode.Length == 8)
                 {
-                    api.AuthenticateSecondFactor(code.NewValue);
+                    api.AuthenticateSecondFactor(trimmedCode);
                     codeTextBox.Current.Disabled = true;
                 }
             });

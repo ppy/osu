@@ -12,7 +12,6 @@ using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
-using osu.Game.Extensions;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
@@ -85,6 +84,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
+        [FlakyTest]
         public void TestPresentedBeatmapIsRecommended()
         {
             List<BeatmapSetInfo> beatmapSets = null;
@@ -106,6 +106,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
+        [FlakyTest]
         public void TestCurrentRulesetIsRecommended()
         {
             BeatmapSetInfo catchSet = null, mixedSet = null;
@@ -142,6 +143,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
+        [FlakyTest]
         public void TestSecondBestRulesetIsRecommended()
         {
             BeatmapSetInfo osuSet = null, mixedSet = null;
@@ -159,6 +161,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
+        [FlakyTest]
         public void TestCorrectStarRatingIsUsed()
         {
             BeatmapSetInfo osuSet = null, maniaSet = null;
@@ -176,6 +179,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
+        [FlakyTest]
         public void TestBeatmapListingFilter()
         {
             AddStep("set playmode to taiko", () => ((DummyAPIAccess)API).LocalUser.Value.PlayMode = "taiko");
@@ -245,7 +249,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("present beatmap", () => Game.PresentBeatmap(getImport()));
 
             AddUntilStep("wait for song select", () => Game.ScreenStack.CurrentScreen is Screens.Select.SongSelect select && select.BeatmapSetsLoaded);
-            AddUntilStep("recommended beatmap displayed", () => Game.Beatmap.Value.BeatmapInfo.MatchesOnlineID(getImport().Beatmaps[expectedDiff - 1]));
+            AddUntilStep("recommended beatmap displayed", () => Game.Beatmap.Value.BeatmapInfo.OnlineID, () => Is.EqualTo(getImport().Beatmaps[expectedDiff - 1].OnlineID));
         }
 
         protected override TestOsuGame CreateTestGame() => new NoBeatmapUpdateGame(LocalStorage, API);

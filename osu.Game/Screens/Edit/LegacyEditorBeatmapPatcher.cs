@@ -115,7 +115,9 @@ namespace osu.Game.Screens.Edit
                 if (editorBeatmap.Bookmarks.Contains(newBookmark))
                     continue;
 
-                editorBeatmap.Bookmarks.Add(newBookmark);
+                int idx = editorBeatmap.Bookmarks.BinarySearch(newBookmark);
+                if (idx < 0)
+                    editorBeatmap.Bookmarks.Insert(~idx, newBookmark);
             }
         }
 

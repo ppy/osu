@@ -36,6 +36,7 @@ using osu.Game.Configuration;
 using osu.Game.Rulesets.Scoring.Legacy;
 using osu.Game.Rulesets.Taiko.Configuration;
 using osu.Game.Rulesets.Taiko.Edit.Setup;
+using osu.Game.Rulesets.Taiko.Skinning.Default;
 using osu.Game.Screens.Edit.Setup;
 
 namespace osu.Game.Rulesets.Taiko
@@ -56,6 +57,9 @@ namespace osu.Game.Rulesets.Taiko
             {
                 case ArgonSkin:
                     return new TaikoArgonSkinTransformer(skin);
+
+                case TrianglesSkin:
+                    return new TaikoTrianglesSkinTransformer(skin);
 
                 case LegacySkin:
                     return new TaikoLegacySkinTransformer(skin);
@@ -130,6 +134,7 @@ namespace osu.Game.Rulesets.Taiko
                         new TaikoModEasy(),
                         new TaikoModNoFail(),
                         new MultiMod(new TaikoModHalfTime(), new TaikoModDaycore()),
+                        new TaikoModSimplifiedRhythm(),
                     };
 
                 case ModType.DifficultyIncrease:

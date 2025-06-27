@@ -34,16 +34,13 @@ namespace osu.Game.Graphics.Containers
         /// <param name="easing">The easing type of the initial transform.</param>
         public void StartTracking(OsuLogo logo, double duration = 0, Easing easing = Easing.None)
         {
+            if (Logo != null && Logo != logo)
+                throw new InvalidOperationException("A different logo is already being tracked.");
+
             ArgumentNullException.ThrowIfNull(logo);
 
             if (logo.IsTracking && Logo == null)
                 throw new InvalidOperationException($"Cannot track an instance of {typeof(OsuLogo)} to multiple {typeof(LogoTrackingContainer)}s");
-
-            if (Logo != logo && Logo != null)
-            {
-                // If we're replacing the logo to be tracked, the old one no longer has a tracking container
-                Logo.IsTracking = false;
-            }
 
             Logo = logo;
             Logo.IsTracking = true;
@@ -60,11 +57,10 @@ namespace osu.Game.Graphics.Containers
         /// </summary>
         public void StopTracking()
         {
-            if (Logo != null)
-            {
-                Logo.IsTracking = false;
-                Logo = null;
-            }
+            if (Logo == null) return;
+
+            Logo.IsTracking = false;
+            Logo = null;
         }
 
         /// <summary>

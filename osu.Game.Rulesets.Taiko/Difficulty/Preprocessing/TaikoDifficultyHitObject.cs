@@ -3,11 +3,14 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Taiko.Difficulty.Evaluators;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Rhythm;
+using osu.Game.Rulesets.Taiko.Difficulty.Utils;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
 {
@@ -37,20 +40,16 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         public readonly int NoteIndex;
 
         /// <summary>
-        /// The rhythm required to hit this hit object.
+        /// Rhythm data used by <see cref="RhythmEvaluator"/>.
+        /// This is populated via <see cref="TaikoRhythmDifficultyPreprocessor"/>.
         /// </summary>
-        public readonly TaikoDifficultyHitObjectRhythm Rhythm;
+        public readonly TaikoRhythmData RhythmData;
 
         /// <summary>
-        /// The interval between this hit object and the surrounding hit objects in its rhythm group.
+        /// Colour data used by <see cref="ColourEvaluator"/> and <see cref="StaminaEvaluator"/>.
+        /// This is populated via <see cref="TaikoColourDifficultyPreprocessor"/>.
         /// </summary>
-        public double? HitObjectInterval { get; set; }
-
-        /// <summary>
-        /// Colour data for this hit object. This is used by colour evaluator to calculate colour difficulty, but can be used
-        /// by other skills in the future.
-        /// </summary>
-        public readonly TaikoDifficultyHitObjectColour Colour;
+        public readonly TaikoColourData ColourData;
 
         /// <summary>
         /// The adjusted BPM of this hit object, based on its slider velocity and scroll speed.
@@ -58,59 +57,72 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         public double EffectiveBPM;
 
         /// <summary>
-        /// The current slider velocity of this hit object.
-        /// </summary>
-        public double CurrentSliderVelocity;
-
-        public double Interval => DeltaTime;
-
-        /// <summary>
         /// Creates a new difficulty hit object.
         /// </summary>
         /// <param name="hitObject">The gameplay <see cref="HitObject"/> associated with this difficulty object.</param>
         /// <param name="lastObject">The gameplay <see cref="HitObject"/> preceding <paramref name="hitObject"/>.</param>
-        /// <param name="lastLastObject">The gameplay <see cref="HitObject"/> preceding <paramref name="lastObject"/>.</param>
         /// <param name="clockRate">The rate of the gameplay clock. Modified by speed-changing mods.</param>
         /// <param name="objects">The list of all <see cref="DifficultyHitObject"/>s in the current beatmap.</param>
         /// <param name="centreHitObjects">The list of centre (don) <see cref="DifficultyHitObject"/>s in the current beatmap.</param>
         /// <param name="rimHitObjects">The list of rim (kat) <see cref="DifficultyHitObject"/>s in the current beatmap.</param>
         /// <param name="noteObjects">The list of <see cref="DifficultyHitObject"/>s that is a hit (i.e. not a drumroll or swell) in the current beatmap.</param>
         /// <param name="index">The position of this <see cref="DifficultyHitObject"/> in the <paramref name="objects"/> list.</param>
-        public TaikoDifficultyHitObject(HitObject hitObject, HitObject lastObject, HitObject lastLastObject, double clockRate,
+        /// <param name="controlPointInfo">The control point info of the beatmap.</param>
+        /// <param name="globalSliderVelocity">The global slider velocity of the beatmap.</param>
+        public TaikoDifficultyHitObject(HitObject hitObject, HitObject lastObject, double clockRate,
                                         List<DifficultyHitObject> objects,
                                         List<TaikoDifficultyHitObject> centreHitObjects,
                                         List<TaikoDifficultyHitObject> rimHitObjects,
-                                        List<TaikoDifficultyHitObject> noteObjects, int index)
+                                        List<TaikoDifficultyHitObject> noteObjects, int index,
+                                        ControlPointInfo controlPointInfo,
+                                        double globalSliderVelocity)
             : base(hitObject, lastObject, clockRate, objects, index)
         {
             noteDifficultyHitObjects = noteObjects;
 
-            // Create the Colour object, its properties should be filled in by TaikoDifficultyPreprocessor
-            Colour = new TaikoDifficultyHitObjectColour();
+            ColourData = new TaikoColourData();
+            RhythmData = new TaikoRhythmData(this);
 
-            // Create a Rhythm object, its properties are filled in by TaikoDifficultyHitObjectRhythm
-            Rhythm = new TaikoDifficultyHitObjectRhythm(this);
-
-            switch ((hitObject as Hit)?.Type)
+            if (hitObject is Hit hit)
             {
-                case HitType.Centre:
-                    MonoIndex = centreHitObjects.Count;
-                    centreHitObjects.Add(this);
-                    monoDifficultyHitObjects = centreHitObjects;
-                    break;
+                switch (hit.Type)
+                {
+                    case HitType.Centre:
+                        MonoIndex = centreHitObjects.Count;
+                        centreHitObjects.Add(this);
+                        monoDifficultyHitObjects = centreHitObjects;
+                        break;
 
-                case HitType.Rim:
-                    MonoIndex = rimHitObjects.Count;
-                    rimHitObjects.Add(this);
-                    monoDifficultyHitObjects = rimHitObjects;
-                    break;
-            }
+                    case HitType.Rim:
+                        MonoIndex = rimHitObjects.Count;
+                        rimHitObjects.Add(this);
+                        monoDifficultyHitObjects = rimHitObjects;
+                        break;
+                }
 
-            if (hitObject is Hit)
-            {
                 NoteIndex = noteObjects.Count;
                 noteObjects.Add(this);
             }
+
+            // Using `hitObject.StartTime` causes floating point error differences
+            double normalisedStartTime = StartTime * clockRate;
+
+            // Retrieve the timing point at the note's start time
+            TimingControlPoint currentControlPoint = controlPointInfo.TimingPointAt(normalisedStartTime);
+
+            // Calculate the slider velocity at the note's start time.
+            double currentSliderVelocity = calculateSliderVelocity(controlPointInfo, globalSliderVelocity, normalisedStartTime, clockRate);
+
+            EffectiveBPM = currentControlPoint.BPM * currentSliderVelocity;
+        }
+
+        /// <summary>
+        /// Calculates the slider velocity based on control point info and clock rate.
+        /// </summary>
+        private static double calculateSliderVelocity(ControlPointInfo controlPointInfo, double globalSliderVelocity, double startTime, double clockRate)
+        {
+            var activeEffectControlPoint = controlPointInfo.EffectPointAt(startTime);
+            return globalSliderVelocity * (activeEffectControlPoint.ScrollSpeed) * clockRate;
         }
 
         public TaikoDifficultyHitObject? PreviousMono(int backwardsIndex) => monoDifficultyHitObjects?.ElementAtOrDefault(MonoIndex - (backwardsIndex + 1));
@@ -120,5 +132,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         public TaikoDifficultyHitObject? PreviousNote(int backwardsIndex) => noteDifficultyHitObjects.ElementAtOrDefault(NoteIndex - (backwardsIndex + 1));
 
         public TaikoDifficultyHitObject? NextNote(int forwardsIndex) => noteDifficultyHitObjects.ElementAtOrDefault(NoteIndex + (forwardsIndex + 1));
+
+        public double Interval => DeltaTime;
     }
 }

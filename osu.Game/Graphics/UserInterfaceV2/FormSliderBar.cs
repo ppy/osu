@@ -68,6 +68,11 @@ namespace osu.Game.Graphics.UserInterfaceV2
         /// </summary>
         public LocalisableString HintText { get; init; }
 
+        /// <summary>
+        /// A custom step value for each key press which actuates a change on this control.
+        /// </summary>
+        public float KeyboardStep { get; init; }
+
         private Box background = null!;
         private Box flashLayer = null!;
         private FormTextBox.InnerTextBox textBox = null!;
@@ -119,7 +124,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                             Caption = Caption,
                             TooltipText = HintText,
                         },
-                        textBox = new FormNumberBox.InnerNumberBox
+                        textBox = new FormNumberBox.InnerNumberBox(allowDecimals: true)
                         {
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
@@ -127,7 +132,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
                             Width = 0.5f,
                             CommitOnFocusLost = true,
                             SelectAllOnFocus = true,
-                            AllowDecimals = true,
                             OnInputError = () =>
                             {
                                 flashLayer.Colour = ColourInfo.GradientVertical(colours.Red3.Opacity(0), colours.Red3);
@@ -141,6 +145,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                             Origin = Anchor.CentreRight,
                             RelativeSizeAxes = Axes.X,
                             Width = 0.5f,
+                            KeyboardStep = KeyboardStep,
                             Current = currentNumberInstantaneous,
                             OnCommit = () => current.Value = currentNumberInstantaneous.Value,
                         }
@@ -307,6 +312,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 Height = 40;
                 RelativeSizeAxes = Axes.X;
                 RangePadding = nub_width / 2;
+
                 Children = new Drawable[]
                 {
                     new Container

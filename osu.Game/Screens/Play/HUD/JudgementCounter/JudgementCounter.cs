@@ -20,7 +20,10 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
 
         public readonly JudgementCount Result;
 
-        public JudgementCounter(JudgementCount result) => Result = result;
+        public JudgementCounter(JudgementCount result)
+        {
+            Result = result;
+        }
 
         public OsuSpriteText ResultName = null!;
         private FillFlowContainer flowContainer = null!;

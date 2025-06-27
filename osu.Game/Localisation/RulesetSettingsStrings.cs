@@ -89,6 +89,26 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString TouchControlScheme => new TranslatableString(getKey(@"touch_control_scheme"), @"Touch control scheme");
 
+        /// <summary>
+        /// "Mobile layout"
+        /// </summary>
+        public static LocalisableString MobileLayout => new TranslatableString(getKey(@"mobile_layout"), @"Mobile layout");
+
+        /// <summary>
+        /// "Portrait (expanded columns)"
+        /// </summary>
+        public static LocalisableString PortraitExpandedColumns => new TranslatableString(getKey(@"portrait_expanded_columns"), @"Portrait (expanded columns)");
+
+        /// <summary>
+        /// "Landscape (expanded columns)"
+        /// </summary>
+        public static LocalisableString LandscapeExpandedColumns => new TranslatableString(getKey(@"landscape_expanded_columns"), @"Landscape (expanded columns)");
+
+        /// <summary>
+        /// "Landscape (touch overlay)"
+        /// </summary>
+        public static LocalisableString LandscapeTouchOverlay => new TranslatableString(getKey(@"landscape_touch_overlay"), @"Landscape (touch overlay)");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

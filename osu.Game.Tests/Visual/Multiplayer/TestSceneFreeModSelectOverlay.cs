@@ -166,7 +166,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         Anchor = Anchor.BottomRight,
                         Origin = Anchor.BottomRight,
                         Y = -ScreenFooter.HEIGHT,
-                        Current = { BindTarget = freeModSelectOverlay.SelectedMods },
+                        FreeMods = { BindTarget = freeModSelectOverlay.SelectedMods },
                     },
                     footer = new ScreenFooter(),
                 },

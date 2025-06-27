@@ -47,8 +47,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             // High density is penalised at high velocity as it is generally considered easier to read. See https://www.desmos.com/calculator/u63f3ntdsi
             double densityPenalty = DifficultyCalculationUtils.Logistic(objectDensity, 0.925, 15);
 
-            double highVelocityDifficulty = (1.0 - 0.33 * densityPenalty) * DifficultyCalculationUtils.Logistic
-                (effectiveBPM, highVelocity.Center + 8 * densityPenalty, (1.0 + 0.5 * densityPenalty) / (highVelocity.Range / 10));
+            double highVelocityDifficulty = (1.0 - 0.33 * densityPenalty)
+                                            * DifficultyCalculationUtils.Logistic(effectiveBPM, highVelocity.Center + 8 * densityPenalty, (1.0 + 0.5 * densityPenalty) / (highVelocity.Range / 10));
 
             return midVelocityDifficulty + highVelocityDifficulty;
         }
