@@ -50,9 +50,9 @@ namespace osu.Game.Localisation
         public static LocalisableString BackgroundBlur => new TranslatableString(getKey(@"blur"), @"Background blur");
 
         /// <summary>
-        /// "Song Select Prefrence"
+        /// "Song Select v2 button"
         /// </summary>
-        public static LocalisableString SongSelectV2 => new TranslatableString(getKey(@"selectVer"), @"Song Select Ver 2");
+        public static LocalisableString SongSelectV2 => new TranslatableString(getKey(@"selectVer"), @"Song Select v2");
 
         /// <summary>
         /// "Lighten playfield during breaks"
