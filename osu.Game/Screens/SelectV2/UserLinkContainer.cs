@@ -67,7 +67,7 @@ namespace osu.Game.Screens.SelectV2
         public MenuItem[] ContextMenuItems => new MenuItem[]
         {
             new OsuMenuItem(ContextMenuStrings.ViewProfile, MenuItemType.Standard, () => linkHandler?.HandleLink(new LinkDetails(LinkAction.OpenUserProfile, user!))),
-            new OsuMenuItem(ContextMenuStrings.SearchOnline, MenuItemType.Standard, () => linkHandler?.HandleLink(new LinkDetails(LinkAction.OpenUserProfile, user!))),
+            new OsuMenuItem(ContextMenuStrings.SearchOnline, MenuItemType.Standard, () => linkHandler?.HandleLink(new LinkDetails(LinkAction.SearchBeatmapSet, user!.Username))),
         };
     }
 }
