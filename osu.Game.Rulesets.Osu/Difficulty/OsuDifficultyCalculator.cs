@@ -48,30 +48,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return multiplier;
         }
 
-        /// <summary>
-        /// Calculates a visibility bonus that is applicable to Hidden and Traceable.
-        /// </summary>
-        public static double CalculateVisibilityBonus(Mod[] mods, double approachRate, double visibilityFactor = 1)
-        {
-            // NOTE: TC's effect is only noticeable in performance calculations until lazer mods are accounted for server-side.
-            bool isAlwaysPartiallyVisible = mods.OfType<OsuModHidden>().Any(m => !m.OnlyFadeApproachCircles.Value) || mods.OfType<OsuModTraceable>().Any();
-
-            // Start from normal curve, rewarding lower AR up to AR5
-            double readingBonus = 0.04 * (12.0 - Math.Max(approachRate, 5));
-
-            readingBonus *= visibilityFactor;
-
-            // For AR up to 0 - reduce reward for very low ARs when object is visible
-            if (approachRate < 5)
-                readingBonus += (isAlwaysPartiallyVisible ? 0.04 : 0.03) * (5.0 - Math.Max(approachRate, 0));
-
-            // Starting from AR0 - cap values so they won't grow to infinity
-            if (approachRate < 0)
-                readingBonus += (isAlwaysPartiallyVisible ? 0.1 : 0.075) * (1 - Math.Pow(1.5, approachRate));
-
-            return readingBonus;
-        }
-
         protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
         {
             if (beatmap.HitObjects.Count == 0)
@@ -120,8 +96,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double snapAimDifficultyValue = skills.OfType<SnapAim>().Single().DifficultyValue();
             double flowAimDifficultyValue = skills.OfType<FlowAim>().Single().DifficultyValue();
             double speedDifficultyValue = speed.DifficultyValue();
+            double totalAimDifficultyValue = double.Lerp(aimDifficultyValue, snapAimDifficultyValue + flowAimDifficultyValue, AimVersatilityBonus);
 
-            mechanicalDifficultyRating = calculateMechanicalDifficultyRating(aimDifficultyValue, speedDifficultyValue);
+            mechanicalDifficultyRating = calculateMechanicalDifficultyRating(totalAimDifficultyValue, speedDifficultyValue);
 
             double aimRating = computeTotalAimRating(aim.DifficultyValue(), snapAimDifficultyValue, flowAimDifficultyValue, mods, totalHits, approachRate, overallDifficulty);
             double aimRatingNoSliders = computeTotalAimRating(aimWithoutSliders.DifficultyValue(), snapAimDifficultyValue, flowAimDifficultyValue, mods, totalHits, approachRate, overallDifficulty);
@@ -183,6 +160,30 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             };
 
             return attributes;
+        }
+
+        /// <summary>
+        /// Calculates a visibility bonus that is applicable to Hidden and Traceable.
+        /// </summary>
+        public static double CalculateVisibilityBonus(Mod[] mods, double approachRate, double visibilityFactor = 1)
+        {
+            // NOTE: TC's effect is only noticeable in performance calculations until lazer mods are accounted for server-side.
+            bool isAlwaysPartiallyVisible = mods.OfType<OsuModHidden>().Any(m => !m.OnlyFadeApproachCircles.Value) || mods.OfType<OsuModTraceable>().Any();
+
+            // Start from normal curve, rewarding lower AR up to AR5
+            double readingBonus = 0.04 * (12.0 - Math.Max(approachRate, 5));
+
+            readingBonus *= visibilityFactor;
+
+            // For AR up to 0 - reduce reward for very low ARs when object is visible
+            if (approachRate < 5)
+                readingBonus += (isAlwaysPartiallyVisible ? 0.04 : 0.03) * (5.0 - Math.Max(approachRate, 0));
+
+            // Starting from AR0 - cap values so they won't grow to infinity
+            if (approachRate < 0)
+                readingBonus += (isAlwaysPartiallyVisible ? 0.1 : 0.075) * (1 - Math.Pow(1.5, approachRate));
+
+            return readingBonus;
         }
 
         // Summation for aim and speed, reducing reward for mixed maps
