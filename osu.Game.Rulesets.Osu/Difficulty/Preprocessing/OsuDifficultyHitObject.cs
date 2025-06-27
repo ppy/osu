@@ -114,6 +114,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
         /// <summary>
         /// Selective bonus for sliderjumps being more difficult to process, effectively increasing aiming difficulty.
+        /// This is kept in mechanical skills until better balancing option is discovered.
         /// </summary>
         public double SliderJumpBonus { get; private set; }
 
