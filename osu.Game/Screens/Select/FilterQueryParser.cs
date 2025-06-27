@@ -16,7 +16,7 @@ namespace osu.Game.Screens.Select
     public static class FilterQueryParser
     {
         private static readonly Regex query_syntax_regex = new Regex(
-            @"\b(?<key>\w+)(?<op>(:|=|(>|<)(:|=)?))(?<value>("".*""[!]?)|(\S*))",
+            @"\b(?<key>\w+)(?<op>(!?(:|=)|(>|<)(:|=)?))(?<value>("".*""[!]?)|(\S*))",
             RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         internal static void ApplyQueries(FilterCriteria criteria, string query)
@@ -113,6 +113,9 @@ namespace osu.Game.Screens.Select
                 case "diff":
                     return TryUpdateCriteriaText(ref criteria.DifficultyName, op, value);
 
+                case "source":
+                    return TryUpdateCriteriaText(ref criteria.Source, op, value);
+
                 default:
                     return criteria.RulesetCriteria?.TryParseCustomKeywordCriteria(key, op, value) ?? false;
             }
@@ -125,6 +128,10 @@ namespace osu.Game.Screens.Select
                 case "=":
                 case ":":
                     return Operator.Equal;
+
+                case "!=":
+                case "!:":
+                    return Operator.NotEqual;
 
                 case "<":
                     return Operator.Less;

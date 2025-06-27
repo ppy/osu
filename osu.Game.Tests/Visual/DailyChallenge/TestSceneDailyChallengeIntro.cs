@@ -44,17 +44,17 @@ namespace osu.Game.Tests.Visual.DailyChallenge
         [Test]
         public void TestDailyChallenge()
         {
-            startChallenge(1234);
+            startChallenge();
             AddStep("push screen", () => LoadScreen(new DailyChallengeIntro(room)));
         }
 
         [Test]
         public void TestPlayIntroOnceFlag()
         {
-            startChallenge(1234);
+            startChallenge();
             AddStep("set intro played flag", () => Dependencies.Get<SessionStatics>().SetValue(Static.DailyChallengeIntroPlayed, true));
 
-            startChallenge(1235);
+            startChallenge();
 
             AddAssert("intro played flag reset", () => Dependencies.Get<SessionStatics>().Get<bool>(Static.DailyChallengeIntroPlayed), () => Is.False);
 
@@ -62,28 +62,27 @@ namespace osu.Game.Tests.Visual.DailyChallenge
             AddUntilStep("intro played flag set", () => Dependencies.Get<SessionStatics>().Get<bool>(Static.DailyChallengeIntroPlayed), () => Is.True);
         }
 
-        private void startChallenge(int roomId)
+        private void startChallenge()
         {
             AddStep("add room", () =>
             {
                 API.Perform(new CreateRoomRequest(room = new Room
                 {
-                    RoomID = { Value = roomId },
-                    Name = { Value = "Daily Challenge: June 4, 2024" },
+                    Name = "Daily Challenge: June 4, 2024",
                     Playlist =
-                    {
+                    [
                         new PlaylistItem(CreateAPIBeatmap(new OsuRuleset().RulesetInfo))
                         {
                             RequiredMods = [new APIMod(new OsuModTraceable())],
                             AllowedMods = [new APIMod(new OsuModDoubleTime())]
                         }
-                    },
-                    StartDate = { Value = DateTimeOffset.Now },
-                    EndDate = { Value = DateTimeOffset.Now.AddHours(24) },
-                    Category = { Value = RoomCategory.DailyChallenge }
+                    ],
+                    StartDate = DateTimeOffset.Now,
+                    EndDate = DateTimeOffset.Now.AddHours(24),
+                    Category = RoomCategory.DailyChallenge
                 }));
             });
-            AddStep("signal client", () => metadataClient.DailyChallengeUpdated(new DailyChallengeInfo { RoomID = roomId }));
+            AddStep("signal client", () => metadataClient.DailyChallengeUpdated(new DailyChallengeInfo { RoomID = room.RoomID!.Value }));
         }
     }
 }

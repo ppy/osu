@@ -17,6 +17,7 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
+using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Spectate;
@@ -42,6 +43,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private BeatmapManager beatmapManager { get; set; } = null!;
 
         private MultiSpectatorScreen spectatorScreen = null!;
+        private Room room = null!;
 
         private readonly List<MultiplayerRoomUser> playingUsers = new List<MultiplayerRoomUser>();
 
@@ -63,6 +65,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
             base.SetUpSteps();
 
             AddStep("clear playing users", () => playingUsers.Clear());
+
+            AddStep("create room", () => room = CreateDefaultRoom());
+            AddStep("join room", () => JoinRoom(room));
+            WaitForJoined();
         }
 
         [TestCase(1)]
@@ -372,7 +378,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             sendFrames(getPlayerIds(4), 300);
 
-            AddUntilStep("wait for correct track speed", () => Beatmap.Value.Track.Rate, () => Is.EqualTo(1.5));
+            AddUntilStep("wait for correct track speed",
+                () => this.ChildrenOfType<MultiSpectatorPlayer>().All(player => player.ClockAdjustmentsFromMods.AggregateTempo.Value == 1.5));
         }
 
         [Test]
@@ -406,13 +413,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         /// <summary>
-        /// Tests spectating with a beatmap that has a high <see cref="BeatmapInfo.AudioLeadIn"/> value.
+        /// Tests spectating with a beatmap that has a high <see cref="IBeatmap.AudioLeadIn"/> value.
         ///
         /// This test is not intended not to check the correct initial time value, but only to guard against
         /// gameplay potentially getting stuck in a stopped state due to lead in time being present.
         /// </summary>
         [Test]
-        public void TestAudioLeadIn() => testLeadIn(b => b.BeatmapInfo.AudioLeadIn = 2000);
+        public void TestAudioLeadIn() => testLeadIn(b => b.Beatmap.AudioLeadIn = 2000);
 
         /// <summary>
         /// Tests spectating with a beatmap that has a storyboard element with a negative start time (i.e. intro storyboard element).
@@ -455,7 +462,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                 applyToBeatmap?.Invoke(Beatmap.Value);
 
-                LoadScreen(spectatorScreen = new MultiSpectatorScreen(SelectedRoom.Value, playingUsers.ToArray()));
+                LoadScreen(spectatorScreen = new MultiSpectatorScreen(room, playingUsers.ToArray()));
             });
 
             AddUntilStep("wait for screen load", () => spectatorScreen.LoadState == LoadState.Loaded && (!waitForPlayerLoad || spectatorScreen.AllPlayersLoaded));
@@ -553,7 +560,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private PlayerArea getInstance(int userId) => spectatorScreen.ChildrenOfType<PlayerArea>().Single(p => p.UserId == userId);
 
-        private GameplayLeaderboardScore getLeaderboardScore(int userId) => spectatorScreen.ChildrenOfType<GameplayLeaderboardScore>().Single(s => s.User?.OnlineID == userId);
+        private DrawableGameplayLeaderboardScore getLeaderboardScore(int userId) => spectatorScreen.Leaderboard.ChildrenOfType<DrawableGameplayLeaderboardScore>().Single(s => s.User?.OnlineID == userId);
 
         private int[] getPlayerIds(int count) => Enumerable.Range(PLAYER_1_ID, count).ToArray();
     }

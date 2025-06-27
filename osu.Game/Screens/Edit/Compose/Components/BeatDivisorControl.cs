@@ -146,22 +146,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
                                 }
                             }
                         },
-                        new Drawable[]
-                        {
-                            new TextFlowContainer(s => s.Font = s.Font.With(size: 14))
-                            {
-                                Padding = new MarginPadding { Horizontal = 15, Vertical = 2 },
-                                Text = "beat snap",
-                                RelativeSizeAxes = Axes.X,
-                                TextAnchor = Anchor.TopCentre,
-                            },
-                        },
                     },
                     RowDimensions = new[]
                     {
                         new Dimension(GridSizeMode.Absolute, 40),
                         new Dimension(GridSizeMode.Absolute, 20),
-                        new Dimension(GridSizeMode.Absolute, 15)
                     }
                 }
             };
@@ -177,6 +166,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     lastCustomDivisor = valid.NewValue.Presets.Last();
             }, true);
         }
+
+        protected override bool OnMouseDown(MouseDownEvent e) => true;
+        protected override bool OnClick(ClickEvent e) => true;
 
         private void cycleDivisorType(int direction)
         {
@@ -397,6 +389,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
             private OsuColour colours { get; set; } = null!;
 
             private readonly BindableBeatDivisor beatDivisor;
+
+            public override bool AcceptsFocus => false;
 
             public TickSliderBar(BindableBeatDivisor beatDivisor)
             {

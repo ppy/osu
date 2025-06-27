@@ -205,7 +205,7 @@ namespace osu.Game.Tests.Visual.Editing
         {
             double originalSpacing = 0;
 
-            AddStep("retrieve original spacing", () => originalSpacing = editorBeatmap.BeatmapInfo.DistanceSpacing);
+            AddStep("retrieve original spacing", () => originalSpacing = editorBeatmap.DistanceSpacing);
 
             AddStep("hold ctrl", () => InputManager.PressKey(Key.LControl));
             AddStep("hold alt", () => InputManager.PressKey(Key.LAlt));
@@ -215,7 +215,7 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("release alt", () => InputManager.ReleaseKey(Key.LAlt));
             AddStep("release ctrl", () => InputManager.ReleaseKey(Key.LControl));
 
-            AddAssert("distance spacing increased by 0.5", () => editorBeatmap.BeatmapInfo.DistanceSpacing == originalSpacing + 0.5);
+            AddAssert("distance spacing increased by 0.5", () => editorBeatmap.DistanceSpacing == originalSpacing + 0.5);
         }
 
         public partial class EditorBeatmapContainer : PopoverContainer

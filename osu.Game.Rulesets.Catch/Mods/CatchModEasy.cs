@@ -8,6 +8,6 @@ namespace osu.Game.Rulesets.Catch.Mods
 {
     public class CatchModEasy : ModEasyWithExtraLives
     {
-        public override LocalisableString Description => @"Larger fruits, more forgiving HP drain, less accuracy required, and three lives!";
+        public override LocalisableString Description => @"Larger fruits, more forgiving HP drain, less accuracy required, and extra lives!";
     }
 }

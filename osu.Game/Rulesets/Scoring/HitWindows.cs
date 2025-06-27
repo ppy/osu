@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Scoring
         /// An empty <see cref="HitWindows"/> with only <see cref="HitResult.Miss"/> and <see cref="HitResult.Perfect"/>.
         /// No time values are provided (meaning instantaneous hit or miss).
         /// </summary>
-        public static HitWindows Empty => new EmptyHitWindows();
+        public static HitWindows Empty { get; } = new EmptyHitWindows();
 
         public HitWindows()
         {
@@ -143,6 +143,9 @@ namespace osu.Game.Rulesets.Scoring
         /// <returns>One half of the hit window for <paramref name="result"/>.</returns>
         public double WindowFor(HitResult result)
         {
+            if (!IsHitResultAllowed(result))
+                throw new ArgumentOutOfRangeException(nameof(result), result, $@"{result} is not an allowed result.");
+
             switch (result)
             {
                 case HitResult.Perfect:
@@ -164,7 +167,7 @@ namespace osu.Game.Rulesets.Scoring
                     return miss;
 
                 default:
-                    throw new ArgumentException("Unknown enum member", nameof(result));
+                    throw new ArgumentOutOfRangeException(nameof(result), result, null);
             }
         }
 
@@ -182,7 +185,7 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         protected virtual DifficultyRange[] GetRanges() => base_ranges;
 
-        public class EmptyHitWindows : HitWindows
+        private class EmptyHitWindows : HitWindows
         {
             private static readonly DifficultyRange[] ranges =
             {
@@ -190,17 +193,7 @@ namespace osu.Game.Rulesets.Scoring
                 new DifficultyRange(HitResult.Miss, 0, 0, 0),
             };
 
-            public override bool IsHitResultAllowed(HitResult result)
-            {
-                switch (result)
-                {
-                    case HitResult.Perfect:
-                    case HitResult.Miss:
-                        return true;
-                }
-
-                return false;
-            }
+            public override bool IsHitResultAllowed(HitResult result) => true;
 
             protected override DifficultyRange[] GetRanges() => ranges;
         }

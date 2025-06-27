@@ -63,7 +63,7 @@ namespace osu.Game.Tests.Visual.DailyChallenge
                 {
                     Id = 2,
                     Username = "peppy",
-                    CoverUrl = "https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
+                    CoverUrl = TestResources.COVER_IMAGE_3,
                 }, RNG.Next(1_000_000), null);
 
                 feed.AddNewScore(ev);
@@ -75,7 +75,7 @@ namespace osu.Game.Tests.Visual.DailyChallenge
                 {
                     Id = 2,
                     Username = "peppy",
-                    CoverUrl = "https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
+                    CoverUrl = TestResources.COVER_IMAGE_3,
                 }, RNG.Next(1_000_000), RNG.Next(11, 1000));
 
                 var testScore = TestResources.CreateTestScoreInfo();
@@ -90,7 +90,7 @@ namespace osu.Game.Tests.Visual.DailyChallenge
                 {
                     Id = 2,
                     Username = "peppy",
-                    CoverUrl = "https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
+                    CoverUrl = TestResources.COVER_IMAGE_3,
                 }, RNG.Next(1_000_000), RNG.Next(1, 10));
 
                 feed.AddNewScore(ev);
@@ -108,7 +108,7 @@ namespace osu.Game.Tests.Visual.DailyChallenge
                     {
                         Id = 2,
                         Username = "peppy",
-                        CoverUrl = "https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
+                        CoverUrl = TestResources.COVER_IMAGE_3,
                     }, RNG.Next(1_000_000), null);
 
                     feed.AddNewScore(ev);

@@ -43,12 +43,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private OsuButton readyButton => control.ChildrenOfType<OsuButton>().Single();
 
-        [Cached(typeof(IBindable<PlaylistItem>))]
-        private readonly Bindable<PlaylistItem> currentItem = new Bindable<PlaylistItem>();
-
-        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
-            new CachedModelDependencyContainer<Room>(base.CreateChildDependencies(parent)) { Model = { BindTarget = room } };
-
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -113,25 +107,25 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                 beatmapAvailability.Value = BeatmapAvailability.LocallyAvailable();
 
-                currentItem.Value = new PlaylistItem(Beatmap.Value.BeatmapInfo)
+                PlaylistItem item = new PlaylistItem(Beatmap.Value.BeatmapInfo)
                 {
                     RulesetID = Beatmap.Value.BeatmapInfo.Ruleset.OnlineID
                 };
 
                 room.Value = new Room
                 {
-                    Playlist = { currentItem.Value },
-                    CurrentPlaylistItem = { BindTarget = currentItem }
+                    Playlist = [item],
+                    CurrentPlaylistItem = item
                 };
 
-                localUser = new MultiplayerRoomUser(API.LocalUser.Value.Id) { User = API.LocalUser.Value };
+                localUser = new MultiplayerRoomUser(API.LocalUser.Value.Id)
+                {
+                    User = API.LocalUser.Value
+                };
 
                 multiplayerRoom = new MultiplayerRoom(0)
                 {
-                    Playlist =
-                    {
-                        TestMultiplayerClient.CreateMultiplayerPlaylistItem(currentItem.Value),
-                    },
+                    Playlist = { new MultiplayerPlaylistItem(item) },
                     Users = { localUser },
                     Host = localUser,
                 };
@@ -143,7 +137,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Size = new Vector2(250, 50),
+                    Size = new Vector2(250, 50)
                 };
             });
         }

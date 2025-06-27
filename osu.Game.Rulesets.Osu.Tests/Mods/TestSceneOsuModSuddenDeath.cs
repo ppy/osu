@@ -24,13 +24,17 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
         {
         }
 
-        [Test]
-        public void TestMissTail() => CreateModTest(new ModTestData
+        [TestCase(true)]
+        [TestCase(false)]
+        public void TestMissTail(bool tailMiss) => CreateModTest(new ModTestData
         {
-            Mod = new OsuModSuddenDeath(),
-            PassCondition = () => ((ModFailConditionTestPlayer)Player).CheckFailed(false),
+            Mod = new OsuModSuddenDeath
+            {
+                FailOnSliderTail = { Value = tailMiss }
+            },
+            PassCondition = () => ((ModFailConditionTestPlayer)Player).CheckFailed(tailMiss),
             Autoplay = false,
-            Beatmap = new Beatmap
+            CreateBeatmap = () => new Beatmap
             {
                 HitObjects = new List<HitObject>
                 {
@@ -55,7 +59,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
             Mod = new OsuModSuddenDeath(),
             PassCondition = () => ((ModFailConditionTestPlayer)Player).CheckFailed(true),
             Autoplay = false,
-            Beatmap = new Beatmap
+            CreateBeatmap = () => new Beatmap
             {
                 HitObjects = new List<HitObject>
                 {

@@ -12,7 +12,6 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Online.Notifications.WebSocket;
 using osu.Game.Tests;
-using osu.Game.Users;
 
 namespace osu.Game.Online.API
 {
@@ -27,10 +26,7 @@ namespace osu.Game.Online.API
         });
 
         public BindableList<APIRelation> Friends { get; } = new BindableList<APIRelation>();
-
-        public Bindable<UserActivity> Activity { get; } = new Bindable<UserActivity>();
-
-        public Bindable<UserStatistics?> Statistics { get; } = new Bindable<UserStatistics?>();
+        public BindableList<APIRelation> Blocks { get; } = new BindableList<APIRelation>();
 
         public DummyNotificationsClient NotificationsClient { get; } = new DummyNotificationsClient();
         INotificationsClient IAPIProvider.NotificationsClient => NotificationsClient;
@@ -46,9 +42,11 @@ namespace osu.Game.Online.API
 
         public string ProvidedUsername => LocalUser.Value.Username;
 
-        public string APIEndpointUrl => "http://localhost";
-
-        public string WebsiteRootUrl => "http://localhost";
+        public EndpointConfiguration Endpoints { get; } = new EndpointConfiguration
+        {
+            APIUrl = "http://localhost",
+            WebsiteUrl = "http://localhost",
+        };
 
         public int APIVersion => int.Parse(DateTime.Now.ToString("yyyyMMdd"));
 
@@ -70,15 +68,6 @@ namespace osu.Game.Online.API
         /// The current connectivity state of the API.
         /// </summary>
         public IBindable<APIState> State => state;
-
-        public DummyAPIAccess()
-        {
-            LocalUser.BindValueChanged(u =>
-            {
-                u.OldValue?.Activity.UnbindFrom(Activity);
-                u.NewValue.Activity.BindTo(Activity);
-            }, true);
-        }
 
         public virtual void Queue(APIRequest request)
         {
@@ -178,11 +167,6 @@ namespace osu.Game.Online.API
         private void onSuccessfulLogin()
         {
             state.Value = APIState.Online;
-            Statistics.Value = new UserStatistics
-            {
-                GlobalRank = 1,
-                CountryRank = 1
-            };
         }
 
         public void Logout()
@@ -193,15 +177,11 @@ namespace osu.Game.Online.API
             LocalUser.Value = new GuestUser();
         }
 
-        public void UpdateStatistics(UserStatistics newStatistics)
+        public void UpdateLocalFriends()
         {
-            Statistics.Value = newStatistics;
-
-            if (IsLoggedIn)
-                LocalUser.Value.Statistics = newStatistics;
         }
 
-        public void UpdateLocalFriends()
+        public void UpdateLocalBlocks()
         {
         }
 
@@ -219,8 +199,7 @@ namespace osu.Game.Online.API
 
         IBindable<APIUser> IAPIProvider.LocalUser => LocalUser;
         IBindableList<APIRelation> IAPIProvider.Friends => Friends;
-        IBindable<UserActivity> IAPIProvider.Activity => Activity;
-        IBindable<UserStatistics?> IAPIProvider.Statistics => Statistics;
+        IBindableList<APIRelation> IAPIProvider.Blocks => Blocks;
 
         /// <summary>
         /// Skip 2FA requirement for next login.

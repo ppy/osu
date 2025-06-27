@@ -20,7 +20,6 @@ using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Compose.Components;
 using osu.Game.Tests.Visual;
-using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Tests.Editor
 {
@@ -99,11 +98,6 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
         public Drawable Child
         {
             set => InternalChild = value;
-        }
-
-        public override SnapResult FindSnappedPositionAndTime(Vector2 screenSpacePosition, SnapType snapType = SnapType.All)
-        {
-            throw new NotImplementedException();
         }
     }
 }

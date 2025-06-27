@@ -14,7 +14,6 @@ using osu.Framework.Input.Events;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osuTK;
-using osuTK.Input;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
@@ -73,14 +72,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             if (wasOpened)
                 samplePopOut?.Play();
-        }
-
-        protected override bool OnKeyDown(KeyDownEvent e)
-        {
-            if (e.Key == Key.Escape)
-                return false; // disable the framework-level handling of escape key for conformity (we use GlobalAction.Back).
-
-            return base.OnKeyDown(e);
         }
 
         public virtual bool OnPressed(KeyBindingPressEvent<GlobalAction> e)

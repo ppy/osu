@@ -30,12 +30,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         [Resolved]
         private MultiplayerClient client { get; set; } = null!;
 
-        [Resolved]
-        private IBindable<PlaylistItem?> currentItem { get; set; } = null!;
+        private readonly RoundedButton button;
 
         private IBindable<bool> operationInProgress = null!;
-
-        private readonly RoundedButton button;
 
         public MultiplayerSpectateButton()
         {
@@ -54,7 +51,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
             client.ToggleSpectate().ContinueWith(_ => endOperation());
 
-            void endOperation() => clickOperation?.Dispose();
+            void endOperation() => clickOperation.Dispose();
         }
 
         [BackgroundDependencyLoader]
@@ -71,7 +68,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         {
             base.LoadComplete();
 
-            currentItem.BindValueChanged(_ => Scheduler.AddOnce(checkForAutomaticDownload), true);
             client.RoomUpdated += onRoomUpdated;
             updateState();
         }
@@ -117,11 +113,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
         private void checkForAutomaticDownload()
         {
-            PlaylistItem? item = currentItem.Value;
-
             downloadCheckCancellation?.Cancel();
 
-            if (item == null)
+            if (client.Room == null)
                 return;
 
             if (!automaticallyDownload.Value)
@@ -136,10 +130,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             if (client.LocalUser?.State != MultiplayerUserState.Spectating)
                 return;
 
+            MultiplayerPlaylistItem item = client.Room.CurrentPlaylistItem;
+
             // In a perfect world we'd use BeatmapAvailability, but there's no event-driven flow for when a selection changes.
             // ie. if selection changes from "not downloaded" to another "not downloaded" we wouldn't get a value changed raised.
             beatmapLookupCache
-                .GetBeatmapAsync(item.Beatmap.OnlineID, (downloadCheckCancellation = new CancellationTokenSource()).Token)
+                .GetBeatmapAsync(item.BeatmapID, (downloadCheckCancellation = new CancellationTokenSource()).Token)
                 .ContinueWith(resolved => Schedule(() =>
                 {
                     var beatmapSet = resolved.GetResultSafely()?.BeatmapSet;

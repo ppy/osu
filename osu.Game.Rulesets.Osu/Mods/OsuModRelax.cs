@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         /// <summary>
         /// How early before a hitobject's start time to trigger a hit.
         /// </summary>
-        private const float relax_leniency = 3;
+        public const float RELAX_LENIENCY = 12;
 
         private bool isDownState;
         private bool wasLeft;
@@ -83,7 +83,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             foreach (var h in playfield.HitObjectContainer.AliveObjects.OfType<DrawableOsuHitObject>())
             {
                 // we are not yet close enough to the object.
-                if (time < h.HitObject.StartTime - relax_leniency)
+                if (time < h.HitObject.StartTime - RELAX_LENIENCY)
                     break;
 
                 // already hit or beyond the hittable end time.

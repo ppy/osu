@@ -248,29 +248,30 @@ namespace osu.Game.Database
             return new RealmLive<T>(realmObject, realm);
         }
 
+#pragma warning disable RS0030 // mentioning banned symbols in documentation
         /// <summary>
-        /// Register a callback to be invoked each time this <see cref="T:Realms.IRealmCollection`1" /> changes.
+        /// Register a callback to be invoked each time this <see cref="IRealmCollection{T}" /> changes.
         /// </summary>
         /// <remarks>
         /// <para>
         /// This adds osu! specific thread and managed state safety checks on top of <see cref="IRealmCollection{T}.SubscribeForNotifications"/>.
         /// </para>
         /// <para>
-        /// The first callback will be invoked with the initial <see cref="T:Realms.IRealmCollection`1" /> after the asynchronous query completes,
+        /// The first callback will be invoked with the initial <see cref="IRealmCollection{T}" /> after the asynchronous query completes,
         /// and then called again after each write transaction which changes either any of the objects in the collection, or
         /// which objects are in the collection. The <c>changes</c> parameter will
         /// be <c>null</c> the first time the callback is invoked with the initial results. For each call after that,
         /// it will contain information about which rows in the results were added, removed or modified.
         /// </para>
         /// <para>
-        /// If a write transaction did not modify any objects in this <see cref="T:Realms.IRealmCollection`1" />, the callback is not invoked at all.
+        /// If a write transaction did not modify any objects in this <see cref="IRealmCollection{T}" />, the callback is not invoked at all.
         /// If an error occurs the callback will be invoked with <c>null</c> for the <c>sender</c> parameter and a non-<c>null</c> <c>error</c>.
-        /// Currently the only errors that can occur are when opening the <see cref="T:Realms.Realm" /> on the background worker thread.
+        /// Currently, the only errors that can occur are when opening the <see cref="Realm" /> on the background worker thread.
         /// </para>
         /// <para>
-        /// At the time when the block is called, the <see cref="T:Realms.IRealmCollection`1" /> object will be fully evaluated
+        /// At the time when the block is called, the <see cref="IRealmCollection{T}" /> object will be fully evaluated
         /// and up-to-date, and as long as you do not perform a write transaction on the same thread
-        /// or explicitly call <see cref="M:Realms.Realm.Refresh" />, accessing it will never perform blocking work.
+        /// or explicitly call <see cref="Realm.Refresh" />, accessing it will never perform blocking work.
         /// </para>
         /// <para>
         /// Notifications are delivered via the standard event loop, and so can't be delivered while the event loop is blocked by other activity.
@@ -279,13 +280,14 @@ namespace osu.Game.Database
         /// </para>
         /// </remarks>
         /// <param name="collection">The <see cref="IRealmCollection{T}"/> to observe for changes.</param>
-        /// <param name="callback">The callback to be invoked with the updated <see cref="T:Realms.IRealmCollection`1" />.</param>
+        /// <param name="callback">The callback to be invoked with the updated <see cref="IRealmCollection{T}" />.</param>
         /// <returns>
         /// A subscription token. It must be kept alive for as long as you want to receive change notifications.
-        /// To stop receiving notifications, call <see cref="M:System.IDisposable.Dispose" />.
+        /// To stop receiving notifications, call <see cref="IDisposable.Dispose" />.
         /// </returns>
-        /// <seealso cref="M:Realms.CollectionExtensions.SubscribeForNotifications``1(System.Collections.Generic.IList{``0},Realms.NotificationCallbackDelegate{``0})" />
-        /// <seealso cref="M:Realms.CollectionExtensions.SubscribeForNotifications``1(System.Linq.IQueryable{``0},Realms.NotificationCallbackDelegate{``0})" />
+        /// <seealso cref="Realms.CollectionExtensions.SubscribeForNotifications{T}(IList{T}, NotificationCallbackDelegate{T},KeyPathsCollection?)" />
+        /// <seealso cref="Realms.CollectionExtensions.SubscribeForNotifications{T}(IQueryable{T}, NotificationCallbackDelegate{T},KeyPathsCollection?)" />
+#pragma warning restore RS0030
         public static IDisposable QueryAsyncWithNotifications<T>(this IRealmCollection<T> collection, NotificationCallbackDelegate<T> callback)
             where T : RealmObjectBase
         {

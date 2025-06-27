@@ -154,9 +154,13 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             if (MainPiece != null)
                 Content.Remove(MainPiece, true);
 
-            Content.Add(MainPiece = CreateMainPiece());
+            MainPiece = CreateMainPiece();
+
+            if (MainPiece != null)
+                Content.Add(MainPiece);
         }
 
+        [CanBeNull]
         protected abstract SkinnableDrawable CreateMainPiece();
     }
 }
