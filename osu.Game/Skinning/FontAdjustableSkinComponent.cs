@@ -24,8 +24,7 @@ namespace osu.Game.Skinning
         [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.Font), nameof(SkinnableComponentStrings.FontDescription))]
         public Bindable<Typeface> Font { get; } = new Bindable<Typeface>(Typeface.Torus);
 
-        [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.TextWeight), nameof(SkinnableComponentStrings.TextWeightDescription),
-            SettingControlType = typeof(WeightDropdown))]
+        [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.TextWeight), SettingControlType = typeof(WeightDropdown))]
         public Bindable<FontWeight> TextWeight { get; } = new Bindable<FontWeight>(FontWeight.Regular);
 
         [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.TextColour), nameof(SkinnableComponentStrings.TextColourDescription))]
