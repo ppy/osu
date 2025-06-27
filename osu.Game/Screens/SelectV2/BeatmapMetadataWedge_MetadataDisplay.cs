@@ -141,6 +141,8 @@ namespace osu.Game.Screens.SelectV2
 
                 if (contentContainer.Child is TruncatingSpriteText text)
                     text.MaxWidth = ChildSize.X;
+                else if (contentContainer.Child is UserLinkContainer userLink)
+                    userLink.MaxWidth = ChildSize.X;
                 else if (contentContainer.Child is MetadataLinkContainer link)
                     link.MaxWidth = ChildSize.X;
             }
