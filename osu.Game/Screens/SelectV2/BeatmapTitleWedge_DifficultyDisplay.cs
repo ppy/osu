@@ -56,7 +56,7 @@ namespace osu.Game.Screens.SelectV2
             private FillFlowContainer nameLine = null!;
             private OsuSpriteText difficultyText = null!;
             private OsuSpriteText mappedByText = null!;
-            private UserLinkContainer userLink = null!;
+            private UserLinkContainer mapperLink = null!;
 
             private GridContainer ratingAndNameContainer = null!;
             private DifficultyStatisticsDisplay countStatisticsDisplay = null!;
@@ -135,7 +135,7 @@ namespace osu.Game.Screens.SelectV2
                                                     Text = " mapped by ",
                                                     Font = OsuFont.Style.Body,
                                                 },
-                                                userLink = new UserLinkContainer
+                                                mapperLink = new UserLinkContainer
                                                 {
                                                     Anchor = Anchor.BottomLeft,
                                                     Origin = Anchor.BottomLeft,
@@ -237,7 +237,7 @@ namespace osu.Game.Screens.SelectV2
                 {
                     ratingAndNameContainer.FadeIn(300, Easing.OutQuint);
                     difficultyText.Text = beatmap.Value.BeatmapInfo.DifficultyName;
-                    userLink.User = beatmap.Value.Metadata.Author;
+                    mapperLink.User = beatmap.Value.Metadata.Author;
                 }
 
                 starRatingDisplay.Current = (Bindable<StarDifficulty>)difficultyCache.GetBindableDifficulty(beatmap.Value.BeatmapInfo, cancellationSource.Token, SongSelect.SELECTION_DEBOUNCE);
@@ -330,7 +330,7 @@ namespace osu.Game.Screens.SelectV2
             {
                 base.Update();
 
-                difficultyText.MaxWidth = Math.Max(nameLine.DrawWidth - mappedByText.DrawWidth - userLink.DrawWidth - 20, 0);
+                difficultyText.MaxWidth = Math.Max(nameLine.DrawWidth - mappedByText.DrawWidth - mapperLink.DrawWidth - 20, 0);
 
                 // Use difficulty colour until it gets too dark to be visible against dark backgrounds.
                 Color4 col = starRatingDisplay.DisplayedStars.Value >= OsuColour.STAR_DIFFICULTY_DEFINED_COLOUR_CUTOFF ? colours.Orange1 : starRatingDisplay.DisplayedDifficultyColour;
