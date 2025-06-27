@@ -569,8 +569,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         public partial class RoomNameLine : FillFlowContainer
         {
-            private TruncatingSpriteText spriteText = null!;
-            private ExternalLinkButton linkButton = null!;
+            private readonly TruncatingSpriteText spriteText;
+            private readonly ExternalLinkButton linkButton;
 
             public LocalisableString Text
             {
@@ -590,8 +590,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 }
             }
 
-            [BackgroundDependencyLoader]
-            private void load()
+            public RoomNameLine()
             {
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
