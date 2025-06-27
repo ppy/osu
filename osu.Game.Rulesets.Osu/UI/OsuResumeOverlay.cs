@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.ObjectExtensions;
@@ -12,7 +11,6 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
-using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.UI.Cursor;
 using osu.Game.Rulesets.Scoring;
@@ -61,7 +59,10 @@ namespace osu.Game.Rulesets.Osu.UI
                         if (inputBlocker != null)
                         {
                             bool resumeKeyWasNotHeldWhenPausing = !drawableOsuRuleset.AsNonNull().KeyBindingInputManager.PressedActions.Contains(action);
-                            bool mouseOverHittableCircle = enumerateAllObjects(drawableOsuRuleset!.Playfield.HitObjectContainer.AliveObjects).Any(h =>
+                            // this intentionally ignores slider head circles because it is complicated to make blocking the resume input there
+                            // due to how complex `SliderInputManager` is and the methods it uses to determine whether the slider is being tracked
+                            // (it reads `PressedActions` from the input manager directly, so even if we attempt to block the initial input here, `SliderInputManager` will still see it through that).
+                            bool mouseOverHittableCircle = drawableOsuRuleset!.Playfield.HitObjectContainer.AliveObjects.Any(h =>
                                 h is DrawableHitCircle && h.IsHovered && !h.IsHit && drawableOsuRuleset.Playfield.HitPolicy.CheckHittable(h, Time.Current, HitResult.None) != ClickAction.Ignore);
 
                             if (resumeKeyWasNotHeldWhenPausing && mouseOverHittableCircle)
@@ -72,17 +73,6 @@ namespace osu.Game.Rulesets.Osu.UI
                     }
                 }
             });
-        }
-
-        private IEnumerable<DrawableHitObject> enumerateAllObjects(IEnumerable<DrawableHitObject> hitObjects)
-        {
-            foreach (var hitObject in hitObjects)
-            {
-                foreach (var nested in hitObject.NestedHitObjects)
-                    yield return nested;
-
-                yield return hitObject;
-            }
         }
 
         protected override void PopIn()
