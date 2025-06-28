@@ -118,6 +118,9 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty("has_replay")]
         public bool HasReplay { get; set; }
 
+        [JsonProperty("is_pinned")]
+        public bool IsPinned { get; set; }
+
         [JsonProperty("ranked")]
         public bool Ranked { get; set; }
 
@@ -129,6 +132,8 @@ namespace osu.Game.Online.API.Requests.Responses
         public bool ShouldSerializePP() => false;
         public bool ShouldSerializeOnlineID() => false;
         public bool ShouldSerializeHasReplay() => false;
+        public bool ShouldSerializeIsPinned() => false;
+
 
         // These fields only need to be serialised if they hold values.
         // Generally this is required because this model may be used by server-side components, but
