@@ -197,6 +197,11 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         public override void OnKilled()
         {
             base.OnKilled();
+            // flush the final state of holding on kill.
+            // this matters because some skin implementations like legacy skin
+            // insert drawables in the hierarchy that are not a child of this DHO
+            // (see `LegacyBodyPiece` and related machinations with `lightContainer` being added at column level)
+            isHolding.Value = Result.IsHolding(Time.Current);
             (bodyPiece.Drawable as IHoldNoteBody)?.Recycle();
         }
 

@@ -53,6 +53,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                     {
                         fillFlow = new FillFlowContainer
                         {
+                            X = 100,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             RelativeSizeAxes = Axes.X,
@@ -281,7 +282,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 },
                 new ScoreInfo
                 {
-                    Position = 110000,
+                    Position = 2233,
                     Rank = ScoreRank.D,
                     Accuracy = 1,
                     MaxCombo = 244,

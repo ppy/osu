@@ -165,21 +165,73 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         Name = "A host-only room",
                         QueueMode = QueueMode.HostOnly,
                         Type = MatchType.HeadToHead,
+                        RoomID = 1337,
                     }),
                     new MultiplayerRoomPanel(new Room
                     {
                         Name = "An all-players, team-versus room",
                         QueueMode = QueueMode.AllPlayers,
-                        Type = MatchType.TeamVersus
+                        Type = MatchType.TeamVersus,
+                        RoomID = 1338,
                     }),
                     new MultiplayerRoomPanel(new Room
                     {
                         Name = "A round-robin room",
                         QueueMode = QueueMode.AllPlayersRoundRobin,
-                        Type = MatchType.HeadToHead
+                        Type = MatchType.HeadToHead,
+                        RoomID = 1339,
                     }),
                 }
             });
+        }
+
+        [Test]
+        public void TestRoomWithLongTitle()
+        {
+            AddStep("create rooms", () => Child = new FillFlowContainer
+            {
+                AutoSizeAxes = Axes.Y,
+                RelativeSizeAxes = Axes.X,
+                Direction = FillDirection.Vertical,
+                Spacing = new Vector2(5),
+                Children = new[]
+                {
+                    new MultiplayerRoomPanel(new Room
+                    {
+                        Name = "This room has a very very long title enough to make the external link button reach the participants list on the right side unless the test window is very wide, at which point I don't know, hi.",
+                        QueueMode = QueueMode.HostOnly,
+                        Type = MatchType.HeadToHead,
+                        RoomID = 1337,
+                    }),
+                }
+            });
+        }
+
+        [Test]
+        public void TestRoomWithUpdatedRoomID()
+        {
+            Room room = null!;
+
+            AddStep("create rooms", () => Child = new FillFlowContainer
+            {
+                AutoSizeAxes = Axes.Y,
+                RelativeSizeAxes = Axes.X,
+                Direction = FillDirection.Vertical,
+                Spacing = new Vector2(5),
+                Children = new[]
+                {
+                    new MultiplayerRoomPanel(room = new Room
+                    {
+                        Name = "This room has a very very long title enough to make the external link button reach the participants list on the right side unless the test window is very wide, at which point I don't know, hi.",
+                        QueueMode = QueueMode.HostOnly,
+                        Type = MatchType.HeadToHead,
+                    }),
+                }
+            });
+            AddWaitStep("wait", 3);
+            AddStep("set room ID", () => room.RoomID = 1337);
+            AddWaitStep("wait", 3);
+            AddStep("clear room ID", () => room.RoomID = null);
         }
 
         private RoomPanel createLoungeRoom(Room room)

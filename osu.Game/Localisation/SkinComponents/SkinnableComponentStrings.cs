@@ -80,9 +80,25 @@ namespace osu.Game.Localisation.SkinComponents
         public static LocalisableString TextColourDescription => new TranslatableString(getKey(@"text_colour_description"), @"The colour of the text.");
 
         /// <summary>
+        /// "Text weight"
+        /// </summary>
+        public static LocalisableString TextWeight => new TranslatableString(getKey(@"text_weight"), @"Text weight");
+
+        /// <summary>
         /// "Use relative size"
         /// </summary>
         public static LocalisableString UseRelativeSize => new TranslatableString(getKey(@"use_relative_size"), @"Use relative size");
+
+        /// <summary>
+        /// "Collapse during gameplay"
+        /// </summary>
+        public static LocalisableString CollapseDuringGameplay => new TranslatableString(getKey(@"collapse_during_gameplay"), @"Collapse during gameplay");
+
+        /// <summary>
+        /// "If enabled, the leaderboard will become more compact during active gameplay."
+        /// </summary>
+        public static LocalisableString CollapseDuringGameplayDescription =>
+            new TranslatableString(getKey(@"if_enabled_the_leaderboard_will"), @"If enabled, the leaderboard will become more compact during active gameplay.");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

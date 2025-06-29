@@ -67,11 +67,11 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("show", () => overlay.Show());
 
-            AddUntilStep("wait for content dim", () => overlay.BackgroundDimLayer.Alpha > 0);
+            AddUntilStep("wait for content dim", () => overlay.Alpha > 0);
 
             AddStep("hide", () => overlay.Hide());
 
-            AddUntilStep("wait for content restore", () => Precision.AlmostEquals(overlay.BackgroundDimLayer.Alpha, 0));
+            AddUntilStep("wait for content restore", () => Precision.AlmostEquals(overlay.Alpha, 0));
         }
 
         [Test]
@@ -90,8 +90,6 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private partial class TestLoadingLayer : LoadingLayer
         {
-            public new Box BackgroundDimLayer => base.BackgroundDimLayer;
-
             public TestLoadingLayer(bool dimBackground = false, bool withBox = true)
                 : base(dimBackground, withBox)
             {

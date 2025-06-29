@@ -192,7 +192,7 @@ namespace osu.Game.Rulesets.Objects
         /// </para>
         /// </summary>
         [NotNull]
-        protected virtual HitWindows CreateHitWindows() => new HitWindows();
+        protected virtual HitWindows CreateHitWindows() => new DefaultHitWindows();
 
         /// <summary>
         /// The maximum offset from the end time of <see cref="HitObject"/> at which this <see cref="HitObject"/> can be judged.

@@ -94,9 +94,9 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [Test]
         public void TestSelectionHeld()
         {
-            SelectNextGroup();
+            SelectNextSet();
 
-            WaitForSelection(1, 0);
+            WaitForSetSelection(1, 0);
             AddAssert("selection is updateable beatmap", () => Carousel.CurrentSelection, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
             AddAssert("visible panel is updateable beatmap", () => GetSelectedPanel()?.Item?.Model, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
 
@@ -110,9 +110,9 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [Test] // Checks that we keep selection based on online ID where possible.
         public void TestSelectionHeldDifficultyNameChanged()
         {
-            SelectNextGroup();
+            SelectNextSet();
 
-            WaitForSelection(1, 0);
+            WaitForSetSelection(1, 0);
             AddAssert("selection is updateable beatmap", () => Carousel.CurrentSelection, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
             AddAssert("visible panel is updateable beatmap", () => GetSelectedPanel()?.Item?.Model, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
 
@@ -126,9 +126,9 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [Test] // Checks that we fallback to keeping selection based on difficulty name.
         public void TestSelectionHeldDifficultyOnlineIDChanged()
         {
-            SelectNextGroup();
+            SelectNextSet();
 
-            WaitForSelection(1, 0);
+            WaitForSetSelection(1, 0);
             AddAssert("selection is updateable beatmap", () => Carousel.CurrentSelection, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
             AddAssert("visible panel is updateable beatmap", () => GetSelectedPanel()?.Item?.Model, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
 
@@ -172,7 +172,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             Guid[] originalOrder = null!;
 
             SortBy(SortMode.Artist);
-            WaitForFiltering();
 
             AddAssert("Items in descending added order", () => Carousel.PostFilterBeatmaps.Select(b => b.BeatmapSet!.DateAdded), () => Is.Ordered.Descending);
             AddStep("Save order", () => originalOrder = Carousel.PostFilterBeatmaps.Select(b => b.ID).ToArray());
@@ -188,7 +187,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddAssert("Order didn't change", () => Carousel.PostFilterBeatmaps.Select(b => b.ID), () => Is.EqualTo(originalOrder));
 
             SortBy(SortMode.Title);
-            WaitForFiltering();
 
             AddAssert("Order didn't change", () => Carousel.PostFilterBeatmaps.Select(b => b.ID), () => Is.EqualTo(originalOrder));
         }
@@ -225,7 +223,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             Guid[] originalOrder = null!;
 
             SortBy(SortMode.Artist);
-            WaitForFiltering();
 
             AddAssert("Items in descending added order", () => Carousel.PostFilterBeatmaps.Select(b => b.BeatmapSet!.DateAdded), () => Is.Ordered.Descending);
             AddStep("Save order", () => originalOrder = Carousel.PostFilterBeatmaps.Select(b => b.ID).ToArray());
@@ -252,7 +249,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddAssert("Order didn't change", () => Carousel.PostFilterBeatmaps.Select(b => b.ID), () => Is.EqualTo(originalOrder));
 
             SortBy(SortMode.Title);
-            WaitForFiltering();
 
             AddAssert("Order didn't change", () => Carousel.PostFilterBeatmaps.Select(b => b.ID), () => Is.EqualTo(originalOrder));
         }
