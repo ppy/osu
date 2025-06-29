@@ -6,11 +6,12 @@ using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Graphics;
 using osuTK;
 
 namespace osu.Game.Storyboards.Drawables
 {
-    public partial class DrawableStoryboardLayer : CompositeDrawable
+    public partial class DrawableStoryboardLayer : CompositeDrawable, IColouredDimmable
     {
         public StoryboardLayer Layer { get; }
         public bool Enabled;
@@ -31,7 +32,7 @@ namespace osu.Game.Storyboards.Drawables
             InternalChild = ElementContainer = new LayerElementContainer(layer);
         }
 
-        public partial class LayerElementContainer : LifetimeManagementContainer
+        public partial class LayerElementContainer : LifetimeManagementContainer, IColouredDimmable
         {
             private readonly StoryboardLayer storyboardLayer;
 
