@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private double totalMultiplier => 1.0;
         private double burstMultiplier => 1.92;
         private double streamMultiplier => 0.165;
-        private double staminaMultiplier => 0.042;
+        private double staminaMultiplier => 0.045;
         private double meanExponent => 1.25;
 
         private double currentBurstStrain;
