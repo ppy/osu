@@ -82,8 +82,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             var speedWithoutStamina = skills.OfType<Speed>().Single(s => s.WithoutStamina);
             double speedNotes = speed.RelevantNoteCount();
 
-            var stamina = skills.OfType<Stamina>().Single(); // TODO: remove
-
             double aimDifficultStrainCount = aim.CountTopWeightedStrains();
             double speedDifficultStrainCount = speed.CountTopWeightedStrains();
 
@@ -126,7 +124,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double speedRating = computeSpeedRating(speedDifficultyValue, mods, totalHits, approachRate, overallDifficulty);
 
             double speedRatingNoStamina = computeSpeedRating(speedWithoutStamina.DifficultyValue(), mods, totalHits, approachRate, overallDifficulty);
-            double staminaRating = computeSpeedRating(stamina.DifficultyValue(), mods, totalHits, approachRate, overallDifficulty);
             double staminaFactor = speedRating > 0 ? speedRatingNoStamina / speedRating : 1;
 
             double flashlightRating = 0.0;
@@ -164,7 +161,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 AimDifficultSliderCount = difficultSliders,
                 SpeedDifficulty = speedRating,
                 SpeedNoteCount = speedNotes,
-                staminaRating = staminaRating,
                 StaminaFactor = staminaFactor,
                 FlashlightDifficulty = flashlightRating,
                 SliderFactor = sliderFactor,
@@ -373,9 +369,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (mods.Any(h => h is OsuModFlashlight))
                 skills.Add(new Flashlight(mods));
-
-            skills.Add(new Stamina(mods));
-            skills.Add(new StreamStamina(mods));
 
             return skills.ToArray();
         }

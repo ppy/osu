@@ -39,9 +39,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         [JsonProperty("speed_note_count")]
         public double SpeedNoteCount { get; set; }
 
-        [JsonProperty("stamina_difficulty")]
-        public double staminaRating { get; set; }
-
+        /// <summary>
+        /// Describes how much of <see cref="SpeedDifficulty"/> is contributed to by the stamina strains.
+        /// </summary>
         [JsonProperty("stamina_factor")]
         public double StaminaFactor { get; set; }
 
@@ -133,6 +133,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             yield return (ATTRIB_ID_NESTED_SCORE_PER_OBJECT, NestedScorePerObject);
             yield return (ATTRIB_ID_LEGACY_SCORE_BASE_MULTIPLIER, LegacyScoreBaseMultiplier);
             yield return (ATTRIB_ID_MAXIMUM_LEGACY_COMBO_SCORE, MaximumLegacyComboScore);
+            yield return (ATTRIB_ID_STAMINA_FACTOR, StaminaFactor);
         }
 
         public override void FromDatabaseAttributes(IReadOnlyDictionary<int, double> values, IBeatmapOnlineInfo onlineInfo)
@@ -153,6 +154,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             NestedScorePerObject = values[ATTRIB_ID_NESTED_SCORE_PER_OBJECT];
             LegacyScoreBaseMultiplier = values[ATTRIB_ID_LEGACY_SCORE_BASE_MULTIPLIER];
             MaximumLegacyComboScore = values[ATTRIB_ID_MAXIMUM_LEGACY_COMBO_SCORE];
+            StaminaFactor = values[ATTRIB_ID_STAMINA_FACTOR];
             DrainRate = onlineInfo.DrainRate;
             HitCircleCount = onlineInfo.CircleCount;
             SliderCount = onlineInfo.SliderCount;
