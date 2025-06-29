@@ -69,12 +69,13 @@ namespace osu.Game.Overlays.Comments
         private ChevronButton chevronButton = null!;
         private LinkFlowContainer actionsContainer = null!;
         private LoadingSpinner actionsLoading = null!;
-        private DeletedCommentsCounter deletedCommentsCounter = null!;
         private CommentAuthorLine author = null!;
         private GridContainer content = null!;
         private VotePill votePill = null!;
         private Container<CommentEditor> replyEditorContainer = null!;
         private Container repliesButtonContainer = null!;
+
+        // private DeletedCommentsCounter deletedCommentsCounter = null!;
 
         [Resolved]
         private IDialogOverlay? dialogOverlay { get; set; }
@@ -258,14 +259,15 @@ namespace osu.Game.Overlays.Comments
                                         AutoSizeAxes = Axes.Y,
                                         Direction = FillDirection.Vertical
                                     },
-                                    deletedCommentsCounter = new DeletedCommentsCounter
-                                    {
-                                        ShowDeleted = { BindTarget = ShowDeleted },
-                                        Margin = new MarginPadding
-                                        {
-                                            Top = 10
-                                        }
-                                    },
+                                    // TODO: This should eventually be visible for moderators.
+                                    // deletedCommentsCounter = new DeletedCommentsCounter
+                                    // {
+                                    //     ShowDeleted = { BindTarget = ShowDeleted },
+                                    //     Margin = new MarginPadding
+                                    //     {
+                                    //         Top = 10
+                                    //     }
+                                    // },
                                     showMoreButton = new ShowMoreRepliesButton
                                     {
                                         Action = () => RepliesRequested(this, ++currentPage)
@@ -405,8 +407,7 @@ namespace osu.Game.Overlays.Comments
                 actionsLoading.Hide();
                 makeDeleted();
                 WasDeleted = true;
-                if (!ShowDeleted.Value)
-                    Hide();
+                updateVisibility();
             });
             request.Failure += e => Schedule(() =>
             {
@@ -415,6 +416,13 @@ namespace osu.Game.Overlays.Comments
                 actionsContainer.Show();
             });
             api.Queue(request);
+        }
+
+        private void updateVisibility()
+        {
+            // intentionally not checking deleted state of inner replies recursively. this matches web.
+            bool visible = !WasDeleted || Replies.Any(r => !r.WasDeleted) || ShowDeleted.Value;
+            this.FadeTo(visible ? 1 : 0);
         }
 
         private void copyUrl()
@@ -448,14 +456,16 @@ namespace osu.Game.Overlays.Comments
 
         protected override void LoadComplete()
         {
-            ShowDeleted.BindValueChanged(show =>
-            {
-                if (WasDeleted)
-                    this.FadeTo(show.NewValue ? 1 : 0);
-            }, true);
-            childrenExpanded.BindValueChanged(expanded => childCommentsVisibilityContainer.FadeTo(expanded.NewValue ? 1 : 0), true);
-            updateButtonsState();
             base.LoadComplete();
+
+            ShowDeleted.BindValueChanged(_ => updateVisibility(), true);
+
+            childrenExpanded.BindValueChanged(expanded =>
+            {
+                childCommentsVisibilityContainer.FadeTo(expanded.NewValue ? 1 : 0);
+            }, true);
+
+            updateButtonsState();
         }
 
         private void onRepliesAdded(IEnumerable<DrawableComment> replies)
@@ -477,7 +487,7 @@ namespace osu.Game.Overlays.Comments
 
             var newReplies = replies.Select(reply => reply.Comment);
             newReplies.ForEach(reply => loadedReplies.Add(reply.Id, reply));
-            deletedCommentsCounter.Count.Value += newReplies.Count(reply => reply.IsDeleted);
+            // deletedCommentsCounter.Count.Value += newReplies.Count(reply => reply.IsDeleted);
             updateButtonsState();
         }
 
