@@ -91,7 +91,7 @@ namespace osu.Game.Screens.SelectV2
         {
             if (playerLoader != null) return;
 
-            modsAtGameplayStart = Mods.Value;
+            modsAtGameplayStart = Mods.Value.Select(m => m.DeepClone()).ToArray();
 
             // Ctrl+Enter should start map with autoplay enabled.
             if (GetContainingInputManager()?.CurrentState?.Keyboard.ControlPressed == true)

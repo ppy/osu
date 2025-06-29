@@ -16,6 +16,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
+using osu.Game.Beatmaps.Drawables.Cards;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
@@ -46,6 +47,8 @@ namespace osu.Game.Overlays.BeatmapSet
         private readonly Box coverGradient;
         private readonly LinkFlowContainer title, artist;
         private readonly AuthorInfo author;
+        private readonly VideoIconPill videoIconPill;
+        private readonly StoryboardIconPill storyboardIconPill;
 
         private ExternalLinkButton externalLink;
 
@@ -175,13 +178,42 @@ namespace osu.Game.Overlays.BeatmapSet
                         Spacing = new Vector2(10),
                         Children = new Drawable[]
                         {
-                            onlineStatusPill = new BeatmapSetOnlineStatusPill
+                            new FillFlowContainer
                             {
-                                Anchor = Anchor.TopRight,
-                                Origin = Anchor.TopRight,
-                                TextSize = 14,
-                                TextPadding = new MarginPadding { Horizontal = 35, Vertical = 10 }
+                                AutoSizeAxes = Axes.Y,
+                                RelativeSizeAxes = Axes.X,
+                                Direction = FillDirection.Horizontal,
+                                Spacing = new Vector2(10),
+                                Children = new Drawable[]
+                                {
+                                    onlineStatusPill = new BeatmapSetOnlineStatusPill
+                                    {
+                                        Anchor = Anchor.TopRight,
+                                        Origin = Anchor.TopRight,
+                                        TextSize = 14,
+                                        TextPadding = new MarginPadding { Horizontal = 35, Vertical = 10 }
+                                    },
+                                    storyboardIconPill = new StoryboardIconPill
+                                    {
+                                        AutoSizeAxes = Axes.X,
+                                        RelativeSizeAxes = Axes.Y,
+                                        Anchor = Anchor.TopRight,
+                                        Origin = Anchor.TopRight,
+                                        IconSize = new Vector2(34),
+                                        IconPadding = new MarginPadding(10),
+                                    },
+                                    videoIconPill = new VideoIconPill
+                                    {
+                                        AutoSizeAxes = Axes.X,
+                                        RelativeSizeAxes = Axes.Y,
+                                        Anchor = Anchor.TopRight,
+                                        Origin = Anchor.TopRight,
+                                        IconSize = new Vector2(34),
+                                        IconPadding = new MarginPadding(10),
+                                    },
+                                }
                             },
+
                             Details = new Details(),
                         },
                     },
@@ -218,6 +250,8 @@ namespace osu.Game.Overlays.BeatmapSet
                 if (setInfo.NewValue == null)
                 {
                     onlineStatusPill.FadeTo(0.5f, 500, Easing.OutQuint);
+                    videoIconPill.Hide();
+                    storyboardIconPill.Hide();
                     fadeContent.Hide();
 
                     loading.Show();
@@ -234,6 +268,16 @@ namespace osu.Game.Overlays.BeatmapSet
                     fadeContent.FadeIn(500, Easing.OutQuint);
 
                     loading.Hide();
+
+                    if (setInfo.NewValue.HasVideo)
+                        videoIconPill.Show();
+                    else
+                        videoIconPill.Hide();
+
+                    if (setInfo.NewValue.HasStoryboard)
+                        storyboardIconPill.Show();
+                    else
+                        storyboardIconPill.Hide();
 
                     var titleText = new RomanisableString(setInfo.NewValue.TitleUnicode, setInfo.NewValue.Title);
                     var artistText = new RomanisableString(setInfo.NewValue.ArtistUnicode, setInfo.NewValue.Artist);

@@ -96,10 +96,6 @@ namespace osu.Game.Rulesets.Mods
             }
         }
 
-        public void ReadFromDifficulty(IBeatmapDifficultyInfo difficulty)
-        {
-        }
-
         public void ApplyToDifficulty(BeatmapDifficulty difficulty) => ApplySettings(difficulty);
 
         /// <summary>

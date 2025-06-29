@@ -110,23 +110,23 @@ namespace osu.Game.Rulesets.Osu.Tests
                             new Spinner
                             {
                                 StartTime = 0,
-                                Duration = 1000,
+                                Duration = 3000,
                                 Position = OsuPlayfield.BASE_SIZE / 2,
                             },
                             new Slider
                             {
-                                StartTime = 2500,
+                                StartTime = 4500,
                                 RepeatCount = 0,
                                 Position = OsuPlayfield.BASE_SIZE / 2,
                                 Path = new SliderPath(new[]
                                 {
                                     new PathControlPoint(Vector2.Zero),
-                                    new PathControlPoint(new Vector2(100, 0)),
+                                    new PathControlPoint(new Vector2(200, 0)),
                                 })
                             },
                             new HitCircle
                             {
-                                StartTime = 4500,
+                                StartTime = 10000,
                                 Position = OsuPlayfield.BASE_SIZE / 2,
                             },
                         },

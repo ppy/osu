@@ -232,8 +232,8 @@ namespace osu.Game.Tests.Visual.Editing
                 EditorBeatmap.ControlPointInfo.Add(1500, new EffectControlPoint { KiaiMode = false, ScrollSpeed = 0.3 });
             });
 
+            ensureEditorLoaded();
             AddStep("save beatmap", () => Editor.Save());
-
             AddStep("create new difficulty", () => Editor.CreateNewDifficulty(new ManiaRuleset().RulesetInfo));
 
             AddUntilStep("wait for dialog", () => DialogOverlay.CurrentDialog is CreateNewDifficultyDialog);
@@ -274,6 +274,14 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("save beatmap", () => Editor.Save());
             AddStep("create new difficulty", () => Editor.CreateNewDifficulty(new ManiaRuleset().RulesetInfo));
 
+            AddUntilStep("wait for created", () =>
+            {
+                string? difficultyName = Editor.ChildrenOfType<EditorBeatmap>().SingleOrDefault()?.BeatmapInfo.DifficultyName;
+                return difficultyName != null && difficultyName != firstDifficultyName;
+            });
+
+            ensureEditorLoaded();
+
             AddStep("set unique difficulty name", () => EditorBeatmap.BeatmapInfo.DifficultyName = firstDifficultyName);
             AddStep("add timing point", () => EditorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = 1000 }));
             AddStep("add effect points", () =>
@@ -285,8 +293,8 @@ namespace osu.Game.Tests.Visual.Editing
                 EditorBeatmap.ControlPointInfo.Add(1500, new EffectControlPoint { KiaiMode = false, ScrollSpeed = 0.3 });
             });
 
+            ensureEditorLoaded();
             AddStep("save beatmap", () => Editor.Save());
-
             AddStep("create new difficulty", () => Editor.CreateNewDifficulty(new TaikoRuleset().RulesetInfo));
 
             AddUntilStep("wait for created", () =>
@@ -629,6 +637,8 @@ namespace osu.Game.Tests.Visual.Editing
                     StartTime = 1000
                 }
             }));
+
+            ensureEditorLoaded();
             AddStep("save beatmap", () => Editor.Save());
             AddStep("try to create new catch difficulty", () => Editor.CreateNewDifficulty(new CatchRuleset().RulesetInfo));
 
@@ -765,7 +775,7 @@ namespace osu.Game.Tests.Visual.Editing
             AddAssert("other audio not removed", () => Beatmap.Value.BeatmapSetInfo.Files.Any(f => f.Filename == "audio (1).mp3"));
         }
 
-        private void ensureEditorLoaded() => AddUntilStep("wait for editor load", () => Editor.IsLoaded && DialogOverlay.IsLoaded);
+        private void ensureEditorLoaded() => AddUntilStep("wait for editor load", () => Editor.ReadyForUse && DialogOverlay.IsLoaded);
 
         private void createNewDifficulty()
         {

@@ -21,5 +21,18 @@ namespace osu.Game.Tests.NonVisual
         {
             Assert.AreEqual(expectedOutput, input.FormatAccuracy().ToString());
         }
+
+        [TestCase(3, "3.00")]
+        [TestCase(3.3, "3.30")]
+        [TestCase(3.55, "3.55")]
+        [TestCase(3.553, "3.55")]
+        [TestCase(3.557, "3.55")]
+        [TestCase(3.9999, "3.99")]
+        [TestCase(3.999999, "3.99")]
+        [TestCase(4, "4.00")]
+        public void TestStarRatingFormatting(double input, string expectedOutput)
+        {
+            Assert.AreEqual(expectedOutput, input.FormatStarRating().ToString());
+        }
     }
 }

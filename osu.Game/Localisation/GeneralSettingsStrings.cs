@@ -80,22 +80,25 @@ namespace osu.Game.Localisation
         public static LocalisableString LearnMoreAboutLazerTooltip => new TranslatableString(getKey(@"check_out_the_feature_comparison"), @"Check out the feature comparison and FAQ");
 
         /// <summary>
+        /// "Check with your package manager / provider for other release streams."
+        /// </summary>
+        public static LocalisableString ChangeReleaseStreamPackageManagerWarning => new TranslatableString(getKey(@"change_release_stream_package_warning"), @"Check with your package manager / provider for other release streams.");
+
+        /// <summary>
         /// "Are you sure you want to run a potentially unstable version of the game?"
         /// </summary>
-        public static LocalisableString ChangeReleaseStreamConfirmation => new TranslatableString(getKey(@"change_release stream_confirmation"),
-            @"Are you sure you want to run a potentially unstable version of the game?");
+        public static LocalisableString ChangeReleaseStreamConfirmation => new TranslatableString(getKey(@"change_release_stream_confirmation"), @"Are you sure you want to run a potentially unstable version of the game?");
 
         /// <summary>
         /// "If you run into issues starting the game, you can usually run the installer from the official site to recover."
         /// </summary>
-        public static LocalisableString ChangeReleaseStreamConfirmationInfo => new TranslatableString(getKey(@"change_release stream_confirmation_info"),
-            @"If you run into issues starting the game, you can usually run the installer from the official site to recover.");
+        public static LocalisableString ChangeReleaseStreamConfirmationInfo => new TranslatableString(getKey(@"change_release_stream_confirmation_info"), @"If you run into issues starting the game, you can usually run the installer from the official site to recover.");
 
         /// <summary>
         /// "You are running the latest release ({0})"
         /// </summary>
         public static LocalisableString RunningLatestRelease(string version) => new TranslatableString(getKey(@"running_latest_release"), @"You are running the latest release ({0})", version);
 
-        private static string getKey(string key) => $"{prefix}:{key}";
+        private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

@@ -37,8 +37,6 @@ namespace osu.Game.Screens.Select.Leaderboards
 
         public bool HasTeams => TeamScores.Count > 0;
 
-        public bool IsPartial => false;
-
         private readonly MultiplayerRoomUser[] users;
 
         private readonly Bindable<ScoringMode> scoringMode = new Bindable<ScoringMode>();
