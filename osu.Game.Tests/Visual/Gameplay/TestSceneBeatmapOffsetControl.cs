@@ -242,6 +242,12 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("No calibration button", () => !offsetControl.ChildrenOfType<SettingsButton>().Any());
         }
 
+        [Test]
+        public void TestNegativeZero()
+        {
+            Assert.That(BeatmapOffsetControl.GetOffsetExplanatoryText(-0.01).ToString(), Is.EqualTo("0.0 ms"));
+        }
+
         private void recreateControl()
         {
             AddStep("Create control", () =>
