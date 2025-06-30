@@ -667,7 +667,7 @@ namespace osu.Game.Screens.SelectV2
                 return false;
             }
 
-            // CurrentSelectionItem won't be valid until UpdaterAfterChildren.
+            // CurrentSelectionItem won't be valid until UpdateAfterChildren.
             // We probably want to fix this at some point since a few places are working-around this quirk.
             ScheduleAfterChildren(() =>
             {
