@@ -115,10 +115,9 @@ namespace osu.Game.Overlays.SkinEditor
             catch (Exception ex)
             {
                 Logger.Log($"Failed to initialize external edit operation: {ex}", LoggingTarget.Database, LogLevel.Error);
-                Schedule(() => showSpinner("Export failed!"));
-                await Task.Delay(1000).ConfigureAwait(true);
                 setGlobalSkinDisabled(false);
-                Hide();
+                Schedule(() => showSpinner("Export failed!"));
+                Scheduler.AddDelayed(Hide, 1000);
                 return Task.FromException(ex);
             }
 
@@ -195,8 +194,7 @@ namespace osu.Game.Overlays.SkinEditor
             {
                 Logger.Log($"Failed to finish external edit operation: {ex}", LoggingTarget.Database, LogLevel.Error);
                 showSpinner("Import failed!");
-                await Task.Delay(1000).ConfigureAwait(true);
-                Hide();
+                Scheduler.AddDelayed(Hide, 1000);
                 setGlobalSkinDisabled(false);
                 taskCompletionSource.SetException(ex);
                 taskCompletionSource = null;
