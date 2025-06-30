@@ -29,7 +29,7 @@ using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Overlays
+namespace osu.Game.Overlays.SkinEditor
 {
     public partial class ExternalEditOverlay : OsuFocusedOverlayContainer
     {
