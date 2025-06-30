@@ -284,7 +284,7 @@ namespace osu.Game.Overlays.SkinEditor
         {
             var skin = currentSkin.Value.SkinInfo.PerformRead(s => s.Detach());
 
-            await externalEditOverlay!.Begin(skin, currentSkin, skins).ConfigureAwait(false);
+            await externalEditOverlay!.Begin(skin).ConfigureAwait(false);
         }
 
         public bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
