@@ -5,7 +5,6 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -42,10 +41,10 @@ namespace osu.Game.Overlays.SkinEditor
         [Resolved]
         private GameHost gameHost { get; set; } = null!;
 
-        private ExternalEditOperation<SkinInfo>? editOperation;
+        [Resolved]
+        private SkinManager skinManager { get; set; } = null!;
 
-        private Bindable<Skin>? skinBindable;
-        private SkinManager? skinManager;
+        private ExternalEditOperation<SkinInfo>? editOperation;
 
         protected override bool DimMainContent => false;
 
@@ -96,7 +95,7 @@ namespace osu.Game.Overlays.SkinEditor
             };
         }
 
-        public async Task Begin(SkinInfo skinInfo, Bindable<Skin> skinBindable, SkinManager skinManager)
+        public async Task Begin(SkinInfo skinInfo)
         {
             Show();
             showSpinner("Mounting external skin...");
@@ -114,9 +113,6 @@ namespace osu.Game.Overlays.SkinEditor
                 await Task.Delay(1000).ConfigureAwait(true);
                 Hide();
             }
-
-            this.skinBindable = skinBindable;
-            this.skinManager = skinManager;
 
             Schedule(() =>
             {
@@ -194,12 +190,12 @@ namespace osu.Game.Overlays.SkinEditor
 
             Schedule(() =>
             {
-                var oldSkin = skinBindable!.Value;
+                var oldSkin = skinManager.CurrentSkin!.Value;
                 var newSkinInfo = oldSkin.SkinInfo.PerformRead(s => s);
 
                 // Create a new skin instance to ensure the skin is reloaded
                 // If there's a better way to reload the skin, this should be replaced with it.
-                skinBindable.Value = newSkinInfo.CreateInstance(skinManager!);
+                skinManager.CurrentSkin.Value = newSkinInfo.CreateInstance(skinManager!);
 
                 oldSkin.Dispose();
 
@@ -218,8 +214,6 @@ namespace osu.Game.Overlays.SkinEditor
             {
                 // Set everything to a clean state
                 editOperation = null;
-                skinManager = null;
-                skinBindable = null;
                 flow.Children = Array.Empty<Drawable>();
             });
         }
