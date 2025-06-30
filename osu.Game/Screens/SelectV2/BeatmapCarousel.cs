@@ -667,10 +667,12 @@ namespace osu.Game.Screens.SelectV2
                 return false;
             }
 
-            Scheduler.Add(() =>
+            // CurrentSelectionItem won't be valid until UpdateAfterChildren.
+            // We probably want to fix this at some point since a few places are working-around this quirk.
+            ScheduleAfterChildren(() =>
             {
                 if (selectionBefore != null && CurrentSelectionItem != null)
-                    playSpinSample(distanceBetween(selectionBefore, CurrentSelectionItem), carouselItems.Count);
+                    playSpinSample(visiblePanelCountBetweenItems(selectionBefore, CurrentSelectionItem));
             });
 
             return true;
@@ -769,12 +771,12 @@ namespace osu.Game.Screens.SelectV2
             return true;
         }
 
-        public void PreviousRandom()
+        public bool PreviousRandom()
         {
             var carouselItems = GetCarouselItems();
 
             if (carouselItems?.Any() != true)
-                return;
+                return false;
 
             while (randomHistory.Any())
             {
@@ -784,7 +786,7 @@ namespace osu.Game.Screens.SelectV2
                 var previousBeatmapItem = carouselItems.FirstOrDefault(i => i.Model is BeatmapInfo b && b.Equals(previousBeatmap));
 
                 if (previousBeatmapItem == null)
-                    return;
+                    return false;
 
                 if (CurrentSelection is BeatmapInfo beatmapInfo)
                 {
@@ -792,25 +794,27 @@ namespace osu.Game.Screens.SelectV2
                         previouslyVisitedRandomBeatmaps.Remove(beatmapInfo);
 
                     if (CurrentSelectionItem == null)
-                        playSpinSample(0, carouselItems.Count);
+                        playSpinSample(0);
                     else
-                        playSpinSample(distanceBetween(previousBeatmapItem, CurrentSelectionItem), carouselItems.Count);
+                        playSpinSample(visiblePanelCountBetweenItems(previousBeatmapItem, CurrentSelectionItem));
                 }
 
                 RequestSelection(previousBeatmap);
-                break;
+                return true;
             }
+
+            return false;
         }
 
-        private double distanceBetween(CarouselItem item1, CarouselItem item2) => Math.Ceiling(Math.Abs(item1.CarouselYPosition - item2.CarouselYPosition) / PanelBeatmapSet.HEIGHT);
+        private double visiblePanelCountBetweenItems(CarouselItem item1, CarouselItem item2) => Math.Ceiling(Math.Abs(item1.CarouselYPosition - item2.CarouselYPosition) / PanelBeatmapSet.HEIGHT);
 
-        private void playSpinSample(double distance, int count)
+        private void playSpinSample(double distance)
         {
             var chan = spinSample?.GetChannel();
 
             if (chan != null)
             {
-                chan.Frequency.Value = 1f + Math.Min(1f, distance / count);
+                chan.Frequency.Value = 1f + Math.Clamp(distance / 200, 0, 1);
                 chan.Play();
             }
 
