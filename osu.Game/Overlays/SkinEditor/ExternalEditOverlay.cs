@@ -99,6 +99,7 @@ namespace osu.Game.Overlays.SkinEditor
         {
             Show();
             showSpinner("Mounting external skin...");
+            setGlobalSkinDisabled(true);
 
             await Task.Delay(500).ConfigureAwait(true);
 
@@ -111,6 +112,7 @@ namespace osu.Game.Overlays.SkinEditor
                 Logger.Log($"Failed to initialize external edit operation: {ex}", LoggingTarget.Database, LogLevel.Error);
                 Schedule(() => showSpinner("Export failed!"));
                 await Task.Delay(1000).ConfigureAwait(true);
+                setGlobalSkinDisabled(false);
                 Hide();
             }
 
@@ -186,6 +188,7 @@ namespace osu.Game.Overlays.SkinEditor
                 showSpinner("Import failed!");
                 await Task.Delay(1000).ConfigureAwait(true);
                 Hide();
+                setGlobalSkinDisabled(false);
             }
 
             Schedule(() =>
@@ -195,12 +198,19 @@ namespace osu.Game.Overlays.SkinEditor
 
                 // Create a new skin instance to ensure the skin is reloaded
                 // If there's a better way to reload the skin, this should be replaced with it.
-                skinManager.CurrentSkin.Value = newSkinInfo.CreateInstance(skinManager!);
+                setGlobalSkinDisabled(false);
+                skinManager.CurrentSkin.Value = newSkinInfo.CreateInstance(skinManager);
 
                 oldSkin.Dispose();
 
                 Hide();
             });
+        }
+
+        private void setGlobalSkinDisabled(bool disabled)
+        {
+            skinManager.CurrentSkin.Disabled = disabled;
+            skinManager.CurrentSkinInfo.Disabled = disabled;
         }
 
         protected override void PopIn()
