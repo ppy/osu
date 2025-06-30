@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -103,6 +105,8 @@ namespace osu.Game.Screens.SelectV2
 
         public override bool ShowFooter => true;
 
+        private Sample? errorSample;
+
         [Resolved]
         private OsuGameBase? game { get; set; }
 
@@ -128,8 +132,10 @@ namespace osu.Game.Screens.SelectV2
         private IDialogOverlay? dialogOverlay { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(AudioManager audio)
         {
+            errorSample = audio.Samples.Get(@"UI/generic-error");
+
             AddRangeInternal(new Drawable[]
             {
                 new GlobalScrollAdjustsVolume(),
@@ -286,8 +292,16 @@ namespace osu.Game.Screens.SelectV2
             },
             new FooterButtonRandom
             {
-                NextRandom = () => carousel.NextRandom(),
-                PreviousRandom = () => carousel.PreviousRandom()
+                NextRandom = () =>
+                {
+                    if (!carousel.NextRandom())
+                        errorSample?.Play();
+                },
+                PreviousRandom = () =>
+                {
+                    if (!carousel.PreviousRandom())
+                        errorSample?.Play();
+                }
             },
             new FooterButtonOptions
             {
