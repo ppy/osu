@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Utils
 
         private static List<T> createNextGroup<T>(IReadOnlyList<T> objects, ref int i) where T : IHasInterval
         {
-            const double margin_of_error = 5;
+            const double margin_of_error = 5.0;
 
             // This never compares the first two elements in the group.
             // This sounds wrong but is apparently "as intended" (https://github.com/ppy/osu/pull/31636#discussion_r1942673329)
