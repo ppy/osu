@@ -12,7 +12,6 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Overlays;
-using static osu.Game.Graphics.UserInterface.ShearedNub;
 using Vector2 = osuTK.Vector2;
 
 namespace osu.Game.Graphics.UserInterface
@@ -28,6 +27,8 @@ namespace osu.Game.Graphics.UserInterface
         private readonly HoverClickSounds hoverClickSounds;
 
         private readonly Container mainContent;
+
+        protected virtual bool FocusIndicator => true;
 
         private Color4 accentColour;
 
@@ -56,53 +57,50 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
+        public Color4 NubShadowColour
+        {
+            get => Nub.ShadowColour;
+            set => Nub.ShadowColour = value;
+        }
+
         public ShearedSliderBar()
         {
-            Shear = SHEAR;
-            Height = HEIGHT;
-            RangePadding = EXPANDED_SIZE / 2;
+            Shear = OsuGame.SHEAR;
+            Height = ShearedNub.HEIGHT;
+            RangePadding = ShearedNub.EXPANDED_SIZE / 2;
             Children = new Drawable[]
             {
                 mainContent = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Masking = true,
-                    CornerRadius = 5,
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
-                    Child = new Container
+                    Masking = true,
+                    CornerRadius = 5,
+                    Children = new Drawable[]
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                        Masking = true,
-                        CornerRadius = 5,
-                        Children = new Drawable[]
+                        LeftBox = new Box
                         {
-                            LeftBox = new Box
-                            {
-                                EdgeSmoothness = new Vector2(0, 0.5f),
-                                RelativeSizeAxes = Axes.Y,
-                                Anchor = Anchor.CentreLeft,
-                                Origin = Anchor.CentreLeft,
-                            },
-                            RightBox = new Box
-                            {
-                                EdgeSmoothness = new Vector2(0, 0.5f),
-                                RelativeSizeAxes = Axes.Y,
-                                Anchor = Anchor.CentreRight,
-                                Origin = Anchor.CentreRight,
-                            },
+                            EdgeSmoothness = new Vector2(0, 0.5f),
+                            RelativeSizeAxes = Axes.Y,
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                        },
+                        RightBox = new Box
+                        {
+                            EdgeSmoothness = new Vector2(0, 0.5f),
+                            RelativeSizeAxes = Axes.Y,
+                            Anchor = Anchor.CentreRight,
+                            Origin = Anchor.CentreRight,
                         },
                     },
                 },
                 nubContainer = new Container
                 {
-                    Shear = -SHEAR,
+                    Shear = -OsuGame.SHEAR,
                     RelativeSizeAxes = Axes.Both,
                     Child = Nub = new ShearedNub
                     {
-                        X = -SHEAR.X * HEIGHT / 2f,
                         Origin = Anchor.TopCentre,
                         RelativePositionAxes = Axes.X,
                         Current = { Value = true },
@@ -146,13 +144,16 @@ namespace osu.Game.Graphics.UserInterface
         {
             base.OnFocus(e);
 
-            mainContent.EdgeEffect = new EdgeEffectParameters
+            if (FocusIndicator)
             {
-                Type = EdgeEffectType.Glow,
-                Colour = AccentColour.Darken(1),
-                Hollow = true,
-                Radius = 2,
-            };
+                mainContent.EdgeEffect = new EdgeEffectParameters
+                {
+                    Type = EdgeEffectType.Glow,
+                    Colour = AccentColour.Darken(1),
+                    Hollow = true,
+                    Radius = 2,
+                };
+            }
         }
 
         protected override void OnFocusLost(FocusLostEvent e)
@@ -191,8 +192,9 @@ namespace osu.Game.Graphics.UserInterface
         protected override void UpdateAfterChildren()
         {
             base.UpdateAfterChildren();
-            LeftBox.Scale = new Vector2(Math.Clamp(RangePadding + Nub.DrawPosition.X - Nub.DrawWidth / 2.3f, 0, Math.Max(0, DrawWidth)), 1);
-            RightBox.Scale = new Vector2(Math.Clamp(DrawWidth - Nub.DrawPosition.X - RangePadding - Nub.DrawWidth / 2.3f, 0, Math.Max(0, DrawWidth)), 1);
+
+            LeftBox.Size = new Vector2(Math.Clamp(RangePadding + Nub.DrawPosition.X - Nub.DrawWidth / 2f + ShearedNub.CORNER_RADIUS - 0.5f, 0, Math.Max(0, DrawWidth)), 1);
+            RightBox.Size = new Vector2(Math.Clamp(DrawWidth - RangePadding - Nub.DrawPosition.X - Nub.DrawWidth / 2f + ShearedNub.CORNER_RADIUS - 0.5f, 0, Math.Max(0, DrawWidth)), 1);
         }
 
         protected override void UpdateValue(float value)

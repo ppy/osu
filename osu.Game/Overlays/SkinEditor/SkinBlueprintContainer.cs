@@ -111,6 +111,16 @@ namespace osu.Game.Overlays.SkinEditor
             SelectedItems.AddRange(targetComponents.SelectMany(list => list).Except(SelectedItems).ToArray());
         }
 
+        protected override bool TryMoveBlueprints(DragEvent e, IList<(SelectionBlueprint<ISerialisableDrawable> blueprint, Vector2[] originalSnapPositions)> blueprints)
+        {
+            Vector2 distanceTravelled = e.ScreenSpaceMousePosition - e.ScreenSpaceMouseDownPosition;
+
+            // The final movement position, relative to movementBlueprintOriginalPosition.
+            var referenceBlueprint = blueprints.First().blueprint;
+            Vector2 movePosition = blueprints.First().originalSnapPositions.First() + distanceTravelled;
+            return SelectionHandler.HandleMovement(new MoveSelectionEvent<ISerialisableDrawable>(referenceBlueprint, movePosition - referenceBlueprint.ScreenSpaceSelectionPoint));
+        }
+
         /// <summary>
         /// Move the current selection spatially by the specified delta, in screen coordinates (ie. the same coordinates as the blueprints).
         /// </summary>

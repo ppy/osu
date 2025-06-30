@@ -223,7 +223,7 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
         private void addBeatmapsetLink()
             => content.AddLink(activity.Beatmapset.AsNonNull().Title, LinkAction.OpenBeatmapSet, getLinkArgument(activity.Beatmapset.AsNonNull().Url), creationParameters: t => t.Font = getLinkFont());
 
-        private object getLinkArgument(string url) => MessageFormatter.GetLinkDetails($"{api.WebsiteRootUrl}{url}").Argument.AsNonNull();
+        private object getLinkArgument(string url) => MessageFormatter.GetLinkDetails($"{api.Endpoints.WebsiteUrl}{url}").Argument.AsNonNull();
 
         private FontUsage getLinkFont(FontWeight fontWeight = FontWeight.Regular)
             => OsuFont.GetFont(size: font_size, weight: fontWeight, italics: true);

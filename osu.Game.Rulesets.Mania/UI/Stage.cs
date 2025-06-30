@@ -103,12 +103,13 @@ namespace osu.Game.Rulesets.Mania.UI
                             Width = 1366, // Bar lines should only be masked on the vertical axis
                             BypassAutoSizeAxes = Axes.Both,
                             Masking = true,
-                            Child = barLineContainer = new HitObjectArea(HitObjectContainer)
+                            Child = barLineContainer = new HitPositionPaddedContainer
                             {
                                 Name = "Bar lines",
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
                                 RelativeSizeAxes = Axes.Y,
+                                Child = HitObjectContainer,
                             }
                         },
                         columnFlow = new ColumnFlow<Column>(definition)
@@ -119,12 +120,13 @@ namespace osu.Game.Rulesets.Mania.UI
                         {
                             RelativeSizeAxes = Axes.Both
                         },
-                        judgements = new JudgementContainer<DrawableManiaJudgement>
+                        new HitPositionPaddedContainer
                         {
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.Centre,
                             RelativeSizeAxes = Axes.Both,
-                            Y = HIT_TARGET_POSITION + 150
+                            Child = judgements = new JudgementContainer<DrawableManiaJudgement>
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                            },
                         },
                         topLevelContainer = new Container { RelativeSizeAxes = Axes.Both }
                     }
@@ -214,13 +216,7 @@ namespace osu.Game.Rulesets.Mania.UI
                 return;
 
             judgements.Clear(false);
-            judgements.Add(judgementPooler.Get(result.Type, j =>
-            {
-                j.Apply(result, judgedObject);
-
-                j.Anchor = Anchor.Centre;
-                j.Origin = Anchor.Centre;
-            })!);
+            judgements.Add(judgementPooler.Get(result.Type, j => j.Apply(result, judgedObject))!);
         }
 
         protected override void Update()

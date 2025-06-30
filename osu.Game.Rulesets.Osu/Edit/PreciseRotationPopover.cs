@@ -96,11 +96,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             base.LoadComplete();
 
-            ScheduleAfterChildren(() =>
-            {
-                angleInput.TakeFocus();
-                angleInput.SelectAll();
-            });
+            ScheduleAfterChildren(() => angleInput.TakeFocus());
             angleInput.Current.BindValueChanged(angle => rotationInfo.Value = rotationInfo.Value with { Degrees = angle.NewValue });
 
             rotationHandler.CanRotateAroundSelectionOrigin.BindValueChanged(e =>

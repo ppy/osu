@@ -44,6 +44,8 @@ namespace osu.Game.Online
             (typeof(UserActivity.EditingBeatmap), typeof(UserActivity)),
             (typeof(UserActivity.ModdingBeatmap), typeof(UserActivity)),
             (typeof(UserActivity.TestingBeatmap), typeof(UserActivity)),
+            (typeof(UserActivity.InDailyChallengeLobby), typeof(UserActivity)),
+            (typeof(UserActivity.PlayingDailyChallenge), typeof(UserActivity)),
         };
     }
 }

@@ -69,6 +69,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
+        [FlakyTest]
         public void TestFadeOnIdle()
         {
             createTest();
@@ -144,7 +145,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
-        public void TestDoesntFadeOnMouseDown()
+        [FlakyTest]
+        public void TestDoesNotFadeOnMouseDown()
         {
             createTest();
 

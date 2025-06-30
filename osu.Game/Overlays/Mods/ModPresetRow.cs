@@ -1,10 +1,11 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
@@ -14,12 +15,20 @@ namespace osu.Game.Overlays.Mods
 {
     public partial class ModPresetRow : FillFlowContainer
     {
+        private readonly Mod mod;
+
         public ModPresetRow(Mod mod)
+        {
+            this.mod = mod;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OverlayColourProvider colourProvider)
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             Direction = FillDirection.Vertical;
-            Spacing = new Vector2(4);
+            Spacing = new Vector2(5);
             InternalChildren = new Drawable[]
             {
                 new FillFlowContainer
@@ -39,26 +48,47 @@ namespace osu.Game.Overlays.Mods
                         },
                         new OsuSpriteText
                         {
-                            Text = mod.Name,
-                            Font = OsuFont.Default.With(size: 16, weight: FontWeight.SemiBold),
-                            Origin = Anchor.CentreLeft,
                             Anchor = Anchor.CentreLeft,
-                            Margin = new MarginPadding { Bottom = 2 }
-                        }
+                            Origin = Anchor.CentreLeft,
+                            Font = OsuFont.Torus.With(size: 16f, weight: FontWeight.SemiBold),
+                            Colour = colourProvider.Content1,
+                            UseFullGlyphHeight = false,
+                            Text = mod.Name,
+                        },
                     }
-                }
-            };
-
-            if (!string.IsNullOrEmpty(mod.SettingDescription))
-            {
-                AddInternal(new OsuTextFlowContainer
+                },
+                new Container
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Padding = new MarginPadding { Left = 14 },
-                    Text = mod.SettingDescription
-                });
-            }
+                    Padding = new MarginPadding { Horizontal = 10f },
+                    Alpha = mod.SettingDescription.Any() ? 1 : 0,
+                    Children = new Drawable[]
+                    {
+                        new TextFlowContainer(t =>
+                        {
+                            t.Font = OsuFont.Torus.With(size: 12f, weight: FontWeight.SemiBold);
+                        })
+                        {
+                            AutoSizeAxes = Axes.Both,
+                            Colour = colourProvider.Content2,
+                            Text = string.Join('\n', mod.SettingDescription.Select(svp => svp.setting)),
+                        },
+                        new TextFlowContainer(t =>
+                        {
+                            t.Font = OsuFont.Torus.With(size: 12f, weight: FontWeight.SemiBold);
+                        })
+                        {
+                            Anchor = Anchor.TopRight,
+                            Origin = Anchor.TopRight,
+                            AutoSizeAxes = Axes.Both,
+                            Colour = colourProvider.Content1,
+                            TextAnchor = Anchor.TopRight,
+                            Text = string.Join('\n', mod.SettingDescription.Select(svp => svp.value)),
+                        },
+                    }
+                }
+            };
         }
     }
 }

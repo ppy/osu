@@ -1,0 +1,87 @@
+name: Pack and nuget
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  notify_pending_production_deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Submit pending deployment notification
+        run: |
+          export TITLE="Pending osu Production Deployment: $GITHUB_REF_NAME"
+          export URL="https://github.com/ppy/osu/actions/runs/$GITHUB_RUN_ID"
+          export DESCRIPTION="Awaiting approval for building NuGet packages for tag $GITHUB_REF_NAME:
+          [View Workflow Run]($URL)"
+          export ACTOR_ICON="https://avatars.githubusercontent.com/u/$GITHUB_ACTOR_ID"
+
+          BODY="$(jq --null-input '{
+            "embeds": [
+              {
+                "title": env.TITLE,
+                "color": 15098112,
+                "description": env.DESCRIPTION,
+                "url": env.URL,
+                "author": {
+                  "name": env.GITHUB_ACTOR,
+                  "icon_url": env.ACTOR_ICON
+                }
+              }
+            ]
+          }')"
+
+          curl \
+            -H "Content-Type: application/json" \
+            -d "$BODY" \
+            "${{ secrets.DISCORD_INFRA_WEBHOOK_URL }}"
+
+  pack:
+    name: Pack
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set artifacts directory
+        id: artifactsPath
+        run: echo "::set-output name=nuget_artifacts::${{github.workspace}}/artifacts"
+
+      - name: Install .NET 8.0.x
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Pack
+        run: |
+          # Replace project references in templates with package reference, because they're included as source files.
+          dotnet remove Templates/Rulesets/ruleset-empty/osu.Game.Rulesets.EmptyFreeform/osu.Game.Rulesets.EmptyFreeform.csproj reference osu.Game/osu.Game.csproj
+          dotnet remove Templates/Rulesets/ruleset-example/osu.Game.Rulesets.Pippidon/osu.Game.Rulesets.Pippidon.csproj reference osu.Game/osu.Game.csproj
+          dotnet remove Templates/Rulesets/ruleset-scrolling-empty/osu.Game.Rulesets.EmptyScrolling/osu.Game.Rulesets.EmptyScrolling.csproj reference osu.Game/osu.Game.csproj
+          dotnet remove Templates/Rulesets/ruleset-scrolling-example/osu.Game.Rulesets.Pippidon/osu.Game.Rulesets.Pippidon.csproj reference osu.Game/osu.Game.csproj
+
+          dotnet add Templates/Rulesets/ruleset-empty/osu.Game.Rulesets.EmptyFreeform/osu.Game.Rulesets.EmptyFreeform.csproj package ppy.osu.Game -n -v ${{ github.ref_name }}
+          dotnet add Templates/Rulesets/ruleset-example/osu.Game.Rulesets.Pippidon/osu.Game.Rulesets.Pippidon.csproj package ppy.osu.Game -n -v ${{ github.ref_name }}
+          dotnet add Templates/Rulesets/ruleset-scrolling-empty/osu.Game.Rulesets.EmptyScrolling/osu.Game.Rulesets.EmptyScrolling.csproj package ppy.osu.Game -n -v ${{ github.ref_name }}
+          dotnet add Templates/Rulesets/ruleset-scrolling-example/osu.Game.Rulesets.Pippidon/osu.Game.Rulesets.Pippidon.csproj package ppy.osu.Game -n -v ${{ github.ref_name }}
+
+          # Pack
+          dotnet pack -c Release osu.Game /p:Version=${{ github.ref_name }} /p:GenerateDocumentationFile=true /p:IncludeSymbols=true /p:SymbolPackageFormat=snupkg -o ${{steps.artifactsPath.outputs.nuget_artifacts}}
+          dotnet pack -c Release osu.Game.Rulesets.Osu /p:Version=${{ github.ref_name }} /p:GenerateDocumentationFile=true /p:IncludeSymbols=true /p:SymbolPackageFormat=snupkg -o ${{steps.artifactsPath.outputs.nuget_artifacts}}
+          dotnet pack -c Release osu.Game.Rulesets.Taiko /p:Version=${{ github.ref_name }} /p:GenerateDocumentationFile=true /p:IncludeSymbols=true /p:SymbolPackageFormat=snupkg -o ${{steps.artifactsPath.outputs.nuget_artifacts}}
+          dotnet pack -c Release osu.Game.Rulesets.Catch /p:Version=${{ github.ref_name }} /p:GenerateDocumentationFile=true /p:IncludeSymbols=true /p:SymbolPackageFormat=snupkg -o ${{steps.artifactsPath.outputs.nuget_artifacts}}
+          dotnet pack -c Release osu.Game.Rulesets.Mania /p:Version=${{ github.ref_name }} /p:GenerateDocumentationFile=true /p:IncludeSymbols=true /p:SymbolPackageFormat=snupkg -o ${{steps.artifactsPath.outputs.nuget_artifacts}}
+          dotnet pack -c Release Templates /p:Version=${{ github.ref_name }} -o ${{steps.artifactsPath.outputs.nuget_artifacts}}
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: osu
+          path: |
+            ${{steps.artifactsPath.outputs.nuget_artifacts}}/*.nupkg
+            ${{steps.artifactsPath.outputs.nuget_artifacts}}/*.snupkg
+
+      - name: Publish packages to nuget.org
+        run: dotnet nuget push ${{steps.artifactsPath.outputs.nuget_artifacts}}/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json

@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Screens.Select.Filter;
+using osu.Game.Utils;
 
 namespace osu.Game.Screens.Select.Carousel
 {
@@ -59,7 +60,7 @@ namespace osu.Game.Screens.Select.Carousel
 
             if (!match) return false;
 
-            match &= !criteria.StarDifficulty.HasFilter || criteria.StarDifficulty.IsInRange(BeatmapInfo.StarRating);
+            match &= !criteria.StarDifficulty.HasFilter || criteria.StarDifficulty.IsInRange(BeatmapInfo.StarRating.FloorToDecimalDigits(2));
             match &= !criteria.ApproachRate.HasFilter || criteria.ApproachRate.IsInRange(BeatmapInfo.Difficulty.ApproachRate);
             match &= !criteria.DrainRate.HasFilter || criteria.DrainRate.IsInRange(BeatmapInfo.Difficulty.DrainRate);
             match &= !criteria.CircleSize.HasFilter || criteria.CircleSize.IsInRange(BeatmapInfo.Difficulty.CircleSize);
@@ -89,6 +90,12 @@ namespace osu.Game.Screens.Select.Carousel
             match &= criteria.CollectionBeatmapMD5Hashes?.Contains(BeatmapInfo.MD5Hash) ?? true;
             if (match && criteria.RulesetCriteria != null)
                 match &= criteria.RulesetCriteria.Matches(BeatmapInfo, criteria);
+
+            if (match && criteria.HasOnlineID == true)
+                match &= BeatmapInfo.OnlineID >= 0;
+
+            if (match && criteria.BeatmapSetId != null)
+                match &= criteria.BeatmapSetId == BeatmapInfo.BeatmapSet?.OnlineID;
 
             return match;
         }

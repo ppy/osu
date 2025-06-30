@@ -62,19 +62,32 @@ namespace osu.Game.Screens
         bool HideMenuCursorOnNonMouseInput { get; }
 
         /// <summary>
+        /// On mobile phones, this specifies whether this <see cref="OsuScreen"/> requires the device to be in portrait orientation.
+        /// Tablet devices are unaffected by this property.
+        /// </summary>
+        /// <remarks>
+        /// By default, all screens in the game display in landscape orientation on phones.
+        /// Setting this to <c>true</c> will display this screen in portrait orientation instead,
+        /// and switch back to landscape when transitioning back to a regular non-portrait screen.
+        /// </remarks>
+        bool RequiresPortraitOrientation { get; }
+
+        /// <summary>
         /// Whether overlays should be able to be opened when this screen is current.
         /// </summary>
         IBindable<OverlayActivation> OverlayActivationMode { get; }
 
         /// <summary>
         /// Whether the back button should be displayed in this screen.
+        /// Note that this property is ignored when <see cref="ShowFooter"/> is <c>true</c>.
         /// </summary>
+        // todo: make this work with footer.
         IBindable<bool> BackButtonVisibility { get; }
 
         /// <summary>
         /// The current <see cref="UserActivity"/> for this screen.
         /// </summary>
-        IBindable<UserActivity> Activity { get; }
+        Bindable<UserActivity> Activity { get; }
 
         /// <summary>
         /// The amount of parallax to be applied while this screen is displayed.
@@ -86,7 +99,7 @@ namespace osu.Game.Screens
         Bindable<RulesetInfo> Ruleset { get; }
 
         /// <summary>
-        /// A list of footer buttons to be added to the game footer, or empty to display no buttons.
+        /// Buttons to be added to the game's footer toolbar.
         /// </summary>
         IReadOnlyList<ScreenFooterButton> CreateFooterButtons();
 

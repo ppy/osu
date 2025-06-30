@@ -108,7 +108,10 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             public bool IsRunning => true;
 
-            public double TrueGameplayRate { set => adjustableAudioComponent.Tempo.Value = value; }
+            public double TrueGameplayRate
+            {
+                set => adjustableAudioComponent.Tempo.Value = value;
+            }
 
             private readonly AudioAdjustments adjustableAudioComponent = new AudioAdjustments();
 
@@ -120,6 +123,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             public double FramesPerSecond => throw new NotImplementedException();
             public FrameTimeInfo TimeInfo => throw new NotImplementedException();
             public double StartTime => throw new NotImplementedException();
+            public double GameplayStartTime => throw new NotImplementedException();
 
             public IAdjustableAudioComponent AdjustmentsFromMods => adjustableAudioComponent;
 

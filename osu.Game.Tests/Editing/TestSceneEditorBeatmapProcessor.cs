@@ -539,5 +539,85 @@ namespace osu.Game.Tests.Editing
                 Assert.That(beatmap.Breaks[0].EndTime, Is.EqualTo(5000 - OsuHitObject.PREEMPT_MAX));
             });
         }
+
+        [Test]
+        public void TestPuttingObjectBetweenBreakEndAndAnotherObjectForcesNewCombo()
+        {
+            var controlPoints = new ControlPointInfo();
+            controlPoints.Add(0, new TimingControlPoint { BeatLength = 500 });
+            var beatmap = new EditorBeatmap(new Beatmap
+            {
+                ControlPointInfo = controlPoints,
+                BeatmapInfo = { Ruleset = new OsuRuleset().RulesetInfo },
+                Difficulty =
+                {
+                    ApproachRate = 10,
+                },
+                HitObjects =
+                {
+                    new HitCircle { StartTime = 1000, NewCombo = true },
+                    new HitCircle { StartTime = 4500 },
+                    new HitCircle { StartTime = 5000, NewCombo = true },
+                },
+                Breaks =
+                {
+                    new BreakPeriod(2000, 4000),
+                }
+            });
+
+            foreach (var ho in beatmap.HitObjects)
+                ho.ApplyDefaults(beatmap.ControlPointInfo, beatmap.Difficulty);
+
+            var beatmapProcessor = new EditorBeatmapProcessor(beatmap, new OsuRuleset());
+            beatmapProcessor.PreProcess();
+            beatmapProcessor.PostProcess();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(((HitCircle)beatmap.HitObjects[1]).NewCombo, Is.True);
+                Assert.That(((HitCircle)beatmap.HitObjects[2]).NewCombo, Is.True);
+
+                Assert.That(((HitCircle)beatmap.HitObjects[0]).ComboIndex, Is.EqualTo(1));
+                Assert.That(((HitCircle)beatmap.HitObjects[1]).ComboIndex, Is.EqualTo(2));
+                Assert.That(((HitCircle)beatmap.HitObjects[2]).ComboIndex, Is.EqualTo(3));
+            });
+        }
+
+        [Test]
+        public void TestAutomaticallyInsertedBreakForcesNewCombo()
+        {
+            var controlPoints = new ControlPointInfo();
+            controlPoints.Add(0, new TimingControlPoint { BeatLength = 500 });
+            var beatmap = new EditorBeatmap(new Beatmap
+            {
+                ControlPointInfo = controlPoints,
+                BeatmapInfo = { Ruleset = new OsuRuleset().RulesetInfo },
+                Difficulty =
+                {
+                    ApproachRate = 10,
+                },
+                HitObjects =
+                {
+                    new HitCircle { StartTime = 1000, NewCombo = true },
+                    new HitCircle { StartTime = 5000 },
+                },
+            });
+
+            foreach (var ho in beatmap.HitObjects)
+                ho.ApplyDefaults(beatmap.ControlPointInfo, beatmap.Difficulty);
+
+            var beatmapProcessor = new EditorBeatmapProcessor(beatmap, new OsuRuleset());
+            beatmapProcessor.PreProcess();
+            beatmapProcessor.PostProcess();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(beatmap.Breaks, Has.Count.EqualTo(1));
+                Assert.That(((HitCircle)beatmap.HitObjects[1]).NewCombo, Is.True);
+
+                Assert.That(((HitCircle)beatmap.HitObjects[0]).ComboIndex, Is.EqualTo(1));
+                Assert.That(((HitCircle)beatmap.HitObjects[1]).ComboIndex, Is.EqualTo(2));
+            });
+        }
     }
 }

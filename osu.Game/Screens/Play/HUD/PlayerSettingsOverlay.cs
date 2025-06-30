@@ -1,10 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
@@ -43,6 +45,15 @@ namespace osu.Game.Screens.Play.HUD
 
         private InputManager inputManager = null!;
 
+        [Resolved]
+        private HUDOverlay? hudOverlay { get; set; }
+
+        // Player settings are kept off the edge of the screen.
+        //
+        // In edge cases, floating point error could result in the whole control getting masked away
+        // while collapsed down, so let's avoid that.
+        protected override bool ComputeIsMaskedAway(RectangleF maskingBounds) => false;
+
         public PlayerSettingsOverlay()
             : base(0, EXPANDED_WIDTH)
         {
@@ -62,6 +73,11 @@ namespace osu.Game.Screens.Play.HUD
                 }
             });
 
+            // For future consideration, this icon should probably not exist.
+            //
+            // If we remove it, the following needs attention:
+            // - Mobile support (swipe from side of screen?)
+            // - Consolidating this overlay with the one at player loader (to have the animation hint at its presence)
             AddInternal(button = new IconButton
             {
                 Icon = FontAwesome.Solid.Cog,
@@ -86,11 +102,37 @@ namespace osu.Game.Screens.Play.HUD
             inputManager = GetContainingInputManager()!;
         }
 
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
+            screenSpacePos.X > button.ScreenSpaceDrawQuad.TopLeft.X;
+
+        protected override bool OnMouseMove(MouseMoveEvent e)
+        {
+            checkExpanded();
+            return base.OnMouseMove(e);
+        }
+
         protected override void Update()
         {
             base.Update();
 
-            Expanded.Value = inputManager.CurrentState.Mouse.Position.X >= button.ScreenSpaceDrawQuad.TopLeft.X;
+            if (hudOverlay != null)
+                button.Y = ToLocalSpace(hudOverlay.TopRightElements.ScreenSpaceDrawQuad.BottomRight).Y;
+
+            // Only check expanded if already expanded.
+            // This is because if we are always checking, it would bypass blocking overlays.
+            // Case in point: the skin editor overlay blocks input from reaching the player, but checking raw coordinates would make settings pop out.
+            if (Expanded.Value)
+                checkExpanded();
+        }
+
+        private void checkExpanded()
+        {
+            float screenMouseX = inputManager.CurrentState.Mouse.Position.X;
+
+            Expanded.Value =
+                (screenMouseX >= button.ScreenSpaceDrawQuad.TopLeft.X && screenMouseX <= ToScreenSpace(new Vector2(DrawWidth + EXPANDED_WIDTH, 0)).X)
+                // Stay expanded if the user is dragging a slider.
+                || inputManager.DraggedDrawable != null;
         }
 
         protected override void OnHoverLost(HoverLostEvent e)

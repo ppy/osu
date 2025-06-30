@@ -13,6 +13,9 @@ namespace osu.Game.Rulesets.Mania.Edit
     {
         private readonly List<ICheck> checks = new List<ICheck>
         {
+            // Compose
+            new CheckManiaConcurrentObjects(),
+
             // Settings
             new CheckKeyCount(),
             new CheckManiaAbnormalDifficultySettings(),

@@ -10,6 +10,6 @@ namespace osu.Game.Rulesets.UI
     /// </summary>
     public interface IHasRecordingHandler
     {
-        public ReplayRecorder? Recorder { set; }
+        ReplayRecorder? Recorder { get; set; }
     }
 }

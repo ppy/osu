@@ -10,10 +10,12 @@ using osu.Game.Configuration;
 
 namespace osu.Game.Online.API
 {
-    public class ModSettingsDictionaryFormatter : IMessagePackFormatter<Dictionary<string, object>>
+    public class ModSettingsDictionaryFormatter : IMessagePackFormatter<Dictionary<string, object>?>
     {
-        public void Serialize(ref MessagePackWriter writer, Dictionary<string, object> value, MessagePackSerializerOptions options)
+        public void Serialize(ref MessagePackWriter writer, Dictionary<string, object>? value, MessagePackSerializerOptions options)
         {
+            if (value == null) return;
+
             var primitiveFormatter = PrimitiveObjectFormatter.Instance;
 
             writer.WriteArrayHeader(value.Count);

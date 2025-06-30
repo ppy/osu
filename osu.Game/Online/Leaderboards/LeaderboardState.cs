@@ -7,12 +7,14 @@ namespace osu.Game.Online.Leaderboards
     {
         Success,
         Retrieving,
-        NetworkFailure,
-        BeatmapUnavailable,
-        RulesetUnavailable,
-        NoneSelected,
         NoScores,
-        NotLoggedIn,
-        NotSupporter,
+
+        NetworkFailure = LeaderboardFailState.NetworkFailure,
+        BeatmapUnavailable = LeaderboardFailState.BeatmapUnavailable,
+        RulesetUnavailable = LeaderboardFailState.RulesetUnavailable,
+        NoneSelected = LeaderboardFailState.NoneSelected,
+        NotLoggedIn = LeaderboardFailState.NotLoggedIn,
+        NotSupporter = LeaderboardFailState.NotSupporter,
+        NoTeam = LeaderboardFailState.NoTeam,
     }
 }

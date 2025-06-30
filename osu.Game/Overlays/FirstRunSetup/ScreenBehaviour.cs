@@ -20,7 +20,7 @@ using osu.Game.Overlays.Settings.Sections;
 namespace osu.Game.Overlays.FirstRunSetup
 {
     [LocalisableDescription(typeof(FirstRunSetupOverlayStrings), nameof(FirstRunSetupOverlayStrings.Behaviour))]
-    public partial class ScreenBehaviour : FirstRunSetupScreen
+    public partial class ScreenBehaviour : WizardScreen
     {
         private SearchContainer<SettingsSection> searchContainer;
 

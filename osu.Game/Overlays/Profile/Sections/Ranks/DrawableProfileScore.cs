@@ -216,34 +216,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
         {
             var font = OsuFont.GetFont(weight: FontWeight.Bold);
 
-            if (Score.PP.HasValue)
-            {
-                return new FillFlowContainer
-                {
-                    AutoSizeAxes = Axes.Both,
-                    Direction = FillDirection.Horizontal,
-                    Children = new[]
-                    {
-                        new OsuSpriteText
-                        {
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
-                            Font = font,
-                            Text = $"{Score.PP:0}",
-                            Colour = colourProvider.Highlight1
-                        },
-                        new OsuSpriteText
-                        {
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
-                            Font = font.With(size: 12),
-                            Text = "pp",
-                            Colour = colourProvider.Light3
-                        }
-                    }
-                };
-            }
-
+            // cross-reference: https://github.com/ppy/osu-web/blob/a6afee076f4f68bb56dea0cb8f18db63651763a7/resources/js/profile-page/play-detail.tsx#L118-L133
             if (Score.Beatmap?.Status.GrantsPerformancePoints() != true)
             {
                 if (Score.Beatmap?.Status == BeatmapOnlineStatus.Loved)
@@ -266,7 +239,8 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                 };
             }
 
-            if (!Score.Ranked)
+            // cross-reference: https://github.com/ppy/osu-web/blob/a6afee076f4f68bb56dea0cb8f18db63651763a7/resources/js/scores/pp-value.tsx#L19-L39
+            if (!Score.Ranked || !Score.Preserve || (Score.PP == null && Score.Processed))
             {
                 return new SpriteTextWithTooltip
                 {
@@ -277,12 +251,40 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                 };
             }
 
-            return new SpriteIconWithTooltip
+            if (Score.PP == null)
             {
-                Icon = FontAwesome.Solid.Sync,
-                Size = new Vector2(font.Size),
-                TooltipText = ScoresStrings.StatusProcessing,
-                Colour = colourProvider.Highlight1
+                return new SpriteIconWithTooltip
+                {
+                    Icon = FontAwesome.Solid.Sync,
+                    Size = new Vector2(font.Size),
+                    TooltipText = ScoresStrings.StatusProcessing,
+                    Colour = colourProvider.Highlight1
+                };
+            }
+
+            return new FillFlowContainer
+            {
+                AutoSizeAxes = Axes.Both,
+                Direction = FillDirection.Horizontal,
+                Children = new[]
+                {
+                    new OsuSpriteText
+                    {
+                        Anchor = Anchor.BottomLeft,
+                        Origin = Anchor.BottomLeft,
+                        Font = font,
+                        Text = $"{Score.PP:0}",
+                        Colour = colourProvider.Highlight1
+                    },
+                    new OsuSpriteText
+                    {
+                        Anchor = Anchor.BottomLeft,
+                        Origin = Anchor.BottomLeft,
+                        Font = font.With(size: 12),
+                        Text = "pp",
+                        Colour = colourProvider.Light3
+                    }
+                }
             };
         }
 

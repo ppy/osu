@@ -16,11 +16,14 @@ namespace osu.Game.Tests.Visual.Metadata
         public override IBindable<bool> IsConnected => isConnected;
         private readonly BindableBool isConnected = new BindableBool(true);
 
-        public override IBindable<bool> IsWatchingUserPresence => isWatchingUserPresence;
-        private readonly BindableBool isWatchingUserPresence = new BindableBool();
+        public override UserPresence LocalUserPresence => localUserPresence;
+        private UserPresence localUserPresence;
 
-        public override IBindableDictionary<int, UserPresence> UserStates => userStates;
-        private readonly BindableDictionary<int, UserPresence> userStates = new BindableDictionary<int, UserPresence>();
+        public override IBindableDictionary<int, UserPresence> UserPresences => userPresences;
+        private readonly BindableDictionary<int, UserPresence> userPresences = new BindableDictionary<int, UserPresence>();
+
+        public override IBindableDictionary<int, UserPresence> FriendPresences => friendPresences;
+        private readonly BindableDictionary<int, UserPresence> friendPresences = new BindableDictionary<int, UserPresence>();
 
         public override Bindable<DailyChallengeInfo?> DailyChallengeInfo => dailyChallengeInfo;
         private readonly Bindable<DailyChallengeInfo?> dailyChallengeInfo = new Bindable<DailyChallengeInfo?>();
@@ -28,25 +31,29 @@ namespace osu.Game.Tests.Visual.Metadata
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
 
-        public override Task BeginWatchingUserPresence()
+        public event Action? OnBeginWatchingUserPresence;
+        public event Action? OnEndWatchingUserPresence;
+
+        protected override Task BeginWatchingUserPresenceInternal()
         {
-            isWatchingUserPresence.Value = true;
+            OnBeginWatchingUserPresence?.Invoke();
             return Task.CompletedTask;
         }
 
-        public override Task EndWatchingUserPresence()
+        protected override Task EndWatchingUserPresenceInternal()
         {
-            isWatchingUserPresence.Value = false;
+            OnEndWatchingUserPresence?.Invoke();
             return Task.CompletedTask;
         }
 
         public override Task UpdateActivity(UserActivity? activity)
         {
-            if (isWatchingUserPresence.Value)
+            localUserPresence = localUserPresence with { Activity = activity };
+
+            if (IsWatchingUserPresence)
             {
-                userStates.TryGetValue(api.LocalUser.Value.Id, out var localUserPresence);
-                localUserPresence = localUserPresence with { Activity = activity };
-                userStates[api.LocalUser.Value.Id] = localUserPresence;
+                if (userPresences.ContainsKey(api.LocalUser.Value.Id))
+                    userPresences[api.LocalUser.Value.Id] = localUserPresence;
             }
 
             return Task.CompletedTask;
@@ -54,11 +61,12 @@ namespace osu.Game.Tests.Visual.Metadata
 
         public override Task UpdateStatus(UserStatus? status)
         {
-            if (isWatchingUserPresence.Value)
+            localUserPresence = localUserPresence with { Status = status };
+
+            if (IsWatchingUserPresence)
             {
-                userStates.TryGetValue(api.LocalUser.Value.Id, out var localUserPresence);
-                localUserPresence = localUserPresence with { Status = status };
-                userStates[api.LocalUser.Value.Id] = localUserPresence;
+                if (userPresences.ContainsKey(api.LocalUser.Value.Id))
+                    userPresences[api.LocalUser.Value.Id] = localUserPresence;
             }
 
             return Task.CompletedTask;
@@ -66,13 +74,33 @@ namespace osu.Game.Tests.Visual.Metadata
 
         public override Task UserPresenceUpdated(int userId, UserPresence? presence)
         {
-            if (isWatchingUserPresence.Value)
+            if (IsWatchingUserPresence)
             {
-                if (presence.HasValue)
-                    userStates[userId] = presence.Value;
+                if (presence?.Status != null)
+                {
+                    if (userId == api.LocalUser.Value.OnlineID)
+                        localUserPresence = presence.Value;
+                    else
+                        userPresences[userId] = presence.Value;
+                }
                 else
-                    userStates.Remove(userId);
+                {
+                    if (userId == api.LocalUser.Value.OnlineID)
+                        localUserPresence = default;
+                    else
+                        userPresences.Remove(userId);
+                }
             }
+
+            return Task.CompletedTask;
+        }
+
+        public override Task FriendPresenceUpdated(int userId, UserPresence? presence)
+        {
+            if (presence.HasValue)
+                friendPresences[userId] = presence.Value;
+            else
+                friendPresences.Remove(userId);
 
             return Task.CompletedTask;
         }

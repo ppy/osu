@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Newtonsoft.Json;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Online.API;
@@ -15,7 +16,6 @@ using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
-using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Tests.Beatmaps;
 using osu.Game.Utils;
 
@@ -28,7 +28,6 @@ namespace osu.Game.Tests.Visual.OnlinePlay
     public class TestRoomRequestsHandler
     {
         public IReadOnlyList<Room> ServerSideRooms => serverSideRooms;
-
         private readonly List<Room> serverSideRooms = new List<Room>();
 
         private int currentRoomId = 1;
@@ -36,8 +35,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
         private int currentScoreId = 1;
 
         /// <summary>
-        /// Handles an API request, while also updating the local state to match
-        /// how the server would eventually respond and update an <see cref="RoomManager"/>.
+        /// Handles an API request, while also updating the local state to match how the server would eventually respond.
         /// </summary>
         /// <param name="request">The API request to handle.</param>
         /// <param name="localUser">The local user to store in responses where required.</param>
@@ -128,6 +126,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
                                 MaxCombo = 100,
                                 TotalScore = 200000,
                                 User = new APIUser { Username = "worst user" },
+                                Mods = [new APIMod { Acronym = @"TD" }],
                                 Statistics = new Dictionary<HitResult, int>()
                             },
                         },
@@ -221,7 +220,15 @@ namespace osu.Game.Tests.Visual.OnlinePlay
                                                    : new APIUser
                                                    {
                                                        Id = id,
-                                                       Username = $"User {id}"
+                                                       Username = $"User {id}",
+                                                       Team = RNG.NextBool()
+                                                           ? new APITeam
+                                                           {
+                                                               Name = "Collective Wangs",
+                                                               ShortName = "WANG",
+                                                               FlagUrl = "https://assets.ppy.sh/teams/flag/1/wanglogo.jpg",
+                                                           }
+                                                           : null,
                                                    })
                                                .Where(u => u != null).ToList(),
                     });
@@ -260,7 +267,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
         /// <param name="host">The room host.</param>
         public void AddServerSideRoom(Room room, APIUser host)
         {
-            room.RoomID ??= currentRoomId++;
+            room.RoomID = currentRoomId++;
             room.Host = host;
 
             for (int i = 0; i < room.Playlist.Count; i++)

@@ -13,6 +13,8 @@ namespace osu.Game.Beatmaps.Legacy
         NewCombo = 1 << 2,
         Spinner = 1 << 3,
         ComboOffset = (1 << 4) | (1 << 5) | (1 << 6),
-        Hold = 1 << 7
+        Hold = 1 << 7,
+
+        ObjectTypes = Circle | Slider | Spinner | Hold
     }
 }
