@@ -28,7 +28,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                 base.Width = value;
 
                 if (LoadState >= LoadState.Ready)
-                    buttonContainer.Width = value;
+                    ButtonContainer.Width = value;
             }
         }
 
@@ -37,8 +37,6 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 
         [Cached]
         private readonly BeatmapCardContent content;
-
-        private CollapsibleButtonContainer buttonContainer = null!;
 
         private FillFlowContainer idleBottomContent = null!;
         private BeatmapCardDownloadProgressBar downloadProgressBar = null!;
@@ -66,7 +64,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                     Height = height,
                     Children = new Drawable[]
                     {
-                        buttonContainer = new CollapsibleButtonContainer(BeatmapSet)
+                        ButtonContainer = new CollapsibleButtonContainer(BeatmapSet)
                         {
                             Width = Width,
                             FavouriteState = { BindTarget = FavouriteState },
@@ -163,7 +161,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 
             bool showDetails = IsHovered;
 
-            buttonContainer.ShowDetails.Value = showDetails;
+            ButtonContainer.ShowDetails.Value = showDetails;
         }
     }
 }
