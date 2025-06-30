@@ -36,6 +36,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
     public abstract partial class BeatmapCarouselTestScene : OsuManualInputManagerTestScene
     {
         protected readonly Stack<BeatmapSetInfo> BeatmapSetRequestedSelections = new Stack<BeatmapSetInfo>();
+        protected readonly Stack<BeatmapInfo> BeatmapRequestedSelections = new Stack<BeatmapInfo>();
 
         protected readonly BindableList<BeatmapSetInfo> BeatmapSets = new BindableList<BeatmapSetInfo>();
 
@@ -73,6 +74,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         {
             AddStep("create components", () =>
             {
+                BeatmapRequestedSelections.Clear();
                 BeatmapSetRequestedSelections.Clear();
                 BeatmapRecommendationFunction = null;
                 NewItemsPresentedInvocationCount = 0;
@@ -113,6 +115,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                                     NewItemsPresented = _ => NewItemsPresentedInvocationCount++,
                                     RequestSelection = b =>
                                     {
+                                        BeatmapRequestedSelections.Push(b);
                                         Carousel.CurrentSelection = b;
                                     },
                                     RequestRecommendedSelection = beatmaps =>
@@ -270,9 +273,13 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             {
                 var groupingFilter = Carousel.Filters.OfType<BeatmapCarouselFilterGrouping>().Single();
 
-                GroupDefinition g = groupingFilter.GroupItems.Keys.ElementAt(group);
+                GroupDefinition? groupDefinition = groupingFilter.GroupItems.Keys.ElementAtOrDefault(group);
+
+                if (groupDefinition == null)
+                    return false;
+
                 // offset by one because the group itself is included in the items list.
-                CarouselItem item = groupingFilter.GroupItems[g].ElementAt(panel + 1);
+                CarouselItem item = groupingFilter.GroupItems[groupDefinition].ElementAt(panel + 1);
 
                 return (Carousel.CurrentSelection as BeatmapInfo)?
                     .Equals(item.Model as BeatmapInfo) == true;

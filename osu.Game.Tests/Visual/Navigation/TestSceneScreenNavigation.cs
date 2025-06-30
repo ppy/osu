@@ -1201,6 +1201,8 @@ namespace osu.Game.Tests.Visual.Navigation
         [Test]
         public void TestExitWithHoldDisabled()
         {
+            AddUntilStep("wait for dialog overlay", () => Game.ChildrenOfType<DialogOverlay>().SingleOrDefault() != null);
+
             AddStep("set hold delay to 0", () => Game.LocalConfig.SetValue(OsuSetting.UIHoldActivationDelay, 0.0));
 
             AddStep("press escape twice rapidly", () =>
