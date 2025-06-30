@@ -375,7 +375,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
-                IconColour = Color4.Black;
+                IconColour = colours.GrayB;
+                IconHoverColour = Color4.White;
                 HoverColour = colours.Gray7;
                 FlashColour = colours.Gray9;
             }
