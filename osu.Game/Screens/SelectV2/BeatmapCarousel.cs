@@ -672,7 +672,7 @@ namespace osu.Game.Screens.SelectV2
             ScheduleAfterChildren(() =>
             {
                 if (selectionBefore != null && CurrentSelectionItem != null)
-                    playSpinSample(distanceBetween(selectionBefore, CurrentSelectionItem), carouselItems.Count);
+                    playSpinSample(visiblePanelCountBetweenItems(selectionBefore, CurrentSelectionItem));
             });
 
             return true;
@@ -794,9 +794,9 @@ namespace osu.Game.Screens.SelectV2
                         previouslyVisitedRandomBeatmaps.Remove(beatmapInfo);
 
                     if (CurrentSelectionItem == null)
-                        playSpinSample(0, carouselItems.Count);
+                        playSpinSample(0);
                     else
-                        playSpinSample(distanceBetween(previousBeatmapItem, CurrentSelectionItem), carouselItems.Count);
+                        playSpinSample(visiblePanelCountBetweenItems(previousBeatmapItem, CurrentSelectionItem));
                 }
 
                 RequestSelection(previousBeatmap);
@@ -806,15 +806,15 @@ namespace osu.Game.Screens.SelectV2
             return false;
         }
 
-        private double distanceBetween(CarouselItem item1, CarouselItem item2) => Math.Ceiling(Math.Abs(item1.CarouselYPosition - item2.CarouselYPosition) / PanelBeatmapSet.HEIGHT);
+        private double visiblePanelCountBetweenItems(CarouselItem item1, CarouselItem item2) => Math.Ceiling(Math.Abs(item1.CarouselYPosition - item2.CarouselYPosition) / PanelBeatmapSet.HEIGHT);
 
-        private void playSpinSample(double distance, int count)
+        private void playSpinSample(double distance)
         {
             var chan = spinSample?.GetChannel();
 
             if (chan != null)
             {
-                chan.Frequency.Value = 1f + Math.Min(1f, distance / count);
+                chan.Frequency.Value = 1f + Math.Clamp(distance / 200, 0, 1);
                 chan.Play();
             }
 
