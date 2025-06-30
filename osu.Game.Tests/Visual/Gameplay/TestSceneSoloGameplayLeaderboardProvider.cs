@@ -21,12 +21,25 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestLocalLeaderboardHasPositionsAutofilled()
         {
+            DependencyProvidingContainer content = null!;
             SoloGameplayLeaderboardProvider provider = null!;
 
             var leaderboardManager = new LeaderboardManager();
-            LoadComponent(leaderboardManager);
             var gameplayState = TestGameplayState.Create(new OsuRuleset());
 
+            AddStep("create content", () => Child = content = new DependencyProvidingContainer
+            {
+                RelativeSizeAxes = Axes.Both,
+                CachedDependencies =
+                [
+                    (typeof(LeaderboardManager), leaderboardManager),
+                    (typeof(GameplayState), gameplayState)
+                ],
+                Children = new Drawable[]
+                {
+                    leaderboardManager,
+                }
+            });
             AddStep("fetch local", () => leaderboardManager.FetchWithCriteria(new LeaderboardCriteria(Beatmap.Value.BeatmapInfo, Ruleset.Value, BeatmapLeaderboardScope.Local, null)));
             AddStep("set scores", () =>
             {
@@ -41,20 +54,8 @@ namespace osu.Game.Tests.Visual.Gameplay
                     null
                 );
             });
-            AddStep("create content", () => Child = new DependencyProvidingContainer
-            {
-                RelativeSizeAxes = Axes.Both,
-                CachedDependencies =
-                [
-                    (typeof(LeaderboardManager), leaderboardManager),
-                    (typeof(GameplayState), gameplayState)
-                ],
-                Children = new Drawable[]
-                {
-                    leaderboardManager,
-                    provider = new SoloGameplayLeaderboardProvider()
-                }
-            });
+            AddStep("load provider", () => content.Add(provider = new SoloGameplayLeaderboardProvider()));
+
             AddUntilStep("tracked score shows #101", () => provider.Scores.Single(s => s.Tracked).Position.Value, () => Is.EqualTo(101));
             AddUntilStep("tracked score ordered #101", () => provider.Scores.Single(s => s.Tracked).DisplayOrder.Value, () => Is.EqualTo(101));
             AddStep("move score to #20", () => gameplayState.ScoreProcessor.TotalScore.Value = 802_000);
@@ -68,12 +69,25 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestFullGlobalLeaderboard()
         {
+            DependencyProvidingContainer content = null!;
             SoloGameplayLeaderboardProvider provider = null!;
 
             var leaderboardManager = new LeaderboardManager();
-            LoadComponent(leaderboardManager);
             var gameplayState = TestGameplayState.Create(new OsuRuleset());
 
+            AddStep("create content", () => Child = content = new DependencyProvidingContainer
+            {
+                RelativeSizeAxes = Axes.Both,
+                CachedDependencies =
+                [
+                    (typeof(LeaderboardManager), leaderboardManager),
+                    (typeof(GameplayState), gameplayState)
+                ],
+                Children = new Drawable[]
+                {
+                    leaderboardManager,
+                }
+            });
             AddStep("fetch local", () => leaderboardManager.FetchWithCriteria(new LeaderboardCriteria(Beatmap.Value.BeatmapInfo, Ruleset.Value, BeatmapLeaderboardScope.Global, null)));
             AddStep("set scores", () =>
             {
@@ -88,20 +102,8 @@ namespace osu.Game.Tests.Visual.Gameplay
                     null
                 );
             });
-            AddStep("create content", () => Child = new DependencyProvidingContainer
-            {
-                RelativeSizeAxes = Axes.Both,
-                CachedDependencies =
-                [
-                    (typeof(LeaderboardManager), leaderboardManager),
-                    (typeof(GameplayState), gameplayState)
-                ],
-                Children = new Drawable[]
-                {
-                    leaderboardManager,
-                    provider = new SoloGameplayLeaderboardProvider()
-                }
-            });
+            AddStep("load provider", () => content.Add(provider = new SoloGameplayLeaderboardProvider()));
+
             AddUntilStep("tracked score shows #41", () => provider.Scores.Single(s => s.Tracked).Position.Value, () => Is.EqualTo(41));
             AddUntilStep("tracked score ordered #41", () => provider.Scores.Single(s => s.Tracked).DisplayOrder.Value, () => Is.EqualTo(41));
             AddStep("move score to #20", () => gameplayState.ScoreProcessor.TotalScore.Value = 802_000);
@@ -115,12 +117,25 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestPartialGlobalLeaderboard()
         {
+            DependencyProvidingContainer content = null!;
             SoloGameplayLeaderboardProvider provider = null!;
 
             var leaderboardManager = new LeaderboardManager();
-            LoadComponent(leaderboardManager);
             var gameplayState = TestGameplayState.Create(new OsuRuleset());
 
+            AddStep("create content", () => Child = content = new DependencyProvidingContainer
+            {
+                RelativeSizeAxes = Axes.Both,
+                CachedDependencies =
+                [
+                    (typeof(LeaderboardManager), leaderboardManager),
+                    (typeof(GameplayState), gameplayState)
+                ],
+                Children = new Drawable[]
+                {
+                    leaderboardManager,
+                }
+            });
             AddStep("fetch local", () => leaderboardManager.FetchWithCriteria(new LeaderboardCriteria(Beatmap.Value.BeatmapInfo, Ruleset.Value, BeatmapLeaderboardScope.Global, null)));
             AddStep("set scores", () =>
             {
@@ -135,20 +150,8 @@ namespace osu.Game.Tests.Visual.Gameplay
                     new ScoreInfo { TotalScore = 200_000 }
                 );
             });
-            AddStep("create content", () => Child = new DependencyProvidingContainer
-            {
-                RelativeSizeAxes = Axes.Both,
-                CachedDependencies =
-                [
-                    (typeof(LeaderboardManager), leaderboardManager),
-                    (typeof(GameplayState), gameplayState)
-                ],
-                Children = new Drawable[]
-                {
-                    leaderboardManager,
-                    provider = new SoloGameplayLeaderboardProvider()
-                }
-            });
+            AddStep("load provider", () => content.Add(provider = new SoloGameplayLeaderboardProvider()));
+
             AddUntilStep("tracked score shows no position", () => provider.Scores.Single(s => s.Tracked).Position.Value, () => Is.Null);
             AddUntilStep("tracked score ordered #52", () => provider.Scores.Single(s => s.Tracked).DisplayOrder.Value, () => Is.EqualTo(52));
             AddStep("move score above user best", () => gameplayState.ScoreProcessor.TotalScore.Value = 202_000);

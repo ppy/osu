@@ -78,6 +78,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 Height = 500,
                 Children = new Drawable[]
                 {
+                    leaderboardManager,
                     dialogOverlay,
                 }
             };
