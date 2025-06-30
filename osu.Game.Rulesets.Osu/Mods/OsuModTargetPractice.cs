@@ -115,10 +115,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         #region Reduce AR (IApplicableToDifficulty)
 
-        public void ReadFromDifficulty(IBeatmapDifficultyInfo difficulty)
-        {
-        }
-
         public void ApplyToDifficulty(BeatmapDifficulty difficulty)
         {
             // Decrease AR to increase preempt time

@@ -22,10 +22,6 @@ namespace osu.Game.Rulesets.Mods
 
         protected const float ADJUST_RATIO = 1.4f;
 
-        public void ReadFromDifficulty(IBeatmapDifficultyInfo difficulty)
-        {
-        }
-
         public virtual void ApplyToDifficulty(BeatmapDifficulty difficulty)
         {
             difficulty.DrainRate = Math.Min(difficulty.DrainRate * ADJUST_RATIO, 10.0f);

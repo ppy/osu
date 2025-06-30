@@ -29,8 +29,6 @@ namespace osu.Game.Screens.Play
 
         private readonly Func<IBeatmap, IReadOnlyList<Mod>, Score> createScore;
 
-        private readonly bool replayIsFailedScore;
-
         private PlaybackSettings playbackSettings;
 
         [Cached(typeof(IGameplayLeaderboardProvider))]
@@ -40,19 +38,28 @@ namespace osu.Game.Screens.Play
 
         private bool isAutoplayPlayback => GameplayState.Mods.OfType<ModAutoplay>().Any();
 
-        // Disallow replays from failing. (see https://github.com/ppy/osu/issues/6108)
+        private double? lastFrameTime;
+
         protected override bool CheckModsAllowFailure()
         {
-            if (!replayIsFailedScore && !isAutoplayPlayback)
-                return false;
+            // autoplay should be able to fail if the beatmap is not humanly beatable
+            if (isAutoplayPlayback)
+                return base.CheckModsAllowFailure();
 
-            return base.CheckModsAllowFailure();
+            // non-autoplay replays should be able to fail, but only after they've exhausted their frames.
+            // note that the rank isn't checked here - that's because it is generally unreliable.
+            // stable replays, as well as lazer replays recorded prior to https://github.com/ppy/osu/pull/28058,
+            // do not even *contain* the user's rank.
+            // not to mention possible gameplay mechanics changes that could make a replay fail sooner than it really should.
+            if (GameplayClockContainer.CurrentTime >= lastFrameTime)
+                return base.CheckModsAllowFailure();
+
+            return false;
         }
 
         public ReplayPlayer(Score score, PlayerConfiguration configuration = null)
             : this((_, _) => score, configuration)
         {
-            replayIsFailedScore = score.ScoreInfo.Rank == ScoreRank.F;
         }
 
         public ReplayPlayer(Func<IBeatmap, IReadOnlyList<Mod>, Score> createScore, PlayerConfiguration configuration = null)
@@ -95,6 +102,7 @@ namespace osu.Game.Screens.Play
         protected override void PrepareReplay()
         {
             DrawableRuleset?.SetReplayScore(Score);
+            lastFrameTime = Score.Replay.Frames.LastOrDefault()?.Time;
         }
 
         protected override Score CreateScore(IBeatmap beatmap) => createScore(beatmap, Mods.Value);

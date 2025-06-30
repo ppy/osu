@@ -19,10 +19,6 @@ namespace osu.Game.Rulesets.Mods
         public override bool Ranked => UsesDefaultConfiguration;
         public override bool ValidForFreestyleAsRequiredMod => true;
 
-        public virtual void ReadFromDifficulty(BeatmapDifficulty difficulty)
-        {
-        }
-
         public virtual void ApplyToDifficulty(BeatmapDifficulty difficulty)
         {
             const float ratio = 0.5f;
