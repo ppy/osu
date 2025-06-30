@@ -16,7 +16,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [Cached]
         protected readonly OverlayColourProvider ColourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
 
-        protected override Container<Drawable> Content { get; } = new OsuContextMenuContainer
+        protected override Container<Drawable> Content { get; } = new Container
         {
             RelativeSizeAxes = Axes.X,
             AutoSizeAxes = Axes.Y,
@@ -30,17 +30,21 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [BackgroundDependencyLoader]
         private void load()
         {
-            base.Content.Child = new PopoverContainer
+            base.Content.Child = new OsuContextMenuContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = resizeContainer = new Container
+                Child = new PopoverContainer
                 {
-                    Anchor = ComponentAnchor,
-                    Origin = ComponentAnchor,
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Width = InitialRelativeWidth,
-                    Child = Content
+                    RelativeSizeAxes = Axes.Both,
+                    Child = resizeContainer = new Container
+                    {
+                        Anchor = ComponentAnchor,
+                        Origin = ComponentAnchor,
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Width = InitialRelativeWidth,
+                        Child = Content
+                    }
                 }
             };
 
