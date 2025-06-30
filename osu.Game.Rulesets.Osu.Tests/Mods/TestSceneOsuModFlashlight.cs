@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Testing;
-using osu.Framework.Utils;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Beatmaps;
@@ -36,22 +35,21 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
         [Test]
         public void TestPlayfieldBasedSize()
         {
-            ModFlashlight mod = new OsuModFlashlight();
+            OsuModFlashlight flashlight;
             CreateModTest(new ModTestData
             {
-                Mod = mod,
+                Mods = [flashlight = new OsuModFlashlight(), new OsuModBarrelRoll()],
                 PassCondition = () =>
                 {
                     var flashlightOverlay = Player.DrawableRuleset.Overlays
                                                   .ChildrenOfType<ModFlashlight<OsuHitObject>.Flashlight>()
                                                   .First();
 
-                    return Precision.AlmostEquals(mod.DefaultFlashlightSize * .5f, flashlightOverlay.GetSize());
+                    // the combo check is here because the flashlight radius decreases for the first time at 100 combo
+                    // and hardcoding it here eliminates the need to meddle in flashlight internals further by e.g. exposing `GetComboScaleFor()`
+                    return flashlightOverlay.GetSize() < flashlight.DefaultFlashlightSize && Player.GameplayState.ScoreProcessor.Combo.Value < 100;
                 }
             });
-
-            AddStep("adjust playfield scale", () =>
-                Player.DrawableRuleset.Playfield.Scale = new Vector2(.5f));
         }
 
         [Test]
