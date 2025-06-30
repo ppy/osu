@@ -282,6 +282,8 @@ namespace osu.Game.Overlays.SkinEditor
 
         private async Task editExternally()
         {
+            Save();
+
             var skin = currentSkin.Value.SkinInfo.PerformRead(s => s.Detach());
 
             await externalEditOverlay!.Begin(skin).ConfigureAwait(false);
