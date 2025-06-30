@@ -771,12 +771,12 @@ namespace osu.Game.Screens.SelectV2
             return true;
         }
 
-        public void PreviousRandom()
+        public bool PreviousRandom()
         {
             var carouselItems = GetCarouselItems();
 
             if (carouselItems?.Any() != true)
-                return;
+                return false;
 
             while (randomHistory.Any())
             {
@@ -786,7 +786,7 @@ namespace osu.Game.Screens.SelectV2
                 var previousBeatmapItem = carouselItems.FirstOrDefault(i => i.Model is BeatmapInfo b && b.Equals(previousBeatmap));
 
                 if (previousBeatmapItem == null)
-                    return;
+                    return false;
 
                 if (CurrentSelection is BeatmapInfo beatmapInfo)
                 {
@@ -800,8 +800,10 @@ namespace osu.Game.Screens.SelectV2
                 }
 
                 RequestSelection(previousBeatmap);
-                break;
+                return true;
             }
+
+            return false;
         }
 
         private double distanceBetween(CarouselItem item1, CarouselItem item2) => Math.Ceiling(Math.Abs(item1.CarouselYPosition - item2.CarouselYPosition) / PanelBeatmapSet.HEIGHT);
