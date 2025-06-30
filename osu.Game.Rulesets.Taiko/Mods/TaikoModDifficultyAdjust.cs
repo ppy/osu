@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
         {
             get
             {
-                if (UserAdjustedSettingsCount != 1)
+                if (!IsExactlyOneSettingChanged(ScrollSpeed, OverallDifficulty, DrainRate))
                     return string.Empty;
 
                 if (!ScrollSpeed.IsDefault) return format("SC", ScrollSpeed);
