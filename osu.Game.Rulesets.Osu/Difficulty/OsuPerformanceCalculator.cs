@@ -69,7 +69,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
             var osuAttributes = (OsuDifficultyAttributes)attributes;
 
-            usingClassicSliderAccuracy = score.Mods.OfType<OsuModClassic>().Any(m => m.NoSliderHeadAccuracy.Value) || score.Mods.Any(m => m is ModScoreV2);
+            usingClassicSliderAccuracy = score.Mods.OfType<OsuModClassic>().Any(m => m.NoSliderHeadAccuracy.Value) && !score.Mods.Any(m => m is ModScoreV2);
             isLegacyScore = score.IsLegacyScore;
 
             accuracy = score.Accuracy;
