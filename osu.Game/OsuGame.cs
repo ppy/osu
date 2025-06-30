@@ -312,6 +312,8 @@ namespace osu.Game
             foreach (var overlay in focusedOverlays)
                 overlay.Hide();
 
+            ScreenFooter.ActiveOverlay?.Hide();
+
             if (hideToolbar) Toolbar.Hide();
         }
 
