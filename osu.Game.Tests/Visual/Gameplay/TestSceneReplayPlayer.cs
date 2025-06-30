@@ -12,6 +12,7 @@ using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Play.HUD;
 using osu.Game.Tests.Beatmaps;
 using osu.Game.Tests.Resources;
 using osuTK;
@@ -190,6 +191,20 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("seek to 8000", () => Player.Seek(8000));
             AddUntilStep("wait for fail", () => Player.GameplayState.HasFailed);
             AddAssert("player failed after 10000", () => Player.GameplayClockContainer.CurrentTime, () => Is.GreaterThanOrEqualTo(10000));
+        }
+
+        [Test]
+        public void TestPlayerLoaderSettingsHover()
+        {
+            loadPlayerWithBeatmap();
+
+            AddUntilStep("wait for settings overlay hidden", () => settingsOverlay().Expanded.Value, () => Is.False);
+            AddStep("move mouse to right of screen", () => InputManager.MoveMouseTo(Player.ScreenSpaceDrawQuad.TopRight));
+            AddUntilStep("wait for settings overlay visible", () => settingsOverlay().Expanded.Value, () => Is.True);
+            AddStep("move mouse to centre of screen", () => InputManager.MoveMouseTo(Player.ScreenSpaceDrawQuad.Centre));
+            AddUntilStep("wait for settings overlay hidden", () => settingsOverlay().Expanded.Value, () => Is.False);
+
+            PlayerSettingsOverlay settingsOverlay() => Player.ChildrenOfType<PlayerSettingsOverlay>().Single();
         }
 
         private void loadPlayerWithBeatmap(IBeatmap? beatmap = null)
