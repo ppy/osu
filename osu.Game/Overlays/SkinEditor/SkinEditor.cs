@@ -48,6 +48,8 @@ namespace osu.Game.Overlays.SkinEditor
 
         public readonly BindableList<ISerialisableDrawable> SelectedComponents = new BindableList<ISerialisableDrawable>();
 
+        public bool ExternalEditInProgress => externalEditOperation != null && !externalEditOperation.IsCompleted;
+
         protected override bool StartHidden => true;
 
         private Drawable? targetScreen;
@@ -106,6 +108,8 @@ namespace osu.Game.Overlays.SkinEditor
 
         [Resolved]
         private ExternalEditOverlay? externalEditOverlay { get; set; }
+
+        private Task? externalEditOperation;
 
         public SkinEditor()
         {
@@ -286,7 +290,7 @@ namespace osu.Game.Overlays.SkinEditor
 
             var skin = currentSkin.Value.SkinInfo.PerformRead(s => s.Detach());
 
-            await externalEditOverlay!.Begin(skin).ConfigureAwait(false);
+            externalEditOperation = await externalEditOverlay!.Begin(skin).ConfigureAwait(false);
         }
 
         public bool OnPressed(KeyBindingPressEvent<PlatformAction> e)

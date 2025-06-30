@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
@@ -45,6 +46,7 @@ namespace osu.Game.Overlays.SkinEditor
         private SkinManager skinManager { get; set; } = null!;
 
         private ExternalEditOperation<SkinInfo>? editOperation;
+        private TaskCompletionSource? taskCompletionSource;
 
         protected override bool DimMainContent => false;
 
@@ -95,8 +97,11 @@ namespace osu.Game.Overlays.SkinEditor
             };
         }
 
-        public async Task Begin(SkinInfo skinInfo)
+        public async Task<Task> Begin(SkinInfo skinInfo)
         {
+            if (taskCompletionSource != null)
+                throw new InvalidOperationException("Cannot start multiple concurrent external edits!");
+
             Show();
             showSpinner("Mounting external skin...");
             setGlobalSkinDisabled(true);
@@ -114,6 +119,7 @@ namespace osu.Game.Overlays.SkinEditor
                 await Task.Delay(1000).ConfigureAwait(true);
                 setGlobalSkinDisabled(false);
                 Hide();
+                return Task.FromException(ex);
             }
 
             Schedule(() =>
@@ -163,6 +169,7 @@ namespace osu.Game.Overlays.SkinEditor
                     b.Enabled.Value = true;
                 openDirectory();
             }, 1000);
+            return (taskCompletionSource = new TaskCompletionSource()).Task;
         }
 
         private void openDirectory()
@@ -175,6 +182,8 @@ namespace osu.Game.Overlays.SkinEditor
 
         private async Task finish()
         {
+            Debug.Assert(taskCompletionSource != null);
+
             showSpinner("Cleaning up...");
             await Task.Delay(500).ConfigureAwait(true);
 
@@ -189,6 +198,9 @@ namespace osu.Game.Overlays.SkinEditor
                 await Task.Delay(1000).ConfigureAwait(true);
                 Hide();
                 setGlobalSkinDisabled(false);
+                taskCompletionSource.SetException(ex);
+                taskCompletionSource = null;
+                return;
             }
 
             Schedule(() =>
@@ -205,6 +217,8 @@ namespace osu.Game.Overlays.SkinEditor
 
                 Hide();
             });
+            taskCompletionSource.SetResult();
+            taskCompletionSource = null;
         }
 
         private void setGlobalSkinDisabled(bool disabled)

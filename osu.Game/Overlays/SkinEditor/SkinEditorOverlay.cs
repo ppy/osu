@@ -334,6 +334,14 @@ namespace osu.Game.Overlays.SkinEditor
             leasedBeatmapSkins = null;
         }
 
+        public new void ToggleVisibility()
+        {
+            if (skinEditor?.ExternalEditInProgress == true)
+                return;
+
+            base.ToggleVisibility();
+        }
+
         private partial class EndlessPlayer : ReplayPlayer
         {
             protected override UserActivity? InitialActivity => null;
