@@ -670,7 +670,7 @@ namespace osu.Game.Screens.SelectV2
             // This avoids a flicker of a placeholder or invalid beatmap before a proper selection.
             //
             // After the carousel finishes filtering, it will attempt a selection then call this method again.
-            if (!carouselItemsPresented && !checkBeatmapValidForSelection(Beatmap.Value.BeatmapInfo, filterControl.CreateCriteria()))
+            if (!CarouselItemsPresented && !checkBeatmapValidForSelection(Beatmap.Value.BeatmapInfo, filterControl.CreateCriteria()))
                 return;
 
             if (carousel.VisuallyFocusSelected)
@@ -703,7 +703,10 @@ namespace osu.Game.Screens.SelectV2
 
         #region Filtering
 
-        private bool carouselItemsPresented;
+        /// <summary>
+        /// Whether the carousel has finished initial presentation of beatmap panels.
+        /// </summary>
+        public bool CarouselItemsPresented { get; private set; }
 
         private const double filter_delay = 250;
 
@@ -727,7 +730,7 @@ namespace osu.Game.Screens.SelectV2
             if (carousel.Criteria == null)
                 return;
 
-            carouselItemsPresented = true;
+            CarouselItemsPresented = true;
 
             int count = carousel.MatchedBeatmapsCount;
 
