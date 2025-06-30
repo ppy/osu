@@ -71,8 +71,7 @@ namespace osu.Game.Overlays.BeatmapSet
                     {
                         new Container
                         {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
+                            AutoSizeAxes = Axes.Both,
                             Margin = new MarginPadding { Left = -(tile_icon_padding + tile_spacing / 2), Bottom = 10 },
                             Children = new Drawable[]
                             {
@@ -89,8 +88,7 @@ namespace osu.Game.Overlays.BeatmapSet
                                 },
                                 Difficulties = new DifficultiesContainer
                                 {
-                                    RelativeSizeAxes = Axes.X,
-                                    AutoSizeAxes = Axes.Y,
+                                    AutoSizeAxes = Axes.Both,
                                     OnLostHover = () => showBeatmap(Beatmap.Value, withStarRating: false),
                                 },
                             }
@@ -142,6 +140,12 @@ namespace osu.Game.Overlays.BeatmapSet
 
             // done here so everything can bind in intialization and get the first trigger
             Beatmap.TriggerChange();
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+            Difficulties.MaximumSize = new Vector2(DrawWidth, float.MaxValue);
         }
 
         private void updateDisplay()
