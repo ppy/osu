@@ -18,6 +18,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
 using osuTK;
 using osuTK.Graphics;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
@@ -215,6 +216,29 @@ namespace osu.Game.Tests.Visual.UserInterface
             checkBindableAtValue("Circle Size", 3);
 
             AddStep("reset mod settings", () => modDifficultyAdjust.ResetSettingsToDefaults());
+
+            checkSliderAtValue("Circle Size", 5);
+            checkBindableAtValue("Circle Size", null);
+        }
+
+        [Test]
+        public void TestResetToDefaultViaDoubleClickingNub()
+        {
+            setBeatmapWithDifficultyParameters(5);
+
+            setSliderValue("Circle Size", 3);
+            setExtendedLimits(true);
+
+            checkSliderAtValue("Circle Size", 3);
+            checkBindableAtValue("Circle Size", 3);
+
+            AddStep("double click circle size nub", () =>
+            {
+                var nub = this.ChildrenOfType<RoundedSliderBar<float>.SliderNub>().First();
+                InputManager.MoveMouseTo(nub);
+                InputManager.Click(MouseButton.Left);
+                InputManager.Click(MouseButton.Left);
+            });
 
             checkSliderAtValue("Circle Size", 5);
             checkBindableAtValue("Circle Size", null);

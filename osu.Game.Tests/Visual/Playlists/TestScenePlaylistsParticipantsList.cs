@@ -14,13 +14,15 @@ namespace osu.Game.Tests.Visual.Playlists
 {
     public partial class TestScenePlaylistsParticipantsList : OnlinePlayTestScene
     {
+        private Room room = null!;
+
         public override void SetUpSteps()
         {
             base.SetUpSteps();
 
-            AddStep("create list", () =>
+            AddStep("create room", () =>
             {
-                SelectedRoom.Value = new Room
+                room = new Room
                 {
                     RoomID = 7,
                     RecentParticipants = Enumerable.Range(0, 50).Select(_ => new APIUser
@@ -38,7 +40,7 @@ namespace osu.Game.Tests.Visual.Playlists
         {
             AddStep("create component", () =>
             {
-                Child = new ParticipantsDisplay(SelectedRoom.Value!, Direction.Horizontal)
+                Child = new ParticipantsDisplay(room, Direction.Horizontal)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -52,7 +54,7 @@ namespace osu.Game.Tests.Visual.Playlists
         {
             AddStep("create component", () =>
             {
-                Child = new ParticipantsDisplay(SelectedRoom.Value!, Direction.Vertical)
+                Child = new ParticipantsDisplay(room, Direction.Vertical)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,

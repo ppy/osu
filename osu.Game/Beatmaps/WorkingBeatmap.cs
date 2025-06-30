@@ -124,18 +124,16 @@ namespace osu.Game.Beatmaps
             Track.Looping = looping;
             Track.RestartPoint = Metadata.PreviewTime;
 
-            if (Track.RestartPoint == -1)
+            if (!Track.IsLoaded)
             {
-                if (!Track.IsLoaded)
-                {
-                    // force length to be populated (https://github.com/ppy/osu-framework/issues/4202)
-                    Track.Seek(Track.CurrentTime);
-                }
-
-                Track.RestartPoint = 0.4f * Track.Length;
+                // force length to be populated (https://github.com/ppy/osu-framework/issues/4202)
+                Track.Seek(Track.CurrentTime);
             }
 
-            Track.RestartPoint += offsetFromPreviewPoint;
+            if (Track.RestartPoint < 0 || Track.RestartPoint > Track.Length)
+                Track.RestartPoint = 0.4f * Track.Length;
+
+            Track.RestartPoint = Math.Clamp(Track.RestartPoint + offsetFromPreviewPoint, 0, Track.Length);
         }
 
         /// <summary>
@@ -203,6 +201,8 @@ namespace osu.Game.Beatmaps
             {
                 try
                 {
+                    // TODO: This is a touch expensive and can become an issue if being accessed every Update call.
+                    // Optimally we would not involve the async flow if things are already loaded.
                     return loadBeatmapAsync().GetResultSafely();
                 }
                 catch (AggregateException ae)
@@ -211,12 +211,12 @@ namespace osu.Game.Beatmaps
                     if (ae.InnerExceptions.FirstOrDefault() is TaskCanceledException)
                         return null;
 
-                    Logger.Error(ae, "Beatmap failed to load");
+                    Logger.Error(ae, $"Beatmap failed to load ({BeatmapInfo})");
                     return null;
                 }
                 catch (Exception e)
                 {
-                    Logger.Error(e, "Beatmap failed to load");
+                    Logger.Error(e, $"Beatmap failed to load ({BeatmapInfo})");
                     return null;
                 }
             }
@@ -233,11 +233,18 @@ namespace osu.Game.Beatmaps
                     // Todo: Handle cancellation during beatmap parsing
                     var b = GetBeatmap() ?? new Beatmap();
 
-                    // The original beatmap version needs to be preserved as the database doesn't contain it
-                    BeatmapInfo.BeatmapVersion = b.BeatmapInfo.BeatmapVersion;
-
-                    // Use the database-backed info for more up-to-date values (beatmap id, ranked status, etc)
-                    b.BeatmapInfo = BeatmapInfo;
+                    // Copy across values of key properties for which the database-backed model has data that the decoded beatmap isn't going to.
+                    b.BeatmapInfo.ID = BeatmapInfo.ID;
+                    b.BeatmapInfo.UserSettings = BeatmapInfo.UserSettings;
+                    b.BeatmapInfo.BeatmapSet = BeatmapInfo.BeatmapSet;
+                    b.BeatmapInfo.Status = BeatmapInfo.Status;
+                    b.BeatmapInfo.OnlineID = BeatmapInfo.OnlineID;
+                    b.BeatmapInfo.OnlineMD5Hash = BeatmapInfo.OnlineMD5Hash;
+                    b.BeatmapInfo.LastLocalUpdate = BeatmapInfo.LastLocalUpdate;
+                    b.BeatmapInfo.LastOnlineUpdate = BeatmapInfo.LastOnlineUpdate;
+                    b.BeatmapInfo.LastPlayed = BeatmapInfo.LastPlayed;
+                    b.BeatmapInfo.EditorTimestamp = BeatmapInfo.EditorTimestamp;
+                    b.BeatmapInfo.StarRating = BeatmapInfo.StarRating; // this could be recomputed in the decoding process but it's a bit annoying to do.
 
                     return b;
                 }, loadCancellationSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);

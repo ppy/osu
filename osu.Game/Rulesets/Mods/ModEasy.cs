@@ -17,10 +17,7 @@ namespace osu.Game.Rulesets.Mods
         public override double ScoreMultiplier => 0.5;
         public override Type[] IncompatibleMods => new[] { typeof(ModHardRock), typeof(ModDifficultyAdjust) };
         public override bool Ranked => UsesDefaultConfiguration;
-
-        public virtual void ReadFromDifficulty(BeatmapDifficulty difficulty)
-        {
-        }
+        public override bool ValidForFreestyleAsRequiredMod => true;
 
         public virtual void ApplyToDifficulty(BeatmapDifficulty difficulty)
         {

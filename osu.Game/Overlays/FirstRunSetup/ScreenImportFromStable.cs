@@ -31,7 +31,7 @@ using osuTK;
 namespace osu.Game.Overlays.FirstRunSetup
 {
     [LocalisableDescription(typeof(FirstRunOverlayImportFromStableScreenStrings), nameof(FirstRunOverlayImportFromStableScreenStrings.Header))]
-    public partial class ScreenImportFromStable : FirstRunSetupScreen
+    public partial class ScreenImportFromStable : WizardScreen
     {
         private static readonly Vector2 button_size = new Vector2(400, 50);
 

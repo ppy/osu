@@ -29,7 +29,7 @@ namespace osu.Game.Skinning.Components
     [UsedImplicitly]
     public partial class BeatmapAttributeText : FontAdjustableSkinComponent
     {
-        [SettingSource(typeof(BeatmapAttributeTextStrings), nameof(BeatmapAttributeTextStrings.Attribute), nameof(BeatmapAttributeTextStrings.AttributeDescription))]
+        [SettingSource(typeof(BeatmapAttributeTextStrings), nameof(BeatmapAttributeTextStrings.Attribute))]
         public Bindable<BeatmapAttribute> Attribute { get; } = new Bindable<BeatmapAttribute>(BeatmapAttribute.StarRating);
 
         [SettingSource(typeof(BeatmapAttributeTextStrings), nameof(BeatmapAttributeTextStrings.Template), nameof(BeatmapAttributeTextStrings.TemplateDescription))]
@@ -48,7 +48,7 @@ namespace osu.Game.Skinning.Components
         private BeatmapDifficultyCache difficultyCache { get; set; } = null!;
 
         private readonly OsuSpriteText text;
-        private IBindable<StarDifficulty?>? difficultyBindable;
+        private IBindable<StarDifficulty>? difficultyBindable;
         private CancellationTokenSource? difficultyCancellationSource;
         private ModSettingChangeTracker? modSettingTracker;
         private StarDifficulty? starDifficulty;
@@ -226,7 +226,7 @@ namespace osu.Game.Skinning.Components
                     return computeDifficulty().ApproachRate.ToLocalisableString(@"0.##");
 
                 case BeatmapAttribute.StarRating:
-                    return (starDifficulty?.Stars ?? 0).ToLocalisableString(@"F2");
+                    return (starDifficulty?.Stars ?? 0).FormatStarRating();
 
                 case BeatmapAttribute.MaxPP:
                     return Math.Round(starDifficulty?.PerformanceAttributes?.Total ?? 0, MidpointRounding.AwayFromZero).ToLocalisableString();

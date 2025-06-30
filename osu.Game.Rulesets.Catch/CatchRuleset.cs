@@ -14,6 +14,7 @@ using osu.Game.Graphics;
 using osu.Game.Rulesets.Catch.Beatmaps;
 using osu.Game.Rulesets.Catch.Difficulty;
 using osu.Game.Rulesets.Catch.Edit;
+using osu.Game.Rulesets.Catch.Edit.Setup;
 using osu.Game.Rulesets.Catch.Mods;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Replays;
@@ -228,7 +229,7 @@ namespace osu.Game.Rulesets.Catch
         public override IEnumerable<Drawable> CreateEditorSetupSections() =>
         [
             new MetadataSection(),
-            new DifficultySection(),
+            new CatchDifficultySection(),
             new FillFlowContainer
             {
                 AutoSizeAxes = Axes.Y,

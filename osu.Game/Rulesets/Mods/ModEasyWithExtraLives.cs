@@ -2,9 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Humanizer;
 using osu.Framework.Bindables;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Scoring;
@@ -20,7 +22,15 @@ namespace osu.Game.Rulesets.Mods
             MaxValue = 10
         };
 
-        public override string SettingDescription => Retries.IsDefault ? string.Empty : $"{"lives".ToQuantity(Retries.Value)}";
+        public override IEnumerable<(LocalisableString setting, LocalisableString value)> SettingDescription
+        {
+            get
+            {
+                if (!Retries.IsDefault)
+                    yield return ("Extra lives", "lives".ToQuantity(Retries.Value));
+            }
+        }
+
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(ModAccuracyChallenge)).ToArray();
 
         private int retries;

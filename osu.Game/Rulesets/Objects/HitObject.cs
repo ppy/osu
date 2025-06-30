@@ -104,6 +104,8 @@ namespace osu.Game.Rulesets.Objects
         /// <param name="cancellationToken">The cancellation token.</param>
         public void ApplyDefaults(ControlPointInfo controlPointInfo, IBeatmapDifficultyInfo difficulty, CancellationToken cancellationToken = default)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
             nestedHitObjects.Clear();
@@ -114,6 +116,8 @@ namespace osu.Game.Rulesets.Objects
             {
                 foreach (HitObject hitObject in nestedHitObjects)
                 {
+                    cancellationToken.ThrowIfCancellationRequested();
+
                     if (hitObject is IHasComboInformation n)
                     {
                         n.ComboIndexBindable.BindTo(hasCombo.ComboIndexBindable);
@@ -188,7 +192,7 @@ namespace osu.Game.Rulesets.Objects
         /// </para>
         /// </summary>
         [NotNull]
-        protected virtual HitWindows CreateHitWindows() => new HitWindows();
+        protected virtual HitWindows CreateHitWindows() => new DefaultHitWindows();
 
         /// <summary>
         /// The maximum offset from the end time of <see cref="HitObject"/> at which this <see cref="HitObject"/> can be judged.

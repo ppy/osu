@@ -28,6 +28,8 @@ namespace osu.Desktop
 
         private static LegacyTcpIpcProvider? legacyIpc;
 
+        private static bool isFirstRun;
+
         [STAThread]
         public static void Main(string[] args)
         {
@@ -135,7 +137,12 @@ namespace osu.Desktop
                 if (tournamentClient)
                     host.Run(new TournamentGame());
                 else
-                    host.Run(new OsuGameDesktop(args));
+                {
+                    host.Run(new OsuGameDesktop(args)
+                    {
+                        IsFirstRun = isFirstRun
+                    });
+                }
             }
         }
 
@@ -177,6 +184,8 @@ namespace osu.Desktop
 
             var app = VelopackApp.Build();
 
+            app.OnFirstRun(_ => isFirstRun = true);
+
             if (OperatingSystem.IsWindows())
                 configureWindows(app);
 
@@ -186,9 +195,9 @@ namespace osu.Desktop
         [SupportedOSPlatform("windows")]
         private static void configureWindows(VelopackApp app)
         {
-            app.WithFirstRun(_ => WindowsAssociationManager.InstallAssociations());
-            app.WithAfterUpdateFastCallback(_ => WindowsAssociationManager.UpdateAssociations());
-            app.WithBeforeUninstallFastCallback(_ => WindowsAssociationManager.UninstallAssociations());
+            app.OnFirstRun(_ => WindowsAssociationManager.InstallAssociations());
+            app.OnAfterUpdateFastCallback(_ => WindowsAssociationManager.UpdateAssociations());
+            app.OnBeforeUninstallFastCallback(_ => WindowsAssociationManager.UninstallAssociations());
         }
     }
 }

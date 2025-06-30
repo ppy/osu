@@ -16,6 +16,7 @@ using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.UI;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
@@ -37,6 +38,9 @@ namespace osu.Game.Rulesets.Osu.Mods
                     if (e.NewValue || slider.Judged) return;
 
                     if (slider.Time.Current < slider.HitObject.StartTime)
+                        return;
+
+                    if ((slider.Clock as IGameplayClock)?.IsRewinding == true)
                         return;
 
                     var tail = slider.NestedHitObjects.OfType<StrictTrackingDrawableSliderTail>().First();

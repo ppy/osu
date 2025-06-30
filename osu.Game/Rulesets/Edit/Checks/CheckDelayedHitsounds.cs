@@ -119,8 +119,8 @@ namespace osu.Game.Rulesets.Edit.Checks
             string bank = parts[0];
             string sampleSet = parts[1];
 
-            return HitSampleInfo.AllBanks.Contains(bank)
-                   && HitSampleInfo.AllAdditions.Append(HitSampleInfo.HIT_NORMAL).Any(sampleSet.StartsWith);
+            return HitSampleInfo.ALL_BANKS.Contains(bank)
+                   && HitSampleInfo.ALL_ADDITIONS.Append(HitSampleInfo.HIT_NORMAL).Any(sampleSet.StartsWith);
         }
 
         public class IssueTemplateConsequentDelay : IssueTemplate

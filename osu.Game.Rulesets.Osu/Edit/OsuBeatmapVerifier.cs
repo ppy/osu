@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Edit.Checks;
 using osu.Game.Rulesets.Edit.Checks.Components;
 using osu.Game.Rulesets.Osu.Edit.Checks;
 
@@ -16,6 +17,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             // Compose
             new CheckOffscreenObjects(),
             new CheckTooShortSpinners(),
+            new CheckConcurrentObjects(),
 
             // Spread
             new CheckTimeDistanceEquality(),

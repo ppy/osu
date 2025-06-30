@@ -210,7 +210,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
             double osuVelocity = taikoVelocity * (1000f / beatLength);
 
             // osu-stable always uses the speed-adjusted beatlength to determine the osu! velocity, but only uses it for conversion if beatmap version < 8
-            if (beatmap.BeatmapInfo.BeatmapVersion >= 8)
+            if (beatmap.BeatmapVersion >= 8)
                 beatLength = timingPoint.BeatLength;
 
             // If the drum roll is to be split into hit circles, assume the ticks are 1/8 spaced within the duration of one beat
