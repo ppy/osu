@@ -98,6 +98,8 @@ namespace osu.Game.Screens.Play
 
         private Box? quickRestartBlackLayer;
 
+        private ScheduledDelegate? quickRestartBackButtonRestore;
+
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
 
@@ -518,7 +520,8 @@ namespace osu.Game.Screens.Play
                     .ScaleTo(1)
                     .FadeInFromZero(500, Easing.OutQuint);
 
-                this.Delay(quick_restart_initial_delay).Schedule(() => BackButtonVisibility.Value = true);
+                quickRestartBackButtonRestore?.Cancel();
+                quickRestartBackButtonRestore = Scheduler.AddDelayed(() => BackButtonVisibility.Value = true, quick_restart_initial_delay);
             }
             else
             {
