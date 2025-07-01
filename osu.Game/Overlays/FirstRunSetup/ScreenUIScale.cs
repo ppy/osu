@@ -148,6 +148,8 @@ namespace osu.Game.Overlays.FirstRunSetup
             protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
                 new DependencyContainer(new DependencyIsolationContainer(base.CreateChildDependencies(parent)));
 
+            private ScreenFooter footer;
+
             [BackgroundDependencyLoader]
             private void load(AudioManager audio, TextureStore textures, RulesetStore rulesets)
             {
@@ -157,7 +159,6 @@ namespace osu.Game.Overlays.FirstRunSetup
 
                 OsuScreenStack stack;
                 OsuLogo logo;
-                ScreenFooter footer;
 
                 Padding = new MarginPadding(5);
 
@@ -194,6 +195,13 @@ namespace osu.Game.Overlays.FirstRunSetup
 
                 // intentionally load synchronously so it is included in the initial load of the first run screen.
                 stack.PushSynchronously(screen);
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                footer.Show();
             }
         }
 
