@@ -173,7 +173,7 @@ namespace osu.Game.Screens.SelectV2
 
         private partial class PlayerLoader : Play.PlayerLoader
         {
-            public override bool ShowFooter => true;
+            public override bool ShowFooter => !QuickRestart;
 
             public PlayerLoader(Func<Player> createPlayer)
                 : base(createPlayer)
