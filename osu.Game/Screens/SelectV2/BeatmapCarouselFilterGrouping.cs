@@ -323,6 +323,7 @@ namespace osu.Game.Screens.SelectV2
 
         private GroupDefinition defineGroupByStars(double stars)
         {
+            // truncation is intentional - compare `FormatUtils.FormatStarRating()`
             int starInt = (int)stars;
             var starDifficulty = new StarDifficulty(starInt, 0);
 
