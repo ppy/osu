@@ -254,55 +254,12 @@ namespace osu.Game.Tests.Visual.Navigation
             AddStep("set game volume to max", () => Game.Dependencies.Get<FrameworkConfigManager>().SetValue(FrameworkSetting.VolumeUniversal, 1d));
             AddUntilStep("wait for volume overlay to hide", () => Game.ChildrenOfType<VolumeOverlay>().SingleOrDefault()?.State.Value, () => Is.EqualTo(Visibility.Hidden));
             PushAndConfirm(() => songSelect = new SoloSongSelect());
-            AddUntilStep("wait for song select", () => songSelect.CarouselItemsPresented);
-            AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
-            AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
-
-            AddUntilStep("store scroll position", () =>
-            {
-                double s = getCarouselScrollPosition();
-
-                // TODO: this logic can likely be removed when we fix https://github.com/ppy/osu/issues/33379
-                if (scrollPosition == s)
-                    return true;
-
-                scrollPosition = s;
-                return false;
-            });
-
-            AddStep("move to left side", () => InputManager.MoveMouseTo(
-                songSelect.ChildrenOfType<BeatmapTitleWedge>().Single().ScreenSpaceDrawQuad.Centre));
-            AddStep("scroll down", () => InputManager.ScrollVerticalBy(-1));
-            AddAssert("carousel didn't move", getCarouselScrollPosition, () => Is.EqualTo(scrollPosition));
-
-            AddRepeatStep("alt-scroll down", () =>
-            {
-                InputManager.PressKey(Key.AltLeft);
-                InputManager.ScrollVerticalBy(-1);
-                InputManager.ReleaseKey(Key.AltLeft);
-            }, 5);
-            AddAssert("game volume decreased", () => Game.Dependencies.Get<FrameworkConfigManager>().Get<double>(FrameworkSetting.VolumeUniversal), () => Is.LessThan(1));
-
-            AddStep("move to carousel", () => InputManager.MoveMouseTo(songSelect.ChildrenOfType<BeatmapCarousel>().Single()));
-            AddStep("scroll down", () => InputManager.ScrollVerticalBy(-1));
-            AddAssert("carousel moved", getCarouselScrollPosition, () => Is.Not.EqualTo(scrollPosition));
-
-            double getCarouselScrollPosition() => Game.ChildrenOfType<Carousel<BeatmapInfo>.CarouselScrollContainer>().Single().Current;
-        }
-
-        [Test]
-        public void TestNewSongSelectScrollHandling()
-        {
-            SoloSongSelect songSelect = null;
-            double scrollPosition = 0;
-
-            AddStep("set game volume to max", () => Game.Dependencies.Get<FrameworkConfigManager>().SetValue(FrameworkSetting.VolumeUniversal, 1d));
-            AddUntilStep("wait for volume overlay to hide", () => Game.ChildrenOfType<VolumeOverlay>().SingleOrDefault()?.State.Value, () => Is.EqualTo(Visibility.Hidden));
-            PushAndConfirm(() => songSelect = new SoloSongSelect());
             AddUntilStep("wait for song select", () => songSelect.IsLoaded);
             AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
             AddUntilStep("wait for beatmap", () => Game.ChildrenOfType<PanelBeatmapSet>().Any());
 
+            // TODO: this logic can likely be removed when we fix https://github.com/ppy/osu/issues/33379
+            // It should be probably be immediate in this case.
             AddWaitStep("wait for scroll", 10);
 
             AddStep("store scroll position", () => scrollPosition = getCarouselScrollPosition());
