@@ -49,8 +49,14 @@ namespace osu.Game.Overlays.SkinEditor
         [Resolved]
         private IPerformFromScreenRunner? performer { get; set; }
 
+        [Resolved]
+        private IOverlayManager? overlayManager { get; set; }
+
         [Cached]
         public readonly EditorClipboard Clipboard = new EditorClipboard();
+
+        [Cached]
+        private readonly ExternalEditOverlay externalEditOverlay = new ExternalEditOverlay();
 
         [Resolved]
         private OsuGame game { get; set; } = null!;
@@ -69,6 +75,7 @@ namespace osu.Game.Overlays.SkinEditor
 
         private OsuScreen? lastTargetScreen;
         private InvokeOnDisposal? nestedInputManagerDisable;
+        private IDisposable? externalEditOverlayRegistration;
 
         private readonly LayoutValue drawSizeLayout;
 
@@ -84,6 +91,13 @@ namespace osu.Game.Overlays.SkinEditor
         private void load(OsuConfigManager config)
         {
             config.BindWith(OsuSetting.BeatmapSkins, beatmapSkins);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            externalEditOverlayRegistration = overlayManager?.RegisterBlockingOverlay(externalEditOverlay);
         }
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
@@ -332,6 +346,22 @@ namespace osu.Game.Overlays.SkinEditor
         {
             leasedBeatmapSkins?.Return();
             leasedBeatmapSkins = null;
+        }
+
+        public new void ToggleVisibility()
+        {
+            if (skinEditor?.ExternalEditInProgress == true)
+                return;
+
+            base.ToggleVisibility();
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            externalEditOverlayRegistration?.Dispose();
+            externalEditOverlayRegistration = null;
         }
 
         private partial class EndlessPlayer : ReplayPlayer
