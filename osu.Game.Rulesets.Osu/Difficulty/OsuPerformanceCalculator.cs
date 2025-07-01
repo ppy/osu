@@ -20,10 +20,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 {
     public class OsuPerformanceCalculator : PerformanceCalculator
     {
-        // This value is true if sliderheads don't have accuracy, and false if they do have (either lazer or scorev2)
+        // This value is false when scorev2 is enabled
         private bool usingClassicSliderAccuracy;
-
-        // This value is true if score was set on stable and doesn't have all information about judgements
         private bool isLegacyScore;
 
         private double accuracy;
@@ -103,7 +101,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double comboBasedEstimatedMissCount = calculateComboBasedEstimatedMissCount(osuAttributes);
             double? scoreBasedEstimatedMissCount = null;
 
-            if (usingClassicSliderAccuracy && score.LegacyTotalScore != null)
+            if (isLegacyScore && score.LegacyTotalScore != null)
             {
                 var legacyScoreMissCalculator = new OsuLegacyScoreMissCalculator(score, osuAttributes);
                 scoreBasedEstimatedMissCount = legacyScoreMissCalculator.Calculate();
@@ -351,10 +349,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             }
             else if (usingClassicSliderAccuracy)
             {
-                // If score is not legacy - it doesn't have scorev1, so we're going to use lazer info to get amount of sliderbreaks.
-                // This line punishes all LTMs as misses,
-                // What makes maps with difficult ticks and reverses (like Oshama Scramble) to be underweight for non-FC scores,
-                // But there's nothing we can do about it because there's no differentiation between LTMs and slider head misses on CL scores
+                // If this is a non-legacy score then we don't have a calculated legacy score value,
+                // so we will use the available statistics to create the correct miss count when slider head accuracy is not in use.
                 missCount += countSliderTickMiss;
             }
             else
