@@ -11,7 +11,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics.Carousel;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
-using osu.Game.Utils;
 
 namespace osu.Game.Screens.SelectV2
 {
@@ -190,7 +189,7 @@ namespace osu.Game.Screens.SelectV2
                     }, items);
 
                 case GroupMode.Difficulty:
-                    return getGroupsBy(b => defineGroupByStars(b.StarRating.FloorToDecimalDigits(2)), items);
+                    return getGroupsBy(b => defineGroupByStars(b.StarRating), items);
 
                 case GroupMode.Length:
                     return getGroupsBy(b =>
@@ -324,7 +323,7 @@ namespace osu.Game.Screens.SelectV2
 
         private GroupDefinition defineGroupByStars(double stars)
         {
-            int starInt = (int)Math.Round(stars, 2);
+            int starInt = (int)stars;
             var starDifficulty = new StarDifficulty(starInt, 0);
 
             if (starInt == 0)
