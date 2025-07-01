@@ -59,7 +59,7 @@ namespace osu.Game.Screens.Play
         // this makes the game stay in portrait mode when restarting gameplay rather than switching back to landscape.
         public override bool RequiresPortraitOrientation => CurrentPlayer?.RequiresPortraitOrientation == true;
 
-        public override float BackgroundParallaxAmount => quickRestart ? 0 : 1;
+        public override float BackgroundParallaxAmount => QuickRestart ? 0 : 1;
 
         // Here because IsHovered will not update unless we do so.
         public override bool HandlePositionalInput => true;
@@ -158,7 +158,7 @@ namespace osu.Game.Screens.Play
 
         private PlayerLoaderDisclaimer? epilepsyWarning;
 
-        private bool quickRestart;
+        protected bool QuickRestart { get; private set; }
 
         private IDisposable? highPerformanceSession;
 
@@ -380,7 +380,7 @@ namespace osu.Game.Screens.Play
 
             logo.ScaleTo(new Vector2(0.15f), duration, Easing.OutQuint);
 
-            if (quickRestart)
+            if (QuickRestart)
             {
                 logo.Delay(quick_restart_initial_delay)
                     .FadeIn(350);
@@ -430,7 +430,7 @@ namespace osu.Game.Screens.Play
 
             // We need to perform this check here rather than in OnHover as any number of children of VisualSettings
             // may also be handling the hover events.
-            if (inputManager.HoveredDrawables.Contains(VisualSettings) || quickRestart)
+            if (inputManager.HoveredDrawables.Contains(VisualSettings) || QuickRestart)
             {
                 // Preview user-defined background dim and blur when hovered on the visual settings panel.
                 ApplyToBackground(b =>
@@ -469,7 +469,7 @@ namespace osu.Game.Screens.Play
                 return;
 
             CurrentPlayer = createPlayer();
-            CurrentPlayer.Configuration.AutomaticallySkipIntro |= quickRestart;
+            CurrentPlayer.Configuration.AutomaticallySkipIntro |= QuickRestart;
             CurrentPlayer.RestartCount = restartCount++;
             CurrentPlayer.PrepareLoaderForRestart = prepareForRestart;
 
@@ -486,7 +486,7 @@ namespace osu.Game.Screens.Play
 
         private void prepareForRestart(bool quickRestartRequested)
         {
-            quickRestart = quickRestartRequested;
+            QuickRestart = quickRestartRequested;
             hideOverlays = true;
             ValidForResume = true;
         }
@@ -495,7 +495,7 @@ namespace osu.Game.Screens.Play
         {
             MetadataInfo.Loading = true;
 
-            if (quickRestart)
+            if (QuickRestart)
             {
                 BackButtonVisibility.Value = false;
 
@@ -635,7 +635,7 @@ namespace osu.Game.Screens.Play
                 },
                 // When a quick restart is activated, the metadata content will display some time later if it's taking too long.
                 // To avoid it appearing too briefly, if it begins to fade in let's induce a standard delay.
-                quickRestart && content.Alpha == 0 ? 0 : 500);
+                QuickRestart && content.Alpha == 0 ? 0 : 500);
         }
 
         private void cancelLoad()
