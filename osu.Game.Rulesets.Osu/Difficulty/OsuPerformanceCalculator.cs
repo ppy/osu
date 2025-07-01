@@ -20,8 +20,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 {
     public class OsuPerformanceCalculator : PerformanceCalculator
     {
+        // This value is false when scorev2 is enabled
         private bool usingClassicSliderAccuracy;
-        private bool usingScoreV2;
+        private bool isLegacyScore;
 
         private double accuracy;
         private int scoreMaxCombo;
@@ -66,8 +67,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
             var osuAttributes = (OsuDifficultyAttributes)attributes;
 
-            usingClassicSliderAccuracy = score.Mods.OfType<OsuModClassic>().Any(m => m.NoSliderHeadAccuracy.Value);
-            usingScoreV2 = score.Mods.Any(m => m is ModScoreV2);
+            usingClassicSliderAccuracy = score.Mods.OfType<OsuModClassic>().Any(m => m.NoSliderHeadAccuracy.Value) && !score.Mods.Any(m => m is ModScoreV2);
+            isLegacyScore = score.IsLegacyScore;
 
             accuracy = score.Accuracy;
             scoreMaxCombo = score.MaxCombo;
@@ -100,7 +101,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double comboBasedEstimatedMissCount = calculateComboBasedEstimatedMissCount(osuAttributes);
             double? scoreBasedEstimatedMissCount = null;
 
-            if (usingClassicSliderAccuracy && score.LegacyTotalScore != null)
+            if (isLegacyScore && score.LegacyTotalScore != null)
             {
                 var legacyScoreMissCalculator = new OsuLegacyScoreMissCalculator(score, osuAttributes);
                 scoreBasedEstimatedMissCount = legacyScoreMissCalculator.Calculate();
@@ -113,8 +114,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 effectiveMissCount = comboBasedEstimatedMissCount;
             }
 
-            effectiveMissCount = Math.Max(countMiss, effectiveMissCount);
-            effectiveMissCount = Math.Min(totalHits, effectiveMissCount);
+            effectiveMissCount = Math.Clamp(effectiveMissCount, countMiss, totalHits);
 
             double multiplier = OsuDifficultyCalculator.CalculateDifficultyMultiplier(score.Mods, totalHits, osuAttributes.SpinnerCount);
 
@@ -175,7 +175,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             {
                 double estimateImproperlyFollowedDifficultSliders;
 
-                if (usingClassicSliderAccuracy)
+                if (isLegacyScore)
                 {
                     // When the score is considered classic (regardless if it was made on old client or not) we consider all missing combo to be dropped difficult sliders
                     int maximumPossibleDroppedSliders = totalImperfectHits;
@@ -275,7 +275,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // This percentage only considers HitCircles of any value - in this part of the calculation we focus on hitting the timing hit window.
             double betterAccuracyPercentage;
             int amountHitObjectsWithAccuracy = attributes.HitCircleCount;
-            if (!usingClassicSliderAccuracy || usingScoreV2)
+            if (!usingClassicSliderAccuracy)
                 amountHitObjectsWithAccuracy += attributes.SliderCount;
 
             if (amountHitObjectsWithAccuracy > 0)
@@ -335,7 +335,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double missCount = countMiss;
 
-            if (usingClassicSliderAccuracy)
+            if (isLegacyScore)
             {
                 // Consider that full combo is maximum combo minus dropped slider tails since they don't contribute to combo but also don't break it
                 // In classic scores we can't know the amount of dropped sliders so we estimate to 10% of all sliders on the map
@@ -346,6 +346,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
                 // In classic scores there can't be more misses than a sum of all non-perfect judgements
                 missCount = Math.Min(missCount, totalImperfectHits);
+            }
+            else if (usingClassicSliderAccuracy)
+            {
+                // If this is a non-legacy score then we don't have a calculated legacy score value,
+                // so we will use the available statistics to create the correct miss count when slider head accuracy is not in use.
+                missCount += countSliderTickMiss;
             }
             else
             {
@@ -363,7 +369,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double calculateEstimatedSliderBreaks(double topWeightedSliderFactor, OsuDifficultyAttributes attributes)
         {
-            if (!usingClassicSliderAccuracy || countOk == 0)
+            if (!isLegacyScore || countOk == 0)
                 return 0;
 
             double missedComboPercent = 1.0 - (double)scoreMaxCombo / attributes.MaxCombo;
