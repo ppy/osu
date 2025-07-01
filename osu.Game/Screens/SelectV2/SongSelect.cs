@@ -402,22 +402,6 @@ namespace osu.Game.Screens.SelectV2
         private void ensureTrackLooping(IWorkingBeatmap beatmap, TrackChangeDirection changeDirection)
             => beatmap.PrepareTrackForPreview(true);
 
-        private IDisposable? trackDuck;
-
-        private void attachTrackDuckingIfShould()
-        {
-            bool shouldDuck = noResultsPlaceholder.State.Value == Visibility.Visible;
-
-            if (shouldDuck && trackDuck == null)
-                trackDuck = music.Duck(new DuckParameters { DuckVolumeTo = 1, DuckCutoffTo = 500 });
-        }
-
-        private void detachTrackDucking()
-        {
-            trackDuck?.Dispose();
-            trackDuck = null;
-        }
-
         #endregion
 
         #region Selection handling
@@ -604,7 +588,6 @@ namespace osu.Game.Screens.SelectV2
             updateWedgeVisibility();
 
             beginLooping();
-            attachTrackDuckingIfShould();
 
             ensureGlobalBeatmapValid();
 
@@ -622,7 +605,6 @@ namespace osu.Game.Screens.SelectV2
             updateWedgeVisibility();
 
             endLooping();
-            detachTrackDucking();
         }
 
         protected override void LogoArriving(OsuLogo logo, bool resuming)
@@ -748,17 +730,30 @@ namespace osu.Game.Screens.SelectV2
 
             if (count == 0)
             {
+                if (noResultsPlaceholder.State.Value == Visibility.Hidden)
+                {
+                    // Duck audio temporarily when the no results placeholder becomes visible.
+                    //
+                    // Temporary ducking makes it easier to avoid scenarios where the ducking interacts badly
+                    // with other global UI components (like overlays).
+                    music.DuckMomentarily(400, new DuckParameters
+                    {
+                        DuckVolumeTo = 1,
+                        DuckCutoffTo = 500,
+                        DuckDuration = 250,
+                        RestoreDuration = 2000,
+                    });
+                }
+
                 noResultsPlaceholder.Show();
                 noResultsPlaceholder.Filter = carousel.Criteria!;
 
-                attachTrackDuckingIfShould();
                 rightGradientBackground.ResizeWidthTo(3, 1000, Easing.OutPow10);
             }
             else
             {
                 noResultsPlaceholder.Hide();
 
-                detachTrackDucking();
                 rightGradientBackground.ResizeWidthTo(1, 400, Easing.OutPow10);
             }
         }
