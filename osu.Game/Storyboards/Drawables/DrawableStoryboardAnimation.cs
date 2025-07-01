@@ -8,15 +8,18 @@ using System.IO;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Skinning;
 using osuTK;
 
 namespace osu.Game.Storyboards.Drawables
 {
-    public partial class DrawableStoryboardAnimation : TextureAnimation, IFlippable, IVectorScalable
+    public partial class DrawableStoryboardAnimation : TextureAnimation, IFlippable, IVectorScalable, IColouredDimmable
     {
         public StoryboardAnimation Animation { get; }
 
@@ -66,6 +69,13 @@ namespace osu.Game.Storyboards.Drawables
                 Invalidate(Invalidation.MiscGeometry);
             }
         }
+
+        protected override Sprite CreateSprite() => new ColouredDimmableSprite
+        {
+            RelativeSizeAxes = Axes.Both,
+            Anchor = Anchor.Centre,
+            Origin = Anchor.Centre,
+        };
 
         public override bool RemoveWhenNotAlive => false;
 

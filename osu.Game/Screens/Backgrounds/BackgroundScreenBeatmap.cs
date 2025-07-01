@@ -11,6 +11,7 @@ using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Backgrounds;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Screens.Play;
 using osuTK;
@@ -70,10 +71,12 @@ namespace osu.Game.Screens.Backgrounds
             dimmable.DimWhenUserSettingsIgnored.BindTo(DimWhenUserSettingsIgnored);
         }
 
+        protected virtual BeatmapBackground CreateBeatmapBackground(WorkingBeatmap beatmap) => new BeatmapBackground(beatmap);
+
         [BackgroundDependencyLoader]
         private void load()
         {
-            var background = new BeatmapBackground(beatmap);
+            var background = CreateBeatmapBackground(beatmap);
             LoadComponent(background);
             switchBackground(background);
         }
@@ -96,7 +99,7 @@ namespace osu.Game.Screens.Backgrounds
                         return;
 
                     cancellationSource?.Cancel();
-                    LoadComponentAsync(new BeatmapBackground(beatmap), switchBackground, (cancellationSource = new CancellationTokenSource()).Token);
+                    LoadComponentAsync(CreateBeatmapBackground(beatmap), switchBackground, (cancellationSource = new CancellationTokenSource()).Token);
                 });
             }
         }
@@ -114,7 +117,7 @@ namespace osu.Game.Screens.Backgrounds
 
             b.Depth = newDepth;
             b.FadeInFromZero(500, Easing.OutQuint);
-            dimmable.Background = Background = b;
+            Background = dimmable.Background = b;
         }
 
         public override bool Equals(BackgroundScreen other)
@@ -124,7 +127,7 @@ namespace osu.Game.Screens.Backgrounds
             return base.Equals(other) && beatmap == otherBeatmapBackground.Beatmap;
         }
 
-        public partial class DimmableBackground : UserDimContainer
+        public partial class DimmableBackground : UserDimContainer, IColouredDimmable
         {
             /// <summary>
             /// The amount of blur to be applied to the background in addition to user-specified blur.
@@ -136,7 +139,7 @@ namespace osu.Game.Screens.Backgrounds
 
             public readonly Bindable<bool> StoryboardReplacesBackground = new Bindable<bool>();
 
-            public Background Background
+            public BeatmapBackground Background
             {
                 get => background;
                 set
@@ -149,8 +152,9 @@ namespace osu.Game.Screens.Backgrounds
             }
 
             private Bindable<double> userBlurLevel { get; set; }
+            private Bindable<double> userDimColour { get; set; }
 
-            private Background background;
+            private BeatmapBackground background;
 
             public override void Add(Drawable drawable)
             {
@@ -173,6 +177,7 @@ namespace osu.Game.Screens.Backgrounds
             private void load(OsuConfigManager config)
             {
                 userBlurLevel = config.GetBindable<double>(OsuSetting.BlurLevel);
+                userDimColour = config.GetBindable<double>(OsuSetting.DimColour);
             }
 
             protected override void LoadComplete()
@@ -180,6 +185,7 @@ namespace osu.Game.Screens.Backgrounds
                 base.LoadComplete();
 
                 userBlurLevel.ValueChanged += _ => UpdateVisuals();
+                userDimColour.ValueChanged += _ => UpdateVisuals();
                 BlurAmount.ValueChanged += _ => UpdateVisuals();
                 StoryboardReplacesBackground.ValueChanged += _ => UpdateVisuals();
             }
@@ -195,9 +201,40 @@ namespace osu.Game.Screens.Backgrounds
                 }
             }
 
+            protected virtual Colour4 DimColour
+            {
+                get
+                {
+                    if (IgnoreUserSettings.Value)
+                        return Colour4.Black;
+
+                    float grayscaleDimColour = (float)userDimColour.Value * DimLevel;
+                    return new Colour4(grayscaleDimColour, grayscaleDimColour, grayscaleDimColour, 1.0f);
+                }
+            }
+
+            private Colour4 colourOffset;
+
+            protected Colour4 ColourOffset
+            {
+                get => colourOffset;
+                set
+                {
+                    if (value.Equals(colourOffset))
+                        return;
+
+                    colourOffset = value;
+                    Invalidate(Invalidation.Colour);
+                }
+            }
+
+            public Colour4 DrawColourOffset => ColourOffset * DrawColourInfo.Colour;
+
             protected override void UpdateVisuals()
             {
                 base.UpdateVisuals();
+
+                this.TransformTo(nameof(ColourOffset), DimColour, BACKGROUND_FADE_DURATION, Easing.OutQuint);
 
                 Background?.BlurTo(blurTarget, BACKGROUND_FADE_DURATION, Easing.OutQuint);
             }

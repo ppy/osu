@@ -4,17 +4,23 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Rendering;
+using osu.Framework.Graphics.Shaders;
+using osu.Framework.Graphics.Shaders.Types;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.Video;
+using osu.Framework.Layout;
 using osu.Framework.Utils;
+using osu.Game.Graphics;
 using osuTK;
 
 namespace osu.Game.Storyboards.Drawables
 {
-    public partial class DrawableStoryboardVideo : CompositeDrawable
+    public partial class DrawableStoryboardVideo : CompositeDrawable, IColouredDimmable
     {
         public readonly StoryboardVideo Video;
 
@@ -47,14 +53,7 @@ namespace osu.Game.Storyboards.Drawables
             if (stream == null)
                 return;
 
-            InternalChild = drawableVideo = new DrawableVideo(stream, false)
-            {
-                RelativeSizeAxes = RelativeSizeAxes,
-                FillMode = FillMode.Fill,
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Alpha = 0,
-            };
+            InternalChild = drawableVideo = CreateDrawableVideo(stream, false);
 
             Video.ApplyTransforms(drawableVideo);
         }
@@ -76,7 +75,16 @@ namespace osu.Game.Storyboards.Drawables
             }
         }
 
-        private partial class DrawableVideo : Video, IFlippable, IVectorScalable
+        protected virtual DrawableVideo CreateDrawableVideo(Stream stream, bool startAtCurrentTime) => new DrawableVideo(stream, startAtCurrentTime)
+        {
+            RelativeSizeAxes = RelativeSizeAxes,
+            FillMode = FillMode.Fill,
+            Anchor = Anchor.Centre,
+            Origin = Anchor.Centre,
+            Alpha = 0,
+        };
+
+        protected partial class DrawableVideo : Video, IFlippable, IVectorScalable, IColouredDimmable
         {
             private bool flipH;
 
@@ -130,9 +138,97 @@ namespace osu.Game.Storyboards.Drawables
 
             public override Anchor Origin => StoryboardExtensions.AdjustOrigin(base.Origin, VectorScale, FlipH, FlipV);
 
+            protected override VideoSprite CreateSprite() => new DrawableVideoSprite(this);
+
             public DrawableVideo(Stream stream, bool startAtCurrentTime = true)
                 : base(stream, startAtCurrentTime)
             {
+            }
+
+            protected partial class DrawableVideoSprite : VideoSprite, IColouredDimmable
+            {
+                private readonly Video video;
+
+                protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
+                {
+                    bool result = base.OnInvalidate(invalidation, source);
+
+                    // Needed because DrawColourOffset is handled by the DrawNode
+                    if ((invalidation & Invalidation.Colour) > 0)
+                    {
+                        result |= Invalidate(Invalidation.DrawNode);
+                    }
+
+                    return result;
+                }
+
+                public DrawableVideoSprite(Video video)
+                    : base(video)
+                {
+                    this.video = video;
+                }
+
+                [BackgroundDependencyLoader]
+                private void load(ShaderManager shaders)
+                {
+                    TextureShader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, "ColouredDimmableVideo");
+                }
+
+                protected override DrawNode CreateDrawNode() => new DrawableVideoSpriteDrawNode(this, video);
+
+                public class DrawableVideoSpriteDrawNode : VideoSpriteDrawNode
+                {
+                    public new readonly DrawableVideoSprite Source;
+
+                    public DrawableVideoSpriteDrawNode(DrawableVideoSprite source, Video video)
+                        : base(video)
+                    {
+                        Source = source;
+                    }
+
+                    private Colour4 drawColourOffset;
+
+                    public override void ApplyState()
+                    {
+                        base.ApplyState();
+
+                        drawColourOffset = (Source as IColouredDimmable).DrawColourOffset;
+                    }
+
+                    private IUniformBuffer<DimParameters>? dimParametersBuffer;
+
+                    protected override void BindUniformResources(IShader shader, IRenderer renderer)
+                    {
+                        base.BindUniformResources(shader, renderer);
+
+                        dimParametersBuffer ??= renderer.CreateUniformBuffer<DimParameters>();
+
+                        dimParametersBuffer.Data = new DimParameters
+                        {
+                            DimColour = new UniformVector4
+                            {
+                                X = drawColourOffset.R,
+                                Y = drawColourOffset.G,
+                                Z = drawColourOffset.B,
+                                W = drawColourOffset.A
+                            },
+                        };
+
+                        shader.BindUniformBlock("m_DimParameters", dimParametersBuffer);
+                    }
+
+                    protected override void Dispose(bool isDisposing)
+                    {
+                        base.Dispose(isDisposing);
+                        dimParametersBuffer?.Dispose();
+                    }
+
+                    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+                    private record struct DimParameters
+                    {
+                        public UniformVector4 DimColour;
+                    }
+                }
             }
         }
     }

@@ -31,13 +31,7 @@ namespace osu.Game.Graphics.Backgrounds
             this.textureName = textureName;
             RelativeSizeAxes = Axes.Both;
 
-            AddInternal(Sprite = new Sprite
-            {
-                RelativeSizeAxes = Axes.Both,
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                FillMode = FillMode.Fill,
-            });
+            AddInternal(Sprite = CreateSprite());
         }
 
         [BackgroundDependencyLoader]
@@ -47,24 +41,34 @@ namespace osu.Game.Graphics.Backgrounds
                 Sprite.Texture = textures.Get(textureName);
         }
 
+        protected virtual Sprite CreateSprite() => new Sprite
+        {
+            RelativeSizeAxes = Axes.Both,
+            Anchor = Anchor.Centre,
+            Origin = Anchor.Centre,
+            FillMode = FillMode.Fill,
+        };
+
+        protected virtual BufferedContainer CreateBufferedContainer() => new BufferedContainer(cachedFrameBuffer: true)
+        {
+            RelativeSizeAxes = Axes.Both,
+            RedrawOnScale = false,
+            Child = Sprite
+        };
+
         public Vector2 BlurSigma => Vector2.Divide(bufferedContainer?.BlurSigma ?? Vector2.Zero, blurScale);
 
         /// <summary>
         /// Smoothly adjusts <see cref="IBufferedContainer.BlurSigma"/> over time.
         /// </summary>
         /// <returns>A <see cref="TransformSequence{T}"/> to which further transforms can be added.</returns>
-        public void BlurTo(Vector2 newBlurSigma, double duration = 0, Easing easing = Easing.None)
+        public virtual void BlurTo(Vector2 newBlurSigma, double duration = 0, Easing easing = Easing.None)
         {
             if (bufferedContainer == null && newBlurSigma != Vector2.Zero)
             {
                 RemoveInternal(Sprite, false);
 
-                AddInternal(bufferedContainer = new BufferedContainer(cachedFrameBuffer: true)
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    RedrawOnScale = false,
-                    Child = Sprite
-                });
+                AddInternal(bufferedContainer = CreateBufferedContainer());
             }
 
             if (bufferedContainer != null)
