@@ -120,9 +120,9 @@ namespace osu.Game.Screens.Select.Leaderboards
             if (scores == null) return;
 
             if (scores.FailState == null)
-                Schedule(() => SetScores(scores.TopScores, scores.UserScore));
+                SetScores(scores.TopScores, scores.UserScore);
             else
-                Schedule(() => SetErrorState((LeaderboardState)scores.FailState));
+                SetErrorState((LeaderboardState)scores.FailState);
         }
 
         protected override LeaderboardScore CreateDrawableScore(ScoreInfo model, int index) => new LeaderboardScore(model, index, IsOnlineScope, Scope != BeatmapLeaderboardScope.Friend)
