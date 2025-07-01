@@ -352,8 +352,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             else if (usingClassicSliderAccuracy)
             {
                 // If score is not legacy - it doesn't have scorev1, so we're going to use lazer info to get amount of sliderbreaks.
-                // This line also punishes all LTMs as misses,
-                // What makes maps with difficult ticks and reverses (like Oshama Scramble) to be underweight for non-FC scores
+                // This line punishes all LTMs as misses,
+                // What makes maps with difficult ticks and reverses (like Oshama Scramble) to be underweight for non-FC scores,
+                // But there's nothing we can do about it because there's no differentiation between LTMs and slider head misses on CL scores
                 missCount += countSliderTickMiss;
             }
             else
