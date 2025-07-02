@@ -177,7 +177,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Judgements
             PerformTest(new List<ReplayFrame>
             {
                 new TaikoReplayFrame(0),
-                new TaikoReplayFrame(hit_time - hitWindows.WindowFor(HitResult.Great), TaikoAction.LeftCentre),
+                new TaikoReplayFrame(hit_time - (hitWindows.WindowFor(HitResult.Great) + 0.1), TaikoAction.LeftCentre),
             }, beatmap);
 
             AssertJudgementCount(1);
