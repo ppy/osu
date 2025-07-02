@@ -418,8 +418,6 @@ namespace osu.Game.Screens.SelectV2
             if (!this.IsCurrentScreen())
                 return;
 
-            // `ensureGlobalBeatmapValid` also performs this checks, but it will change the active selection on fail.
-            // By checking locally first, we can correctly perform a no-op rather than changing selection.
             if (!checkBeatmapValidForSelection(beatmap, carousel.Criteria))
                 return;
 
@@ -431,9 +429,6 @@ namespace osu.Game.Screens.SelectV2
             Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap, true);
 
             if (Beatmap.IsDefault)
-                return;
-
-            if (!ensureGlobalBeatmapValid())
                 return;
 
             startAction();
@@ -652,7 +647,7 @@ namespace osu.Game.Screens.SelectV2
             // This avoids a flicker of a placeholder or invalid beatmap before a proper selection.
             //
             // After the carousel finishes filtering, it will attempt a selection then call this method again.
-            if (!carouselItemsPresented && !checkBeatmapValidForSelection(Beatmap.Value.BeatmapInfo, filterControl.CreateCriteria()))
+            if (!CarouselItemsPresented && !checkBeatmapValidForSelection(Beatmap.Value.BeatmapInfo, filterControl.CreateCriteria()))
                 return;
 
             if (carousel.VisuallyFocusSelected)
@@ -685,7 +680,10 @@ namespace osu.Game.Screens.SelectV2
 
         #region Filtering
 
-        private bool carouselItemsPresented;
+        /// <summary>
+        /// Whether the carousel has finished initial presentation of beatmap panels.
+        /// </summary>
+        public bool CarouselItemsPresented { get; private set; }
 
         private const double filter_delay = 250;
 
@@ -709,7 +707,7 @@ namespace osu.Game.Screens.SelectV2
             if (carousel.Criteria == null)
                 return;
 
-            carouselItemsPresented = true;
+            CarouselItemsPresented = true;
 
             int count = carousel.MatchedBeatmapsCount;
 
