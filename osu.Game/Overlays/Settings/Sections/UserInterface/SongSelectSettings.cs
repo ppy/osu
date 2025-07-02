@@ -42,12 +42,6 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
                     Current = config.GetBindable<bool>(OsuSetting.ModSelectTextSearchStartsActive),
                     ClassicDefault = false
                 },
-                new SettingsCheckbox
-                {
-                    LabelText = GameplaySettingsStrings.BackgroundBlur,
-                    Current = config.GetBindable<bool>(OsuSetting.SongSelectBackgroundBlur),
-                    ClassicDefault = false,
-                }
             };
         }
     }

@@ -34,7 +34,6 @@ using osu.Game.Overlays.Mods;
 using osu.Game.Overlays.Volume;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play;
@@ -52,7 +51,6 @@ namespace osu.Game.Screens.Select
     {
         public static readonly float WEDGE_HEIGHT = 200;
 
-        protected const float BACKGROUND_BLUR = 20;
         private const float left_area_padding = 20;
 
         public FilterControl FilterControl { get; private set; } = null!;
@@ -156,20 +154,9 @@ namespace osu.Game.Screens.Select
         [Resolved]
         internal IOverlayManager? OverlayManager { get; private set; }
 
-        private Bindable<bool> configBackgroundBlur = null!;
-
         [BackgroundDependencyLoader(true)]
         private void load(AudioManager audio, OsuColour colours, ManageCollectionsDialog? manageCollectionsDialog, DifficultyRecommender? recommender, OsuConfigManager config)
         {
-            configBackgroundBlur = config.GetBindable<bool>(OsuSetting.SongSelectBackgroundBlur);
-            configBackgroundBlur.BindValueChanged(e =>
-            {
-                if (!this.IsCurrentScreen())
-                    return;
-
-                ApplyToBackground(applyBlurToBackground);
-            });
-
             // initial value transfer is required for FilterControl (it uses our re-cached bindables in its async load for the initial filter).
             transferRulesetValue();
 
@@ -880,7 +867,10 @@ namespace osu.Game.Screens.Select
                     backgroundModeBeatmap.IgnoreUserSettings.Value = true;
                     backgroundModeBeatmap.FadeColour(Color4.White, 250);
 
-                    applyBlurToBackground(backgroundModeBeatmap);
+                    backgroundModeBeatmap.BlurAmount.Value = 0f;
+                    backgroundModeBeatmap.DimWhenUserSettingsIgnored.Value = 0.4f;
+
+                    wedgeBackground.FadeTo(0.2f, UserDimContainer.BACKGROUND_FADE_DURATION, Easing.OutQuint);
                 });
             }
 
@@ -903,14 +893,6 @@ namespace osu.Game.Screens.Select
                 beatmapOptionsButton.Enabled.Value = false;
                 BeatmapOptions.Hide();
             }
-        }
-
-        private void applyBlurToBackground(BackgroundScreenBeatmap backgroundModeBeatmap)
-        {
-            backgroundModeBeatmap.BlurAmount.Value = configBackgroundBlur.Value ? BACKGROUND_BLUR : 0f;
-            backgroundModeBeatmap.DimWhenUserSettingsIgnored.Value = configBackgroundBlur.Value ? 0 : 0.4f;
-
-            wedgeBackground.FadeTo(configBackgroundBlur.Value ? 0.5f : 0.2f, UserDimContainer.BACKGROUND_FADE_DURATION, Easing.OutQuint);
         }
 
         private readonly WeakReference<ITrack?> lastTrack = new WeakReference<ITrack?>(null);
