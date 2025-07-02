@@ -247,7 +247,7 @@ namespace osu.Game.Rulesets.Edit
                             Colour = colourProvider.Background5,
                             RelativeSizeAxes = Axes.Both,
                         },
-                        RightToolbox = new ExpandingToolboxContainer(TOOLBOX_CONTRACTED_SIZE_RIGHT, 250)
+                        RightToolbox = new ExpandingToolboxContainer(TOOLBOX_CONTRACTED_SIZE_RIGHT, 180)
                         {
                             Child = new EditorToolboxGroup("inspector")
                             {
@@ -577,7 +577,7 @@ namespace osu.Game.Rulesets.Edit
     public abstract partial class HitObjectComposer : CompositeDrawable
     {
         public const float TOOLBOX_CONTRACTED_SIZE_LEFT = 60;
-        public const float TOOLBOX_CONTRACTED_SIZE_RIGHT = 120;
+        public const float TOOLBOX_CONTRACTED_SIZE_RIGHT = 100;
 
         public readonly Ruleset Ruleset;
 
