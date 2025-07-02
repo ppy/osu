@@ -114,17 +114,25 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             SelectPrevPanel();
             SelectPrevPanel();
 
+            ICarouselPanel? groupPanel = null;
+
+            AddStep("get group panel", () => groupPanel = GetKeyboardSelectedPanel());
+
             AddAssert("keyboard selected panel is expanded", () => GetKeyboardSelectedPanel()?.Expanded.Value, () => Is.True);
+            AddAssert("keyboard selected panel is group", GetKeyboardSelectedPanel, () => Is.EqualTo(groupPanel));
 
             SelectPrevSet();
 
             WaitForBeatmapSelection(0, 1);
             AddAssert("keyboard selected panel is contracted", () => GetKeyboardSelectedPanel()?.Expanded.Value, () => Is.False);
+            AddAssert("keyboard selected panel is group", GetKeyboardSelectedPanel, () => Is.EqualTo(groupPanel));
 
             SelectPrevSet();
 
             WaitForBeatmapSelection(0, 1);
-            AddAssert("keyboard selected panel is expanded", () => GetKeyboardSelectedPanel()?.Expanded.Value, () => Is.True);
+            // Expanding a group will move keyboard selection to the selected beatmap if contained.
+            AddAssert("keyboard selected panel is expanded", () => groupPanel?.Expanded.Value, () => Is.True);
+            AddAssert("keyboard selected panel is beatmap", () => GetKeyboardSelectedPanel()?.Item?.Model, Is.TypeOf<BeatmapInfo>);
         }
 
         [Test]
