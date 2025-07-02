@@ -17,7 +17,6 @@ using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play;
-using static osu.Game.Rulesets.Osu.Objects.SliderTailCircle;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
@@ -87,7 +86,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             public override Judgement CreateJudgement() => new StrictTrackingTailJudgement();
         }
 
-        public class StrictTrackingTailJudgement : TailJudgement
+        public class StrictTrackingTailJudgement : SliderTailCircle.TailJudgement
         {
             public override HitResult MinResult => HitResult.LargeTickMiss;
         }
