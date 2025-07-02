@@ -178,7 +178,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             aimStrain += velocityChangeBonus * velocity_change_multiplier;
 
             // Add in acute angle bonus or wide angle bonus, whichever is larger.
-            aimStrain += Math.Max(currVelocity + Math.Max(acuteAngleBonus * acute_angle_multiplier, wideAngleBonus * wide_angle_multiplier), travelVelocity + movementVelocity + Math.Max(acuteSliderAngleBonus * acute_angle_multiplier, wideSliderAngleBonus * wide_angle_multiplier));
+            aimStrain += Math.Max(
+                currVelocity +
+                Math.Max(acuteAngleBonus * acute_angle_multiplier, wideAngleBonus * wide_angle_multiplier),
+                travelVelocity + movementVelocity +
+                Math.Max(acuteSliderAngleBonus * acute_angle_multiplier, wideSliderAngleBonus * wide_angle_multiplier
+                ));
 
             // Add in additional slider velocity bonus.
             if (withSliderTravelDistance)
