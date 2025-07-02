@@ -29,6 +29,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
         protected new OsuHitObject BaseObject => (OsuHitObject)base.BaseObject;
         protected new OsuHitObject LastObject => (OsuHitObject)base.LastObject;
+        protected new OsuHitObject LastLastObject => (OsuHitObject)base.LastObject;
 
         /// <summary>
         /// Milliseconds elapsed since the start time of the previous <see cref="OsuDifficultyHitObject"/>, with a minimum of 25ms.
@@ -99,6 +100,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// Calculated as the angle between the circles (current-2, current-1, current).
         /// </summary>
         public double? Angle { get; private set; }
+
+        /// <summary>
+        /// Angle the player has to take to hit this <see cref="OsuDifficultyHitObject"/>.
+        /// Calculated as the angle between the last slider head, last slider tail, and current circle.
+        /// </summary>
+        public double? SliderAngle1 { get; private set; }
+
+        /// <summary>
+        /// Angle the player has to take to hit this <see cref="OsuDifficultyHitObject"/>.
+        /// Calculated as the angle between the last last object, last slider head, and last slider tail.
+        /// </summary>
+        public double? SliderAngle2 { get; private set; }
 
         /// <summary>
         /// Retrieves the full hit window for a Great <see cref="HitResult"/>.
@@ -242,12 +255,33 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 Vector2 lastLastCursorPosition = getEndCursorPosition(lastLastDifficultyObject);
 
                 Vector2 v1 = lastLastCursorPosition - LastObject.StackedPosition;
-                Vector2 v2 = BaseObject.StackedPosition - lastCursorPosition;
+                Vector2 v2 = BaseObject.StackedPosition - LastObject.StackedPosition;
 
                 float dot = Vector2.Dot(v1, v2);
                 float det = v1.X * v2.Y - v1.Y * v2.X;
 
                 Angle = Math.Abs(Math.Atan2(det, dot));
+            }
+
+            if (lastLastDifficultyObject != null && lastLastDifficultyObject.BaseObject is not Spinner && lastDifficultyObject?.BaseObject is Slider)
+            {
+                Vector2 v1 = LastObject.StackedPosition - lastCursorPosition;
+                Vector2 v2 = BaseObject.StackedPosition - lastCursorPosition;
+
+                float dot = Vector2.Dot(v1, v2);
+                float det = v1.X * v2.Y - v1.Y * v2.X;
+
+                SliderAngle1 = Math.Abs(Math.Atan2(det, dot));
+
+                Vector2 lastLastCursorPosition = getEndCursorPosition(lastLastDifficultyObject);
+
+                v1 = lastLastCursorPosition - LastObject.StackedPosition;
+                v2 = lastCursorPosition - LastObject.StackedPosition;
+
+                dot = Vector2.Dot(v1, v2);
+                det = v1.X * v2.Y - v1.Y * v2.X;
+
+                SliderAngle2 = Math.Abs(Math.Atan2(det, dot));
             }
         }
 
