@@ -120,7 +120,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 }
             }
 
-            if (osuLastObj.BaseObject is Slider && withSliderTravelDistance && osuCurrObj.SliderAngle1 != null)
+            if (osuLastObj.BaseObject is Slider && withSliderTravelDistance && osuCurrObj.SliderAngle1 != null && osuCurrObj.SliderAngle2 != null)
             {
                 double currAngle = osuCurrObj.SliderAngle1.Value;
                 double lastAngle = osuCurrObj.SliderAngle2.Value;
