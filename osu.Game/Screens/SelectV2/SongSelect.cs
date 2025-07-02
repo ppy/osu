@@ -434,8 +434,6 @@ namespace osu.Game.Screens.SelectV2
             if (!this.IsCurrentScreen())
                 return;
 
-            // `ensureGlobalBeatmapValid` also performs this checks, but it will change the active selection on fail.
-            // By checking locally first, we can correctly perform a no-op rather than changing selection.
             if (!checkBeatmapValidForSelection(beatmap, carousel.Criteria))
                 return;
 
