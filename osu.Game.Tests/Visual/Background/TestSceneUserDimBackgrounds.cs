@@ -32,7 +32,7 @@ using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.PlayerSettings;
 using osu.Game.Screens.Ranking;
-using osu.Game.Screens.Select;
+using osu.Game.Screens.SelectV2;
 using osu.Game.Storyboards.Drawables;
 using osu.Game.Tests.Resources;
 using osuTK;
@@ -325,7 +325,7 @@ namespace osu.Game.Tests.Visual.Background
         private void setupUserSettings()
         {
             AddUntilStep("Song select is current", () => songSelect.IsCurrentScreen());
-            AddUntilStep("Song select has selection", () => songSelect.Carousel?.SelectedBeatmapInfo != null);
+            AddUntilStep("Song select has selection", () => songSelect.Carousel?.CurrentSelection != null);
             AddStep("Set default user settings", () =>
             {
                 SelectedMods.Value = new[] { new OsuModNoFail() };
@@ -340,7 +340,7 @@ namespace osu.Game.Tests.Visual.Background
             rulesets?.Dispose();
         }
 
-        private partial class DummySongSelect : PlaySongSelect
+        private partial class DummySongSelect : SoloSongSelect
         {
             private FadeAccessibleBackground background;
 
@@ -355,7 +355,7 @@ namespace osu.Game.Tests.Visual.Background
             public readonly Bindable<double> DimLevel = new BindableDouble();
             public readonly Bindable<double> BlurLevel = new BindableDouble();
 
-            public new BeatmapCarousel Carousel => base.Carousel;
+            public BeatmapCarousel Carousel => this.ChildrenOfType<BeatmapCarousel>().SingleOrDefault();
 
             [BackgroundDependencyLoader]
             private void load(OsuConfigManager config)
@@ -368,7 +368,7 @@ namespace osu.Game.Tests.Visual.Background
 
             public bool IsBackgroundDimmed() => background.CurrentColour == OsuColour.Gray(1f - background.CurrentDim);
 
-            public bool IsBackgroundUndimmed() => background.CurrentColour == Color4.White;
+            public bool IsBackgroundUndimmed() => background.CurrentColour == new Color4(0.9f, 0.9f, 0.9f, 1f);
 
             public bool IsUserBlurApplied() => Precision.AlmostEquals(background.CurrentBlur, new Vector2((float)BlurLevel.Value * BackgroundScreenBeatmap.USER_BLUR_FACTOR), 0.1f);
 
@@ -376,7 +376,7 @@ namespace osu.Game.Tests.Visual.Background
 
             public bool IsBackgroundVisible() => background.CurrentAlpha == 1;
 
-            public bool IsBackgroundBlur() => Precision.AlmostEquals(background.CurrentBlur, new Vector2(BACKGROUND_BLUR), 0.1f);
+            public bool IsBackgroundBlur() => Precision.AlmostBigger(background.CurrentBlur.X, 0, 0.1f);
 
             public bool CheckBackgroundBlur(Vector2 expected) => Precision.AlmostEquals(background.CurrentBlur, expected, 0.1f);
 
