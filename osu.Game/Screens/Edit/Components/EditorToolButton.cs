@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
@@ -41,6 +42,9 @@ namespace osu.Game.Screens.Edit.Components
             this.createPopover = createPopover;
 
             RelativeSizeAxes = Axes.X;
+            Height = 30;
+
+            Content.CornerRadius = 3;
         }
 
         [BackgroundDependencyLoader]
@@ -57,8 +61,8 @@ namespace osu.Game.Screens.Edit.Components
                 b.Blending = BlendingParameters.Additive;
                 b.Anchor = Anchor.CentreLeft;
                 b.Origin = Anchor.CentreLeft;
-                b.Size = new Vector2(20);
-                b.X = 10;
+                b.Size = new Vector2(14);
+                b.X = 8;
             }));
 
             Action = Selected.Toggle;
@@ -90,7 +94,8 @@ namespace osu.Game.Screens.Edit.Components
             Depth = -1,
             Origin = Anchor.CentreLeft,
             Anchor = Anchor.CentreLeft,
-            X = 40f
+            X = 30f,
+            Font = OsuFont.Style.Caption2
         };
 
         public Popover? GetPopover() => Enabled.Value
