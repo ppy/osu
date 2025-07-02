@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
     {
         private const double wide_angle_multiplier = 1.5;
         private const double acute_angle_multiplier = 2.55;
-        private const double slider_multiplier = 2.35;
+        private const double slider_multiplier = 2.00;
         private const double velocity_change_multiplier = 0.75;
         private const double wiggle_multiplier = 1.02;
 
@@ -123,7 +123,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             if (osuLastObj.BaseObject is Slider && withSliderTravelDistance && osuCurrObj.SliderAngle1 != null)
             {
                 double currAngle = osuCurrObj.SliderAngle1.Value;
-                double lastAngle = osuCurrObj.SliderAngle1.Value;
+                double lastAngle = osuCurrObj.SliderAngle2.Value;
 
                 // Rewarding angles, take the smaller velocity as base.
                 double angleBonus = Math.Min(movementVelocity, travelVelocity);
