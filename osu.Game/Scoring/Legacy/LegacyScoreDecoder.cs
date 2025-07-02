@@ -110,6 +110,9 @@ namespace osu.Game.Scoring.Legacy
                 else if (version >= 20121008)
                     scoreInfo.LegacyOnlineID = sr.ReadInt32();
 
+                if (scoreInfo.LegacyOnlineID == 0)
+                    scoreInfo.LegacyOnlineID = -1;
+
                 byte[] compressedScoreInfo = null;
 
                 if (version >= 30000001)
@@ -283,7 +286,23 @@ namespace osu.Game.Scoring.Legacy
                 // In mania, mouseX encodes the pressed keys in the lower 20 bits
                 int mouseXParseLimit = currentRuleset.RulesetInfo.OnlineID == 3 ? (1 << 20) - 1 : Parsing.MAX_COORDINATE_VALUE;
 
-                int diff = Parsing.ParseInt(split[0]);
+                // the legacy replay format as defined by stable expects frame delta times
+                // ('delta time' here meaning the amount of time between consecutive frames)
+                // to be integral and does not allow fractional values.
+                // one particular reason why this matters is that integral deltas
+                // avoid nasty floating point traps like accumulation error from summation or round-off error.
+                // however, there was a period in lazer's lifetime wherein lazer emitted replays
+                // with fractional (float) frame deltas, up until https://github.com/ppy/osu/pull/12583.
+                // despite the fact that gameplay mechanics changed multiple times since
+                // and the replay isn't going to play back anywhere near accurately anyway,
+                // no mistakes are ever forgiven, thus this attempts to parse the delta as an integer once,
+                // and if that fails, tries again as float.
+                // notably this cannot just be `(int)Parsing.ParseFloat(split[0])`, because that can lose information
+                // (`float` numbers have 24 bits of significand precision, which is not enough to accurately represent every possible value of `int`).
+                int diff;
+                if (!int.TryParse(split[0], out diff))
+                    diff = (int)Math.Round(Parsing.ParseFloat(split[0]));
+
                 float mouseX = Parsing.ParseFloat(split[1], mouseXParseLimit);
                 float mouseY = Parsing.ParseFloat(split[2], Parsing.MAX_COORDINATE_VALUE);
 

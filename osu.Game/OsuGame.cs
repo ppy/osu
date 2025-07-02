@@ -227,6 +227,8 @@ namespace osu.Game
 
         private Bindable<string> configSkin;
 
+        private RealmDetachedBeatmapStore detachedBeatmapStore;
+
         private readonly string[] args;
 
         private readonly List<OsuFocusedOverlayContainer> focusedOverlays = new List<OsuFocusedOverlayContainer>();
@@ -311,6 +313,8 @@ namespace osu.Game
         {
             foreach (var overlay in focusedOverlays)
                 overlay.Hide();
+
+            ScreenFooter.ActiveOverlay?.Hide();
 
             if (hideToolbar) Toolbar.Hide();
         }
@@ -1000,6 +1004,10 @@ namespace osu.Game
 
         protected override void Dispose(bool isDisposing)
         {
+            // Without this, tests may deadlock due to cancellation token not becoming cancelled before disposal.
+            // To reproduce, run `TestSceneButtonSystemNavigation` ensuring `TestConstructor` runs before `TestFastShortcutKeys`.
+            detachedBeatmapStore?.Dispose();
+
             base.Dispose(isDisposing);
             SentryLogger.Dispose();
         }
@@ -1243,7 +1251,7 @@ namespace osu.Game
             loadComponentSingleFile(new MedalOverlay(), topMostOverlayContent.Add);
 
             loadComponentSingleFile(new BackgroundDataStoreProcessor(), Add);
-            loadComponentSingleFile<BeatmapStore>(new RealmDetachedBeatmapStore(), Add, true);
+            loadComponentSingleFile<BeatmapStore>(detachedBeatmapStore = new RealmDetachedBeatmapStore(), Add, true);
 
             Add(externalLinkOpener = new ExternalLinkOpener());
             Add(new MusicKeyBindingHandler());

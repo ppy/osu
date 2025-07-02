@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -103,6 +105,8 @@ namespace osu.Game.Screens.SelectV2
 
         public override bool ShowFooter => true;
 
+        private Sample? errorSample;
+
         [Resolved]
         private OsuGameBase? game { get; set; }
 
@@ -128,8 +132,10 @@ namespace osu.Game.Screens.SelectV2
         private IDialogOverlay? dialogOverlay { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(AudioManager audio)
         {
+            errorSample = audio.Samples.Get(@"UI/generic-error");
+
             AddRangeInternal(new Drawable[]
             {
                 new GlobalScrollAdjustsVolume(),
@@ -233,8 +239,8 @@ namespace osu.Game.Screens.SelectV2
                                                                 BleedBottom = ScreenFooter.HEIGHT + 5,
                                                                 RelativeSizeAxes = Axes.Both,
                                                                 RequestPresentBeatmap = b => SelectAndRun(b, OnStart),
-                                                                RequestSelection = selectBeatmap,
-                                                                RequestRecommendedSelection = selectRecommendedBeatmap,
+                                                                RequestSelection = queueBeatmapSelection,
+                                                                RequestRecommendedSelection = b => queueBeatmapSelection(difficultyRecommender?.GetRecommendedBeatmap(b) ?? b.First()),
                                                                 NewItemsPresented = newItemsPresented,
                                                             },
                                                             noResultsPlaceholder = new NoResultsPlaceholder
@@ -286,8 +292,16 @@ namespace osu.Game.Screens.SelectV2
             },
             new FooterButtonRandom
             {
-                NextRandom = () => carousel.NextRandom(),
-                PreviousRandom = () => carousel.PreviousRandom()
+                NextRandom = () =>
+                {
+                    if (!carousel.NextRandom())
+                        errorSample?.Play();
+                },
+                PreviousRandom = () =>
+                {
+                    if (!carousel.PreviousRandom())
+                        errorSample?.Play();
+                }
             },
             new FooterButtonOptions
             {
@@ -388,22 +402,6 @@ namespace osu.Game.Screens.SelectV2
         private void ensureTrackLooping(IWorkingBeatmap beatmap, TrackChangeDirection changeDirection)
             => beatmap.PrepareTrackForPreview(true);
 
-        private IDisposable? trackDuck;
-
-        private void attachTrackDuckingIfShould()
-        {
-            bool shouldDuck = noResultsPlaceholder.State.Value == Visibility.Visible;
-
-            if (shouldDuck && trackDuck == null)
-                trackDuck = music.Duck(new DuckParameters { DuckVolumeTo = 1, DuckCutoffTo = 500 });
-        }
-
-        private void detachTrackDucking()
-        {
-            trackDuck?.Dispose();
-            trackDuck = null;
-        }
-
         #endregion
 
         #region Selection handling
@@ -417,15 +415,15 @@ namespace osu.Game.Screens.SelectV2
         /// <param name="startAction">The action to perform if conditions are met to be able to proceed. May not be invoked if in an invalid state.</param>
         public void SelectAndRun(BeatmapInfo beatmap, Action startAction)
         {
-            selectionDebounce?.Cancel();
-
             if (!this.IsCurrentScreen())
                 return;
 
-            // `ensureGlobalBeatmapValid` also performs this checks, but it will change the active selection on fail.
-            // By checking locally first, we can correctly perform a no-op rather than changing selection.
             if (!checkBeatmapValidForSelection(beatmap, carousel.Criteria))
                 return;
+
+            // To ensure sanity, cancel any pending selection as we are about to force a selection.
+            // Carousel selection will update to the forced selection via a call of `ensureGlobalBeatmapValid` below, or when song select becomes current again.
+            selectionDebounce?.Cancel();
 
             // Forced refetch is important here to guarantee correct invalidation across all difficulties (editor specific).
             Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap, true);
@@ -433,18 +431,21 @@ namespace osu.Game.Screens.SelectV2
             if (Beatmap.IsDefault)
                 return;
 
-            if (!ensureGlobalBeatmapValid())
-                return;
-
             startAction();
         }
 
-        private void selectRecommendedBeatmap(IEnumerable<BeatmapInfo> beatmaps)
-        {
-            selectBeatmap(difficultyRecommender?.GetRecommendedBeatmap(beatmaps) ?? beatmaps.First());
-        }
-
-        private void selectBeatmap(BeatmapInfo beatmap)
+        /// <summary>
+        /// Prepares the proposed beatmap for global selection based on a carousel user-performed action.
+        /// </summary>
+        /// <remarks>
+        /// Calling this method will:
+        /// - Immediately update the selection the carousel.
+        /// - After <see cref="SELECTION_DEBOUNCE"/>, update the global beatmap. This in turn causes song select visuals (title, details, leaderboard) to update.
+        ///   This debounce is intended to avoid high overheads from churning lookups while a user is changing selection via rapid keyboard operations.
+        ///   To complete the operation immediately, call <see cref="finaliseBeatmapSelection"/>.
+        /// </remarks>
+        /// <param name="beatmap">The beatmap to be selected.</param>
+        private void queueBeatmapSelection(BeatmapInfo beatmap)
         {
             if (!this.IsCurrentScreen())
                 return;
@@ -462,10 +463,21 @@ namespace osu.Game.Screens.SelectV2
             }, SELECTION_DEBOUNCE);
         }
 
+        /// <summary>
+        /// If any pending selection exists from <see cref="queueBeatmapSelection"/>, run it immediately.
+        /// </summary>
+        private void finaliseBeatmapSelection()
+        {
+            if (selectionDebounce?.State == ScheduledDelegate.RunState.Waiting)
+                selectionDebounce?.RunTask();
+        }
+
         private bool ensureGlobalBeatmapValid()
         {
             if (!this.IsCurrentScreen())
                 return false;
+
+            finaliseBeatmapSelection();
 
             // While filtering, let's not ever attempt to change selection.
             // This will be resolved after the filter completes, see `newItemsPresented`.
@@ -480,8 +492,7 @@ namespace osu.Game.Screens.SelectV2
             if (Beatmap.IsDefault || !validSelection)
             {
                 validSelection = carousel.NextRandom();
-                if (selectionDebounce?.State == ScheduledDelegate.RunState.Waiting)
-                    selectionDebounce?.RunTask();
+                finaliseBeatmapSelection();
             }
 
             if (validSelection)
@@ -572,7 +583,6 @@ namespace osu.Game.Screens.SelectV2
             updateWedgeVisibility();
 
             beginLooping();
-            attachTrackDuckingIfShould();
 
             ensureGlobalBeatmapValid();
 
@@ -590,7 +600,6 @@ namespace osu.Game.Screens.SelectV2
             updateWedgeVisibility();
 
             endLooping();
-            detachTrackDucking();
         }
 
         protected override void LogoArriving(OsuLogo logo, bool resuming)
@@ -638,7 +647,7 @@ namespace osu.Game.Screens.SelectV2
             // This avoids a flicker of a placeholder or invalid beatmap before a proper selection.
             //
             // After the carousel finishes filtering, it will attempt a selection then call this method again.
-            if (!carouselItemsPresented && !checkBeatmapValidForSelection(Beatmap.Value.BeatmapInfo, filterControl.CreateCriteria()))
+            if (!CarouselItemsPresented && !checkBeatmapValidForSelection(Beatmap.Value.BeatmapInfo, filterControl.CreateCriteria()))
                 return;
 
             if (carousel.VisuallyFocusSelected)
@@ -671,7 +680,10 @@ namespace osu.Game.Screens.SelectV2
 
         #region Filtering
 
-        private bool carouselItemsPresented;
+        /// <summary>
+        /// Whether the carousel has finished initial presentation of beatmap panels.
+        /// </summary>
+        public bool CarouselItemsPresented { get; private set; }
 
         private const double filter_delay = 250;
 
@@ -695,7 +707,7 @@ namespace osu.Game.Screens.SelectV2
             if (carousel.Criteria == null)
                 return;
 
-            carouselItemsPresented = true;
+            CarouselItemsPresented = true;
 
             int count = carousel.MatchedBeatmapsCount;
 
@@ -716,17 +728,30 @@ namespace osu.Game.Screens.SelectV2
 
             if (count == 0)
             {
+                if (noResultsPlaceholder.State.Value == Visibility.Hidden)
+                {
+                    // Duck audio temporarily when the no results placeholder becomes visible.
+                    //
+                    // Temporary ducking makes it easier to avoid scenarios where the ducking interacts badly
+                    // with other global UI components (like overlays).
+                    music.DuckMomentarily(400, new DuckParameters
+                    {
+                        DuckVolumeTo = 1,
+                        DuckCutoffTo = 500,
+                        DuckDuration = 250,
+                        RestoreDuration = 2000,
+                    });
+                }
+
                 noResultsPlaceholder.Show();
                 noResultsPlaceholder.Filter = carousel.Criteria!;
 
-                attachTrackDuckingIfShould();
                 rightGradientBackground.ResizeWidthTo(3, 1000, Easing.OutPow10);
             }
             else
             {
                 noResultsPlaceholder.Hide();
 
-                detachTrackDucking();
                 rightGradientBackground.ResizeWidthTo(1, 400, Easing.OutPow10);
             }
         }
@@ -904,7 +929,7 @@ namespace osu.Game.Screens.SelectV2
 
             collectionItems.Add(new OsuMenuItem("Manage...", MenuItemType.Standard, () => manageCollectionsDialog?.Show()));
 
-            yield return new OsuMenuItem("Collections") { Items = collectionItems };
+            yield return new OsuMenuItem(CommonStrings.Collections) { Items = collectionItems };
         }
 
         public void ManageCollections() => collectionsDialog?.Show();

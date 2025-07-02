@@ -28,7 +28,6 @@ using osu.Game.Scoring;
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Screens.SelectV2;
 using osu.Game.Tests.Resources;
-using osu.Game.Tests.Visual.SongSelect;
 using osu.Game.Users;
 using osuTK.Input;
 
@@ -118,8 +117,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         {
             setScope(BeatmapLeaderboardScope.Global);
 
-            AddStep(@"New Scores", () => leaderboard.SetScores(TestSceneBeatmapLeaderboard.GenerateSampleScores(new BeatmapInfo())));
-            AddStep(@"New Scores with teams", () => leaderboard.SetScores(TestSceneBeatmapLeaderboard.GenerateSampleScores(new BeatmapInfo()).Select(s =>
+            AddStep(@"New Scores", () => leaderboard.SetScores(GenerateSampleScores(new BeatmapInfo())));
+            AddStep(@"New Scores with teams", () => leaderboard.SetScores(GenerateSampleScores(new BeatmapInfo()).Select(s =>
             {
                 s.User.Team = new APITeam();
                 return s;
@@ -150,7 +149,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [Test]
         public void TestUseTheseModsDoesNotCopySystemMods()
         {
-            AddStep(@"set scores", () => leaderboard.SetScores(TestSceneBeatmapLeaderboard.GenerateSampleScores(new BeatmapInfo()), new ScoreInfo
+            AddStep(@"set scores", () => leaderboard.SetScores(GenerateSampleScores(new BeatmapInfo()), new ScoreInfo
             {
                 OnlineID = 1337,
                 Position = 999,
@@ -297,7 +296,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
         private void showPersonalBestWithNullPosition()
         {
-            leaderboard.SetScores(TestSceneBeatmapLeaderboard.GenerateSampleScores(new BeatmapInfo()), new ScoreInfo
+            leaderboard.SetScores(GenerateSampleScores(new BeatmapInfo()), new ScoreInfo
             {
                 OnlineID = 1337,
                 Rank = ScoreRank.XH,
@@ -318,7 +317,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
         private void showPersonalBest()
         {
-            leaderboard.SetScores(TestSceneBeatmapLeaderboard.GenerateSampleScores(new BeatmapInfo()), new ScoreInfo
+            leaderboard.SetScores(GenerateSampleScores(new BeatmapInfo()), new ScoreInfo
             {
                 OnlineID = 1337,
                 Position = 999,
@@ -347,7 +346,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         {
             AddStep(@"Import new scores", () =>
             {
-                foreach (var score in TestSceneBeatmapLeaderboard.GenerateSampleScores(beatmapInfo()))
+                foreach (var score in GenerateSampleScores(beatmapInfo()))
                     scoreManager.Import(score);
             });
         }
@@ -367,6 +366,217 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         {
             public new void SetState(LeaderboardState state) => base.SetState(state);
             public new void SetScores(IEnumerable<ScoreInfo> scores, ScoreInfo? userScore = null, int? totalCount = null) => base.SetScores(scores, userScore, totalCount);
+        }
+
+        public static ScoreInfo[] GenerateSampleScores(BeatmapInfo beatmapInfo)
+        {
+            return new[]
+            {
+                new ScoreInfo
+                {
+                    Rank = ScoreRank.XH,
+                    Accuracy = 1,
+                    MaxCombo = 244,
+                    TotalScore = 1707827,
+                    Date = DateTime.Now,
+                    Mods = new Mod[]
+                    {
+                        new OsuModHidden(),
+                        new OsuModFlashlight
+                        {
+                            FollowDelay = { Value = 200 },
+                            SizeMultiplier = { Value = 5 },
+                        },
+                        new OsuModDifficultyAdjust
+                        {
+                            CircleSize = { Value = 11 },
+                            ApproachRate = { Value = 10 },
+                            OverallDifficulty = { Value = 10 },
+                            DrainRate = { Value = 10 },
+                            ExtendedLimits = { Value = true }
+                        }
+                    },
+                    Ruleset = new OsuRuleset().RulesetInfo,
+                    BeatmapInfo = beatmapInfo,
+                    BeatmapHash = beatmapInfo.Hash,
+                    User = new APIUser
+                    {
+                        Id = 6602580,
+                        Username = @"waaiiru",
+                        CountryCode = CountryCode.ES,
+                    },
+                },
+                new ScoreInfo
+                {
+                    Rank = ScoreRank.X,
+                    Accuracy = 1,
+                    MaxCombo = 244,
+                    TotalScore = 1707827,
+                    Date = DateTime.Now.AddSeconds(-30),
+                    Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
+                    BeatmapInfo = beatmapInfo,
+                    BeatmapHash = beatmapInfo.Hash,
+                    Ruleset = new OsuRuleset().RulesetInfo,
+                    User = new APIUser
+                    {
+                        Id = 4608074,
+                        Username = @"Skycries",
+                        CountryCode = CountryCode.BR,
+                    },
+                },
+                new ScoreInfo
+                {
+                    Rank = ScoreRank.SH,
+                    Accuracy = 1,
+                    MaxCombo = 244,
+                    TotalScore = 1707827,
+                    Date = DateTime.Now.AddSeconds(-70),
+                    Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
+                    BeatmapInfo = beatmapInfo,
+                    BeatmapHash = beatmapInfo.Hash,
+                    Ruleset = new OsuRuleset().RulesetInfo,
+
+                    User = new APIUser
+                    {
+                        Id = 1014222,
+                        Username = @"eLy",
+                        CountryCode = CountryCode.JP,
+                    },
+                },
+                new ScoreInfo
+                {
+                    Rank = ScoreRank.S,
+                    Accuracy = 1,
+                    MaxCombo = 244,
+                    TotalScore = 1707827,
+                    Date = DateTime.Now.AddMinutes(-40),
+                    Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
+                    BeatmapInfo = beatmapInfo,
+                    BeatmapHash = beatmapInfo.Hash,
+                    Ruleset = new OsuRuleset().RulesetInfo,
+
+                    User = new APIUser
+                    {
+                        Id = 1541390,
+                        Username = @"Toukai",
+                        CountryCode = CountryCode.CA,
+                    },
+                },
+                new ScoreInfo
+                {
+                    Rank = ScoreRank.A,
+                    Accuracy = 1,
+                    MaxCombo = 244,
+                    TotalScore = 1707827,
+                    Date = DateTime.Now.AddHours(-2),
+                    Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
+                    BeatmapInfo = beatmapInfo,
+                    BeatmapHash = beatmapInfo.Hash,
+                    Ruleset = new OsuRuleset().RulesetInfo,
+
+                    User = new APIUser
+                    {
+                        Id = 2243452,
+                        Username = @"Satoruu",
+                        CountryCode = CountryCode.VE,
+                    },
+                },
+                new ScoreInfo
+                {
+                    Rank = ScoreRank.B,
+                    Accuracy = 0.9826,
+                    MaxCombo = 244,
+                    TotalScore = 1707827,
+                    Date = DateTime.Now.AddHours(-25),
+                    Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
+                    BeatmapInfo = beatmapInfo,
+                    BeatmapHash = beatmapInfo.Hash,
+                    Ruleset = new OsuRuleset().RulesetInfo,
+
+                    User = new APIUser
+                    {
+                        Id = 2705430,
+                        Username = @"Mooha",
+                        CountryCode = CountryCode.FR,
+                    },
+                },
+                new ScoreInfo
+                {
+                    Rank = ScoreRank.C,
+                    Accuracy = 0.9654,
+                    MaxCombo = 244,
+                    TotalScore = 1707827,
+                    Date = DateTime.Now.AddHours(-50),
+                    Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
+                    BeatmapInfo = beatmapInfo,
+                    BeatmapHash = beatmapInfo.Hash,
+                    Ruleset = new OsuRuleset().RulesetInfo,
+
+                    User = new APIUser
+                    {
+                        Id = 7151382,
+                        Username = @"Mayuri Hana",
+                        CountryCode = CountryCode.TH,
+                    },
+                },
+                new ScoreInfo
+                {
+                    Rank = ScoreRank.D,
+                    Accuracy = 0.6025,
+                    MaxCombo = 244,
+                    TotalScore = 1707827,
+                    Date = DateTime.Now.AddHours(-72),
+                    Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
+                    BeatmapInfo = beatmapInfo,
+                    BeatmapHash = beatmapInfo.Hash,
+                    Ruleset = new OsuRuleset().RulesetInfo,
+
+                    User = new APIUser
+                    {
+                        Id = 2051389,
+                        Username = @"FunOrange",
+                        CountryCode = CountryCode.CA,
+                    },
+                },
+                new ScoreInfo
+                {
+                    Rank = ScoreRank.D,
+                    Accuracy = 0.5140,
+                    MaxCombo = 244,
+                    TotalScore = 1707827,
+                    Date = DateTime.Now.AddMonths(-10),
+                    Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
+                    BeatmapInfo = beatmapInfo,
+                    BeatmapHash = beatmapInfo.Hash,
+                    Ruleset = new OsuRuleset().RulesetInfo,
+
+                    User = new APIUser
+                    {
+                        Id = 6169483,
+                        Username = @"-Hebel-",
+                        CountryCode = CountryCode.MX,
+                    },
+                },
+                new ScoreInfo
+                {
+                    Rank = ScoreRank.D,
+                    Accuracy = 0.4222,
+                    MaxCombo = 244,
+                    TotalScore = 1707827,
+                    Date = DateTime.Now.AddYears(-2),
+                    Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
+                    BeatmapInfo = beatmapInfo,
+                    BeatmapHash = beatmapInfo.Hash,
+                    Ruleset = new OsuRuleset().RulesetInfo,
+
+                    User = new APIUser
+                    {
+                        Id = 6702666,
+                        Username = @"prhtnsm",
+                        CountryCode = CountryCode.DE,
+                    },
+                },
+            };
         }
     }
 }
