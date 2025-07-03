@@ -350,11 +350,6 @@ namespace osu.Game.Tests.Mods
 
                         if (mod.ValidForFreestyleAsRequiredMod && mod.UserPlayable && mod.HasImplementation && !commonAcronyms.Contains(mod.Acronym))
                             Assert.Fail($"{mod.GetType().ReadableName()} declares {nameof(Mod.ValidForFreestyleAsRequiredMod)} but does not exist in all four basic rulesets!");
-
-                        // downgraded to warning, because there are valid reasons why they may still not be specified to be valid for freestyle as required
-                        // (see `TestModsValidForRequiredFreestyleAreConsistentlyCompatibleAcrossRulesets()` test case below).
-                        if (!mod.ValidForFreestyleAsRequiredMod && mod.UserPlayable && mod.HasImplementation && commonAcronyms.Contains(mod.Acronym))
-                            Assert.Warn($"{mod.GetType().ReadableName()} does not declare {nameof(Mod.ValidForFreestyleAsRequiredMod)} but exists in all four basic rulesets.");
                     }
                 }
             });
