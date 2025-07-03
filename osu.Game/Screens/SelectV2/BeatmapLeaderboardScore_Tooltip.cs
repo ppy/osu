@@ -117,7 +117,7 @@ namespace osu.Game.Screens.SelectV2
                         relativeDate.Date = value.Date;
 
                         var judgementsStatistics = value.GetStatisticsForDisplay().Select(s =>
-                            new StatisticRow(s.DisplayName.ToUpper(), colours.ForHitResult(s.Result), s.Count.ToLocalisableString("N0")));
+                            new StatisticRow(s.DisplayName.ToUpper(), s.Count.ToLocalisableString("N0"), colours.ForHitResult(s.Result)));
 
                         double multiplier = 1.0;
 
@@ -126,10 +126,10 @@ namespace osu.Game.Screens.SelectV2
 
                         var generalStatistics = new[]
                         {
-                            new PerformanceStatisticRow(BeatmapsetsStrings.ShowScoreboardHeaderspp.ToUpper(), colourProvider.Content2, score),
-                            new StatisticRow(ModSelectOverlayStrings.ScoreMultiplier, colourProvider.Content2, ModUtils.FormatScoreMultiplier(multiplier)),
-                            new StatisticRow(BeatmapsetsStrings.ShowScoreboardHeadersCombo, colourProvider.Content2, value.MaxCombo.ToLocalisableString(@"0\x")),
-                            new StatisticRow(BeatmapsetsStrings.ShowScoreboardHeadersAccuracy, colourProvider.Content2, value.Accuracy.FormatAccuracy()),
+                            new PerformanceStatisticRow(BeatmapsetsStrings.ShowScoreboardHeaderspp.ToUpper(), score),
+                            new StatisticRow(ModSelectOverlayStrings.ScoreMultiplier, ModUtils.FormatScoreMultiplier(multiplier)),
+                            new StatisticRow(BeatmapsetsStrings.ShowScoreboardHeadersCombo, value.MaxCombo.ToLocalisableString(@"0\x")),
+                            new StatisticRow(BeatmapsetsStrings.ShowScoreboardHeadersAccuracy, value.Accuracy.FormatAccuracy()),
                         };
 
                         statistics.ChildrenEnumerable = judgementsStatistics
@@ -230,22 +230,26 @@ namespace osu.Game.Screens.SelectV2
 
             public partial class StatisticRow : CompositeDrawable
             {
-                protected OsuSpriteText ValueLabel;
+                private readonly OsuSpriteText labelText;
+                protected readonly OsuSpriteText ValueText;
 
-                public StatisticRow(LocalisableString label, Color4 labelColour, LocalisableString value)
+                private readonly Color4? colour;
+
+                public StatisticRow(LocalisableString label, LocalisableString value, Color4? colour = null)
                 {
+                    this.colour = colour;
+
                     RelativeSizeAxes = Axes.X;
                     AutoSizeAxes = Axes.Y;
 
                     InternalChildren = new[]
                     {
-                        new OsuSpriteText
+                        labelText = new OsuSpriteText
                         {
                             Text = label,
-                            Colour = labelColour,
                             Font = OsuFont.Style.Caption2.With(weight: FontWeight.SemiBold),
                         },
-                        ValueLabel = new OsuSpriteText
+                        ValueText = new OsuSpriteText
                         {
                             Anchor = Anchor.TopRight,
                             Origin = Anchor.TopRight,
@@ -255,14 +259,21 @@ namespace osu.Game.Screens.SelectV2
                         },
                     };
                 }
+
+                [BackgroundDependencyLoader]
+                private void load(OverlayColourProvider colourProvider)
+                {
+                    labelText.Colour = colour ?? colourProvider.Content2;
+                    ValueText.Colour = colour ?? colourProvider.Content1;
+                }
             }
 
             public partial class PerformanceStatisticRow : StatisticRow
             {
                 private readonly ScoreInfo score;
 
-                public PerformanceStatisticRow(LocalisableString label, Color4 labelColour, ScoreInfo score)
-                    : base(label, labelColour, @"0pp")
+                public PerformanceStatisticRow(LocalisableString label, ScoreInfo score)
+                    : base(label, @"0pp")
                 {
                     this.score = score;
                 }
@@ -296,7 +307,7 @@ namespace osu.Game.Screens.SelectV2
                     if (pp.HasValue)
                     {
                         int ppValue = (int)Math.Round(pp.Value, MidpointRounding.AwayFromZero);
-                        ValueLabel.Text = LocalisableString.Interpolate(@$"{ppValue:N0}pp");
+                        ValueText.Text = LocalisableString.Interpolate(@$"{ppValue:N0}pp");
 
                         if (!scoreInfo.BeatmapInfo!.Status.GrantsPerformancePoints() || hasUnrankedMods(scoreInfo))
                             Alpha = 0.5f;
