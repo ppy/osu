@@ -262,7 +262,7 @@ namespace osu.Game.Screens.SelectV2
                 private readonly ScoreInfo score;
 
                 public PerformanceStatisticRow(LocalisableString label, Color4 labelColour, ScoreInfo score)
-                    : base(label, labelColour, 0.ToLocalisableString("N0"))
+                    : base(label, labelColour, @"0pp")
                 {
                     this.score = score;
                 }
@@ -296,7 +296,7 @@ namespace osu.Game.Screens.SelectV2
                     if (pp.HasValue)
                     {
                         int ppValue = (int)Math.Round(pp.Value, MidpointRounding.AwayFromZero);
-                        ValueLabel.Text = ppValue.ToLocalisableString("N0");
+                        ValueLabel.Text = LocalisableString.Interpolate(@$"{ppValue:N0}pp");
 
                         if (!scoreInfo.BeatmapInfo!.Status.GrantsPerformancePoints() || hasUnrankedMods(scoreInfo))
                             Alpha = 0.5f;
