@@ -12,79 +12,79 @@ namespace osu.Game.Tests.Online.Chat
         [Test]
         public void TestContainsUsernameMidlinePositive()
         {
-            Assert.IsTrue(MessageNotifier.CheckContainsUsername("This is a test message", "Test"));
+            Assert.IsTrue(MessageNotifier.MatchUsername("This is a test message", "Test").Success);
         }
 
         [Test]
         public void TestContainsUsernameStartOfLinePositive()
         {
-            Assert.IsTrue(MessageNotifier.CheckContainsUsername("Test message", "Test"));
+            Assert.IsTrue(MessageNotifier.MatchUsername("Test message", "Test").Success);
         }
 
         [Test]
         public void TestContainsUsernameEndOfLinePositive()
         {
-            Assert.IsTrue(MessageNotifier.CheckContainsUsername("This is a test", "Test"));
+            Assert.IsTrue(MessageNotifier.MatchUsername("This is a test", "Test").Success);
         }
 
         [Test]
         public void TestContainsUsernameMidlineNegative()
         {
-            Assert.IsFalse(MessageNotifier.CheckContainsUsername("This is a testmessage for notifications", "Test"));
+            Assert.IsFalse(MessageNotifier.MatchUsername("This is a testmessage for notifications", "Test").Success);
         }
 
         [Test]
         public void TestContainsUsernameStartOfLineNegative()
         {
-            Assert.IsFalse(MessageNotifier.CheckContainsUsername("Testmessage", "Test"));
+            Assert.IsFalse(MessageNotifier.MatchUsername("Testmessage", "Test").Success);
         }
 
         [Test]
         public void TestContainsUsernameEndOfLineNegative()
         {
-            Assert.IsFalse(MessageNotifier.CheckContainsUsername("This is a notificationtest", "Test"));
+            Assert.IsFalse(MessageNotifier.MatchUsername("This is a notificationtest", "Test").Success);
         }
 
         [Test]
         public void TestContainsUsernameBetweenPunctuation()
         {
-            Assert.IsTrue(MessageNotifier.CheckContainsUsername("Hello 'test'-message", "Test"));
+            Assert.IsTrue(MessageNotifier.MatchUsername("Hello 'test'-message", "Test").Success);
         }
 
         [Test]
         public void TestContainsUsernameUnicode()
         {
-            Assert.IsTrue(MessageNotifier.CheckContainsUsername("Test \u0460\u0460 message", "\u0460\u0460"));
+            Assert.IsTrue(MessageNotifier.MatchUsername("Test \u0460\u0460 message", "\u0460\u0460").Success);
         }
 
         [Test]
         public void TestContainsUsernameUnicodeNegative()
         {
-            Assert.IsFalse(MessageNotifier.CheckContainsUsername("Test ha\u0460\u0460o message", "\u0460\u0460"));
+            Assert.IsFalse(MessageNotifier.MatchUsername("Test ha\u0460\u0460o message", "\u0460\u0460").Success);
         }
 
         [Test]
         public void TestContainsUsernameSpecialCharactersPositive()
         {
-            Assert.IsTrue(MessageNotifier.CheckContainsUsername("Test [#^-^#] message", "[#^-^#]"));
+            Assert.IsTrue(MessageNotifier.MatchUsername("Test [#^-^#] message", "[#^-^#]").Success);
         }
 
         [Test]
         public void TestContainsUsernameSpecialCharactersNegative()
         {
-            Assert.IsFalse(MessageNotifier.CheckContainsUsername("Test pad[#^-^#]oru message", "[#^-^#]"));
+            Assert.IsFalse(MessageNotifier.MatchUsername("Test pad[#^-^#]oru message", "[#^-^#]").Success);
         }
 
         [Test]
         public void TestContainsUsernameAtSign()
         {
-            Assert.IsTrue(MessageNotifier.CheckContainsUsername("@username hi", "username"));
+            Assert.IsTrue(MessageNotifier.MatchUsername("@username hi", "username").Success);
         }
 
         [Test]
         public void TestContainsUsernameColon()
         {
-            Assert.IsTrue(MessageNotifier.CheckContainsUsername("username: hi", "username"));
+            Assert.IsTrue(MessageNotifier.MatchUsername("username: hi", "username").Success);
         }
     }
 }
