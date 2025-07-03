@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
+using osu.Framework.Text;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using osu.Game.Resources.Localisation.Web;
@@ -141,7 +142,7 @@ namespace osu.Game.Graphics.UserInterface
                 }
             }
 
-            protected override Drawable GetDrawableCharacter(char c) => new FallingDownContainer
+            protected override Drawable GetDrawableCharacter(Grapheme c) => new FallingDownContainer
             {
                 AutoSizeAxes = Axes.Both,
                 Child = new OsuSpriteText { Text = c.ToString(), Font = OsuFont.GetFont(size: 20, weight: FontWeight.SemiBold) },
