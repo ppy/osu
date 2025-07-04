@@ -682,14 +682,13 @@ namespace osu.Game.Screens.SelectV2
             backgroundModeBeatmap.Beatmap = Beatmap.Value;
             backgroundModeBeatmap.IgnoreUserSettings.Value = true;
 
-            backgroundModeBeatmap.BlurAmount.Value = 0;
             backgroundModeBeatmap.DimWhenUserSettingsIgnored.Value = 0.1f;
 
             // Required to undo results screen dimming the background.
             // Probably needs more thought because this needs to be in every `ApplyToBackground` currently to restore sane defaults.
             backgroundModeBeatmap.FadeColour(Color4.White, 250);
 
-            backgroundModeBeatmap.BlurAmount.Value = configBackgroundBlur.Value ? 20 : 0f;
+            backgroundModeBeatmap.BlurAmount.Value = revealingBackground == null && configBackgroundBlur.Value ? 20 : 0f;
         });
 
         #endregion
@@ -809,6 +808,8 @@ namespace osu.Game.Screens.SelectV2
                     skinnableContent.ScaleTo(1.2f, 600, Easing.OutQuint);
                     skinnableContent.FadeOut(200, Easing.OutQuint);
 
+                    updateBackgroundDim();
+
                     Footer?.Hide();
                 }, 200);
             }
@@ -842,6 +843,8 @@ namespace osu.Game.Screens.SelectV2
 
             revealingBackground.Cancel();
             revealingBackground = null;
+
+            updateBackgroundDim();
         }
 
         public virtual bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
