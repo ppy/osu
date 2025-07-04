@@ -3,7 +3,6 @@
 
 #nullable disable
 
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
@@ -47,7 +46,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private IAPIProvider api { get; set; }
 
         [Resolved]
-        private RulesetStore rulesets { get; set; }
+        private IRulesetStore rulesets { get; set; } = null!;
 
         private GetScoresRequest getScoresRequest;
 
@@ -67,36 +66,22 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 loading.Hide();
                 loading.FinishTransforms();
 
-                if (value?.Scores.Any() != true)
+                if (value == null || value.Scores.Count == 0)
                     return;
 
-                var apiBeatmap = Beatmap.Value;
+                var scores = value.Scores.OrderByTotalScore().ToArray();
+                var rulesetInstance = rulesets.GetRuleset(ruleset.Value.OnlineID)!.CreateInstance();
 
-                Debug.Assert(apiBeatmap != null);
-
-                // TODO: temporary. should be removed once `OrderByTotalScore` can accept `IScoreInfo`.
-                var beatmapInfo = new BeatmapInfo
-                {
-#pragma warning disable 618
-                    MaxCombo = apiBeatmap.MaxCombo,
-#pragma warning restore 618
-                    Status = apiBeatmap.Status,
-                    MD5Hash = apiBeatmap.MD5Hash
-                };
-
-                var scores = value.Scores.Select(s => s.ToScoreInfo(rulesets, beatmapInfo)).OrderByTotalScore().ToArray();
-                var topScore = scores.First();
-
-                scoreTable.DisplayScores(scores, apiBeatmap.Status.GrantsPerformancePoints());
+                scoreTable.DisplayScores(scores, Beatmap.Value, rulesetInstance);
                 scoreTable.Show();
 
+                var topScore = scores.First();
                 var userScore = value.UserScore;
-                var userScoreInfo = userScore?.Score.ToScoreInfo(rulesets, beatmapInfo);
 
-                topScoresContainer.Add(new DrawableTopScore(topScore));
+                topScoresContainer.Add(new DrawableTopScore(topScore, Beatmap.Value, rulesetInstance));
 
-                if (userScoreInfo != null && userScoreInfo.OnlineID != topScore.OnlineID)
-                    topScoresContainer.Add(new DrawableTopScore(userScoreInfo, userScore.Position));
+                if (userScore != null && userScore.Score.OnlineID != topScore.OnlineID)
+                    topScoresContainer.Add(new DrawableTopScore(userScore.Score, Beatmap.Value, rulesetInstance, userScore.Position));
             });
         }
 

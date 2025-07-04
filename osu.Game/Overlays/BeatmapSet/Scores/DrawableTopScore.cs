@@ -9,7 +9,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Scoring;
+using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Rulesets;
 using osuTK;
 using osuTK.Graphics;
 
@@ -19,7 +20,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
     {
         private readonly Box background;
 
-        public DrawableTopScore(ScoreInfo score, int? position = 1)
+        public DrawableTopScore(SoloScoreInfo score, APIBeatmap beatmap, Ruleset ruleset, int? position = 1)
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -59,19 +60,16 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                             {
                                 new Drawable[]
                                 {
-                                    new TopScoreUserSection
+                                    new TopScoreUserSection(score, position)
                                     {
                                         Anchor = Anchor.CentreLeft,
                                         Origin = Anchor.CentreLeft,
-                                        Score = score,
-                                        ScorePosition = position,
                                     },
                                     null,
-                                    new TopScoreStatisticsSection
+                                    new TopScoreStatisticsSection(score, beatmap, ruleset)
                                     {
                                         Anchor = Anchor.CentreRight,
                                         Origin = Anchor.CentreRight,
-                                        Score = score,
                                     }
                                 },
                             },
