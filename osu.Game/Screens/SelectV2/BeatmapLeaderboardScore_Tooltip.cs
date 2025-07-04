@@ -296,24 +296,21 @@ namespace osu.Game.Screens.SelectV2
                         if (attributes?.DifficultyAttributes == null || performanceCalculator == null)
                             return;
 
-                        var result = await performanceCalculator.CalculateAsync(score, attributes.Value.DifficultyAttributes, cancellationToken ?? default).ConfigureAwait(false);
+                        var result = await performanceCalculator.CalculateAsync(score, attributes.Value.DifficultyAttributes, cancellationToken ?? CancellationToken.None).ConfigureAwait(false);
 
                         Schedule(() => setPerformanceValue(score, result.Total));
                     }, cancellationToken ?? default);
                 }
 
-                private void setPerformanceValue(ScoreInfo scoreInfo, double? pp)
+                private void setPerformanceValue(ScoreInfo scoreInfo, double pp)
                 {
-                    if (pp.HasValue)
-                    {
-                        int ppValue = (int)Math.Round(pp.Value, MidpointRounding.AwayFromZero);
-                        ValueText.Text = LocalisableString.Interpolate(@$"{ppValue:N0}pp");
+                    int ppValue = (int)Math.Round(pp, MidpointRounding.AwayFromZero);
+                    ValueText.Text = LocalisableString.Interpolate(@$"{ppValue:N0}pp");
 
-                        if (!scoreInfo.BeatmapInfo!.Status.GrantsPerformancePoints() || hasUnrankedMods(scoreInfo))
-                            Alpha = 0.5f;
-                        else
-                            Alpha = 1f;
-                    }
+                    if (!scoreInfo.BeatmapInfo!.Status.GrantsPerformancePoints() || hasUnrankedMods(scoreInfo))
+                        Alpha = 0.5f;
+                    else
+                        Alpha = 1f;
                 }
 
                 private static bool hasUnrankedMods(ScoreInfo scoreInfo)
