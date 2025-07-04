@@ -357,36 +357,6 @@ namespace osu.Game.Scoring
                 : string.Empty;
         }
 
-        public IEnumerable<HitResultDisplayStatistic> GetStatisticsForDisplay()
-        {
-            foreach (var r in Ruleset.CreateInstance().GetHitResults())
-            {
-                int value = Statistics.GetValueOrDefault(r.result);
-
-                switch (r.result)
-                {
-                    case HitResult.SmallTickHit:
-                    case HitResult.LargeTickHit:
-                    case HitResult.SliderTailHit:
-                    case HitResult.LargeBonus:
-                    case HitResult.SmallBonus:
-                        if (MaximumStatistics.TryGetValue(r.result, out int count) && count > 0)
-                            yield return new HitResultDisplayStatistic(r.result, value, count, r.displayName);
-
-                        break;
-
-                    case HitResult.SmallTickMiss:
-                    case HitResult.LargeTickMiss:
-                        break;
-
-                    default:
-                        yield return new HitResultDisplayStatistic(r.result, value, null, r.displayName);
-
-                        break;
-                }
-            }
-        }
-
         #endregion
 
         public bool Equals(ScoreInfo? other) => other?.ID == ID;
