@@ -451,8 +451,7 @@ namespace osu.Game.Screens.SelectV2
 
         private Sample? sampleChangeDifficulty;
         private Sample? sampleChangeSet;
-        private Sample? sampleOpen;
-        private Sample? sampleClose;
+        private Sample? sampleToggleGroup;
 
         private double audioFeedbackLastPlaybackTime;
 
@@ -460,8 +459,7 @@ namespace osu.Game.Screens.SelectV2
         {
             sampleChangeDifficulty = audio.Samples.Get(@"SongSelect/select-difficulty");
             sampleChangeSet = audio.Samples.Get(@"SongSelect/select-expand");
-            sampleOpen = audio.Samples.Get(@"UI/menu-open");
-            sampleClose = audio.Samples.Get(@"UI/menu-close");
+            sampleToggleGroup = audio.Samples.Get(@"SongSelect/select-group");
 
             spinSample = audio.Samples.Get("SongSelect/random-spin");
             randomSelectSample = audio.Samples.Get(@"SongSelect/select-random");
@@ -474,10 +472,7 @@ namespace osu.Game.Screens.SelectV2
                 switch (item.Model)
                 {
                     case GroupDefinition:
-                        if (item.IsExpanded)
-                            sampleOpen?.Play();
-                        else
-                            sampleClose?.Play();
+                        sampleToggleGroup?.Play();
                         return;
 
                     case BeatmapSetInfo:
