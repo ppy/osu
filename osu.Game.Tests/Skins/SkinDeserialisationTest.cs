@@ -77,6 +77,8 @@ namespace osu.Game.Tests.Skins
             "Archives/modified-argon-20250214.osk",
             // Covers skinnable leaderboard
             "Archives/modified-argon-20250424.osk",
+            // Covers score difference to first place in multiplayer display
+            "Archives/modified-argon-20250519.osk"
         };
 
         /// <summary>
