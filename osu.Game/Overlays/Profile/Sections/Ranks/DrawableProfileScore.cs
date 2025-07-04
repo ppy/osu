@@ -275,7 +275,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                         Origin = Anchor.BottomLeft,
                         Font = font,
                         Text = Score.PP.ToLocalisableString(@"N0"),
-                        TooltipText = Score.PP.ToLocalisableString(@"#,0.###"),
+                        TooltipText = Score.PP.ToLocalisableString(@"N1"),
                         Colour = colourProvider.Highlight1,
                     },
                     new SpriteTextWithTooltip
@@ -284,7 +284,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                         Origin = Anchor.BottomLeft,
                         Font = font.With(size: 12),
                         Text = "pp",
-                        TooltipText = Score.PP.ToLocalisableString(@"#,0.###"),
+                        TooltipText = Score.PP.ToLocalisableString(@"N1"),
                         Colour = colourProvider.Light3,
                     }
                 }
