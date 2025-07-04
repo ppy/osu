@@ -127,10 +127,11 @@ namespace osu.Game.Screens.SelectV2
 
                         var generalStatistics = new[]
                         {
-                            new PerformanceStatisticRow(BeatmapsetsStrings.ShowScoreboardHeaderspp.ToUpper(), score),
-                            new StatisticRow(ModSelectOverlayStrings.ScoreMultiplier, ModUtils.FormatScoreMultiplier(multiplier)),
                             new StatisticRow(BeatmapsetsStrings.ShowScoreboardHeadersCombo, value.MaxCombo.ToLocalisableString(@"0\x")),
                             new StatisticRow(BeatmapsetsStrings.ShowScoreboardHeadersAccuracy, value.Accuracy.FormatAccuracy()),
+                            new PerformanceStatisticRow(BeatmapsetsStrings.ShowScoreboardHeaderspp.ToUpper(), score),
+                            Empty().With(d => d.Height = 20),
+                            new StatisticRow(ModSelectOverlayStrings.ScoreMultiplier, ModUtils.FormatScoreMultiplier(multiplier)),
                         };
 
                         statistics.ChildrenEnumerable = judgementsStatistics
@@ -206,7 +207,7 @@ namespace osu.Game.Screens.SelectV2
                                         {
                                             RelativeSizeAxes = Axes.X,
                                             AutoSizeAxes = Axes.Y,
-                                            Spacing = new Vector2(0f, 4f),
+                                            Spacing = new Vector2(0f, 2f),
                                             Padding = new MarginPadding(8f),
                                         },
                                     },
