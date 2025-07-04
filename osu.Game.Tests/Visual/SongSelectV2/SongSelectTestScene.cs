@@ -97,7 +97,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             dependencies.Cache(Realm);
             dependencies.Cache(Beatmaps = new BeatmapManager(LocalStorage, Realm, null, Dependencies.Get<AudioManager>(), Resources, Dependencies.Get<GameHost>(), Beatmap.Default));
             dependencies.Cache(Config = new OsuConfigManager(LocalStorage));
-            dependencies.Cache(ScoreManager = new ScoreManager(Rulesets, () => Beatmaps, LocalStorage, Realm, API, Config));
+            dependencies.Cache(ScoreManager = new ScoreManager(Rulesets, () => Beatmaps, LocalStorage, Realm, API));
 
             dependencies.CacheAs<BeatmapStore>(beatmapStore = new RealmDetachedBeatmapStore());
 

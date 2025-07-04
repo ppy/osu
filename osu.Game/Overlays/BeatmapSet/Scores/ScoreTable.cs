@@ -23,6 +23,7 @@ using osu.Framework.Localisation;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Configuration;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets.Mods;
 
@@ -35,7 +36,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private const int text_size = 12;
 
         [Resolved]
-        private ScoreManager scoreManager { get; set; }
+        private OsuConfigManager config { get; set; }
 
         private readonly FillFlowContainer backgroundFlow;
 
@@ -148,7 +149,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 new OsuSpriteText
                 {
                     Margin = new MarginPadding { Right = horizontal_inset },
-                    Current = scoreManager.GetBindableTotalScoreString(score),
+                    Current = score.GetBindableTotalScoreString(config),
                     Font = OsuFont.GetFont(size: text_size, weight: index == 0 ? FontWeight.Bold : FontWeight.Medium)
                 },
                 new StatisticText(score.Accuracy, 1, showTooltip: false)

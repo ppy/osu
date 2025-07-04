@@ -14,6 +14,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -44,6 +45,9 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
         [Resolved]
         private ScoreManager scoreManager { get; set; }
+
+        [Resolved]
+        private OsuConfigManager config { get; set; } = null!;
 
         public TopScoreStatisticsSection()
         {
@@ -99,7 +103,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         {
             if (score != null)
             {
-                totalScoreColumn.Current = scoreManager.GetBindableTotalScoreString(score);
+                totalScoreColumn.Current = score.GetBindableTotalScoreString(config);
 
                 if (score.Accuracy == 1.0) accuracyColumn.TextColour = colours.GreenLight;
 #pragma warning disable CS0618
@@ -155,7 +159,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 modsColumn.Mods = value.Mods;
 
                 if (scoreManager != null)
-                    totalScoreColumn.Current = scoreManager.GetBindableTotalScoreString(value);
+                    totalScoreColumn.Current = value.GetBindableTotalScoreString(config);
             }
         }
 
