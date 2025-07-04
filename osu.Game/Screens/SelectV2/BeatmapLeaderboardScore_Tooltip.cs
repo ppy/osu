@@ -17,6 +17,7 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
@@ -264,7 +265,7 @@ namespace osu.Game.Screens.SelectV2
                 private void load(OverlayColourProvider colourProvider)
                 {
                     labelText.Colour = colour ?? colourProvider.Content2;
-                    ValueText.Colour = colour ?? colourProvider.Content1;
+                    ValueText.Colour = Interpolation.ValueAt(0.85f, colourProvider.Content1, colour ?? colourProvider.Content1, 0, 1);
                 }
             }
 
