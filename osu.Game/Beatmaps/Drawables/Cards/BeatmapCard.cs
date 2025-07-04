@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -23,6 +24,8 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         public const float CORNER_RADIUS = 8;
 
         protected const float WIDTH = 345;
+
+        public CollapsibleButtonContainer ButtonContainer { get; set; } = null!;
 
         public IBindable<bool> Expanded { get; }
 
@@ -103,9 +106,19 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             }
         }
 
-        public MenuItem[] ContextMenuItems => new MenuItem[]
+        public MenuItem[] ContextMenuItems
         {
-            new OsuMenuItem(ContextMenuStrings.ViewBeatmap, MenuItemType.Highlighted, Action),
-        };
+            get
+            {
+                var menuItems = new List<MenuItem>();
+
+                if (ButtonContainer.DownloadButton.Enabled.Value)
+                    menuItems.Add(new OsuMenuItem(ContextMenuStrings.DownloadBeatmap, MenuItemType.Highlighted, () => ButtonContainer.DownloadButton.TriggerClick()));
+
+                menuItems.Add(new OsuMenuItem(ContextMenuStrings.ViewBeatmap, MenuItemType.Standard, Action));
+
+                return menuItems.ToArray();
+            }
+        }
     }
 }
