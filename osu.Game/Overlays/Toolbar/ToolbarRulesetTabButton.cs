@@ -57,7 +57,7 @@ namespace osu.Game.Overlays.Toolbar
             {
                 set => Scheduler.AddOnce(() =>
                 {
-                    IconContainer.Colour = value ? Color4Extensions.FromHex("#00FFAA") : colours.GrayF;
+                    IconContainer.Colour = value ? colours.PinkLight : colours.GrayF;
                 });
             }
 
