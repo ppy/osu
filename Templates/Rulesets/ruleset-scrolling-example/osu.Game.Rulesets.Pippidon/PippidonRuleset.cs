@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
+using osu.Game.Rulesets.Filter;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Pippidon.Beatmaps;
 using osu.Game.Rulesets.Pippidon.Mods;
@@ -36,6 +37,8 @@ namespace osu.Game.Rulesets.Pippidon
                     return Array.Empty<Mod>();
             }
         }
+
+        public override IRulesetConvertSupport GetRulesetMapConvertSupport() => new PippidonRulesetConversionSupport();
 
         public override string ShortName => "pippidon";
 
