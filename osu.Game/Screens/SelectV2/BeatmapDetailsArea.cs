@@ -87,6 +87,7 @@ namespace osu.Game.Screens.SelectV2
                     currentContent = new BeatmapLeaderboardWedge
                     {
                         Scope = { BindTarget = header.Scope },
+                        Sorting = { BindTarget = header.Sorting },
                         FilterBySelectedMods = { BindTarget = header.FilterBySelectedMods },
                     };
 
