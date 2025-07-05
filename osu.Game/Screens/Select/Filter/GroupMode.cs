@@ -34,6 +34,9 @@ namespace osu.Game.Screens.Select.Filter
         // [Description("Favourites")]
         // Favourites,
 
+        [Description("Last Played")]
+        LastPlayed,
+
         [Description("Length")]
         Length,
 
@@ -46,8 +49,8 @@ namespace osu.Game.Screens.Select.Filter
         [Description("Ranked Status")]
         RankedStatus,
 
-        [Description("Last Played")]
-        LastPlayed,
+        [Description("Source")]
+        Source,
 
         [Description("Title")]
         Title,
