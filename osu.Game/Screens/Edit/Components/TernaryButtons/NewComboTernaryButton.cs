@@ -66,6 +66,7 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
                 },
                 pickerButton = new ColourPickerButton
                 {
+                    Height = 30,
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
                     ComboColours = { BindTarget = comboColours }
@@ -94,21 +95,21 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
         {
             if (Current.Value == TernaryState.True && selectedHitObjects.Count == 1 && selectedHitObjects.Single() is IHasComboInformation hasCombo && comboColours.Count > 1)
             {
-                float targetPickerButtonWidth = expanded.Value ? 25 : 10;
+                float targetPickerButtonWidth = expanded.Value ? 25 : 7;
 
                 pickerButton.ResizeWidthTo(targetPickerButtonWidth, ExpandingContainer.TRANSITION_DURATION, Easing.OutQuint);
                 pickerButton.SelectedHitObject.Value = hasCombo;
                 pickerButton.Icon.Alpha = expanded.Value ? 1 : 0;
 
-                mainButtonContainer.TransformTo(nameof(mainButtonContainer.Padding), new MarginPadding { Right = targetPickerButtonWidth + 5 }, ExpandingContainer.TRANSITION_DURATION, Easing.OutQuint);
-                mainButton.Icon.MoveToX(expanded.Value ? 10 : 2.5f, ExpandingContainer.TRANSITION_DURATION, Easing.OutQuint);
+                mainButtonContainer.TransformTo(nameof(mainButtonContainer.Padding), new MarginPadding { Right = targetPickerButtonWidth + 3 }, ExpandingContainer.TRANSITION_DURATION, Easing.OutQuint);
+                mainButton.Icon.MoveToX(expanded.Value ? 8 : 3f, ExpandingContainer.TRANSITION_DURATION, Easing.OutQuint);
             }
             else
             {
                 pickerButton.ResizeWidthTo(0, ExpandingContainer.TRANSITION_DURATION, Easing.OutQuint);
 
                 mainButtonContainer.TransformTo(nameof(mainButtonContainer.Padding), new MarginPadding(), ExpandingContainer.TRANSITION_DURATION, Easing.OutQuint);
-                mainButton.Icon.MoveToX(10, ExpandingContainer.TRANSITION_DURATION, Easing.OutQuint);
+                mainButton.Icon.MoveToX(8, ExpandingContainer.TRANSITION_DURATION, Easing.OutQuint);
             }
         }
 
@@ -128,6 +129,8 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
             [BackgroundDependencyLoader]
             private void load()
             {
+                Content.CornerRadius = 3;
+
                 Add(Icon = new SpriteIcon
                 {
                     Icon = FontAwesome.Solid.Palette,

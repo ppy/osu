@@ -162,16 +162,18 @@ namespace osu.Game.Rulesets.Edit
                             Colour = colourProvider.Background5,
                             RelativeSizeAxes = Axes.Both,
                         },
-                        LeftToolbox = new ExpandingToolboxContainer(TOOLBOX_CONTRACTED_SIZE_LEFT, 200)
+                        LeftToolbox = new ExpandingToolboxContainer(TOOLBOX_CONTRACTED_SIZE_LEFT, 160)
                         {
                             Children = new Drawable[]
                             {
                                 new EditorToolboxGroup("toolbox (1-9)")
                                 {
-                                    Child = toolboxCollection = new EditorRadioButtonCollection { RelativeSizeAxes = Axes.X }
+                                    ContentPadding = new MarginPadding(5),
+                                    Child = toolboxCollection = new EditorRadioButtonCollection { RelativeSizeAxes = Axes.X },
                                 },
                                 new EditorToolboxGroup("toggles (Q~P)")
                                 {
+                                    ContentPadding = new MarginPadding(5),
                                     Child = togglesCollection = new FillFlowContainer
                                     {
                                         RelativeSizeAxes = Axes.X,
@@ -182,6 +184,7 @@ namespace osu.Game.Rulesets.Edit
                                 },
                                 new EditorToolboxGroup("bank (Shift/Alt-Q~R)")
                                 {
+                                    ContentPadding = new MarginPadding(5),
                                     Child = new FillFlowContainer
                                     {
                                         RelativeSizeAxes = Axes.X,
@@ -205,7 +208,7 @@ namespace osu.Game.Rulesets.Edit
                                                         X = 0.25f,
                                                         Origin = Anchor.TopCentre,
                                                         Anchor = Anchor.TopLeft,
-                                                        Font = OsuFont.GetFont(weight: FontWeight.Regular, size: 17),
+                                                        Font = OsuFont.Style.Caption1,
                                                     },
                                                     new ExpandableSpriteText
                                                     {
@@ -216,7 +219,7 @@ namespace osu.Game.Rulesets.Edit
                                                         X = 0.75f,
                                                         Origin = Anchor.TopCentre,
                                                         Anchor = Anchor.TopLeft,
-                                                        Font = OsuFont.GetFont(weight: FontWeight.Regular, size: 17),
+                                                        Font = OsuFont.Style.Caption1,
                                                     },
                                                 }
                                             },
@@ -247,7 +250,7 @@ namespace osu.Game.Rulesets.Edit
                             Colour = colourProvider.Background5,
                             RelativeSizeAxes = Axes.Both,
                         },
-                        RightToolbox = new ExpandingToolboxContainer(TOOLBOX_CONTRACTED_SIZE_RIGHT, 250)
+                        RightToolbox = new ExpandingToolboxContainer(TOOLBOX_CONTRACTED_SIZE_RIGHT, 180)
                         {
                             Child = new EditorToolboxGroup("inspector")
                             {
@@ -576,8 +579,8 @@ namespace osu.Game.Rulesets.Edit
     [Cached]
     public abstract partial class HitObjectComposer : CompositeDrawable
     {
-        public const float TOOLBOX_CONTRACTED_SIZE_LEFT = 60;
-        public const float TOOLBOX_CONTRACTED_SIZE_RIGHT = 120;
+        public const float TOOLBOX_CONTRACTED_SIZE_LEFT = 40;
+        public const float TOOLBOX_CONTRACTED_SIZE_RIGHT = 100;
 
         public readonly Ruleset Ruleset;
 

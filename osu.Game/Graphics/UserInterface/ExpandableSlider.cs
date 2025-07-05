@@ -95,10 +95,15 @@ namespace osu.Game.Graphics.UserInterface
                 Spacing = new Vector2(0f, 10f),
                 Children = new Drawable[]
                 {
-                    label = new OsuSpriteText(),
+                    label = new OsuSpriteText
+                    {
+                        Font = OsuFont.Style.Caption2,
+                    },
                     slider = new TSlider
                     {
                         RelativeSizeAxes = Axes.X,
+                        Scale = new Vector2(0.8f),
+                        Width = 1 / 0.8f,
                     },
                 }
             };

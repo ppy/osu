@@ -221,7 +221,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Y = -1,
-                Font = OsuFont.Default.With(weight: FontWeight.Bold, size: 20),
+                Font = OsuFont.Style.Caption1.With(weight: FontWeight.Bold),
                 Text = $"{char.ToUpperInvariant(sampleName.First())}"
             };
         }
