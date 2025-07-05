@@ -498,6 +498,7 @@ namespace osu.Game
             AddFont(Resources, @"Fonts/Venera/Venera-Bold");
             AddFont(Resources, @"Fonts/Venera/Venera-Black");
 
+            Fonts.AddStore(new EmojiStore(Textures));
             Fonts.AddStore(new OsuIcon.OsuIconStore(Textures));
         }
 
