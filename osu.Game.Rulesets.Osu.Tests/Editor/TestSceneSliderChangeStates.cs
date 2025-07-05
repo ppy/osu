@@ -7,6 +7,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Screens.Edit.Changes;
 using osu.Game.Tests.Beatmaps;
 using osuTK;
 
@@ -35,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 })
             }));
             AddAssert("slider has correct spline type", () => ((Slider)EditorBeatmap.HitObjects[0]).Path.ControlPoints.All(p => p.Type == pathType));
-            AddStep("remove object", () => EditorBeatmap.Remove(slider));
+            AddStep("remove object", () => new RemoveHitObjectChange(EditorBeatmap, slider!).Apply(ChangeHandler, true));
             AddAssert("slider removed", () => EditorBeatmap.HitObjects.Count == 0);
             addUndoSteps();
             AddAssert("slider not removed", () => EditorBeatmap.HitObjects.Count == 1);
