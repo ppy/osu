@@ -248,6 +248,7 @@ namespace osu.Game.Screens.Play
                     },
                 },
                 idleTracker = new IdleTracker(1500),
+                new HotkeyRetryOverlay(),
                 sampleRestart = new SkinnableSound(new SampleInfo(@"Gameplay/restart", @"pause-retry-click"))
             };
 
