@@ -235,7 +235,7 @@ namespace osu.Game.Screens.SelectV2
                 {
                     // only bind this after the first fetch to avoid reading stale scores.
                     fetchedScores.BindTo(leaderboardManager.Scores);
-                    fetchedScores.BindValueChanged(_ => updateScores(), true);
+                    fetchedScores.BindValueChanged(_ => Schedule(updateScores), true);
                     initialFetchComplete = true;
                 }
             }, initialFetchComplete ? 300 : 0);
