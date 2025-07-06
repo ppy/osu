@@ -14,6 +14,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Framework.IO.Stores;
 using osu.Game.Rulesets;
 using osuTK;
 using osuTK.Graphics;
@@ -32,6 +33,8 @@ namespace osu.Game.Overlays.Toolbar
         private readonly Dictionary<RulesetInfo, SampleChannel> rulesetSelectionChannel = new Dictionary<RulesetInfo, SampleChannel>();
         private Sample defaultSelectSample;
 
+        private ISampleStore samples;
+
         public ToolbarRulesetSelector()
         {
             RelativeSizeAxes = Axes.Y;
@@ -39,7 +42,7 @@ namespace osu.Game.Overlays.Toolbar
         }
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        private void load(AudioManager audio, OsuGameBase game)
         {
             AddRangeInternal(new[]
             {
@@ -66,8 +69,15 @@ namespace osu.Game.Overlays.Toolbar
                 },
             });
 
+            var store = new ResourceStore<byte[]>(game.Resources);
+            samples = audio.GetSampleStore(new NamespacedResourceStore<byte[]>(store, "Samples"), audio.SampleMixer);
+
             foreach (var r in Rulesets.AvailableRulesets)
-                rulesetSelectionSample[r] = audio.Samples.Get($@"UI/ruleset-select-{r.ShortName}");
+            {
+                store.AddStore(r.CreateInstance().CreateResourceStore());
+
+                rulesetSelectionSample[r] = samples.Get($@"UI/ruleset-select-{r.ShortName}");
+            }
 
             defaultSelectSample = audio.Samples.Get(@"UI/default-select");
 
@@ -158,6 +168,13 @@ namespace osu.Game.Overlays.Toolbar
             }
 
             return false;
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            samples?.Dispose();
+
+            base.Dispose(isDisposing);
         }
     }
 }
