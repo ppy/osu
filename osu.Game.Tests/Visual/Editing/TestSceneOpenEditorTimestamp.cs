@@ -14,7 +14,7 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Menu;
-using osu.Game.Screens.Select;
+using osu.Game.Screens.SelectV2;
 using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests.Visual.Editing
@@ -36,7 +36,7 @@ namespace osu.Game.Tests.Visual.Editing
                 () => Is.EqualTo(1));
 
             AddStep("enter song select", () => Game.ChildrenOfType<ButtonSystem>().Single().OnSolo?.Invoke());
-            AddUntilStep("entered song select", () => Game.ScreenStack.CurrentScreen is PlaySongSelect songSelect && songSelect.BeatmapSetsLoaded);
+            AddUntilStep("entered song select", () => Game.ScreenStack.CurrentScreen is SoloSongSelect songSelect && songSelect.CarouselItemsPresented);
 
             addStepClickLink("00:00:000 (1)", waitForSeek: false);
             AddUntilStep("received 'must be in edit'",
@@ -151,12 +151,12 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("Present beatmap", () => Game.PresentBeatmap(beatmapSet));
             AddUntilStep("Wait for song select", () =>
                 Game.Beatmap.Value.BeatmapSetInfo.Equals(beatmapSet)
-                && Game.ScreenStack.CurrentScreen is PlaySongSelect songSelect
-                && songSelect.BeatmapSetsLoaded
+                && Game.ScreenStack.CurrentScreen is SoloSongSelect songSelect
+                && songSelect.CarouselItemsPresented
             );
             AddStep("Switch ruleset", () => Game.Ruleset.Value = ruleset);
             AddStep("Open editor for ruleset", () =>
-                ((PlaySongSelect)Game.ScreenStack.CurrentScreen)
+                ((SoloSongSelect)Game.ScreenStack.CurrentScreen)
                 .Edit(beatmapSet.Beatmaps.Last(beatmap => beatmap.Ruleset.Name == ruleset.Name))
             );
             AddUntilStep("Wait for editor open", () => editor?.ReadyForUse == true);

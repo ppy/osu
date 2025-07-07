@@ -594,12 +594,17 @@ namespace osu.Game.Skinning
         {
             var lookupNames = hitSample.LookupNames.SelectMany(getFallbackSampleNames);
 
-            if (!UseCustomSampleBanks && !string.IsNullOrEmpty(hitSample.Suffix))
+            if (!string.IsNullOrEmpty(hitSample.Suffix))
             {
-                // for compatibility with stable, exclude the lookup names with the custom sample bank suffix, if they are not valid for use in this skin.
+                // for compatibility with stable:
+                // - if the skin can use custom sample banks, it MUST use the custom sample bank suffix. it is not allowed to fall back to a non-custom sound.
+                // - if the skin cannot use custom sample banks, it MUST NOT use the custom sample bank suffix.
                 // using .EndsWith() is intentional as it ensures parity in all edge cases
-                // (see LegacyTaikoSampleInfo for an example of one - prioritising the taiko prefix should still apply, but the sample bank should not).
-                lookupNames = lookupNames.Where(name => !name.EndsWith(hitSample.Suffix, StringComparison.Ordinal));
+                // (see LegacyTaikoSampleInfo for an example of one - prioritising the taiko prefix should still apply).
+                if (UseCustomSampleBanks)
+                    lookupNames = lookupNames.Where(name => name.EndsWith(hitSample.Suffix, StringComparison.Ordinal));
+                else
+                    lookupNames = lookupNames.Where(name => !name.EndsWith(hitSample.Suffix, StringComparison.Ordinal));
             }
 
             foreach (string l in lookupNames)

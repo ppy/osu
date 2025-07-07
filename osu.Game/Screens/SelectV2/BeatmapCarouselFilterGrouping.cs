@@ -76,15 +76,18 @@ namespace osu.Game.Screens.SelectV2
                     {
                         var beatmap = (BeatmapInfo)item.Model;
 
+                        bool newBeatmapSet = lastBeatmap?.BeatmapSet!.ID != beatmap.BeatmapSet!.ID;
+
+                        if (newBeatmapSet)
+                        {
+                            if (!setMap.TryGetValue(beatmap.BeatmapSet!, out currentSetItems))
+                                setMap[beatmap.BeatmapSet!] = currentSetItems = new HashSet<CarouselItem>();
+                        }
+
                         if (BeatmapSetsGroupedTogether)
                         {
-                            bool newBeatmapSet = lastBeatmap?.BeatmapSet!.ID != beatmap.BeatmapSet!.ID;
-
                             if (newBeatmapSet)
                             {
-                                if (!setMap.TryGetValue(beatmap.BeatmapSet!, out currentSetItems))
-                                    setMap[beatmap.BeatmapSet!] = currentSetItems = new HashSet<CarouselItem>();
-
                                 if (groupItem != null)
                                     groupItem.NestedItemCount++;
 
@@ -114,7 +117,7 @@ namespace osu.Game.Screens.SelectV2
                         currentGroupItems?.Add(i);
                         currentSetItems?.Add(i);
 
-                        i.IsVisible = i.Model is GroupDefinition || (group == null && (i.Model is BeatmapSetInfo || currentSetItems == null));
+                        i.IsVisible = i.Model is GroupDefinition || (group == null && (i.Model is BeatmapSetInfo || !BeatmapSetsGroupedTogether));
                     }
                 }
 
@@ -320,7 +323,8 @@ namespace osu.Game.Screens.SelectV2
 
         private GroupDefinition defineGroupByStars(double stars)
         {
-            int starInt = (int)Math.Round(stars, 2);
+            // truncation is intentional - compare `FormatUtils.FormatStarRating()`
+            int starInt = (int)stars;
             var starDifficulty = new StarDifficulty(starInt, 0);
 
             if (starInt == 0)

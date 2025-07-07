@@ -24,7 +24,6 @@ using osu.Game.Online;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
-using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Utils;
@@ -96,7 +95,7 @@ namespace osu.Game.Screens.SelectV2
                                 Shear = -OsuGame.SHEAR,
                                 AlwaysPresent = true,
                                 RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y,
+                                Height = 20,
                                 Margin = new MarginPadding { Vertical = 5f },
                                 Padding = new MarginPadding { Left = SongSelect.WEDGE_CONTENT_MARGIN },
                                 RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
@@ -159,7 +158,7 @@ namespace osu.Game.Screens.SelectV2
                             {
                                 Shear = -OsuGame.SHEAR,
                                 RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y,
+                                Height = 53,
                                 Padding = new MarginPadding { Bottom = border_weight, Right = border_weight },
                                 Child = new Container
                                 {
@@ -322,20 +321,20 @@ namespace osu.Game.Screens.SelectV2
                         // - Using the difficulty adjustment mod to adjust OD doesn't have an effect on conversion.
                         int keyCount = legacyRuleset.GetKeyCount(beatmap.Value.BeatmapInfo, mods.Value);
 
-                        firstStatistic = new StatisticDifficulty.Data(BeatmapsetsStrings.ShowStatsCsMania, keyCount, keyCount, 10);
+                        firstStatistic = new StatisticDifficulty.Data(SongSelectStrings.KeyCount, keyCount, keyCount, 10);
                         break;
 
                     default:
-                        firstStatistic = new StatisticDifficulty.Data(BeatmapsetsStrings.ShowStatsCs, originalDifficulty.CircleSize, adjustedDifficulty.CircleSize, 10);
+                        firstStatistic = new StatisticDifficulty.Data(SongSelectStrings.CircleSize, originalDifficulty.CircleSize, adjustedDifficulty.CircleSize, 10);
                         break;
                 }
 
                 difficultyStatisticsDisplay.Statistics = new[]
                 {
                     firstStatistic,
-                    new StatisticDifficulty.Data(BeatmapsetsStrings.ShowStatsAr, originalDifficulty.ApproachRate, adjustedDifficulty.ApproachRate, 10),
-                    new StatisticDifficulty.Data(BeatmapsetsStrings.ShowStatsAccuracy, originalDifficulty.OverallDifficulty, adjustedDifficulty.OverallDifficulty, 10),
-                    new StatisticDifficulty.Data(BeatmapsetsStrings.ShowStatsDrain, originalDifficulty.DrainRate, adjustedDifficulty.DrainRate, 10),
+                    new StatisticDifficulty.Data(SongSelectStrings.ApproachRate, originalDifficulty.ApproachRate, adjustedDifficulty.ApproachRate, 10),
+                    new StatisticDifficulty.Data(SongSelectStrings.Accuracy, originalDifficulty.OverallDifficulty, adjustedDifficulty.OverallDifficulty, 10),
+                    new StatisticDifficulty.Data(SongSelectStrings.HPDrain, originalDifficulty.DrainRate, adjustedDifficulty.DrainRate, 10),
                 };
             });
 

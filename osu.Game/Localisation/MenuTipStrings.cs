@@ -150,6 +150,11 @@ namespace osu.Game.Localisation
         public static LocalisableString DragAndDropImageInSkinEditor => new TranslatableString(getKey(@"drag_and_drop_image_in_skin_editor"), @"Drag and drop any image into the skin editor to load it in quickly!");
 
         /// <summary>
+        /// "Try holding your right mouse button near the beatmap carousel to quickly scroll to an absolute position!"
+        /// </summary>
+        public static LocalisableString RightMouseAbsoluteScroll => new TranslatableString(getKey(@"right_mouse_absolute_scroll"), @"Try holding your right mouse button near the beatmap carousel to quickly scroll to an absolute position!");
+
+        /// <summary>
         /// "a tip for you:"
         /// </summary>
         public static LocalisableString MenuTipTitle => new TranslatableString(getKey(@"menu_tip_title"), @"a tip for you:");

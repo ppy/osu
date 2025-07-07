@@ -54,6 +54,46 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString EditBeatmap => new TranslatableString(getKey(@"edit_beatmap"), @"Edit beatmap");
 
+        /// <summary>
+        /// "Circle Size"
+        /// </summary>
+        public static LocalisableString CircleSize => new TranslatableString(getKey(@"circle_size"), @"Circle Size");
+
+        /// <summary>
+        /// "Key Count"
+        /// </summary>
+        public static LocalisableString KeyCount => new TranslatableString(getKey(@"key_count"), @"Key Count");
+
+        /// <summary>
+        /// "Approach Rate"
+        /// </summary>
+        public static LocalisableString ApproachRate => new TranslatableString(getKey(@"approach_rate"), @"Approach Rate");
+
+        /// <summary>
+        /// "Accuracy"
+        /// </summary>
+        public static LocalisableString Accuracy => new TranslatableString(getKey(@"accuracy"), @"Accuracy");
+
+        /// <summary>
+        /// "HP Drain"
+        /// </summary>
+        public static LocalisableString HPDrain => new TranslatableString(getKey(@"hp_drain"), @"HP Drain");
+
+        /// <summary>
+        /// "Submitted"
+        /// </summary>
+        public static LocalisableString Submitted => new TranslatableString(getKey(@"submitted"), @"Submitted");
+
+        /// <summary>
+        /// "Ranked"
+        /// </summary>
+        public static LocalisableString Ranked => new TranslatableString(getKey(@"ranked"), @"Ranked");
+
+        /// <summary>
+        /// "{0} stars"
+        /// </summary>
+        public static LocalisableString Stars(LocalisableString value) => new TranslatableString(getKey(@"stars"), @"{0} stars", value);
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

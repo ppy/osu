@@ -317,6 +317,9 @@ namespace osu.Game.Tests.Visual.Gameplay
                 Position = position;
                 Actions.AddRange(actions);
             }
+
+            public override bool IsEquivalentTo(ReplayFrame other)
+                => other is TestReplayFrame testFrame && Time == testFrame.Time && Position == testFrame.Position && Actions.SequenceEqual(testFrame.Actions);
         }
 
         public enum TestAction

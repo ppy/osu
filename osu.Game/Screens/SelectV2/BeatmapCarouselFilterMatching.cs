@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Carousel;
 using osu.Game.Screens.Select;
+using osu.Game.Utils;
 
 namespace osu.Game.Screens.SelectV2
 {
@@ -56,9 +57,7 @@ namespace osu.Game.Screens.SelectV2
 
         private static bool checkCriteriaMatch(BeatmapInfo beatmap, FilterCriteria criteria)
         {
-            bool match = criteria.Ruleset == null ||
-                         beatmap.Ruleset.ShortName == criteria.Ruleset.ShortName ||
-                         (beatmap.Ruleset.OnlineID == 0 && criteria.Ruleset.OnlineID != 0 && criteria.AllowConvertedBeatmaps);
+            bool match = criteria.Ruleset == null || beatmap.AllowGameplayWithRuleset(criteria.Ruleset!, criteria.AllowConvertedBeatmaps);
 
             if (beatmap.BeatmapSet?.Equals(criteria.SelectedBeatmapSet) == true)
             {
@@ -83,7 +82,7 @@ namespace osu.Game.Screens.SelectV2
 
             if (!match) return false;
 
-            match &= !criteria.StarDifficulty.HasFilter || criteria.StarDifficulty.IsInRange(beatmap.StarRating);
+            match &= !criteria.StarDifficulty.HasFilter || criteria.StarDifficulty.IsInRange(beatmap.StarRating.FloorToDecimalDigits(2));
             match &= !criteria.ApproachRate.HasFilter || criteria.ApproachRate.IsInRange(beatmap.Difficulty.ApproachRate);
             match &= !criteria.DrainRate.HasFilter || criteria.DrainRate.IsInRange(beatmap.Difficulty.DrainRate);
             match &= !criteria.CircleSize.HasFilter || criteria.CircleSize.IsInRange(beatmap.Difficulty.CircleSize);

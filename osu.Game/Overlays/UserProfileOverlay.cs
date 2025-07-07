@@ -9,6 +9,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
@@ -55,13 +56,17 @@ namespace osu.Game.Overlays
         public UserProfileOverlay()
             : base(OverlayColourScheme.Pink)
         {
-            base.Content.AddRange(new Drawable[]
+            base.Content.Add(new PopoverContainer
             {
-                onlineViewContainer = new OnlineViewContainer($"Sign in to view the {Header.Title.Title}")
+                RelativeSizeAxes = Axes.Both,
+                Children = new Drawable[]
                 {
-                    RelativeSizeAxes = Axes.Both
-                },
-                loadingLayer = new LoadingLayer(true)
+                    onlineViewContainer = new OnlineViewContainer($"Sign in to view the {Header.Title.Title}")
+                    {
+                        RelativeSizeAxes = Axes.Both
+                    },
+                    loadingLayer = new LoadingLayer(true)
+                }
             });
         }
 

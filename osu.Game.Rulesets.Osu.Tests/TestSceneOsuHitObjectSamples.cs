@@ -14,26 +14,27 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         protected override IResourceStore<byte[]> RulesetResources => new DllResourceStore(Assembly.GetAssembly(typeof(TestSceneOsuHitObjectSamples)));
 
-        [TestCase("normal-hitnormal")]
-        [TestCase("hitnormal")]
-        public void TestDefaultCustomSampleFromBeatmap(string expectedSample)
+        [TestCase("normal-hitnormal2", "normal-hitnormal")]
+        [TestCase("hitnormal", "hitnormal")]
+        public void TestDefaultCustomSampleFromBeatmap(string beatmapSkinSampleName, string userSkinSampleName)
         {
-            SetupSkins(expectedSample, expectedSample);
+            SetupSkins(beatmapSkinSampleName, userSkinSampleName);
 
             CreateTestWithBeatmap("osu-hitobject-beatmap-custom-sample-bank.osu");
 
-            AssertBeatmapLookup(expectedSample);
+            AssertBeatmapLookup(beatmapSkinSampleName);
         }
 
-        [TestCase("normal-hitnormal")]
-        [TestCase("hitnormal")]
-        public void TestDefaultCustomSampleFromUserSkinFallback(string expectedSample)
+        [TestCase("", "normal-hitnormal")]
+        [TestCase("normal-hitnormal", "normal-hitnormal")]
+        [TestCase("", "hitnormal")]
+        public void TestDefaultCustomSampleFromUserSkinFallback(string beatmapSkinSampleName, string userSkinSampleName)
         {
-            SetupSkins(string.Empty, expectedSample);
+            SetupSkins(beatmapSkinSampleName, userSkinSampleName);
 
             CreateTestWithBeatmap("osu-hitobject-beatmap-custom-sample-bank.osu");
 
-            AssertUserLookup(expectedSample);
+            AssertUserLookup(userSkinSampleName);
         }
 
         [TestCase("normal-hitnormal2")]

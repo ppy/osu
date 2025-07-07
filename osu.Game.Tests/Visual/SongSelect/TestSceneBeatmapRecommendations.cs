@@ -23,6 +23,7 @@ using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Taiko;
+using osu.Game.Screens.SelectV2;
 using osu.Game.Tests.Resources;
 using osu.Game.Users;
 using osu.Game.Utils;
@@ -64,16 +65,16 @@ namespace osu.Game.Tests.Visual.SongSelect
                 switch (rulesetID)
                 {
                     case 0:
-                        return 336; // recommended star rating of 2
+                        return 337; // recommended star rating of 2
 
                     case 1:
                         return 973; // SR 3
 
                     case 2:
-                        return 1905; // SR 4
+                        return 1906; // SR 4
 
                     case 3:
-                        return 3329; // SR 5
+                        return 3330; // SR 5
 
                     default:
                         return 0;
@@ -248,7 +249,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             AddStep("present beatmap", () => Game.PresentBeatmap(getImport()));
 
-            AddUntilStep("wait for song select", () => Game.ScreenStack.CurrentScreen is Screens.Select.SongSelect select && select.BeatmapSetsLoaded);
+            AddUntilStep("wait for song select", () => Game.ScreenStack.CurrentScreen is SoloSongSelect select && select.CarouselItemsPresented);
             AddUntilStep("recommended beatmap displayed", () => Game.Beatmap.Value.BeatmapInfo.OnlineID, () => Is.EqualTo(getImport().Beatmaps[expectedDiff - 1].OnlineID));
         }
 

@@ -197,6 +197,7 @@ namespace osu.Game.Overlays.Dashboard
                     case UserActivity.InSoloGame:
                     case UserActivity.InMultiplayerGame:
                     case UserActivity.InPlaylistGame:
+                    case UserActivity.PlayingDailyChallenge:
                         spectateButton.Enabled.Value = true;
                         break;
                 }

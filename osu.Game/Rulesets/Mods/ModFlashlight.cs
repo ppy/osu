@@ -37,7 +37,6 @@ namespace osu.Game.Rulesets.Mods
         public override ModType Type => ModType.DifficultyIncrease;
         public override LocalisableString Description => "Restricted view area.";
         public override bool Ranked => UsesDefaultConfiguration;
-        public override bool ValidForFreestyleAsRequiredMod => true;
 
         [SettingSource("Flashlight size", "Multiplier applied to the default flashlight size.")]
         public abstract BindableFloat SizeMultiplier { get; }
@@ -86,7 +85,7 @@ namespace osu.Game.Rulesets.Mods
             flashlight.Colour = Color4.Black;
 
             flashlight.Combo.BindTo(Combo);
-            flashlight.GetPlayfieldScale = () => drawableRuleset.Playfield.Scale;
+            flashlight.GetPlayfieldScale = () => drawableRuleset.PlayfieldAdjustmentContainer.Scale;
 
             drawableRuleset.Overlays.Add(new Container
             {

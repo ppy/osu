@@ -79,6 +79,11 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
                     Alpha = 0.5f;
                     TooltipText = ResultsScreenStrings.NoPPForUnrankedMods;
                 }
+                else if (scoreInfo.Rank == ScoreRank.F)
+                {
+                    Alpha = 0.5f;
+                    TooltipText = ResultsScreenStrings.NoPPForFailedScores;
+                }
                 else
                 {
                     Alpha = 1f;

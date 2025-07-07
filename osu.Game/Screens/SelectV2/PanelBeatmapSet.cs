@@ -67,19 +67,6 @@ namespace osu.Game.Screens.SelectV2
             PanelXOffset = 20f;
         }
 
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
-        {
-            var inputRectangle = TopLevelContent.DrawRectangle;
-
-            // Cover the gaps introduced by the spacing between BeatmapPanels so that clicks will not fall through the carousel.
-            //
-            // Caveat is that for simplicity, we are covering the full spacing, so panels with frontmost depth will have a slightly
-            // larger hit target.
-            inputRectangle = inputRectangle.Inflate(new MarginPadding { Vertical = BeatmapCarousel.SPACING });
-
-            return inputRectangle.Contains(TopLevelContent.ToLocalSpace(screenSpacePos));
-        }
-
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -110,7 +97,9 @@ namespace osu.Game.Screens.SelectV2
                 {
                     AutoSizeAxes = Axes.Both,
                     Direction = FillDirection.Vertical,
-                    Padding = new MarginPadding { Top = 7.5f, Left = 15, Bottom = 5 },
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                    Padding = new MarginPadding { Top = 7.5f, Left = 15, Bottom = 13 },
                     Children = new Drawable[]
                     {
                         titleText = new OsuSpriteText
@@ -245,7 +234,7 @@ namespace osu.Game.Screens.SelectV2
                 if (manageCollectionsDialog != null)
                     collectionItems.Add(new OsuMenuItem("Manage...", MenuItemType.Standard, manageCollectionsDialog.Show));
 
-                items.Add(new OsuMenuItem("Collections") { Items = collectionItems });
+                items.Add(new OsuMenuItem(CommonStrings.Collections) { Items = collectionItems });
 
                 if (beatmapSet.Beatmaps.Any(b => b.Hidden))
                     items.Add(new OsuMenuItem("Restore all hidden", MenuItemType.Standard, () => songSelect?.RestoreAllHidden(beatmapSet)));

@@ -28,7 +28,7 @@ using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play;
-using osu.Game.Screens.Select;
+using osu.Game.Screens.SelectV2;
 using osu.Game.Users;
 using osu.Game.Utils;
 
@@ -49,8 +49,14 @@ namespace osu.Game.Overlays.SkinEditor
         [Resolved]
         private IPerformFromScreenRunner? performer { get; set; }
 
+        [Resolved]
+        private IOverlayManager? overlayManager { get; set; }
+
         [Cached]
         public readonly EditorClipboard Clipboard = new EditorClipboard();
+
+        [Cached]
+        private readonly ExternalEditOverlay externalEditOverlay = new ExternalEditOverlay();
 
         [Resolved]
         private OsuGame game { get; set; } = null!;
@@ -69,6 +75,7 @@ namespace osu.Game.Overlays.SkinEditor
 
         private OsuScreen? lastTargetScreen;
         private InvokeOnDisposal? nestedInputManagerDisable;
+        private IDisposable? externalEditOverlayRegistration;
 
         private readonly LayoutValue drawSizeLayout;
 
@@ -84,6 +91,13 @@ namespace osu.Game.Overlays.SkinEditor
         private void load(OsuConfigManager config)
         {
             config.BindWith(OsuSetting.BeatmapSkins, beatmapSkins);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            externalEditOverlayRegistration = overlayManager?.RegisterBlockingOverlay(externalEditOverlay);
         }
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
@@ -180,7 +194,7 @@ namespace osu.Game.Overlays.SkinEditor
 
                 // the validity of the current game-wide beatmap + ruleset combination is enforced by song select.
                 // if we're anywhere else, the state is unknown and may not make sense, so forcibly set something that does.
-                if (screen is not PlaySongSelect)
+                if (screen is not SoloSongSelect)
                     ruleset.Value = beatmap.Value.BeatmapInfo.Ruleset;
                 var replayGeneratingMod = ruleset.Value.CreateInstance().GetAutoplayMod();
 
@@ -194,7 +208,7 @@ namespace osu.Game.Overlays.SkinEditor
 
                 if (replayGeneratingMod != null)
                     screen.Push(new EndlessPlayer((beatmap, mods) => replayGeneratingMod.CreateScoreFromReplayData(beatmap, mods)));
-            }, new[] { typeof(Player), typeof(PlaySongSelect) });
+            }, new[] { typeof(Player), typeof(SoloSongSelect) });
         }
 
         protected override void Update()
@@ -332,6 +346,22 @@ namespace osu.Game.Overlays.SkinEditor
         {
             leasedBeatmapSkins?.Return();
             leasedBeatmapSkins = null;
+        }
+
+        public new void ToggleVisibility()
+        {
+            if (skinEditor?.ExternalEditInProgress == true)
+                return;
+
+            base.ToggleVisibility();
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            externalEditOverlayRegistration?.Dispose();
+            externalEditOverlayRegistration = null;
         }
 
         private partial class EndlessPlayer : ReplayPlayer

@@ -37,8 +37,6 @@ namespace osu.Game.Screens.Select.Leaderboards
 
         public bool HasTeams => TeamScores.Count > 0;
 
-        public bool IsPartial => false;
-
         private readonly MultiplayerRoomUser[] users;
 
         private readonly Bindable<ScoringMode> scoringMode = new Bindable<ScoringMode>();
@@ -99,7 +97,11 @@ namespace osu.Game.Screens.Select.Leaderboards
 
                                        var trackedUser = UserScores[user.Id];
 
-                                       var leaderboardScore = new GameplayLeaderboardScore(user, trackedUser.ScoreProcessor, user.Id == api.LocalUser.Value.Id)
+                                       var leaderboardScore = new GameplayLeaderboardScore(
+                                           user,
+                                           trackedUser.ScoreProcessor,
+                                           user.Id == api.LocalUser.Value.Id,
+                                           GameplayLeaderboardScore.ComboDisplayMode.Current)
                                        {
                                            HasQuit = { BindTarget = trackedUser.UserQuit },
                                            TeamColour = UserScores[user.OnlineID].Team is int team ? getTeamColour(team) : null,
