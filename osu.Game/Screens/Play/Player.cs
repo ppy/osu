@@ -1046,7 +1046,7 @@ namespace osu.Game.Screens.Play
             // already resuming
             && !IsResuming;
 
-        public bool Pause()
+        public virtual bool Pause()
         {
             if (!pausingSupportedByCurrentState) return false;
 
