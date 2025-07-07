@@ -31,7 +31,7 @@ namespace osu.Game.Screens.SelectV2
         // taken from draw visualiser. used for carousel alignment purposes.
         public const float HEIGHT_FROM_SCREEN_TOP = 141 - corner_radius;
 
-        private const float corner_radius = 8;
+        private const float corner_radius = 10;
 
         private SongSelectSearchTextBox searchTextBox = null!;
         private ShearedToggleButton showConvertedBeatmapsButton = null!;
@@ -269,7 +269,7 @@ namespace osu.Game.Screens.SelectV2
                 .FadeOut(SongSelect.ENTER_DURATION / 3, Easing.In);
         }
 
-        private partial class SongSelectSearchTextBox : ShearedFilterTextBox
+        internal partial class SongSelectSearchTextBox : ShearedFilterTextBox
         {
             protected override InnerSearchTextBox CreateInnerTextBox() => new InnerTextBox();
 
@@ -279,6 +279,10 @@ namespace osu.Game.Screens.SelectV2
 
                 public override bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
                 {
+                    // Conflicts with default group navigation keys (shift-left shift-right).
+                    if (e.Action == PlatformAction.SelectBackwardChar || e.Action == PlatformAction.SelectForwardChar)
+                        return false;
+
                     // the "cut" platform key binding (shift-delete) conflicts with the beatmap deletion action.
                     if (e.Action == PlatformAction.Cut && e.ShiftPressed && e.CurrentState.Keyboard.Keys.IsPressed(Key.Delete))
                         return false;
