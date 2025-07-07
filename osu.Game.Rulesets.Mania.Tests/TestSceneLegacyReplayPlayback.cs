@@ -9,7 +9,6 @@ using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Mods;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Replays;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
@@ -521,14 +520,13 @@ namespace osu.Game.Rulesets.Mania.Tests
                 ScoreInfo = new ScoreInfo
                 {
                     Ruleset = CreateRuleset().RulesetInfo,
-                    Mods = [new ModScoreV2()]
+                    Mods = [new ManiaModScoreV2()]
                 }
             };
 
             RunTest($@"SV2 single note @ OD{overallDifficulty}", beatmap, $@"SV2 {hitOffset}ms @ OD{overallDifficulty} = {expectedResult}", score, [expectedResult]);
         }
 
-        [Ignore("Tests expected to fail until stable's detailed treatment of hit windows in mania is reproduced.")]
         [TestCaseSource(nameof(score_v1_non_convert_test_cases))]
         public void TestHitWindowTreatmentWithScoreV1NonConvert(float overallDifficulty, double hitOffset, HitResult expectedResult)
         {
@@ -556,7 +554,6 @@ namespace osu.Game.Rulesets.Mania.Tests
             RunTest($@"SV1 single note @ OD{overallDifficulty}", beatmap, $@"SV1 {hitOffset}ms @ OD{overallDifficulty} = {expectedResult}", score, [expectedResult]);
         }
 
-        [Ignore("Tests expected to fail until stable's detailed treatment of hit windows in mania is reproduced.")]
         [TestCaseSource(nameof(score_v1_convert_test_cases))]
         public void TestHitWindowTreatmentWithScoreV1Convert(float overallDifficulty, double hitOffset, HitResult expectedResult)
         {
@@ -585,7 +582,6 @@ namespace osu.Game.Rulesets.Mania.Tests
             RunTest($@"SV1 convert single note @ OD{overallDifficulty}", beatmap, $@"SV1 convert {hitOffset}ms @ OD{overallDifficulty} = {expectedResult}", score, [expectedResult]);
         }
 
-        [Ignore("Tests expected to fail until stable's detailed treatment of hit windows in mania is reproduced.")]
         [TestCaseSource(nameof(score_v1_non_convert_hard_rock_test_cases))]
         public void TestHitWindowTreatmentWithScoreV1AndHardRockNonConvert(float overallDifficulty, double hitOffset, HitResult expectedResult)
         {
@@ -614,7 +610,6 @@ namespace osu.Game.Rulesets.Mania.Tests
             RunTest($@"SV1+HR single note @ OD{overallDifficulty}", beatmap, $@"SV1+HR {hitOffset}ms @ OD{overallDifficulty} = {expectedResult}", score, [expectedResult]);
         }
 
-        [Ignore("Tests expected to fail until stable's detailed treatment of hit windows in mania is reproduced.")]
         [TestCaseSource(nameof(score_v1_non_convert_easy_test_cases))]
         public void TestHitWindowTreatmentWithScoreV1AndEasyNonConvert(float overallDifficulty, double hitOffset, HitResult expectedResult)
         {
@@ -643,7 +638,6 @@ namespace osu.Game.Rulesets.Mania.Tests
             RunTest($@"SV1+EZ single note @ OD{overallDifficulty}", beatmap, $@"SV1+EZ {hitOffset}ms @ OD{overallDifficulty} = {expectedResult}", score, [expectedResult]);
         }
 
-        [Ignore("Tests expected to fail until stable's detailed treatment of hit windows in mania is reproduced.")]
         [TestCaseSource(nameof(score_v1_non_convert_double_time_test_cases))]
         public void TestHitWindowTreatmentWithScoreV1AndDoubleTimeNonConvert(float overallDifficulty, double hitOffset, HitResult expectedResult)
         {
@@ -672,7 +666,6 @@ namespace osu.Game.Rulesets.Mania.Tests
             RunTest($@"SV1+DT single note @ OD{overallDifficulty}", beatmap, $@"SV1+DT {hitOffset}ms @ OD{overallDifficulty} = {expectedResult}", score, [expectedResult]);
         }
 
-        [Ignore("Tests expected to fail until stable's detailed treatment of hit windows in mania is reproduced.")]
         [TestCaseSource(nameof(score_v1_non_convert_half_time_test_cases))]
         public void TestHitWindowTreatmentWithScoreV1AndHalfTimeNonConvert(float overallDifficulty, double hitOffset, HitResult expectedResult)
         {
