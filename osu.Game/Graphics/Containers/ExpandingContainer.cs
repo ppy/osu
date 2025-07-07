@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -41,24 +40,20 @@ namespace osu.Game.Graphics.Containers
             RelativeSizeAxes = Axes.Y;
             Width = contractedWidth;
 
-            FillFlow = new FillFlowContainer
-            {
-                Origin = Anchor.CentreLeft,
-                Anchor = Anchor.CentreLeft,
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-                Direction = FillDirection.Vertical,
-            };
-        }
-
-        [BackgroundDependencyLoader]
-        private void load()
-        {
             InternalChild = CreateScrollContainer().With(s =>
             {
                 s.RelativeSizeAxes = Axes.Both;
                 s.ScrollbarVisible = false;
-            }).WithChild(FillFlow);
+            }).WithChild(
+                FillFlow = new FillFlowContainer
+                {
+                    Origin = Anchor.CentreLeft,
+                    Anchor = Anchor.CentreLeft,
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Direction = FillDirection.Vertical,
+                }
+            );
         }
 
         protected virtual OsuScrollContainer CreateScrollContainer() => new OsuScrollContainer();

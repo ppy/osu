@@ -32,6 +32,8 @@ namespace osu.Game.Updater
                                          // only implementations will actually check for updates.
                                          GetType() != typeof(UpdateManager);
 
+        public virtual ReleaseStream? FixedReleaseStream => null;
+
         [Resolved]
         private OsuConfigManager config { get; set; } = null!;
 
@@ -86,7 +88,7 @@ namespace osu.Game.Updater
         /// Immediately checks for any available update.
         /// </summary>
         /// <returns><c>true</c> if any updates are available, <c>false</c> otherwise.</returns>
-        public async Task<bool> CheckForUpdateAsync(CancellationToken cancellationToken = default)
+        public async Task<bool> CheckForUpdateAsync(CancellationToken cancellationToken = default) => await Task.Run(async () =>
         {
             if (!CanCheckForUpdate)
                 return false;
@@ -98,7 +100,7 @@ namespace osu.Game.Updater
                 await lastCts.CancelAsync().ConfigureAwait(false);
 
             return await PerformUpdateCheck(cts.Token).ConfigureAwait(false);
-        }
+        }, cancellationToken).ConfigureAwait(false);
 
         /// <summary>
         /// Performs an asynchronous check for application updates.

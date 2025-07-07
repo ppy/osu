@@ -166,11 +166,7 @@ namespace osu.Game.Tests.Mods
         /// </summary>
         private BeatmapDifficulty applyDifficulty(BeatmapDifficulty difficulty)
         {
-            // ensure that ReadFromDifficulty doesn't pollute the values.
             var newDifficulty = difficulty.Clone();
-
-            testMod.ReadFromDifficulty(difficulty);
-
             testMod.ApplyToDifficulty(newDifficulty);
             return newDifficulty;
         }

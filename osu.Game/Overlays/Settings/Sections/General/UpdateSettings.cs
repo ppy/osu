@@ -28,9 +28,9 @@ namespace osu.Game.Overlays.Settings.Sections.General
         protected override LocalisableString Header => GeneralSettingsStrings.UpdateHeader;
 
         private SettingsButton checkForUpdatesButton = null!;
+        private SettingsEnumDropdown<ReleaseStream> releaseStreamDropdown = null!;
 
         private readonly Bindable<ReleaseStream> configReleaseStream = new Bindable<ReleaseStream>();
-        private SettingsEnumDropdown<ReleaseStream> releaseStreamDropdown = null!;
 
         [Resolved]
         private UpdateManager? updateManager { get; set; }
@@ -44,51 +44,50 @@ namespace osu.Game.Overlays.Settings.Sections.General
         [Resolved]
         private OsuGame? game { get; set; }
 
+        [Resolved]
+        private IDialogOverlay? dialogOverlay { get; set; }
+
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config, IDialogOverlay? dialogOverlay)
+        private void load(OsuConfigManager config)
         {
             config.BindWith(OsuSetting.ReleaseStream, configReleaseStream);
 
-            if (updateManager?.CanCheckForUpdate == true)
+            bool isDesktop = RuntimeInfo.IsDesktop;
+            bool canCheckUpdates = updateManager?.CanCheckForUpdate == true;
+
+            if (canCheckUpdates)
             {
-                Add(releaseStreamDropdown = new SettingsEnumDropdown<ReleaseStream>
+                // For simplicity, hide the concept of release streams from mobile users.
+                if (isDesktop)
                 {
-                    LabelText = GeneralSettingsStrings.ReleaseStream,
-                    Current = { Value = configReleaseStream.Value },
-                    Keywords = new[] { @"version" },
-                });
+                    Add(releaseStreamDropdown = new SettingsEnumDropdown<ReleaseStream>
+                    {
+                        LabelText = GeneralSettingsStrings.ReleaseStream,
+                        Current = { Value = configReleaseStream.Value },
+                        Keywords = new[] { @"version" },
+                    });
+
+                    if (updateManager!.FixedReleaseStream != null)
+                    {
+                        configReleaseStream.Value = updateManager.FixedReleaseStream.Value;
+
+                        releaseStreamDropdown.ShowsDefaultIndicator = false;
+                        releaseStreamDropdown.Items = [updateManager.FixedReleaseStream.Value];
+                        releaseStreamDropdown.SetNoticeText(GeneralSettingsStrings.ChangeReleaseStreamPackageManagerWarning);
+                    }
+
+                    releaseStreamDropdown.Current.BindValueChanged(releaseStreamChanged);
+                }
 
                 Add(checkForUpdatesButton = new SettingsButton
                 {
                     Text = GeneralSettingsStrings.CheckUpdate,
                     Action = () => checkForUpdates().FireAndForget()
                 });
-
-                releaseStreamDropdown.Current.BindValueChanged(stream =>
-                {
-                    if (stream.NewValue == ReleaseStream.Tachyon)
-                    {
-                        dialogOverlay?.Push(new ConfirmDialog(GeneralSettingsStrings.ChangeReleaseStreamConfirmation,
-                            () =>
-                            {
-                                configReleaseStream.Value = ReleaseStream.Tachyon;
-                            },
-                            () =>
-                            {
-                                releaseStreamDropdown.Current.Value = ReleaseStream.Lazer;
-                            })
-                        {
-                            BodyText = GeneralSettingsStrings.ChangeReleaseStreamConfirmationInfo
-                        });
-
-                        return;
-                    }
-
-                    configReleaseStream.Value = stream.NewValue;
-                });
             }
 
-            if (RuntimeInfo.IsDesktop)
+            // Loosely update-related maintenance buttons.
+            if (isDesktop)
             {
                 Add(new SettingsButton
                 {
@@ -110,6 +109,24 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     Action = () => game?.PerformFromScreen(menu => menu.Push(new MigrationSelectScreen()))
                 });
             }
+        }
+
+        private void releaseStreamChanged(ValueChangedEvent<ReleaseStream> stream)
+        {
+            if (stream.NewValue == ReleaseStream.Tachyon)
+            {
+                dialogOverlay?.Push(
+                    new ConfirmDialog(GeneralSettingsStrings.ChangeReleaseStreamConfirmation,
+                        () => configReleaseStream.Value = ReleaseStream.Tachyon,
+                        () => releaseStreamDropdown.Current.Value = ReleaseStream.Lazer)
+                    {
+                        BodyText = GeneralSettingsStrings.ChangeReleaseStreamConfirmationInfo
+                    });
+
+                return;
+            }
+
+            configReleaseStream.Value = stream.NewValue;
         }
 
         private async Task checkForUpdates()

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using osu.Framework.Extensions;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Extensions;
@@ -85,6 +86,7 @@ namespace osu.Game.Database
         /// </summary>
         public void AddFile(TModel item, Stream contents, string filename, Realm realm)
         {
+            filename = filename.ToStandardisedPath();
             var existing = item.GetFile(filename);
 
             if (existing != null)

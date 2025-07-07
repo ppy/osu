@@ -6,11 +6,16 @@ using NUnit.Framework;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Replays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Play.HUD;
 using osu.Game.Tests.Beatmaps;
+using osu.Game.Tests.Resources;
+using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
@@ -155,6 +160,51 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
 
             AddAssert("Jumped forwards", () => Player.GameplayClockContainer.CurrentTime - lastTime > 500);
+        }
+
+        [Test]
+        public void TestReplayDoesNotFailUntilRunningOutOfFrames()
+        {
+            var score = new Score
+            {
+                ScoreInfo = TestResources.CreateTestScoreInfo(Beatmap.Value.BeatmapInfo),
+                Replay = new Replay
+                {
+                    Frames =
+                    {
+                        new OsuReplayFrame(0, Vector2.Zero),
+                        new OsuReplayFrame(10000, Vector2.Zero),
+                    }
+                }
+            };
+            score.ScoreInfo.Mods = [];
+            score.ScoreInfo.Rank = ScoreRank.F;
+            AddStep("set global state", () =>
+            {
+                Beatmap.Value = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
+                Ruleset.Value = Beatmap.Value.BeatmapInfo.Ruleset;
+                SelectedMods.Value = score.ScoreInfo.Mods;
+            });
+            AddStep("create player", () => Player = new TestReplayPlayer(score, showResults: false));
+            AddStep("load player", () => LoadScreen(Player));
+            AddUntilStep("wait for loaded", () => Player.IsCurrentScreen());
+            AddStep("seek to 8000", () => Player.Seek(8000));
+            AddUntilStep("wait for fail", () => Player.GameplayState.HasFailed);
+            AddAssert("player failed after 10000", () => Player.GameplayClockContainer.CurrentTime, () => Is.GreaterThanOrEqualTo(10000));
+        }
+
+        [Test]
+        public void TestPlayerLoaderSettingsHover()
+        {
+            loadPlayerWithBeatmap();
+
+            AddUntilStep("wait for settings overlay hidden", () => settingsOverlay().Expanded.Value, () => Is.False);
+            AddStep("move mouse to right of screen", () => InputManager.MoveMouseTo(Player.ScreenSpaceDrawQuad.TopRight));
+            AddUntilStep("wait for settings overlay visible", () => settingsOverlay().Expanded.Value, () => Is.True);
+            AddStep("move mouse to centre of screen", () => InputManager.MoveMouseTo(Player.ScreenSpaceDrawQuad.Centre));
+            AddUntilStep("wait for settings overlay hidden", () => settingsOverlay().Expanded.Value, () => Is.False);
+
+            PlayerSettingsOverlay settingsOverlay() => Player.ChildrenOfType<PlayerSettingsOverlay>().Single();
         }
 
         private void loadPlayerWithBeatmap(IBeatmap? beatmap = null)
