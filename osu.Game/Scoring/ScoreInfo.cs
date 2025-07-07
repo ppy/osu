@@ -155,6 +155,9 @@ namespace osu.Game.Scoring
         [MapTo("MaximumStatistics")]
         public string MaximumStatisticsJson { get; set; } = string.Empty;
 
+        [Ignored]
+        public int PauseCount { get; set; }
+
         public ScoreInfo(BeatmapInfo? beatmap = null, RulesetInfo? ruleset = null, RealmUser? realmUser = null)
         {
             Ruleset = ruleset ?? new RulesetInfo();
