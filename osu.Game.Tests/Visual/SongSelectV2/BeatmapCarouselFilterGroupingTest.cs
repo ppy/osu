@@ -263,8 +263,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             var results = await runGrouping(GroupMode.Difficulty, beatmapSets);
             assertGroup(results, 0, "Below 1 Star", new[] { beatmapBelow1 }, ref total);
-            assertGroup(results, 1, "1 Star", new[] { beatmapAbove1 }, ref total);
-            assertGroup(results, 2, "2 Stars", new[] { beatmapAlmost2, beatmap2, beatmapAbove2 }, ref total);
+            assertGroup(results, 1, "1 Star", new[] { beatmapAbove1, beatmapAlmost2 }, ref total);
+            assertGroup(results, 2, "2 Stars", new[] { beatmap2, beatmapAbove2 }, ref total);
             assertGroup(results, 3, "7 Stars", new[] { beatmap7 }, ref total);
             assertTotal(results, total);
         }

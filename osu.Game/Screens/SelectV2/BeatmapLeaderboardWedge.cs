@@ -14,6 +14,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Events;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
@@ -81,6 +82,13 @@ namespace osu.Game.Screens.SelectV2
         private readonly IBindable<LeaderboardScores?> fetchedScores = new Bindable<LeaderboardScores?>();
 
         private const float personal_best_height = 112;
+
+        // Blocking mouse down is required to avoid song select's background reveal logic happening while hovering scores.
+        // Our horizontal alignment doesn't really align with the rest of the sheared components (protrudes a touch to the right) which makes
+        // it complicated to handle this at a higher level.
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => scoresScroll.ReceivePositionalInputAt(screenSpacePos);
+
+        protected override bool OnMouseDown(MouseDownEvent e) => true;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -389,8 +397,7 @@ namespace osu.Game.Screens.SelectV2
             float fadeBottom = (float)(scoresScroll.Current + scoresScroll.DrawHeight);
             float fadeTop = (float)(scoresScroll.Current);
 
-            if (!scoresScroll.IsScrolledToStart())
-                fadeTop += height;
+            fadeTop += (float)Math.Min(height, Math.Log10(Math.Max(fadeTop, 0) + 1) * height);
 
             foreach (var c in scoresContainer)
             {
