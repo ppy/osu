@@ -364,40 +364,42 @@ namespace osu.Game
             if (host.Window != null)
             {
                 host.Window.CursorState |= CursorState.Hidden;
-                host.Window.DragDrop += path =>
-                {
-                    // on macOS/iOS, URL associations are handled via SDL_DROPFILE events.
-                    if (path.StartsWith(OSU_PROTOCOL, StringComparison.Ordinal))
-                    {
-                        HandleLink(path);
-                        return;
-                    }
-
-                    lock (dragDropFiles)
-                    {
-                        dragDropFiles.Add(path);
-
-                        Logger.Log($@"Adding ""{Path.GetFileName(path)}"" for import");
-
-                        // File drag drop operations can potentially trigger hundreds or thousands of these calls on some platforms.
-                        // In order to avoid spawning multiple import tasks for a single drop operation, debounce a touch.
-                        dragDropImportSchedule?.Cancel();
-                        dragDropImportSchedule = Scheduler.AddDelayed(handlePendingDragDropImports, 100);
-                    }
-                };
+                host.Window.DragDrop += onWindowDragDrop;
             }
         }
 
-        private void handlePendingDragDropImports()
+        private void onWindowDragDrop(string path)
         {
+            // on macOS/iOS, URL associations are handled via SDL_DROPFILE events.
+            if (path.StartsWith(OSU_PROTOCOL, StringComparison.Ordinal))
+            {
+                HandleLink(path);
+                return;
+            }
+
             lock (dragDropFiles)
             {
-                Logger.Log($"Handling batch import of {dragDropFiles.Count} files");
+                dragDropFiles.Add(path);
 
-                string[] paths = dragDropFiles.ToArray();
-                dragDropFiles.Clear();
+                Logger.Log($@"Adding ""{Path.GetFileName(path)}"" for import");
 
-                Task.Factory.StartNew(() => Import(paths), TaskCreationOptions.LongRunning);
+                // File drag drop operations can potentially trigger hundreds or thousands of these calls on some platforms.
+                // In order to avoid spawning multiple import tasks for a single drop operation, debounce a touch.
+                dragDropImportSchedule?.Cancel();
+                dragDropImportSchedule = Scheduler.AddDelayed(handlePendingDragDropImports, 100);
+            }
+
+            void handlePendingDragDropImports()
+            {
+                lock (dragDropFiles)
+                {
+                    Logger.Log($"Handling batch import of {dragDropFiles.Count} files");
+
+                    string[] paths = dragDropFiles.ToArray();
+                    dragDropFiles.Clear();
+
+                    Task.Factory.StartNew(() => Import(paths), TaskCreationOptions.LongRunning);
+                }
             }
         }
 
@@ -1026,7 +1028,11 @@ namespace osu.Game
             detachedBeatmapStore?.Dispose();
 
             base.Dispose(isDisposing);
+
             SentryLogger.Dispose();
+
+            if (Host?.Window != null)
+                Host.Window.DragDrop -= onWindowDragDrop;
 
             Logger.NewEntry -= forwardGeneralLogToNotifications;
             Logger.NewEntry -= forwardTabletLogToNotifications;
