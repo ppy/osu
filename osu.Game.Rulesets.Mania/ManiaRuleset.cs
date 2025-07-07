@@ -161,7 +161,7 @@ namespace osu.Game.Rulesets.Mania
                 yield return new ManiaModMirror();
 
             if (mods.HasFlag(LegacyMods.ScoreV2))
-                yield return new ModScoreV2();
+                yield return new ManiaModScoreV2();
         }
 
         public override LegacyMods ConvertToLegacyMods(Mod[] mods)
@@ -296,7 +296,7 @@ namespace osu.Game.Rulesets.Mania
                 case ModType.System:
                     return new Mod[]
                     {
-                        new ModScoreV2(),
+                        new ManiaModScoreV2(),
                     };
 
                 default:
