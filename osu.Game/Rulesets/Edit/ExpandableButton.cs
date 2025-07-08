@@ -8,6 +8,7 @@ using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Screens.Edit;
 
 namespace osu.Game.Rulesets.Edit
 {
@@ -68,7 +69,7 @@ namespace osu.Game.Rulesets.Edit
 
         public ExpandableButton()
         {
-            Height = 30;
+            Height = Editor.BUTTON_HEIGHT;
         }
 
         protected override void LoadComplete()

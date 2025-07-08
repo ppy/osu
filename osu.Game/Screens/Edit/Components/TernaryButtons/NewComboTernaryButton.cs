@@ -66,7 +66,7 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
                 },
                 pickerButton = new ColourPickerButton
                 {
-                    Height = 30,
+                    Height = Editor.BUTTON_HEIGHT,
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
                     ComboColours = { BindTarget = comboColours }
@@ -93,6 +93,8 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
 
         private void updateState()
         {
+            const float icon_offset = (Editor.BUTTON_HEIGHT - Editor.BUTTON_ICON_SIZE) / 2;
+
             if (Current.Value == TernaryState.True && selectedHitObjects.Count == 1 && selectedHitObjects.Single() is IHasComboInformation hasCombo && comboColours.Count > 1)
             {
                 float targetPickerButtonWidth = expanded.Value ? 25 : 7;
@@ -102,14 +104,14 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
                 pickerButton.Icon.Alpha = expanded.Value ? 1 : 0;
 
                 mainButtonContainer.TransformTo(nameof(mainButtonContainer.Padding), new MarginPadding { Right = targetPickerButtonWidth + 3 }, ExpandingContainer.TRANSITION_DURATION, Easing.OutQuint);
-                mainButton.Icon.MoveToX(expanded.Value ? 8 : 3f, ExpandingContainer.TRANSITION_DURATION, Easing.OutQuint);
+                mainButton.Icon.MoveToX(expanded.Value ? icon_offset / 2 : 3f, ExpandingContainer.TRANSITION_DURATION, Easing.OutQuint);
             }
             else
             {
                 pickerButton.ResizeWidthTo(0, ExpandingContainer.TRANSITION_DURATION, Easing.OutQuint);
 
                 mainButtonContainer.TransformTo(nameof(mainButtonContainer.Padding), new MarginPadding(), ExpandingContainer.TRANSITION_DURATION, Easing.OutQuint);
-                mainButton.Icon.MoveToX(8, ExpandingContainer.TRANSITION_DURATION, Easing.OutQuint);
+                mainButton.Icon.MoveToX(icon_offset, ExpandingContainer.TRANSITION_DURATION, Easing.OutQuint);
             }
         }
 
@@ -129,12 +131,12 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
             [BackgroundDependencyLoader]
             private void load()
             {
-                Content.CornerRadius = 3;
+                Content.CornerRadius = Editor.BUTTON_CORNER_RADIUS;
 
                 Add(Icon = new SpriteIcon
                 {
                     Icon = FontAwesome.Solid.Palette,
-                    Size = new Vector2(16),
+                    Size = new Vector2(Editor.BUTTON_ICON_SIZE),
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                 });
