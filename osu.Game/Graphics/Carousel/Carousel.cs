@@ -307,7 +307,7 @@ namespace osu.Game.Graphics.Carousel
         /// <summary>
         /// Retrieve a list of all <see cref="CarouselItem"/>s currently displayed.
         /// </summary>
-        protected IReadOnlyCollection<CarouselItem>? GetCarouselItems() => carouselItems;
+        public IReadOnlyCollection<CarouselItem>? GetCarouselItems() => carouselItems;
 
         protected int IndexOfItem(T item) => Items.IndexOf(item);
 
@@ -672,7 +672,7 @@ namespace osu.Game.Graphics.Carousel
 
         private void loadSamples(AudioManager audio)
         {
-            sampleKeyboardTraversal = audio.Samples.Get(@"UI/button-hover");
+            sampleKeyboardTraversal = audio.Samples.Get(@"SongSelect/select-difficulty");
         }
 
         private void playTraversalSound()
@@ -1030,7 +1030,7 @@ namespace osu.Game.Graphics.Carousel
         /// Implementation of scroll container which handles very large vertical lists by internally using <c>double</c> precision
         /// for pre-display Y values.
         /// </summary>
-        protected partial class CarouselScrollContainer : UserTrackingScrollContainer, IKeyBindingHandler<GlobalAction>
+        public partial class CarouselScrollContainer : UserTrackingScrollContainer, IKeyBindingHandler<GlobalAction>
         {
             public readonly Container Panels;
 
