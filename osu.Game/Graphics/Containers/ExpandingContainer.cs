@@ -40,20 +40,23 @@ namespace osu.Game.Graphics.Containers
             RelativeSizeAxes = Axes.Y;
             Width = contractedWidth;
 
-            InternalChild = new OsuScrollContainer
+            InternalChild = CreateScrollContainer().With(s =>
             {
-                RelativeSizeAxes = Axes.Both,
-                ScrollbarVisible = false,
-                Child = FillFlow = new FillFlowContainer
+                s.RelativeSizeAxes = Axes.Both;
+                s.ScrollbarVisible = false;
+            }).WithChild(
+                FillFlow = new FillFlowContainer
                 {
                     Origin = Anchor.CentreLeft,
                     Anchor = Anchor.CentreLeft,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Direction = FillDirection.Vertical,
-                },
-            };
+                }
+            );
         }
+
+        protected virtual OsuScrollContainer CreateScrollContainer() => new OsuScrollContainer();
 
         private ScheduledDelegate? hoverExpandEvent;
 

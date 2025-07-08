@@ -5,6 +5,7 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Caching;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
@@ -32,9 +33,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private BindableBeatDivisor beatDivisor { get; set; } = null!;
 
         [Resolved]
-        private IEditorChangeHandler? changeHandler { get; set; }
-
-        [Resolved]
         private OsuColour colours { get; set; } = null!;
 
         public TimelineTickDisplay()
@@ -51,9 +49,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         {
             beatDivisor.BindValueChanged(_ => invalidateTicks());
 
-            if (changeHandler != null)
-                // currently this is the best way to handle any kind of timing changes.
-                changeHandler.OnStateChange += invalidateTicks;
+            beatmap.ControlPointInfo.ControlPointsChanged += invalidateTicks;
 
             configManager.BindWith(OsuSetting.EditorTimelineShowTimingChanges, showTimingChanges);
             showTimingChanges.BindValueChanged(_ => invalidateTicks());
@@ -194,8 +190,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         {
             base.Dispose(isDisposing);
 
-            if (changeHandler != null)
-                changeHandler.OnStateChange -= invalidateTicks;
+            if (beatmap.IsNotNull())
+                beatmap.ControlPointInfo.ControlPointsChanged -= invalidateTicks;
         }
     }
 }
