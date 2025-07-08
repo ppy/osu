@@ -40,8 +40,8 @@ namespace osu.Game.Tests.Visual.Online
                 daa.HandleRequest = dummyAPIHandleRequest;
             }
 
-            friend = new APIUser { Id = 0, Username = "Friend" };
-            publicChannel = new Channel { Id = 1, Name = "osu" };
+            friend = new APIUser { Id = 0, Username = "SomeFriend" };
+            publicChannel = new Channel { Id = 1, Name = "#osu" };
             privateMessageChannel = new Channel(friend) { Id = 2, Name = friend.Username, Type = ChannelType.PM };
 
             Schedule(() =>

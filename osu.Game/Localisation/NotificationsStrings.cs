@@ -131,9 +131,9 @@ Click to see what's new!", version);
         public static LocalisableString MultiplayerRoomEnded => new TranslatableString(getKey(@"multiplayer_room_ended"), @"This multiplayer room has ended. Click to display room results.");
 
         /// <summary>
-        /// "Mentioned in {0}"
+        /// "Mention"
         /// </summary>
-        public static LocalisableString MentionedInChannel(string channel) => new TranslatableString(getKey(@"mentioned_in_channel"), @"Mentioned in {0}", channel);
+        public static LocalisableString Mention => new TranslatableString(getKey(@"mention"), @"Mention");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
