@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Extensions.IEnumerableExtensions;
-using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Scoring;
@@ -92,10 +91,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             okHitWindow = hitWindows.WindowFor(HitResult.Ok) / clockRate;
             mehHitWindow = hitWindows.WindowFor(HitResult.Meh) / clockRate;
 
-            double preempt = IBeatmapDifficultyInfo.DifficultyRange(difficulty.ApproachRate, 1800, 1200, 450) / clockRate;
-
-            overallDifficulty = (79.5 - greatHitWindow) / 6;
-            approachRate = preempt > 1200 ? (1800 - preempt) / 120 : (1200 - preempt) / 150 + 5;
+            approachRate = OsuDifficultyCalculator.CalculateRateAdjustedApproachRate(difficulty.ApproachRate, clockRate);
+            overallDifficulty = OsuDifficultyCalculator.CalculateRateAdjustedOverallDifficulty(difficulty.OverallDifficulty, clockRate);
 
             double comboBasedEstimatedMissCount = calculateComboBasedEstimatedMissCount(osuAttributes);
             double? scoreBasedEstimatedMissCount = null;
