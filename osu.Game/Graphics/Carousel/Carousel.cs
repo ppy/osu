@@ -309,8 +309,6 @@ namespace osu.Game.Graphics.Carousel
         /// </summary>
         public IReadOnlyCollection<CarouselItem>? GetCarouselItems() => carouselItems;
 
-        protected int IndexOfItem(T item) => Items.IndexOf(item);
-
         private List<CarouselItem>? carouselItems;
 
         private Task<IEnumerable<CarouselItem>> filterTask = Task.FromResult(Enumerable.Empty<CarouselItem>());

@@ -143,7 +143,7 @@ namespace osu.Game.Screens.SelectV2
                     break;
 
                 case NotifyCollectionChangedAction.Remove:
-                    int previousSelectionIndex = CurrentSelection != null ? IndexOfItem((BeatmapInfo)CurrentSelection) : -1;
+                    int previousSelectionIndex = CurrentSelection != null ? Items.IndexOf((BeatmapInfo)CurrentSelection) : -1;
                     object? previousSelection = CurrentSelection;
 
                     foreach (var set in oldItems!)
