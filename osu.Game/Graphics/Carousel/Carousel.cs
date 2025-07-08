@@ -670,7 +670,7 @@ namespace osu.Game.Graphics.Carousel
 
         private void loadSamples(AudioManager audio)
         {
-            sampleKeyboardTraversal = audio.Samples.Get(@"UI/button-hover");
+            sampleKeyboardTraversal = audio.Samples.Get(@"SongSelect/select-difficulty");
         }
 
         private void playTraversalSound()
