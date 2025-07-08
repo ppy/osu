@@ -143,22 +143,27 @@ namespace osu.Game.Screens.SelectV2
                     break;
 
                 case NotifyCollectionChangedAction.Remove:
-                    int previousSelectionIndex = CurrentSelection != null ? Items.IndexOf((BeatmapInfo)CurrentSelection) : -1;
-                    object? previousSelection = CurrentSelection;
 
-                    foreach (var set in oldItems!)
+                    int? selectionIndex = null;
+
+                    foreach (var beatmap in oldItems!.SelectMany(s => s.Beatmaps))
                     {
-                        foreach (var beatmap in set.Beatmaps)
-                            Items.RemoveAll(i => i is BeatmapInfo bi && beatmap.Equals(bi));
+                        // This is a touch inefficient and could likely be improved.
+                        for (int i = Items.Count - 1; i >= 0; i--)
+                        {
+                            if (Items[i] is BeatmapInfo bi && beatmap.Equals(bi))
+                            {
+                                Items.RemoveAt(i);
+                                if (CurrentSelection is BeatmapInfo b && b.Equals(beatmap))
+                                    selectionIndex = i;
+                            }
+                        }
                     }
 
                     // TODO: should this exist in song select instead of here?
-                    if (!Items.Contains(previousSelection) && previousSelectionIndex != -1)
-                    {
-                        var newBeatmap = Items.ElementAtOrDefault(previousSelectionIndex);
-                        if (newBeatmap != null)
-                            RequestSelection(newBeatmap);
-                    }
+                    // when the selection is removed, attempt to select the closest available item.
+                    if (selectionIndex != null && selectionIndex < Items.Count)
+                        RequestSelection(Items[selectionIndex.Value]);
 
                     break;
 
