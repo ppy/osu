@@ -85,6 +85,8 @@ namespace osu.Game.Graphics.UserInterface
 
         public ExpandableSlider()
         {
+            const float slider_bar_scale = 0.8f;
+
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
@@ -102,8 +104,8 @@ namespace osu.Game.Graphics.UserInterface
                     slider = new TSlider
                     {
                         RelativeSizeAxes = Axes.X,
-                        Scale = new Vector2(0.8f),
-                        Width = 1 / 0.8f,
+                        Scale = new Vector2(slider_bar_scale),
+                        Width = 1 / slider_bar_scale,
                     },
                 }
             };
