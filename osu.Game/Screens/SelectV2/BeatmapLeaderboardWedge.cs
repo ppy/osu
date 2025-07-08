@@ -397,8 +397,7 @@ namespace osu.Game.Screens.SelectV2
             float fadeBottom = (float)(scoresScroll.Current + scoresScroll.DrawHeight);
             float fadeTop = (float)(scoresScroll.Current);
 
-            if (!scoresScroll.IsScrolledToStart())
-                fadeTop += height;
+            fadeTop += (float)Math.Min(height, Math.Log10(Math.Max(fadeTop, 0) + 1) * height);
 
             foreach (var c in scoresContainer)
             {
