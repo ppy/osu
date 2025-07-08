@@ -263,6 +263,8 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                 };
             }
 
+            var ppTooltipText = LocalisableString.Interpolate($@"{Score.PP:N1}pp");
+
             return new FillFlowContainer
             {
                 AutoSizeAxes = Axes.Both,
@@ -275,7 +277,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                         Origin = Anchor.BottomLeft,
                         Font = font,
                         Text = Score.PP.ToLocalisableString(@"N0"),
-                        TooltipText = Score.PP.ToLocalisableString(@"N1"),
+                        TooltipText = ppTooltipText,
                         Colour = colourProvider.Highlight1,
                     },
                     new SpriteTextWithTooltip
@@ -283,8 +285,8 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                         Anchor = Anchor.BottomLeft,
                         Origin = Anchor.BottomLeft,
                         Font = font.With(size: 12),
-                        Text = "pp",
-                        TooltipText = Score.PP.ToLocalisableString(@"N1"),
+                        Text = @"pp",
+                        TooltipText = ppTooltipText,
                         Colour = colourProvider.Light3,
                     }
                 }
