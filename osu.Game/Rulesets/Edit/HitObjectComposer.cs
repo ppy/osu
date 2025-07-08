@@ -19,7 +19,6 @@ using osu.Framework.Logging;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
-using osu.Game.Graphics;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Edit.Tools;
@@ -208,7 +207,7 @@ namespace osu.Game.Rulesets.Edit
                                                         X = 0.25f,
                                                         Origin = Anchor.TopCentre,
                                                         Anchor = Anchor.TopLeft,
-                                                        Font = OsuFont.Style.Caption1,
+                                                        Font = Editor.Fonts.Default,
                                                     },
                                                     new ExpandableSpriteText
                                                     {
@@ -219,7 +218,7 @@ namespace osu.Game.Rulesets.Edit
                                                         X = 0.75f,
                                                         Origin = Anchor.TopCentre,
                                                         Anchor = Anchor.TopLeft,
-                                                        Font = OsuFont.Style.Caption1,
+                                                        Font = Editor.Fonts.Default,
                                                     },
                                                 }
                                             },

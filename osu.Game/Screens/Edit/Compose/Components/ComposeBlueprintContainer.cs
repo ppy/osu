@@ -220,7 +220,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Font = OsuFont.Style.Caption1.With(weight: FontWeight.Bold),
+                Font = Editor.Fonts.Heading,
                 Text = $"{char.ToUpperInvariant(sampleName.First())}"
             };
         }

@@ -5,7 +5,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Screens.Edit;
@@ -89,7 +88,7 @@ namespace osu.Game.Rulesets.Edit
                 {
                     SpriteText.Anchor = Anchor.Centre;
                     SpriteText.Origin = Anchor.Centre;
-                    SpriteText.Font = OsuFont.Style.Caption2.With(weight: FontWeight.Bold);
+                    SpriteText.Font = Editor.Fonts.Default;
                     base.Height = actualHeight;
                     Background.Show();
                     Triangles?.Show();
@@ -98,7 +97,7 @@ namespace osu.Game.Rulesets.Edit
                 {
                     SpriteText.Anchor = Anchor.CentreLeft;
                     SpriteText.Origin = Anchor.CentreLeft;
-                    SpriteText.Font = OsuFont.Style.Caption2;
+                    SpriteText.Font = Editor.Fonts.Default;
                     base.Height = actualHeight / 2;
                     Background.Hide();
                     Triangles?.Hide();
