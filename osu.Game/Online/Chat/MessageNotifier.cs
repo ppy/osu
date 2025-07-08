@@ -171,7 +171,7 @@ namespace osu.Game.Online.Chat
             }
 
             [BackgroundDependencyLoader]
-            private void load(ChatOverlay chatOverlay, INotificationOverlay notificationOverlay)
+            private void load(ChatOverlay chatOverlay, INotificationOverlay notificationOverlay, OverlayColourProvider colourProvider)
             {
                 // Sane maximum height to avoid the notification becoming too tall on long messages.
                 // The height is ballparked to display two lines.
@@ -180,8 +180,13 @@ namespace osu.Game.Online.Chat
 
                 TextFlow.ParagraphSpacing = 0.25f;
 
-                TextFlow.AddParagraph(NotificationsStrings.ItemChannelChannelDefault.ToUpper(), s => s.Font = OsuFont.Style.Caption2.With(weight: FontWeight.Bold));
-                TextFlow.AddParagraph(NotificationsStrings.ItemChannelChannelPmChannelMessage(message.Sender.Username, message.Content));
+                TextFlow.AddText(NotificationsStrings.ItemChannelChannelDefault.ToUpper(), s => s.Font = OsuFont.Style.Caption2.With(weight: FontWeight.Bold));
+                TextFlow.AddText($" – {message.Sender.Username}", s =>
+                {
+                    s.Font = OsuFont.Style.Caption2.With(weight: FontWeight.SemiBold);
+                    s.Colour = colourProvider.Content2;
+                });
+                TextFlow.AddParagraph($"\"{message.Content}\"");
 
                 Avatar.Colour = OsuColour.Gray(0.4f);
                 Icon = FontAwesome.Solid.Comments;
@@ -221,19 +226,23 @@ namespace osu.Game.Online.Chat
 
                 TextFlow.ParagraphSpacing = 0.25f;
 
-                TextFlow.AddParagraph(Localisation.NotificationsStrings.MentionedInChannel(channel.Name).ToUpper(), s => s.Font = OsuFont.Style.Caption2.With(weight: FontWeight.Bold));
-                TextFlow.AddParagraph($"{message.Sender.Username} says \"");
+                TextFlow.AddParagraph(Localisation.NotificationsStrings.Mention.ToUpper(), s => s.Font = OsuFont.Style.Caption2.With(weight: FontWeight.Bold));
+                TextFlow.AddText($" – {message.Sender.Username} in {channel.Name}", s =>
+                {
+                    s.Font = OsuFont.Style.Caption2.With(weight: FontWeight.SemiBold);
+                    s.Colour = colourProvider.Content2;
+                });
 
                 int start = match.Index;
                 int end = match.Index + match.Length;
 
-                TextFlow.AddText(message.Content[..start]);
+                TextFlow.AddParagraph($"\"{message.Content[..start]}");
                 TextFlow.AddText(message.Content[start..end], s =>
                 {
                     s.Font = s.Font.With(weight: FontWeight.SemiBold);
                     s.Colour = colourProvider.Colour0;
                 });
-                TextFlow.AddText(message.Content[end..] + "\"");
+                TextFlow.AddText($"{message.Content[end..]}\"");
 
                 Avatar.Colour = OsuColour.Gray(0.4f);
                 Icon = FontAwesome.Solid.At;
