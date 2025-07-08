@@ -11,7 +11,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
@@ -138,7 +137,7 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
             Origin = Anchor.CentreLeft,
             Anchor = Anchor.CentreLeft,
             X = Editor.BUTTON_HEIGHT,
-            Font = OsuFont.Style.Caption2,
+            Font = Editor.Fonts.Default,
         };
     }
 }

@@ -8,7 +8,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 
@@ -87,7 +86,7 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
                 Origin = Anchor.CentreLeft,
                 Anchor = Anchor.CentreLeft,
                 X = 18f,
-                Font = OsuFont.Style.Caption2,
+                Font = Editor.Fonts.Default,
             };
         }
     }

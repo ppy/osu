@@ -10,6 +10,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Screens.Edit;
 using Vector2 = osuTK.Vector2;
 
 namespace osu.Game.Graphics.UserInterface
@@ -99,7 +100,7 @@ namespace osu.Game.Graphics.UserInterface
                 {
                     label = new OsuSpriteText
                     {
-                        Font = OsuFont.Style.Caption2,
+                        Font = Editor.Fonts.Default,
                     },
                     slider = new TSlider
                     {

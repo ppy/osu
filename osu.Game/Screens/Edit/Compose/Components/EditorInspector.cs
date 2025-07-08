@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             AutoSizeAxes = Axes.Y;
             RelativeSizeAxes = Axes.X;
 
-            InternalChild = InspectorText = new OsuTextFlowContainer(d => d.Font = OsuFont.Style.Caption2)
+            InternalChild = InspectorText = new OsuTextFlowContainer(d => d.Font = Editor.Fonts.Default)
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,

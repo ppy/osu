@@ -15,6 +15,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
+using osu.Game.Screens.Edit;
 using osuTK;
 using osuTK.Graphics;
 
@@ -109,7 +110,7 @@ namespace osu.Game.Rulesets.Edit
                                     Origin = Anchor.CentreLeft,
                                     Anchor = Anchor.CentreLeft,
                                     Text = title.ToUpperInvariant(),
-                                    Font = OsuFont.Style.Caption1.With(weight: FontWeight.Bold),
+                                    Font = Editor.Fonts.Heading,
                                     Padding = new MarginPadding { Left = ContentPadding.Left, Right = 24 },
                                 },
                                 expandButton = new IconButton

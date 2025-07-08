@@ -168,12 +168,12 @@ namespace osu.Game.Rulesets.Edit
                             {
                                 new EditorToolboxGroup("toolbox (1-9)")
                                 {
-                                    ContentPadding = new MarginPadding(5),
+                                    ContentPadding = new MarginPadding(TOOLBAR_PADDING),
                                     Child = toolboxCollection = new EditorRadioButtonCollection { RelativeSizeAxes = Axes.X },
                                 },
                                 new EditorToolboxGroup("toggles (Q~P)")
                                 {
-                                    ContentPadding = new MarginPadding(5),
+                                    ContentPadding = new MarginPadding(TOOLBAR_PADDING),
                                     Child = togglesCollection = new FillFlowContainer
                                     {
                                         RelativeSizeAxes = Axes.X,
@@ -184,7 +184,7 @@ namespace osu.Game.Rulesets.Edit
                                 },
                                 new EditorToolboxGroup("bank (Shift/Alt-Q~R)")
                                 {
-                                    ContentPadding = new MarginPadding(5),
+                                    ContentPadding = new MarginPadding(TOOLBAR_PADDING),
                                     Child = new FillFlowContainer
                                     {
                                         RelativeSizeAxes = Axes.X,
@@ -579,7 +579,8 @@ namespace osu.Game.Rulesets.Edit
     [Cached]
     public abstract partial class HitObjectComposer : CompositeDrawable
     {
-        public const float TOOLBOX_CONTRACTED_SIZE_LEFT = 40;
+        public const float TOOLBAR_PADDING = 5;
+        public const float TOOLBOX_CONTRACTED_SIZE_LEFT = Editor.BUTTON_HEIGHT + TOOLBAR_PADDING * 2;
         public const float TOOLBOX_CONTRACTED_SIZE_RIGHT = 100;
 
         public readonly Ruleset Ruleset;
