@@ -822,9 +822,31 @@ namespace osu.Game.Screens.SelectV2
     /// <summary>
     /// Defines a grouping header for a set of carousel items.
     /// </summary>
-    /// <param name="Order">The order of this group in the carousel, sorted using ascending order.</param>
-    /// <param name="Title">The title of this group.</param>
-    public record GroupDefinition(int Order, string Title);
+    public record GroupDefinition
+    {
+        /// <summary>
+        /// The order of this group in the carousel, sorted using ascending order.
+        /// </summary>
+        public int Order { get; }
+
+        /// <summary>
+        /// The title of this group.
+        /// </summary>
+        public string Title { get; }
+
+        private readonly string uncasedTitle;
+
+        public GroupDefinition(int order, string title)
+        {
+            Order = order;
+            Title = title;
+            uncasedTitle = title.ToLowerInvariant();
+        }
+
+        public virtual bool Equals(GroupDefinition? other) => uncasedTitle == other?.uncasedTitle;
+
+        public override int GetHashCode() => HashCode.Combine(uncasedTitle);
+    }
 
     /// <summary>
     /// Defines a grouping header for a set of carousel items grouped by star difficulty.
