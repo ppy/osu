@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -25,6 +26,7 @@ using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osuTK;
+using WebCommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
 
 namespace osu.Game.Screens.SelectV2
 {
@@ -211,7 +213,7 @@ namespace osu.Game.Screens.SelectV2
 
                 if (!Expanded.Value)
                 {
-                    items.Add(new OsuMenuItem(SongSelectStrings.Expand, MenuItemType.Highlighted, () => TriggerClick()));
+                    items.Add(new OsuMenuItem(WebCommonStrings.ButtonsExpand.ToSentence(), MenuItemType.Highlighted, () => TriggerClick()));
                     items.Add(new OsuMenuItemSpacer());
                 }
 

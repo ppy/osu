@@ -22,6 +22,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Footer;
 using osu.Game.Screens.Play.HUD;
@@ -73,7 +74,7 @@ namespace osu.Game.Screens.SelectV2
         [BackgroundDependencyLoader]
         private void load()
         {
-            Text = SongSelectStrings.Mods;
+            Text = BeatmapsetsStrings.ShowScoreboardHeadersMods;
             Icon = FontAwesome.Solid.ExchangeAlt;
             AccentColour = colours.Lime1;
 

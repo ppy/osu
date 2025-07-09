@@ -40,7 +40,7 @@ namespace osu.Game.Screens.Select.Filter
         [LocalisableDescription(typeof(WebSortStrings), nameof(WebSortStrings.ArtistTracksLength))]
         Length,
 
-        // [LocalisableDescription(typeof(SortStrings), nameof(SortStrings.MyMaps))]
+        // [LocalisableDescription(typeof(WebBeatmapsStrings), nameof(WebBeatmapsStrings.StatusMine))]
         // MyMaps,
 
         // [LocalisableDescription(typeof(WebBeatmapsStrings), nameof(WebBeatmapsStrings.ListingSearchSortingFavourites))]

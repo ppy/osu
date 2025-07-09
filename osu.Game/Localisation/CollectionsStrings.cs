@@ -15,11 +15,6 @@ namespace osu.Game.Localisation
         public static LocalisableString Collection => new TranslatableString(getKey(@"collection"), @"Collection");
 
         /// <summary>
-        /// "Manage collections"
-        /// </summary>
-        public static LocalisableString ManageCollectionsHeader => new TranslatableString(getKey(@"manage_collections_title"), @"Manage collections");
-
-        /// <summary>
         /// "All beatmaps"
         /// </summary>
         public static LocalisableString AllBeatmaps => new TranslatableString(getKey(@"all_beatmaps"), @"All beatmaps");
