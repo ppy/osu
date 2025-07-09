@@ -322,11 +322,9 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
         public static LocalisableString GetOffsetExplanatoryText(double offset)
         {
-            string formatOffset = offset.ToStandardFormattedString(1, false);
-            // Display a minimum of one significant digit
-            formatOffset = formatOffset == "0" ? "0.0" : formatOffset;
+            string formatOffset = offset.ToStandardFormattedString(1);
 
-            return formatOffset == "0.0"
+            return formatOffset == "0"
                 ? LocalisableString.Interpolate($@"{formatOffset} ms")
                 : LocalisableString.Interpolate($@"{formatOffset} ms {getEarlyLateText(offset)}");
 
