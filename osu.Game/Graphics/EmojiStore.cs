@@ -1,36 +1,44 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.IO.Stores;
 using osu.Framework.Text;
+using osu.Game.IO.Archives;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Memory;
+using SixLabors.ImageSharp.PixelFormats;
 
 namespace osu.Game.Graphics
 {
-    public class EmojiStore : ITextureStore, ITexturedGlyphLookupStore
+    public class EmojiStore : TextureStore, ITexturedGlyphLookupStore
     {
         public const string FONT_NAME = @"Emoji";
 
-        private readonly TextureStore textures;
-
-        public EmojiStore(TextureStore textures)
+        public EmojiStore(IRenderer renderer, ResourceStore<byte[]> resourceStore)
+            : base(renderer, new EmojiTextureLoaderStore(resourceStore))
         {
-            this.textures = textures;
         }
 
         public ITexturedCharacterGlyph? Get(string? fontName, Grapheme character)
         {
             if (string.IsNullOrEmpty(fontName) || fontName == FONT_NAME)
             {
-                var texture = textures.Get($@"{FONT_NAME}/{string.Join(
+                // Convert the character to a sequence of hex values joined by underscores
+                // Example: "👍" -> "1f44d"
+                // Example: "👨‍👩‍👧‍👦" -> "1f468_200d_1f469_200d_1f467_200d_1f466"
+                var texture = Get(string.Join(
                     "_",
-                    character.ToString().EnumerateRunes().Select(rune => rune.Value.ToString("X").ToLower(CultureInfo.InvariantCulture)))}");
+                    character.ToString().EnumerateRunes().Select(rune => rune.Value.ToString("X").ToLower(CultureInfo.InvariantCulture))
+                ) + ".raw");
+
                 return texture != null ? new EmojiGlyph(texture, character) : null;
             }
 
@@ -39,17 +47,49 @@ namespace osu.Game.Graphics
 
         public Task<ITexturedCharacterGlyph?> GetAsync(string fontName, Grapheme character) => Task.Run(() => Get(fontName, character));
 
-        public Texture? Get(string name, WrapMode wrapModeS, WrapMode wrapModeT) => null;
+        private sealed class EmojiTextureLoaderStore : IResourceStore<TextureUpload>
+        {
+            private readonly ZipArchiveReader store;
 
-        public Texture Get(string name) => throw new NotImplementedException();
+            public EmojiTextureLoaderStore(ResourceStore<byte[]> resourceStore)
+            {
+                store = new ZipArchiveReader(resourceStore.GetStream(@"Textures/Emoji/Emoji.zip"));
+            }
 
-        public Task<Texture> GetAsync(string name, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+            public Task<TextureUpload> GetAsync(string name, CancellationToken cancellationToken = default) =>
+                Task.Run(() => Get(name), cancellationToken);
 
-        public Stream GetStream(string name) => throw new NotImplementedException();
+            public TextureUpload Get(string name)
+            {
+                var stream = store.GetStream(name);
 
-        public IEnumerable<string> GetAvailableResources() => throw new NotImplementedException();
+                // Each emoji is stored as a 50x50 pixel RGBA32 image (4 bytes per pixel)
+                // Total size = 50 * 50 * 4 = 10000 bytes
+                if (stream != null && stream.Length == 50 * 50 * 4)
+                {
+                    var memory = MemoryAllocator.Default.Allocate<byte>(50 * 50 * 4);
 
-        public Task<Texture?> GetAsync(string name, WrapMode wrapModeS, WrapMode wrapModeT, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+                    stream.ReadExactly(memory.Memory.Span);
+
+                    return new TextureUpload(Image.WrapMemory<Rgba32>(memory, 50, 50));
+                }
+
+                return null!;
+            }
+
+            public Stream GetStream(string name) => store.GetStream(name);
+
+            public IEnumerable<string> GetAvailableResources() => store.GetAvailableResources();
+
+            #region IDisposable Support
+
+            public void Dispose()
+            {
+                store.Dispose();
+            }
+
+            #endregion
+        }
 
         public class EmojiGlyph : ITexturedCharacterGlyph
         {
@@ -71,11 +111,6 @@ namespace osu.Game.Graphics
                 Texture = texture;
                 Character = character;
             }
-        }
-
-        public void Dispose()
-        {
-            textures.Dispose();
         }
     }
 }
