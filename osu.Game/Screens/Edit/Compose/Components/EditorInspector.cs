@@ -30,6 +30,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
+                ParagraphSpacing = 0.1f,
             };
         }
 
