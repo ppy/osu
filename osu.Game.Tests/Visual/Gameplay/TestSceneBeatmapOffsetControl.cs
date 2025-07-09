@@ -276,7 +276,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestNegativeZero()
         {
-            Assert.That(BeatmapOffsetControl.GetOffsetExplanatoryText(-0.01).ToString(), Is.EqualTo("0.0 ms"));
+            AddAssert("assert", () => BeatmapOffsetControl.GetOffsetExplanatoryText(-0.0001).ToString(), () => Is.EqualTo("0 ms"));
         }
 
         private void recreateControl()
