@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Platform;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osuTK;
@@ -15,6 +16,9 @@ namespace osu.Game.Screens.Edit
         private float absoluteScaleFactor { get; set; }
 
         private readonly Bindable<bool> useNativeResolution = new Bindable<bool>();
+
+        [Resolved]
+        private GameHost host { get; set; } = null!;
 
         public EditorScalingContainer()
             : base(true)
@@ -43,7 +47,7 @@ namespace osu.Game.Screens.Edit
         {
             float inverseParentScale = Parent!.DrawInfo.MatrixInverse.ExtractScale().X;
 
-            float scale = CurrentScale * float.Lerp(1, inverseParentScale * 1.5f, absoluteScaleFactor);
+            float scale = CurrentScale * float.Lerp(1, inverseParentScale * host.Window.Scale * 1.5f, absoluteScaleFactor);
 
             Scale = new Vector2(scale);
             Size = new Vector2(1 / scale);
