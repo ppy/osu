@@ -90,7 +90,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double consistentTopNote = DifficultyValue() / noteWeights.Sum(); // What would the top note be if all note values were identical
 
             if (consistentTopNote == 0)
-                return noteDifficulties.Count;
+                return 0;
 
             // Use a weighted sum of all notes. Constants are arbitrary and give nice values
             return noteDifficulties.Sum(s => 1.1 / (1 + Math.Exp(-5 * (s / consistentTopNote - 2))));
@@ -100,6 +100,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
             if (noteDifficulties.Count == 0)
                 return 0;
+
+            DifficultyValue();
 
             double maxStrain = noteDifficulties.Max();
             if (maxStrain == 0)
