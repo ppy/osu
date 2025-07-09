@@ -42,6 +42,22 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return multiplier;
         }
 
+        public static double CalculateRateAdjustedApproachRate(double approachRate, double clockRate)
+        {
+            double preempt = IBeatmapDifficultyInfo.DifficultyRange(approachRate, OsuHitObject.PREEMPT_MAX, OsuHitObject.PREEMPT_MID, OsuHitObject.PREEMPT_MIN) / clockRate;
+            return IBeatmapDifficultyInfo.InverseDifficultyRange(preempt, OsuHitObject.PREEMPT_MAX, OsuHitObject.PREEMPT_MID, OsuHitObject.PREEMPT_MIN);
+        }
+
+        public static double CalculateRateAdjustedOverallDifficulty(double overallDifficulty, double clockRate)
+        {
+            HitWindows hitWindows = new OsuHitWindows();
+            hitWindows.SetDifficulty(overallDifficulty);
+
+            double hitWindowGreat = hitWindows.WindowFor(HitResult.Great) / clockRate;
+
+            return (79.5 - hitWindowGreat) / 6;
+        }
+
         protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
         {
             if (beatmap.HitObjects.Count == 0)
@@ -69,12 +85,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double difficultSliders = aim.GetDifficultSliders();
 
-            HitWindows hitWindows = new OsuHitWindows();
-            hitWindows.SetDifficulty(beatmap.Difficulty.OverallDifficulty);
-
-            double hitWindowGreat = hitWindows.WindowFor(HitResult.Great) / clockRate;
-
-            double overallDifficulty = (80 - hitWindowGreat) / 6;
+            double overallDifficulty = CalculateRateAdjustedOverallDifficulty(beatmap.Difficulty.OverallDifficulty, clockRate);
 
             int hitCircleCount = beatmap.HitObjects.Count(h => h is HitCircle);
             int sliderCount = beatmap.HitObjects.Count(h => h is Slider);

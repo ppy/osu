@@ -12,6 +12,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Difficulty.Evaluators;
 using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
@@ -30,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
             this.clockRate = clockRate;
             hasHiddenMod = mods.Any(m => m is OsuModHidden);
-            preempt = IBeatmapDifficultyInfo.DifficultyRange(beatmap.Difficulty.ApproachRate, 1800, 1200, 450) / clockRate;
+            preempt = IBeatmapDifficultyInfo.DifficultyRange(beatmap.Difficulty.ApproachRate, OsuHitObject.PREEMPT_MAX, OsuHitObject.PREEMPT_MID, OsuHitObject.PREEMPT_MIN) / clockRate;
             objectList = beatmap.HitObjects;
         }
 
@@ -115,7 +116,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 return 0.0;
 
             if (consistentTopNote == 0)
-                return noteDifficulties.Count;
+                return 0;
 
             // Use a weighted sum of all notes. Constants are arbitrary and give nice values
             return noteDifficulties.Sum(s => 1.1 / (1 + Math.Exp(-5 * (s / consistentTopNote - 1.15))));
