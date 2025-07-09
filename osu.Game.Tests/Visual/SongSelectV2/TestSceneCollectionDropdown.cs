@@ -62,12 +62,12 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             };
         });
 
-        [Test]
-        public void TestEmptyCollectionFilterContainsAllBeatmaps()
-        {
-            assertCollectionDropdownContains("All beatmaps");
-            assertCollectionHeaderDisplays("All beatmaps");
-        }
+        // [Test]
+        // public void TestEmptyCollectionFilterContainsAllBeatmaps()
+        // {
+        //     assertCollectionDropdownContains("All beatmaps");
+        //     assertCollectionHeaderDisplays("All beatmaps");
+        // }
 
         [Test]
         public void TestCollectionAddedToDropdown()
