@@ -15,6 +15,9 @@ namespace osu.Game.Scoring
 {
     public static class ScoreInfoExtensions
     {
+        /// <summary>
+        /// Computes the total score based on the given scoring mode.
+        /// </summary>
         public static long GetDisplayScore(this IScoreInfo score, ScoringMode mode)
         {
             switch (score)
@@ -48,16 +51,13 @@ namespace osu.Game.Scoring
                      .ThenBy(s => s.Date);
 
         /// <summary>
-        /// Retrieves the maximum achievable combo for the provided score.
+        /// Returns the list of hit result statistics applicable for this score.
         /// </summary>
-        /// <param name="score">The <see cref="ScoreInfo"/> to compute the maximum achievable combo for.</param>
-        /// <returns>The maximum achievable combo.</returns>
-        public static int GetMaximumAchievableCombo(this ScoreInfo score) => score.MaximumStatistics.Where(kvp => kvp.Key.AffectsCombo()).Sum(kvp => kvp.Value);
-
-        public static IEnumerable<HitResultDisplayStatistic> GetStatisticsForDisplay(this ScoreInfo score) => score.GetStatisticsForDisplay(score.Ruleset.CreateInstance());
-
         public static IEnumerable<HitResultDisplayStatistic> GetStatisticsForDisplay(this IScoreInfo score, Ruleset ruleset)
         {
+            if (ruleset.RulesetInfo.OnlineID != score.Ruleset.OnlineID)
+                throw new InvalidOperationException($@"The ID of the given ruleset instance ({ruleset.RulesetInfo.OnlineID}) does not match the score's ruleset ({score.Ruleset.OnlineID})");
+
             foreach (var r in ruleset.GetHitResults())
             {
                 int value = score.Statistics.GetValueOrDefault(r.result);
@@ -107,6 +107,22 @@ namespace osu.Game.Scoring
         /// <param name="config">The <see cref="OsuConfigManager"/> to read and listen to the active scoring mode from.</param>
         /// <returns>The bindable containing the formatted total score string.</returns>
         public static Bindable<string> GetBindableTotalScoreString(this IScoreInfo score, OsuConfigManager config) => new TotalScoreStringBindable(GetBindableTotalScore(score, config));
+
+        #region ScoreInfo-specific extensions
+
+        /// <summary>
+        /// Retrieves the maximum achievable combo for the provided score.
+        /// </summary>
+        /// <param name="score">The <see cref="ScoreInfo"/> to compute the maximum achievable combo for.</param>
+        /// <returns>The maximum achievable combo.</returns>
+        public static int GetMaximumAchievableCombo(this ScoreInfo score) => score.MaximumStatistics.Where(kvp => kvp.Key.AffectsCombo()).Sum(kvp => kvp.Value);
+
+        /// <summary>
+        /// Returns the list of hit result statistics applicable for this score.
+        /// </summary>
+        public static IEnumerable<HitResultDisplayStatistic> GetStatisticsForDisplay(this ScoreInfo score) => score.GetStatisticsForDisplay(score.Ruleset.CreateInstance());
+
+        #endregion
 
         /// <summary>
         /// Provides the total score of a <see cref="IScoreInfo"/>. Responds to changes in the currently-selected <see cref="ScoringMode"/>.
