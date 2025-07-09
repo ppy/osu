@@ -288,6 +288,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 flashlightRating *= 0.7;
             else if (mods.Any(m => m is OsuModAutopilot))
                 flashlightRating *= 0.4;
+            else if (mods.Any(m => m is OsuModDeflate))
+            {
+                float deflateInitialScale = mods.OfType<OsuModDeflate>().First().StartScale.Value;
+                flashlightRating *= 1.0 - Math.Clamp((deflateInitialScale - 1) / 10, 0.0, 0.9);
+            }
 
             if (mods.Any(m => m is OsuModMagnetised))
             {
