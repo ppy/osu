@@ -70,7 +70,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     return;
 
                 var scores = value.Scores.OrderByTotalScore().ToArray();
-                var rulesetInstance = rulesets.GetRuleset(ruleset.Value.OnlineID)!.CreateInstance();
+                var rulesetInstance = rulesets.GetRuleset(scores.First().RulesetID)!.CreateInstance();
 
                 scoreTable.DisplayScores(scores, Beatmap.Value, rulesetInstance);
                 scoreTable.Show();
