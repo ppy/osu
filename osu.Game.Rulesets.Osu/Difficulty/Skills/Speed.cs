@@ -101,15 +101,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             if (noteDifficulties.Count == 0)
                 return 0;
 
-            double consistentTopNote = DifficultyValue() / noteWeights.Sum(); // What would the top note be if all note values were identical
+            double maxStrain = noteDifficulties.Max();
+            if (maxStrain == 0)
+                return 0;
 
-            if (noteWeights.Sum() == 0)
-                return 0.0;
-
-            if (consistentTopNote == 0)
-                return noteDifficulties.Count;
-
-            return noteDifficulties.Sum(strain => 1.0 / (1.0 + Math.Exp(-(strain / consistentTopNote * 12.0 - 7.0))));
+            return noteDifficulties.Sum(strain => 1.0 / (1.0 + Math.Exp(-(strain / maxStrain * 12.0 - 6.0))));
         }
 
         public double CountTopWeightedSliders()
