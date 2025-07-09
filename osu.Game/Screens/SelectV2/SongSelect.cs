@@ -918,7 +918,7 @@ namespace osu.Game.Screens.SelectV2
 
         public virtual IEnumerable<OsuMenuItem> GetForwardActions(BeatmapInfo beatmap)
         {
-            yield return new OsuMenuItem(CommonStrings.Select, MenuItemType.Highlighted, () => SelectAndRun(beatmap, OnStart))
+            yield return new OsuMenuItem(GlobalActionKeyBindingStrings.Select, MenuItemType.Highlighted, () => SelectAndRun(beatmap, OnStart))
             {
                 Icon = FontAwesome.Solid.Check
             };

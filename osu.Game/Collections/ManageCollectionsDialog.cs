@@ -80,7 +80,7 @@ namespace osu.Game.Collections
                                         {
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.Centre,
-                                            Text = CollectionsStrings.ManageCollectionsHeader,
+                                            Text = SongSelectStrings.ManageCollections,
                                             Font = OsuFont.GetFont(size: 30),
                                             Padding = new MarginPadding { Vertical = 10 },
                                         },

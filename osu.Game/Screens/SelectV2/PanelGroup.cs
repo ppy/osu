@@ -5,6 +5,7 @@ using System;
 using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -16,10 +17,10 @@ using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Carousel;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osuTK;
 using osuTK.Graphics;
+using WebCommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
 
 namespace osu.Game.Screens.SelectV2
 {
@@ -168,7 +169,7 @@ namespace osu.Game.Screens.SelectV2
 
                 return new MenuItem[]
                 {
-                    new OsuMenuItem(Expanded.Value ? SongSelectStrings.Collapse : SongSelectStrings.Expand, MenuItemType.Highlighted, () => TriggerClick())
+                    new OsuMenuItem(Expanded.Value ? WebCommonStrings.ButtonsCollapse.ToSentence() : WebCommonStrings.ButtonsExpand.ToSentence(), MenuItemType.Highlighted, () => TriggerClick())
                 };
             }
         }

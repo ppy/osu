@@ -75,11 +75,6 @@ namespace osu.Game.Localisation
         public static LocalisableString LastPlayed => new TranslatableString(getKey(@"last_played"), @"Last Played");
 
         /// <summary>
-        /// "My Maps"
-        /// </summary>
-        public static LocalisableString MyMaps => new TranslatableString(getKey(@"my_maps"), @"My Maps");
-
-        /// <summary>
         /// "Collections"
         /// </summary>
         public static LocalisableString Collections => new TranslatableString(getKey(@"collections"), @"Collections");

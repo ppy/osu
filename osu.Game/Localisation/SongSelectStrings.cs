@@ -10,21 +10,6 @@ namespace osu.Game.Localisation
         private const string prefix = @"osu.Game.Resources.Localisation.SongSelect";
 
         /// <summary>
-        /// "Mods"
-        /// </summary>
-        public static LocalisableString Mods => new TranslatableString(getKey(@"mods"), @"Mods");
-
-        /// <summary>
-        /// "Random"
-        /// </summary>
-        public static LocalisableString Random => new TranslatableString(getKey(@"random"), @"Random");
-
-        /// <summary>
-        /// "Rewind"
-        /// </summary>
-        public static LocalisableString Rewind => new TranslatableString(getKey(@"rewind"), @"Rewind");
-
-        /// <summary>
         /// "Options"
         /// </summary>
         public static LocalisableString Options => new TranslatableString(getKey(@"options"), @"Options");
@@ -38,6 +23,11 @@ namespace osu.Game.Localisation
         /// "Has been locally modified"
         /// </summary>
         public static LocalisableString LocallyModifiedTooltip => new TranslatableString(getKey(@"locally_modified_tooltip"), @"Has been locally modified");
+
+        /// <summary>
+        /// "Manage collections"
+        /// </summary>
+        public static LocalisableString ManageCollections => new TranslatableString(getKey(@"manage_collections"), @"Manage collections");
 
         /// <summary>
         /// "Unknown"
@@ -123,16 +113,6 @@ namespace osu.Game.Localisation
         /// "Update beatmap with online changes"
         /// </summary>
         public static LocalisableString UpdateBeatmapTooltip => new TranslatableString(getKey(@"update_beatmap_tooltip"), @"Update beatmap with online changes");
-
-        /// <summary>
-        /// "Expand"
-        /// </summary>
-        public static LocalisableString Expand => new TranslatableString(getKey(@"expand"), @"Expand");
-
-        /// <summary>
-        /// "Collapse"
-        /// </summary>
-        public static LocalisableString Collapse => new TranslatableString(getKey(@"collapse"), @"Collapse");
 
         /// <summary>
         /// "Edit beatmap"
