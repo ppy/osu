@@ -14,9 +14,9 @@ namespace osu.Game.Screens.Edit
 
         public static class Fonts
         {
-            public static FontUsage Default => OsuFont.GetFont(size: 13.5f, weight: FontWeight.Regular);
+            public static FontUsage Default => OsuFont.Style.Caption1;
 
-            public static FontUsage Heading => OsuFont.GetFont(size: 15, weight: FontWeight.Bold);
+            public static FontUsage Heading => OsuFont.Style.Body.With(weight: FontWeight.Bold);
         }
     }
 }
