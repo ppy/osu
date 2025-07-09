@@ -139,6 +139,16 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString RestoreAllHidden => new TranslatableString(getKey(@"restore_all_hidden"), @"Restore all hidden");
 
+        /// <summary>
+        /// "No matching beatmaps"
+        /// </summary>
+        public static LocalisableString NoMatchingBeatmaps => new TranslatableString(getKey(@"no_matching_beatmaps"), @"No matching beatmaps");
+
+        /// <summary>
+        /// "No beatmaps match your filter criteria!"
+        /// </summary>
+        public static LocalisableString NoFilteredBeatmaps => new TranslatableString(getKey(@"no_filtered_beatmaps"), @"No beatmaps match your filter criteria!");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
