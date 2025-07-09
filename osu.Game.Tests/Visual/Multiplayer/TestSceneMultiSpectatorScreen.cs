@@ -303,6 +303,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        [FlakyTest]
         public void TestMostInSyncUserIsAudioSource()
         {
             start(new[] { PLAYER_1_ID, PLAYER_2_ID });

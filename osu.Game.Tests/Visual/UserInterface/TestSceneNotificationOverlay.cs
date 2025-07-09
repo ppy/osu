@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using NUnit.Framework;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
@@ -456,7 +457,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             {
                 applyUpdate = false;
 
-                var updateNotification = new UpdateManager.UpdateProgressNotification
+                var updateNotification = new UpdateManager.UpdateDownloadProgressNotification(CancellationToken.None)
                 {
                     CompletionClickAction = () => applyUpdate = true
                 };
@@ -468,9 +469,9 @@ namespace osu.Game.Tests.Visual.UserInterface
             checkProgressingCount(1);
             waitForCompletion();
 
-            UpdateManager.UpdateApplicationCompleteNotification? completionNotification = null;
+            UpdateManager.UpdateReadyNotification? completionNotification = null;
             AddUntilStep("wait for completion notification",
-                () => (completionNotification = notificationOverlay.ChildrenOfType<UpdateManager.UpdateApplicationCompleteNotification>().SingleOrDefault()) != null);
+                () => (completionNotification = notificationOverlay.ChildrenOfType<UpdateManager.UpdateReadyNotification>().SingleOrDefault()) != null);
             AddStep("click notification", () => completionNotification?.TriggerClick());
 
             AddUntilStep("wait for update applied", () => applyUpdate);

@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -12,6 +13,8 @@ using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Input;
+using osu.Game.Input.Bindings;
 using osuTK;
 using osuTK.Graphics;
 using osu.Game.Localisation;
@@ -26,6 +29,9 @@ namespace osu.Game.Screens.Menu
         private LinkFlowContainer textFlow = null!;
 
         private Bindable<bool> showMenuTips = null!;
+
+        [Resolved]
+        private RealmKeyBindingStore keyBindingStore { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -97,41 +103,103 @@ namespace osu.Game.Screens.Menu
                 .FadeOutFromOne(2000, Easing.OutQuint);
         }
 
+        private const int available_tips = 29;
+
         private LocalisableString getRandomTip()
         {
-            LocalisableString[] tips =
-            {
-                MenuTipStrings.ToggleToolbarShortcut,
-                MenuTipStrings.GameSettingsShortcut,
-                MenuTipStrings.DynamicSettings,
-                MenuTipStrings.NewFeaturesAreComingOnline,
-                MenuTipStrings.UIScalingSettings,
-                MenuTipStrings.ScreenScalingSettings,
-                MenuTipStrings.FreeOsuDirect,
-                MenuTipStrings.ReplaySeeking,
-                MenuTipStrings.MultithreadingSupport,
-                MenuTipStrings.TryNewMods,
-                MenuTipStrings.EmbeddedWebContent,
-                MenuTipStrings.BeatmapRightClick,
-                MenuTipStrings.TemporaryDeleteOperations,
-                MenuTipStrings.DiscoverPlaylists,
-                MenuTipStrings.ToggleAdvancedFPSCounter,
-                MenuTipStrings.GlobalStatisticsShortcut,
-                MenuTipStrings.ReplayPausing,
-                MenuTipStrings.ConfigurableHotkeys,
-                MenuTipStrings.PeekHUDWhenHidden,
-                MenuTipStrings.SkinEditor,
-                MenuTipStrings.DragAndDropImageInSkinEditor,
-                MenuTipStrings.ModPresets,
-                MenuTipStrings.ModCustomisationSettings,
-                MenuTipStrings.RandomSkinShortcut,
-                MenuTipStrings.ToggleReplaySettingsShortcut,
-                MenuTipStrings.CopyModsFromScore,
-                MenuTipStrings.AutoplayBeatmapShortcut,
-                MenuTipStrings.LazerIsNotAWord
-            };
+            int tipIndex = RNG.Next(0, available_tips);
 
-            return tips[RNG.Next(0, tips.Length)];
+            switch (tipIndex)
+            {
+                case 0:
+                    return MenuTipStrings.ToggleToolbarShortcut(keyBindingStore.GetReadableKeyCombinationsFor(GlobalAction.ToggleToolbar).FirstOrDefault() ?? InputSettingsStrings.ActionHasNoKeyBinding);
+
+                case 1:
+                    return MenuTipStrings.GameSettingsShortcut(keyBindingStore.GetReadableKeyCombinationsFor(GlobalAction.ToggleSettings).FirstOrDefault() ?? InputSettingsStrings.ActionHasNoKeyBinding);
+
+                case 2:
+                    return MenuTipStrings.DynamicSettings;
+
+                case 3:
+                    return MenuTipStrings.NewFeaturesAreComingOnline;
+
+                case 4:
+                    return MenuTipStrings.UIScalingSettings;
+
+                case 5:
+                    return MenuTipStrings.ScreenScalingSettings;
+
+                case 6:
+                    return MenuTipStrings.FreeOsuDirect(keyBindingStore.GetReadableKeyCombinationsFor(GlobalAction.ToggleBeatmapListing).FirstOrDefault() ?? InputSettingsStrings.ActionHasNoKeyBinding);
+
+                case 7:
+                    return MenuTipStrings.ReplaySeeking;
+
+                case 8:
+                    return MenuTipStrings.MultithreadingSupport;
+
+                case 9:
+                    return MenuTipStrings.TryNewMods;
+
+                case 10:
+                    return MenuTipStrings.EmbeddedWebContent;
+
+                case 11:
+                    return MenuTipStrings.BeatmapRightClick;
+
+                case 12:
+                    return MenuTipStrings.TemporaryDeleteOperations;
+
+                case 13:
+                    return MenuTipStrings.DiscoverPlaylists;
+
+                case 14:
+                    return MenuTipStrings.ToggleAdvancedFPSCounter;
+
+                case 15:
+                    return MenuTipStrings.GlobalStatisticsShortcut;
+
+                case 16:
+                    return MenuTipStrings.ReplayPausing(keyBindingStore.GetReadableKeyCombinationsFor(GlobalAction.TogglePauseReplay).FirstOrDefault() ?? InputSettingsStrings.ActionHasNoKeyBinding);
+
+                case 17:
+                    return MenuTipStrings.ConfigurableHotkeys;
+
+                case 18:
+                    return MenuTipStrings.PeekHUDWhenHidden(keyBindingStore.GetReadableKeyCombinationsFor(GlobalAction.HoldForHUD).FirstOrDefault() ?? InputSettingsStrings.ActionHasNoKeyBinding);
+
+                case 19:
+                    return MenuTipStrings.SkinEditor(keyBindingStore.GetReadableKeyCombinationsFor(GlobalAction.ToggleSkinEditor).FirstOrDefault() ?? InputSettingsStrings.ActionHasNoKeyBinding);
+
+                case 20:
+                    return MenuTipStrings.DragAndDropImageInSkinEditor;
+
+                case 21:
+                    return MenuTipStrings.ModPresets;
+
+                case 22:
+                    return MenuTipStrings.ModCustomisationSettings;
+
+                case 23:
+                    return MenuTipStrings.RandomSkinShortcut(keyBindingStore.GetReadableKeyCombinationsFor(GlobalAction.RandomSkin).FirstOrDefault() ?? InputSettingsStrings.ActionHasNoKeyBinding);
+
+                case 24:
+                    return MenuTipStrings.ToggleReplaySettingsShortcut(keyBindingStore.GetReadableKeyCombinationsFor(GlobalAction.ToggleReplaySettings).FirstOrDefault() ?? InputSettingsStrings.ActionHasNoKeyBinding);
+
+                case 25:
+                    return MenuTipStrings.CopyModsFromScore;
+
+                case 26:
+                    return MenuTipStrings.AutoplayBeatmapShortcut;
+
+                case 27:
+                    return MenuTipStrings.LazerIsNotAWord;
+
+                case 28:
+                    return MenuTipStrings.RightMouseAbsoluteScroll;
+            }
+
+            return string.Empty;
         }
     }
 }

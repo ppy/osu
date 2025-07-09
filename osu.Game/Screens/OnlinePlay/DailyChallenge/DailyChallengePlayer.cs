@@ -3,7 +3,6 @@
 
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Playlists;
-using osu.Game.Screens.Play;
 using osu.Game.Users;
 
 namespace osu.Game.Screens.OnlinePlay.DailyChallenge
@@ -12,8 +11,8 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
     {
         protected override UserActivity InitialActivity => new UserActivity.PlayingDailyChallenge(Beatmap.Value.BeatmapInfo, Ruleset.Value);
 
-        public DailyChallengePlayer(Room room, PlaylistItem playlistItem, PlayerConfiguration? configuration = null)
-            : base(room, playlistItem, configuration)
+        public DailyChallengePlayer(Room room, PlaylistItem playlistItem)
+            : base(room, playlistItem)
         {
         }
     }
