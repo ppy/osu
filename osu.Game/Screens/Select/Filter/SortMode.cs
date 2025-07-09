@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Select.Filter
         [LocalisableDescription(typeof(SortStrings), nameof(SortStrings.DateSubmitted))]
         DateSubmitted,
 
-        [LocalisableDescription(typeof(SortStrings), nameof(SortStrings.DateRanked))]
+        [LocalisableDescription(typeof(SortStrings), nameof(SortStrings.DateAdded))]
         DateAdded,
 
         [LocalisableDescription(typeof(SortStrings), nameof(SortStrings.DateRanked))]
