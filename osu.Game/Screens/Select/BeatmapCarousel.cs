@@ -701,13 +701,13 @@ namespace osu.Game.Screens.Select
             switch (e.Action)
             {
                 case GlobalAction.SelectNext:
-                case GlobalAction.SelectNextGroup:
-                    SelectNext(1, e.Action == GlobalAction.SelectNextGroup);
+                case GlobalAction.ActivateNextSet:
+                    SelectNext(1, e.Action == GlobalAction.ActivateNextSet);
                     return true;
 
                 case GlobalAction.SelectPrevious:
-                case GlobalAction.SelectPreviousGroup:
-                    SelectNext(-1, e.Action == GlobalAction.SelectPreviousGroup);
+                case GlobalAction.ActivatePreviousSet:
+                    SelectNext(-1, e.Action == GlobalAction.ActivatePreviousSet);
                     return true;
             }
 

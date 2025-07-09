@@ -48,6 +48,8 @@ namespace osu.Game.Overlays.SkinEditor
 
         public readonly BindableList<ISerialisableDrawable> SelectedComponents = new BindableList<ISerialisableDrawable>();
 
+        public bool ExternalEditInProgress => externalEditOperation != null && !externalEditOperation.IsCompleted;
+
         protected override bool StartHidden => true;
 
         private Drawable? targetScreen;
@@ -104,6 +106,11 @@ namespace osu.Game.Overlays.SkinEditor
         [Resolved]
         private IDialogOverlay? dialogOverlay { get; set; }
 
+        [Resolved]
+        private ExternalEditOverlay? externalEditOverlay { get; set; }
+
+        private Task? externalEditOperation;
+
         public SkinEditor()
         {
         }
@@ -159,6 +166,7 @@ namespace osu.Game.Overlays.SkinEditor
                                                     {
                                                         new EditorMenuItem(Web.CommonStrings.ButtonsSave, MenuItemType.Standard, () => Save()) { Hotkey = new Hotkey(PlatformAction.Save) },
                                                         new EditorMenuItem(CommonStrings.Export, MenuItemType.Standard, () => skins.ExportCurrentSkin()) { Action = { Disabled = !RuntimeInfo.IsDesktop } },
+                                                        new EditorMenuItem(EditorStrings.EditExternally, MenuItemType.Standard, () => _ = editExternally()) { Action = { Disabled = !RuntimeInfo.IsDesktop } },
                                                         new OsuMenuItemSpacer(),
                                                         new EditorMenuItem(CommonStrings.RevertToDefault, MenuItemType.Destructive, () => dialogOverlay?.Push(new RevertConfirmDialog(revert))),
                                                         new OsuMenuItemSpacer(),
@@ -274,6 +282,15 @@ namespace osu.Game.Overlays.SkinEditor
             SelectedComponents.BindCollectionChanged((_, _) => Scheduler.AddOnce(populateSettings), true);
 
             selectedTarget.BindValueChanged(targetChanged, true);
+        }
+
+        private async Task editExternally()
+        {
+            Save();
+
+            var skin = currentSkin.Value.SkinInfo.PerformRead(s => s.Detach());
+
+            externalEditOperation = await externalEditOverlay!.Begin(skin).ConfigureAwait(false);
         }
 
         public bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
@@ -436,8 +453,8 @@ namespace osu.Game.Overlays.SkinEditor
 
             headerText.Clear();
 
-            headerText.AddParagraph(SkinEditorStrings.SkinEditor, cp => cp.Font = OsuFont.Default.With(size: 16));
-            headerText.NewParagraph();
+            headerText.AddText(SkinEditorStrings.SkinEditor, cp => cp.Font = OsuFont.Default.With(size: 16));
+            headerText.NewLine();
             headerText.AddText(SkinEditorStrings.CurrentlyEditing, cp =>
             {
                 cp.Font = OsuFont.Default.With(size: 12);

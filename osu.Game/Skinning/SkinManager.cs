@@ -131,6 +131,10 @@ namespace osu.Game.Skinning
         {
             Realm.Run(r =>
             {
+                // can be the case when the current skin is externally mounted for editing
+                if (CurrentSkinInfo.Disabled)
+                    return;
+
                 // Required local for iOS. Will cause runtime crash if inlined.
                 Guid currentSkinId = CurrentSkinInfo.Value.ID;
 

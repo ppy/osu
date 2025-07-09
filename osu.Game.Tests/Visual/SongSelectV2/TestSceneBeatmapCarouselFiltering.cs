@@ -36,24 +36,22 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             AddAssert("invocation count correct", () => NewItemsPresentedInvocationCount, () => Is.EqualTo(1));
 
-            ApplyToFilter("filter", c => c.SearchText = BeatmapSets[2].Metadata.Title);
-            WaitForFiltering();
+            ApplyToFilterAndWaitForFilter("filter", c => c.SearchText = BeatmapSets[2].Metadata.Title);
 
             AddAssert("invocation count correct", () => NewItemsPresentedInvocationCount, () => Is.EqualTo(2));
 
             CheckDisplayedBeatmapSetsCount(1);
             CheckDisplayedBeatmapsCount(3);
 
-            WaitForSelection(2, 0);
+            WaitForSetSelection(2, 0);
 
             for (int i = 0; i < 5; i++)
                 SelectNextPanel();
 
             Select();
-            WaitForSelection(2, 1);
+            WaitForSetSelection(2, 1);
 
-            ApplyToFilter("remove filter", c => c.SearchText = string.Empty);
-            WaitForFiltering();
+            ApplyToFilterAndWaitForFilter("remove filter", c => c.SearchText = string.Empty);
 
             AddAssert("invocation count correct", () => NewItemsPresentedInvocationCount, () => Is.EqualTo(3));
 
@@ -84,46 +82,39 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             WaitForDrawablePanels();
 
-            ApplyToFilter("filter [5..]", c =>
+            ApplyToFilterAndWaitForFilter("filter [5..]", c =>
             {
                 c.UserStarDifficulty.Min = 5;
                 c.UserStarDifficulty.Max = null;
             });
-            WaitForFiltering();
             CheckDisplayedBeatmapsCount(11);
 
-            ApplyToFilter("filter to [0..7]", c =>
+            ApplyToFilterAndWaitForFilter("filter to [0..7]", c =>
             {
                 c.UserStarDifficulty.Min = null;
                 c.UserStarDifficulty.Max = 7;
             });
-            WaitForFiltering();
             CheckDisplayedBeatmapsCount(7);
 
-            ApplyToFilter("filter to [5..7]", c =>
+            ApplyToFilterAndWaitForFilter("filter to [5..7]", c =>
             {
                 c.UserStarDifficulty.Min = 5;
                 c.UserStarDifficulty.Max = 7;
             });
-
-            WaitForFiltering();
             CheckDisplayedBeatmapsCount(3);
 
-            ApplyToFilter("filter to [2..2]", c =>
+            ApplyToFilterAndWaitForFilter("filter to [2..2]", c =>
             {
                 c.UserStarDifficulty.Min = 2;
                 c.UserStarDifficulty.Max = 2;
             });
-
-            WaitForFiltering();
             CheckDisplayedBeatmapsCount(1);
 
-            ApplyToFilter("filter to [0..]", c =>
+            ApplyToFilterAndWaitForFilter("filter to [0..]", c =>
             {
                 c.UserStarDifficulty.Min = 0;
                 c.UserStarDifficulty.Max = null;
             });
-            WaitForFiltering();
             CheckDisplayedBeatmapsCount(15);
         }
 
@@ -135,7 +126,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddBeatmaps(50, 3);
             WaitForDrawablePanels();
 
-            SelectNextGroup();
+            SelectNextSet();
             SelectNextPanel();
             Select();
 
@@ -143,9 +134,9 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             for (int i = 0; i < 5; i++)
             {
-                ApplyToFilter("filter all", c => c.SearchText = Guid.NewGuid().ToString());
+                ApplyToFilterAndWaitForFilter("filter all", c => c.SearchText = Guid.NewGuid().ToString());
                 AddAssert("selection not changed", () => ((BeatmapInfo)Carousel.CurrentSelection!).ID == selectedID);
-                ApplyToFilter("remove filter", c => c.SearchText = string.Empty);
+                ApplyToFilterAndWaitForFilter("remove filter", c => c.SearchText = string.Empty);
                 AddAssert("selection not changed", () => ((BeatmapInfo)Carousel.CurrentSelection!).ID == selectedID);
             }
         }
@@ -156,11 +147,11 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddBeatmaps(50, 3);
             WaitForDrawablePanels();
 
-            SelectPrevGroup();
-            WaitForSelection(49, 0);
+            SelectPrevSet();
+            WaitForSetSelection(49, 0);
 
-            ApplyToFilter("filter all but one", c => c.SearchText = BeatmapSets.First().Metadata.Title);
-            WaitForSelection(0, 0);
+            ApplyToFilterAndWaitForFilter("filter all but one", c => c.SearchText = BeatmapSets.First().Metadata.Title);
+            WaitForSetSelection(0, 0);
         }
 
         [Test]
@@ -170,8 +161,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             WaitForDrawablePanels();
 
             CheckNoSelection();
-            ApplyToFilter("filter all but one", c => c.SearchText = BeatmapSets.First().Metadata.Title);
-            WaitForSelection(0, 0);
+            ApplyToFilterAndWaitForFilter("filter all but one", c => c.SearchText = BeatmapSets.First().Metadata.Title);
+            WaitForSetSelection(0, 0);
         }
 
         [Test]
@@ -184,15 +175,15 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             SortBy(SortMode.Difficulty);
 
-            SelectNextGroup();
+            SelectNextSet();
 
             AddStep("record selection", () => selectedID = ((BeatmapInfo)Carousel.CurrentSelection!).ID);
 
             for (int i = 0; i < 5; i++)
             {
-                ApplyToFilter("filter all", c => c.SearchText = Guid.NewGuid().ToString());
+                ApplyToFilterAndWaitForFilter("filter all", c => c.SearchText = Guid.NewGuid().ToString());
                 AddAssert("selection not changed", () => ((BeatmapInfo)Carousel.CurrentSelection!).ID == selectedID);
-                ApplyToFilter("remove filter", c => c.SearchText = string.Empty);
+                ApplyToFilterAndWaitForFilter("remove filter", c => c.SearchText = string.Empty);
                 AddAssert("selection not changed", () => ((BeatmapInfo)Carousel.CurrentSelection!).ID == selectedID);
             }
         }
@@ -223,10 +214,11 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [Test]
         public void TestExternalRulesetChange()
         {
-            ApplyToFilter("allow converted beatmaps", c => c.AllowConvertedBeatmaps = true);
-            ApplyToFilter("filter to osu", c => c.Ruleset = rulesets.AvailableRulesets.ElementAt(0));
-
-            WaitForFiltering();
+            ApplyToFilterAndWaitForFilter("allow converted beatmaps, filter to osu", c =>
+            {
+                c.AllowConvertedBeatmaps = true;
+                c.Ruleset = rulesets.AvailableRulesets.ElementAt(0);
+            });
 
             AddStep("add mixed ruleset beatmapset", () =>
             {
@@ -250,9 +242,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                        && visibleBeatmapPanels.Count(p => ((BeatmapInfo)p.Item!.Model).Ruleset.OnlineID == 0) == 1;
             });
 
-            ApplyToFilter("filter to taiko", c => c.Ruleset = rulesets.AvailableRulesets.ElementAt(1));
-
-            WaitForFiltering();
+            ApplyToFilterAndWaitForFilter("filter to taiko", c => c.Ruleset = rulesets.AvailableRulesets.ElementAt(1));
 
             AddUntilStep("wait for filtered difficulties", () =>
             {
@@ -263,9 +253,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                        && visibleBeatmapPanels.Count(p => ((BeatmapInfo)p.Item!.Model).Ruleset.OnlineID == 1) == 1;
             });
 
-            ApplyToFilter("filter to catch", c => c.Ruleset = rulesets.AvailableRulesets.ElementAt(2));
-
-            WaitForFiltering();
+            ApplyToFilterAndWaitForFilter("filter to catch", c => c.Ruleset = rulesets.AvailableRulesets.ElementAt(2));
 
             AddUntilStep("wait for filtered difficulties", () =>
             {
@@ -297,17 +285,14 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             });
 
             SortBy(SortMode.Difficulty);
-            WaitForFiltering();
 
             CheckDisplayedBeatmapsCount(local_set_count * diffs_per_set);
 
-            ApplyToFilter("filter to normal", c => c.SearchText = "Normal");
-            WaitForFiltering();
+            ApplyToFilterAndWaitForFilter("filter to normal", c => c.SearchText = "Normal");
 
             CheckDisplayedBeatmapsCount(local_set_count);
 
-            ApplyToFilter("filter to insane", c => c.SearchText = "Insane");
-            WaitForFiltering();
+            ApplyToFilterAndWaitForFilter("filter to insane", c => c.SearchText = "Insane");
 
             CheckDisplayedBeatmapsCount(local_set_count);
         }
@@ -318,20 +303,19 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddBeatmaps(2, 3);
             WaitForDrawablePanels();
 
-            SelectNextGroup();
-            WaitForSelection(0, 0);
+            SelectNextSet();
+            WaitForSetSelection(0, 0);
 
             CheckDisplayedBeatmapsCount(6);
 
-            ApplyToFilter("filter first away", c => c.UserStarDifficulty.Min = 3);
-            WaitForFiltering();
+            ApplyToFilterAndWaitForFilter("filter first away", c => c.UserStarDifficulty.Min = 3);
 
             CheckDisplayedBeatmapsCount(4);
 
-            SelectNextGroup();
-            WaitForSelection(0, 1);
-            SelectPrevGroup();
-            WaitForSelection(1, 1);
+            SelectNextSet();
+            WaitForSetSelection(1, 1);
+            SelectPrevSet();
+            WaitForSetSelection(0, 1);
         }
 
         [Test]
@@ -340,16 +324,15 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddBeatmaps(5, 3);
             WaitForDrawablePanels();
 
-            SelectNextGroup();
-            SelectNextGroup();
-            SelectNextGroup();
-            WaitForSelection(2, 0);
+            SelectNextSet();
+            SelectNextSet();
+            SelectNextSet();
+            WaitForSetSelection(2, 0);
 
-            ApplyToFilter("filter first away", c => c.UserStarDifficulty.Min = 3);
-            WaitForFiltering();
+            ApplyToFilterAndWaitForFilter("filter first away", c => c.UserStarDifficulty.Min = 3);
 
-            SelectNextGroup();
-            WaitForSelection(0, 1);
+            SelectNextSet();
+            WaitForSetSelection(0, 1);
         }
 
         [Test]
@@ -358,16 +341,15 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddBeatmaps(5, 3);
             WaitForDrawablePanels();
 
-            SelectNextGroup();
-            SelectNextGroup();
-            SelectNextGroup();
-            WaitForSelection(2, 0);
+            SelectNextSet();
+            SelectNextSet();
+            SelectNextSet();
+            WaitForSetSelection(2, 0);
 
-            ApplyToFilter("filter first away", c => c.UserStarDifficulty.Min = 3);
-            WaitForFiltering();
+            ApplyToFilterAndWaitForFilter("filter first away", c => c.UserStarDifficulty.Min = 3);
 
-            SelectPrevGroup();
-            WaitForSelection(4, 1);
+            SelectPrevSet();
+            WaitForSetSelection(4, 1);
         }
 
         [Test]
@@ -376,14 +358,13 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddBeatmaps(2, 3);
             WaitForDrawablePanels();
 
-            SelectPrevGroup();
-            WaitForSelection(1, 0);
+            SelectPrevSet();
+            WaitForSetSelection(1, 0);
 
-            ApplyToFilter("filter last set away", c => c.SearchText = BeatmapSets.First().Metadata.Title);
-            WaitForFiltering();
+            ApplyToFilterAndWaitForFilter("filter last set away", c => c.SearchText = BeatmapSets.First().Metadata.Title);
 
-            SelectPrevGroup();
-            WaitForSelection(0, 0);
+            SelectPrevSet();
+            WaitForSetSelection(0, 0);
         }
 
         [Test]
@@ -392,14 +373,13 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddBeatmaps(2, 3);
             WaitForDrawablePanels();
 
-            SelectNextGroup();
-            WaitForSelection(0, 0);
+            SelectNextSet();
+            WaitForSetSelection(0, 0);
 
-            ApplyToFilter("filter first set away", c => c.SearchText = BeatmapSets.Last().Metadata.Title);
-            WaitForFiltering();
+            ApplyToFilterAndWaitForFilter("filter first set away", c => c.SearchText = BeatmapSets.Last().Metadata.Title);
 
-            SelectNextGroup();
-            WaitForSelection(1, 0);
+            SelectNextSet();
+            WaitForSetSelection(1, 0);
         }
 
         [Test]
@@ -408,13 +388,12 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddBeatmaps(5, 3);
             WaitForDrawablePanels();
 
-            SelectNextGroup();
-            SelectNextGroup();
-            SelectNextGroup();
-            WaitForSelection(2, 0);
+            SelectNextSet();
+            SelectNextSet();
+            SelectNextSet();
+            WaitForSetSelection(2, 0);
 
-            ApplyToFilter("filter first away", c => c.UserStarDifficulty.Min = 3);
-            WaitForFiltering();
+            ApplyToFilterAndWaitForFilter("filter first away", c => c.UserStarDifficulty.Min = 3);
 
             SelectNextPanel();
             AddAssert("keyboard selected is first set", () => GetKeyboardSelectedPanel()?.Item?.Model, () => Is.EqualTo(BeatmapSets.First()));
@@ -426,13 +405,12 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddBeatmaps(5, 3);
             WaitForDrawablePanels();
 
-            SelectNextGroup();
-            SelectNextGroup();
-            SelectNextGroup();
-            WaitForSelection(2, 0);
+            SelectNextSet();
+            SelectNextSet();
+            SelectNextSet();
+            WaitForSetSelection(2, 0);
 
-            ApplyToFilter("filter first away", c => c.UserStarDifficulty.Min = 3);
-            WaitForFiltering();
+            ApplyToFilterAndWaitForFilter("filter first away", c => c.UserStarDifficulty.Min = 3);
 
             SelectPrevPanel();
             AddAssert("keyboard selected is last set", () => GetKeyboardSelectedPanel()?.Item?.Model, () => Is.EqualTo(BeatmapSets.Last()));
@@ -444,11 +422,10 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddBeatmaps(2, 3);
             WaitForDrawablePanels();
 
-            SelectPrevGroup();
-            WaitForSelection(1, 0);
+            SelectPrevSet();
+            WaitForSetSelection(1, 0);
 
-            ApplyToFilter("filter last set away", c => c.SearchText = BeatmapSets.First().Metadata.Title);
-            WaitForFiltering();
+            ApplyToFilterAndWaitForFilter("filter last set away", c => c.SearchText = BeatmapSets.First().Metadata.Title);
 
             SelectPrevPanel();
             AddAssert("keyboard selected is first set", () => GetKeyboardSelectedPanel()?.Item?.Model, () => Is.EqualTo(BeatmapSets.First()));
@@ -460,11 +437,10 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddBeatmaps(2, 3);
             WaitForDrawablePanels();
 
-            SelectNextGroup();
-            WaitForSelection(0, 0);
+            SelectNextSet();
+            WaitForSetSelection(0, 0);
 
-            ApplyToFilter("filter first set away", c => c.SearchText = BeatmapSets.Last().Metadata.Title);
-            WaitForFiltering();
+            ApplyToFilterAndWaitForFilter("filter first set away", c => c.SearchText = BeatmapSets.Last().Metadata.Title);
 
             // Single result is automatically selected for us, so we iterate once backwards to the set header.
             SelectPrevPanel();
