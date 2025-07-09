@@ -23,12 +23,12 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
-using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Select.Filter;
 using osuTK;
 using osuTK.Input;
+using WebSortStrings = osu.Game.Resources.Localisation.Web.SortStrings;
 
 namespace osu.Game.Screens.Select
 {
@@ -144,7 +144,7 @@ namespace osu.Game.Screens.Select
                                     {
                                         new OsuSpriteText
                                         {
-                                            Text = SortStrings.Default,
+                                            Text = WebSortStrings.Default,
                                             Font = OsuFont.GetFont(size: 14),
                                             Margin = new MarginPadding(5),
                                             Anchor = Anchor.BottomRight,
