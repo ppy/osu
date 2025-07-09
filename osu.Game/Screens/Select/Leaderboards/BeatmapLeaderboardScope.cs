@@ -1,27 +1,26 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.ComponentModel;
 using osu.Framework.Localisation;
-using osu.Game.Resources.Localisation.Web;
+using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Select.Leaderboards
 {
     public enum BeatmapLeaderboardScope
     {
-        [Description("Local Ranking")]
+        [LocalisableDescription(typeof(SortStrings), nameof(SortStrings.Local))]
         Local,
 
-        [LocalisableDescription(typeof(BeatmapsetsStrings), nameof(BeatmapsetsStrings.ShowScoreboardGlobal))]
+        [LocalisableDescription(typeof(SortStrings), nameof(SortStrings.Global))]
         Global,
 
-        [LocalisableDescription(typeof(BeatmapsetsStrings), nameof(BeatmapsetsStrings.ShowScoreboardCountry))]
+        [LocalisableDescription(typeof(SortStrings), nameof(SortStrings.Country))]
         Country,
 
-        [LocalisableDescription(typeof(BeatmapsetsStrings), nameof(BeatmapsetsStrings.ShowScoreboardFriend))]
+        [LocalisableDescription(typeof(SortStrings), nameof(SortStrings.Friend))]
         Friend,
 
-        [LocalisableDescription(typeof(BeatmapsetsStrings), nameof(BeatmapsetsStrings.ShowScoreboardTeam))]
+        [LocalisableDescription(typeof(SortStrings), nameof(SortStrings.Team))]
         Team,
     }
 }

@@ -11,6 +11,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Resources.Localisation.Web;
 using osuTK;
@@ -79,7 +80,7 @@ namespace osu.Game.Collections
                                         {
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.Centre,
-                                            Text = "Manage collections",
+                                            Text = CollectionsStrings.ManageCollectionsHeader,
                                             Font = OsuFont.GetFont(size: 30),
                                             Padding = new MarginPadding { Vertical = 10 },
                                         },
@@ -146,10 +147,7 @@ namespace osu.Game.Collections
         {
             base.LoadComplete();
 
-            searchTextBox.Current.BindValueChanged(_ =>
-            {
-                list.SearchTerm = searchTextBox.Current.Value;
-            });
+            searchTextBox.Current.BindValueChanged(_ => { list.SearchTerm = searchTextBox.Current.Value; });
         }
 
         protected override void Dispose(bool isDisposing)

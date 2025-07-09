@@ -16,6 +16,7 @@ using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Carousel;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osuTK;
 using osuTK.Graphics;
@@ -167,7 +168,7 @@ namespace osu.Game.Screens.SelectV2
 
                 return new MenuItem[]
                 {
-                    new OsuMenuItem(Expanded.Value ? "Collapse" : "Expand", MenuItemType.Highlighted, () => TriggerClick())
+                    new OsuMenuItem(Expanded.Value ? SongSelectStrings.Collapse : SongSelectStrings.Expand, MenuItemType.Highlighted, () => TriggerClick())
                 };
             }
         }

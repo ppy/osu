@@ -70,6 +70,11 @@ namespace osu.Game.Localisation
         public static LocalisableString Importing => new TranslatableString(getKey(@"importing"), @"Importing...");
 
         /// <summary>
+        /// "Select"
+        /// </summary>
+        public static LocalisableString Select => new TranslatableString(getKey(@"select"), @"Select");
+
+        /// <summary>
         /// "Deselect All"
         /// </summary>
         public static LocalisableString DeselectAll => new TranslatableString(getKey(@"deselect_all"), @"Deselect All");
@@ -183,6 +188,16 @@ namespace osu.Game.Localisation
         /// "Copy link"
         /// </summary>
         public static LocalisableString CopyLink => new TranslatableString(getKey(@"copy_link"), @"Copy link");
+
+        /// <summary>
+        /// "Manage..."
+        /// </summary>
+        public static LocalisableString Manage => new TranslatableString(getKey(@"manage"), @"Manage...");
+
+        /// <summary>
+        /// "Details..."
+        /// </summary>
+        public static LocalisableString Details => new TranslatableString(getKey(@"details"), @"Details...");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

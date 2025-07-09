@@ -117,7 +117,8 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Automatically focus search text box in mod select"
         /// </summary>
-        public static LocalisableString ModSelectTextSearchStartsActive => new TranslatableString(getKey(@"mod_select_text_search_starts_active"), @"Automatically focus search text box in mod select");
+        public static LocalisableString ModSelectTextSearchStartsActive =>
+            new TranslatableString(getKey(@"mod_select_text_search_starts_active"), @"Automatically focus search text box in mod select");
 
         /// <summary>
         /// "no limit"
@@ -163,6 +164,11 @@ namespace osu.Game.Localisation
         /// "True Random"
         /// </summary>
         public static LocalisableString TrueRandom => new TranslatableString(getKey(@"true_random"), @"True Random");
+
+        /// <summary>
+        /// "Selected Mods"
+        /// </summary>
+        public static LocalisableString SelectedMods => new TranslatableString(getKey(@"selected_mods"), @"Selected Mods");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

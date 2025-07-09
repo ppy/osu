@@ -1,49 +1,50 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.ComponentModel;
 using osu.Framework.Localisation;
-using osu.Game.Resources.Localisation.Web;
+using osu.Game.Localisation;
+using WebBeatmapsStrings = osu.Game.Resources.Localisation.Web.BeatmapsStrings;
+using WebSortStrings = osu.Game.Resources.Localisation.Web.SortStrings;
 
 namespace osu.Game.Screens.Select.Filter
 {
     public enum SortMode
     {
-        [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.ListingSearchSortingArtist))]
+        [LocalisableDescription(typeof(WebBeatmapsStrings), nameof(WebBeatmapsStrings.ListingSearchSortingTitle))]
+        Title,
+
+        [LocalisableDescription(typeof(WebBeatmapsStrings), nameof(WebBeatmapsStrings.ListingSearchSortingArtist))]
         Artist,
 
-        [Description("Author")]
+        [LocalisableDescription(typeof(SortStrings), nameof(SortStrings.Author))]
         Author,
 
-        [LocalisableDescription(typeof(SortStrings), nameof(SortStrings.ArtistTracksBpm))]
+        [LocalisableDescription(typeof(WebSortStrings), nameof(WebSortStrings.ArtistTracksBpm))]
         BPM,
 
-        [Description("Date Submitted")]
+        [LocalisableDescription(typeof(SortStrings), nameof(SortStrings.DateSubmitted))]
         DateSubmitted,
 
-        [Description("Date Added")]
+        [LocalisableDescription(typeof(SortStrings), nameof(SortStrings.DateRanked))]
         DateAdded,
 
-        [Description("Date Ranked")]
+        [LocalisableDescription(typeof(SortStrings), nameof(SortStrings.DateRanked))]
         DateRanked,
 
-        [Description("Last Played")]
+        [LocalisableDescription(typeof(SortStrings), nameof(SortStrings.LastPlayed))]
         LastPlayed,
 
-        [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.ListingSearchSortingDifficulty))]
+        [LocalisableDescription(typeof(WebBeatmapsStrings), nameof(WebBeatmapsStrings.ListingSearchSortingDifficulty))]
         Difficulty,
 
-        [LocalisableDescription(typeof(SortStrings), nameof(SortStrings.ArtistTracksLength))]
+        [LocalisableDescription(typeof(WebSortStrings), nameof(WebSortStrings.ArtistTracksLength))]
         Length,
 
         // todo: pending support (https://github.com/ppy/osu/issues/4917)
-        // [Description("Rank Achieved")]
+        // [LocalisableDescription(typeof(SortStrings), nameof(SortStrings.RankAchieved))]
         // RankAchieved,
 
-        [Description("Source")]
+        [LocalisableDescription(typeof(SortStrings), nameof(SortStrings.Source))]
         Source,
-
-        [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.ListingSearchSortingTitle))]
-        Title,
     }
 }
