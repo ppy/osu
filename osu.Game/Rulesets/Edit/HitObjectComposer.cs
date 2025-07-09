@@ -580,7 +580,7 @@ namespace osu.Game.Rulesets.Edit
     {
         public const float TOOLBAR_PADDING = 5;
         public const float TOOLBOX_CONTRACTED_SIZE_LEFT = Editor.BUTTON_HEIGHT + TOOLBAR_PADDING * 2;
-        public const float TOOLBOX_CONTRACTED_SIZE_RIGHT = 100;
+        public const float TOOLBOX_CONTRACTED_SIZE_RIGHT = 110;
 
         public readonly Ruleset Ruleset;
 
