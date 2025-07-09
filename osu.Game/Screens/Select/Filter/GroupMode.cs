@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Localisation;
@@ -56,8 +56,7 @@ namespace osu.Game.Screens.Select.Filter
         [LocalisableDescription(typeof(SortStrings), nameof(SortStrings.RankedStatus))]
         RankedStatus,
 
-        // added for convenience when changing in this pr: https://github.com/ppy/osu/pull/33889
-        // [LocalisableDescription(typeof(SortStrings), nameof(SortStrings.Source))]
-        // Source,
+        [LocalisableDescription(typeof(SortStrings), nameof(SortStrings.Source))]
+        Source,
     }
 }
