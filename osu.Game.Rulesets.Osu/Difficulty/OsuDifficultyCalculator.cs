@@ -241,8 +241,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (mods.Any(m => m is OsuModRelax))
             {
                 aimRating *= 0.9;
-                flowAimRating *= 0;
-                // no reduce on snap aim rating is intentional, because it's used only in versatility bonus, not as a base
+                snapAimRating *= 0.9;
+                flowAimRating *= 0.9;
+
+                // Remove big chunk of flow aim difficulty
+                aimRating = double.Lerp(snapAimRating, aimRating, 0.5);
             }
 
             aimRating = double.Lerp(aimRating, snapAimRating + flowAimRating, AimVersatilityBonus);
