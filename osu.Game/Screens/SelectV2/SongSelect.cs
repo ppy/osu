@@ -244,7 +244,7 @@ namespace osu.Game.Screens.SelectV2
                                                                 RelativeSizeAxes = Axes.Both,
                                                                 RequestPresentBeatmap = b => SelectAndRun(b, OnStart),
                                                                 RequestSelection = queueBeatmapSelection,
-                                                                RequestRecommendedSelection = b => queueBeatmapSelection(difficultyRecommender?.GetRecommendedBeatmap(b) ?? b.First()),
+                                                                RequestRecommendedSelection = requestRecommendedSelection,
                                                                 NewItemsPresented = newItemsPresented,
                                                             },
                                                             noResultsPlaceholder = new NoResultsPlaceholder
@@ -286,6 +286,11 @@ namespace osu.Game.Screens.SelectV2
 
                 updateBackgroundDim();
             });
+        }
+
+        private void requestRecommendedSelection(IEnumerable<BeatmapInfo> b)
+        {
+            queueBeatmapSelection(difficultyRecommender?.GetRecommendedBeatmap(b) ?? b.First());
         }
 
         /// <summary>
@@ -502,16 +507,39 @@ namespace osu.Game.Screens.SelectV2
             var currentBeatmap = beatmaps.GetWorkingBeatmap(Beatmap.Value.BeatmapInfo, true);
             bool validSelection = checkBeatmapValidForSelection(currentBeatmap.BeatmapInfo, filterControl.CreateCriteria());
 
-            if (Beatmap.IsDefault || !validSelection)
+            if (validSelection)
+            {
+                carousel.CurrentSelection = currentBeatmap.BeatmapInfo;
+                return true;
+            }
+
+            // If there was no beatmap selected, pick a random one.
+            if (Beatmap.IsDefault)
             {
                 validSelection = carousel.NextRandom();
                 finaliseBeatmapSelection();
+                return validSelection;
             }
 
-            if (validSelection)
-                carousel.CurrentSelection = Beatmap.Value.BeatmapInfo;
-            else
-                Beatmap.SetDefault();
+            // If a previous non-default selection became non-valid, it was likely hidden or deleted.
+            if (!validSelection)
+            {
+                // In the case a difficulty was hidden or removed, prefer selecting another difficulty from the same set.
+                var activeSet = currentBeatmap.BeatmapSetInfo;
+                var criteria = filterControl.CreateCriteria();
+
+                var validBeatmaps = activeSet.Beatmaps.Where(b => checkBeatmapValidForSelection(b, criteria)).ToArray();
+
+                if (validBeatmaps.Any())
+                {
+                    requestRecommendedSelection(validBeatmaps);
+                    return true;
+                }
+            }
+
+            // If all else fails, use the default beatmap.
+            Beatmap.SetDefault();
+            finaliseBeatmapSelection();
 
             return validSelection;
         }
