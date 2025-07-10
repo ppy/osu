@@ -80,7 +80,7 @@ namespace osu.Game.Screens.SelectV2
             AddRange(new[]
             {
                 unrankedBadge = new UnrankedBadge(),
-                modDisplayBar = new Container
+                modDisplayBar = new InputBlockingContainer
                 {
                     Y = -5f,
                     Depth = float.MaxValue,
