@@ -532,8 +532,7 @@ namespace osu.Game.Screens.SelectV2
 
             // If all else fails, use the default beatmap.
             Beatmap.SetDefault();
-            if (selectionDebounce?.State == ScheduledDelegate.RunState.Waiting)
-                selectionDebounce?.RunTask();
+            finaliseBeatmapSelection();
 
             return validSelection;
         }
