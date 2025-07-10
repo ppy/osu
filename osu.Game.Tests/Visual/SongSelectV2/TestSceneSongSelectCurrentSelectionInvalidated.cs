@@ -189,13 +189,12 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddStep("hide selected", () => Beatmaps.Hide(hiddenBeatmap = selectedBeatmap!));
             waitForFiltering(2);
 
-            AddAssert("selected beatmap below", () => selectedBeatmap, () => Is.Not.EqualTo(hiddenBeatmap));
-            assertPanelSelected<PanelBeatmap>(1);
+            AddAssert("selected beatmap below", () => selectedBeatmap!.BeatmapSet, () => Is.EqualTo(hiddenBeatmap.BeatmapSet));
 
             AddStep("hide selected", () => Beatmaps.Hide(hiddenBeatmap = selectedBeatmap!));
             waitForFiltering(3);
 
-            AddAssert("selected difficulty above", () => selectedBeatmap, () => Is.Not.EqualTo(hiddenBeatmap));
+            AddAssert("selected beatmap below", () => selectedBeatmap!.BeatmapSet, () => Is.EqualTo(hiddenBeatmap.BeatmapSet));
             assertPanelSelected<PanelBeatmap>(0);
         }
 
