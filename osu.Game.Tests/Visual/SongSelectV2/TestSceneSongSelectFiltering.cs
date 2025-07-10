@@ -309,6 +309,24 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             checkMatchedBeatmaps(3);
         }
 
+        [Test]
+        public void TestCantHideAllBeatmaps()
+        {
+            LoadSongSelect();
+            ImportBeatmapForRuleset(0);
+
+            checkMatchedBeatmaps(3);
+
+            AddStep("hide selected", () => Beatmaps.Hide(Beatmap.Value.BeatmapInfo));
+            checkMatchedBeatmaps(2);
+
+            AddStep("hide selected", () => Beatmaps.Hide(Beatmap.Value.BeatmapInfo));
+            checkMatchedBeatmaps(1);
+
+            AddAssert("hide fails", () => Beatmaps.Hide(Beatmap.Value.BeatmapInfo), () => Is.False);
+            checkMatchedBeatmaps(1);
+        }
+
         private NoResultsPlaceholder? getPlaceholder() => SongSelect.ChildrenOfType<NoResultsPlaceholder>().FirstOrDefault();
 
         private void checkMatchedBeatmaps(int expected) => AddUntilStep($"{expected} matching shown", () => Carousel.MatchedBeatmapsCount, () => Is.EqualTo(expected));
