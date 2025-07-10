@@ -96,7 +96,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             difficultyValue *= Math.Pow(missPenalty, effectiveMissCount);
 
             if (score.Mods.Any(m => m is ModHidden))
-                difficultyValue *= (isConvert) ? 1.025 : 1.1;
+            {
+                if (score.Mods.Any(m => m is ModClassic)) difficultyValue *= 1.025;
+                if (!isConvert) difficultyValue *= 1.02;
+                if (score.Mods.Any(m => m is ModClassic) && !isConvert) difficultyValue *= 1.05;
+            }
 
             if (score.Mods.Any(m => m is ModFlashlight<TaikoHitObject>))
                 difficultyValue *= Math.Max(1, 1.050 - Math.Min(attributes.MonoStaminaFactor / 50, 1) * lengthBonus);
