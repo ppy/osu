@@ -307,7 +307,7 @@ namespace osu.Game.Graphics.Carousel
         /// <summary>
         /// Retrieve a list of all <see cref="CarouselItem"/>s currently displayed.
         /// </summary>
-        public IReadOnlyCollection<CarouselItem>? GetCarouselItems() => carouselItems;
+        public IList<CarouselItem>? GetCarouselItems() => carouselItems;
 
         private List<CarouselItem>? carouselItems;
 
@@ -690,6 +690,11 @@ namespace osu.Game.Graphics.Carousel
         /// The currently selected <see cref="CarouselItem"/>, if any is selected.
         /// </summary>
         protected CarouselItem? CurrentSelectionItem => currentSelection.CarouselItem;
+
+        /// <summary>
+        /// The index in <see cref="GetCarouselItems"/> of the current selection, if available.
+        /// </summary>
+        protected int? CurrentSelectionIndex => currentSelection.Index;
 
         /// <summary>
         /// Becomes invalid when the current selection has changed and needs to be updated visually.
