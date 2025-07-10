@@ -7,6 +7,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Screens.Select.Filter;
 using osu.Game.Screens.SelectV2;
 
@@ -37,6 +38,38 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 ImportBeatmapForRuleset(0);
 
             LoadSongSelect();
+        }
+
+        [Test]
+        public void TestRulesetChange()
+        {
+            AddStep("disable converts", () => Config.SetValue(OsuSetting.ShowConvertedBeatmaps, false));
+
+            ImportBeatmapForRuleset(0, 1);
+            ImportBeatmapForRuleset(0, 1);
+            ImportBeatmapForRuleset(0, 2);
+            waitForFiltering(5);
+
+            ChangeRuleset(1);
+            waitForFiltering(6);
+
+            BeatmapInfo? initiallySelected = null;
+            AddAssert("selected is taiko", () => (initiallySelected = selectedBeatmap)?.Ruleset.OnlineID, () => Is.EqualTo(1));
+
+            ChangeRuleset(0);
+            waitForFiltering(7);
+            AddAssert("selected is osu", () => selectedBeatmap?.Ruleset.OnlineID, () => Is.EqualTo(0));
+            AddAssert("selected is same set as original", () => selectedBeatmap?.BeatmapSet, () => Is.EqualTo(initiallySelected!.BeatmapSet));
+
+            ChangeRuleset(1);
+            waitForFiltering(8);
+            AddAssert("selected is taiko", () => selectedBeatmap?.Ruleset.OnlineID, () => Is.EqualTo(1));
+            AddAssert("selected is same set as original", () => selectedBeatmap?.BeatmapSet, () => Is.EqualTo(initiallySelected!.BeatmapSet));
+
+            ChangeRuleset(2);
+            waitForFiltering(9);
+            AddAssert("selected is catch", () => selectedBeatmap?.Ruleset.OnlineID, () => Is.EqualTo(2));
+            AddAssert("selected is different set", () => selectedBeatmap?.BeatmapSet, () => Is.Not.EqualTo(initiallySelected!.BeatmapSet));
         }
 
         /// <summary>
