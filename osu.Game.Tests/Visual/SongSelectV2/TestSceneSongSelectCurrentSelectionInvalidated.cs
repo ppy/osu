@@ -17,6 +17,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
     /// Every case we're testing here is expected to have a *custom behaviour* – engaging and overriding this random selection fallback.
     ///
     /// The scenarios we care abouts are:
+    /// - Ruleset change (select another difficulty from same set for the new ruleset, if possible).
+    /// - Beatmap difficulty hidden (select closest valid difficulty from same set)
     /// - Beatmap set deleted (select closest valid beatmap post-deletion)
     ///
     /// We are working with 5 sets, each with 3 difficulties (all osu! ruleset).
@@ -140,6 +142,27 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             selectionChangedFrom(() => deletedSet);
             assertPanelSelected<PanelBeatmapSet>(2);
+            assertPanelSelected<PanelBeatmap>(0);
+        }
+
+        [Test]
+        public void TestHideBeatmap()
+        {
+            makePanelSelected<PanelBeatmapSet>(2);
+            makePanelSelected<PanelBeatmap>(1);
+
+            BeatmapInfo hiddenBeatmap = null!;
+
+            AddStep("hide selected", () => Beatmaps.Hide(hiddenBeatmap = selectedBeatmap!));
+            waitForFiltering(2);
+
+            AddAssert("selected beatmap below", () => selectedBeatmap, () => Is.Not.EqualTo(hiddenBeatmap));
+            assertPanelSelected<PanelBeatmap>(1);
+
+            AddStep("hide selected", () => Beatmaps.Hide(hiddenBeatmap = selectedBeatmap!));
+            waitForFiltering(3);
+
+            AddAssert("selected difficulty above", () => selectedBeatmap, () => Is.Not.EqualTo(hiddenBeatmap));
             assertPanelSelected<PanelBeatmap>(0);
         }
 
