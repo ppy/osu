@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -143,6 +144,19 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddStep("load screen", () => Stack.Push(SongSelect = new SoloSongSelect()));
             AddUntilStep("wait for load", () => Stack.CurrentScreen == SongSelect && SongSelect.IsLoaded);
             AddUntilStep("wait for filtering", () => !Carousel.IsFiltering);
+        }
+
+        protected void SortBy(SortMode mode) => AddStep($"sort by {mode.GetDescription().ToLowerInvariant()}", () => Config.SetValue(OsuSetting.SongSelectSortingMode, mode));
+
+        protected void GroupBy(GroupMode mode) => AddStep($"group by {mode.GetDescription().ToLowerInvariant()}", () => Config.SetValue(OsuSetting.SongSelectGroupMode, mode));
+
+        protected void SortAndGroupBy(SortMode sort, GroupMode group)
+        {
+            AddStep($"sort by {sort.GetDescription().ToLowerInvariant()} & group by {group.GetDescription().ToLowerInvariant()}", () =>
+            {
+                Config.SetValue(OsuSetting.SongSelectSortingMode, sort);
+                Config.SetValue(OsuSetting.SongSelectGroupMode, group);
+            });
         }
 
         protected void ImportBeatmapForRuleset(int rulesetId)
