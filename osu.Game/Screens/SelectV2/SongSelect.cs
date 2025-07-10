@@ -244,7 +244,7 @@ namespace osu.Game.Screens.SelectV2
                                                                 RelativeSizeAxes = Axes.Both,
                                                                 RequestPresentBeatmap = b => SelectAndRun(b, OnStart),
                                                                 RequestSelection = queueBeatmapSelection,
-                                                                RequestRecommendedSelection = b => queueBeatmapSelection(difficultyRecommender?.GetRecommendedBeatmap(b) ?? b.First()),
+                                                                RequestRecommendedSelection = requestRecommendedSelection,
                                                                 NewItemsPresented = newItemsPresented,
                                                             },
                                                             noResultsPlaceholder = new NoResultsPlaceholder
@@ -286,6 +286,11 @@ namespace osu.Game.Screens.SelectV2
 
                 updateBackgroundDim();
             });
+        }
+
+        private void requestRecommendedSelection(IEnumerable<BeatmapInfo> b)
+        {
+            queueBeatmapSelection(difficultyRecommender?.GetRecommendedBeatmap(b) ?? b.First());
         }
 
         /// <summary>
@@ -521,11 +526,13 @@ namespace osu.Game.Screens.SelectV2
             {
                 // In the case a difficulty was hidden or removed, prefer selecting another difficulty from the same set.
                 var activeSet = currentBeatmap.BeatmapSetInfo;
-                BeatmapInfo? nextValidBeatmap = findNextValidBeatmap(activeSet.Beatmaps, currentBeatmap.BeatmapInfo);
+                var criteria = filterControl.CreateCriteria();
 
-                if (nextValidBeatmap != null)
+                var validBeatmaps = activeSet.Beatmaps.Where(b => checkBeatmapValidForSelection(b, criteria)).ToArray();
+
+                if (validBeatmaps.Any())
                 {
-                    carousel.CurrentSelection = nextValidBeatmap;
+                    requestRecommendedSelection(validBeatmaps);
                     return true;
                 }
             }
@@ -535,22 +542,6 @@ namespace osu.Game.Screens.SelectV2
             finaliseBeatmapSelection();
 
             return validSelection;
-        }
-
-        private BeatmapInfo? findNextValidBeatmap(IEnumerable<BeatmapInfo> beatmaps, BeatmapInfo current)
-        {
-            beatmaps = beatmaps.OrderBy(b => b.StarRating).ToList();
-            var criteria = filterControl.CreateCriteria();
-
-            // Find the first valid beatmap after `current`.
-            BeatmapInfo? nextValidBeatmap = beatmaps.Reverse()
-                                                    .TakeWhile(b => !b.Equals(current))
-                                                    .LastOrDefault(b => checkBeatmapValidForSelection(b, criteria));
-
-            // If `current` is the last beatmap, we need to get the new last beatmap.
-            nextValidBeatmap ??= beatmaps.LastOrDefault(b => !b.Equals(current) && checkBeatmapValidForSelection(b, criteria));
-
-            return nextValidBeatmap;
         }
 
         private bool checkBeatmapValidForSelection(BeatmapInfo beatmap, FilterCriteria? criteria)
