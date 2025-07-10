@@ -269,7 +269,7 @@ namespace osu.Game.Screens.SelectV2
                 .FadeOut(SongSelect.ENTER_DURATION / 3, Easing.In);
         }
 
-        private partial class SongSelectSearchTextBox : ShearedFilterTextBox
+        internal partial class SongSelectSearchTextBox : ShearedFilterTextBox
         {
             protected override InnerSearchTextBox CreateInnerTextBox() => new InnerTextBox();
 

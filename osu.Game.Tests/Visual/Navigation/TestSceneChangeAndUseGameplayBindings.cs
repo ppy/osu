@@ -15,7 +15,7 @@ using osu.Game.Input.Bindings;
 using osu.Game.Overlays.Settings.Sections.Input;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
-using osu.Game.Screens.Select;
+using osu.Game.Screens.SelectV2;
 using osu.Game.Tests.Beatmaps.IO;
 using osuTK.Input;
 
@@ -54,10 +54,10 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
 
-            PushAndConfirm(() => new PlaySongSelect());
+            PushAndConfirm(() => new SoloSongSelect());
 
             AddUntilStep("wait for selection", () => !Game.Beatmap.IsDefault);
-            AddUntilStep("wait for carousel load", () => songSelect.BeatmapSetsLoaded);
+            AddUntilStep("wait for carousel load", () => songSelect.CarouselItemsPresented);
 
             AddStep("enter gameplay", () => InputManager.Key(Key.Enter));
 
@@ -94,7 +94,7 @@ namespace osu.Game.Tests.Visual.Navigation
                                                                   .AsEnumerable()
                                                                   .First(k => k.RulesetName == "osu" && k.ActionInt == 0);
 
-        private Screens.Select.SongSelect songSelect => Game.ScreenStack.CurrentScreen as Screens.Select.SongSelect;
+        private SoloSongSelect songSelect => Game.ScreenStack.CurrentScreen as SoloSongSelect;
 
         private Player player => Game.ScreenStack.CurrentScreen as Player;
 

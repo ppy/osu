@@ -24,7 +24,6 @@ using osu.Game.Online;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
-using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Utils;
@@ -322,20 +321,20 @@ namespace osu.Game.Screens.SelectV2
                         // - Using the difficulty adjustment mod to adjust OD doesn't have an effect on conversion.
                         int keyCount = legacyRuleset.GetKeyCount(beatmap.Value.BeatmapInfo, mods.Value);
 
-                        firstStatistic = new StatisticDifficulty.Data(BeatmapsetsStrings.ShowStatsCsMania, keyCount, keyCount, 10);
+                        firstStatistic = new StatisticDifficulty.Data(SongSelectStrings.KeyCount, keyCount, keyCount, 10);
                         break;
 
                     default:
-                        firstStatistic = new StatisticDifficulty.Data(BeatmapsetsStrings.ShowStatsCs, originalDifficulty.CircleSize, adjustedDifficulty.CircleSize, 10);
+                        firstStatistic = new StatisticDifficulty.Data(SongSelectStrings.CircleSize, originalDifficulty.CircleSize, adjustedDifficulty.CircleSize, 10);
                         break;
                 }
 
                 difficultyStatisticsDisplay.Statistics = new[]
                 {
                     firstStatistic,
-                    new StatisticDifficulty.Data(BeatmapsetsStrings.ShowStatsAr, originalDifficulty.ApproachRate, adjustedDifficulty.ApproachRate, 10),
-                    new StatisticDifficulty.Data(BeatmapsetsStrings.ShowStatsAccuracy, originalDifficulty.OverallDifficulty, adjustedDifficulty.OverallDifficulty, 10),
-                    new StatisticDifficulty.Data(BeatmapsetsStrings.ShowStatsDrain, originalDifficulty.DrainRate, adjustedDifficulty.DrainRate, 10),
+                    new StatisticDifficulty.Data(SongSelectStrings.ApproachRate, originalDifficulty.ApproachRate, adjustedDifficulty.ApproachRate, 10),
+                    new StatisticDifficulty.Data(SongSelectStrings.Accuracy, originalDifficulty.OverallDifficulty, adjustedDifficulty.OverallDifficulty, 10),
+                    new StatisticDifficulty.Data(SongSelectStrings.HPDrain, originalDifficulty.DrainRate, adjustedDifficulty.DrainRate, 10),
                 };
             });
 

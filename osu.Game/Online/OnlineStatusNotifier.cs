@@ -151,7 +151,7 @@ namespace osu.Game.Online
             base.Dispose(isDisposing);
 
             if (notificationsClient.IsNotNull())
-                notificationsClient.MessageReceived += notifyAboutForcedDisconnection;
+                notificationsClient.MessageReceived -= notifyAboutForcedDisconnection;
 
             if (spectatorClient.IsNotNull())
                 spectatorClient.Disconnecting -= notifyAboutForcedDisconnection;

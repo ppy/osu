@@ -25,7 +25,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Screens;
 using osu.Game.Screens.Footer;
 using osu.Game.Screens.Menu;
-using osu.Game.Screens.Select;
+using osu.Game.Screens.SelectV2;
 using osu.Game.Tests.Visual;
 using osuTK;
 
@@ -101,11 +101,14 @@ namespace osu.Game.Overlays.FirstRunSetup
             }
         }
 
-        private partial class NestedSongSelect : PlaySongSelect
+        private partial class NestedSongSelect : SoloSongSelect
         {
-            protected override bool ControlGlobalMusic => false;
-
             public override bool? ApplyModTrackAdjustments => false;
+
+            public NestedSongSelect()
+            {
+                ControlGlobalMusic = false;
+            }
         }
 
         private partial class UIScaleSlider : RoundedSliderBar<float>
@@ -145,16 +148,17 @@ namespace osu.Game.Overlays.FirstRunSetup
             protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
                 new DependencyContainer(new DependencyIsolationContainer(base.CreateChildDependencies(parent)));
 
+            private ScreenFooter footer;
+
             [BackgroundDependencyLoader]
             private void load(AudioManager audio, TextureStore textures, RulesetStore rulesets)
             {
-                Beatmap.Value = new DummyWorkingBeatmap(audio, textures);
+                Beatmap.Default = Beatmap.Value = new DummyWorkingBeatmap(audio, textures);
 
                 Ruleset.Value = rulesets.AvailableRulesets.First();
 
                 OsuScreenStack stack;
                 OsuLogo logo;
-                ScreenFooter footer;
 
                 Padding = new MarginPadding(5);
 
@@ -191,6 +195,13 @@ namespace osu.Game.Overlays.FirstRunSetup
 
                 // intentionally load synchronously so it is included in the initial load of the first run screen.
                 stack.PushSynchronously(screen);
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                footer.Show();
             }
         }
 

@@ -15,7 +15,7 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Overlays;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
-using osu.Game.Screens.Select;
+using osu.Game.Screens.SelectV2;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Editing
@@ -190,7 +190,7 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("Set tags again", () => EditorBeatmap.BeatmapInfo.Metadata.Tags = tags_to_discard);
 
             AddStep("Exit editor", () => Editor.Exit());
-            AddUntilStep("Wait for song select", () => Game.ScreenStack.CurrentScreen is PlaySongSelect);
+            AddUntilStep("Wait for song select", () => Game.ScreenStack.CurrentScreen is SoloSongSelect);
             AddAssert("Tags reverted correctly", () => Game.Beatmap.Value.BeatmapInfo.Metadata.Tags == tags_to_save);
         }
 

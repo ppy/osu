@@ -98,10 +98,11 @@ namespace osu.Game.Screens.SelectV2
                                 },
                             },
                         },
-                        labelText = new OsuSpriteText
+                        labelText = new TruncatingSpriteText
                         {
                             Margin = new MarginPadding { Top = 2f },
                             Font = OsuFont.Style.Caption1.With(weight: FontWeight.SemiBold),
+                            MaxWidth = 85,
                         },
                         new FillFlowContainer
                         {

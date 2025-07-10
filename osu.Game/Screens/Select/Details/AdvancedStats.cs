@@ -251,7 +251,7 @@ namespace osu.Game.Screens.Select.Details
                 if (normalDifficulty == null || moddedDifficulty == null)
                     return;
 
-                starDifficulty.Value = ((float)normalDifficulty.Value.Stars, (float)moddedDifficulty.Value.Stars);
+                starDifficulty.Value = ((float)normalDifficulty.Value.Stars.FloorToDecimalDigits(2), (float)moddedDifficulty.Value.Stars.FloorToDecimalDigits(2));
             }), starDifficultyCancellationSource.Token, TaskContinuationOptions.OnlyOnRanToCompletion, TaskScheduler.Current);
         });
 

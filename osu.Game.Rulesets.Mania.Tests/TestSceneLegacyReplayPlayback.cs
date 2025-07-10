@@ -9,7 +9,6 @@ using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Mods;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Replays;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
@@ -19,7 +18,6 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Tests
 {
-    [Ignore("These tests are expected to fail until an acceptable solution for various replay playback issues concerning rounding of replay frame times & hit windows is found.")]
     public partial class TestSceneLegacyReplayPlayback : LegacyReplayPlaybackTestScene
     {
         protected override Ruleset CreateRuleset() => new ManiaRuleset();
@@ -72,13 +70,14 @@ namespace osu.Game.Rulesets.Mania.Tests
             new object[] { 5f, -137d, HitResult.Miss },
             new object[] { 5f, -138d, HitResult.Miss },
             new object[] { 5f, 111d, HitResult.Ok },
-            new object[] { 5f, 112d, HitResult.Miss },
-            new object[] { 5f, 113d, HitResult.Miss },
-            new object[] { 5f, 114d, HitResult.Miss },
-            new object[] { 5f, 135d, HitResult.Miss },
-            new object[] { 5f, 136d, HitResult.Miss },
-            new object[] { 5f, 137d, HitResult.Miss },
-            new object[] { 5f, 138d, HitResult.Miss },
+            // coverage of broken "can't hit meh late" behaviour, which is intentionally not being reproduced
+            // new object[] { 5f, 112d, HitResult.Miss },
+            // new object[] { 5f, 113d, HitResult.Miss },
+            // new object[] { 5f, 114d, HitResult.Miss },
+            // new object[] { 5f, 135d, HitResult.Miss },
+            // new object[] { 5f, 136d, HitResult.Miss },
+            // new object[] { 5f, 137d, HitResult.Miss },
+            // new object[] { 5f, 138d, HitResult.Miss },
 
             // OD = 9.3 test cases.
             // PERFECT hit window is [ -14ms,  14ms]
@@ -99,13 +98,14 @@ namespace osu.Game.Rulesets.Mania.Tests
             new object[] { 9.3f, 70d, HitResult.Ok },
             new object[] { 9.3f, 71d, HitResult.Ok },
             new object[] { 9.3f, 98d, HitResult.Ok },
-            new object[] { 9.3f, 99d, HitResult.Miss },
-            new object[] { 9.3f, 100d, HitResult.Miss },
-            new object[] { 9.3f, 101d, HitResult.Miss },
-            new object[] { 9.3f, 122d, HitResult.Miss },
-            new object[] { 9.3f, 123d, HitResult.Miss },
-            new object[] { 9.3f, 124d, HitResult.Miss },
-            new object[] { 9.3f, 125d, HitResult.Miss },
+            // coverage of broken "can't hit meh late" behaviour, which is intentionally not being reproduced
+            // new object[] { 9.3f, 99d, HitResult.Miss },
+            // new object[] { 9.3f, 100d, HitResult.Miss },
+            // new object[] { 9.3f, 101d, HitResult.Miss },
+            // new object[] { 9.3f, 122d, HitResult.Miss },
+            // new object[] { 9.3f, 123d, HitResult.Miss },
+            // new object[] { 9.3f, 124d, HitResult.Miss },
+            // new object[] { 9.3f, 125d, HitResult.Miss },
             new object[] { 9.3f, -98d, HitResult.Ok },
             new object[] { 9.3f, -99d, HitResult.Ok },
             new object[] { 9.3f, -100d, HitResult.Meh },
@@ -145,13 +145,14 @@ namespace osu.Game.Rulesets.Mania.Tests
             new object[] { 5f, -137d, HitResult.Miss },
             new object[] { 5f, -138d, HitResult.Miss },
             new object[] { 5f, 111d, HitResult.Ok },
-            new object[] { 5f, 112d, HitResult.Miss },
-            new object[] { 5f, 113d, HitResult.Miss },
-            new object[] { 5f, 114d, HitResult.Miss },
-            new object[] { 5f, 135d, HitResult.Miss },
-            new object[] { 5f, 136d, HitResult.Miss },
-            new object[] { 5f, 137d, HitResult.Miss },
-            new object[] { 5f, 138d, HitResult.Miss },
+            // coverage of broken "can't hit meh late" behaviour, which is intentionally not being reproduced
+            // new object[] { 5f, 112d, HitResult.Miss },
+            // new object[] { 5f, 113d, HitResult.Miss },
+            // new object[] { 5f, 114d, HitResult.Miss },
+            // new object[] { 5f, 135d, HitResult.Miss },
+            // new object[] { 5f, 136d, HitResult.Miss },
+            // new object[] { 5f, 137d, HitResult.Miss },
+            // new object[] { 5f, 138d, HitResult.Miss },
 
             // OD = 9.3 test cases.
             // PERFECT hit window is [ -16ms,  16ms]
@@ -172,13 +173,14 @@ namespace osu.Game.Rulesets.Mania.Tests
             new object[] { 9.3f, 70d, HitResult.Ok },
             new object[] { 9.3f, 71d, HitResult.Ok },
             new object[] { 9.3f, 98d, HitResult.Ok },
-            new object[] { 9.3f, 99d, HitResult.Miss },
-            new object[] { 9.3f, 100d, HitResult.Miss },
-            new object[] { 9.3f, 101d, HitResult.Miss },
-            new object[] { 9.3f, 122d, HitResult.Miss },
-            new object[] { 9.3f, 123d, HitResult.Miss },
-            new object[] { 9.3f, 124d, HitResult.Miss },
-            new object[] { 9.3f, 125d, HitResult.Miss },
+            // coverage of broken "can't hit meh late" behaviour, which is intentionally not being reproduced
+            // new object[] { 9.3f, 99d, HitResult.Miss },
+            // new object[] { 9.3f, 100d, HitResult.Miss },
+            // new object[] { 9.3f, 101d, HitResult.Miss },
+            // new object[] { 9.3f, 122d, HitResult.Miss },
+            // new object[] { 9.3f, 123d, HitResult.Miss },
+            // new object[] { 9.3f, 124d, HitResult.Miss },
+            // new object[] { 9.3f, 125d, HitResult.Miss },
             new object[] { 9.3f, -98d, HitResult.Ok },
             new object[] { 9.3f, -99d, HitResult.Ok },
             new object[] { 9.3f, -100d, HitResult.Meh },
@@ -207,13 +209,14 @@ namespace osu.Game.Rulesets.Mania.Tests
             new object[] { 3.1f, 88d, HitResult.Ok },
             new object[] { 3.1f, 89d, HitResult.Ok },
             new object[] { 3.1f, 116d, HitResult.Ok },
-            new object[] { 3.1f, 117d, HitResult.Miss },
-            new object[] { 3.1f, 118d, HitResult.Miss },
-            new object[] { 3.1f, 119d, HitResult.Miss },
-            new object[] { 3.1f, 140d, HitResult.Miss },
-            new object[] { 3.1f, 141d, HitResult.Miss },
-            new object[] { 3.1f, 142d, HitResult.Miss },
-            new object[] { 3.1f, 143d, HitResult.Miss },
+            // coverage of broken "can't hit meh late" behaviour, which is intentionally not being reproduced
+            // new object[] { 3.1f, 117d, HitResult.Miss },
+            // new object[] { 3.1f, 118d, HitResult.Miss },
+            // new object[] { 3.1f, 119d, HitResult.Miss },
+            // new object[] { 3.1f, 140d, HitResult.Miss },
+            // new object[] { 3.1f, 141d, HitResult.Miss },
+            // new object[] { 3.1f, 142d, HitResult.Miss },
+            // new object[] { 3.1f, 143d, HitResult.Miss },
             new object[] { 3.1f, -116d, HitResult.Ok },
             new object[] { 3.1f, -117d, HitResult.Ok },
             new object[] { 3.1f, -118d, HitResult.Meh },
@@ -253,13 +256,14 @@ namespace osu.Game.Rulesets.Mania.Tests
             new object[] { 5f, -122d, HitResult.Miss },
             new object[] { 5f, -123d, HitResult.Miss },
             new object[] { 5f, 96d, HitResult.Ok },
-            new object[] { 5f, 97d, HitResult.Miss },
-            new object[] { 5f, 98d, HitResult.Miss },
-            new object[] { 5f, 99d, HitResult.Miss },
-            new object[] { 5f, 120d, HitResult.Miss },
-            new object[] { 5f, 121d, HitResult.Miss },
-            new object[] { 5f, 122d, HitResult.Miss },
-            new object[] { 5f, 123d, HitResult.Miss },
+            // coverage of broken "can't hit meh late" behaviour, which is intentionally not being reproduced
+            // new object[] { 5f, 97d, HitResult.Miss },
+            // new object[] { 5f, 98d, HitResult.Miss },
+            // new object[] { 5f, 99d, HitResult.Miss },
+            // new object[] { 5f, 120d, HitResult.Miss },
+            // new object[] { 5f, 121d, HitResult.Miss },
+            // new object[] { 5f, 122d, HitResult.Miss },
+            // new object[] { 5f, 123d, HitResult.Miss },
 
             // OD = 3.1 test cases.
             // PERFECT hit window is [ -16ms,  16ms]
@@ -280,13 +284,14 @@ namespace osu.Game.Rulesets.Mania.Tests
             new object[] { 3.1f, 78d, HitResult.Ok },
             new object[] { 3.1f, 79d, HitResult.Ok },
             new object[] { 3.1f, 96d, HitResult.Ok },
-            new object[] { 3.1f, 97d, HitResult.Miss },
-            new object[] { 3.1f, 98d, HitResult.Miss },
-            new object[] { 3.1f, 99d, HitResult.Miss },
-            new object[] { 3.1f, 120d, HitResult.Miss },
-            new object[] { 3.1f, 121d, HitResult.Miss },
-            new object[] { 3.1f, 122d, HitResult.Miss },
-            new object[] { 3.1f, 123d, HitResult.Miss },
+            // coverage of broken "can't hit meh late" behaviour, which is intentionally not being reproduced
+            // new object[] { 3.1f, 97d, HitResult.Miss },
+            // new object[] { 3.1f, 98d, HitResult.Miss },
+            // new object[] { 3.1f, 99d, HitResult.Miss },
+            // new object[] { 3.1f, 120d, HitResult.Miss },
+            // new object[] { 3.1f, 121d, HitResult.Miss },
+            // new object[] { 3.1f, 122d, HitResult.Miss },
+            // new object[] { 3.1f, 123d, HitResult.Miss },
             new object[] { 3.1f, -96d, HitResult.Ok },
             new object[] { 3.1f, -97d, HitResult.Ok },
             new object[] { 3.1f, -98d, HitResult.Meh },
@@ -327,13 +332,14 @@ namespace osu.Game.Rulesets.Mania.Tests
             new object[] { 5f, -98d, HitResult.Miss },
             new object[] { 5f, -99d, HitResult.Miss },
             new object[] { 5f, 79d, HitResult.Ok },
-            new object[] { 5f, 80d, HitResult.Miss },
-            new object[] { 5f, 81d, HitResult.Miss },
-            new object[] { 5f, 82d, HitResult.Miss },
-            new object[] { 5f, 96d, HitResult.Miss },
-            new object[] { 5f, 97d, HitResult.Miss },
-            new object[] { 5f, 98d, HitResult.Miss },
-            new object[] { 5f, 99d, HitResult.Miss },
+            // coverage of broken "can't hit meh late" behaviour, which is intentionally not being reproduced
+            // new object[] { 5f, 80d, HitResult.Miss },
+            // new object[] { 5f, 81d, HitResult.Miss },
+            // new object[] { 5f, 82d, HitResult.Miss },
+            // new object[] { 5f, 96d, HitResult.Miss },
+            // new object[] { 5f, 97d, HitResult.Miss },
+            // new object[] { 5f, 98d, HitResult.Miss },
+            // new object[] { 5f, 99d, HitResult.Miss },
 
             // OD = 9.3 test cases.
             // This leads to "effective" OD of 13.02.
@@ -356,13 +362,14 @@ namespace osu.Game.Rulesets.Mania.Tests
             new object[] { 9.3f, 50d, HitResult.Ok },
             new object[] { 9.3f, 51d, HitResult.Ok },
             new object[] { 9.3f, 69d, HitResult.Ok },
-            new object[] { 9.3f, 70d, HitResult.Miss },
-            new object[] { 9.3f, 71d, HitResult.Miss },
-            new object[] { 9.3f, 72d, HitResult.Miss },
-            new object[] { 9.3f, 86d, HitResult.Miss },
-            new object[] { 9.3f, 87d, HitResult.Miss },
-            new object[] { 9.3f, 88d, HitResult.Miss },
-            new object[] { 9.3f, 89d, HitResult.Miss },
+            // coverage of broken "can't hit meh late" behaviour, which is intentionally not being reproduced
+            // new object[] { 9.3f, 70d, HitResult.Miss },
+            // new object[] { 9.3f, 71d, HitResult.Miss },
+            // new object[] { 9.3f, 72d, HitResult.Miss },
+            // new object[] { 9.3f, 86d, HitResult.Miss },
+            // new object[] { 9.3f, 87d, HitResult.Miss },
+            // new object[] { 9.3f, 88d, HitResult.Miss },
+            // new object[] { 9.3f, 89d, HitResult.Miss },
             new object[] { 9.3f, -69d, HitResult.Ok },
             new object[] { 9.3f, -70d, HitResult.Ok },
             new object[] { 9.3f, -71d, HitResult.Meh },
@@ -402,13 +409,14 @@ namespace osu.Game.Rulesets.Mania.Tests
             new object[] { 5f, -191d, HitResult.Miss },
             new object[] { 5f, -192d, HitResult.Miss },
             new object[] { 5f, 155d, HitResult.Ok },
-            new object[] { 5f, 156d, HitResult.Miss },
-            new object[] { 5f, 157d, HitResult.Miss },
-            new object[] { 5f, 158d, HitResult.Miss },
-            new object[] { 5f, 189d, HitResult.Miss },
-            new object[] { 5f, 190d, HitResult.Miss },
-            new object[] { 5f, 191d, HitResult.Miss },
-            new object[] { 5f, 192d, HitResult.Miss },
+            // coverage of broken "can't hit meh late" behaviour, which is intentionally not being reproduced
+            // new object[] { 5f, 156d, HitResult.Miss },
+            // new object[] { 5f, 157d, HitResult.Miss },
+            // new object[] { 5f, 158d, HitResult.Miss },
+            // new object[] { 5f, 189d, HitResult.Miss },
+            // new object[] { 5f, 190d, HitResult.Miss },
+            // new object[] { 5f, 191d, HitResult.Miss },
+            // new object[] { 5f, 192d, HitResult.Miss },
         };
 
         private static readonly object[][] score_v1_non_convert_double_time_test_cases =
@@ -440,13 +448,14 @@ namespace osu.Game.Rulesets.Mania.Tests
             new object[] { 5f, -205d, HitResult.Miss },
             new object[] { 5f, -206d, HitResult.Miss },
             new object[] { 5f, 167d, HitResult.Ok },
-            new object[] { 5f, 168d, HitResult.Miss },
-            new object[] { 5f, 169d, HitResult.Miss },
-            new object[] { 5f, 170d, HitResult.Miss },
-            new object[] { 5f, 203d, HitResult.Miss },
-            new object[] { 5f, 204d, HitResult.Miss },
-            new object[] { 5f, 205d, HitResult.Miss },
-            new object[] { 5f, 206d, HitResult.Miss },
+            // coverage of broken "can't hit meh late" behaviour, which is intentionally not being reproduced
+            // new object[] { 5f, 168d, HitResult.Miss },
+            // new object[] { 5f, 169d, HitResult.Miss },
+            // new object[] { 5f, 170d, HitResult.Miss },
+            // new object[] { 5f, 203d, HitResult.Miss },
+            // new object[] { 5f, 204d, HitResult.Miss },
+            // new object[] { 5f, 205d, HitResult.Miss },
+            // new object[] { 5f, 206d, HitResult.Miss },
         };
 
         private static readonly object[][] score_v1_non_convert_half_time_test_cases =
@@ -478,13 +487,14 @@ namespace osu.Game.Rulesets.Mania.Tests
             new object[] { 5f, -103d, HitResult.Miss },
             new object[] { 5f, -104d, HitResult.Miss },
             new object[] { 5f, 83d, HitResult.Ok },
-            new object[] { 5f, 84d, HitResult.Miss },
-            new object[] { 5f, 85d, HitResult.Miss },
-            new object[] { 5f, 86d, HitResult.Miss },
-            new object[] { 5f, 101d, HitResult.Miss },
-            new object[] { 5f, 102d, HitResult.Miss },
-            new object[] { 5f, 103d, HitResult.Miss },
-            new object[] { 5f, 104d, HitResult.Miss },
+            // coverage of broken "can't hit meh late" behaviour, which is intentionally not being reproduced
+            // new object[] { 5f, 84d, HitResult.Miss },
+            // new object[] { 5f, 85d, HitResult.Miss },
+            // new object[] { 5f, 86d, HitResult.Miss },
+            // new object[] { 5f, 101d, HitResult.Miss },
+            // new object[] { 5f, 102d, HitResult.Miss },
+            // new object[] { 5f, 103d, HitResult.Miss },
+            // new object[] { 5f, 104d, HitResult.Miss },
         };
 
         private const double note_time = 300;
@@ -510,7 +520,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 ScoreInfo = new ScoreInfo
                 {
                     Ruleset = CreateRuleset().RulesetInfo,
-                    Mods = [new ModScoreV2()]
+                    Mods = [new ManiaModScoreV2()]
                 }
             };
 

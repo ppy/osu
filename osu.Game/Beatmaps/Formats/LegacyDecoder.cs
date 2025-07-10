@@ -16,6 +16,8 @@ namespace osu.Game.Beatmaps.Formats
     public abstract class LegacyDecoder<T> : Decoder<T>
         where T : new()
     {
+        // If this is updated, a new release of `osu-server-beatmap-submission` is required with updated packages.
+        // See usage at https://github.com/ppy/osu-server-beatmap-submission/blob/master/osu.Server.BeatmapSubmission/Services/BeatmapPackageParser.cs#L96-L97.
         public const int LATEST_VERSION = 14;
 
         public const int MAX_COMBO_COLOUR_COUNT = 8;

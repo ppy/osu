@@ -12,6 +12,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Tournament.IPC;
@@ -42,6 +43,7 @@ namespace osu.Game.Tournament.Screens.Setup
         [Resolved]
         private TournamentSceneManager? sceneManager { get; set; }
 
+        private readonly IBindable<APIUser> localUser = new Bindable<APIUser>();
         private Bindable<Size> windowSize = null!;
 
         [BackgroundDependencyLoader]
@@ -70,7 +72,8 @@ namespace osu.Game.Tournament.Screens.Setup
                 },
             };
 
-            api.LocalUser.BindValueChanged(_ => Schedule(reload));
+            localUser.BindTo(api.LocalUser);
+            localUser.BindValueChanged(_ => Schedule(reload));
             stableInfo.OnStableInfoSaved += () => Schedule(reload);
             reload();
         }

@@ -21,13 +21,13 @@ namespace osu.Game.Skinning
     {
         public bool UsesFixedAnchor { get; set; }
 
-        [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.Font), nameof(SkinnableComponentStrings.FontDescription))]
+        [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.Font))]
         public Bindable<Typeface> Font { get; } = new Bindable<Typeface>(Typeface.Torus);
 
         [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.TextWeight), SettingControlType = typeof(WeightDropdown))]
         public Bindable<FontWeight> TextWeight { get; } = new Bindable<FontWeight>(FontWeight.Regular);
 
-        [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.TextColour), nameof(SkinnableComponentStrings.TextColourDescription))]
+        [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.TextColour))]
         public BindableColour4 TextColour { get; } = new BindableColour4(Colour4.White);
 
         /// <summary>

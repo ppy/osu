@@ -33,7 +33,7 @@ namespace osu.Game.Screens.Play.HUD
         [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.UseRelativeSize))]
         public BindableBool UseRelativeSize { get; } = new BindableBool(true);
 
-        [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.Colour), nameof(SkinnableComponentStrings.ColourDescription))]
+        [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.Colour))]
         public BindableColour4 AccentColour { get; } = new BindableColour4(Colour4.White);
 
         [Resolved]

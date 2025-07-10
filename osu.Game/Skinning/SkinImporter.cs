@@ -4,8 +4,10 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
@@ -13,6 +15,7 @@ using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.IO;
 using osu.Game.IO.Archives;
+using osu.Game.Overlays.Notifications;
 using Realms;
 
 namespace osu.Game.Skinning
@@ -42,6 +45,50 @@ namespace osu.Game.Skinning
         protected override SkinInfo CreateModel(ArchiveReader archive, ImportParameters parameters) => new SkinInfo { Name = archive.Name ?? @"No name" };
 
         private const string unknown_creator_string = @"Unknown";
+
+        /// <summary>
+        /// Update an existing skin with the contents of a path
+        /// </summary>
+        /// <param name="notification">The progress notification</param>
+        /// <param name="task">The <see cref="ImportTask"/> to update the <paramref name="original"/> with</param>
+        /// <param name="original">The <see cref="SkinInfo"/> to update</param>
+        /// <returns></returns>
+        public override async Task<Live<SkinInfo>?> ImportAsUpdate(ProgressNotification notification, ImportTask task, SkinInfo original)
+        {
+            return await Realm.WriteAsync<Live<SkinInfo>?>(r =>
+            {
+                var skinInfo = r.Find<SkinInfo>(original.ID)!;
+                skinInfo.Files.Clear();
+
+                string[] filesInMountedDirectory = Directory.EnumerateFiles(task.Path, "*.*", SearchOption.AllDirectories).Select(f => Path.GetRelativePath(task.Path, f)).ToArray();
+
+                foreach (string file in filesInMountedDirectory)
+                {
+                    using var stream = File.OpenRead(Path.Combine(task.Path, file));
+
+                    modelManager.AddFile(skinInfo, stream, file, r);
+                }
+
+                string skinIniPath = Path.Combine(task.Path, "skin.ini");
+
+                if (File.Exists(skinIniPath))
+                {
+                    using (var stream = File.OpenRead(skinIniPath))
+                    using (var lineReader = new LineBufferedReader(stream))
+                    {
+                        var decodedSkinIni = new LegacySkinDecoder().Decode(lineReader);
+
+                        if (!string.IsNullOrEmpty(decodedSkinIni.SkinInfo.Name))
+                            skinInfo.Name = decodedSkinIni.SkinInfo.Name;
+
+                        if (!string.IsNullOrEmpty(decodedSkinIni.SkinInfo.Creator))
+                            skinInfo.Creator = decodedSkinIni.SkinInfo.Creator;
+                    }
+                }
+
+                return skinInfo.ToLive(Realm);
+            }).ConfigureAwait(false);
+        }
 
         protected override void Populate(SkinInfo model, ArchiveReader? archive, Realm realm, CancellationToken cancellationToken = default)
         {

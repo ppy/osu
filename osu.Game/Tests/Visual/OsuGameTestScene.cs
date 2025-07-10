@@ -82,10 +82,11 @@ namespace osu.Game.Tests.Visual
         [TearDownSteps]
         public virtual void TearDownSteps()
         {
-            if (DebugUtils.IsNUnitRunning && Game != null)
+            if (DebugUtils.IsNUnitRunning)
             {
-                AddStep("exit game", () => Game.Exit());
-                AddUntilStep("wait for game exit", () => Game.Parent == null);
+                AddStep("exit game", () => Game?.Exit());
+                AddUntilStep("wait for game exit", () => Game?.Parent == null);
+                AddStep("dispose game", () => Game?.Dispose());
             }
         }
 

@@ -15,11 +15,6 @@ namespace osu.Game.Localisation.SkinComponents
         public static LocalisableString Attribute => new TranslatableString(getKey(@"attribute"), @"Attribute");
 
         /// <summary>
-        /// "The attribute to be displayed."
-        /// </summary>
-        public static LocalisableString AttributeDescription => new TranslatableString(getKey(@"attribute_description"), @"The attribute to be displayed.");
-
-        /// <summary>
         /// "Template"
         /// </summary>
         public static LocalisableString Template => new TranslatableString(getKey(@"template"), @"Template");
