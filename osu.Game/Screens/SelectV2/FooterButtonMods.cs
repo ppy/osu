@@ -378,6 +378,8 @@ namespace osu.Game.Screens.SelectV2
                     }
                 };
             }
+
+            protected override bool OnMouseDown(MouseDownEvent e) => true;
         }
     }
 }
