@@ -84,7 +84,9 @@ namespace osu.Game.Screens.SelectV2
             {
                 Icon = FontAwesome.Solid.Eraser
             };
-            yield return new OsuMenuItem(WebCommonStrings.ButtonsHide.ToSentence(), MenuItemType.Destructive, () => beatmaps.Hide(beatmap));
+
+            if (beatmaps.CanHide(beatmap))
+                yield return new OsuMenuItem(WebCommonStrings.ButtonsHide.ToSentence(), MenuItemType.Destructive, () => beatmaps.Hide(beatmap));
         }
 
         protected override void OnStart()
