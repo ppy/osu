@@ -159,14 +159,14 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             });
         }
 
-        protected void ImportBeatmapForRuleset(int rulesetId)
+        protected void ImportBeatmapForRuleset(params int[] rulesetIds)
         {
             int beatmapsCount = 0;
 
-            AddStep($"import test map for ruleset {rulesetId}", () =>
+            AddStep($"import test map for ruleset {rulesetIds}", () =>
             {
                 beatmapsCount = SongSelect.IsNull() ? 0 : Carousel.Filters.OfType<BeatmapCarouselFilterGrouping>().Single().SetItems.Count;
-                Beatmaps.Import(TestResources.CreateTestBeatmapSetInfo(3, Rulesets.AvailableRulesets.Where(r => r.OnlineID == rulesetId).ToArray()));
+                Beatmaps.Import(TestResources.CreateTestBeatmapSetInfo(3, Rulesets.AvailableRulesets.Where(r => rulesetIds.Contains(r.OnlineID)).ToArray()));
             });
 
             // This is specifically for cases where the add is happening post song select load.
