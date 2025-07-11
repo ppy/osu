@@ -69,6 +69,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             pauseViaBackAction();
             pauseViaBackAction();
             confirmPausedWithNoOverlay();
+            AddAssert("score pause count incremented", () => Player.Score.ScoreInfo.PauseCount, () => Is.EqualTo(1));
         }
 
         [Test]
@@ -77,6 +78,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             pauseViaPauseGameplayAction();
             pauseViaPauseGameplayAction();
             confirmPausedWithNoOverlay();
+            AddAssert("score pause count incremented", () => Player.Score.ScoreInfo.PauseCount, () => Is.EqualTo(1));
         }
 
         [Test]

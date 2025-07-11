@@ -142,6 +142,8 @@ namespace osu.Game.Scoring.Legacy
                             score.ScoreInfo.TotalScoreWithoutMods = totalScoreWithoutMods;
                         else
                             PopulateTotalScoreWithoutMods(score.ScoreInfo);
+
+                        score.ScoreInfo.PauseCount = readScore.PauseCount;
                     });
                 }
             }

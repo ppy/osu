@@ -321,6 +321,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 CountryCode = CountryCode.PL
             };
             scoreInfo.ClientVersion = "2023.1221.0";
+            scoreInfo.PauseCount = 3;
 
             var beatmap = new TestBeatmap(ruleset);
             var score = new Score
@@ -345,6 +346,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.That(decodedAfterEncode.ScoreInfo.Mods, Is.EqualTo(scoreInfo.Mods));
                 Assert.That(decodedAfterEncode.ScoreInfo.ClientVersion, Is.EqualTo("2023.1221.0"));
                 Assert.That(decodedAfterEncode.ScoreInfo.RealmUser.OnlineID, Is.EqualTo(3035836));
+                Assert.That(decodedAfterEncode.ScoreInfo.PauseCount, Is.EqualTo(3));
             });
         }
 
