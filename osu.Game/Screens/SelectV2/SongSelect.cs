@@ -133,7 +133,7 @@ namespace osu.Game.Screens.SelectV2
         [Resolved]
         private IDialogOverlay? dialogOverlay { get; set; }
 
-        private Bindable<bool> configBackgroundBlur = null!;
+        private Bindable<float> configBackgroundBlur = null!;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, OsuConfigManager config)
@@ -278,7 +278,7 @@ namespace osu.Game.Screens.SelectV2
                 modSelectOverlay,
             });
 
-            configBackgroundBlur = config.GetBindable<bool>(OsuSetting.SongSelectBackgroundBlur);
+            configBackgroundBlur = config.GetBindable<float>(OsuSetting.SongSelectBackgroundBlur);
             configBackgroundBlur.BindValueChanged(e =>
             {
                 if (!this.IsCurrentScreen())
@@ -725,7 +725,7 @@ namespace osu.Game.Screens.SelectV2
             // Probably needs more thought because this needs to be in every `ApplyToBackground` currently to restore sane defaults.
             backgroundModeBeatmap.FadeColour(Color4.White, 250);
 
-            backgroundModeBeatmap.BlurAmount.Value = revealingBackground == null && configBackgroundBlur.Value ? 20 : 0f;
+            backgroundModeBeatmap.BlurAmount.Value = (revealingBackground == null ? 1.0f : 0.0f) * configBackgroundBlur.Value * 20.0f;
         });
 
         #endregion
