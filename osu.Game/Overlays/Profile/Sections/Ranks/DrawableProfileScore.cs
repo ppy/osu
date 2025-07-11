@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -262,27 +263,31 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                 };
             }
 
+            var ppTooltipText = LocalisableString.Interpolate($@"{Score.PP:N1}pp");
+
             return new FillFlowContainer
             {
                 AutoSizeAxes = Axes.Both,
                 Direction = FillDirection.Horizontal,
                 Children = new[]
                 {
-                    new OsuSpriteText
+                    new SpriteTextWithTooltip
                     {
                         Anchor = Anchor.BottomLeft,
                         Origin = Anchor.BottomLeft,
                         Font = font,
-                        Text = $"{Score.PP:0}",
-                        Colour = colourProvider.Highlight1
+                        Text = Score.PP.ToLocalisableString(@"N0"),
+                        TooltipText = ppTooltipText,
+                        Colour = colourProvider.Highlight1,
                     },
-                    new OsuSpriteText
+                    new SpriteTextWithTooltip
                     {
                         Anchor = Anchor.BottomLeft,
                         Origin = Anchor.BottomLeft,
                         Font = font.With(size: 12),
-                        Text = "pp",
-                        Colour = colourProvider.Light3
+                        Text = @"pp",
+                        TooltipText = ppTooltipText,
+                        Colour = colourProvider.Light3,
                     }
                 }
             };
