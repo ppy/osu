@@ -14,13 +14,17 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Resources.Localisation.Web;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
+using osu.Game.Utils;
 using osuTK;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
@@ -37,18 +41,22 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private readonly TotalScoreColumn totalScoreColumn;
         private readonly TextColumn accuracyColumn;
         private readonly TextColumn maxComboColumn;
-        private readonly TextColumn ppColumn;
-
-        private readonly FillFlowContainer<InfoColumn> statisticsColumns;
-        private readonly ModsInfoColumn modsColumn;
 
         [Resolved]
-        private ScoreManager scoreManager { get; set; }
+        private OsuConfigManager config { get; set; } = null!;
 
-        public TopScoreStatisticsSection()
+        private readonly SoloScoreInfo score;
+        private readonly APIBeatmap beatmap;
+
+        public TopScoreStatisticsSection(SoloScoreInfo score, APIBeatmap beatmap, Ruleset ruleset)
         {
+            this.score = score;
+            this.beatmap = beatmap;
+
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
+
+            TextColumn ppColumn;
 
             InternalChild = new FillFlowContainer
             {
@@ -66,9 +74,18 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                         Spacing = new Vector2(margin, 0),
                         Children = new Drawable[]
                         {
-                            totalScoreColumn = new TotalScoreColumn(BeatmapsetsStrings.ShowScoreboardHeadersScoreTotal, largeFont, top_columns_min_width),
-                            accuracyColumn = new TextColumn(BeatmapsetsStrings.ShowScoreboardHeadersAccuracy, largeFont, top_columns_min_width),
+                            totalScoreColumn = new TotalScoreColumn(BeatmapsetsStrings.ShowScoreboardHeadersScoreTotal, largeFont, top_columns_min_width)
+                            {
+                                Current = score.GetBindableTotalScoreString(config),
+                            },
+                            accuracyColumn = new TextColumn(BeatmapsetsStrings.ShowScoreboardHeadersAccuracy, largeFont, top_columns_min_width)
+                            {
+                                Text = score.Accuracy.FormatAccuracy(),
+                            },
                             maxComboColumn = new TextColumn(BeatmapsetsStrings.ShowScoreboardHeadersCombo, largeFont, top_columns_min_width)
+                            {
+                                Text = score.MaxCombo.ToLocalisableString(@"0\x"),
+                            }
                         }
                     },
                     new FillFlowContainer
@@ -80,18 +97,47 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                         Spacing = new Vector2(margin, 0),
                         Children = new Drawable[]
                         {
-                            statisticsColumns = new FillFlowContainer<InfoColumn>
+                            new FillFlowContainer<InfoColumn>
                             {
                                 AutoSizeAxes = Axes.Both,
                                 Direction = FillDirection.Horizontal,
                                 Spacing = new Vector2(margin, 0),
+                                ChildrenEnumerable = score.GetStatisticsForDisplay(ruleset).Select(createStatisticsColumn),
                             },
-                            ppColumn = new TextColumn(BeatmapsetsStrings.ShowScoreboardHeaderspp, smallFont, bottom_columns_min_width),
-                            modsColumn = new ModsInfoColumn(),
+                            ppColumn = new TextColumn(BeatmapsetsStrings.ShowScoreboardHeaderspp, smallFont, bottom_columns_min_width)
+                            {
+                                Alpha = beatmap.Status.GrantsPerformancePoints() ? 1 : 0,
+                            },
+                            new ModsInfoColumn
+                            {
+                                Mods = score.Mods.Select(m => m.ToMod(ruleset)),
+                            },
                         }
                     },
                 }
             };
+
+            // cross-reference: https://github.com/ppy/osu-web/blob/a6afee076f4f68bb56dea0cb8f18db63651763a7/resources/js/scores/pp-value.tsx#L19-L39
+            if (!score.Ranked || !score.Preserve || (score.PP == null && score.Processed))
+            {
+                ppColumn.Drawable = new SpriteTextWithTooltip
+                {
+                    Text = "-",
+                    Font = smallFont,
+                    TooltipText = ScoresStrings.StatusNoPp
+                };
+            }
+            else if (score.PP is not double pp)
+            {
+                ppColumn.Drawable = new SpriteIconWithTooltip
+                {
+                    Icon = FontAwesome.Solid.Sync,
+                    Size = new Vector2(smallFont.Size),
+                    TooltipText = ScoresStrings.StatusProcessing,
+                };
+            }
+            else
+                ppColumn.Text = pp.ToLocalisableString(@"N0");
         }
 
         [BackgroundDependencyLoader]
@@ -99,63 +145,13 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         {
             if (score != null)
             {
-                totalScoreColumn.Current = scoreManager.GetBindableTotalScoreString(score);
+                totalScoreColumn.Current = score.GetBindableTotalScoreString(config);
 
-                if (score.Accuracy == 1.0) accuracyColumn.TextColour = colours.GreenLight;
-#pragma warning disable CS0618
-                if (score.MaxCombo == score.BeatmapInfo!.MaxCombo) maxComboColumn.TextColour = colours.GreenLight;
-#pragma warning restore CS0618
-            }
-        }
+                if (score.Accuracy == 1.0)
+                    accuracyColumn.TextColour = colours.GreenLight;
 
-        private ScoreInfo score;
-
-        /// <summary>
-        /// Sets the score to be displayed.
-        /// </summary>
-        public ScoreInfo Score
-        {
-            set
-            {
-                if (score == null && value == null)
-                    return;
-
-                if (score?.Equals(value) == true)
-                    return;
-
-                score = value;
-
-                accuracyColumn.Text = value.DisplayAccuracy;
-                maxComboColumn.Text = value.MaxCombo.ToLocalisableString(@"0\x");
-
-                ppColumn.Alpha = value.BeatmapInfo!.Status.GrantsPerformancePoints() ? 1 : 0;
-
-                if (!value.Ranked)
-                {
-                    ppColumn.Drawable = new SpriteTextWithTooltip
-                    {
-                        Text = "-",
-                        Font = smallFont,
-                        TooltipText = ScoresStrings.StatusNoPp
-                    };
-                }
-                else if (value.PP is not double pp)
-                {
-                    ppColumn.Drawable = new SpriteIconWithTooltip
-                    {
-                        Icon = FontAwesome.Solid.Sync,
-                        Size = new Vector2(smallFont.Size),
-                        TooltipText = ScoresStrings.StatusProcessing,
-                    };
-                }
-                else
-                    ppColumn.Text = pp.ToLocalisableString(@"N0");
-
-                statisticsColumns.ChildrenEnumerable = value.GetStatisticsForDisplay().Select(createStatisticsColumn);
-                modsColumn.Mods = value.Mods;
-
-                if (scoreManager != null)
-                    totalScoreColumn.Current = scoreManager.GetBindableTotalScoreString(value);
+                if (score.MaxCombo == beatmap.MaxCombo)
+                    maxComboColumn.TextColour = colours.GreenLight;
             }
         }
 
