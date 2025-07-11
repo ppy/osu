@@ -10,16 +10,17 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Platform;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
-using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Online.Chat
 {
@@ -136,59 +137,115 @@ namespace osu.Game.Online.Chat
 
         private void checkForMentions(Channel channel, Message message)
         {
-            if (!notifyOnUsername.Value || !CheckContainsUsername(message.Content, localUser.Value.Username)) return;
+            if (!notifyOnUsername.Value)
+                return;
 
-            notifications.Post(new MentionNotification(message, channel));
+            var match = MatchUsername(message.Content, localUser.Value.Username);
+            if (!match.Success)
+                return;
+
+            notifications.Post(new MentionNotification(message, channel, match));
         }
 
         /// <summary>
         /// Checks if <paramref name="message"/> mentions <paramref name="username"/>.
         /// This will match against the case where underscores are used instead of spaces (which is how osu-stable handles usernames with spaces).
         /// </summary>
-        public static bool CheckContainsUsername(string message, string username)
+        public static Match MatchUsername(string message, string username)
         {
             string fullName = Regex.Escape(username);
             string underscoreName = Regex.Escape(username.Replace(' ', '_'));
-            return Regex.IsMatch(message, $@"(^|\W)({fullName}|{underscoreName})($|\W)", RegexOptions.IgnoreCase);
+            return Regex.Match(message, $@"(^|\W)({fullName}|{underscoreName})($|\W)", RegexOptions.IgnoreCase);
         }
 
-        public partial class PrivateMessageNotification : HighlightMessageNotification
+        public partial class PrivateMessageNotification : UserAvatarNotification
         {
+            private readonly Message message;
+            private readonly Channel channel;
+
             public PrivateMessageNotification(Message message, Channel channel)
-                : base(message, channel)
-            {
-                Icon = FontAwesome.Solid.Envelope;
-                Text = NotificationsStrings.PrivateMessageReceived(message.Sender.Username);
-            }
-        }
-
-        public partial class MentionNotification : HighlightMessageNotification
-        {
-            public MentionNotification(Message message, Channel channel)
-                : base(message, channel)
-            {
-                Icon = FontAwesome.Solid.At;
-                Text = NotificationsStrings.YourNameWasMentioned(message.Sender.Username);
-            }
-        }
-
-        public abstract partial class HighlightMessageNotification : SimpleNotification
-        {
-            public override string PopInSampleName => "UI/notification-mention";
-
-            protected HighlightMessageNotification(Message message, Channel channel)
+                : base(message.Sender)
             {
                 this.message = message;
                 this.channel = channel;
             }
 
+            [BackgroundDependencyLoader]
+            private void load(ChatOverlay chatOverlay, INotificationOverlay notificationOverlay, OverlayColourProvider colourProvider)
+            {
+                // Sane maximum height to avoid the notification becoming too tall on long messages.
+                // The height is ballparked to display two lines.
+                TextFlow.AutoSizeAxes = Axes.None;
+                TextFlow.Height = 45;
+
+                TextFlow.ParagraphSpacing = 0.25f;
+
+                TextFlow.AddText(NotificationsStrings.ItemChannelChannelDefault.ToUpper(), s => s.Font = OsuFont.Style.Caption2.With(weight: FontWeight.Bold));
+                TextFlow.AddText($" – {message.Sender.Username}", s =>
+                {
+                    s.Font = OsuFont.Style.Caption2.With(weight: FontWeight.SemiBold);
+                    s.Colour = colourProvider.Content2;
+                });
+                TextFlow.AddParagraph($"\"{message.Content}\"");
+
+                Avatar.Colour = OsuColour.Gray(0.4f);
+                Icon = FontAwesome.Solid.Comments;
+
+                Activated = delegate
+                {
+                    notificationOverlay.Hide();
+                    chatOverlay.HighlightMessage(message, channel);
+                    return true;
+                };
+            }
+        }
+
+        public partial class MentionNotification : UserAvatarNotification
+        {
+            public override string PopInSampleName => "UI/notification-mention";
+
             private readonly Message message;
             private readonly Channel channel;
+            private readonly Match match;
+
+            public MentionNotification(Message message, Channel channel, Match match)
+                : base(message.Sender)
+            {
+                this.message = message;
+                this.channel = channel;
+                this.match = match;
+            }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours, ChatOverlay chatOverlay, INotificationOverlay notificationOverlay)
+            private void load(ChatOverlay chatOverlay, INotificationOverlay notificationOverlay, OverlayColourProvider colourProvider)
             {
-                IconContent.Colour = colours.PurpleDark;
+                // Sane maximum height to avoid the notification becoming too tall on long messages.
+                // The height is ballparked to display two lines.
+                TextFlow.AutoSizeAxes = Axes.None;
+                TextFlow.Height = 45;
+
+                TextFlow.ParagraphSpacing = 0.25f;
+
+                TextFlow.AddParagraph(Localisation.NotificationsStrings.Mention.ToUpper(), s => s.Font = OsuFont.Style.Caption2.With(weight: FontWeight.Bold));
+                TextFlow.AddText($" – {message.Sender.Username} in {channel.Name}", s =>
+                {
+                    s.Font = OsuFont.Style.Caption2.With(weight: FontWeight.SemiBold);
+                    s.Colour = colourProvider.Content2;
+                });
+
+                int start = match.Index;
+                int end = match.Index + match.Length;
+
+                TextFlow.AddParagraph($"\"{message.Content[..start]}");
+                TextFlow.AddText(message.Content[start..end], s =>
+                {
+                    s.Font = s.Font.With(weight: FontWeight.SemiBold);
+                    s.Colour = colourProvider.Colour0;
+                });
+                TextFlow.AddText($"{message.Content[end..]}\"");
+
+                Avatar.Colour = OsuColour.Gray(0.4f);
+                Icon = FontAwesome.Solid.At;
 
                 Activated = delegate
                 {
