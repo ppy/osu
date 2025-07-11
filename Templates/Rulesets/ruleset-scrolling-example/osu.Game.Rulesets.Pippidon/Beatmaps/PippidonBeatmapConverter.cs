@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Pippidon.Beatmaps
             }
         }
 
-        public override bool CanConvert() => Beatmap.HitObjects.All(h => h is IHasXPosition && h is IHasYPosition);
+        public override bool CanConvert() => Beatmap.HitObjects.All(h => h is IHasXPosition || h is IHasYPosition);
 
         protected override IEnumerable<PippidonHitObject> ConvertHitObject(HitObject original, IBeatmap beatmap, CancellationToken cancellationToken)
         {
@@ -43,6 +43,6 @@ namespace osu.Game.Rulesets.Pippidon.Beatmaps
         private int getLane(HitObject hitObject) => (int)Math.Clamp(
             (getUsablePosition(hitObject) - minPosition) / (maxPosition - minPosition) * PippidonPlayfield.LANE_COUNT, 0, PippidonPlayfield.LANE_COUNT - 1);
 
-        private float getUsablePosition(HitObject h) => (h as IHasYPosition)?.Y ?? ((IHasXPosition)h).X;
+        private float getUsablePosition(HitObject h) => (h as IHasXPosition)?.X ?? ((IHasYPosition)h).Y;
     }
 }
