@@ -17,6 +17,7 @@ namespace osu.Game.Rulesets.Mods
         private IAdjustableAudioComponent? track;
 
         private BindableBool? adjustPitch;
+        private BindableBool? adjustAudioSpeed;
 
         /// <summary>
         /// The score multiplier for the current <see cref="SpeedChange"/>.
@@ -52,19 +53,14 @@ namespace osu.Game.Rulesets.Mods
         /// Importantly, <see cref="ApplyToTrack"/> must be called when a track is obtained/changed for this to work.
         /// </summary>
         /// <param name="adjustPitch">The "adjust pitch" setting as exposed to the user.</param>
-        public void HandleAudioAdjustments(BindableBool adjustPitch)
+        /// <param name="adjustAudioSpeed">The "adjust audio speed" setting as exposed to the user</param>
+        public void HandleAudioAdjustments(BindableBool adjustPitch, BindableBool adjustAudioSpeed)
         {
             this.adjustPitch = adjustPitch;
+            this.adjustAudioSpeed = adjustAudioSpeed;
 
-            // When switching between pitch adjust, we need to update adjustments to time-shift or frequency-scale.
-            adjustPitch.BindValueChanged(adjustPitchSetting =>
-            {
-                track?.RemoveAdjustment(adjustmentForPitchSetting(adjustPitchSetting.OldValue), SpeedChange);
-                track?.AddAdjustment(adjustmentForPitchSetting(adjustPitchSetting.NewValue), SpeedChange);
-
-                AdjustableProperty adjustmentForPitchSetting(bool adjustPitchSettingValue)
-                    => adjustPitchSettingValue ? AdjustableProperty.Frequency : AdjustableProperty.Tempo;
-            });
+            adjustPitch.BindValueChanged(_ => updateTrackAdjustments(), true);
+            adjustAudioSpeed.BindValueChanged(_ => updateTrackAdjustments(), true);
         }
 
         /// <summary>
@@ -74,11 +70,28 @@ namespace osu.Game.Rulesets.Mods
         /// <exception cref="InvalidOperationException">If this method is called before <see cref="HandleAudioAdjustments"/>.</exception>
         public void ApplyToTrack(IAdjustableAudioComponent track)
         {
-            if (adjustPitch == null)
+            if (adjustPitch == null || adjustAudioSpeed == null)
                 throw new InvalidOperationException($"Must call {nameof(HandleAudioAdjustments)} first");
 
             this.track = track;
-            adjustPitch.TriggerChange();
+            updateTrackAdjustments();
+        }
+
+        /// <summary>
+        /// Updates the audio track adjustments based on current settings
+        /// </summary>
+        private void updateTrackAdjustments()
+        {
+            if (track == null || adjustPitch == null || adjustAudioSpeed == null) return;
+
+            track.RemoveAdjustment(AdjustableProperty.Tempo, SpeedChange);
+            track.RemoveAdjustment(AdjustableProperty.Frequency, SpeedChange);
+
+            if (adjustAudioSpeed.Value)
+            {
+                var property = adjustPitch.Value ? AdjustableProperty.Frequency : AdjustableProperty.Tempo;
+                track.AddAdjustment(property, SpeedChange);
+            }
         }
     }
 }

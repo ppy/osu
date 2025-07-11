@@ -221,6 +221,9 @@ namespace osu.Game.Tests.Online
 
             [SettingSource("Adjust pitch", "Should pitch be adjusted with speed")]
             public override BindableBool AdjustPitch { get; } = new BindableBool(true);
+
+            [SettingSource("Adjust audio speed", "Should audio speed be adjusted with speed")]
+            public override BindableBool AdjustAudioSpeed { get; } = new BindableBool(true);
         }
 
         private class TestModDifficultyAdjust : ModDifficultyAdjust

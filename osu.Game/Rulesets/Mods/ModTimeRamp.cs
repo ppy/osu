@@ -32,6 +32,9 @@ namespace osu.Game.Rulesets.Mods
         [SettingSource("Adjust pitch", "Should pitch be adjusted with speed")]
         public abstract BindableBool AdjustPitch { get; }
 
+        [SettingSource("Adjust audio speed", "Should audio speed be adjusted with speed")]
+        public abstract BindableBool AdjustAudioSpeed { get; }
+
         public sealed override bool ValidForFreestyleAsRequiredMod => true;
         public sealed override bool ValidForMultiplayerAsFreeMod => false;
 
@@ -45,6 +48,9 @@ namespace osu.Game.Rulesets.Mods
 
                 if (!AdjustPitch.IsDefault)
                     yield return ("Adjust pitch", AdjustPitch.Value ? "On" : "Off");
+
+                if (!AdjustAudioSpeed.IsDefault)
+                    yield return ("Adjust audio speed", AdjustAudioSpeed.Value ? "On" : "Off");
             }
         }
 
@@ -61,7 +67,7 @@ namespace osu.Game.Rulesets.Mods
         protected ModTimeRamp()
         {
             rateAdjustHelper = new RateAdjustModHelper(SpeedChange);
-            rateAdjustHelper.HandleAudioAdjustments(AdjustPitch);
+            rateAdjustHelper.HandleAudioAdjustments(AdjustPitch, AdjustAudioSpeed);
 
             // for preview purpose at song select. eventually we'll want to be able to update every frame.
             FinalRate.BindValueChanged(_ => applyRateAdjustment(double.PositiveInfinity), true);

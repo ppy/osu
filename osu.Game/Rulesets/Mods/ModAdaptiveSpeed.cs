@@ -47,6 +47,9 @@ namespace osu.Game.Rulesets.Mods
         [SettingSource("Adjust pitch", "Should pitch be adjusted with speed")]
         public BindableBool AdjustPitch { get; } = new BindableBool(true);
 
+        [SettingSource("Adjust audio speed", "Should audio speed be adjusted with speed")]
+        public virtual BindableBool AdjustAudioSpeed { get; } = new BindableBool(true);
+
         /// <summary>
         /// The instantaneous rate of the track.
         /// Every frame this mod will attempt to smoothly adjust this to meet <see cref="targetRate"/>.
@@ -127,7 +130,7 @@ namespace osu.Game.Rulesets.Mods
         public ModAdaptiveSpeed()
         {
             rateAdjustHelper = new RateAdjustModHelper(SpeedChange);
-            rateAdjustHelper.HandleAudioAdjustments(AdjustPitch);
+            rateAdjustHelper.HandleAudioAdjustments(AdjustPitch, AdjustAudioSpeed);
 
             InitialRate.BindValueChanged(val =>
             {

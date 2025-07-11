@@ -31,6 +31,7 @@ namespace osu.Game.Rulesets.Mods
         };
 
         public override BindableBool AdjustPitch { get; } = new BindableBool(true);
+        public override BindableBool AdjustAudioSpeed { get; } = new BindableBool(true);
 
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(ModWindDown)).ToArray();
 

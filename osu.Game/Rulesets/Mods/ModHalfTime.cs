@@ -32,6 +32,9 @@ namespace osu.Game.Rulesets.Mods
         [SettingSource("Adjust pitch", "Should pitch be adjusted with speed")]
         public virtual BindableBool AdjustPitch { get; } = new BindableBool();
 
+        [SettingSource("Adjust audio speed", "Should audio speed be adjusted with speed")]
+        public virtual BindableBool AdjustAudioSpeed { get; } = new BindableBool(true);
+
         public override IEnumerable<(LocalisableString setting, LocalisableString value)> SettingDescription
         {
             get
@@ -41,6 +44,9 @@ namespace osu.Game.Rulesets.Mods
 
                 if (!AdjustPitch.IsDefault)
                     yield return ("Adjust pitch", AdjustPitch.Value ? "On" : "Off");
+
+                if (!AdjustAudioSpeed.IsDefault)
+                    yield return ("Adjust audio speed", AdjustAudioSpeed.Value ? "On" : "Off");
             }
         }
 
@@ -49,7 +55,7 @@ namespace osu.Game.Rulesets.Mods
         protected ModHalfTime()
         {
             rateAdjustHelper = new RateAdjustModHelper(SpeedChange);
-            rateAdjustHelper.HandleAudioAdjustments(AdjustPitch);
+            rateAdjustHelper.HandleAudioAdjustments(AdjustPitch, AdjustAudioSpeed);
         }
 
         public override void ApplyToTrack(IAdjustableAudioComponent track)
