@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 
         public CirclePiece()
         {
-            Size = OsuHitObject.OBJECT_DIMENSIONS;
+            Size = OsuHitObject.VISUAL_OBJECT_DIMENSIONS;
             Masking = true;
 
             CornerRadius = Size.X / 2;
