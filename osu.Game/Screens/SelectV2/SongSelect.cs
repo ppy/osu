@@ -163,7 +163,7 @@ namespace osu.Game.Screens.SelectV2
                                     Width = 0.6f,
                                     Colour = ColourInfo.GradientHorizontal(Color4.Black.Opacity(0.3f), Color4.Black.Opacity(0f)),
                                 },
-                                new GridContainer // used for max width implementation
+                                mainGridContainer = new GridContainer // used for max width implementation
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     ColumnDimensions = new[]
@@ -359,6 +359,15 @@ namespace osu.Game.Screens.SelectV2
             base.Update();
 
             detailsArea.Height = wedgesContainer.DrawHeight - titleWedge.LayoutSize.Y - 4;
+
+            float widescreenBonusWidth = Math.Max(0, DrawWidth / DrawHeight - 2);
+
+            mainGridContainer.ColumnDimensions = new[]
+            {
+                new Dimension(GridSizeMode.Relative, 0.5f, maxSize: 700 + widescreenBonusWidth * 100),
+                new Dimension(),
+                new Dimension(GridSizeMode.Relative, 0.5f, minSize: 500, maxSize: 600 + widescreenBonusWidth * 300),
+            };
         }
 
         #region Audio
@@ -804,6 +813,8 @@ namespace osu.Game.Screens.SelectV2
         #region Input
 
         private ScheduledDelegate? revealingBackground;
+
+        private GridContainer mainGridContainer = null!;
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
