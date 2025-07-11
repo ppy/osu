@@ -157,17 +157,17 @@ namespace osu.Game.Skinning
             // Regardless of whether this is an import or not, let's write the skin.ini if non-existing or non-matching.
             // This is (weirdly) done inside ComputeHash to avoid adding a new method to handle this case. After switching to realm it can be moved into another place.
             if (skinIniSourcedName != item.Name)
-                updateSkinIniMetadata(item, realm);
+                UpdateSkinIniMetadata(item, realm);
         }
 
-        private void updateSkinIniMetadata(SkinInfo item, Realm realm)
+        public void UpdateSkinIniMetadata(SkinInfo item, Realm realm)
         {
             string nameLine = @$"Name: {item.Name}";
             string authorLine = @$"Author: {item.Creator}";
 
             List<string> newLines = new List<string>
             {
-                @"// The following content was automatically added by osu! during import, based on filename / folder metadata.",
+                @"// The following content was automatically added by osu! in order to use metadata that more closely matches user expectations.",
                 @"[General]",
                 nameLine,
                 authorLine,
