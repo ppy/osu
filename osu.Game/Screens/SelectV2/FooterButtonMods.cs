@@ -47,23 +47,12 @@ namespace osu.Game.Screens.SelectV2
             set => current.Current = value;
         }
 
-        private Container modDisplayBar = null!;
+        private Drawable modDisplayBar = null!;
 
         private Drawable unrankedBadge = null!;
 
-        private ModDisplay modDisplay = null!;
-
-        private OsuSpriteText multiplierText { get; set; } = null!;
-
-        private Container modContainer = null!;
-
-        private ModCountText overflowModCountDisplay = null!;
-
         [Resolved]
         private OsuColour colours { get; set; } = null!;
-
-        [Resolved]
-        private OverlayColourProvider colourProvider { get; set; } = null!;
 
         public FooterButtonMods(ModSelectOverlay overlay)
             : base(overlay)
@@ -80,73 +69,7 @@ namespace osu.Game.Screens.SelectV2
             AddRange(new[]
             {
                 unrankedBadge = new UnrankedBadge(),
-                modDisplayBar = new InputBlockingContainer
-                {
-                    Y = -5f,
-                    Depth = float.MaxValue,
-                    Origin = Anchor.BottomLeft,
-                    Shear = OsuGame.SHEAR,
-                    CornerRadius = CORNER_RADIUS,
-                    Size = new Vector2(BUTTON_WIDTH, bar_height),
-                    Masking = true,
-                    EdgeEffect = new EdgeEffectParameters
-                    {
-                        Type = EdgeEffectType.Shadow,
-                        Radius = 4,
-                        // Figma says 50% opacity, but it does not match up visually if taken at face value, and looks bad.
-                        Colour = Colour4.Black.Opacity(0.25f),
-                        Offset = new Vector2(0, 2),
-                    },
-                    Children = new Drawable[]
-                    {
-                        new Box
-                        {
-                            Colour = colourProvider.Background4,
-                            RelativeSizeAxes = Axes.Both,
-                        },
-                        new Container
-                        {
-                            Anchor = Anchor.CentreRight,
-                            Origin = Anchor.CentreRight,
-                            RelativeSizeAxes = Axes.Both,
-                            Width = 1f - mod_display_portion,
-                            Masking = true,
-                            Child = multiplierText = new OsuSpriteText
-                            {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                Shear = -OsuGame.SHEAR,
-                                UseFullGlyphHeight = false,
-                                Font = OsuFont.Torus.With(size: 14f, weight: FontWeight.Bold)
-                            }
-                        },
-                        modContainer = new Container
-                        {
-                            CornerRadius = CORNER_RADIUS,
-                            RelativeSizeAxes = Axes.Both,
-                            Width = mod_display_portion,
-                            Masking = true,
-                            Children = new Drawable[]
-                            {
-                                new Box
-                                {
-                                    Colour = colourProvider.Background3,
-                                    RelativeSizeAxes = Axes.Both,
-                                },
-                                modDisplay = new ModDisplay(showExtendedInformation: true)
-                                {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    Shear = -OsuGame.SHEAR,
-                                    Scale = new Vector2(0.5f),
-                                    Current = { BindTarget = Current },
-                                    ExpansionMode = ExpansionMode.AlwaysContracted,
-                                },
-                                overflowModCountDisplay = new ModCountText { Mods = { BindTarget = Current }, },
-                            }
-                        },
-                    }
-                },
+                modDisplayBar = new ModDisplayBar { Mods = { BindTarget = Current } },
             });
         }
 
@@ -193,9 +116,6 @@ namespace osu.Game.Screens.SelectV2
             {
                 modDisplayBar.MoveToY(20, duration, easing);
                 modDisplayBar.FadeOut(duration, easing);
-                modDisplay.FadeOut(duration, easing);
-                overflowModCountDisplay.FadeOut(duration, easing);
-
                 unrankedBadge.MoveToY(20, duration, easing);
                 unrankedBadge.FadeOut(duration, easing);
 
@@ -222,31 +142,146 @@ namespace osu.Game.Screens.SelectV2
                 modDisplayBar.MoveToY(-5, duration, Easing.OutQuint);
                 unrankedBadge.MoveToY(-5, duration, easing);
                 modDisplayBar.FadeIn(duration, easing);
-                modDisplay.FadeIn(duration, easing);
             }
-
-            double multiplier = Current.Value?.Aggregate(1.0, (current, mod) => current * mod.ScoreMultiplier) ?? 1;
-            multiplierText.Text = ModUtils.FormatScoreMultiplier(multiplier);
-
-            if (multiplier > 1)
-                multiplierText.FadeColour(colours.Red1, duration, easing);
-            else if (multiplier < 1)
-                multiplierText.FadeColour(colours.Lime1, duration, easing);
-            else
-                multiplierText.FadeColour(Color4.White, duration, easing);
         }
 
-        protected override void Update()
+        internal partial class ModDisplayBar : CompositeDrawable
         {
-            base.Update();
+            private ModDisplay modDisplay = null!;
 
-            if (Current.Value.Count == 0)
-                return;
+            private OsuSpriteText multiplierText = null!;
 
-            if (modDisplay.DrawWidth * modDisplay.Scale.X > modContainer.DrawWidth)
-                overflowModCountDisplay.Show();
-            else
-                overflowModCountDisplay.Hide();
+            private ModCountText overflowModCountDisplay = null!;
+
+            private Container modContainer = null!;
+
+            public readonly Bindable<IReadOnlyList<Mod>> Mods = new Bindable<IReadOnlyList<Mod>>();
+
+            [Resolved]
+            private OverlayColourProvider colourProvider { get; set; } = null!;
+
+            [Resolved]
+            private OsuColour colours { get; set; } = null!;
+
+            public ModDisplayBar()
+            {
+                Y = -5f;
+                Depth = float.MaxValue;
+                Origin = Anchor.BottomLeft;
+                Shear = OsuGame.SHEAR;
+                CornerRadius = CORNER_RADIUS;
+                Size = new Vector2(BUTTON_WIDTH, bar_height);
+                Masking = true;
+                EdgeEffect = new EdgeEffectParameters
+                {
+                    Type = EdgeEffectType.Shadow,
+                    Radius = 4,
+                    // Figma says 50% opacity, but it does not match up visually if taken at face value, and looks bad.
+                    Colour = Colour4.Black.Opacity(0.25f),
+                    Offset = new Vector2(0, 2),
+                };
+            }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                InternalChildren = new Drawable[]
+                {
+                    new Box
+                    {
+                        Colour = colourProvider.Background4,
+                        RelativeSizeAxes = Axes.Both,
+                    },
+                    new Container
+                    {
+                        Anchor = Anchor.CentreRight,
+                        Origin = Anchor.CentreRight,
+                        RelativeSizeAxes = Axes.Both,
+                        Width = 1f - mod_display_portion,
+                        Masking = true,
+                        Child = multiplierText = new OsuSpriteText
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Shear = -OsuGame.SHEAR,
+                            UseFullGlyphHeight = false,
+                            Font = OsuFont.Torus.With(size: 14f, weight: FontWeight.Bold)
+                        }
+                    },
+                    modContainer = new Container
+                    {
+                        CornerRadius = CORNER_RADIUS,
+                        RelativeSizeAxes = Axes.Both,
+                        Width = mod_display_portion,
+                        Masking = true,
+                        Children = new Drawable[]
+                        {
+                            new Box
+                            {
+                                Colour = colourProvider.Background3,
+                                RelativeSizeAxes = Axes.Both,
+                            },
+                            modDisplay = new ModDisplay(showExtendedInformation: true)
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Shear = -OsuGame.SHEAR,
+                                Scale = new Vector2(0.5f),
+                                Current = { BindTarget = Mods },
+                                ExpansionMode = ExpansionMode.AlwaysContracted,
+                            },
+                            overflowModCountDisplay = new ModCountText { Mods = { BindTarget = Mods }, },
+                        }
+                    },
+                };
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                Mods.BindValueChanged(_ => updateDisplay());
+            }
+
+            protected override void Update()
+            {
+                base.Update();
+
+                if (Mods.Value.Count == 0)
+                    return;
+
+                if (modDisplay.DrawWidth * modDisplay.Scale.X > modContainer.DrawWidth)
+                    overflowModCountDisplay.Show();
+                else
+                    overflowModCountDisplay.Hide();
+            }
+
+            private void updateDisplay()
+            {
+                if (Mods.Value.Count == 0)
+                {
+                    modDisplay.FadeOut(duration, easing);
+                    overflowModCountDisplay.FadeOut(duration, easing);
+                }
+                else
+                {
+                    modDisplay.FadeIn(duration, easing);
+                }
+
+                double multiplier = Mods.Value?.Aggregate(1.0, (current, mod) => current * mod.ScoreMultiplier) ?? 1;
+                multiplierText.Text = ModUtils.FormatScoreMultiplier(multiplier);
+
+                if (multiplier > 1)
+                    multiplierText.FadeColour(colours.Red1, duration, easing);
+                else if (multiplier < 1)
+                    multiplierText.FadeColour(colours.Lime1, duration, easing);
+                else
+                    multiplierText.FadeColour(Color4.White, duration, easing);
+            }
+
+            protected override bool OnMouseDown(MouseDownEvent e) => true;
+
+            protected override bool OnHover(HoverEvent e) => true;
         }
 
         private partial class ModCountText : CompositeDrawable, IHasCustomTooltip<IReadOnlyList<Mod>>
