@@ -91,6 +91,13 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                             {
                                 KeyboardStep = 0.1f
                             },
+                            new TimingAdjustButton(0.05)
+                            {
+                                Text = "Velocity",
+                                RelativeSizeAxes = Axes.X,
+                                Size = new Vector2(1f, 45),
+                                Action = adjustVelocity,
+                            },
                             new OsuTextFlowContainer
                             {
                                 AutoSizeAxes = Axes.Y,
@@ -140,6 +147,30 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             {
                 base.LoadComplete();
                 ScheduleAfterChildren(() => GetContainingFocusManager()!.ChangeFocus(sliderVelocitySlider));
+            }
+
+            private void adjustVelocity(double adjust)
+            {
+                var relevantObjects = (beatmap.SelectedHitObjects.Contains(hitObject) ? beatmap.SelectedHitObjects : hitObject.Yield()).Where(o => o is IHasSliderVelocity).ToArray();
+
+                if (!(relevantObjects.Length > 1))
+                {
+                    sliderVelocitySlider.Current.Value += adjust;
+                }
+                else
+                {
+                    beatmap.BeginChange();
+
+                    foreach (var h in relevantObjects)
+                    {
+                        ((IHasSliderVelocity)h).SliderVelocityMultiplier += adjust;
+                        beatmap.Update(h);
+                    }
+
+                    beatmap.EndChange();
+                }
+
+                // sliderVelocitySlider.Current.Value += adjust;
             }
         }
     }
