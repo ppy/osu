@@ -110,6 +110,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// </summary>
         public double SmallCircleBonus { get; private set; }
 
+        /// <summary>
+        /// Selective bonus for maps with higher circle size, taking a slider body's larger radius into account.
+        /// </summary>
+        public double SmallCircleSliderBonus { get; private set; }
+
         private readonly OsuDifficultyHitObject? lastLastDifficultyObject;
         private readonly OsuDifficultyHitObject? lastDifficultyObject;
 
@@ -123,6 +128,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             StrainTime = Math.Max(DeltaTime, MIN_DELTA_TIME);
 
             SmallCircleBonus = Math.Max(1.0, 1.0 + (30 - BaseObject.Radius) / 40);
+            SmallCircleSliderBonus = Math.Max(1.0, 1.0 + (30 - BaseObject.Radius * assumed_slider_radius / NORMALISED_RADIUS) / 40);
 
             if (BaseObject is Slider sliderObject)
             {

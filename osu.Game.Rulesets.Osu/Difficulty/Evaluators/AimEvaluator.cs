@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double travelVelocity = osuLastObj.TravelDistance / osuLastObj.TravelTime; // calculate the slider velocity from slider head to slider end.
                 double movementVelocity = osuCurrObj.MinimumJumpDistance / osuCurrObj.MinimumJumpTime; // calculate the movement velocity from slider end to current object
 
-                currVelocity = Math.Max(currVelocity, movementVelocity + travelVelocity); // take the larger total combined velocity.
+                currVelocity = Math.Max(currVelocity * osuCurrObj.SmallCircleBonus, (movementVelocity + travelVelocity) * osuCurrObj.SmallCircleSliderBonus); // take the larger total combined velocity.
             }
 
             // As above, do the same for the previous hitobject.
@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double travelVelocity = osuLastLastObj.TravelDistance / osuLastLastObj.TravelTime;
                 double movementVelocity = osuLastObj.MinimumJumpDistance / osuLastObj.MinimumJumpTime;
 
-                prevVelocity = Math.Max(prevVelocity, movementVelocity + travelVelocity);
+                prevVelocity = Math.Max(prevVelocity * osuLastObj.SmallCircleBonus, (movementVelocity + travelVelocity) * osuLastObj.SmallCircleSliderBonus);
             }
 
             double wideAngleBonus = 0;
@@ -149,18 +149,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 sliderBonus = osuLastObj.TravelDistance / osuLastObj.TravelTime;
             }
 
-            aimStrain += wiggleBonus * wiggle_multiplier;
-            aimStrain += velocityChangeBonus * velocity_change_multiplier;
+            aimStrain += wiggleBonus * wiggle_multiplier * osuCurrObj.SmallCircleBonus;
+            aimStrain += velocityChangeBonus * velocity_change_multiplier * osuCurrObj.SmallCircleBonus;
 
             // Add in acute angle bonus or wide angle bonus, whichever is larger.
             aimStrain += Math.Max(acuteAngleBonus * acute_angle_multiplier, wideAngleBonus * wide_angle_multiplier);
 
             // Add in additional slider velocity bonus.
             if (withSliderTravelDistance)
-                aimStrain += sliderBonus * slider_multiplier;
-
-            // Apply high circle size bonus
-            aimStrain *= osuCurrObj.SmallCircleBonus;
+                aimStrain += sliderBonus * slider_multiplier * osuCurrObj.SmallCircleSliderBonus;
 
             return aimStrain;
         }
