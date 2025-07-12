@@ -10,6 +10,11 @@ namespace osu.Game.Localisation
         private const string prefix = @"osu.Game.Resources.Localisation.SongSelect";
 
         /// <summary>
+        /// "Options"
+        /// </summary>
+        public static LocalisableString Options => new TranslatableString(getKey(@"options"), @"Options");
+
+        /// <summary>
         /// "Local"
         /// </summary>
         public static LocalisableString LocallyModified => new TranslatableString(getKey(@"locally_modified"), @"Local");
@@ -25,34 +30,19 @@ namespace osu.Game.Localisation
         public static LocalisableString ManageCollections => new TranslatableString(getKey(@"manage_collections"), @"Manage collections");
 
         /// <summary>
-        /// "For all difficulties"
+        /// "Unknown"
         /// </summary>
-        public static LocalisableString ForAllDifficulties => new TranslatableString(getKey(@"for_all_difficulties"), @"For all difficulties");
+        public static LocalisableString Unknown => new TranslatableString(getKey(@"unknown"), @"Unknown");
 
         /// <summary>
-        /// "Delete beatmap"
+        /// "Total Plays"
         /// </summary>
-        public static LocalisableString DeleteBeatmap => new TranslatableString(getKey(@"delete_beatmap"), @"Delete beatmap");
+        public static LocalisableString TotalPlays => new TranslatableString(getKey(@"total_plays"), @"Total Plays");
 
         /// <summary>
-        /// "For selected difficulty"
+        /// "Personal Plays"
         /// </summary>
-        public static LocalisableString ForSelectedDifficulty => new TranslatableString(getKey(@"for_selected_difficulty"), @"For selected difficulty");
-
-        /// <summary>
-        /// "Mark as played"
-        /// </summary>
-        public static LocalisableString MarkAsPlayed => new TranslatableString(getKey(@"mark_as_played"), @"Mark as played");
-
-        /// <summary>
-        /// "Clear all local scores"
-        /// </summary>
-        public static LocalisableString ClearAllLocalScores => new TranslatableString(getKey(@"clear_all_local_scores"), @"Clear all local scores");
-
-        /// <summary>
-        /// "Edit beatmap"
-        /// </summary>
-        public static LocalisableString EditBeatmap => new TranslatableString(getKey(@"edit_beatmap"), @"Edit beatmap");
+        public static LocalisableString PersonalPlays => new TranslatableString(getKey(@"personal_lays"), @"Personal Plays");
 
         /// <summary>
         /// "Circle Size"
@@ -93,6 +83,71 @@ namespace osu.Game.Localisation
         /// "{0} stars"
         /// </summary>
         public static LocalisableString Stars(LocalisableString value) => new TranslatableString(getKey(@"stars"), @"{0} stars", value);
+
+        /// <summary>
+        /// "Details"
+        /// </summary>
+        public static LocalisableString Details => new TranslatableString(getKey(@"details"), @"Details");
+
+        /// <summary>
+        /// "Ranking"
+        /// </summary>
+        public static LocalisableString Ranking => new TranslatableString(getKey(@"ranking"), @"Ranking");
+
+        /// <summary>
+        /// "Use these mods"
+        /// </summary>
+        public static LocalisableString UseTheseMods => new TranslatableString(getKey(@"use_these_mods"), @"Use these mods");
+
+        /// <summary>
+        /// "For all difficulties"
+        /// </summary>
+        public static LocalisableString ForAllDifficulties => new TranslatableString(getKey(@"for_all_difficulties"), @"For all difficulties");
+
+        /// <summary>
+        /// "For selected difficulty"
+        /// </summary>
+        public static LocalisableString ForSelectedDifficulty => new TranslatableString(getKey(@"for_selected_difficulty"), @"For selected difficulty");
+
+        /// <summary>
+        /// "Update beatmap with online changes"
+        /// </summary>
+        public static LocalisableString UpdateBeatmapTooltip => new TranslatableString(getKey(@"update_beatmap_tooltip"), @"Update beatmap with online changes");
+
+        /// <summary>
+        /// "Edit beatmap"
+        /// </summary>
+        public static LocalisableString EditBeatmap => new TranslatableString(getKey(@"edit_beatmap"), @"Edit beatmap");
+
+        /// <summary>
+        /// "Mark as played"
+        /// </summary>
+        public static LocalisableString MarkAsPlayed => new TranslatableString(getKey(@"mark_as_played"), @"Mark as played");
+
+        /// <summary>
+        /// "Clear all local scores"
+        /// </summary>
+        public static LocalisableString ClearAllLocalScores => new TranslatableString(getKey(@"clear_all_local_scores"), @"Clear all local scores");
+
+        /// <summary>
+        /// "Delete beatmap"
+        /// </summary>
+        public static LocalisableString DeleteBeatmap => new TranslatableString(getKey(@"delete_beatmap"), @"Delete beatmap");
+
+        /// <summary>
+        /// "Restore all hidden"
+        /// </summary>
+        public static LocalisableString RestoreAllHidden => new TranslatableString(getKey(@"restore_all_hidden"), @"Restore all hidden");
+
+        /// <summary>
+        /// "No matching beatmaps"
+        /// </summary>
+        public static LocalisableString NoMatchingBeatmaps => new TranslatableString(getKey(@"no_matching_beatmaps"), @"No matching beatmaps");
+
+        /// <summary>
+        /// "No beatmaps match your filter criteria!"
+        /// </summary>
+        public static LocalisableString NoFilteredBeatmaps => new TranslatableString(getKey(@"no_filtered_beatmaps"), @"No beatmaps match your filter criteria!");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
