@@ -99,6 +99,7 @@ namespace osu.Game.Screens.OnlinePlay
             private readonly PlaylistItem item;
             private double itemLength;
             private int beatmapSetId;
+
             [Resolved]
             private RealmAccess realm { get; set; } = null!;
 
