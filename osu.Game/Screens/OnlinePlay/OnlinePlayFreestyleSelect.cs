@@ -100,14 +100,18 @@ namespace osu.Game.Screens.OnlinePlay
             private double itemLength;
             private int beatmapSetId;
 
+            [Resolved]
+            private RealmAccess realm { get; set; } = null!;
+
             public DifficultySelectFilterControl(PlaylistItem item)
             {
                 this.item = item;
             }
 
-            [BackgroundDependencyLoader]
-            private void load(RealmAccess realm)
+            public override FilterCriteria CreateCriteria()
             {
+                var criteria = base.CreateCriteria();
+
                 realm.Run(r =>
                 {
                     int beatmapId = item.Beatmap.OnlineID;
@@ -116,11 +120,6 @@ namespace osu.Game.Screens.OnlinePlay
                     itemLength = beatmap?.Length ?? 0;
                     beatmapSetId = beatmap?.BeatmapSet?.OnlineID ?? 0;
                 });
-            }
-
-            public override FilterCriteria CreateCriteria()
-            {
-                var criteria = base.CreateCriteria();
 
                 // Must be from the same set as the playlist item.
                 criteria.BeatmapSetId = beatmapSetId;
