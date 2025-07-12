@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double travelVelocity = osuLastObj.TravelDistance / osuLastObj.TravelTime; // calculate the slider velocity from slider head to slider end.
                 double movementVelocity = osuCurrObj.MinimumJumpDistance / osuCurrObj.MinimumJumpTime; // calculate the movement velocity from slider end to current object
 
-                currVelocity = Math.Max(currVelocity, movementVelocity + travelVelocity); // take the larger total combined velocity.
+                currVelocity = Math.Max(currVelocity * osuCurrObj.SmallCircleBonus, (movementVelocity + travelVelocity) * osuCurrObj.SmallCircleSliderBonus); // take the larger total combined velocity.
             }
 
             // As above, do the same for the previous hitobject.
@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double travelVelocity = osuLastLastObj.TravelDistance / osuLastLastObj.TravelTime;
                 double movementVelocity = osuLastObj.MinimumJumpDistance / osuLastObj.MinimumJumpTime;
 
-                prevVelocity = Math.Max(prevVelocity, movementVelocity + travelVelocity);
+                prevVelocity = Math.Max(prevVelocity * osuLastObj.SmallCircleBonus, (movementVelocity + travelVelocity) * osuLastObj.SmallCircleSliderBonus);
             }
 
             double wideAngleBonus = 0;
@@ -137,7 +137,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 // Reward for % distance up to 125 / strainTime for overlaps where velocity is still changing.
                 double overlapVelocityBuff = Math.Min(diameter * 1.25 / Math.Min(osuCurrObj.StrainTime, osuLastObj.StrainTime), Math.Abs(prevVelocity - currVelocity));
 
-                velocityChangeBonus = overlapVelocityBuff * distRatio;
+                velocityChangeBonus = overlapVelocityBuff * distRatio * osuCurrObj.SmallCircleBonus;
 
                 // Penalize for rhythm changes.
                 velocityChangeBonus *= Math.Pow(Math.Min(osuCurrObj.StrainTime, osuLastObj.StrainTime) / Math.Max(osuCurrObj.StrainTime, osuLastObj.StrainTime), 2);
@@ -154,9 +154,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             // Add in acute angle bonus or wide angle bonus, whichever is larger.
             aimStrain += Math.Max(acuteAngleBonus * acute_angle_multiplier, wideAngleBonus * wide_angle_multiplier);
-
-            // Apply high circle size bonus
-            aimStrain *= osuCurrObj.SmallCircleBonus;
 
             // Add in additional slider velocity bonus.
             if (withSliderTravelDistance)
