@@ -122,10 +122,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 return 0;
 
             // Scale accuracy more harshly on nearly-completely mono (single coloured) speed maps.
-            double accScalingExponent = 2 + attributes.MonoStaminaFactor;
-            double accScalingShift = 500 - 100 * (attributes.MonoStaminaFactor * 3);
+            double monoAccScalingExponent = 2 + attributes.MonoStaminaFactor;
+            double monoAccScalingShift = 500 - 100 * (attributes.MonoStaminaFactor * 3);
 
-            return difficultyValue * Math.Pow(DifficultyCalculationUtils.Erf(accScalingShift / (Math.Sqrt(2) * estimatedUnstableRate.Value)), accScalingExponent);
+            return difficultyValue * Math.Pow(DifficultyCalculationUtils.Erf(monoAccScalingShift / (Math.Sqrt(2) * estimatedUnstableRate.Value)), monoAccScalingExponent);
         }
 
         private double computeAccuracyValue(ScoreInfo score, TaikoDifficultyAttributes attributes, bool isConvert)
