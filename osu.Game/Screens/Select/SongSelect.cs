@@ -156,12 +156,12 @@ namespace osu.Game.Screens.Select
         [Resolved]
         internal IOverlayManager? OverlayManager { get; private set; }
 
-        private Bindable<bool> configBackgroundBlur = null!;
+        private Bindable<float> configBackgroundBlur = null!;
 
         [BackgroundDependencyLoader(true)]
         private void load(AudioManager audio, OsuColour colours, ManageCollectionsDialog? manageCollectionsDialog, DifficultyRecommender? recommender, OsuConfigManager config)
         {
-            configBackgroundBlur = config.GetBindable<bool>(OsuSetting.SongSelectBackgroundBlur);
+            configBackgroundBlur = config.GetBindable<float>(OsuSetting.SongSelectBackgroundBlur);
             configBackgroundBlur.BindValueChanged(e =>
             {
                 if (!this.IsCurrentScreen())
@@ -907,10 +907,10 @@ namespace osu.Game.Screens.Select
 
         private void applyBlurToBackground(BackgroundScreenBeatmap backgroundModeBeatmap)
         {
-            backgroundModeBeatmap.BlurAmount.Value = configBackgroundBlur.Value ? BACKGROUND_BLUR : 0f;
-            backgroundModeBeatmap.DimWhenUserSettingsIgnored.Value = configBackgroundBlur.Value ? 0 : 0.4f;
+            backgroundModeBeatmap.BlurAmount.Value = configBackgroundBlur.Value * BACKGROUND_BLUR;
+            backgroundModeBeatmap.DimWhenUserSettingsIgnored.Value = 0.1f;
 
-            wedgeBackground.FadeTo(configBackgroundBlur.Value ? 0.5f : 0.2f, UserDimContainer.BACKGROUND_FADE_DURATION, Easing.OutQuint);
+            wedgeBackground.FadeTo(0.2f, UserDimContainer.BACKGROUND_FADE_DURATION, Easing.OutQuint);
         }
 
         private readonly WeakReference<ITrack?> lastTrack = new WeakReference<ITrack?>(null);
