@@ -81,7 +81,24 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
         private double computeDifficultyValue(ScoreInfo score, TaikoDifficultyAttributes attributes, bool isConvert)
         {
-            double baseDifficulty = 5 * Math.Max(1.0, attributes.StarRating / 0.110) - 4.0;
+            // An estimation of the unstable rate expected for a SS at the map's star rating, at which all rhythm difficulty has been played successfully.
+            double topExpectedUnstableRate = 75 + 150 / Math.Pow(10, attributes.StarRating / 9);
+
+            // The unstable rate at which it can be assumed all rhythm difficulty has been ignored.
+            double bottomExpectedUnstableRate = 2 * topExpectedUnstableRate;
+
+            // The fraction of star rating made up by rhythm difficulty, normalised between the range where rhythm most affects star rating.
+            double rhythmFactor = DifficultyCalculationUtils.ReverseLerp(attributes.RhythmDifficulty / attributes.StarRating, 0.15, 0.35);
+
+            // A penalty removing ignored rhythm difficulty from star rating based on estimated unstable rate.
+            double rhythmPenalty = 1 - DifficultyCalculationUtils.Logistic(
+                estimatedUnstableRate.Value,
+                midpointOffset: (topExpectedUnstableRate + bottomExpectedUnstableRate) / 2,
+                multiplier: 10 / (bottomExpectedUnstableRate - topExpectedUnstableRate),
+                maxValue: 0.2 * Math.Pow(rhythmFactor, 2)
+            );
+
+            double baseDifficulty = 5 * Math.Max(1.0, attributes.StarRating * rhythmPenalty / 0.110) - 4.0;
             double difficultyValue = Math.Min(Math.Pow(baseDifficulty, 3) / 69052.51, Math.Pow(baseDifficulty, 2.25) / 1250.0);
 
             difficultyValue *= 1 + 0.10 * Math.Max(0, attributes.StarRating - 10);
