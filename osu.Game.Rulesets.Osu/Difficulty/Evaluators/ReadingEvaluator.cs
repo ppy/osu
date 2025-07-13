@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         private const double reading_window_size = 3000; // 3 seconds
         private const double density_difficulty_base_max = 0.8;
         private const double hidden_multiplier = 0.013;
-        private const double preempt_balancing_factor = 160000;
+        private const double preempt_balancing_factor = 200000;
 
         public static double EvaluateDifficultyOf(int totalObjects, DifficultyHitObject current, double clockRate, double preempt, bool hidden)
         {
@@ -84,7 +84,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             // Arbitrary curve for the base value preempt difficulty should have as approach rate increases.
             // https://www.desmos.com/calculator/qmqxuukqqe
-            preemptDifficulty += preempt > 475 ? 0 : Math.Pow(475 - preempt, 2.4) / preempt_balancing_factor;
+            preemptDifficulty += preempt > 475 ? 0 : Math.Pow(475 - preempt, 2.5) / preempt_balancing_factor;
 
             preemptDifficulty *= constantAngleNerfFactor * velocity;
 
