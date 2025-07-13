@@ -39,6 +39,7 @@ namespace osu.Game.Rulesets.Edit.Checks
             if (audioFormat == 0)
             {
                 yield return new IssueTemplateFormatUnsupported(this).Create(audioFile.Filename);
+
                 yield break;
             }
 
