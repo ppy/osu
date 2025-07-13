@@ -147,7 +147,10 @@ namespace osu.Game.Collections
         {
             base.LoadComplete();
 
-            searchTextBox.Current.BindValueChanged(_ => { list.SearchTerm = searchTextBox.Current.Value; });
+            searchTextBox.Current.BindValueChanged(_ =>
+            {
+                list.SearchTerm = searchTextBox.Current.Value;
+            });
         }
 
         protected override void Dispose(bool isDisposing)

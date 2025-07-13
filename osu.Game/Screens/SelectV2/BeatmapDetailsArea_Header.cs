@@ -208,7 +208,7 @@ namespace osu.Game.Screens.SelectV2
             private partial class ScopeDropdown : ShearedDropdown<BeatmapLeaderboardScope>
             {
                 public ScopeDropdown()
-                    : base(SortStrings.Scope)
+                    : base(BeatmapLeaderboardWedgeStrings.Scope)
                 {
                     Items = Enum.GetValues<BeatmapLeaderboardScope>();
                 }

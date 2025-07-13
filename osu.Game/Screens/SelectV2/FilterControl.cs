@@ -23,7 +23,6 @@ using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
 using osuTK;
 using osuTK.Input;
-using WebSortStrings = osu.Game.Resources.Localisation.Web.SortStrings;
 
 namespace osu.Game.Screens.SelectV2
 {
@@ -142,9 +141,9 @@ namespace osu.Game.Screens.SelectV2
                             RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
                             ColumnDimensions = new[]
                             {
-                                new Dimension(maxSize: 270),
+                                new Dimension(maxSize: 180),
                                 new Dimension(GridSizeMode.Absolute, 5),
-                                new Dimension(maxSize: 270),
+                                new Dimension(maxSize: 180),
                                 new Dimension(GridSizeMode.Absolute, 5),
                                 new Dimension(),
                             },
@@ -152,13 +151,13 @@ namespace osu.Game.Screens.SelectV2
                             {
                                 new[]
                                 {
-                                    sortDropdown = new ShearedDropdown<SortMode>(WebSortStrings.Default)
+                                    sortDropdown = new ShearedDropdown<SortMode>(SongSelectStrings.Sort)
                                     {
                                         RelativeSizeAxes = Axes.X,
                                         Items = Enum.GetValues<SortMode>(),
                                     },
                                     Empty(),
-                                    groupDropdown = new ShearedDropdown<GroupMode>(SortStrings.GroupBy)
+                                    groupDropdown = new ShearedDropdown<GroupMode>(SongSelectStrings.Group)
                                     {
                                         RelativeSizeAxes = Axes.X,
                                         Items = Enum.GetValues<GroupMode>(),

@@ -117,8 +117,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Automatically focus search text box in mod select"
         /// </summary>
-        public static LocalisableString ModSelectTextSearchStartsActive =>
-            new TranslatableString(getKey(@"mod_select_text_search_starts_active"), @"Automatically focus search text box in mod select");
+        public static LocalisableString ModSelectTextSearchStartsActive => new TranslatableString(getKey(@"mod_select_text_search_starts_active"), @"Automatically focus search text box in mod select");
 
         /// <summary>
         /// "no limit"

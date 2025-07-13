@@ -47,7 +47,7 @@ namespace osu.Game.Screens.SelectV2
                         AlwaysPresent = true,
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
-                        Text = GlobalActionKeyBindingStrings.SelectNextRandom,
+                        Text = SongSelectStrings.Random,
                     },
                     rewindSpriteText = new OsuSpriteText
                     {
@@ -55,7 +55,7 @@ namespace osu.Game.Screens.SelectV2
                         AlwaysPresent = true,
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
-                        Text = GlobalActionKeyBindingStrings.SelectPreviousRandom,
+                        Text = SongSelectStrings.Rewind,
                         Alpha = 0f,
                     }
                 }

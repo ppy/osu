@@ -10,6 +10,21 @@ namespace osu.Game.Localisation
         private const string prefix = @"osu.Game.Resources.Localisation.SongSelect";
 
         /// <summary>
+        /// "Mods"
+        /// </summary>
+        public static LocalisableString Mods => new TranslatableString(getKey(@"mods"), @"Mods");
+
+        /// <summary>
+        /// "Random"
+        /// </summary>
+        public static LocalisableString Random => new TranslatableString(getKey(@"random"), @"Random");
+
+        /// <summary>
+        /// "Rewind"
+        /// </summary>
+        public static LocalisableString Rewind => new TranslatableString(getKey(@"rewind"), @"Rewind");
+
+        /// <summary>
         /// "Options"
         /// </summary>
         public static LocalisableString Options => new TranslatableString(getKey(@"options"), @"Options");
@@ -80,11 +95,6 @@ namespace osu.Game.Localisation
         public static LocalisableString Ranked => new TranslatableString(getKey(@"ranked"), @"Ranked");
 
         /// <summary>
-        /// "{0} stars"
-        /// </summary>
-        public static LocalisableString Stars(LocalisableString value) => new TranslatableString(getKey(@"stars"), @"{0} stars", value);
-
-        /// <summary>
         /// "Details"
         /// </summary>
         public static LocalisableString Details => new TranslatableString(getKey(@"details"), @"Details");
@@ -138,6 +148,106 @@ namespace osu.Game.Localisation
         /// "Restore all hidden"
         /// </summary>
         public static LocalisableString RestoreAllHidden => new TranslatableString(getKey(@"restore_all_hidden"), @"Restore all hidden");
+
+        /// <summary>
+        /// "{0} stars"
+        /// </summary>
+        public static LocalisableString Stars(LocalisableString value) => new TranslatableString(getKey(@"stars"), @"{0} stars", value);
+
+        /// <summary>
+        /// "Sort"
+        /// </summary>
+        public static LocalisableString Sort => new TranslatableString(getKey(@"sort"), @"Sort");
+
+        /// <summary>
+        /// "Group"
+        /// </summary>
+        public static LocalisableString Group => new TranslatableString(getKey(@"group"), @"Group");
+
+        /// <summary>
+        /// "None"
+        /// </summary>
+        public static LocalisableString None => new TranslatableString(getKey(@"none"), @"None");
+
+        /// <summary>
+        /// "Title"
+        /// </summary>
+        public static LocalisableString Title => new TranslatableString(getKey(@"title"), @"Title");
+
+        /// <summary>
+        /// "Artist"
+        /// </summary>
+        public static LocalisableString Artist => new TranslatableString(getKey(@"artist"), @"Artist");
+
+        /// <summary>
+        /// "Author"
+        /// </summary>
+        public static LocalisableString Author => new TranslatableString(getKey(@"author"), @"Author");
+
+        /// <summary>
+        /// "BPM"
+        /// </summary>
+        public static LocalisableString BPM => new TranslatableString(getKey(@"bpm"), @"BPM");
+
+        /// <summary>
+        /// "Date Submitted"
+        /// </summary>
+        public static LocalisableString DateSubmitted => new TranslatableString(getKey(@"date_submitted"), @"Date Submitted");
+
+        /// <summary>
+        /// "Date Ranked"
+        /// </summary>
+        public static LocalisableString DateRanked => new TranslatableString(getKey(@"date_ranked"), @"Date Ranked");
+
+        /// <summary>
+        /// "Date Added"
+        /// </summary>
+        public static LocalisableString DateAdded => new TranslatableString(getKey(@"date_added"), @"Date Added");
+
+        /// <summary>
+        /// "Last Played"
+        /// </summary>
+        public static LocalisableString LastPlayed => new TranslatableString(getKey(@"last_played"), @"Last Played");
+
+        /// <summary>
+        /// "Difficulty"
+        /// </summary>
+        public static LocalisableString Difficulty => new TranslatableString(getKey(@"difficulty"), @"Difficulty");
+
+        /// <summary>
+        /// "Length"
+        /// </summary>
+        public static LocalisableString Length => new TranslatableString(getKey(@"length"), @"Length");
+
+        /// <summary>
+        /// "Favourites"
+        /// </summary>
+        public static LocalisableString Favourites => new TranslatableString(getKey(@"favourites"), @"Favourites");
+
+        /// <summary>
+        /// "My Maps"
+        /// </summary>
+        public static LocalisableString MyMaps => new TranslatableString(getKey(@"my_maps"), @"My Maps");
+
+        /// <summary>
+        /// "Collections"
+        /// </summary>
+        public static LocalisableString Collections => new TranslatableString(getKey(@"collections"), @"Collections");
+
+        /// <summary>
+        /// "Rank Achieved"
+        /// </summary>
+        public static LocalisableString RankAchieved => new TranslatableString(getKey(@"rank_achieved"), @"Rank Achieved");
+
+        /// <summary>
+        /// "Ranked Status"
+        /// </summary>
+        public static LocalisableString RankedStatus => new TranslatableString(getKey(@"ranked_status"), @"Ranked Status");
+
+        /// <summary>
+        /// "Source"
+        /// </summary>
+        public static LocalisableString Source => new TranslatableString(getKey(@"source"), @"Source");
 
         /// <summary>
         /// "No matching beatmaps"
