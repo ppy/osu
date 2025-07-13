@@ -3,60 +3,57 @@
 
 using osu.Framework.Localisation;
 using osu.Game.Localisation;
-using WebBeatmapsStrings = osu.Game.Resources.Localisation.Web.BeatmapsStrings;
-using WebSortStrings = osu.Game.Resources.Localisation.Web.SortStrings;
 
 namespace osu.Game.Screens.Select.Filter
 {
     public enum GroupMode
     {
-        [LocalisableDescription(typeof(SortStrings), nameof(SortStrings.None))]
+        [LocalisableDescription(typeof(SongSelectStrings), nameof(SongSelectStrings.None))]
         None,
 
-        [LocalisableDescription(typeof(WebBeatmapsStrings), nameof(WebBeatmapsStrings.ListingSearchSortingTitle))]
-        Title,
-
-        [LocalisableDescription(typeof(WebBeatmapsStrings), nameof(WebBeatmapsStrings.ListingSearchSortingArtist))]
+        [LocalisableDescription(typeof(SongSelectStrings), nameof(SongSelectStrings.Artist))]
         Artist,
 
-        [LocalisableDescription(typeof(SortStrings), nameof(SortStrings.Author))]
+        [LocalisableDescription(typeof(SongSelectStrings), nameof(SongSelectStrings.Author))]
         Author,
 
-        [LocalisableDescription(typeof(WebSortStrings), nameof(WebSortStrings.ArtistTracksBpm))]
+        [LocalisableDescription(typeof(SongSelectStrings), nameof(SongSelectStrings.BPM))]
         BPM,
 
-        [LocalisableDescription(typeof(SortStrings), nameof(SortStrings.DateAdded))]
-        DateAdded,
-
-        [LocalisableDescription(typeof(SortStrings), nameof(SortStrings.DateRanked))]
-        DateRanked,
-
-        [LocalisableDescription(typeof(SortStrings), nameof(SortStrings.LastPlayed))]
-        LastPlayed,
-
-        [LocalisableDescription(typeof(WebBeatmapsStrings), nameof(WebBeatmapsStrings.ListingSearchSortingDifficulty))]
-        Difficulty,
-
-        [LocalisableDescription(typeof(WebSortStrings), nameof(WebSortStrings.ArtistTracksLength))]
-        Length,
-
-        // [LocalisableDescription(typeof(WebBeatmapsStrings), nameof(WebBeatmapsStrings.StatusMine))]
-        // MyMaps,
-
-        // [LocalisableDescription(typeof(WebBeatmapsStrings), nameof(WebBeatmapsStrings.ListingSearchSortingFavourites))]
-        // Favourites,
-
-        // [LocalisableDescription(typeof(SortStrings), nameof(SortStrings.Collections))]
+        // [LocalisableDescription(typeof(SongSelectStrings), nameof(SongSelectStrings.Collections))]
         // Collections,
 
-        // todo: pending support (https://github.com/ppy/osu/issues/4917)
-        // [LocalisableDescription(typeof(SortStrings), nameof(SortStrings.RankAchieved))]
+        [LocalisableDescription(typeof(SongSelectStrings), nameof(SongSelectStrings.DateAdded))]
+        DateAdded,
+
+        [LocalisableDescription(typeof(SongSelectStrings), nameof(SongSelectStrings.DateRanked))]
+        DateRanked,
+
+        [LocalisableDescription(typeof(SongSelectStrings), nameof(SongSelectStrings.Difficulty))]
+        Difficulty,
+
+        // [LocalisableDescription(typeof(SongSelectStrings), nameof(SongSelectStrings.Favourites))]
+        // Favourites,
+
+        [LocalisableDescription(typeof(SongSelectStrings), nameof(SongSelectStrings.LastPlayed))]
+        LastPlayed,
+
+        [LocalisableDescription(typeof(SongSelectStrings), nameof(SongSelectStrings.Length))]
+        Length,
+
+        // [LocalisableDescription(typeof(SongSelectStrings), nameof(SongSelectStrings.MyMaps))]
+        // MyMaps,
+
+        // [LocalisableDescription(typeof(SongSelectStrings), nameof(SongSelectStrings.RankAchieved))]
         // RankAchieved,
 
-        [LocalisableDescription(typeof(SortStrings), nameof(SortStrings.RankedStatus))]
+        [LocalisableDescription(typeof(SongSelectStrings), nameof(SongSelectStrings.RankedStatus))]
         RankedStatus,
 
-        [LocalisableDescription(typeof(SortStrings), nameof(SortStrings.Source))]
+        [LocalisableDescription(typeof(SongSelectStrings), nameof(SongSelectStrings.Source))]
         Source,
+
+        [LocalisableDescription(typeof(SongSelectStrings), nameof(SongSelectStrings.Title))]
+        Title,
     }
 }

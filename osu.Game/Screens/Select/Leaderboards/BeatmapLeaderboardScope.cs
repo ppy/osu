@@ -8,19 +8,19 @@ namespace osu.Game.Screens.Select.Leaderboards
 {
     public enum BeatmapLeaderboardScope
     {
-        [LocalisableDescription(typeof(SortStrings), nameof(SortStrings.Local))]
+        [LocalisableDescription(typeof(BeatmapLeaderboardWedgeStrings), nameof(BeatmapLeaderboardWedgeStrings.Local))]
         Local,
 
-        [LocalisableDescription(typeof(SortStrings), nameof(SortStrings.Global))]
+        [LocalisableDescription(typeof(BeatmapLeaderboardWedgeStrings), nameof(BeatmapLeaderboardWedgeStrings.Global))]
         Global,
 
-        [LocalisableDescription(typeof(SortStrings), nameof(SortStrings.Country))]
+        [LocalisableDescription(typeof(BeatmapLeaderboardWedgeStrings), nameof(BeatmapLeaderboardWedgeStrings.Country))]
         Country,
 
-        [LocalisableDescription(typeof(SortStrings), nameof(SortStrings.Friend))]
+        [LocalisableDescription(typeof(BeatmapLeaderboardWedgeStrings), nameof(BeatmapLeaderboardWedgeStrings.Friend))]
         Friend,
 
-        [LocalisableDescription(typeof(SortStrings), nameof(SortStrings.Team))]
+        [LocalisableDescription(typeof(BeatmapLeaderboardWedgeStrings), nameof(BeatmapLeaderboardWedgeStrings.Team))]
         Team,
     }
 }

@@ -151,6 +151,18 @@ namespace osu.Game.Screens.SelectV2
                 textFlow.AddParagraph(SongSelectStrings.NoFilteredBeatmaps);
                 textFlow.AddParagraph(string.Empty);
 
+                if (!string.IsNullOrEmpty(filter?.SearchText))
+                {
+                    addBulletPoint();
+                    textFlow.AddText("Try ");
+                    textFlow.AddLink("clearing", () =>
+                    {
+                        RequestClearFilterText?.Invoke();
+                    });
+
+                    textFlow.AddText(" your current search criteria.");
+                }
+
                 if (filter?.UserStarDifficulty.HasFilter == true)
                 {
                     addBulletPoint();
@@ -182,14 +194,10 @@ namespace osu.Game.Screens.SelectV2
             {
                 addBulletPoint();
                 textFlow.AddText("Try ");
-                textFlow.AddLink("clearing", () => { RequestClearFilterText?.Invoke(); });
-                textFlow.AddText(" your current search criteria.");
-
-                addBulletPoint();
-                textFlow.AddText("Try ");
                 textFlow.AddLink("searching online", LinkAction.SearchBeatmapSet, filter.SearchText);
                 textFlow.AddText($" for \"{filter.SearchText}\".");
             }
+            // TODO: add clickable link to reset criteria.
         }
 
         private void addBulletPoint()
