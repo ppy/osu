@@ -81,6 +81,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
         private double computeDifficultyValue(ScoreInfo score, TaikoDifficultyAttributes attributes, bool isConvert)
         {
+            if (estimatedUnstableRate == null)
+                return 0;
+
             // An estimation of the unstable rate expected for a SS at the map's star rating, at which all rhythm difficulty has been played successfully.
             double topExpectedUnstableRate = 75 + 150 / Math.Pow(10, attributes.StarRating / 9);
 
@@ -117,9 +120,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
             if (score.Mods.Any(m => m is ModFlashlight<TaikoHitObject>))
                 difficultyValue *= Math.Max(1, 1.050 - Math.Min(attributes.MonoStaminaFactor / 50, 1) * lengthBonus);
-
-            if (estimatedUnstableRate == null)
-                return 0;
 
             // Scale accuracy more harshly on nearly-completely mono (single coloured) speed maps.
             double monoAccScalingExponent = 2 + attributes.MonoStaminaFactor;
