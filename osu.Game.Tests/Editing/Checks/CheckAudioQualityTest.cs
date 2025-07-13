@@ -126,7 +126,7 @@ namespace osu.Game.Tests.Editing.Checks
 
         private BeatmapVerifierContext getContext(int? audioBitrate, bool useOgg = false)
         {
-            // Update the audio file name and beatmap set files based on the format being tested
+            // Update the audio filename and beatmapset files based on the format being tested
             string audioFileName = useOgg ? "abc123.ogg" : "abc123.mp3";
             string fileExtension = useOgg ? "ogg" : "mp3";
 
