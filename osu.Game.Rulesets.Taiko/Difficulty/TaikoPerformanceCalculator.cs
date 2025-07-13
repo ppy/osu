@@ -116,7 +116,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             if (greatHitWindow <= 0 || estimatedUnstableRate == null)
                 return 0;
 
-            double accuracyValue = Math.Pow(70 / estimatedUnstableRate.Value, 1.1) * Math.Pow(attributes.StarRating, 0.4) * 100.0;
+            double accuracyValue = 470 * Math.Pow(0.9885, estimatedUnstableRate.Value);
+
+            // Scales up the bonus for lower unstable rate as star rating increases.
+            accuracyValue *= 1 + Math.Pow(50 / estimatedUnstableRate.Value, 2) * Math.Pow(attributes.StarRating, 2) / 125;
 
             if (score.Mods.Any(m => m is ModHidden) && !isConvert)
                 accuracyValue *= 1.075;
