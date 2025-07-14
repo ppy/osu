@@ -1154,10 +1154,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("open user style selection", () => this.ChildrenOfType<MultiplayerMatchSubScreen>().Single().ShowUserStyleSelect());
             AddUntilStep("style selection screen opened", () => this.ChildrenOfType<MultiplayerMatchFreestyleSelect>().SingleOrDefault()?.IsCurrentScreen() == true);
 
-            AddStep("change beatmap", () => multiplayerClient.EditPlaylistItem(new MultiplayerPlaylistItem(new PlaylistItem(multiplayerClient.ServerRoom!.Playlist[0])
+            AddStep("change beatmap", () =>
             {
-                Beatmap = importedSet.Beatmaps.Last(),
-            })));
+                var newItem = multiplayerClient.ServerRoom!.Playlist[0].Clone();
+                var newBeatmap = importedSet.Beatmaps.Last();
+                newItem.BeatmapID = newBeatmap.OnlineID;
+                newItem.BeatmapChecksum = newBeatmap.MD5Hash;
+
+                multiplayerClient.EditPlaylistItem(newItem);
+            });
 
             AddWaitStep("wait for potential beatmap change", 2);
             AddAssert("style selection screen still open", () => this.ChildrenOfType<MultiplayerMatchFreestyleSelect>().SingleOrDefault()?.IsCurrentScreen() == true);
@@ -1186,10 +1191,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("open user style selection", () => this.ChildrenOfType<MultiplayerMatchSubScreen>().Single().ShowUserStyleSelect());
             AddUntilStep("style selection screen opened", () => this.ChildrenOfType<MultiplayerMatchFreestyleSelect>().SingleOrDefault()?.IsCurrentScreen() == true);
 
-            AddStep("change beatmap set", () => multiplayerClient.EditPlaylistItem(new MultiplayerPlaylistItem(new PlaylistItem(multiplayerClient.ServerRoom!.Playlist[0])
+            AddStep("change beatmap set", () =>
             {
-                Beatmap = importedSet2.Beatmaps.First(),
-            })));
+                var newItem = multiplayerClient.ServerRoom!.Playlist[0].Clone();
+                var newBeatmap = importedSet2.Beatmaps.Last();
+                newItem.BeatmapID = newBeatmap.OnlineID;
+                newItem.BeatmapChecksum = newBeatmap.MD5Hash;
+
+                multiplayerClient.EditPlaylistItem(newItem);
+            });
 
             AddUntilStep("selected beatmap changed", () => Beatmap.Value.BeatmapInfo.Equals(importedSet2.Beatmaps.First()));
             AddUntilStep("style selection screen closed", () => this.ChildrenOfType<MultiplayerMatchFreestyleSelect>().SingleOrDefault()?.IsCurrentScreen() != true);
