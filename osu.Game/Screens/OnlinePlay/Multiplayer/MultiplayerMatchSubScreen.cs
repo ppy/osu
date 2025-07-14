@@ -83,6 +83,21 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         /// </summary>
         protected bool ExitConfirmed { get; private set; }
 
+        /// <summary>
+        /// Used for testing - whether the local user style can be edited.
+        /// False if the beatmap hasn't been downloaded yet, or if freestyle isn't enabled.
+        /// </summary>
+        internal bool UserStyleEditingEnabled
+        {
+            get
+            {
+                if (!userStyleDisplayContainer.IsPresent)
+                    return false;
+
+                return userStyleDisplayContainer.SingleOrDefault()?.AllowEditing == true;
+            }
+        }
+
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
 
@@ -677,7 +692,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         /// <summary>
         /// Shows the user style selection.
         /// </summary>
-        private void showUserStyleSelect()
+        public void ShowUserStyleSelect()
         {
             if (!this.IsCurrentScreen() || client.Room == null || client.LocalUser == null)
                 return;
