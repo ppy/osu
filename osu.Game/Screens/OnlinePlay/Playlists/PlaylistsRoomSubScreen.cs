@@ -641,6 +641,9 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                         RequestEdit = _ => showUserStyleSelect()
                     };
                 }
+
+                DrawableRoomPlaylistItem panel = userStyleDisplayContainer.Single();
+                panel.AllowEditing = localBeatmap != null;
             }
             else
                 userStyleSection.Hide();

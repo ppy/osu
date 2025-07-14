@@ -657,10 +657,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                     userStyleDisplayContainer.Child = new DrawableRoomPlaylistItem(apiItem, true)
                     {
                         AllowReordering = false,
-                        AllowEditing = true,
-                        RequestEdit = _ => showUserStyleSelect()
+                        RequestEdit = _ => ShowUserStyleSelect()
                     };
                 }
+
+                DrawableRoomPlaylistItem panel = userStyleDisplayContainer.Single();
+                panel.AllowEditing = localBeatmap != null;
             }
             else
                 userStyleSection.Hide();
