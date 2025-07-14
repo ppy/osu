@@ -154,7 +154,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             });
             leaderboardFlow.Insert(0, Leaderboard = new DrawableGameplayLeaderboard
             {
-                CollapseDuringGameplay = { Value = false }
+                CollapseDuringGameplay = { Value = false },
+                AlwaysShown = true,
             });
 
             LoadComponentAsync(new GameplayChatDisplay(room)
