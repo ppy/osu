@@ -126,17 +126,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double speedDifficultyValue = speed.DifficultyValue();
 
             mechanicalDifficultyRating = calculateMechanicalDifficultyRating(aimDifficultyValue, speedDifficultyValue);
+            double sliderFactor = aimDifficultyValue > 0 ? calculateDifficultyRating(aimNoSlidersDifficultyValue) / calculateDifficultyRating(aimDifficultyValue) : 1;
 
             double aimRating = computeAimRating(aimDifficultyValue, mods, totalHits, approachRate, overallDifficulty);
-            double aimRatingNoSliders = computeAimRating(aimNoSlidersDifficultyValue, mods, totalHits, approachRate, overallDifficulty);
             double speedRating = computeSpeedRating(speedDifficultyValue, mods, totalHits, approachRate, overallDifficulty);
 
             double flashlightRating = 0.0;
 
             if (flashlight is not null)
                 flashlightRating = computeFlashlightRating(flashlight.DifficultyValue(), mods, totalHits, overallDifficulty);
-
-            double sliderFactor = aimRating > 0 ? aimRatingNoSliders / aimRating : 1;
 
             double baseAimPerformance = OsuStrainSkill.DifficultyToPerformance(aimRating);
             double baseSpeedPerformance = OsuStrainSkill.DifficultyToPerformance(speedRating);
