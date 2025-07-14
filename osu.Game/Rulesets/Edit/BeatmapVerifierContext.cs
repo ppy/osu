@@ -31,9 +31,7 @@ namespace osu.Game.Rulesets.Edit
         /// <summary>
         /// All beatmap difficulties in the same beatmapset, including the current beatmap.
         /// </summary>
-        public IReadOnlyList<IBeatmap> BeatmapsetDifficulties => beatmapsetDifficulties.Value;
-
-        private readonly Lazy<IReadOnlyList<IBeatmap>> beatmapsetDifficulties;
+        public readonly IReadOnlyList<IBeatmap> BeatmapsetDifficulties;
 
         public BeatmapVerifierContext(IBeatmap beatmap, IWorkingBeatmap workingBeatmap, DifficultyRating difficultyRating = DifficultyRating.ExpertPlus, Func<BeatmapInfo, IWorkingBeatmap?>? beatmapResolver = null)
         {
@@ -41,31 +39,32 @@ namespace osu.Game.Rulesets.Edit
             WorkingBeatmap = workingBeatmap;
             InterpretedDifficulty = difficultyRating;
 
-            beatmapsetDifficulties = new Lazy<IReadOnlyList<IBeatmap>>(() =>
+            var beatmapSet = beatmap.BeatmapInfo.BeatmapSet;
+
+            if (beatmapSet?.Beatmaps == null)
             {
-                var beatmapSet = beatmap.BeatmapInfo.BeatmapSet;
-                if (beatmapSet?.Beatmaps == null)
-                    return new[] { beatmap };
+                BeatmapsetDifficulties = new[] { beatmap };
+                return;
+            }
 
-                var difficulties = new List<IBeatmap>();
+            var difficulties = new List<IBeatmap>();
 
-                foreach (var beatmapInfo in beatmapSet.Beatmaps)
+            foreach (var beatmapInfo in beatmapSet.Beatmaps)
+            {
+                // Use the current beatmap if it matches this BeatmapInfo
+                if (beatmapInfo.Equals(beatmap.BeatmapInfo))
                 {
-                    // Use the current beatmap if it matches this BeatmapInfo
-                    if (beatmapInfo.Equals(beatmap.BeatmapInfo))
-                    {
-                        difficulties.Add(beatmap);
-                        continue;
-                    }
-
-                    // Try to resolve other difficulties using the provided resolver
-                    var working = beatmapResolver?.Invoke(beatmapInfo);
-                    if (working?.Beatmap != null)
-                        difficulties.Add(working.Beatmap);
+                    difficulties.Add(beatmap);
+                    continue;
                 }
 
-                return difficulties;
-            });
+                // Try to resolve other difficulties using the provided resolver
+                var working = beatmapResolver?.Invoke(beatmapInfo);
+                if (working?.Beatmap != null)
+                    difficulties.Add(working.Beatmap);
+            }
+
+            BeatmapsetDifficulties = difficulties;
         }
     }
 }
