@@ -22,9 +22,7 @@ namespace osu.Game.Online.API.Requests.Responses
         /// </summary>
         public const int SYSTEM_USER_ID = 0;
 
-        /// <summary>
-        /// In osu-web, deleted users have a null ID. When deserializing, we ignore the null value and use 1 instead.
-        /// </summary>
+        // In osu-web, deleted users have a null ID. When deserializing, we ignore the null value and use 1 instead.
         [JsonProperty(@"id", NullValueHandling = NullValueHandling.Ignore)]
         public int Id { get; set; } = 1;
 
