@@ -481,7 +481,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
             if (settings.PlaylistItemId != lastPlaylistItemId)
             {
-                Scheduler.AddOnce(updateGameplayState);
+                onActivePlaylistItemChanged();
                 lastPlaylistItemId = settings.PlaylistItemId;
             }
 
@@ -494,7 +494,29 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         private void onItemChanged(MultiplayerPlaylistItem item)
         {
             if (item.ID == client.Room?.Settings.PlaylistItemId)
-                Scheduler.AddOnce(updateGameplayState);
+                onActivePlaylistItemChanged();
+        }
+
+        /// <summary>
+        /// Responds to changes in the active playlist item resulting from the playlist item being edited or the room settings changing.
+        /// </summary>
+        private void onActivePlaylistItemChanged()
+        {
+            if (client.Room == null)
+                return;
+
+            // Check if we need to make this the current screen as a result of the beatmap set changing while the user's selecting a style.
+            if (this.GetChildScreen() is MultiplayerMatchFreestyleSelect)
+            {
+                MultiplayerPlaylistItem item = client.Room.CurrentPlaylistItem;
+
+                var newBeatmap = beatmapManager.QueryBeatmap($@"{nameof(BeatmapInfo.OnlineID)} == $0 AND {nameof(BeatmapInfo.MD5Hash)} == {nameof(BeatmapInfo.OnlineMD5Hash)}", item.BeatmapID);
+
+                if (!Beatmap.Value.BeatmapSetInfo.Equals(newBeatmap?.BeatmapSet))
+                    this.MakeCurrent();
+            }
+
+            Scheduler.AddOnce(updateGameplayState);
         }
 
         /// <summary>
