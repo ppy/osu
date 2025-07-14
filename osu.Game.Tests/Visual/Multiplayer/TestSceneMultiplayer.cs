@@ -1184,7 +1184,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
 
             AddStep("open user style selection", () => this.ChildrenOfType<MultiplayerMatchSubScreen>().Single().ShowUserStyleSelect());
-            AddAssert("style selection screen still open", () => this.ChildrenOfType<MultiplayerMatchFreestyleSelect>().SingleOrDefault()?.IsCurrentScreen() == true);
+            AddUntilStep("style selection screen opened", () => this.ChildrenOfType<MultiplayerMatchFreestyleSelect>().SingleOrDefault()?.IsCurrentScreen() == true);
 
             AddStep("change beatmap set", () => multiplayerClient.EditPlaylistItem(new MultiplayerPlaylistItem(new PlaylistItem(multiplayerClient.ServerRoom!.Playlist[0])
             {
