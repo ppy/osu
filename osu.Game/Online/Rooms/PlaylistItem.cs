@@ -90,7 +90,7 @@ namespace osu.Game.Online.Rooms
         /// In many cases, this will *not* contain any usable information apart from OnlineID.
         /// </summary>
         [JsonIgnore]
-        public IBeatmapInfo Beatmap { get; set; }
+        public IBeatmapInfo Beatmap { get; private set; }
 
         [JsonIgnore]
         public IBindable<bool> Valid => valid;
