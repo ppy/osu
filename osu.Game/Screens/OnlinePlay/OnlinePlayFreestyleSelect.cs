@@ -97,8 +97,6 @@ namespace osu.Game.Screens.OnlinePlay
         private partial class DifficultySelectFilterControl : FilterControl
         {
             private readonly PlaylistItem item;
-            private double itemLength;
-            private int beatmapSetId;
 
             [Resolved]
             private RealmAccess realm { get; set; } = null!;
@@ -111,6 +109,9 @@ namespace osu.Game.Screens.OnlinePlay
             public override FilterCriteria CreateCriteria()
             {
                 var criteria = base.CreateCriteria();
+
+                double itemLength = 0;
+                int beatmapSetId = 0;
 
                 realm.Run(r =>
                 {
@@ -130,7 +131,6 @@ namespace osu.Game.Screens.OnlinePlay
                 criteria.Length.Max = itemLength + 30000;
                 criteria.Length.IsLowerInclusive = true;
                 criteria.Length.IsUpperInclusive = true;
-
                 return criteria;
             }
         }
