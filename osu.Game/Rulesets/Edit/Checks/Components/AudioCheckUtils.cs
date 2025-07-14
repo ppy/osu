@@ -19,22 +19,23 @@ namespace osu.Game.Rulesets.Edit.Checks.Components
         /// Gets the audio format (ChannelType) from a stream using BASS.
         /// </summary>
         /// <param name="data">The audio file stream.</param>
-        /// <returns>The ChannelType of the audio, or 0 if detection fails.</returns>
+        /// <returns>The ChannelType of the audio, or <see cref="ChannelType.Unknown"/> if detection fails.</returns>
         public static ChannelType GetAudioFormat(Stream data)
         {
             if (data.Length <= 0)
-                return 0;
+                return ChannelType.Unknown;
 
-            var fileCallbacks = new FileCallbacks(new DataStreamFileProcedures(data));
-            int decodeStream = Bass.CreateStream(StreamSystem.NoBuffer, BassFlags.Decode, fileCallbacks.Callbacks, fileCallbacks.Handle);
+            using (var fileCallbacks = new FileCallbacks(new DataStreamFileProcedures(data)))
+            {
+                int decodeStream = Bass.CreateStream(StreamSystem.NoBuffer, BassFlags.Decode, fileCallbacks.Callbacks, fileCallbacks.Handle);
+                if (decodeStream == 0)
+                    return ChannelType.Unknown;
 
-            if (decodeStream == 0)
-                return 0;
+                var audioInfo = Bass.ChannelGetInfo(decodeStream);
+                Bass.StreamFree(decodeStream);
 
-            var audioInfo = Bass.ChannelGetInfo(decodeStream);
-            Bass.StreamFree(decodeStream);
-
-            return audioInfo.ChannelType;
+                return audioInfo.ChannelType;
+            }
         }
 
         /// <summary>
@@ -42,19 +43,17 @@ namespace osu.Game.Rulesets.Edit.Checks.Components
         /// </summary>
         /// <param name="context">The beatmap verifier context.</param>
         /// <param name="filename">The filename to check.</param>
-        /// <returns>The ChannelType of the audio file, or 0 if detection fails.</returns>
+        /// <returns>The ChannelType of the audio file, or <see cref="ChannelType.Unknown"/> if detection fails.</returns>
         public static ChannelType GetAudioFormatFromFile(BeatmapVerifierContext context, string filename)
         {
             var beatmapSet = context.Beatmap.BeatmapInfo.BeatmapSet;
             var audioFile = beatmapSet?.GetFile(filename);
 
             if (beatmapSet == null || audioFile == null)
-                return 0;
+                return ChannelType.Unknown;
 
             using (Stream data = context.WorkingBeatmap.GetStream(audioFile.File.GetStoragePath()))
-            {
                 return GetAudioFormat(data);
-            }
         }
     }
 }
