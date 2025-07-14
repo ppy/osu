@@ -249,7 +249,8 @@ namespace osu.Game.Overlays.SkinEditor
                 Scheduler.AddOnce(updateScreenSizing);
 
                 game.Toolbar.Hide();
-                game.CloseAllOverlays();
+                if (externalEditOverlay.State.Value != Visibility.Visible)
+                    game.CloseAllOverlays();
             }
             else
             {
@@ -298,7 +299,8 @@ namespace osu.Game.Overlays.SkinEditor
 
             if (skinEditor.State.Value == Visibility.Visible)
             {
-                skinEditor.Save(false);
+                if (externalEditOverlay.State.Value != Visibility.Visible)
+                    skinEditor.Save(false);
                 skinEditor.UpdateTargetScreen(target);
                 disableNestedInputManagers();
             }
