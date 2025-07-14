@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         /// <summary>
         /// Calculates a visibility bonus that is applicable to Hidden and Traceable.
         /// </summary>
-        public static double CalculateVisibilityBonus(Mod[] mods, double approachRate, double visibilityFactor = 1)
+        public static double CalculateVisibilityBonus(Mod[] mods, double approachRate, double visibilityFactor = 1, double sliderFactor = 1)
         {
             // NOTE: TC's effect is only noticeable in performance calculations until lazer mods are accounted for server-side.
             bool isAlwaysPartiallyVisible = mods.OfType<OsuModHidden>().Any(m => !m.OnlyFadeApproachCircles.Value) || mods.OfType<OsuModTraceable>().Any();
@@ -58,13 +58,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             readingBonus *= visibilityFactor;
 
+            // We want to reward slideraim on low AR less
+            double sliderVisibilityFactor = Math.Pow(sliderFactor, 3);
+
             // For AR up to 0 - reduce reward for very low ARs when object is visible
             if (approachRate < 5)
-                readingBonus += (isAlwaysPartiallyVisible ? 0.04 : 0.03) * (5.0 - Math.Max(approachRate, 0));
+                readingBonus += (isAlwaysPartiallyVisible ? 0.04 : 0.03) * (5.0 - Math.Max(approachRate, 0)) * sliderVisibilityFactor;
 
             // Starting from AR0 - cap values so they won't grow to infinity
             if (approachRate < 0)
-                readingBonus += (isAlwaysPartiallyVisible ? 0.1 : 0.075) * (1 - Math.Pow(1.5, approachRate));
+                readingBonus += (isAlwaysPartiallyVisible ? 0.1 : 0.075) * (1 - Math.Pow(1.5, approachRate)) * sliderVisibilityFactor;
 
             return readingBonus;
         }
@@ -128,7 +131,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             mechanicalDifficultyRating = calculateMechanicalDifficultyRating(aimDifficultyValue, speedDifficultyValue);
             double sliderFactor = aimDifficultyValue > 0 ? calculateDifficultyRating(aimNoSlidersDifficultyValue) / calculateDifficultyRating(aimDifficultyValue) : 1;
 
-            double aimRating = computeAimRating(aimDifficultyValue, mods, totalHits, approachRate, overallDifficulty);
+            double aimRating = computeAimRating(aimDifficultyValue, mods, totalHits, approachRate, overallDifficulty, sliderFactor);
             double speedRating = computeSpeedRating(speedDifficultyValue, mods, totalHits, approachRate, overallDifficulty);
 
             double flashlightRating = 0.0;
@@ -183,7 +186,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return attributes;
         }
 
-        private double computeAimRating(double aimDifficultyValue, Mod[] mods, int totalHits, double approachRate, double overallDifficulty)
+        private double computeAimRating(double aimDifficultyValue, Mod[] mods, int totalHits, double approachRate, double overallDifficulty, double sliderFactor)
         {
             if (mods.Any(m => m is OsuModAutopilot))
                 return 0;
@@ -221,7 +224,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (mods.Any(m => m is OsuModHidden))
             {
                 double visibilityFactor = calculateAimVisibilityFactor(approachRate);
-                ratingMultiplier *= 1.0 + CalculateVisibilityBonus(mods, approachRate, visibilityFactor);
+                ratingMultiplier *= 1.0 + CalculateVisibilityBonus(mods, approachRate, visibilityFactor, sliderFactor);
             }
 
             // It is important to consider accuracy difficulty when scaling with accuracy.
