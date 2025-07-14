@@ -277,7 +277,7 @@ namespace osu.Game.Tests.Visual.Playlists
         [Test]
         public void TestPresentInvalidOnlineScore()
         {
-            AddStep("set user score ID -1 and total score -1", () =>
+            AddStep("set up invalid user score", () =>
             {
                 userScore.OnlineID = -1;
                 userScore.TotalScore = 0;
