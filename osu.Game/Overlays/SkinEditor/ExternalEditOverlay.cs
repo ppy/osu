@@ -47,6 +47,7 @@ namespace osu.Game.Overlays.SkinEditor
 
         private ExternalEditOperation<SkinInfo>? editOperation;
         private TaskCompletionSource? taskCompletionSource;
+        private bool finishingEdit;
 
         protected override bool DimMainContent => false;
 
@@ -181,6 +182,11 @@ namespace osu.Game.Overlays.SkinEditor
 
         private async Task finish()
         {
+            if (finishingEdit)
+                return;
+
+            finishingEdit = true;
+
             Debug.Assert(taskCompletionSource != null);
 
             showSpinner("Cleaning up...");
@@ -236,6 +242,7 @@ namespace osu.Game.Overlays.SkinEditor
             {
                 // Set everything to a clean state
                 editOperation = null;
+                finishingEdit = false;
                 flow.Children = Array.Empty<Drawable>();
             });
         }
@@ -249,7 +256,8 @@ namespace osu.Game.Overlays.SkinEditor
             {
                 case GlobalAction.Back:
                 case GlobalAction.Select:
-                    if (editOperation == null) return base.OnPressed(e);
+                    if (editOperation == null)
+                        return false;
 
                     finish().FireAndForget();
                     return true;
