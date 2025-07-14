@@ -673,18 +673,18 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 userStyleSection.Show();
 
                 PlaylistItem apiItem = new PlaylistItem(item).With(beatmap: new Optional<IBeatmapInfo>(new APIBeatmap { OnlineID = gameplayBeatmapId }), ruleset: gameplayRulesetId);
+                DrawableRoomPlaylistItem? currentDisplay = userStyleDisplayContainer.SingleOrDefault();
 
-                if (!apiItem.Equals(userStyleDisplayContainer.SingleOrDefault()?.Item))
+                if (!apiItem.Equals(currentDisplay?.Item))
                 {
-                    userStyleDisplayContainer.Child = new DrawableRoomPlaylistItem(apiItem, true)
+                    userStyleDisplayContainer.Child = currentDisplay = new DrawableRoomPlaylistItem(apiItem, true)
                     {
                         AllowReordering = false,
                         RequestEdit = _ => ShowUserStyleSelect()
                     };
                 }
 
-                DrawableRoomPlaylistItem panel = userStyleDisplayContainer.Single();
-                panel.AllowEditing = localBeatmap != null;
+                currentDisplay.AllowEditing = localBeatmap != null;
             }
             else
                 userStyleSection.Hide();
