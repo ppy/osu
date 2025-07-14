@@ -57,7 +57,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             double wideAngleBonus = 0;
             double acuteAngleBonus = 0;
-            double wideSliderAngleBonus = 0;
             double acuteSliderAngleBonus = 0;
             double sliderBonus = 0;
             double velocityChangeBonus = 0;
@@ -140,14 +139,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                                              DifficultyCalculationUtils.Smootherstep(DifficultyCalculationUtils.MillisecondsToBPM(osuCurrObj.MinimumJumpTime, 2), 300, 400) *
                                              DifficultyCalculationUtils.Smootherstep(osuCurrObj.MinimumJumpDistance, diameter, diameter * 2);
                 }
-
-                wideSliderAngleBonus = calcWideAngleBonus(currAngle);
-
-                // Penalize angle repetition.
-                wideSliderAngleBonus *= 1 - Math.Min(wideSliderAngleBonus, Math.Pow(calcWideAngleBonus(lastAngle), 3));
-
-                // Apply full wide angle bonus for distance more than one diameter
-                wideSliderAngleBonus *= angleBonus * DifficultyCalculationUtils.Smootherstep(osuCurrObj.MinimumJumpDistance, 0, diameter);
             }
 
             if (Math.Max(prevVelocity, currVelocity) != 0)
@@ -182,8 +173,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 currVelocity +
                 Math.Max(acuteAngleBonus * acute_angle_multiplier, wideAngleBonus * wide_angle_multiplier),
                 travelVelocity + movementVelocity +
-                Math.Max(acuteSliderAngleBonus * acute_angle_multiplier, wideSliderAngleBonus * wide_angle_multiplier
-                ));
+                acuteSliderAngleBonus * acute_angle_multiplier);
 
             // Add in additional slider velocity bonus.
             if (withSliderTravelDistance)
