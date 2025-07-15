@@ -199,7 +199,7 @@ namespace osu.Game.Screens.SelectV2
                 public TagsOverflowPopover(string[] tags, Action<string>? performSearchAction)
                 {
                     this.tags = tags;
-                    this.performSearch = performSearchAction;
+                    performSearch = performSearchAction;
                 }
 
                 [BackgroundDependencyLoader]
