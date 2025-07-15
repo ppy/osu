@@ -5,6 +5,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
+using osu.Game.Extensions;
 using osu.Game.Screens.Select.Filter;
 using osu.Game.Screens.SelectV2;
 
@@ -59,6 +60,56 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 var group = grouping.GroupItems.Single(g => g.Key.Title == "Not in collection");
                 return group.Value.Select(i => i.Model).OfType<BeatmapSetInfo>().Single().Equals(beatmapSets[2]);
             });
+        }
+
+        [Test]
+        public void TestCollectionGroupingUpdatesOnChange()
+        {
+            ImportBeatmapForRuleset(0);
+
+            BeatmapSetInfo beatmapSet = null!;
+
+            AddStep("add collections", () =>
+            {
+                beatmapSet = Beatmaps.GetAllUsableBeatmapSets().Single();
+
+                Realm.Write(r =>
+                {
+                    r.RemoveAll<BeatmapCollection>();
+                    r.Add(new BeatmapCollection("My Collection #4"));
+                });
+            });
+
+            LoadSongSelect();
+            GroupBy(GroupMode.Collections);
+            WaitForFiltering();
+
+            AddAssert("collection not present", () => grouping.GroupItems.All(g => g.Key.Title != "My Collection #4"));
+
+            AddAssert("no-collection group present", () =>
+            {
+                var group = grouping.GroupItems.Single(g => g.Key.Title == "Not in collection");
+                return group.Value.Select(i => i.Model).OfType<BeatmapSetInfo>().Single().Equals(beatmapSet);
+            });
+
+            AddStep("add beatmap to collection", () =>
+            {
+                Realm.Write(r =>
+                {
+                    var collection = r.All<BeatmapCollection>().Single();
+                    collection.BeatmapMD5Hashes.AddRange(beatmapSet.Beatmaps.Select(b => b.MD5Hash));
+                });
+            });
+
+            WaitForFiltering();
+
+            AddAssert("collection present", () =>
+            {
+                var group = grouping.GroupItems.Single(g => g.Key.Title == "My Collection #4");
+                return group.Value.Select(i => i.Model).OfType<BeatmapSetInfo>().Single().Equals(beatmapSet);
+            });
+
+            AddAssert("no-collection group not present", () => grouping.GroupItems.All(g => g.Key.Title != "Not in collection"));
         }
     }
 }
