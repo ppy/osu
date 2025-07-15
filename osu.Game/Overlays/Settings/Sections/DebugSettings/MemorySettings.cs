@@ -28,7 +28,13 @@ namespace osu.Game.Overlays.Settings.Sections.DebugSettings
             Add(new SettingsButton
             {
                 Text = @"Clear all caches",
-                Action = host.Collect
+                Action = () =>
+                {
+                    host.Collect();
+
+                    // host.Collect() uses GCCollectionMode.Optimized, but we should be as aggressive as possible here.
+                    GC.Collect(GC.MaxGeneration, GCCollectionMode.Aggressive, true, true);
+                }
             });
 
             if (DebugUtils.IsDebugBuild)
