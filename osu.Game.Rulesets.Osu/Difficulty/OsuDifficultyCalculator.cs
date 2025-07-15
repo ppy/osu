@@ -26,6 +26,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private const double difficulty_multiplier = 0.0675;
         private const double star_rating_multiplier = 0.0265;
 
+        private const double relax_multiplier = 0.87;
+        private const double touch_device_multiplier = 0.83;
+
         public override int Version => 20250306;
 
         private double mechanicalDifficultyRating;
@@ -233,16 +236,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (mods.Any(m => m is OsuModTouchDevice))
             {
-                aimRating = Math.Pow(aimRating, 0.83);
-                snapAimRating = Math.Pow(snapAimRating, 0.83);
+                aimRating = Math.Pow(aimRating, touch_device_multiplier);
+                snapAimRating = Math.Pow(snapAimRating, touch_device_multiplier);
                 // no reduce on flow aim rating is intentional
             }
 
             if (mods.Any(m => m is OsuModRelax))
             {
-                aimRating *= 0.9;
-                snapAimRating *= 0.9;
-                flowAimRating *= 0.9;
+                aimRating *= relax_multiplier;
+                snapAimRating *= relax_multiplier;
+                flowAimRating *= relax_multiplier;
 
                 // Remove big chunk of flow aim difficulty
                 aimRating = double.Lerp(snapAimRating, aimRating, 0.5);
@@ -261,11 +264,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double snapAimRating = Math.Sqrt(snapAimDifficultyValue) * difficulty_multiplier;
 
             if (mods.Any(m => m is OsuModTouchDevice))
-                snapAimRating = Math.Pow(snapAimRating, 0.83);
+                snapAimRating = Math.Pow(snapAimRating, touch_device_multiplier);
 
             // To ensure that result would not be bigger than normal aim difficulty rating
             if (mods.Any(m => m is OsuModRelax))
-                snapAimRating *= 0.9;
+                snapAimRating *= relax_multiplier;
 
             return computeRawAimRating(snapAimRating, mods, totalHits, approachRate, overallDifficulty);
         }
