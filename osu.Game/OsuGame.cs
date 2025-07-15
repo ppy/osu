@@ -1058,10 +1058,6 @@ namespace osu.Game
             if (RuntimeInfo.EntryAssembly.GetCustomAttribute<OfficialBuildAttribute>() == null)
                 Logger.Log(NotificationsStrings.NotOfficialBuild.ToString());
 
-            // Make sure the release stream setting matches the build which was just run.
-            if (Enum.TryParse<ReleaseStream>(Version.Split('-').Last(), true, out var releaseStream))
-                LocalConfig.SetValue(OsuSetting.ReleaseStream, releaseStream);
-
             var languages = Enum.GetValues<Language>();
 
             var mappings = languages.Select(language =>
