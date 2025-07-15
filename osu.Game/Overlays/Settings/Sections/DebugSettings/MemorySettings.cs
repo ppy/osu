@@ -46,6 +46,8 @@ namespace osu.Game.Overlays.Settings.Sections.DebugSettings
 
             latencyModeDropdown.Current.BindValueChanged(mode =>
             {
+                Logger.Log($"Changing latency mode: {mode.NewValue}");
+
                 switch (mode.NewValue)
                 {
                     case GCLatencyMode.Default:
