@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Mods
     {
         public override string Name => "Daycore";
         public override string Acronym => "DC";
-        public override IconUsage? Icon => null;
+        public override IconUsage? Icon => FontAwesome.Solid.Stopwatch;
         public override ModType Type => ModType.DifficultyReduction;
         public override LocalisableString Description => "Whoaaaaa...";
         public override bool Ranked => UsesDefaultConfiguration;

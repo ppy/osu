@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mania.Beatmaps;
@@ -15,6 +16,7 @@ namespace osu.Game.Rulesets.Mania.Mods
         public override LocalisableString Description => @"Double the stages, double the fun!";
         public override ModType Type => ModType.Conversion;
         public override double ScoreMultiplier => 1;
+        public override IconUsage? Icon => FontAwesome.Solid.Glasses;
 
         private bool isForCurrentRuleset;
 

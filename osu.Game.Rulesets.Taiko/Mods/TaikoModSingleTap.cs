@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps.Timing;
@@ -27,6 +28,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
         public override LocalisableString Description => @"One key for dons, one key for kats.";
 
         public override double ScoreMultiplier => 1.0;
+        public override IconUsage? Icon => FontAwesome.Solid.HandPointUp;
         public override Type[] IncompatibleMods => new[] { typeof(ModAutoplay), typeof(ModRelax), typeof(TaikoModCinema) };
         public override ModType Type => ModType.Conversion;
 

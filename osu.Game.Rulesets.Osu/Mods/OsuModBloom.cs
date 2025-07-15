@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Configuration;
@@ -26,6 +27,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override double ScoreMultiplier => 1;
         protected const float MIN_SIZE = 1;
         protected const float TRANSITION_DURATION = 100;
+        public override IconUsage? Icon => FontAwesome.Solid.PlusCircle;
         public override Type[] IncompatibleMods => new[] { typeof(OsuModFlashlight), typeof(OsuModNoScope), typeof(ModTouchDevice) };
 
         protected readonly BindableNumber<int> CurrentCombo = new BindableInt();

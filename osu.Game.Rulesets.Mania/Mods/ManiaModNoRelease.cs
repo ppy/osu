@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using System.Threading;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mania.Beatmaps;
@@ -26,6 +27,7 @@ namespace osu.Game.Rulesets.Mania.Mods
 
         public override double ScoreMultiplier => 0.9;
 
+        public override IconUsage? Icon => FontAwesome.Solid.Eraser;
         public override ModType Type => ModType.DifficultyReduction;
 
         public override Type[] IncompatibleMods => new[] { typeof(ManiaModHoldOff) };
