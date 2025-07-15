@@ -21,10 +21,11 @@ namespace osu.Game.Overlays.Settings.Sections
 
         public DebugSection()
         {
-            Add(new GeneralSettings());
-
             if (DebugUtils.IsDebugBuild)
+            {
+                Add(new GeneralSettings());
                 Add(new BatchImportSettings());
+            }
 
             Add(new MemorySettings());
         }
