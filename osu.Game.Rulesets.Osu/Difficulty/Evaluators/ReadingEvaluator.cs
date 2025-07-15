@@ -175,7 +175,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 index++;
             }
 
-            return Math.Min(1, 2 / constantAngleCount);
+            return Math.Clamp(2 / constantAngleCount, 0.2, 1);
         }
 
         // Returns a nerfing factor for when objects are very distant in time, affecting reading less.
