@@ -56,11 +56,15 @@ namespace osu.Game.Updater
             string version = game.Version;
             string lastVersion = config.Get<string>(OsuSetting.Version);
 
-            if (game.IsDeployedBuild && version != lastVersion)
+            if (game.IsDeployedBuild)
             {
                 // only show a notification if we've previously saved a version to the config file (ie. not the first run).
-                if (!string.IsNullOrEmpty(lastVersion))
+                if (!string.IsNullOrEmpty(lastVersion) && version != lastVersion)
                     Notifications.Post(new UpdateCompleteNotification(version));
+
+                // make sure the release stream setting matches the build which was just run.
+                if (FixedReleaseStream != null)
+                    config.SetValue(OsuSetting.ReleaseStream, FixedReleaseStream.Value);
 
                 if (RuntimeInfo.EntryAssembly.GetCustomAttribute<OfficialBuildAttribute>() == null)
                     Notifications.Post(new SimpleNotification { Text = NotificationsStrings.NotOfficialBuild });
