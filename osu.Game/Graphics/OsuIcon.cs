@@ -108,6 +108,7 @@ namespace osu.Game.Graphics
         public static IconUsage ModMirror => getMod(0xe814);
         public static IconUsage ModNightcore => getMod(0xe815);
         public static IconUsage ModNoFail => getMod(0xe816);
+        public static IconUsage NoMod => getMod(0xe817);
         public static IconUsage ModPerfect => getMod(0xe818);
         public static IconUsage ModRandom => getMod(0xe819);
         public static IconUsage ModRelax => getMod(0xe81a);
