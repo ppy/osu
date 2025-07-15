@@ -592,11 +592,16 @@ namespace osu.Game.Screens.SelectV2
 
         private ScheduledDelegate? loadingDebounce;
 
-        public void Filter(FilterCriteria criteria, bool showLoadingImmediately = false)
+        public void Filter(FilterCriteria? newCriteria = null, bool showLoadingImmediately = false)
         {
-            bool resetDisplay = grouping.BeatmapSetsGroupedTogether != BeatmapCarouselFilterGrouping.ShouldGroupBeatmapsTogether(criteria);
+            if (newCriteria != null)
+                Criteria = newCriteria;
 
-            Criteria = criteria;
+            // no initial criteria was provided yet, ignore this.
+            if (Criteria == null)
+                return;
+
+            bool resetDisplay = grouping.BeatmapSetsGroupedTogether != BeatmapCarouselFilterGrouping.ShouldGroupBeatmapsTogether(Criteria);
 
             loadingDebounce ??= Scheduler.AddDelayed(() =>
             {

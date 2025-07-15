@@ -339,7 +339,8 @@ namespace osu.Game.Screens.SelectV2
         {
             base.LoadComplete();
 
-            filterControl.CriteriaChanged += criteriaChanged;
+            filterControl.CriteriaChanged += filter;
+            collections.BindCollectionChanged((_, _) => filter());
 
             modSelectOverlay.State.BindValueChanged(v =>
             {
@@ -754,7 +755,7 @@ namespace osu.Game.Screens.SelectV2
 
         private ScheduledDelegate? filterDebounce;
 
-        private void criteriaChanged(FilterCriteria criteria)
+        private void filter(FilterCriteria? newCriteria = null)
         {
             filterDebounce?.Cancel();
 
@@ -762,9 +763,9 @@ namespace osu.Game.Screens.SelectV2
             bool isFirstFilter = filterDebounce == null;
 
             // Criteria change may have included a ruleset change which made the current selection invalid.
-            bool isSelectionValid = checkBeatmapValidForSelection(Beatmap.Value.BeatmapInfo, criteria);
+            bool isSelectionValid = checkBeatmapValidForSelection(Beatmap.Value.BeatmapInfo, newCriteria ?? carousel.Criteria);
 
-            filterDebounce = Scheduler.AddDelayed(() => { carousel.Filter(criteria, !isSelectionValid); }, isFirstFilter || !isSelectionValid ? 0 : filter_delay);
+            filterDebounce = Scheduler.AddDelayed(() => carousel.Filter(newCriteria, !isSelectionValid), isFirstFilter || !isSelectionValid ? 0 : filter_delay);
         }
 
         private void newItemsPresented(IEnumerable<CarouselItem> carouselItems)
