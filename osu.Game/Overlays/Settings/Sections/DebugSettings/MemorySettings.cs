@@ -5,6 +5,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
+using osu.Framework.Development;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
@@ -24,73 +25,77 @@ namespace osu.Game.Overlays.Settings.Sections.DebugSettings
             SettingsButton blockAction;
             SettingsButton unblockAction;
 
-            Children = new Drawable[]
+            Add(new SettingsButton
             {
-                new SettingsButton
+                Text = @"Clear all caches",
+                Action = host.Collect
+            });
+
+            if (DebugUtils.IsDebugBuild)
+            {
+                AddRange(new Drawable[]
                 {
-                    Text = @"Clear all caches",
-                    Action = host.Collect
-                },
-                new SettingsButton
-                {
-                    Text = @"Compact realm",
-                    Action = () =>
+                    new SettingsButton
                     {
-                        // Blocking operations implicitly causes a Compact().
-                        using (realm.BlockAllOperations(@"compact"))
+                        Text = @"Compact realm",
+                        Action = () =>
                         {
+                            // Blocking operations implicitly causes a Compact().
+                            using (realm.BlockAllOperations(@"compact"))
+                            {
+                            }
+                        }
+                    },
+                    blockAction = new SettingsButton
+                    {
+                        Text = @"Block realm",
+                    },
+                    unblockAction = new SettingsButton
+                    {
+                        Text = @"Unblock realm",
+                    }
+                });
+
+                blockAction.Action = () =>
+                {
+                    try
+                    {
+                        IDisposable? token = realm.BlockAllOperations(@"maintenance");
+
+                        blockAction.Enabled.Value = false;
+
+                        // As a safety measure, unblock after 10 seconds.
+                        // This is to handle the case where a dev may block, but then something on the update thread
+                        // accesses realm and blocks for eternity.
+                        Task.Factory.StartNew(() =>
+                        {
+                            Thread.Sleep(10000);
+                            unblock();
+                        });
+
+                        unblockAction.Action = unblock;
+
+                        void unblock()
+                        {
+                            if (token.IsNull())
+                                return;
+
+                            token.Dispose();
+                            token = null;
+
+                            Scheduler.Add(() =>
+                            {
+                                blockAction.Enabled.Value = true;
+                                unblockAction.Action = null;
+                            });
                         }
                     }
-                },
-                blockAction = new SettingsButton
-                {
-                    Text = @"Block realm",
-                },
-                unblockAction = new SettingsButton
-                {
-                    Text = @"Unblock realm",
-                },
-            };
-
-            blockAction.Action = () =>
-            {
-                try
-                {
-                    IDisposable? token = realm.BlockAllOperations(@"maintenance");
-
-                    blockAction.Enabled.Value = false;
-
-                    // As a safety measure, unblock after 10 seconds.
-                    // This is to handle the case where a dev may block, but then something on the update thread
-                    // accesses realm and blocks for eternity.
-                    Task.Factory.StartNew(() =>
+                    catch (Exception e)
                     {
-                        Thread.Sleep(10000);
-                        unblock();
-                    });
-
-                    unblockAction.Action = unblock;
-
-                    void unblock()
-                    {
-                        if (token.IsNull())
-                            return;
-
-                        token.Dispose();
-                        token = null;
-
-                        Scheduler.Add(() =>
-                        {
-                            blockAction.Enabled.Value = true;
-                            unblockAction.Action = null;
-                        });
+                        Logger.Error(e, @"Blocking realm failed");
                     }
-                }
-                catch (Exception e)
-                {
-                    Logger.Error(e, @"Blocking realm failed");
-                }
-            };
+                };
+            }
         }
     }
 }
