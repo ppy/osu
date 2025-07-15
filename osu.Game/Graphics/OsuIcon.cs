@@ -82,9 +82,6 @@ namespace osu.Game.Graphics
         public static IconUsage InsaneMania => get(0xe027);
         public static IconUsage ExpertMania => get(0xe028);
 
-        // Use "Icons/BeatmapDetails/mod-icon" instead
-        // public static IconUsage ModBg => Get(0xe04a);
-
         // mod icons
         public static IconUsage ModKey1 => getMod(0xe801);
         public static IconUsage ModKey2 => getMod(0xe802);
@@ -108,13 +105,17 @@ namespace osu.Game.Graphics
         public static IconUsage ModMirror => getMod(0xe814);
         public static IconUsage ModNightcore => getMod(0xe815);
         public static IconUsage ModNoFail => getMod(0xe816);
-        public static IconUsage NoMod => getMod(0xe817);
+        public static IconUsage ModNoMod => getMod(0xe817);
         public static IconUsage ModPerfect => getMod(0xe818);
         public static IconUsage ModRandom => getMod(0xe819);
         public static IconUsage ModRelax => getMod(0xe81a);
         public static IconUsage ModSpunOut => getMod(0xe81b);
         public static IconUsage ModSuddenDeath => getMod(0xe81c);
         public static IconUsage ModTarget => getMod(0xe81d);
+        public static IconUsage ModTouchDevice => getMod(0xe81e);
+
+        // Use "Icons/BeatmapDetails/mod-icon" instead
+        // public static IconUsage ModBg => Get(0xe04a);
 
         #endregion
 

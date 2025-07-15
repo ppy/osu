@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Mods
         public override string Acronym => "NM";
         public override LocalisableString Description => "No mods applied.";
         public override double ScoreMultiplier => 1;
-        public override IconUsage? Icon => OsuIcon.NoMod;
+        public override IconUsage? Icon => OsuIcon.ModNoMod;
         public override ModType Type => ModType.System;
     }
 }
