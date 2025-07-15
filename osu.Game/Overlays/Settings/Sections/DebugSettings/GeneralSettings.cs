@@ -3,7 +3,6 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
-using osu.Framework.Development;
 using osu.Framework.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.DebugSettings
@@ -21,14 +20,11 @@ namespace osu.Game.Overlays.Settings.Sections.DebugSettings
                 Current = frameworkConfig.GetBindable<bool>(FrameworkSetting.ShowLogOverlay)
             });
 
-            if (DebugUtils.IsDebugBuild)
+            Add(new SettingsCheckbox
             {
-                Add(new SettingsCheckbox
-                {
-                    LabelText = @"Bypass front-to-back render pass",
-                    Current = config.GetBindable<bool>(DebugSetting.BypassFrontToBackPass)
-                });
-            }
+                LabelText = @"Bypass front-to-back render pass",
+                Current = config.GetBindable<bool>(DebugSetting.BypassFrontToBackPass)
+            });
         }
     }
 }
