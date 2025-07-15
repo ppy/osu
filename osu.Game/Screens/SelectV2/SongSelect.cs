@@ -251,6 +251,7 @@ namespace osu.Game.Screens.SelectV2
                                                                 RequestSelection = queueBeatmapSelection,
                                                                 RequestRecommendedSelection = requestRecommendedSelection,
                                                                 NewItemsPresented = newItemsPresented,
+                                                                GetUserCollections = beatmapCollectionStore.GetCollections,
                                                             },
                                                             noResultsPlaceholder = new NoResultsPlaceholder
                                                             {

@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Extensions;
 using osu.Game.Beatmaps;
+using osu.Game.Collections;
 using osu.Game.Graphics.Carousel;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
@@ -32,6 +33,8 @@ namespace osu.Game.Screens.SelectV2
         private readonly Dictionary<GroupDefinition, HashSet<CarouselItem>> groupMap = new Dictionary<GroupDefinition, HashSet<CarouselItem>>();
 
         private readonly Func<FilterCriteria> getCriteria;
+
+        public Func<IEnumerable<BeatmapCollection>>? GetUserCollections { get; init; }
 
         public BeatmapCarouselFilterGrouping(Func<FilterCriteria> getCriteria)
         {
@@ -205,11 +208,11 @@ namespace osu.Game.Screens.SelectV2
                 case GroupMode.Source:
                     return getGroupsBy(b => defineGroupBySource(b.BeatmapSet!.Metadata.Source), items);
 
+                case GroupMode.Collections:
+                    var collections = GetUserCollections?.Invoke() ?? Enumerable.Empty<BeatmapCollection>();
+                    return getGroupsBy(b => defineGroupByCollection(b, collections), items);
+
                 // TODO: need implementation
-                //
-                // case GroupMode.Collections:
-                //     goto case GroupMode.None;
-                //
                 // case GroupMode.Favourites:
                 //     goto case GroupMode.None;
                 //
@@ -365,6 +368,17 @@ namespace osu.Game.Screens.SelectV2
                 return new GroupDefinition(1, "Unsourced");
 
             return new GroupDefinition(0, source);
+        }
+
+        private GroupDefinition defineGroupByCollection(BeatmapInfo beatmap, IEnumerable<BeatmapCollection> collections)
+        {
+            foreach (var collection in collections)
+            {
+                if (collection.BeatmapMD5Hashes.Contains(beatmap.MD5Hash))
+                    return new GroupDefinition(0, collection.Name);
+            }
+
+            return new GroupDefinition(1, "Not in collection");
         }
 
         private static T? aggregateMax<T>(BeatmapInfo b, Func<BeatmapInfo, T> func)

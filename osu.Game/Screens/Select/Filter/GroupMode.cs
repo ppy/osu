@@ -19,8 +19,8 @@ namespace osu.Game.Screens.Select.Filter
         [Description("BPM")]
         BPM,
 
-        // [Description("Collections")]
-        // Collections,
+        [Description("Collections")]
+        Collections,
 
         [Description("Date Added")]
         DateAdded,
