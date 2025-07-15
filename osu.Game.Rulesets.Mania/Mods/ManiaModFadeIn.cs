@@ -3,7 +3,9 @@
 
 using System;
 using System.Linq;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
+using osu.Game.Graphics;
 using osu.Game.Rulesets.Mania.UI;
 
 namespace osu.Game.Rulesets.Mania.Mods
@@ -14,6 +16,7 @@ namespace osu.Game.Rulesets.Mania.Mods
         public override string Acronym => "FI";
         public override LocalisableString Description => @"Keys appear out of nowhere!";
         public override double ScoreMultiplier => 1;
+        public override IconUsage? Icon => OsuIcon.ModFadeIn;
         public override bool ValidForFreestyleAsRequiredMod => false;
 
         public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[]
