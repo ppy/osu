@@ -1,0 +1,22 @@
+﻿<Project>
+  <PropertyGroup>
+    <DeployPropertiesFile>DeployProperties.g.cs</DeployPropertiesFile>
+  </PropertyGroup>
+
+  <Target Name="WriteDeployProperties" BeforeTargets="BeforeCompile;CoreCompile" Outputs="$(IntermediateOutputPath)$(DeployPropertiesFile)">
+    <PropertyGroup>
+      <DeployPropertiesFilePath>$(IntermediateOutputPath)$(DeployPropertiesFile)</DeployPropertiesFilePath>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <DeployAttributes Include="osu.Game.Utils.OfficialBuildAttribute">
+        <_Parameter1>$(Version)</_Parameter1>
+      </DeployAttributes>
+    </ItemGroup>
+
+    <WriteCodeFragment AssemblyAttributes="@(DeployAttributes)" Language="C#" OutputFile="$(DeployPropertiesFilePath)">
+      <Output TaskParameter="OutputFile" ItemName="Compile"/>
+      <Output TaskParameter="OutputFile" ItemName="FileWrites"/>
+    </WriteCodeFragment>
+  </Target>
+</Project>

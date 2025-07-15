@@ -125,13 +125,9 @@ namespace osu.Game
                 if (!IsDeployedBuild)
                     return @"local " + (DebugUtils.IsDebugBuild ? @"debug" : @"release");
 
-                string informationalVersion = Assembly.GetEntryAssembly()?
-                    .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?
-                    .InformationalVersion;
-
-                // Example: [assembly: AssemblyInformationalVersion("2025.613.0-tachyon+d934e574b2539e8787956c3c9ecce9dadebb10ee")]
-                if (!string.IsNullOrEmpty(informationalVersion))
-                    return informationalVersion.Split('+').First();
+                OfficialBuildAttribute buildAttribute = RuntimeInfo.EntryAssembly.GetCustomAttribute<OfficialBuildAttribute>();
+                if (buildAttribute != null)
+                    return buildAttribute.Version;
 
                 Version version = AssemblyVersion;
                 return $@"{version.Major}.{version.Minor}.{version.Build}-lazer";
