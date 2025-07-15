@@ -91,6 +91,9 @@ namespace osu.Game.Screens.SelectV2
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 
+        private BeatmapCollectionStore beatmapCollectionStore = null!;
+        private IBindableList<BeatmapCollection> collections = null!;
+
         private BeatmapCarousel carousel = null!;
 
         private FilterControl filterControl = null!;
@@ -139,6 +142,8 @@ namespace osu.Game.Screens.SelectV2
         private void load(AudioManager audio, OsuConfigManager config)
         {
             errorSample = audio.Samples.Get(@"UI/generic-error");
+
+            AddInternal(beatmapCollectionStore = new BeatmapCollectionStore());
 
             AddRangeInternal(new Drawable[]
             {
@@ -286,6 +291,8 @@ namespace osu.Game.Screens.SelectV2
 
                 updateBackgroundDim();
             });
+
+            collections = beatmapCollectionStore.GetCollections();
         }
 
         private void requestRecommendedSelection(IEnumerable<BeatmapInfo> b)
@@ -980,13 +987,8 @@ namespace osu.Game.Screens.SelectV2
 
         protected IEnumerable<OsuMenuItem> CreateCollectionMenuActions(BeatmapInfo beatmap)
         {
-            var collectionItems = realm.Realm.All<BeatmapCollection>()
-                                       .OrderBy(c => c.Name)
-                                       .AsEnumerable()
-                                       .Select(c => new CollectionToggleMenuItem(c.ToLive(realm), beatmap)).Cast<OsuMenuItem>().ToList();
-
+            var collectionItems = collections.Select(c => new CollectionToggleMenuItem(c.ToLive(realm), beatmap)).Cast<OsuMenuItem>().ToList();
             collectionItems.Add(new OsuMenuItem("Manage...", MenuItemType.Standard, () => manageCollectionsDialog?.Show()));
-
             yield return new OsuMenuItem(CommonStrings.Collections) { Items = collectionItems };
         }
 
