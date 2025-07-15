@@ -148,7 +148,7 @@ namespace osu.Game.Screens.SelectV2
             }
             else
             {
-                textFlow.AddParagraph(SongSelectStrings.NoFilteredBeatmaps);
+                textFlow.AddParagraph(SongSelectStrings.NoMatchingBeatmapsDescription);
                 textFlow.AddParagraph(string.Empty);
 
                 if (!string.IsNullOrEmpty(filter?.SearchText))

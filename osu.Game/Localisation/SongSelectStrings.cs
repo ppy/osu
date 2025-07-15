@@ -257,7 +257,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "No beatmaps match your filter criteria!"
         /// </summary>
-        public static LocalisableString NoFilteredBeatmaps => new TranslatableString(getKey(@"no_filtered_beatmaps"), @"No beatmaps match your filter criteria!");
+        public static LocalisableString NoMatchingBeatmapsDescription => new TranslatableString(getKey(@"no_matching_beatmaps_description"), @"No beatmaps match your filter criteria!");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
