@@ -745,6 +745,11 @@ namespace osu.Game.Screens.SelectV2
         /// </summary>
         public bool CarouselItemsPresented { get; private set; }
 
+        /// <summary>
+        /// Whether a filter operation is pending execution due to debouncing.
+        /// </summary>
+        public bool IsFilterPendingDebounce => filterDebounce?.State == ScheduledDelegate.RunState.Waiting;
+
         private const double filter_delay = 250;
 
         private ScheduledDelegate? filterDebounce;
