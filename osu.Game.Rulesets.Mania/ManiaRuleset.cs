@@ -414,6 +414,32 @@ namespace osu.Game.Rulesets.Mania
             }), true)
         };
 
+        /// <seealso cref="ManiaHitWindows"/>
+        public override BeatmapDifficulty GetAdjustedDisplayDifficulty(IBeatmapDifficultyInfo difficulty, IReadOnlyCollection<Mod> mods)
+        {
+            BeatmapDifficulty adjustedDifficulty = new BeatmapDifficulty(difficulty);
+
+            // notably, in mania, hit windows are designed to be independent of track playback rate (see `ManiaHitWindows.SpeedMultiplier`).
+            // *however*, to not make matters *too* simple, mania Hard Rock and Easy differ from all other rulesets
+            // in that they apply multipliers *to hit window durations directly* rather than to the Overall Difficulty attribute itself.
+            // because the duration of hit window durations as a function of OD is not a linear function,
+            // this means that multiplying the OD is *not* the same thing as multiplying the hit window duration.
+            // in fact, the second operation is *much* harsher and will produce values much farther outside of normal operating range
+            // (even negative in the case of Easy).
+            // stable handles this wrong on song select and just assumes that it can handle mania EZ / HR the same way as all other rulesets.
+
+            double perfectHitWindow = IBeatmapDifficultyInfo.DifficultyRange(adjustedDifficulty.OverallDifficulty, ManiaHitWindows.PERFECT_WINDOW_RANGE);
+
+            if (mods.Any(m => m is ManiaModHardRock))
+                perfectHitWindow /= ManiaModHardRock.HIT_WINDOW_DIFFICULTY_MULTIPLIER;
+            else if (mods.Any(m => m is ManiaModEasy))
+                perfectHitWindow /= ManiaModEasy.HIT_WINDOW_DIFFICULTY_MULTIPLIER;
+
+            adjustedDifficulty.OverallDifficulty = (float)IBeatmapDifficultyInfo.InverseDifficultyRange(perfectHitWindow, ManiaHitWindows.PERFECT_WINDOW_RANGE);
+
+            return adjustedDifficulty;
+        }
+
         public override IRulesetFilterCriteria CreateRulesetFilterCriteria()
         {
             return new ManiaFilterCriteria();
