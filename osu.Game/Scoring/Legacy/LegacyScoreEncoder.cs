@@ -54,6 +54,11 @@ namespace osu.Game.Scoring.Legacy
         /// <summary>
         /// The first stable-compatible YYYYMMDD format version given to lazer usage of replays.
         /// </summary>
+        /// <remarks>
+        /// Note that for a time (between commit 546772192ce30e0afd20e9830864de65ac11680d and commit 4d9fffc01bbcc2863386f0d32f38840cb0077c91)
+        /// lazer would emit replays with the version of "128".
+        /// Therefore, a score's version being lower than this constant IS NOT A GUARANTEE THAT IT IS A STABLE REPLAY.
+        /// </remarks>
         public const int FIRST_LAZER_VERSION = 30000000;
 
         private readonly Score score;
@@ -144,7 +149,7 @@ namespace osu.Game.Scoring.Legacy
                 // As this is baked into hitobject timing (see `LegacyBeatmapDecoder`) we also need to apply this to replay frame timing.
                 double offset = beatmap?.BeatmapVersion < 5 ? -LegacyBeatmapDecoder.EARLY_VERSION_TIMING_OFFSET : 0;
 
-                int lastTime = 0;
+                double lastTime = 0;
 
                 if (score.Replay != null)
                 {
@@ -152,9 +157,15 @@ namespace osu.Game.Scoring.Legacy
                     {
                         var legacyFrame = getLegacyFrame(f);
 
-                        // Rounding because stable could only parse integral values
-                        int time = (int)Math.Round(legacyFrame.Time + offset);
-                        replayData.Append(FormattableString.Invariant($"{time - lastTime}|{legacyFrame.MouseX ?? 0}|{legacyFrame.MouseY ?? 0}|{(int)legacyFrame.ButtonState},"));
+                        double time = legacyFrame.Time + offset;
+                        // attempt to store a frame delta to the replay with reasonable accuracy.
+                        // precision is constrained to attempt to circumvent potential round-trip parsing issues regarding treatment of floating point numbers.
+                        // 4 decimal places of precision were chosen because in most rulesets the hit window as a function of OD has at most 2 decimal places,
+                        // so adding another 2 decimal places on top should hopefully be a comfortable margin to prevent most rounding issues.
+                        // note that there are still possible sources of inaccuracy here:
+                        // - catastrophic cancellation from the `time - lastTime` operation (probably relevant when timestamps get large in magnitude, i.e. marathon maps)
+                        // - rounding error from rounding the delta time to 4dp
+                        replayData.Append(FormattableString.Invariant($"{Math.Round(time - lastTime, 4)}|{legacyFrame.MouseX ?? 0}|{legacyFrame.MouseY ?? 0}|{(int)legacyFrame.ButtonState},"));
                         lastTime = time;
                     }
                 }
