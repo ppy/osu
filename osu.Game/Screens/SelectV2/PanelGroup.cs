@@ -150,9 +150,9 @@ namespace osu.Game.Screens.SelectV2
             countText.Text = Item.NestedItemCount.ToString("N0");
         }
 
-        protected override void Update()
+        protected override void UpdateAfterChildren()
         {
-            base.Update();
+            base.UpdateAfterChildren();
 
             // Move the count pill in the opposite direction to keep it pinned to the screen regardless of the X position of TopLevelContent.
             countPill.X = -TopLevelContent.X;

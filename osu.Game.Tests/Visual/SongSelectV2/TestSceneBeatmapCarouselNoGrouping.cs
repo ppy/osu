@@ -156,6 +156,38 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         }
 
         [Test]
+        public void TestMultipleKeyboardOperationsPerFrame()
+        {
+            AddBeatmaps(10, 3);
+            WaitForDrawablePanels();
+
+            SelectNextSet();
+            WaitForSetSelection(0, 0);
+
+            SelectNextPanel();
+            SelectNextPanel();
+            SelectNextPanel();
+
+            AddStep("Press two keys at once", () =>
+            {
+                InputManager.Key(Key.Down);
+                InputManager.Key(Key.Right);
+            });
+
+            // Second key is respected, so only set selection changes.
+            WaitForSetSelection(1, 0);
+
+            AddStep("Press two keys at once", () =>
+            {
+                InputManager.Key(Key.Left);
+                InputManager.Key(Key.Up);
+            });
+
+            // Second key is respected, so only keyboard selection changes.
+            WaitForSetSelection(1, 0);
+        }
+
+        [Test]
         public void TestKeyboardSelection()
         {
             AddBeatmaps(10, 3);
@@ -195,16 +227,13 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             SelectNextSet();
             WaitForSetSelection(0, 0);
 
-            // In the case of a grouped beatmap set, the header gets activated and re-selects the recommended difficulty.
-            // This is probably fine.
-            CheckActivationCount(1);
-            // We don't want it to request present though, which would start gameplay.
+            CheckActivationCount(0);
             CheckRequestPresentCount(0);
 
             SelectPrevSet();
             WaitForSetSelection(0, 0);
 
-            CheckActivationCount(1);
+            CheckActivationCount(0);
             CheckRequestPresentCount(0);
         }
 

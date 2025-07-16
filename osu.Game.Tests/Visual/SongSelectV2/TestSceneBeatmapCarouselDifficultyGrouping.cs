@@ -102,18 +102,115 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             WaitForBeatmapSelection(0, 0);
 
             SelectPrevPanel();
+
+            ICarouselPanel? groupPanel = null;
+
+            AddStep("get group panel", () => groupPanel = GetKeyboardSelectedPanel());
+
             AddAssert("keyboard selected panel is expanded", () => GetKeyboardSelectedPanel()?.Expanded.Value, () => Is.True);
+            AddAssert("keyboard selected panel is group", GetKeyboardSelectedPanel, () => Is.EqualTo(groupPanel));
 
             SelectPrevSet();
 
             WaitForBeatmapSelection(0, 0);
             AddAssert("keyboard selected panel is contracted", () => GetKeyboardSelectedPanel()?.Expanded.Value, () => Is.False);
+            AddAssert("keyboard selected panel is group", GetKeyboardSelectedPanel, () => Is.EqualTo(groupPanel));
 
             SelectPrevSet();
 
             WaitForBeatmapSelection(0, 0);
-            AddAssert("keyboard selected panel is expanded", () => GetKeyboardSelectedPanel()?.Expanded.Value, () => Is.True);
+            // Expanding a group will move keyboard selection to the selected beatmap if contained.
+            AddAssert("keyboard selected panel is expanded", () => groupPanel?.Expanded.Value, () => Is.True);
+            AddAssert("keyboard selected panel is beatmap", () => GetKeyboardSelectedPanel()?.Item?.Model, Is.TypeOf<BeatmapInfo>);
         }
+
+        [Test]
+        public void TestKeyboardGroupToggleCollapse_SelectionContained()
+        {
+            SelectNextSet();
+            WaitForBeatmapSelection(0, 0);
+            checkBeatmapIsKeyboardSelected();
+
+            ToggleGroupCollapse();
+            checkGroupKeyboardSelected(0);
+
+            ToggleGroupCollapse();
+            checkBeatmapIsKeyboardSelected();
+        }
+
+        [Test]
+        public void TestKeyboardGroupToggleCollapse_SelectionNotContained()
+        {
+            SelectNextSet();
+            WaitForBeatmapSelection(0, 0);
+            checkBeatmapIsKeyboardSelected();
+
+            SelectNextGroup();
+            checkGroupKeyboardSelected(1);
+
+            ToggleGroupCollapse();
+            checkGroupKeyboardSelected(1);
+
+            ToggleGroupCollapse();
+            checkGroupKeyboardSelected(1);
+        }
+
+        [Test]
+        public void TestKeyboardGroupTraversalSingleGroup()
+        {
+            RemoveAllBeatmaps();
+            AddBeatmaps(1, 1);
+
+            WaitForBeatmapSelection(0, 0);
+
+            SelectNextGroup();
+            checkBeatmapIsKeyboardSelected();
+
+            SelectPrevGroup();
+            checkBeatmapIsKeyboardSelected();
+        }
+
+        [Test]
+        public void TestKeyboardGroupTraversal()
+        {
+            SelectNextSet();
+            WaitForBeatmapSelection(0, 0);
+            checkBeatmapIsKeyboardSelected();
+
+            SelectNextGroup();
+            WaitForBeatmapSelection(0, 0);
+            WaitForExpandedGroup(1);
+            checkGroupKeyboardSelected(1);
+
+            SelectNextGroup();
+            WaitForBeatmapSelection(0, 0);
+            WaitForExpandedGroup(2);
+            checkGroupKeyboardSelected(2);
+
+            SelectNextGroup();
+            WaitForBeatmapSelection(0, 0);
+            WaitForExpandedGroup(0);
+            checkBeatmapIsKeyboardSelected();
+
+            SelectPrevGroup();
+            WaitForBeatmapSelection(0, 0);
+            WaitForExpandedGroup(2);
+            checkGroupKeyboardSelected(2);
+        }
+
+        private void checkBeatmapIsKeyboardSelected() =>
+            AddUntilStep("check keyboard selected group is beatmap", () => GetKeyboardSelectedPanel()?.Item?.Model, () => Is.EqualTo(Carousel.CurrentSelection));
+
+        private void checkGroupKeyboardSelected(int index) => AddUntilStep($"check keyboard selected group is {index}", () => GetKeyboardSelectedPanel()?.Item?.Model, () =>
+        {
+            var groupingFilter = Carousel.Filters.OfType<BeatmapCarouselFilterGrouping>().Single();
+
+            GroupDefinition g = groupingFilter.GroupItems.Keys.ElementAt(index);
+            // offset by one because the group itself is included in the items list.
+            CarouselItem item = groupingFilter.GroupItems[g].ElementAt(0);
+
+            return Is.EqualTo(item.Model);
+        });
 
         [Test]
         public void TestGroupSelectionOnHeaderMouse()
@@ -129,9 +226,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddAssert("keyboard selected panel is contracted", () => GetKeyboardSelectedPanel()?.Expanded.Value, () => Is.False);
 
             ClickVisiblePanel<PanelGroupStarDifficulty>(0);
-            AddAssert("keyboard selected panel is group", GetKeyboardSelectedPanel, Is.TypeOf<PanelGroupStarDifficulty>);
-            AddAssert("keyboard selected panel is expanded", () => GetKeyboardSelectedPanel()?.Expanded.Value, () => Is.True);
-
+            // Expanding a group will move keyboard selection to the selected beatmap if contained.
+            AddAssert("keyboard selected panel is group", GetKeyboardSelectedPanel, Is.TypeOf<PanelBeatmapStandalone>);
             AddAssert("selected panel is still beatmap", GetSelectedPanel, Is.TypeOf<PanelBeatmapStandalone>);
         }
 

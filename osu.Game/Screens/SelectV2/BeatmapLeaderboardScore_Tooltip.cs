@@ -17,11 +17,13 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Localisation;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays;
 using osu.Game.Resources.Localisation.Web;
@@ -116,7 +118,7 @@ namespace osu.Game.Screens.SelectV2
                         relativeDate.Date = value.Date;
 
                         var judgementsStatistics = value.GetStatisticsForDisplay().Select(s =>
-                            new StatisticRow(s.DisplayName.ToUpper(), colours.ForHitResult(s.Result), s.Count.ToLocalisableString("N0")));
+                            new StatisticRow(s.DisplayName.ToUpper(), s.Count.ToLocalisableString("N0"), colours.ForHitResult(s.Result)));
 
                         double multiplier = 1.0;
 
@@ -125,10 +127,11 @@ namespace osu.Game.Screens.SelectV2
 
                         var generalStatistics = new[]
                         {
-                            new PerformanceStatisticRow(BeatmapsetsStrings.ShowScoreboardHeaderspp.ToUpper(), colourProvider.Content2, score),
-                            new StatisticRow("Score Multiplier", colourProvider.Content2, ModUtils.FormatScoreMultiplier(multiplier)),
-                            new StatisticRow(BeatmapsetsStrings.ShowScoreboardHeadersCombo, colourProvider.Content2, value.MaxCombo.ToLocalisableString(@"0\x")),
-                            new StatisticRow(BeatmapsetsStrings.ShowScoreboardHeadersAccuracy, colourProvider.Content2, value.Accuracy.FormatAccuracy()),
+                            new StatisticRow(BeatmapsetsStrings.ShowScoreboardHeadersCombo, value.MaxCombo.ToLocalisableString(@"0\x")),
+                            new StatisticRow(BeatmapsetsStrings.ShowScoreboardHeadersAccuracy, value.Accuracy.FormatAccuracy()),
+                            new PerformanceStatisticRow(BeatmapsetsStrings.ShowScoreboardHeaderspp.ToUpper(), score),
+                            Empty().With(d => d.Height = 20),
+                            new StatisticRow(ModSelectOverlayStrings.ScoreMultiplier, ModUtils.FormatScoreMultiplier(multiplier)),
                         };
 
                         statistics.ChildrenEnumerable = judgementsStatistics
@@ -204,7 +207,7 @@ namespace osu.Game.Screens.SelectV2
                                         {
                                             RelativeSizeAxes = Axes.X,
                                             AutoSizeAxes = Axes.Y,
-                                            Spacing = new Vector2(0f, 4f),
+                                            Spacing = new Vector2(0f, 2f),
                                             Padding = new MarginPadding(8f),
                                         },
                                     },
@@ -229,22 +232,26 @@ namespace osu.Game.Screens.SelectV2
 
             public partial class StatisticRow : CompositeDrawable
             {
-                protected OsuSpriteText ValueLabel;
+                private readonly OsuSpriteText labelText;
+                protected readonly OsuSpriteText ValueText;
 
-                public StatisticRow(LocalisableString label, Color4 labelColour, LocalisableString value)
+                private readonly Color4? colour;
+
+                public StatisticRow(LocalisableString label, LocalisableString value, Color4? colour = null)
                 {
+                    this.colour = colour;
+
                     RelativeSizeAxes = Axes.X;
                     AutoSizeAxes = Axes.Y;
 
                     InternalChildren = new[]
                     {
-                        new OsuSpriteText
+                        labelText = new OsuSpriteText
                         {
                             Text = label,
-                            Colour = labelColour,
                             Font = OsuFont.Style.Caption2.With(weight: FontWeight.SemiBold),
                         },
-                        ValueLabel = new OsuSpriteText
+                        ValueText = new OsuSpriteText
                         {
                             Anchor = Anchor.TopRight,
                             Origin = Anchor.TopRight,
@@ -254,14 +261,21 @@ namespace osu.Game.Screens.SelectV2
                         },
                     };
                 }
+
+                [BackgroundDependencyLoader]
+                private void load(OverlayColourProvider colourProvider)
+                {
+                    labelText.Colour = colour ?? colourProvider.Content2;
+                    ValueText.Colour = Interpolation.ValueAt(0.85f, colourProvider.Content1, colour ?? colourProvider.Content1, 0, 1);
+                }
             }
 
             public partial class PerformanceStatisticRow : StatisticRow
             {
                 private readonly ScoreInfo score;
 
-                public PerformanceStatisticRow(LocalisableString label, Color4 labelColour, ScoreInfo score)
-                    : base(label, labelColour, 0.ToLocalisableString("N0"))
+                public PerformanceStatisticRow(LocalisableString label, ScoreInfo score)
+                    : base(label, @"0pp")
                 {
                     this.score = score;
                 }
@@ -284,24 +298,21 @@ namespace osu.Game.Screens.SelectV2
                         if (attributes?.DifficultyAttributes == null || performanceCalculator == null)
                             return;
 
-                        var result = await performanceCalculator.CalculateAsync(score, attributes.Value.DifficultyAttributes, cancellationToken ?? default).ConfigureAwait(false);
+                        var result = await performanceCalculator.CalculateAsync(score, attributes.Value.DifficultyAttributes, cancellationToken ?? CancellationToken.None).ConfigureAwait(false);
 
                         Schedule(() => setPerformanceValue(score, result.Total));
                     }, cancellationToken ?? default);
                 }
 
-                private void setPerformanceValue(ScoreInfo scoreInfo, double? pp)
+                private void setPerformanceValue(ScoreInfo scoreInfo, double pp)
                 {
-                    if (pp.HasValue)
-                    {
-                        int ppValue = (int)Math.Round(pp.Value, MidpointRounding.AwayFromZero);
-                        ValueLabel.Text = ppValue.ToLocalisableString("N0");
+                    int ppValue = (int)Math.Round(pp, MidpointRounding.AwayFromZero);
+                    ValueText.Text = LocalisableString.Interpolate(@$"{ppValue:N0}pp");
 
-                        if (!scoreInfo.BeatmapInfo!.Status.GrantsPerformancePoints() || hasUnrankedMods(scoreInfo))
-                            Alpha = 0.5f;
-                        else
-                            Alpha = 1f;
-                    }
+                    if (!scoreInfo.BeatmapInfo!.Status.GrantsPerformancePoints() || hasUnrankedMods(scoreInfo))
+                        Alpha = 0.5f;
+                    else
+                        Alpha = 1f;
                 }
 
                 private static bool hasUnrankedMods(ScoreInfo scoreInfo)

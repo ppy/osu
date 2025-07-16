@@ -6,6 +6,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
@@ -46,6 +47,12 @@ namespace osu.Game.Screens.Play.HUD
 
         [Resolved]
         private HUDOverlay? hudOverlay { get; set; }
+
+        // Player settings are kept off the edge of the screen.
+        //
+        // In edge cases, floating point error could result in the whole control getting masked away
+        // while collapsed down, so let's avoid that.
+        protected override bool ComputeIsMaskedAway(RectangleF maskingBounds) => false;
 
         public PlayerSettingsOverlay()
             : base(0, EXPANDED_WIDTH)

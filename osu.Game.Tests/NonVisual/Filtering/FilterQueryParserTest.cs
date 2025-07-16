@@ -85,16 +85,6 @@ namespace osu.Game.Tests.NonVisual.Filtering
             Assert.That(filterCriteria.SearchTerms[0].MatchMode, Is.EqualTo(FilterCriteria.MatchMode.IsolatedPhrase));
         }
 
-        /*
-         * The following tests have been written a bit strangely (they don't check exact
-         * bound equality with what the filter says).
-         * This is to account for floating-point arithmetic issues.
-         * For example, specifying a bpm<140 filter would previously match beatmaps with BPM
-         * of 139.99999, which would be displayed in the UI as 140.
-         * Due to this the tests check the last tick inside the range and the first tick
-         * outside of the range.
-         */
-
         [TestCase("star")]
         [TestCase("stars")]
         public void TestApplyStarQueries(string variant)
@@ -105,10 +95,30 @@ namespace osu.Game.Tests.NonVisual.Filtering
             Assert.AreEqual("easy", filterCriteria.SearchText.Trim());
             Assert.AreEqual(1, filterCriteria.SearchTerms.Length);
             Assert.IsNotNull(filterCriteria.StarDifficulty.Max);
-            Assert.Greater(filterCriteria.StarDifficulty.Max, 3.99d);
-            Assert.Less(filterCriteria.StarDifficulty.Max, 4.00d);
+            Assert.AreEqual(filterCriteria.StarDifficulty.Max, 4.00d);
             Assert.IsNull(filterCriteria.StarDifficulty.Min);
         }
+
+        [Test]
+        public void TestStarQueriesInclusive()
+        {
+            const string query = "stars>=6";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.AreEqual(filterCriteria.StarDifficulty.Min, 6.00d);
+            Assert.True(filterCriteria.StarDifficulty.IsLowerInclusive);
+            Assert.IsNull(filterCriteria.StarDifficulty.Max);
+        }
+
+        /*
+         * The following tests have been written a bit strangely (they don't check exact
+         * bound equality with what the filter says).
+         * This is to account for floating-point arithmetic issues.
+         * For example, specifying a bpm<140 filter would previously match beatmaps with BPM
+         * of 139.99999, which would be displayed in the UI as 140.
+         * Due to this the tests check the last tick inside the range and the first tick
+         * outside of the range.
+         */
 
         [Test]
         public void TestApplyApproachRateQueries()

@@ -202,6 +202,9 @@ namespace osu.Game.Screens.SelectV2
                         return defineGroupByLength(length);
                     }, items);
 
+                case GroupMode.Source:
+                    return getGroupsBy(b => defineGroupBySource(b.BeatmapSet!.Metadata.Source), items);
+
                 // TODO: need implementation
                 //
                 // case GroupMode.Collections:
@@ -225,6 +228,7 @@ namespace osu.Game.Screens.SelectV2
         {
             return items.GroupBy(i => getGroup((BeatmapInfo)i.Model))
                         .OrderBy(s => s.Key.Order)
+                        .ThenBy(s => s.Key.Title)
                         .Select(g => new GroupMapping(g.Key, g.ToList()))
                         .ToList();
         }
@@ -323,7 +327,8 @@ namespace osu.Game.Screens.SelectV2
 
         private GroupDefinition defineGroupByStars(double stars)
         {
-            int starInt = (int)Math.Round(stars, 2);
+            // truncation is intentional - compare `FormatUtils.FormatStarRating()`
+            int starInt = (int)stars;
             var starDifficulty = new StarDifficulty(starInt, 0);
 
             if (starInt == 0)
@@ -352,6 +357,14 @@ namespace osu.Game.Screens.SelectV2
                 return new GroupDefinition(10, "10 minutes or less");
 
             return new GroupDefinition(11, "Over 10 minutes");
+        }
+
+        private GroupDefinition defineGroupBySource(string source)
+        {
+            if (string.IsNullOrEmpty(source))
+                return new GroupDefinition(1, "Unsourced");
+
+            return new GroupDefinition(0, source);
         }
 
         private static T? aggregateMax<T>(BeatmapInfo b, Func<BeatmapInfo, T> func)

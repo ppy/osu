@@ -313,9 +313,9 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             CheckDisplayedBeatmapsCount(4);
 
             SelectNextSet();
-            WaitForSetSelection(0, 1);
-            SelectPrevSet();
             WaitForSetSelection(1, 1);
+            SelectPrevSet();
+            WaitForSetSelection(0, 1);
         }
 
         [Test]

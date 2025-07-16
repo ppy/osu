@@ -10,6 +10,8 @@ using osu.Game.Rulesets;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics.Sprites;
@@ -193,7 +195,8 @@ namespace osu.Game.Tests.Visual.Online
                 overlay.ShowBeatmapSet(set);
             });
 
-            AddAssert("shown beatmaps of current ruleset", () => overlay.Header.HeaderContent.Picker.Difficulties.All(b => b.Beatmap.Ruleset.OnlineID == overlay.Header.RulesetSelector.Current.Value.OnlineID));
+            AddAssert("shown beatmaps of current ruleset",
+                () => overlay.Header.HeaderContent.Picker.Difficulties.All(b => b.Beatmap.Ruleset.OnlineID == overlay.Header.RulesetSelector.Current.Value.OnlineID));
             AddAssert("left-most beatmap selected", () => overlay.Header.HeaderContent.Picker.Difficulties.First().State == BeatmapPicker.DifficultySelectorState.Selected);
         }
 
@@ -239,6 +242,30 @@ namespace osu.Game.Tests.Visual.Online
                 beatmapSet.HasExplicitContent = true;
                 beatmapSet.FeaturedInSpotlight = true;
                 beatmapSet.TrackId = 1;
+                overlay.ShowBeatmapSet(beatmapSet);
+            });
+        }
+
+        [Test]
+        public void TestBeatmapSetHasVideoOrStoryboard()
+        {
+            AddStep("show beatmapset with video", () =>
+            {
+                var beatmapSet = getBeatmapSet();
+                beatmapSet.HasVideo = true;
+                overlay.ShowBeatmapSet(beatmapSet);
+            });
+            AddStep("show beatmapset with storyboard", () =>
+            {
+                var beatmapSet = getBeatmapSet();
+                beatmapSet.HasStoryboard = true;
+                overlay.ShowBeatmapSet(beatmapSet);
+            });
+            AddStep("show beatmapset with video and storyboard", () =>
+            {
+                var beatmapSet = getBeatmapSet();
+                beatmapSet.HasVideo = true;
+                beatmapSet.HasStoryboard = true;
                 overlay.ShowBeatmapSet(beatmapSet);
             });
         }
@@ -346,6 +373,39 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("move mouse to guest difficulty", () =>
             {
                 InputManager.MoveMouseTo(overlay.ChildrenOfType<DifficultyIcon>().ElementAt(1));
+            });
+        }
+
+        [Test]
+        public void TestBeatmapsetWithDeletedUser()
+        {
+            AddStep("show map with deleted user", () =>
+            {
+                JObject jsonBlob = JObject.FromObject(getBeatmapSet(), new JsonSerializer
+                {
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                });
+
+                jsonBlob["user"] = JToken.Parse(
+                    """
+                    {
+                        "avatar_url": null,
+                        "country_code": null,
+                        "default_group": "default",
+                        "id": null,
+                        "is_active": false,
+                        "is_bot": false,
+                        "is_deleted": true,
+                        "is_online": false,
+                        "is_supporter": false,
+                        "last_visit": null,
+                        "pm_friends_only": false,
+                        "profile_colour": null,
+                        "username": "[deleted user]"
+                    }
+                    """);
+
+                overlay.ShowBeatmapSet(JsonConvert.DeserializeObject<APIBeatmapSet>(JsonConvert.SerializeObject(jsonBlob)));
             });
         }
 

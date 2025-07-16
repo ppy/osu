@@ -17,14 +17,16 @@ namespace osu.Game.Updater
     /// </summary>
     public partial class NoActionUpdateManager : UpdateManager
     {
-        private static ReleaseStream? externalReleaseStream => Enum.TryParse(Environment.GetEnvironmentVariable("OSU_EXTERNAL_UPDATE_STREAM"), out ReleaseStream stream) ? stream : null;
+        public override ReleaseStream? FixedReleaseStream => externalReleaseStream;
+
+        private static ReleaseStream? externalReleaseStream => Enum.TryParse(Environment.GetEnvironmentVariable("OSU_EXTERNAL_UPDATE_STREAM"), true, out ReleaseStream stream) ? stream : null;
 
         private string version = string.Empty;
 
         [BackgroundDependencyLoader]
         private void load(OsuGameBase game)
         {
-            version = game.Version;
+            version = game.Version.Split('-').First();
         }
 
         protected override async Task<bool> PerformUpdateCheck(CancellationToken cancellationToken)
@@ -43,9 +45,6 @@ namespace osu.Game.Updater
                 if (latest == null)
                     return false;
 
-                // avoid any discrepancies due to build suffixes for now.
-                // eventually we will want to support release streams and consider these.
-                version = version.Split('-').First();
                 string latestTagName = latest.TagName.Split('-').First();
 
                 if (latestTagName != version)

@@ -199,6 +199,11 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.Left, GlobalAction.ActivatePreviousSet),
             new KeyBinding(InputKey.Right, GlobalAction.ActivateNextSet),
 
+            new KeyBinding(new[] { InputKey.Shift, InputKey.Left }, GlobalAction.ExpandPreviousGroup),
+            new KeyBinding(new[] { InputKey.Shift, InputKey.Right }, GlobalAction.ExpandNextGroup),
+
+            new KeyBinding(new[] { InputKey.Shift, InputKey.Enter }, GlobalAction.ToggleCurrentGroup),
+
             new KeyBinding(InputKey.F1, GlobalAction.ToggleModSelection),
             new KeyBinding(InputKey.F2, GlobalAction.SelectNextRandom),
             new KeyBinding(new[] { InputKey.Shift, InputKey.F2 }, GlobalAction.SelectPreviousRandom),
@@ -506,6 +511,15 @@ namespace osu.Game.Input.Bindings
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorDiscardUnsavedChanges))]
         EditorDiscardUnsavedChanges,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ExpandPreviousGroup))]
+        ExpandPreviousGroup,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ExpandNextGroup))]
+        ExpandNextGroup,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleCurrentGroup))]
+        ToggleCurrentGroup,
     }
 
     public enum GlobalActionCategory

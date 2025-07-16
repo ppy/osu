@@ -46,6 +46,32 @@ namespace osu.Game.Tests.Visual.Ranking
                 });
         }
 
+        // cross-reference: `TestSceneToolbarUserButton.TestTransientUserStatisticsDisplay()`, "Test rounding treatment" step.
+        [Test]
+        public void TestRoundingTreatment()
+        {
+            createDisplay();
+            displayUpdate(
+                new UserStatistics
+                {
+                    GlobalRank = 12_345,
+                    Accuracy = 98.99,
+                    MaxCombo = 2_322,
+                    RankedScore = 23_123_543_456,
+                    TotalScore = 123_123_543_456,
+                    PP = 5_071.495M
+                },
+                new UserStatistics
+                {
+                    GlobalRank = 12_345,
+                    Accuracy = 98.99,
+                    MaxCombo = 2_322,
+                    RankedScore = 23_123_543_456,
+                    TotalScore = 123_123_543_456,
+                    PP = 5_072.99M
+                });
+        }
+
         [Test]
         public void TestAllDecreased()
         {

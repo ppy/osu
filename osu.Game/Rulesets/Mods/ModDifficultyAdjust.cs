@@ -72,7 +72,7 @@ namespace osu.Game.Rulesets.Mods
         {
             get
             {
-                if (UserAdjustedSettingsCount != 1)
+                if (!IsExactlyOneSettingChanged(OverallDifficulty, DrainRate))
                     return string.Empty;
 
                 if (!OverallDifficulty.IsDefault) return format("OD", OverallDifficulty);
@@ -82,6 +82,24 @@ namespace osu.Game.Rulesets.Mods
 
                 string format(string acronym, DifficultyBindable bindable) => $"{acronym}{bindable.Value!.Value.ToStandardFormattedString(1)}";
             }
+        }
+
+        protected bool IsExactlyOneSettingChanged(params DifficultyBindable[] difficultySettings)
+        {
+            DifficultyBindable? changedSetting = null;
+
+            foreach (var setting in difficultySettings)
+            {
+                if (setting.IsDefault)
+                    continue;
+
+                if (changedSetting != null)
+                    return false;
+
+                changedSetting = setting;
+            }
+
+            return changedSetting != null;
         }
 
         public override IEnumerable<(LocalisableString setting, LocalisableString value)> SettingDescription
@@ -96,10 +114,6 @@ namespace osu.Game.Rulesets.Mods
             }
         }
 
-        public void ReadFromDifficulty(IBeatmapDifficultyInfo difficulty)
-        {
-        }
-
         public void ApplyToDifficulty(BeatmapDifficulty difficulty) => ApplySettings(difficulty);
 
         /// <summary>
@@ -110,27 +124,6 @@ namespace osu.Game.Rulesets.Mods
         {
             if (DrainRate.Value != null) difficulty.DrainRate = DrainRate.Value.Value;
             if (OverallDifficulty.Value != null) difficulty.OverallDifficulty = OverallDifficulty.Value.Value;
-        }
-
-        /// <summary>
-        /// The number of settings on this mod instance which have been adjusted by the user from their default values.
-        /// </summary>
-        protected int UserAdjustedSettingsCount
-        {
-            get
-            {
-                int count = 0;
-
-                foreach (var (_, property) in this.GetSettingsSourceProperties())
-                {
-                    var bindable = (IBindable)property.GetValue(this)!;
-
-                    if (!bindable.IsDefault)
-                        count++;
-                }
-
-                return count;
-            }
         }
     }
 }
