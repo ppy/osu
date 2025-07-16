@@ -314,9 +314,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             private readonly HitObject? hitObject;
 
             [Resolved]
-            private EditorBeatmap beatmap { get; set; } = null!;
-
-            [Resolved]
             private IBeatSnapProvider beatSnapProvider { get; set; } = null!;
 
             [Resolved]

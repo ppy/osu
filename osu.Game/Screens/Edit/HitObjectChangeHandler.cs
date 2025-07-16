@@ -15,7 +15,6 @@ namespace osu.Game.Screens.Edit
     /// A change handler for handling hit object changes in an <see cref="EditorBeatmap"/> using the command design pattern.
     /// This is supposed to eventually replace the <see cref="EditorChangeHandler"/> and its inheritors once all the editor operations have been refactored.
     /// </summary>
-    /// <inheritdoc/>
     public partial class HitObjectChangeHandler : TransactionalCommitComponent, IBeatmapEditorChangeHandler
     {
         private readonly IBeatmapEditorChangeHandler? changeHandler;

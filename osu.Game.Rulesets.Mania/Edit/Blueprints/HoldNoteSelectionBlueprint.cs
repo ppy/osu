@@ -21,9 +21,6 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         private IBeatmapEditorChangeHandler? changeHandler { get; set; }
 
         [Resolved]
-        private EditorBeatmap? editorBeatmap { get; set; }
-
-        [Resolved]
         private ManiaHitObjectComposer? positionSnapProvider { get; set; }
 
         private EditBodyPiece body = null!;

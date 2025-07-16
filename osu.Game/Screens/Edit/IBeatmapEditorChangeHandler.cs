@@ -6,6 +6,9 @@ using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Screens.Edit
 {
+    /// <summary>
+    /// Interface for a component that manages changes in the <see cref="EditorBeatmap"/>.
+    /// </summary>
     [Cached]
     public interface IBeatmapEditorChangeHandler : IEditorChangeHandler
     {

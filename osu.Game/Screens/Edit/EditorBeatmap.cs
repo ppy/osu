@@ -388,7 +388,7 @@ namespace osu.Game.Screens.Edit
         /// Updates a <see cref="HitObject"/>, invoking <see cref="HitObject.ApplyDefaults"/> and re-processing the beatmap.
         /// </summary>
         /// <param name="hitObject">The <see cref="HitObject"/> to update.</param>
-        public void Update([NotNull] HitObject hitObject)
+        public void Update(HitObject hitObject)
         {
             // updates are debounced regardless of whether a batch is active.
             if (batchPendingUpdates.Add(hitObject))
