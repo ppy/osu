@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -21,7 +20,6 @@ namespace osu.Game.Rulesets.Taiko.Mods
         public override string Name => "Simplified Rhythm";
         public override string Acronym => "SR";
         public override double ScoreMultiplier => 0.6;
-        public override IconUsage? Icon => FontAwesome.Solid.Cut;
 
         public override LocalisableString Description => "Simplify tricky rhythms!";
         public override ModType Type => ModType.DifficultyReduction;

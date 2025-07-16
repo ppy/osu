@@ -4,7 +4,6 @@
 using System;
 using System.Linq;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
@@ -21,7 +20,6 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Acronym => "FR";
 
         public override double ScoreMultiplier => 1;
-        public override IconUsage? Icon => FontAwesome.Solid.PauseCircle;
 
         public override LocalisableString Description => "Burn the notes into your memory.";
 
