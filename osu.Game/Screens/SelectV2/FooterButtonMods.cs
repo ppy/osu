@@ -240,7 +240,7 @@ namespace osu.Game.Screens.SelectV2
             {
                 base.LoadComplete();
 
-                Mods.BindValueChanged(_ => updateDisplay());
+                Mods.BindValueChanged(_ => updateDisplay(), true);
             }
 
             protected override void Update()
