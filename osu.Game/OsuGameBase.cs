@@ -489,9 +489,10 @@ namespace osu.Game
             AddFont(Resources, @"Fonts/Inter/Inter-BoldItalic");
 
             AddFont(Resources, @"Fonts/Noto/Noto-Basic");
-            AddFont(Resources, @"Fonts/Noto/Noto-Hangul");
+            AddFont(Resources, @"Fonts/Noto/Noto-Bopomofo");
             AddFont(Resources, @"Fonts/Noto/Noto-CJK-Basic");
             AddFont(Resources, @"Fonts/Noto/Noto-CJK-Compatibility");
+            AddFont(Resources, @"Fonts/Noto/Noto-Hangul");
             AddFont(Resources, @"Fonts/Noto/Noto-Thai");
 
             AddFont(Resources, @"Fonts/Venera/Venera-Light");
