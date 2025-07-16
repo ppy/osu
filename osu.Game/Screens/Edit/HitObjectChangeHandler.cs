@@ -86,12 +86,18 @@ namespace osu.Game.Screens.Edit
 
             Logger.Log($"Added {currentTransaction.UndoChanges.Count} change(s) to undo stack");
 
+            // There is always an ambient transaction ready to record changes,
+            // so no explicit 'start transaction' is needed before changes can be recorded to the transaction.
+            // This allows for transactions to be made via the SaveState() method.
             currentTransaction = new Transaction();
 
             OnStateChange?.Invoke();
             historyChanged();
         }
 
+        /// <summary>
+        /// This method will be removed once the <see cref="EditorChangeHandler"/> is fully replaced by this change handler.
+        /// </summary>
         private void commitChangeHandlerStateChange()
         {
             if (isRestoring || changeHandler!.CurrentState <= 0)
@@ -119,6 +125,8 @@ namespace osu.Game.Screens.Edit
 
             if (transaction.IsChangeHandlerTransaction)
             {
+                // Handle undo via the old change handler for stuff like metadata and timing points
+                // This will be removed once the old change handler is fully replaced by this change handler.
                 isRestoring = true;
                 changeHandler!.RestoreState(-1);
                 isRestoring = false;
@@ -151,6 +159,8 @@ namespace osu.Game.Screens.Edit
 
             if (transaction.IsChangeHandlerTransaction)
             {
+                // Handle redo via the old change handler for stuff like metadata and timing points
+                // This will be removed once the old change handler is fully replaced by this change handler.
                 isRestoring = true;
                 changeHandler!.RestoreState(1);
                 isRestoring = false;
@@ -236,6 +246,10 @@ namespace osu.Game.Screens.Edit
                 undoChanges = new List<IRevertibleChange>();
             }
 
+            /// <summary>
+            /// True if this transaction was created by the <see cref="EditorChangeHandler"/> and should be handled by it.
+            /// This will be removed once the <see cref="EditorChangeHandler"/> is fully replaced by this change handler.
+            /// </summary>
             public readonly bool IsChangeHandlerTransaction;
 
             public readonly Guid Id;
