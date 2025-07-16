@@ -53,7 +53,7 @@ namespace osu.Game.Screens.Edit.Verify
                 beatmapInfo =>
                     beatmapManager
                         .GetWorkingBeatmap(beatmapInfo)
-                        ?.GetPlayableBeatmap(beatmapInfo.Ruleset)
+                        .GetPlayableBeatmap(beatmapInfo.Ruleset)
             );
 
             verify.InterpretedDifficulty.BindValueChanged(difficulty => context.InterpretedDifficulty = difficulty.NewValue);
