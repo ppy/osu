@@ -512,6 +512,8 @@ namespace osu.Game.Screens.Edit
             foreach (var h in inserts) HitObjectAdded?.Invoke(h);
             foreach (var h in updates) HitObjectUpdated?.Invoke(h);
 
+            OnStateChange?.Invoke();
+
             updateInProgress.Value = false;
         }
 

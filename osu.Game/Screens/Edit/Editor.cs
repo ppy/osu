@@ -306,6 +306,8 @@ namespace osu.Game.Screens.Edit
 
             AddInternal(changeHandler = new HitObjectChangeHandler(this, oldChangeHandler));
 
+            changeHandler.OnStateChange += () => OnStateChange?.Invoke();
+
             beatDivisor.SetArbitraryDivisor(editorBeatmap.BeatmapInfo.BeatDivisor);
             beatDivisor.BindValueChanged(divisor => editorBeatmap.BeatmapInfo.BeatDivisor = divisor.NewValue);
 
