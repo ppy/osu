@@ -75,6 +75,7 @@ namespace osu.Game.Tests.Visual.Navigation
             AddUntilStep("wait for dialog overlay", () => Game.ChildrenOfType<DialogOverlay>().SingleOrDefault() != null);
 
             PushAndConfirm(() => playlistScreen = new Screens.OnlinePlay.Playlists.Playlists());
+            AddUntilStep("wait for lounge", () => (playlistScreen.CurrentSubScreen as LoungeSubScreen)?.IsLoaded == true);
 
             AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
 

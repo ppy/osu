@@ -9,7 +9,7 @@ namespace osu.Game.Rulesets.Mania.Scoring
 {
     public class ManiaHitWindows : HitWindows
     {
-        private static readonly DifficultyRange perfect_window_range = new DifficultyRange(22.4D, 19.4D, 13.9D);
+        public static readonly DifficultyRange PERFECT_WINDOW_RANGE = new DifficultyRange(22.4D, 19.4D, 13.9D);
         private static readonly DifficultyRange great_window_range = new DifficultyRange(64, 49, 34);
         private static readonly DifficultyRange good_window_range = new DifficultyRange(97, 82, 67);
         private static readonly DifficultyRange ok_window_range = new DifficultyRange(127, 112, 97);
@@ -151,7 +151,7 @@ namespace osu.Game.Rulesets.Mania.Scoring
             }
             else
             {
-                perfect = Math.Floor(IBeatmapDifficultyInfo.DifficultyRange(overallDifficulty, perfect_window_range) * totalMultiplier) + 0.5;
+                perfect = Math.Floor(IBeatmapDifficultyInfo.DifficultyRange(overallDifficulty, PERFECT_WINDOW_RANGE) * totalMultiplier) + 0.5;
                 great = Math.Floor(IBeatmapDifficultyInfo.DifficultyRange(overallDifficulty, great_window_range) * totalMultiplier) + 0.5;
                 good = Math.Floor(IBeatmapDifficultyInfo.DifficultyRange(overallDifficulty, good_window_range) * totalMultiplier) + 0.5;
                 ok = Math.Floor(IBeatmapDifficultyInfo.DifficultyRange(overallDifficulty, ok_window_range) * totalMultiplier) + 0.5;
