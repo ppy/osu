@@ -17,6 +17,20 @@ namespace osu.Game.Rulesets.Taiko.Scoring
         private double ok;
         private double miss;
 
+        private double overallDifficulty;
+
+        private bool classicModActive;
+
+        public bool ClassicModActive
+        {
+            get => classicModActive;
+            set
+            {
+                classicModActive = value;
+                updateWindows();
+            }
+        }
+
         public override bool IsHitResultAllowed(HitResult result)
         {
             switch (result)
@@ -32,9 +46,22 @@ namespace osu.Game.Rulesets.Taiko.Scoring
 
         public override void SetDifficulty(double difficulty)
         {
-            great = Math.Floor(IBeatmapDifficultyInfo.DifficultyRange(difficulty, GREAT_WINDOW_RANGE)) - 0.5;
-            ok = Math.Floor(IBeatmapDifficultyInfo.DifficultyRange(difficulty, OK_WINDOW_RANGE)) - 0.5;
-            miss = Math.Floor(IBeatmapDifficultyInfo.DifficultyRange(difficulty, MISS_WINDOW_RANGE)) - 0.5;
+            overallDifficulty = difficulty;
+            updateWindows();
+        }
+
+        private void updateWindows()
+        {
+            great = IBeatmapDifficultyInfo.DifficultyRange(overallDifficulty, GREAT_WINDOW_RANGE);
+            ok = IBeatmapDifficultyInfo.DifficultyRange(overallDifficulty, OK_WINDOW_RANGE);
+            miss = IBeatmapDifficultyInfo.DifficultyRange(overallDifficulty, MISS_WINDOW_RANGE);
+
+            if (ClassicModActive)
+            {
+                great = Math.Floor(great) - 0.5;
+                ok = Math.Floor(ok) - 0.5;
+                miss = Math.Floor(miss) - 0.5;
+            }
         }
 
         public override double WindowFor(HitResult result)
