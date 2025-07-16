@@ -54,11 +54,6 @@ namespace osu.Game.Screens.Edit
                 this.oldChangeHandler.OnStateChange += commitOldChangeHandlerStateChange;
         }
 
-        public void RestoreState(int direction)
-        {
-            throw new NotImplementedException();
-        }
-
         /// <summary>
         /// Adds a change to the history. The change should be applied before this method is called.
         /// </summary>
@@ -117,6 +112,23 @@ namespace osu.Game.Screens.Edit
 
             OnStateChange?.Invoke();
             historyChanged();
+        }
+
+        public void RestoreState(int direction)
+        {
+            switch (direction)
+            {
+                case 0:
+                    return;
+
+                case > 0:
+                    Redo();
+                    break;
+
+                case < 0:
+                    Undo();
+                    break;
+            }
         }
 
         /// <summary>

@@ -1039,7 +1039,7 @@ namespace osu.Game.Screens.Edit
 
         public void RestoreState(int direction)
         {
-            throw new NotImplementedException();
+            changeHandler.RestoreState(direction);
         }
 
         public void Record(IRevertibleChange change)
