@@ -52,7 +52,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Personal Plays"
         /// </summary>
-        public static LocalisableString PersonalPlays => new TranslatableString(getKey(@"personal_lays"), @"Personal Plays");
+        public static LocalisableString PersonalPlays => new TranslatableString(getKey(@"personal_plays"), @"Personal Plays");
 
         /// <summary>
         /// "Circle Size"
