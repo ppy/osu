@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         private const double preempt_balancing_factor = 200000;
         private const double hidden_multiplier = 0.85;
         private const double density_multiplier = 0.9;
-        private const double density_difficulty_base_max = 1.5;
+        private const double density_difficulty_base = 3.0;
 
         public static double EvaluateDifficultyOf(int totalObjects, DifficultyHitObject current, double clockRate, double preempt, bool hidden)
         {
@@ -49,12 +49,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             // Value higher note densities exponentially
             double noteDensityDifficulty = Math.Pow(pastObjectDifficultyInfluence, 1.45) * 0.85 * constantAngleNerfFactor * velocity;
 
-            // Make density more sensitive to higher approach rates as you have a lot less time to react to information
-            // https://www.desmos.com/calculator/bjkauuagat
-            double densityDifficultyBase = 1.5 + DifficultyCalculationUtils.Logistic(-(preempt - 360) / 15, density_difficulty_base_max);
-
             // Award only denser than average maps.
-            noteDensityDifficulty = Math.Max(0, noteDensityDifficulty - densityDifficultyBase);
+            noteDensityDifficulty = Math.Max(0, noteDensityDifficulty - density_difficulty_base);
 
             // Apply a soft cap to general density reading to account for partial memorization
             noteDensityDifficulty = Math.Pow(noteDensityDifficulty, 0.8) * density_multiplier;
