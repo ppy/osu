@@ -27,7 +27,9 @@ namespace osu.Game.Rulesets.Edit.Checks
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
-            IReadOnlyList<IBeatmap> difficulties = context.BeatmapsetDifficulties;
+            IReadOnlyList<IBeatmap> difficulties = context.BeatmapsetDifficulties
+                                                          .Where(d => d.BeatmapInfo.Ruleset.Equals(context.Beatmap.BeatmapInfo.Ruleset))
+                                                          .ToList();
 
             if (difficulties.Count == 0)
                 yield break;
