@@ -548,6 +548,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
                 new AddHitObjectChange(editorBeatmap, newSlider).Apply(changeHandler);
 
+                // Manually apply defaults to calculate the slider's span duration
+                newSlider.ApplyDefaults(editorBeatmap.ControlPointInfo, editorBeatmap.PlayableBeatmap.Difficulty);
+
                 new NewComboChange(HitObject, false).Apply(changeHandler);
                 new ExpectedDistanceChange(HitObject.Path, HitObject.Path.ExpectedDistance.Value - newSlider.Path.CalculatedDistance).Apply(changeHandler);
                 new StartTimeChange(HitObject, HitObject.StartTime + newSlider.SpanDuration).Apply(changeHandler);
