@@ -10,6 +10,7 @@ using osu.Game.Extensions;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Checks;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Tests.Editing.Checks
@@ -158,7 +159,8 @@ namespace osu.Game.Tests.Editing.Checks
                 BeatmapInfo = new BeatmapInfo
                 {
                     StarRating = starRating,
-                    DifficultyName = difficultyName
+                    DifficultyName = difficultyName,
+                    Ruleset = new OsuRuleset().RulesetInfo
                 },
                 HitObjects = new List<HitObject>
                 {
@@ -177,7 +179,8 @@ namespace osu.Game.Tests.Editing.Checks
                 BeatmapInfo = new BeatmapInfo
                 {
                     StarRating = starRating,
-                    DifficultyName = difficultyName
+                    DifficultyName = difficultyName,
+                    Ruleset = new OsuRuleset().RulesetInfo
                 },
                 HitObjects = new List<HitObject>
                 {
@@ -242,7 +245,7 @@ namespace osu.Game.Tests.Editing.Checks
                 currentBeatmap,
                 new TestWorkingBeatmap(currentBeatmap),
                 currentDifficultyRating,
-                beatmapInfo => difficultyDict.TryGetValue(beatmapInfo, out var workingBeatmap) ? workingBeatmap : null
+                beatmapInfo => difficultyDict.TryGetValue(beatmapInfo, out var workingBeatmap) ? workingBeatmap.Beatmap : null
             );
         }
 
