@@ -90,7 +90,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             {
                 // Use a harmonic sum for note which effectively buffs maps with more notes, especially if note difficulties are consistent.
                 // Constants are arbitrary and give good values.
-                // https://www.desmos.com/calculator/gquji01mlg
+                // https://www.desmos.com/calculator/5eb60faf4c
                 double weight = (1.0 + (1.0 / (1 + index))) / (Math.Pow(index, 0.8) + 1.0 + (1.0 / (1.0 + index)));
 
                 noteWeightSum += weight;

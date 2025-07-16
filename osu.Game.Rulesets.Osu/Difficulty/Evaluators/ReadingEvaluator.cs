@@ -15,9 +15,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
     public static class ReadingEvaluator
     {
         private const double reading_window_size = 3000; // 3 seconds
-        private const double density_difficulty_base_max = 1.5;
-        private const double hidden_multiplier = 0.007;
         private const double preempt_balancing_factor = 200000;
+        private const double hidden_multiplier = 0.85;
+        private const double density_multiplier = 0.9;
+        private const double density_difficulty_base_max = 1.5;
 
         public static double EvaluateDifficultyOf(int totalObjects, DifficultyHitObject current, double clockRate, double preempt, bool hidden)
         {
@@ -35,7 +36,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double loopDifficulty = currObj.OpacityAt(loopObj.BaseObject.StartTime, false);
 
                 // Small distances means objects may be cheesed, so it doesn't matter whether they are arranged confusingly.
-                // https://www.desmos.com/calculator/gioagbaopk
                 loopDifficulty *= DifficultyCalculationUtils.Logistic(-(loopObj.LazyJumpDistance - 80) / 15);
 
                 // Account less for objects close to the max reading window
@@ -46,17 +46,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 pastObjectDifficultyInfluence += loopDifficulty;
             }
 
-            // Value higher densities more
-            pastObjectDifficultyInfluence = Math.Pow(pastObjectDifficultyInfluence, 1.35) * 0.9;
+            // Value higher note densities exponentially
+            double noteDensityDifficulty = Math.Pow(pastObjectDifficultyInfluence, 1.45) * 0.85 * constantAngleNerfFactor * velocity;
 
             // Make density more sensitive to higher approach rates as you have a lot less time to react to information
+            // https://www.desmos.com/calculator/bjkauuagat
             double densityDifficultyBase = 1.5 + DifficultyCalculationUtils.Logistic(-(preempt - 360) / 15, density_difficulty_base_max);
 
             // Award only denser than average maps.
-            double noteDensityDifficulty = Math.Max(0, pastObjectDifficultyInfluence * constantAngleNerfFactor * velocity - densityDifficultyBase);
+            noteDensityDifficulty = Math.Max(0, noteDensityDifficulty - densityDifficultyBase);
 
             // Apply a soft cap to general density reading to account for partial memorization
-            noteDensityDifficulty = Math.Pow(noteDensityDifficulty, 0.8);
+            noteDensityDifficulty = Math.Pow(noteDensityDifficulty, 0.8) * density_multiplier;
 
             double hiddenDifficulty = 0.0;
 
@@ -64,30 +65,34 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             {
                 double timeSpentInvisible = getDurationSpentInvisible(currObj) / clockRate;
 
+                // Value time spent invisible exponentially
+                double timeSpentInvisibleFactor = Math.Pow(timeSpentInvisible, 2.1) * 0.0001;
+
                 // Buff current note if upcoming notes are dense
                 // This is on the basis that part of hidden difficulty is the uncertainty of the current cursor position in relation to future notes
-                double visibleObjectFactor = getCurrentVisibleObjectFactor(totalObjects, currObj, preempt);
+                double futureObjectDifficultyInfluence = retrieveCurrentVisibleObjects(totalObjects, currObj, preempt);
 
-                hiddenDifficulty += (Math.Pow(timeSpentInvisible, 1.65) * 0.001 + Math.Pow(Math.Max(1, visibleObjectFactor + pastObjectDifficultyInfluence - 2), 2.4)) * hidden_multiplier;
+                // Account for both past and current densities
+                double densityFactor = Math.Pow(Math.Max(1, futureObjectDifficultyInfluence + pastObjectDifficultyInfluence - 2), 2.2) * 2.9;
 
-                hiddenDifficulty *= constantAngleNerfFactor * velocity;
+                hiddenDifficulty += (timeSpentInvisibleFactor + densityFactor) * constantAngleNerfFactor * velocity * 0.007;
 
                 // Apply a soft cap to general HD reading to account for partial memorization
-                hiddenDifficulty = Math.Pow(hiddenDifficulty, 0.65);
+                hiddenDifficulty = Math.Pow(hiddenDifficulty, 0.65) * hidden_multiplier;
 
                 // Buff perfect stacks only if current note is completely invisible at the time you click the previous note.
                 var previousObj = currObj.Previous(0);
                 hiddenDifficulty += currObj.LazyJumpDistance == 0 &&
                                     currObj.OpacityAt(previousObj.BaseObject.StartTime + preempt, hidden) == 0 &&
                                     previousObj.StartTime + preempt > currObj.StartTime
-                    ? timeSpentInvisible * hidden_multiplier / 2.7
+                    ? timeSpentInvisible * hidden_multiplier * 0.0035
                     : 0;
             }
 
             double preemptDifficulty = 0.0;
 
             // Arbitrary curve for the base value preempt difficulty should have as approach rate increases.
-            // https://www.desmos.com/calculator/qmqxuukqqe
+            // https://www.desmos.com/calculator/c175335a71
             preemptDifficulty += preempt > 475 ? 0 : Math.Pow(475 - preempt, 2.5) / preempt_balancing_factor;
 
             preemptDifficulty *= constantAngleNerfFactor * velocity;
@@ -114,7 +119,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         }
 
         // Returns the density of objects visible at the point in time the current object needs to be clicked.
-        private static double getCurrentVisibleObjectFactor(int totalObjects, OsuDifficultyHitObject current, double preempt)
+        private static double retrieveCurrentVisibleObjects(int totalObjects, OsuDifficultyHitObject current, double preempt)
         {
             double visibleObjectCount = 0;
 
@@ -149,7 +154,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
         // Returns a factor of how often the current object's angle has been repeated in a certain time frame.
         // It does this by checking the difference in angle between current and past objects and sums them based on a range of similarity.
-        // https://www.desmos.com/calculator/cjlvp8pjah
+        // https://www.desmos.com/calculator/eb057a4822
         private static double getConstantAngleNerfFactor(OsuDifficultyHitObject current)
         {
             const double time_limit = 2000; // 2 seconds
