@@ -415,6 +415,8 @@ namespace osu.Game.Screens.SelectV2
             }
 
             protected override bool OnMouseDown(MouseDownEvent e) => true;
+
+            protected override bool OnHover(HoverEvent e) => true;
         }
     }
 }
