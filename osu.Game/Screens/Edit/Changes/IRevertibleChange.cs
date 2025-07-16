@@ -23,8 +23,10 @@ namespace osu.Game.Screens.Edit.Changes
     {
         public static void Apply(this IRevertibleChange change, HitObjectChangeHandler? changeHandler)
         {
+            changeHandler?.BeginChange();
             change.Apply();
             changeHandler?.Record(change);
+            changeHandler?.EndChange();
         }
     }
 }
