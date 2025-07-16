@@ -14,7 +14,7 @@ namespace osu.Game.Screens.Edit
 {
     public class BindableBeatDivisor : BindableInt
     {
-        public static readonly int[] PREDEFINED_DIVISORS = { 1, 2, 3, 4, 6, 8, 12, 16 };
+        public static readonly int[] PREDEFINED_DIVISORS = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 16 };
 
         public const int MINIMUM_DIVISOR = 1;
         public const int MAXIMUM_DIVISOR = 64;

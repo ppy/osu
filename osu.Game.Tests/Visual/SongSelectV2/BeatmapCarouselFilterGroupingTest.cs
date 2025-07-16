@@ -263,8 +263,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             var results = await runGrouping(GroupMode.Difficulty, beatmapSets);
             assertGroup(results, 0, "Below 1 Star", new[] { beatmapBelow1 }, ref total);
-            assertGroup(results, 1, "1 Star", new[] { beatmapAbove1 }, ref total);
-            assertGroup(results, 2, "2 Stars", new[] { beatmapAlmost2, beatmap2, beatmapAbove2 }, ref total);
+            assertGroup(results, 1, "1 Star", new[] { beatmapAbove1, beatmapAlmost2 }, ref total);
+            assertGroup(results, 2, "2 Stars", new[] { beatmap2, beatmapAbove2 }, ref total);
             assertGroup(results, 3, "7 Stars", new[] { beatmap7 }, ref total);
             assertTotal(results, total);
         }
@@ -333,22 +333,32 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
         #endregion
 
+        #region Source grouping
+
+        [Test]
+        public async Task TestGroupingBySource()
+        {
+            int total = 0;
+
+            var beatmapSets = new List<BeatmapSetInfo>();
+            addBeatmapSet(s => s.Beatmaps[0].Metadata.Source = "Cool Game", beatmapSets, out var beatmapCoolGame);
+            addBeatmapSet(s => s.Beatmaps[0].Metadata.Source = "Cool game", beatmapSets, out var beatmapCoolGameB);
+            addBeatmapSet(s => s.Beatmaps[0].Metadata.Source = "Nice Movie", beatmapSets, out var beatmapNiceMovie);
+            addBeatmapSet(s => s.Beatmaps[0].Metadata.Source = string.Empty, beatmapSets, out var beatmapUnsourced);
+
+            var results = await runGrouping(GroupMode.Source, beatmapSets);
+            assertGroup(results, 0, "Cool Game", new[] { beatmapCoolGame, beatmapCoolGameB }, ref total);
+            assertGroup(results, 1, "Nice Movie", new[] { beatmapNiceMovie }, ref total);
+            assertGroup(results, 2, "Unsourced", new[] { beatmapUnsourced }, ref total);
+            assertTotal(results, total);
+        }
+
+        #endregion
+
         private static async Task<List<CarouselItem>> runGrouping(GroupMode group, List<BeatmapSetInfo> beatmapSets)
         {
             var groupingFilter = new BeatmapCarouselFilterGrouping(() => new FilterCriteria { Group = group });
-            var carouselItems = await groupingFilter.Run(beatmapSets.SelectMany(s => s.Beatmaps.Select(b => new CarouselItem(b))).ToList(), CancellationToken.None);
-
-            // sanity check to ensure no detection of two group items with equal order value.
-            var groups = carouselItems.Select(i => i.Model).OfType<GroupDefinition>();
-
-            foreach (var header in groups)
-            {
-                var sameOrder = groups.FirstOrDefault(g => g != header && g.Order == header.Order);
-                if (sameOrder != null)
-                    Assert.Fail($"Detected two groups with equal order number: \"{header.Title}\" vs. \"{sameOrder.Title}\"");
-            }
-
-            return carouselItems;
+            return await groupingFilter.Run(beatmapSets.SelectMany(s => s.Beatmaps.Select(b => new CarouselItem(b))).ToList(), CancellationToken.None);
         }
 
         private static void assertGroup(List<CarouselItem> items, int index, string expectedTitle, IEnumerable<BeatmapSetInfo> expectedBeatmapSets, ref int totalItems)

@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -13,8 +14,10 @@ using osu.Framework.Graphics.Pooling;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Carousel;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osuTK;
@@ -37,10 +40,13 @@ namespace osu.Game.Screens.SelectV2
         private Container backgroundLayerHorizontalPadding = null!;
         private Container backgroundContainer = null!;
         private Container iconContainer = null!;
-        private Box activationFlash = null!;
-        private Box hoverLayer = null!;
-        private Box keyboardSelectionLayer = null!;
-        private Box selectionLayer = null!;
+
+        private Drawable activationFlash = null!;
+        private Drawable hoverLayer = null!;
+
+        private Drawable keyboardSelectionLayer = null!;
+
+        private PulsatingBox selectionLayer = null!;
 
         public Container TopLevelContent { get; private set; } = null!;
 
@@ -63,15 +69,30 @@ namespace osu.Game.Screens.SelectV2
             get => accentColour;
             set
             {
+                if (value == accentColour)
+                    return;
+
                 accentColour = value;
                 updateAccentColour();
             }
         }
 
-        // content is offset by PanelXOffset, make sure we only handle input at the actual visible
-        // offset region.
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
-            TopLevelContent.ReceivePositionalInputAt(screenSpacePos);
+        public sealed override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
+        {
+            if (item == null)
+                return TopLevelContent.ReceivePositionalInputAt(screenSpacePos);
+
+            var inputRectangle = TopLevelContent.DrawRectangle;
+
+            // Cover the gaps introduced by the spacing between panels so that user mis-aims don't result in no-ops.
+            inputRectangle = inputRectangle.Inflate(new MarginPadding
+            {
+                Top = item.CarouselInputLenienceAbove,
+                Bottom = item.CarouselInputLenienceBelow,
+            });
+
+            return inputRectangle.Contains(TopLevelContent.ToLocalSpace(screenSpacePos));
+        }
 
         [Resolved]
         private BeatmapCarousel? carousel { get; set; }
@@ -97,37 +118,30 @@ namespace osu.Game.Screens.SelectV2
                     Hollow = true,
                     Radius = 2,
                 },
-                Children = new Drawable[]
+                Children = new[]
                 {
-                    new BufferedContainer
+                    backgroundBorder = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Children = new Drawable[]
+                        Colour = Color4.Black,
+                    },
+                    backgroundLayerHorizontalPadding = new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Child = new Container
                         {
-                            backgroundBorder = new Box
+                            RelativeSizeAxes = Axes.Both,
+                            Masking = true,
+                            CornerRadius = corner_radius,
+                            Children = new Drawable[]
                             {
-                                RelativeSizeAxes = Axes.Both,
-                                Colour = Color4.Black,
-                            },
-                            backgroundLayerHorizontalPadding = new Container
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Child = new Container
+                                backgroundGradient = new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Masking = true,
-                                    CornerRadius = corner_radius,
-                                    Children = new Drawable[]
-                                    {
-                                        backgroundGradient = new Box
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                        },
-                                        backgroundContainer = new Container
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                        },
-                                    }
+                                },
+                                backgroundContainer = new Container
+                                {
+                                    RelativeSizeAxes = Axes.Both,
                                 },
                             }
                         },
@@ -150,11 +164,11 @@ namespace osu.Game.Screens.SelectV2
                         Blending = BlendingParameters.Additive,
                         RelativeSizeAxes = Axes.Both,
                     },
-                    selectionLayer = new Box
+                    selectionLayer = new PulsatingBox
                     {
                         Alpha = 0,
                         RelativeSizeAxes = Axes.Both,
-                        Width = 0.6f,
+                        Width = 0.8f,
                         Blending = BlendingParameters.Additive,
                         Anchor = Anchor.TopRight,
                         Origin = Anchor.TopRight,
@@ -162,7 +176,7 @@ namespace osu.Game.Screens.SelectV2
                     keyboardSelectionLayer = new Box
                     {
                         Alpha = 0,
-                        Colour = colourProvider.Highlight1.Opacity(0.1f),
+                        Colour = ColourInfo.GradientHorizontal(colourProvider.Highlight1.Opacity(0.1f), colourProvider.Highlight1.Opacity(0.4f)),
                         Blending = BlendingParameters.Additive,
                         RelativeSizeAxes = Axes.Both,
                     },
@@ -178,6 +192,51 @@ namespace osu.Game.Screens.SelectV2
             };
 
             backgroundGradient.Colour = ColourInfo.GradientHorizontal(colourProvider.Background3, colourProvider.Background4);
+        }
+
+        public partial class PulsatingBox : BeatSyncedContainer
+        {
+            public double FlashOffset;
+
+            private readonly Box box;
+
+            public PulsatingBox()
+            {
+                EarlyActivationMilliseconds = 50;
+
+                InternalChildren = new Drawable[]
+                {
+                    box = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                    },
+                };
+            }
+
+            private int separation = 1;
+
+            protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
+            {
+                base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
+
+                if (beatIndex % separation != 0)
+                    return;
+
+                double length = timingPoint.BeatLength;
+                separation = 1;
+
+                while (length < 500)
+                {
+                    length *= 2;
+                    separation *= 2;
+                }
+
+                box
+                    .Delay(FlashOffset)
+                    .FadeTo(0.8f, length / 6, Easing.Out)
+                    .Then()
+                    .FadeTo(0.4f, length, Easing.Out);
+            }
         }
 
         protected override void LoadComplete()
@@ -199,7 +258,11 @@ namespace osu.Game.Screens.SelectV2
             KeyboardSelected.BindValueChanged(selected =>
             {
                 if (selected.NewValue)
-                    keyboardSelectionLayer.FadeIn(100, Easing.OutQuint);
+                {
+                    keyboardSelectionLayer.FadeIn(80, Easing.Out)
+                                          .Then()
+                                          .FadeTo(0.5f, 2000, Easing.OutQuint);
+                }
                 else
                     keyboardSelectionLayer.FadeOut(1000, Easing.OutQuint);
 
@@ -211,8 +274,14 @@ namespace osu.Game.Screens.SelectV2
         {
             base.PrepareForUse();
 
+            // Slightly offset the flash animation based on the panel depth.
+            // This assumes a minimum depth of -2 (groups).
+            selectionLayer.FlashOffset = (2 + Item!.DepthLayer) * 50;
+
             updateAccentColour();
-            updateXOffset();
+
+            updateXOffset(animated: false);
+            updateSelectedState(animated: false);
 
             this.FadeIn(DURATION, Easing.OutQuint);
         }
@@ -257,13 +326,13 @@ namespace osu.Game.Screens.SelectV2
                 selectionLayer.FadeOut(200, Easing.OutQuint);
         }
 
-        private void updateXOffset()
+        private void updateXOffset(bool animated = true)
         {
             float x = PanelXOffset + corner_radius;
 
             if (!Expanded.Value && !Selected.Value)
             {
-                if (this is PanelBeatmap)
+                if (this is PanelBeatmap || this is PanelBeatmapStandalone)
                     x += active_x_offset * 2;
                 else
                     x += active_x_offset * 4;
@@ -272,7 +341,7 @@ namespace osu.Game.Screens.SelectV2
             if (!KeyboardSelected.Value)
                 x += active_x_offset;
 
-            TopLevelContent.MoveToX(x, DURATION, Easing.OutQuint);
+            TopLevelContent.MoveToX(x, animated ? DURATION : 0, Easing.OutQuint);
         }
 
         protected override bool OnHover(HoverEvent e)

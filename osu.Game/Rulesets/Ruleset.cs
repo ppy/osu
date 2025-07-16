@@ -382,15 +382,15 @@ namespace osu.Game.Rulesets
         public virtual LocalisableString GetDisplayNameForHitResult(HitResult result) => result.GetLocalisableDescription();
 
         /// <summary>
-        /// Applies changes to difficulty attributes for presenting to a user a rough estimate of how rate adjust mods affect difficulty.
+        /// Applies changes to difficulty attributes for presenting to a user a rough estimate of how mods affect difficulty.
         /// Importantly, this should NOT BE USED FOR ANY CALCULATIONS.
         ///
         /// It is also not always correct, and arguably is never correct depending on your frame of mind.
         /// </summary>
         /// <param name="difficulty">>The <see cref="IBeatmapDifficultyInfo"/> that will be adjusted.</param>
-        /// <param name="rate">The rate adjustment multiplier from mods. For example 1.5 for DT.</param>
+        /// <param name="mods">The active mods.</param>
         /// <returns>The adjusted difficulty attributes.</returns>
-        public virtual BeatmapDifficulty GetRateAdjustedDisplayDifficulty(IBeatmapDifficultyInfo difficulty, double rate) => new BeatmapDifficulty(difficulty);
+        public virtual BeatmapDifficulty GetAdjustedDisplayDifficulty(IBeatmapDifficultyInfo difficulty, IReadOnlyCollection<Mod> mods) => new BeatmapDifficulty(difficulty);
 
         /// <summary>
         /// Creates ruleset-specific beatmap filter criteria to be used on the song select screen.

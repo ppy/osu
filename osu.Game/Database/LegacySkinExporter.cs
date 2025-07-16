@@ -13,6 +13,8 @@ namespace osu.Game.Database
         {
         }
 
+        protected override bool UseFixedEncoding => false;
+
         protected override string FileExtension => @".osk";
     }
 }
