@@ -59,34 +59,21 @@ namespace osu.Game.Screens.Edit
         }
 
         /// <summary>
-        /// Submits a change to be applied and added to the history.
+        /// Adds a change to the history. The change should be applied before this method is called.
         /// </summary>
-        /// <param name="change">Change to be applied.</param>
-        /// <param name="commitImmediately">Whether to commit the current transaction and push it onto the undo stack immediately.</param>
-        public void Submit(IRevertibleChange change, bool commitImmediately = false)
+        /// <param name="change">Change to be recorded.</param>
+        public void Record(IRevertibleChange change)
         {
-            if (commitImmediately)
-                BeginChange();
-
-            change.Apply();
-            Record(change);
-
-            if (commitImmediately)
-                EndChange();
+            currentTransaction.Add(change);
         }
 
         /// <summary>
-        /// Submits a collection of changes to be applied and added to the history.
+        /// Records to the history that a <see cref="HitObject"/> has been changed. This makes sure hit objects are properly updated on undo/redo operations.
         /// </summary>
-        /// <param name="changes">Changes to be applied.</param>
-        /// <param name="commitImmediately">Whether to commit the current transaction and push it onto the undo stack immediately.</param>
-        public void Submit(IEnumerable<IRevertibleChange> changes, bool commitImmediately = false)
+        /// <param name="hitObject">Hit object which was changed.</param>
+        public void RecordUpdate(HitObject hitObject)
         {
-            foreach (var change in changes)
-                Submit(change);
-
-            if (commitImmediately)
-                UpdateState();
+            currentTransaction.RecordUpdate(hitObject);
         }
 
         protected override void UpdateState()
@@ -231,20 +218,6 @@ namespace osu.Game.Screens.Edit
         {
             CanUndo.Value = undoStack.Count > 0;
             CanRedo.Value = redoStack.Count > 0;
-        }
-
-        /// <summary>
-        /// Adds a change to the history but does not apply it.
-        /// </summary>
-        /// <param name="change">Change to be recorded.</param>
-        public void Record(IRevertibleChange change)
-        {
-            currentTransaction.Add(change);
-        }
-
-        public void RecordUpdate(HitObject hitObject)
-        {
-            currentTransaction.RecordUpdate(hitObject);
         }
 
         private readonly struct Transaction
