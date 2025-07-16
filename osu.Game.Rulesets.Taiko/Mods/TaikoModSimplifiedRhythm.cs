@@ -20,7 +20,6 @@ namespace osu.Game.Rulesets.Taiko.Mods
         public override string Name => "Simplified Rhythm";
         public override string Acronym => "SR";
         public override double ScoreMultiplier => 0.6;
-
         public override LocalisableString Description => "Simplify tricky rhythms!";
         public override ModType Type => ModType.DifficultyReduction;
 
