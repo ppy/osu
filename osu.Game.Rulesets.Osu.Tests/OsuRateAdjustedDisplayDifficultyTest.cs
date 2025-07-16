@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Osu.Mods;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
@@ -22,7 +23,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             var ruleset = new OsuRuleset();
             var difficulty = new BeatmapDifficulty { ApproachRate = originalApproachRate };
 
-            var adjustedDifficulty = ruleset.GetRateAdjustedDisplayDifficulty(difficulty, 1);
+            var adjustedDifficulty = ruleset.GetAdjustedDisplayDifficulty(difficulty, []);
 
             Assert.That(adjustedDifficulty.ApproachRate, Is.EqualTo(originalApproachRate));
         }
@@ -33,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             var ruleset = new OsuRuleset();
             var difficulty = new BeatmapDifficulty { OverallDifficulty = originalOverallDifficulty };
 
-            var adjustedDifficulty = ruleset.GetRateAdjustedDisplayDifficulty(difficulty, 1);
+            var adjustedDifficulty = ruleset.GetAdjustedDisplayDifficulty(difficulty, []);
 
             Assert.That(adjustedDifficulty.OverallDifficulty, Is.EqualTo(originalOverallDifficulty));
         }
@@ -44,7 +45,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             var ruleset = new OsuRuleset();
             var difficulty = new BeatmapDifficulty();
 
-            var adjustedDifficulty = ruleset.GetRateAdjustedDisplayDifficulty(difficulty, 0.75);
+            var adjustedDifficulty = ruleset.GetAdjustedDisplayDifficulty(difficulty, [new OsuModHalfTime()]);
 
             Assert.That(adjustedDifficulty.ApproachRate, Is.EqualTo(1.67).Within(0.01));
             Assert.That(adjustedDifficulty.OverallDifficulty, Is.EqualTo(2.22).Within(0.01));
@@ -56,7 +57,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             var ruleset = new OsuRuleset();
             var difficulty = new BeatmapDifficulty();
 
-            var adjustedDifficulty = ruleset.GetRateAdjustedDisplayDifficulty(difficulty, 1.5);
+            var adjustedDifficulty = ruleset.GetAdjustedDisplayDifficulty(difficulty, [new OsuModDoubleTime()]);
 
             Assert.That(adjustedDifficulty.ApproachRate, Is.EqualTo(7.67).Within(0.01));
             Assert.That(adjustedDifficulty.OverallDifficulty, Is.EqualTo(7.77).Within(0.01));
