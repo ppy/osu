@@ -21,10 +21,10 @@ namespace osu.Game.Screens.Edit.Changes
             this.snapProvider = snapProvider;
         }
 
-        protected override void SubmitChanges()
+        protected override void ApplyChanges()
         {
             double newDistance = snapProvider?.FindSnappedDistance((float)hitObject.Path.CalculatedDistance, hitObject.StartTime, hitObject) ?? hitObject.Path.CalculatedDistance;
-            Submit(new ExpectedDistanceChange(hitObject.Path, newDistance));
+            Apply(new ExpectedDistanceChange(hitObject.Path, newDistance));
         }
     }
 }

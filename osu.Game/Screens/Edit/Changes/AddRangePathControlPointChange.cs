@@ -21,10 +21,10 @@ namespace osu.Game.Screens.Edit.Changes
             this.points = points;
         }
 
-        protected override void SubmitChanges()
+        protected override void ApplyChanges()
         {
             foreach (var point in points)
-                Submit(new InsertPathControlPointChange(controlPoints, controlPoints.Count, point));
+                Apply(new InsertPathControlPointChange(controlPoints, controlPoints.Count, point));
         }
     }
 }

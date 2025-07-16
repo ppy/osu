@@ -8,7 +8,7 @@ namespace osu.Game.Screens.Edit.Changes
     /// <summary>
     /// This class provides a way to create more complex subroutines that consist of multiple <see cref="IRevertibleChange"/>s,
     /// while it itself can be used like any other <see cref="IRevertibleChange"/>.
-    /// This is not meant to replace transactions, but rather for grouping multiple changes together.
+    /// This is not meant to replace transactions, but rather for grouping multiple changes together within a transaction.
     /// </summary>
     public abstract class CompositeChange : IRevertibleChange
     {
@@ -19,7 +19,7 @@ namespace osu.Game.Screens.Edit.Changes
             if (changes == null)
             {
                 changes = new List<IRevertibleChange>();
-                SubmitChanges();
+                ApplyChanges();
                 return;
             }
 
@@ -36,16 +36,20 @@ namespace osu.Game.Screens.Edit.Changes
                 changes[i].Revert();
         }
 
-        protected void Submit(IRevertibleChange change)
+        /// <summary>
+        /// Applies the given <see cref="IRevertibleChange"/> and records it in this <see cref="CompositeChange"/>.
+        /// </summary>
+        /// <param name="change">The <see cref="IRevertibleChange"/> to apply and record.</param>
+        protected void Apply(IRevertibleChange change)
         {
             change.Apply();
             changes!.Add(change);
         }
 
         /// <summary>
-        /// Applies the tracks the changes of this <see cref="CompositeChange"/>.
+        /// Applies and records the changes of this <see cref="CompositeChange"/>.
         /// </summary>
-        /// <remarks>Use <see cref="Submit"/> to apply the <see cref="IRevertibleChange"/> created in this method.</remarks>
-        protected abstract void SubmitChanges();
+        /// <remarks>Use <see cref="Apply(IRevertibleChange)"/> to apply the <see cref="IRevertibleChange"/> created in this method.</remarks>
+        protected abstract void ApplyChanges();
     }
 }

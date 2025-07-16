@@ -30,7 +30,7 @@ namespace osu.Game.Screens.Edit.Changes
             this.sliderPath = sliderPath;
         }
 
-        protected override void SubmitChanges()
+        protected override void ApplyChanges()
         {
             var controlPoints = sliderPath.ControlPoints;
 
@@ -38,7 +38,7 @@ namespace osu.Game.Screens.Edit.Changes
 
             // Inherited points after a linear point, as well as the first control point if it inherited,
             // should be treated as linear points, so their types are temporarily changed to linear.
-            inheritedLinearPoints.ForEach(p => Submit(new PathControlPointTypeChange(p, PathType.LINEAR)));
+            inheritedLinearPoints.ForEach(p => Apply(new PathControlPointTypeChange(p, PathType.LINEAR)));
 
             double[] segmentEnds = sliderPath.GetSegmentEnds().ToArray();
 
@@ -51,11 +51,11 @@ namespace osu.Game.Screens.Edit.Changes
                     segmentEnds = segmentEnds[..^1];
                 }
 
-                Submit(new RemovePathControlPointChange(controlPoints, controlPoints.Count - 1));
+                Apply(new RemovePathControlPointChange(controlPoints, controlPoints.Count - 1));
             }
 
             // Restore original control point types.
-            inheritedLinearPoints.ForEach(p => Submit(new PathControlPointTypeChange(p, null)));
+            inheritedLinearPoints.ForEach(p => Apply(new PathControlPointTypeChange(p, null)));
 
             // Recalculate middle perfect curve control points at the end of the slider path.
             if (controlPoints.Count >= 3 && controlPoints[^3].Type == PathType.PERFECT_CURVE && controlPoints[^2].Type == null && segmentEnds.Any())
@@ -66,7 +66,7 @@ namespace osu.Game.Screens.Edit.Changes
                 var circleArcPath = new List<Vector2>();
                 sliderPath.GetPathToProgress(circleArcPath, lastSegmentStart / lastSegmentEnd, 1);
 
-                Submit(new PathControlPointPositionChange(controlPoints[^2], circleArcPath[circleArcPath.Count / 2]));
+                Apply(new PathControlPointPositionChange(controlPoints[^2], circleArcPath[circleArcPath.Count / 2]));
             }
 
             reverseControlPoints();
@@ -77,7 +77,7 @@ namespace osu.Game.Screens.Edit.Changes
             var points = sliderPath.ControlPoints.ToArray();
             PositionalOffset = sliderPath.PositionAt(1);
 
-            Submit(new RemoveRangePathControlPointChange(sliderPath.ControlPoints, 0, sliderPath.ControlPoints.Count));
+            Apply(new RemoveRangePathControlPointChange(sliderPath.ControlPoints, 0, sliderPath.ControlPoints.Count));
 
             PathType? lastType = null;
 
@@ -95,7 +95,7 @@ namespace osu.Game.Screens.Edit.Changes
                 else if (p.Type != null)
                     (p.Type, lastType) = (lastType, p.Type);
 
-                Submit(new InsertPathControlPointChange(sliderPath.ControlPoints, 0, p));
+                Apply(new InsertPathControlPointChange(sliderPath.ControlPoints, 0, p));
             }
         }
     }

@@ -21,11 +21,11 @@ namespace osu.Game.Screens.Edit.Changes
             this.hitObjects = hitObjects.ToArray();
         }
 
-        protected override void SubmitChanges()
+        protected override void ApplyChanges()
         {
             beatmap.BeginChange();
             foreach (var h in hitObjects)
-                Submit(new AddHitObjectChange(beatmap, h));
+                Apply(new AddHitObjectChange(beatmap, h));
             beatmap.EndChange();
         }
     }

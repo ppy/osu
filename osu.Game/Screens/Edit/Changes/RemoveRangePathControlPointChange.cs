@@ -22,10 +22,10 @@ namespace osu.Game.Screens.Edit.Changes
             this.count = count;
         }
 
-        protected override void SubmitChanges()
+        protected override void ApplyChanges()
         {
             for (int i = 0; i < count; i++)
-                Submit(new RemovePathControlPointChange(controlPoints, startIndex));
+                Apply(new RemovePathControlPointChange(controlPoints, startIndex));
         }
     }
 }

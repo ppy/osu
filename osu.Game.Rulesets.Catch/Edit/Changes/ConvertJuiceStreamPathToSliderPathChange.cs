@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Changes
             this.velocity = velocity;
         }
 
-        protected override void SubmitChanges()
+        protected override void ApplyChanges()
         {
             const float margin = 1;
 
@@ -46,12 +46,12 @@ namespace osu.Game.Rulesets.Catch.Edit.Changes
             double currentTime = 0;
             Vector2 lastPosition = new Vector2(path.Vertices[0].X, 0);
 
-            Submit(new RemoveRangePathControlPointChange(sliderPath.ControlPoints, 0, sliderPath.ControlPoints.Count));
-            Submit(new InsertPathControlPointChange(sliderPath.ControlPoints, 0, new PathControlPoint(lastPosition)));
+            Apply(new RemoveRangePathControlPointChange(sliderPath.ControlPoints, 0, sliderPath.ControlPoints.Count));
+            Apply(new InsertPathControlPointChange(sliderPath.ControlPoints, 0, new PathControlPoint(lastPosition)));
 
             for (int i = 1; i < path.Vertices.Count; i++)
             {
-                Submit(new PathControlPointTypeChange(sliderPath.ControlPoints[^1], PathType.LINEAR));
+                Apply(new PathControlPointTypeChange(sliderPath.ControlPoints[^1], PathType.LINEAR));
 
                 float deltaX = path.Vertices[i].X - lastPosition.X;
                 double length = (path.Vertices[i].Time - currentTime) * velocity;
@@ -96,7 +96,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Changes
             void addControlPoint(float nextX, float nextY)
             {
                 Vector2 nextPosition = new Vector2(nextX, nextY);
-                Submit(new InsertPathControlPointChange(sliderPath.ControlPoints, sliderPath.ControlPoints.Count, new PathControlPoint(nextPosition)));
+                Apply(new InsertPathControlPointChange(sliderPath.ControlPoints, sliderPath.ControlPoints.Count, new PathControlPoint(nextPosition)));
                 currentTime += Vector2.Distance(lastPosition, nextPosition) / velocity;
                 lastPosition = nextPosition;
             }
