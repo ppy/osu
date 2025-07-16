@@ -40,7 +40,11 @@ namespace osu.Game.Screens.Footer
 
         private const int padding = 60;
         private const float delay_per_button = 30;
-        private const double transition_duration = 400;
+        private const double transition_duration = 500;
+
+        // Disable masking because it breaks due to the height of this container being less than the displayed content.
+        // The height being set as it is is required for transition purposes.
+        public override bool UpdateSubTreeMasking() => false;
 
         private readonly List<OverlayContainer> overlays = new List<OverlayContainer>();
 
@@ -100,7 +104,7 @@ namespace osu.Game.Screens.Footer
                             {
                                 Anchor = Anchor.BottomLeft,
                                 Origin = Anchor.BottomLeft,
-                                Y = ScreenFooterButton.Y_OFFSET,
+                                Y = ScreenFooterButton.CORNER_RADIUS,
                                 Direction = FillDirection.Horizontal,
                                 Spacing = new Vector2(7, 0),
                                 AutoSizeAxes = Axes.Both,
@@ -123,7 +127,7 @@ namespace osu.Game.Screens.Footer
                 hiddenButtonsContainer = new Container<ScreenFooterButton>
                 {
                     Margin = new MarginPadding { Left = OsuGame.SCREEN_EDGE_MARGIN + ScreenBackButton.BUTTON_WIDTH + padding },
-                    Y = ScreenFooterButton.Y_OFFSET,
+                    Y = ScreenFooterButton.CORNER_RADIUS,
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                     AutoSizeAxes = Axes.Both,
@@ -162,13 +166,14 @@ namespace osu.Game.Screens.Footer
         protected override void PopIn()
         {
             this.MoveToY(0, transition_duration, Easing.OutQuint)
-                .FadeIn(transition_duration, Easing.OutQuint);
+                .FadeIn();
         }
 
         protected override void PopOut()
         {
-            this.MoveToY(HEIGHT, transition_duration, Easing.OutQuint)
-                .FadeOut(transition_duration, Easing.OutQuint);
+            this.MoveToY(ScreenFooterButton.HEIGHT, transition_duration, Easing.OutQuint)
+                .Then()
+                .FadeOut();
         }
 
         public void SetButtons(IReadOnlyList<ScreenFooterButton> buttons)
@@ -221,20 +226,21 @@ namespace osu.Game.Screens.Footer
             }
         }
 
-        private ShearedOverlayContainer? activeOverlay;
+        public ShearedOverlayContainer? ActiveOverlay { get; private set; }
+
         private VisibilityContainer? activeFooterContent;
 
         private readonly List<ScreenFooterButton> temporarilyHiddenButtons = new List<ScreenFooterButton>();
 
         public IDisposable RegisterActiveOverlayContainer(ShearedOverlayContainer overlay, out VisibilityContainer? footerContent)
         {
-            if (activeOverlay != null)
+            if (ActiveOverlay != null)
             {
                 throw new InvalidOperationException(@"Cannot set overlay content while one is already present. " +
-                                                    $@"The previous overlay ({activeOverlay.GetType().Name}) should be hidden first.");
+                                                    $@"The previous overlay ({ActiveOverlay.GetType().Name}) should be hidden first.");
             }
 
-            activeOverlay = overlay;
+            ActiveOverlay = overlay;
 
             Debug.Assert(temporarilyHiddenButtons.Count == 0);
 
@@ -272,7 +278,7 @@ namespace osu.Game.Screens.Footer
 
         private void clearActiveOverlayContainer()
         {
-            if (activeOverlay == null)
+            if (ActiveOverlay == null)
                 return;
 
             Debug.Assert(activeFooterContent != null);
@@ -295,7 +301,7 @@ namespace osu.Game.Screens.Footer
 
             activeFooterContent.Delay(timeUntilRun).Expire();
             activeFooterContent = null;
-            activeOverlay = null;
+            ActiveOverlay = null;
         }
 
         private void updateColourScheme(int hue)
@@ -332,12 +338,12 @@ namespace osu.Game.Screens.Footer
 
         private void onBackPressed()
         {
-            if (activeOverlay != null)
+            if (ActiveOverlay != null)
             {
-                if (activeOverlay.OnBackButton())
+                if (ActiveOverlay.OnBackButton())
                     return;
 
-                activeOverlay.Hide();
+                ActiveOverlay.Hide();
                 return;
             }
 

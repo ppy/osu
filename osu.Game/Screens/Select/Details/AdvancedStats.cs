@@ -185,9 +185,7 @@ namespace osu.Game.Screens.Select.Details
 
                 if (Ruleset.Value != null)
                 {
-                    double rate = ModUtils.CalculateRateWithMods(Mods.Value);
-
-                    adjustedDifficulty = Ruleset.Value.CreateInstance().GetRateAdjustedDisplayDifficulty(originalDifficulty, rate);
+                    adjustedDifficulty = Ruleset.Value.CreateInstance().GetAdjustedDisplayDifficulty(originalDifficulty, Mods.Value);
 
                     TooltipContent = new AdjustedAttributesTooltip.Data(originalDifficulty, adjustedDifficulty);
                 }
@@ -251,7 +249,7 @@ namespace osu.Game.Screens.Select.Details
                 if (normalDifficulty == null || moddedDifficulty == null)
                     return;
 
-                starDifficulty.Value = ((float)normalDifficulty.Value.Stars, (float)moddedDifficulty.Value.Stars);
+                starDifficulty.Value = ((float)normalDifficulty.Value.Stars.FloorToDecimalDigits(2), (float)moddedDifficulty.Value.Stars.FloorToDecimalDigits(2));
             }), starDifficultyCancellationSource.Token, TaskContinuationOptions.OnlyOnRanToCompletion, TaskScheduler.Current);
         });
 

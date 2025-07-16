@@ -335,11 +335,14 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 ArrayPool<(PathType, int)>.Shared.Return(segmentsBuffer);
             }
 
-            static Vector2 readPoint(string value, Vector2 startPos)
+            Vector2 readPoint(string value, Vector2 startPos)
             {
                 string[] vertexSplit = value.Split(':');
 
-                Vector2 pos = new Vector2((int)Parsing.ParseDouble(vertexSplit[0], Parsing.MAX_COORDINATE_VALUE), (int)Parsing.ParseDouble(vertexSplit[1], Parsing.MAX_COORDINATE_VALUE)) - startPos;
+                Vector2 pos = formatVersion >= LegacyBeatmapEncoder.FIRST_LAZER_VERSION
+                    ? new Vector2(Parsing.ParseFloat(vertexSplit[0], Parsing.MAX_COORDINATE_VALUE), Parsing.ParseFloat(vertexSplit[1], Parsing.MAX_COORDINATE_VALUE))
+                    : new Vector2((int)Parsing.ParseFloat(vertexSplit[0], Parsing.MAX_COORDINATE_VALUE), (int)Parsing.ParseFloat(vertexSplit[1], Parsing.MAX_COORDINATE_VALUE));
+                pos -= startPos;
                 return pos;
             }
         }
