@@ -4,7 +4,7 @@
 namespace osu.Game.Screens.Edit.Changes
 {
     /// <summary>
-    /// Represents a change which can be undone.
+    /// Represents a single atomic change which can be undone and saved to undo history.
     /// </summary>
     public interface IRevertibleChange
     {

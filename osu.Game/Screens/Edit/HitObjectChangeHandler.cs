@@ -230,6 +230,9 @@ namespace osu.Game.Screens.Edit
             CanRedo.Value = redoStack.Count > 0;
         }
 
+        /// <summary>
+        /// A transaction is a collection of revertible changes that represent a single undo step.
+        /// </summary>
         private readonly struct Transaction
         {
             public Transaction()

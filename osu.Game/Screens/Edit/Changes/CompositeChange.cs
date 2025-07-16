@@ -5,6 +5,11 @@ using System.Collections.Generic;
 
 namespace osu.Game.Screens.Edit.Changes
 {
+    /// <summary>
+    /// This class provides a way to create more complex subroutines that consist of multiple <see cref="IRevertibleChange"/>s,
+    /// while it itself can be used like any other <see cref="IRevertibleChange"/>.
+    /// This is not meant to replace transactions, but rather for grouping multiple changes together.
+    /// </summary>
     public abstract class CompositeChange : IRevertibleChange
     {
         private List<IRevertibleChange>? changes;
