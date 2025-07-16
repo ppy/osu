@@ -16,15 +16,15 @@ namespace osu.Game.Screens.Edit
     /// This is supposed to eventually replace the <see cref="EditorChangeHandler"/> and its inheritors once all the editor operations have been refactored.
     /// </summary>
     /// <inheritdoc/>
-    public partial class HitObjectChangeHandler : TransactionalCommitComponent
+    public partial class HitObjectChangeHandler : TransactionalCommitComponent, IBeatmapEditorChangeHandler
     {
-        private readonly EditorBeatmap editorBeatmap;
+        private readonly IBeatmapEditorChangeHandler? changeHandler;
 
         /// <summary>
         /// This change handler will be suppressed while a transaction with this command handler is in progress.
         /// Any save states of this change handler will be added to the undo stack.
         /// </summary>
-        private readonly EditorChangeHandler? changeHandler;
+        private readonly EditorChangeHandler? oldChangeHandler;
 
         public readonly Bindable<bool> CanUndo = new BindableBool();
 
@@ -44,18 +44,19 @@ namespace osu.Game.Screens.Edit
 
         private bool isRestoring;
 
-        public HitObjectChangeHandler(EditorBeatmap editorBeatmap, EditorChangeHandler? changeHandler = null)
+        public HitObjectChangeHandler(IBeatmapEditorChangeHandler? changeHandler = null, EditorChangeHandler? oldChangeHandler = null)
         {
             currentTransaction = new Transaction();
-            this.editorBeatmap = editorBeatmap;
             this.changeHandler = changeHandler;
+            this.oldChangeHandler = oldChangeHandler;
 
-            editorBeatmap.TransactionBegan += BeginChange;
-            editorBeatmap.TransactionEnded += EndChange;
-            editorBeatmap.SaveStateTriggered += SaveState;
+            if (this.oldChangeHandler != null)
+                this.oldChangeHandler.OnStateChange += commitOldChangeHandlerStateChange;
+        }
 
-            if (this.changeHandler != null)
-                this.changeHandler.OnStateChange += commitChangeHandlerStateChange;
+        public void RestoreState(int direction)
+        {
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -64,6 +65,9 @@ namespace osu.Game.Screens.Edit
         /// <param name="change">Change to be recorded.</param>
         public void Record(IRevertibleChange change)
         {
+            if (isRestoring)
+                return;
+
             currentTransaction.Add(change);
         }
 
@@ -71,8 +75,11 @@ namespace osu.Game.Screens.Edit
         /// Records to the history that a <see cref="HitObject"/> has been changed. This makes sure hit objects are properly updated on undo/redo operations.
         /// </summary>
         /// <param name="hitObject">Hit object which was changed.</param>
-        public void RecordUpdate(HitObject hitObject)
+        public void Update(HitObject hitObject)
         {
+            if (isRestoring)
+                return;
+
             currentTransaction.RecordUpdate(hitObject);
         }
 
@@ -98,9 +105,9 @@ namespace osu.Game.Screens.Edit
         /// <summary>
         /// This method will be removed once the <see cref="EditorChangeHandler"/> is fully replaced by this change handler.
         /// </summary>
-        private void commitChangeHandlerStateChange()
+        private void commitOldChangeHandlerStateChange()
         {
-            if (isRestoring || changeHandler!.CurrentState <= 0)
+            if (isRestoring || oldChangeHandler!.CurrentState <= 0)
                 return;
 
             undoStack.Push(new Transaction(true));
@@ -128,7 +135,7 @@ namespace osu.Game.Screens.Edit
                 // Handle undo via the old change handler for stuff like metadata and timing points
                 // This will be removed once the old change handler is fully replaced by this change handler.
                 isRestoring = true;
-                changeHandler!.RestoreState(-1);
+                oldChangeHandler!.RestoreState(-1);
                 isRestoring = false;
                 Logger.Log("Undo handled by old change handler");
             }
@@ -162,7 +169,7 @@ namespace osu.Game.Screens.Edit
                 // Handle redo via the old change handler for stuff like metadata and timing points
                 // This will be removed once the old change handler is fully replaced by this change handler.
                 isRestoring = true;
-                changeHandler!.RestoreState(1);
+                oldChangeHandler!.RestoreState(1);
                 isRestoring = false;
                 Logger.Log("Redo handled by old change handler");
             }
@@ -183,45 +190,45 @@ namespace osu.Game.Screens.Edit
         private void revertTransaction(Transaction transaction)
         {
             // We are navigating history so we don't want to write a new state.
-            if (changeHandler != null)
-                changeHandler.SuppressStateChange = true;
+            if (oldChangeHandler != null)
+                oldChangeHandler.SuppressStateChange = true;
 
             isRestoring = true;
-            editorBeatmap.BeginChange();
+            changeHandler?.BeginChange();
 
             foreach (var change in transaction.UndoChanges.Reverse())
                 change.Revert();
 
             foreach (var hitObject in transaction.HitObjectUpdates)
-                editorBeatmap.Update(hitObject);
+                changeHandler?.Update(hitObject);
 
-            editorBeatmap.EndChange();
+            changeHandler?.EndChange();
             isRestoring = false;
 
-            if (changeHandler != null)
-                changeHandler.SuppressStateChange = false;
+            if (oldChangeHandler != null)
+                oldChangeHandler.SuppressStateChange = false;
         }
 
         private void applyTransaction(Transaction transaction)
         {
             // We are navigating history so we don't want to write a new state.
-            if (changeHandler != null)
-                changeHandler.SuppressStateChange = true;
+            if (oldChangeHandler != null)
+                oldChangeHandler.SuppressStateChange = true;
 
             isRestoring = true;
-            editorBeatmap.BeginChange();
+            changeHandler?.BeginChange();
 
             foreach (var change in transaction.UndoChanges)
                 change.Apply();
 
             foreach (var hitObject in transaction.HitObjectUpdates)
-                editorBeatmap.Update(hitObject);
+                changeHandler?.Update(hitObject);
 
-            editorBeatmap.EndChange();
+            changeHandler?.EndChange();
             isRestoring = false;
 
-            if (changeHandler != null)
-                changeHandler.SuppressStateChange = false;
+            if (oldChangeHandler != null)
+                oldChangeHandler.SuppressStateChange = false;
         }
 
         private void historyChanged()

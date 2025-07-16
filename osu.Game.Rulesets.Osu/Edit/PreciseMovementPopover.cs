@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         private EditorBeatmap editorBeatmap { get; set; } = null!;
 
         [Resolved]
-        private HitObjectChangeHandler? changeHandler { get; set; }
+        private IBeatmapEditorChangeHandler? changeHandler { get; set; }
 
         private readonly Dictionary<HitObject, Vector2> initialPositions = new Dictionary<HitObject, Vector2>();
         private RectangleF initialSurroundingQuad;
@@ -96,7 +96,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         protected override void PopIn()
         {
             base.PopIn();
-            editorBeatmap.BeginChange();
+            changeHandler?.BeginChange();
             initialPositions.AddRange(editorBeatmap.SelectedHitObjects.Where(ho => ho is not Spinner).Select(ho => new KeyValuePair<HitObject, Vector2>(ho, ((IHasPosition)ho).Position)));
             initialSurroundingQuad = GeometryUtils.GetSurroundingQuad(initialPositions.Keys.Cast<IHasPosition>()).AABBFloat;
 
@@ -116,7 +116,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         protected override void PopOut()
         {
             base.PopOut();
-            if (IsLoaded) editorBeatmap.EndChange();
+            if (IsLoaded) changeHandler?.EndChange();
         }
 
         private void relativeChanged()

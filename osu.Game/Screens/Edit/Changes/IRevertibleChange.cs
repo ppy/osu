@@ -21,7 +21,7 @@ namespace osu.Game.Screens.Edit.Changes
 
     public static class RevertibleChangeExtension
     {
-        public static void Apply(this IRevertibleChange change, HitObjectChangeHandler? changeHandler)
+        public static void Apply(this IRevertibleChange change, IEditorChangeHandler? changeHandler)
         {
             changeHandler?.BeginChange();
             change.Apply();

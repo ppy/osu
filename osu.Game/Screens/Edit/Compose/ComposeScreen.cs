@@ -36,7 +36,7 @@ namespace osu.Game.Screens.Edit.Compose
         private IBeatSnapProvider beatSnapProvider { get; set; }
 
         [Resolved(canBeNull: true)]
-        private HitObjectChangeHandler changeHandler { get; set; }
+        private IBeatmapEditorChangeHandler changeHandler { get; set; }
 
         private Bindable<string> clipboard { get; set; }
 
@@ -162,14 +162,14 @@ namespace osu.Game.Screens.Edit.Compose
             foreach (var h in objects)
                 h.StartTime += timeOffset;
 
-            EditorBeatmap.BeginChange();
+            changeHandler?.BeginChange();
 
             EditorBeatmap.SelectedHitObjects.Clear();
 
             new AddRangeHitObjectChange(EditorBeatmap, objects).Apply(changeHandler);
             EditorBeatmap.SelectedHitObjects.AddRange(objects);
 
-            EditorBeatmap.EndChange();
+            changeHandler?.EndChange();
         }
 
         private void updateClipboardActionAvailability()

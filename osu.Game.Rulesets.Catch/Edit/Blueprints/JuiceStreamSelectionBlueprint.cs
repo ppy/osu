@@ -58,7 +58,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
         private EditorBeatmap? editorBeatmap { get; set; }
 
         [Resolved]
-        private HitObjectChangeHandler? changeHandler { get; set; }
+        private IBeatmapEditorChangeHandler? changeHandler { get; set; }
 
         [Resolved]
         private BindableBeatDivisor? beatDivisor { get; set; }
@@ -185,7 +185,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
         private void updateHitObjectFromPath()
         {
             editablePath.UpdateHitObjectFromPath(HitObject);
-            editorBeatmap?.Update(HitObject);
+            changeHandler?.Update(HitObject);
 
             lastEditablePathId = editablePath.PathId;
             lastSliderPathVersion = HitObject.Path.Version.Value;

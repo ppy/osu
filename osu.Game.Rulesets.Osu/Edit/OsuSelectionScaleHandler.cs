@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         public Bindable<bool> IsScalingSlider { get; private set; } = new BindableBool();
 
         [Resolved]
-        private HitObjectChangeHandler? changeHandler { get; set; }
+        private IBeatmapEditorChangeHandler? changeHandler { get; set; }
 
         [Resolved(CanBeNull = true)]
         private IDistanceSnapProvider? snapProvider { get; set; }

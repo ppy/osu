@@ -56,7 +56,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             EditorBeatmap.PerformOnSelection(h =>
             {
                 new StartTimeChange(h, h.StartTime + adjustment).Apply(ChangeHandler);
-                EditorBeatmap.Update(h);
             });
         }
 

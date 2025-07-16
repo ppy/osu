@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         private EditorBeatmap? editorBeatmap { get; set; }
 
         [Resolved]
-        private HitObjectChangeHandler? changeHandler { get; set; }
+        private IBeatmapEditorChangeHandler? changeHandler { get; set; }
 
         [Resolved]
         private BindableBeatDivisor? beatDivisor { get; set; }
@@ -122,7 +122,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             pathVersion.BindTo(HitObject.Path.Version);
             pathVersion.BindValueChanged(_ =>
             {
-                editorBeatmap?.Update(HitObject);
+                changeHandler?.Update(HitObject);
             });
 
             BodyPiece.UpdateFrom(HitObject);
@@ -297,7 +297,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
             new SliderVelocityMultiplierChange(HitObject, proposedVelocity).Apply(changeHandler);
             new ExpectedDistanceChange(HitObject.Path, proposedDistance).Apply(changeHandler);
-            editorBeatmap?.Update(HitObject);
+            changeHandler?.Update(HitObject);
         }
 
         /// <summary>

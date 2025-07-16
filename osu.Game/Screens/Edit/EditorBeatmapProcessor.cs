@@ -21,14 +21,14 @@ namespace osu.Game.Screens.Edit
 
         private readonly IBeatmapProcessor? rulesetBeatmapProcessor;
 
-        private readonly HitObjectChangeHandler? changeHandler;
+        private readonly IBeatmapEditorChangeHandler? changeHandler;
 
         /// <summary>
         /// Kept for the purposes of reducing redundant regeneration of automatic breaks.
         /// </summary>
         private HashSet<(double, double)> objectDurationCache = new HashSet<(double, double)>();
 
-        public EditorBeatmapProcessor(EditorBeatmap beatmap, Ruleset ruleset, HitObjectChangeHandler? changeHandler = null)
+        public EditorBeatmapProcessor(EditorBeatmap beatmap, Ruleset ruleset, IBeatmapEditorChangeHandler? changeHandler = null)
         {
             Beatmap = beatmap;
             rulesetBeatmapProcessor = ruleset.CreateBeatmapProcessor(beatmap, changeHandler);

@@ -433,7 +433,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         }
 
         [Resolved(CanBeNull = true)]
-        private HitObjectChangeHandler changeHandler { get; set; }
+        private IBeatmapEditorChangeHandler changeHandler { get; set; }
 
         public void DragInProgress(DragEvent e)
         {

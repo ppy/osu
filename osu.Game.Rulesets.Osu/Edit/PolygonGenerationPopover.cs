@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         private EditorBeatmap editorBeatmap { get; set; } = null!;
 
         [Resolved]
-        private HitObjectChangeHandler? changeHandler { get; set; }
+        private IBeatmapEditorChangeHandler? changeHandler { get; set; }
 
         [Resolved]
         private HitObjectComposer composer { get; set; } = null!;
@@ -171,7 +171,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                     circle.StartTime = startTime;
                     circle.NewCombo = newCombo;
 
-                    editorBeatmap.Update(circle);
+                    changeHandler?.Update(circle);
                 }
                 else
                 {

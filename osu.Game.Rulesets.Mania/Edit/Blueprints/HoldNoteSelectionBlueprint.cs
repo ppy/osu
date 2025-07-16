@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
     public partial class HoldNoteSelectionBlueprint : ManiaSelectionBlueprint<HoldNote>
     {
         [Resolved]
-        private HitObjectChangeHandler? changeHandler { get; set; }
+        private IBeatmapEditorChangeHandler? changeHandler { get; set; }
 
         [Resolved]
         private EditorBeatmap? editorBeatmap { get; set; }
@@ -65,7 +65,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 
                         new StartTimeChange(HitObject, proposedStartTime).Apply(changeHandler);
                         new DurationChange(HitObject, proposedEndTime - HitObject.StartTime).Apply(changeHandler);
-                        editorBeatmap?.Update(HitObject);
+                        changeHandler?.Update(HitObject);
                     },
                     DragEnded = () => changeHandler?.EndChange(),
                 },
@@ -85,7 +85,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 
                         new StartTimeChange(HitObject, proposedStartTime).Apply(changeHandler);
                         new DurationChange(HitObject, proposedEndTime - HitObject.StartTime).Apply(changeHandler);
-                        editorBeatmap?.Update(HitObject);
+                        changeHandler?.Update(HitObject);
                     },
                     DragEnded = () => changeHandler?.EndChange(),
                 },

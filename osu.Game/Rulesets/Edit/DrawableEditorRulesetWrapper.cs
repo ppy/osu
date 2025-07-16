@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Edit
         }
 
         [Resolved]
-        private HitObjectChangeHandler? changeHandler { get; set; }
+        private IBeatmapEditorChangeHandler? changeHandler { get; set; }
 
         protected override void LoadComplete()
         {

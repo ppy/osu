@@ -66,7 +66,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             private EditorBeatmap beatmap { get; set; }
 
             [Resolved(canBeNull: true)]
-            private HitObjectChangeHandler changeHandler { get; set; }
+            private IBeatmapEditorChangeHandler changeHandler { get; set; }
 
             public DifficultyEditPopover(HitObject hitObject)
             {
@@ -128,15 +128,15 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     if (val.NewValue == null)
                         return;
 
-                    beatmap.BeginChange();
+                    changeHandler?.BeginChange();
 
                     foreach (var h in relevantObjects)
                     {
                         new SliderVelocityMultiplierChange((IHasSliderVelocity)h, val.NewValue.Value).Apply(changeHandler);
-                        beatmap.Update(h);
+                        changeHandler?.Update(h);
                     }
 
-                    beatmap.EndChange();
+                    changeHandler?.EndChange();
                 });
             }
 

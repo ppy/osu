@@ -14,9 +14,9 @@ namespace osu.Game.Beatmaps
     {
         public IBeatmap Beatmap { get; }
 
-        protected HitObjectChangeHandler? ChangeHandler { get; }
+        protected IBeatmapEditorChangeHandler? ChangeHandler { get; }
 
-        public BeatmapProcessor(IBeatmap beatmap, HitObjectChangeHandler? changeHandler = null)
+        public BeatmapProcessor(IBeatmap beatmap, IBeatmapEditorChangeHandler? changeHandler = null)
         {
             Beatmap = beatmap;
             ChangeHandler = changeHandler;

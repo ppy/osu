@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected EditorBeatmap Beatmap { get; private set; }
 
         [Resolved(canBeNull: true)]
-        private HitObjectChangeHandler changeHandler { get; set; }
+        private IBeatmapEditorChangeHandler changeHandler { get; set; }
 
         protected readonly HitObjectComposer Composer;
 
@@ -117,7 +117,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             // handle positional change etc.
             foreach (var blueprint in SelectionBlueprints)
             {
-                Beatmap.Update(blueprint.Item);
+                changeHandler?.Update(blueprint.Item);
             }
         }
 

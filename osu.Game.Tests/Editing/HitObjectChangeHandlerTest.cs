@@ -156,9 +156,7 @@ namespace osu.Game.Tests.Editing
                 },
             });
 
-            var changeHandler = new HitObjectChangeHandler(beatmap);
-
-            beatmap.AddChangeHandler(changeHandler);
+            var changeHandler = new HitObjectChangeHandler();
 
             changeHandler.OnStateChange += () => stateChangedFired++;
             return (changeHandler, beatmap);

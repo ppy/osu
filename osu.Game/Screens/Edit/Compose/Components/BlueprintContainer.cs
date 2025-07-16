@@ -44,7 +44,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private readonly Dictionary<T, SelectionBlueprint<T>> blueprintMap = new Dictionary<T, SelectionBlueprint<T>>();
 
         [Resolved(CanBeNull = true)]
-        private HitObjectChangeHandler changeHandler { get; set; }
+        private IBeatmapEditorChangeHandler changeHandler { get; set; }
 
         protected readonly BindableList<T> SelectedItems = new BindableList<T>();
 

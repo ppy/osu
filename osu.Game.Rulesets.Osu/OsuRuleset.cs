@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Osu
 
         public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new OsuBeatmapConverter(beatmap, this);
 
-        public override IBeatmapProcessor CreateBeatmapProcessor(IBeatmap beatmap, HitObjectChangeHandler? changeHandler = null) => new OsuBeatmapProcessor(beatmap, changeHandler);
+        public override IBeatmapProcessor CreateBeatmapProcessor(IBeatmap beatmap, IBeatmapEditorChangeHandler? changeHandler = null) => new OsuBeatmapProcessor(beatmap, changeHandler);
 
         public const string SHORT_NAME = "osu";
 

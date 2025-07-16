@@ -91,7 +91,7 @@ namespace osu.Game.Rulesets.Catch.Edit
 
             if (nudgeMovementActive && !e.ControlPressed)
             {
-                EditorBeatmap.EndChange();
+                ChangeHandler?.EndChange();
                 nudgeMovementActive = false;
             }
         }
@@ -104,7 +104,7 @@ namespace osu.Game.Rulesets.Catch.Edit
             if (!nudgeMovementActive)
             {
                 nudgeMovementActive = true;
-                EditorBeatmap.BeginChange();
+                ChangeHandler?.BeginChange();
             }
 
             var firstBlueprint = SelectedBlueprints.FirstOrDefault();
@@ -163,7 +163,7 @@ namespace osu.Game.Rulesets.Catch.Edit
                     reverse.Apply();
                     new OriginalXChange(juiceStream, juiceStream.OriginalX + reverse.PositionalOffset.X).Apply(ChangeHandler);
                     new LegacyConvertedYChange(juiceStream, juiceStream.LegacyConvertedY + reverse.PositionalOffset.Y).Apply(ChangeHandler);
-                    EditorBeatmap.Update(juiceStream);
+                    ChangeHandler?.Update(juiceStream);
                 }
             }
 
@@ -220,7 +220,7 @@ namespace osu.Game.Rulesets.Catch.Edit
                     foreach (var point in juiceStream.Path.ControlPoints)
                         new PathControlPointPositionChange(point, point.Position * new Vector2(-1, 1)).Apply(ChangeHandler);
 
-                    EditorBeatmap.Update(juiceStream);
+                    ChangeHandler?.Update(juiceStream);
                     return true;
 
                 default:

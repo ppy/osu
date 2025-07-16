@@ -35,6 +35,7 @@ using osu.Game.Screens.Edit.Components.Menus;
 using osu.Game.Skinning;
 using osu.Framework.Graphics.Cursor;
 using osu.Game.Input.Bindings;
+using osu.Game.Screens.Edit.Changes;
 using osu.Game.Utils;
 
 namespace osu.Game.Overlays.SkinEditor
@@ -589,6 +590,11 @@ namespace osu.Game.Overlays.SkinEditor
         protected void Redo() => changeHandler?.RestoreState(1);
 
         void IEditorChangeHandler.RestoreState(int direction) => changeHandler?.RestoreState(direction);
+
+        public void Record(IRevertibleChange change)
+        {
+            throw new NotImplementedException();
+        }
 
         public void Save(bool userTriggered = true) => save(currentSkin.Value, userTriggered);
 

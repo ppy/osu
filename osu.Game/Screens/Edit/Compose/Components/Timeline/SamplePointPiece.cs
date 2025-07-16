@@ -210,7 +210,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             private EditorBeatmap beatmap { get; set; } = null!;
 
             [Resolved]
-            private HitObjectChangeHandler? changeHandler { get; set; }
+            private IBeatmapEditorChangeHandler? changeHandler { get; set; }
 
             public SampleEditPopover(HitObject hitObject)
             {
@@ -348,15 +348,15 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             /// <param name="updateAction">The action to perform on each element of <see cref="allRelevantSamples"/>.</param>
             private void updateAllRelevantSamples(Action<HitObject, IList<HitSampleInfo>> updateAction)
             {
-                beatmap.BeginChange();
+                changeHandler?.BeginChange();
 
                 foreach (var (relevantHitObject, relevantSamples) in GetRelevantSamples(relevantObjects))
                 {
                     updateAction(relevantHitObject, relevantSamples);
-                    beatmap.Update(relevantHitObject);
+                    changeHandler?.Update(relevantHitObject);
                 }
 
-                beatmap.EndChange();
+                changeHandler?.EndChange();
             }
 
             private void setBank(string newBank)

@@ -32,14 +32,14 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
 
         public void AddVertex(Vector2 relativePosition)
         {
-            EditorBeatmap?.BeginChange();
+            ChangeHandler?.BeginChange();
 
             double time = Math.Max(0, PositionToTime(relativePosition.Y));
             int index = AddVertex(time, relativePosition.X);
             UpdateHitObjectFromPath(juiceStream);
             selectOnly(index);
 
-            EditorBeatmap?.EndChange();
+            ChangeHandler?.EndChange();
         }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => InternalChildren.Any(d => d.ReceivePositionalInputAt(screenSpacePos));
@@ -52,10 +52,10 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
 
             if (e.Button == MouseButton.Right && e.ShiftPressed)
             {
-                EditorBeatmap?.BeginChange();
+                ChangeHandler?.BeginChange();
                 RemoveVertex(index);
                 UpdateHitObjectFromPath(juiceStream);
-                EditorBeatmap?.EndChange();
+                ChangeHandler?.EndChange();
 
                 return true;
             }
@@ -83,7 +83,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
             for (int i = 0; i < VertexCount; i++)
                 VertexStates[i].VertexBeforeChange = Vertices[i];
 
-            EditorBeatmap?.BeginChange();
+            ChangeHandler?.BeginChange();
             return true;
         }
 
@@ -97,7 +97,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
 
         protected override void OnDragEnd(DragEndEvent e)
         {
-            EditorBeatmap?.EndChange();
+            ChangeHandler?.EndChange();
         }
 
         private int getMouseTargetVertex(Vector2 screenSpacePosition)
@@ -127,7 +127,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
 
         private void deleteSelectedVertices()
         {
-            EditorBeatmap?.BeginChange();
+            ChangeHandler?.BeginChange();
 
             for (int i = VertexCount - 1; i >= 0; i--)
             {
@@ -137,7 +137,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
 
             UpdateHitObjectFromPath(juiceStream);
 
-            EditorBeatmap?.EndChange();
+            ChangeHandler?.EndChange();
         }
 
         public override void UpdateHitObjectFromPath(JuiceStream hitObject)

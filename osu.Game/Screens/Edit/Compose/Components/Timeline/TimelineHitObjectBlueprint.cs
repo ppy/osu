@@ -323,7 +323,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             private Timeline timeline { get; set; } = null!;
 
             [Resolved]
-            private HitObjectChangeHandler? changeHandler { get; set; }
+            private IBeatmapEditorChangeHandler? changeHandler { get; set; }
 
             private ScheduledDelegate? dragOperation;
 
@@ -434,7 +434,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                         return;
 
                                     new SliderVelocityMultiplierChange(hasSliderVelocity, newVelocity).Apply(changeHandler);
-                                    beatmap.Update(hitObject);
+                                    changeHandler?.Update(hitObject);
                                 }
                                 else
                                 {
@@ -446,7 +446,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                         return;
 
                                     new RepeatCountChange(repeatHitObject, proposedCount).Apply(changeHandler);
-                                    beatmap.Update(hitObject);
+                                    changeHandler?.Update(hitObject);
                                 }
 
                                 break;
@@ -458,7 +458,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                     return;
 
                                 new DurationChange(endTimeHitObject, snappedTime - hitObject.StartTime).Apply(changeHandler);
-                                beatmap.Update(hitObject);
+                                changeHandler?.Update(hitObject);
                                 break;
                         }
                     }

@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
+using osu.Game.Screens.Edit.Changes;
 
 namespace osu.Game.Screens.Edit
 {
@@ -110,6 +111,11 @@ namespace osu.Game.Screens.Edit
 
             OnStateChange?.Invoke();
             updateBindables();
+        }
+
+        public void Record(IRevertibleChange change)
+        {
+            throw new NotImplementedException();
         }
 
         /// <summary>

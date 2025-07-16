@@ -84,13 +84,13 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             if (nudgeMovementActive && !e.ControlPressed)
             {
-                EditorBeatmap.EndChange();
+                ChangeHandler?.EndChange();
                 nudgeMovementActive = false;
             }
         }
 
         [Resolved(canBeNull: true)]
-        private HitObjectChangeHandler? changeHandler { get; set; }
+        private IBeatmapEditorChangeHandler? changeHandler { get; set; }
 
         public override bool HandleMovement(MoveSelectionEvent<HitObject> moveEvent)
         {
@@ -140,7 +140,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             if (!nudgeMovementActive)
             {
                 nudgeMovementActive = true;
-                EditorBeatmap.BeginChange();
+                ChangeHandler?.BeginChange();
             }
 
             var firstBlueprint = SelectedBlueprints.FirstOrDefault();
@@ -299,7 +299,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             if (!canMerge(mergeableObjects))
                 return;
 
-            EditorBeatmap.BeginChange();
+            ChangeHandler?.BeginChange();
 
             // Have an initial slider object.
             var firstHitObject = mergeableObjects[0];
@@ -374,7 +374,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             SelectedItems.Clear();
             SelectedItems.Add(mergedHitObject);
 
-            EditorBeatmap.EndChange();
+            ChangeHandler?.EndChange();
         }
 
         protected override IEnumerable<MenuItem> GetContextMenuItemsForSelection(IEnumerable<SelectionBlueprint<HitObject>> selection)

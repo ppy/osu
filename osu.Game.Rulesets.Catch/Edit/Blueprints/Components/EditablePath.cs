@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
         protected EditorBeatmap? EditorBeatmap { get; private set; }
 
         [Resolved]
-        protected HitObjectChangeHandler? ChangeHandler { get; private set; }
+        protected IBeatmapEditorChangeHandler? ChangeHandler { get; private set; }
 
         protected EditablePath(Func<float, double> positionToTime)
         {
@@ -116,7 +116,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
             new SliderVelocityMultiplierChange(hitObject, Math.Ceiling(requiredVelocity / svToVelocityFactor)).Apply(ChangeHandler);
 
             // adjust velocity locally, so that once the SV change is applied by applying defaults
-            // (triggered by `EditorBeatmap.Update()` call at end of method),
+            // (triggered by `ChangeHandler?.Update()` call at end of method),
             // it results in the outcome desired by the user.
             double relativeChange = svBindable.Value / previousVelocity;
             double localVelocity = hitObject.Velocity * relativeChange;
@@ -128,7 +128,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
             double snappedEndTime = beatSnapProvider.SnapTime(endTime, hitObject.StartTime);
             hitObject.Path.ExpectedDistance.Value = (snappedEndTime - hitObject.StartTime) * localVelocity;
 
-            EditorBeatmap?.Update(hitObject);
+            ChangeHandler?.Update(hitObject);
         }
 
         public Vector2 ToRelativePosition(Vector2 screenSpacePosition)

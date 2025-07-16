@@ -47,6 +47,7 @@ using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Screens.Backgrounds;
+using osu.Game.Screens.Edit.Changes;
 using osu.Game.Screens.Edit.Components.Menus;
 using osu.Game.Screens.Edit.Compose;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
@@ -65,7 +66,7 @@ namespace osu.Game.Screens.Edit
 {
     [Cached(typeof(IBeatSnapProvider))]
     [Cached]
-    public partial class Editor : OsuScreen, IKeyBindingHandler<GlobalAction>, IKeyBindingHandler<PlatformAction>, IBeatSnapProvider, ISamplePlaybackDisabler, IBeatSyncProvider
+    public partial class Editor : OsuScreen, IKeyBindingHandler<GlobalAction>, IKeyBindingHandler<PlatformAction>, IBeatSnapProvider, ISamplePlaybackDisabler, IBeatSyncProvider, IBeatmapEditorChangeHandler
     {
         /// <summary>
         /// An offset applied to waveform visuals to align them with expectations.
@@ -90,7 +91,7 @@ namespace osu.Game.Screens.Edit
 
         protected override bool PlayExitSound => !ExitConfirmed && !switchingDifficulty;
 
-        protected bool HasUnsavedChanges => lastSavedState != newChangeHandler.CurrentState;
+        protected bool HasUnsavedChanges => lastSavedState != changeHandler.CurrentState;
 
         [Resolved]
         private BeatmapManager beatmapManager { get; set; }
@@ -173,9 +174,9 @@ namespace osu.Game.Screens.Edit
         private BottomBar bottomBar;
 
         [CanBeNull] // Should be non-null once it can support custom rulesets.
-        private EditorChangeHandler changeHandler;
+        private EditorChangeHandler oldChangeHandler;
 
-        private HitObjectChangeHandler newChangeHandler;
+        private HitObjectChangeHandler changeHandler;
 
         private DependencyContainer dependencies;
 
@@ -290,7 +291,7 @@ namespace osu.Game.Screens.Edit
             // todo: remove caching of this and consume via editorBeatmap?
             dependencies.Cache(beatDivisor);
 
-            AddInternal(editorBeatmap = new EditorBeatmap(playableBeatmap, loadableBeatmap.GetSkin(), loadableBeatmap.BeatmapInfo));
+            AddInternal(editorBeatmap = new EditorBeatmap(playableBeatmap, loadableBeatmap.GetSkin(), loadableBeatmap.BeatmapInfo, this));
             dependencies.CacheAs(editorBeatmap);
 
             editorBeatmap.UpdateInProgress.BindValueChanged(_ => updateSampleDisabledState());
@@ -299,23 +300,17 @@ namespace osu.Game.Screens.Edit
 
             if (canSave)
             {
-                changeHandler = new BeatmapEditorChangeHandler(editorBeatmap);
-                dependencies.CacheAs<IEditorChangeHandler>(changeHandler);
+                oldChangeHandler = new BeatmapEditorChangeHandler(editorBeatmap);
+                dependencies.CacheAs<IEditorChangeHandler>(oldChangeHandler);
             }
 
-            newChangeHandler = new HitObjectChangeHandler(editorBeatmap, changeHandler);
-            dependencies.CacheAs(newChangeHandler);
-            AddInternal(newChangeHandler);
-
-            // EditorBeatmap has a circular dependency on the change handler.
-            // In the future, the change handler should be a child of EditorBeatmap, so all changes are handled through EditorBeatmap.
-            editorBeatmap.AddChangeHandler(newChangeHandler);
+            AddInternal(changeHandler = new HitObjectChangeHandler(this, oldChangeHandler));
 
             beatDivisor.SetArbitraryDivisor(editorBeatmap.BeatmapInfo.BeatDivisor);
             beatDivisor.BindValueChanged(divisor => editorBeatmap.BeatmapInfo.BeatDivisor = divisor.NewValue);
 
             updateLastSavedState();
-            changeHandler?.EnsureStateSaved();
+            oldChangeHandler?.EnsureStateSaved();
 
             Schedule(() =>
             {
@@ -473,8 +468,8 @@ namespace osu.Game.Screens.Edit
                 }
             });
 
-            newChangeHandler.CanUndo.BindValueChanged(v => undoMenuItem.Action.Disabled = !v.NewValue, true);
-            newChangeHandler.CanRedo.BindValueChanged(v => redoMenuItem.Action.Disabled = !v.NewValue, true);
+            changeHandler.CanUndo.BindValueChanged(v => undoMenuItem.Action.Disabled = !v.NewValue, true);
+            changeHandler.CanRedo.BindValueChanged(v => redoMenuItem.Action.Disabled = !v.NewValue, true);
 
             editorBackgroundDim.BindValueChanged(_ => setUpBackground());
         }
@@ -1016,9 +1011,45 @@ namespace osu.Game.Screens.Edit
 
         #endregion
 
-        protected void Undo() => newChangeHandler.Undo();
+        protected void Undo() => changeHandler.Undo();
 
-        protected void Redo() => newChangeHandler.Redo();
+        protected void Redo() => changeHandler.Redo();
+
+        public event Action OnStateChange;
+
+        public void BeginChange()
+        {
+            editorBeatmap.BeginChange();
+            changeHandler.BeginChange();
+        }
+
+        public void EndChange()
+        {
+            editorBeatmap.EndChange();
+            changeHandler.EndChange();
+        }
+
+        public void SaveState()
+        {
+            editorBeatmap.SaveState();
+            changeHandler.SaveState();
+        }
+
+        public void RestoreState(int direction)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Record(IRevertibleChange change)
+        {
+            changeHandler.Record(change);
+        }
+
+        public void Update(HitObject hitObject)
+        {
+            editorBeatmap.Update(hitObject);
+            changeHandler.Update(hitObject);
+        }
 
         protected void DiscardUnsavedChanges()
         {
@@ -1269,7 +1300,7 @@ namespace osu.Game.Screens.Edit
 
         private void updateLastSavedState()
         {
-            lastSavedState = newChangeHandler.CurrentState;
+            lastSavedState = changeHandler.CurrentState;
         }
 
         private IEnumerable<MenuItem> createFileMenuItems()

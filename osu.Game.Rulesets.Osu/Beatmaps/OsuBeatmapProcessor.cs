@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
         /// </summary>
         public const int STACK_DISTANCE = 3;
 
-        public OsuBeatmapProcessor(IBeatmap beatmap, HitObjectChangeHandler? changeHandler = null)
+        public OsuBeatmapProcessor(IBeatmap beatmap, IBeatmapEditorChangeHandler? changeHandler = null)
             : base(beatmap, changeHandler)
         {
         }
