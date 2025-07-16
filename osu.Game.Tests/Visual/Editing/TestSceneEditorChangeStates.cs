@@ -70,7 +70,7 @@ namespace osu.Game.Tests.Visual.Editing
                 EditorBeatmap.HitObjectRemoved += h => removedObject = h;
             });
 
-            AddStep("add hitobject", () => new AddHitObjectChange(EditorBeatmap, expectedObject = new HitCircle { StartTime = 1000 }).Apply(ChangeHandler, true));
+            AddStep("add hitobject", () => new AddHitObjectChange(EditorBeatmap, expectedObject = new HitCircle { StartTime = 1000 }).Apply(ChangeHandler));
             AddAssert("hitobject added", () => addedObject == expectedObject);
             AddAssert("unsaved changes", () => Editor.HasUnsavedChanges);
 
@@ -92,7 +92,7 @@ namespace osu.Game.Tests.Visual.Editing
                 EditorBeatmap.HitObjectRemoved += h => removedObject = h;
             });
 
-            AddStep("add hitobject", () => new AddHitObjectChange(EditorBeatmap, expectedObject = new HitCircle { StartTime = 1000 }).Apply(ChangeHandler, true));
+            AddStep("add hitobject", () => new AddHitObjectChange(EditorBeatmap, expectedObject = new HitCircle { StartTime = 1000 }).Apply(ChangeHandler));
             addUndoSteps();
 
             AddStep("reset variables", () =>
@@ -110,7 +110,7 @@ namespace osu.Game.Tests.Visual.Editing
         [Test]
         public void TestAddObjectThenSaveHasNoUnsavedChanges()
         {
-            AddStep("add hitobject", () => new AddHitObjectChange(EditorBeatmap, new HitCircle { StartTime = 1000 }).Apply(ChangeHandler, true));
+            AddStep("add hitobject", () => new AddHitObjectChange(EditorBeatmap, new HitCircle { StartTime = 1000 }).Apply(ChangeHandler));
 
             AddAssert("unsaved changes", () => Editor.HasUnsavedChanges);
             AddStep("save changes", () => Editor.Save());
@@ -118,7 +118,7 @@ namespace osu.Game.Tests.Visual.Editing
 
             addUndoSteps();
             AddAssert("unsaved changes", () => Editor.HasUnsavedChanges);
-            AddStep("add hitobject", () => new AddHitObjectChange(EditorBeatmap, new HitCircle { StartTime = 2000 }).Apply(ChangeHandler, true));
+            AddStep("add hitobject", () => new AddHitObjectChange(EditorBeatmap, new HitCircle { StartTime = 2000 }).Apply(ChangeHandler));
             AddAssert("unsaved changes", () => Editor.HasUnsavedChanges);
         }
 
@@ -135,8 +135,8 @@ namespace osu.Game.Tests.Visual.Editing
                 EditorBeatmap.HitObjectRemoved += h => removedObject = h;
             });
 
-            AddStep("add hitobject", () => new AddHitObjectChange(EditorBeatmap, expectedObject = new HitCircle { StartTime = 1000 }).Apply(ChangeHandler, true));
-            AddStep("remove object", () => new RemoveHitObjectChange(EditorBeatmap, expectedObject).Apply(ChangeHandler, true));
+            AddStep("add hitobject", () => new AddHitObjectChange(EditorBeatmap, expectedObject = new HitCircle { StartTime = 1000 }).Apply(ChangeHandler));
+            AddStep("remove object", () => new RemoveHitObjectChange(EditorBeatmap, expectedObject).Apply(ChangeHandler));
             AddStep("reset variables", () =>
             {
                 addedObject = null;
@@ -162,8 +162,8 @@ namespace osu.Game.Tests.Visual.Editing
                 EditorBeatmap.HitObjectRemoved += h => removedObject = h;
             });
 
-            AddStep("add hitobject", () => new AddHitObjectChange(EditorBeatmap, expectedObject = new HitCircle { StartTime = 1000 }).Apply(ChangeHandler, true));
-            AddStep("remove object", () => new RemoveHitObjectChange(EditorBeatmap, expectedObject).Apply(ChangeHandler, true));
+            AddStep("add hitobject", () => new AddHitObjectChange(EditorBeatmap, expectedObject = new HitCircle { StartTime = 1000 }).Apply(ChangeHandler));
+            AddStep("remove object", () => new RemoveHitObjectChange(EditorBeatmap, expectedObject).Apply(ChangeHandler));
             addUndoSteps();
 
             AddStep("reset variables", () =>

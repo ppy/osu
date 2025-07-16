@@ -56,7 +56,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             return base.ShouldQuickDelete(e);
         }
 
-        protected override void DeleteItems(IEnumerable<HitObject> items) => new RemoveRangeHitObjectChange(EditorBeatmap, items).Apply(ChangeHandler, true);
+        protected override void DeleteItems(IEnumerable<HitObject> items) => new RemoveRangeHitObjectChange(EditorBeatmap, items).Apply(ChangeHandler);
 
         #region Selection State
 

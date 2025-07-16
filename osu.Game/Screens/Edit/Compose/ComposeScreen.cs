@@ -133,7 +133,7 @@ namespace osu.Game.Screens.Edit.Compose
                 return;
 
             Copy();
-            new RemoveRangeHitObjectChange(EditorBeatmap, EditorBeatmap.SelectedHitObjects.ToArray()).Apply(changeHandler, true);
+            new RemoveRangeHitObjectChange(EditorBeatmap, EditorBeatmap.SelectedHitObjects.ToArray()).Apply(changeHandler);
         }
 
         public override void Copy()

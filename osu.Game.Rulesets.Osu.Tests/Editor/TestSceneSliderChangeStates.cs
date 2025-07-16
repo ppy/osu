@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 })
             }));
             AddAssert("slider has correct spline type", () => ((Slider)EditorBeatmap.HitObjects[0]).Path.ControlPoints.All(p => p.Type == pathType));
-            AddStep("remove object", () => new RemoveHitObjectChange(EditorBeatmap, slider!).Apply(ChangeHandler, true));
+            AddStep("remove object", () => new RemoveHitObjectChange(EditorBeatmap, slider!).Apply(ChangeHandler));
             AddAssert("slider removed", () => EditorBeatmap.HitObjects.Count == 0);
             addUndoSteps();
             AddAssert("slider not removed", () => EditorBeatmap.HitObjects.Count == 1);

@@ -166,7 +166,7 @@ namespace osu.Game.Tests.Editing
 
         private void addArbitraryChange(HitObjectChangeHandler changeHandler, EditorBeatmap beatmap)
         {
-            new AddHitObjectChange(beatmap, new HitCircle { StartTime = 2760 }).Apply(changeHandler, true);
+            new AddHitObjectChange(beatmap, new HitCircle { StartTime = 2760 }).Apply(changeHandler);
         }
     }
 }
