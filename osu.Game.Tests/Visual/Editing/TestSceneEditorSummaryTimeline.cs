@@ -16,6 +16,7 @@ namespace osu.Game.Tests.Visual.Editing
     public partial class TestSceneEditorSummaryTimeline : EditorClockTestScene
     {
         [Cached(typeof(EditorBeatmap))]
+        [Cached(typeof(IBeatmapEditorChangeHandler))]
         private readonly EditorBeatmap editorBeatmap;
 
         public TestSceneEditorSummaryTimeline()

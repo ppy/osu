@@ -23,6 +23,7 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
 
         [Cached(typeof(EditorBeatmap))]
         [Cached(typeof(IBeatSnapProvider))]
+        [Cached(typeof(IBeatmapEditorChangeHandler))]
         protected readonly EditorBeatmap EditorBeatmap;
 
         private readonly CatchEditorTestSceneContainer contentContainer;

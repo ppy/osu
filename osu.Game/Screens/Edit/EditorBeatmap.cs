@@ -18,11 +18,12 @@ using osu.Game.Beatmaps.Legacy;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Screens.Edit.Changes;
 using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Edit
 {
-    public partial class EditorBeatmap : TransactionalCommitComponent, IBeatmap, IBeatSnapProvider
+    public partial class EditorBeatmap : TransactionalCommitComponent, IBeatmap, IBeatSnapProvider, IBeatmapEditorChangeHandler
     {
         /// <summary>
         /// Will become <c>true</c> when a new update is queued, and <c>false</c> when all updates have been applied.
@@ -552,5 +553,11 @@ namespace osu.Game.Screens.Edit
         public double GetBeatLengthAtTime(double referenceTime) => ControlPointInfo.TimingPointAt(referenceTime).BeatLength / BeatDivisor;
 
         public int BeatDivisor => beatDivisor?.Value ?? 1;
+
+        public event Action OnStateChange;
+
+        public void RestoreState(int direction) { }
+
+        public void Record(IRevertibleChange change) { }
     }
 }
