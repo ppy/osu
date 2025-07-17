@@ -16,78 +16,6 @@ namespace osu.Game.Graphics
 {
     public static class OsuIcon
     {
-        #region Legacy spritesheet-based icons
-
-        private static IconUsage get(int icon) => new IconUsage((char)icon, @"osuFont");
-
-        // ruleset icons in circles
-        public static IconUsage RulesetOsu => get(0xe000);
-        public static IconUsage RulesetMania => get(0xe001);
-        public static IconUsage RulesetCatch => get(0xe002);
-        public static IconUsage RulesetTaiko => get(0xe003);
-
-        // ruleset icons without circles
-        public static IconUsage FilledCircle => get(0xe004);
-        public static IconUsage Logo => get(0xe006);
-        public static IconUsage ChevronDownCircle => get(0xe007);
-        public static IconUsage EditCircle => get(0xe033);
-        public static IconUsage LeftCircle => get(0xe034);
-        public static IconUsage RightCircle => get(0xe035);
-        public static IconUsage Charts => get(0xe036);
-        public static IconUsage Solo => get(0xe037);
-        public static IconUsage Multi => get(0xe038);
-        public static IconUsage Gear => get(0xe039);
-
-        // misc icons
-        public static IconUsage Bat => get(0xe008);
-        public static IconUsage Bubble => get(0xe009);
-        public static IconUsage BubblePop => get(0xe02e);
-        public static IconUsage Dice => get(0xe011);
-        public static IconUsage HeartBreak => get(0xe030);
-        public static IconUsage Hot => get(0xe031);
-        public static IconUsage ListSearch => get(0xe032);
-
-        //osu! playstyles
-        public static IconUsage PlayStyleTablet => get(0xe02a);
-        public static IconUsage PlayStyleMouse => get(0xe029);
-        public static IconUsage PlayStyleKeyboard => get(0xe02b);
-        public static IconUsage PlayStyleTouch => get(0xe02c);
-
-        // osu! difficulties
-        public static IconUsage EasyOsu => get(0xe015);
-        public static IconUsage NormalOsu => get(0xe016);
-        public static IconUsage HardOsu => get(0xe017);
-        public static IconUsage InsaneOsu => get(0xe018);
-        public static IconUsage ExpertOsu => get(0xe019);
-
-        // taiko difficulties
-        public static IconUsage EasyTaiko => get(0xe01a);
-        public static IconUsage NormalTaiko => get(0xe01b);
-        public static IconUsage HardTaiko => get(0xe01c);
-        public static IconUsage InsaneTaiko => get(0xe01d);
-        public static IconUsage ExpertTaiko => get(0xe01e);
-
-        // fruits difficulties
-        public static IconUsage EasyFruits => get(0xe01f);
-        public static IconUsage NormalFruits => get(0xe020);
-        public static IconUsage HardFruits => get(0xe021);
-        public static IconUsage InsaneFruits => get(0xe022);
-        public static IconUsage ExpertFruits => get(0xe023);
-
-        // mania difficulties
-        public static IconUsage EasyMania => get(0xe024);
-        public static IconUsage NormalMania => get(0xe025);
-        public static IconUsage HardMania => get(0xe026);
-        public static IconUsage InsaneMania => get(0xe027);
-        public static IconUsage ExpertMania => get(0xe028);
-
-        // Use "Icons/BeatmapDetails/mod-icon" instead
-        // public static IconUsage ModBg => Get(0xe04a);
-
-        #endregion
-
-        #region New single-file-based icons
-
         public const string FONT_NAME = @"Icons";
 
         public static IconUsage Audio => get(OsuIconMapping.Audio);
@@ -162,6 +90,41 @@ namespace osu.Game.Graphics
         public static IconUsage EditorWhistle => get(OsuIconMapping.EditorWhistle);
         public static IconUsage Tortoise => get(OsuIconMapping.Tortoise);
         public static IconUsage Hare => get(OsuIconMapping.Hare);
+
+        // ruleset icons in circles
+        public static IconUsage RulesetOsu => get(OsuIconMapping.RulesetOsu);
+        public static IconUsage RulesetMania => get(OsuIconMapping.RulesetMania);
+        public static IconUsage RulesetCatch => get(OsuIconMapping.RulesetCatch);
+        public static IconUsage RulesetTaiko => get(OsuIconMapping.RulesetTaiko);
+
+        // ruleset icons without circles
+        public static IconUsage FilledCircle => get(OsuIconMapping.FilledCircle);
+        public static IconUsage Logo => get(OsuIconMapping.Logo);
+        public static IconUsage ChevronDownCircle => get(OsuIconMapping.ChevronDownCircle);
+        public static IconUsage EditCircle => get(OsuIconMapping.EditCircle);
+        public static IconUsage LeftCircle => get(OsuIconMapping.LeftCircle);
+        public static IconUsage RightCircle => get(OsuIconMapping.RightCircle);
+        public static IconUsage Charts => get(OsuIconMapping.Charts);
+        public static IconUsage Solo => get(OsuIconMapping.Solo);
+        public static IconUsage Multi => get(OsuIconMapping.Multi);
+        public static IconUsage Gear => get(OsuIconMapping.Gear);
+
+        // misc icons
+        public static IconUsage Bat => get(OsuIconMapping.Bat);
+        public static IconUsage Bubble => get(OsuIconMapping.Bubble);
+        public static IconUsage BubblePop => get(OsuIconMapping.BubblePop);
+        public static IconUsage Dice => get(OsuIconMapping.Dice);
+        public static IconUsage HeartBreak => get(OsuIconMapping.HeartBreak);
+        public static IconUsage Hot => get(OsuIconMapping.Hot);
+        public static IconUsage ListSearch => get(OsuIconMapping.ListSearch);
+
+        //osu! playstyles
+        public static IconUsage PlayStyleTablet => get(OsuIconMapping.PlayStyleTablet);
+        public static IconUsage PlayStyleMouse => get(OsuIconMapping.PlayStyleMouse);
+        public static IconUsage PlayStyleKeyboard => get(OsuIconMapping.PlayStyleKeyboard);
+        public static IconUsage PlayStyleTouch => get(OsuIconMapping.PlayStyleTouch);
+
+        // mod icons
         public static IconUsage ModKey1 => get(OsuIconMapping.ModKey1);
         public static IconUsage ModKey2 => get(OsuIconMapping.ModKey2);
         public static IconUsage ModKey3 => get(OsuIconMapping.ModKey3);
@@ -413,6 +376,81 @@ namespace osu.Game.Graphics
             [Description(@"hare")]
             Hare,
 
+            [Description(@"OsuFontIcons/ruleset-osu")]
+            RulesetOsu,
+
+            [Description(@"OsuFontIcons/ruleset-mania")]
+            RulesetMania,
+
+            [Description(@"OsuFontIcons/ruleset-catch")]
+            RulesetCatch,
+
+            [Description(@"OsuFontIcons/ruleset-taiko")]
+            RulesetTaiko,
+
+            [Description(@"OsuFontIcons/filled-circle")]
+            FilledCircle,
+
+            [Description(@"OsuFontIcons/logo")]
+            Logo,
+
+            [Description(@"OsuFontIcons/chevron-down-circle")]
+            ChevronDownCircle,
+
+            [Description(@"OsuFontIcons/edit-circle")]
+            EditCircle,
+
+            [Description(@"OsuFontIcons/left-circle")]
+            LeftCircle,
+
+            [Description(@"OsuFontIcons/right-circle")]
+            RightCircle,
+
+            [Description(@"OsuFontIcons/charts")]
+            Charts,
+
+            [Description(@"OsuFontIcons/solo")]
+            Solo,
+
+            [Description(@"OsuFontIcons/multi")]
+            Multi,
+
+            [Description(@"OsuFontIcons/gear")]
+            Gear,
+
+            [Description(@"OsuFontIcons/bat")]
+            Bat,
+
+            [Description(@"OsuFontIcons/bubble")]
+            Bubble,
+
+            [Description(@"OsuFontIcons/bubble-pop")]
+            BubblePop,
+
+            [Description(@"OsuFontIcons/dice")]
+            Dice,
+
+            [Description(@"OsuFontIcons/heart-break")]
+            HeartBreak,
+
+            [Description(@"OsuFontIcons/hot")]
+            Hot,
+
+            [Description(@"OsuFontIcons/list-search")]
+            ListSearch,
+
+            [Description(@"OsuFontIcons/play-style-tablet")]
+            PlayStyleTablet,
+
+            [Description(@"OsuFontIcons/play-style-mouse")]
+            PlayStyleMouse,
+
+            [Description(@"OsuFontIcons/play-style-keyboard")]
+            PlayStyleKeyboard,
+
+            [Description(@"OsuFontIcons/play-style-touch")]
+            PlayStyleTouch,
+
             [Description(@"ModIcons/mod-key1")]
             ModKey1,
 
@@ -560,7 +598,5 @@ namespace osu.Game.Graphics
                 textures.Dispose();
             }
         }
-
-        #endregion
     }
 }
