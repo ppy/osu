@@ -64,6 +64,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             double aimStrain = 0;
 
+            // Evaluate angle bonuses for circles
             if (osuCurrObj.Angle != null && osuLastObj.Angle != null)
             {
                 double currAngle = osuCurrObj.Angle.Value;
@@ -119,10 +120,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 }
             }
 
-            if (osuLastObj.BaseObject is Slider && withSliderTravelDistance && osuCurrObj.SliderAngle1 != null && osuCurrObj.SliderAngle2 != null)
+            // Evaluate acute angle bonus for sliders
+            // Wide angle bonus is skipped since wide slider angles just are not hard in the way they are for circles
+            if (osuLastObj.BaseObject is Slider && withSliderTravelDistance && osuCurrObj.CurrSliderAngle != null && osuCurrObj.PrevSliderAngle != null)
             {
-                double currAngle = osuCurrObj.SliderAngle1.Value;
-                double lastAngle = osuCurrObj.SliderAngle2.Value;
+                double currAngle = osuCurrObj.CurrSliderAngle.Value;
+                double lastAngle = osuCurrObj.PrevSliderAngle.Value;
 
                 // Rewarding angles, take the smaller velocity as base.
                 double angleBonus = Math.Min(movementVelocity, travelVelocity);
