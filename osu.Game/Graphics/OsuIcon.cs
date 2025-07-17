@@ -19,7 +19,6 @@ namespace osu.Game.Graphics
         #region Legacy spritesheet-based icons
 
         private static IconUsage get(int icon) => new IconUsage((char)icon, @"osuFont");
-        private static IconUsage getMod(int icon) => new IconUsage((char)icon, @"osuModsFont");
 
         // ruleset icons in circles
         public static IconUsage RulesetOsu => get(0xe000);
@@ -81,38 +80,6 @@ namespace osu.Game.Graphics
         public static IconUsage HardMania => get(0xe026);
         public static IconUsage InsaneMania => get(0xe027);
         public static IconUsage ExpertMania => get(0xe028);
-
-        // mod icons
-        public static IconUsage ModKey1 => getMod(0xe801);
-        public static IconUsage ModKey2 => getMod(0xe802);
-        public static IconUsage ModKey3 => getMod(0xe803);
-        public static IconUsage ModKey4 => getMod(0xe804);
-        public static IconUsage ModKey5 => getMod(0xe805);
-        public static IconUsage ModKey6 => getMod(0xe806);
-        public static IconUsage ModKey7 => getMod(0xe807);
-        public static IconUsage ModKey8 => getMod(0xe808);
-        public static IconUsage ModKey9 => getMod(0xe809);
-        public static IconUsage ModAuto => getMod(0xe80a);
-        public static IconUsage ModAutopilot => getMod(0xe80b);
-        public static IconUsage ModCinema => getMod(0xe80c);
-        public static IconUsage ModDoubleTime => getMod(0xe80d);
-        public static IconUsage ModEasy => getMod(0xe80e);
-        public static IconUsage ModFadeIn => getMod(0xe80f);
-        public static IconUsage ModFlashlight => getMod(0xe810);
-        public static IconUsage ModHalftime => getMod(0xe811);
-        public static IconUsage ModHardRock => getMod(0xe812);
-        public static IconUsage ModHidden => getMod(0xe813);
-        public static IconUsage ModMirror => getMod(0xe814);
-        public static IconUsage ModNightcore => getMod(0xe815);
-        public static IconUsage ModNoFail => getMod(0xe816);
-        public static IconUsage ModNoMod => getMod(0xe817);
-        public static IconUsage ModPerfect => getMod(0xe818);
-        public static IconUsage ModRandom => getMod(0xe819);
-        public static IconUsage ModRelax => getMod(0xe81a);
-        public static IconUsage ModSpunOut => getMod(0xe81b);
-        public static IconUsage ModSuddenDeath => getMod(0xe81c);
-        public static IconUsage ModTarget => getMod(0xe81d);
-        public static IconUsage ModTouchDevice => getMod(0xe81e);
 
         // Use "Icons/BeatmapDetails/mod-icon" instead
         // public static IconUsage ModBg => Get(0xe04a);
@@ -195,6 +162,36 @@ namespace osu.Game.Graphics
         public static IconUsage EditorWhistle => get(OsuIconMapping.EditorWhistle);
         public static IconUsage Tortoise => get(OsuIconMapping.Tortoise);
         public static IconUsage Hare => get(OsuIconMapping.Hare);
+        public static IconUsage ModKey1 => get(OsuIconMapping.ModKey1);
+        public static IconUsage ModKey2 => get(OsuIconMapping.ModKey2);
+        public static IconUsage ModKey3 => get(OsuIconMapping.ModKey3);
+        public static IconUsage ModKey4 => get(OsuIconMapping.ModKey4);
+        public static IconUsage ModKey5 => get(OsuIconMapping.ModKey5);
+        public static IconUsage ModKey6 => get(OsuIconMapping.ModKey6);
+        public static IconUsage ModKey7 => get(OsuIconMapping.ModKey7);
+        public static IconUsage ModKey8 => get(OsuIconMapping.ModKey8);
+        public static IconUsage ModKey9 => get(OsuIconMapping.ModKey9);
+        public static IconUsage ModAuto => get(OsuIconMapping.ModAuto);
+        public static IconUsage ModAutopilot => get(OsuIconMapping.ModAutopilot);
+        public static IconUsage ModCinema => get(OsuIconMapping.ModCinema);
+        public static IconUsage ModDoubleTime => get(OsuIconMapping.ModDoubleTime);
+        public static IconUsage ModEasy => get(OsuIconMapping.ModEasy);
+        public static IconUsage ModFadeIn => get(OsuIconMapping.ModFadeIn);
+        public static IconUsage ModFlashlight => get(OsuIconMapping.ModFlashlight);
+        public static IconUsage ModHalftime => get(OsuIconMapping.ModHalftime);
+        public static IconUsage ModHardRock => get(OsuIconMapping.ModHardRock);
+        public static IconUsage ModHidden => get(OsuIconMapping.ModHidden);
+        public static IconUsage ModMirror => get(OsuIconMapping.ModMirror);
+        public static IconUsage ModNightcore => get(OsuIconMapping.ModNightcore);
+        public static IconUsage ModNoFail => get(OsuIconMapping.ModNoFail);
+        public static IconUsage ModNoMod => get(OsuIconMapping.ModNoMod);
+        public static IconUsage ModPerfect => get(OsuIconMapping.ModPerfect);
+        public static IconUsage ModRandom => get(OsuIconMapping.ModRandom);
+        public static IconUsage ModRelax => get(OsuIconMapping.ModRelax);
+        public static IconUsage ModSpunOut => get(OsuIconMapping.ModSpunOut);
+        public static IconUsage ModSuddenDeath => get(OsuIconMapping.ModSuddenDeath);
+        public static IconUsage ModTarget => get(OsuIconMapping.ModTarget);
+        public static IconUsage ModTouchDevice => get(OsuIconMapping.ModTouchDevice);
 
         private static IconUsage get(OsuIconMapping glyph) => new IconUsage((char)glyph, FONT_NAME);
 
@@ -415,6 +412,96 @@ namespace osu.Game.Graphics
 
             [Description(@"hare")]
             Hare,
+
+            [Description(@"ModIcons/mod-key1")]
+            ModKey1,
+
+            [Description(@"ModIcons/mod-key2")]
+            ModKey2,
+
+            [Description(@"ModIcons/mod-key3")]
+            ModKey3,
+
+            [Description(@"ModIcons/mod-key4")]
+            ModKey4,
+
+            [Description(@"ModIcons/mod-key5")]
+            ModKey5,
+
+            [Description(@"ModIcons/mod-key6")]
+            ModKey6,
+
+            [Description(@"ModIcons/mod-key7")]
+            ModKey7,
+
+            [Description(@"ModIcons/mod-key8")]
+            ModKey8,
+
+            [Description(@"ModIcons/mod-key9")]
+            ModKey9,
+
+            [Description(@"ModIcons/mod-auto")]
+            ModAuto,
+
+            [Description(@"ModIcons/mod-autopilot")]
+            ModAutopilot,
+
+            [Description(@"ModIcons/mod-cinema")]
+            ModCinema,
+
+            [Description(@"ModIcons/mod-double-time")]
+            ModDoubleTime,
+
+            [Description(@"ModIcons/mod-easy")]
+            ModEasy,
+
+            [Description(@"ModIcons/mod-fade-in")]
+            ModFadeIn,
+
+            [Description(@"ModIcons/mod-flashlight")]
+            ModFlashlight,
+
+            [Description(@"ModIcons/mod-halftime")]
+            ModHalftime,
+
+            [Description(@"ModIcons/mod-hard-rock")]
+            ModHardRock,
+
+            [Description(@"ModIcons/mod-hidden")]
+            ModHidden,
+
+            [Description(@"ModIcons/mod-mirror")]
+            ModMirror,
+
+            [Description(@"ModIcons/mod-nightcore")]
+            ModNightcore,
+
+            [Description(@"ModIcons/mod-no-fail")]
+            ModNoFail,
+
+            [Description(@"ModIcons/mod-no-mod")]
+            ModNoMod,
+
+            [Description(@"ModIcons/mod-perfect")]
+            ModPerfect,
+
+            [Description(@"ModIcons/mod-random")]
+            ModRandom,
+
+            [Description(@"ModIcons/mod-relax")]
+            ModRelax,
+
+            [Description(@"ModIcons/mod-spun-out")]
+            ModSpunOut,
+
+            [Description(@"ModIcons/mod-sudden-death")]
+            ModSuddenDeath,
+
+            [Description(@"ModIcons/mod-target")]
+            ModTarget,
+
+            [Description(@"ModIcons/mod-touch-device")]
+            ModTouchDevice,
         }
 
         public class OsuIconStore : ITextureStore, ITexturedGlyphLookupStore
