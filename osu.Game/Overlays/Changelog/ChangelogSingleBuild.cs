@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Threading;
 using osu.Framework.Allocation;
@@ -38,12 +36,12 @@ namespace osu.Game.Overlays.Changelog
         {
             bool complete = false;
 
-            APIChangelogBuild buildDetail = null;
+            APIChangelogBuild? onlineBuildDetails = null;
 
             var req = new GetChangelogBuildRequest(build.UpdateStream.Name, build.Version);
             req.Success += res =>
             {
-                buildDetail = res;
+                onlineBuildDetails = res;
                 complete = true;
             };
             req.Failure += _ => complete = true;
@@ -61,36 +59,35 @@ namespace osu.Game.Overlays.Changelog
                 Thread.Sleep(10);
             }
 
-            if (buildDetail != null)
+            if (onlineBuildDetails == null) return;
+
+            CommentsContainer comments;
+
+            Children = new Drawable[]
             {
-                CommentsContainer comments;
-
-                Children = new Drawable[]
+                new ChangelogBuildWithNavigation(onlineBuildDetails) { SelectBuild = SelectBuild },
+                new Box
                 {
-                    new ChangelogBuildWithNavigation(buildDetail) { SelectBuild = SelectBuild },
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        Height = 2,
-                        Colour = colourProvider.Background6,
-                        Margin = new MarginPadding { Top = 30 },
-                    },
-                    new ChangelogSupporterPromo
-                    {
-                        Alpha = api.LocalUser.Value.IsSupporter ? 0 : 1,
-                    },
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        Height = 2,
-                        Colour = colourProvider.Background6,
-                        Alpha = api.LocalUser.Value.IsSupporter ? 0 : 1,
-                    },
-                    comments = new CommentsContainer()
-                };
+                    RelativeSizeAxes = Axes.X,
+                    Height = 2,
+                    Colour = colourProvider.Background6,
+                    Margin = new MarginPadding { Top = 30 },
+                },
+                new ChangelogSupporterPromo
+                {
+                    Alpha = api.LocalUser.Value.IsSupporter ? 0 : 1,
+                },
+                new Box
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Height = 2,
+                    Colour = colourProvider.Background6,
+                    Alpha = api.LocalUser.Value.IsSupporter ? 0 : 1,
+                },
+                comments = new CommentsContainer()
+            };
 
-                comments.ShowComments(CommentableType.Build, buildDetail.Id);
-            }
+            comments.ShowComments(CommentableType.Build, onlineBuildDetails.Id);
         }
 
         public partial class ChangelogBuildWithNavigation : ChangelogBuild
@@ -100,7 +97,7 @@ namespace osu.Game.Overlays.Changelog
             {
             }
 
-            private OsuSpriteText date;
+            private OsuSpriteText date = null!;
 
             protected override FillFlowContainer CreateHeader()
             {
@@ -146,9 +143,9 @@ namespace osu.Game.Overlays.Changelog
 
         private partial class NavigationIconButton : IconButton
         {
-            public Action<APIChangelogBuild> SelectBuild;
+            public required Action<APIChangelogBuild> SelectBuild { get; init; }
 
-            public NavigationIconButton(APIChangelogBuild build)
+            public NavigationIconButton(APIChangelogBuild? build)
             {
                 Anchor = Anchor.Centre;
                 Origin = Anchor.Centre;
