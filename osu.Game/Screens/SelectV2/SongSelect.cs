@@ -166,12 +166,6 @@ namespace osu.Game.Screens.SelectV2
                                 mainGridContainer = new GridContainer // used for max width implementation
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    ColumnDimensions = new[]
-                                    {
-                                        new Dimension(GridSizeMode.Relative, 0.5f, maxSize: 700),
-                                        new Dimension(),
-                                        new Dimension(GridSizeMode.Relative, 0.5f, minSize: 500, maxSize: 900),
-                                    },
                                     Content = new[]
                                     {
                                         new[]
@@ -360,13 +354,13 @@ namespace osu.Game.Screens.SelectV2
 
             detailsArea.Height = wedgesContainer.DrawHeight - titleWedge.LayoutSize.Y - 4;
 
-            float widescreenBonusWidth = Math.Max(0, DrawWidth / DrawHeight - 2);
+            float widescreenBonusWidth = Math.Max(0, DrawWidth / DrawHeight - 2f);
 
             mainGridContainer.ColumnDimensions = new[]
             {
                 new Dimension(GridSizeMode.Relative, 0.5f, maxSize: 700 + widescreenBonusWidth * 100),
                 new Dimension(),
-                new Dimension(GridSizeMode.Relative, 0.5f, minSize: 500, maxSize: 600 + widescreenBonusWidth * 300),
+                new Dimension(GridSizeMode.Relative, 0.5f, minSize: 500, maxSize: 700 + widescreenBonusWidth * 300),
             };
         }
 
