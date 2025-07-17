@@ -120,11 +120,6 @@ namespace osu.Game.Localisation
         public static LocalisableString UpdateBeatmapTooltip => new TranslatableString(getKey(@"update_beatmap_tooltip"), @"Update beatmap with online changes");
 
         /// <summary>
-        /// "Edit beatmap"
-        /// </summary>
-        public static LocalisableString EditBeatmap => new TranslatableString(getKey(@"edit_beatmap"), @"Edit beatmap");
-
-        /// <summary>
         /// "Mark as played"
         /// </summary>
         public static LocalisableString MarkAsPlayed => new TranslatableString(getKey(@"mark_as_played"), @"Mark as played");
