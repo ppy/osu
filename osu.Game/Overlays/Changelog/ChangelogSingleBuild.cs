@@ -26,7 +26,7 @@ namespace osu.Game.Overlays.Changelog
 {
     public partial class ChangelogSingleBuild : ChangelogContent
     {
-        private APIChangelogBuild build;
+        private readonly APIChangelogBuild build;
 
         public ChangelogSingleBuild(APIChangelogBuild build)
         {
@@ -38,10 +38,12 @@ namespace osu.Game.Overlays.Changelog
         {
             bool complete = false;
 
+            APIChangelogBuild buildDetail = null;
+
             var req = new GetChangelogBuildRequest(build.UpdateStream.Name, build.Version);
             req.Success += res =>
             {
-                build = res;
+                buildDetail = res;
                 complete = true;
             };
             req.Failure += _ => complete = true;
@@ -59,13 +61,13 @@ namespace osu.Game.Overlays.Changelog
                 Thread.Sleep(10);
             }
 
-            if (build != null)
+            if (buildDetail != null)
             {
                 CommentsContainer comments;
 
                 Children = new Drawable[]
                 {
-                    new ChangelogBuildWithNavigation(build) { SelectBuild = SelectBuild },
+                    new ChangelogBuildWithNavigation(buildDetail) { SelectBuild = SelectBuild },
                     new Box
                     {
                         RelativeSizeAxes = Axes.X,
@@ -87,7 +89,7 @@ namespace osu.Game.Overlays.Changelog
                     comments = new CommentsContainer()
                 };
 
-                comments.ShowComments(CommentableType.Build, build.Id);
+                comments.ShowComments(CommentableType.Build, buildDetail.Id);
             }
         }
 
