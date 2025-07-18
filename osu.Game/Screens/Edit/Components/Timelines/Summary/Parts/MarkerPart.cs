@@ -107,6 +107,13 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
             [BackgroundDependencyLoader]
             private void load(OverlayColourProvider colours) => Colour = colours.Highlight1;
 
+            /// <summary>
+            /// Triangles drawn at the top and bottom of <see cref="MarkerVisualisation"/>.
+            /// </summary>
+            /// <remarks>
+            /// Since framework-side triangles don't support antialiasing we are using custom implementation involving shaders to avoid mismatch
+            /// in antialiasing between top and bottom triangles when drawable moves across the screen.
+            /// </remarks>
             private partial class VerticalTriangles : Sprite
             {
                 [BackgroundDependencyLoader]
@@ -118,13 +125,6 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
 
                 protected override DrawNode CreateDrawNode() => new VerticalTrianglesDrawNode(this);
 
-                /// <summary>
-                /// Triangles drawn at the top and bottom of <see cref="MarkerVisualisation"/>.
-                /// </summary>
-                /// <remarks>
-                /// Since framework-side triangles don't support antialiasing we are using custom implementation involving shaders to avoid mismatch
-                /// in antialiasing between top and bottom triangles when drawable moves across the screen.
-                /// </remarks>
                 private class VerticalTrianglesDrawNode : SpriteDrawNode
                 {
                     private const float aa = 1.5f; // across how many pixels antialiasing is being applied
