@@ -357,7 +357,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
         private static async Task<List<CarouselItem>> runGrouping(GroupMode group, List<BeatmapSetInfo> beatmapSets)
         {
-            var groupingFilter = new BeatmapCarouselFilterGrouping(() => new FilterCriteria { Group = group });
+            var groupingFilter = new BeatmapCarouselFilterGrouping(() => new FilterCriteria { Group = group }, () => null);
             return await groupingFilter.Run(beatmapSets.SelectMany(s => s.Beatmaps.Select(b => new CarouselItem(b))).ToList(), CancellationToken.None);
         }
 

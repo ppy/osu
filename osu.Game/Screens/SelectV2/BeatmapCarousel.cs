@@ -18,7 +18,6 @@ using osu.Framework.Graphics.Pooling;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
-using osu.Game.Collections;
 using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Graphics;
@@ -32,11 +31,6 @@ namespace osu.Game.Screens.SelectV2
     public partial class BeatmapCarousel : Carousel<BeatmapInfo>
     {
         public Action<BeatmapInfo>? RequestPresentBeatmap { private get; init; }
-
-        /// <summary>
-        /// Retrieves all collections stored in the user's database.
-        /// </summary>
-        public Func<IEnumerable<BeatmapCollection>>? GetUserCollections { private get; init; }
 
         /// <summary>
         /// From the provided beatmaps, select the most appropriate one for the user's skill.
@@ -56,6 +50,9 @@ namespace osu.Game.Screens.SelectV2
 
         private readonly BeatmapCarouselFilterMatching matching;
         private readonly BeatmapCarouselFilterGrouping grouping;
+
+        [Resolved]
+        private BeatmapCollectionStore? collectionStore { get; set; }
 
         /// <summary>
         /// Total number of beatmap difficulties displayed with the filter.
@@ -104,7 +101,7 @@ namespace osu.Game.Screens.SelectV2
             {
                 matching = new BeatmapCarouselFilterMatching(() => Criteria!),
                 new BeatmapCarouselFilterSorting(() => Criteria!),
-                grouping = createFilterGrouping(() => Criteria!),
+                grouping = new BeatmapCarouselFilterGrouping(() => Criteria!, () => collectionStore),
             };
 
             AddInternal(loading = new LoadingLayer());
@@ -893,15 +890,6 @@ namespace osu.Game.Screens.SelectV2
 
             randomSelectSample?.Play();
         }
-
-        #endregion
-
-        #region Grouping
-
-        private BeatmapCarouselFilterGrouping createFilterGrouping(Func<FilterCriteria> getCriteria) => new BeatmapCarouselFilterGrouping(getCriteria)
-        {
-            GetUserCollections = () => GetUserCollections?.Invoke() ?? Enumerable.Empty<BeatmapCollection>(),
-        };
 
         #endregion
     }

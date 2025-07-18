@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -19,15 +20,30 @@ namespace osu.Game.Screens.SelectV2
 
         private IDisposable? realmSubscription;
 
-        private readonly BindableList<BeatmapCollection> collections = new BindableList<BeatmapCollection>();
+        private readonly BindableList<Live<BeatmapCollection>> liveCollections = new BindableList<Live<BeatmapCollection>>();
+        private readonly List<BeatmapCollection> detachedCollections = new List<BeatmapCollection>();
 
         /// <summary>
-        /// Gets a thread-safe bound copy to the list of <see cref="BeatmapCollection"/> present in the user's database.
+        /// Gets a thread-safe bound copy to the list of <see cref="BeatmapCollection"/> present in the user's database, wrapped in <see cref="Live{T}"/> objects.
         /// </summary>
-        public IBindableList<BeatmapCollection> GetCollections()
+        public BindableList<Live<BeatmapCollection>> GetLiveCollections()
         {
-            lock (collections)
-                return collections.GetBoundCopy();
+            lock (liveCollections)
+                return liveCollections.GetBoundCopy();
+        }
+
+        /// <summary>
+        /// Gets a thread-safe copy to the list of <see cref="BeatmapCollection"/> present in the user's database, in a detached state.
+        /// </summary>
+        /// <remarks>
+        /// Note this does not guarantee validity of the list if called too early,
+        /// but the current usage of this is accompanied by listening to changes in <see cref="GetLiveCollections"/>,
+        /// so this is not an issue for the current usage.
+        /// </remarks>
+        public List<BeatmapCollection> GetDetachedCollections()
+        {
+            lock (detachedCollections)
+                return detachedCollections.ToList();
         }
 
         [BackgroundDependencyLoader]
@@ -36,14 +52,45 @@ namespace osu.Game.Screens.SelectV2
             realmSubscription = realm.RegisterForNotifications(r => r.All<BeatmapCollection>().OrderBy(c => c.Name), onChanged);
         }
 
-        private void onChanged(IRealmCollection<BeatmapCollection> sender, ChangeSet? changes)
+        private void onChanged(IRealmCollection<BeatmapCollection> realmCollections, ChangeSet? changes)
         {
-            lock (collections)
-            {
-                collections.Clear();
+            processLiveCollections(realmCollections, changes);
+            processDetachedCollections(realmCollections, changes);
+        }
 
-                foreach (var c in sender)
-                    collections.Add(c.Detach());
+        private void processLiveCollections(IRealmCollection<BeatmapCollection> realmCollections, ChangeSet? changes)
+        {
+            lock (liveCollections)
+            {
+                if (changes == null)
+                {
+                    liveCollections.Clear();
+
+                    foreach (var c in realmCollections)
+                        liveCollections.Add(c.ToLive(realm));
+                }
+                else
+                {
+                    foreach (int i in changes.DeletedIndices.OrderDescending())
+                        liveCollections.RemoveAt(i);
+
+                    foreach (int i in changes.InsertedIndices)
+                        liveCollections.Insert(i, realmCollections[i].ToLive(realm));
+
+                    foreach (int i in changes.NewModifiedIndices)
+                        liveCollections[i] = realmCollections[i].ToLive(realm);
+                }
+            }
+        }
+
+        private void processDetachedCollections(IRealmCollection<BeatmapCollection> realmCollections, ChangeSet? changes)
+        {
+            var detached = realmCollections.Detach();
+
+            lock (detachedCollections)
+            {
+                detachedCollections.Clear();
+                detachedCollections.AddRange(detached);
             }
         }
 

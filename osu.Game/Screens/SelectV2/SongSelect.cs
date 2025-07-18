@@ -91,8 +91,10 @@ namespace osu.Game.Screens.SelectV2
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 
-        private BeatmapCollectionStore beatmapCollectionStore = null!;
-        private IBindableList<BeatmapCollection> collections = null!;
+        [Cached]
+        private readonly BeatmapCollectionStore beatmapCollectionStore = new BeatmapCollectionStore();
+
+        private IBindableList<Live<BeatmapCollection>> collections = null!;
 
         private BeatmapCarousel carousel = null!;
 
@@ -143,7 +145,7 @@ namespace osu.Game.Screens.SelectV2
         {
             errorSample = audio.Samples.Get(@"UI/generic-error");
 
-            AddInternal(beatmapCollectionStore = new BeatmapCollectionStore());
+            AddInternal(beatmapCollectionStore);
 
             AddRangeInternal(new Drawable[]
             {
@@ -251,7 +253,6 @@ namespace osu.Game.Screens.SelectV2
                                                                 RequestSelection = queueBeatmapSelection,
                                                                 RequestRecommendedSelection = requestRecommendedSelection,
                                                                 NewItemsPresented = newItemsPresented,
-                                                                GetUserCollections = beatmapCollectionStore.GetCollections,
                                                             },
                                                             noResultsPlaceholder = new NoResultsPlaceholder
                                                             {
@@ -293,7 +294,7 @@ namespace osu.Game.Screens.SelectV2
                 updateBackgroundDim();
             });
 
-            collections = beatmapCollectionStore.GetCollections();
+            collections = beatmapCollectionStore.GetLiveCollections();
         }
 
         private void requestRecommendedSelection(IEnumerable<BeatmapInfo> b)
@@ -966,9 +967,6 @@ namespace osu.Game.Screens.SelectV2
         [Resolved]
         private ManageCollectionsDialog? manageCollectionsDialog { get; set; }
 
-        [Resolved]
-        private RealmAccess realm { get; set; } = null!;
-
         public virtual IEnumerable<OsuMenuItem> GetForwardActions(BeatmapInfo beatmap)
         {
             yield return new OsuMenuItem("Select", MenuItemType.Highlighted, () => SelectAndRun(beatmap, OnStart))
@@ -994,7 +992,7 @@ namespace osu.Game.Screens.SelectV2
 
         protected IEnumerable<OsuMenuItem> CreateCollectionMenuActions(BeatmapInfo beatmap)
         {
-            var collectionItems = collections.Select(c => new CollectionToggleMenuItem(c.ToLive(realm), beatmap)).Cast<OsuMenuItem>().ToList();
+            var collectionItems = collections.Select(c => new CollectionToggleMenuItem(c, beatmap)).Cast<OsuMenuItem>().ToList();
             collectionItems.Add(new OsuMenuItem("Manage...", MenuItemType.Standard, () => manageCollectionsDialog?.Show()));
             yield return new OsuMenuItem(CommonStrings.Collections) { Items = collectionItems };
         }

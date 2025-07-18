@@ -33,12 +33,12 @@ namespace osu.Game.Screens.SelectV2
         private readonly Dictionary<GroupDefinition, HashSet<CarouselItem>> groupMap = new Dictionary<GroupDefinition, HashSet<CarouselItem>>();
 
         private readonly Func<FilterCriteria> getCriteria;
+        private readonly Func<BeatmapCollectionStore?> getCollectionStore;
 
-        public Func<IEnumerable<BeatmapCollection>>? GetUserCollections { get; init; }
-
-        public BeatmapCarouselFilterGrouping(Func<FilterCriteria> getCriteria)
+        public BeatmapCarouselFilterGrouping(Func<FilterCriteria> getCriteria, Func<BeatmapCollectionStore?> getCollectionStore)
         {
             this.getCriteria = getCriteria;
+            this.getCollectionStore = getCollectionStore;
         }
 
         public async Task<List<CarouselItem>> Run(IEnumerable<CarouselItem> items, CancellationToken cancellationToken)
@@ -53,7 +53,7 @@ namespace osu.Game.Screens.SelectV2
 
                 BeatmapSetsGroupedTogether = ShouldGroupBeatmapsTogether(criteria);
 
-                var groups = getGroups((List<CarouselItem>)items, criteria);
+                var groups = getGroups((List<CarouselItem>)items, criteria, cancellationToken);
 
                 foreach (var (group, itemsInGroup) in groups)
                 {
@@ -141,7 +141,7 @@ namespace osu.Game.Screens.SelectV2
             return true;
         }
 
-        private List<GroupMapping> getGroups(List<CarouselItem> items, FilterCriteria criteria)
+        private List<GroupMapping> getGroups(List<CarouselItem> items, FilterCriteria criteria, CancellationToken cancellationToken)
         {
             switch (criteria.Group)
             {
@@ -209,7 +209,8 @@ namespace osu.Game.Screens.SelectV2
                     return getGroupsBy(b => defineGroupBySource(b.BeatmapSet!.Metadata.Source), items);
 
                 case GroupMode.Collections:
-                    var collections = GetUserCollections?.Invoke() ?? Enumerable.Empty<BeatmapCollection>();
+                    var collectionStore = getCollectionStore();
+                    var collections = collectionStore?.GetDetachedCollections() ?? Enumerable.Empty<BeatmapCollection>();
                     return getGroupsBy(b => defineGroupByCollection(b, collections), items);
 
                 // TODO: need implementation

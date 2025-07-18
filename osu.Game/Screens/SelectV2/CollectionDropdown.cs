@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -19,7 +20,6 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osuTK;
-using Realms;
 
 namespace osu.Game.Screens.SelectV2
 {
@@ -38,12 +38,12 @@ namespace osu.Game.Screens.SelectV2
         private readonly BindableList<CollectionFilterMenuItem> filters = new BindableList<CollectionFilterMenuItem>();
 
         [Resolved]
-        private ManageCollectionsDialog? manageCollectionsDialog { get; set; }
+        private BeatmapCollectionStore collectionStore { get; set; } = null!;
+
+        private IBindableList<Live<BeatmapCollection>> collections = null!;
 
         [Resolved]
-        private RealmAccess realm { get; set; } = null!;
-
-        private IDisposable? realmSubscription;
+        private ManageCollectionsDialog? manageCollectionsDialog { get; set; }
 
         private readonly CollectionFilterMenuItem allBeatmapsItem = new AllBeatmapsCollectionFilterMenuItem();
 
@@ -56,64 +56,83 @@ namespace osu.Game.Screens.SelectV2
             AlwaysShowSearchBar = true;
         }
 
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            filters.Clear();
+            filters.Add(allBeatmapsItem);
+
+            if (ShowManageCollectionsItem)
+                filters.Add(new ManageCollectionsFilterMenuItem());
+
+            collections = collectionStore.GetLiveCollections();
+            collections.BindCollectionChanged(collectionsChanged, true);
+        }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            realmSubscription = realm.RegisterForNotifications(r => r.All<BeatmapCollection>().OrderBy(c => c.Name), collectionsChanged);
-
             Current.BindValueChanged(selectionChanged);
         }
 
-        private void collectionsChanged(IRealmCollection<BeatmapCollection> collections, ChangeSet? changes)
+        private void collectionsChanged(object? sender, NotifyCollectionChangedEventArgs args)
         {
-            if (changes == null)
+            switch (args.Action)
             {
-                filters.Clear();
-                filters.Add(allBeatmapsItem);
-                filters.AddRange(collections.Select(c => new CollectionFilterMenuItem(c.ToLive(realm))));
-                if (ShowManageCollectionsItem)
-                    filters.Add(new ManageCollectionsFilterMenuItem());
-            }
-            else
-            {
-                foreach (int i in changes.DeletedIndices.OrderDescending())
-                    filters.RemoveAt(i + 1);
+                case NotifyCollectionChangedAction.Add:
+                    int startingIndex = Math.Max(args.NewStartingIndex, 0);
 
-                foreach (int i in changes.InsertedIndices)
-                    filters.Insert(i + 1, new CollectionFilterMenuItem(collections[i].ToLive(realm)));
-
-                var selectedItem = SelectedItem?.Value;
-
-                foreach (int i in changes.NewModifiedIndices)
-                {
-                    var updatedItem = collections[i];
-
-                    // This is responsible for updating the state of the +/- button and the collection's name.
-                    // TODO: we can probably make the menu items update with changes to avoid this.
-                    filters.RemoveAt(i + 1);
-                    filters.Insert(i + 1, new CollectionFilterMenuItem(updatedItem.ToLive(realm)));
-
-                    if (updatedItem.ID == selectedItem?.Collection?.ID)
+                    for (int i = startingIndex; i < startingIndex + args.NewItems!.Count; i++)
                     {
-                        // This current update and schedule is required to work around dropdown headers not updating text even when the selected item
-                        // changes. It's not great but honestly the whole dropdown menu structure isn't great. This needs to be fixed, but I'll issue
-                        // a warning that it's going to be a frustrating journey.
-                        Current.Value = allBeatmapsItem;
-                        Schedule(() =>
-                        {
-                            // current may have changed before the scheduled call is run.
-                            if (Current.Value != allBeatmapsItem)
-                                return;
-
-                            Current.Value = filters.SingleOrDefault(f => f.Collection?.ID == selectedItem.Collection?.ID) ?? filters[0];
-                        });
-
-                        // Trigger an external re-filter if the current item was in the change set.
-                        RequestFilter?.Invoke();
-                        break;
+                        var newItem = collections[i];
+                        filters.Insert(i + 1, new CollectionFilterMenuItem(newItem));
                     }
-                }
+
+                    break;
+
+                case NotifyCollectionChangedAction.Remove:
+                    foreach (var collection in args.OldItems!.Cast<Live<BeatmapCollection>>())
+                        filters.RemoveAll(f => f.Collection?.ID == collection.ID);
+                    break;
+
+                case NotifyCollectionChangedAction.Replace:
+                    var selectedItem = SelectedItem?.Value;
+
+                    for (int i = args.NewStartingIndex; i < args.NewStartingIndex + args.NewItems!.Count; i++)
+                    {
+                        var updatedItem = collections[i];
+
+                        // This is responsible for updating the state of the +/- button and the collection's name.
+                        // TODO: we can probably make the menu items update with changes to avoid this.
+                        filters.RemoveAt(i + 1);
+                        filters.Insert(i + 1, new CollectionFilterMenuItem(updatedItem));
+
+                        if (updatedItem.ID == selectedItem?.Collection?.ID)
+                        {
+                            // This current update and schedule is required to work around dropdown headers not updating text even when the selected item
+                            // changes. It's not great but honestly the whole dropdown menu structure isn't great. This needs to be fixed, but I'll issue
+                            // a warning that it's going to be a frustrating journey.
+                            Current.Value = allBeatmapsItem;
+                            Schedule(() =>
+                            {
+                                // current may have changed before the scheduled call is run.
+                                if (Current.Value != allBeatmapsItem)
+                                    return;
+
+                                Current.Value = filters.SingleOrDefault(f => f.Collection?.ID == selectedItem.Collection?.ID) ?? filters[0];
+                            });
+
+                            // Trigger an external re-filter if the current item was in the change set.
+                            RequestFilter?.Invoke();
+                            break;
+                        }
+                    }
+
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(args));
             }
         }
 
@@ -143,12 +162,6 @@ namespace osu.Game.Screens.SelectV2
                 RequestFilter?.Invoke();
                 lastFiltered = newCollection;
             }
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-            realmSubscription?.Dispose();
         }
 
         protected override LocalisableString GenerateItemText(CollectionFilterMenuItem item) => item.CollectionName;
