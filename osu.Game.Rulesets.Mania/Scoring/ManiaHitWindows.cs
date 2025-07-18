@@ -148,15 +148,25 @@ namespace osu.Game.Rulesets.Mania.Scoring
                     meh = Math.Floor((121 + 3 * invertedOd) * totalMultiplier) + 0.5;
                     miss = Math.Floor((158 + 3 * invertedOd) * totalMultiplier) + 0.5;
                 }
+
+                return;
             }
-            else
+
+            perfect = IBeatmapDifficultyInfo.DifficultyRange(overallDifficulty, PERFECT_WINDOW_RANGE) * totalMultiplier;
+            great = IBeatmapDifficultyInfo.DifficultyRange(overallDifficulty, great_window_range) * totalMultiplier;
+            good = IBeatmapDifficultyInfo.DifficultyRange(overallDifficulty, good_window_range) * totalMultiplier;
+            ok = IBeatmapDifficultyInfo.DifficultyRange(overallDifficulty, ok_window_range) * totalMultiplier;
+            meh = IBeatmapDifficultyInfo.DifficultyRange(overallDifficulty, meh_window_range) * totalMultiplier;
+            miss = IBeatmapDifficultyInfo.DifficultyRange(overallDifficulty, miss_window_range) * totalMultiplier;
+
+            if (ClassicModActive)
             {
-                perfect = Math.Floor(IBeatmapDifficultyInfo.DifficultyRange(overallDifficulty, PERFECT_WINDOW_RANGE) * totalMultiplier) + 0.5;
-                great = Math.Floor(IBeatmapDifficultyInfo.DifficultyRange(overallDifficulty, great_window_range) * totalMultiplier) + 0.5;
-                good = Math.Floor(IBeatmapDifficultyInfo.DifficultyRange(overallDifficulty, good_window_range) * totalMultiplier) + 0.5;
-                ok = Math.Floor(IBeatmapDifficultyInfo.DifficultyRange(overallDifficulty, ok_window_range) * totalMultiplier) + 0.5;
-                meh = Math.Floor(IBeatmapDifficultyInfo.DifficultyRange(overallDifficulty, meh_window_range) * totalMultiplier) + 0.5;
-                miss = Math.Floor(IBeatmapDifficultyInfo.DifficultyRange(overallDifficulty, miss_window_range) * totalMultiplier) + 0.5;
+                perfect = Math.Floor(perfect) + 0.5;
+                great = Math.Floor(great) + 0.5;
+                good = Math.Floor(good) + 0.5;
+                ok = Math.Floor(ok) + 0.5;
+                meh = Math.Floor(meh) + 0.5;
+                miss = Math.Floor(miss) + 0.5;
             }
         }
 

@@ -41,11 +41,13 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void ApplyToHitObject(HitObject hitObject)
         {
-            switch (hitObject)
+            if (hitObject is Slider slider)
+                slider.ClassicSliderBehaviour = NoSliderHeadAccuracy.Value;
+
+            foreach (var ho in hitObject.EnumerateAllHitObjects())
             {
-                case Slider slider:
-                    slider.ClassicSliderBehaviour = NoSliderHeadAccuracy.Value;
-                    break;
+                if (ho.HitWindows is OsuHitWindows osuHitWindows)
+                    osuHitWindows.ClassicModActive = true;
             }
         }
 

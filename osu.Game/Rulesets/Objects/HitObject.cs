@@ -256,5 +256,28 @@ namespace osu.Game.Rulesets.Objects
         /// <param name="hitObject">The object.</param>
         /// <returns>The end time of this object.</returns>
         public static double GetEndTime(this HitObject hitObject) => (hitObject as IHasDuration)?.EndTime ?? hitObject.StartTime;
+
+        /// <summary>
+        /// Returns an enumerable containing the provided <paramref name="hitObject"/> and its nested objects.
+        /// </summary>
+        public static IEnumerable<HitObject> EnumerateAllHitObjects(this HitObject hitObject)
+        {
+            yield return hitObject;
+
+            foreach (var nested in hitObject.NestedHitObjects)
+                yield return nested;
+        }
+
+        /// <summary>
+        /// Returns an enumerable containing all top-level objects from <paramref name="hitObjects"/> and all their nested objects.
+        /// </summary>
+        public static IEnumerable<HitObject> EnumerateAllHitObjects(this IEnumerable<HitObject> hitObjects)
+        {
+            foreach (var topLevelObjects in hitObjects)
+            {
+                foreach (var ho in topLevelObjects.EnumerateAllHitObjects())
+                    yield return ho;
+            }
+        }
     }
 }

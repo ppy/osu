@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
@@ -21,8 +22,8 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
-using osuTK;
 using SharpCompress.Compressors.LZMA;
+using Vector2 = osuTK.Vector2;
 
 namespace osu.Game.Scoring.Legacy
 {
@@ -265,7 +266,7 @@ namespace osu.Game.Scoring.Legacy
 
         private void readLegacyReplay(Replay replay, StreamReader reader)
         {
-            long lastTime = beatmapOffset;
+            decimal lastTime = beatmapOffset;
             var legacyFrames = new List<LegacyReplayFrame>();
 
             string[] frames = reader.ReadToEnd().Split(',');
@@ -291,24 +292,31 @@ namespace osu.Game.Scoring.Legacy
                 // to be integral and does not allow fractional values.
                 // one particular reason why this matters is that integral deltas
                 // avoid nasty floating point traps like accumulation error from summation or round-off error.
-                // however, there was a period in lazer's lifetime wherein lazer emitted replays
-                // with fractional (float) frame deltas, up until https://github.com/ppy/osu/pull/12583.
-                // despite the fact that gameplay mechanics changed multiple times since
-                // and the replay isn't going to play back anywhere near accurately anyway,
-                // no mistakes are ever forgiven, thus this attempts to parse the delta as an integer once,
-                // and if that fails, tries again as float.
-                // notably this cannot just be `(int)Parsing.ParseFloat(split[0])`, because that can lose information
-                // (`float` numbers have 24 bits of significand precision, which is not enough to accurately represent every possible value of `int`).
-                int diff;
-                if (!int.TryParse(split[0], out diff))
-                    diff = (int)Math.Round(Parsing.ParseFloat(split[0]));
+                //
+                // lazer initially emitted replays with floating point frame delta times,
+                // then stopped doing so in https://github.com/ppy/osu/pull/12583,
+                // which then caused lazer replays to incur irretrievable data loss
+                // because the rounded times were causing replays to play back inaccurately.
+                // we attempted to bring back lazer hit windows to match stable to kill two birds with one stone
+                // (that worked because stable uses integers both for input timestamping and for hitwindow comparisons).
+                // however everyone hated that.
+                //
+                // thus, this uneasy compromise of using `decimal`.
+                // why `decimal` and not `double` or `float`? couple of reasons:
+                // - `decimal` is base-10 and not base-2 which by intuition is *somewhat* better to use
+                //   because in general hit windows intervals get specified in base-10, so this gives vague hope of better parsing precision
+                // - `decimal` supports the most digits of precision of any decimal type (28-29) which should hopefully be more than enough,
+                //    especially so given that `LegacyScoreEncoder` will emit at most 4 decimal digits to a replay
+                // there is still a non-zero chance of this not working completely correctly, because of a few encode-time concerns (see commentary in `LegacyScoreEncoder`),
+                // as well as the fact that the timestamps have to be turned back to `double` to be plugged into the game logic.
+                decimal diff = decimal.Parse(split[0], CultureInfo.InvariantCulture);
 
                 float mouseX = Parsing.ParseFloat(split[1], mouseXParseLimit);
                 float mouseY = Parsing.ParseFloat(split[2], Parsing.MAX_COORDINATE_VALUE);
 
                 lastTime += diff;
 
-                legacyFrames.Add(new LegacyReplayFrame(lastTime,
+                legacyFrames.Add(new LegacyReplayFrame(double.CreateTruncating(lastTime),
                     mouseX,
                     mouseY,
                     (ReplayButtonState)Parsing.ParseInt(split[3])));
