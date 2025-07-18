@@ -134,27 +134,50 @@ namespace osu.Game.Graphics
         public static IconUsage ModKey7 => get(OsuIconMapping.ModKey7);
         public static IconUsage ModKey8 => get(OsuIconMapping.ModKey8);
         public static IconUsage ModKey9 => get(OsuIconMapping.ModKey9);
+        public static IconUsage ModKey10 => get(OsuIconMapping.ModKey10);
+        public static IconUsage ModApproachDifferent => get(OsuIconMapping.ModApproachDifferent);
+
+        public static IconUsage ModAlternate => get(OsuIconMapping.ModAlternate);
         public static IconUsage ModAuto => get(OsuIconMapping.ModAuto);
         public static IconUsage ModAutopilot => get(OsuIconMapping.ModAutopilot);
+        public static IconUsage ModBlinds => get(OsuIconMapping.ModBlinds);
         public static IconUsage ModCinema => get(OsuIconMapping.ModCinema);
+        public static IconUsage ModClassic => get(OsuIconMapping.ModClassic);
+        public static IconUsage ModConstantSpeed => get(OsuIconMapping.ModConstantSpeed);
+        public static IconUsage ModCover => get(OsuIconMapping.ModCover);
+        public static IconUsage ModDeflate => get(OsuIconMapping.ModDeflate);
+        public static IconUsage ModDepth => get(OsuIconMapping.ModDepth);
         public static IconUsage ModDoubleTime => get(OsuIconMapping.ModDoubleTime);
+        public static IconUsage ModDifficultyAdjust => get(OsuIconMapping.ModDifficultyAdjust);
         public static IconUsage ModEasy => get(OsuIconMapping.ModEasy);
         public static IconUsage ModFadeIn => get(OsuIconMapping.ModFadeIn);
+        public static IconUsage ModFloatingFruits => get(OsuIconMapping.ModFloatingFruits);
         public static IconUsage ModFlashlight => get(OsuIconMapping.ModFlashlight);
+        public static IconUsage ModGrow => get(OsuIconMapping.ModGrow);
         public static IconUsage ModHalftime => get(OsuIconMapping.ModHalftime);
         public static IconUsage ModHardRock => get(OsuIconMapping.ModHardRock);
         public static IconUsage ModHidden => get(OsuIconMapping.ModHidden);
+        public static IconUsage ModHoldOff => get(OsuIconMapping.ModHoldOff);
+        public static IconUsage ModInvert => get(OsuIconMapping.ModInvert);
+        public static IconUsage ModMagnetised => get(OsuIconMapping.ModMagnetised);
         public static IconUsage ModMirror => get(OsuIconMapping.ModMirror);
+        public static IconUsage ModMuted => get(OsuIconMapping.ModMuted);
         public static IconUsage ModNightcore => get(OsuIconMapping.ModNightcore);
         public static IconUsage ModNoFail => get(OsuIconMapping.ModNoFail);
         public static IconUsage ModNoMod => get(OsuIconMapping.ModNoMod);
+        public static IconUsage ModNoScope => get(OsuIconMapping.ModNoScope);
         public static IconUsage ModPerfect => get(OsuIconMapping.ModPerfect);
         public static IconUsage ModRandom => get(OsuIconMapping.ModRandom);
         public static IconUsage ModRelax => get(OsuIconMapping.ModRelax);
+        public static IconUsage ModSpinIn => get(OsuIconMapping.ModSpinIn);
         public static IconUsage ModSpunOut => get(OsuIconMapping.ModSpunOut);
         public static IconUsage ModSuddenDeath => get(OsuIconMapping.ModSuddenDeath);
         public static IconUsage ModTarget => get(OsuIconMapping.ModTarget);
         public static IconUsage ModTouchDevice => get(OsuIconMapping.ModTouchDevice);
+        public static IconUsage ModTransform => get(OsuIconMapping.ModTransform);
+        public static IconUsage ModWindDown => get(OsuIconMapping.ModWindDown);
+        public static IconUsage ModWindUp => get(OsuIconMapping.ModWindUp);
+        public static IconUsage ModWiggle => get(OsuIconMapping.ModWiggle);
 
         private static IconUsage get(OsuIconMapping glyph) => new IconUsage((char)glyph, FONT_NAME);
 
@@ -478,17 +501,47 @@ namespace osu.Game.Graphics
             [Description(@"ModIcons/mod-key9")]
             ModKey9,
 
+            [Description(@"ModIcons/mod-key10")]
+            ModKey10,
+
+            [Description(@"ModIcons/mod-alternate")]
+            ModAlternate,
+
+            [Description(@"ModIcons/mod-approach-different")]
+            ModApproachDifferent,
+
             [Description(@"ModIcons/mod-auto")]
             ModAuto,
 
             [Description(@"ModIcons/mod-autopilot")]
             ModAutopilot,
 
+            [Description(@"ModIcons/mod-blinds")]
+            ModBlinds,
+
             [Description(@"ModIcons/mod-cinema")]
             ModCinema,
 
+            [Description(@"ModIcons/mod-classic")]
+            ModClassic,
+
+            [Description(@"ModIcons/mod-constant-speed")]
+            ModConstantSpeed,
+
+            [Description(@"ModIcons/mod-cover")]
+            ModCover,
+
             [Description(@"ModIcons/mod-double-time")]
             ModDoubleTime,
+
+            [Description(@"ModIcons/mod-deflate")]
+            ModDeflate,
+
+            [Description(@"ModIcons/mod-depth")]
+            ModDepth,
+
+            [Description(@"ModIcons/mod-difficulty-adjust")]
+            ModDifficultyAdjust,
 
             [Description(@"ModIcons/mod-easy")]
             ModEasy,
@@ -499,6 +552,12 @@ namespace osu.Game.Graphics
             [Description(@"ModIcons/mod-flashlight")]
             ModFlashlight,
 
+            [Description(@"ModIcons/mod-floating-fruits")]
+            ModFloatingFruits,
+
+            [Description(@"ModIcons/mod-grow")]
+            ModGrow,
+
             [Description(@"ModIcons/mod-halftime")]
             ModHalftime,
 
@@ -508,8 +567,20 @@ namespace osu.Game.Graphics
             [Description(@"ModIcons/mod-hidden")]
             ModHidden,
 
+            [Description(@"ModIcons/mod-hold-off")]
+            ModHoldOff,
+
+            [Description(@"ModIcons/mod-invert")]
+            ModInvert,
+
+            [Description(@"ModIcons/mod-magnetised")]
+            ModMagnetised,
+
             [Description(@"ModIcons/mod-mirror")]
             ModMirror,
+
+            [Description(@"ModIcons/mod-muted")]
+            ModMuted,
 
             [Description(@"ModIcons/mod-nightcore")]
             ModNightcore,
@@ -520,6 +591,9 @@ namespace osu.Game.Graphics
             [Description(@"ModIcons/mod-no-mod")]
             ModNoMod,
 
+            [Description(@"ModIcons/mod-no-scope")]
+            ModNoScope,
+
             [Description(@"ModIcons/mod-perfect")]
             ModPerfect,
 
@@ -528,6 +602,9 @@ namespace osu.Game.Graphics
 
             [Description(@"ModIcons/mod-relax")]
             ModRelax,
+
+            [Description(@"ModIcons/mod-spin-in")]
+            ModSpinIn,
 
             [Description(@"ModIcons/mod-spun-out")]
             ModSpunOut,
@@ -540,6 +617,18 @@ namespace osu.Game.Graphics
 
             [Description(@"ModIcons/mod-touch-device")]
             ModTouchDevice,
+
+            [Description(@"ModIcons/mod-transform")]
+            ModTransform,
+
+            [Description(@"ModIcons/mod-wind-down")]
+            ModWindDown,
+
+            [Description(@"ModIcons/mod-wind-up")]
+            ModWindUp,
+
+            [Description(@"ModIcons/mod-wiggle")]
+            ModWiggle,
         }
 
         public class OsuIconStore : ITextureStore, ITexturedGlyphLookupStore

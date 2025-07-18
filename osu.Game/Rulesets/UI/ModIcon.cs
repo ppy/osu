@@ -123,7 +123,7 @@ namespace osu.Game.Rulesets.UI
                         {
                             RelativeSizeAxes = Axes.Both,
                             FillMode = FillMode.Fit,
-                            Texture = textures.Get("Icons/BeatmapDetails/mod-icon-extender"),
+        Texture = textures.Get("Icons/BeatmapDetails/mod-icon-extender"),
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                         },
@@ -167,7 +167,7 @@ namespace osu.Game.Rulesets.UI
                         {
                             Origin = Anchor.Centre,
                             Anchor = Anchor.Centre,
-                            Size = new Vector2(45),
+                            Size = new Vector2(85),
                             Icon = FontAwesome.Solid.Question
                         },
                         adjustmentMarker = new Container
@@ -190,7 +190,7 @@ namespace osu.Game.Rulesets.UI
                                     Origin = Anchor.Centre,
                                     Icon = FontAwesome.Solid.Cog,
                                     RelativeSizeAxes = Axes.Both,
-                                    Size = new Vector2(0.6f),
+                                    Size = new Vector2(1.6f),
                                 }
                             }
                         },

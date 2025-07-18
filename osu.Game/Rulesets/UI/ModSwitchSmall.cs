@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.UI
                     AutoSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Spacing = new Vector2(0, 4),
+                    Spacing = new Vector2(0, -6),
                     Direction = FillDirection.Vertical,
                     Child = tinySwitch = new ModSwitchTiny(mod)
                     {
@@ -75,12 +75,13 @@ namespace osu.Game.Rulesets.UI
 
             if (mod.Icon != null)
             {
+                contentFlow.Y = -5;
                 contentFlow.Insert(-1, modIcon = new SpriteIcon
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
-                    Size = new Vector2(21),
-                    Icon = mod.Icon.Value
+                    Size = new Vector2(38),
+                    Icon = mod.Icon.Value,
                 });
                 tinySwitch.Scale = new Vector2(0.3f);
             }
