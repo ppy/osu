@@ -33,6 +33,7 @@ namespace osu.Game.Screens.SelectV2
         /// </summary>
         protected virtual bool ShowManageCollectionsItem => true;
 
+        // todo: this is not used anywhere, it should probably be removed.
         public Action? RequestFilter { private get; set; }
 
         private readonly BindableList<CollectionFilterMenuItem> filters = new BindableList<CollectionFilterMenuItem>();
