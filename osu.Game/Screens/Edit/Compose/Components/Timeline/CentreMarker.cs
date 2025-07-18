@@ -90,20 +90,20 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 }
 
                 private float triangleScreenSpaceHeight;
-                private Vector2 inflation;
 
                 public override void ApplyState()
                 {
                     base.ApplyState();
 
                     triangleScreenSpaceHeight = ScreenSpaceDrawQuad.Width * Source.TriangleHeightRatio;
-                    inflation = new Vector2(InflationAmount.X / DrawRectangle.Width, InflationAmount.Y / (DrawRectangle.Width * Source.TriangleHeightRatio));
                 }
 
                 protected override void Blit(IRenderer renderer)
                 {
-                    if (triangleScreenSpaceHeight == 0)
+                    if (triangleScreenSpaceHeight == 0 || DrawRectangle.Width == 0 || DrawRectangle.Height == 0)
                         return;
+
+                    Vector2 inflation = new Vector2(InflationAmount.X / DrawRectangle.Width, InflationAmount.Y / (DrawRectangle.Width * Source.TriangleHeightRatio));
 
                     Quad topTriangle = new Quad
                     (
