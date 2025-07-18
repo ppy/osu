@@ -159,11 +159,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             });
         }
 
-        protected void WaitForFiltering()
-        {
-            AddUntilStep("wait for debounce", () => SongSelect.IsFilterPendingDebounce);
-            AddUntilStep("wait for filtering", () => !Carousel.IsFiltering);
-        }
+        protected void WaitForFiltering() => AddUntilStep("wait for filtering", () => !SongSelect.IsFiltering);
 
         protected void ImportBeatmapForRuleset(params int[] rulesetIds)
         {

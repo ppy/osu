@@ -518,8 +518,7 @@ namespace osu.Game.Screens.SelectV2
 
             // While filtering, let's not ever attempt to change selection.
             // This will be resolved after the filter completes, see `newItemsPresented`.
-            bool carouselStateIsValid = filterDebounce?.State != ScheduledDelegate.RunState.Waiting && !carousel.IsFiltering;
-            if (!carouselStateIsValid)
+            if (IsFiltering)
                 return false;
 
             // Refetch to be confident that the current selection is still valid. It may have been deleted or hidden.
@@ -748,9 +747,9 @@ namespace osu.Game.Screens.SelectV2
         public bool CarouselItemsPresented { get; private set; }
 
         /// <summary>
-        /// Whether a filter operation is pending execution due to debouncing.
+        /// Whether the carousel is or will be undergoing a filter operation.
         /// </summary>
-        public bool IsFilterPendingDebounce => filterDebounce?.State == ScheduledDelegate.RunState.Waiting;
+        public bool IsFiltering => carousel.IsFiltering || filterDebounce?.State == ScheduledDelegate.RunState.Waiting;
 
         private const double filter_delay = 250;
 
