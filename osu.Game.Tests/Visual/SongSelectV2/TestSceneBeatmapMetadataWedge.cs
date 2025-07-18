@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
@@ -25,9 +26,19 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         {
             base.LoadComplete();
 
-            Child = wedge = new BeatmapMetadataWedge
+            var lookupSource = new RealmPopulatingOnlineLookupSource();
+            Child = new DependencyProvidingContainer
             {
-                State = { Value = Visibility.Visible },
+                RelativeSizeAxes = Axes.Both,
+                CachedDependencies = [(typeof(RealmPopulatingOnlineLookupSource), lookupSource)],
+                Children =
+                [
+                    lookupSource,
+                    wedge = new BeatmapMetadataWedge
+                    {
+                        State = { Value = Visibility.Visible },
+                    }
+                ]
             };
         }
 

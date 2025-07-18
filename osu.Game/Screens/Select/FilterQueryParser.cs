@@ -116,6 +116,9 @@ namespace osu.Game.Screens.Select
                 case "source":
                     return TryUpdateCriteriaText(ref criteria.Source, op, value);
 
+                case "tag":
+                    return TryUpdateCriteriaText(ref criteria.UserTag, op, value);
+
                 default:
                     return criteria.RulesetCriteria?.TryParseCustomKeywordCriteria(key, op, value) ?? false;
             }
