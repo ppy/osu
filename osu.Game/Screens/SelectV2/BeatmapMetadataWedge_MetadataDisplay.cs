@@ -2,15 +2,16 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
+using osu.Game.Users;
 using osuTK;
 
 namespace osu.Game.Screens.SelectV2
@@ -20,52 +21,10 @@ namespace osu.Game.Screens.SelectV2
         private partial class MetadataDisplay : FillFlowContainer
         {
             private readonly OsuSpriteText labelText;
-            private readonly OsuSpriteText contentText;
-            private readonly OsuSpriteText contentLinkText;
-            private readonly OsuHoverContainer contentLink;
-            private readonly DrawableDate contentDate;
-            private readonly TagsLine contentTags;
-            private readonly LoadingSpinner contentLoading;
+            private readonly Container contentContainer;
 
-            private (LocalisableString value, Action? linkAction)? data;
-
-            public (LocalisableString value, Action? linkAction)? Data
-            {
-                get => data;
-                set
-                {
-                    data = value;
-
-                    if (value?.linkAction != null)
-                        setLink(value.Value.value, value.Value.linkAction);
-                    else if (value.HasValue)
-                        setText(value.Value.value);
-                    else
-                        setLoading();
-                }
-            }
-
-            public DateTimeOffset? Date
-            {
-                set
-                {
-                    if (value != null)
-                        setDate(value.Value);
-                    else
-                        setText("-");
-                }
-            }
-
-            public (string[] tags, Action<string> linkAction)? Tags
-            {
-                set
-                {
-                    if (value != null)
-                        setTags(value.Value.tags, value.Value.linkAction);
-                    else
-                        setLoading();
-                }
-            }
+            [Resolved]
+            private OverlayColourProvider colourProvider { get; set; } = null!;
 
             public MetadataDisplay(LocalisableString label)
             {
@@ -81,99 +40,111 @@ namespace osu.Game.Screens.SelectV2
                         Text = label,
                         Font = OsuFont.Style.Caption1.With(weight: FontWeight.SemiBold),
                     },
-                    new Container
+                    contentContainer = new Container
                     {
                         RelativeSizeAxes = Axes.X,
                         Height = OsuFont.Style.Caption1.Size,
-                        Children = new Drawable[]
-                        {
-                            contentText = new TruncatingSpriteText
-                            {
-                                RelativeSizeAxes = Axes.X,
-                                Font = OsuFont.Style.Caption1,
-                            },
-                            contentLink = new OsuHoverContainer
-                            {
-                                AutoSizeAxes = Axes.Both,
-                                Child = contentLinkText = new TruncatingSpriteText
-                                {
-                                    Font = OsuFont.Style.Caption1,
-                                },
-                            },
-                            contentDate = new DrawableDate(default, OsuFont.Style.Caption1.Size, false),
-                            contentTags = new TagsLine(),
-                            contentLoading = new LoadingSpinner
-                            {
-                                Anchor = Anchor.TopLeft,
-                                Origin = Anchor.TopLeft,
-                                Size = new Vector2(10),
-                                Margin = new MarginPadding { Top = 3f },
-                                State = { Value = Visibility.Visible },
-                            }
-                        },
                     },
                 };
             }
 
             [BackgroundDependencyLoader]
-            private void load(OverlayColourProvider colourProvider)
+            private void load()
             {
                 labelText.Colour = colourProvider.Content1;
-                contentText.Colour = colourProvider.Content2;
-                contentLink.IdleColour = colourProvider.Light2;
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                SetHyphen();
+            }
+
+            public void SetHyphen()
+            {
+                contentContainer.Child = new TruncatingSpriteText
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Font = OsuFont.Style.Caption1,
+                    Text = "-",
+                    Colour = colourProvider.Content1,
+                };
+            }
+
+            public void SetText(string? text)
+            {
+                if (string.IsNullOrEmpty(text))
+                {
+                    SetHyphen();
+                    return;
+                }
+
+                contentContainer.Child = new MetadataLinkContainer
+                {
+                    Font = OsuFont.Style.Caption1,
+                    Text = text,
+                };
+            }
+
+            public void SetUser(IUser? user)
+            {
+                if (string.IsNullOrEmpty(user?.Username))
+                {
+                    SetHyphen();
+                    return;
+                }
+
+                contentContainer.Child = new UserLinkContainer
+                {
+                    Font = OsuFont.Style.Caption1,
+                    User = user,
+                };
+            }
+
+            public void SetDate(DateTimeOffset? date)
+            {
+                if (!date.HasValue)
+                {
+                    SetHyphen();
+                    return;
+                }
+
+                contentContainer.Child = new DrawableDate(date.Value, OsuFont.Style.Caption1.Size, false);
+            }
+
+            public void SetTags(string[]? tags)
+            {
+                if (tags == null || !tags.Any())
+                {
+                    SetHyphen();
+                    return;
+                }
+
+                contentContainer.Child = new TagsLine { Tags = tags };
+            }
+
+            public void SetLoading()
+            {
+                contentContainer.Child = new LoadingSpinner
+                {
+                    Anchor = Anchor.TopLeft,
+                    Origin = Anchor.TopLeft,
+                    Size = new Vector2(10),
+                    Margin = new MarginPadding { Top = 3f },
+                    State = { Value = Visibility.Visible },
+                };
             }
 
             protected override void Update()
             {
                 base.Update();
-                contentLinkText.MaxWidth = ChildSize.X;
-            }
 
-            private void clear()
-            {
-                contentText.Text = string.Empty;
-                contentLinkText.Text = string.Empty;
-                contentDate.Hide();
-                contentTags.Tags = Array.Empty<string>();
-                contentLoading.Hide();
-            }
-
-            private void setText(LocalisableString text)
-            {
-                clear();
-
-                contentText.Text = text;
-            }
-
-            private void setLink(LocalisableString text, Action action) => Schedule(() =>
-            {
-                clear();
-
-                contentLinkText.Text = text;
-                contentLink.Action = action;
-            });
-
-            private void setDate(DateTimeOffset date)
-            {
-                clear();
-
-                contentDate.Show();
-                contentDate.Date = date;
-            }
-
-            private void setTags(string[] tags, Action<string> link)
-            {
-                clear();
-
-                contentTags.Tags = tags;
-                contentTags.Action = link;
-            }
-
-            private void setLoading()
-            {
-                clear();
-
-                contentLoading.Show();
+                if (contentContainer.Child is TruncatingSpriteText text)
+                    text.MaxWidth = ChildSize.X;
+                else if (contentContainer.Child is UserLinkContainer userLink)
+                    userLink.MaxWidth = ChildSize.X;
+                else if (contentContainer.Child is MetadataLinkContainer link)
+                    link.MaxWidth = ChildSize.X;
             }
         }
     }

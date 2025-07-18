@@ -10,12 +10,10 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
-using osu.Game.Localisation;
-using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Online.Chat;
+using osu.Game.Localisation;
 using osu.Game.Resources.Localisation.Web;
 using osuTK;
 
@@ -52,12 +50,6 @@ namespace osu.Game.Screens.SelectV2
         private IAPIProvider api { get; set; } = null!;
 
         private IBindable<APIState> apiState = null!;
-
-        [Resolved]
-        private ILinkHandler? linkHandler { get; set; }
-
-        [Resolved]
-        private ISongSelect? songSelect { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -292,20 +284,14 @@ namespace osu.Game.Screens.SelectV2
             var metadata = beatmap.Value.Metadata;
             var beatmapSetInfo = beatmap.Value.BeatmapSetInfo;
 
-            creator.Data = (metadata.Author.Username, () => linkHandler?.HandleLink(new LinkDetails(LinkAction.OpenUserProfile, metadata.Author)));
+            creator.SetUser(metadata.Author);
+            source.SetText(metadata.Source);
+            submitted.SetDate(beatmapSetInfo.DateSubmitted);
+            ranked.SetDate(beatmapSetInfo.DateRanked);
 
-            if (!string.IsNullOrEmpty(metadata.Source))
-                source.Data = (metadata.Source, () => songSelect?.Search(metadata.Source));
-            else
-                source.Data = ("-", null);
-
-            if (!string.IsNullOrEmpty(metadata.Tags))
-                mapperTags.Tags = (metadata.Tags.Split(' '), t => songSelect?.Search(t));
-            else
-                mapperTags.Tags = (Array.Empty<string>(), _ => { });
-
-            submitted.Date = beatmapSetInfo.DateSubmitted;
-            ranked.Date = beatmapSetInfo.DateRanked;
+            // ReSharper disable once ConditionalAccessQualifierIsNonNullableAccordingToAPIContract
+            // todo: Tags may be null, but the property is defined as non-nullable.
+            mapperTags.SetTags(metadata.Tags?.Split(' ', StringSplitOptions.RemoveEmptyEntries));
 
             if (currentOnlineBeatmapSet == null || currentOnlineBeatmapSet.OnlineID != beatmapSetInfo.OnlineID)
                 refetchBeatmapSet();
@@ -343,16 +329,16 @@ namespace osu.Game.Screens.SelectV2
         {
             if (currentRequest?.CompletionState == APIRequestCompletionState.Waiting)
             {
-                genre.Data = null;
-                language.Data = null;
-                userTags.Tags = null;
+                genre.SetLoading();
+                language.SetLoading();
+                userTags.SetLoading();
                 return;
             }
 
             if (currentOnlineBeatmapSet == null)
             {
-                genre.Data = ("-", null);
-                language.Data = ("-", null);
+                genre.SetHyphen();
+                language.SetHyphen();
             }
             else
             {
@@ -361,8 +347,8 @@ namespace osu.Game.Screens.SelectV2
                 var onlineBeatmapSet = currentOnlineBeatmapSet;
                 var onlineBeatmap = onlineBeatmapSet.Beatmaps.SingleOrDefault(b => b.OnlineID == beatmapInfo.OnlineID);
 
-                genre.Data = (onlineBeatmapSet.Genre.Name, () => songSelect?.Search(onlineBeatmapSet.Genre.Name));
-                language.Data = (onlineBeatmapSet.Language.Name, () => songSelect?.Search(onlineBeatmapSet.Language.Name));
+                genre.SetText(onlineBeatmapSet.Genre.Name);
+                language.SetText(onlineBeatmapSet.Language.Name);
 
                 if (onlineBeatmap != null)
                 {
@@ -400,7 +386,7 @@ namespace osu.Game.Screens.SelectV2
                                                   .ToArray();
 
             userTags.FadeIn(transition_duration, Easing.OutQuint);
-            userTags.Tags = (userTagsArray, t => songSelect?.Search(t));
+            userTags.SetTags(userTagsArray);
         }
     }
 }

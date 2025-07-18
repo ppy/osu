@@ -19,9 +19,6 @@ using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Localisation;
-using osu.Game.Online;
-using osu.Game.Online.Chat;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets;
@@ -57,8 +54,7 @@ namespace osu.Game.Screens.SelectV2
             private FillFlowContainer nameLine = null!;
             private OsuSpriteText difficultyText = null!;
             private OsuSpriteText mappedByText = null!;
-            private OsuHoverContainer mapperLink = null!;
-            private OsuSpriteText mapperText = null!;
+            private UserLinkContainer mapperLink = null!;
 
             private GridContainer ratingAndNameContainer = null!;
             private DifficultyStatisticsDisplay countStatisticsDisplay = null!;
@@ -137,16 +133,11 @@ namespace osu.Game.Screens.SelectV2
                                                     Text = " mapped by ",
                                                     Font = OsuFont.Style.Body,
                                                 },
-                                                mapperLink = new MapperLinkContainer
+                                                mapperLink = new UserLinkContainer
                                                 {
-                                                    AutoSizeAxes = Axes.Both,
                                                     Anchor = Anchor.BottomLeft,
                                                     Origin = Anchor.BottomLeft,
-                                                    Child = mapperText = new TruncatingSpriteText
-                                                    {
-                                                        Shadow = true,
-                                                        Font = OsuFont.Style.Body.With(weight: FontWeight.SemiBold),
-                                                    },
+                                                    Font = OsuFont.Style.Body.With(weight: FontWeight.SemiBold),
                                                 },
                                             },
                                         },
@@ -230,9 +221,6 @@ namespace osu.Game.Screens.SelectV2
                 updateDisplay();
             }
 
-            [Resolved]
-            private ILinkHandler? linkHandler { get; set; }
-
             private void updateDisplay()
             {
                 cancellationSource?.Cancel();
@@ -247,8 +235,7 @@ namespace osu.Game.Screens.SelectV2
                 {
                     ratingAndNameContainer.FadeIn(300, Easing.OutQuint);
                     difficultyText.Text = beatmap.Value.BeatmapInfo.DifficultyName;
-                    mapperLink.Action = () => linkHandler?.HandleLink(new LinkDetails(LinkAction.OpenUserProfile, beatmap.Value.Metadata.Author));
-                    mapperText.Text = beatmap.Value.Metadata.Author.Username;
+                    mapperLink.User = beatmap.Value.Metadata.Author;
                 }
 
                 starRatingDisplay.Current = (Bindable<StarDifficulty>)difficultyCache.GetBindableDifficulty(beatmap.Value.BeatmapInfo, cancellationSource.Token, SongSelect.SELECTION_DEBOUNCE);
@@ -339,7 +326,7 @@ namespace osu.Game.Screens.SelectV2
             {
                 base.Update();
 
-                difficultyText.MaxWidth = Math.Max(nameLine.DrawWidth - mappedByText.DrawWidth - mapperText.DrawWidth - 20, 0);
+                difficultyText.MaxWidth = Math.Max(nameLine.DrawWidth - mappedByText.DrawWidth - mapperLink.DrawWidth - 20, 0);
 
                 // Use difficulty colour until it gets too dark to be visible against dark backgrounds.
                 Color4 col = starRatingDisplay.DisplayedStars.Value >= OsuColour.STAR_DIFFICULTY_DEFINED_COLOUR_CUTOFF ? colours.Orange1 : starRatingDisplay.DisplayedDifficultyColour;
@@ -348,16 +335,6 @@ namespace osu.Game.Screens.SelectV2
                 mappedByText.Colour = col;
                 countStatisticsDisplay.AccentColour = col;
                 difficultyStatisticsDisplay.AccentColour = col;
-            }
-
-            private partial class MapperLinkContainer : OsuHoverContainer
-            {
-                [BackgroundDependencyLoader]
-                private void load(OverlayColourProvider? overlayColourProvider, OsuColour colours)
-                {
-                    TooltipText = ContextMenuStrings.ViewProfile;
-                    IdleColour = overlayColourProvider?.Light2 ?? colours.Blue;
-                }
             }
 
             private partial class AdjustableDifficultyStatisticsDisplay : DifficultyStatisticsDisplay, IHasCustomTooltip<AdjustedAttributesTooltip.Data>
