@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Localisation;
+using osu.Game.Overlays.Settings;
 
 namespace osu.Game.Overlays.Settings.Sections.Online
 {
@@ -40,6 +41,11 @@ namespace osu.Game.Overlays.Settings.Sections.Online
                     LabelText = OnlineSettingsStrings.ShowExplicitContent,
                     Keywords = new[] { "nsfw", "18+", "offensive" },
                     Current = config.GetBindable<bool>(OsuSetting.ShowOnlineExplicitContent),
+                },
+                new SettingsTextBox
+                {
+                    LabelText = OnlineSettingsStrings.CustomApiUrl,
+                    Current = config.GetBindable<string>(OsuSetting.CustomApiUrl)
                 }
             };
         }

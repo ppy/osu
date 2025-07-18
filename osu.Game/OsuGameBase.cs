@@ -104,8 +104,25 @@ namespace osu.Game
 
         public virtual bool UseDevelopmentServer => DebugUtils.IsDebugBuild;
 
-        public virtual EndpointConfiguration CreateEndpoints() =>
-            UseDevelopmentServer ? new DevelopmentEndpointConfiguration() : new ProductionEndpointConfiguration();
+        public virtual EndpointConfiguration CreateEndpoints()
+        {
+            EndpointConfiguration config = UseDevelopmentServer ? new DevelopmentEndpointConfiguration() : new ProductionEndpointConfiguration();
+
+            string customUrl = LocalConfig?.Get<string>(OsuSetting.CustomApiUrl);
+
+            if (!string.IsNullOrEmpty(customUrl))
+            {
+                customUrl = customUrl.TrimEnd('/');
+                config.APIUrl = customUrl;
+                config.WebsiteUrl = customUrl;
+                config.SpectatorUrl = $"{customUrl}/signalr/spectator";
+                config.MultiplayerUrl = $"{customUrl}/signalr/multiplayer";
+                config.MetadataUrl = $"{customUrl}/signalr/metadata";
+                config.BeatmapSubmissionServiceUrl = $"{customUrl}/beatmap-submission";
+            }
+
+            return config;
+        }
 
         protected override OnlineStore CreateOnlineStore() => new TrustedDomainOnlineStore();
 
