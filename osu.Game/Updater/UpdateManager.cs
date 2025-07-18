@@ -101,7 +101,10 @@ namespace osu.Game.Updater
         /// <summary>
         /// Immediately checks for any available update.
         /// </summary>
-        /// <returns><c>true</c> if any updates are available, <c>false</c> otherwise.</returns>
+        /// <returns>
+        /// <c>true</c> if any updates are available, <c>false</c> otherwise.
+        /// May return true if an error occured (there is potentially an update available).
+        /// </returns>
         public async Task<bool> CheckForUpdateAsync(CancellationToken cancellationToken = default) => await Task.Run(async () =>
         {
             if (!CanCheckForUpdate)
@@ -120,7 +123,7 @@ namespace osu.Game.Updater
             catch (Exception e)
             {
                 Logger.Log($"{nameof(PerformUpdateCheck)} failed ({e.Message})");
-                return false;
+                return true;
             }
         }, cancellationToken).ConfigureAwait(false);
 
