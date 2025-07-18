@@ -118,11 +118,39 @@ namespace osu.Game.Graphics
         public static IconUsage Hot => get(OsuIconMapping.Hot);
         public static IconUsage ListSearch => get(OsuIconMapping.ListSearch);
 
-        //osu! playstyles
+        // osu! playstyles
         public static IconUsage PlayStyleTablet => get(OsuIconMapping.PlayStyleTablet);
         public static IconUsage PlayStyleMouse => get(OsuIconMapping.PlayStyleMouse);
         public static IconUsage PlayStyleKeyboard => get(OsuIconMapping.PlayStyleKeyboard);
         public static IconUsage PlayStyleTouch => get(OsuIconMapping.PlayStyleTouch);
+
+        // osu! difficulties
+        public static IconUsage EasyOsu => get(OsuIconMapping.EasyOsu);
+        public static IconUsage NormalOsu => get(OsuIconMapping.NormalOsu);
+        public static IconUsage HardOsu => get(OsuIconMapping.HardOsu);
+        public static IconUsage InsaneOsu => get(OsuIconMapping.InsaneOsu);
+        public static IconUsage ExpertOsu => get(OsuIconMapping.ExpertOsu);
+
+        // taiko difficulties
+        public static IconUsage EasyTaiko => get(OsuIconMapping.EasyTaiko);
+        public static IconUsage NormalTaiko => get(OsuIconMapping.NormalTaiko);
+        public static IconUsage HardTaiko => get(OsuIconMapping.HardTaiko);
+        public static IconUsage InsaneTaiko => get(OsuIconMapping.InsaneTaiko);
+        public static IconUsage ExpertTaiko => get(OsuIconMapping.ExpertTaiko);
+
+        // fruits difficulties
+        public static IconUsage EasyFruits => get(OsuIconMapping.EasyFruits);
+        public static IconUsage NormalFruits => get(OsuIconMapping.NormalFruits);
+        public static IconUsage HardFruits => get(OsuIconMapping.HardFruits);
+        public static IconUsage InsaneFruits => get(OsuIconMapping.InsaneFruits);
+        public static IconUsage ExpertFruits => get(OsuIconMapping.ExpertFruits);
+
+        // mania difficulties
+        public static IconUsage EasyMania => get(OsuIconMapping.EasyMania);
+        public static IconUsage NormalMania => get(OsuIconMapping.NormalMania);
+        public static IconUsage HardMania => get(OsuIconMapping.HardMania);
+        public static IconUsage InsaneMania => get(OsuIconMapping.InsaneMania);
+        public static IconUsage ExpertMania => get(OsuIconMapping.ExpertMania);
 
         // mod icons
         public static IconUsage ModKey1 => get(OsuIconMapping.ModKey1);
@@ -136,7 +164,6 @@ namespace osu.Game.Graphics
         public static IconUsage ModKey9 => get(OsuIconMapping.ModKey9);
         public static IconUsage ModKey10 => get(OsuIconMapping.ModKey10);
         public static IconUsage ModApproachDifferent => get(OsuIconMapping.ModApproachDifferent);
-
         public static IconUsage ModAlternate => get(OsuIconMapping.ModAlternate);
         public static IconUsage ModAuto => get(OsuIconMapping.ModAuto);
         public static IconUsage ModAutopilot => get(OsuIconMapping.ModAutopilot);
@@ -473,6 +500,66 @@ namespace osu.Game.Graphics
 
             [Description(@"OsuFontIcons/play-style-touch")]
             PlayStyleTouch,
+
+            [Description(@"OsuFontIcons/osu-easy")]
+            EasyOsu,
+
+            [Description(@"OsuFontIcons/osu-normal")]
+            NormalOsu,
+
+            [Description(@"OsuFontIcons/osu-hard")]
+            HardOsu,
+
+            [Description(@"OsuFontIcons/osu-insane")]
+            InsaneOsu,
+
+            [Description(@"OsuFontIcons/osu-expert")]
+            ExpertOsu,
+
+            [Description(@"OsuFontIcons/taiko-easy")]
+            EasyTaiko,
+
+            [Description(@"OsuFontIcons/taiko-normal")]
+            NormalTaiko,
+
+            [Description(@"OsuFontIcons/taiko-hard")]
+            HardTaiko,
+
+            [Description(@"OsuFontIcons/taiko-insane")]
+            InsaneTaiko,
+
+            [Description(@"OsuFontIcons/taiko-expert")]
+            ExpertTaiko,
+
+            [Description(@"OsuFontIcons/fruits-easy")]
+            EasyFruits,
+
+            [Description(@"OsuFontIcons/fruits-normal")]
+            NormalFruits,
+
+            [Description(@"OsuFontIcons/fruits-hard")]
+            HardFruits,
+
+            [Description(@"OsuFontIcons/fruits-insane")]
+            InsaneFruits,
+
+            [Description(@"OsuFontIcons/fruits-expert")]
+            ExpertFruits,
+
+            [Description(@"OsuFontIcons/mania-easy")]
+            EasyMania,
+
+            [Description(@"OsuFontIcons/mania-normal")]
+            NormalMania,
+
+            [Description(@"OsuFontIcons/mania-hard")]
+            HardMania,
+
+            [Description(@"OsuFontIcons/mania-insane")]
+            InsaneMania,
+
+            [Description(@"OsuFontIcons/mania-expert")]
+            ExpertMania,
 
             [Description(@"ModIcons/mod-key1")]
             ModKey1,
