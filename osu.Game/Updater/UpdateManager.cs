@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,6 +15,7 @@ using osu.Framework.Logging;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Localisation;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Utils;
@@ -93,7 +95,7 @@ namespace osu.Game.Updater
         /// </summary>
         public void CheckForUpdate()
         {
-            _ = CheckForUpdateAsync();
+            CheckForUpdateAsync().FireAndForget();
         }
 
         /// <summary>
@@ -111,7 +113,15 @@ namespace osu.Game.Updater
             using (var lastCts = Interlocked.Exchange(ref updateCancellationSource, cts))
                 await lastCts.CancelAsync().ConfigureAwait(false);
 
-            return await PerformUpdateCheck(cts.Token).ConfigureAwait(false);
+            try
+            {
+                return await PerformUpdateCheck(cts.Token).ConfigureAwait(false);
+            }
+            catch (Exception e)
+            {
+                Logger.Log($"{nameof(PerformUpdateCheck)} failed ({e.Message})");
+                return false;
+            }
         }, cancellationToken).ConfigureAwait(false);
 
         /// <summary>
