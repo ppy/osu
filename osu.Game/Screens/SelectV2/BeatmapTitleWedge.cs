@@ -8,7 +8,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
@@ -316,20 +315,13 @@ namespace osu.Game.Screens.SelectV2
             if (currentRequest?.CompletionState == APIRequestCompletionState.Waiting)
             {
                 playCount.Value = null;
-                favouriteButton.Text = null;
-            }
-            else if (currentOnlineBeatmapSet == null)
-            {
-                playCount.Value = new StatisticPlayCount.Data(-1, -1);
-                favouriteButton.Text = "-";
+                favouriteButton.SetLoading();
             }
             else
             {
-                var onlineBeatmapSet = currentOnlineBeatmapSet;
-                var onlineBeatmap = currentOnlineBeatmapSet.Beatmaps.SingleOrDefault(b => b.OnlineID == working.Value.BeatmapInfo.OnlineID);
-
+                var onlineBeatmap = currentOnlineBeatmapSet?.Beatmaps.SingleOrDefault(b => b.OnlineID == working.Value.BeatmapInfo.OnlineID);
                 playCount.Value = new StatisticPlayCount.Data(onlineBeatmap?.PlayCount ?? -1, onlineBeatmap?.UserPlayCount ?? -1);
-                favouriteButton.Text = onlineBeatmapSet.FavouriteCount.ToLocalisableString(@"N0");
+                favouriteButton.SetBeatmapSet(currentOnlineBeatmapSet);
             }
         }
     }
