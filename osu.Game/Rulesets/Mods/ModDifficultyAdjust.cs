@@ -25,7 +25,6 @@ namespace osu.Game.Rulesets.Mods
 
         public override IconUsage? Icon => OsuIcon.ModDifficultyAdjust;
 
-
         public override double ScoreMultiplier => 0.5;
 
         public override bool RequiresConfiguration => true;

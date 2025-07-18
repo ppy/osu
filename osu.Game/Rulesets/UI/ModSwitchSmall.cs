@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.UI
                     AutoSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Spacing = new Vector2(0, -6),
+                    Spacing = new Vector2(0, -3),
                     Direction = FillDirection.Vertical,
                     Child = tinySwitch = new ModSwitchTiny(mod)
                     {
