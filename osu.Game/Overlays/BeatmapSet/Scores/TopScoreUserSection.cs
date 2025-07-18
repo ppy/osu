@@ -1,17 +1,17 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
+using System.Diagnostics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Scoring;
 using osu.Game.Users.Drawables;
@@ -22,18 +22,11 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 {
     public partial class TopScoreUserSection : CompositeDrawable
     {
-        private readonly SpriteText rankText;
-        private readonly UpdateableRank rank;
-        private readonly UpdateableAvatar avatar;
-        private readonly LinkFlowContainer usernameText;
-        private readonly DrawableDate achievedOn;
-
-        private readonly UpdateableFlag flag;
-        private readonly UpdateableTeamFlag teamFlag;
-
-        public TopScoreUserSection()
+        public TopScoreUserSection(SoloScoreInfo score, int? position)
         {
             AutoSizeAxes = Axes.Both;
+
+            Debug.Assert(score.User != null);
 
             InternalChild = new FillFlowContainer
             {
@@ -50,22 +43,24 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                         Direction = FillDirection.Vertical,
                         Children = new Drawable[]
                         {
-                            rankText = new OsuSpriteText
+                            new OsuSpriteText
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                                Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold)
+                                Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold),
+                                Text = position?.ToLocalisableString(@"\##") ?? (LocalisableString)"-",
                             },
-                            rank = new UpdateableRank(ScoreRank.D)
+                            new UpdateableRank(ScoreRank.D)
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
                                 Size = new Vector2(28),
                                 FillMode = FillMode.Fit,
+                                Rank = score.Rank,
                             },
                         }
                     },
-                    avatar = new UpdateableAvatar(showGuestOnNull: false)
+                    new UpdateableAvatar(showGuestOnNull: false)
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
@@ -79,6 +74,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                             Offset = new Vector2(0, 2),
                             Radius = 1,
                         },
+                        User = score.User,
                     },
                     new FillFlowContainer
                     {
@@ -89,12 +85,12 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                         Spacing = new Vector2(0, 3),
                         Children = new Drawable[]
                         {
-                            usernameText = new LinkFlowContainer(s => s.Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold, italics: true))
+                            new LinkFlowContainer(s => s.Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold, italics: true))
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
                                 AutoSizeAxes = Axes.Both,
-                            },
+                            }.With(u => u.AddUserLink(score.User)),
                             new FillFlowContainer
                             {
                                 AutoSizeAxes = Axes.Both,
@@ -108,7 +104,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                                         Text = "achieved ",
                                         Font = OsuFont.GetFont(size: 10, weight: FontWeight.Bold)
                                     },
-                                    achievedOn = new DrawableDate(DateTimeOffset.MinValue)
+                                    new DrawableDate(score.EndedAt)
                                     {
                                         Font = OsuFont.GetFont(size: 10, weight: FontWeight.Bold)
                                     },
@@ -123,14 +119,14 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                                 Spacing = new Vector2(4),
                                 Children = new Drawable[]
                                 {
-                                    flag = new UpdateableFlag
+                                    new UpdateableFlag(score.User.CountryCode)
                                     {
                                         Anchor = Anchor.CentreLeft,
                                         Origin = Anchor.CentreLeft,
                                         Size = new Vector2(19, 14),
                                         Margin = new MarginPadding { Top = 3 }, // makes spacing look more even
                                     },
-                                    teamFlag = new UpdateableTeamFlag
+                                    new UpdateableTeamFlag(score.User.Team)
                                     {
                                         Anchor = Anchor.CentreLeft,
                                         Origin = Anchor.CentreLeft,
@@ -143,30 +139,6 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     }
                 }
             };
-        }
-
-        public int? ScorePosition
-        {
-            set => rankText.Text = value?.ToLocalisableString(@"\##") ?? (LocalisableString)"-";
-        }
-
-        /// <summary>
-        /// Sets the score to be displayed.
-        /// </summary>
-        public ScoreInfo Score
-        {
-            set
-            {
-                avatar.User = value.User;
-                flag.CountryCode = value.User.CountryCode;
-                teamFlag.Team = value.User.Team;
-                achievedOn.Date = value.Date;
-
-                usernameText.Clear();
-                usernameText.AddUserLink(value.User);
-
-                rank.Rank = value.Rank;
-            }
         }
     }
 }
