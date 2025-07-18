@@ -164,6 +164,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString TrueRandom => new TranslatableString(getKey(@"true_random"), @"True Random");
 
+        /// <summary>
+        /// "Selected Mods"
+        /// </summary>
+        public static LocalisableString SelectedMods => new TranslatableString(getKey(@"selected_mods"), @"Selected Mods");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
