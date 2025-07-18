@@ -18,6 +18,9 @@ namespace osu.Game.Rulesets.Catch.Edit
             new CheckBananaShowerGap(),
             new CheckConcurrentObjects(),
 
+            // Spread
+            new CheckCatchLowestDiffDrainTime(),
+
             // Settings
             new CheckCatchAbnormalDifficultySettings(),
         };
