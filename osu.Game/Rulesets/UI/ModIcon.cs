@@ -167,7 +167,7 @@ namespace osu.Game.Rulesets.UI
                         {
                             Origin = Anchor.Centre,
                             Anchor = Anchor.Centre,
-                            Size = new Vector2(85),
+                            Size = new Vector2(75),
                             Icon = FontAwesome.Solid.Question
                         },
                         adjustmentMarker = new Container
