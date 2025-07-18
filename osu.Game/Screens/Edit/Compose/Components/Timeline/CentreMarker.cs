@@ -1,16 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Rendering;
-using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Graphics.Backgrounds;
 using osu.Game.Overlays;
 using osuTK;
 
@@ -44,7 +41,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Both
+                    RelativeSizeAxes = Axes.Both,
+                    EdgeSmoothness = Vector2.One
                 }
             };
         }
@@ -56,8 +54,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         /// Triangles drawn at the top and bottom of <see cref="CentreMarker"/>.
         /// </summary>
         /// <remarks>
-        /// Since framework-side triangles don't support antialiasing we are using custom implementation involving shaders to avoid mismatch
-        /// in antialiasing between top and bottom triangles when drawable moves across the screen.
+        /// Since framework-side triangles don't support antialiasing we are using custom implementation involving rotated smoothened boxes to avoid
+        /// mismatch in antialiasing between top and bottom triangles when drawable moves across the screen.
+        /// To "trim" boxes we must enable masking at the top level.
         /// </remarks>
         private partial class VerticalTriangles : Sprite
         {
@@ -74,9 +73,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             }
 
             [BackgroundDependencyLoader]
-            private void load(ShaderManager shaders, IRenderer renderer)
+            private void load(IRenderer renderer)
             {
-                TextureShader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, "TriangleBorder");
                 Texture = renderer.WhitePixel;
             }
 
@@ -84,8 +82,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             private class VerticalTrianglesDrawNode : SpriteDrawNode
             {
-                private const float aa = 1.5f; // across how many pixels antialiasing is being applied
-
                 public new VerticalTriangles Source => (VerticalTriangles)base.Source;
 
                 public VerticalTrianglesDrawNode(VerticalTriangles source)
@@ -93,15 +89,15 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 {
                 }
 
-                private float texelSize;
                 private float triangleScreenSpaceHeight;
+                private Vector2 inflation;
 
                 public override void ApplyState()
                 {
                     base.ApplyState();
 
                     triangleScreenSpaceHeight = ScreenSpaceDrawQuad.Width * Source.TriangleHeightRatio;
-                    texelSize = aa / Math.Max(ScreenSpaceDrawQuad.Width, 1);
+                    inflation = new Vector2(InflationAmount.X / DrawRectangle.Width, InflationAmount.Y / (DrawRectangle.Width * Source.TriangleHeightRatio));
                 }
 
                 protected override void Blit(IRenderer renderer)
@@ -109,51 +105,27 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     if (triangleScreenSpaceHeight == 0)
                         return;
 
-                    // TriangleBorder shader makes a smooth triangle for all its sides, which we want to avoid at the top and bottom.
-                    // To do that we are expanding triangles outside the drawable by the aa value and applying masking at the top level.
                     Quad topTriangle = new Quad
                     (
-                        ScreenSpaceDrawQuad.TopLeft + new Vector2(-aa, triangleScreenSpaceHeight),
-                        ScreenSpaceDrawQuad.TopRight + new Vector2(aa, triangleScreenSpaceHeight),
-                        ScreenSpaceDrawQuad.TopLeft - new Vector2(aa),
-                        ScreenSpaceDrawQuad.TopRight + new Vector2(aa, -aa)
+                        ScreenSpaceDrawQuad.TopLeft,
+                        ScreenSpaceDrawQuad.TopLeft + new Vector2(ScreenSpaceDrawQuad.Width * 0.5f, -triangleScreenSpaceHeight),
+                        ScreenSpaceDrawQuad.TopLeft + new Vector2(ScreenSpaceDrawQuad.Width * 0.5f, triangleScreenSpaceHeight),
+                        ScreenSpaceDrawQuad.TopRight
                     );
 
                     Quad bottomTriangle = new Quad
                     (
-                        ScreenSpaceDrawQuad.BottomLeft - new Vector2(aa, triangleScreenSpaceHeight),
-                        ScreenSpaceDrawQuad.BottomRight - new Vector2(-aa, triangleScreenSpaceHeight),
-                        ScreenSpaceDrawQuad.BottomLeft + new Vector2(-aa, aa),
-                        ScreenSpaceDrawQuad.BottomRight + new Vector2(aa)
+                        ScreenSpaceDrawQuad.BottomLeft,
+                        ScreenSpaceDrawQuad.BottomLeft + new Vector2(ScreenSpaceDrawQuad.Width * 0.5f, -triangleScreenSpaceHeight),
+                        ScreenSpaceDrawQuad.BottomLeft + new Vector2(ScreenSpaceDrawQuad.Width * 0.5f, triangleScreenSpaceHeight),
+                        ScreenSpaceDrawQuad.BottomRight
                     );
 
-                    renderer.DrawQuad(Texture, topTriangle, DrawColourInfo.Colour);
-                    renderer.DrawQuad(Texture, bottomTriangle, DrawColourInfo.Colour);
-                }
-
-                private IUniformBuffer<TriangleBorderData>? borderDataBuffer;
-
-                protected override void BindUniformResources(IShader shader, IRenderer renderer)
-                {
-                    base.BindUniformResources(shader, renderer);
-
-                    borderDataBuffer ??= renderer.CreateUniformBuffer<TriangleBorderData>();
-                    borderDataBuffer.Data = borderDataBuffer.Data with
-                    {
-                        Thickness = 1f,
-                        TexelSize = texelSize
-                    };
-
-                    shader.BindUniformBlock("m_BorderData", borderDataBuffer);
+                    renderer.DrawQuad(Texture, topTriangle, DrawColourInfo.Colour, inflationPercentage: inflation);
+                    renderer.DrawQuad(Texture, bottomTriangle, DrawColourInfo.Colour, inflationPercentage: inflation);
                 }
 
                 protected override bool CanDrawOpaqueInterior => false;
-
-                protected override void Dispose(bool isDisposing)
-                {
-                    base.Dispose(isDisposing);
-                    borderDataBuffer?.Dispose();
-                }
             }
         }
     }
