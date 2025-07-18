@@ -90,6 +90,17 @@ namespace osu.Game.Localisation
         public static LocalisableString VerticalScale => new TranslatableString(getKey(@"vertical_scale"), @"Vertical scale");
 
         /// <summary>
+        /// "Scale editor to native resolution"
+        /// </summary>
+        public static LocalisableString EditorUseNativeResolution => new TranslatableString(getKey(@"editor_use_native_resolution"), @"Scale editor to native resolution");
+
+        /// <summary>
+        /// "Will maintain the same size for the editor's UI regardless of the actual window size."
+        /// </summary>
+        public static LocalisableString EditorUseNativeResolutionTooltip =>
+            new TranslatableString(getKey(@"editor_use_native_resolution_tooltip"), @"Will maintain the same size for the editor's UI regardless of the actual window size.");
+
+        /// <summary>
         /// "Running without fullscreen mode will increase your input latency!"
         /// </summary>
         public static LocalisableString NotFullscreenNote => new TranslatableString(getKey(@"not_fullscreen_note"), @"Running without fullscreen mode will increase your input latency!");
