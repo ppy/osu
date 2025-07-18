@@ -51,6 +51,9 @@ namespace osu.Game.Screens.SelectV2
         private readonly BeatmapCarouselFilterMatching matching;
         private readonly BeatmapCarouselFilterGrouping grouping;
 
+        [Resolved]
+        private BeatmapCollectionStore? collectionStore { get; set; }
+
         /// <summary>
         /// Total number of beatmap difficulties displayed with the filter.
         /// </summary>
@@ -98,7 +101,7 @@ namespace osu.Game.Screens.SelectV2
             {
                 matching = new BeatmapCarouselFilterMatching(() => Criteria!),
                 new BeatmapCarouselFilterSorting(() => Criteria!),
-                grouping = new BeatmapCarouselFilterGrouping(() => Criteria!),
+                grouping = new BeatmapCarouselFilterGrouping(() => Criteria!, () => collectionStore),
             };
 
             AddInternal(loading = new LoadingLayer());

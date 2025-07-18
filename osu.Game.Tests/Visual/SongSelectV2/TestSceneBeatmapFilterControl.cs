@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -18,14 +19,24 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
-            Child = new Container
+            BeatmapCollectionStore collectionStore;
+
+            Child = new DependencyProvidingContainer
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
-                Child = filterControl = new FilterControl
+                CachedDependencies = new (Type, object)[]
                 {
-                    State = { Value = Visibility.Visible },
-                    RelativeSizeAxes = Axes.X,
+                    (typeof(BeatmapCollectionStore), collectionStore = new BeatmapCollectionStore()),
+                },
+                Children = new Drawable[]
+                {
+                    collectionStore,
+                    filterControl = new FilterControl
+                    {
+                        State = { Value = Visibility.Visible },
+                        RelativeSizeAxes = Axes.X,
+                    }
                 },
             };
         });

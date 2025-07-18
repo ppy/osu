@@ -91,6 +91,11 @@ namespace osu.Game.Screens.SelectV2
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 
+        [Cached]
+        private readonly BeatmapCollectionStore beatmapCollectionStore = new BeatmapCollectionStore();
+
+        private IBindableList<Live<BeatmapCollection>> collections = null!;
+
         private BeatmapCarousel carousel = null!;
 
         private FilterControl filterControl = null!;
@@ -139,6 +144,8 @@ namespace osu.Game.Screens.SelectV2
         private void load(AudioManager audio, OsuConfigManager config)
         {
             errorSample = audio.Samples.Get(@"UI/generic-error");
+
+            AddInternal(beatmapCollectionStore);
 
             AddRangeInternal(new Drawable[]
             {
@@ -280,6 +287,8 @@ namespace osu.Game.Screens.SelectV2
 
                 updateBackgroundDim();
             });
+
+            collections = beatmapCollectionStore.GetLiveCollections();
         }
 
         private void requestRecommendedSelection(IEnumerable<BeatmapInfo> b)
@@ -325,7 +334,8 @@ namespace osu.Game.Screens.SelectV2
         {
             base.LoadComplete();
 
-            filterControl.CriteriaChanged += criteriaChanged;
+            filterControl.CriteriaChanged += filter;
+            collections.BindCollectionChanged((_, _) => filterWithSameCriteria());
 
             modSelectOverlay.State.BindValueChanged(v =>
             {
@@ -502,8 +512,7 @@ namespace osu.Game.Screens.SelectV2
 
             // While filtering, let's not ever attempt to change selection.
             // This will be resolved after the filter completes, see `newItemsPresented`.
-            bool carouselStateIsValid = filterDebounce?.State != ScheduledDelegate.RunState.Waiting && !carousel.IsFiltering;
-            if (!carouselStateIsValid)
+            if (IsFiltering)
                 return false;
 
             // Refetch to be confident that the current selection is still valid. It may have been deleted or hidden.
@@ -731,11 +740,24 @@ namespace osu.Game.Screens.SelectV2
         /// </summary>
         public bool CarouselItemsPresented { get; private set; }
 
+        /// <summary>
+        /// Whether the carousel is or will be undergoing a filter operation.
+        /// </summary>
+        public bool IsFiltering => carousel.IsFiltering || filterDebounce?.State == ScheduledDelegate.RunState.Waiting;
+
         private const double filter_delay = 250;
 
         private ScheduledDelegate? filterDebounce;
 
-        private void criteriaChanged(FilterCriteria criteria)
+        private void filterWithSameCriteria()
+        {
+            if (carousel.Criteria == null)
+                return;
+
+            filter(carousel.Criteria);
+        }
+
+        private void filter(FilterCriteria criteria)
         {
             filterDebounce?.Cancel();
 
@@ -745,7 +767,7 @@ namespace osu.Game.Screens.SelectV2
             // Criteria change may have included a ruleset change which made the current selection invalid.
             bool isSelectionValid = checkBeatmapValidForSelection(Beatmap.Value.BeatmapInfo, criteria);
 
-            filterDebounce = Scheduler.AddDelayed(() => { carousel.Filter(criteria, !isSelectionValid); }, isFirstFilter || !isSelectionValid ? 0 : filter_delay);
+            filterDebounce = Scheduler.AddDelayed(() => carousel.Filter(criteria, !isSelectionValid), isFirstFilter || !isSelectionValid ? 0 : filter_delay);
         }
 
         private void newItemsPresented(IEnumerable<CarouselItem> carouselItems)
@@ -946,9 +968,6 @@ namespace osu.Game.Screens.SelectV2
         [Resolved]
         private ManageCollectionsDialog? manageCollectionsDialog { get; set; }
 
-        [Resolved]
-        private RealmAccess realm { get; set; } = null!;
-
         public virtual IEnumerable<OsuMenuItem> GetForwardActions(BeatmapInfo beatmap)
         {
             yield return new OsuMenuItem("Select", MenuItemType.Highlighted, () => SelectAndRun(beatmap, OnStart))
@@ -974,13 +993,8 @@ namespace osu.Game.Screens.SelectV2
 
         protected IEnumerable<OsuMenuItem> CreateCollectionMenuActions(BeatmapInfo beatmap)
         {
-            var collectionItems = realm.Realm.All<BeatmapCollection>()
-                                       .OrderBy(c => c.Name)
-                                       .AsEnumerable()
-                                       .Select(c => new CollectionToggleMenuItem(c.ToLive(realm), beatmap)).Cast<OsuMenuItem>().ToList();
-
+            var collectionItems = collections.Select(c => new CollectionToggleMenuItem(c, beatmap)).Cast<OsuMenuItem>().ToList();
             collectionItems.Add(new OsuMenuItem("Manage...", MenuItemType.Standard, () => manageCollectionsDialog?.Show()));
-
             yield return new OsuMenuItem(CommonStrings.Collections) { Items = collectionItems };
         }
 
