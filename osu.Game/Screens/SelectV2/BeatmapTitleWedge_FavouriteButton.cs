@@ -42,6 +42,9 @@ namespace osu.Game.Screens.SelectV2
             private PostBeatmapFavouriteRequest? favouriteRequest;
 
             [Resolved]
+            private OverlayColourProvider colourProvider { get; set; } = null!;
+
+            [Resolved]
             private OsuColour colours { get; set; } = null!;
 
             [Resolved]
@@ -55,7 +58,7 @@ namespace osu.Game.Screens.SelectV2
             }
 
             [BackgroundDependencyLoader]
-            private void load(OverlayColourProvider colourProvider)
+            private void load()
             {
                 Masking = true;
                 CornerRadius = 5;
@@ -207,7 +210,10 @@ namespace osu.Game.Screens.SelectV2
 
                 isFavourite.Value = onlineBeatmapSet?.HasFavourited == true;
 
-                background.FadeColour(isFavourite.Value ? colours.Pink1 : Colour4.Black.Opacity(0.2f), 500, Easing.OutQuint);
+                background.FadeColour(isFavourite.Value ? colours.Pink4.Darken(1f).Opacity(0.5f) : Color4.Black.Opacity(0.2f), 500, Easing.OutQuint);
+                icon.FadeColour(isFavourite.Value ? colours.Pink1 : colourProvider.Content2, 500, Easing.OutQuint);
+                valueText.FadeColour(isFavourite.Value ? colours.Pink1 : colourProvider.Content2, 500, Easing.OutQuint);
+
                 icon.Icon = isFavourite.Value ? FontAwesome.Solid.Heart : FontAwesome.Regular.Heart;
             }
 
