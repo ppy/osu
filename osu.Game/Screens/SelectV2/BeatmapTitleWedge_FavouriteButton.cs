@@ -201,7 +201,10 @@ namespace osu.Game.Screens.SelectV2
             private void updateFavouriteState()
             {
                 Enabled.Value = onlineBeatmapSet != null;
-                valueText.Text = onlineBeatmapSet?.FavouriteCount.ToLocalisableString(@"N0") ?? "-";
+
+                if (loadingSpinner.State.Value == Visibility.Hidden)
+                    valueText.Text = onlineBeatmapSet?.FavouriteCount.ToLocalisableString(@"N0") ?? "-";
+
                 isFavourite.Value = onlineBeatmapSet?.HasFavourited == true;
 
                 background.FadeColour(isFavourite.Value ? colours.Pink1 : Colour4.Black.Opacity(0.2f), 500, Easing.OutQuint);
