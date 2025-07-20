@@ -3,6 +3,8 @@
 
 #nullable disable
 
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,6 +13,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -29,6 +32,7 @@ namespace osu.Game.Screens.Import
         private TextFlowContainer currentFileText;
 
         private RoundedButton importButton;
+        private RoundedButton importAllButton;
 
         private const float duration = 300;
         private const float button_height = 50;
@@ -105,6 +109,19 @@ namespace osu.Game.Screens.Import
                                 Width = 0.9f,
                                 Margin = new MarginPadding { Vertical = button_vertical_margin },
                                 Action = () => startImport(fileSelector.CurrentFile.Value?.FullName)
+                            },
+
+                            importAllButton = new RoundedButton
+                            {
+                                Text = "Import all",
+                                Anchor = Anchor.BottomCentre,
+                                Origin = Anchor.BottomCentre,
+                                RelativeSizeAxes = Axes.X,
+                                Height = button_height,
+                                Width = 0.9f,
+                                TooltipText = "Imports all osu files from selected directory",
+                                Margin = new MarginPadding { Bottom = button_height + button_vertical_margin * 2 },
+                                Action = () => startDirectoryImport(fileSelector.CurrentPath.Value?.FullName)
                             }
                         }
                     }
@@ -131,10 +148,37 @@ namespace osu.Game.Screens.Import
             return base.OnExiting(e);
         }
 
-        private void directoryChanged(ValueChangedEvent<DirectoryInfo> _)
+        private void directoryChanged(ValueChangedEvent<DirectoryInfo> directoryChangedEvent)
         {
             // this should probably be done by the selector itself, but let's do it here for now.
             fileSelector.CurrentFile.Value = null;
+
+            // enable the "importDirectoryButton" only when there is at least 1 file that matches the extension
+            importAllButton.Enabled.Value = false;
+
+            if (directoryChangedEvent.NewValue == null)
+                return;
+
+            DirectoryInfo directoryInfo = directoryChangedEvent.NewValue;
+
+            if (!directoryInfo.Exists)
+                return;
+
+            try
+            {
+                foreach (FileInfo file in directoryInfo.EnumerateFiles())
+                {
+                    if (game.HandledExtensions.Contains(file.Extension))
+                    {
+                        importAllButton.Enabled.Value = true;
+                        break;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Could not enumerate files in selected directory!");
+            }
         }
 
         private void fileChanged(ValueChangedEvent<FileInfo> selectedFile)
@@ -156,6 +200,42 @@ namespace osu.Game.Screens.Import
                 Schedule(() =>
                 {
                     // should probably be exposed as a refresh method.
+                    fileSelector.CurrentPath.TriggerChange();
+                });
+            }, TaskCreationOptions.LongRunning);
+        }
+
+        private void startDirectoryImport(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+                return;
+
+            List<string> filesToImport = new List<string>();
+
+            try
+            {
+                foreach (string file in Directory.EnumerateFiles(path))
+                {
+                    // check if the file ends in a valid extension
+                    if (game.HandledExtensions.Contains(Path.GetExtension(file)))
+                        filesToImport.Add(file);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Could not enumerate files in selected directory!");
+            }
+
+            if (filesToImport.Count <= 0)
+                return;
+
+            Task.Factory.StartNew(async () =>
+            {
+                await game.Import(filesToImport.ToArray()).ConfigureAwait(false);
+
+                // Refresh the filepicker after importing
+                Schedule(() =>
+                {
                     fileSelector.CurrentPath.TriggerChange();
                 });
             }, TaskCreationOptions.LongRunning);
