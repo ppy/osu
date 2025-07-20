@@ -261,12 +261,15 @@ namespace osu.Game.Screens.SelectV2
                 return new GroupDefinition(2, "Last week");
 
             if (elapsed.TotalDays < 30)
-                return new GroupDefinition(3, "1 month ago");
+                return new GroupDefinition(3, "Last month");
 
-            for (int i = 60; i <= 150; i += 30)
+            if (elapsed.TotalDays < 60)
+                return new GroupDefinition(4, "1 month ago");
+
+            for (int i = 90; i <= 150; i += 30)
             {
                 if (elapsed.TotalDays < i)
-                    return new GroupDefinition(i, $"{i / 30} months ago");
+                    return new GroupDefinition(i, $"{i / 30 - 1} months ago");
             }
 
             return new GroupDefinition(151, "Over 5 months ago");
