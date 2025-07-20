@@ -195,16 +195,27 @@ namespace osu.Game.Screens.SelectV2
                                                             RelativeSizeAxes = Axes.Both,
                                                         },
                                                     },
-                                                    wedgesContainer = new FillFlowContainer
+                                                    // Add another context menu container dedicated to the wedges area,
+                                                    // since the LeftSideInteractionContainer layer that's directly behind us
+                                                    // blocks right clicks from reaching the outer context menu container.
+                                                    new OsuContextMenuContainer
                                                     {
                                                         RelativeSizeAxes = Axes.Both,
-                                                        Spacing = new Vector2(0f, 4f),
-                                                        Direction = FillDirection.Vertical,
-                                                        Children = new Drawable[]
+                                                        // Temporarily un-shear here so that context menus don't appear sheared.
+                                                        Shear = -OsuGame.SHEAR,
+                                                        Child = wedgesContainer = new FillFlowContainer
                                                         {
-                                                            new ShearAligningWrapper(titleWedge = new BeatmapTitleWedge()),
-                                                            new ShearAligningWrapper(detailsArea = new BeatmapDetailsArea()),
-                                                        },
+                                                            RelativeSizeAxes = Axes.Both,
+                                                            Spacing = new Vector2(0f, 4f),
+                                                            Direction = FillDirection.Vertical,
+                                                            // Shear again after un-shearing in parent.
+                                                            Shear = OsuGame.SHEAR,
+                                                            Children = new Drawable[]
+                                                            {
+                                                                new ShearAligningWrapper(titleWedge = new BeatmapTitleWedge()),
+                                                                new ShearAligningWrapper(detailsArea = new BeatmapDetailsArea()),
+                                                            },
+                                                        }
                                                     },
                                                 }
                                             },

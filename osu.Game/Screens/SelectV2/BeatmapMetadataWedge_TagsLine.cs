@@ -16,6 +16,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Layout;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
@@ -43,11 +44,6 @@ namespace osu.Game.Screens.SelectV2
                     updateTags();
                 }
             }
-
-            public Action<string>? Action;
-
-            [Resolved]
-            private OverlayColourProvider colourProvider { get; set; } = null!;
 
             public TagsLine()
             {
@@ -100,18 +96,12 @@ namespace osu.Game.Screens.SelectV2
 
             private void updateTags()
             {
-                ChildrenEnumerable = tags.Select(t => new OsuHoverContainer
+                ChildrenEnumerable = tags.Select(t => new MetadataLinkContainer
                 {
-                    AutoSizeAxes = Axes.Both,
-                    Action = () => Action?.Invoke(t),
-                    IdleColour = colourProvider.Light2,
                     AlwaysPresent = true,
                     Alpha = 0f,
-                    Child = new OsuSpriteText
-                    {
-                        Text = t,
-                        Font = OsuFont.Style.Caption1,
-                    },
+                    Font = OsuFont.Style.Caption1,
+                    Text = t,
                 });
 
                 Add(overflowButton = new TagsOverflowButton(tags)
@@ -131,9 +121,6 @@ namespace osu.Game.Screens.SelectV2
 
                 [Resolved]
                 private OverlayColourProvider colourProvider { get; set; } = null!;
-
-                [Resolved]
-                private ISongSelect? songSelect { get; set; }
 
                 public float LineBaseHeight => text.LineBaseHeight;
 
@@ -188,34 +175,46 @@ namespace osu.Game.Screens.SelectV2
                     return true;
                 }
 
-                public Popover GetPopover() => new TagsOverflowPopover(tags, songSelect);
+                public Popover GetPopover() => new TagsOverflowPopover(tags);
             }
 
             public partial class TagsOverflowPopover : OsuPopover
             {
                 private readonly string[] tags;
-                private readonly ISongSelect? songSelect;
 
-                public TagsOverflowPopover(string[] tags, ISongSelect? songSelect)
+                public TagsOverflowPopover(string[] tags)
+                    : base(false)
                 {
                     this.tags = tags;
-                    this.songSelect = songSelect;
                 }
 
                 [BackgroundDependencyLoader]
                 private void load()
                 {
-                    LinkFlowContainer textFlow;
+                    OsuTextFlowContainer textFlow;
 
-                    Child = textFlow = new LinkFlowContainer(t => t.Font = OsuFont.Style.Caption1)
+                    // context menu layer is required inside popover since popovers block right clicks from reaching a parent context menu container.
+                    // todo: popovers should support higher level context menu containers.
+                    Child = new OsuContextMenuContainer
                     {
                         Width = 200,
                         AutoSizeAxes = Axes.Y,
+                        Child = textFlow = new OsuTextFlowContainer(t => t.Font = OsuFont.Style.Caption1)
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Padding = new MarginPadding(20),
+                        }
                     };
 
                     foreach (string tag in tags)
                     {
-                        textFlow.AddLink(tag, () => songSelect?.Search(tag));
+                        textFlow.AddArbitraryDrawable(new MetadataLinkContainer
+                        {
+                            Font = OsuFont.Style.Caption1,
+                            Text = tag
+                        });
+
                         textFlow.AddText(" ");
                     }
                 }

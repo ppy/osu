@@ -17,7 +17,6 @@ using osu.Game.Configuration;
 using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
@@ -26,6 +25,7 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Utils;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.SelectV2
 {
@@ -48,25 +48,17 @@ namespace osu.Game.Screens.SelectV2
 
         private BeatmapSetOnlineStatusPill statusPill = null!;
         private Container titleContainer = null!;
-        private OsuHoverContainer titleLink = null!;
-        private OsuSpriteText titleLabel = null!;
+        private MetadataLinkContainer titleLink = null!;
         private Container artistContainer = null!;
-        private OsuHoverContainer artistLink = null!;
-        private OsuSpriteText artistLabel = null!;
+        private MetadataLinkContainer artistLink = null!;
 
-        internal string DisplayedTitle => titleLabel.Text.ToString();
-        internal string DisplayedArtist => artistLabel.Text.ToString();
+        internal string DisplayedTitle => titleLink.Text.ToString();
+        internal string DisplayedArtist => artistLink.Text.ToString();
 
         private StatisticPlayCount playCount = null!;
         private FavouriteButton favouriteButton = null!;
         private Statistic lengthStatistic = null!;
         private Statistic bpmStatistic = null!;
-
-        [Resolved]
-        private ISongSelect? songSelect { get; set; }
-
-        [Resolved]
-        private LocalisationManager localisation { get; set; } = null!;
 
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
@@ -117,15 +109,11 @@ namespace osu.Game.Screens.SelectV2
                             RelativeSizeAxes = Axes.X,
                             Height = OsuFont.Style.Title.Size,
                             Margin = new MarginPadding { Bottom = -4f },
-                            Child = titleLink = new OsuHoverContainer
+                            Child = titleLink = new MetadataLinkContainer
                             {
-                                AutoSizeAxes = Axes.Both,
-                                Child = titleLabel = new TruncatingSpriteText
-                                {
-                                    Shadow = true,
-                                    Font = OsuFont.Style.Title,
-                                },
-                            }
+                                Font = OsuFont.Style.Title,
+                                IdleColour = Color4.White,
+                            },
                         }),
                         new ShearAligningWrapper(artistContainer = new Container
                         {
@@ -133,15 +121,11 @@ namespace osu.Game.Screens.SelectV2
                             RelativeSizeAxes = Axes.X,
                             Height = OsuFont.Style.Heading2.Size,
                             Margin = new MarginPadding { Left = 1f },
-                            Child = artistLink = new OsuHoverContainer
+                            Child = artistLink = new MetadataLinkContainer
                             {
-                                AutoSizeAxes = Axes.Both,
-                                Child = artistLabel = new TruncatingSpriteText
-                                {
-                                    Shadow = true,
-                                    Font = OsuFont.Style.Heading2,
-                                },
-                            }
+                                Font = OsuFont.Style.Heading2,
+                                IdleColour = Color4.White,
+                            },
                         }),
                         new ShearAligningWrapper(statisticsFlow = new FillFlowContainer
                         {
@@ -220,8 +204,8 @@ namespace osu.Game.Screens.SelectV2
         protected override void Update()
         {
             base.Update();
-            titleLabel.MaxWidth = titleContainer.DrawWidth - 20;
-            artistLabel.MaxWidth = artistContainer.DrawWidth - 20;
+            titleLink.MaxWidth = titleContainer.DrawWidth - 20;
+            artistLink.MaxWidth = artistContainer.DrawWidth - 20;
         }
 
         private void updateDisplay()
@@ -232,13 +216,8 @@ namespace osu.Game.Screens.SelectV2
 
             statusPill.Status = beatmapInfo.Status;
 
-            var titleText = new RomanisableString(metadata.TitleUnicode, metadata.Title);
-            titleLabel.Text = titleText;
-            titleLink.Action = () => songSelect?.Search(titleText.GetPreferred(localisation.CurrentParameters.Value.PreferOriginalScript));
-
-            var artistText = new RomanisableString(metadata.ArtistUnicode, metadata.Artist);
-            artistLabel.Text = artistText;
-            artistLink.Action = () => songSelect?.Search(artistText.GetPreferred(localisation.CurrentParameters.Value.PreferOriginalScript));
+            titleLink.Text = new RomanisableString(metadata.TitleUnicode, metadata.Title);
+            artistLink.Text = new RomanisableString(metadata.ArtistUnicode, metadata.Artist);
 
             updateLengthAndBpmStatistics();
 
