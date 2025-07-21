@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -254,9 +255,9 @@ namespace osu.Game.Tests.Editing.Checks
             protected override IEnumerable<(DifficultyRating rating, double thresholdMs, string name)> GetThresholds()
             {
                 // Same thresholds as `CheckOsuLowestDiffDrainTime` for testing
-                yield return (DifficultyRating.Hard, (3 * 60 + 30) * 1000, "Hard");
-                yield return (DifficultyRating.Insane, (4 * 60 + 15) * 1000, "Insane");
-                yield return (DifficultyRating.Expert, 5 * 60 * 1000, "Expert");
+                yield return (DifficultyRating.Hard, new TimeSpan(0, 3, 30).TotalMilliseconds, "Hard");
+                yield return (DifficultyRating.Insane, new TimeSpan(0, 4, 15).TotalMilliseconds, "Insane");
+                yield return (DifficultyRating.Expert, new TimeSpan(0, 5, 0).TotalMilliseconds, "Expert");
             }
         }
     }
