@@ -299,16 +299,15 @@ namespace osu.Game.Screens.SelectV2
                     Scale = new Vector2(0.5f),
                     Blending = BlendingParameters.Additive,
                     Alpha = 0,
-                    Depth = 1,
+                    Depth = float.MinValue,
                 };
 
                 AddInternal(circle);
 
                 circle.Delay(pop_out_duration)
                       .FadeTo(0.35f)
-                      .FadeOut(1200, Easing.OutCubic)
-                      .FadeColour(colours.Pink1, 1200, Easing.Out)
-                      .ScaleTo(10f, 1200, Easing.OutQuint)
+                      .FadeOut(1400, Easing.OutCubic)
+                      .ScaleTo(10f, 750, Easing.OutQuint)
                       .Expire();
 
                 const int num_particles = 8;
