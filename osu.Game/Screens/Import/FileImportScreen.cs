@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -153,9 +154,9 @@ namespace osu.Game.Screens.Import
             // this should probably be done by the selector itself, but let's do it here for now.
             fileSelector.CurrentFile.Value = null;
 
-            // enable the "importDirectoryButton" only when there is at least 1 file that matches the extension
             importAllButton.Enabled.Value = false;
 
+            // Fixes crashing the game on Linux when clicking on Computer in "file tree"
             if (directoryChangedEvent.NewValue == null)
                 return;
 
@@ -164,21 +165,10 @@ namespace osu.Game.Screens.Import
             if (!directoryInfo.Exists)
                 return;
 
-            try
-            {
-                foreach (FileInfo file in directoryInfo.EnumerateFiles())
-                {
-                    if (game.HandledExtensions.Contains(file.Extension))
-                    {
-                        importAllButton.Enabled.Value = true;
-                        break;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(ex, "Could not enumerate files in selected directory!");
-            }
+            // enable the "importDirectoryButton" only when there is at least 1 file that matches the extension
+            importAllButton.Enabled.Value = directoryInfo.EnumerateFiles()
+                                                         .Where(file => game.HandledExtensions.Contains(file.Extension))
+                                                         .Any();
         }
 
         private void fileChanged(ValueChangedEvent<FileInfo> selectedFile)
@@ -187,14 +177,14 @@ namespace osu.Game.Screens.Import
             currentFileText.Text = selectedFile.NewValue?.Name ?? "Select a file";
         }
 
-        private void startImport(string path)
+        private void startImport(params string[] paths)
         {
-            if (string.IsNullOrEmpty(path))
+            if (paths.Length == 0)
                 return;
 
             Task.Factory.StartNew(async () =>
             {
-                await game.Import(path).ConfigureAwait(false);
+                await game.Import(paths).ConfigureAwait(false);
 
                 // some files will be deleted after successful import, so we want to refresh the view.
                 Schedule(() =>
@@ -210,35 +200,13 @@ namespace osu.Game.Screens.Import
             if (string.IsNullOrEmpty(path))
                 return;
 
-            List<string> filesToImport = new List<string>();
-
-            try
-            {
-                foreach (string file in Directory.EnumerateFiles(path))
-                {
-                    // check if the file ends in a valid extension
-                    if (game.HandledExtensions.Contains(Path.GetExtension(file)))
-                        filesToImport.Add(file);
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(ex, "Could not enumerate files in selected directory!");
-            }
-
-            if (filesToImport.Count <= 0)
+            // get only files that match extensions handled by the game
+            IEnumerable<string> filesToImport = Directory.EnumerateFiles(path)
+                                                         .Where(file => game.HandledExtensions.Contains(Path.GetExtension(file)));
+            if (!filesToImport.Any())
                 return;
 
-            Task.Factory.StartNew(async () =>
-            {
-                await game.Import(filesToImport.ToArray()).ConfigureAwait(false);
-
-                // Refresh the filepicker after importing
-                Schedule(() =>
-                {
-                    fileSelector.CurrentPath.TriggerChange();
-                });
-            }, TaskCreationOptions.LongRunning);
+            startImport(filesToImport.ToArray());
         }
     }
 }
