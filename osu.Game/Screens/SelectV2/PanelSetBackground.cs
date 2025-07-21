@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
+using osu.Game.Overlays;
 using osuTK;
 using osuTK.Graphics;
 
@@ -54,6 +55,9 @@ namespace osu.Game.Screens.SelectV2
         public PanelSetBackground()
         {
             RelativeSizeAxes = Axes.Both;
+            CornerRadius = Panel.CORNER_RADIUS;
+            Masking = true;
+            MaskingSmoothness = 1.5f;
         }
 
         protected override void Update()
@@ -64,10 +68,16 @@ namespace osu.Game.Screens.SelectV2
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OverlayColourProvider colourProvider)
         {
             InternalChildren = new Drawable[]
             {
+                new Box
+                {
+                    Depth = 1,
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = colourProvider.Background4,
+                },
                 new FillFlowContainer
                 {
                     Depth = -1,
@@ -133,7 +143,6 @@ namespace osu.Game.Screens.SelectV2
 
             LoadComponentAsync(new PanelBeatmapBackground(working)
             {
-                Depth = float.MaxValue,
                 RelativeSizeAxes = Axes.Both,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
