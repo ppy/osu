@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -35,8 +36,7 @@ namespace osu.Game.Screens.SelectV2
             private OsuSpriteText valueText = null!;
             private LoadingSpinner loadingSpinner = null!;
             private Box hoverLayer = null!;
-            private Box flashLayer = null!;
-            private SpriteIcon icon = null!;
+            private HeartIcon icon = null!;
 
             private APIBeatmapSet? onlineBeatmapSet;
             private PostBeatmapFavouriteRequest? favouriteRequest;
@@ -82,13 +82,11 @@ namespace osu.Game.Screens.SelectV2
                         Shear = -OsuGame.SHEAR,
                         Children = new Drawable[]
                         {
-                            icon = new SpriteIcon
+                            icon = new HeartIcon
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
-                                Icon = OsuIcon.Heart,
                                 Size = new Vector2(OsuFont.Style.Heading2.Size),
-                                Colour = colourProvider.Content2,
                             },
                             new Container
                             {
@@ -142,12 +140,6 @@ namespace osu.Game.Screens.SelectV2
                         Colour = Colour4.White.Opacity(0.1f),
                         Blending = BlendingParameters.Additive,
                     },
-                    flashLayer = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Alpha = 0,
-                        Colour = Colour4.White,
-                    }
                 });
                 Action = toggleFavourite;
             }
@@ -192,16 +184,16 @@ namespace osu.Game.Screens.SelectV2
                 setBeatmapSet(beatmapSet);
             }
 
-            private void setBeatmapSet(APIBeatmapSet? beatmapSet)
+            private void setBeatmapSet(APIBeatmapSet? beatmapSet, bool withHeartAnimation = false)
             {
                 loadingSpinner.State.Value = Visibility.Hidden;
                 valueText.FadeIn(120, Easing.OutQuint);
 
                 onlineBeatmapSet = beatmapSet;
-                updateFavouriteState();
+                updateFavouriteState(withHeartAnimation);
             }
 
-            private void updateFavouriteState()
+            private void updateFavouriteState(bool withAnimation = false)
             {
                 Enabled.Value = onlineBeatmapSet != null;
 
@@ -211,10 +203,8 @@ namespace osu.Game.Screens.SelectV2
                 isFavourite.Value = onlineBeatmapSet?.HasFavourited == true;
 
                 background.FadeColour(isFavourite.Value ? colours.Pink4.Darken(1f).Opacity(0.5f) : Color4.Black.Opacity(0.2f), 500, Easing.OutQuint);
-                icon.FadeColour(isFavourite.Value ? colours.Pink1 : colourProvider.Content2, 500, Easing.OutQuint);
                 valueText.FadeColour(isFavourite.Value ? colours.Pink1 : colourProvider.Content2, 500, Easing.OutQuint);
-
-                icon.Icon = isFavourite.Value ? FontAwesome.Solid.Heart : FontAwesome.Regular.Heart;
+                icon.SetActive(isFavourite.Value, withAnimation);
             }
 
             private void toggleFavourite()
@@ -232,12 +222,127 @@ namespace osu.Game.Screens.SelectV2
                     bool hasFavourited = favouriteRequest.Action == BeatmapFavouriteAction.Favourite;
                     beatmapSet.HasFavourited = hasFavourited;
                     beatmapSet.FavouriteCount += hasFavourited ? 1 : -1;
-                    setBeatmapSet(beatmapSet);
-                    if (hasFavourited)
-                        flashLayer.FadeOutFromOne(500, Easing.OutQuint);
+                    setBeatmapSet(beatmapSet, withHeartAnimation: hasFavourited);
                 };
                 api.Queue(favouriteRequest);
                 setLoading();
+            }
+        }
+
+        private partial class HeartIcon : CompositeDrawable
+        {
+            private readonly SpriteIcon icon;
+
+            [Resolved]
+            private OverlayColourProvider colourProvider { get; set; } = null!;
+
+            [Resolved]
+            private OsuColour colours { get; set; } = null!;
+
+            public HeartIcon()
+            {
+                InternalChildren = new Drawable[]
+                {
+                    icon = new SpriteIcon
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Icon = FontAwesome.Regular.Heart,
+                        RelativeSizeAxes = Axes.Both,
+                    },
+                };
+            }
+
+            private const double pop_out_duration = 100;
+            private const double pop_in_duration = 500;
+
+            private bool active;
+
+            public void SetActive(bool active, bool withAnimation = false)
+            {
+                if (this.active == active)
+                    return;
+
+                this.active = active;
+
+                FinishTransforms(true);
+
+                if (active)
+                {
+                    transitionIcon(FontAwesome.Solid.Heart, colours.Pink1, emphasised: withAnimation);
+
+                    if (withAnimation)
+                        playFavouriteAnimation();
+                }
+                else
+                {
+                    transitionIcon(FontAwesome.Regular.Heart, colourProvider.Content2);
+                }
+            }
+
+            private void transitionIcon(IconUsage newIcon, Color4 colour, bool emphasised = false)
+            {
+                icon.ScaleTo(emphasised ? 0.5f : 0.8f, pop_out_duration, Easing.OutQuad)
+                    .Then()
+                    .FadeColour(colour)
+                    .Schedule(() => icon.Icon = newIcon)
+                    .ScaleTo(1, pop_in_duration, Easing.OutElasticHalf);
+            }
+
+            private void playFavouriteAnimation()
+            {
+                var circle = new FastCircle
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Scale = new Vector2(0.5f),
+                    Blending = BlendingParameters.Additive,
+                    Alpha = 0,
+                    Depth = float.MinValue,
+                };
+
+                AddInternal(circle);
+
+                circle.Delay(pop_out_duration)
+                      .FadeTo(0.35f)
+                      .FadeOut(1400, Easing.OutCubic)
+                      .ScaleTo(10f, 750, Easing.OutQuint)
+                      .Expire();
+
+                const int num_particles = 8;
+
+                static float randomFloat(float min, float max) => min + Random.Shared.NextSingle() * (max - min);
+
+                for (int i = 0; i < num_particles; i++)
+                {
+                    double duration = randomFloat(600, 1000);
+                    float angle = (i + randomFloat(0, 0.75f)) / num_particles * MathF.PI * 2;
+                    var direction = new Vector2(MathF.Cos(angle), MathF.Sin(angle));
+                    float distance = randomFloat(DrawWidth / 2, DrawWidth);
+
+                    var particle = new FastCircle
+                    {
+                        Position = direction * DrawWidth / 4,
+                        Size = new Vector2(3),
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Blending = BlendingParameters.Additive,
+                        Alpha = 0,
+                        Depth = 2,
+                        Colour = colours.Pink,
+                    };
+
+                    AddInternal(particle);
+
+                    particle
+                        .Delay(pop_out_duration)
+                        .FadeTo(0.5f)
+                        .MoveTo(direction * distance, 1300, Easing.OutQuint)
+                        .FadeOut(duration, Easing.Out)
+                        .ScaleTo(0.5f, duration)
+                        .Expire();
+                }
             }
         }
     }
