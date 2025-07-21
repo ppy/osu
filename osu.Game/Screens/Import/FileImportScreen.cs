@@ -3,18 +3,15 @@
 
 #nullable disable
 
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -156,7 +153,7 @@ namespace osu.Game.Screens.Import
 
             importAllButton.Enabled.Value = false;
 
-            // Fixes crashing the game on Linux when clicking on Computer in "file tree"
+            // Fixes crashing the game on Linux when clicking on "Computer" in the path/navigation bar
             if (directoryChangedEvent.NewValue == null)
                 return;
 
@@ -167,8 +164,7 @@ namespace osu.Game.Screens.Import
 
             // enable the "importDirectoryButton" only when there is at least 1 file that matches the extension
             importAllButton.Enabled.Value = directoryInfo.EnumerateFiles()
-                                                         .Where(file => game.HandledExtensions.Contains(file.Extension))
-                                                         .Any();
+                                                         .Any(file => game.HandledExtensions.Contains(file.Extension));
         }
 
         private void fileChanged(ValueChangedEvent<FileInfo> selectedFile)
