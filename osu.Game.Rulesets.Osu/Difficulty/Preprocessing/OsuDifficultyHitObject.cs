@@ -262,7 +262,22 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 Angle = Math.Abs(Math.Atan2(det, dot));
             }
 
-            if (lastLastDifficultyObject != null && lastLastDifficultyObject.BaseObject is not Spinner && lastDifficultyObject?.BaseObject is Slider)
+            if (lastDifficultyObject?.BaseObject is Slider slider && slider.RepeatCount > 0)
+            {
+                Vector2 lastLastCursorPosition = slider.RepeatCount % 2 == 0 ? slider.StackedPosition : slider.StackedEndPosition;
+
+                Vector2 v1 = lastLastCursorPosition- lastCursorPosition;
+                Vector2 v2 = BaseObject.StackedPosition - lastCursorPosition;
+
+                float dot = Vector2.Dot(v1, v2);
+                float det = v1.X * v2.Y - v1.Y * v2.X;
+
+                CurrSliderAngle = Math.Abs(Math.Atan2(det, dot));
+
+                // Reverse arrow angle is always 0
+                PrevSliderAngle = 0;
+            }
+            else if (lastDifficultyObject?.BaseObject is Slider && lastLastDifficultyObject != null && lastLastDifficultyObject.BaseObject is not Spinner)
             {
                 Vector2 v1 = LastObject.StackedPosition - lastCursorPosition;
                 Vector2 v2 = BaseObject.StackedPosition - lastCursorPosition;
