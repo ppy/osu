@@ -304,10 +304,16 @@ namespace osu.Game.Screens.SelectV2
                 adjustedDifficulty = rulesetInstance.GetAdjustedDisplayDifficulty(adjustedDifficulty, mods.Value);
                 difficultyStatisticsDisplay.TooltipContent = new AdjustedAttributesTooltip.Data(originalDifficulty, adjustedDifficulty);
 
-                StatisticDifficulty.Data firstStatistic;
-
                 switch (ruleset.Value.OnlineID)
                 {
+                    case 1:
+                        difficultyStatisticsDisplay.Statistics = new[]
+                        {
+                            new StatisticDifficulty.Data(SongSelectStrings.HPDrain, originalDifficulty.DrainRate, adjustedDifficulty.DrainRate, 10),
+                            new StatisticDifficulty.Data(SongSelectStrings.Accuracy, originalDifficulty.OverallDifficulty, adjustedDifficulty.OverallDifficulty, 10),
+                        };
+                        break;
+
                     case 3:
                         // Account for mania differences locally for now.
                         // Eventually this should be handled in a more modular way, allowing rulesets to return arbitrary difficulty attributes.
@@ -318,21 +324,24 @@ namespace osu.Game.Screens.SelectV2
                         // - Using the difficulty adjustment mod to adjust OD doesn't have an effect on conversion.
                         int keyCount = legacyRuleset.GetKeyCount(beatmap.Value.BeatmapInfo, mods.Value);
 
-                        firstStatistic = new StatisticDifficulty.Data(SongSelectStrings.KeyCount, keyCount, keyCount, 10);
+                        difficultyStatisticsDisplay.Statistics = new[]
+                        {
+                            new StatisticDifficulty.Data(SongSelectStrings.KeyCount, keyCount, keyCount, 10),
+                            new StatisticDifficulty.Data(SongSelectStrings.HPDrain, originalDifficulty.DrainRate, adjustedDifficulty.DrainRate, 10),
+                            new StatisticDifficulty.Data(SongSelectStrings.Accuracy, originalDifficulty.OverallDifficulty, adjustedDifficulty.OverallDifficulty, 10),
+                        };
                         break;
 
                     default:
-                        firstStatistic = new StatisticDifficulty.Data(SongSelectStrings.CircleSize, originalDifficulty.CircleSize, adjustedDifficulty.CircleSize, 10);
+                        difficultyStatisticsDisplay.Statistics = new[]
+                        {
+                            new StatisticDifficulty.Data(SongSelectStrings.CircleSize, originalDifficulty.CircleSize, adjustedDifficulty.CircleSize, 10),
+                            new StatisticDifficulty.Data(SongSelectStrings.ApproachRate, originalDifficulty.ApproachRate, adjustedDifficulty.ApproachRate, 10),
+                            new StatisticDifficulty.Data(SongSelectStrings.Accuracy, originalDifficulty.OverallDifficulty, adjustedDifficulty.OverallDifficulty, 10),
+                            new StatisticDifficulty.Data(SongSelectStrings.HPDrain, originalDifficulty.DrainRate, adjustedDifficulty.DrainRate, 10),
+                        };
                         break;
                 }
-
-                difficultyStatisticsDisplay.Statistics = new[]
-                {
-                    firstStatistic,
-                    new StatisticDifficulty.Data(SongSelectStrings.ApproachRate, originalDifficulty.ApproachRate, adjustedDifficulty.ApproachRate, 10),
-                    new StatisticDifficulty.Data(SongSelectStrings.Accuracy, originalDifficulty.OverallDifficulty, adjustedDifficulty.OverallDifficulty, 10),
-                    new StatisticDifficulty.Data(SongSelectStrings.HPDrain, originalDifficulty.DrainRate, adjustedDifficulty.DrainRate, 10),
-                };
             });
 
             protected override void Update()
