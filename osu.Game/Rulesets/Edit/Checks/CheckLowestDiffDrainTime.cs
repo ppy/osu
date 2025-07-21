@@ -73,7 +73,7 @@ namespace osu.Game.Rulesets.Edit.Checks
         public class IssueTemplateTooShort : IssueTemplate
         {
             public IssueTemplateTooShort(ICheck check)
-                : base(check, IssueType.Problem, "With the lowest difficulty being \"{0}\", the {1} time of this difficulty must be at least {3}, currently {4}.")
+                : base(check, IssueType.Problem, "With the lowest difficulty being \"{0}\", the {1} time of this difficulty must be at least {2}, currently {3}.")
             {
             }
 
