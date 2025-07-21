@@ -64,7 +64,6 @@ namespace osu.Game.Rulesets.Edit.Checks
                 yield return new IssueTemplateTooShort(this).Create(
                     applicableThreshold.name,
                     canUsePlayTime ? "play" : "drain",
-                    context.Beatmap.BeatmapInfo.DifficultyName,
                     applicableThreshold.thresholdMs - thresholdReduction,
                     effectiveTime
                 );
@@ -74,15 +73,14 @@ namespace osu.Game.Rulesets.Edit.Checks
         public class IssueTemplateTooShort : IssueTemplate
         {
             public IssueTemplateTooShort(ICheck check)
-                : base(check, IssueType.Problem, "With a lowest difficulty {0}, the {1} time of {2} must be at least {3}, currently {4}.")
+                : base(check, IssueType.Problem, "With the lowest difficulty being \"{0}\", the {1} time of this difficulty must be at least {3}, currently {4}.")
             {
             }
 
-            public Issue Create(string lowestDiffLevel, string timeType, string beatmapName, double requiredTime, double currentTime)
+            public Issue Create(string lowestDiffLevel, string timeType, double requiredTime, double currentTime)
                 => new Issue(this,
                     lowestDiffLevel,
                     timeType,
-                    beatmapName,
                     TimeSpan.FromMilliseconds(requiredTime).ToString(@"m\:ss"),
                     TimeSpan.FromMilliseconds(currentTime).ToString(@"m\:ss"));
         }
