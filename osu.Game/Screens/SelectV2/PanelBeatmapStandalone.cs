@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -227,8 +226,7 @@ namespace osu.Game.Screens.SelectV2
             var beatmap = (BeatmapInfo)Item.Model;
             var beatmapSet = beatmap.BeatmapSet!;
 
-            // Choice of background image matches BSS implementation (always uses the lowest `beatmap_id` from the set).
-            background.Beatmap = beatmaps.GetWorkingBeatmap(beatmapSet.Beatmaps.MinBy(b => b.OnlineID));
+            background.Beatmap = beatmaps.GetWorkingBeatmap(beatmap);
 
             titleText.Text = new RomanisableString(beatmapSet.Metadata.TitleUnicode, beatmapSet.Metadata.Title);
             artistText.Text = new RomanisableString(beatmapSet.Metadata.ArtistUnicode, beatmapSet.Metadata.Artist);

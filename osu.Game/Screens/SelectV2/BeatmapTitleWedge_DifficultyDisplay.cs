@@ -26,7 +26,6 @@ using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Utils;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.SelectV2
@@ -302,9 +301,7 @@ namespace osu.Game.Screens.SelectV2
 
                 Ruleset rulesetInstance = ruleset.Value.CreateInstance();
 
-                double rate = ModUtils.CalculateRateWithMods(mods.Value);
-
-                adjustedDifficulty = rulesetInstance.GetRateAdjustedDisplayDifficulty(adjustedDifficulty, rate);
+                adjustedDifficulty = rulesetInstance.GetAdjustedDisplayDifficulty(adjustedDifficulty, mods.Value);
                 difficultyStatisticsDisplay.TooltipContent = new AdjustedAttributesTooltip.Data(originalDifficulty, adjustedDifficulty);
 
                 StatisticDifficulty.Data firstStatistic;

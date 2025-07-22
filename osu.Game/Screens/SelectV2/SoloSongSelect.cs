@@ -20,6 +20,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Select;
+using osu.Game.Users;
 using osu.Game.Utils;
 using WebCommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
 
@@ -27,6 +28,8 @@ namespace osu.Game.Screens.SelectV2
 {
     public partial class SoloSongSelect : SongSelect
     {
+        protected override UserActivity InitialActivity => new UserActivity.ChoosingBeatmap();
+
         private PlayerLoader? playerLoader;
         private IReadOnlyList<Mod>? modsAtGameplayStart;
 
@@ -84,7 +87,9 @@ namespace osu.Game.Screens.SelectV2
             {
                 Icon = FontAwesome.Solid.Eraser
             };
-            yield return new OsuMenuItem(WebCommonStrings.ButtonsHide.ToSentence(), MenuItemType.Destructive, () => beatmaps.Hide(beatmap));
+
+            if (beatmaps.CanHide(beatmap))
+                yield return new OsuMenuItem(WebCommonStrings.ButtonsHide.ToSentence(), MenuItemType.Destructive, () => beatmaps.Hide(beatmap));
         }
 
         protected override void OnStart()

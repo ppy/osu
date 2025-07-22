@@ -40,7 +40,8 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
 
         private void updateState()
         {
-            this.FadeTo(state.Value == DownloadState.LocallyAvailable ? 1 : 0, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
+            Enabled.Value = state.Value == DownloadState.LocallyAvailable;
+            this.FadeTo(Enabled.Value ? 1 : 0, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
         }
     }
 }
