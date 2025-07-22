@@ -69,6 +69,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             pauseViaBackAction();
             pauseViaBackAction();
             confirmPausedWithNoOverlay();
+            AddAssert("pause recorded", () => Player.Score.ScoreInfo.Pauses, () => Has.Count.EqualTo(1));
         }
 
         [Test]
@@ -77,6 +78,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             pauseViaPauseGameplayAction();
             pauseViaPauseGameplayAction();
             confirmPausedWithNoOverlay();
+            AddAssert("pause recorded", () => Player.Score.ScoreInfo.Pauses, () => Has.Count.EqualTo(1));
         }
 
         [Test]
