@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
+using osu.Game.Localisation;
 using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Beatmaps
@@ -22,21 +23,21 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
             {
                 new BeatmapStatistic
                 {
-                    Name = "Circles",
+                    Name = BeatmapStatisticStrings.Circles,
                     Content = circles.ToString(),
                     CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Circles),
                     BarDisplayLength = circles / (float)sum,
                 },
                 new BeatmapStatistic
                 {
-                    Name = "Sliders",
+                    Name = BeatmapStatisticStrings.Sliders,
                     Content = sliders.ToString(),
                     CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Sliders),
                     BarDisplayLength = sliders / (float)sum,
                 },
                 new BeatmapStatistic
                 {
-                    Name = @"Spinners",
+                    Name = BeatmapStatisticStrings.Spinners,
                     Content = spinners.ToString(),
                     CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Spinners),
                     BarDisplayLength = Math.Min(spinners / 10f, 1),

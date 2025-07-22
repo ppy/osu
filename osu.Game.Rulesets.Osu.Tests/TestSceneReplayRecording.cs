@@ -78,6 +78,16 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddAssert("smoke button press recorded to replay", () => Player.Score.Replay.Frames.OfType<OsuReplayFrame>().Any(f => f.Actions.SequenceEqual([OsuAction.Smoke])));
         }
 
+        [Test]
+        public void TestPressAndReleaseOnSameFrame()
+        {
+            seekTo(0);
+            AddStep("move cursor to circle", () => InputManager.MoveMouseTo(Player.DrawableRuleset.Playfield.HitObjectContainer.AliveObjects.Single()));
+            AddStep("press X", () => InputManager.PressKey(Key.X));
+            AddStep("release X", () => InputManager.ReleaseKey(Key.X));
+            AddAssert("right button press recorded to replay", () => Player.Score.Replay.Frames.OfType<OsuReplayFrame>().Any(f => f.Actions.SequenceEqual([OsuAction.RightButton])));
+        }
+
         private void seekTo(double time)
         {
             AddStep($"seek to {time}ms", () => Player.GameplayClockContainer.Seek(time));
