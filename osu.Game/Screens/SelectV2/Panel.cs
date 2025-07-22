@@ -115,8 +115,6 @@ namespace osu.Game.Screens.SelectV2
                     backgroundContainer = new Container
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Masking = true,
-                        CornerRadius = CORNER_RADIUS,
                     },
                     iconContainer = new Container
                     {
