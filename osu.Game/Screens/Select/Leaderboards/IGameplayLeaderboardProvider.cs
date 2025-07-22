@@ -13,6 +13,9 @@ namespace osu.Game.Screens.Select.Leaderboards
         /// <summary>
         /// List of all scores to display on the leaderboard.
         /// </summary>
+        /// <remarks>
+        /// Implementors should ensure that this list is only mutated from the update thread.
+        /// </remarks>
         IBindableList<GameplayLeaderboardScore> Scores { get; }
     }
 

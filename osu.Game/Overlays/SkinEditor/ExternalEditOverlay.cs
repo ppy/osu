@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -47,6 +48,7 @@ namespace osu.Game.Overlays.SkinEditor
 
         private ExternalEditOperation<SkinInfo>? editOperation;
         private TaskCompletionSource? taskCompletionSource;
+        private bool finishingEdit;
 
         protected override bool DimMainContent => false;
 
@@ -95,6 +97,8 @@ namespace osu.Game.Overlays.SkinEditor
                     }
                 }
             };
+
+            gameHost.ExitRequested += tryFinishOnExit;
         }
 
         public async Task<Task> Begin(SkinInfo skinInfo)
@@ -179,8 +183,19 @@ namespace osu.Game.Overlays.SkinEditor
             gameHost.OpenFileExternally(editOperation.MountedPath.TrimDirectorySeparator() + Path.DirectorySeparatorChar);
         }
 
+        private void tryFinishOnExit()
+        {
+            if (editOperation != null && !finishingEdit)
+                finish().FireAndForget(onSuccess: () => Schedule(() => finishingEdit = false));
+        }
+
         private async Task finish()
         {
+            if (finishingEdit)
+                return;
+
+            finishingEdit = true;
+
             Debug.Assert(taskCompletionSource != null);
 
             showSpinner("Cleaning up...");
@@ -236,6 +251,7 @@ namespace osu.Game.Overlays.SkinEditor
             {
                 // Set everything to a clean state
                 editOperation = null;
+                finishingEdit = false;
                 flow.Children = Array.Empty<Drawable>();
             });
         }
@@ -249,7 +265,8 @@ namespace osu.Game.Overlays.SkinEditor
             {
                 case GlobalAction.Back:
                 case GlobalAction.Select:
-                    if (editOperation == null) return base.OnPressed(e);
+                    if (editOperation == null)
+                        return false;
 
                     finish().FireAndForget();
                     return true;
@@ -279,6 +296,14 @@ namespace osu.Game.Overlays.SkinEditor
                     State = { Value = Visibility.Visible }
                 },
             };
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            if (gameHost.IsNotNull())
+                gameHost.ExitRequested -= tryFinishOnExit;
+
+            base.Dispose(isDisposing);
         }
     }
 }

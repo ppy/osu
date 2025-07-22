@@ -243,10 +243,7 @@ namespace osu.Game.Skinning.Components
                     mod.ApplyToDifficulty(difficulty);
 
                 if (ruleset.Value is RulesetInfo rulesetInfo)
-                {
-                    double rate = ModUtils.CalculateRateWithMods(mods.Value);
-                    difficulty = rulesetInfo.CreateInstance().GetRateAdjustedDisplayDifficulty(difficulty, rate);
-                }
+                    difficulty = rulesetInfo.CreateInstance().GetAdjustedDisplayDifficulty(difficulty, mods.Value);
 
                 return difficulty;
             }

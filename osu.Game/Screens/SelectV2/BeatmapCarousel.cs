@@ -143,10 +143,77 @@ namespace osu.Game.Screens.SelectV2
                     break;
 
                 case NotifyCollectionChangedAction.Remove:
+                    bool selectedSetDeleted = false;
+
                     foreach (var set in oldItems!)
                     {
                         foreach (var beatmap in set.Beatmaps)
+                        {
                             Items.RemoveAll(i => i is BeatmapInfo bi && beatmap.Equals(bi));
+                            selectedSetDeleted |= CheckModelEquality(CurrentSelection, beatmap);
+                        }
+                    }
+
+                    // After removing all items in this batch, we want to make an immediate reselection
+                    // based on adjacency to the previous selection if it was deleted.
+                    //
+                    // This needs to be done immediately to avoid song select making a random selection.
+                    // This needs to be done in this class because we need to know final display order.
+                    // This needs to be done with attention to detail of which beatmaps have not been deleted.
+                    if (selectedSetDeleted && CurrentSelectionIndex != null)
+                    {
+                        var items = GetCarouselItems()!;
+                        if (items.Count == 0)
+                            break;
+
+                        bool success = false;
+
+                        // Try selecting forwards first
+                        for (int i = CurrentSelectionIndex.Value + 1; i < items.Count; i++)
+                        {
+                            if (attemptSelection(items[i]))
+                            {
+                                success = true;
+                                break;
+                            }
+                        }
+
+                        if (success)
+                            break;
+
+                        // Then try backwards (we might be at the end of available items).
+                        for (int i = Math.Min(items.Count - 1, CurrentSelectionIndex.Value); i >= 0; i--)
+                        {
+                            if (attemptSelection(items[i]))
+                                break;
+                        }
+
+                        bool attemptSelection(CarouselItem item)
+                        {
+                            if (CheckValidForSetSelection(item))
+                            {
+                                if (item.Model is BeatmapInfo beatmapInfo)
+                                {
+                                    // check the new selection wasn't deleted above
+                                    if (!Items.Contains(beatmapInfo))
+                                        return false;
+
+                                    RequestSelection(beatmapInfo);
+                                    return true;
+                                }
+
+                                if (item.Model is BeatmapSetInfo beatmapSetInfo)
+                                {
+                                    if (oldItems.Contains(beatmapSetInfo))
+                                        return false;
+
+                                    RequestRecommendedSelection(beatmapSetInfo.Beatmaps);
+                                    return true;
+                                }
+                            }
+
+                            return false;
+                        }
                     }
 
                     break;
@@ -822,9 +889,31 @@ namespace osu.Game.Screens.SelectV2
     /// <summary>
     /// Defines a grouping header for a set of carousel items.
     /// </summary>
-    /// <param name="Order">The order of this group in the carousel, sorted using ascending order.</param>
-    /// <param name="Title">The title of this group.</param>
-    public record GroupDefinition(int Order, string Title);
+    public record GroupDefinition
+    {
+        /// <summary>
+        /// The order of this group in the carousel, sorted using ascending order.
+        /// </summary>
+        public int Order { get; }
+
+        /// <summary>
+        /// The title of this group.
+        /// </summary>
+        public string Title { get; }
+
+        private readonly string uncasedTitle;
+
+        public GroupDefinition(int order, string title)
+        {
+            Order = order;
+            Title = title;
+            uncasedTitle = title.ToLowerInvariant();
+        }
+
+        public virtual bool Equals(GroupDefinition? other) => uncasedTitle == other?.uncasedTitle;
+
+        public override int GetHashCode() => HashCode.Combine(uncasedTitle);
+    }
 
     /// <summary>
     /// Defines a grouping header for a set of carousel items grouped by star difficulty.

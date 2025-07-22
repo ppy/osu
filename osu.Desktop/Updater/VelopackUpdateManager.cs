@@ -53,33 +53,44 @@ namespace osu.Desktop.Updater
                 return false;
             }
 
-            IUpdateSource updateSource = new GithubSource(@"https://github.com/ppy/osu", null, ReleaseStream.Value == Game.Configuration.ReleaseStream.Tachyon);
-            Velopack.UpdateManager updateManager = new Velopack.UpdateManager(updateSource, new UpdateOptions
+            try
             {
-                AllowVersionDowngrade = true
-            });
+                IUpdateSource updateSource = new GithubSource(@"https://github.com/ppy/osu", null, ReleaseStream.Value == Game.Configuration.ReleaseStream.Tachyon);
+                Velopack.UpdateManager updateManager = new Velopack.UpdateManager(updateSource, new UpdateOptions
+                {
+                    AllowVersionDowngrade = true
+                });
 
-            UpdateInfo? update = await updateManager.CheckForUpdatesAsync().ConfigureAwait(false);
+                UpdateInfo? update = await updateManager.CheckForUpdatesAsync().ConfigureAwait(false);
 
-            if (cancellationToken.IsCancellationRequested)
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    log("Update check cancelled");
+                    scheduleNextUpdateCheck();
+                    return true;
+                }
+
+                if (update == null)
+                {
+                    // No update is available.
+                    log("No update found");
+                    scheduleNextUpdateCheck();
+                    return false;
+                }
+
+                // Download update in the background while notifying awaiters of the update being available.
+                log($"New update available: {update.TargetFullRelease.Version}");
+                downloadUpdate(updateManager, update, cancellationToken);
+                return true;
+            }
+            catch (Exception e)
             {
-                log("Update check cancelled");
+                log($"Update check failed with error ({e.Message})");
+
+                // we shouldn't crash on a web failure. or any failure for the matter.
                 scheduleNextUpdateCheck();
                 return true;
             }
-
-            if (update == null)
-            {
-                // No update is available.
-                log("No update found");
-                scheduleNextUpdateCheck();
-                return false;
-            }
-
-            // Download update in the background while notifying awaiters of the update being available.
-            log($"New update available: {update.TargetFullRelease.Version}");
-            downloadUpdate(updateManager, update, cancellationToken);
-            return true;
         }
 
         private void downloadUpdate(Velopack.UpdateManager updateManager, UpdateInfo update, CancellationToken cancellationToken) => Task.Run(async () =>
