@@ -31,6 +31,13 @@ namespace osu.Game.Screens.Play.HUD
         [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.CollapseDuringGameplay), nameof(SkinnableComponentStrings.CollapseDuringGameplayDescription))]
         public Bindable<bool> CollapseDuringGameplay { get; } = new BindableBool(true);
 
+        /// <summary>
+        /// Whether the leaderboard is currently in expanded state.
+        /// </summary>
+        public IBindable<bool> Expanded => expanded;
+
+        private readonly Bindable<bool> expanded = new BindableBool();
+
         [Resolved]
         private Player? player { get; set; }
 
@@ -41,8 +48,6 @@ namespace osu.Game.Screens.Play.HUD
         private readonly Bindable<bool> configVisibility = new Bindable<bool>();
         private readonly IBindable<LocalUserPlayingState> userPlayingState = new Bindable<LocalUserPlayingState>();
         private readonly IBindable<bool> holdingForHUD = new Bindable<bool>();
-
-        private readonly Bindable<bool> expanded = new Bindable<bool>();
 
         /// <summary>
         /// Create a new leaderboard.
