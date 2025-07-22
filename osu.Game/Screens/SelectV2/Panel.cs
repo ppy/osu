@@ -296,6 +296,7 @@ namespace osu.Game.Screens.SelectV2
                 {
                     Type = EdgeEffectType.Shadow,
                     Radius = 2f,
+                    Hollow = true,
                 };
             }
             else
@@ -304,6 +305,7 @@ namespace osu.Game.Screens.SelectV2
                 {
                     Type = EdgeEffectType.Shadow,
                     Radius = 4f,
+                    Hollow = true,
                     Offset = new Vector2(0f, 1f),
                 };
             }
