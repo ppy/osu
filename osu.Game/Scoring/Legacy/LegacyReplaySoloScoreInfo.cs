@@ -49,8 +49,8 @@ namespace osu.Game.Scoring.Legacy
         [JsonProperty("total_score_without_mods")]
         public long? TotalScoreWithoutMods { get; set; }
 
-        [JsonProperty("pause_count")]
-        public int PauseCount { get; set; }
+        [JsonProperty("pauses")]
+        public int[] Pauses { get; set; } = [];
 
         public static LegacyReplaySoloScoreInfo FromScore(ScoreInfo score) => new LegacyReplaySoloScoreInfo
         {
@@ -62,7 +62,7 @@ namespace osu.Game.Scoring.Legacy
             Rank = score.Rank,
             UserID = score.User.OnlineID,
             TotalScoreWithoutMods = score.TotalScoreWithoutMods > 0 ? score.TotalScoreWithoutMods : null,
-            PauseCount = score.PauseCount,
+            Pauses = score.Pauses.ToArray(),
         };
     }
 }

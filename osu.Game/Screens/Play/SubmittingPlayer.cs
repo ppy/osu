@@ -241,7 +241,7 @@ namespace osu.Game.Screens.Play
             bool paused = base.Pause();
 
             if (!wasPaused && paused)
-                Score.ScoreInfo.PauseCount++;
+                Score.ScoreInfo.Pauses.Add((int)Math.Round(GameplayClockContainer.CurrentTime));
 
             return paused;
         }
