@@ -54,7 +54,9 @@ namespace osu.Game.Screens.Play.HUD
         /// </summary>
         public DrawableGameplayLeaderboard()
         {
-            Width = DrawableGameplayLeaderboardScore.EXTENDED_WIDTH + DrawableGameplayLeaderboardScore.SHEAR_WIDTH;
+            float xOffset = DrawableGameplayLeaderboardScore.SHEAR_WIDTH + DrawableGameplayLeaderboardScore.ELASTIC_WIDTH_LENIENCE;
+
+            Width = DrawableGameplayLeaderboardScore.EXTENDED_WIDTH + xOffset;
             Height = 300;
 
             InternalChildren = new Drawable[]
@@ -66,7 +68,7 @@ namespace osu.Game.Screens.Play.HUD
                     Child = Flow = new FillFlowContainer<DrawableGameplayLeaderboardScore>
                     {
                         RelativeSizeAxes = Axes.X,
-                        X = DrawableGameplayLeaderboardScore.SHEAR_WIDTH,
+                        X = xOffset,
                         AutoSizeAxes = Axes.Y,
                         Direction = FillDirection.Vertical,
                         Spacing = new Vector2(2.5f),
