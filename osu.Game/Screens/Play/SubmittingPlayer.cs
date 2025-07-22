@@ -234,6 +234,18 @@ namespace osu.Game.Screens.Play
             spectatorClient.BeginPlaying(token, GameplayState, Score);
         }
 
+        public override bool Pause()
+        {
+            bool wasPaused = GameplayClockContainer.IsPaused.Value;
+
+            bool paused = base.Pause();
+
+            if (!wasPaused && paused)
+                Score.ScoreInfo.Pauses.Add((int)Math.Round(GameplayClockContainer.CurrentTime));
+
+            return paused;
+        }
+
         protected override void OnFail()
         {
             base.OnFail();
