@@ -19,7 +19,6 @@ namespace osu.Game.Screens.Backgrounds
 {
     public partial class EditorBackgroundScreen : BackgroundScreen
     {
-        private readonly IBindable<WorkingBeatmap> beatmap;
         private readonly Container dimContainer;
 
         private CancellationTokenSource? cancellationTokenSource;
@@ -31,10 +30,14 @@ namespace osu.Game.Screens.Backgrounds
 
         private IFrameBasedClock? clockSource;
 
-        public EditorBackgroundScreen(IBindable<WorkingBeatmap> beatmap)
-        {
-            this.beatmap = beatmap;
+        // We retrieve IBindable<WorkingBeatmap> from our dependency cache instead of passing WorkingBeatmap directly into EditorBackgroundScreen.
+        // Otherwise, DummyWorkingBeatmap will be erroneously passed in whenever creating a new beatmap (since the Schedule() in the Editor that populates
+        // a new WorkingBeatmap with correct values generally runs after EditorBackgroundScreen is created), which causes any background changes to not be displayed.
+        [Resolved]
+        private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
 
+        public EditorBackgroundScreen()
+        {
             InternalChild = dimContainer = new Container
             {
                 RelativeSizeAxes = Axes.Both,
