@@ -295,7 +295,6 @@ namespace osu.Game.Screens.SelectV2
                 TopLevelContent.EdgeEffect = new EdgeEffectParameters
                 {
                     Type = EdgeEffectType.Shadow,
-                    Colour = edgeEffectColour.Opacity(0.8f),
                     Radius = 2f,
                 };
             }
@@ -304,11 +303,12 @@ namespace osu.Game.Screens.SelectV2
                 TopLevelContent.EdgeEffect = new EdgeEffectParameters
                 {
                     Type = EdgeEffectType.Shadow,
-                    Colour = Color4.Black.Opacity(0.2f),
                     Radius = 4f,
                     Offset = new Vector2(0f, 1f),
                 };
             }
+
+            TopLevelContent.FadeEdgeEffectTo(selectedOrExpanded ? edgeEffectColour.Opacity(0.8f) : Color4.Black.Opacity(0.2f), animated ? DURATION : 0, Easing.OutQuint);
 
             if (selectedOrExpanded)
                 selectionLayer.FadeIn(100, Easing.OutQuint);
