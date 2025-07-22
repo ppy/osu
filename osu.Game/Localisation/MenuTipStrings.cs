@@ -10,14 +10,14 @@ namespace osu.Game.Localisation
         private const string prefix = @"osu.Game.Resources.Localisation.MenuTip";
 
         /// <summary>
-        /// "Press Ctrl-T anywhere in the game to toggle the toolbar!"
+        /// "Press {0} anywhere in the game to toggle the toolbar!"
         /// </summary>
-        public static LocalisableString ToggleToolbarShortcut => new TranslatableString(getKey(@"toggle_toolbar_shortcut"), @"Press Ctrl-T anywhere in the game to toggle the toolbar!");
+        public static LocalisableString ToggleToolbarShortcut(LocalisableString keybind) => new TranslatableString(getKey(@"toggle_toolbar_shortcut"), @"Press {0} anywhere in the game to toggle the toolbar!", keybind);
 
         /// <summary>
-        /// "Press Ctrl-O anywhere in the game to access settings!"
+        /// "Press {0} anywhere in the game to access settings!"
         /// </summary>
-        public static LocalisableString GameSettingsShortcut => new TranslatableString(getKey(@"game_settings_shortcut"), @"Press Ctrl-O anywhere in the game to access settings!");
+        public static LocalisableString GameSettingsShortcut(LocalisableString keybind) => new TranslatableString(getKey(@"game_settings_shortcut"), @"Press {0} anywhere in the game to access settings!", keybind);
 
         /// <summary>
         /// "All settings are dynamic and take effect in real-time. Try changing the skin while watching autoplay!"
@@ -40,9 +40,9 @@ namespace osu.Game.Localisation
         public static LocalisableString ScreenScalingSettings => new TranslatableString(getKey(@"screen_scaling_settings"), @"Try adjusting the ""Screen Scaling"" mode to change your gameplay or UI area, even in fullscreen!");
 
         /// <summary>
-        /// "What used to be &quot;osu!direct&quot; is available to all users just like on the website. You can access it anywhere using Ctrl-B!"
+        /// "What used to be &quot;osu!direct&quot; is available to all users just like on the website. You can access it anywhere using {0}!"
         /// </summary>
-        public static LocalisableString FreeOsuDirect => new TranslatableString(getKey(@"free_osu_direct"), @"What used to be ""osu!direct"" is available to all users just like on the website. You can access it anywhere using Ctrl-B!");
+        public static LocalisableString FreeOsuDirect(LocalisableString keybind) => new TranslatableString(getKey(@"free_osu_direct"), @"What used to be ""osu!direct"" is available to all users just like on the website. You can access it anywhere using {0}!", keybind);
 
         /// <summary>
         /// "Seeking in replays is available by dragging on the progress bar at the bottom of the screen or by using the left and right arrow keys!"
@@ -75,9 +75,9 @@ namespace osu.Game.Localisation
         public static LocalisableString ToggleAdvancedFPSCounter => new TranslatableString(getKey(@"toggle_advanced_fps_counter"), @"Toggle advanced frame / thread statistics with Ctrl-F11!");
 
         /// <summary>
-        /// "You can pause during a replay by pressing Space!"
+        /// "You can pause during a replay by pressing {0}!"
         /// </summary>
-        public static LocalisableString ReplayPausing => new TranslatableString(getKey(@"replay_pausing"), @"You can pause during a replay by pressing Space!");
+        public static LocalisableString ReplayPausing(LocalisableString keybind) => new TranslatableString(getKey(@"replay_pausing"), @"You can pause during a replay by pressing {0}!", keybind);
 
         /// <summary>
         /// "Most of the hotkeys in the game are configurable and can be changed to anything you want. Check the bindings panel under input settings!"
@@ -85,9 +85,9 @@ namespace osu.Game.Localisation
         public static LocalisableString ConfigurableHotkeys => new TranslatableString(getKey(@"configurable_hotkeys"), @"Most of the hotkeys in the game are configurable and can be changed to anything you want. Check the bindings panel under input settings!");
 
         /// <summary>
-        /// "Your gameplay HUD can be customised by using the skin layout editor. Open it at any time via Ctrl-Shift-S!"
+        /// "Your gameplay HUD can be customised by using the skin layout editor. Open it at any time via {0}!"
         /// </summary>
-        public static LocalisableString SkinEditor => new TranslatableString(getKey(@"skin_editor"), @"Your gameplay HUD can be customised by using the skin layout editor. Open it at any time via Ctrl-Shift-S!");
+        public static LocalisableString SkinEditor(LocalisableString keybind) => new TranslatableString(getKey(@"skin_editor"), @"Your gameplay HUD can be customised by using the skin layout editor. Open it at any time via {0}!", keybind);
 
         /// <summary>
         /// "You can create mod presets to make toggling your favourite mod combinations easier!"
@@ -100,14 +100,14 @@ namespace osu.Game.Localisation
         public static LocalisableString ModCustomisationSettings => new TranslatableString(getKey(@"mod_customisation_settings"), @"Many mods have customisation settings that drastically change how they function. Click the Customise button in mod select to view settings!");
 
         /// <summary>
-        /// "Press Ctrl-Shift-R to switch to a random skin!"
+        /// "Press {0} to switch to a random skin!"
         /// </summary>
-        public static LocalisableString RandomSkinShortcut => new TranslatableString(getKey(@"random_skin_shortcut"), @"Press Ctrl-Shift-R to switch to a random skin!");
+        public static LocalisableString RandomSkinShortcut(LocalisableString keybind) => new TranslatableString(getKey(@"random_skin_shortcut"), @"Press {0} to switch to a random skin!", keybind);
 
         /// <summary>
-        /// "While watching a replay, press Ctrl-H to toggle replay settings!"
+        /// "While watching a replay, press {0} to toggle replay settings!"
         /// </summary>
-        public static LocalisableString ToggleReplaySettingsShortcut => new TranslatableString(getKey(@"toggle_replay_settings_shortcut"), @"While watching a replay, press Ctrl-H to toggle replay settings!");
+        public static LocalisableString ToggleReplaySettingsShortcut(LocalisableString keybind) => new TranslatableString(getKey(@"toggle_replay_settings_shortcut"), @"While watching a replay, press {0} to toggle replay settings!", keybind);
 
         /// <summary>
         /// "You can easily copy the mods from scores on a leaderboard by right-clicking on them!"
@@ -140,14 +140,19 @@ namespace osu.Game.Localisation
         public static LocalisableString GlobalStatisticsShortcut => new TranslatableString(getKey(@"global_statistics_shortcut"), @"Take a look under the hood at performance counters and enable verbose performance logging with Ctrl-F2!");
 
         /// <summary>
-        /// "When your gameplay HUD is hidden, you can press and hold Ctrl to view it temporarily!"
+        /// "When your gameplay HUD is hidden, you can press and hold {0} to view it temporarily!"
         /// </summary>
-        public static LocalisableString PeekHUDWhenHidden => new TranslatableString(getKey(@"peek_hud_when_hidden"), @"When your gameplay HUD is hidden, you can press and hold Ctrl to view it temporarily!");
+        public static LocalisableString PeekHUDWhenHidden(LocalisableString keybind) => new TranslatableString(getKey(@"peek_hud_when_hidden"), @"When your gameplay HUD is hidden, you can press and hold {0} to view it temporarily!", keybind);
 
         /// <summary>
         /// "Drag and drop any image into the skin editor to load it in quickly!"
         /// </summary>
         public static LocalisableString DragAndDropImageInSkinEditor => new TranslatableString(getKey(@"drag_and_drop_image_in_skin_editor"), @"Drag and drop any image into the skin editor to load it in quickly!");
+
+        /// <summary>
+        /// "Try holding your right mouse button near the beatmap carousel to quickly scroll to an absolute position!"
+        /// </summary>
+        public static LocalisableString RightMouseAbsoluteScroll => new TranslatableString(getKey(@"right_mouse_absolute_scroll"), @"Try holding your right mouse button near the beatmap carousel to quickly scroll to an absolute position!");
 
         /// <summary>
         /// "a tip for you:"

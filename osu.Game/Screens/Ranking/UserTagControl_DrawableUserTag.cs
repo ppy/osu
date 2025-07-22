@@ -18,7 +18,7 @@ namespace osu.Game.Screens.Ranking
 {
     public partial class UserTagControl
     {
-        private partial class DrawableUserTag : OsuAnimatedButton
+        public partial class DrawableUserTag : OsuAnimatedButton
         {
             public readonly UserTag UserTag;
 
