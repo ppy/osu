@@ -57,7 +57,9 @@ namespace osu.Game.Screens.SelectV2
             RelativeSizeAxes = Axes.Both;
             CornerRadius = Panel.CORNER_RADIUS;
             Masking = true;
-            MaskingSmoothness = 1.5f;
+
+            // Add some level of smoothness around the rounded edges to give more visual polish (make it anti-aliased).
+            MaskingSmoothness = 2f;
         }
 
         protected override void Update()
