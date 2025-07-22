@@ -218,12 +218,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (mods.Any(h => h is OsuModRelax))
                 approachRateFactor = 0.0;
 
-            ratingMultiplier *= 1.0 + approachRateFactor * approachRateLengthBonus; // Buff for longer maps with high AR.
+            ratingMultiplier += approachRateFactor * approachRateLengthBonus; // Buff for longer maps with high AR.
 
             if (mods.Any(m => m is OsuModHidden))
             {
                 double visibilityFactor = calculateAimVisibilityFactor(approachRate);
-                ratingMultiplier *= 1.0 + CalculateVisibilityBonus(mods, approachRate, visibilityFactor);
+                ratingMultiplier += CalculateVisibilityBonus(mods, approachRate, visibilityFactor);
             }
 
             // It is important to consider accuracy difficulty when scaling with accuracy.
@@ -261,12 +261,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (mods.Any(m => m is OsuModAutopilot))
                 approachRateFactor = 0.0;
 
-            ratingMultiplier *= 1.0 + approachRateFactor * approachRateLengthBonus; // Buff for longer maps with high AR.
+            ratingMultiplier += approachRateFactor * approachRateLengthBonus; // Buff for longer maps with high AR.
 
             if (mods.Any(m => m is OsuModHidden))
             {
                 double visibilityFactor = calculateSpeedVisibilityFactor(approachRate);
-                ratingMultiplier *= 1.0 + CalculateVisibilityBonus(mods, approachRate, visibilityFactor);
+                ratingMultiplier += CalculateVisibilityBonus(mods, approachRate, visibilityFactor);
             }
 
             ratingMultiplier *= 0.95 + Math.Pow(Math.Max(0, overallDifficulty), 2) / 750;
