@@ -78,7 +78,7 @@ namespace osu.Game.Screens.SelectV2
                 {
                     Depth = 1,
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider.Background4,
+                    Colour = ColourInfo.GradientHorizontal(colourProvider.Background3, colourProvider.Background4),
                 },
                 new FillFlowContainer
                 {
