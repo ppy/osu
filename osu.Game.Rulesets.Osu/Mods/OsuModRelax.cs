@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private bool isDownState;
         private bool wasLeft;
-        private double previousTime = 0;
+        private double previousTime;
 
         private OsuInputManager osuInputManager = null!;
 
