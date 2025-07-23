@@ -1348,6 +1348,28 @@ namespace osu.Game.Tests.Visual.Navigation
         }
 
         [Test]
+        public void TestSongPresentBeatmap()
+        {
+            BeatmapSetInfo beatmap = null!;
+            AddStep("import beatmap", () =>
+            {
+                var task = BeatmapImportHelper.LoadOszIntoOsu(Game, virtualTrack: true);
+                task.WaitSafely();
+                beatmap = task.GetResultSafely();
+            });
+
+            AddStep("present Beatmap", () => Game.PresentBeatmap(beatmap));
+
+            AddUntilStep("wait for track playing", () => Game.MusicController.IsPlaying);
+            AddAssert("ensure time is reset to preview point",
+                () =>
+                {
+                    double timeFormPreviewPoint = Game.MusicController.CurrentTrack.CurrentTime - beatmap.Metadata.PreviewTime;
+                    return timeFormPreviewPoint > 0 && timeFormPreviewPoint < 1000;
+                });
+        }
+
+        [Test]
         public void TestPresentBeatmapAfterDeletion()
         {
             BeatmapSetInfo beatmap = null;
