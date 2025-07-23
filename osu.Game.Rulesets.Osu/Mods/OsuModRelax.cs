@@ -37,6 +37,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private bool isDownState;
         private bool wasLeft;
+        private double previousTime = 0;
 
         private OsuInputManager osuInputManager = null!;
 
@@ -129,6 +130,8 @@ namespace osu.Game.Rulesets.Osu.Mods
             else if (isDownState && time - lastStateChangeTime > AutoGenerator.KEY_UP_DELAY)
                 changeState(false);
 
+            previousTime = time;
+
             void handleHitCircle(DrawableHitCircle circle)
             {
                 Debug.Assert(circle.HitObject.HitWindows != null);
@@ -136,10 +139,8 @@ namespace osu.Game.Rulesets.Osu.Mods
                 // If we use perfect timing, we click the circle exactly on time.
                 if (PerfectTiming.Value)
                 {
-                    // Allow a small epsilon for floating point comparison
-                    const double epsilon = 1;
-
-                    if (Math.Abs(time - circle.HitObject.StartTime) < epsilon)
+                    // Use previousTime and current time to detect crossing the hit window
+                    if (previousTime < circle.HitObject.StartTime && time >= circle.HitObject.StartTime)
                     {
                         requiresHit = true;
                     }
