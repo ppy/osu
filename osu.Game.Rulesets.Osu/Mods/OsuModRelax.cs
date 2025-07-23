@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModRelax : ModRelax, IUpdatableByPlayfield, IApplicableToDrawableRuleset<OsuHitObject>, IApplicableToPlayer, IHasNoTimedInputs
     {
-        [SettingSource("Perfect Timing", "If enabled, RX will hits circles exactly on time regardless of cursor position.")]
+        [SettingSource("Perfect Timing", "Hits circles exactly on time regardless of cursor position.")]
         public Bindable<bool> PerfectTiming { get; } = new BindableBool();
 
         public override LocalisableString Description => @"You don't need to click. Give your clicking/tapping fingers a break from the heat of things.";
