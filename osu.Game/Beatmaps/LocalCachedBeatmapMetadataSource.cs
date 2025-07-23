@@ -46,7 +46,7 @@ namespace osu.Game.Beatmaps
             this.storage = storage;
 
             if (shouldFetchCache())
-                prepareLocalCache();
+                FetchCache();
         }
 
         private bool shouldFetchCache()
@@ -131,7 +131,7 @@ namespace osu.Game.Beatmaps
                             return false;
 
                         tryPurgeCache();
-                        prepareLocalCache();
+                        FetchCache();
                         return false;
                 }
 
@@ -165,7 +165,7 @@ namespace osu.Game.Beatmaps
         private SqliteConnection getConnection() =>
             new SqliteConnection(string.Concat(@"Data Source=", storage.GetFullPath(@"online.db", true)));
 
-        private void prepareLocalCache()
+        public Task FetchCache()
         {
             bool isRefetch = storage.Exists(cache_database_name);
 
@@ -218,7 +218,7 @@ namespace osu.Game.Beatmaps
                 }
             };
 
-            Task.Run(async () =>
+            return Task.Run(async () =>
             {
                 try
                 {
