@@ -151,6 +151,9 @@ namespace osu.Game.Overlays.Mods
                 if (Alpha == 1)
                     beatmapAttributesDisplay.Collapsed.Value = DisplaysStackedVertically;
 
+                if (ActiveMods.Value.Count != 0)
+                    beatmapAttributesDisplay.Collapsed.Value = false;
+
                 contentFlow.LayoutDuration = 200;
                 contentFlow.LayoutEasing = Easing.OutQuint;
                 contentFlow.Direction = DisplaysStackedVertically ? FillDirection.Vertical : FillDirection.Horizontal;
