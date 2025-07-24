@@ -20,15 +20,9 @@ namespace osu.iOS
     {
         private readonly AppDelegate appDelegate;
 
-        public override Version AssemblyVersion
-        {
-            get
-            {
-                // Example: 2025.613.0-tachyon
-                string bundleVersion = NSBundle.MainBundle.InfoDictionary["CFBundleVersion"].ToString();
-                return new Version(bundleVersion.Split('-')[0]);
-            }
-        }
+        public override Version AssemblyVersion => new Version(NSBundle.MainBundle.InfoDictionary["CFBundleVersion"].ToString());
+
+        public override string Version => NSBundle.MainBundle.InfoDictionary["OsuVersion"].ToString();
 
         public override bool HideUnlicensedContent => true;
 

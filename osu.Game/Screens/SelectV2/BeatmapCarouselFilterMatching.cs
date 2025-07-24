@@ -105,6 +105,15 @@ namespace osu.Game.Screens.SelectV2
                      criteria.Title.Matches(beatmap.Metadata.TitleUnicode);
             match &= !criteria.DifficultyName.HasFilter || criteria.DifficultyName.Matches(beatmap.DifficultyName);
             match &= !criteria.Source.HasFilter || criteria.Source.Matches(beatmap.Metadata.Source);
+
+            if (criteria.UserTag.HasFilter)
+            {
+                bool anyTagMatched = false;
+                foreach (string tag in beatmap.Metadata.UserTags)
+                    anyTagMatched |= criteria.UserTag.Matches(tag);
+                match &= anyTagMatched;
+            }
+
             match &= !criteria.UserStarDifficulty.HasFilter || criteria.UserStarDifficulty.IsInRange(beatmap.StarRating);
 
             if (!match) return false;

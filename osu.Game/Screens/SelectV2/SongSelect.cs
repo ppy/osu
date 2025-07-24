@@ -133,6 +133,9 @@ namespace osu.Game.Screens.SelectV2
         [Resolved]
         private IDialogOverlay? dialogOverlay { get; set; }
 
+        [Cached]
+        private RealmPopulatingOnlineLookupSource onlineLookupSource = new RealmPopulatingOnlineLookupSource();
+
         private Bindable<bool> configBackgroundBlur = null!;
 
         [BackgroundDependencyLoader]
@@ -143,6 +146,7 @@ namespace osu.Game.Screens.SelectV2
             AddRangeInternal(new Drawable[]
             {
                 new GlobalScrollAdjustsVolume(),
+                onlineLookupSource,
                 mainContent = new Container
                 {
                     Anchor = Anchor.Centre,
@@ -342,7 +346,7 @@ namespace osu.Game.Screens.SelectV2
 
                 ensureGlobalBeatmapValid();
 
-                ensurePlayingSelected(true);
+                ensurePlayingSelected();
                 updateBackgroundDim();
                 updateWedgeVisibility();
             });
@@ -375,7 +379,7 @@ namespace osu.Game.Screens.SelectV2
         /// Ensures some music is playing for the current track.
         /// Will resume playback from a manual user pause if the track has changed.
         /// </summary>
-        private void ensurePlayingSelected(bool restart)
+        private void ensurePlayingSelected()
         {
             if (!ControlGlobalMusic)
                 return;
@@ -387,7 +391,10 @@ namespace osu.Game.Screens.SelectV2
             if (!track.IsRunning && (music.UserPauseRequested != true || isNewTrack))
             {
                 Logger.Log($"Song select decided to {nameof(ensurePlayingSelected)}");
-                music.Play(restart);
+
+                // Only restart playback if a new track.
+                // This is important so that when exiting gameplay, the track is not restarted back to the preview point.
+                music.Play(isNewTrack);
             }
 
             lastTrack.SetTarget(track);
@@ -630,7 +637,7 @@ namespace osu.Game.Screens.SelectV2
 
             ensureGlobalBeatmapValid();
 
-            ensurePlayingSelected(false);
+            ensurePlayingSelected();
             updateBackgroundDim();
         }
 

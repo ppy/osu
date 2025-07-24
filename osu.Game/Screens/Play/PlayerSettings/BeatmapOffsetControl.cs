@@ -17,6 +17,7 @@ using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
+using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -321,9 +322,11 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
         public static LocalisableString GetOffsetExplanatoryText(double offset)
         {
-            return offset == 0
-                ? LocalisableString.Interpolate($@"{offset:0.0} ms")
-                : LocalisableString.Interpolate($@"{offset:0.0} ms {getEarlyLateText(offset)}");
+            string formatOffset = offset.ToStandardFormattedString(1);
+
+            return formatOffset == "0"
+                ? LocalisableString.Interpolate($@"{formatOffset} ms")
+                : LocalisableString.Interpolate($@"{formatOffset} ms {getEarlyLateText(offset)}");
 
             LocalisableString getEarlyLateText(double value)
             {
