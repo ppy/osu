@@ -75,10 +75,10 @@ namespace osu.Game.Graphics.UserInterface
         {
             get
             {
-                var lowerSS = LowerBoundSlider.Nub.ScreenSpaceDrawQuad.TopLeft;
+                var lowerSS = LowerBoundSlider.Nub.ScreenSpaceDrawQuad.TopRight;
                 var upperSS = UpperBoundSlider.Nub.ScreenSpaceDrawQuad.TopLeft;
 
-                return lowerSS + (upperSS - lowerSS) / 2;
+                return lowerSS + (upperSS - lowerSS) / 2 - new Vector2(ShearedNub.CORNER_RADIUS / 2, 0);
             }
         }
 
