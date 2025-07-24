@@ -24,8 +24,7 @@ namespace osu.Game.Overlays.Notifications
             set
             {
                 text = value;
-                if (textDrawable != null)
-                    textDrawable.Text = text;
+                TextFlow.Text = text;
             }
         }
 
@@ -37,8 +36,7 @@ namespace osu.Game.Overlays.Notifications
             set
             {
                 icon = value;
-                if (iconDrawable != null)
-                    iconDrawable.Icon = icon;
+                IconDrawable.Icon = icon;
             }
         }
 
@@ -46,39 +44,6 @@ namespace osu.Game.Overlays.Notifications
         {
             get => IconContent.Colour;
             set => IconContent.Colour = value;
-        }
-
-        private TextFlowContainer? textDrawable;
-
-        private SpriteIcon? iconDrawable;
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours, OverlayColourProvider colourProvider)
-        {
-            Light.Colour = colours.Green;
-
-            IconContent.AddRange(new Drawable[]
-            {
-                new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider.Background5,
-                },
-                iconDrawable = new SpriteIcon
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Icon = icon,
-                    Size = new Vector2(16),
-                }
-            });
-
-            Content.Add(textDrawable = new OsuTextFlowContainer(t => t.Font = t.Font.With(size: 14, weight: FontWeight.Medium))
-            {
-                AutoSizeAxes = Axes.Y,
-                RelativeSizeAxes = Axes.X,
-                Text = text
-            });
         }
 
         public override bool Read
@@ -91,6 +56,43 @@ namespace osu.Game.Overlays.Notifications
                 base.Read = value;
                 Light.FadeTo(value ? 0 : 1, 100);
             }
+        }
+
+        protected TextFlowContainer TextFlow { get; }
+        protected SpriteIcon IconDrawable { get; }
+
+        private readonly Box iconBackground;
+
+        public SimpleNotification()
+        {
+            IconContent.AddRange(new Drawable[]
+            {
+                iconBackground = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                },
+                IconDrawable = new SpriteIcon
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Icon = icon,
+                    Size = new Vector2(16),
+                }
+            });
+
+            Content.Add(TextFlow = new OsuTextFlowContainer(t => t.Font = t.Font.With(size: 14, weight: FontWeight.Medium))
+            {
+                AutoSizeAxes = Axes.Y,
+                RelativeSizeAxes = Axes.X,
+                Text = text
+            });
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours, OverlayColourProvider colourProvider)
+        {
+            Light.Colour = colours.Green;
+            iconBackground.Colour = colourProvider.Background5;
         }
     }
 }
