@@ -60,7 +60,7 @@ namespace osu.Game.Rulesets.Edit.Checks
         public class IssueTemplateIncorrectFormat : IssueTemplate
         {
             public IssueTemplateIncorrectFormat(ICheck check)
-                : base(check, IssueType.Problem, "\"{0}\" is using a incorrect format. Use mp3 or ogg for the song's audio.")
+                : base(check, IssueType.Problem, "\"{0}\" is using an incorrect format. Use mp3 or ogg for the song's audio.")
             {
             }
 
