@@ -28,14 +28,24 @@ namespace osu.Game.Rulesets.Mania.Edit.Checks
                         continue;
 
                     // Two hitobjects cannot be concurrent without also being concurrent with all objects in between.
-                    // So if the next object is not concurrent, then we know no future objects will be either.
-                    if (!AreConcurrent(hitobject, nextHitobject))
+                    // So if the next object is not concurrent or almost concurrent, then we know no future objects will be either.
+                    if (!AreConcurrent(hitobject, nextHitobject) && !AreAlmostConcurrent(hitobject, nextHitobject))
                         break;
 
-                    if (hitobject.GetType() == nextHitobject.GetType())
-                        yield return new IssueTemplateConcurrentSame(this).Create(hitobject, nextHitobject);
-                    else
-                        yield return new IssueTemplateConcurrentDifferent(this).Create(hitobject, nextHitobject);
+                    if (AreConcurrent(hitobject, nextHitobject))
+                    {
+                        if (hitobject.GetType() == nextHitobject.GetType())
+                            yield return new IssueTemplateConcurrentSame(this).Create(hitobject, nextHitobject);
+                        else
+                            yield return new IssueTemplateConcurrentDifferent(this).Create(hitobject, nextHitobject);
+                    }
+                    else if (AreAlmostConcurrent(hitobject, nextHitobject))
+                    {
+                        if (hitobject.GetType() == nextHitobject.GetType())
+                            yield return new IssueTemplateAlmostConcurrentSame(this).Create(hitobject, nextHitobject);
+                        else
+                            yield return new IssueTemplateAlmostConcurrentDifferent(this).Create(hitobject, nextHitobject);
+                    }
                 }
             }
         }
