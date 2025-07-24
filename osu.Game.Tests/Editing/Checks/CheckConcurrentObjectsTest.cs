@@ -58,6 +58,16 @@ namespace osu.Game.Tests.Editing.Checks
         }
 
         [Test]
+        public void TestCirclesAlmostConcurrentWarning()
+        {
+            assertAlmostConcurrentSame(new List<HitObject>
+            {
+                new HitCircle { StartTime = 100 },
+                new HitCircle { StartTime = 108 }
+            });
+        }
+
+        [Test]
         public void TestSlidersSeparate()
         {
             assertOk(new List<HitObject>
@@ -94,6 +104,16 @@ namespace osu.Game.Tests.Editing.Checks
             {
                 getSliderMock(startTime: 100, endTime: 400.75d).Object,
                 new HitCircle { StartTime = 300 }
+            });
+        }
+
+        [Test]
+        public void TestSliderAndCircleAlmostConcurrent()
+        {
+            assertAlmostConcurrentDifferent(new List<HitObject>
+            {
+                getSliderMock(startTime: 100, endTime: 400.75d).Object,
+                new HitCircle { StartTime = 408 }
             });
         }
 
@@ -153,6 +173,22 @@ namespace osu.Game.Tests.Editing.Checks
 
             Assert.That(issues, Has.Count.EqualTo(count));
             Assert.That(issues.All(issue => issue.Template is CheckConcurrentObjects.IssueTemplateConcurrentDifferent));
+        }
+
+        private void assertAlmostConcurrentSame(List<HitObject> hitobjects)
+        {
+            var issues = check.Run(getContext(hitobjects)).ToList();
+
+            Assert.That(issues, Has.Count.EqualTo(1));
+            Assert.That(issues.All(issue => issue.Template is CheckConcurrentObjects.IssueTemplateAlmostConcurrentSame));
+        }
+
+        private void assertAlmostConcurrentDifferent(List<HitObject> hitobjects)
+        {
+            var issues = check.Run(getContext(hitobjects)).ToList();
+
+            Assert.That(issues, Has.Count.EqualTo(1));
+            Assert.That(issues.All(issue => issue.Template is CheckConcurrentObjects.IssueTemplateAlmostConcurrentDifferent));
         }
 
         private BeatmapVerifierContext getContext(List<HitObject> hitobjects)
