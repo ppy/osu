@@ -208,8 +208,8 @@ namespace osu.Game.Graphics.UserInterface
             private void load(OverlayColourProvider colourProvider)
             {
                 Nub.Width = NubWidth;
-                RangePadding = Nub.Width / 2;
-
+                RangePadding = Nub.Width;
+                Nub.Origin = isUpper ? Anchor.TopLeft : Anchor.TopRight;
                 Nub.Add(NubText = new OsuSpriteText
                 {
                     Anchor = Anchor.Centre,
