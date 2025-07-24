@@ -155,12 +155,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             // Add in acute angle bonus or wide angle bonus, whichever is larger.
             aimStrain += Math.Max(acuteAngleBonus * acute_angle_multiplier, wideAngleBonus * wide_angle_multiplier);
 
+            // Apply high circle size bonus
+            aimStrain *= osuCurrObj.SmallCircleBonus;
+
             // Add in additional slider velocity bonus.
             if (withSliderTravelDistance)
                 aimStrain += sliderBonus * slider_multiplier;
-
-            // Apply high circle size bonus
-            aimStrain *= osuCurrObj.SmallCircleBonus;
 
             return aimStrain;
         }
