@@ -18,10 +18,8 @@ namespace osu.Game.Rulesets.Edit.Checks
 
         public IEnumerable<IssueTemplate> PossibleTemplates => new IssueTemplate[]
         {
-            new IssueTemplateConcurrentSame(this),
-            new IssueTemplateConcurrentDifferent(this),
-            new IssueTemplateAlmostConcurrentSame(this),
-            new IssueTemplateAlmostConcurrentDifferent(this)
+            new IssueTemplateConcurrent(this),
+            new IssueTemplateAlmostConcurrent(this)
         };
 
         public virtual IEnumerable<Issue> Run(BeatmapVerifierContext context)
@@ -41,19 +39,15 @@ namespace osu.Game.Rulesets.Edit.Checks
                     if (!AreConcurrent(hitobject, nextHitobject) && !AreAlmostConcurrent(hitobject, nextHitobject))
                         break;
 
+                    bool sameType = hitobject.GetType() == nextHitobject.GetType();
+
                     if (AreConcurrent(hitobject, nextHitobject))
                     {
-                        if (hitobject.GetType() == nextHitobject.GetType())
-                            yield return new IssueTemplateConcurrentSame(this).Create(hitobject, nextHitobject);
-                        else
-                            yield return new IssueTemplateConcurrentDifferent(this).Create(hitobject, nextHitobject);
+                        yield return new IssueTemplateConcurrent(this).Create(hitobject, nextHitobject, sameType);
                     }
                     else if (AreAlmostConcurrent(hitobject, nextHitobject))
                     {
-                        if (hitobject.GetType() == nextHitobject.GetType())
-                            yield return new IssueTemplateAlmostConcurrentSame(this).Create(hitobject, nextHitobject);
-                        else
-                            yield return new IssueTemplateAlmostConcurrentDifferent(this).Create(hitobject, nextHitobject);
+                        yield return new IssueTemplateAlmostConcurrent(this).Create(hitobject, nextHitobject, sameType);
                     }
                 }
             }
@@ -64,67 +58,42 @@ namespace osu.Game.Rulesets.Edit.Checks
         protected bool AreAlmostConcurrent(HitObject hitobject, HitObject nextHitobject) =>
             Math.Abs(nextHitobject.StartTime - hitobject.GetEndTime()) < almost_concurrent_threshold;
 
-        public abstract class IssueTemplateConcurrent : IssueTemplate
+        public class IssueTemplateConcurrent : IssueTemplate
         {
-            protected IssueTemplateConcurrent(ICheck check, string unformattedMessage)
-                : base(check, IssueType.Problem, unformattedMessage)
+            public IssueTemplateConcurrent(ICheck check)
+                : base(check, IssueType.Problem, "{0}")
             {
             }
 
-            public Issue Create(HitObject hitobject, HitObject nextHitobject)
+            public Issue Create(HitObject hitobject, HitObject nextHitobject, bool sameType)
             {
                 var hitobjects = new List<HitObject> { hitobject, nextHitobject };
-                return new Issue(hitobjects, this, hitobject.GetType().Name, nextHitobject.GetType().Name)
+                string message = sameType
+                    ? $"{hitobject.GetType().Name}s are concurrent here."
+                    : $"{hitobject.GetType().Name} and {nextHitobject.GetType().Name} are concurrent here.";
+
+                return new Issue(hitobjects, this, message)
                 {
                     Time = nextHitobject.StartTime
                 };
             }
         }
 
-        public class IssueTemplateConcurrentSame : IssueTemplateConcurrent
+        public class IssueTemplateAlmostConcurrent : IssueTemplate
         {
-            public IssueTemplateConcurrentSame(ICheck check)
-                : base(check, "{0}s are concurrent here.")
-            {
-            }
-        }
-
-        public class IssueTemplateConcurrentDifferent : IssueTemplateConcurrent
-        {
-            public IssueTemplateConcurrentDifferent(ICheck check)
-                : base(check, "{0} and {1} are concurrent here.")
-            {
-            }
-        }
-
-        public class IssueTemplateAlmostConcurrentSame : IssueTemplate
-        {
-            public IssueTemplateAlmostConcurrentSame(ICheck check)
-                : base(check, IssueType.Problem, "{0}s are less than 10ms apart.")
+            public IssueTemplateAlmostConcurrent(ICheck check)
+                : base(check, IssueType.Problem, "{0}")
             {
             }
 
-            public Issue Create(HitObject hitobject, HitObject nextHitobject)
+            public Issue Create(HitObject hitobject, HitObject nextHitobject, bool sameType)
             {
                 var hitobjects = new List<HitObject> { hitobject, nextHitobject };
-                return new Issue(hitobjects, this, hitobject.GetType().Name)
-                {
-                    Time = nextHitobject.StartTime
-                };
-            }
-        }
+                string message = sameType
+                    ? $"{hitobject.GetType().Name}s are less than 10ms apart."
+                    : $"{hitobject.GetType().Name} and {nextHitobject.GetType().Name} are less than 10ms apart.";
 
-        public class IssueTemplateAlmostConcurrentDifferent : IssueTemplate
-        {
-            public IssueTemplateAlmostConcurrentDifferent(ICheck check)
-                : base(check, IssueType.Problem, "{0} and {1} are less than 10ms apart.")
-            {
-            }
-
-            public Issue Create(HitObject hitobject, HitObject nextHitobject)
-            {
-                var hitobjects = new List<HitObject> { hitobject, nextHitobject };
-                return new Issue(hitobjects, this, hitobject.GetType().Name, nextHitobject.GetType().Name)
+                return new Issue(hitobjects, this, message)
                 {
                     Time = nextHitobject.StartTime
                 };

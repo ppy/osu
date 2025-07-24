@@ -75,7 +75,8 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor.Checks
             var issues = check.Run(getContext(hitobjects)).ToList();
 
             Assert.That(issues, Has.Count.EqualTo(count));
-            Assert.That(issues.All(issue => issue.Template is CheckConcurrentObjects.IssueTemplateConcurrentSame));
+            Assert.That(issues.All(issue => issue.Template is CheckConcurrentObjects.IssueTemplateConcurrent));
+            Assert.That(issues.All(issue => issue.ToString().Contains("s are concurrent here")));
         }
 
         private void assertAlmostConcurrentSame(List<HitObject> hitobjects)
@@ -83,7 +84,8 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor.Checks
             var issues = check.Run(getContext(hitobjects)).ToList();
 
             Assert.That(issues, Has.Count.EqualTo(1));
-            Assert.That(issues.All(issue => issue.Template is CheckConcurrentObjects.IssueTemplateAlmostConcurrentSame));
+            Assert.That(issues.All(issue => issue.Template is CheckConcurrentObjects.IssueTemplateAlmostConcurrent));
+            Assert.That(issues.All(issue => issue.ToString().Contains("s are less than 10ms apart")));
         }
 
         private BeatmapVerifierContext getContext(List<HitObject> hitobjects)
