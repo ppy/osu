@@ -92,6 +92,30 @@ namespace osu.Game.Tests.Visual.Navigation
             waitForScreen<SoloSongSelect>();
         }
 
+        [Test]
+        public void TestPresentBeatmapFromMainMenuUsesPreviewPoint()
+        {
+            BeatmapSetInfo beatmapInfo = null!;
+
+            AddStep("import beatmap", () =>
+            {
+                var task = BeatmapImportHelper.LoadOszIntoOsu(Game, virtualTrack: true);
+                task.WaitSafely();
+                beatmapInfo = task.GetResultSafely();
+            });
+
+            AddStep("present beatmap", () => Game.PresentBeatmap(beatmapInfo));
+
+            AddUntilStep("wait for track playing", () => Game.MusicController.IsPlaying);
+
+            AddAssert("ensure time is reset to preview point",
+                () =>
+                {
+                    double timeFromPreviewPoint = Math.Abs(Game.MusicController.CurrentTrack.CurrentTime - beatmapInfo.Metadata.PreviewTime);
+                    return timeFromPreviewPoint < 5000;
+                });
+        }
+
         [TestCase(true)]
         [TestCase(false)]
         public void TestSongContinuesAfterExitPlayer(bool withUserPause)

@@ -697,44 +697,6 @@ namespace osu.Game.Tests.Visual.Navigation
             AddUntilStep("wait for score panel removal", () => scorePanel.Parent == null);
         }
 
-        [TestCase(true)]
-        [TestCase(false)]
-        public void TestSongContinuesAfterExitPlayer(bool withUserPause)
-        {
-            Player player = null;
-
-            IWorkingBeatmap beatmap() => Game.Beatmap.Value;
-
-            Screens.SelectV2.SongSelect songSelect = null;
-            PushAndConfirm(() => songSelect = new SoloSongSelect());
-            AddUntilStep("wait for song select", () => songSelect.CarouselItemsPresented);
-
-            AddStep("import beatmap", () => BeatmapImportHelper.LoadOszIntoOsu(Game, virtualTrack: true).WaitSafely());
-
-            AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
-
-            if (withUserPause)
-                AddStep("pause", () => Game.Dependencies.Get<MusicController>().Stop(true));
-
-            AddStep("press enter", () => InputManager.Key(Key.Enter));
-
-            AddUntilStep("wait for player", () =>
-            {
-                DismissAnyNotifications();
-                return (player = Game.ScreenStack.CurrentScreen as Player) != null;
-            });
-
-            AddUntilStep("wait for fail", () => player.GameplayState.HasFailed);
-
-            AddUntilStep("wait for track stop", () => !Game.MusicController.IsPlaying);
-            AddAssert("Ensure time before preview point", () => Game.MusicController.CurrentTrack.CurrentTime < beatmap().BeatmapInfo.Metadata.PreviewTime);
-
-            pushEscape();
-
-            AddUntilStep("wait for track playing", () => Game.MusicController.IsPlaying);
-            AddAssert("Ensure time wasn't reset to preview point", () => Game.MusicController.CurrentTrack.CurrentTime < beatmap().BeatmapInfo.Metadata.PreviewTime);
-        }
-
         [Test]
         public void TestMenuMakesMusic()
         {
@@ -1345,28 +1307,6 @@ namespace osu.Game.Tests.Visual.Navigation
                     InputManager.Click(MouseButton.Left);
                 }
             }
-        }
-
-        [Test]
-        public void TestSongPresentBeatmap()
-        {
-            BeatmapSetInfo beatmapInfo = null!;
-            AddStep("import beatmap", () =>
-            {
-                var task = BeatmapImportHelper.LoadOszIntoOsu(Game, virtualTrack: true);
-                task.WaitSafely();
-                beatmapInfo = task.GetResultSafely();
-            });
-
-            AddStep("present beatmap", () => Game.PresentBeatmap(beatmapInfo));
-
-            AddUntilStep("wait for track playing", () => Game.MusicController.IsPlaying);
-            AddAssert("ensure time is reset to preview point",
-                () =>
-                {
-                    double timeFormPreviewPoint = Game.MusicController.CurrentTrack.CurrentTime - beatmapInfo.Metadata.PreviewTime;
-                    return timeFormPreviewPoint > 0 && timeFormPreviewPoint < 1000;
-                });
         }
 
         [Test]
