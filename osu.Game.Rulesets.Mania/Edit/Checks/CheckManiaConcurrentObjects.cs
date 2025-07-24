@@ -32,19 +32,15 @@ namespace osu.Game.Rulesets.Mania.Edit.Checks
                     if (!AreConcurrent(hitobject, nextHitobject) && !AreAlmostConcurrent(hitobject, nextHitobject))
                         break;
 
+                    bool sameType = hitobject.GetType() == nextHitobject.GetType();
+
                     if (AreConcurrent(hitobject, nextHitobject))
                     {
-                        if (hitobject.GetType() == nextHitobject.GetType())
-                            yield return new IssueTemplateConcurrentSame(this).Create(hitobject, nextHitobject);
-                        else
-                            yield return new IssueTemplateConcurrentDifferent(this).Create(hitobject, nextHitobject);
+                        yield return new IssueTemplateConcurrent(this).Create(hitobject, nextHitobject, sameType);
                     }
                     else if (AreAlmostConcurrent(hitobject, nextHitobject))
                     {
-                        if (hitobject.GetType() == nextHitobject.GetType())
-                            yield return new IssueTemplateAlmostConcurrentSame(this).Create(hitobject, nextHitobject);
-                        else
-                            yield return new IssueTemplateAlmostConcurrentDifferent(this).Create(hitobject, nextHitobject);
+                        yield return new IssueTemplateAlmostConcurrent(this).Create(hitobject, nextHitobject, sameType);
                     }
                 }
             }
