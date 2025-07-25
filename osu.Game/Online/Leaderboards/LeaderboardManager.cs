@@ -106,6 +106,9 @@ namespace osu.Game.Online.Leaderboards
                         return;
                     }
 
+                    if (newCriteria.Sorting != LeaderboardSortMode.Score)
+                        throw new InvalidOperationException("Should not attempt to request online scores with a sort mode other than score");
+
                     IReadOnlyList<Mod>? requestMods = null;
 
                     if (newCriteria.ExactMods != null)
@@ -180,7 +183,7 @@ namespace osu.Game.Online.Leaderboards
                 }
             }
 
-            newScores = newScores.Detach().OrderByTotalScore();
+            newScores = newScores.Detach().OrderByCriteria(CurrentCriteria.Sorting);
 
             var newScoresArray = newScores.ToArray();
             scores.Value = LeaderboardScores.Success(newScoresArray, newScoresArray.Length, null);
@@ -191,7 +194,8 @@ namespace osu.Game.Online.Leaderboards
         BeatmapInfo? Beatmap,
         RulesetInfo? Ruleset,
         BeatmapLeaderboardScope Scope,
-        Mod[]? ExactMods
+        Mod[]? ExactMods,
+        LeaderboardSortMode Sorting = LeaderboardSortMode.Score
     );
 
     public record LeaderboardScores
