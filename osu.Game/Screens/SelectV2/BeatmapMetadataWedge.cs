@@ -6,11 +6,14 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Graphics.Containers;
@@ -68,8 +71,11 @@ namespace osu.Game.Screens.SelectV2
         [Resolved]
         private ISongSelect? songSelect { get; set; }
 
+        private Sample? wedgeAppearSample;
+        private Sample? wedgeHideSample;
+
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(AudioManager audio)
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -239,6 +245,9 @@ namespace osu.Game.Screens.SelectV2
                     }),
                 }
             };
+
+            wedgeAppearSample = audio.Samples.Get(@"SongSelect/metadata-wedge-pop-in");
+            wedgeHideSample = audio.Samples.Get(@"SongSelect/metadata-wedge-pop-out");
         }
 
         protected override void LoadComplete()
@@ -278,6 +287,10 @@ namespace osu.Game.Screens.SelectV2
 
             if (State.Value == Visibility.Visible && currentOnlineBeatmap != null)
             {
+                // play show sounds only if the wedges were previously hidden
+                if (ratingsWedge.Alpha < 1)
+                    playWedgeAppearSound();
+
                 ratingsWedge.FadeIn(transition_duration, Easing.OutQuint)
                             .MoveToX(0, transition_duration, Easing.OutQuint);
 
@@ -287,6 +300,10 @@ namespace osu.Game.Screens.SelectV2
             }
             else
             {
+                // play hide sounds only if the wedges were previously visible
+                if (ratingsWedge.Alpha > 0)
+                    playWedgeHideSound();
+
                 failRetryWedge.FadeOut(transition_duration, Easing.OutQuint)
                               .MoveToX(-50, transition_duration, Easing.OutQuint);
 
@@ -294,6 +311,38 @@ namespace osu.Game.Screens.SelectV2
                             .FadeOut(transition_duration, Easing.OutQuint)
                             .MoveToX(-50, transition_duration, Easing.OutQuint);
             }
+        }
+
+        private void playWedgeAppearSound()
+        {
+            var wedgeAppearChannel1 = wedgeAppearSample?.GetChannel();
+            if (wedgeAppearChannel1 == null)
+                return;
+
+            wedgeAppearChannel1.Balance.Value = -OsuGameBase.SFX_STEREO_STRENGTH;
+            wedgeAppearChannel1.Frequency.Value = 0.98f + RNG.NextDouble(0.04f);
+            wedgeAppearChannel1.Play();
+
+            Scheduler.AddDelayed(() =>
+            {
+                var wedgeAppearChannel2 = wedgeAppearSample?.GetChannel();
+                if (wedgeAppearChannel2 == null)
+                    return;
+
+                wedgeAppearChannel2.Balance.Value = -OsuGameBase.SFX_STEREO_STRENGTH;
+                wedgeAppearChannel2.Frequency.Value = 0.90f + RNG.NextDouble(0.05f);
+                wedgeAppearChannel2.Play();
+            }, 100);
+        }
+
+        private void playWedgeHideSound()
+        {
+            var wedgeHideChannel = wedgeHideSample?.GetChannel();
+            if (wedgeHideChannel == null)
+                return;
+
+            wedgeHideChannel.Balance.Value = -OsuGameBase.SFX_STEREO_STRENGTH;
+            wedgeHideChannel.Play();
         }
 
         private void updateDisplay()
