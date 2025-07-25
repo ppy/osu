@@ -319,13 +319,16 @@ namespace osu.Game.Screens.SelectV2
 
         private GroupDefinition defineGroupByBPM(double bpm)
         {
-            for (int i = 1; i < 6; i++)
+            if (bpm < 60)
+                return new GroupDefinition(60, "Under 60 BPM");
+
+            for (int i = 60; i < 300; i += 10)
             {
-                if (bpm < i * 60)
-                    return new GroupDefinition(i, $"Under {i * 60} BPM");
+                if (bpm < i)
+                    return new GroupDefinition(i, $"{i - 10} - {i} BPM");
             }
 
-            return new GroupDefinition(6, "Over 300 BPM");
+            return new GroupDefinition(300, "Over 300 BPM");
         }
 
         private GroupDefinition defineGroupByStars(double stars)
