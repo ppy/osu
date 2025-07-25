@@ -162,8 +162,8 @@ namespace osu.Game.Online.API.Requests.Responses
         IUser IScoreInfo.User => User!;
         DateTimeOffset IScoreInfo.Date => EndedAt;
         long IScoreInfo.LegacyOnlineID => (long?)LegacyScoreId ?? -1;
-        IBeatmapInfo IScoreInfo.Beatmap => Beatmap!;
-        IRulesetInfo IScoreInfo.Ruleset => Beatmap!.Ruleset;
+        IBeatmapInfo? IScoreInfo.Beatmap => Beatmap;
+        IRulesetInfo IScoreInfo.Ruleset => new APIBeatmap.APIRuleset { OnlineID = RulesetID };
 
         #endregion
 

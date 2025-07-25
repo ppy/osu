@@ -18,6 +18,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Framework.Platform;
+using osu.Game.Configuration;
 using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -86,6 +87,9 @@ namespace osu.Game.Online.Leaderboards
 
         [Resolved]
         private ScoreManager scoreManager { get; set; } = null!;
+
+        [Resolved]
+        private OsuConfigManager config { get; set; } = null!;
 
         public LeaderboardScore(ScoreInfo score, int? rank, bool isOnlineScope = true, bool highlightFriend = true)
         {
@@ -230,7 +234,7 @@ namespace osu.Game.Online.Leaderboards
                                         {
                                             TextColour = Color4.White,
                                             GlowColour = Color4Extensions.FromHex(@"83ccfa"),
-                                            Current = scoreManager.GetBindableTotalScoreString(Score),
+                                            Current = Score.GetBindableTotalScoreString(config),
                                             Font = OsuFont.Numeric.With(size: 23),
                                             Margin = new MarginPadding { Top = 1 },
                                         },

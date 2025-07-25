@@ -398,7 +398,7 @@ namespace osu.Game.Screens.SelectV2
                 private OsuSpriteText totalScore = null!;
 
                 [Resolved]
-                private ScoreManager scoreManager { get; set; } = null!;
+                private OsuConfigManager config { get; set; } = null!;
 
                 public ScoreInfo Score
                 {
@@ -408,7 +408,7 @@ namespace osu.Game.Screens.SelectV2
                             OsuColour.ForRank(value.Rank).Opacity(0f),
                             OsuColour.ForRank(value.Rank).Opacity(0.5f));
                         rankContainer.Child = new DrawableRank(value.Rank);
-                        totalScore.Current = scoreManager.GetBindableTotalScoreString(value);
+                        totalScore.Current = value.GetBindableTotalScoreString(config);
                     }
                 }
 
