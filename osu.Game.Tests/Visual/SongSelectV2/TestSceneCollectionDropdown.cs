@@ -18,6 +18,7 @@ using osu.Game.Collections;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
+using osu.Game.Screens.SelectV2;
 using osu.Game.Tests.Resources;
 using osuTK.Input;
 using Realms;
@@ -48,17 +49,27 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         {
             writeAndRefresh(r => r.RemoveAll<BeatmapCollection>());
 
-            Child = new Container
+            BeatmapCollectionStore collectionStore;
+
+            Child = new DependencyProvidingContainer
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
-                Child = dropdown = new CollectionDropdown
+                CachedDependencies = new (Type, object)[]
                 {
-                    Width = 300,
-                    Y = 100,
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
+                    (typeof(BeatmapCollectionStore), collectionStore = new BeatmapCollectionStore())
                 },
+                Children = new Drawable[]
+                {
+                    collectionStore,
+                    dropdown = new CollectionDropdown
+                    {
+                        Width = 300,
+                        Y = 100,
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
+                    }
+                }
             };
         });
 
