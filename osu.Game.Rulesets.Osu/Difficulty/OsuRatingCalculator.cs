@@ -137,12 +137,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (mods.Any(h => h is OsuModRelax))
                 approachRateFactor = 0.0;
 
-            ratingMultiplier *= 1.0 + approachRateFactor * approachRateLengthBonus; // Buff for longer maps with high AR.
+            ratingMultiplier += approachRateFactor * approachRateLengthBonus; // Buff for longer maps with high AR.
 
             if (mods.Any(m => m is OsuModHidden))
             {
                 double visibilityFactor = calculateAimVisibilityFactor(approachRate);
-                ratingMultiplier *= 1.0 + CalculateVisibilityBonus(mods, approachRate, visibilityFactor);
+                ratingMultiplier += CalculateVisibilityBonus(mods, approachRate, visibilityFactor);
             }
 
             // It is important to consider accuracy difficulty when scaling with accuracy.
@@ -170,12 +170,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (mods.Any(m => m is OsuModAutopilot))
                 approachRateFactor = 0.0;
 
-            ratingMultiplier *= 1.0 + approachRateFactor * approachRateLengthBonus; // Buff for longer maps with high AR.
+            ratingMultiplier += approachRateFactor * approachRateLengthBonus; // Buff for longer maps with high AR.
 
             if (mods.Any(m => m is OsuModHidden))
             {
                 double visibilityFactor = calculateSpeedVisibilityFactor(approachRate);
-                ratingMultiplier *= 1.0 + CalculateVisibilityBonus(mods, approachRate, visibilityFactor);
+                ratingMultiplier += CalculateVisibilityBonus(mods, approachRate, visibilityFactor);
             }
 
             ratingMultiplier *= 0.95 + Math.Pow(Math.Max(0, overallDifficulty), 2) / 750;
@@ -244,14 +244,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // NOTE: TC's effect is only noticeable in performance calculations until lazer mods are accounted for server-side.
             bool isAlwaysPartiallyVisible = mods.OfType<OsuModHidden>().Any(m => m.OnlyFadeApproachCircles.Value) || mods.OfType<OsuModTraceable>().Any();
 
-            // Start from normal curve, rewarding lower AR up to AR5
-            double readingBonus = 0.04 * (12.0 - Math.Max(approachRate, 5));
+            // Start from normal curve, rewarding lower AR up to AR7
+            double readingBonus = 0.04 * (12.0 - Math.Max(approachRate, 7));
 
             readingBonus *= visibilityFactor;
 
             // For AR up to 0 - reduce reward for very low ARs when object is visible
-            if (approachRate < 5)
-                readingBonus += (isAlwaysPartiallyVisible ? 0.03 : 0.04) * (5.0 - Math.Max(approachRate, 0));
+            if (approachRate < 7)
+                readingBonus += (isAlwaysPartiallyVisible ? 0.03 : 0.045) * (7.0 - Math.Max(approachRate, 0));
 
             // Starting from AR0 - cap values so they won't grow to infinity
             if (approachRate < 0)
