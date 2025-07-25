@@ -71,10 +71,10 @@ namespace osu.Game.Scoring.Legacy
         public static double GetOsuClassicScoreMultiplier(this ScoreProcessor scoreProcessor)
         {
             int maxBasicJudgements = scoreProcessor.MaximumStatistics
-                                     .Where(k => k.Key.IsBasic())
-                                     .Select(k => k.Value)
-                                     .DefaultIfEmpty(0)
-                                     .Sum();
+                                       .Where(k => k.Key.IsBasic())
+                                       .Select(k => k.Value)
+                                       .DefaultIfEmpty(0)
+                                       .Sum();
 
             return getOsuClassicScoreMultiplier(maxBasicJudgements);
         }
