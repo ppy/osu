@@ -79,7 +79,8 @@ namespace osu.Game.Scoring.Legacy
             return getOsuClassicScoreMultiplier(maxBasicJudgements);
         }
 
-        private static double getOsuClassicScoreMultiplier(int objectCount) {
+        private static double getOsuClassicScoreMultiplier(int objectCount)
+        {
             return (Math.Pow(objectCount, 2) * 32.57 + 100000) / ScoreProcessor.MAX_SCORE;
         }
 

@@ -129,7 +129,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             PositionBindable.BindValueChanged(pos => Position = pos.NewValue);
 
-            if (config == null || scoreProcessor == null) {
+            if (config == null || scoreProcessor == null)
+            {
                 return;
             }
 
