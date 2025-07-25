@@ -13,6 +13,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
     {
         private const double difficulty_multiplier = 0.0675;
 
+        private const double relax_multiplier = 0.87;
+        private const double touch_device_multiplier = 0.83;
+
+        // Increasing this multiplier buffs versatile aim+flow maps
+        public const double AIM_VERSATILITY_BONUS = 0.08;
+
         private readonly Mod[] mods;
         private readonly int totalHits;
         private readonly double approachRate;
@@ -27,20 +33,90 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             this.overallDifficulty = overallDifficulty;
             this.mechanicalDifficultyRating = mechanicalDifficultyRating;
         }
-
-        public double ComputeAimRating(double aimDifficultyValue)
+        public double ComputeTotalAimRating(double aimDifficultyValue, double snapAimDifficultyValue, double flowAimDifficultyValue)
         {
             if (mods.Any(m => m is OsuModAutopilot))
                 return 0;
 
             double aimRating = CalculateDifficultyRating(aimDifficultyValue);
+            double snapAimRating = CalculateDifficultyRating(snapAimDifficultyValue);
+            double flowAimRating = CalculateDifficultyRating(flowAimDifficultyValue);
 
             if (mods.Any(m => m is OsuModTouchDevice))
-                aimRating = Math.Pow(aimRating, 0.8);
+            {
+                aimRating = Math.Pow(aimRating, touch_device_multiplier);
+                snapAimRating = Math.Pow(snapAimRating, touch_device_multiplier);
+                // no reduce on flow aim rating is intentional
+            }
 
             if (mods.Any(m => m is OsuModRelax))
-                aimRating *= 0.9;
+            {
+                aimRating *= relax_multiplier;
+                snapAimRating *= relax_multiplier;
+                flowAimRating *= relax_multiplier;
 
+                // Remove big chunk of flow aim difficulty
+                aimRating = double.Lerp(snapAimRating, aimRating, 0.5);
+            }
+
+            if (mods.Any(m => m is OsuModMagnetised))
+            {
+                float magnetisedStrength = mods.OfType<OsuModMagnetised>().First().AttractionStrength.Value;
+                aimRating *= 1.0 - magnetisedStrength;
+                snapAimRating *= 1.0 - magnetisedStrength;
+                flowAimRating *= 1.0 - magnetisedStrength;
+            }
+
+            aimRating = double.Lerp(aimRating, snapAimRating + flowAimRating, AIM_VERSATILITY_BONUS);
+
+            return computeRawAimRating(aimRating);
+        }
+
+        public double ComputeSnapAimRating(double snapAimDifficultyValue)
+        {
+            if (mods.Any(m => m is OsuModAutopilot))
+                return 0;
+
+            double snapAimRating = Math.Sqrt(snapAimDifficultyValue) * difficulty_multiplier;
+
+            if (mods.Any(m => m is OsuModTouchDevice))
+                snapAimRating = Math.Pow(snapAimRating, touch_device_multiplier);
+
+            // To ensure that result would not be bigger than normal aim difficulty rating
+            if (mods.Any(m => m is OsuModRelax))
+                snapAimRating *= relax_multiplier;
+
+            if (mods.Any(m => m is OsuModMagnetised))
+            {
+                float magnetisedStrength = mods.OfType<OsuModMagnetised>().First().AttractionStrength.Value;
+                snapAimRating *= 1.0 - magnetisedStrength;
+            }
+
+            return computeRawAimRating(snapAimRating);
+        }
+
+        public double ComputeFlowAimRating(double flowAimDifficultyValue)
+        {
+            if (mods.Any(m => m is OsuModAutopilot) || mods.Any(m => m is OsuModRelax))
+                return 0;
+
+            double flowAimRating = Math.Sqrt(flowAimDifficultyValue) * difficulty_multiplier;
+
+            // To ensure that result would not be bigger than normal aim difficulty rating
+            if (mods.Any(m => m is OsuModTouchDevice))
+                flowAimRating = Math.Pow(flowAimRating, 0.83);
+
+            if (mods.Any(m => m is OsuModMagnetised))
+            {
+                float magnetisedStrength = mods.OfType<OsuModMagnetised>().First().AttractionStrength.Value;
+                flowAimRating *= 1.0 - magnetisedStrength;
+            }
+
+            return computeRawAimRating(flowAimRating);
+        }
+
+        private double computeRawAimRating(double aimRating)
+        {
             if (mods.Any(m => m is OsuModMagnetised))
             {
                 float magnetisedStrength = mods.OfType<OsuModMagnetised>().First().AttractionStrength.Value;
@@ -81,16 +157,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 return 0;
 
             double speedRating = CalculateDifficultyRating(speedDifficultyValue);
-
-            if (mods.Any(m => m is OsuModAutopilot))
-                speedRating *= 0.5;
-
-            if (mods.Any(m => m is OsuModMagnetised))
-            {
-                // reduce speed rating because of the speed distance scaling, with maximum reduction being 0.7x
-                float magnetisedStrength = mods.OfType<OsuModMagnetised>().First().AttractionStrength.Value;
-                speedRating *= 1.0 - magnetisedStrength * 0.3;
-            }
 
             double ratingMultiplier = 1.0;
 
