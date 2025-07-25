@@ -27,7 +27,7 @@ namespace osu.Game.Screens.SelectV2
 {
     public abstract partial class Panel : PoolableDrawable, ICarouselPanel, IHasContextMenu
     {
-        private const float corner_radius = 10;
+        public const float CORNER_RADIUS = 10;
 
         private const float active_x_offset = 25f;
 
@@ -35,9 +35,6 @@ namespace osu.Game.Screens.SelectV2
 
         protected float PanelXOffset { get; init; }
 
-        private Box backgroundBorder = null!;
-        private Box backgroundGradient = null!;
-        private Container backgroundLayerHorizontalPadding = null!;
         private Container backgroundContainer = null!;
         private Container iconContainer = null!;
 
@@ -50,6 +47,7 @@ namespace osu.Game.Screens.SelectV2
 
         public Container TopLevelContent { get; private set; } = null!;
 
+        private Container contentPaddingContainer = null!;
         protected Container Content { get; private set; } = null!;
 
         public Drawable Background
@@ -109,42 +107,14 @@ namespace osu.Game.Screens.SelectV2
             InternalChild = TopLevelContent = new Container
             {
                 Masking = true,
-                CornerRadius = corner_radius,
+                CornerRadius = CORNER_RADIUS,
                 RelativeSizeAxes = Axes.Both,
-                X = corner_radius,
-                EdgeEffect = new EdgeEffectParameters
-                {
-                    Type = EdgeEffectType.Shadow,
-                    Hollow = true,
-                    Radius = 2,
-                },
+                X = CORNER_RADIUS,
                 Children = new[]
                 {
-                    backgroundBorder = new Box
+                    backgroundContainer = new Container
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.Black,
-                    },
-                    backgroundLayerHorizontalPadding = new Container
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Child = new Container
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Masking = true,
-                            CornerRadius = corner_radius,
-                            Children = new Drawable[]
-                            {
-                                backgroundGradient = new Box
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                },
-                                backgroundContainer = new Container
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                },
-                            }
-                        },
                     },
                     iconContainer = new Container
                     {
@@ -152,10 +122,15 @@ namespace osu.Game.Screens.SelectV2
                         Origin = Anchor.CentreLeft,
                         AutoSizeAxes = Axes.Both,
                     },
-                    Content = new Container
+                    contentPaddingContainer = new Container
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Padding = new MarginPadding { Right = PanelXOffset + corner_radius },
+                        Child = Content = new Container
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            CornerRadius = CORNER_RADIUS,
+                            Masking = true,
+                        },
                     },
                     hoverLayer = new Box
                     {
@@ -190,8 +165,6 @@ namespace osu.Game.Screens.SelectV2
                     new HoverSounds(),
                 }
             };
-
-            backgroundGradient.Colour = ColourInfo.GradientHorizontal(colourProvider.Background3, colourProvider.Background4);
         }
 
         public partial class PulsatingBox : BeatSyncedContainer
@@ -306,8 +279,6 @@ namespace osu.Game.Screens.SelectV2
         {
             var backgroundColour = accentColour ?? Color4.White;
 
-            backgroundBorder.Colour = backgroundColour;
-
             selectionLayer.Colour = ColourInfo.GradientHorizontal(backgroundColour.Opacity(0), backgroundColour.Opacity(0.5f));
 
             updateSelectedState(animated: false);
@@ -318,7 +289,28 @@ namespace osu.Game.Screens.SelectV2
             bool selectedOrExpanded = Expanded.Value || Selected.Value;
 
             var edgeEffectColour = accentColour ?? Color4Extensions.FromHex(@"4EBFFF");
-            TopLevelContent.FadeEdgeEffectTo(selectedOrExpanded ? edgeEffectColour.Opacity(0.8f) : Color4.Black.Opacity(0.4f), animated ? DURATION : 0, Easing.OutQuint);
+
+            if (selectedOrExpanded)
+            {
+                TopLevelContent.EdgeEffect = new EdgeEffectParameters
+                {
+                    Type = EdgeEffectType.Shadow,
+                    Radius = 2f,
+                    Hollow = true,
+                };
+            }
+            else
+            {
+                TopLevelContent.EdgeEffect = new EdgeEffectParameters
+                {
+                    Type = EdgeEffectType.Shadow,
+                    Radius = 4f,
+                    Hollow = true,
+                    Offset = new Vector2(0f, 1f),
+                };
+            }
+
+            TopLevelContent.FadeEdgeEffectTo(selectedOrExpanded ? edgeEffectColour.Opacity(0.8f) : Color4.Black.Opacity(0.2f), animated ? DURATION : 0, Easing.OutQuint);
 
             if (selectedOrExpanded)
                 selectionLayer.FadeIn(100, Easing.OutQuint);
@@ -328,7 +320,7 @@ namespace osu.Game.Screens.SelectV2
 
         private void updateXOffset(bool animated = true)
         {
-            float x = PanelXOffset + corner_radius;
+            float x = PanelXOffset + CORNER_RADIUS;
 
             if (!Expanded.Value && !Selected.Value)
             {
@@ -359,8 +351,7 @@ namespace osu.Game.Screens.SelectV2
         protected override void Update()
         {
             base.Update();
-            Content.Padding = Content.Padding with { Left = iconContainer.DrawWidth };
-            backgroundLayerHorizontalPadding.Padding = new MarginPadding { Left = iconContainer.DrawWidth };
+            contentPaddingContainer.Padding = contentPaddingContainer.Padding with { Left = iconContainer.DrawWidth };
         }
 
         public abstract MenuItem[]? ContextMenuItems { get; }
