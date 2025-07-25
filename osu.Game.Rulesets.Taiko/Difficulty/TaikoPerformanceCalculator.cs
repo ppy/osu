@@ -81,7 +81,27 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
         private double computeDifficultyValue(ScoreInfo score, TaikoDifficultyAttributes attributes, bool isConvert)
         {
-            double baseDifficulty = 5 * Math.Max(1.0, attributes.StarRating / 0.110) - 4.0;
+            if (estimatedUnstableRate == null)
+                return 0;
+
+            // An estimation of the unstable rate expected for a SS at the map's star rating, at which all rhythm difficulty has been played successfully.
+            double rhythmExpectedUnstableRate = 75 + 150 / Math.Pow(10, attributes.StarRating / 9);
+
+            // The unstable rate at which it can be assumed all rhythm difficulty has been ignored.
+            double rhythmMaximumUnstableRate = 2 * rhythmExpectedUnstableRate;
+
+            // The fraction of star rating made up by rhythm difficulty, normalised to represent rhythm's perceived contribution to star rating.
+            double rhythmFactor = DifficultyCalculationUtils.ReverseLerp(attributes.RhythmDifficulty / attributes.StarRating, 0.15, 0.35);
+
+            // A penalty removing improperly played rhythm difficulty from star rating based on estimated unstable rate.
+            double rhythmPenalty = 1 - DifficultyCalculationUtils.Logistic(
+                estimatedUnstableRate.Value,
+                midpointOffset: (rhythmExpectedUnstableRate + rhythmMaximumUnstableRate) / 2,
+                multiplier: 10 / (rhythmMaximumUnstableRate - rhythmExpectedUnstableRate),
+                maxValue: 0.2 * Math.Pow(rhythmFactor, 2)
+            );
+
+            double baseDifficulty = 5 * Math.Max(1.0, attributes.StarRating * rhythmPenalty / 0.110) - 4.0;
             double difficultyValue = Math.Min(Math.Pow(baseDifficulty, 3) / 69052.51, Math.Pow(baseDifficulty, 2.25) / 1250.0);
 
             difficultyValue *= 1 + 0.10 * Math.Max(0, attributes.StarRating - 10);
@@ -101,14 +121,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             if (score.Mods.Any(m => m is ModFlashlight<TaikoHitObject>))
                 difficultyValue *= Math.Max(1, 1.050 - Math.Min(attributes.MonoStaminaFactor / 50, 1) * lengthBonus);
 
-            if (estimatedUnstableRate == null)
-                return 0;
-
             // Scale accuracy more harshly on nearly-completely mono (single coloured) speed maps.
-            double accScalingExponent = 2 + attributes.MonoStaminaFactor;
-            double accScalingShift = 500 - 100 * (attributes.MonoStaminaFactor * 3);
+            double monoAccScalingExponent = 2 + attributes.MonoStaminaFactor;
+            double monoAccScalingShift = 500 - 100 * (attributes.MonoStaminaFactor * 3);
 
-            return difficultyValue * Math.Pow(DifficultyCalculationUtils.Erf(accScalingShift / (Math.Sqrt(2) * estimatedUnstableRate.Value)), accScalingExponent);
+            return difficultyValue * Math.Pow(DifficultyCalculationUtils.Erf(monoAccScalingShift / (Math.Sqrt(2) * estimatedUnstableRate.Value)), monoAccScalingExponent);
         }
 
         private double computeAccuracyValue(ScoreInfo score, TaikoDifficultyAttributes attributes, bool isConvert)
@@ -116,7 +133,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             if (greatHitWindow <= 0 || estimatedUnstableRate == null)
                 return 0;
 
-            double accuracyValue = Math.Pow(70 / estimatedUnstableRate.Value, 1.1) * Math.Pow(attributes.StarRating, 0.4) * 100.0;
+            double accuracyValue = 470 * Math.Pow(0.9885, estimatedUnstableRate.Value);
+
+            // Scales up the bonus for lower unstable rate as star rating increases.
+            accuracyValue *= 1 + Math.Pow(50 / estimatedUnstableRate.Value, 2) * Math.Pow(attributes.StarRating, 2) / 125;
 
             if (score.Mods.Any(m => m is ModHidden) && !isConvert)
                 accuracyValue *= 1.075;
