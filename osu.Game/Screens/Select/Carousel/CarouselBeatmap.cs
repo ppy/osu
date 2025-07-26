@@ -34,8 +34,10 @@ namespace osu.Game.Screens.Select.Carousel
         {
             bool match =
                 criteria.Ruleset == null ||
-                BeatmapInfo.Ruleset.ShortName == criteria.Ruleset.ShortName ||
-                (BeatmapInfo.Ruleset.OnlineID == 0 && criteria.Ruleset.OnlineID != 0 && criteria.AllowConvertedBeatmaps);
+                (criteria.RulesetConvertSupport?.CanBePlayed(BeatmapInfo.Ruleset, criteria.AllowConvertedBeatmaps) ??
+                 (BeatmapInfo.Ruleset.ShortName == criteria.Ruleset.ShortName ||
+                  (BeatmapInfo.Ruleset.OnlineID == 0 && criteria.Ruleset.OnlineID != 0 &&
+                   criteria.AllowConvertedBeatmaps)));
 
             if (BeatmapInfo.BeatmapSet?.Equals(criteria.SelectedBeatmapSet) == true)
             {
