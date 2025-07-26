@@ -5,7 +5,6 @@ using osu.Game.Configuration;
 
 namespace osu.Game.Online
 {
-
     public sealed class TrustedDomainOnlineStore : OnlineStore
     {
         private readonly OsuConfigManager? configManager;
