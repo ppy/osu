@@ -10,6 +10,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Screens.Edit;
 using Vector2 = osuTK.Vector2;
 
 namespace osu.Game.Graphics.UserInterface
@@ -85,6 +86,8 @@ namespace osu.Game.Graphics.UserInterface
 
         public ExpandableSlider()
         {
+            const float slider_bar_scale = 0.8f;
+
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
@@ -95,10 +98,15 @@ namespace osu.Game.Graphics.UserInterface
                 Spacing = new Vector2(0f, 10f),
                 Children = new Drawable[]
                 {
-                    label = new OsuSpriteText(),
+                    label = new OsuSpriteText
+                    {
+                        Font = Editor.Fonts.Default,
+                    },
                     slider = new TSlider
                     {
                         RelativeSizeAxes = Axes.X,
+                        Scale = new Vector2(slider_bar_scale),
+                        Width = 1 / slider_bar_scale,
                     },
                 }
             };
