@@ -165,12 +165,18 @@ namespace osu.Game.Screens.Footer
 
         protected override void PopIn()
         {
+            buttonsFlow.FadeIn(transition_duration / 4, Easing.OutQuint);
+
             this.MoveToY(0, transition_duration, Easing.OutQuint)
                 .FadeIn();
         }
 
         protected override void PopOut()
         {
+            // Really we shouldn't need to do this, but some buttons protrude vertically more than expected
+            // (see FooterButtonMods).
+            buttonsFlow.FadeOut(transition_duration, Easing.OutQuint);
+
             this.MoveToY(ScreenFooterButton.HEIGHT, transition_duration, Easing.OutQuint)
                 .Then()
                 .FadeOut();
