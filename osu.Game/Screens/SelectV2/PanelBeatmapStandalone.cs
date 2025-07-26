@@ -238,7 +238,7 @@ namespace osu.Game.Screens.SelectV2
             titleText.Text = new RomanisableString(beatmapSet.Metadata.TitleUnicode, beatmapSet.Metadata.Title);
             artistText.Text = new RomanisableString(beatmapSet.Metadata.ArtistUnicode, beatmapSet.Metadata.Artist);
             updateButton.BeatmapSet = beatmapSet;
-            statusPill.Status = beatmapSet.Status;
+            statusPill.Status = beatmap.Status;
 
             difficultyIcon.Icon = beatmap.Ruleset.CreateInstance().CreateIcon();
             difficultyIcon.Show();
