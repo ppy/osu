@@ -48,6 +48,7 @@ namespace osu.Game.Rulesets.Edit
 
             // Metadata
             new CheckTitleMarkers(),
+            new CheckInconsistentMetadata(),
         };
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
