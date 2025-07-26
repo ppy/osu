@@ -3,7 +3,9 @@
 
 using System;
 using System.Linq;
+using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Objects;
@@ -13,6 +15,9 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModHardRock : ModHardRock, IApplicableToHitObject
     {
+        [SettingSource("Bypass Approach Rate", "Prevents the approach rate from being adjusted by this mod. Useful for +DTHR precision plays to avoid reading AR11.")]
+        public Bindable<bool> BypassApproachRate { get; } = new BindableBool();
+
         public override double ScoreMultiplier => UsesDefaultConfiguration ? 1.06 : 1;
 
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(ModMirror)).ToArray();
@@ -29,8 +34,10 @@ namespace osu.Game.Rulesets.Osu.Mods
             base.ApplyToDifficulty(difficulty);
 
             difficulty.OverallDifficulty = Math.Min(difficulty.OverallDifficulty * ADJUST_RATIO, 10.0f);
-            difficulty.CircleSize = Math.Min(difficulty.CircleSize * 1.3f, 10.0f); // CS uses a custom 1.3 ratio.
-            difficulty.ApproachRate = Math.Min(difficulty.ApproachRate * ADJUST_RATIO, 10.0f);
+            difficulty.CircleSize = Math.Min(difficulty.CircleSize * 1.3f, 10.0f);
+
+            if (!BypassApproachRate.Value)
+                difficulty.ApproachRate = Math.Min(difficulty.ApproachRate * ADJUST_RATIO, 10.0f);
         }
     }
 }
