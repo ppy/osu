@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             int consistentRatioCount = 0;
             double totalRatioCount = 0.0;
 
-            List<double> recentRatios = new List<double> { };
+            List<double> recentRatios = new List<double>();
             TaikoDifficultyHitObject current = hitObject;
             var previousHitObject = (TaikoDifficultyHitObject)current.Previous(1);
 
