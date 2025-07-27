@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
             greatHitWindow = hitWindows.WindowFor(HitResult.Great) / clockRate;
 
-            estimatedUnstableRate =  (countGreat == 0 || greatHitWindow <= 0)
+            estimatedUnstableRate = (countGreat == 0 || greatHitWindow <= 0)
                 ? null
                 : computeDeviationUpperBound(countGreat / (double)totalHits) * 10;
 
