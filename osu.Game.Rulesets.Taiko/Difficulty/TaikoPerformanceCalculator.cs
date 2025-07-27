@@ -54,7 +54,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
             greatHitWindow = hitWindows.WindowFor(HitResult.Great) / clockRate;
 
-            estimatedUnstableRate = computeDeviationUpperBound() * 10;
+            estimatedUnstableRate =  (countGreat == 0 || greatHitWindow <= 0)
+                ? null
+                : computeDeviationUpperBound(countGreat / (double)totalHits) * 10;
 
             // Effective miss count is calculated by raising the fraction of hits missed to a power based on the map's consistency factor.
             // This is because in less consistently difficult maps, each miss removes more of the map's total difficulty.
@@ -84,8 +86,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             if (estimatedUnstableRate == null)
                 return 0;
 
-            // An estimation of the unstable rate expected for a SS at the map's star rating, at which all rhythm difficulty has been played successfully.
-            double rhythmExpectedUnstableRate = 75 + 150 / Math.Pow(10, attributes.StarRating / 9);
+            // The estimated unstable rate for 100% accuracy, at which all rhythm difficulty has been played successfully.
+            double rhythmExpectedUnstableRate = computeDeviationUpperBound(1.0) * 10;
 
             // The unstable rate at which it can be assumed all rhythm difficulty has been ignored.
             double rhythmMaximumUnstableRate = 2 * rhythmExpectedUnstableRate;
@@ -160,17 +162,14 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         /// and the hit judgements, assuming the player's mean hit error is 0. The estimation is consistent in that
         /// two SS scores on the same map with the same settings will always return the same deviation.
         /// </summary>
-        private double? computeDeviationUpperBound()
+        private double computeDeviationUpperBound(double accuracy)
         {
-            if (countGreat == 0 || greatHitWindow <= 0)
-                return null;
-
             const double z = 2.32634787404; // 99% critical value for the normal distribution (one-tailed).
 
             double n = totalHits;
 
             // Proportion of greats hit.
-            double p = countGreat / n;
+            double p = accuracy;
 
             // We can be 99% confident that p is at least this value.
             double pLowerBound = (n * p + z * z / 2) / (n + z * z) - z / (n + z * z) * Math.Sqrt(n * p * (1 - p) + z * z / 4);
