@@ -1,9 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
+using System.ComponentModel;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -13,22 +12,28 @@ using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
+using osu.Game.Online.Rooms;
 using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Components
 {
-    public partial class StarRatingRangeDisplay : OnlinePlayComposite
+    public partial class StarRatingRangeDisplay : CompositeDrawable
     {
+        private readonly Room room;
+
         [Resolved]
-        private OsuColour colours { get; set; }
+        private OsuColour colours { get; set; } = null!;
 
-        private StarRatingDisplay minDisplay;
-        private Drawable minBackground;
-        private StarRatingDisplay maxDisplay;
-        private Drawable maxBackground;
+        private StarRatingDisplay minDisplay = null!;
+        private Drawable minBackground = null!;
+        private StarRatingDisplay maxDisplay = null!;
+        private Drawable maxBackground = null!;
 
-        public StarRatingRangeDisplay()
+        private BufferedContainer bufferedContent = null!;
+
+        public StarRatingRangeDisplay(Room room)
         {
+            this.room = room;
             AutoSizeAxes = Axes.Both;
         }
 
@@ -37,38 +42,43 @@ namespace osu.Game.Screens.OnlinePlay.Components
         {
             InternalChildren = new Drawable[]
             {
-                new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Masking = true,
-                    CornerRadius = 1,
-                    Children = new[]
-                    {
-                        minBackground = new Box
-                        {
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
-                            RelativeSizeAxes = Axes.Both,
-                            Size = new Vector2(0.5f),
-                        },
-                        maxBackground = new Box
-                        {
-                            Anchor = Anchor.BottomCentre,
-                            Origin = Anchor.BottomCentre,
-                            RelativeSizeAxes = Axes.Both,
-                            Size = new Vector2(0.5f),
-                        },
-                    }
-                },
-                new FillFlowContainer
+                new CircularContainer
                 {
                     AutoSizeAxes = Axes.Both,
-                    Children = new Drawable[]
+                    Masking = true,
+                    // Stops artifacting from boxes drawn behind wrong colour boxes (and edge pixels adding up to higher opacity).
+                    Padding = new MarginPadding(-0.1f),
+                    Child = bufferedContent = new BufferedContainer(pixelSnapping: true, cachedFrameBuffer: true)
                     {
-                        minDisplay = new StarRatingDisplay(default, StarRatingDisplaySize.Range),
-                        maxDisplay = new StarRatingDisplay(default, StarRatingDisplaySize.Range)
+                        AutoSizeAxes = Axes.Both,
+                        Children = new[]
+                        {
+                            minBackground = new Box
+                            {
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.TopCentre,
+                                RelativeSizeAxes = Axes.Both,
+                                Size = new Vector2(1, 0.5f),
+                            },
+                            maxBackground = new Box
+                            {
+                                Anchor = Anchor.BottomCentre,
+                                Origin = Anchor.BottomCentre,
+                                RelativeSizeAxes = Axes.Both,
+                                Size = new Vector2(1, 0.5f),
+                            },
+                            new FillFlowContainer
+                            {
+                                AutoSizeAxes = Axes.Both,
+                                Children = new Drawable[]
+                                {
+                                    minDisplay = new StarRatingDisplay(default, StarRatingDisplaySize.Range),
+                                    maxDisplay = new StarRatingDisplay(default, StarRatingDisplaySize.Range)
+                                }
+                            }
+                        }
                     }
-                }
+                },
             };
         }
 
@@ -76,8 +86,19 @@ namespace osu.Game.Screens.OnlinePlay.Components
         {
             base.LoadComplete();
 
-            DifficultyRange.BindValueChanged(_ => updateRange());
-            Playlist.BindCollectionChanged((_, _) => updateRange(), true);
+            room.PropertyChanged += onRoomPropertyChanged;
+            updateRange();
+        }
+
+        private void onRoomPropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case nameof(Room.Playlist):
+                case nameof(Room.DifficultyRange):
+                    updateRange();
+                    break;
+            }
         }
 
         private void updateRange()
@@ -85,16 +106,16 @@ namespace osu.Game.Screens.OnlinePlay.Components
             StarDifficulty minDifficulty;
             StarDifficulty maxDifficulty;
 
-            if (DifficultyRange.Value != null && Playlist.Count == 0)
+            if (room.DifficultyRange != null && room.Playlist.Count == 0)
             {
                 // When Playlist is empty (in lounge) we take retrieved range
-                minDifficulty = new StarDifficulty(DifficultyRange.Value.Min, 0);
-                maxDifficulty = new StarDifficulty(DifficultyRange.Value.Max, 0);
+                minDifficulty = new StarDifficulty(room.DifficultyRange.Min, 0);
+                maxDifficulty = new StarDifficulty(room.DifficultyRange.Max, 0);
             }
             else
             {
                 // When Playlist is not empty (in room) we compute actual range
-                var orderedDifficulties = Playlist.Select(p => p.Beatmap).OrderBy(b => b.StarRating).ToArray();
+                var orderedDifficulties = room.Playlist.Select(p => p.Beatmap).OrderBy(b => b.StarRating).ToArray();
 
                 minDifficulty = new StarDifficulty(orderedDifficulties.Length > 0 ? orderedDifficulties[0].StarRating : 0, 0);
                 maxDifficulty = new StarDifficulty(orderedDifficulties.Length > 0 ? orderedDifficulties[^1].StarRating : 0, 0);
@@ -106,6 +127,14 @@ namespace osu.Game.Screens.OnlinePlay.Components
 
             minBackground.Colour = colours.ForStarDifficulty(minDifficulty.Stars);
             maxBackground.Colour = colours.ForStarDifficulty(maxDifficulty.Stars);
+
+            bufferedContent.ForceRedraw();
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            room.PropertyChanged -= onRoomPropertyChanged;
         }
     }
 }

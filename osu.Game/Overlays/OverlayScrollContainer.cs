@@ -35,7 +35,7 @@ namespace osu.Game.Overlays
 
         public ScrollBackButton Button { get; private set; }
 
-        private readonly Bindable<float?> lastScrollTarget = new Bindable<float?>();
+        private readonly Bindable<double?> lastScrollTarget = new Bindable<double?>();
 
         [BackgroundDependencyLoader]
         private void load()
@@ -63,7 +63,7 @@ namespace osu.Game.Overlays
             Button.State = Target > button_scroll_position || lastScrollTarget.Value != null ? Visibility.Visible : Visibility.Hidden;
         }
 
-        protected override void OnUserScroll(float value, bool animated = true, double? distanceDecay = default)
+        protected override void OnUserScroll(double value, bool animated = true, double? distanceDecay = default)
         {
             base.OnUserScroll(value, animated, distanceDecay);
 
@@ -112,7 +112,7 @@ namespace osu.Game.Overlays
             private readonly Box background;
             private readonly SpriteIcon spriteIcon;
 
-            public Bindable<float?> LastScrollTarget = new Bindable<float?>();
+            public Bindable<double?> LastScrollTarget = new Bindable<double?>();
 
             protected override HoverSounds CreateHoverSounds(HoverSampleSet sampleSet) => new HoverSounds();
 

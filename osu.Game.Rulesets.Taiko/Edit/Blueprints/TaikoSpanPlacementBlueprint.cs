@@ -1,9 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
@@ -26,12 +25,15 @@ namespace osu.Game.Rulesets.Taiko.Edit.Blueprints
 
         private readonly IHasDuration spanPlacementObject;
 
+        [Resolved]
+        private TaikoHitObjectComposer? composer { get; set; }
+
         protected override bool IsValidForPlacement => Precision.DefinitelyBigger(spanPlacementObject.Duration, 0);
 
         public TaikoSpanPlacementBlueprint(HitObject hitObject)
             : base(hitObject)
         {
-            spanPlacementObject = hitObject as IHasDuration;
+            spanPlacementObject = (hitObject as IHasDuration)!;
 
             RelativeSizeAxes = Axes.Both;
 
@@ -79,9 +81,11 @@ namespace osu.Game.Rulesets.Taiko.Edit.Blueprints
             EndPlacement(true);
         }
 
-        public override void UpdateTimeAndPosition(SnapResult result)
+        public override SnapResult UpdateTimeAndPosition(Vector2 screenSpacePosition, double fallbackTime)
         {
-            base.UpdateTimeAndPosition(result);
+            var result = composer?.FindSnappedPositionAndTime(screenSpacePosition) ?? new SnapResult(screenSpacePosition, fallbackTime);
+
+            base.UpdateTimeAndPosition(result.ScreenSpacePosition, result.Time ?? fallbackTime);
 
             if (PlacementActive == PlacementState.Active)
             {
@@ -116,6 +120,8 @@ namespace osu.Game.Rulesets.Taiko.Edit.Blueprints
                     originalPosition = ToLocalSpace(result.ScreenSpacePosition);
                 }
             }
+
+            return result;
         }
     }
 }

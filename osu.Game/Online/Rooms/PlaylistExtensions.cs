@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Humanizer;
 using Humanizer.Localisation;
-using osu.Framework.Bindables;
 using osu.Game.Rulesets;
 using osu.Game.Utils;
 
@@ -30,7 +29,7 @@ namespace osu.Game.Online.Rooms
         /// or the last-played <see cref="PlaylistItem"/> if all items are expired,
         /// or <see langword="null"/> if <paramref name="playlist"/> was empty.
         /// </summary>
-        public static PlaylistItem? GetCurrentItem(this ICollection<PlaylistItem> playlist)
+        public static PlaylistItem? GetCurrentItem(this IReadOnlyCollection<PlaylistItem> playlist)
         {
             if (playlist.Count == 0)
                 return null;
@@ -43,7 +42,7 @@ namespace osu.Game.Online.Rooms
         /// <summary>
         /// Returns the total duration from the <see cref="PlaylistItem"/> in playlist order from the supplied <paramref name="playlist"/>,
         /// </summary>
-        public static string GetTotalDuration(this BindableList<PlaylistItem> playlist, RulesetStore rulesetStore) =>
+        public static string GetTotalDuration(this IReadOnlyList<PlaylistItem> playlist, RulesetStore rulesetStore) =>
             playlist.Select(p =>
             {
                 double rate = 1;

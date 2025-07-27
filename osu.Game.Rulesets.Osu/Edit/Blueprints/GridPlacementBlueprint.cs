@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Edit;
 using osuTK;
@@ -12,7 +13,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints
     public partial class GridPlacementBlueprint : PlacementBlueprint
     {
         [Resolved]
-        private HitObjectComposer? hitObjectComposer { get; set; }
+        private OsuHitObjectComposer? hitObjectComposer { get; set; }
 
         private OsuGridToolboxGroup gridToolboxGroup = null!;
         private Vector2 originalOrigin;
@@ -31,12 +32,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints
         public override void EndPlacement(bool commit)
         {
             if (!commit && PlacementActive != PlacementState.Finished)
-            {
-                gridToolboxGroup.StartPosition.Value = originalOrigin;
-                gridToolboxGroup.Spacing.Value = originalSpacing;
-                if (!gridToolboxGroup.GridLinesRotation.Disabled)
-                    gridToolboxGroup.GridLinesRotation.Value = originalRotation;
-            }
+                resetGridState();
 
             base.EndPlacement(commit);
 
@@ -99,10 +95,13 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints
             base.OnDragEnd(e);
         }
 
-        public override SnapType SnapType => ~SnapType.GlobalGrids;
-
-        public override void UpdateTimeAndPosition(SnapResult result)
+        public override SnapResult UpdateTimeAndPosition(Vector2 screenSpacePosition, double fallbackTime)
         {
+            if (State.Value == Visibility.Hidden)
+                return new SnapResult(screenSpacePosition, fallbackTime);
+
+            var result = hitObjectComposer?.TrySnapToNearbyObjects(screenSpacePosition) ?? new SnapResult(screenSpacePosition, fallbackTime);
+
             var pos = ToLocalSpace(result.ScreenSpacePosition);
 
             if (PlacementActive != PlacementState.Active)
@@ -121,6 +120,22 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints
                     gridToolboxGroup.SetGridFromPoints(gridToolboxGroup.StartPosition.Value, pos);
                 }
             }
+
+            return result;
+        }
+
+        protected override void PopOut()
+        {
+            base.PopOut();
+            resetGridState();
+        }
+
+        private void resetGridState()
+        {
+            gridToolboxGroup.StartPosition.Value = originalOrigin;
+            gridToolboxGroup.Spacing.Value = originalSpacing;
+            if (!gridToolboxGroup.GridLinesRotation.Disabled)
+                gridToolboxGroup.GridLinesRotation.Value = originalRotation;
         }
     }
 }

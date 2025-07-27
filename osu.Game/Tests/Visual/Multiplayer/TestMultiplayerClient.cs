@@ -10,13 +10,16 @@ using MessagePack;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
+using osu.Game.Beatmaps;
 using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Online.Multiplayer.Countdown;
 using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Tests.Visual.OnlinePlay;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
@@ -65,15 +68,16 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
 
-        private readonly TestMultiplayerRoomManager roomManager;
-
         private MultiplayerPlaylistItem? currentItem => ServerRoom?.Playlist[currentIndex];
         private int currentIndex;
         private long lastPlaylistItemId;
+        private int lastCountdownId;
 
-        public TestMultiplayerClient(TestMultiplayerRoomManager roomManager)
+        private readonly TestRoomRequestsHandler apiRequestHandler;
+
+        public TestMultiplayerClient(TestRoomRequestsHandler? apiRequestHandler = null)
         {
-            this.roomManager = roomManager;
+            this.apiRequestHandler = apiRequestHandler ?? new TestRoomRequestsHandler();
         }
 
         public void Connect() => isConnected.Value = true;
@@ -206,7 +210,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             ((IMultiplayerClient)this).UserBeatmapAvailabilityChanged(clone(userId), clone(user.BeatmapAvailability));
         }
 
-        protected override async Task<MultiplayerRoom> JoinRoom(long roomId, string? password = null)
+        protected override async Task<MultiplayerRoom> JoinRoomInternal(long roomId, string? password = null)
         {
             if (RoomJoined || ServerAPIRoom != null)
                 throw new InvalidOperationException("Already joined a room");
@@ -214,9 +218,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
             roomId = clone(roomId);
             password = clone(password);
 
-            ServerAPIRoom = roomManager.ServerSideRooms.Single(r => r.RoomID.Value == roomId);
+            ServerAPIRoom = ServerSideRooms.Single(r => r.RoomID == roomId);
 
-            if (password != ServerAPIRoom.Password.Value)
+            if (password != ServerAPIRoom.Password)
                 throw new InvalidOperationException("Invalid password.");
 
             lastPlaylistItemId = ServerAPIRoom.Playlist.Max(item => item.ID);
@@ -230,13 +234,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 Settings =
                 {
-                    Name = ServerAPIRoom.Name.Value,
-                    MatchType = ServerAPIRoom.Type.Value,
-                    Password = password,
-                    QueueMode = ServerAPIRoom.QueueMode.Value,
-                    AutoStartDuration = ServerAPIRoom.AutoStartDuration.Value
+                    Name = ServerAPIRoom.Name,
+                    MatchType = ServerAPIRoom.Type,
+                    Password = password ?? string.Empty,
+                    QueueMode = ServerAPIRoom.QueueMode,
+                    AutoStartDuration = ServerAPIRoom.AutoStartDuration
                 },
-                Playlist = ServerAPIRoom.Playlist.Select(CreateMultiplayerPlaylistItem).ToList(),
+                Playlist = ServerAPIRoom.Playlist.Select(item => new MultiplayerPlaylistItem(item)).ToList(),
                 Users = { localUser },
                 Host = localUser
             };
@@ -296,14 +300,24 @@ namespace osu.Game.Tests.Visual.Multiplayer
             return ((IMultiplayerClient)this).UserKicked(clone(user));
         }
 
+        /// <summary>
+        /// Simulates a change to the server-side room's settings without any other change.
+        /// </summary>
+        public async Task ChangeServerRoomSettings(MultiplayerRoomSettings settings)
+        {
+            Debug.Assert(ServerRoom != null);
+
+            ServerRoom.Settings = settings;
+
+            await ((IMultiplayerClient)this).SettingsChanged(clone(settings)).ConfigureAwait(false);
+        }
+
         public override async Task ChangeSettings(MultiplayerRoomSettings settings)
         {
-            settings = clone(settings);
-
             Debug.Assert(ServerRoom != null);
-            Debug.Assert(currentItem != null);
 
             // Server is authoritative for the time being.
+            settings = clone(settings);
             settings.PlaylistItemId = ServerRoom.Settings.PlaylistItemId;
             ServerRoom.Settings = settings;
 
@@ -335,6 +349,23 @@ namespace osu.Game.Tests.Visual.Multiplayer
             return Task.CompletedTask;
         }
 
+        public override Task ChangeUserStyle(int? beatmapId, int? rulesetId)
+        {
+            ChangeUserStyle(api.LocalUser.Value.Id, beatmapId, rulesetId);
+            return Task.CompletedTask;
+        }
+
+        public void ChangeUserStyle(int userId, int? beatmapId, int? rulesetId)
+        {
+            Debug.Assert(ServerRoom != null);
+
+            var user = ServerRoom.Users.Single(u => u.UserID == userId);
+            user.BeatmapId = beatmapId;
+            user.RulesetId = rulesetId;
+
+            ((IMultiplayerClient)this).UserStyleChanged(userId, beatmapId, rulesetId);
+        }
+
         public void ChangeUserMods(int userId, IEnumerable<Mod> newMods)
             => ChangeUserMods(userId, newMods.Select(m => new APIMod(m)));
 
@@ -364,7 +395,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
             switch (request)
             {
                 case ChangeTeamRequest changeTeam:
-
                     TeamVersusRoomState roomState = (TeamVersusRoomState)ServerRoom.MatchState!;
                     TeamVersusUserState userState = (TeamVersusUserState)LocalUser.MatchState!;
 
@@ -373,10 +403,24 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     if (targetTeam != null)
                     {
                         userState.TeamID = targetTeam.ID;
-
                         await ((IMultiplayerClient)this).MatchUserStateChanged(clone(LocalUser.UserID), clone(userState)).ConfigureAwait(false);
                     }
 
+                    break;
+
+                case StartMatchCountdownRequest startCountdown:
+                    ServerRoom.ActiveCountdowns.Add(new MatchStartCountdown
+                    {
+                        ID = ++lastCountdownId,
+                        TimeRemaining = startCountdown.Duration
+                    });
+
+                    await ((IMultiplayerClient)this).MatchEvent(clone(new CountdownStartedEvent(ServerRoom.ActiveCountdowns[^1]))).ConfigureAwait(false);
+                    break;
+
+                case StopCountdownRequest stopCountdown:
+                    ServerRoom.ActiveCountdowns.Remove(ServerRoom.ActiveCountdowns.First(c => c.ID == stopCountdown.ID));
+                    await ((IMultiplayerClient)this).MatchEvent(clone(new CountdownStoppedEvent(stopCountdown.ID))).ConfigureAwait(false);
                     break;
             }
         }
@@ -447,7 +491,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             item.PlaylistOrder = existingItem.PlaylistOrder;
 
             ServerRoom.Playlist[ServerRoom.Playlist.IndexOf(existingItem)] = item;
-            ServerAPIRoom.Playlist[ServerAPIRoom.Playlist.IndexOf(ServerAPIRoom.Playlist.Single(i => i.ID == item.ID))] = new PlaylistItem(item);
+            ServerAPIRoom.Playlist = ServerAPIRoom.Playlist.Select((pi, i) => pi.ID == item.ID ? new PlaylistItem(item) : ServerAPIRoom.Playlist[i]).ToArray();
 
             await ((IMultiplayerClient)this).PlaylistItemChanged(clone(item)).ConfigureAwait(false);
         }
@@ -474,7 +518,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 throw new InvalidOperationException("Attempted to remove an item which has already been played.");
 
             ServerRoom.Playlist.Remove(item);
-            ServerAPIRoom.Playlist.RemoveAll(i => i.ID == item.ID);
+            ServerAPIRoom.Playlist = ServerAPIRoom.Playlist.Where(i => i.ID != item.ID).ToArray();
             await ((IMultiplayerClient)this).PlaylistItemRemoved(clone(playlistItemId)).ConfigureAwait(false);
 
             await updateCurrentItem(ServerRoom).ConfigureAwait(false);
@@ -482,6 +526,19 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         public override Task RemovePlaylistItem(long playlistItemId) => RemoveUserPlaylistItem(api.LocalUser.Value.OnlineID, clone(playlistItemId));
+
+        protected override Task<MultiplayerRoom> CreateRoomInternal(MultiplayerRoom room)
+        {
+            Room apiRoom = new Room(room)
+            {
+                Type = room.Settings.MatchType == MatchType.Playlists
+                    ? MatchType.HeadToHead
+                    : room.Settings.MatchType
+            };
+
+            AddServerSideRoom(apiRoom, api.LocalUser.Value);
+            return JoinRoomInternal(apiRoom.RoomID!.Value, room.Settings.Password);
+        }
 
         private async Task changeMatchType(MatchType type)
         {
@@ -569,7 +626,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             item.ID = ++lastPlaylistItemId;
 
             ServerRoom.Playlist.Add(item);
-            ServerAPIRoom.Playlist.Add(new PlaylistItem(item));
+            ServerAPIRoom.Playlist = ServerAPIRoom.Playlist.Append(new PlaylistItem(item)).ToArray();
             await ((IMultiplayerClient)this).PlaylistItemAdded(clone(item)).ConfigureAwait(false);
 
             await updatePlaylistOrder(ServerRoom).ConfigureAwait(false);
@@ -655,25 +712,23 @@ namespace osu.Game.Tests.Visual.Multiplayer
             return MessagePackSerializer.Deserialize<T>(serialized, SignalRUnionWorkaroundResolver.OPTIONS);
         }
 
-        public static MultiplayerPlaylistItem CreateMultiplayerPlaylistItem(PlaylistItem item) => new MultiplayerPlaylistItem
-        {
-            ID = item.ID,
-            OwnerID = item.OwnerID,
-            BeatmapID = item.Beatmap.OnlineID,
-            BeatmapChecksum = item.Beatmap.MD5Hash,
-            RulesetID = item.RulesetID,
-            RequiredMods = item.RequiredMods.ToArray(),
-            AllowedMods = item.AllowedMods.ToArray(),
-            Expired = item.Expired,
-            PlaylistOrder = item.PlaylistOrder ?? 0,
-            PlayedAt = item.PlayedAt,
-            StarRating = item.Beatmap.StarRating,
-        };
-
         public override Task DisconnectInternal()
         {
             isConnected.Value = false;
             return Task.CompletedTask;
         }
+
+        #region API Room Handling
+
+        public IReadOnlyList<Room> ServerSideRooms
+            => apiRequestHandler.ServerSideRooms;
+
+        public void AddServerSideRoom(Room room, APIUser host)
+            => apiRequestHandler.AddServerSideRoom(room, host);
+
+        public bool HandleRequest(APIRequest request, APIUser localUser, BeatmapManager beatmapManager)
+            => apiRequestHandler.HandleRequest(request, localUser, beatmapManager);
+
+        #endregion
     }
 }

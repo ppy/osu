@@ -16,13 +16,15 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
 
         public override Drawable? GetDrawableComponent(ISkinComponentLookup lookup)
         {
+            bool isPro = Skin is ArgonProSkin;
+
             switch (lookup)
             {
                 case SkinComponentLookup<HitResult> resultComponent:
                     HitResult result = resultComponent.Component;
 
                     // This should eventually be moved to a skin setting, when supported.
-                    if (Skin is ArgonProSkin && (result == HitResult.Great || result == HitResult.Perfect))
+                    if (isPro && (result == HitResult.Great || result == HitResult.Perfect))
                         return Drawable.Empty();
 
                     switch (result)
@@ -46,7 +48,10 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                             return new ArgonMainCirclePiece(false);
 
                         case OsuSkinComponents.SliderBody:
-                            return new ArgonSliderBody();
+                            return new ArgonSliderBody
+                            {
+                                BodyAlpha = isPro ? 0.92f : 0.98f
+                            };
 
                         case OsuSkinComponents.SliderBall:
                             return new ArgonSliderBall();

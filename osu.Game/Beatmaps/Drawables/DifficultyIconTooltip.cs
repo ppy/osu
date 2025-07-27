@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets;
@@ -139,14 +140,15 @@ namespace osu.Game.Beatmaps.Drawables
             }
 
             Ruleset ruleset = displayedContent.Ruleset.CreateInstance();
-            BeatmapDifficulty adjustedDifficulty = ruleset.GetRateAdjustedDisplayDifficulty(originalDifficulty, rate);
+            BeatmapDifficulty adjustedDifficulty = ruleset.GetAdjustedDisplayDifficulty(originalDifficulty, displayedContent.Mods ?? []);
 
             circleSize.Text = @"CS: " + adjustedDifficulty.CircleSize.ToString(@"0.##");
             drainRate.Text = @" HP: " + adjustedDifficulty.DrainRate.ToString(@"0.##");
             approachRate.Text = @" AR: " + adjustedDifficulty.ApproachRate.ToString(@"0.##");
             overallDifficulty.Text = @" OD: " + adjustedDifficulty.OverallDifficulty.ToString(@"0.##");
 
-            length.Text = "Length: " + TimeSpan.FromMilliseconds(displayedContent.BeatmapInfo.Length / rate).ToString(@"mm\:ss");
+            TimeSpan lengthTimeSpan = TimeSpan.FromMilliseconds(displayedContent.BeatmapInfo.Length / rate);
+            length.Text = "Length: " + lengthTimeSpan.ToFormattedDuration();
             bpm.Text = " BPM: " + Math.Round(bpmAdjusted, 0);
         }
 

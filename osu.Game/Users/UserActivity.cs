@@ -6,6 +6,7 @@ using MessagePack;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Online;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
@@ -34,12 +35,20 @@ namespace osu.Game.Users
     [Union(41, typeof(EditingBeatmap))]
     [Union(42, typeof(ModdingBeatmap))]
     [Union(43, typeof(TestingBeatmap))]
+    [Union(51, typeof(InDailyChallengeLobby))]
+    [Union(52, typeof(PlayingDailyChallenge))]
     public abstract class UserActivity
     {
         public abstract string GetStatus(bool hideIdentifiableInformation = false);
         public virtual string? GetDetails(bool hideIdentifiableInformation = false) => null;
 
         public virtual Color4 GetAppropriateColour(OsuColour colours) => colours.GreenDarker;
+
+        /// <summary>
+        /// Returns the ID of the beatmap involved in this activity, if applicable and/or available.
+        /// </summary>
+        /// <param name="hideIdentifiableInformation"></param>
+        public virtual int? GetBeatmapID(bool hideIdentifiableInformation = false) => null;
 
         [MessagePackObject]
         public class ChoosingBeatmap : UserActivity
@@ -48,6 +57,11 @@ namespace osu.Game.Users
         }
 
         [MessagePackObject]
+        [Union(12, typeof(InSoloGame))]
+        [Union(23, typeof(InMultiplayerGame))]
+        [Union(24, typeof(SpectatingMultiplayerGame))]
+        [Union(31, typeof(InPlaylistGame))]
+        [Union(52, typeof(PlayingDailyChallenge))]
         public abstract class InGame : UserActivity
         {
             [Key(0)]
@@ -76,6 +90,7 @@ namespace osu.Game.Users
 
             public override string GetStatus(bool hideIdentifiableInformation = false) => RulesetPlayingVerb;
             public override string GetDetails(bool hideIdentifiableInformation = false) => BeatmapDisplayTitle;
+            public override int? GetBeatmapID(bool hideIdentifiableInformation = false) => BeatmapID;
         }
 
         [MessagePackObject]
@@ -156,6 +171,11 @@ namespace osu.Game.Users
                 // For now let's assume that showing the beatmap a user is editing could reveal unwanted information.
                 ? string.Empty
                 : BeatmapDisplayTitle;
+
+            public override int? GetBeatmapID(bool hideIdentifiableInformation = false) => hideIdentifiableInformation
+                // For now let's assume that showing the beatmap a user is editing could reveal unwanted information.
+                ? null
+                : BeatmapID;
         }
 
         [MessagePackObject]
@@ -228,7 +248,7 @@ namespace osu.Game.Users
             [SerializationConstructor]
             public SpectatingMultiplayerGame() { }
 
-            public override string GetStatus(bool hideIdentifiableInformation = false) => $"Watching others {base.GetStatus(hideIdentifiableInformation).ToLowerInvariant()}";
+            public override string GetStatus(bool hideIdentifiableInformation = false) => @"Spectating a multiplayer game";
         }
 
         [MessagePackObject]
@@ -248,8 +268,14 @@ namespace osu.Game.Users
 
             public InLobby(Room room)
             {
-                RoomID = room.RoomID.Value ?? -1;
-                RoomName = room.Name.Value;
+                RoomID = room.RoomID ?? -1;
+                RoomName = room.Name;
+            }
+
+            public InLobby(MultiplayerRoom room)
+            {
+                RoomID = room.RoomID;
+                RoomName = room.Settings.Name;
             }
 
             [SerializationConstructor]
@@ -260,6 +286,31 @@ namespace osu.Game.Users
             public override string? GetDetails(bool hideIdentifiableInformation = false) => hideIdentifiableInformation
                 ? null
                 : RoomName;
+        }
+
+        [MessagePackObject]
+        public class InDailyChallengeLobby : UserActivity
+        {
+            [SerializationConstructor]
+            public InDailyChallengeLobby() { }
+
+            public override string GetStatus(bool hideIdentifiableInformation = false) => @"In daily challenge lobby";
+        }
+
+        [MessagePackObject]
+        public class PlayingDailyChallenge : InGame
+        {
+            public PlayingDailyChallenge(IBeatmapInfo beatmapInfo, IRulesetInfo ruleset)
+                : base(beatmapInfo, ruleset)
+            {
+            }
+
+            [SerializationConstructor]
+            public PlayingDailyChallenge()
+            {
+            }
+
+            public override string GetStatus(bool hideIdentifiableInformation = false) => @$"{RulesetPlayingVerb} in daily challenge";
         }
     }
 }

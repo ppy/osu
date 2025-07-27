@@ -199,6 +199,21 @@ namespace osu.Game.Localisation
         public static LocalisableString ClickToSelectBackground => new TranslatableString(getKey(@"click_to_select_background"), @"Click to select a background image");
 
         /// <summary>
+        /// "Apply this change to all difficulties?"
+        /// </summary>
+        public static LocalisableString ApplicationScopeSelectionTitle => new TranslatableString(getKey(@"application_scope_selection_title"), @"Apply this change to all difficulties?");
+
+        /// <summary>
+        /// "Apply to all difficulties"
+        /// </summary>
+        public static LocalisableString ApplyToAllDifficulties => new TranslatableString(getKey(@"apply_to_all_difficulties"), @"Apply to all difficulties");
+
+        /// <summary>
+        /// "Only apply to this difficulty"
+        /// </summary>
+        public static LocalisableString ApplyToThisDifficulty => new TranslatableString(getKey(@"apply_to_this_difficulty"), @"Only apply to this difficulty");
+
+        /// <summary>
         /// "Ruleset ({0})"
         /// </summary>
         public static LocalisableString RulesetHeader(string arg0) => new TranslatableString(getKey(@"ruleset"), @"Ruleset ({0})", arg0);

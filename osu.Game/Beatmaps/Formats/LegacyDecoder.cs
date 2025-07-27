@@ -16,7 +16,11 @@ namespace osu.Game.Beatmaps.Formats
     public abstract class LegacyDecoder<T> : Decoder<T>
         where T : new()
     {
+        // If this is updated, a new release of `osu-server-beatmap-submission` is required with updated packages.
+        // See usage at https://github.com/ppy/osu-server-beatmap-submission/blob/master/osu.Server.BeatmapSubmission/Services/BeatmapPackageParser.cs#L96-L97.
         public const int LATEST_VERSION = 14;
+
+        public const int MAX_COMBO_COLOUR_COUNT = 8;
 
         /// <summary>
         /// The .osu format (beatmap) version.
@@ -126,7 +130,9 @@ namespace osu.Game.Beatmaps.Formats
             string[] split = pair.Value.Split(',');
             Color4 colour = convertSettingStringToColor4(split, allowAlpha, pair);
 
-            bool isCombo = pair.Key.StartsWith(@"Combo", StringComparison.Ordinal);
+            bool isCombo = pair.Key.StartsWith(@"Combo", StringComparison.Ordinal)
+                           && int.TryParse(pair.Key[5..], out int comboIndex)
+                           && comboIndex >= 1 && comboIndex <= MAX_COMBO_COLOUR_COUNT;
 
             if (isCombo)
             {

@@ -43,7 +43,7 @@ namespace osu.Game.Tests.Visual.DailyChallenge
                     return false;
                 };
             });
-            AddStep("create leaderboard", () => Child = leaderboard = new DailyChallengeLeaderboard(new Room { RoomID = { Value = 1 } }, new PlaylistItem(Beatmap.Value.BeatmapInfo))
+            AddStep("create leaderboard", () => Child = leaderboard = new DailyChallengeLeaderboard(new Room { RoomID = 1 }, new PlaylistItem(Beatmap.Value.BeatmapInfo))
             {
                 RelativeSizeAxes = Axes.Both,
                 Anchor = Anchor.Centre,
@@ -86,7 +86,7 @@ namespace osu.Game.Tests.Visual.DailyChallenge
                     return false;
                 };
             });
-            AddStep("create leaderboard", () => Child = leaderboard = new DailyChallengeLeaderboard(new Room { RoomID = { Value = 1 } }, new PlaylistItem(Beatmap.Value.BeatmapInfo))
+            AddStep("create leaderboard", () => Child = leaderboard = new DailyChallengeLeaderboard(new Room { RoomID = 1 }, new PlaylistItem(Beatmap.Value.BeatmapInfo))
             {
                 RelativeSizeAxes = Axes.Both,
                 Anchor = Anchor.Centre,

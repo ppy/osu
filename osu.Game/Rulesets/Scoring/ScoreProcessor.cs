@@ -120,6 +120,11 @@ namespace osu.Game.Rulesets.Scoring
         public long MaximumTotalScore { get; private set; }
 
         /// <summary>
+        /// The maximum achievable combo.
+        /// </summary>
+        public int MaximumCombo { get; private set; }
+
+        /// <summary>
         /// The maximum sum of accuracy-affecting judgements at the current point in time.
         /// </summary>
         /// <remarks>
@@ -197,7 +202,6 @@ namespace osu.Game.Rulesets.Scoring
         {
             Ruleset = ruleset;
 
-            Combo.ValueChanged += combo => HighestCombo.Value = Math.Max(HighestCombo.Value, combo.NewValue);
             Accuracy.ValueChanged += _ => updateRank();
 
             Mods.ValueChanged += mods =>
@@ -233,7 +237,10 @@ namespace osu.Game.Rulesets.Scoring
             else if (result.Type.BreaksCombo())
                 Combo.Value = 0;
 
+            HighestCombo.Value = Math.Max(HighestCombo.Value, Combo.Value);
+
             result.ComboAfterJudgement = Combo.Value;
+            result.HighestComboAfterJudgement = HighestCombo.Value;
 
             if (result.Judgement.MaxResult.AffectsAccuracy())
             {
@@ -276,8 +283,11 @@ namespace osu.Game.Rulesets.Scoring
             if (!TrackHitEvents)
                 throw new InvalidOperationException(@$"Rewind is not supported when {nameof(TrackHitEvents)} is disabled.");
 
-            Combo.Value = result.ComboAtJudgement;
-            HighestCombo.Value = result.HighestComboAtJudgement;
+            // the reason this is written so funnily rather than just using `ComboAtJudgement`
+            // is to nullify impact of ordering when reverting concurrent judgement results
+            // (think mania and multiple judgements within a frame).
+            Combo.Value -= (result.ComboAfterJudgement - result.ComboAtJudgement);
+            HighestCombo.Value -= (result.HighestComboAfterJudgement - result.HighestComboAtJudgement);
 
             if (result.FailedAtJudgement && !ApplyNewJudgementsWhenFailed)
                 return;
@@ -423,6 +433,7 @@ namespace osu.Game.Rulesets.Scoring
                 MaximumResultCounts.AddRange(ScoreResultCounts);
 
                 MaximumTotalScore = TotalScore.Value;
+                MaximumCombo = HighestCombo.Value;
             }
 
             ScoreResultCounts.Clear();
