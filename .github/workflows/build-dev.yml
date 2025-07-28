@@ -37,8 +37,8 @@ jobs:
           ${{ runner.os }}-nuget-
 
     - name: Restore dependencies
-      timeout-minutes: 10
-      run: dotnet restore osu.Desktop.slnf --verbosity normal --configfile nuget.config
+      timeout-minutes: 15
+      run: dotnet restore osu.Desktop.slnf --verbosity normal --configfile nuget.config --no-cache
 
     - name: Build project
       run: dotnet build osu.Desktop.slnf -c Release --no-restore
