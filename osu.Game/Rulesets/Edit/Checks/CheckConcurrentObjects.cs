@@ -39,15 +39,13 @@ namespace osu.Game.Rulesets.Edit.Checks
                     if (!AreConcurrent(hitobject, nextHitobject) && !AreAlmostConcurrent(hitobject, nextHitobject))
                         break;
 
-                    bool sameType = hitobject.GetType() == nextHitobject.GetType();
-
                     if (AreConcurrent(hitobject, nextHitobject))
                     {
-                        yield return new IssueTemplateConcurrent(this).Create(hitobject, nextHitobject, sameType);
+                        yield return new IssueTemplateConcurrent(this).Create(hitobject, nextHitobject);
                     }
                     else if (AreAlmostConcurrent(hitobject, nextHitobject))
                     {
-                        yield return new IssueTemplateAlmostConcurrent(this).Create(hitobject, nextHitobject, sameType);
+                        yield return new IssueTemplateAlmostConcurrent(this).Create(hitobject, nextHitobject);
                     }
                 }
             }
@@ -65,10 +63,10 @@ namespace osu.Game.Rulesets.Edit.Checks
             {
             }
 
-            public Issue Create(HitObject hitobject, HitObject nextHitobject, bool sameType)
+            public Issue Create(HitObject hitobject, HitObject nextHitobject)
             {
                 var hitobjects = new List<HitObject> { hitobject, nextHitobject };
-                string message = sameType
+                string message = hitobject.GetType() == nextHitobject.GetType()
                     ? $"{hitobject.GetType().Name}s are concurrent here."
                     : $"{hitobject.GetType().Name} and {nextHitobject.GetType().Name} are concurrent here.";
 
@@ -86,12 +84,12 @@ namespace osu.Game.Rulesets.Edit.Checks
             {
             }
 
-            public Issue Create(HitObject hitobject, HitObject nextHitobject, bool sameType)
+            public Issue Create(HitObject hitobject, HitObject nextHitobject)
             {
                 var hitobjects = new List<HitObject> { hitobject, nextHitobject };
-                string message = sameType
-                    ? $"{hitobject.GetType().Name}s are less than 10ms apart."
-                    : $"{hitobject.GetType().Name} and {nextHitobject.GetType().Name} are less than 10ms apart.";
+                string message = hitobject.GetType() == nextHitobject.GetType()
+                    ? $"{hitobject.GetType().Name}s are less than {almost_concurrent_threshold}ms apart."
+                    : $"{hitobject.GetType().Name} and {nextHitobject.GetType().Name} are less than {almost_concurrent_threshold}ms apart.";
 
                 return new Issue(hitobjects, this, message)
                 {
