@@ -3,11 +3,11 @@
     <TargetFramework>net8.0</TargetFramework>
     <OutputType>WinExe</OutputType>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Description>A free-to-win rhythm game. Rhythm is just a *click* away!</Description>
-    <AssemblyName>osu!</AssemblyName>
-    <AssemblyTitle>osu!(lazer)</AssemblyTitle>
-    <Title>osu!</Title>
-    <Product>osu!(lazer)</Product>
+    <Description>A free-to-win rhythm game. Rhythm is just a *click* away! (GU Version)</Description>
+    <AssemblyName>osu-gu!</AssemblyName>
+    <AssemblyTitle>osu!(lazer-gu)</AssemblyTitle>
+    <Title>osu! GU</Title>
+    <Product>osu!(lazer-gu)</Product>
     <ApplicationIcon>lazer.ico</ApplicationIcon>
     <Version>0.0.0</Version>
     <FileVersion>0.0.0</FileVersion>

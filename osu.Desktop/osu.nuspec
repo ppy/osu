@@ -1,26 +1,28 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
-    <metadata>
-        <id>osulazer</id>
-        <version>0.0.0</version>
-        <title>osu!</title>
-        <authors>ppy Pty Ltd</authors>
-        <owners>Dean Herbert</owners>
-        <projectUrl>https://osu.ppy.sh/</projectUrl>
-        <iconUrl>https://github.com/ppy/osu/blob/master/assets/lazer-nuget.png?raw=true</iconUrl>
-        <icon>icon.png</icon>
-        <requireLicenseAcceptance>false</requireLicenseAcceptance>
-        <description>A free-to-win rhythm game. Rhythm is just a *click* away!</description>
-        <releaseNotes>testing</releaseNotes>
-        <copyright>Copyright (c) 2025 ppy Pty Ltd</copyright>
-        <language>en-AU</language>
-    </metadata>
-    <files>
-      <file src="**.exe" target="lib\net45\" exclude="**vshost**"/>
-      <file src="**.dll" target="lib\net45\"/>
-      <file src="**.config" target="lib\net45\"/>
-      <file src="**.json" target="lib\net45\"/>
-      <file src="**.ico" target="lib\net45\"/>
-      <file src="icon.png" target=""/>
-    </files>
+  <metadata>
+    <id>osu-lazer-gu</id>
+    <version>0.0.0</version>
+    <title>osu! GU</title>
+    <authors>ppy Pty Ltd, GooGu Team</authors>
+    <owners>GooGu Team</owners>
+    <projectUrl>https://github.com/GooGuTeam/osu/</projectUrl>
+    <iconUrl>https://github.com/GooGuTeam/osu/blob/master/assets/lazer-nuget.png?raw=true</iconUrl>
+    <icon>icon.png</icon>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="file">LICENSE</license>
+    <description>A free-to-win rhythm game. Rhythm is just a *click* away! (GU Version)</description>
+    <releaseNotes>GU version with modifications</releaseNotes>
+    <copyright>Copyright (c) 2025 GooGu Team. Based on osu! (c) ppy Pty Ltd, licensed under MIT.</copyright>
+    <language>en-AU</language>
+  </metadata>
+  <files>
+    <file src="**.exe" target="lib\net45\" exclude="**vshost**"/>
+    <file src="**.dll" target="lib\net45\"/>
+    <file src="**.config" target="lib\net45\"/>
+    <file src="**.json" target="lib\net45\"/>
+    <file src="**.ico" target="lib\net45\"/>
+    <file src="icon.png" target=""/>
+    <file src="LICENSE" target=""/>
+  </files>
 </package>

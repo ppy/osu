@@ -99,6 +99,16 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString CustomApiUrl => new TranslatableString(getKey(@"custom_api_url"), @"Custom API server URL");
 
+        /// <summary>
+        /// "A restart is required for this setting to take effect."
+        /// </summary>
+        public static LocalisableString CustomApiUrlRestartRequired => new TranslatableString(getKey(@"custom_api_url_restart_required"), @"A restart is required for this setting to take effect.");
+
+        /// <summary>
+        /// "The game will be restarted to apply the new API server settings."
+        /// </summary>
+        public static LocalisableString CustomApiUrlRestartMessage => new TranslatableString(getKey(@"custom_api_url_restart_message"), @"The game will be restarted to apply the new API server settings.");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

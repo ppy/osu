@@ -1,0 +1,181 @@
+name: Build osu! GU
+
+on:
+  push:
+    branches: [ main, master, develop ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g., 1.0.0)'
+        required: false
+        default: '1.0.0-dev'
+
+env:
+  DOTNET_VERSION: '8.0.x'
+
+jobs:
+  build:
+    name: Build ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            runtime: win-x64
+            artifact-name: osu-gu-windows
+            executable: osu-gu!.exe
+          - os: ubuntu-latest
+            runtime: linux-x64
+            artifact-name: osu-gu-linux
+            executable: osu-gu!
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: Install Velopack CLI
+      run: dotnet tool install -g vpk
+
+    - name: Cache NuGet packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.nuget/packages
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+        restore-keys: |
+          ${{ runner.os }}-nuget-
+
+    - name: Restore dependencies
+      run: dotnet restore osu.Desktop.slnf
+
+    - name: Determine version
+      id: version
+      shell: bash
+      run: |
+        if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+          VERSION="${{ github.event.inputs.version }}"
+        elif [[ "${{ github.ref }}" == refs/tags/* ]]; then
+          VERSION="${{ github.ref_name }}"
+        elif [[ "${{ github.ref }}" == "refs/heads/main" ]] || [[ "${{ github.ref }}" == "refs/heads/master" ]]; then
+          VERSION="1.0.0-nightly.$(date +%Y%m%d).$(echo ${{ github.sha }} | cut -c1-7)"
+        else
+          VERSION="1.0.0-dev.$(echo ${{ github.sha }} | cut -c1-7)"
+        fi
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        echo "Building version: $VERSION"
+
+    - name: Build and publish
+      run: |
+        dotnet publish osu.Desktop/osu.Desktop.csproj \
+          --self-contained \
+          -r ${{ matrix.runtime }} \
+          -c Release \
+          -o "publish/${{ matrix.runtime }}" \
+          /p:PublishSingleFile=false \
+          /p:PublishTrimmed=false \
+          /p:Version=${{ steps.version.outputs.version }} \
+          /p:FileVersion=${{ steps.version.outputs.version }} \
+          /p:AssemblyVersion=${{ steps.version.outputs.version }}
+
+    - name: Set executable permissions (Linux)
+      if: matrix.os == 'ubuntu-latest'
+      run: chmod +x "publish/${{ matrix.runtime }}/${{ matrix.executable }}"
+
+    - name: Create Velopack package
+      run: |
+        vpk pack \
+          --packId "osu-lazer-gu" \
+          --packVersion "${{ steps.version.outputs.version }}" \
+          --packDir "publish/${{ matrix.runtime }}" \
+          --mainExe "${{ matrix.executable }}" \
+          --packAuthors "osu! GU Team" \
+          --packTitle "osu! GU Edition" \
+          --packDescription "osu! GU 版本 - 基于官方 osu!(lazer) 修改" \
+          --icon "osu.Desktop/lazer.ico" \
+          --packChannel "gu"
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ matrix.artifact-name }}-${{ steps.version.outputs.version }}
+        path: |
+          publish/${{ matrix.runtime }}/
+          Releases/
+        retention-days: 30
+
+    - name: Upload installer (Release only)
+      if: startsWith(github.ref, 'refs/tags/v')
+      uses: actions/upload-artifact@v4
+      with:
+        name: installer-${{ matrix.artifact-name }}
+        path: Releases/
+        retention-days: 90
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+      with:
+        pattern: installer-*
+        merge-multiple: true
+        path: release-files
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: release-files/*
+        draft: false
+        prerelease: ${{ contains(github.ref_name, 'alpha') || contains(github.ref_name, 'beta') || contains(github.ref_name, 'rc') }}
+        generate_release_notes: true
+        body: |
+          ## osu! GU ${{ github.ref_name }}
+
+          基于官方 osu!(lazer) 的自定义版本。
+
+          ### 下载
+
+          - **Windows**: 下载 `.exe` 安装程序
+          - **Linux**: 下载对应的 Linux 安装包
+
+          ### 安装说明
+
+          1. 下载对应平台的安装程序
+          2. 运行安装程序并按提示安装
+          3. 该版本使用独立数据目录 (`osu-gu`)，不会与官方版本冲突
+          4. 保持使用官方 `osu://` 协议
+
+          ### 注意事项
+
+          - 需要 .NET 8.0 运行时（安装程序会自动检查）
+          - 首次运行可能需要较长时间进行初始化
+
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  notify:
+    if: always()
+    needs: [build, release]
+    runs-on: ubuntu-latest
+    steps:
+    - name: Notify build result
+      run: |
+        if [[ "${{ needs.build.result }}" == "success" ]]; then
+          echo "✅ 构建成功"
+        else
+          echo "❌ 构建失败"
+          exit 1
+        fi

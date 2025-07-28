@@ -1,0 +1,48 @@
+name: Build Dev
+
+on:
+  push:
+    branches: [ develop, feature/* ]
+  pull_request:
+    branches: [ develop ]
+
+env:
+  DOTNET_VERSION: '8.0.x'
+
+jobs:
+  build-dev:
+    name: Quick Build Check
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: Cache NuGet packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.nuget/packages
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+        restore-keys: |
+          ${{ runner.os }}-nuget-
+
+    - name: Restore dependencies
+      run: dotnet restore osu.Desktop.slnf
+
+    - name: Build project
+      run: dotnet build osu.Desktop.slnf -c Release --no-restore
+
+    - name: Run tests (if any)
+      run: dotnet test osu.Game.Tests/ --no-restore --verbosity normal
+      continue-on-error: true
+
+    - name: Build summary
+      run: |
+        echo "✅ 开发版本构建检查完成"
+        echo "📝 这是一个快速构建检查，不会生成安装包"
+        echo "🚀 推送到 main/master 分支或创建 tag 以触发完整构建"
