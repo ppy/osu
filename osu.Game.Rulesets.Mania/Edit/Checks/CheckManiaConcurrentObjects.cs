@@ -32,8 +32,6 @@ namespace osu.Game.Rulesets.Mania.Edit.Checks
                     if (!AreConcurrent(hitobject, nextHitobject) && !AreAlmostConcurrent(hitobject, nextHitobject))
                         break;
 
-                    bool sameType = hitobject.GetType() == nextHitobject.GetType();
-
                     if (AreConcurrent(hitobject, nextHitobject))
                     {
                         yield return new IssueTemplateConcurrent(this).Create(hitobject, nextHitobject);
