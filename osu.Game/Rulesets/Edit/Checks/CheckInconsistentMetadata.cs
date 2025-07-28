@@ -42,21 +42,34 @@ namespace osu.Game.Rulesets.Edit.Checks
 
             foreach (var beatmap in difficulties)
             {
+                if (beatmap == referenceBeatmap)
+                    continue;
+
                 var currentMetadata = beatmap.Metadata;
 
                 // Check each metadata field for inconsistencies
-                foreach (var (fieldName, fieldSelector) in fieldsToCheck)
+                foreach ((string fieldName, var fieldSelector) in fieldsToCheck)
                 {
-                    foreach (var issue in getInconsistency(fieldName, referenceBeatmap, beatmap, fieldSelector))
-                        yield return issue;
+                    string referenceField = fieldSelector(referenceMetadata);
+                    string currentField = fieldSelector(currentMetadata);
+
+                    if (referenceField != currentField)
+                    {
+                        yield return new IssueTemplateInconsistentOtherFields(this).Create(
+                            fieldName,
+                            referenceBeatmap.BeatmapInfo.DifficultyName,
+                            beatmap.BeatmapInfo.DifficultyName,
+                            referenceField,
+                            currentField
+                        );
+                    }
                 }
 
                 // Special handling for tags
                 if (referenceMetadata.Tags != currentMetadata.Tags)
                 {
-                    string[] referenceTags = referenceMetadata.Tags.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-                    string[] currentTags = currentMetadata.Tags.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-                    var differenceTags = referenceTags.Except(currentTags).Union(currentTags.Except(referenceTags)).Distinct();
+                    var differenceTags = referenceMetadata.Tags.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToHashSet();
+                    differenceTags.SymmetricExceptWith(currentMetadata.Tags.Split(' ', StringSplitOptions.RemoveEmptyEntries));
 
                     string difference = string.Join(" ", differenceTags);
 
@@ -69,26 +82,6 @@ namespace osu.Game.Rulesets.Edit.Checks
                         );
                     }
                 }
-            }
-        }
-
-        /// <summary>
-        /// Returns issues where the metadata fields of the given beatmaps do not match.
-        /// </summary>
-        private IEnumerable<Issue> getInconsistency(string fieldName, IBeatmap referenceBeatmap, IBeatmap beatmap, Func<BeatmapMetadata, string> metadataField)
-        {
-            string referenceField = metadataField(referenceBeatmap.Metadata);
-            string currentField = metadataField(beatmap.Metadata);
-
-            if (referenceField != currentField)
-            {
-                yield return new IssueTemplateInconsistentOtherFields(this).Create(
-                    fieldName,
-                    referenceBeatmap.BeatmapInfo.DifficultyName,
-                    beatmap.BeatmapInfo.DifficultyName,
-                    referenceField,
-                    currentField
-                );
             }
         }
 
