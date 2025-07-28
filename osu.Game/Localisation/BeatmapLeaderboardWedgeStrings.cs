@@ -39,6 +39,36 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString Team => new TranslatableString(getKey(@"team"), @"Team");
 
+        /// <summary>
+        /// "Sort"
+        /// </summary>
+        public static LocalisableString Sort => new TranslatableString(getKey(@"sort"), @"Sort");
+
+        /// <summary>
+        /// "Score"
+        /// </summary>
+        public static LocalisableString Score => new TranslatableString(getKey(@"score"), @"Score");
+
+        /// <summary>
+        /// "Accuracy"
+        /// </summary>
+        public static LocalisableString Accuracy => new TranslatableString(getKey(@"accuracy"), @"Accuracy");
+
+        /// <summary>
+        /// "Max Combo"
+        /// </summary>
+        public static LocalisableString MaxCombo => new TranslatableString(getKey(@"max_combo"), @"Max Combo");
+
+        /// <summary>
+        /// "Misses"
+        /// </summary>
+        public static LocalisableString Misses => new TranslatableString(getKey(@"misses"), @"Misses");
+
+        /// <summary>
+        /// "Date"
+        /// </summary>
+        public static LocalisableString Date => new TranslatableString(getKey(@"date"), @"Date");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

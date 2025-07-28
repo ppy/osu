@@ -69,10 +69,17 @@ namespace osu.Game.Screens.SelectV2
                                 Height = 30,
                                 Spacing = new Vector2(5f, 0f),
                                 Direction = FillDirection.Horizontal,
-                                Padding = new MarginPadding { Left = 125, Right = 133 },
+                                Padding = new MarginPadding { Left = 258 },
                                 Children = new Drawable[]
                                 {
-                                    sortDropdown = new ShearedDropdown<LeaderboardSortMode>("Sort")
+                                    selectedModsToggle = new ShearedToggleButton
+                                    {
+                                        Anchor = Anchor.CentreRight,
+                                        Origin = Anchor.CentreRight,
+                                        Text = UserInterfaceStrings.SelectedMods,
+                                        Height = 30f,
+                                    },
+                                    sortDropdown = new ShearedDropdown<LeaderboardSortMode>(BeatmapLeaderboardWedgeStrings.Sort)
                                     {
                                         Anchor = Anchor.TopRight,
                                         Origin = Anchor.TopRight,
@@ -88,19 +95,6 @@ namespace osu.Game.Screens.SelectV2
                                         Width = 0.4f,
                                         Current = { Value = BeatmapLeaderboardScope.Global },
                                     },
-                                },
-                            },
-                            new Container
-                            {
-                                Anchor = Anchor.CentreRight,
-                                Origin = Anchor.CentreRight,
-                                Size = new Vector2(128f, 30f),
-                                Child = selectedModsToggle = new ShearedToggleButton
-                                {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    Text = @"Selected Mods",
-                                    Height = 30,
                                 },
                             },
                         },
