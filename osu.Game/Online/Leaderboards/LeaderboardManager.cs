@@ -76,6 +76,9 @@ namespace osu.Game.Online.Leaderboards
 
                 default:
                 {
+                    if (newCriteria.Sorting != LeaderboardSortMode.Score)
+                        throw new NotSupportedException($@"Requesting online scores with a {nameof(LeaderboardSortMode)} other than {nameof(LeaderboardSortMode.Score)} is not supported");
+
                     if (!api.IsLoggedIn)
                     {
                         scores.Value = LeaderboardScores.Failure(LeaderboardFailState.NotLoggedIn);
@@ -105,9 +108,6 @@ namespace osu.Game.Online.Leaderboards
                         scores.Value = LeaderboardScores.Failure(LeaderboardFailState.NoTeam);
                         return;
                     }
-
-                    if (newCriteria.Sorting != LeaderboardSortMode.Score)
-                        throw new InvalidOperationException("Should not attempt to request online scores with a sort mode other than score");
 
                     IReadOnlyList<Mod>? requestMods = null;
 
