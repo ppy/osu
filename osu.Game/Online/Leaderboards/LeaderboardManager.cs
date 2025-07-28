@@ -195,6 +195,7 @@ namespace osu.Game.Online.Leaderboards
             var newScoresArray = newScores.ToArray();
             scores.Value = LeaderboardScores.Success(newScoresArray, newScoresArray.Length, null);
         }
+
         private void updatePpValues(IEnumerable<ScoreInfo> scores)
         {
             foreach (ScoreInfo score in scores)
