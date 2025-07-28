@@ -76,6 +76,9 @@ namespace osu.Game.Online.Leaderboards
 
                 default:
                 {
+                    if (newCriteria.Sorting != LeaderboardSortMode.Score)
+                        throw new NotSupportedException($@"Requesting online scores with a {nameof(LeaderboardSortMode)} other than {nameof(LeaderboardSortMode.Score)} is not supported");
+
                     if (!api.IsLoggedIn)
                     {
                         scores.Value = LeaderboardScores.Failure(LeaderboardFailState.NotLoggedIn);
@@ -180,7 +183,7 @@ namespace osu.Game.Online.Leaderboards
                 }
             }
 
-            newScores = newScores.Detach().OrderByTotalScore();
+            newScores = newScores.Detach().OrderByCriteria(CurrentCriteria.Sorting);
 
             var newScoresArray = newScores.ToArray();
             scores.Value = LeaderboardScores.Success(newScoresArray, newScoresArray.Length, null);
@@ -191,7 +194,8 @@ namespace osu.Game.Online.Leaderboards
         BeatmapInfo? Beatmap,
         RulesetInfo? Ruleset,
         BeatmapLeaderboardScope Scope,
-        Mod[]? ExactMods
+        Mod[]? ExactMods,
+        LeaderboardSortMode Sorting = LeaderboardSortMode.Score
     );
 
     public record LeaderboardScores
