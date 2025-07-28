@@ -70,15 +70,21 @@ namespace osu.Game.Screens.SelectV2
                                 Padding = new MarginPadding { Left = 125, Right = 133 },
                                 Children = new Drawable[]
                                 {
-                                    scopeDropdown = new ScopeDropdown
-                                    {
-                                        RelativeSizeAxes = Axes.X,
-                                        Current = { Value = BeatmapLeaderboardScope.Global },
-                                    },
                                     sortDropdown = new ShearedDropdown<LeaderboardSortMode>("Sort")
                                     {
+                                        Anchor = Anchor.TopRight,
+                                        Origin = Anchor.TopRight,
                                         RelativeSizeAxes = Axes.X,
+                                        Width = 0,
                                         Items = Enum.GetValues<LeaderboardSortMode>(),
+                                    },
+                                    scopeDropdown = new ScopeDropdown
+                                    {
+                                        Anchor = Anchor.TopRight,
+                                        Origin = Anchor.TopRight,
+                                        RelativeSizeAxes = Axes.X,
+                                        Width = 0.4f,
+                                        Current = { Value = BeatmapLeaderboardScope.Global },
                                     },
                                 },
                             },
@@ -124,8 +130,7 @@ namespace osu.Game.Screens.SelectV2
                 scopeDropdown.Current.BindValueChanged(v =>
                 {
                     bool isLocal = v.NewValue == BeatmapLeaderboardScope.Local;
-                    scopeDropdown.ResizeWidthTo(isLocal ? 0.5f : 1, 300, Easing.OutQuint);
-                    sortDropdown.ResizeWidthTo(isLocal ? 0.5f : 0, 300, Easing.OutQuint);
+                    sortDropdown.ResizeWidthTo(isLocal ? 0.4f : 0, 300, Easing.OutQuint);
                     sortDropdown.FadeTo(isLocal ? 1 : 0, 300, Easing.OutQuint);
                 }, true);
             }
