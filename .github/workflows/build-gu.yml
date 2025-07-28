@@ -136,18 +136,16 @@ jobs:
         elif [[ "${{ github.ref }}" == refs/tags/* ]]; then
           VERSION="${{ github.ref_name }}"
         elif [[ "${{ github.ref }}" == "refs/heads/main" ]] || [[ "${{ github.ref }}" == "refs/heads/master" ]]; then
-          # Use date-based version for main/master: 1.0.YYMM.DDHH
-          YEAR=$(date +%y)
-          MONTH=$(date +%m)
-          DAY=$(date +%d)
-          HOUR=$(date +%H)
-          VERSION="1.0.$YEAR$MONTH.$DAY$HOUR"
-        else
-          # Dev builds use simple incrementing format: 0.9.x.0
+          # Use 3-part SemVer for main/master: 1.0.BUILDNUMBER
           COMMIT_COUNT=$(git rev-list --count HEAD)
-          # Use last 4 digits of commit count to stay within limits
+          # Use a reasonable build number
           BUILD_NUMBER=$((COMMIT_COUNT % 10000))
-          VERSION="0.9.$BUILD_NUMBER.0"
+          VERSION="1.0.$BUILD_NUMBER"
+        else
+          # Dev builds use 3-part SemVer: 0.9.BUILDNUMBER
+          COMMIT_COUNT=$(git rev-list --count HEAD)
+          BUILD_NUMBER=$((COMMIT_COUNT % 10000))
+          VERSION="0.9.$BUILD_NUMBER"
         fi
         echo "version=$VERSION" >> $GITHUB_OUTPUT
         echo "Building version: $VERSION"
@@ -197,7 +195,7 @@ jobs:
     - name: Create Velopack package
       shell: bash
       run: |
-        if [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+                if [[ "${{ matrix.os }}" == "macos-latest" ]]; then
           # Use icns if available, fallback to ico
           ICON_FILE="osu.Desktop/lazer.ico"
           if [ -f "osu.Desktop/lazer.icns" ] && [ -s "osu.Desktop/lazer.icns" ]; then
@@ -208,27 +206,23 @@ jobs:
           fi
 
           vpk pack \
-            --packId "osu-lazer-gu" \
-            --packVersion "${{ steps.version.outputs.version }}" \
-            --packDir "publish/${{ matrix.runtime }}" \
-            --mainExe "${{ matrix.executable }}" \
+            -u "osu-lazer-gu" \
+            -v "${{ steps.version.outputs.version }}" \
+            -p "publish/${{ matrix.runtime }}" \
+            -e "${{ matrix.executable }}" \
             --packAuthors "osu! GU Team" \
             --packTitle "osu! GU Edition" \
-            --packDescription "osu! GU 版本 - 基于官方 osu!(lazer) 修改" \
-            --icon "$ICON_FILE" \
-            --packChannel "gu" \
-            --framework "net8-osx"
+            -i "$ICON_FILE" \
+            -c "osx"
         else
           vpk pack \
-            --packId "osu-lazer-gu" \
-            --packVersion "${{ steps.version.outputs.version }}" \
-            --packDir "publish/${{ matrix.runtime }}" \
-            --mainExe "${{ matrix.executable }}" \
+            -u "osu-lazer-gu" \
+            -v "${{ steps.version.outputs.version }}" \
+            -p "publish/${{ matrix.runtime }}" \
+            -e "${{ matrix.executable }}" \
             --packAuthors "osu! GU Team" \
             --packTitle "osu! GU Edition" \
-            --packDescription "osu! GU 版本 - 基于官方 osu!(lazer) 修改" \
-            --icon "osu.Desktop/lazer.ico" \
-            --packChannel "gu"
+            -i "osu.Desktop/lazer.ico"
         fi
 
     - name: Upload build artifacts
