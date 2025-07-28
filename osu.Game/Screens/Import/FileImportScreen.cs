@@ -76,7 +76,7 @@ namespace osu.Game.Screens.Import
                             new Container
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Padding = new MarginPadding { Bottom = button_height + button_vertical_margin * 2 },
+                                Padding = new MarginPadding { Bottom = button_height * 2 + button_vertical_margin * 3 },
                                 Child = new OsuScrollContainer
                                 {
                                     RelativeSizeAxes = Axes.Both,
@@ -99,26 +99,26 @@ namespace osu.Game.Screens.Import
                             },
                             importButton = new RoundedButton
                             {
-                                Text = "Import",
+                                Text = "Import selected file",
                                 Anchor = Anchor.BottomCentre,
                                 Origin = Anchor.BottomCentre,
                                 RelativeSizeAxes = Axes.X,
                                 Height = button_height,
                                 Width = 0.9f,
-                                Margin = new MarginPadding { Vertical = button_vertical_margin },
+                                Margin = new MarginPadding { Bottom = button_height + button_vertical_margin * 2 },
                                 Action = () => startImport(fileSelector.CurrentFile.Value?.FullName)
                             },
 
                             importAllButton = new RoundedButton
                             {
-                                Text = "Import all",
+                                Text = "Import all files from directory",
                                 Anchor = Anchor.BottomCentre,
                                 Origin = Anchor.BottomCentre,
                                 RelativeSizeAxes = Axes.X,
                                 Height = button_height,
                                 Width = 0.9f,
                                 TooltipText = "Imports all osu files from selected directory",
-                                Margin = new MarginPadding { Bottom = button_height + button_vertical_margin * 2 },
+                                Margin = new MarginPadding { Vertical = button_vertical_margin },
                                 Action = () => startDirectoryImport(fileSelector.CurrentPath.Value?.FullName)
                             }
                         }
