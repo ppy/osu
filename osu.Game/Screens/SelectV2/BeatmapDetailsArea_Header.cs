@@ -26,6 +26,7 @@ namespace osu.Game.Screens.SelectV2
             private FillFlowContainer leaderboardControls = null!;
 
             private ShearedDropdown<BeatmapLeaderboardScope> scopeDropdown = null!;
+            private ShearedDropdown<LeaderboardSortMode> sortDropdown = null!;
             private ShearedToggleButton selectedModsToggle = null!;
 
             public IBindable<Selection> Type => tabControl.Current;
@@ -33,6 +34,10 @@ namespace osu.Game.Screens.SelectV2
             public IBindable<BeatmapLeaderboardScope> Scope => scopeDropdown.Current;
 
             private readonly Bindable<BeatmapDetailTab> configDetailTab = new Bindable<BeatmapDetailTab>();
+
+            public IBindable<LeaderboardSortMode> Sorting => sortDropdown.Current;
+
+            private readonly Bindable<LeaderboardSortMode> configLeaderboardSortMode = new Bindable<LeaderboardSortMode>();
 
             public IBindable<bool> FilterBySelectedMods => selectedModsToggle.Active;
 
@@ -60,39 +65,42 @@ namespace osu.Game.Screens.SelectV2
                             {
                                 Anchor = Anchor.CentreRight,
                                 Origin = Anchor.CentreRight,
-                                AutoSizeAxes = Axes.Both,
+                                RelativeSizeAxes = Axes.X,
+                                Height = 30,
                                 Spacing = new Vector2(5f, 0f),
+                                Direction = FillDirection.Horizontal,
+                                Padding = new MarginPadding { Left = 125, Right = 133 },
                                 Children = new Drawable[]
                                 {
-                                    selectedModsToggle = new ShearedToggleButton
+                                    sortDropdown = new ShearedDropdown<LeaderboardSortMode>("Sort")
                                     {
-                                        Anchor = Anchor.CentreRight,
-                                        Origin = Anchor.CentreRight,
-                                        Text = UserInterfaceStrings.SelectedMods,
-                                        Height = 30f,
+                                        Anchor = Anchor.TopRight,
+                                        Origin = Anchor.TopRight,
+                                        RelativeSizeAxes = Axes.X,
+                                        Width = 0,
+                                        Items = Enum.GetValues<LeaderboardSortMode>(),
                                     },
-                                    // new Container
-                                    // {
-                                    //     Anchor = Anchor.CentreRight,
-                                    //     Origin = Anchor.CentreRight,
-                                    //     Size = new Vector2(180f, 30f),
-                                    //     Child = new ShearedDropdown<RankingsSort>(@"Sort")
-                                    //     {
-                                    //         Width = 180f,
-                                    //         Items = Enum.GetValues<RankingsSort>(),
-                                    //     },
-                                    // },
-                                    new Container
+                                    scopeDropdown = new ScopeDropdown
                                     {
-                                        Anchor = Anchor.CentreRight,
-                                        Origin = Anchor.CentreRight,
-                                        Size = new Vector2(180f, 30f),
-                                        Child = scopeDropdown = new ScopeDropdown
-                                        {
-                                            Width = 180f,
-                                            Current = { Value = BeatmapLeaderboardScope.Global },
-                                        },
+                                        Anchor = Anchor.TopRight,
+                                        Origin = Anchor.TopRight,
+                                        RelativeSizeAxes = Axes.X,
+                                        Width = 0.4f,
+                                        Current = { Value = BeatmapLeaderboardScope.Global },
                                     },
+                                },
+                            },
+                            new Container
+                            {
+                                Anchor = Anchor.CentreRight,
+                                Origin = Anchor.CentreRight,
+                                Size = new Vector2(128f, 30f),
+                                Child = selectedModsToggle = new ShearedToggleButton
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    Text = @"Selected Mods",
+                                    Height = 30,
                                 },
                             },
                         },
@@ -100,6 +108,7 @@ namespace osu.Game.Screens.SelectV2
                 };
 
                 config.BindWith(OsuSetting.BeatmapDetailTab, configDetailTab);
+                config.BindWith(OsuSetting.BeatmapLeaderboardSortMode, configLeaderboardSortMode);
                 config.BindWith(OsuSetting.BeatmapDetailModsFilter, selectedModsToggle.Active);
             }
 
@@ -110,11 +119,21 @@ namespace osu.Game.Screens.SelectV2
                 scopeDropdown.Current.Value = tryMapDetailTabToLeaderboardScope(configDetailTab.Value) ?? scopeDropdown.Current.Value;
                 scopeDropdown.Current.BindValueChanged(_ => updateConfigDetailTab());
 
+                sortDropdown.Current.Value = configLeaderboardSortMode.Value;
+                sortDropdown.Current.BindValueChanged(v => configLeaderboardSortMode.Value = v.NewValue);
+
                 tabControl.Current.Value = configDetailTab.Value == BeatmapDetailTab.Details ? Selection.Details : Selection.Ranking;
                 tabControl.Current.BindValueChanged(v =>
                 {
                     leaderboardControls.FadeTo(v.NewValue == Selection.Ranking ? 1 : 0, 300, Easing.OutQuint);
                     updateConfigDetailTab();
+                }, true);
+
+                scopeDropdown.Current.BindValueChanged(v =>
+                {
+                    bool isLocal = v.NewValue == BeatmapLeaderboardScope.Local;
+                    sortDropdown.ResizeWidthTo(isLocal ? 0.4f : 0, 300, Easing.OutQuint);
+                    sortDropdown.FadeTo(isLocal ? 1 : 0, 300, Easing.OutQuint);
                 }, true);
             }
 
@@ -195,15 +214,6 @@ namespace osu.Game.Screens.SelectV2
                 [LocalisableDescription(typeof(SongSelectStrings), nameof(SongSelectStrings.Ranking))]
                 Ranking,
             }
-
-            // public enum RankingsSort
-            // {
-            //     Score,
-            //     Accuracy,
-            //     Combo,
-            //     Misses,
-            //     Date,
-            // }
 
             private partial class ScopeDropdown : ShearedDropdown<BeatmapLeaderboardScope>
             {

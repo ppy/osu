@@ -277,6 +277,12 @@ namespace osu.Game.Screens.Play
             showStoryboards.BindValueChanged(val => epilepsyWarning?.FadeTo(val.NewValue ? 1 : 0, 250, Easing.OutQuint), true);
             epilepsyWarning?.FinishTransforms(true);
 
+            // this re-fetch has two purposes:
+            // - is a safety against potential unexpected screen transitions, making sure that the leaderboard
+            //   displayed during gameplay definitely matches the beatmap and ruleset being played
+            //   (as the solo gameplay leaderboard provider uses the global leaderboard manager to populate itself)
+            // - the sort mode is not specified and defaults to `Score` which is good because gameplay leaderboards only support sorting by score.
+            //   this may change at some point in the future, at which point specifying a sort mode should be considered.
             leaderboardManager?.FetchWithCriteria(new LeaderboardCriteria(
                 Beatmap.Value.BeatmapInfo,
                 Ruleset.Value,

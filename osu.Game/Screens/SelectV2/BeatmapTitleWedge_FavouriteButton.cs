@@ -21,6 +21,7 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Notifications;
 using osuTK;
 using osuTK.Graphics;
 
@@ -49,6 +50,9 @@ namespace osu.Game.Screens.SelectV2
 
             [Resolved]
             private IAPIProvider api { get; set; } = null!;
+
+            [Resolved]
+            private INotificationOverlay? notifications { get; set; }
 
             internal LocalisableString Text => valueText.Text;
 
@@ -223,6 +227,15 @@ namespace osu.Game.Screens.SelectV2
                     beatmapSet.HasFavourited = hasFavourited;
                     beatmapSet.FavouriteCount += hasFavourited ? 1 : -1;
                     setBeatmapSet(beatmapSet, withHeartAnimation: hasFavourited);
+                };
+                favouriteRequest.Failure += e =>
+                {
+                    notifications?.Post(new SimpleNotification
+                    {
+                        Text = e.Message,
+                        Icon = FontAwesome.Solid.Times,
+                    });
+                    setBeatmapSet(beatmapSet, withHeartAnimation: false);
                 };
                 api.Queue(favouriteRequest);
                 setLoading();
