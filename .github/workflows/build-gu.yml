@@ -136,13 +136,18 @@ jobs:
         elif [[ "${{ github.ref }}" == refs/tags/* ]]; then
           VERSION="${{ github.ref_name }}"
         elif [[ "${{ github.ref }}" == "refs/heads/main" ]] || [[ "${{ github.ref }}" == "refs/heads/master" ]]; then
-          # Use simpler version format compatible with .NET
-          COMMIT_COUNT=$(git rev-list --count HEAD)
-          VERSION="1.0.$COMMIT_COUNT"
+          # Use date-based version for main/master: 1.0.YYMM.DDHH
+          YEAR=$(date +%y)
+          MONTH=$(date +%m)
+          DAY=$(date +%d)
+          HOUR=$(date +%H)
+          VERSION="1.0.$YEAR$MONTH.$DAY$HOUR"
         else
-          # Use commit count for dev builds too
+          # Dev builds use simple incrementing format: 0.9.x.0
           COMMIT_COUNT=$(git rev-list --count HEAD)
-          VERSION="0.9.$COMMIT_COUNT"
+          # Use last 4 digits of commit count to stay within limits
+          BUILD_NUMBER=$((COMMIT_COUNT % 10000))
+          VERSION="0.9.$BUILD_NUMBER.0"
         fi
         echo "version=$VERSION" >> $GITHUB_OUTPUT
         echo "Building version: $VERSION"
