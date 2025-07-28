@@ -13,6 +13,7 @@ jobs:
   build-dev:
     name: Quick Build Check
     runs-on: ubuntu-latest
+    timeout-minutes: 30
 
     steps:
     - name: Checkout code
@@ -26,13 +27,23 @@ jobs:
     - name: Cache NuGet packages
       uses: actions/cache@v4
       with:
-        path: ~/.nuget/packages
-        key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+        path: |
+          ~/.nuget/packages
+          ~/.local/share/NuGet/v3-cache
+          ~/.cache/NuGet/v3-cache
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/packages.lock.json', 'nuget.config') }}
         restore-keys: |
+          ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
           ${{ runner.os }}-nuget-
 
     - name: Restore dependencies
-      run: dotnet restore osu.Desktop.slnf
+      timeout-minutes: 10
+      run: |
+        dotnet restore osu.Desktop.slnf \
+          --verbosity normal \
+          --configfile nuget.config \
+          --disable-parallel \
+          --force
 
     - name: Build project
       run: dotnet build osu.Desktop.slnf -c Release --no-restore

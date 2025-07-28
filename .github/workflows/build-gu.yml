@@ -20,6 +20,7 @@ jobs:
   build:
     name: Build ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
     strategy:
       matrix:
         include:
@@ -49,13 +50,23 @@ jobs:
     - name: Cache NuGet packages
       uses: actions/cache@v4
       with:
-        path: ~/.nuget/packages
-        key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+        path: |
+          ~/.nuget/packages
+          ~/.local/share/NuGet/v3-cache
+          ~/.cache/NuGet/v3-cache
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/packages.lock.json', 'nuget.config') }}
         restore-keys: |
+          ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
           ${{ runner.os }}-nuget-
 
     - name: Restore dependencies
-      run: dotnet restore osu.Desktop.slnf
+      timeout-minutes: 10
+      run: |
+        dotnet restore osu.Desktop.slnf \
+          --verbosity normal \
+          --configfile nuget.config \
+          --disable-parallel \
+          --force
 
     - name: Determine version
       id: version
@@ -156,7 +167,6 @@ jobs:
           1. 下载对应平台的安装程序
           2. 运行安装程序并按提示安装
           3. 该版本使用独立数据目录 (`osu-gu`)，不会与官方版本冲突
-          4. 保持使用官方 `osu://` 协议
 
           ### 注意事项
 
