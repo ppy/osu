@@ -41,6 +41,9 @@ namespace osu.Game.Online.Leaderboards
         [Resolved]
         private RulesetStore rulesets { get; set; } = null!;
 
+        [Resolved]
+        private BeatmapDifficultyCache difficultyCache { get; set; } = null!;
+
         /// <summary>
         /// Fetch leaderboard content with the new criteria specified in the background.
         /// On completion, <see cref="Scores"/> will be updated with the results from this call (unless a more recent call with a different criteria has completed).
@@ -183,10 +186,29 @@ namespace osu.Game.Online.Leaderboards
                 }
             }
 
-            newScores = newScores.Detach().OrderByCriteria(CurrentCriteria.Sorting);
+            newScores = newScores.Detach();
+
+            if (CurrentCriteria.Sorting == LeaderboardSortMode.PP) updatePpValues(newScores);
+
+            newScores = newScores.OrderByCriteria(CurrentCriteria.Sorting);
 
             var newScoresArray = newScores.ToArray();
             scores.Value = LeaderboardScores.Success(newScoresArray, newScoresArray.Length, null);
+        }
+        private void updatePpValues(IEnumerable<ScoreInfo> scores)
+        {
+            foreach (ScoreInfo score in scores)
+            {
+                var attributes = difficultyCache.GetDifficultyAsync(score.BeatmapInfo!, score.Ruleset, score.Mods, default).GetAwaiter().GetResult();
+
+                var performanceCalculator = score.Ruleset.CreateInstance().CreatePerformanceCalculator();
+
+                if (attributes?.DifficultyAttributes == null || performanceCalculator == null)
+                    return;
+
+                var result = performanceCalculator.Calculate(score, attributes.Value.DifficultyAttributes);
+                score.PP = result.Total;
+            }
         }
     }
 
