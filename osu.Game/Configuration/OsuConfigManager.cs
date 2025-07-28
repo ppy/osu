@@ -228,6 +228,9 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.EditorSubmissionNotifyOnDiscussionReplies, true);
             SetDefault(OsuSetting.EditorSubmissionLoadInBrowserAfterSubmission, true);
 
+            // GU specific settings
+            SetDefault(OsuSetting.DisableAutomaticUpdates, false);
+
             SetDefault(OsuSetting.WasSupporter, false);
         }
 
@@ -480,6 +483,11 @@ namespace osu.Game.Configuration
         /// Cached state of whether local user is a supporter.
         /// Used to allow early checks (ie for startup samples) to be in the correct state, even if the API authentication process has not completed.
         /// </summary>
-        WasSupporter
+        WasSupporter,
+
+        /// <summary>
+        /// Disables automatic updates for the GU version.
+        /// </summary>
+        DisableAutomaticUpdates
     }
 }

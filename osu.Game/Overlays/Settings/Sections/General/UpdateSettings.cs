@@ -57,6 +57,14 @@ namespace osu.Game.Overlays.Settings.Sections.General
 
             if (canCheckUpdates)
             {
+                // Add GU-specific disable auto-update option
+                Add(new SettingsCheckbox
+                {
+                    LabelText = "Disable automatic updates (GU)",
+                    Current = config.GetBindable<bool>(OsuSetting.DisableAutomaticUpdates),
+                    Keywords = new[] { "update", "automatic", "disable", "gu" },
+                });
+
                 // For simplicity, hide the concept of release streams from mobile users.
                 if (isDesktop)
                 {

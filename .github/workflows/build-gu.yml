@@ -210,8 +210,8 @@ jobs:
             -v "${{ steps.version.outputs.version }}" \
             -p "publish/${{ matrix.runtime }}" \
             -e "${{ matrix.executable }}" \
-            --packAuthors "osu! GU Team" \
-            --packTitle "osu! GU Edition" \
+            --packAuthors "osu! GooGuTeam" \
+            --packTitle "osu! GU" \
             -i "$ICON_FILE" \
             -c "osx"
         else
@@ -220,8 +220,8 @@ jobs:
             -v "${{ steps.version.outputs.version }}" \
             -p "publish/${{ matrix.runtime }}" \
             -e "${{ matrix.executable }}" \
-            --packAuthors "osu! GU Team" \
-            --packTitle "osu! GU Edition" \
+            --packAuthors "osu! GooGuTeam" \
+            --packTitle "osu! GU" \
             -i "osu.Desktop/lazer.ico"
         fi
 
