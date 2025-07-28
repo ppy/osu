@@ -7,6 +7,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.PolygonExtensions;
@@ -14,7 +16,9 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Events;
 using osu.Framework.Threading;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -84,8 +88,19 @@ namespace osu.Game.Screens.SelectV2
 
         private const float personal_best_height = 112;
 
+        // Blocking mouse down is required to avoid song select's background reveal logic happening while hovering scores.
+        // Our horizontal alignment doesn't really align with the rest of the sheared components (protrudes a touch to the right) which makes
+        // it complicated to handle this at a higher level.
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => scoresScroll.ReceivePositionalInputAt(screenSpacePos);
+
+        protected override bool OnMouseDown(MouseDownEvent e) => true;
+
+        private Sample? swishSample;
+
+        private readonly List<ScheduledDelegate> scoreSfxDelegates = new List<ScheduledDelegate>();
+
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(AudioManager audio)
         {
             RelativeSizeAxes = Axes.Both;
 
@@ -166,6 +181,8 @@ namespace osu.Game.Screens.SelectV2
                     loading = new LoadingLayer(),
                 }
             };
+
+            swishSample = audio.Samples.Get(@"SongSelect/leaderboard-score");
         }
 
         protected override void LoadComplete()
@@ -253,6 +270,9 @@ namespace osu.Game.Screens.SelectV2
             cancellationTokenSource?.Cancel();
             cancellationTokenSource = new CancellationTokenSource();
 
+            scoreSfxDelegates.ForEach(d => d.Cancel());
+            scoreSfxDelegates.Clear();
+
             clearScores();
             SetState(LeaderboardState.Success);
 
@@ -298,6 +318,23 @@ namespace osu.Game.Screens.SelectV2
                      .Delay(delay)
                      .FadeIn(300, Easing.OutQuint)
                      .MoveToX(0f, 300, Easing.OutQuint);
+
+                    bool visible = d.ScreenSpaceDrawQuad.TopLeft.Y < d.Parent!.ChildMaskingBounds.BottomLeft.Y;
+
+                    if (visible)
+                    {
+                        var del = Scheduler.AddDelayed(() =>
+                        {
+                            var chan = swishSample?.GetChannel();
+                            if (chan == null) return;
+
+                            chan.Balance.Value = -OsuGameBase.SFX_STEREO_STRENGTH;
+                            chan.Frequency.Value = 0.98f + RNG.NextDouble(0.04f);
+                            chan.Play();
+                        }, delay);
+
+                        scoreSfxDelegates.Add(del);
+                    }
 
                     delay += 30;
                     i++;
@@ -392,8 +429,7 @@ namespace osu.Game.Screens.SelectV2
             float fadeBottom = (float)(scoresScroll.Current + scoresScroll.DrawHeight);
             float fadeTop = (float)(scoresScroll.Current);
 
-            if (!scoresScroll.IsScrolledToStart())
-                fadeTop += height;
+            fadeTop += (float)Math.Min(height, Math.Log10(Math.Max(fadeTop, 0) + 1) * height);
 
             foreach (var c in scoresContainer)
             {

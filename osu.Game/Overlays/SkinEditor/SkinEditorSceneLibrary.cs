@@ -12,8 +12,9 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Screens;
-using osu.Game.Screens.Select;
+using osu.Game.Screens.SelectV2;
 using osuTK;
+using SongSelect = osu.Game.Screens.Select.SongSelect;
 
 namespace osu.Game.Overlays.SkinEditor
 {
@@ -78,7 +79,7 @@ namespace osu.Game.Overlays.SkinEditor
                                         if (screen is SongSelect)
                                             return;
 
-                                        screen.Push(new PlaySongSelect());
+                                        screen.Push(new SoloSongSelect());
                                     }, new[] { typeof(SongSelect) })
                                 },
                                 new SceneButton

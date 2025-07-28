@@ -180,7 +180,7 @@ namespace osu.Game.Overlays.Mods
                 mod.ApplyToDifficulty(adjustedDifficulty);
 
             Ruleset ruleset = GameRuleset.Value.CreateInstance();
-            adjustedDifficulty = ruleset.GetRateAdjustedDisplayDifficulty(adjustedDifficulty, rate);
+            adjustedDifficulty = ruleset.GetAdjustedDisplayDifficulty(adjustedDifficulty, Mods.Value);
 
             TooltipContent = new AdjustedAttributesTooltip.Data(originalDifficulty, adjustedDifficulty);
 

@@ -12,6 +12,7 @@ using osu.Framework.Logging;
 using osu.Game.Configuration;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Users;
 
 namespace osu.Game.Online.Metadata
@@ -116,7 +117,7 @@ namespace osu.Game.Online.Metadata
             }
 
             if (IsWatchingUserPresence)
-                BeginWatchingUserPresenceInternal();
+                BeginWatchingUserPresenceInternal().FireAndForget();
 
             if (localUser.Value is not GuestUser)
             {
