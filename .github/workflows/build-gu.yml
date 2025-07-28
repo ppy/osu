@@ -32,6 +32,14 @@ jobs:
             runtime: linux-x64
             artifact-name: osu-gu-linux
             executable: osu-gu!
+          - os: macos-latest
+            runtime: osx-x64
+            artifact-name: osu-gu-macos-intel
+            executable: osu-gu!
+          - os: macos-latest
+            runtime: osx-arm64
+            artifact-name: osu-gu-macos-apple-silicon
+            executable: osu-gu!
 
     steps:
     - name: Checkout code
@@ -47,6 +55,27 @@ jobs:
     - name: Install Velopack CLI
       run: dotnet tool install -g vpk
 
+    - name: Create macOS icon (macOS only)
+      if: matrix.os == 'macos-latest'
+      run: |
+        # Convert .ico to .icns on macOS
+        if [ -f "osu.Desktop/lazer.ico" ]; then
+          mkdir -p lazer.iconset
+          sips -z 16 16     osu.Desktop/lazer.ico --out lazer.iconset/icon_16x16.png
+          sips -z 32 32     osu.Desktop/lazer.ico --out lazer.iconset/icon_16x16@2x.png
+          sips -z 32 32     osu.Desktop/lazer.ico --out lazer.iconset/icon_32x32.png
+          sips -z 64 64     osu.Desktop/lazer.ico --out lazer.iconset/icon_32x32@2x.png
+          sips -z 128 128   osu.Desktop/lazer.ico --out lazer.iconset/icon_128x128.png
+          sips -z 256 256   osu.Desktop/lazer.ico --out lazer.iconset/icon_128x128@2x.png
+          sips -z 256 256   osu.Desktop/lazer.ico --out lazer.iconset/icon_256x256.png
+          sips -z 512 512   osu.Desktop/lazer.ico --out lazer.iconset/icon_256x256@2x.png
+          sips -z 512 512   osu.Desktop/lazer.ico --out lazer.iconset/icon_512x512.png
+          sips -z 1024 1024 osu.Desktop/lazer.ico --out lazer.iconset/icon_512x512@2x.png
+          iconutil -c icns lazer.iconset
+          cp lazer.icns osu.Desktop/lazer.icns
+          rm -rf lazer.iconset
+        fi
+
     - name: Cache NuGet packages
       uses: actions/cache@v4
       with:
@@ -61,7 +90,7 @@ jobs:
 
     - name: Restore dependencies
       timeout-minutes: 10
-      run: dotnet restore osu.Desktop.slnf --verbosity normal --configfile nuget.config --disable-parallel --force
+      run: dotnet restore osu.Desktop.slnf --verbosity normal --configfile nuget.config
 
     - name: Determine version
       id: version
@@ -92,22 +121,36 @@ jobs:
           /p:FileVersion=${{ steps.version.outputs.version }} \
           /p:AssemblyVersion=${{ steps.version.outputs.version }}
 
-    - name: Set executable permissions (Linux)
-      if: matrix.os == 'ubuntu-latest'
+    - name: Set executable permissions (Linux/macOS)
+      if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
       run: chmod +x "publish/${{ matrix.runtime }}/${{ matrix.executable }}"
 
     - name: Create Velopack package
       run: |
-        vpk pack \
-          --packId "osu-lazer-gu" \
-          --packVersion "${{ steps.version.outputs.version }}" \
-          --packDir "publish/${{ matrix.runtime }}" \
-          --mainExe "${{ matrix.executable }}" \
-          --packAuthors "osu! GU Team" \
-          --packTitle "osu! GU Edition" \
-          --packDescription "osu! GU 版本 - 基于官方 osu!(lazer) 修改" \
-          --icon "osu.Desktop/lazer.ico" \
-          --packChannel "gu"
+        if [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+          vpk pack \
+            --packId "osu-lazer-gu" \
+            --packVersion "${{ steps.version.outputs.version }}" \
+            --packDir "publish/${{ matrix.runtime }}" \
+            --mainExe "${{ matrix.executable }}" \
+            --packAuthors "osu! GU Team" \
+            --packTitle "osu! GU Edition" \
+            --packDescription "osu! GU 版本 - 基于官方 osu!(lazer) 修改" \
+            --icon "osu.Desktop/lazer.icns" \
+            --packChannel "gu" \
+            --framework "net8-osx"
+        else
+          vpk pack \
+            --packId "osu-lazer-gu" \
+            --packVersion "${{ steps.version.outputs.version }}" \
+            --packDir "publish/${{ matrix.runtime }}" \
+            --mainExe "${{ matrix.executable }}" \
+            --packAuthors "osu! GU Team" \
+            --packTitle "osu! GU Edition" \
+            --packDescription "osu! GU 版本 - 基于官方 osu!(lazer) 修改" \
+            --icon "osu.Desktop/lazer.ico" \
+            --packChannel "gu"
+        fi
 
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
@@ -154,14 +197,24 @@ jobs:
 
           ### 下载
 
-          - **Windows**: 下载 `.exe` 安装程序
-          - **Linux**: 下载对应的 Linux 安装包
+          - **Windows**: 下载 `osu-gu-windows` 安装程序
+          - **Linux**: 下载 `osu-gu-linux` 安装包
+          - **macOS (Intel)**: 下载 `osu-gu-macos-intel` 安装包
+          - **macOS (Apple Silicon)**: 下载 `osu-gu-macos-apple-silicon` 安装包
 
           ### 安装说明
 
           1. 下载对应平台的安装程序
           2. 运行安装程序并按提示安装
           3. 该版本使用独立数据目录 (`osu-gu`)，不会与官方版本冲突
+          4. 保持使用官方 `osu://` 协议
+
+          ### 平台特殊说明
+
+          **macOS 用户**:
+          - Intel Mac 请下载 `osu-gu-macos-intel`
+          - Apple Silicon Mac (M1/M2/M3) 请下载 `osu-gu-macos-apple-silicon`
+          - 首次运行可能需要在系统偏好设置中允许来自未知开发者的应用
 
           ### 注意事项
 

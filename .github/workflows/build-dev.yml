@@ -38,7 +38,7 @@ jobs:
 
     - name: Restore dependencies
       timeout-minutes: 10
-      run: dotnet restore osu.Desktop.slnf --verbosity normal --configfile nuget.config --disable-parallel --force
+      run: dotnet restore osu.Desktop.slnf --verbosity normal --configfile nuget.config
 
     - name: Build project
       run: dotnet build osu.Desktop.slnf -c Release --no-restore

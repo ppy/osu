@@ -34,4 +34,22 @@
   <ItemGroup Label="Windows Icons">
     <Content Include="*.ico" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
+
+  <!-- macOS specific configurations -->
+  <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('OSX'))">
+    <CFBundleName>osu! GU</CFBundleName>
+    <CFBundleDisplayName>osu! GU</CFBundleDisplayName>
+    <CFBundleIdentifier>sh.ppy.osulazer.gu</CFBundleIdentifier>
+    <CFBundleVersion>0.0.0</CFBundleVersion>
+    <CFBundlePackageType>APPL</CFBundlePackageType>
+    <CFBundleSignature>????</CFBundleSignature>
+    <CFBundleExecutable>osu-gu!</CFBundleExecutable>
+    <CFBundleIconFile>lazer.icns</CFBundleIconFile>
+    <NSPrincipalClass>NSApplication</NSPrincipalClass>
+    <NSHighResolutionCapable>true</NSHighResolutionCapable>
+  </PropertyGroup>
+
+  <ItemGroup Label="macOS Icons" Condition="$([MSBuild]::IsOSPlatform('OSX'))">
+    <Content Include="lazer.icns" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" Condition="Exists('lazer.icns')" />
+  </ItemGroup>
 </Project>
