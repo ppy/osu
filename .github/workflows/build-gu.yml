@@ -59,11 +59,13 @@ jobs:
         dotnet-version: ${{ env.DOTNET_VERSION }}
 
     - name: Install Velopack CLI
+      shell: bash
       run: dotnet tool install -g vpk
 
     - name: Create macOS icon (macOS only)
       if: matrix.os == 'macos-latest'
       continue-on-error: true
+      shell: bash
       run: |
         # Convert .ico to .icns on macOS
         if [ -f "osu.Desktop/lazer.ico" ]; then
@@ -146,6 +148,7 @@ jobs:
         echo "Building version: $VERSION"
 
     - name: Clean previous build artifacts
+      shell: bash
       run: |
         echo "Cleaning previous build artifacts for ${{ matrix.runtime }}"
         rm -rf osu.Desktop/bin osu.Desktop/obj
@@ -153,6 +156,7 @@ jobs:
 
     - name: Restore dependencies for specific runtime
       timeout-minutes: 15
+      shell: bash
       run: |
         echo "Restoring packages for runtime: ${{ matrix.runtime }}"
         dotnet restore osu.Desktop/osu.Desktop.csproj \
@@ -163,6 +167,7 @@ jobs:
           --force
 
     - name: Build and publish
+      shell: bash
       run: |
         echo "Publishing for runtime: ${{ matrix.runtime }}"
         dotnet publish osu.Desktop/osu.Desktop.csproj \
@@ -181,9 +186,11 @@ jobs:
 
     - name: Set executable permissions (Linux/macOS)
       if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
+      shell: bash
       run: chmod +x "publish/${{ matrix.runtime }}/${{ matrix.executable }}"
 
-    - name: Create Velopack package
+        - name: Create Velopack package
+      shell: bash
       run: |
         if [[ "${{ matrix.os }}" == "macos-latest" ]]; then
           # Use icns if available, fallback to ico
