@@ -45,6 +45,7 @@ namespace osu.Game.Screens.SelectV2
             {
                 AlwaysPresent = true,
                 RelativeSizeAxes = Axes.Y,
+                Alpha = 0f,
                 Child = new SpriteIcon
                 {
                     Anchor = Anchor.Centre,
@@ -54,34 +55,34 @@ namespace osu.Game.Screens.SelectV2
                     Colour = colourProvider.Background3,
                 },
             };
-            Background = new Container
+
+            Background = new Box
             {
                 RelativeSizeAxes = Axes.Both,
-                Children = new Drawable[]
-                {
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = colourProvider.Background5,
-                    },
-                    triangles = new TrianglesV2
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Thickness = 0.02f,
-                        SpawnRatio = 0.6f,
-                        Colour = ColourInfo.GradientHorizontal(colourProvider.Background6, colourProvider.Background5)
-                    },
-                    glow = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Width = 0.5f,
-                        Colour = ColourInfo.GradientHorizontal(colourProvider.Highlight1, colourProvider.Highlight1.Opacity(0f)),
-                    },
-                },
+                Colour = colourProvider.Highlight1,
             };
+
             AccentColour = colourProvider.Highlight1;
             Content.Children = new Drawable[]
             {
+                new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = colourProvider.Background5,
+                },
+                triangles = new TrianglesV2
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Thickness = 0.02f,
+                    SpawnRatio = 0.6f,
+                    Colour = ColourInfo.GradientHorizontal(colourProvider.Background6, colourProvider.Background5)
+                },
+                glow = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Width = 0.5f,
+                    Colour = ColourInfo.GradientHorizontal(colourProvider.Highlight1, colourProvider.Highlight1.Opacity(0f)),
+                },
                 titleText = new OsuSpriteText
                 {
                     Anchor = Anchor.CentreLeft,
@@ -150,9 +151,9 @@ namespace osu.Game.Screens.SelectV2
             countText.Text = Item.NestedItemCount.ToString("N0");
         }
 
-        protected override void Update()
+        protected override void UpdateAfterChildren()
         {
-            base.Update();
+            base.UpdateAfterChildren();
 
             // Move the count pill in the opposite direction to keep it pinned to the screen regardless of the X position of TopLevelContent.
             countPill.X = -TopLevelContent.X;

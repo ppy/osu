@@ -11,6 +11,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics.Carousel;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
+using osu.Game.Utils;
 
 namespace osu.Game.Screens.SelectV2
 {
@@ -180,10 +181,10 @@ namespace osu.Game.Screens.SelectV2
                 case GroupMode.BPM:
                     return getGroupsBy(b =>
                     {
-                        double bpm = b.BPM;
+                        double bpm = FormatUtils.RoundBPM(b.BPM);
 
                         if (BeatmapSetsGroupedTogether)
-                            bpm = aggregateMax(b, bb => bb.BPM);
+                            bpm = aggregateMax(b, bb => FormatUtils.RoundBPM(bb.BPM));
 
                         return defineGroupByBPM(bpm);
                     }, items);
@@ -201,6 +202,9 @@ namespace osu.Game.Screens.SelectV2
 
                         return defineGroupByLength(length);
                     }, items);
+
+                case GroupMode.Source:
+                    return getGroupsBy(b => defineGroupBySource(b.BeatmapSet!.Metadata.Source), items);
 
                 // TODO: need implementation
                 //
@@ -225,6 +229,7 @@ namespace osu.Game.Screens.SelectV2
         {
             return items.GroupBy(i => getGroup((BeatmapInfo)i.Model))
                         .OrderBy(s => s.Key.Order)
+                        .ThenBy(s => s.Key.Title)
                         .Select(g => new GroupMapping(g.Key, g.ToList()))
                         .ToList();
         }
@@ -257,12 +262,15 @@ namespace osu.Game.Screens.SelectV2
                 return new GroupDefinition(2, "Last week");
 
             if (elapsed.TotalDays < 30)
-                return new GroupDefinition(3, "1 month ago");
+                return new GroupDefinition(3, "Last month");
 
-            for (int i = 60; i <= 150; i += 30)
+            if (elapsed.TotalDays < 60)
+                return new GroupDefinition(4, "1 month ago");
+
+            for (int i = 90; i <= 150; i += 30)
             {
                 if (elapsed.TotalDays < i)
-                    return new GroupDefinition(i, $"{i / 30} months ago");
+                    return new GroupDefinition(i, $"{i / 30 - 1} months ago");
             }
 
             return new GroupDefinition(151, "Over 5 months ago");
@@ -312,18 +320,22 @@ namespace osu.Game.Screens.SelectV2
 
         private GroupDefinition defineGroupByBPM(double bpm)
         {
-            for (int i = 1; i < 6; i++)
+            if (bpm < 60)
+                return new GroupDefinition(60, "Under 60 BPM");
+
+            for (int i = 70; i < 300; i += 10)
             {
-                if (bpm < i * 60)
-                    return new GroupDefinition(i, $"Under {i * 60} BPM");
+                if (bpm < i)
+                    return new GroupDefinition(i, $"{i - 10} - {i} BPM");
             }
 
-            return new GroupDefinition(6, "Over 300 BPM");
+            return new GroupDefinition(300, "Over 300 BPM");
         }
 
         private GroupDefinition defineGroupByStars(double stars)
         {
-            int starInt = (int)Math.Round(stars, 2);
+            // truncation is intentional - compare `FormatUtils.FormatStarRating()`
+            int starInt = (int)stars;
             var starDifficulty = new StarDifficulty(starInt, 0);
 
             if (starInt == 0)
@@ -352,6 +364,14 @@ namespace osu.Game.Screens.SelectV2
                 return new GroupDefinition(10, "10 minutes or less");
 
             return new GroupDefinition(11, "Over 10 minutes");
+        }
+
+        private GroupDefinition defineGroupBySource(string source)
+        {
+            if (string.IsNullOrEmpty(source))
+                return new GroupDefinition(1, "Unsourced");
+
+            return new GroupDefinition(0, source);
         }
 
         private static T? aggregateMax<T>(BeatmapInfo b, Func<BeatmapInfo, T> func)

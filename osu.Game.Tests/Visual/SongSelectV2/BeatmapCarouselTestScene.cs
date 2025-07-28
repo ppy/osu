@@ -273,9 +273,13 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             {
                 var groupingFilter = Carousel.Filters.OfType<BeatmapCarouselFilterGrouping>().Single();
 
-                GroupDefinition g = groupingFilter.GroupItems.Keys.ElementAt(group);
+                GroupDefinition? groupDefinition = groupingFilter.GroupItems.Keys.ElementAtOrDefault(group);
+
+                if (groupDefinition == null)
+                    return false;
+
                 // offset by one because the group itself is included in the items list.
-                CarouselItem item = groupingFilter.GroupItems[g].ElementAt(panel + 1);
+                CarouselItem item = groupingFilter.GroupItems[groupDefinition].ElementAt(panel + 1);
 
                 return (Carousel.CurrentSelection as BeatmapInfo)?
                     .Equals(item.Model as BeatmapInfo) == true;
