@@ -57,23 +57,53 @@ jobs:
 
     - name: Create macOS icon (macOS only)
       if: matrix.os == 'macos-latest'
+      continue-on-error: true
       run: |
         # Convert .ico to .icns on macOS
         if [ -f "osu.Desktop/lazer.ico" ]; then
+          echo "Converting lazer.ico to lazer.icns for macOS..."
+          # First convert ico to png to avoid format issues
+          sips -s format png osu.Desktop/lazer.ico --out temp_icon.png || {
+            echo "Warning: Failed to convert ico to png, trying alternative method..."
+            # Fallback: just copy the ico file and rename it
+            cp osu.Desktop/lazer.ico osu.Desktop/lazer.icns
+            echo "Using .ico file as fallback for macOS icon"
+            exit 0
+          }
+
+          # Create iconset directory
           mkdir -p lazer.iconset
-          sips -z 16 16     osu.Desktop/lazer.ico --out lazer.iconset/icon_16x16.png
-          sips -z 32 32     osu.Desktop/lazer.ico --out lazer.iconset/icon_16x16@2x.png
-          sips -z 32 32     osu.Desktop/lazer.ico --out lazer.iconset/icon_32x32.png
-          sips -z 64 64     osu.Desktop/lazer.ico --out lazer.iconset/icon_32x32@2x.png
-          sips -z 128 128   osu.Desktop/lazer.ico --out lazer.iconset/icon_128x128.png
-          sips -z 256 256   osu.Desktop/lazer.ico --out lazer.iconset/icon_128x128@2x.png
-          sips -z 256 256   osu.Desktop/lazer.ico --out lazer.iconset/icon_256x256.png
-          sips -z 512 512   osu.Desktop/lazer.ico --out lazer.iconset/icon_256x256@2x.png
-          sips -z 512 512   osu.Desktop/lazer.ico --out lazer.iconset/icon_512x512.png
-          sips -z 1024 1024 osu.Desktop/lazer.ico --out lazer.iconset/icon_512x512@2x.png
-          iconutil -c icns lazer.iconset
+
+          # Generate different sizes from the converted PNG
+          sips -z 16 16     temp_icon.png --out lazer.iconset/icon_16x16.png
+          sips -z 32 32     temp_icon.png --out lazer.iconset/icon_16x16@2x.png
+          sips -z 32 32     temp_icon.png --out lazer.iconset/icon_32x32.png
+          sips -z 64 64     temp_icon.png --out lazer.iconset/icon_32x32@2x.png
+          sips -z 128 128   temp_icon.png --out lazer.iconset/icon_128x128.png
+          sips -z 256 256   temp_icon.png --out lazer.iconset/icon_128x128@2x.png
+          sips -z 256 256   temp_icon.png --out lazer.iconset/icon_256x256.png
+          sips -z 512 512   temp_icon.png --out lazer.iconset/icon_256x256@2x.png
+          sips -z 512 512   temp_icon.png --out lazer.iconset/icon_512x512.png
+          cp lazer.iconset/icon_512x512.png lazer.iconset/icon_512x512@2x.png
+
+          # Create the icns file
+          iconutil -c icns lazer.iconset || {
+            echo "Warning: iconutil failed, using fallback method..."
+            cp osu.Desktop/lazer.ico osu.Desktop/lazer.icns
+            rm -f temp_icon.png
+            rm -rf lazer.iconset
+            exit 0
+          }
+
+          # Copy the result and cleanup
           cp lazer.icns osu.Desktop/lazer.icns
+          rm -f temp_icon.png
           rm -rf lazer.iconset
+          echo "Successfully created lazer.icns"
+        else
+          echo "Warning: lazer.ico not found, creating placeholder icns"
+          # Create a simple placeholder if the ico file doesn't exist
+          touch osu.Desktop/lazer.icns
         fi
 
     - name: Cache NuGet packages
@@ -128,6 +158,15 @@ jobs:
     - name: Create Velopack package
       run: |
         if [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+          # Use icns if available, fallback to ico
+          ICON_FILE="osu.Desktop/lazer.ico"
+          if [ -f "osu.Desktop/lazer.icns" ] && [ -s "osu.Desktop/lazer.icns" ]; then
+            ICON_FILE="osu.Desktop/lazer.icns"
+            echo "Using lazer.icns for macOS packaging"
+          else
+            echo "Using lazer.ico as fallback for macOS packaging"
+          fi
+
           vpk pack \
             --packId "osu-lazer-gu" \
             --packVersion "${{ steps.version.outputs.version }}" \
@@ -136,7 +175,7 @@ jobs:
             --packAuthors "osu! GU Team" \
             --packTitle "osu! GU Edition" \
             --packDescription "osu! GU 版本 - 基于官方 osu!(lazer) 修改" \
-            --icon "osu.Desktop/lazer.icns" \
+            --icon "$ICON_FILE" \
             --packChannel "gu" \
             --framework "net8-osx"
         else
