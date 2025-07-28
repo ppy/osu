@@ -18,6 +18,7 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Drawables;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
@@ -246,6 +247,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             {
                 var (working, onlineSet) = createTestBeatmap();
                 onlineSet.FavouriteCount = 9999;
+                onlineSet.HasFavourited = true;
                 working.BeatmapSetInfo.OnlineID = onlineSet.OnlineID = 99999;
 
                 currentOnlineSet = onlineSet;
@@ -253,6 +255,42 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             });
             AddStep("allow request to complete", () => resetEvent.Set());
             AddAssert("favourites count = 9999", () => this.ChildrenOfType<BeatmapTitleWedge.FavouriteButton>().Single().Text.ToString() == "9,999");
+
+            AddStep("set up request handler to fail", () =>
+            {
+                ((DummyAPIAccess)API).HandleRequest = request =>
+                {
+                    switch (request)
+                    {
+                        case GetBeatmapSetRequest set:
+                            if (set.ID == currentOnlineSet?.OnlineID)
+                            {
+                                set.TriggerSuccess(currentOnlineSet);
+                                return true;
+                            }
+
+                            return false;
+
+                        case PostBeatmapFavouriteRequest favourite:
+                            Task.Run(() =>
+                            {
+                                resetEvent.Wait(10000);
+                                favourite.TriggerFailure(new APIException("You have too many favourited beatmaps! Please unfavourite some before trying again.", null));
+                            });
+                            return true;
+
+                        default:
+                            return false;
+                    }
+                };
+            });
+            AddStep("reset event", () => resetEvent.Reset());
+            AddStep("click favourite button", () => this.ChildrenOfType<BeatmapTitleWedge.FavouriteButton>().Single().TriggerClick());
+            AddAssert("spinner visible", () => this.ChildrenOfType<BeatmapTitleWedge.FavouriteButton>().Single()
+                                                   .ChildrenOfType<LoadingSpinner>().Single().State.Value, () => Is.EqualTo(Visibility.Visible));
+            AddStep("allow request to complete", () => resetEvent.Set());
+            AddAssert("spinner hidden", () => this.ChildrenOfType<BeatmapTitleWedge.FavouriteButton>().Single()
+                                                  .ChildrenOfType<LoadingSpinner>().Single().State.Value, () => Is.EqualTo(Visibility.Hidden));
         }
 
         [TestCase(120, 125, null, "120-125 (mostly 120)")]
