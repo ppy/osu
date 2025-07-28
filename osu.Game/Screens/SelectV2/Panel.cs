@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
@@ -169,13 +170,13 @@ namespace osu.Game.Screens.SelectV2
 
         public partial class PulsatingBox : BeatSyncedContainer
         {
-            public double FlashOffset;
+            public int FlashOffset;
 
             private readonly Box box;
 
             public PulsatingBox()
             {
-                EarlyActivationMilliseconds = 50;
+                EarlyActivationMilliseconds = 40;
 
                 InternalChildren = new Drawable[]
                 {
@@ -186,27 +187,20 @@ namespace osu.Game.Screens.SelectV2
                 };
             }
 
-            private int separation = 1;
-
             protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
             {
                 base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
 
-                if (beatIndex % separation != 0)
+                if (beatIndex % Math.Pow(2, FlashOffset) != 0)
                     return;
 
                 double length = timingPoint.BeatLength;
-                separation = 1;
 
-                while (length < 500)
-                {
+                while (length < 250)
                     length *= 2;
-                    separation *= 2;
-                }
 
                 box
-                    .Delay(FlashOffset)
-                    .FadeTo(0.8f, length / 6, Easing.Out)
+                    .FadeTo(0.8f, 40, Easing.Out)
                     .Then()
                     .FadeTo(0.4f, length, Easing.Out);
             }
@@ -249,7 +243,7 @@ namespace osu.Game.Screens.SelectV2
 
             // Slightly offset the flash animation based on the panel depth.
             // This assumes a minimum depth of -2 (groups).
-            selectionLayer.FlashOffset = (2 + Item!.DepthLayer) * 50;
+            selectionLayer.FlashOffset = -Item!.DepthLayer;
 
             updateAccentColour();
 
