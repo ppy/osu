@@ -124,7 +124,7 @@ namespace osu.Game
             return config;
         }
 
-        protected override OnlineStore CreateOnlineStore() => new TrustedDomainOnlineStore();
+        protected override OnlineStore CreateOnlineStore() => new TrustedDomainOnlineStore(LocalConfig);
 
         public virtual Version AssemblyVersion => Assembly.GetEntryAssembly()?.GetName().Version ?? new Version();
 
