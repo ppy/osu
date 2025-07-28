@@ -180,12 +180,12 @@ jobs:
           --output "publish/${{ matrix.runtime }}" \
           --no-restore \
           --verbosity normal \
-          /p:PublishSingleFile=false \
-          /p:PublishTrimmed=false \
-          /p:Version=${{ steps.version.outputs.version }} \
-          /p:FileVersion=${{ steps.version.outputs.version }} \
-          /p:AssemblyVersion=${{ steps.version.outputs.version }} \
-          /p:InformationalVersion=${{ steps.version.outputs.version }}
+          -p:PublishSingleFile=false \
+          -p:PublishTrimmed=false \
+          -p:Version=${{ steps.version.outputs.version }} \
+          -p:FileVersion=${{ steps.version.outputs.version }} \
+          -p:AssemblyVersion=${{ steps.version.outputs.version }} \
+          -p:InformationalVersion=${{ steps.version.outputs.version }}
 
     - name: Set executable permissions (Linux/macOS)
       if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
