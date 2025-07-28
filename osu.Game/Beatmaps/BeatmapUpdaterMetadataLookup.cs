@@ -77,6 +77,7 @@ namespace osu.Game.Beatmaps
                 {
                     beatmapInfo.Status = res.BeatmapStatus;
                     beatmapInfo.Metadata.Author.OnlineID = res.AuthorID;
+                    beatmapInfo.Metadata.UserTags.Clear();
                     beatmapInfo.Metadata.UserTags.AddRange(res.UserTags);
                 }
             }
