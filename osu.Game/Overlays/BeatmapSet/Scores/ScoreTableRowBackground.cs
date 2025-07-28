@@ -8,7 +8,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Online.API;
-using osu.Game.Scoring;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
@@ -20,9 +20,9 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private readonly Box background;
 
         private readonly int index;
-        private readonly ScoreInfo score;
+        private readonly SoloScoreInfo score;
 
-        public ScoreTableRowBackground(int index, ScoreInfo score, float height)
+        public ScoreTableRowBackground(int index, SoloScoreInfo score, float height)
         {
             this.index = index;
             this.score = score;

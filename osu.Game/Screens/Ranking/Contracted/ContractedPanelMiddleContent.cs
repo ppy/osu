@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps.Drawables;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Leaderboards;
@@ -36,7 +37,7 @@ namespace osu.Game.Screens.Ranking.Contracted
         private readonly ScoreInfo score;
 
         [Resolved]
-        private ScoreManager scoreManager { get; set; } = null!;
+        private OsuConfigManager config { get; set; } = null!;
 
         /// <summary>
         /// Creates a new <see cref="ContractedPanelMiddleContent"/>.
@@ -181,7 +182,7 @@ namespace osu.Game.Screens.Ranking.Contracted
                                     {
                                         Anchor = Anchor.Centre,
                                         Origin = Anchor.Centre,
-                                        Current = scoreManager.GetBindableTotalScoreString(score),
+                                        Current = score.GetBindableTotalScoreString(config),
                                         Font = OsuFont.GetFont(size: 20, weight: FontWeight.Medium, fixedWidth: true),
                                         Spacing = new Vector2(-1, 0)
                                     },

@@ -6,6 +6,7 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
@@ -23,8 +24,13 @@ using osu.Framework.Localisation;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Beatmaps;
+using osu.Game.Configuration;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Resources.Localisation.Web;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Utils;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
@@ -35,7 +41,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private const int text_size = 12;
 
         [Resolved]
-        private ScoreManager scoreManager { get; set; }
+        private OsuConfigManager config { get; set; }
 
         private readonly FillFlowContainer backgroundFlow;
 
@@ -63,23 +69,20 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         /// </summary>
         private readonly List<LocalisableString> statisticResultNames = new List<LocalisableString>();
 
-        private bool showPerformancePoints;
-
-        public void DisplayScores(IReadOnlyList<ScoreInfo> scores, bool showPerformanceColumn)
+        public void DisplayScores(IReadOnlyList<SoloScoreInfo> scores, APIBeatmap beatmap, Ruleset ruleset)
         {
             ClearScores();
 
             if (!scores.Any())
                 return;
 
-            showPerformancePoints = showPerformanceColumn;
             statisticResultNames.Clear();
 
             for (int i = 0; i < scores.Count; i++)
                 backgroundFlow.Add(new ScoreTableRowBackground(i, scores[i], row_height));
 
-            Columns = createHeaders(scores);
-            Content = scores.Select((s, i) => createContent(i, s)).ToArray().ToRectangular();
+            Columns = createHeaders(scores, beatmap, ruleset);
+            Content = scores.Select((s, i) => createContent(i, s, beatmap, ruleset)).ToArray().ToRectangular();
         }
 
         public void ClearScores()
@@ -88,7 +91,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             backgroundFlow.Clear();
         }
 
-        private TableColumn[] createHeaders(IReadOnlyList<ScoreInfo> scores)
+        private TableColumn[] createHeaders(IReadOnlyList<SoloScoreInfo> scores, APIBeatmap beatmap, Ruleset ruleset)
         {
             var columns = new List<TableColumn>
             {
@@ -102,9 +105,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             };
 
             // All statistics across all scores, unordered.
-            var allScoreStatistics = scores.SelectMany(s => s.GetStatisticsForDisplay().Select(stat => stat.Result)).ToHashSet();
-
-            var ruleset = scores.First().Ruleset.CreateInstance();
+            var allScoreStatistics = scores.SelectMany(s => s.GetStatisticsForDisplay(ruleset).Select(stat => stat.Result)).ToHashSet();
 
             foreach (var resultGroup in ruleset.GetHitResults().GroupBy(r => r.displayName))
             {
@@ -120,7 +121,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 statisticResultNames.Add(resultGroup.Key);
             }
 
-            if (showPerformancePoints)
+            if (beatmap.Status.GrantsPerformancePoints())
                 columns.Add(new TableColumn(BeatmapsetsStrings.ShowScoreboardHeaderspp, Anchor.CentreLeft, new Dimension(GridSizeMode.Absolute, 30)));
 
             columns.Add(new TableColumn(BeatmapsetsStrings.ShowScoreboardHeadersTime, Anchor.CentreLeft, new Dimension(GridSizeMode.AutoSize)));
@@ -129,9 +130,11 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             return columns.ToArray();
         }
 
-        private Drawable[] createContent(int index, ScoreInfo score)
+        private Drawable[] createContent(int index, SoloScoreInfo score, APIBeatmap beatmap, Ruleset ruleset)
         {
             var username = new LinkFlowContainer(t => t.Font = OsuFont.GetFont(size: text_size)) { AutoSizeAxes = Axes.Both };
+
+            Debug.Assert(score.User != null);
             username.AddUserLink(score.User);
 
             var content = new List<Drawable>
@@ -148,13 +151,13 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 new OsuSpriteText
                 {
                     Margin = new MarginPadding { Right = horizontal_inset },
-                    Current = scoreManager.GetBindableTotalScoreString(score),
+                    Current = score.GetBindableTotalScoreString(config),
                     Font = OsuFont.GetFont(size: text_size, weight: index == 0 ? FontWeight.Bold : FontWeight.Medium)
                 },
                 new StatisticText(score.Accuracy, 1, showTooltip: false)
                 {
                     Margin = new MarginPadding { Right = horizontal_inset },
-                    Text = score.DisplayAccuracy,
+                    Text = score.Accuracy.FormatAccuracy(),
                 },
                 new UpdateableFlag(score.User.CountryCode)
                 {
@@ -175,11 +178,11 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     }
                 },
 #pragma warning disable 618
-                new StatisticText(score.MaxCombo, score.BeatmapInfo!.MaxCombo, @"0\x"),
+                new StatisticText(score.MaxCombo, beatmap.MaxCombo, @"0\x"),
 #pragma warning restore 618
             };
 
-            var availableStatistics = score.GetStatisticsForDisplay().ToLookup(tuple => tuple.DisplayName);
+            var availableStatistics = score.GetStatisticsForDisplay(ruleset).ToLookup(tuple => tuple.DisplayName);
 
             foreach (var columnName in statisticResultNames)
             {
@@ -200,11 +203,10 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 content.Add(new StatisticText(count, maxCount, @"N0") { Colour = count == 0 ? Color4.Gray : Color4.White });
             }
 
-            // TODO: all this should be using the same sort of logic as `DrawableProfileScore` is, but that's not easily done
-            // unless the ENTIRE overlay can be weaned off of `ScoreInfo` and use `SoloScoreInfo` instead
-            if (showPerformancePoints)
+            if (beatmap.Status.GrantsPerformancePoints())
             {
-                if (!score.Ranked)
+                // cross-reference: https://github.com/ppy/osu-web/blob/a6afee076f4f68bb56dea0cb8f18db63651763a7/resources/js/scores/pp-value.tsx#L19-L39
+                if (!score.Ranked || !score.Preserve || (score.PP == null && score.Processed))
                 {
                     content.Add(new SpriteTextWithTooltip
                     {
@@ -226,7 +228,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     content.Add(new StatisticText(score.PP, format: @"N0"));
             }
 
-            content.Add(new ScoreboardTime(score.Date, text_size)
+            content.Add(new ScoreboardTime(score.EndedAt, text_size)
             {
                 Margin = new MarginPadding { Right = 10 }
             });
@@ -236,7 +238,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 Direction = FillDirection.Horizontal,
                 AutoSizeAxes = Axes.Both,
                 Spacing = new Vector2(1),
-                ChildrenEnumerable = score.Mods.AsOrdered().Select(m => new ModIcon(m)
+                ChildrenEnumerable = score.Mods.Select(m => m.ToMod(ruleset)).AsOrdered().Select(m => new ModIcon(m)
                 {
                     AutoSizeAxes = Axes.Both,
                     Scale = new Vector2(0.3f)

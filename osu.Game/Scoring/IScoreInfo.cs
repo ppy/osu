@@ -2,9 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Users;
 
 namespace osu.Game.Scoring
@@ -34,9 +36,11 @@ namespace osu.Game.Scoring
 
         ScoreRank Rank { get; }
 
+        Dictionary<HitResult, int> Statistics { get; }
+
+        Dictionary<HitResult, int> MaximumStatistics { get; }
+
         // Mods is currently missing from this interface as the `IMod` class has properties which can't be fulfilled by `APIMod`,
         // but also doesn't expose `Settings`. We can consider how to implement this in the future if required.
-
-        // Statistics is also missing. This can be reconsidered once changes in serialisation have been completed.
     }
 }

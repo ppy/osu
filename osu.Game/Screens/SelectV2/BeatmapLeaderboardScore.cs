@@ -438,7 +438,7 @@ namespace osu.Game.Screens.SelectV2
                                                         Anchor = Anchor.TopRight,
                                                         Origin = Anchor.TopRight,
                                                         UseFullGlyphHeight = false,
-                                                        Current = scoreManager.GetBindableTotalScoreString(Score),
+                                                        Current = Score.GetBindableTotalScoreString(config),
                                                         Spacing = new Vector2(-1.5f),
                                                         Font = OsuFont.Style.Subtitle.With(weight: FontWeight.Light, fixedWidth: true),
                                                         Shear = sheared ? -OsuGame.SHEAR : Vector2.Zero,

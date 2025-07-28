@@ -8,17 +8,14 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
-using osu.Framework.Bindables;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
-using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.IO.Archives;
 using osu.Game.Online.API;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring.Legacy;
 
 namespace osu.Game.Scoring
@@ -26,7 +23,6 @@ namespace osu.Game.Scoring
     public class ScoreManager : ModelManager<ScoreInfo>, IModelImporter<ScoreInfo>
     {
         private readonly Func<BeatmapManager> beatmaps;
-        private readonly OsuConfigManager? configManager;
         private readonly ScoreImporter scoreImporter;
         private readonly LegacyScoreExporter scoreExporter;
 
@@ -40,12 +36,10 @@ namespace osu.Game.Scoring
             }
         }
 
-        public ScoreManager(RulesetStore rulesets, Func<BeatmapManager> beatmaps, Storage storage, RealmAccess realm, IAPIProvider api,
-                            OsuConfigManager? configManager = null)
+        public ScoreManager(RulesetStore rulesets, Func<BeatmapManager> beatmaps, Storage storage, RealmAccess realm, IAPIProvider api)
             : base(storage, realm)
         {
             this.beatmaps = beatmaps;
-            this.configManager = configManager;
 
             scoreImporter = new ScoreImporter(rulesets, beatmaps, storage, realm, api)
             {
@@ -110,60 +104,6 @@ namespace osu.Game.Scoring
             }
 
             return databasedScoreInfo;
-        }
-
-        /// <summary>
-        /// Retrieves a bindable that represents the total score of a <see cref="ScoreInfo"/>.
-        /// </summary>
-        /// <remarks>
-        /// Responds to changes in the currently-selected <see cref="ScoringMode"/>.
-        /// </remarks>
-        /// <param name="score">The <see cref="ScoreInfo"/> to retrieve the bindable for.</param>
-        /// <returns>The bindable containing the total score.</returns>
-        public Bindable<long> GetBindableTotalScore(ScoreInfo score) => new TotalScoreBindable(score, configManager);
-
-        /// <summary>
-        /// Retrieves a bindable that represents the formatted total score string of a <see cref="ScoreInfo"/>.
-        /// </summary>
-        /// <remarks>
-        /// Responds to changes in the currently-selected <see cref="ScoringMode"/>.
-        /// </remarks>
-        /// <param name="score">The <see cref="ScoreInfo"/> to retrieve the bindable for.</param>
-        /// <returns>The bindable containing the formatted total score string.</returns>
-        public Bindable<string> GetBindableTotalScoreString(ScoreInfo score) => new TotalScoreStringBindable(GetBindableTotalScore(score));
-
-        /// <summary>
-        /// Provides the total score of a <see cref="ScoreInfo"/>. Responds to changes in the currently-selected <see cref="ScoringMode"/>.
-        /// </summary>
-        private class TotalScoreBindable : Bindable<long>
-        {
-            private readonly Bindable<ScoringMode> scoringMode = new Bindable<ScoringMode>();
-
-            /// <summary>
-            /// Creates a new <see cref="TotalScoreBindable"/>.
-            /// </summary>
-            /// <param name="score">The <see cref="ScoreInfo"/> to provide the total score of.</param>
-            /// <param name="configManager">The config.</param>
-            public TotalScoreBindable(ScoreInfo score, OsuConfigManager? configManager)
-            {
-                configManager?.BindWith(OsuSetting.ScoreDisplayMode, scoringMode);
-                scoringMode.BindValueChanged(mode => Value = score.GetDisplayScore(mode.NewValue), true);
-            }
-        }
-
-        /// <summary>
-        /// Provides the total score of a <see cref="ScoreInfo"/> as a formatted string. Responds to changes in the currently-selected <see cref="ScoringMode"/>.
-        /// </summary>
-        private class TotalScoreStringBindable : Bindable<string>
-        {
-            // ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable (need to hold a reference)
-            private readonly IBindable<long> totalScore;
-
-            public TotalScoreStringBindable(IBindable<long> totalScore)
-            {
-                this.totalScore = totalScore;
-                this.totalScore.BindValueChanged(v => Value = v.NewValue.ToString("N0"), true);
-            }
         }
 
         public void Delete(Expression<Func<ScoreInfo, bool>>? filter = null, bool silent = false)

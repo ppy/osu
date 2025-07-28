@@ -43,7 +43,7 @@ namespace osu.Game.Screens.Ranking.Expanded
         private RollingCounter<long> scoreCounter = null!;
 
         [Resolved]
-        private ScoreManager scoreManager { get; set; } = null!;
+        private OsuConfigManager config { get; set; } = null!;
 
         /// <summary>
         /// Creates a new <see cref="ExpandedPanelMiddleContent"/>.
@@ -250,7 +250,7 @@ namespace osu.Game.Screens.Ranking.Expanded
                 using (BeginDelayedSequence(AccuracyCircle.ACCURACY_TRANSFORM_DELAY))
                 {
                     scoreCounter.FadeIn();
-                    scoreCounter.Current = scoreManager.GetBindableTotalScore(score);
+                    scoreCounter.Current = score.GetBindableTotalScore(config);
 
                     double delay = 0;
 
