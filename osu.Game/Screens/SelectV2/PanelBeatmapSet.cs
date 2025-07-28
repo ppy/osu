@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -217,7 +218,19 @@ namespace osu.Game.Screens.SelectV2
 
                 List<MenuItem> items = new List<MenuItem>();
 
-                if (!Expanded.Value)
+                if (Expanded.Value)
+                {
+                    if (songSelect is SoloSongSelect soloSongSelect)
+                    {
+                        // Assume the current set has one of its beatmaps selected since it is expanded.
+                        items.Add(new OsuMenuItem(ButtonSystemStrings.Edit.ToSentence(), MenuItemType.Standard, () => soloSongSelect.Edit(soloSongSelect.Beatmap.Value.BeatmapInfo))
+                        {
+                            Icon = FontAwesome.Solid.PencilAlt
+                        });
+                        items.Add(new OsuMenuItemSpacer());
+                    }
+                }
+                else
                 {
                     items.Add(new OsuMenuItem("Expand", MenuItemType.Highlighted, () => TriggerClick()));
                     items.Add(new OsuMenuItemSpacer());
