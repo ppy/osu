@@ -53,7 +53,8 @@ namespace osu.Game.Scoring
                 case LeaderboardSortMode.Date:
                     return scores.OrderByDescending(s => s.Date);
 
-                default: throw new ArgumentOutOfRangeException();
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(leaderboardSortMode), leaderboardSortMode, null);
             }
         }
 
