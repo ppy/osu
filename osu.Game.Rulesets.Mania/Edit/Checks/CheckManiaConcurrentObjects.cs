@@ -36,11 +36,11 @@ namespace osu.Game.Rulesets.Mania.Edit.Checks
 
                     if (AreConcurrent(hitobject, nextHitobject))
                     {
-                        yield return new IssueTemplateConcurrent(this).Create(hitobject, nextHitobject, sameType);
+                        yield return new IssueTemplateConcurrent(this).Create(hitobject, nextHitobject);
                     }
                     else if (AreAlmostConcurrent(hitobject, nextHitobject))
                     {
-                        yield return new IssueTemplateAlmostConcurrent(this).Create(hitobject, nextHitobject, sameType);
+                        yield return new IssueTemplateAlmostConcurrent(this).Create(hitobject, nextHitobject);
                     }
                 }
             }
