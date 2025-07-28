@@ -189,7 +189,7 @@ jobs:
       shell: bash
       run: chmod +x "publish/${{ matrix.runtime }}/${{ matrix.executable }}"
 
-        - name: Create Velopack package
+    - name: Create Velopack package
       shell: bash
       run: |
         if [[ "${{ matrix.os }}" == "macos-latest" ]]; then
