@@ -195,7 +195,7 @@ jobs:
     - name: Create Velopack package
       shell: bash
       run: |
-                if [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+        if [[ "${{ matrix.os }}" == "macos-latest" ]]; then
           # Use icns if available, fallback to ico
           ICON_FILE="osu.Desktop/lazer.ico"
           if [ -f "osu.Desktop/lazer.icns" ] && [ -s "osu.Desktop/lazer.icns" ]; then
