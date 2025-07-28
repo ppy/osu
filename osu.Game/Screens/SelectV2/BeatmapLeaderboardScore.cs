@@ -32,7 +32,9 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
+using osu.Game.Scoring.Legacy;
 using osu.Game.Screens.Select;
+using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Users;
 using osu.Game.Users.Drawables;
 using osu.Game.Utils;
@@ -71,6 +73,9 @@ namespace osu.Game.Screens.SelectV2
 
         [Resolved]
         private ScoreManager scoreManager { get; set; } = null!;
+
+        [Resolved]
+        private LeaderboardManager leaderboardManager { get; set; } = null!;
 
         [Resolved]
         private OsuConfigManager config { get; set; } = null!;
@@ -438,7 +443,7 @@ namespace osu.Game.Screens.SelectV2
                                                         Anchor = Anchor.TopRight,
                                                         Origin = Anchor.TopRight,
                                                         UseFullGlyphHeight = false,
-                                                        Current = scoreManager.GetBindableTotalScoreString(Score),
+                                                        Current = getMainMetricString(),
                                                         Spacing = new Vector2(-1.5f),
                                                         Font = OsuFont.Style.Subtitle.With(weight: FontWeight.Light, fixedWidth: true),
                                                         Shear = sheared ? -OsuGame.SHEAR : Vector2.Zero,
@@ -463,6 +468,29 @@ namespace osu.Game.Screens.SelectV2
                 }
             };
             innerAvatar.OnLoadComplete += d => d.FadeInFromZero(200);
+        }
+
+        private Bindable<string> getMainMetricString()
+        {
+            var leaderboardSortMode = leaderboardManager.CurrentCriteria?.Sorting ?? LeaderboardSortMode.Score;
+
+            switch (leaderboardSortMode)
+            {
+                case LeaderboardSortMode.Accuracy:
+                    return new Bindable<string>(Score.DisplayAccuracy.GetDisplayString());
+
+                case LeaderboardSortMode.MaxCombo:
+                    return new Bindable<string>($"{Score.MaxCombo}x");
+
+                case LeaderboardSortMode.Misses:
+                    return new Bindable<string>($"{Score.GetCountMiss() ?? 0}");
+
+                case LeaderboardSortMode.Date:
+                    return new Bindable<string>(Score.Date.ToString("dd/MM/yy"));
+
+                default:
+                    return scoreManager.GetBindableTotalScoreString(Score);
+            }
         }
 
         private ColourInfo getHighlightColour(HighlightType? highlightType, float lightenAmount = 0)
