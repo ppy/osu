@@ -11,6 +11,8 @@
     <ApplicationIcon>lazer.ico</ApplicationIcon>
     <Version>0.0.0</Version>
     <FileVersion>0.0.0</FileVersion>
+    <!-- Support multiple runtime identifiers for cross-platform builds -->
+    <RuntimeIdentifiers>win-x64;linux-x64;osx-x64;osx-arm64</RuntimeIdentifiers>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject>osu.Desktop.Program</StartupObject>

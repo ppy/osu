@@ -21,6 +21,10 @@ jobs:
     name: Build ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
+    # Prevent concurrent builds from interfering with each other's NuGet operations
+    concurrency:
+      group: build-${{ matrix.os }}-${{ matrix.runtime }}
+      cancel-in-progress: false
     strategy:
       matrix:
         include:
@@ -115,14 +119,11 @@ jobs:
           ~/.nuget/packages
           ~/.local/share/NuGet/v3-cache
           ~/.cache/NuGet/v3-cache
-        key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/packages.lock.json', 'nuget.config') }}
+        key: ${{ runner.os }}-${{ matrix.runtime }}-nuget-${{ hashFiles('**/*.csproj', '**/packages.lock.json', 'nuget.config') }}
         restore-keys: |
-          ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+          ${{ runner.os }}-${{ matrix.runtime }}-nuget-${{ hashFiles('**/*.csproj') }}
+          ${{ runner.os }}-${{ matrix.runtime }}-nuget-
           ${{ runner.os }}-nuget-
-
-    - name: Restore dependencies
-      timeout-minutes: 15
-      run: dotnet restore osu.Desktop.slnf --verbosity normal --configfile nuget.config --no-cache
 
     - name: Determine version
       id: version
@@ -144,14 +145,33 @@ jobs:
         echo "version=$VERSION" >> $GITHUB_OUTPUT
         echo "Building version: $VERSION"
 
+    - name: Clean previous build artifacts
+      run: |
+        echo "Cleaning previous build artifacts for ${{ matrix.runtime }}"
+        rm -rf osu.Desktop/bin osu.Desktop/obj
+        rm -rf publish/${{ matrix.runtime }}
+
+    - name: Restore dependencies for specific runtime
+      timeout-minutes: 15
+      run: |
+        echo "Restoring packages for runtime: ${{ matrix.runtime }}"
+        dotnet restore osu.Desktop/osu.Desktop.csproj \
+          --runtime ${{ matrix.runtime }} \
+          --verbosity normal \
+          --configfile nuget.config \
+          --no-cache \
+          --force
+
     - name: Build and publish
       run: |
+        echo "Publishing for runtime: ${{ matrix.runtime }}"
         dotnet publish osu.Desktop/osu.Desktop.csproj \
           --self-contained \
-          -r ${{ matrix.runtime }} \
-          -c Release \
-          -o "publish/${{ matrix.runtime }}" \
+          --runtime ${{ matrix.runtime }} \
+          --configuration Release \
+          --output "publish/${{ matrix.runtime }}" \
           --no-restore \
+          --verbosity normal \
           /p:PublishSingleFile=false \
           /p:PublishTrimmed=false \
           /p:Version=${{ steps.version.outputs.version }} \
