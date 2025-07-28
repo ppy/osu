@@ -188,6 +188,9 @@ namespace osu.Game.Online.Leaderboards
 
             newScores = newScores.Detach();
 
+            // score.PP value is never actually set and saved for scores present in database
+            // So just as with other cases where it's used (such as BeatmapLeaderboardScore_Tooltip and ScorePanel PerformanceStatistics)
+            // it has to be calculated in real time before being used
             if (CurrentCriteria.Sorting == LeaderboardSortMode.PP) updatePpValues(newScores);
 
             newScores = newScores.OrderByCriteria(CurrentCriteria.Sorting);
