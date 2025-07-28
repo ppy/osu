@@ -151,20 +151,15 @@ namespace osu.Game.Screens.Import
             // this should probably be done by the selector itself, but let's do it here for now.
             fileSelector.CurrentFile.Value = null;
 
-            importAllButton.Enabled.Value = false;
-
-            // Fixes crashing the game on Linux when clicking on "Computer" in the path/navigation bar
-            if (directoryChangedEvent.NewValue == null)
-                return;
-
-            DirectoryInfo directoryInfo = directoryChangedEvent.NewValue;
-
-            if (!directoryInfo.Exists)
-                return;
-
-            // enable the "importDirectoryButton" only when there is at least 1 file that matches the extension
-            importAllButton.Enabled.Value = directoryInfo.EnumerateFiles()
-                                                         .Any(file => game.HandledExtensions.Contains(file.Extension));
+            DirectoryInfo newDirectory = directoryChangedEvent.NewValue;
+            importAllButton.Enabled.Value =
+                // this will be `null` if the user clicked the "Computer" option (showing drives)
+                // handling that is difficult due to platform differences, and nobody sane wants that to work with the "import all" button anyway
+                newDirectory != null
+                // extra safety against various I/O errors (lack of access, deleted directory, etc.)
+                && newDirectory.Exists
+                // there must be at least one file in the current directory for the game to import (non-recursive)
+                && newDirectory.EnumerateFiles().Any(file => game.HandledExtensions.Contains(file.Extension));
         }
 
         private void fileChanged(ValueChangedEvent<FileInfo> selectedFile)
