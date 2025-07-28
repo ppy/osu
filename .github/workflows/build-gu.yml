@@ -61,12 +61,7 @@ jobs:
 
     - name: Restore dependencies
       timeout-minutes: 10
-      run: |
-        dotnet restore osu.Desktop.slnf \
-          --verbosity normal \
-          --configfile nuget.config \
-          --disable-parallel \
-          --force
+      run: dotnet restore osu.Desktop.slnf --verbosity normal --configfile nuget.config --disable-parallel --force
 
     - name: Determine version
       id: version
