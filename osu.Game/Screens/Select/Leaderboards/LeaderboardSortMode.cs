@@ -8,6 +8,7 @@ namespace osu.Game.Screens.Select.Leaderboards
     public enum LeaderboardSortMode
     {
         Score,
+        PP,
         Accuracy,
 
         [Description("Max Combo")]
