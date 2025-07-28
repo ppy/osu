@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
@@ -203,7 +204,9 @@ namespace osu.Game.Online.Leaderboards
         {
             foreach (ScoreInfo score in scores)
             {
-                var attributes = difficultyCache.GetDifficultyAsync(score.BeatmapInfo!, score.Ruleset, score.Mods, default).GetAwaiter().GetResult();
+                var difficultyCalculationTask = difficultyCache.GetDifficultyAsync(score.BeatmapInfo!, score.Ruleset, score.Mods, default);
+                difficultyCalculationTask.WaitSafely();
+                var attributes = difficultyCalculationTask.GetResultSafely();
 
                 var performanceCalculator = score.Ruleset.CreateInstance().CreatePerformanceCalculator();
 
