@@ -4,6 +4,8 @@
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -45,14 +47,14 @@ namespace osu.Game.Screens.Menu
                     RelativeSizeAxes = Axes.Both,
                     Masking = true,
                     CornerExponent = 2.5f,
-                    CornerRadius = 15,
+                    CornerRadius = 10,
                     Children = new Drawable[]
                     {
                         new Box
                         {
-                            Colour = Color4.Black,
+                            Colour = Color4Extensions.FromHex("#171A1C"),
                             RelativeSizeAxes = Axes.Both,
-                            Alpha = 0.4f,
+                            Alpha = 0.75f,
                         },
                     }
                 },
@@ -84,12 +86,22 @@ namespace osu.Game.Screens.Menu
             }
 
             static void formatRegular(SpriteText t) => t.Font = OsuFont.GetFont(size: 16, weight: FontWeight.Regular);
-            static void formatSemiBold(SpriteText t) => t.Font = OsuFont.GetFont(size: 16, weight: FontWeight.SemiBold);
+
+            static void formatSemiBold(SpriteText t)
+            {
+                t.Font = OsuFont.GetFont(size: 16, weight: FontWeight.SemiBold);
+                t.Colour = Color4Extensions.FromHex("#FF99C7");
+            }
 
             var tip = getRandomTip();
 
             textFlow.Clear();
-            textFlow.AddParagraph(MenuTipStrings.MenuTipTitle, formatSemiBold);
+            textFlow.AddIcon(FontAwesome.Solid.Lightbulb, icon =>
+            {
+                icon.Colour = Color4Extensions.FromHex("#FF99C7");
+                icon.Size = new Vector2(16);
+            });
+            textFlow.AddText(MenuTipStrings.MenuTipTitle.ToSentence(), formatSemiBold);
             textFlow.AddParagraph(tip, formatRegular);
 
             this
