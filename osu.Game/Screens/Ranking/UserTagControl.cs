@@ -48,7 +48,7 @@ namespace osu.Game.Screens.Ranking
         /// <summary>
         /// Determines whether the user can modify the contained tags
         /// </summary>
-        public bool Writable { get; init; }
+        public bool Writable { private get; init; }
 
         private InputManager inputManager = null!;
 
