@@ -24,6 +24,7 @@ namespace osu.Game.Rulesets.Mania.Configuration
             SetDefault(ManiaRulesetSetting.ScrollDirection, ManiaScrollingDirection.Down);
             SetDefault(ManiaRulesetSetting.TimingBasedNoteColouring, false);
             SetDefault(ManiaRulesetSetting.MobileLayout, ManiaMobileLayout.Portrait);
+            SetDefault(ManiaRulesetSetting.TouchOverlay, false);
         }
 
         public override TrackedSettings CreateTrackedSettings() => new TrackedSettings
@@ -44,5 +45,6 @@ namespace osu.Game.Rulesets.Mania.Configuration
         ScrollDirection,
         TimingBasedNoteColouring,
         MobileLayout,
+        TouchOverlay,
     }
 }
