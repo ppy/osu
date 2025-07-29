@@ -14,6 +14,7 @@ using osu.Game.Input.Bindings;
 using osu.Game.Models;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
+using osu.Game.Skinning;
 using Realms;
 
 namespace osu.Game.Database
@@ -177,6 +178,7 @@ namespace osu.Game.Database
             c.CreateMap<RealmUser, RealmUser>();
             c.CreateMap<RealmFile, RealmFile>();
             c.CreateMap<RealmNamedFileUsage, RealmNamedFileUsage>();
+            c.CreateMap<SkinInfo, SkinInfo>();
         }
 
         /// <summary>

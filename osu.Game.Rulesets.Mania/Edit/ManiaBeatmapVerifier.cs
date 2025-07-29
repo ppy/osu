@@ -16,6 +16,9 @@ namespace osu.Game.Rulesets.Mania.Edit
             // Compose
             new CheckManiaConcurrentObjects(),
 
+            // Spread
+            new CheckManiaLowestDiffDrainTime(),
+
             // Settings
             new CheckKeyCount(),
             new CheckManiaAbnormalDifficultySettings(),

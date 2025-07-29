@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Carousel;
 using osu.Game.Screens.Select;
+using osu.Game.Utils;
 
 namespace osu.Game.Screens.SelectV2
 {
@@ -81,7 +82,7 @@ namespace osu.Game.Screens.SelectV2
 
             if (!match) return false;
 
-            match &= !criteria.StarDifficulty.HasFilter || criteria.StarDifficulty.IsInRange(beatmap.StarRating);
+            match &= !criteria.StarDifficulty.HasFilter || criteria.StarDifficulty.IsInRange(beatmap.StarRating.FloorToDecimalDigits(2));
             match &= !criteria.ApproachRate.HasFilter || criteria.ApproachRate.IsInRange(beatmap.Difficulty.ApproachRate);
             match &= !criteria.DrainRate.HasFilter || criteria.DrainRate.IsInRange(beatmap.Difficulty.DrainRate);
             match &= !criteria.CircleSize.HasFilter || criteria.CircleSize.IsInRange(beatmap.Difficulty.CircleSize);
@@ -104,6 +105,15 @@ namespace osu.Game.Screens.SelectV2
                      criteria.Title.Matches(beatmap.Metadata.TitleUnicode);
             match &= !criteria.DifficultyName.HasFilter || criteria.DifficultyName.Matches(beatmap.DifficultyName);
             match &= !criteria.Source.HasFilter || criteria.Source.Matches(beatmap.Metadata.Source);
+
+            if (criteria.UserTag.HasFilter)
+            {
+                bool anyTagMatched = false;
+                foreach (string tag in beatmap.Metadata.UserTags)
+                    anyTagMatched |= criteria.UserTag.Matches(tag);
+                match &= anyTagMatched;
+            }
+
             match &= !criteria.UserStarDifficulty.HasFilter || criteria.UserStarDifficulty.IsInRange(beatmap.StarRating);
 
             if (!match) return false;

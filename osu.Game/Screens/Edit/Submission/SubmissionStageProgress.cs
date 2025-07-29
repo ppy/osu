@@ -149,6 +149,9 @@ namespace osu.Game.Screens.Edit.Submission
             progress.BindValueChanged(_ => Scheduler.AddOnce(updateProgress), true);
 
             progressSampleChannel = progressSample?.GetChannel();
+            // TODO: add back once framework revert is reverted.
+            // if (progressSampleChannel != null)
+            //     progressSampleChannel.ManualFree = true;
         }
 
         public void SetNotStarted() => status.Value = StageStatusType.NotStarted;
@@ -181,6 +184,7 @@ namespace osu.Game.Screens.Edit.Submission
             base.Dispose(isDisposing);
 
             progressSampleChannel?.Stop();
+            progressSampleChannel?.Dispose();
         }
 
         private const float transition_duration = 200;
