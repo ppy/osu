@@ -42,7 +42,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Unknown"
         /// </summary>
-        public static LocalisableString Unknown => new TranslatableString(getKey(@"unknown"), @"Unknown");
+        public static LocalisableString StatusUnknown => new TranslatableString(getKey(@"status_unknown"), @"Unknown");
 
         /// <summary>
         /// "Total Plays"
