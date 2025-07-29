@@ -101,7 +101,7 @@ namespace osu.Game.Screens.Menu
                 icon.Colour = Color4Extensions.FromHex("#FF99C7");
                 icon.Size = new Vector2(16);
             });
-            textFlow.AddText(MenuTipStrings.MenuTipTitle.ToSentence(), formatSemiBold);
+            textFlow.AddText(" " + MenuTipStrings.MenuTipTitle.ToSentence(), formatSemiBold);
             textFlow.AddParagraph(tip, formatRegular);
 
             this
