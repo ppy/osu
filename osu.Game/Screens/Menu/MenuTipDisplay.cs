@@ -18,7 +18,6 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osuTK;
-using osuTK.Graphics;
 using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Menu
@@ -27,6 +26,9 @@ namespace osu.Game.Screens.Menu
     {
         [Resolved]
         private OsuConfigManager config { get; set; } = null!;
+
+        [Resolved]
+        private OsuColour colours { get; set; } = null!;
 
         private LinkFlowContainer textFlow = null!;
 
@@ -87,10 +89,10 @@ namespace osu.Game.Screens.Menu
 
             static void formatRegular(SpriteText t) => t.Font = OsuFont.GetFont(size: 16, weight: FontWeight.Regular);
 
-            static void formatSemiBold(SpriteText t)
+            void formatSemiBold(SpriteText t)
             {
                 t.Font = OsuFont.GetFont(Typeface.TorusAlternate, 16, weight: FontWeight.SemiBold);
-                t.Colour = Color4Extensions.FromHex("#FF99C7");
+                t.Colour = colours.Pink0;
             }
 
             var tip = getRandomTip();
@@ -98,7 +100,7 @@ namespace osu.Game.Screens.Menu
             textFlow.Clear();
             textFlow.AddIcon(FontAwesome.Solid.Lightbulb, icon =>
             {
-                icon.Colour = Color4Extensions.FromHex("#FF99C7");
+                icon.Colour = colours.Pink0;
                 icon.Size = new Vector2(16);
             });
             textFlow.AddText(" " + MenuTipStrings.MenuTipTitle.ToSentence(), formatSemiBold);
@@ -124,10 +126,12 @@ namespace osu.Game.Screens.Menu
             switch (tipIndex)
             {
                 case 0:
-                    return MenuTipStrings.ToggleToolbarShortcut(keyBindingStore.GetReadableKeyCombinationsFor(GlobalAction.ToggleToolbar).FirstOrDefault() ?? InputSettingsStrings.ActionHasNoKeyBinding);
+                    return MenuTipStrings.ToggleToolbarShortcut(
+                        keyBindingStore.GetReadableKeyCombinationsFor(GlobalAction.ToggleToolbar).FirstOrDefault() ?? InputSettingsStrings.ActionHasNoKeyBinding);
 
                 case 1:
-                    return MenuTipStrings.GameSettingsShortcut(keyBindingStore.GetReadableKeyCombinationsFor(GlobalAction.ToggleSettings).FirstOrDefault() ?? InputSettingsStrings.ActionHasNoKeyBinding);
+                    return MenuTipStrings.GameSettingsShortcut(
+                        keyBindingStore.GetReadableKeyCombinationsFor(GlobalAction.ToggleSettings).FirstOrDefault() ?? InputSettingsStrings.ActionHasNoKeyBinding);
 
                 case 2:
                     return MenuTipStrings.DynamicSettings;
@@ -142,7 +146,8 @@ namespace osu.Game.Screens.Menu
                     return MenuTipStrings.ScreenScalingSettings;
 
                 case 6:
-                    return MenuTipStrings.FreeOsuDirect(keyBindingStore.GetReadableKeyCombinationsFor(GlobalAction.ToggleBeatmapListing).FirstOrDefault() ?? InputSettingsStrings.ActionHasNoKeyBinding);
+                    return MenuTipStrings.FreeOsuDirect(keyBindingStore.GetReadableKeyCombinationsFor(GlobalAction.ToggleBeatmapListing).FirstOrDefault()
+                                                        ?? InputSettingsStrings.ActionHasNoKeyBinding);
 
                 case 7:
                     return MenuTipStrings.ReplaySeeking;
@@ -196,7 +201,8 @@ namespace osu.Game.Screens.Menu
                     return MenuTipStrings.RandomSkinShortcut(keyBindingStore.GetReadableKeyCombinationsFor(GlobalAction.RandomSkin).FirstOrDefault() ?? InputSettingsStrings.ActionHasNoKeyBinding);
 
                 case 24:
-                    return MenuTipStrings.ToggleReplaySettingsShortcut(keyBindingStore.GetReadableKeyCombinationsFor(GlobalAction.ToggleReplaySettings).FirstOrDefault() ?? InputSettingsStrings.ActionHasNoKeyBinding);
+                    return MenuTipStrings.ToggleReplaySettingsShortcut(keyBindingStore.GetReadableKeyCombinationsFor(GlobalAction.ToggleReplaySettings).FirstOrDefault()
+                                                                       ?? InputSettingsStrings.ActionHasNoKeyBinding);
 
                 case 25:
                     return MenuTipStrings.CopyModsFromScore;
