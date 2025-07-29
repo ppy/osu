@@ -165,13 +165,13 @@ namespace osu.Game.Screens.Select.Carousel
 
         protected override bool OnHover(HoverEvent e)
         {
-            icon.Spin(400, RotationDirection.Clockwise);
+            icon.Spin(400, RotationDirection.Clockwise, icon.Rotation);
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            icon.Spin(4000, RotationDirection.Clockwise);
+            icon.Spin(4000, RotationDirection.Clockwise, icon.Rotation);
             base.OnHoverLost(e);
         }
     }

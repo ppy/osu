@@ -25,9 +25,9 @@ namespace osu.Game.Screens.Footer
 {
     public partial class ScreenFooterButton : OsuClickableContainer, IKeyBindingHandler<GlobalAction>
     {
-        public const int Y_OFFSET = 10;
+        public const int CORNER_RADIUS = 10;
 
-        protected const int BUTTON_HEIGHT = 75;
+        public const int HEIGHT = 75;
         protected const int BUTTON_WIDTH = 116;
 
         public Bindable<Visibility> OverlayState = new Bindable<Visibility>();
@@ -75,7 +75,7 @@ namespace osu.Game.Screens.Footer
         {
             Overlay = overlay;
 
-            Size = new Vector2(BUTTON_WIDTH, BUTTON_HEIGHT);
+            Size = new Vector2(BUTTON_WIDTH, HEIGHT);
 
             Children = new Drawable[]
             {
@@ -91,7 +91,7 @@ namespace osu.Game.Screens.Footer
                     },
                     Shear = OsuGame.SHEAR,
                     Masking = true,
-                    CornerRadius = 10,
+                    CornerRadius = CORNER_RADIUS,
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
@@ -138,7 +138,7 @@ namespace osu.Game.Screens.Footer
                             Shear = -OsuGame.SHEAR,
                             Anchor = Anchor.BottomCentre,
                             Origin = Anchor.Centre,
-                            Y = -Y_OFFSET,
+                            Y = -CORNER_RADIUS,
                             Size = new Vector2(100, 5),
                             Masking = true,
                             CornerRadius = 3,

@@ -7,6 +7,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.PolygonExtensions;
@@ -14,7 +16,9 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Events;
 using osu.Framework.Threading;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -22,6 +26,7 @@ using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
+using osu.Game.Online.API;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Online.Placeholders;
 using osu.Game.Overlays;
@@ -39,6 +44,8 @@ namespace osu.Game.Screens.SelectV2
         public const float SPACING_BETWEEN_SCORES = 4;
 
         public IBindable<BeatmapLeaderboardScope> Scope { get; } = new Bindable<BeatmapLeaderboardScope>();
+
+        public IBindable<LeaderboardSortMode> Sorting { get; } = new Bindable<LeaderboardSortMode>();
 
         public IBindable<bool> FilterBySelectedMods { get; } = new BindableBool();
 
@@ -60,6 +67,9 @@ namespace osu.Game.Screens.SelectV2
         [Resolved]
         private ISongSelect? songSelect { get; set; }
 
+        [Resolved]
+        private IAPIProvider api { get; set; } = null!;
+
         private Container<Placeholder> placeholderContainer = null!;
         private Placeholder? placeholder;
 
@@ -78,8 +88,19 @@ namespace osu.Game.Screens.SelectV2
 
         private const float personal_best_height = 112;
 
+        // Blocking mouse down is required to avoid song select's background reveal logic happening while hovering scores.
+        // Our horizontal alignment doesn't really align with the rest of the sheared components (protrudes a touch to the right) which makes
+        // it complicated to handle this at a higher level.
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => scoresScroll.ReceivePositionalInputAt(screenSpacePos);
+
+        protected override bool OnMouseDown(MouseDownEvent e) => true;
+
+        private Sample? swishSample;
+
+        private readonly List<ScheduledDelegate> scoreSfxDelegates = new List<ScheduledDelegate>();
+
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(AudioManager audio)
         {
             RelativeSizeAxes = Axes.Both;
 
@@ -160,6 +181,8 @@ namespace osu.Game.Screens.SelectV2
                     loading = new LoadingLayer(),
                 }
             };
+
+            swishSample = audio.Samples.Get(@"SongSelect/leaderboard-score");
         }
 
         protected override void LoadComplete()
@@ -167,6 +190,7 @@ namespace osu.Game.Screens.SelectV2
             base.LoadComplete();
 
             Scope.BindValueChanged(_ => refetchScores());
+            Sorting.BindValueChanged(_ => refetchScores());
             FilterBySelectedMods.BindValueChanged(_ => refetchScores());
             beatmap.BindValueChanged(_ => refetchScores());
             ruleset.BindValueChanged(_ => refetchScores());
@@ -197,27 +221,27 @@ namespace osu.Game.Screens.SelectV2
 
         private void refetchScores()
         {
+            SetScores(Array.Empty<ScoreInfo>());
+
+            if (beatmap.IsDefault)
+            {
+                SetState(LeaderboardState.NoneSelected);
+                return;
+            }
+
+            SetState(LeaderboardState.Retrieving);
+
             refetchOperation?.Cancel();
             refetchOperation = Scheduler.AddDelayed(() =>
             {
-                SetScores(Array.Empty<ScoreInfo>());
-
-                if (beatmap.IsDefault)
-                {
-                    SetState(LeaderboardState.NoneSelected);
-                    return;
-                }
-
-                SetState(LeaderboardState.Retrieving);
-
                 var fetchBeatmapInfo = beatmap.Value.BeatmapInfo;
                 var fetchRuleset = ruleset.Value ?? fetchBeatmapInfo.Ruleset;
+                var fetchSorting = Scope.Value == BeatmapLeaderboardScope.Local ? Sorting.Value : LeaderboardSortMode.Score;
 
                 // For now, we forcefully refresh to keep things simple.
                 // In the future, removing this requirement may be deemed useful, but will need ample testing of edge case scenarios
                 // (like returning from gameplay after setting a new score, returning to song select after main menu).
-                leaderboardManager.FetchWithCriteria(new LeaderboardCriteria(fetchBeatmapInfo, fetchRuleset, Scope.Value, FilterBySelectedMods.Value ? mods.Value.ToArray() : null),
-                    forceRefresh: true);
+                leaderboardManager.FetchWithCriteria(new LeaderboardCriteria(fetchBeatmapInfo, fetchRuleset, Scope.Value, FilterBySelectedMods.Value ? mods.Value.ToArray() : null, fetchSorting), forceRefresh: true);
 
                 if (!initialFetchComplete)
                 {
@@ -226,7 +250,7 @@ namespace osu.Game.Screens.SelectV2
                     fetchedScores.BindValueChanged(_ => updateScores(), true);
                     initialFetchComplete = true;
                 }
-            }, initialFetchComplete ? 200 : 0);
+            }, initialFetchComplete ? 300 : 0);
         }
 
         private void updateScores()
@@ -246,6 +270,9 @@ namespace osu.Game.Screens.SelectV2
             cancellationTokenSource?.Cancel();
             cancellationTokenSource = new CancellationTokenSource();
 
+            scoreSfxDelegates.ForEach(d => d.Cancel());
+            scoreSfxDelegates.Clear();
+
             clearScores();
             SetState(LeaderboardState.Success);
 
@@ -255,12 +282,22 @@ namespace osu.Game.Screens.SelectV2
                 return;
             }
 
-            LoadComponentsAsync(scores.Select((s, i) => new BeatmapLeaderboardScore(s)
+            LoadComponentsAsync(scores.Select((s, i) =>
             {
-                Rank = i + 1,
-                IsPersonalBest = s.OnlineID == userScore?.OnlineID,
-                SelectedMods = { BindTarget = mods },
-                Action = () => onLeaderboardScoreClicked(s),
+                BeatmapLeaderboardScore.HighlightType? highlightType = null;
+
+                if (s.OnlineID == userScore?.OnlineID)
+                    highlightType = BeatmapLeaderboardScore.HighlightType.Own;
+                else if (api.Friends.Any(r => r.TargetID == s.UserID) && Scope.Value != BeatmapLeaderboardScope.Friend)
+                    highlightType = BeatmapLeaderboardScore.HighlightType.Friend;
+
+                return new BeatmapLeaderboardScore(s)
+                {
+                    Rank = i + 1,
+                    Highlight = highlightType,
+                    SelectedMods = { BindTarget = mods },
+                    Action = () => onLeaderboardScoreClicked(s),
+                };
             }), loadedScores =>
             {
                 int delay = 200;
@@ -282,6 +319,23 @@ namespace osu.Game.Screens.SelectV2
                      .FadeIn(300, Easing.OutQuint)
                      .MoveToX(0f, 300, Easing.OutQuint);
 
+                    bool visible = d.ScreenSpaceDrawQuad.TopLeft.Y < d.Parent!.ChildMaskingBounds.BottomLeft.Y;
+
+                    if (visible)
+                    {
+                        var del = Scheduler.AddDelayed(() =>
+                        {
+                            var chan = swishSample?.GetChannel();
+                            if (chan == null) return;
+
+                            chan.Balance.Value = -OsuGameBase.SFX_STEREO_STRENGTH;
+                            chan.Frequency.Value = 0.98f + RNG.NextDouble(0.04f);
+                            chan.Play();
+                        }, delay);
+
+                        scoreSfxDelegates.Add(del);
+                    }
+
                     delay += 30;
                     i++;
                 }
@@ -293,7 +347,7 @@ namespace osu.Game.Screens.SelectV2
                 personalBestDisplay.FadeIn(600, Easing.OutQuint);
                 personalBestScoreContainer.Child = new BeatmapLeaderboardScore(userScore)
                 {
-                    IsPersonalBest = true,
+                    Highlight = BeatmapLeaderboardScore.HighlightType.Own,
                     Rank = userScore.Position,
                     SelectedMods = { BindTarget = mods },
                     Action = () => onLeaderboardScoreClicked(userScore),
@@ -375,8 +429,7 @@ namespace osu.Game.Screens.SelectV2
             float fadeBottom = (float)(scoresScroll.Current + scoresScroll.DrawHeight);
             float fadeTop = (float)(scoresScroll.Current);
 
-            if (!scoresScroll.IsScrolledToStart())
-                fadeTop += height;
+            fadeTop += (float)Math.Min(height, Math.Log10(Math.Max(fadeTop, 0) + 1) * height);
 
             foreach (var c in scoresContainer)
             {
