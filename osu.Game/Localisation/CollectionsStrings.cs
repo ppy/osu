@@ -12,7 +12,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Manage collections"
         /// </summary>
-        public static LocalisableString ManageCollectionsTitle => new TranslatableString(getKey(@"manage_collections_title"), @"Manage collections");
+        public static LocalisableString ManageCollectionsTitle => new TranslatableString(getKey(@"manage_collections_title"), @"Manage Collections");
 
         /// <summary>
         /// "Collection"
