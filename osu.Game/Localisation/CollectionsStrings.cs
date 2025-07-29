@@ -10,7 +10,7 @@ namespace osu.Game.Localisation
         private const string prefix = @"osu.Game.Resources.Localisation.Collections";
 
         /// <summary>
-        /// "Manage collections"
+        /// "Manage Collections"
         /// </summary>
         public static LocalisableString ManageCollectionsTitle => new TranslatableString(getKey(@"manage_collections_title"), @"Manage Collections");
 
