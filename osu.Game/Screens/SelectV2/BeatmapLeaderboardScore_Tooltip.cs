@@ -1,8 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
@@ -12,9 +17,13 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
+using osu.Framework.Utils;
+using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Localisation;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays;
 using osu.Game.Resources.Localisation.Web;
@@ -88,21 +97,28 @@ namespace osu.Game.Screens.SelectV2
                 private DrawableDate relativeDate = null!;
                 private FillFlowContainer statistics = null!;
 
+                private readonly Bindable<bool> prefer24HourTime = new Bindable<bool>();
+
                 [Resolved]
                 private OsuColour colours { get; set; } = null!;
 
                 [Resolved]
                 private OverlayColourProvider colourProvider { get; set; } = null!;
 
+                private ScoreInfo score = null!;
+
                 public ScoreInfo Score
                 {
+                    get => score;
                     set
                     {
-                        absoluteDate.Text = value.Date.ToLocalisableString(@"dd MMMM yyyy h:mm tt");
+                        score = value;
+
+                        updateAbsoluteDate();
                         relativeDate.Date = value.Date;
 
                         var judgementsStatistics = value.GetStatisticsForDisplay().Select(s =>
-                            new StatisticRow(s.DisplayName.ToUpper(), colours.ForHitResult(s.Result), s.Count.ToLocalisableString("N0")));
+                            new StatisticRow(s.DisplayName.ToUpper(), s.Count.ToLocalisableString("N0"), colours.ForHitResult(s.Result)));
 
                         double multiplier = 1.0;
 
@@ -111,18 +127,12 @@ namespace osu.Game.Screens.SelectV2
 
                         var generalStatistics = new[]
                         {
-                            new StatisticRow("Score Multiplier", colourProvider.Content2, ModUtils.FormatScoreMultiplier(multiplier)),
-                            new StatisticRow(BeatmapsetsStrings.ShowScoreboardHeadersCombo, colourProvider.Content2, value.MaxCombo.ToLocalisableString(@"0\x")),
-                            new StatisticRow(BeatmapsetsStrings.ShowScoreboardHeadersAccuracy, colourProvider.Content2, value.Accuracy.FormatAccuracy()),
+                            new StatisticRow(BeatmapsetsStrings.ShowScoreboardHeadersCombo, value.MaxCombo.ToLocalisableString(@"0\x")),
+                            new StatisticRow(BeatmapsetsStrings.ShowScoreboardHeadersAccuracy, value.Accuracy.FormatAccuracy()),
+                            new PerformanceStatisticRow(BeatmapsetsStrings.ShowScoreboardHeaderspp.ToUpper(), score),
+                            Empty().With(d => d.Height = 20),
+                            new StatisticRow(ModSelectOverlayStrings.ScoreMultiplier, ModUtils.FormatScoreMultiplier(multiplier)),
                         };
-
-                        if (value.PP != null)
-                        {
-                            generalStatistics = new[]
-                            {
-                                new StatisticRow(BeatmapsetsStrings.ShowScoreboardHeaderspp.ToUpper(), colourProvider.Content2, value.PP.ToLocalisableString("N0"))
-                            }.Concat(generalStatistics).ToArray();
-                        }
 
                         statistics.ChildrenEnumerable = judgementsStatistics
                                                         .Append(Empty().With(d => d.Height = 20))
@@ -131,7 +141,7 @@ namespace osu.Game.Screens.SelectV2
                 }
 
                 [BackgroundDependencyLoader]
-                private void load()
+                private void load(OsuConfigManager configManager)
                 {
                     RelativeSizeAxes = Axes.X;
                     AutoSizeAxes = Axes.Y;
@@ -197,7 +207,7 @@ namespace osu.Game.Screens.SelectV2
                                         {
                                             RelativeSizeAxes = Axes.X,
                                             AutoSizeAxes = Axes.Y,
-                                            Spacing = new Vector2(0f, 4f),
+                                            Spacing = new Vector2(0f, 2f),
                                             Padding = new MarginPadding(8f),
                                         },
                                     },
@@ -205,25 +215,43 @@ namespace osu.Game.Screens.SelectV2
                             },
                         },
                     };
+
+                    configManager.BindWith(OsuSetting.Prefer24HourTime, prefer24HourTime);
                 }
+
+                protected override void LoadComplete()
+                {
+                    base.LoadComplete();
+
+                    prefer24HourTime.BindValueChanged(_ => updateAbsoluteDate(), true);
+                }
+
+                private void updateAbsoluteDate()
+                    => absoluteDate.Text = score.Date.ToLocalTime().ToLocalisableString(prefer24HourTime.Value ? @"d MMMM yyyy HH:mm" : @"d MMMM yyyy h:mm tt");
             }
 
-            private partial class StatisticRow : CompositeDrawable
+            public partial class StatisticRow : CompositeDrawable
             {
-                public StatisticRow(LocalisableString label, Color4 labelColour, LocalisableString value)
+                private readonly OsuSpriteText labelText;
+                protected readonly OsuSpriteText ValueText;
+
+                private readonly Color4? colour;
+
+                public StatisticRow(LocalisableString label, LocalisableString value, Color4? colour = null)
                 {
+                    this.colour = colour;
+
                     RelativeSizeAxes = Axes.X;
                     AutoSizeAxes = Axes.Y;
 
                     InternalChildren = new[]
                     {
-                        new OsuSpriteText
+                        labelText = new OsuSpriteText
                         {
                             Text = label,
-                            Colour = labelColour,
                             Font = OsuFont.Style.Caption2.With(weight: FontWeight.SemiBold),
                         },
-                        new OsuSpriteText
+                        ValueText = new OsuSpriteText
                         {
                             Anchor = Anchor.TopRight,
                             Origin = Anchor.TopRight,
@@ -232,6 +260,69 @@ namespace osu.Game.Screens.SelectV2
                             Font = OsuFont.Style.Caption2,
                         },
                     };
+                }
+
+                [BackgroundDependencyLoader]
+                private void load(OverlayColourProvider colourProvider)
+                {
+                    labelText.Colour = colour ?? colourProvider.Content2;
+                    ValueText.Colour = Interpolation.ValueAt(0.85f, colourProvider.Content1, colour ?? colourProvider.Content1, 0, 1);
+                }
+            }
+
+            public partial class PerformanceStatisticRow : StatisticRow
+            {
+                private readonly ScoreInfo score;
+
+                public PerformanceStatisticRow(LocalisableString label, ScoreInfo score)
+                    : base(label, @"0pp")
+                {
+                    this.score = score;
+                }
+
+                [BackgroundDependencyLoader]
+                private void load(BeatmapDifficultyCache difficultyCache, CancellationToken? cancellationToken)
+                {
+                    if (score.PP.HasValue)
+                    {
+                        setPerformanceValue(score, score.PP.Value);
+                        return;
+                    }
+
+                    Task.Run(async () =>
+                    {
+                        var attributes = await difficultyCache.GetDifficultyAsync(score.BeatmapInfo!, score.Ruleset, score.Mods, cancellationToken ?? default).ConfigureAwait(false);
+                        var performanceCalculator = score.Ruleset.CreateInstance().CreatePerformanceCalculator();
+
+                        // Performance calculation requires the beatmap and ruleset to be locally available. If not, return a default value.
+                        if (attributes?.DifficultyAttributes == null || performanceCalculator == null)
+                            return;
+
+                        var result = await performanceCalculator.CalculateAsync(score, attributes.Value.DifficultyAttributes, cancellationToken ?? CancellationToken.None).ConfigureAwait(false);
+
+                        Schedule(() => setPerformanceValue(score, result.Total));
+                    }, cancellationToken ?? default);
+                }
+
+                private void setPerformanceValue(ScoreInfo scoreInfo, double pp)
+                {
+                    int ppValue = (int)Math.Round(pp, MidpointRounding.AwayFromZero);
+                    ValueText.Text = LocalisableString.Interpolate(@$"{ppValue:N0}pp");
+
+                    if (!scoreInfo.BeatmapInfo!.Status.GrantsPerformancePoints() || hasUnrankedMods(scoreInfo))
+                        Alpha = 0.5f;
+                    else
+                        Alpha = 1f;
+                }
+
+                private static bool hasUnrankedMods(ScoreInfo scoreInfo)
+                {
+                    IEnumerable<Mod> modsToCheck = scoreInfo.Mods;
+
+                    if (scoreInfo.IsLegacyScore)
+                        modsToCheck = modsToCheck.Where(m => m is not ModClassic);
+
+                    return modsToCheck.Any(m => !m.Ranked);
                 }
             }
 

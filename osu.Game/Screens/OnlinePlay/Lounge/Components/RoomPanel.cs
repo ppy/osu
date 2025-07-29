@@ -17,6 +17,7 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Database;
@@ -54,11 +55,13 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         protected readonly Bindable<PlaylistItem?> SelectedItem = new Bindable<PlaylistItem?>();
         protected Container ButtonsContainer { get; private set; } = null!;
 
+        protected bool ShowExternalLink { get; init; } = true;
+
         private DrawableRoomParticipantsList? drawableRoomParticipantsList;
         private RoomSpecialCategoryPill? specialCategoryPill;
         private PasswordProtectedIcon? passwordIcon;
         private EndDateInfo? endDateInfo;
-        private SpriteText? roomName;
+        private RoomNameLine? roomName;
         private DelayedLoadWrapper wrapper = null!;
         private CancellationTokenSource? beatmapLookupCancellation;
 
@@ -204,11 +207,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                                                 Direction = FillDirection.Vertical,
                                                                 Children = new Drawable[]
                                                                 {
-                                                                    roomName = new TruncatingSpriteText
-                                                                    {
-                                                                        RelativeSizeAxes = Axes.X,
-                                                                        Font = OsuFont.GetFont(size: 28)
-                                                                    },
+                                                                    roomName = new RoomNameLine(),
                                                                     new RoomStatusText(Room)
                                                                     {
                                                                         Beatmap = { BindTarget = currentBeatmap }
@@ -279,6 +278,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
                 wrapper.FadeInFromZero(200);
 
+                updateRoomID();
                 updateRoomName();
                 updateRoomCategory();
                 updateRoomType();
@@ -292,6 +292,10 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         {
             switch (e.PropertyName)
             {
+                case nameof(Room.RoomID):
+                    updateRoomID();
+                    break;
+
                 case nameof(Room.Name):
                     updateRoomName();
                     break;
@@ -333,6 +337,12 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                   if (!cancellationSource.IsCancellationRequested)
                                       currentBeatmap.Value = task.GetResultSafely();
                               }), cancellationSource.Token);
+        }
+
+        private void updateRoomID()
+        {
+            if (roomName != null && ShowExternalLink)
+                roomName.Link = Room.GetOnlineURL(api);
         }
 
         private void updateRoomName()
@@ -381,17 +391,17 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             {
                 var items = new List<MenuItem>();
 
-                if (Room.RoomID.HasValue)
+                string? url = Room.GetOnlineURL(api);
+
+                if (url != null)
                 {
                     items.AddRange([
-                        new OsuMenuItem("View in browser", MenuItemType.Standard, () => game?.OpenUrlExternally(formatRoomUrl(Room.RoomID.Value))),
-                        new OsuMenuItem("Copy link", MenuItemType.Standard, () => game?.CopyToClipboard(formatRoomUrl(Room.RoomID.Value)))
+                        new OsuMenuItem("View in browser", MenuItemType.Standard, () => game?.OpenUrlExternally(url)),
+                        new OsuMenuItem("Copy link", MenuItemType.Standard, () => game?.CopyToClipboard(url))
                     ]);
                 }
 
                 return items.ToArray();
-
-                string formatRoomUrl(long id) => $@"{api.Endpoints.WebsiteUrl}/multiplayer/rooms/{id}";
             }
         }
 
@@ -554,6 +564,71 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                         Size = new Vector2(14),
                     }
                 };
+            }
+        }
+
+        public partial class RoomNameLine : FillFlowContainer
+        {
+            private readonly TruncatingSpriteText spriteText;
+            private readonly ExternalLinkButton linkButton;
+
+            public LocalisableString Text
+            {
+                get => spriteText.Text;
+                set => spriteText.Text = value;
+            }
+
+            private string? link;
+
+            public string? Link
+            {
+                get => link;
+                set
+                {
+                    link = value;
+                    updateLink();
+                }
+            }
+
+            public RoomNameLine()
+            {
+                RelativeSizeAxes = Axes.X;
+                AutoSizeAxes = Axes.Y;
+                Direction = FillDirection.Horizontal;
+
+                Children = new Drawable[]
+                {
+                    spriteText = new TruncatingSpriteText
+                    {
+                        Anchor = Anchor.BottomLeft,
+                        Origin = Anchor.BottomLeft,
+                        Font = OsuFont.GetFont(size: 28),
+                    },
+                    linkButton = new ExternalLinkButton
+                    {
+                        Anchor = Anchor.BottomLeft,
+                        Origin = Anchor.BottomLeft,
+                        Margin = new MarginPadding { Horizontal = 6, Bottom = 4 },
+                        Alpha = 0f,
+                    },
+                };
+            }
+
+            private void updateLink()
+            {
+                if (link == null)
+                    linkButton.Hide();
+                else
+                {
+                    linkButton.Show();
+                    linkButton.Link = link;
+                }
+            }
+
+            protected override void Update()
+            {
+                base.Update();
+                spriteText.MaxWidth = DrawWidth - linkButton.LayoutSize.X;
             }
         }
     }

@@ -17,6 +17,7 @@ using osu.Framework.Testing;
 using osu.Framework.Threading;
 using osu.Game.Online.API;
 using osu.Game.Beatmaps;
+using osu.Game.Overlays.Mods;
 using osu.Game.Overlays.Settings;
 using osu.Game.Overlays.SkinEditor;
 using osu.Game.Rulesets.Mods;
@@ -26,17 +27,19 @@ using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.HUD.HitErrorMeters;
+using osu.Game.Screens.SelectV2;
 using osu.Game.Skinning;
 using osu.Game.Tests.Beatmaps.IO;
 using osuTK;
 using osuTK.Input;
-using static osu.Game.Tests.Visual.Navigation.TestSceneScreenNavigation;
 
 namespace osu.Game.Tests.Visual.Navigation
 {
     public partial class TestSceneSkinEditorNavigation : OsuGameTestScene
     {
-        private TestPlaySongSelect songSelect;
+        private SoloSongSelect songSelect;
+        private ModSelectOverlay modSelect => songSelect.ChildrenOfType<ModSelectOverlay>().First();
+
         private SkinEditor skinEditor => Game.ChildrenOfType<SkinEditor>().FirstOrDefault();
 
         [Test]
@@ -331,10 +334,10 @@ namespace osu.Game.Tests.Visual.Navigation
         public void TestModOverlayClosesOnOpeningSkinEditor()
         {
             advanceToSongSelect();
-            AddStep("open mod overlay", () => songSelect.ModSelectOverlay.Show());
+            AddStep("open mod overlay", () => modSelect.Show());
 
             openSkinEditor();
-            AddUntilStep("mod overlay closed", () => songSelect.ModSelectOverlay.State.Value == Visibility.Hidden);
+            AddUntilStep("mod overlay closed", () => modSelect.State.Value == Visibility.Hidden);
         }
 
         [Test]
@@ -448,8 +451,8 @@ namespace osu.Game.Tests.Visual.Navigation
 
         private void advanceToSongSelect()
         {
-            PushAndConfirm(() => songSelect = new TestPlaySongSelect());
-            AddUntilStep("wait for song select", () => songSelect.BeatmapSetsLoaded);
+            PushAndConfirm(() => songSelect = new SoloSongSelect());
+            AddUntilStep("wait for song select", () => songSelect.CarouselItemsPresented);
         }
 
         private void openSkinEditor()

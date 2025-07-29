@@ -148,5 +148,96 @@ namespace osu.Game.Rulesets.Taiko.Tests.Mods
             },
             PassCondition = () => Player.ScoreProcessor.Combo.Value == 8 && Player.ScoreProcessor.Accuracy.Value == 1
         });
+
+        /// <summary>
+        /// Regression tests a case of 1/3rd conversion where there are exactly div-3 number of hitobjects.
+        /// </summary>
+        [Test]
+        public void TestOnlyOneThirdConversion()
+        {
+            CreateModTest(new ModTestData
+            {
+                Mod = new TaikoModSimplifiedRhythm
+                {
+                    OneThirdConversion = { Value = true },
+                },
+                Autoplay = false,
+                CreateBeatmap = () => new Beatmap
+                {
+                    HitObjects = new List<HitObject>
+                    {
+                        new Hit { StartTime = 1000, Type = HitType.Centre },
+                        new Hit { StartTime = 1333, Type = HitType.Centre }, // mod removes this
+                        new Hit { StartTime = 1666, Type = HitType.Centre }, // mod moves this to 1500
+                        new Hit { StartTime = 2000, Type = HitType.Centre },
+                        new Hit { StartTime = 2333, Type = HitType.Centre }, // mod removes this
+                        new Hit { StartTime = 2666, Type = HitType.Centre }, // mod moves this to 2500
+                    },
+                },
+                ReplayFrames = new List<ReplayFrame>
+                {
+                    new TaikoReplayFrame(1000, TaikoAction.LeftCentre),
+                    new TaikoReplayFrame(1200),
+                    new TaikoReplayFrame(1500, TaikoAction.LeftCentre),
+                    new TaikoReplayFrame(1700),
+                    new TaikoReplayFrame(2000, TaikoAction.LeftCentre),
+                    new TaikoReplayFrame(2200),
+                    new TaikoReplayFrame(2500, TaikoAction.LeftCentre),
+                    new TaikoReplayFrame(2700),
+                },
+                PassCondition = () => Player.ScoreProcessor.Combo.Value == 4 && Player.ScoreProcessor.Accuracy.Value == 1
+            });
+        }
+
+        /// <summary>
+        /// Regression tests a case of 1/6th conversion where there are exactly div-6 number of hitobjects.
+        /// </summary>
+        [Test]
+        public void TestOnlyOneSixthConversion() => CreateModTest(new ModTestData
+        {
+            Mod = new TaikoModSimplifiedRhythm
+            {
+                OneSixthConversion = { Value = true }
+            },
+            Autoplay = false,
+            CreateBeatmap = () => new Beatmap
+            {
+                HitObjects = new List<HitObject>
+                {
+                    new Hit { StartTime = 1000, Type = HitType.Centre },
+                    new Hit { StartTime = 1166, Type = HitType.Centre }, // mod removes this
+                    new Hit { StartTime = 1333, Type = HitType.Centre }, // mod moves this to 1250
+                    new Hit { StartTime = 1500, Type = HitType.Centre },
+                    new Hit { StartTime = 1666, Type = HitType.Centre }, // mod removes this
+                    new Hit { StartTime = 1833, Type = HitType.Centre }, // mod moves this to 1750
+                    new Hit { StartTime = 2000, Type = HitType.Centre },
+                    new Hit { StartTime = 2166, Type = HitType.Centre }, // mod removes this
+                    new Hit { StartTime = 2333, Type = HitType.Centre }, // mod moves this to 2250
+                    new Hit { StartTime = 2500, Type = HitType.Centre },
+                    new Hit { StartTime = 2666, Type = HitType.Centre }, // mod removes this
+                    new Hit { StartTime = 2833, Type = HitType.Centre }, // mod moves this to 2750
+                },
+            },
+            ReplayFrames = new List<ReplayFrame>
+            {
+                new TaikoReplayFrame(1000, TaikoAction.LeftCentre),
+                new TaikoReplayFrame(1200),
+                new TaikoReplayFrame(1250, TaikoAction.LeftCentre),
+                new TaikoReplayFrame(1450),
+                new TaikoReplayFrame(1500, TaikoAction.LeftCentre),
+                new TaikoReplayFrame(1600),
+                new TaikoReplayFrame(1750, TaikoAction.LeftCentre),
+                new TaikoReplayFrame(1800),
+                new TaikoReplayFrame(2000, TaikoAction.LeftCentre),
+                new TaikoReplayFrame(2200),
+                new TaikoReplayFrame(2250, TaikoAction.LeftCentre),
+                new TaikoReplayFrame(2450),
+                new TaikoReplayFrame(2500, TaikoAction.LeftCentre),
+                new TaikoReplayFrame(2600),
+                new TaikoReplayFrame(2750, TaikoAction.LeftCentre),
+                new TaikoReplayFrame(2800),
+            },
+            PassCondition = () => Player.ScoreProcessor.Combo.Value == 8 && Player.ScoreProcessor.Accuracy.Value == 1
+        });
     }
 }

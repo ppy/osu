@@ -107,7 +107,14 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             CentreMarker centreMarker;
 
             // We don't want the centre marker to scroll
-            AddInternal(centreMarker = new CentreMarker());
+            AddInternal(centreMarker = new CentreMarker
+            {
+                Anchor = Anchor.TopCentre,
+                Origin = Anchor.TopCentre,
+                Width = 8,
+                TriangleHeightRatio = 0.8f,
+                Colour = colourProvider.Colour2
+            });
 
             AddRange(new Drawable[]
             {

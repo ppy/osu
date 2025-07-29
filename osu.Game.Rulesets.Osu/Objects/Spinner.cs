@@ -21,12 +21,12 @@ namespace osu.Game.Rulesets.Osu.Objects
         /// <summary>
         /// The RPM required to clear the spinner at ODs [ 0, 5, 10 ].
         /// </summary>
-        private static readonly (int min, int mid, int max) clear_rpm_range = (90, 150, 225);
+        private static readonly DifficultyRange clear_rpm_range = new DifficultyRange(90, 150, 225);
 
         /// <summary>
         /// The RPM required to complete the spinner and receive full score at ODs [ 0, 5, 10 ].
         /// </summary>
-        private static readonly (int min, int mid, int max) complete_rpm_range = (250, 380, 430);
+        private static readonly DifficultyRange complete_rpm_range = new DifficultyRange(250, 380, 430);
 
         public double EndTime
         {

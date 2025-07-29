@@ -383,6 +383,9 @@ namespace osu.Game.Tests.NonVisual
                 IsImportant = isImportant;
                 FrameIndex = frameIndex;
             }
+
+            public override bool IsEquivalentTo(ReplayFrame other)
+                => other is TestReplayFrame testFrame && Time == testFrame.Time && IsImportant == testFrame.IsImportant && FrameIndex == testFrame.FrameIndex;
         }
 
         private class TestInputHandler : FramedReplayInputHandler<TestReplayFrame>

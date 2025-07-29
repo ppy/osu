@@ -36,7 +36,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("toggle expanded", () =>
             {
                 if (leaderboard.IsNotNull())
-                    leaderboard.ForceExpand.Value = !leaderboard.ForceExpand.Value;
+                    leaderboard.CollapseDuringGameplay.Value = !leaderboard.CollapseDuringGameplay.Value;
             });
 
             AddSliderStep("set player score", 50, 5000000, 1222333, v => playerScore.Value = v);

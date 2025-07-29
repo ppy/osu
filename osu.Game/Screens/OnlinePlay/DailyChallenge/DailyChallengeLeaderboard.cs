@@ -158,13 +158,23 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                 }
                 else
                 {
-                    LoadComponentsAsync(best.Select((s, index) => new BeatmapLeaderboardScore(s, sheared: false)
+                    LoadComponentsAsync(best.Select((s, index) =>
                     {
-                        Rank = index + 1,
-                        IsPersonalBest = s.UserID == api.LocalUser.Value.Id,
-                        Action = () => PresentScore?.Invoke(s.OnlineID),
-                        SelectedMods = { BindTarget = SelectedMods },
-                        IsValidMod = IsValidMod,
+                        BeatmapLeaderboardScore.HighlightType? highlightType = null;
+
+                        if (s.UserID == api.LocalUser.Value.Id)
+                            highlightType = BeatmapLeaderboardScore.HighlightType.Own;
+                        else if (api.Friends.Any(r => r.TargetID == s.UserID))
+                            highlightType = BeatmapLeaderboardScore.HighlightType.Friend;
+
+                        return new BeatmapLeaderboardScore(s, sheared: false)
+                        {
+                            Rank = index + 1,
+                            Highlight = highlightType,
+                            Action = () => PresentScore?.Invoke(s.OnlineID),
+                            SelectedMods = { BindTarget = SelectedMods },
+                            IsValidMod = IsValidMod,
+                        };
                     }), loaded =>
                     {
                         scoreFlow.Clear();
@@ -181,7 +191,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                     userBestContainer.Add(new BeatmapLeaderboardScore(userBest, sheared: false)
                     {
                         Rank = userBest.Position,
-                        IsPersonalBest = true,
+                        Highlight = BeatmapLeaderboardScore.HighlightType.Own,
                         Action = () => PresentScore?.Invoke(userBest.OnlineID),
                         SelectedMods = { BindTarget = SelectedMods },
                         IsValidMod = IsValidMod,

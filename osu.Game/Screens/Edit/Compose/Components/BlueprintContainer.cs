@@ -166,6 +166,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected override void OnMouseUp(MouseUpEvent e)
         {
+            // When an object is being dragged, ONLY a left MouseUpEvent should end the drag and finalize the changes caused by the drag.
+            // Otherwise, other mouse inputs while a drag is occurring will cause change transactions to lock up.
+            if (e.Button != MouseButton.Left)
+                return;
+
             // Special case for when a drag happened instead of a click
             Schedule(() =>
             {

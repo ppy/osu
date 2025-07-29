@@ -19,6 +19,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString NoPPForUnrankedMods => new TranslatableString(getKey(@"no_pp_for_unranked_mods"), @"Performance points are not granted for this score because of unranked mods.");
 
+        /// <summary>
+        /// "Performance points are not granted for failed scores."
+        /// </summary>
+        public static LocalisableString NoPPForFailedScores => new TranslatableString(getKey(@"no_pp_for_failed_scores"), @"Performance points are not granted for failed scores.");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

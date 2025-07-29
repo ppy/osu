@@ -33,6 +33,7 @@ using osu.Game.Scoring;
 using osu.Game.Screens.Edit.Setup;
 using osu.Game.Screens.Ranking.Statistics;
 using osu.Game.Skinning;
+using osu.Game.Utils;
 using osuTK;
 
 namespace osu.Game.Rulesets.Catch
@@ -266,9 +267,10 @@ namespace osu.Game.Rulesets.Catch
         }
 
         /// <seealso cref="CatchHitObject.ApplyDefaultsToSelf"/>
-        public override BeatmapDifficulty GetRateAdjustedDisplayDifficulty(IBeatmapDifficultyInfo difficulty, double rate)
+        public override BeatmapDifficulty GetAdjustedDisplayDifficulty(IBeatmapDifficultyInfo difficulty, IReadOnlyCollection<Mod> mods)
         {
             BeatmapDifficulty adjustedDifficulty = new BeatmapDifficulty(difficulty);
+            double rate = ModUtils.CalculateRateWithMods(mods);
 
             double preempt = IBeatmapDifficultyInfo.DifficultyRange(adjustedDifficulty.ApproachRate, CatchHitObject.PREEMPT_MAX, CatchHitObject.PREEMPT_MID, CatchHitObject.PREEMPT_MIN);
             preempt /= rate;

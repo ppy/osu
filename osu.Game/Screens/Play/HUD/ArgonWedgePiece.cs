@@ -22,7 +22,7 @@ namespace osu.Game.Screens.Play.HUD
         [SettingSource("Inverted shear")]
         public BindableBool InvertShear { get; } = new BindableBool();
 
-        [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.Colour), nameof(SkinnableComponentStrings.ColourDescription))]
+        [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.Colour))]
         public BindableColour4 AccentColour { get; } = new BindableColour4(Color4Extensions.FromHex("#66CCFF"));
 
         public ArgonWedgePiece()

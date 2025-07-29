@@ -4,13 +4,14 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Platform;
+using osu.Game.Configuration;
 using osu.Game.Online.API;
-using osu.Game.Overlays.Notifications;
 
 namespace osu.Game.Updater
 {
@@ -20,7 +21,10 @@ namespace osu.Game.Updater
     /// </summary>
     public partial class MobileUpdateNotifier : UpdateManager
     {
+        public override ReleaseStream? FixedReleaseStream => stream;
+
         private string version = null!;
+        private ReleaseStream stream;
 
         [Resolved]
         private GameHost host { get; set; } = null!;
@@ -28,27 +32,30 @@ namespace osu.Game.Updater
         [BackgroundDependencyLoader]
         private void load(OsuGameBase game)
         {
-            version = game.Version;
+            version = game.Version.Split('-').First();
+            stream = Enum.TryParse(game.Version.Split('-').Last(), true, out ReleaseStream s) ? s : Configuration.ReleaseStream.Lazer;
         }
 
-        protected override async Task<bool> PerformUpdateCheck()
+        protected override async Task<bool> PerformUpdateCheck(CancellationToken cancellationToken)
         {
             try
             {
-                var releases = new OsuJsonWebRequest<GitHubRelease>("https://api.github.com/repos/ppy/osu/releases/latest");
+                bool includePrerelease = stream == Configuration.ReleaseStream.Tachyon;
 
-                await releases.PerformAsync().ConfigureAwait(false);
+                OsuJsonWebRequest<GitHubRelease[]> releasesRequest = new OsuJsonWebRequest<GitHubRelease[]>("https://api.github.com/repos/ppy/osu/releases?per_page=10&page=1");
+                await releasesRequest.PerformAsync(cancellationToken).ConfigureAwait(false);
 
-                var latest = releases.ResponseObject;
+                GitHubRelease[] releases = releasesRequest.ResponseObject;
+                GitHubRelease? latest = releases.OrderByDescending(r => r.PublishedAt).FirstOrDefault(r => includePrerelease || !r.Prerelease);
 
-                // avoid any discrepancies due to build suffixes for now.
-                // eventually we will want to support release streams and consider these.
-                version = version.Split('-').First();
+                if (latest == null)
+                    return false;
+
                 string latestTagName = latest.TagName.Split('-').First();
 
                 if (latestTagName != version && tryGetBestUrl(latest, out string? url))
                 {
-                    Notifications.Post(new SimpleNotification
+                    Notifications.Post(new UpdateAvailableNotification(cancellationToken)
                     {
                         Text = $"A newer release of osu! has been found ({version} → {latestTagName}).\n\n"
                                + "Click here to download the new version, which can be installed over the top of your existing installation",

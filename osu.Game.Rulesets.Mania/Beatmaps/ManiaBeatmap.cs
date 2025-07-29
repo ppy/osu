@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
+using osu.Game.Localisation;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.UI;
 
@@ -42,14 +43,14 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             {
                 new BeatmapStatistic
                 {
-                    Name = @"Notes",
+                    Name = BeatmapStatisticStrings.Notes,
                     CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Circles),
                     Content = notes.ToString(),
                     BarDisplayLength = notes / (float)sum,
                 },
                 new BeatmapStatistic
                 {
-                    Name = @"Hold Notes",
+                    Name = BeatmapStatisticStrings.HoldNotes,
                     CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Sliders),
                     Content = holdNotes.ToString(),
                     BarDisplayLength = holdNotes / (float)sum,

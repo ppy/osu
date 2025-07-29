@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -145,14 +146,27 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddUntilStep("wait for filtering", () => !Carousel.IsFiltering);
         }
 
-        protected void ImportBeatmapForRuleset(int rulesetId)
+        protected void SortBy(SortMode mode) => AddStep($"sort by {mode.GetDescription().ToLowerInvariant()}", () => Config.SetValue(OsuSetting.SongSelectSortingMode, mode));
+
+        protected void GroupBy(GroupMode mode) => AddStep($"group by {mode.GetDescription().ToLowerInvariant()}", () => Config.SetValue(OsuSetting.SongSelectGroupMode, mode));
+
+        protected void SortAndGroupBy(SortMode sort, GroupMode group)
+        {
+            AddStep($"sort by {sort.GetDescription().ToLowerInvariant()} & group by {group.GetDescription().ToLowerInvariant()}", () =>
+            {
+                Config.SetValue(OsuSetting.SongSelectSortingMode, sort);
+                Config.SetValue(OsuSetting.SongSelectGroupMode, group);
+            });
+        }
+
+        protected void ImportBeatmapForRuleset(params int[] rulesetIds)
         {
             int beatmapsCount = 0;
 
-            AddStep($"import test map for ruleset {rulesetId}", () =>
+            AddStep($"import test map for ruleset {rulesetIds}", () =>
             {
                 beatmapsCount = SongSelect.IsNull() ? 0 : Carousel.Filters.OfType<BeatmapCarouselFilterGrouping>().Single().SetItems.Count;
-                Beatmaps.Import(TestResources.CreateTestBeatmapSetInfo(3, Rulesets.AvailableRulesets.Where(r => r.OnlineID == rulesetId).ToArray()));
+                Beatmaps.Import(TestResources.CreateTestBeatmapSetInfo(3, Rulesets.AvailableRulesets.Where(r => rulesetIds.Contains(r.OnlineID)).ToArray()));
             });
 
             // This is specifically for cases where the add is happening post song select load.
@@ -196,7 +210,12 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 if (osuScreen.IsLoaded)
                     updateFooterButtons();
                 else
+                {
+                    // ensure the current buttons are immediately disabled on screen change (so they can't be pressed).
+                    Footer.SetButtons(Array.Empty<ScreenFooterButton>());
+
                     osuScreen.OnLoadComplete += _ => updateFooterButtons();
+                }
 
                 void updateFooterButtons()
                 {

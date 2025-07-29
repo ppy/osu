@@ -9,6 +9,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Framework.Threading;
@@ -64,7 +65,6 @@ namespace osu.Game.Online.Chat
         public IBindableList<Channel> AvailableChannels => availableChannels;
 
         private readonly IAPIProvider api;
-        private readonly IChatClient chatClient;
 
         [Resolved]
         private UserLookupCache users { get; set; }
@@ -72,6 +72,7 @@ namespace osu.Game.Online.Chat
         private readonly IBindable<APIState> apiState = new Bindable<APIState>();
         private ScheduledDelegate scheduledAck;
 
+        private IChatClient chatClient = null!;
         private long? lastSilenceMessageId;
         private uint? lastSilenceId;
 
@@ -79,14 +80,13 @@ namespace osu.Game.Online.Chat
         {
             this.api = api;
 
-            chatClient = api.GetChatClient();
-
             CurrentChannel.ValueChanged += currentChannelChanged;
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
+            chatClient = api.GetChatClient();
             chatClient.ChannelJoined += ch => Schedule(() => joinChannel(ch));
             chatClient.ChannelParted += ch => Schedule(() => leaveChannel(getChannel(ch), false));
             chatClient.NewMessages += msgs => Schedule(() => addMessages(msgs));
@@ -282,8 +282,7 @@ namespace osu.Game.Online.Chat
 
                     // Check if the user has joined the requested channel already.
                     // This uses the channel name for comparison as the PM user's username is unavailable after a restart.
-                    var privateChannel = JoinedChannels.FirstOrDefault(
-                        c => c.Type == ChannelType.PM && c.Users.Count == 1 && c.Name.Equals(content, StringComparison.OrdinalIgnoreCase));
+                    var privateChannel = JoinedChannels.FirstOrDefault(c => c.Type == ChannelType.PM && c.Users.Count == 1 && c.Name.Equals(content, StringComparison.OrdinalIgnoreCase));
 
                     if (privateChannel != null)
                     {
@@ -645,7 +644,9 @@ namespace osu.Game.Online.Chat
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            chatClient?.Dispose();
+
+            if (chatClient.IsNotNull())
+                chatClient.Dispose();
         }
     }
 

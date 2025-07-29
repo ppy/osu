@@ -29,7 +29,7 @@ namespace osu.Game.Skinning
         [Resolved]
         private TextureStore textures { get; set; } = null!;
 
-        [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.SpriteName), nameof(SkinnableComponentStrings.SpriteNameDescription), SettingControlType = typeof(SpriteSelectorControl))]
+        [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.SpriteName), SettingControlType = typeof(SpriteSelectorControl))]
         public Bindable<string> SpriteName { get; } = new Bindable<string>(string.Empty);
 
         [Resolved]
