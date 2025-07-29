@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         private double clockRate;
         private double greatHitWindow;
 
-        private double effectiveMissCount;
+        private double totalDifficultHits;
 
         public TaikoPerformanceCalculator()
             : base(new TaikoRuleset())
@@ -58,12 +58,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 ? null
                 : computeDeviationUpperBound(countGreat / (double)totalHits) * 10;
 
-            // Effective miss count is calculated by raising the fraction of hits missed to a power based on the map's consistency factor.
-            // This is because in less consistently difficult maps, each miss removes more of the map's total difficulty.
-            effectiveMissCount = totalHits * Math.Pow(
-                (double)countMiss / totalHits,
-                Math.Pow(taikoAttributes.ConsistencyFactor, 0.2)
-            );
+            // Total difficult hits measures the total difficulty of a map based on its consistency factor.
+            totalDifficultHits = totalHits * taikoAttributes.ConsistencyFactor;
 
             // Converts are detected and omitted from mod-specific bonuses due to the scope of current difficulty calculation.
             bool isConvert = score.BeatmapInfo!.Ruleset.OnlineID != 1;
@@ -75,7 +71,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             {
                 Difficulty = difficultyValue,
                 Accuracy = accuracyValue,
-                EffectiveMissCount = effectiveMissCount,
                 EstimatedUnstableRate = estimatedUnstableRate,
                 Total = difficultyValue + accuracyValue
             };
@@ -108,14 +103,13 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
             difficultyValue *= 1 + 0.10 * Math.Max(0, attributes.StarRating - 10);
 
-            // Applies a bonus to maps with more total difficulty, calculating this with a map's total hits and consistency factor.
-            double totalDifficultHits = totalHits * Math.Pow(attributes.ConsistencyFactor, 0.5);
+            // Applies a bonus to maps with more total difficulty.
             double lengthBonus = 1 + 0.25 * totalDifficultHits / (totalDifficultHits + 4000);
             difficultyValue *= lengthBonus;
 
-            // Scales miss penalty by the total hits of a map, making misses more punishing on maps with fewer objects.
-            double missPenalty = Math.Pow(0.5, 30.0 / totalHits);
-            difficultyValue *= Math.Pow(missPenalty, effectiveMissCount);
+            // Scales miss penalty by the total difficult hits of a map, making misses more punishing on maps with less total difficulty.
+            double missPenalty = Math.Pow(0.5, 30.0 / totalDifficultHits);
+            difficultyValue *= Math.Pow(missPenalty, countMiss);
 
             if (score.Mods.Any(m => m is ModHidden))
                 difficultyValue *= (isConvert) ? 1.025 : 1.1;
@@ -144,9 +138,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 accuracyValue *= 1.075;
 
             // Applies a bonus to maps with more total difficulty, calculating this with a map's total hits and consistency factor.
-            double totalDifficultHits = totalHits * Math.Pow(attributes.ConsistencyFactor, 0.5);
-            double lengthBonus = 1 + 0.4 * totalDifficultHits / (totalDifficultHits + 4000);
-            accuracyValue *= lengthBonus;
+            accuracyValue *= 1 + 0.4 * totalDifficultHits / (totalDifficultHits + 4000);
 
             // Applies a bonus to maps with more total memory required with HDFL.
             double memoryLengthBonus = Math.Min(1.15, Math.Pow(totalHits / 1500.0, 0.3));
