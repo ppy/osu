@@ -269,6 +269,16 @@ namespace osu.Game.Beatmaps
             }
         }
 
+        public DateTime? GetCacheFetchDate()
+        {
+            string path = storage.GetFullPath(cache_database_name);
+            var file = new FileInfo(path);
+            if (!file.Exists)
+                return null;
+
+            return file.LastWriteTime;
+        }
+
         private bool queryCacheVersion2(SqliteConnection db, BeatmapInfo beatmapInfo, out OnlineBeatmapMetadata? onlineMetadata)
         {
             Debug.Assert(beatmapInfo.BeatmapSet != null);

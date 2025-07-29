@@ -15,6 +15,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Extensions;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
@@ -67,6 +68,9 @@ namespace osu.Game.Database
 
         [Resolved]
         private Storage storage { get; set; } = null!;
+
+        [Resolved]
+        private OsuConfigManager config { get; set; } = null!;
 
         protected virtual int TimeToSleepDuringGameplay => 30000;
 
@@ -640,6 +644,19 @@ namespace osu.Game.Database
                 }
             }
 
+            var lastPopulation = config.Get<DateTime?>(OsuSetting.LastOnlineTagsPopulation);
+            // dropping time data here completely is intentional, because storing the date to config is a lossy operation
+            // (truncates some ticks off of the date when it's being converted to string and back).
+            // therefore, if precision isn't explicitly constrained, the condition below would always fail just because the date stored to config
+            // is less accurate than the cache file's fetch date which is stored with higher precision in the filesystem metadata.
+            var metadataSourceFetchDate = localMetadataSource.GetCacheFetchDate()?.Date;
+
+            if (metadataSourceFetchDate <= lastPopulation)
+            {
+                Logger.Log($@"Skipping user tag population because the local metadata source hasn't been updated since the last time user tags were checked ({lastPopulation.Value:d})");
+                return;
+            }
+
             Logger.Log(@"Querying for beatmaps that do not have user tags");
 
             // it is not an abnormal situation for a map not to have user tags.
@@ -659,7 +676,6 @@ namespace osu.Game.Database
             var notification = showProgressNotification(beatmapIds.Count, @"Populating missing user tags", @"beatmaps now have user tags.");
 
             int processedCount = 0;
-            int countOfBeatmapsThatReceivedTags = 0;
             int failedCount = 0;
 
             foreach (var id in beatmapIds)
@@ -686,9 +702,7 @@ namespace osu.Game.Database
                             Debug.Assert(result != null);
                             beatmap.Metadata.UserTags.Clear();
                             beatmap.Metadata.UserTags.AddRange(result.UserTags);
-                            if (beatmap.Metadata.UserTags.Any())
-                                countOfBeatmapsThatReceivedTags++;
-                            return true;
+                            return beatmap.Metadata.UserTags.Any();
                         }
 
                         Logger.Log(@$"Could not find {beatmap.GetDisplayString()} in local cache while backpopulating missing user tags");
@@ -697,8 +711,8 @@ namespace osu.Game.Database
 
                     if (succeeded)
                         ++processedCount;
-                    else
-                        ++failedCount;
+                    // do not increment count if no tags were added - this is to show only the count of beatmaps that actually received tags in the completion notification
+                    // do not increment failure count either to avoid showing "check logs for failures" message as well - finding no user tags here is not a failure situation
                 }
                 catch (ObjectDisposedException)
                 {
@@ -711,7 +725,8 @@ namespace osu.Game.Database
                 }
             }
 
-            completeNotification(notification, countOfBeatmapsThatReceivedTags, beatmapIds.Count, failedCount);
+            completeNotification(notification, processedCount, beatmapIds.Count, failedCount);
+            config.SetValue(OsuSetting.LastOnlineTagsPopulation, metadataSourceFetchDate);
         }
 
         private void updateNotificationProgress(ProgressNotification? notification, int processedCount, int totalCount)
