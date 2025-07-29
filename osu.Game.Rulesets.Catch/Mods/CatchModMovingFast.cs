@@ -16,12 +16,12 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Mods
 {
-    public partial class CatchModHoldToWalk : Mod, IApplicableToDrawableRuleset<CatchHitObject>, IApplicableToPlayer
+    public partial class CatchModMovingFast : Mod, IApplicableToDrawableRuleset<CatchHitObject>, IApplicableToPlayer
     {
-        public override string Name => "Hold to Walk";
-        public override string Acronym => "HW";
-        public override LocalisableString Description => "Hold the Dash key to walk!";
-        public override ModType Type => ModType.Conversion;
+        public override string Name => "Moving fast";
+        public override string Acronym => "MF";
+        public override LocalisableString Description => "Dashing by default, slow down!";
+        public override ModType Type => ModType.Fun;
         public override double ScoreMultiplier => 1;
         public override IconUsage? Icon => FontAwesome.Solid.Running;
         public override Type[] IncompatibleMods => new[] { typeof(ModAutoplay), typeof(ModRelax) };
