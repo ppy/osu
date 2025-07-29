@@ -73,7 +73,7 @@ namespace osu.Game.Screens.SelectV2
         [BackgroundDependencyLoader]
         private void load()
         {
-            Text = "Mods";
+            Text = SongSelectStrings.Mods;
             Icon = FontAwesome.Solid.ExchangeAlt;
             AccentColour = colours.Lime1;
 

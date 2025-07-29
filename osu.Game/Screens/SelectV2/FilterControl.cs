@@ -151,14 +151,13 @@ namespace osu.Game.Screens.SelectV2
                             {
                                 new[]
                                 {
-                                    sortDropdown = new ShearedDropdown<SortMode>("Sort")
+                                    sortDropdown = new ShearedDropdown<SortMode>(SongSelectStrings.Sort)
                                     {
                                         RelativeSizeAxes = Axes.X,
                                         Items = Enum.GetValues<SortMode>(),
                                     },
                                     Empty(),
-                                    // todo: pending localisation
-                                    groupDropdown = new ShearedDropdown<GroupMode>("Group")
+                                    groupDropdown = new ShearedDropdown<GroupMode>(SongSelectStrings.Group)
                                     {
                                         RelativeSizeAxes = Axes.X,
                                         Items = Enum.GetValues<GroupMode>(),
