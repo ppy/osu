@@ -89,7 +89,7 @@ namespace osu.Game.Screens.Menu
 
             static void formatSemiBold(SpriteText t)
             {
-                t.Font = OsuFont.GetFont(size: 16, weight: FontWeight.SemiBold);
+                t.Font = OsuFont.GetFont(Typeface.TorusAlternate, 16, weight: FontWeight.SemiBold);
                 t.Colour = Color4Extensions.FromHex("#FF99C7");
             }
 
