@@ -8,6 +8,7 @@ using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.LocalisationExtensions;
@@ -158,6 +159,8 @@ namespace osu.Game.Online.Chat
             return Regex.Match(message, $@"(^|\W)({fullName}|{underscoreName})($|\W)", RegexOptions.IgnoreCase);
         }
 
+        private const int truncate_length = 60;
+
         public partial class PrivateMessageNotification : UserAvatarNotification
         {
             private readonly Message message;
@@ -173,20 +176,14 @@ namespace osu.Game.Online.Chat
             [BackgroundDependencyLoader]
             private void load(ChatOverlay chatOverlay, INotificationOverlay notificationOverlay, OverlayColourProvider colourProvider)
             {
-                // Sane maximum height to avoid the notification becoming too tall on long messages.
-                // The height is ballparked to display two lines.
-                TextFlow.AutoSizeAxes = Axes.None;
-                TextFlow.Height = 45;
-
-                TextFlow.ParagraphSpacing = 0.25f;
-
                 TextFlow.AddText(NotificationsStrings.ItemChannelChannelDefault.ToUpper(), s => s.Font = OsuFont.Style.Caption2.With(weight: FontWeight.Bold));
-                TextFlow.AddText($" – {message.Sender.Username}", s =>
+                TextFlow.NewLine();
+                TextFlow.AddText($"{message.Sender.Username}", s =>
                 {
                     s.Font = OsuFont.Style.Caption2.With(weight: FontWeight.SemiBold);
                     s.Colour = colourProvider.Content2;
                 });
-                TextFlow.AddParagraph($"\"{message.Content}\"");
+                TextFlow.AddParagraph($"\"{message.Content.Truncate(truncate_length)}\"");
 
                 Avatar.Colour = OsuColour.Gray(0.4f);
                 Icon = FontAwesome.Solid.Comments;
@@ -219,15 +216,9 @@ namespace osu.Game.Online.Chat
             [BackgroundDependencyLoader]
             private void load(ChatOverlay chatOverlay, INotificationOverlay notificationOverlay, OverlayColourProvider colourProvider)
             {
-                // Sane maximum height to avoid the notification becoming too tall on long messages.
-                // The height is ballparked to display two lines.
-                TextFlow.AutoSizeAxes = Axes.None;
-                TextFlow.Height = 45;
-
-                TextFlow.ParagraphSpacing = 0.25f;
-
-                TextFlow.AddParagraph(Localisation.NotificationsStrings.Mention.ToUpper(), s => s.Font = OsuFont.Style.Caption2.With(weight: FontWeight.Bold));
-                TextFlow.AddText($" – {message.Sender.Username} in {channel.Name}", s =>
+                TextFlow.AddText(Localisation.NotificationsStrings.Mention.ToUpper(), s => s.Font = OsuFont.Style.Caption2.With(weight: FontWeight.Bold));
+                TextFlow.NewLine();
+                TextFlow.AddText($"{message.Sender.Username} in {channel.Name}", s =>
                 {
                     s.Font = OsuFont.Style.Caption2.With(weight: FontWeight.SemiBold);
                     s.Colour = colourProvider.Content2;
@@ -236,13 +227,13 @@ namespace osu.Game.Online.Chat
                 int start = match.Index;
                 int end = match.Index + match.Length;
 
-                TextFlow.AddParagraph($"\"{message.Content[..start]}");
+                TextFlow.AddParagraph($"\"{message.Content[..start].Truncate(truncate_length / 2, "…", from: TruncateFrom.Left)}");
                 TextFlow.AddText(message.Content[start..end], s =>
                 {
                     s.Font = s.Font.With(weight: FontWeight.SemiBold);
                     s.Colour = colourProvider.Colour0;
                 });
-                TextFlow.AddText($"{message.Content[end..]}\"");
+                TextFlow.AddText($"{message.Content[end..].Truncate(truncate_length / 2, "…", from: TruncateFrom.Right)}\"");
 
                 Avatar.Colour = OsuColour.Gray(0.4f);
                 Icon = FontAwesome.Solid.At;
