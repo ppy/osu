@@ -129,6 +129,11 @@ namespace osu.Game.Screens.Edit
                 case 12:
                     return colours.YellowDarker;
 
+                case 5:
+                case 7:
+                case 9:
+                    return colours.GreenLight;
+
                 default:
                     return Color4.Red;
             }

@@ -103,7 +103,8 @@ namespace osu.Game.Screens.Menu
                 icon.Colour = colours.Pink0;
                 icon.Size = new Vector2(16);
             });
-            textFlow.AddText(" " + MenuTipStrings.MenuTipTitle.ToSentence(), formatSemiBold);
+            textFlow.AddText(" ");
+            textFlow.AddText(MenuTipStrings.MenuTipTitle.ToSentence(), formatSemiBold);
             textFlow.AddParagraph(tip, formatRegular);
 
             this

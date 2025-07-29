@@ -33,6 +33,8 @@ namespace osu.Game.Tests.Visual.Ranking
         [SetUpSteps]
         public void SetUpSteps()
         {
+            AddStep("reset mouse position", () => InputManager.MoveMouseTo(Vector2.Zero));
+
             AddStep("set up network requests", () =>
             {
                 writeRequestCount = 0;
