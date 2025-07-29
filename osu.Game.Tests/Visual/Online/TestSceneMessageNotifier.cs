@@ -94,6 +94,17 @@ namespace osu.Game.Tests.Visual.Online
         }
 
         [Test]
+        public void TestLongMessages()
+        {
+            AddStep("close overlay", () => testContainer.ChatOverlay.Hide());
+
+            AddStep("long public", () => receiveMessage(friend, publicChannel, $"For some reason there were no tests testing very long messages, even though there should have been. Why {API.LocalUser.Value.Username} why?"));
+
+            AddStep("long private",
+                () => receiveMessage(friend, privateMessageChannel, "For no good reason, we were not testing very long messages and how the notifications display when the message can't fit"));
+        }
+
+        [Test]
         public void TestPublicChannelMention()
         {
             AddStep("switch to PMs", () => testContainer.ChannelManager.CurrentChannel.Value = privateMessageChannel);
