@@ -273,6 +273,12 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("Button is disabled", () => !offsetControl.ChildrenOfType<SettingsButton>().Single().Enabled.Value);
         }
 
+        [Test]
+        public void TestNegativeZero()
+        {
+            AddAssert("assert", () => BeatmapOffsetControl.GetOffsetExplanatoryText(-0.0001).ToString(), () => Is.EqualTo("0 ms"));
+        }
+
         private void recreateControl()
         {
             AddStep("Create control", () =>

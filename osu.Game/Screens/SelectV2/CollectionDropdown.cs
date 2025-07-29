@@ -19,6 +19,7 @@ using osu.Game.Database;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Localisation;
 using osuTK;
 
 namespace osu.Game.Screens.SelectV2
@@ -49,7 +50,7 @@ namespace osu.Game.Screens.SelectV2
         private readonly CollectionFilterMenuItem allBeatmapsItem = new AllBeatmapsCollectionFilterMenuItem();
 
         public CollectionDropdown()
-            : base("Collection")
+            : base(CollectionsStrings.Collection)
         {
             ItemSource = filters;
 
@@ -228,7 +229,7 @@ namespace osu.Game.Screens.SelectV2
 
                         addOrRemoveButton.Enabled.Value = !beatmap.IsDefault;
                         addOrRemoveButton.Icon = beatmapInCollection ? FontAwesome.Solid.MinusSquare : FontAwesome.Solid.PlusSquare;
-                        addOrRemoveButton.TooltipText = beatmapInCollection ? "Remove selected beatmap" : "Add selected beatmap";
+                        addOrRemoveButton.TooltipText = beatmapInCollection ? CollectionsStrings.RemoveSelectedBeatmap : CollectionsStrings.AddSelectedBeatmap;
 
                         updateButtonVisibility();
                     }, true);

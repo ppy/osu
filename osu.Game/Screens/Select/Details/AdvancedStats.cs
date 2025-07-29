@@ -185,9 +185,7 @@ namespace osu.Game.Screens.Select.Details
 
                 if (Ruleset.Value != null)
                 {
-                    double rate = ModUtils.CalculateRateWithMods(Mods.Value);
-
-                    adjustedDifficulty = Ruleset.Value.CreateInstance().GetRateAdjustedDisplayDifficulty(originalDifficulty, rate);
+                    adjustedDifficulty = Ruleset.Value.CreateInstance().GetAdjustedDisplayDifficulty(originalDifficulty, Mods.Value);
 
                     TooltipContent = new AdjustedAttributesTooltip.Data(originalDifficulty, adjustedDifficulty);
                 }

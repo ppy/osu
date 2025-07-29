@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -16,6 +18,7 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Drawables;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
@@ -49,24 +52,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            ((DummyAPIAccess)API).HandleRequest = request =>
-            {
-                switch (request)
-                {
-                    case GetBeatmapSetRequest set:
-                        if (set.ID == currentOnlineSet?.OnlineID)
-                        {
-                            set.TriggerSuccess(currentOnlineSet);
-                            return true;
-                        }
-
-                        return false;
-
-                    default:
-                        return false;
-                }
-            };
 
             AddRange(new Drawable[]
             {
@@ -151,6 +136,27 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [Test]
         public void TestOnlineAvailability()
         {
+            AddStep("set up request handler", () =>
+            {
+                ((DummyAPIAccess)API).HandleRequest = request =>
+                {
+                    switch (request)
+                    {
+                        case GetBeatmapSetRequest set:
+                            if (set.ID == currentOnlineSet?.OnlineID)
+                            {
+                                set.TriggerSuccess(currentOnlineSet);
+                                return true;
+                            }
+
+                            return false;
+
+                        default:
+                            return false;
+                    }
+                };
+            });
+
             AddStep("online beatmapset", () =>
             {
                 var (working, onlineSet) = createTestBeatmap();
@@ -159,7 +165,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 Beatmap.Value = working;
             });
             AddAssert("play count = 10000", () => this.ChildrenOfType<BeatmapTitleWedge.Statistic>().ElementAt(0).Text.ToString() == "10,000");
-            AddAssert("favourites count = 2345", () => this.ChildrenOfType<BeatmapTitleWedge.Statistic>().ElementAt(1).Text.ToString() == "2,345");
+            AddAssert("favourites count = 2345", () => this.ChildrenOfType<BeatmapTitleWedge.FavouriteButton>().Single().Text.ToString() == "2,345");
             AddStep("online beatmapset with local diff", () =>
             {
                 var (working, onlineSet) = createTestBeatmap();
@@ -170,7 +176,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 Beatmap.Value = working;
             });
             AddAssert("play count = -", () => this.ChildrenOfType<BeatmapTitleWedge.Statistic>().ElementAt(0).Text.ToString() == "-");
-            AddAssert("favourites count = 2345", () => this.ChildrenOfType<BeatmapTitleWedge.Statistic>().ElementAt(1).Text.ToString() == "2,345");
+            AddAssert("favourites count = 2345", () => this.ChildrenOfType<BeatmapTitleWedge.FavouriteButton>().Single().Text.ToString() == "2,345");
             AddStep("local beatmapset", () =>
             {
                 var (working, _) = createTestBeatmap();
@@ -179,7 +185,112 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 Beatmap.Value = working;
             });
             AddAssert("play count = -", () => this.ChildrenOfType<BeatmapTitleWedge.Statistic>().ElementAt(0).Text.ToString() == "-");
-            AddAssert("favourites count = -", () => this.ChildrenOfType<BeatmapTitleWedge.Statistic>().ElementAt(1).Text.ToString() == "-");
+            AddAssert("favourites count = -", () => this.ChildrenOfType<BeatmapTitleWedge.FavouriteButton>().Single().Text.ToString() == "-");
+        }
+
+        [Test]
+        public void TestFavouriting()
+        {
+            var resetEvent = new ManualResetEventSlim(false);
+
+            AddStep("set up request handler", () =>
+            {
+                ((DummyAPIAccess)API).HandleRequest = request =>
+                {
+                    switch (request)
+                    {
+                        case GetBeatmapSetRequest set:
+                            if (set.ID == currentOnlineSet?.OnlineID)
+                            {
+                                set.TriggerSuccess(currentOnlineSet);
+                                return true;
+                            }
+
+                            return false;
+
+                        case PostBeatmapFavouriteRequest favourite:
+                            Task.Run(() =>
+                            {
+                                resetEvent.Wait(10000);
+                                favourite.TriggerSuccess();
+                            });
+                            return true;
+
+                        default:
+                            return false;
+                    }
+                };
+            });
+
+            AddStep("online beatmapset", () =>
+            {
+                var (working, onlineSet) = createTestBeatmap();
+
+                currentOnlineSet = onlineSet;
+                Beatmap.Value = working;
+            });
+            AddUntilStep("play count = 10000", () => this.ChildrenOfType<BeatmapTitleWedge.Statistic>().ElementAt(0).Text.ToString() == "10,000");
+            AddUntilStep("favourites count = 2345", () => this.ChildrenOfType<BeatmapTitleWedge.FavouriteButton>().Single().Text.ToString() == "2,345");
+
+            AddStep("click favourite button", () => this.ChildrenOfType<BeatmapTitleWedge.FavouriteButton>().Single().TriggerClick());
+            AddStep("allow request to complete", () => resetEvent.Set());
+            AddAssert("favourites count = 2346", () => this.ChildrenOfType<BeatmapTitleWedge.FavouriteButton>().Single().Text.ToString() == "2,346");
+
+            AddStep("reset event", () => resetEvent.Reset());
+            AddStep("click favourite button", () => this.ChildrenOfType<BeatmapTitleWedge.FavouriteButton>().Single().TriggerClick());
+            AddStep("allow request to complete", () => resetEvent.Set());
+            AddAssert("favourites count = 2345", () => this.ChildrenOfType<BeatmapTitleWedge.FavouriteButton>().Single().Text.ToString() == "2,345");
+
+            AddStep("reset event", () => resetEvent.Reset());
+            AddStep("click favourite button", () => this.ChildrenOfType<BeatmapTitleWedge.FavouriteButton>().Single().TriggerClick());
+            AddStep("change to another beatmap", () =>
+            {
+                var (working, onlineSet) = createTestBeatmap();
+                onlineSet.FavouriteCount = 9999;
+                onlineSet.HasFavourited = true;
+                working.BeatmapSetInfo.OnlineID = onlineSet.OnlineID = 99999;
+
+                currentOnlineSet = onlineSet;
+                Beatmap.Value = working;
+            });
+            AddStep("allow request to complete", () => resetEvent.Set());
+            AddAssert("favourites count = 9999", () => this.ChildrenOfType<BeatmapTitleWedge.FavouriteButton>().Single().Text.ToString() == "9,999");
+
+            AddStep("set up request handler to fail", () =>
+            {
+                ((DummyAPIAccess)API).HandleRequest = request =>
+                {
+                    switch (request)
+                    {
+                        case GetBeatmapSetRequest set:
+                            if (set.ID == currentOnlineSet?.OnlineID)
+                            {
+                                set.TriggerSuccess(currentOnlineSet);
+                                return true;
+                            }
+
+                            return false;
+
+                        case PostBeatmapFavouriteRequest favourite:
+                            Task.Run(() =>
+                            {
+                                resetEvent.Wait(10000);
+                                favourite.TriggerFailure(new APIException("You have too many favourited beatmaps! Please unfavourite some before trying again.", null));
+                            });
+                            return true;
+
+                        default:
+                            return false;
+                    }
+                };
+            });
+            AddStep("reset event", () => resetEvent.Reset());
+            AddStep("click favourite button", () => this.ChildrenOfType<BeatmapTitleWedge.FavouriteButton>().Single().TriggerClick());
+            AddAssert("spinner visible", () => this.ChildrenOfType<BeatmapTitleWedge.FavouriteButton>().Single()
+                                                   .ChildrenOfType<LoadingSpinner>().Single().State.Value, () => Is.EqualTo(Visibility.Visible));
+            AddStep("allow request to complete", () => resetEvent.Set());
+            AddAssert("spinner hidden", () => this.ChildrenOfType<BeatmapTitleWedge.FavouriteButton>().Single()
+                                                  .ChildrenOfType<LoadingSpinner>().Single().State.Value, () => Is.EqualTo(Visibility.Hidden));
         }
 
         [TestCase(120, 125, null, "120-125 (mostly 120)")]

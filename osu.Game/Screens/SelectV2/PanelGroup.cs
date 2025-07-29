@@ -5,6 +5,7 @@ using System;
 using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -19,6 +20,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osuTK;
 using osuTK.Graphics;
+using WebCommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
 
 namespace osu.Game.Screens.SelectV2
 {
@@ -45,6 +47,7 @@ namespace osu.Game.Screens.SelectV2
             {
                 AlwaysPresent = true,
                 RelativeSizeAxes = Axes.Y,
+                Alpha = 0f,
                 Child = new SpriteIcon
                 {
                     Anchor = Anchor.Centre,
@@ -54,34 +57,34 @@ namespace osu.Game.Screens.SelectV2
                     Colour = colourProvider.Background3,
                 },
             };
-            Background = new Container
+
+            Background = new Box
             {
                 RelativeSizeAxes = Axes.Both,
-                Children = new Drawable[]
-                {
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = colourProvider.Background5,
-                    },
-                    triangles = new TrianglesV2
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Thickness = 0.02f,
-                        SpawnRatio = 0.6f,
-                        Colour = ColourInfo.GradientHorizontal(colourProvider.Background6, colourProvider.Background5)
-                    },
-                    glow = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Width = 0.5f,
-                        Colour = ColourInfo.GradientHorizontal(colourProvider.Highlight1, colourProvider.Highlight1.Opacity(0f)),
-                    },
-                },
+                Colour = colourProvider.Highlight1,
             };
+
             AccentColour = colourProvider.Highlight1;
             Content.Children = new Drawable[]
             {
+                new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = colourProvider.Background5,
+                },
+                triangles = new TrianglesV2
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Thickness = 0.02f,
+                    SpawnRatio = 0.6f,
+                    Colour = ColourInfo.GradientHorizontal(colourProvider.Background6, colourProvider.Background5)
+                },
+                glow = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Width = 0.5f,
+                    Colour = ColourInfo.GradientHorizontal(colourProvider.Highlight1, colourProvider.Highlight1.Opacity(0f)),
+                },
                 titleText = new OsuSpriteText
                 {
                     Anchor = Anchor.CentreLeft,
@@ -167,7 +170,7 @@ namespace osu.Game.Screens.SelectV2
 
                 return new MenuItem[]
                 {
-                    new OsuMenuItem(Expanded.Value ? "Collapse" : "Expand", MenuItemType.Highlighted, () => TriggerClick())
+                    new OsuMenuItem(Expanded.Value ? WebCommonStrings.ButtonsCollapse.ToSentence() : WebCommonStrings.ButtonsExpand.ToSentence(), MenuItemType.Highlighted, () => TriggerClick())
                 };
             }
         }
