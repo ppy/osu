@@ -28,7 +28,7 @@ namespace osu.Game.Tests.Visual.Ranking
 
         private DummyAPIAccess dummyAPI => (DummyAPIAccess)API;
 
-        private int writeRequestCount = 0;
+        private int writeRequestCount;
 
         [SetUpSteps]
         public void SetUpSteps()
