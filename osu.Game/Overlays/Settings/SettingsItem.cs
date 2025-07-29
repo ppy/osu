@@ -45,7 +45,18 @@ namespace osu.Game.Overlays.Settings
 
         private OsuTextFlowContainer noticeText;
 
-        public bool ShowsDefaultIndicator = true;
+        private bool showsDefaultIndicator = true;
+
+        public bool ShowsDefaultIndicator
+        {
+            get => showsDefaultIndicator;
+            set
+            {
+                showsDefaultIndicator = value;
+                defaultValueIndicatorContainer.Alpha = value ? 1 : 0;
+            }
+        }
+
         private readonly Container defaultValueIndicatorContainer;
 
         public LocalisableString TooltipText { get; set; }
@@ -214,17 +225,14 @@ namespace osu.Game.Overlays.Settings
         [BackgroundDependencyLoader]
         private void load()
         {
-            // intentionally done before LoadComplete to avoid overhead.
-            if (ShowsDefaultIndicator)
+            defaultValueIndicatorContainer.Child = new RevertToDefaultButton<T>
             {
-                defaultValueIndicatorContainer.Add(new RevertToDefaultButton<T>
-                {
-                    Current = controlWithCurrent.Current,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre
-                });
-                updateLayout();
-            }
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Current = controlWithCurrent.Current,
+            };
+
+            updateLayout();
         }
 
         private void updateLayout()

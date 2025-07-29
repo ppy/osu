@@ -1,10 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Screens.Select.Leaderboards;
 
 namespace osu.Game.Scoring
 {
@@ -25,6 +27,36 @@ namespace osu.Game.Scoring
                      .ThenBy(s => s.OnlineID)
                      // Local scores may not have an online ID. Fall back to date in these cases.
                      .ThenBy(s => s.Date);
+
+        /// <summary>
+        /// Orders an array of <see cref="ScoreInfo"/>s by the selected <see cref="LeaderboardSortMode"/>.
+        /// </summary>
+        /// <param name="scores">The array of <see cref="ScoreInfo"/>s to reorder.</param>
+        /// <param name="leaderboardSortMode">The attribute to sort the scores by.</param>
+        /// <returns>The given <paramref name="scores"/> ordered by the selected mode.</returns>
+        public static IEnumerable<ScoreInfo> OrderByCriteria(this IEnumerable<ScoreInfo> scores, LeaderboardSortMode leaderboardSortMode)
+        {
+            switch (leaderboardSortMode)
+            {
+                case LeaderboardSortMode.Score:
+                    return scores.OrderByDescending(s => s.TotalScore);
+
+                case LeaderboardSortMode.Accuracy:
+                    return scores.OrderByDescending(s => s.Accuracy).ThenByDescending(s => s.TotalScore);
+
+                case LeaderboardSortMode.MaxCombo:
+                    return scores.OrderByDescending(s => s.MaxCombo).ThenByDescending(s => s.TotalScore);
+
+                case LeaderboardSortMode.Misses:
+                    return scores.OrderBy(s => s.Statistics.GetValueOrDefault(HitResult.Miss, 0)).ThenByDescending(s => s.TotalScore);
+
+                case LeaderboardSortMode.Date:
+                    return scores.OrderByDescending(s => s.Date);
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(leaderboardSortMode), leaderboardSortMode, null);
+            }
+        }
 
         /// <summary>
         /// Retrieves the maximum achievable combo for the provided score.

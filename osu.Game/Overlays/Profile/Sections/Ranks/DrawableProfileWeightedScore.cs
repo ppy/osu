@@ -4,6 +4,7 @@
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
@@ -44,7 +45,9 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                             Child = new OsuSpriteText
                             {
                                 Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold, italics: true),
-                                Text = Score.PP.HasValue ? $"{Score.PP * weight:0}pp" : string.Empty,
+                                Text = Score.PP.HasValue
+                                    ? LocalisableString.Interpolate($"{Score.PP * weight:N0}pp")
+                                    : string.Empty,
                             },
                         }
                     }

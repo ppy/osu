@@ -14,11 +14,13 @@ using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Screens.Select.Carousel;
 using osuTK;
 using osuTK.Graphics;
+using CommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
 
 namespace osu.Game.Screens.SelectV2
 {
@@ -55,7 +57,8 @@ namespace osu.Game.Screens.SelectV2
 
         public PanelUpdateBeatmapButton()
         {
-            Size = new Vector2(72, 22f);
+            AutoSizeAxes = Axes.X;
+            Height = 22f;
         }
 
         private Bindable<bool> preferNoVideo = null!;
@@ -69,7 +72,6 @@ namespace osu.Game.Screens.SelectV2
 
             Content.Anchor = Anchor.Centre;
             Content.Origin = Anchor.Centre;
-            Content.Shear = OsuGame.SHEAR;
 
             Content.AddRange(new Drawable[]
             {
@@ -87,7 +89,6 @@ namespace osu.Game.Screens.SelectV2
                     AutoSizeAxes = Axes.Both,
                     Direction = FillDirection.Horizontal,
                     Spacing = new Vector2(4),
-                    Shear = -OsuGame.SHEAR,
                     Children = new Drawable[]
                     {
                         new Container
@@ -111,7 +112,7 @@ namespace osu.Game.Screens.SelectV2
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                             Font = OsuFont.Style.Body.With(weight: FontWeight.SemiBold),
-                            Text = "Update",
+                            Text = CommonStrings.ButtonsUpdate,
                         }
                     }
                 },
@@ -134,13 +135,13 @@ namespace osu.Game.Screens.SelectV2
 
         protected override bool OnHover(HoverEvent e)
         {
-            icon.Spin(400, RotationDirection.Clockwise);
+            icon.Spin(400, RotationDirection.Clockwise, icon.Rotation);
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            icon.Spin(4000, RotationDirection.Clockwise);
+            icon.Spin(4000, RotationDirection.Clockwise, icon.Rotation);
             base.OnHoverLost(e);
         }
 
@@ -189,7 +190,7 @@ namespace osu.Game.Screens.SelectV2
             else
             {
                 Enabled.Value = true;
-                TooltipText = "Update beatmap with online changes";
+                TooltipText = SongSelectStrings.UpdateBeatmapTooltip;
 
                 progressFill.ResizeWidthTo(0, 100, Easing.OutQuint);
             }

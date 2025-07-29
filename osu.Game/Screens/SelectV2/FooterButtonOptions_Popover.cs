@@ -57,7 +57,7 @@ namespace osu.Game.Screens.SelectV2
                 };
 
                 addHeader(CommonStrings.General);
-                addButton(SongSelectStrings.ManageCollections, FontAwesome.Solid.Book, () => SongSelect?.ManageCollections());
+                addButton(CollectionsStrings.ManageCollections, FontAwesome.Solid.Book, () => SongSelect?.ManageCollections());
 
                 addHeader(SongSelectStrings.ForAllDifficulties, beatmap.BeatmapSetInfo.ToString());
                 addButton(SongSelectStrings.DeleteBeatmap, FontAwesome.Solid.Trash, () => SongSelect?.Delete(beatmap.BeatmapSetInfo), colours.Red1);

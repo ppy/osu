@@ -44,14 +44,16 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     Team2Score = { BindTarget = LeaderboardProvider.TeamScores[1] }
                 }, Add);
 
-                LoadComponentAsync(new GameplayMatchScoreDisplay
+                GameplayMatchScoreDisplay matchScoreDisplay;
+                LoadComponentAsync(matchScoreDisplay = new GameplayMatchScoreDisplay
                 {
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
                     Team1Score = { BindTarget = LeaderboardProvider.TeamScores[0] },
                     Team2Score = { BindTarget = LeaderboardProvider.TeamScores[1] },
-                    Expanded = { BindTarget = Leaderboard!.ForceExpand },
                 }, Add);
+
+                Leaderboard!.CollapseDuringGameplay.BindValueChanged(_ => matchScoreDisplay.Expanded.Value = !Leaderboard.CollapseDuringGameplay.Value);
             });
         }
     }

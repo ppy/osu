@@ -91,6 +91,9 @@ namespace osu.Game.Screens.SelectV2
             DebounceDelay = 100;
             DistanceOffscreenToPreload = 100;
 
+            // Account for the osu! logo being in the way.
+            Scroll.ScrollbarPaddingBottom = 70;
+
             Filters = new ICarouselFilter[]
             {
                 matching = new BeatmapCarouselFilterMatching(() => Criteria!),
@@ -140,10 +143,77 @@ namespace osu.Game.Screens.SelectV2
                     break;
 
                 case NotifyCollectionChangedAction.Remove:
+                    bool selectedSetDeleted = false;
+
                     foreach (var set in oldItems!)
                     {
                         foreach (var beatmap in set.Beatmaps)
+                        {
                             Items.RemoveAll(i => i is BeatmapInfo bi && beatmap.Equals(bi));
+                            selectedSetDeleted |= CheckModelEquality(CurrentSelection, beatmap);
+                        }
+                    }
+
+                    // After removing all items in this batch, we want to make an immediate reselection
+                    // based on adjacency to the previous selection if it was deleted.
+                    //
+                    // This needs to be done immediately to avoid song select making a random selection.
+                    // This needs to be done in this class because we need to know final display order.
+                    // This needs to be done with attention to detail of which beatmaps have not been deleted.
+                    if (selectedSetDeleted && CurrentSelectionIndex != null)
+                    {
+                        var items = GetCarouselItems()!;
+                        if (items.Count == 0)
+                            break;
+
+                        bool success = false;
+
+                        // Try selecting forwards first
+                        for (int i = CurrentSelectionIndex.Value + 1; i < items.Count; i++)
+                        {
+                            if (attemptSelection(items[i]))
+                            {
+                                success = true;
+                                break;
+                            }
+                        }
+
+                        if (success)
+                            break;
+
+                        // Then try backwards (we might be at the end of available items).
+                        for (int i = Math.Min(items.Count - 1, CurrentSelectionIndex.Value); i >= 0; i--)
+                        {
+                            if (attemptSelection(items[i]))
+                                break;
+                        }
+
+                        bool attemptSelection(CarouselItem item)
+                        {
+                            if (CheckValidForSetSelection(item))
+                            {
+                                if (item.Model is BeatmapInfo beatmapInfo)
+                                {
+                                    // check the new selection wasn't deleted above
+                                    if (!Items.Contains(beatmapInfo))
+                                        return false;
+
+                                    RequestSelection(beatmapInfo);
+                                    return true;
+                                }
+
+                                if (item.Model is BeatmapSetInfo beatmapSetInfo)
+                                {
+                                    if (oldItems.Contains(beatmapSetInfo))
+                                        return false;
+
+                                    RequestRecommendedSelection(beatmapSetInfo.Beatmaps);
+                                    return true;
+                                }
+                            }
+
+                            return false;
+                        }
                     }
 
                     break;
@@ -208,6 +278,9 @@ namespace osu.Game.Screens.SelectV2
 
         protected BeatmapSetInfo? ExpandedBeatmapSet { get; private set; }
 
+        protected override bool ShouldActivateOnKeyboardSelection(CarouselItem item) =>
+            grouping.BeatmapSetsGroupedTogether && item.Model is BeatmapInfo;
+
         protected override void HandleItemActivated(CarouselItem item)
         {
             try
@@ -224,6 +297,11 @@ namespace osu.Game.Screens.SelectV2
                         }
 
                         setExpandedGroup(group);
+
+                        // If the active selection is within this group, it should get keyboard focus immediately.
+                        if (CurrentSelectionItem?.IsVisible == true && CurrentSelection is BeatmapInfo info)
+                            RequestSelection(info);
+
                         return;
 
                     case BeatmapSetInfo setInfo:
@@ -261,8 +339,7 @@ namespace osu.Game.Screens.SelectV2
                     // Find any containing group. There should never be too many groups so iterating is efficient enough.
                     GroupDefinition? containingGroup = grouping.GroupItems.SingleOrDefault(kvp => kvp.Value.Any(i => CheckModelEquality(i.Model, beatmapInfo))).Key;
 
-                    if (containingGroup != null)
-                        setExpandedGroup(containingGroup);
+                    setExpandedGroup(containingGroup);
 
                     if (grouping.BeatmapSetsGroupedTogether)
                         setExpandedSet(beatmapInfo);
@@ -283,8 +360,9 @@ namespace osu.Game.Screens.SelectV2
             // This will update the visual state of the selected item.
             HandleItemSelected(CurrentSelection);
 
-            // If a group was selected that is not the one containing the selection, reselect it.
-            if (groupForReselection != null)
+            // If a group was selected that is not the one containing the selection, attempt to reselect it.
+            // If the original group was not found, ExpandedGroup will already have been updated to a valid value in `HandleItemSelected` above.
+            if (groupForReselection != null && grouping.GroupItems.TryGetValue(groupForReselection, out _))
                 setExpandedGroup(groupForReselection);
         }
 
@@ -333,7 +411,9 @@ namespace osu.Game.Screens.SelectV2
             RequestRecommendedSelection(beatmaps);
         }
 
-        protected override bool CheckValidForGroupSelection(CarouselItem item)
+        protected override bool CheckValidForGroupSelection(CarouselItem item) => item.Model is GroupDefinition;
+
+        protected override bool CheckValidForSetSelection(CarouselItem item)
         {
             switch (item.Model)
             {
@@ -355,8 +435,11 @@ namespace osu.Game.Screens.SelectV2
         {
             if (ExpandedGroup != null)
                 setExpansionStateOfGroup(ExpandedGroup, false);
+
             ExpandedGroup = group;
-            setExpansionStateOfGroup(group, true);
+
+            if (ExpandedGroup != null)
+                setExpansionStateOfGroup(group, true);
         }
 
         private void setExpansionStateOfGroup(GroupDefinition group, bool expanded)
@@ -435,8 +518,7 @@ namespace osu.Game.Screens.SelectV2
 
         private Sample? sampleChangeDifficulty;
         private Sample? sampleChangeSet;
-        private Sample? sampleOpen;
-        private Sample? sampleClose;
+        private Sample? sampleToggleGroup;
 
         private double audioFeedbackLastPlaybackTime;
 
@@ -444,8 +526,7 @@ namespace osu.Game.Screens.SelectV2
         {
             sampleChangeDifficulty = audio.Samples.Get(@"SongSelect/select-difficulty");
             sampleChangeSet = audio.Samples.Get(@"SongSelect/select-expand");
-            sampleOpen = audio.Samples.Get(@"UI/menu-open");
-            sampleClose = audio.Samples.Get(@"UI/menu-close");
+            sampleToggleGroup = audio.Samples.Get(@"SongSelect/select-group");
 
             spinSample = audio.Samples.Get("SongSelect/random-spin");
             randomSelectSample = audio.Samples.Get(@"SongSelect/select-random");
@@ -458,10 +539,7 @@ namespace osu.Game.Screens.SelectV2
                 switch (item.Model)
                 {
                     case GroupDefinition:
-                        if (item.IsExpanded)
-                            sampleOpen?.Play();
-                        else
-                            sampleClose?.Play();
+                        sampleToggleGroup?.Play();
                         return;
 
                     case BeatmapSetInfo:
@@ -612,8 +690,8 @@ namespace osu.Game.Screens.SelectV2
         #region Random selection handling
 
         private readonly Bindable<RandomSelectAlgorithm> randomAlgorithm = new Bindable<RandomSelectAlgorithm>();
-        private readonly List<BeatmapSetInfo> previouslyVisitedRandomSets = new List<BeatmapSetInfo>();
-        private readonly List<BeatmapInfo> randomSelectedBeatmaps = new List<BeatmapInfo>();
+        private readonly List<BeatmapInfo> previouslyVisitedRandomBeatmaps = new List<BeatmapInfo>();
+        private readonly List<BeatmapInfo> randomHistory = new List<BeatmapInfo>();
 
         private Sample? spinSample;
         private Sample? randomSelectSample;
@@ -625,83 +703,180 @@ namespace osu.Game.Screens.SelectV2
             if (carouselItems?.Any() != true)
                 return false;
 
-            // This is the fastest way to retrieve sets for randomisation.
-            ICollection<BeatmapSetInfo> visibleSets = grouping.SetItems.Keys;
+            var selectionBefore = CurrentSelectionItem;
+            var beatmapBefore = selectionBefore?.Model as BeatmapInfo;
 
-            if (CurrentSelection is BeatmapInfo beatmapInfo)
+            bool success;
+
+            if (beatmapBefore != null)
             {
-                randomSelectedBeatmaps.Add(beatmapInfo);
-
-                // when performing a random, we want to add the current set to the previously visited list
-                // else the user may be "randomised" to the existing selection.
-                if (previouslyVisitedRandomSets.LastOrDefault()?.Equals(beatmapInfo.BeatmapSet) != true)
-                    previouslyVisitedRandomSets.Add(beatmapInfo.BeatmapSet!);
+                // keep track of visited beatmaps and sets for rewind
+                randomHistory.Add(beatmapBefore);
+                // keep track of visited beatmaps for "RandomPermutation" random tracking.
+                // note that this is reset when we run out of beatmaps, while `randomHistory` is not.
+                previouslyVisitedRandomBeatmaps.Add(beatmapBefore);
             }
+
+            if (grouping.BeatmapSetsGroupedTogether)
+                success = nextRandomSet();
+            else
+                success = nextRandomBeatmap();
+
+            if (!success)
+            {
+                if (beatmapBefore != null)
+                    randomHistory.RemoveAt(randomHistory.Count - 1);
+                return false;
+            }
+
+            // CurrentSelectionItem won't be valid until UpdateAfterChildren.
+            // We probably want to fix this at some point since a few places are working-around this quirk.
+            ScheduleAfterChildren(() =>
+            {
+                if (selectionBefore != null && CurrentSelectionItem != null)
+                    playSpinSample(visiblePanelCountBetweenItems(selectionBefore, CurrentSelectionItem));
+            });
+
+            return true;
+        }
+
+        private bool nextRandomBeatmap()
+        {
+            ICollection<BeatmapInfo> visibleBeatmaps = ExpandedGroup != null
+                // In the case of grouping, users expect random to only operate on the expanded group.
+                // This is going to incur some overhead as we don't have a group-beatmapset mapping currently.
+                //
+                // If this becomes an issue, we could either store a mapping, or run the random algorithm many times
+                // using the `SetItems` method until we get a group HIT.
+                ? grouping.GroupItems[ExpandedGroup].Select(i => i.Model).OfType<BeatmapInfo>().ToArray()
+                : GetCarouselItems()!.Select(i => i.Model).OfType<BeatmapInfo>().ToArray();
+
+            BeatmapInfo beatmap;
+
+            switch (randomAlgorithm.Value)
+            {
+                case RandomSelectAlgorithm.RandomPermutation:
+                {
+                    ICollection<BeatmapInfo> notYetVisitedBeatmaps = visibleBeatmaps.Except(previouslyVisitedRandomBeatmaps).ToList();
+
+                    if (!notYetVisitedBeatmaps.Any())
+                    {
+                        previouslyVisitedRandomBeatmaps.RemoveAll(b => visibleBeatmaps.Contains(b));
+                        notYetVisitedBeatmaps = visibleBeatmaps;
+                        if (CurrentSelection is BeatmapInfo beatmapInfo)
+                            notYetVisitedBeatmaps = notYetVisitedBeatmaps.Except([beatmapInfo]).ToList();
+                    }
+
+                    if (notYetVisitedBeatmaps.Count == 0)
+                        return false;
+
+                    beatmap = notYetVisitedBeatmaps.ElementAt(RNG.Next(notYetVisitedBeatmaps.Count));
+                    break;
+                }
+
+                case RandomSelectAlgorithm.Random:
+                    beatmap = visibleBeatmaps.ElementAt(RNG.Next(visibleBeatmaps.Count));
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            RequestSelection(beatmap);
+            return true;
+        }
+
+        private bool nextRandomSet()
+        {
+            ICollection<BeatmapSetInfo> visibleSets = ExpandedGroup != null
+                // In the case of grouping, users expect random to only operate on the expanded group.
+                // This is going to incur some overhead as we don't have a group-beatmapset mapping currently.
+                //
+                // If this becomes an issue, we could either store a mapping, or run the random algorithm many times
+                // using the `SetItems` method until we get a group HIT.
+                ? grouping.GroupItems[ExpandedGroup].Select(i => i.Model).OfType<BeatmapSetInfo>().ToArray()
+                // This is the fastest way to retrieve sets for randomisation.
+                : grouping.SetItems.Keys;
 
             BeatmapSetInfo set;
 
-            if (randomAlgorithm.Value == RandomSelectAlgorithm.RandomPermutation)
+            switch (randomAlgorithm.Value)
             {
-                ICollection<BeatmapSetInfo> notYetVisitedSets = visibleSets.Except(previouslyVisitedRandomSets).ToList();
-
-                if (!notYetVisitedSets.Any())
+                case RandomSelectAlgorithm.RandomPermutation:
                 {
-                    previouslyVisitedRandomSets.RemoveAll(s => visibleSets.Contains(s));
-                    notYetVisitedSets = visibleSets;
+                    ICollection<BeatmapSetInfo> notYetVisitedSets = visibleSets.Except(previouslyVisitedRandomBeatmaps.Select(b => b.BeatmapSet!)).ToList();
+
+                    if (!notYetVisitedSets.Any())
+                    {
+                        previouslyVisitedRandomBeatmaps.RemoveAll(b => visibleSets.Contains(b.BeatmapSet!));
+                        notYetVisitedSets = visibleSets;
+                        if (CurrentSelection is BeatmapInfo beatmapInfo)
+                            notYetVisitedSets = notYetVisitedSets.Except([beatmapInfo.BeatmapSet!]).ToList();
+                    }
+
+                    if (notYetVisitedSets.Count == 0)
+                        return false;
+
+                    set = notYetVisitedSets.ElementAt(RNG.Next(notYetVisitedSets.Count));
+                    break;
                 }
 
-                set = notYetVisitedSets.ElementAt(RNG.Next(notYetVisitedSets.Count));
-                previouslyVisitedRandomSets.Add(set);
-            }
-            else
-                set = visibleSets.ElementAt(RNG.Next(visibleSets.Count));
+                case RandomSelectAlgorithm.Random:
+                    set = visibleSets.ElementAt(RNG.Next(visibleSets.Count));
+                    break;
 
-            if (CurrentSelectionItem != null)
-                playSpinSample(distanceBetween(carouselItems.First(i => !ReferenceEquals(i.Model, set)), CurrentSelectionItem), visibleSets.Count);
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
 
             selectRecommendedDifficultyForBeatmapSet(set);
             return true;
         }
 
-        public void PreviousRandom()
+        public bool PreviousRandom()
         {
             var carouselItems = GetCarouselItems();
 
             if (carouselItems?.Any() != true)
-                return;
+                return false;
 
-            while (randomSelectedBeatmaps.Any())
+            while (randomHistory.Any())
             {
-                var previousBeatmap = randomSelectedBeatmaps[^1];
-                randomSelectedBeatmaps.RemoveAt(randomSelectedBeatmaps.Count - 1);
+                var previousBeatmap = randomHistory[^1];
+                randomHistory.RemoveAt(randomHistory.Count - 1);
 
                 var previousBeatmapItem = carouselItems.FirstOrDefault(i => i.Model is BeatmapInfo b && b.Equals(previousBeatmap));
 
                 if (previousBeatmapItem == null)
-                    return;
+                    return false;
 
                 if (CurrentSelection is BeatmapInfo beatmapInfo)
                 {
                     if (randomAlgorithm.Value == RandomSelectAlgorithm.RandomPermutation)
-                        previouslyVisitedRandomSets.Remove(beatmapInfo.BeatmapSet!);
+                        previouslyVisitedRandomBeatmaps.Remove(beatmapInfo);
 
-                    playSpinSample(distanceBetween(previousBeatmapItem, CurrentSelectionItem!), carouselItems.Count);
+                    if (CurrentSelectionItem == null)
+                        playSpinSample(0);
+                    else
+                        playSpinSample(visiblePanelCountBetweenItems(previousBeatmapItem, CurrentSelectionItem));
                 }
 
                 RequestSelection(previousBeatmap);
-                break;
+                return true;
             }
+
+            return false;
         }
 
-        private double distanceBetween(CarouselItem item1, CarouselItem item2) => Math.Ceiling(Math.Abs(item1.CarouselYPosition - item2.CarouselYPosition) / PanelBeatmapSet.HEIGHT);
+        private double visiblePanelCountBetweenItems(CarouselItem item1, CarouselItem item2) => Math.Ceiling(Math.Abs(item1.CarouselYPosition - item2.CarouselYPosition) / PanelBeatmapSet.HEIGHT);
 
-        private void playSpinSample(double distance, int count)
+        private void playSpinSample(double distance)
         {
             var chan = spinSample?.GetChannel();
 
             if (chan != null)
             {
-                chan.Frequency.Value = 1f + Math.Min(1f, distance / count);
+                chan.Frequency.Value = 1f + Math.Clamp(distance / 200, 0, 1);
                 chan.Play();
             }
 
@@ -714,9 +889,31 @@ namespace osu.Game.Screens.SelectV2
     /// <summary>
     /// Defines a grouping header for a set of carousel items.
     /// </summary>
-    /// <param name="Order">The order of this group in the carousel, sorted using ascending order.</param>
-    /// <param name="Title">The title of this group.</param>
-    public record GroupDefinition(int Order, string Title);
+    public record GroupDefinition
+    {
+        /// <summary>
+        /// The order of this group in the carousel, sorted using ascending order.
+        /// </summary>
+        public int Order { get; }
+
+        /// <summary>
+        /// The title of this group.
+        /// </summary>
+        public string Title { get; }
+
+        private readonly string uncasedTitle;
+
+        public GroupDefinition(int order, string title)
+        {
+            Order = order;
+            Title = title;
+            uncasedTitle = title.ToLowerInvariant();
+        }
+
+        public virtual bool Equals(GroupDefinition? other) => uncasedTitle == other?.uncasedTitle;
+
+        public override int GetHashCode() => HashCode.Combine(uncasedTitle);
+    }
 
     /// <summary>
     /// Defines a grouping header for a set of carousel items grouped by star difficulty.
