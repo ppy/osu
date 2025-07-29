@@ -9,13 +9,13 @@ using osu.Game.Users.Drawables;
 
 namespace osu.Game.Overlays.Notifications
 {
-    public partial class UserAvatarNotification : SimpleNotification
+    public abstract partial class UserAvatarNotification : SimpleNotification
     {
         private readonly APIUser? user;
 
         protected DrawableAvatar Avatar { get; private set; } = null!;
 
-        public UserAvatarNotification(APIUser? user, LocalisableString text = default)
+        protected UserAvatarNotification(APIUser? user, LocalisableString text = default)
         {
             this.user = user;
 
