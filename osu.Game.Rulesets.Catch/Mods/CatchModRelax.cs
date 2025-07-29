@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Catch.Mods
     {
         public override LocalisableString Description => @"Use the mouse to control the catcher.";
 
-        public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(CatchModHoldToWalk) }).ToArray();
+        public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(CatchModMovingFast) }).ToArray();
 
         private DrawableCatchRuleset drawableRuleset = null!;
 

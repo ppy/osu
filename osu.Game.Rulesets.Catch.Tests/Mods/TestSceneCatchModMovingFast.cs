@@ -7,14 +7,14 @@ using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Catch.Tests.Mods
 {
-    public partial class TestSceneCatchModHoldToWalk : ModTestScene
+    public partial class TestSceneCatchModMovingFast : ModTestScene
     {
         protected override Ruleset CreatePlayerRuleset() => new CatchRuleset();
 
         [Test]
         public void TestFloating() => CreateModTest(new ModTestData
         {
-            Mod = new CatchModHoldToWalk(),
+            Mod = new CatchModMovingFast(),
             PassCondition = () => true
         });
     }
