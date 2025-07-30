@@ -181,6 +181,12 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                         },
                     }
                 },
+                new SettingsCheckbox
+                {
+                    LabelText = GraphicsSettingsStrings.EditorUseNativeResolution,
+                    TooltipText = GraphicsSettingsStrings.EditorUseNativeResolutionTooltip,
+                    Current = osuConfig.GetBindable<bool>(OsuSetting.EditorUseNativeResolution),
+                },
             };
 
             fullscreenCapability.BindValueChanged(_ => Schedule(updateScreenModeWarning), true);

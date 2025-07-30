@@ -66,6 +66,7 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
                 },
                 pickerButton = new ColourPickerButton
                 {
+                    Height = Editor.BUTTON_HEIGHT,
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
                     ComboColours = { BindTarget = comboColours }
@@ -92,23 +93,31 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
 
         private void updateState()
         {
+            const float button_spacing = 3;
+            const float target_picker_button_width_expanded = 25;
+            const float target_picker_button_width_collapsed = 7;
+
+            const float icon_offset = (Editor.BUTTON_HEIGHT - Editor.BUTTON_ICON_SIZE) / 2;
+            const float icon_offset_collapsed = (Editor.BUTTON_HEIGHT - Editor.BUTTON_ICON_SIZE - target_picker_button_width_collapsed - button_spacing) / 2;
+
             if (Current.Value == TernaryState.True && selectedHitObjects.Count == 1 && selectedHitObjects.Single() is IHasComboInformation hasCombo && comboColours.Count > 1)
             {
-                float targetPickerButtonWidth = expanded.Value ? 25 : 10;
+                float targetPickerButtonWidth = expanded.Value ? target_picker_button_width_expanded : target_picker_button_width_collapsed;
 
                 pickerButton.ResizeWidthTo(targetPickerButtonWidth, ExpandingContainer.TRANSITION_DURATION, Easing.OutQuint);
                 pickerButton.SelectedHitObject.Value = hasCombo;
                 pickerButton.Icon.Alpha = expanded.Value ? 1 : 0;
 
-                mainButtonContainer.TransformTo(nameof(mainButtonContainer.Padding), new MarginPadding { Right = targetPickerButtonWidth + 5 }, ExpandingContainer.TRANSITION_DURATION, Easing.OutQuint);
-                mainButton.Icon.MoveToX(expanded.Value ? 10 : 2.5f, ExpandingContainer.TRANSITION_DURATION, Easing.OutQuint);
+                mainButtonContainer.TransformTo(nameof(mainButtonContainer.Padding), new MarginPadding { Right = targetPickerButtonWidth + button_spacing }, ExpandingContainer.TRANSITION_DURATION,
+                    Easing.OutQuint);
+                mainButton.Icon.MoveToX(expanded.Value ? icon_offset : icon_offset_collapsed, ExpandingContainer.TRANSITION_DURATION, Easing.OutQuint);
             }
             else
             {
                 pickerButton.ResizeWidthTo(0, ExpandingContainer.TRANSITION_DURATION, Easing.OutQuint);
 
                 mainButtonContainer.TransformTo(nameof(mainButtonContainer.Padding), new MarginPadding(), ExpandingContainer.TRANSITION_DURATION, Easing.OutQuint);
-                mainButton.Icon.MoveToX(10, ExpandingContainer.TRANSITION_DURATION, Easing.OutQuint);
+                mainButton.Icon.MoveToX(icon_offset, ExpandingContainer.TRANSITION_DURATION, Easing.OutQuint);
             }
         }
 
@@ -128,10 +137,12 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
             [BackgroundDependencyLoader]
             private void load()
             {
+                Content.CornerRadius = Editor.BUTTON_CORNER_RADIUS;
+
                 Add(Icon = new SpriteIcon
                 {
                     Icon = FontAwesome.Solid.Palette,
-                    Size = new Vector2(16),
+                    Size = new Vector2(Editor.BUTTON_ICON_SIZE),
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                 });
