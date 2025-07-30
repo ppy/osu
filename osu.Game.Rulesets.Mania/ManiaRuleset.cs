@@ -416,9 +416,9 @@ namespace osu.Game.Rulesets.Mania
         };
 
         /// <seealso cref="ManiaHitWindows"/>
-        public override BeatmapDifficulty GetAdjustedDisplayDifficulty(IBeatmapDifficultyInfo difficulty, IReadOnlyCollection<Mod> mods)
+        public override BeatmapDifficulty GetAdjustedDisplayDifficulty(IBeatmapInfo beatmapInfo, IReadOnlyCollection<Mod> mods)
         {
-            BeatmapDifficulty adjustedDifficulty = new BeatmapDifficulty(difficulty);
+            BeatmapDifficulty adjustedDifficulty = base.GetAdjustedDisplayDifficulty(beatmapInfo, mods);
 
             // notably, in mania, hit windows are designed to be independent of track playback rate (see `ManiaHitWindows.SpeedMultiplier`).
             // *however*, to not make matters *too* simple, mania Hard Rock and Easy differ from all other rulesets
@@ -437,17 +437,23 @@ namespace osu.Game.Rulesets.Mania
                 perfectHitWindow /= ManiaModEasy.HIT_WINDOW_DIFFICULTY_MULTIPLIER;
 
             adjustedDifficulty.OverallDifficulty = (float)IBeatmapDifficultyInfo.InverseDifficultyRange(perfectHitWindow, ManiaHitWindows.PERFECT_WINDOW_RANGE);
+            adjustedDifficulty.CircleSize = ManiaBeatmapConverter.GetColumnCount(LegacyBeatmapConversionDifficultyInfo.FromBeatmapInfo(beatmapInfo), mods);
 
             return adjustedDifficulty;
         }
 
-        public override IEnumerable<RulesetBeatmapAttribute> GetBeatmapAttributesForDisplay(IBeatmapDifficultyInfo difficulty, IReadOnlyCollection<Mod> mods)
+        public override IEnumerable<RulesetBeatmapAttribute> GetBeatmapAttributesForDisplay(IBeatmapInfo beatmapInfo, IReadOnlyCollection<Mod> mods)
         {
-            var adjustedDifficulty = GetAdjustedDisplayDifficulty(difficulty, mods);
+            // a special touch-up of key count is required to the original difficulty, since key conversion mods are not `IApplicableToDifficulty`
+            var originalDifficulty = new BeatmapDifficulty(beatmapInfo.Difficulty)
+            {
+                CircleSize = ManiaBeatmapConverter.GetColumnCount(LegacyBeatmapConversionDifficultyInfo.FromBeatmapInfo(beatmapInfo), [])
+            };
+            var adjustedDifficulty = GetAdjustedDisplayDifficulty(beatmapInfo, mods);
 
-            yield return new RulesetBeatmapAttribute(SongSelectStrings.KeyCount, @"KC", difficulty.CircleSize, adjustedDifficulty.CircleSize, 1, 18);
-            yield return new RulesetBeatmapAttribute(SongSelectStrings.Accuracy, @"OD", difficulty.OverallDifficulty, adjustedDifficulty.OverallDifficulty, 0, 10);
-            yield return new RulesetBeatmapAttribute(SongSelectStrings.HPDrain, @"HP", difficulty.DrainRate, adjustedDifficulty.DrainRate, 0, 10);
+            yield return new RulesetBeatmapAttribute(SongSelectStrings.KeyCount, @"KC", originalDifficulty.CircleSize, adjustedDifficulty.CircleSize, 1, 18);
+            yield return new RulesetBeatmapAttribute(SongSelectStrings.Accuracy, @"OD", originalDifficulty.OverallDifficulty, adjustedDifficulty.OverallDifficulty, 0, 10);
+            yield return new RulesetBeatmapAttribute(SongSelectStrings.HPDrain, @"HP", originalDifficulty.DrainRate, adjustedDifficulty.DrainRate, 0, 10);
         }
 
         public override IRulesetFilterCriteria CreateRulesetFilterCriteria()

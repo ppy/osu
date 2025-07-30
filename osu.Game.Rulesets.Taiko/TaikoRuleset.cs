@@ -272,9 +272,9 @@ namespace osu.Game.Rulesets.Taiko
         }
 
         /// <seealso cref="TaikoHitWindows"/>
-        public override BeatmapDifficulty GetAdjustedDisplayDifficulty(IBeatmapDifficultyInfo difficulty, IReadOnlyCollection<Mod> mods)
+        public override BeatmapDifficulty GetAdjustedDisplayDifficulty(IBeatmapInfo beatmapInfo, IReadOnlyCollection<Mod> mods)
         {
-            BeatmapDifficulty adjustedDifficulty = new BeatmapDifficulty(difficulty);
+            BeatmapDifficulty adjustedDifficulty = base.GetAdjustedDisplayDifficulty(beatmapInfo, mods);
             double rate = ModUtils.CalculateRateWithMods(mods);
 
             double greatHitWindow = IBeatmapDifficultyInfo.DifficultyRange(adjustedDifficulty.OverallDifficulty, TaikoHitWindows.GREAT_WINDOW_RANGE);
@@ -284,13 +284,14 @@ namespace osu.Game.Rulesets.Taiko
             return adjustedDifficulty;
         }
 
-        public override IEnumerable<RulesetBeatmapAttribute> GetBeatmapAttributesForDisplay(IBeatmapDifficultyInfo difficulty, IReadOnlyCollection<Mod> mods)
+        public override IEnumerable<RulesetBeatmapAttribute> GetBeatmapAttributesForDisplay(IBeatmapInfo beatmapInfo, IReadOnlyCollection<Mod> mods)
         {
-            var adjustedDifficulty = GetAdjustedDisplayDifficulty(difficulty, mods);
+            var originalDifficulty = beatmapInfo.Difficulty;
+            var adjustedDifficulty = GetAdjustedDisplayDifficulty(beatmapInfo, mods);
 
-            yield return new RulesetBeatmapAttribute(SongSelectStrings.Accuracy, @"OD", difficulty.OverallDifficulty, adjustedDifficulty.OverallDifficulty, 0, 10);
-            yield return new RulesetBeatmapAttribute(SongSelectStrings.HPDrain, @"HP", difficulty.DrainRate, adjustedDifficulty.DrainRate, 0, 10);
-            yield return new RulesetBeatmapAttribute(SongSelectStrings.ScrollSpeed, @"SS", 1f, (float)(adjustedDifficulty.SliderMultiplier / difficulty.SliderMultiplier), 0.25f, 4);
+            yield return new RulesetBeatmapAttribute(SongSelectStrings.Accuracy, @"OD", originalDifficulty.OverallDifficulty, adjustedDifficulty.OverallDifficulty, 0, 10);
+            yield return new RulesetBeatmapAttribute(SongSelectStrings.HPDrain, @"HP", originalDifficulty.DrainRate, adjustedDifficulty.DrainRate, 0, 10);
+            yield return new RulesetBeatmapAttribute(SongSelectStrings.ScrollSpeed, @"SS", 1f, (float)(adjustedDifficulty.SliderMultiplier / originalDifficulty.SliderMultiplier), 0.25f, 4);
         }
     }
 }

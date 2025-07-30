@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -174,13 +173,9 @@ namespace osu.Game.Overlays.Mods
             bpmDisplay.Current.Value = FormatUtils.RoundBPM(BeatmapInfo.Value.BPM, rate);
 
             BeatmapDifficulty originalDifficulty = new BeatmapDifficulty(BeatmapInfo.Value.Difficulty);
-            BeatmapDifficulty adjustedDifficulty = new BeatmapDifficulty(originalDifficulty);
-
-            foreach (var mod in Mods.Value.OfType<IApplicableToDifficulty>())
-                mod.ApplyToDifficulty(adjustedDifficulty);
 
             Ruleset ruleset = GameRuleset.Value.CreateInstance();
-            adjustedDifficulty = ruleset.GetAdjustedDisplayDifficulty(adjustedDifficulty, Mods.Value);
+            var adjustedDifficulty = ruleset.GetAdjustedDisplayDifficulty(BeatmapInfo.Value, Mods.Value);
 
             TooltipContent = new AdjustedAttributesTooltip.Data(originalDifficulty, adjustedDifficulty);
 

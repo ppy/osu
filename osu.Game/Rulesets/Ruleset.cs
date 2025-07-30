@@ -386,24 +386,33 @@ namespace osu.Game.Rulesets
         ///
         /// It is also not always correct, and arguably is never correct depending on your frame of mind.
         /// </summary>
-        /// <param name="difficulty">>The <see cref="IBeatmapDifficultyInfo"/> that will be adjusted.</param>
+        /// <param name="beatmapInfo">The <see cref="IBeatmapInfo"/> for which to display the adjusted difficulty.</param>
         /// <param name="mods">The active mods.</param>
         /// <returns>The adjusted difficulty attributes.</returns>
-        public virtual BeatmapDifficulty GetAdjustedDisplayDifficulty(IBeatmapDifficultyInfo difficulty, IReadOnlyCollection<Mod> mods) => new BeatmapDifficulty(difficulty);
+        public virtual BeatmapDifficulty GetAdjustedDisplayDifficulty(IBeatmapInfo beatmapInfo, IReadOnlyCollection<Mod> mods)
+        {
+            BeatmapDifficulty adjustedDifficulty = new BeatmapDifficulty(beatmapInfo.Difficulty);
+
+            foreach (var mod in mods.OfType<IApplicableToDifficulty>())
+                mod.ApplyToDifficulty(adjustedDifficulty);
+
+            return adjustedDifficulty;
+        }
 
         /// <summary>
         /// Returns a list of <see cref="RulesetBeatmapAttribute"/>s to be displayed wherever it is wanted to display a given beatmap's difficulty information.
         /// The returned data includes both material changes to difficulty from <see cref="IApplicableToDifficulty"/> mods,
         /// as well as "effective" adjustments coming from <see cref="GetAdjustedDisplayDifficulty"/>.
         /// </summary>
-        public virtual IEnumerable<RulesetBeatmapAttribute> GetBeatmapAttributesForDisplay(IBeatmapDifficultyInfo difficulty, IReadOnlyCollection<Mod> mods)
+        public virtual IEnumerable<RulesetBeatmapAttribute> GetBeatmapAttributesForDisplay(IBeatmapInfo beatmapInfo, IReadOnlyCollection<Mod> mods)
         {
-            var adjustedDifficulty = GetAdjustedDisplayDifficulty(difficulty, mods);
+            var originalDifficulty = beatmapInfo.Difficulty;
+            var adjustedDifficulty = GetAdjustedDisplayDifficulty(beatmapInfo, mods);
 
-            yield return new RulesetBeatmapAttribute(SongSelectStrings.CircleSize, @"CS", difficulty.CircleSize, adjustedDifficulty.CircleSize, 0, 10);
-            yield return new RulesetBeatmapAttribute(SongSelectStrings.ApproachRate, @"AR", difficulty.ApproachRate, adjustedDifficulty.ApproachRate, 0, 10);
-            yield return new RulesetBeatmapAttribute(SongSelectStrings.Accuracy, @"OD", difficulty.OverallDifficulty, adjustedDifficulty.OverallDifficulty, 0, 10);
-            yield return new RulesetBeatmapAttribute(SongSelectStrings.HPDrain, @"HP", difficulty.DrainRate, adjustedDifficulty.DrainRate, 0, 10);
+            yield return new RulesetBeatmapAttribute(SongSelectStrings.CircleSize, @"CS", originalDifficulty.CircleSize, adjustedDifficulty.CircleSize, 0, 10);
+            yield return new RulesetBeatmapAttribute(SongSelectStrings.ApproachRate, @"AR", originalDifficulty.ApproachRate, adjustedDifficulty.ApproachRate, 0, 10);
+            yield return new RulesetBeatmapAttribute(SongSelectStrings.Accuracy, @"OD", originalDifficulty.OverallDifficulty, adjustedDifficulty.OverallDifficulty, 0, 10);
+            yield return new RulesetBeatmapAttribute(SongSelectStrings.HPDrain, @"HP", originalDifficulty.DrainRate, adjustedDifficulty.DrainRate, 0, 10);
         }
 
         /// <summary>

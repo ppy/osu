@@ -131,16 +131,8 @@ namespace osu.Game.Beatmaps.Drawables
 
             double bpmAdjusted = displayedContent.BeatmapInfo.BPM * rate;
 
-            BeatmapDifficulty originalDifficulty = new BeatmapDifficulty(displayedContent.BeatmapInfo.Difficulty);
-
-            if (displayedContent.Mods != null)
-            {
-                foreach (var mod in displayedContent.Mods.OfType<IApplicableToDifficulty>())
-                    mod.ApplyToDifficulty(originalDifficulty);
-            }
-
             Ruleset ruleset = displayedContent.Ruleset.CreateInstance();
-            BeatmapDifficulty adjustedDifficulty = ruleset.GetAdjustedDisplayDifficulty(originalDifficulty, displayedContent.Mods ?? []);
+            BeatmapDifficulty adjustedDifficulty = ruleset.GetAdjustedDisplayDifficulty(displayedContent.BeatmapInfo, displayedContent.Mods ?? []);
 
             circleSize.Text = @"CS: " + adjustedDifficulty.CircleSize.ToString(@"0.##");
             drainRate.Text = @" HP: " + adjustedDifficulty.DrainRate.ToString(@"0.##");
