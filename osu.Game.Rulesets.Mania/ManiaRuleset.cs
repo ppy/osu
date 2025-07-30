@@ -451,9 +451,9 @@ namespace osu.Game.Rulesets.Mania
             };
             var adjustedDifficulty = GetAdjustedDisplayDifficulty(beatmapInfo, mods);
 
-            yield return new RulesetBeatmapAttribute(SongSelectStrings.KeyCount, @"KC", originalDifficulty.CircleSize, adjustedDifficulty.CircleSize, 1, 18);
-            yield return new RulesetBeatmapAttribute(SongSelectStrings.Accuracy, @"OD", originalDifficulty.OverallDifficulty, adjustedDifficulty.OverallDifficulty, 0, 10);
-            yield return new RulesetBeatmapAttribute(SongSelectStrings.HPDrain, @"HP", originalDifficulty.DrainRate, adjustedDifficulty.DrainRate, 0, 10);
+            yield return new RulesetBeatmapAttribute(SongSelectStrings.KeyCount, @"KC", originalDifficulty.CircleSize, adjustedDifficulty.CircleSize, 18);
+            yield return new RulesetBeatmapAttribute(SongSelectStrings.Accuracy, @"OD", originalDifficulty.OverallDifficulty, adjustedDifficulty.OverallDifficulty, 10);
+            yield return new RulesetBeatmapAttribute(SongSelectStrings.HPDrain, @"HP", originalDifficulty.DrainRate, adjustedDifficulty.DrainRate, 10);
         }
 
         public override IRulesetFilterCriteria CreateRulesetFilterCriteria()
