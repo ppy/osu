@@ -61,10 +61,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             // Total difficult hits measures the total difficulty of a map based on its consistency factor.
             totalDifficultHits = totalHits * taikoAttributes.ConsistencyFactor;
 
-            // Converts are detected and omitted from mod-specific bonuses due to the scope of current difficulty calculation.
+            // Converts and the classic mod are detected and omitted from mod-specific bonuses due to the scope of current difficulty calculation.
             bool isConvert = score.BeatmapInfo!.Ruleset.OnlineID != 1;
+            bool isClassic = score.Mods.Any(m => m is ModClassic);
 
-            double difficultyValue = computeDifficultyValue(score, taikoAttributes, isConvert) * 1.08;
+            double difficultyValue = computeDifficultyValue(score, taikoAttributes, isConvert, isClassic) * 1.08;
             double accuracyValue = computeAccuracyValue(score, taikoAttributes, isConvert) * 1.1;
 
             return new TaikoPerformanceAttributes
@@ -76,7 +77,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             };
         }
 
-        private double computeDifficultyValue(ScoreInfo score, TaikoDifficultyAttributes attributes, bool isConvert)
+        private double computeDifficultyValue(ScoreInfo score, TaikoDifficultyAttributes attributes, bool isConvert, bool isClassic)
         {
             if (estimatedUnstableRate == null)
                 return 0;
@@ -112,7 +113,15 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             difficultyValue *= Math.Pow(missPenalty, countMiss);
 
             if (score.Mods.Any(m => m is ModHidden))
-                difficultyValue *= (isConvert) ? 1.025 : 1.1;
+            {
+                double hiddenBonus = isConvert ? 0.025 : 0.1;
+
+                // A penalty is applied to the bonus for hidden on non-classic scores, as the playfield can be made wider to make fast reading easier.
+                if (!isClassic)
+                    hiddenBonus *= 0.2;
+
+                difficultyValue *= 1 + hiddenBonus;
+            }
 
             if (score.Mods.Any(m => m is ModFlashlight<TaikoHitObject>))
                 difficultyValue *= Math.Max(1, 1.050 - Math.Min(attributes.MonoStaminaFactor / 50, 1) * lengthBonus);
