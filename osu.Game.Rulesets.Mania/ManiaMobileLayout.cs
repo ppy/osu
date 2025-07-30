@@ -13,5 +13,7 @@ namespace osu.Game.Rulesets.Mania
 
         [LocalisableDescription(typeof(RulesetSettingsStrings), nameof(RulesetSettingsStrings.LandscapeExpandedColumns))]
         Landscape,
+
+        LandscapeWithOverlay,
     }
 }

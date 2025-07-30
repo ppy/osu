@@ -60,6 +60,7 @@ namespace osu.Game.Rulesets.Mania
                 {
                     LabelText = RulesetSettingsStrings.MobileLayout,
                     Current = config.GetBindable<ManiaMobileLayout>(ManiaRulesetSetting.MobileLayout),
+                    Items = [ManiaMobileLayout.Portrait, ManiaMobileLayout.Landscape]
                 });
             }
         }

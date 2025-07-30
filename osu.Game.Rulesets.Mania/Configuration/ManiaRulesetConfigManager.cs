@@ -14,6 +14,7 @@ namespace osu.Game.Rulesets.Mania.Configuration
         public ManiaRulesetConfigManager(SettingsStore? settings, RulesetInfo ruleset, int? variant = null)
             : base(settings, ruleset, variant)
         {
+            Migrate();
         }
 
         protected override void InitialiseDefaults()
@@ -25,6 +26,16 @@ namespace osu.Game.Rulesets.Mania.Configuration
             SetDefault(ManiaRulesetSetting.TimingBasedNoteColouring, false);
             SetDefault(ManiaRulesetSetting.MobileLayout, ManiaMobileLayout.Portrait);
             SetDefault(ManiaRulesetSetting.TouchOverlay, false);
+        }
+
+        public void Migrate()
+        {
+            var mobileLayout = GetBindable<ManiaMobileLayout>(ManiaRulesetSetting.MobileLayout);
+            if (mobileLayout.Value == ManiaMobileLayout.LandscapeWithOverlay)
+            {
+                mobileLayout.Value = ManiaMobileLayout.Landscape;
+                GetBindable<bool>(ManiaRulesetSetting.TouchOverlay).Value = true;
+            }
         }
 
         public override TrackedSettings CreateTrackedSettings() => new TrackedSettings
