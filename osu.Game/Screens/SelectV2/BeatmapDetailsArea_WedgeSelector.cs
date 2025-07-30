@@ -5,6 +5,7 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
@@ -89,7 +90,7 @@ namespace osu.Game.Screens.SelectV2
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Text = value.ToString(),
+                            Text = value.GetLocalisableDescription(),
                             Font = OsuFont.Style.Body,
                         },
                         new HoverSounds(HoverSampleSet.TabSelect)

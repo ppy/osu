@@ -4,6 +4,8 @@
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -16,7 +18,6 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osuTK;
-using osuTK.Graphics;
 using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Menu
@@ -25,6 +26,9 @@ namespace osu.Game.Screens.Menu
     {
         [Resolved]
         private OsuConfigManager config { get; set; } = null!;
+
+        [Resolved]
+        private OsuColour colours { get; set; } = null!;
 
         private LinkFlowContainer textFlow = null!;
 
@@ -45,14 +49,14 @@ namespace osu.Game.Screens.Menu
                     RelativeSizeAxes = Axes.Both,
                     Masking = true,
                     CornerExponent = 2.5f,
-                    CornerRadius = 15,
+                    CornerRadius = 10,
                     Children = new Drawable[]
                     {
                         new Box
                         {
-                            Colour = Color4.Black,
+                            Colour = Color4Extensions.FromHex("#171A1C"),
                             RelativeSizeAxes = Axes.Both,
-                            Alpha = 0.4f,
+                            Alpha = 0.75f,
                         },
                     }
                 },
@@ -84,12 +88,23 @@ namespace osu.Game.Screens.Menu
             }
 
             static void formatRegular(SpriteText t) => t.Font = OsuFont.GetFont(size: 16, weight: FontWeight.Regular);
-            static void formatSemiBold(SpriteText t) => t.Font = OsuFont.GetFont(size: 16, weight: FontWeight.SemiBold);
+
+            void formatSemiBold(SpriteText t)
+            {
+                t.Font = OsuFont.GetFont(Typeface.TorusAlternate, 16, weight: FontWeight.SemiBold);
+                t.Colour = colours.Pink0;
+            }
 
             var tip = getRandomTip();
 
             textFlow.Clear();
-            textFlow.AddParagraph(MenuTipStrings.MenuTipTitle, formatSemiBold);
+            textFlow.AddIcon(FontAwesome.Solid.Lightbulb, icon =>
+            {
+                icon.Colour = colours.Pink0;
+                icon.Size = new Vector2(16);
+            });
+            textFlow.AddText(" ");
+            textFlow.AddText(MenuTipStrings.MenuTipTitle.ToSentence(), formatSemiBold);
             textFlow.AddParagraph(tip, formatRegular);
 
             this
@@ -112,10 +127,12 @@ namespace osu.Game.Screens.Menu
             switch (tipIndex)
             {
                 case 0:
-                    return MenuTipStrings.ToggleToolbarShortcut(keyBindingStore.GetReadableKeyCombinationsFor(GlobalAction.ToggleToolbar).FirstOrDefault() ?? InputSettingsStrings.ActionHasNoKeyBinding);
+                    return MenuTipStrings.ToggleToolbarShortcut(
+                        keyBindingStore.GetReadableKeyCombinationsFor(GlobalAction.ToggleToolbar).FirstOrDefault() ?? InputSettingsStrings.ActionHasNoKeyBinding);
 
                 case 1:
-                    return MenuTipStrings.GameSettingsShortcut(keyBindingStore.GetReadableKeyCombinationsFor(GlobalAction.ToggleSettings).FirstOrDefault() ?? InputSettingsStrings.ActionHasNoKeyBinding);
+                    return MenuTipStrings.GameSettingsShortcut(
+                        keyBindingStore.GetReadableKeyCombinationsFor(GlobalAction.ToggleSettings).FirstOrDefault() ?? InputSettingsStrings.ActionHasNoKeyBinding);
 
                 case 2:
                     return MenuTipStrings.DynamicSettings;
@@ -130,7 +147,8 @@ namespace osu.Game.Screens.Menu
                     return MenuTipStrings.ScreenScalingSettings;
 
                 case 6:
-                    return MenuTipStrings.FreeOsuDirect(keyBindingStore.GetReadableKeyCombinationsFor(GlobalAction.ToggleBeatmapListing).FirstOrDefault() ?? InputSettingsStrings.ActionHasNoKeyBinding);
+                    return MenuTipStrings.FreeOsuDirect(keyBindingStore.GetReadableKeyCombinationsFor(GlobalAction.ToggleBeatmapListing).FirstOrDefault()
+                                                        ?? InputSettingsStrings.ActionHasNoKeyBinding);
 
                 case 7:
                     return MenuTipStrings.ReplaySeeking;
@@ -184,7 +202,8 @@ namespace osu.Game.Screens.Menu
                     return MenuTipStrings.RandomSkinShortcut(keyBindingStore.GetReadableKeyCombinationsFor(GlobalAction.RandomSkin).FirstOrDefault() ?? InputSettingsStrings.ActionHasNoKeyBinding);
 
                 case 24:
-                    return MenuTipStrings.ToggleReplaySettingsShortcut(keyBindingStore.GetReadableKeyCombinationsFor(GlobalAction.ToggleReplaySettings).FirstOrDefault() ?? InputSettingsStrings.ActionHasNoKeyBinding);
+                    return MenuTipStrings.ToggleReplaySettingsShortcut(keyBindingStore.GetReadableKeyCombinationsFor(GlobalAction.ToggleReplaySettings).FirstOrDefault()
+                                                                       ?? InputSettingsStrings.ActionHasNoKeyBinding);
 
                 case 25:
                     return MenuTipStrings.CopyModsFromScore;
