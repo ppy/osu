@@ -98,10 +98,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
             if (score.Mods.Any(m => m is ModHidden))
             {
-                double hiddenBonus = (isConvert) ? 0.025 : 0.1;
+                double hiddenBonus = isConvert ? 0.025 : 0.1;
 
                 // A penalty is applied to the bonus for hidden on non-classic scores, as the playfield can be made wider to make fast reading easier.
-                if (!isClassic) hiddenBonus *= 0.2;
+                if (!isClassic) 
+                    hiddenBonus *= 0.2;
 
                 difficultyValue *= 1 + hiddenBonus;
             }
