@@ -10,10 +10,12 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Extensions;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
@@ -23,6 +25,7 @@ using osu.Game.Rulesets;
 using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
 using osu.Game.Screens.Play;
+using Realms;
 
 namespace osu.Game.Database
 {
@@ -66,6 +69,9 @@ namespace osu.Game.Database
         [Resolved]
         private Storage storage { get; set; } = null!;
 
+        [Resolved]
+        private OsuConfigManager config { get; set; } = null!;
+
         protected virtual int TimeToSleepDuringGameplay => 30000;
 
         protected override void LoadComplete()
@@ -85,6 +91,7 @@ namespace osu.Game.Database
                 convertLegacyTotalScoreToStandardised();
                 upgradeScoreRanks();
                 backpopulateMissingSubmissionAndRankDates();
+                backpopulateUserTags();
             }, TaskCreationOptions.LongRunning).ContinueWith(t =>
             {
                 if (t.Exception?.InnerException is ObjectDisposedException)
@@ -481,7 +488,7 @@ namespace osu.Game.Database
             if (scoreIds.Count == 0)
                 return;
 
-            var notification = showProgressNotification(scoreIds.Count, "Adjusting ranks of scores", "scores now have more correct ranks");
+            var notification = showProgressNotification(scoreIds.Count, "Adjusting ranks of scores", "scores now have more correct ranks.");
 
             int processedCount = 0;
             int failedCount = 0;
@@ -619,6 +626,104 @@ namespace osu.Game.Database
             }
 
             completeNotification(notification, processedCount, beatmapSetIds.Count, failedCount);
+        }
+
+        private void backpopulateUserTags()
+        {
+            var localMetadataSource = new LocalCachedBeatmapMetadataSource(storage);
+
+            if (!localMetadataSource.Available || localMetadataSource.GetCacheVersion() < 3)
+            {
+                Logger.Log(@"Local metadata cache has too low version to backpopulate user tags, attempting refetch...");
+                localMetadataSource.FetchCache().WaitSafely();
+
+                if (!localMetadataSource.Available || localMetadataSource.GetCacheVersion() < 3)
+                {
+                    Logger.Log(@"Local metadata cache refetch failed. Aborting user tags backpopulation.");
+                    return;
+                }
+            }
+
+            var lastPopulation = config.Get<DateTime?>(OsuSetting.LastOnlineTagsPopulation);
+            // dropping time data here completely is intentional, because storing the date to config is a lossy operation
+            // (truncates some ticks off of the date when it's being converted to string and back).
+            // therefore, if precision isn't explicitly constrained, the condition below would always fail just because the date stored to config
+            // is less accurate than the cache file's fetch date which is stored with higher precision in the filesystem metadata.
+            var metadataSourceFetchDate = localMetadataSource.GetCacheFetchDate()?.Date;
+
+            if (metadataSourceFetchDate <= lastPopulation)
+            {
+                Logger.Log($@"Skipping user tag population because the local metadata source hasn't been updated since the last time user tags were checked ({lastPopulation.Value:d})");
+                return;
+            }
+
+            Logger.Log(@"Querying for beatmaps that do not have user tags");
+
+            // it is not an abnormal situation for a map not to have user tags.
+            // while this is constrained to run every month or so (every time a new online.db cache is retrieved), there's some chance that this will still run much too often and be annoying to users.
+            // if that turns out to be the case we may need a better way to debounce this (or just delete the backpopulation logic after some time has passed?)
+            HashSet<Guid> beatmapIds = realmAccess.Run(r => new HashSet<Guid>(
+                r.All<BeatmapInfo>()
+                 .Filter($"{nameof(BeatmapInfo.Metadata)}.{nameof(BeatmapMetadata.UserTags)}.@count == 0 AND {nameof(BeatmapInfo.StatusInt)} IN {{ 1,2,4 }}")
+                 .AsEnumerable()
+                 .Select(b => b.ID)));
+
+            if (beatmapIds.Count == 0)
+                return;
+
+            Logger.Log($@"Found {beatmapIds.Count} beatmaps with missing user tags.");
+
+            var notification = showProgressNotification(beatmapIds.Count, @"Populating missing user tags", @"beatmaps have had their tags updated.");
+
+            int processedCount = 0;
+            int failedCount = 0;
+
+            foreach (var id in beatmapIds)
+            {
+                if (notification?.State == ProgressNotificationState.Cancelled)
+                    break;
+
+                updateNotificationProgress(notification, processedCount, beatmapIds.Count);
+
+                sleepIfRequired();
+
+                try
+                {
+                    // Can't use async overload because we're not on the update thread.
+                    // ReSharper disable once MethodHasAsyncOverload
+                    realmAccess.Write(r =>
+                    {
+                        BeatmapInfo beatmap = r.Find<BeatmapInfo>(id)!;
+
+                        bool lookupSucceeded = localMetadataSource.TryLookup(beatmap, out var result);
+
+                        if (lookupSucceeded)
+                        {
+                            Debug.Assert(result != null);
+                            beatmap.Metadata.UserTags.Clear();
+                            beatmap.Metadata.UserTags.AddRange(result.UserTags);
+                            return beatmap.Metadata.UserTags.Any();
+                        }
+
+                        Logger.Log(@$"Could not find {beatmap.GetDisplayString()} in local cache while backpopulating missing user tags");
+                        return false;
+                    });
+
+                    ++processedCount;
+                }
+                catch (ObjectDisposedException)
+                {
+                    throw;
+                }
+                catch (Exception e)
+                {
+                    Logger.Log(@$"Failed to update ranked/submitted dates for beatmap set {id}: {e}");
+                    ++failedCount;
+                }
+            }
+
+            completeNotification(notification, processedCount, beatmapIds.Count, failedCount);
+            config.SetValue(OsuSetting.LastOnlineTagsPopulation, metadataSourceFetchDate);
         }
 
         private void updateNotificationProgress(ProgressNotification? notification, int processedCount, int totalCount)
