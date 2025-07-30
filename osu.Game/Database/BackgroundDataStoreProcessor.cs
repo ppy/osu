@@ -660,7 +660,7 @@ namespace osu.Game.Database
             Logger.Log(@"Querying for beatmaps that do not have user tags");
 
             // it is not an abnormal situation for a map not to have user tags.
-            // therefore there's some chance that this will run much too often and be annoying to users.
+            // while this is constrained to run every month or so (every time a new online.db cache is retrieved), there's some chance that this will still run much too often and be annoying to users.
             // if that turns out to be the case we may need a better way to debounce this (or just delete the backpopulation logic after some time has passed?)
             HashSet<Guid> beatmapIds = realmAccess.Run(r => new HashSet<Guid>(
                 r.All<BeatmapInfo>()
