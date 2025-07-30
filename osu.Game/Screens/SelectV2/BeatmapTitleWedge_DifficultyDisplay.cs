@@ -241,7 +241,7 @@ namespace osu.Game.Screens.SelectV2
                 if (beatmap.IsDefault)
                 {
                     ratingAndNameContainer.FadeOut(300, Easing.OutQuint);
-                    countStatisticsDisplay.Statistics = Array.Empty<StatisticDifficulty.Data>();
+                    countStatisticsDisplay.FadeOut(300, Easing.OutQuint);
                 }
                 else
                 {
@@ -261,7 +261,7 @@ namespace osu.Game.Screens.SelectV2
             {
                 if (beatmap.IsDefault)
                 {
-                    countStatisticsDisplay.Statistics = Array.Empty<StatisticDifficulty.Data>();
+                    countStatisticsDisplay.FadeOut(300, Easing.OutQuint);
                     return;
                 }
 
@@ -279,6 +279,7 @@ namespace osu.Game.Screens.SelectV2
                         if (cancellationToken.IsCancellationRequested)
                             return;
 
+                        countStatisticsDisplay.FadeIn(200, Easing.OutQuint);
                         countStatisticsDisplay.Statistics = statistics;
                     });
                 }, cancellationToken);
