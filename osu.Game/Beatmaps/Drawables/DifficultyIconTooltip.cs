@@ -125,7 +125,7 @@ namespace osu.Game.Beatmaps.Drawables
                                            .Select(attr => new OsuSpriteText
                                            {
                                                Font = OsuFont.Style.Caption1,
-                                               Text = $@"{attr.Acronym}: {attr.Value:0.##}"
+                                               Text = $@"{attr.Acronym}: {attr.AdjustedValue:0.##}"
                                            });
 
             difficultyFillFlowContainer.Clear();

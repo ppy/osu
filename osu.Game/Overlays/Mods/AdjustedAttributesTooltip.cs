@@ -86,8 +86,8 @@ namespace osu.Game.Overlays.Mods
             {
                 foreach (var attribute in data.Attributes)
                 {
-                    if (!Precision.AlmostEquals(attribute.Value, attribute.AdjustedValue))
-                        attributesFillFlow.Add(new AttributeDisplay(attribute.Acronym, attribute.Value, attribute.AdjustedValue));
+                    if (!Precision.AlmostEquals(attribute.OriginalValue, attribute.AdjustedValue))
+                        attributesFillFlow.Add(new AttributeDisplay(attribute.Acronym, attribute.OriginalValue, attribute.AdjustedValue));
                 }
             }
 
