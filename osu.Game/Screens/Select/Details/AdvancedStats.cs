@@ -40,7 +40,7 @@ namespace osu.Game.Screens.Select.Details
         [Resolved]
         private BeatmapDifficultyCache difficultyCache { get; set; }
 
-        private readonly FillFlowContainer flow;
+        protected FillFlowContainer Flow { get; private set; }
         private readonly StatisticRow starDifficulty;
 
         public ITooltip<AdjustedAttributesTooltip.Data> GetCustomTooltip() => new AdjustedAttributesTooltip();
@@ -85,7 +85,7 @@ namespace osu.Game.Screens.Select.Details
             switch (columns)
             {
                 case 1:
-                    Child = flow = new FillFlowContainer
+                    Child = Flow = new FillFlowContainer
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
@@ -101,7 +101,7 @@ namespace osu.Game.Screens.Select.Details
                     break;
 
                 case 2:
-                    Child = flow = new FillFlowContainer
+                    Child = Flow = new FillFlowContainer
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
@@ -120,8 +120,8 @@ namespace osu.Game.Screens.Select.Details
                     break;
             }
 
-            Debug.Assert(flow != null);
-            flow.SetLayoutPosition(starDifficulty, float.MaxValue);
+            Debug.Assert(Flow != null);
+            Flow.SetLayoutPosition(starDifficulty, float.MaxValue);
         }
 
         [BackgroundDependencyLoader]
@@ -164,9 +164,9 @@ namespace osu.Game.Screens.Select.Details
 
                 // if there are not enough attribute displays, make more
                 // the subtraction of 1 is to exclude the star rating row which is always present (and always last)
-                for (int i = flow.Count - 1; i < displayAttributes.Count; i++)
+                for (int i = Flow.Count - 1; i < displayAttributes.Count; i++)
                 {
-                    flow.Add(new StatisticRow()
+                    Flow.Add(new StatisticRow()
                     {
                         Width = columns == 1 ? 1 : 0.5f,
                         Padding = columns == 1 ? new MarginPadding() : new MarginPadding { Horizontal = 5, Vertical = 2.5f },
@@ -177,7 +177,7 @@ namespace osu.Game.Screens.Select.Details
                 for (int i = 0; i < displayAttributes.Count; i++)
                 {
                     var attribute = displayAttributes[i];
-                    var display = (StatisticRow)flow.Where(r => r != starDifficulty).ElementAt(i);
+                    var display = (StatisticRow)Flow.Where(r => r != starDifficulty).ElementAt(i);
 
                     display.Title = attribute.Label;
                     display.MaxValue = attribute.MaxValue;
@@ -186,7 +186,7 @@ namespace osu.Game.Screens.Select.Details
                 }
 
                 // and hide any extra ones
-                foreach (var row in flow.Where(r => r != starDifficulty).Skip(displayAttributes.Count))
+                foreach (var row in Flow.Where(r => r != starDifficulty).Skip(displayAttributes.Count))
                     row.Alpha = 0;
             }
 
