@@ -33,6 +33,7 @@ using osu.Game.Screens.Ranking.Statistics;
 using osu.Game.Skinning;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Configuration;
+using osu.Game.Localisation;
 using osu.Game.Rulesets.Scoring.Legacy;
 using osu.Game.Rulesets.Taiko.Configuration;
 using osu.Game.Rulesets.Taiko.Edit.Setup;
@@ -281,6 +282,15 @@ namespace osu.Game.Rulesets.Taiko
             adjustedDifficulty.OverallDifficulty = (float)IBeatmapDifficultyInfo.InverseDifficultyRange(greatHitWindow, TaikoHitWindows.GREAT_WINDOW_RANGE);
 
             return adjustedDifficulty;
+        }
+
+        public override IEnumerable<RulesetBeatmapAttribute> GetBeatmapAttributesForDisplay(IBeatmapDifficultyInfo difficulty, IReadOnlyCollection<Mod> mods)
+        {
+            var adjustedDifficulty = GetAdjustedDisplayDifficulty(difficulty, mods);
+
+            yield return new RulesetBeatmapAttribute(SongSelectStrings.Accuracy, @"OD", difficulty.OverallDifficulty, adjustedDifficulty.OverallDifficulty, 0, 10);
+            yield return new RulesetBeatmapAttribute(SongSelectStrings.HPDrain, @"HP", difficulty.DrainRate, adjustedDifficulty.DrainRate, 0, 10);
+            yield return new RulesetBeatmapAttribute(SongSelectStrings.ScrollSpeed, @"SS", 1f, (float)(adjustedDifficulty.SliderMultiplier / difficulty.SliderMultiplier), 0.25f, 4);
         }
     }
 }

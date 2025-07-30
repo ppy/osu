@@ -17,6 +17,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Configuration;
 using osu.Game.Extensions;
+using osu.Game.Localisation;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Difficulty;
@@ -389,6 +390,21 @@ namespace osu.Game.Rulesets
         /// <param name="mods">The active mods.</param>
         /// <returns>The adjusted difficulty attributes.</returns>
         public virtual BeatmapDifficulty GetAdjustedDisplayDifficulty(IBeatmapDifficultyInfo difficulty, IReadOnlyCollection<Mod> mods) => new BeatmapDifficulty(difficulty);
+
+        /// <summary>
+        /// Returns a list of <see cref="RulesetBeatmapAttribute"/>s to be displayed wherever it is wanted to display a given beatmap's difficulty information.
+        /// The returned data includes both material changes to difficulty from <see cref="IApplicableToDifficulty"/> mods,
+        /// as well as "effective" adjustments coming from <see cref="GetAdjustedDisplayDifficulty"/>.
+        /// </summary>
+        public virtual IEnumerable<RulesetBeatmapAttribute> GetBeatmapAttributesForDisplay(IBeatmapDifficultyInfo difficulty, IReadOnlyCollection<Mod> mods)
+        {
+            var adjustedDifficulty = GetAdjustedDisplayDifficulty(difficulty, mods);
+
+            yield return new RulesetBeatmapAttribute(SongSelectStrings.CircleSize, @"CS", difficulty.CircleSize, adjustedDifficulty.CircleSize, 0, 10);
+            yield return new RulesetBeatmapAttribute(SongSelectStrings.ApproachRate, @"AR", difficulty.ApproachRate, adjustedDifficulty.ApproachRate, 0, 10);
+            yield return new RulesetBeatmapAttribute(SongSelectStrings.Accuracy, @"OD", difficulty.OverallDifficulty, adjustedDifficulty.OverallDifficulty, 0, 10);
+            yield return new RulesetBeatmapAttribute(SongSelectStrings.HPDrain, @"HP", difficulty.DrainRate, adjustedDifficulty.DrainRate, 0, 10);
+        }
 
         /// <summary>
         /// Creates ruleset-specific beatmap filter criteria to be used on the song select screen.
