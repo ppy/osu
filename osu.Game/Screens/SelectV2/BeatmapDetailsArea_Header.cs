@@ -79,14 +79,6 @@ namespace osu.Game.Screens.SelectV2
                                         Text = UserInterfaceStrings.SelectedMods,
                                         Height = 30f,
                                     },
-                                    sortDropdown = new ShearedDropdown<LeaderboardSortMode>(BeatmapLeaderboardWedgeStrings.Sort)
-                                    {
-                                        Anchor = Anchor.TopRight,
-                                        Origin = Anchor.TopRight,
-                                        RelativeSizeAxes = Axes.X,
-                                        Width = 0,
-                                        Items = Enum.GetValues<LeaderboardSortMode>(),
-                                    },
                                     scopeDropdown = new ScopeDropdown
                                     {
                                         Anchor = Anchor.TopRight,
@@ -94,6 +86,14 @@ namespace osu.Game.Screens.SelectV2
                                         RelativeSizeAxes = Axes.X,
                                         Width = 0.4f,
                                         Current = { Value = BeatmapLeaderboardScope.Global },
+                                    },
+                                    sortDropdown = new ShearedDropdown<LeaderboardSortMode>(BeatmapLeaderboardWedgeStrings.Sort)
+                                    {
+                                        Anchor = Anchor.TopRight,
+                                        Origin = Anchor.TopRight,
+                                        RelativeSizeAxes = Axes.X,
+                                        Width = 0,
+                                        Items = Enum.GetValues<LeaderboardSortMode>(),
                                     },
                                 },
                             },
