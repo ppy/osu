@@ -13,6 +13,7 @@ using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
+using osu.Game.Rulesets.Difficulty;
 using osuTK;
 using osuTK.Graphics;
 
@@ -191,7 +192,13 @@ namespace osu.Game.Screens.SelectV2
                 }
             }
 
-            public record Data(LocalisableString Label, float Value, float AdjustedValue, float Maximum, string? Content = null);
+            public record Data(LocalisableString Label, float Value, float AdjustedValue, float Maximum, string? Content = null)
+            {
+                public Data(RulesetBeatmapAttribute attribute)
+                    : this(attribute.Label, attribute.Value, attribute.AdjustedValue, attribute.MaxValue)
+                {
+                }
+            }
         }
     }
 }
