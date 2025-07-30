@@ -22,8 +22,9 @@ namespace osu.Game.Rulesets.Taiko.Tests
         {
             var ruleset = new TaikoRuleset();
             var difficulty = new BeatmapDifficulty { OverallDifficulty = originalOverallDifficulty };
+            var beatmapInfo = new BeatmapInfo { Difficulty = difficulty };
 
-            var adjustedDifficulty = ruleset.GetAdjustedDisplayDifficulty(difficulty, []);
+            var adjustedDifficulty = ruleset.GetAdjustedDisplayDifficulty(beatmapInfo, []);
 
             Assert.That(adjustedDifficulty.OverallDifficulty, Is.EqualTo(originalOverallDifficulty));
         }
@@ -33,8 +34,9 @@ namespace osu.Game.Rulesets.Taiko.Tests
         {
             var ruleset = new TaikoRuleset();
             var difficulty = new BeatmapDifficulty();
+            var beatmapInfo = new BeatmapInfo { Difficulty = difficulty };
 
-            var adjustedDifficulty = ruleset.GetAdjustedDisplayDifficulty(difficulty, [new TaikoModHalfTime()]);
+            var adjustedDifficulty = ruleset.GetAdjustedDisplayDifficulty(beatmapInfo, [new TaikoModHalfTime()]);
 
             Assert.That(adjustedDifficulty.OverallDifficulty, Is.EqualTo(1.11).Within(0.01));
         }
@@ -44,8 +46,9 @@ namespace osu.Game.Rulesets.Taiko.Tests
         {
             var ruleset = new TaikoRuleset();
             var difficulty = new BeatmapDifficulty();
+            var beatmapInfo = new BeatmapInfo { Difficulty = difficulty };
 
-            var adjustedDifficulty = ruleset.GetAdjustedDisplayDifficulty(difficulty, [new TaikoModDoubleTime()]);
+            var adjustedDifficulty = ruleset.GetAdjustedDisplayDifficulty(beatmapInfo, [new TaikoModDoubleTime()]);
 
             Assert.That(adjustedDifficulty.OverallDifficulty, Is.EqualTo(8.89).Within(0.01));
         }

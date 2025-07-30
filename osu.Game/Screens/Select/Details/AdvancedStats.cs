@@ -17,7 +17,6 @@ using osu.Game.Beatmaps;
 using osu.Framework.Bindables;
 using System.Collections.Generic;
 using osu.Game.Rulesets.Mods;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Extensions;
@@ -171,24 +170,13 @@ namespace osu.Game.Screens.Select.Details
 
         private void updateStatistics()
         {
-            IBeatmapDifficultyInfo baseDifficulty = BeatmapInfo?.Difficulty;
+            var baseDifficulty = BeatmapInfo?.Difficulty != null ? new BeatmapDifficulty(BeatmapInfo.Difficulty) : null;
             BeatmapDifficulty adjustedDifficulty = null;
 
-            if (baseDifficulty != null)
+            if (baseDifficulty != null && Ruleset.Value != null)
             {
-                BeatmapDifficulty originalDifficulty = new BeatmapDifficulty(baseDifficulty);
-
-                foreach (var mod in Mods.Value.OfType<IApplicableToDifficulty>())
-                    mod.ApplyToDifficulty(originalDifficulty);
-
-                adjustedDifficulty = originalDifficulty;
-
-                if (Ruleset.Value != null)
-                {
-                    adjustedDifficulty = Ruleset.Value.CreateInstance().GetAdjustedDisplayDifficulty(originalDifficulty, Mods.Value);
-
-                    TooltipContent = new AdjustedAttributesTooltip.Data(originalDifficulty, adjustedDifficulty);
-                }
+                adjustedDifficulty = Ruleset.Value.CreateInstance().GetAdjustedDisplayDifficulty(BeatmapInfo, Mods.Value);
+                TooltipContent = new AdjustedAttributesTooltip.Data(baseDifficulty, adjustedDifficulty);
             }
 
             switch (Ruleset.Value?.OnlineID)
