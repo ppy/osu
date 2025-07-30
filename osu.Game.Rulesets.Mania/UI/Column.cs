@@ -58,7 +58,6 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public readonly Bindable<Color4> AccentColour = new Bindable<Color4>(Color4.Black);
 
-        private IBindable<ManiaMobileLayout> mobilePlayStyle = null!;
         private IBindable<bool> touchOverlay = null!;
 
         private float leftColumnSpacing;
@@ -125,7 +124,6 @@ namespace osu.Game.Rulesets.Mania.UI
 
             if (rulesetConfig != null)
             {
-                mobilePlayStyle = rulesetConfig.GetBindable<ManiaMobileLayout>(ManiaRulesetSetting.MobileLayout);
                 touchOverlay = rulesetConfig.GetBindable<bool>(ManiaRulesetSetting.TouchOverlay);
             }
         }

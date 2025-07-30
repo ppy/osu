@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Mania
                 },
             };
 
-            Add(new SettingsCheckbox()
+            Add(new SettingsCheckbox
             {
                 LabelText = RulesetSettingsStrings.TouchOverlay,
                 Current = config.GetBindable<bool>(ManiaRulesetSetting.TouchOverlay)
