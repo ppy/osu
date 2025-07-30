@@ -293,7 +293,6 @@ namespace osu.Game.Screens.SelectV2
                     return;
                 }
 
-                BeatmapDifficulty originalDifficulty = beatmap.Value.BeatmapInfo.Difficulty;
                 Ruleset rulesetInstance = ruleset.Value.CreateInstance();
 
                 var displayAttributes = rulesetInstance.GetBeatmapAttributesForDisplay(beatmap.Value.BeatmapInfo, mods.Value).ToList();

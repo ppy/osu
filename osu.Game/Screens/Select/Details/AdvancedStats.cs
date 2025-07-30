@@ -166,7 +166,7 @@ namespace osu.Game.Screens.Select.Details
                 // the subtraction of 1 is to exclude the star rating row which is always present (and always last)
                 for (int i = Flow.Count - 1; i < displayAttributes.Count; i++)
                 {
-                    Flow.Add(new StatisticRow()
+                    Flow.Add(new StatisticRow
                     {
                         Width = columns == 1 ? 1 : 0.5f,
                         Padding = columns == 1 ? new MarginPadding() : new MarginPadding { Horizontal = 5, Vertical = 2.5f },
