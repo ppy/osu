@@ -31,6 +31,7 @@ namespace osu.Game.Rulesets.Mania.Configuration
         public void Migrate()
         {
             var mobileLayout = GetBindable<ManiaMobileLayout>(ManiaRulesetSetting.MobileLayout);
+
             if (mobileLayout.Value == ManiaMobileLayout.LandscapeWithOverlay)
             {
                 mobileLayout.Value = ManiaMobileLayout.Landscape;
