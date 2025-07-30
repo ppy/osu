@@ -488,7 +488,7 @@ namespace osu.Game.Database
             if (scoreIds.Count == 0)
                 return;
 
-            var notification = showProgressNotification(scoreIds.Count, "Adjusting ranks of scores", "scores now have more correct ranks");
+            var notification = showProgressNotification(scoreIds.Count, "Adjusting ranks of scores", "scores now have more correct ranks.");
 
             int processedCount = 0;
             int failedCount = 0;
@@ -673,7 +673,7 @@ namespace osu.Game.Database
 
             Logger.Log($@"Found {beatmapIds.Count} beatmaps with missing user tags.");
 
-            var notification = showProgressNotification(beatmapIds.Count, @"Populating missing user tags", @"beatmaps now have user tags.");
+            var notification = showProgressNotification(beatmapIds.Count, @"Populating missing user tags", @"beatmaps have had their tags updated.");
 
             int processedCount = 0;
             int failedCount = 0;
@@ -691,7 +691,7 @@ namespace osu.Game.Database
                 {
                     // Can't use async overload because we're not on the update thread.
                     // ReSharper disable once MethodHasAsyncOverload
-                    bool succeeded = realmAccess.Write(r =>
+                    realmAccess.Write(r =>
                     {
                         BeatmapInfo beatmap = r.Find<BeatmapInfo>(id)!;
 
@@ -709,10 +709,7 @@ namespace osu.Game.Database
                         return false;
                     });
 
-                    if (succeeded)
-                        ++processedCount;
-                    // do not increment count if no tags were added - this is to show only the count of beatmaps that actually received tags in the completion notification
-                    // do not increment failure count either to avoid showing "check logs for failures" message as well - finding no user tags here is not a failure situation
+                    ++processedCount;
                 }
                 catch (ObjectDisposedException)
                 {
