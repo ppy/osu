@@ -328,7 +328,7 @@ namespace osu.Game.Screens.SelectV2
                             var chan = swishSample?.GetChannel();
                             if (chan == null) return;
 
-                            chan.Balance.Value = -OsuGameBase.SFX_STEREO_STRENGTH;
+                            chan.Balance.Value = -OsuGameBase.SFX_STEREO_STRENGTH / 2;
                             chan.Frequency.Value = 0.98f + RNG.NextDouble(0.04f);
                             chan.Play();
                         }, delay);
