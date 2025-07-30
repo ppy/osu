@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Catch.Mods
 {
     public partial class CatchModMovingFast : Mod, IApplicableToDrawableRuleset<CatchHitObject>, IApplicableToPlayer
     {
-        public override string Name => "Moving fast";
+        public override string Name => "Moving Fast";
         public override string Acronym => "MF";
         public override LocalisableString Description => "Dashing by default, slow down!";
         public override ModType Type => ModType.Fun;
