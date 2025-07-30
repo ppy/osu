@@ -296,11 +296,9 @@ namespace osu.Game.Screens.SelectV2
                 BeatmapDifficulty originalDifficulty = beatmap.Value.BeatmapInfo.Difficulty;
                 Ruleset rulesetInstance = ruleset.Value.CreateInstance();
 
-                var adjustedDifficulty = rulesetInstance.GetAdjustedDisplayDifficulty(beatmap.Value.BeatmapInfo, mods.Value);
-                difficultyStatisticsDisplay.TooltipContent = new AdjustedAttributesTooltip.Data(originalDifficulty, adjustedDifficulty);
-
-                difficultyStatisticsDisplay.Statistics = rulesetInstance.GetBeatmapAttributesForDisplay(beatmap.Value.BeatmapInfo, mods.Value)
-                                                                        .Select(a => new StatisticDifficulty.Data(a)).ToList();
+                var displayAttributes = rulesetInstance.GetBeatmapAttributesForDisplay(beatmap.Value.BeatmapInfo, mods.Value).ToList();
+                difficultyStatisticsDisplay.TooltipContent = new AdjustedAttributesTooltip.Data(displayAttributes);
+                difficultyStatisticsDisplay.Statistics = displayAttributes.Select(a => new StatisticDifficulty.Data(a)).ToList();
             });
 
             protected override void Update()
