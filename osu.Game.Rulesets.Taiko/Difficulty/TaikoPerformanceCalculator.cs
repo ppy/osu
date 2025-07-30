@@ -117,7 +117,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 double hiddenBonus = isConvert ? 0.025 : 0.1;
 
                 // A penalty is applied to the bonus for hidden on non-classic scores, as the playfield can be made wider to make fast reading easier.
-                if (!isClassic) 
+                if (!isClassic)
                     hiddenBonus *= 0.2;
 
                 difficultyValue *= 1 + hiddenBonus;
