@@ -36,7 +36,7 @@ namespace osu.Desktop
             // IMPORTANT DON'T IGNORE: For general sanity, velopack's setup needs to run before anything else.
             // This has bitten us in the rear before (bricked updater), and although the underlying issue from
             // last time has been fixed, let's not tempt fate.
-            setupVelopack();
+            setupVelopack(args);
 
             if (OperatingSystem.IsWindows())
             {
@@ -174,8 +174,18 @@ namespace osu.Desktop
             return false;
         }
 
-        private static void setupVelopack()
+        private static void setupVelopack(string[] args)
         {
+            // Arguments being present indicate the user is either starting the game in a special (aka tournament) mode,
+            // or is running with pending imports via file association or otherwise.
+            //
+            // In both these scenarios, we'd hope the game does not attempt to update.
+            if (args.Length > 0)
+            {
+                Logger.Log("Handling arguments, skipping velopack setup.");
+                return;
+            }
+
             if (OsuGameDesktop.IsPackageManaged)
             {
                 Logger.Log("Updates are being managed by an external provider. Skipping Velopack setup.");
