@@ -181,7 +181,7 @@ namespace osu.Game.Screens.Select.Details
 
                     display.Title = attribute.Label;
                     display.MaxValue = attribute.MaxValue;
-                    display.Value = (attribute.Value, attribute.AdjustedValue);
+                    display.Value = (attribute.OriginalValue, attribute.AdjustedValue);
                     display.Alpha = 1;
                 }
 

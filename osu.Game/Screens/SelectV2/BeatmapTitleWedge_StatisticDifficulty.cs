@@ -195,7 +195,7 @@ namespace osu.Game.Screens.SelectV2
             public record Data(LocalisableString Label, float Value, float AdjustedValue, float Maximum, string? Content = null)
             {
                 public Data(RulesetBeatmapAttribute attribute)
-                    : this(attribute.Label, attribute.Value, attribute.AdjustedValue, attribute.MaxValue)
+                    : this(attribute.Label, attribute.OriginalValue, attribute.AdjustedValue, attribute.MaxValue)
                 {
                 }
             }

@@ -17,14 +17,14 @@ namespace osu.Game.Rulesets.Difficulty
     /// </summary>
     /// <param name="Label">The long label for this beatmap attribute.</param>
     /// <param name="Acronym">A two-letter acronym for this beatmap attribute.</param>
-    /// <param name="Value">The value of this attribute before application of mods.</param>
+    /// <param name="OriginalValue">The value of this attribute before application of mods.</param>
     /// <param name="AdjustedValue">The "effective" value of this attribute after application of mods.</param>
     /// <param name="MinValue">The lowest allowable value of this attribute.</param>
     /// <param name="MaxValue">The highest allowable value of this attribute.</param>
     public record RulesetBeatmapAttribute(
         LocalisableString Label,
         string Acronym,
-        float Value,
+        float OriginalValue,
         float AdjustedValue,
         float MinValue,
         float MaxValue);

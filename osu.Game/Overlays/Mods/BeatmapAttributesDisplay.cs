@@ -178,7 +178,7 @@ namespace osu.Game.Overlays.Mods
 
                 display.Label = attribute.Acronym;
                 display.Current.Value = attribute.AdjustedValue;
-                display.AdjustType.Value = VerticalAttributeDisplay.CalculateEffect(attribute.Value, attribute.AdjustedValue);
+                display.AdjustType.Value = VerticalAttributeDisplay.CalculateEffect(attribute.OriginalValue, attribute.AdjustedValue);
                 display.Alpha = 1;
             }
 
