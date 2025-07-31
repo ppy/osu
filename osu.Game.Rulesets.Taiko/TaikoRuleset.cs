@@ -287,11 +287,39 @@ namespace osu.Game.Rulesets.Taiko
         public override IEnumerable<RulesetBeatmapAttribute> GetBeatmapAttributesForDisplay(IBeatmapInfo beatmapInfo, IReadOnlyCollection<Mod> mods)
         {
             var originalDifficulty = beatmapInfo.Difficulty;
-            var adjustedDifficulty = GetAdjustedDisplayDifficulty(beatmapInfo, mods);
+            // `modAdjustedDifficulty` contains only the direct effect of mods.
+            // `effectiveDifficulty` contains the "perceived" effect of rate-adjusting mods on OD and AR.
+            // we make a distinction here, because some of the calculations below will require very careful maneuvering between the two for correct results.
+            var modAdjustedDifficulty = base.GetAdjustedDisplayDifficulty(beatmapInfo, mods);
+            var effectiveDifficulty = GetAdjustedDisplayDifficulty(beatmapInfo, mods);
+            var colours = new OsuColour();
 
-            yield return new RulesetBeatmapAttribute(SongSelectStrings.Accuracy, @"OD", originalDifficulty.OverallDifficulty, adjustedDifficulty.OverallDifficulty, 10);
-            yield return new RulesetBeatmapAttribute(SongSelectStrings.HPDrain, @"HP", originalDifficulty.DrainRate, adjustedDifficulty.DrainRate, 10);
-            yield return new RulesetBeatmapAttribute(SongSelectStrings.ScrollSpeed, @"SS", 1f, (float)(adjustedDifficulty.SliderMultiplier / originalDifficulty.SliderMultiplier), 4);
+            // when displaying hit window ranges with rate-changing mods active, we will want to adjust for rate ourselves, as `effectiveDifficulty` may not be accurate
+            // because `TaikoHitWindows` applies a floor-and-round operation that will result in inaccurate results.
+            var hitWindows = new TaikoHitWindows();
+            hitWindows.SetDifficulty(modAdjustedDifficulty.OverallDifficulty);
+            double rate = ModUtils.CalculateRateWithMods(mods);
+            yield return new RulesetBeatmapAttribute(SongSelectStrings.Accuracy, @"OD", originalDifficulty.OverallDifficulty, effectiveDifficulty.OverallDifficulty, 10)
+            {
+                Description = "Affects timing requirements for hits and mash rate requirements for swells.",
+                AdditionalMetrics =
+                [
+                    new RulesetBeatmapAttribute.AdditionalMetric("GREAT hit window", LocalisableString.Interpolate($@"±{hitWindows.WindowFor(HitResult.Great) / rate:N1}ms"), colours.ForHitResult(HitResult.Great)),
+                    new RulesetBeatmapAttribute.AdditionalMetric("OK hit window", LocalisableString.Interpolate($@"±{hitWindows.WindowFor(HitResult.Ok) / rate:N1}ms"), colours.ForHitResult(HitResult.Ok)),
+                    new RulesetBeatmapAttribute.AdditionalMetric("MISS hit window", LocalisableString.Interpolate($@"±{hitWindows.WindowFor(HitResult.Miss) / rate:N1}ms"), colours.ForHitResult(HitResult.Miss)),
+                    new RulesetBeatmapAttribute.AdditionalMetric("Hits per second required to clear swells", LocalisableString.Interpolate($@"{TaikoBeatmapConverter.RequiredSwellHitsPerSecond(modAdjustedDifficulty.OverallDifficulty):N1}")),
+                ]
+            };
+
+            yield return new RulesetBeatmapAttribute(SongSelectStrings.HPDrain, @"HP", originalDifficulty.DrainRate, effectiveDifficulty.DrainRate, 10)
+            {
+                Description = "Affects the harshness of health drain and the health penalties for missing."
+            };
+
+            yield return new RulesetBeatmapAttribute(SongSelectStrings.ScrollSpeed, @"SS", 1f, (float)(effectiveDifficulty.SliderMultiplier / originalDifficulty.SliderMultiplier), 4)
+            {
+                Description = "Multiplier applied to the baseline scroll speed of the playfield when no mods are active."
+            };
         }
     }
 }
