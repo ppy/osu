@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -16,19 +14,19 @@ using osuTK;
 
 namespace osu.Game.Overlays.Mods
 {
-    public partial class AdjustedAttributesTooltip : VisibilityContainer, ITooltip<AdjustedAttributesTooltip.Data?>
+    public partial class AdjustedAttributeTooltip : VisibilityContainer, ITooltip<RulesetBeatmapAttribute?>
     {
         private readonly OverlayColourProvider? colourProvider;
-        private FillFlowContainer attributesFillFlow = null!;
 
         private Container content = null!;
 
-        private Data? data;
+        private RulesetBeatmapAttribute? attribute;
+        private OsuSpriteText adjustedByModsText = null!;
 
         [Resolved]
         private OsuColour colours { get; set; } = null!;
 
-        public AdjustedAttributesTooltip(OverlayColourProvider? colourProvider = null)
+        public AdjustedAttributeTooltip(OverlayColourProvider? colourProvider = null)
         {
             this.colourProvider = colourProvider;
         }
@@ -60,17 +58,12 @@ namespace osu.Game.Overlays.Mods
                             Direction = FillDirection.Vertical,
                             Children = new Drawable[]
                             {
-                                new OsuSpriteText
+                                adjustedByModsText = new OsuSpriteText
                                 {
-                                    Text = "One or more values are being adjusted by mods.",
+                                    Font = OsuFont.Default.With(weight: FontWeight.Bold),
                                 },
-                                attributesFillFlow = new FillFlowContainer
-                                {
-                                    Direction = FillDirection.Vertical,
-                                    AutoSizeAxes = Axes.Both
-                                }
                             }
-                        }
+                        },
                     }
                 },
             };
@@ -80,29 +73,21 @@ namespace osu.Game.Overlays.Mods
 
         private void updateDisplay()
         {
-            attributesFillFlow.Clear();
-
-            if (data != null)
+            if (attribute != null && !Precision.AlmostEquals(attribute.OriginalValue, attribute.AdjustedValue))
             {
-                foreach (var attribute in data.Attributes)
-                {
-                    if (!Precision.AlmostEquals(attribute.OriginalValue, attribute.AdjustedValue))
-                        attributesFillFlow.Add(new AttributeDisplay(attribute.Acronym, attribute.OriginalValue, attribute.AdjustedValue));
-                }
-            }
-
-            if (attributesFillFlow.Any())
+                adjustedByModsText.Text = $"This value is being adjusted by mods ({attribute.OriginalValue:0.0#} → {attribute.AdjustedValue:0.0#}).";
                 content.Show();
+            }
             else
                 content.Hide();
         }
 
-        public void SetContent(Data? data)
+        public void SetContent(RulesetBeatmapAttribute? attribute)
         {
-            if (this.data == data)
+            if (this.attribute == attribute)
                 return;
 
-            this.data = data;
+            this.attribute = attribute;
             updateDisplay();
         }
 
@@ -110,29 +95,5 @@ namespace osu.Game.Overlays.Mods
         protected override void PopOut() => this.FadeOut(200, Easing.OutQuint);
 
         public void Move(Vector2 pos) => Position = pos;
-
-        public class Data
-        {
-            public IReadOnlyCollection<RulesetBeatmapAttribute> Attributes { get; }
-
-            public Data(IReadOnlyCollection<RulesetBeatmapAttribute> attributes)
-            {
-                Attributes = attributes;
-            }
-        }
-
-        private partial class AttributeDisplay : CompositeDrawable
-        {
-            public AttributeDisplay(string name, double original, double adjusted)
-            {
-                AutoSizeAxes = Axes.Both;
-
-                InternalChild = new OsuSpriteText
-                {
-                    Font = OsuFont.Default.With(weight: FontWeight.Bold),
-                    Text = $"{name}: {original:0.0#} → {adjusted:0.0#}"
-                };
-            }
-        }
     }
 }
