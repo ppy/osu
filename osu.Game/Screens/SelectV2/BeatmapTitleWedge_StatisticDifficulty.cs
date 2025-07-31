@@ -202,7 +202,7 @@ namespace osu.Game.Screens.SelectV2
                 }
             }
 
-            public ITooltip<RulesetBeatmapAttribute?> GetCustomTooltip() => new AdjustedAttributeTooltip();
+            public ITooltip<RulesetBeatmapAttribute?> GetCustomTooltip() => new BeatmapAttributeTooltip();
             public RulesetBeatmapAttribute? TooltipContent => value.BeatmapAttribute;
         }
     }

@@ -142,7 +142,7 @@ namespace osu.Game.Overlays.Mods
             };
         }
 
-        public ITooltip<RulesetBeatmapAttribute?> GetCustomTooltip() => new AdjustedAttributeTooltip();
+        public ITooltip<RulesetBeatmapAttribute?> GetCustomTooltip() => new BeatmapAttributeTooltip();
         public RulesetBeatmapAttribute? TooltipContent { get; set; }
     }
 }

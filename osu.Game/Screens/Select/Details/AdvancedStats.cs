@@ -362,7 +362,7 @@ namespace osu.Game.Screens.Select.Details
                 TooltipContent = attribute;
             }
 
-            public ITooltip<RulesetBeatmapAttribute> GetCustomTooltip() => new AdjustedAttributeTooltip();
+            public ITooltip<RulesetBeatmapAttribute> GetCustomTooltip() => new BeatmapAttributeTooltip();
 
             [CanBeNull]
             public RulesetBeatmapAttribute TooltipContent { get; set; }
