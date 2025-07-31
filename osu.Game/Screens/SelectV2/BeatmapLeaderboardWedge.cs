@@ -189,14 +189,14 @@ namespace osu.Game.Screens.SelectV2
         {
             base.LoadComplete();
 
-            Scope.BindValueChanged(_ => refetchScores());
-            Sorting.BindValueChanged(_ => refetchScores());
-            FilterBySelectedMods.BindValueChanged(_ => refetchScores());
-            beatmap.BindValueChanged(_ => refetchScores());
-            ruleset.BindValueChanged(_ => refetchScores());
+            Scope.BindValueChanged(_ => RefetchScores());
+            Sorting.BindValueChanged(_ => RefetchScores());
+            FilterBySelectedMods.BindValueChanged(_ => RefetchScores());
+            beatmap.BindValueChanged(_ => RefetchScores());
+            ruleset.BindValueChanged(_ => RefetchScores());
             mods.BindValueChanged(_ => refetchScoresFromMods());
 
-            refetchScores();
+            RefetchScores();
         }
 
         protected override void PopIn()
@@ -212,14 +212,14 @@ namespace osu.Game.Screens.SelectV2
         private void refetchScoresFromMods()
         {
             if (FilterBySelectedMods.Value)
-                refetchScores();
+                RefetchScores();
         }
 
         private bool initialFetchComplete;
 
         private ScheduledDelegate? refetchOperation;
 
-        private void refetchScores()
+        public void RefetchScores()
         {
             SetScores(Array.Empty<ScoreInfo>());
 
@@ -477,7 +477,7 @@ namespace osu.Game.Screens.SelectV2
                 case LeaderboardState.NetworkFailure:
                     return new ClickablePlaceholder(LeaderboardStrings.CouldntFetchScores, FontAwesome.Solid.Sync)
                     {
-                        Action = refetchScores
+                        Action = RefetchScores
                     };
 
                 case LeaderboardState.NoneSelected:
