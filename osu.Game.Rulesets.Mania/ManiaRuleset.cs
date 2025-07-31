@@ -450,10 +450,33 @@ namespace osu.Game.Rulesets.Mania
                 CircleSize = ManiaBeatmapConverter.GetColumnCount(LegacyBeatmapConversionDifficultyInfo.FromBeatmapInfo(beatmapInfo), [])
             };
             var adjustedDifficulty = GetAdjustedDisplayDifficulty(beatmapInfo, mods);
+            var colours = new OsuColour();
 
-            yield return new RulesetBeatmapAttribute(SongSelectStrings.KeyCount, @"KC", originalDifficulty.CircleSize, adjustedDifficulty.CircleSize, 18);
-            yield return new RulesetBeatmapAttribute(SongSelectStrings.Accuracy, @"OD", originalDifficulty.OverallDifficulty, adjustedDifficulty.OverallDifficulty, 10);
-            yield return new RulesetBeatmapAttribute(SongSelectStrings.HPDrain, @"HP", originalDifficulty.DrainRate, adjustedDifficulty.DrainRate, 10);
+            yield return new RulesetBeatmapAttribute(SongSelectStrings.KeyCount, @"KC", originalDifficulty.CircleSize, adjustedDifficulty.CircleSize, 18)
+            {
+                Description = "Affects the number of key columns on the playfield."
+            };
+
+            var hitWindows = new ManiaHitWindows();
+            hitWindows.SetDifficulty(adjustedDifficulty.OverallDifficulty);
+            yield return new RulesetBeatmapAttribute(SongSelectStrings.Accuracy, @"OD", originalDifficulty.OverallDifficulty, adjustedDifficulty.OverallDifficulty, 10)
+            {
+                Description = "Affects timing requirements for notes.",
+                AdditionalMetrics =
+                [
+                    new RulesetBeatmapAttribute.AdditionalMetric("PERFECT hit window", LocalisableString.Interpolate($@"±{hitWindows.WindowFor(HitResult.Perfect):N1}ms"), colours.ForHitResult(HitResult.Perfect)),
+                    new RulesetBeatmapAttribute.AdditionalMetric("GREAT hit window", LocalisableString.Interpolate($@"±{hitWindows.WindowFor(HitResult.Great):N1}ms"), colours.ForHitResult(HitResult.Great)),
+                    new RulesetBeatmapAttribute.AdditionalMetric("GOOD hit window", LocalisableString.Interpolate($@"±{hitWindows.WindowFor(HitResult.Good):N1}ms"), colours.ForHitResult(HitResult.Good)),
+                    new RulesetBeatmapAttribute.AdditionalMetric("OK hit window", LocalisableString.Interpolate($@"±{hitWindows.WindowFor(HitResult.Ok):N1}ms"), colours.ForHitResult(HitResult.Ok)),
+                    new RulesetBeatmapAttribute.AdditionalMetric("MEH hit window", LocalisableString.Interpolate($@"±{hitWindows.WindowFor(HitResult.Meh):N1}ms"), colours.ForHitResult(HitResult.Meh)),
+                    new RulesetBeatmapAttribute.AdditionalMetric("MISS hit window", LocalisableString.Interpolate($@"±{hitWindows.WindowFor(HitResult.Miss):N1}ms"), colours.ForHitResult(HitResult.Miss)),
+                ]
+            };
+
+            yield return new RulesetBeatmapAttribute(SongSelectStrings.HPDrain, @"HP", originalDifficulty.DrainRate, adjustedDifficulty.DrainRate, 10)
+            {
+                Description = "Affects the harshness of health drain and the health penalties for missing."
+            };
         }
 
         public override IRulesetFilterCriteria CreateRulesetFilterCriteria()
