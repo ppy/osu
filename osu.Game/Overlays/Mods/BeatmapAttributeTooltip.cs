@@ -75,7 +75,7 @@ namespace osu.Game.Overlays.Mods
                                 },
                                 adjustedByModsText = new OsuSpriteText
                                 {
-                                    Font = OsuFont.Default.With(weight: FontWeight.Bold),
+                                    Font = OsuFont.Style.Caption1.With(weight: FontWeight.Bold),
                                 },
                             }
                         },
@@ -100,7 +100,8 @@ namespace osu.Game.Overlays.Mods
                     new OsuSpriteText
                     {
                         Font = OsuFont.Style.Caption1,
-                        Text = metric.name,
+                        Text = metric.Name,
+                        Colour = metric.Colour ?? Colour4.White,
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
                     },
@@ -108,7 +109,8 @@ namespace osu.Game.Overlays.Mods
                     new OsuSpriteText
                     {
                         Font = OsuFont.Style.Caption1.With(weight: FontWeight.Bold),
-                        Text = metric.value,
+                        Text = metric.Value,
+                        Colour = metric.Colour ?? Colour4.White,
                         Anchor = Anchor.CentreRight,
                         Origin = Anchor.CentreRight,
                     }

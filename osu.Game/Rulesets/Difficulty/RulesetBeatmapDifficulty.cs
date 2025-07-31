@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 
@@ -50,7 +51,7 @@ namespace osu.Game.Rulesets.Difficulty
         /// <summary>
         /// Contains any and all additional metrics about how this attribute affects gameplay to show to the users.
         /// </summary>
-        public (LocalisableString name, LocalisableString value)[] AdditionalMetrics { get; init; } = [];
+        public AdditionalMetric[] AdditionalMetrics { get; init; } = [];
 
         public RulesetBeatmapAttribute(LocalisableString label, string acronym, float originalValue, float adjustedValue, float maxValue)
         {
@@ -60,5 +61,7 @@ namespace osu.Game.Rulesets.Difficulty
             AdjustedValue = adjustedValue;
             MaxValue = maxValue;
         }
+
+        public record AdditionalMetric(LocalisableString Name, LocalisableString Value, Colour4? Colour = null);
     }
 }
