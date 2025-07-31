@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -26,6 +27,7 @@ using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Scoring.Legacy;
@@ -283,11 +285,28 @@ namespace osu.Game.Rulesets.Catch
         public override IEnumerable<RulesetBeatmapAttribute> GetBeatmapAttributesForDisplay(IBeatmapInfo beatmapInfo, IReadOnlyCollection<Mod> mods)
         {
             var originalDifficulty = beatmapInfo.Difficulty;
-            var adjustedDifficulty = GetAdjustedDisplayDifficulty(beatmapInfo, mods);
+            var effectiveDifficulty = GetAdjustedDisplayDifficulty(beatmapInfo, mods);
 
-            yield return new RulesetBeatmapAttribute(SongSelectStrings.CircleSize, @"CS", originalDifficulty.CircleSize, adjustedDifficulty.CircleSize, 10);
-            yield return new RulesetBeatmapAttribute(SongSelectStrings.ApproachRate, @"AR", originalDifficulty.ApproachRate, adjustedDifficulty.ApproachRate, 10);
-            yield return new RulesetBeatmapAttribute(SongSelectStrings.HPDrain, @"HP", originalDifficulty.DrainRate, adjustedDifficulty.DrainRate, 10);
+            yield return new RulesetBeatmapAttribute(SongSelectStrings.CircleSize, @"CS", originalDifficulty.CircleSize, effectiveDifficulty.CircleSize, 10)
+            {
+                Description = "Affects the size of fruits.",
+                AdditionalMetrics =
+                [
+                    new RulesetBeatmapAttribute.AdditionalMetric("Hit circle radius", (CatchHitObject.OBJECT_RADIUS * LegacyRulesetExtensions.CalculateScaleFromCircleSize(effectiveDifficulty.CircleSize)).ToLocalisableString("N1"))
+                ]
+            };
+            yield return new RulesetBeatmapAttribute(SongSelectStrings.ApproachRate, @"AR", originalDifficulty.ApproachRate, effectiveDifficulty.ApproachRate, 10)
+            {
+                Description = "Affects how early fruits fade in on the screen.",
+                AdditionalMetrics =
+                [
+                    new RulesetBeatmapAttribute.AdditionalMetric("Fade-in time", LocalisableString.Interpolate($@"{IBeatmapDifficultyInfo.DifficultyRange(effectiveDifficulty.ApproachRate, CatchHitObject.PREEMPT_RANGE):N0}ms"))
+                ]
+            };
+            yield return new RulesetBeatmapAttribute(SongSelectStrings.HPDrain, @"HP", originalDifficulty.DrainRate, effectiveDifficulty.DrainRate, 10)
+            {
+                Description = "Affects the harshness of health drain and the health penalties for missing."
+            };
         }
 
         public override bool EditorShowScrollSpeed => false;
