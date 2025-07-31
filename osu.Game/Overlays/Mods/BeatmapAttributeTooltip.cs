@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -14,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Mods
 {
-    public partial class AdjustedAttributeTooltip : VisibilityContainer, ITooltip<RulesetBeatmapAttribute?>
+    public partial class BeatmapAttributeTooltip : VisibilityContainer, ITooltip<RulesetBeatmapAttribute?>
     {
         private readonly OverlayColourProvider? colourProvider;
 
@@ -22,11 +23,13 @@ namespace osu.Game.Overlays.Mods
 
         private RulesetBeatmapAttribute? attribute;
         private OsuSpriteText adjustedByModsText = null!;
+        private OsuSpriteText descriptionText = null!;
+        private GridContainer metricsGrid = null!;
 
         [Resolved]
         private OsuColour colours { get; set; } = null!;
 
-        public AdjustedAttributeTooltip(OverlayColourProvider? colourProvider = null)
+        public BeatmapAttributeTooltip(OverlayColourProvider? colourProvider = null)
         {
             this.colourProvider = colourProvider;
         }
@@ -56,8 +59,20 @@ namespace osu.Game.Overlays.Mods
                             AutoSizeAxes = Axes.Both,
                             Padding = new MarginPadding { Vertical = 10, Horizontal = 15 },
                             Direction = FillDirection.Vertical,
+                            Spacing = new Vector2(10),
                             Children = new Drawable[]
                             {
+                                descriptionText = new OsuSpriteText(),
+                                metricsGrid = new GridContainer
+                                {
+                                    AutoSizeAxes = Axes.Both,
+                                    ColumnDimensions =
+                                    [
+                                        new Dimension(GridSizeMode.AutoSize),
+                                        new Dimension(minSize: 10),
+                                        new Dimension(GridSizeMode.AutoSize),
+                                    ]
+                                },
                                 adjustedByModsText = new OsuSpriteText
                                 {
                                     Font = OsuFont.Default.With(weight: FontWeight.Bold),
@@ -73,11 +88,47 @@ namespace osu.Game.Overlays.Mods
 
         private void updateDisplay()
         {
-            if (attribute != null && !Precision.AlmostEquals(attribute.OriginalValue, attribute.AdjustedValue))
+            bool shouldShow = false;
+
+            if (attribute != null)
             {
-                adjustedByModsText.Text = $"This value is being adjusted by mods ({attribute.OriginalValue:0.0#} → {attribute.AdjustedValue:0.0#}).";
-                content.Show();
+                descriptionText.Text = attribute.Description ?? default;
+                shouldShow = attribute.Description != null;
+
+                metricsGrid.Content = attribute.AdditionalMetrics.Select(metric => new[]
+                {
+                    new OsuSpriteText
+                    {
+                        Font = OsuFont.Style.Caption1,
+                        Text = metric.name,
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
+                    },
+                    Empty(),
+                    new OsuSpriteText
+                    {
+                        Font = OsuFont.Style.Caption1.With(weight: FontWeight.Bold),
+                        Text = metric.value,
+                        Anchor = Anchor.CentreRight,
+                        Origin = Anchor.CentreRight,
+                    }
+                }).ToArray();
+                metricsGrid.RowDimensions = Enumerable.Repeat(new Dimension(GridSizeMode.AutoSize), attribute.AdditionalMetrics.Length).ToArray();
+                metricsGrid.Alpha = attribute.AdditionalMetrics.Length > 0 ? 1 : 0;
+                shouldShow |= attribute.AdditionalMetrics.Length > 0;
+
+                if (!Precision.AlmostEquals(attribute.OriginalValue, attribute.AdjustedValue))
+                {
+                    adjustedByModsText.Text = $"This value is being adjusted by mods ({attribute.OriginalValue:0.0#} → {attribute.AdjustedValue:0.0#}).";
+                    adjustedByModsText.Alpha = 1;
+                    shouldShow = true;
+                }
+                else
+                    adjustedByModsText.Alpha = 0;
             }
+
+            if (shouldShow)
+                content.Show();
             else
                 content.Hide();
         }
