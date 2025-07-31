@@ -54,6 +54,7 @@ namespace osu.Game.Screens.Play.HUD
         /// </summary>
         public DrawableGameplayLeaderboard()
         {
+            // Extra lenience is applied so the scores don't get cut off from the left due to elastic easing transforms.
             float xOffset = DrawableGameplayLeaderboardScore.SHEAR_WIDTH + DrawableGameplayLeaderboardScore.ELASTIC_WIDTH_LENIENCE;
 
             Width = DrawableGameplayLeaderboardScore.EXTENDED_WIDTH + xOffset;
