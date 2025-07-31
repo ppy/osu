@@ -41,12 +41,12 @@ namespace osu.Game.Screens.Ranking
         {
             Debug.Assert(Score != null);
 
+            // sort mode intentionally omitted to default to score - results screen only supports sorting by score, so don't pass any other to avoid confusion
             var criteria = new LeaderboardCriteria(
                 Score.BeatmapInfo!,
                 Score.Ruleset,
                 leaderboardManager.CurrentCriteria?.Scope ?? BeatmapLeaderboardScope.Global,
-                leaderboardManager.CurrentCriteria?.ExactMods,
-                leaderboardManager.CurrentCriteria?.Sorting ?? LeaderboardSortMode.Score
+                leaderboardManager.CurrentCriteria?.ExactMods
             );
             var requestTaskSource = new TaskCompletionSource<LeaderboardScores>();
             globalScores.BindValueChanged(_ =>
