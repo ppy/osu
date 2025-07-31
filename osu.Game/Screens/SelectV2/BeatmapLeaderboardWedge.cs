@@ -270,9 +270,6 @@ namespace osu.Game.Screens.SelectV2
             cancellationTokenSource?.Cancel();
             cancellationTokenSource = new CancellationTokenSource();
 
-            scoreSfxDelegates.ForEach(d => d.Cancel());
-            scoreSfxDelegates.Clear();
-
             clearScores();
             SetState(LeaderboardState.Success);
 
@@ -386,6 +383,9 @@ namespace osu.Game.Screens.SelectV2
             personalBestDisplay.MoveToX(-100, 300, Easing.OutQuint);
             personalBestDisplay.FadeOut(300, Easing.OutQuint);
             scoresScroll.TransformTo(nameof(scoresScroll.Padding), new MarginPadding(), 300, Easing.OutQuint);
+
+            scoreSfxDelegates.ForEach(d => d.Cancel());
+            scoreSfxDelegates.Clear();
         }
 
         private void onLeaderboardScoreClicked(ScoreInfo score) => songSelect?.PresentScore(score);
