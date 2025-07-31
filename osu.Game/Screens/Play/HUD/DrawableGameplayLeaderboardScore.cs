@@ -153,6 +153,7 @@ namespace osu.Game.Screens.Play.HUD
                                 Anchor = Anchor.TopRight,
                                 Origin = Anchor.TopRight,
                                 Width = regular_left_panel_width,
+                                // This may not be mathematically accurate but the position text looks best aligned with it.
                                 Padding = new MarginPadding { Right = avatar_size / 2 - SHEAR_WIDTH / 2 },
                                 RelativeSizeAxes = Axes.Y,
                                 Child = positionText = new OsuSpriteText
