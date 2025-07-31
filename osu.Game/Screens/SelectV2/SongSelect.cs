@@ -595,6 +595,8 @@ namespace osu.Game.Screens.SelectV2
 
             ensureGlobalBeatmapValid();
 
+            detailsArea.Refresh();
+
             if (ControlGlobalMusic)
             {
                 // restart playback on returning to song select, regardless.
