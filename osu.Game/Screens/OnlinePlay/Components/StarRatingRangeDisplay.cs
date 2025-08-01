@@ -115,7 +115,11 @@ namespace osu.Game.Screens.OnlinePlay.Components
             else
             {
                 // When Playlist is not empty (in room) we compute actual range
-                var orderedDifficulties = room.Playlist.Select(p => p.Beatmap).OrderBy(b => b.StarRating).ToArray();
+                var orderedDifficulties = room.Playlist
+                                              .Where(item => !item.Expired)
+                                              .Select(item => item.Beatmap)
+                                              .OrderBy(b => b.StarRating)
+                                              .ToArray();
 
                 minDifficulty = new StarDifficulty(orderedDifficulties.Length > 0 ? orderedDifficulties[0].StarRating : 0, 0);
                 maxDifficulty = new StarDifficulty(orderedDifficulties.Length > 0 ? orderedDifficulties[^1].StarRating : 0, 0);
