@@ -10,7 +10,7 @@ using osu.Game.Rulesets.Edit.Checks.Components;
 
 namespace osu.Game.Rulesets.Edit.Checks
 {
-    public class CheckTooShortAudioFiles : ICheck
+    public class CheckTooShortAudioFiles : IGeneralCheck
     {
         private const int ms_threshold = 25;
 

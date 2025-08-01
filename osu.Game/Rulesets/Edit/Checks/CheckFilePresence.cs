@@ -7,7 +7,7 @@ using osu.Game.Rulesets.Edit.Checks.Components;
 
 namespace osu.Game.Rulesets.Edit.Checks
 {
-    public abstract class CheckFilePresence : ICheck
+    public abstract class CheckFilePresence : IGeneralCheck
     {
         protected abstract CheckCategory Category { get; }
         protected abstract string TypeOfFile { get; }

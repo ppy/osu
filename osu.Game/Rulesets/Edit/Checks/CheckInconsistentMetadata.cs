@@ -9,7 +9,7 @@ using osu.Game.Rulesets.Edit.Checks.Components;
 
 namespace osu.Game.Rulesets.Edit.Checks
 {
-    public class CheckInconsistentMetadata : ICheck
+    public class CheckInconsistentMetadata : IGeneralCheck
     {
         public CheckMetadata Metadata => new CheckMetadata(CheckCategory.Metadata, "Inconsistent metadata");
 

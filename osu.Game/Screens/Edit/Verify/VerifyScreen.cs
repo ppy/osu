@@ -19,6 +19,8 @@ namespace osu.Game.Screens.Edit.Verify
 
         public readonly Bindable<DifficultyRating> InterpretedDifficulty = new Bindable<DifficultyRating>();
 
+        public readonly Bindable<VerifyChecksScope> VerifyChecksScope = new Bindable<VerifyChecksScope>();
+
         public readonly BindableList<IssueType> HiddenIssueTypes = new BindableList<IssueType> { IssueType.Negligible };
 
         public IssueList IssueList { get; private set; }
