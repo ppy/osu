@@ -296,7 +296,8 @@ namespace osu.Game.Rulesets.Taiko
             var colours = new OsuColour();
 
             // when displaying hit window ranges with rate-changing mods active, we will want to adjust for rate ourselves, as `effectiveDifficulty` may not be accurate
-            // because `TaikoHitWindows` applies a floor-and-round operation that will result in inaccurate results.
+            // because `TaikoHitWindows` applies a floor-and-round operation that will result in inaccurate results
+            // (the floor-and-round needs to happen *before* rate is taken into account, not after).
             var hitWindows = new TaikoHitWindows();
             hitWindows.SetDifficulty(modAdjustedDifficulty.OverallDifficulty);
             double rate = ModUtils.CalculateRateWithMods(mods);
