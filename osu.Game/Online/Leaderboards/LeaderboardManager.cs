@@ -24,7 +24,12 @@ namespace osu.Game.Online.Leaderboards
 {
     public partial class LeaderboardManager : Component
     {
+        /// <summary>
+        /// The latest leaderboard scores fetched by the criteria in <see cref="CurrentCriteria"/>.
+        /// This is not always thread-safe, as <see cref="FetchWithCriteria"/> is allowed to be called on async threads.
+        /// </summary>
         public IBindable<LeaderboardScores?> Scores => scores;
+
         private readonly Bindable<LeaderboardScores?> scores = new Bindable<LeaderboardScores?>();
 
         public LeaderboardCriteria? CurrentCriteria { get; private set; }
