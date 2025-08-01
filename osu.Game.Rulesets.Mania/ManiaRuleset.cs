@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
@@ -464,15 +465,13 @@ namespace osu.Game.Rulesets.Mania
             yield return new RulesetBeatmapAttribute(SongSelectStrings.Accuracy, @"OD", originalDifficulty.OverallDifficulty, adjustedDifficulty.OverallDifficulty, 10)
             {
                 Description = "Affects timing requirements for notes.",
-                AdditionalMetrics =
-                [
-                    new RulesetBeatmapAttribute.AdditionalMetric("PERFECT hit window", LocalisableString.Interpolate($@"±{hitWindows.WindowFor(HitResult.Perfect):0.##}ms"), colours.ForHitResult(HitResult.Perfect)),
-                    new RulesetBeatmapAttribute.AdditionalMetric("GREAT hit window", LocalisableString.Interpolate($@"±{hitWindows.WindowFor(HitResult.Great):0.##}ms"), colours.ForHitResult(HitResult.Great)),
-                    new RulesetBeatmapAttribute.AdditionalMetric("GOOD hit window", LocalisableString.Interpolate($@"±{hitWindows.WindowFor(HitResult.Good):0.##}ms"), colours.ForHitResult(HitResult.Good)),
-                    new RulesetBeatmapAttribute.AdditionalMetric("OK hit window", LocalisableString.Interpolate($@"±{hitWindows.WindowFor(HitResult.Ok):0.##}ms"), colours.ForHitResult(HitResult.Ok)),
-                    new RulesetBeatmapAttribute.AdditionalMetric("MEH hit window", LocalisableString.Interpolate($@"±{hitWindows.WindowFor(HitResult.Meh):0.##}ms"), colours.ForHitResult(HitResult.Meh)),
-                    new RulesetBeatmapAttribute.AdditionalMetric("MISS hit window", LocalisableString.Interpolate($@"±{hitWindows.WindowFor(HitResult.Miss):0.##}ms"), colours.ForHitResult(HitResult.Miss)),
-                ]
+                AdditionalMetrics = hitWindows.GetAllAvailableWindows()
+                                              .Reverse()
+                                              .Select(window => new RulesetBeatmapAttribute.AdditionalMetric(
+                                                  $"{window.result.GetDescription().ToUpperInvariant()} hit window",
+                                                  LocalisableString.Interpolate($@"±{hitWindows.WindowFor(window.result):0.##}ms"),
+                                                  colours.ForHitResult(window.result)
+                                              )).ToArray()
             };
 
             yield return new RulesetBeatmapAttribute(SongSelectStrings.HPDrain, @"HP", originalDifficulty.DrainRate, adjustedDifficulty.DrainRate, 10)
