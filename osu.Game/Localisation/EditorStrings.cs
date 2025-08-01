@@ -209,6 +209,16 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString OpenDiscussionPage => new TranslatableString(getKey(@"open_discussion_page"), @"Open beatmap discussion page");
 
+        /// <summary>
+        /// "This difficulty"
+        /// </summary>
+        public static LocalisableString ThisDifficulty => new TranslatableString(getKey(@"this_difficulty"), @"This difficulty");
+
+        /// <summary>
+        /// "General"
+        /// </summary>
+        public static LocalisableString General => new TranslatableString(getKey(@"general"), @"General");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
