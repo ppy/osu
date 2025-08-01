@@ -22,8 +22,9 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             var ruleset = new OsuRuleset();
             var difficulty = new BeatmapDifficulty { ApproachRate = originalApproachRate };
+            var beatmapInfo = new BeatmapInfo { Difficulty = difficulty };
 
-            var adjustedDifficulty = ruleset.GetAdjustedDisplayDifficulty(difficulty, []);
+            var adjustedDifficulty = ruleset.GetAdjustedDisplayDifficulty(beatmapInfo, []);
 
             Assert.That(adjustedDifficulty.ApproachRate, Is.EqualTo(originalApproachRate));
         }
@@ -33,8 +34,9 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             var ruleset = new OsuRuleset();
             var difficulty = new BeatmapDifficulty { OverallDifficulty = originalOverallDifficulty };
+            var beatmapInfo = new BeatmapInfo { Difficulty = difficulty };
 
-            var adjustedDifficulty = ruleset.GetAdjustedDisplayDifficulty(difficulty, []);
+            var adjustedDifficulty = ruleset.GetAdjustedDisplayDifficulty(beatmapInfo, []);
 
             Assert.That(adjustedDifficulty.OverallDifficulty, Is.EqualTo(originalOverallDifficulty));
         }
@@ -44,8 +46,9 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             var ruleset = new OsuRuleset();
             var difficulty = new BeatmapDifficulty();
+            var beatmapInfo = new BeatmapInfo { Difficulty = difficulty };
 
-            var adjustedDifficulty = ruleset.GetAdjustedDisplayDifficulty(difficulty, [new OsuModHalfTime()]);
+            var adjustedDifficulty = ruleset.GetAdjustedDisplayDifficulty(beatmapInfo, [new OsuModHalfTime()]);
 
             Assert.That(adjustedDifficulty.ApproachRate, Is.EqualTo(1.67).Within(0.01));
             Assert.That(adjustedDifficulty.OverallDifficulty, Is.EqualTo(2.22).Within(0.01));
@@ -56,8 +59,9 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             var ruleset = new OsuRuleset();
             var difficulty = new BeatmapDifficulty();
+            var beatmapInfo = new BeatmapInfo { Difficulty = difficulty };
 
-            var adjustedDifficulty = ruleset.GetAdjustedDisplayDifficulty(difficulty, [new OsuModDoubleTime()]);
+            var adjustedDifficulty = ruleset.GetAdjustedDisplayDifficulty(beatmapInfo, [new OsuModDoubleTime()]);
 
             Assert.That(adjustedDifficulty.ApproachRate, Is.EqualTo(7.67).Within(0.01));
             Assert.That(adjustedDifficulty.OverallDifficulty, Is.EqualTo(7.77).Within(0.01));

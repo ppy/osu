@@ -80,6 +80,11 @@ namespace osu.Game.Localisation
         public static LocalisableString HPDrain => new TranslatableString(getKey(@"hp_drain"), @"HP Drain");
 
         /// <summary>
+        /// "Scroll Speed"
+        /// </summary>
+        public static LocalisableString ScrollSpeed => new TranslatableString(getKey(@"scroll_speed"), @"Scroll Speed");
+
+        /// <summary>
         /// "Submitted"
         /// </summary>
         public static LocalisableString Submitted => new TranslatableString(getKey(@"submitted"), @"Submitted");

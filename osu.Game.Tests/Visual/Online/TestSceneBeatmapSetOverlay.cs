@@ -15,11 +15,11 @@ using Newtonsoft.Json.Linq;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.BeatmapSet.Scores;
-using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.Select.Details;
@@ -274,7 +274,7 @@ namespace osu.Game.Tests.Visual.Online
         public void TestSelectedModsDontAffectStatistics()
         {
             AddStep("show map", () => overlay.ShowBeatmapSet(getBeatmapSet()));
-            AddAssert("AR displayed as 0", () => overlay.ChildrenOfType<AdvancedStats.StatisticRow>().Single(s => s.Title == BeatmapsetsStrings.ShowStatsAr).Value, () => Is.EqualTo((0, 0)));
+            AddAssert("AR displayed as 0", () => overlay.ChildrenOfType<AdvancedStats.StatisticRow>().Single(s => s.Title == SongSelectStrings.ApproachRate).Value, () => Is.EqualTo((0, 0)));
             AddStep("set AR10 diff adjust", () => SelectedMods.Value = new[]
             {
                 new OsuModDifficultyAdjust
@@ -282,7 +282,7 @@ namespace osu.Game.Tests.Visual.Online
                     ApproachRate = { Value = 10 }
                 }
             });
-            AddAssert("AR still displayed as 0", () => overlay.ChildrenOfType<AdvancedStats.StatisticRow>().Single(s => s.Title == BeatmapsetsStrings.ShowStatsAr).Value, () => Is.EqualTo((0, 0)));
+            AddAssert("AR still displayed as 0", () => overlay.ChildrenOfType<AdvancedStats.StatisticRow>().Single(s => s.Title == SongSelectStrings.ApproachRate).Value, () => Is.EqualTo((0, 0)));
         }
 
         [Test]
