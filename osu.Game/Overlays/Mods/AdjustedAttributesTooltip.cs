@@ -1,7 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -9,9 +9,9 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Utils;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Rulesets.Difficulty;
 using osuTK;
 
 namespace osu.Game.Overlays.Mods
@@ -84,25 +84,17 @@ namespace osu.Game.Overlays.Mods
 
             if (data != null)
             {
-                attemptAdd("CS", bd => bd.CircleSize);
-                attemptAdd("AR", bd => bd.ApproachRate);
-                attemptAdd("OD", bd => bd.OverallDifficulty);
-                attemptAdd("HP", bd => bd.DrainRate);
+                foreach (var attribute in data.Attributes)
+                {
+                    if (!Precision.AlmostEquals(attribute.OriginalValue, attribute.AdjustedValue))
+                        attributesFillFlow.Add(new AttributeDisplay(attribute.Acronym, attribute.OriginalValue, attribute.AdjustedValue));
+                }
             }
 
             if (attributesFillFlow.Any())
                 content.Show();
             else
                 content.Hide();
-
-            void attemptAdd(string name, Func<BeatmapDifficulty, double> lookup)
-            {
-                double originalValue = lookup(data.OriginalDifficulty);
-                double adjustedValue = lookup(data.AdjustedDifficulty);
-
-                if (!Precision.AlmostEquals(originalValue, adjustedValue))
-                    attributesFillFlow.Add(new AttributeDisplay(name, originalValue, adjustedValue));
-            }
         }
 
         public void SetContent(Data? data)
@@ -121,13 +113,11 @@ namespace osu.Game.Overlays.Mods
 
         public class Data
         {
-            public BeatmapDifficulty OriginalDifficulty { get; }
-            public BeatmapDifficulty AdjustedDifficulty { get; }
+            public IReadOnlyCollection<RulesetBeatmapAttribute> Attributes { get; }
 
-            public Data(BeatmapDifficulty originalDifficulty, BeatmapDifficulty adjustedDifficulty)
+            public Data(IReadOnlyCollection<RulesetBeatmapAttribute> attributes)
             {
-                OriginalDifficulty = originalDifficulty;
-                AdjustedDifficulty = adjustedDifficulty;
+                Attributes = attributes;
             }
         }
 

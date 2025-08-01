@@ -33,7 +33,11 @@ namespace osu.Game.Overlays.Mods
         /// <summary>
         /// Text to display in the top area of the display.
         /// </summary>
-        public LocalisableString Label { get; protected set; }
+        public LocalisableString Label
+        {
+            get => text.Text;
+            set => text.Text = value;
+        }
 
         private readonly EffectCounter counter;
         private readonly OsuSpriteText text;
@@ -67,10 +71,8 @@ namespace osu.Game.Overlays.Mods
             counter.Colour = newColor;
         }
 
-        public VerticalAttributeDisplay(LocalisableString label)
+        public VerticalAttributeDisplay()
         {
-            Label = label;
-
             AutoSizeAxes = Axes.X;
 
             Origin = Anchor.CentreLeft;
@@ -91,7 +93,6 @@ namespace osu.Game.Overlays.Mods
                     {
                         Origin = Anchor.Centre,
                         Anchor = Anchor.Centre,
-                        Text = Label,
                         Margin = new MarginPadding { Horizontal = 15 }, // to reserve space for 0.XX value
                         Font = OsuFont.Default.With(size: 20, weight: FontWeight.Bold)
                     },
