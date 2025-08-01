@@ -18,6 +18,7 @@ using osu.Framework.Graphics.Pooling;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Collections;
 using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Graphics;
@@ -50,6 +51,9 @@ namespace osu.Game.Screens.SelectV2
 
         private readonly BeatmapCarouselFilterMatching matching;
         private readonly BeatmapCarouselFilterGrouping grouping;
+
+        [Resolved]
+        private RealmAccess realm { get; set; } = null!;
 
         /// <summary>
         /// Total number of beatmap difficulties displayed with the filter.
@@ -98,7 +102,7 @@ namespace osu.Game.Screens.SelectV2
             {
                 matching = new BeatmapCarouselFilterMatching(() => Criteria!),
                 new BeatmapCarouselFilterSorting(() => Criteria!),
-                grouping = new BeatmapCarouselFilterGrouping(() => Criteria!),
+                grouping = new BeatmapCarouselFilterGrouping(() => Criteria!, () => realm.Run(r => r.All<BeatmapCollection>().AsEnumerable().Detach())),
             };
 
             AddInternal(loading = new LoadingLayer());

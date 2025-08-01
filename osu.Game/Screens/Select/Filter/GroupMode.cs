@@ -20,8 +20,8 @@ namespace osu.Game.Screens.Select.Filter
         [LocalisableDescription(typeof(SongSelectStrings), nameof(SongSelectStrings.BPM))]
         BPM,
 
-        // [LocalisableDescription(typeof(SongSelectStrings), nameof(SongSelectStrings.Collections))]
-        // Collections,
+        [LocalisableDescription(typeof(SongSelectStrings), nameof(SongSelectStrings.Collections))]
+        Collections,
 
         [LocalisableDescription(typeof(SongSelectStrings), nameof(SongSelectStrings.DateAdded))]
         DateAdded,

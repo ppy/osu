@@ -197,8 +197,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [Test]
         public void TestManageCollectionsFilterIsNotSelected()
         {
-            bool received = false;
-
             addExpandHeaderStep();
 
             AddStep("add collection", () => writeAndRefresh(r => r.Add(new BeatmapCollection(name: "1", new List<string> { "abc" }))));
@@ -212,12 +210,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             addExpandHeaderStep();
 
-            AddStep("watch for filter requests", () =>
-            {
-                received = false;
-                dropdown.ChildrenOfType<CollectionDropdown>().First().RequestFilter = () => received = true;
-            });
-
             AddStep("click manage collections filter", () =>
             {
                 int lastItemIndex = dropdown.ChildrenOfType<CollectionDropdown>().Single().Items.Count() - 1;
@@ -226,8 +218,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             });
 
             AddAssert("collection filter still selected", () => dropdown.Current.Value.CollectionName == "1");
-
-            AddAssert("filter request not fired", () => !received);
         }
 
         private void writeAndRefresh(Action<Realm> action) => Realm.Write(r =>
