@@ -99,18 +99,18 @@ namespace osu.Game.Overlays.Mods
                 {
                     new OsuSpriteText
                     {
-                        Font = OsuFont.Style.Caption1,
+                        Font = OsuFont.Style.Caption1.With(weight: FontWeight.SemiBold),
                         Text = metric.Name,
-                        Colour = metric.Colour ?? Colour4.White,
+                        Colour = metric.Colour ?? colourProvider?.Content2 ?? Colour4.White,
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
                     },
                     Empty(),
                     new OsuSpriteText
                     {
-                        Font = OsuFont.Style.Caption1.With(weight: FontWeight.Bold),
+                        Font = OsuFont.Style.Caption1,
                         Text = metric.Value,
-                        Colour = metric.Colour ?? Colour4.White,
+                        Colour = Interpolation.ValueAt<Colour4>(0.85f, colourProvider?.Content1 ?? Colour4.White, metric.Colour ?? colourProvider?.Content1 ?? Colour4.White, 0, 1),
                         Anchor = Anchor.CentreRight,
                         Origin = Anchor.CentreRight,
                     }
