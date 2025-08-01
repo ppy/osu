@@ -401,7 +401,7 @@ namespace osu.Game.Rulesets.Osu
                 Description = "Affects the size of hit circles and sliders.",
                 AdditionalMetrics =
                 [
-                    new RulesetBeatmapAttribute.AdditionalMetric("Hit circle radius", (OsuHitObject.OBJECT_RADIUS * LegacyRulesetExtensions.CalculateScaleFromCircleSize(effectiveDifficulty.CircleSize)).ToLocalisableString("N1"))
+                    new RulesetBeatmapAttribute.AdditionalMetric("Hit circle radius", (OsuHitObject.OBJECT_RADIUS * LegacyRulesetExtensions.CalculateScaleFromCircleSize(effectiveDifficulty.CircleSize, applyFudge: true)).ToLocalisableString("0.##"))
                 ]
             };
 
@@ -411,7 +411,7 @@ namespace osu.Game.Rulesets.Osu
                 Description = "Affects how early objects appear on screen relative to their hit time.",
                 AdditionalMetrics =
                 [
-                    new RulesetBeatmapAttribute.AdditionalMetric("Approach time", LocalisableString.Interpolate($@"{IBeatmapDifficultyInfo.DifficultyRange(effectiveDifficulty.ApproachRate, OsuHitObject.PREEMPT_RANGE):N0}ms"))
+                    new RulesetBeatmapAttribute.AdditionalMetric("Approach time", LocalisableString.Interpolate($@"{IBeatmapDifficultyInfo.DifficultyRange(effectiveDifficulty.ApproachRate, OsuHitObject.PREEMPT_RANGE):#,0.##}ms"))
                 ]
             };
 
@@ -428,10 +428,10 @@ namespace osu.Game.Rulesets.Osu
                 Description = "Affects timing requirements for hit circles and spin speed requirements for spinners.",
                 AdditionalMetrics =
                 [
-                    new RulesetBeatmapAttribute.AdditionalMetric("GREAT hit window", LocalisableString.Interpolate($@"±{hitWindows.WindowFor(HitResult.Great) / rate:N1}ms"), colours.ForHitResult(HitResult.Great)),
-                    new RulesetBeatmapAttribute.AdditionalMetric("OK hit window", LocalisableString.Interpolate($@"±{hitWindows.WindowFor(HitResult.Ok) / rate:N1}ms"), colours.ForHitResult(HitResult.Ok)),
-                    new RulesetBeatmapAttribute.AdditionalMetric("MEH hit window", LocalisableString.Interpolate($@"±{hitWindows.WindowFor(HitResult.Meh) / rate:N1}ms"), colours.ForHitResult(HitResult.Meh)),
-                    new RulesetBeatmapAttribute.AdditionalMetric("MISS hit window", LocalisableString.Interpolate($@"±{hitWindows.WindowFor(HitResult.Miss) / rate:N1}ms"), colours.ForHitResult(HitResult.Miss)),
+                    new RulesetBeatmapAttribute.AdditionalMetric("GREAT hit window", LocalisableString.Interpolate($@"±{hitWindows.WindowFor(HitResult.Great) / rate:0.##}ms"), colours.ForHitResult(HitResult.Great)),
+                    new RulesetBeatmapAttribute.AdditionalMetric("OK hit window", LocalisableString.Interpolate($@"±{hitWindows.WindowFor(HitResult.Ok) / rate:0.##}ms"), colours.ForHitResult(HitResult.Ok)),
+                    new RulesetBeatmapAttribute.AdditionalMetric("MEH hit window", LocalisableString.Interpolate($@"±{hitWindows.WindowFor(HitResult.Meh) / rate:0.##}ms"), colours.ForHitResult(HitResult.Meh)),
+                    new RulesetBeatmapAttribute.AdditionalMetric("MISS hit window", LocalisableString.Interpolate($@"±{hitWindows.WindowFor(HitResult.Miss) / rate:0.##}ms"), colours.ForHitResult(HitResult.Miss)),
                     new RulesetBeatmapAttribute.AdditionalMetric("RPM required to clear spinners", LocalisableString.Interpolate($@"{IBeatmapDifficultyInfo.DifficultyRange(modAdjustedDifficulty.OverallDifficulty, Spinner.CLEAR_RPM_RANGE):N0} RPM")),
                     new RulesetBeatmapAttribute.AdditionalMetric("RPM required to get full spinner bonus", LocalisableString.Interpolate($@"{IBeatmapDifficultyInfo.DifficultyRange(modAdjustedDifficulty.OverallDifficulty, Spinner.COMPLETE_RPM_RANGE):N0} RPM")),
                 ]
