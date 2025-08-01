@@ -77,7 +77,9 @@ namespace osu.Game.Screens.Select
             if (!maximumStars.IsDefault)
                 criteria.UserStarDifficulty.Max = maximumStars.Value;
 
-            criteria.RulesetCriteria = ruleset.Value.CreateInstance().CreateRulesetFilterCriteria();
+            var rulesetInstance = ruleset.Value.CreateInstance();
+            criteria.RulesetCriteria = rulesetInstance.CreateRulesetFilterCriteria();
+            criteria.RulesetConvertSupport = rulesetInstance.GetRulesetMapConvertSupport();
 
             FilterQueryParser.ApplyQueries(criteria, query);
             return criteria;

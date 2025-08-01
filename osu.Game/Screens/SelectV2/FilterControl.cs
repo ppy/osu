@@ -261,7 +261,9 @@ namespace osu.Game.Screens.SelectV2
             if (!difficultyRangeSlider.UpperBound.IsDefault)
                 criteria.UserStarDifficulty.Max = difficultyRangeSlider.UpperBound.Value;
 
-            criteria.RulesetCriteria = ruleset.Value.CreateInstance().CreateRulesetFilterCriteria();
+            var rulesetInstance = ruleset.Value.CreateInstance();
+            criteria.RulesetCriteria = rulesetInstance.CreateRulesetFilterCriteria();
+            criteria.RulesetConvertSupport = rulesetInstance.GetRulesetMapConvertSupport();
 
             FilterQueryParser.ApplyQueries(criteria, query);
             return criteria;
