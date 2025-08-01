@@ -459,6 +459,8 @@ namespace osu.Game.Rulesets.Mania
 
             var hitWindows = new ManiaHitWindows();
             hitWindows.SetDifficulty(adjustedDifficulty.OverallDifficulty);
+            hitWindows.IsConvert = !beatmapInfo.Ruleset.Equals(RulesetInfo);
+            hitWindows.ClassicModActive = mods.Any(m => m is ManiaModClassic);
             yield return new RulesetBeatmapAttribute(SongSelectStrings.Accuracy, @"OD", originalDifficulty.OverallDifficulty, adjustedDifficulty.OverallDifficulty, 10)
             {
                 Description = "Affects timing requirements for notes.",
