@@ -139,7 +139,7 @@ namespace osu.Game.Screens.Edit.Verify
         private IEnumerable<Issue> filterByScope(IEnumerable<Issue> issues, bool generalOnly)
         {
             return issues.Where(issue =>
-                generalOnly ? issue.Check is IGeneralCheck : issue.Check is ICheck && issue.Check is not IGeneralCheck);
+                generalOnly ? issue.Check is IGeneralCheck : issue.Check is not IGeneralCheck);
         }
     }
 }
