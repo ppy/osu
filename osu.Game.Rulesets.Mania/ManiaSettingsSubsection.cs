@@ -48,12 +48,19 @@ namespace osu.Game.Rulesets.Mania
                 },
             };
 
+            Add(new SettingsCheckbox
+            {
+                LabelText = RulesetSettingsStrings.TouchOverlay,
+                Current = config.GetBindable<bool>(ManiaRulesetSetting.TouchOverlay)
+            });
+
             if (RuntimeInfo.IsMobile)
             {
                 Add(new SettingsEnumDropdown<ManiaMobileLayout>
                 {
                     LabelText = RulesetSettingsStrings.MobileLayout,
                     Current = config.GetBindable<ManiaMobileLayout>(ManiaRulesetSetting.MobileLayout),
+                    Items = [ManiaMobileLayout.Portrait, ManiaMobileLayout.Landscape]
                 });
             }
         }
