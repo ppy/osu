@@ -10,6 +10,7 @@ namespace osu.Game.Screens.Select.Leaderboards
     {
         [LocalisableDescription(typeof(BeatmapLeaderboardWedgeStrings), nameof(BeatmapLeaderboardWedgeStrings.Score))]
         Score,
+        PP,
 
         [LocalisableDescription(typeof(BeatmapLeaderboardWedgeStrings), nameof(BeatmapLeaderboardWedgeStrings.Accuracy))]
         Accuracy,
