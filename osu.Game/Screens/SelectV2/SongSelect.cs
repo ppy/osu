@@ -509,8 +509,7 @@ namespace osu.Game.Screens.SelectV2
 
             // While filtering, let's not ever attempt to change selection.
             // This will be resolved after the filter completes, see `newItemsPresented`.
-            bool carouselStateIsValid = filterDebounce?.State != ScheduledDelegate.RunState.Waiting && !carousel.IsFiltering;
-            if (!carouselStateIsValid)
+            if (IsFiltering)
                 return false;
 
             // Refetch to be confident that the current selection is still valid. It may have been deleted or hidden.
@@ -738,6 +737,11 @@ namespace osu.Game.Screens.SelectV2
         /// </summary>
         public bool CarouselItemsPresented { get; private set; }
 
+        /// <summary>
+        /// Whether the carousel is or will be undergoing a filter operation.
+        /// </summary>
+        public bool IsFiltering => carousel.IsFiltering || filterDebounce?.State == ScheduledDelegate.RunState.Waiting;
+
         private const double filter_delay = 250;
 
         private ScheduledDelegate? filterDebounce;
@@ -752,7 +756,7 @@ namespace osu.Game.Screens.SelectV2
             // Criteria change may have included a ruleset change which made the current selection invalid.
             bool isSelectionValid = checkBeatmapValidForSelection(Beatmap.Value.BeatmapInfo, criteria);
 
-            filterDebounce = Scheduler.AddDelayed(() => { carousel.Filter(criteria, !isSelectionValid); }, isFirstFilter || !isSelectionValid ? 0 : filter_delay);
+            filterDebounce = Scheduler.AddDelayed(() => carousel.Filter(criteria, !isSelectionValid), isFirstFilter || !isSelectionValid ? 0 : filter_delay);
         }
 
         private void newItemsPresented(IEnumerable<CarouselItem> carouselItems)

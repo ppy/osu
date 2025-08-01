@@ -12,7 +12,9 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Game.Collections;
 using osu.Game.Configuration;
+using osu.Game.Database;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
@@ -49,6 +51,9 @@ namespace osu.Game.Screens.SelectV2
         [Resolved]
         private OsuConfigManager config { get; set; } = null!;
 
+        [Resolved]
+        private RealmAccess realm { get; set; } = null!;
+
         public LocalisableString StatusText
         {
             get => searchTextBox.StatusText;
@@ -58,6 +63,8 @@ namespace osu.Game.Screens.SelectV2
         public event Action<FilterCriteria>? CriteriaChanged;
 
         private FilterCriteria currentCriteria = null!;
+
+        private IDisposable? collectionsSubscription;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -209,7 +216,18 @@ namespace osu.Game.Screens.SelectV2
             sortDropdown.Current.BindValueChanged(_ => updateCriteria());
             groupDropdown.Current.BindValueChanged(_ => updateCriteria());
             collectionDropdown.Current.BindValueChanged(_ => updateCriteria());
+            collectionsSubscription = realm.RegisterForNotifications(r => r.All<BeatmapCollection>(), (collections, changeSet) =>
+            {
+                if (changeSet != null && groupDropdown.Current.Value == GroupMode.Collections)
+                    updateCriteria();
+            });
             updateCriteria();
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            collectionsSubscription?.Dispose();
         }
 
         /// <summary>
