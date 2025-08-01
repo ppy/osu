@@ -156,10 +156,7 @@ namespace osu.Game.Screens.SelectV2
                                 {
                                     Margin = new MarginPadding { Left = -SongSelect.WEDGE_CONTENT_MARGIN },
                                 },
-                                favouriteButton = new FavouriteButton
-                                {
-                                    TooltipText = BeatmapsStrings.StatusFavourites,
-                                },
+                                favouriteButton = new FavouriteButton(),
                                 lengthStatistic = new Statistic(OsuIcon.Clock),
                                 bpmStatistic = new Statistic(OsuIcon.Metronome)
                                 {
