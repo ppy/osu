@@ -7,7 +7,7 @@ using osu.Game.Rulesets.Edit.Checks.Components;
 
 namespace osu.Game.Rulesets.Edit.Checks
 {
-    public class CheckAudioQuality : ICheck
+    public class CheckAudioQuality : IGeneralCheck
     {
         // This is a requirement as stated in the Ranking Criteria.
         // See https://osu.ppy.sh/wiki/en/Ranking_criteria#audio

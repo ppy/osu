@@ -8,7 +8,7 @@ using osu.Game.Rulesets.Edit.Checks.Components;
 
 namespace osu.Game.Rulesets.Edit.Checks
 {
-    public class CheckBackgroundQuality : ICheck
+    public class CheckBackgroundQuality : IGeneralCheck
     {
         // These are the requirements as stated in the Ranking Criteria.
         // See https://osu.ppy.sh/wiki/en/Ranking_Criteria#rules.5

@@ -11,7 +11,7 @@ using osu.Game.Rulesets.Edit.Checks.Components;
 
 namespace osu.Game.Rulesets.Edit.Checks
 {
-    public class CheckDelayedHitsounds : ICheck
+    public class CheckDelayedHitsounds : IGeneralCheck
     {
         /// <summary>
         /// Threshold at which point the sample is considered silent.
