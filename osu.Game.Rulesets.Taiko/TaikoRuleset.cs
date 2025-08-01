@@ -304,10 +304,10 @@ namespace osu.Game.Rulesets.Taiko
                 Description = "Affects timing requirements for hits and mash rate requirements for swells.",
                 AdditionalMetrics =
                 [
-                    new RulesetBeatmapAttribute.AdditionalMetric("GREAT hit window", LocalisableString.Interpolate($@"±{hitWindows.WindowFor(HitResult.Great) / rate:N1}ms"), colours.ForHitResult(HitResult.Great)),
-                    new RulesetBeatmapAttribute.AdditionalMetric("OK hit window", LocalisableString.Interpolate($@"±{hitWindows.WindowFor(HitResult.Ok) / rate:N1}ms"), colours.ForHitResult(HitResult.Ok)),
-                    new RulesetBeatmapAttribute.AdditionalMetric("MISS hit window", LocalisableString.Interpolate($@"±{hitWindows.WindowFor(HitResult.Miss) / rate:N1}ms"), colours.ForHitResult(HitResult.Miss)),
-                    new RulesetBeatmapAttribute.AdditionalMetric("Hits per second required to clear swells", LocalisableString.Interpolate($@"{TaikoBeatmapConverter.RequiredSwellHitsPerSecond(modAdjustedDifficulty.OverallDifficulty):N1}")),
+                    new RulesetBeatmapAttribute.AdditionalMetric("GREAT hit window", LocalisableString.Interpolate($@"±{hitWindows.WindowFor(HitResult.Great) / rate:0.##}ms"), colours.ForHitResult(HitResult.Great)),
+                    new RulesetBeatmapAttribute.AdditionalMetric("OK hit window", LocalisableString.Interpolate($@"±{hitWindows.WindowFor(HitResult.Ok) / rate:0.##}ms"), colours.ForHitResult(HitResult.Ok)),
+                    new RulesetBeatmapAttribute.AdditionalMetric("MISS hit window", LocalisableString.Interpolate($@"±{hitWindows.WindowFor(HitResult.Miss) / rate:0.##}ms"), colours.ForHitResult(HitResult.Miss)),
+                    new RulesetBeatmapAttribute.AdditionalMetric("Hits per second required to clear swells", LocalisableString.Interpolate($@"{TaikoBeatmapConverter.RequiredSwellHitsPerSecond(modAdjustedDifficulty.OverallDifficulty):0.##}")),
                 ]
             };
 

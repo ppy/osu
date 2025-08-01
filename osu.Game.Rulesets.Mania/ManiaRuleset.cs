@@ -464,12 +464,12 @@ namespace osu.Game.Rulesets.Mania
                 Description = "Affects timing requirements for notes.",
                 AdditionalMetrics =
                 [
-                    new RulesetBeatmapAttribute.AdditionalMetric("PERFECT hit window", LocalisableString.Interpolate($@"±{hitWindows.WindowFor(HitResult.Perfect):N1}ms"), colours.ForHitResult(HitResult.Perfect)),
-                    new RulesetBeatmapAttribute.AdditionalMetric("GREAT hit window", LocalisableString.Interpolate($@"±{hitWindows.WindowFor(HitResult.Great):N1}ms"), colours.ForHitResult(HitResult.Great)),
-                    new RulesetBeatmapAttribute.AdditionalMetric("GOOD hit window", LocalisableString.Interpolate($@"±{hitWindows.WindowFor(HitResult.Good):N1}ms"), colours.ForHitResult(HitResult.Good)),
-                    new RulesetBeatmapAttribute.AdditionalMetric("OK hit window", LocalisableString.Interpolate($@"±{hitWindows.WindowFor(HitResult.Ok):N1}ms"), colours.ForHitResult(HitResult.Ok)),
-                    new RulesetBeatmapAttribute.AdditionalMetric("MEH hit window", LocalisableString.Interpolate($@"±{hitWindows.WindowFor(HitResult.Meh):N1}ms"), colours.ForHitResult(HitResult.Meh)),
-                    new RulesetBeatmapAttribute.AdditionalMetric("MISS hit window", LocalisableString.Interpolate($@"±{hitWindows.WindowFor(HitResult.Miss):N1}ms"), colours.ForHitResult(HitResult.Miss)),
+                    new RulesetBeatmapAttribute.AdditionalMetric("PERFECT hit window", LocalisableString.Interpolate($@"±{hitWindows.WindowFor(HitResult.Perfect):0.##}ms"), colours.ForHitResult(HitResult.Perfect)),
+                    new RulesetBeatmapAttribute.AdditionalMetric("GREAT hit window", LocalisableString.Interpolate($@"±{hitWindows.WindowFor(HitResult.Great):0.##}ms"), colours.ForHitResult(HitResult.Great)),
+                    new RulesetBeatmapAttribute.AdditionalMetric("GOOD hit window", LocalisableString.Interpolate($@"±{hitWindows.WindowFor(HitResult.Good):0.##}ms"), colours.ForHitResult(HitResult.Good)),
+                    new RulesetBeatmapAttribute.AdditionalMetric("OK hit window", LocalisableString.Interpolate($@"±{hitWindows.WindowFor(HitResult.Ok):0.##}ms"), colours.ForHitResult(HitResult.Ok)),
+                    new RulesetBeatmapAttribute.AdditionalMetric("MEH hit window", LocalisableString.Interpolate($@"±{hitWindows.WindowFor(HitResult.Meh):0.##}ms"), colours.ForHitResult(HitResult.Meh)),
+                    new RulesetBeatmapAttribute.AdditionalMetric("MISS hit window", LocalisableString.Interpolate($@"±{hitWindows.WindowFor(HitResult.Miss):0.##}ms"), colours.ForHitResult(HitResult.Miss)),
                 ]
             };
 
