@@ -94,6 +94,7 @@ namespace osu.Game.Screens.Edit.Verify
             base.LoadComplete();
 
             verify.InterpretedDifficulty.BindValueChanged(_ => Refresh());
+            verify.VerifyChecksScope.BindValueChanged(_ => Refresh());
             verify.HiddenIssueTypes.BindCollectionChanged((_, _) => Refresh());
 
             Refresh();
@@ -101,10 +102,26 @@ namespace osu.Game.Screens.Edit.Verify
 
         public void Refresh()
         {
-            var issues = generalVerifier.Run(context);
+            IEnumerable<Issue> issues;
 
-            if (rulesetVerifier != null)
-                issues = issues.Concat(rulesetVerifier.Run(context));
+            switch (verify.VerifyChecksScope.Value)
+            {
+                case VerifyChecksScope.General:
+                    issues = filterByScope(generalVerifier.Run(context), true);
+                    break;
+
+                case VerifyChecksScope.ThisDifficulty:
+                    var generalIssues = filterByScope(generalVerifier.Run(context), false);
+                    var rulesetIssues = rulesetVerifier?.Run(context) ?? Enumerable.Empty<Issue>();
+                    issues = generalIssues.Concat(rulesetIssues);
+                    break;
+
+                default:
+                    var allGeneralIssues = generalVerifier.Run(context);
+                    var allRulesetIssues = rulesetVerifier?.Run(context) ?? Enumerable.Empty<Issue>();
+                    issues = allGeneralIssues.Concat(allRulesetIssues);
+                    break;
+            }
 
             issues = filter(issues);
 
@@ -117,6 +134,12 @@ namespace osu.Game.Screens.Edit.Verify
         private IEnumerable<Issue> filter(IEnumerable<Issue> issues)
         {
             return issues.Where(issue => !verify.HiddenIssueTypes.Contains(issue.Template.Type));
+        }
+
+        private IEnumerable<Issue> filterByScope(IEnumerable<Issue> issues, bool generalOnly)
+        {
+            return issues.Where(issue =>
+                generalOnly ? issue.Check is IGeneralCheck : issue.Check is ICheck && issue.Check is not IGeneralCheck);
         }
     }
 }
