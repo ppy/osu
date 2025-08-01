@@ -418,7 +418,8 @@ namespace osu.Game.Rulesets.Osu
 
             // for OD is where it gets difficult.
             // when displaying hit window ranges with rate-changing mods active, we will want to adjust for rate ourselves, as `effectiveDifficulty` may not be accurate
-            // because `OsuHitWindows` applies a floor-and-round operation that will result in inaccurate results.
+            // because `OsuHitWindows` applies a floor-and-round operation that will result in inaccurate results
+            // (the floor-and-round needs to happen *before* rate is taken into account, not after).
             // for spinner RPM requirements, we do not want to involve rate-changing mods *at all*,
             // because rate-adjusting mods do not change the spin requirement (see `SpinnerRotationTracker.AddRotation()`).
             var hitWindows = new OsuHitWindows();
