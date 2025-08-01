@@ -159,6 +159,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             });
         }
 
+        protected void WaitForFiltering() => AddUntilStep("wait for filtering", () => !SongSelect.IsFiltering);
+
         protected void ImportBeatmapForRuleset(params int[] rulesetIds)
         {
             int beatmapsCount = 0;
