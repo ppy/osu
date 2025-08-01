@@ -34,8 +34,6 @@ namespace osu.Game.Screens.SelectV2
         /// </summary>
         protected virtual bool ShowManageCollectionsItem => true;
 
-        public Action? RequestFilter { private get; set; }
-
         private readonly BindableList<CollectionFilterMenuItem> filters = new BindableList<CollectionFilterMenuItem>();
 
         [Resolved]
@@ -110,15 +108,11 @@ namespace osu.Game.Screens.SelectV2
                             Current.Value = filters.SingleOrDefault(f => f.Collection?.ID == selectedItem.Collection?.ID) ?? filters[0];
                         });
 
-                        // Trigger an external re-filter if the current item was in the change set.
-                        RequestFilter?.Invoke();
                         break;
                     }
                 }
             }
         }
-
-        private Live<BeatmapCollection>? lastFiltered;
 
         private void selectionChanged(ValueChangedEvent<CollectionFilterMenuItem> filter)
         {
@@ -132,17 +126,6 @@ namespace osu.Game.Screens.SelectV2
             {
                 Current.Value = filter.OldValue;
                 manageCollectionsDialog?.Show();
-                return;
-            }
-
-            var newCollection = filter.NewValue.Collection;
-
-            // This dropdown be weird.
-            // We only care about filtering if the actual collection has changed.
-            if (newCollection != lastFiltered)
-            {
-                RequestFilter?.Invoke();
-                lastFiltered = newCollection;
             }
         }
 
