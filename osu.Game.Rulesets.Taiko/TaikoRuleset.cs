@@ -308,7 +308,7 @@ namespace osu.Game.Rulesets.Taiko
                                               .Reverse()
                                               .Select(window => new RulesetBeatmapAttribute.AdditionalMetric(
                                                   $"{window.result.GetDescription().ToUpperInvariant()} hit window",
-                                                  LocalisableString.Interpolate($@"±{hitWindows.WindowFor(window.result):0.##}ms"),
+                                                  LocalisableString.Interpolate($@"±{hitWindows.WindowFor(window.result) / rate:0.##}ms"),
                                                   colours.ForHitResult(window.result)
                                               ))
                                               .Append(new RulesetBeatmapAttribute.AdditionalMetric("Hits per second required to clear swells", LocalisableString.Interpolate($@"{TaikoBeatmapConverter.RequiredSwellHitsPerSecond(modAdjustedDifficulty.OverallDifficulty):0.##}")))
