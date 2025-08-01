@@ -215,7 +215,15 @@ namespace osu.Game.Screens.SelectV2
             showConvertedBeatmapsButton.Active.BindValueChanged(_ => updateCriteria());
             sortDropdown.Current.BindValueChanged(_ => updateCriteria());
             groupDropdown.Current.BindValueChanged(_ => updateCriteria());
-            collectionDropdown.Current.BindValueChanged(_ => updateCriteria());
+            collectionDropdown.Current.BindValueChanged(v =>
+            {
+                // The hope would be that this never arrives here, but due to bindings receiving changes before
+                // local ValueChanged events, that's not the case (see https://github.com/ppy/osu-framework/pull/1545).
+                if (v.NewValue is ManageCollectionsFilterMenuItem || v.OldValue is ManageCollectionsFilterMenuItem)
+                    return;
+
+                updateCriteria();
+            });
             collectionsSubscription = realm.RegisterForNotifications(r => r.All<BeatmapCollection>(), (collections, changeSet) =>
             {
                 if (changeSet != null && groupDropdown.Current.Value == GroupMode.Collections)
