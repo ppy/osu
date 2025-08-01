@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 
@@ -15,15 +16,52 @@ namespace osu.Game.Rulesets.Difficulty
     /// some want to provide specific extended information for a <see cref="BeatmapDifficulty"/> field
     /// or adjust the "effective display" in different ways.
     /// </summary>
-    /// <param name="Label">The long label for this beatmap attribute.</param>
-    /// <param name="Acronym">A two-letter acronym for this beatmap attribute.</param>
-    /// <param name="OriginalValue">The value of this attribute before application of mods.</param>
-    /// <param name="AdjustedValue">The "effective" value of this attribute after application of mods.</param>
-    /// <param name="MaxValue">The highest allowable value of this attribute.</param>
-    public record RulesetBeatmapAttribute(
-        LocalisableString Label,
-        string Acronym,
-        float OriginalValue,
-        float AdjustedValue,
-        float MaxValue);
+    public class RulesetBeatmapAttribute
+    {
+        /// <summary>
+        /// The long label for this beatmap attribute.
+        /// </summary>
+        public LocalisableString Label { get; }
+
+        /// <summary>
+        /// A two-letter acronym for this beatmap attribute.
+        /// </summary>
+        public string Acronym { get; }
+
+        /// <summary>
+        /// The value of this attribute before application of mods.
+        /// </summary>
+        public float OriginalValue { get; }
+
+        /// <summary>
+        /// The "effective" value of this attribute after application of mods.
+        /// </summary>
+        public float AdjustedValue { get; }
+
+        /// <summary>
+        /// The highest allowable value of this attribute.
+        /// </summary>
+        public float MaxValue { get; }
+
+        /// <summary>
+        /// An optional extended description of this attribute.
+        /// </summary>
+        public LocalisableString? Description { get; init; }
+
+        /// <summary>
+        /// Contains any and all additional metrics about how this attribute affects gameplay to show to the users.
+        /// </summary>
+        public AdditionalMetric[] AdditionalMetrics { get; init; } = [];
+
+        public RulesetBeatmapAttribute(LocalisableString label, string acronym, float originalValue, float adjustedValue, float maxValue)
+        {
+            Label = label;
+            Acronym = acronym;
+            OriginalValue = originalValue;
+            AdjustedValue = adjustedValue;
+            MaxValue = maxValue;
+        }
+
+        public record AdditionalMetric(LocalisableString Name, LocalisableString Value, Colour4? Colour = null);
+    }
 }
