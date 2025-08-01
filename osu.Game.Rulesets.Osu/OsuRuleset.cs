@@ -432,7 +432,7 @@ namespace osu.Game.Rulesets.Osu
                                               .Reverse()
                                               .Select(window => new RulesetBeatmapAttribute.AdditionalMetric(
                                                   $"{window.result.GetDescription().ToUpperInvariant()} hit window",
-                                                  LocalisableString.Interpolate($@"±{hitWindows.WindowFor(window.result):0.##}ms"),
+                                                  LocalisableString.Interpolate($@"±{hitWindows.WindowFor(window.result) / rate:0.##}ms"),
                                                   colours.ForHitResult(window.result)
                                               )).Concat([
                                                   new RulesetBeatmapAttribute.AdditionalMetric("RPM required to clear spinners", LocalisableString.Interpolate($@"{IBeatmapDifficultyInfo.DifficultyRange(modAdjustedDifficulty.OverallDifficulty, Spinner.CLEAR_RPM_RANGE):N0} RPM")),
