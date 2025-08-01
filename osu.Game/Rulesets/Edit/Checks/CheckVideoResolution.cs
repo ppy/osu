@@ -14,7 +14,7 @@ using File = TagLib.File;
 
 namespace osu.Game.Rulesets.Edit.Checks
 {
-    public class CheckVideoResolution : ICheck
+    public class CheckVideoResolution : IGeneralCheck
     {
         private const int max_video_width = 1280;
 

@@ -11,7 +11,7 @@ using osu.Game.Rulesets.Edit.Checks.Components;
 
 namespace osu.Game.Rulesets.Edit.Checks
 {
-    public class CheckHitsoundsFormat : ICheck
+    public class CheckHitsoundsFormat : IGeneralCheck
     {
         public CheckMetadata Metadata => new CheckMetadata(CheckCategory.Audio, "Checks for hitsound formats.");
 
