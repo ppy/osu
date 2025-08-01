@@ -42,6 +42,7 @@ namespace osu.Game.Rulesets.Edit
 
             // Timing
             new CheckPreviewTime(),
+            new CheckInconsistentTimingControlPoints(),
 
             // Events
             new CheckBreaks(),
