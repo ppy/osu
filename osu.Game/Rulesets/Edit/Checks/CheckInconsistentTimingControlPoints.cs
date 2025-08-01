@@ -3,18 +3,12 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using osu.Framework.Utils;
-using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Edit.Checks.Components;
 
 namespace osu.Game.Rulesets.Edit.Checks
 {
     public class CheckInconsistentTimingControlPoints : ICheck
     {
-        // Small tolerance for floating point comparison
-        private const double timing_tolerance = 0.01;
-
         public CheckMetadata Metadata => new CheckMetadata(CheckCategory.Timing, "Inconsistent timing control points");
 
         public IEnumerable<IssueTemplate> PossibleTemplates => new IssueTemplate[]
@@ -47,8 +41,8 @@ namespace osu.Game.Rulesets.Edit.Checks
                 // Check each timing point in the reference against this difficulty
                 foreach (var referencePoint in referenceTimingPoints)
                 {
-                    var matchingPoint = findMatchingTimingPoint(timingPoints, referencePoint.Time);
-                    var exactMatchingPoint = findExactMatchingTimingPoint(timingPoints, referencePoint.Time);
+                    var matchingPoint = TimingCheckUtils.FindMatchingTimingPoint(timingPoints, referencePoint.Time);
+                    var exactMatchingPoint = TimingCheckUtils.FindExactMatchingTimingPoint(timingPoints, referencePoint.Time);
 
                     if (matchingPoint == null)
                     {
@@ -63,7 +57,7 @@ namespace osu.Game.Rulesets.Edit.Checks
                         }
 
                         // Check for BPM inconsistency
-                        if (Math.Abs(referencePoint.BeatLength - matchingPoint.BeatLength) > timing_tolerance)
+                        if (Math.Abs(referencePoint.BeatLength - matchingPoint.BeatLength) > TimingCheckUtils.TIMING_TOLERANCE)
                         {
                             yield return new IssueTemplateInconsistentBPM(this).Create(referencePoint.Time, beatmap.BeatmapInfo.DifficultyName);
                         }
@@ -79,8 +73,8 @@ namespace osu.Game.Rulesets.Edit.Checks
                 // Check timing points in this difficulty that aren't in the reference
                 foreach (var timingPoint in timingPoints)
                 {
-                    var matchingReferencePoint = findMatchingTimingPoint(referenceTimingPoints, timingPoint.Time);
-                    var exactMatchingReferencePoint = findExactMatchingTimingPoint(referenceTimingPoints, timingPoint.Time);
+                    var matchingReferencePoint = TimingCheckUtils.FindMatchingTimingPoint(referenceTimingPoints, timingPoint.Time);
+                    var exactMatchingReferencePoint = TimingCheckUtils.FindExactMatchingTimingPoint(referenceTimingPoints, timingPoint.Time);
 
                     if (matchingReferencePoint == null)
                     {
@@ -92,16 +86,6 @@ namespace osu.Game.Rulesets.Edit.Checks
                     }
                 }
             }
-        }
-
-        private static TimingControlPoint? findMatchingTimingPoint(IEnumerable<TimingControlPoint> timingPoints, double time)
-        {
-            return timingPoints.FirstOrDefault(tp => Precision.AlmostEquals(tp.Time, Math.Round(time), 1.0));
-        }
-
-        private static TimingControlPoint? findExactMatchingTimingPoint(IEnumerable<TimingControlPoint> timingPoints, double time)
-        {
-            return timingPoints.FirstOrDefault(tp => Precision.AlmostEquals(tp.Time, time, timing_tolerance));
         }
 
         public class IssueTemplateMissingTimingPoint : IssueTemplate
