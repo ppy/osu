@@ -2,12 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Testing;
 using osu.Framework.Timing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
@@ -48,14 +50,15 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
-        public void TestVideoSize()
+        public void TestVideo()
         {
             AddStep("load storyboard with only video", () =>
             {
                 // LegacyStoryboardDecoder doesn't parse WidescreenStoryboard, so it is set manually
-                loadStoryboard("storyboard_only_video.osu", s => s.BeatmapInfo.WidescreenStoryboard = false);
+                loadStoryboard("storyboard_only_video.osu", s => s.Beatmap.WidescreenStoryboard = false);
             });
 
+            AddAssert("storyboard video present in hierarchy", () => this.ChildrenOfType<DrawableStoryboardVideo>().Any());
             AddAssert("storyboard is correct width", () => Precision.AlmostEquals(storyboard?.Width ?? 0f, 480 * 16 / 9f));
         }
 

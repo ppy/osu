@@ -33,7 +33,7 @@ namespace osu.Game.Beatmaps
 
             Debug.Assert(beatmapInfo.BeatmapSet != null);
 
-            var req = new GetBeatmapRequest(beatmapInfo);
+            var req = new GetBeatmapRequest(md5Hash: beatmapInfo.MD5Hash, filename: beatmapInfo.Path);
 
             try
             {
@@ -63,7 +63,9 @@ namespace osu.Game.Beatmaps
                         DateRanked = res.BeatmapSet?.Ranked,
                         DateSubmitted = res.BeatmapSet?.Submitted,
                         MD5Hash = res.MD5Hash,
-                        LastUpdated = res.LastUpdated
+                        LastUpdated = res.LastUpdated,
+                        // Tags are not populated because the response does not contain tag data.
+                        // TODO: consider web change to include the tag data? or a second web request for the set to retrieve tags?
                     };
                     return true;
                 }

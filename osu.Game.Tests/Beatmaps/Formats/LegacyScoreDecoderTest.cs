@@ -13,13 +13,14 @@ using osu.Framework.Extensions;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.Legacy;
+using osu.Game.Extensions;
 using osu.Game.IO.Legacy;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Replays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Mania;
-using osu.Game.Rulesets.Mania.Mods;
+using osu.Game.Rulesets.Mania.Replays;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
@@ -65,14 +66,13 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual(829_931, score.ScoreInfo.LegacyTotalScore);
                 Assert.AreEqual(3, score.ScoreInfo.MaxCombo);
 
-                Assert.IsTrue(score.ScoreInfo.Mods.Any(m => m is ManiaModClassic));
-                Assert.IsTrue(score.ScoreInfo.APIMods.Any(m => m.Acronym == "CL"));
-                Assert.IsTrue(score.ScoreInfo.ModsJson.Contains("CL"));
+                Assert.That(score.ScoreInfo.APIMods.Select(m => m.Acronym), Is.EquivalentTo(new[] { "CL", "9K", "DS" }));
 
                 Assert.That((2 * 300d + 1 * 200) / (3 * 305d), Is.EqualTo(score.ScoreInfo.Accuracy).Within(0.0001));
                 Assert.AreEqual(ScoreRank.B, score.ScoreInfo.Rank);
 
-                Assert.That(score.Replay.Frames, Is.Not.Empty);
+                Assert.That(score.Replay.Frames, Has.One.Matches<ManiaReplayFrame>(frame =>
+                    frame.Time == 414 && frame.Actions.SequenceEqual(new[] { ManiaAction.Key1, ManiaAction.Key18 })));
             }
         }
 
@@ -156,10 +156,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             var scoreInfo = TestResources.CreateTestScoreInfo(ruleset);
             var beatmap = new TestBeatmap(ruleset)
             {
-                BeatmapInfo =
-                {
-                    BeatmapVersion = beatmapVersion
-                }
+                BeatmapVersion = beatmapVersion
             };
 
             var score = new Score
@@ -325,6 +322,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 CountryCode = CountryCode.PL
             };
             scoreInfo.ClientVersion = "2023.1221.0";
+            scoreInfo.Pauses.AddRange([111111, 222222, 333333]);
 
             var beatmap = new TestBeatmap(ruleset);
             var score = new Score
@@ -349,6 +347,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.That(decodedAfterEncode.ScoreInfo.Mods, Is.EqualTo(scoreInfo.Mods));
                 Assert.That(decodedAfterEncode.ScoreInfo.ClientVersion, Is.EqualTo("2023.1221.0"));
                 Assert.That(decodedAfterEncode.ScoreInfo.RealmUser.OnlineID, Is.EqualTo(3035836));
+                Assert.That(decodedAfterEncode.ScoreInfo.Pauses, Is.EquivalentTo(new[] { 111111, 222222, 333333 }));
             });
         }
 
@@ -634,14 +633,14 @@ namespace osu.Game.Tests.Beatmaps.Formats
                     MD5Hash = md5Hash,
                     Ruleset = new OsuRuleset().RulesetInfo,
                     Difficulty = new BeatmapDifficulty(),
-                    BeatmapVersion = beatmapVersion,
                 },
-                // needs to have at least one objects so that `StandardisedScoreMigrationTools` doesn't die
+                // needs to have at least one object so that `StandardisedScoreMigrationTools` doesn't die
                 // when trying to recompute total score.
                 HitObjects =
                 {
                     new HitCircle()
-                }
+                },
+                BeatmapVersion = beatmapVersion,
             });
         }
     }

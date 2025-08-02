@@ -228,7 +228,8 @@ namespace osu.Game.Overlays
                     return true;
 
                 case PlatformAction.DocumentClose:
-                    channelManager.LeaveChannel(currentChannel.Value);
+                    if (currentChannel.Value?.Type != ChannelType.Team)
+                        channelManager.LeaveChannel(currentChannel.Value);
                     return true;
 
                 case PlatformAction.TabRestore:
@@ -386,10 +387,8 @@ namespace osu.Game.Overlays
                     {
                         channelList.RemoveChannel(channel);
 
-                        if (loadedChannels.ContainsKey(channel))
+                        if (loadedChannels.Remove(channel, out var loaded))
                         {
-                            DrawableChannel loaded = loadedChannels[channel];
-                            loadedChannels.Remove(channel);
                             // DrawableChannel removed from cache must be manually disposed
                             loaded.Dispose();
                         }

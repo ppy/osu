@@ -4,9 +4,14 @@
 #nullable disable
 
 using System;
+using System.Collections.Generic;
+using System.Runtime.Serialization;
+using JetBrains.Annotations;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using osu.Framework.Localisation;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Scoring;
 using osu.Game.Utils;
 
@@ -74,6 +79,10 @@ namespace osu.Game.Users
         [JsonProperty(@"grade_counts")]
         public Grades GradesCount;
 
+        [JsonProperty(@"variants")]
+        [CanBeNull]
+        public List<Variant> Variants;
+
         public struct Grades
         {
             [JsonProperty(@"ssh")]
@@ -117,6 +126,36 @@ namespace osu.Game.Users
                     }
                 }
             }
+        }
+
+        public enum RulesetVariant
+        {
+            [EnumMember(Value = "4k")]
+            [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.VariantMania4k))]
+            FourKey,
+
+            [EnumMember(Value = "7k")]
+            [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.VariantMania7k))]
+            SevenKey
+        }
+
+        public class Variant
+        {
+            [JsonProperty("country_rank")]
+            public int? CountryRank;
+
+            [JsonProperty("global_rank")]
+            public int? GlobalRank;
+
+            [JsonProperty("mode")]
+            public string Mode;
+
+            [JsonProperty("pp")]
+            public decimal PP;
+
+            [JsonProperty("variant")]
+            [JsonConverter(typeof(StringEnumConverter))]
+            public RulesetVariant VariantType;
         }
     }
 }

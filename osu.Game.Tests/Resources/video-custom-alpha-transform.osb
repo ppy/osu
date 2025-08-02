@@ -1,0 +1,5 @@
+osu file format v14
+
+[Events]
+Video,-5678,"Video.avi",0,0
+ F,0,1500,1600,0,1

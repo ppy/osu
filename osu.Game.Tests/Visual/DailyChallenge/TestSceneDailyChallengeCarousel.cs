@@ -16,6 +16,7 @@ using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Screens.OnlinePlay.DailyChallenge;
 using osu.Game.Screens.OnlinePlay.DailyChallenge.Events;
+using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests.Visual.DailyChallenge
 {
@@ -25,11 +26,6 @@ namespace osu.Game.Tests.Visual.DailyChallenge
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Plum);
 
         private readonly Bindable<Room> room = new Bindable<Room>(new Room());
-
-        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) => new CachedModelDependencyContainer<Room>(base.CreateChildDependencies(parent))
-        {
-            Model = { BindTarget = room }
-        };
 
         [Test]
         public void TestBasicAppearance()
@@ -98,7 +94,7 @@ namespace osu.Game.Tests.Visual.DailyChallenge
                                 Origin = Anchor.Centre,
                                 Children = new Drawable[]
                                 {
-                                    new DailyChallengeTimeRemainingRing(),
+                                    new DailyChallengeTimeRemainingRing(room.Value),
                                     breakdown = new DailyChallengeScoreBreakdown(),
                                 }
                             }
@@ -125,8 +121,8 @@ namespace osu.Game.Tests.Visual.DailyChallenge
             AddSliderStep("update time remaining", 0f, 1f, 0f, progress =>
             {
                 var startedTimeAgo = TimeSpan.FromHours(24) * progress;
-                room.Value.StartDate.Value = DateTimeOffset.Now - startedTimeAgo;
-                room.Value.EndDate.Value = room.Value.StartDate.Value.Value.AddDays(1);
+                room.Value.StartDate = DateTimeOffset.Now - startedTimeAgo;
+                room.Value.EndDate = room.Value.StartDate.Value.AddDays(1);
             });
             AddStep("add normal score", () =>
             {
@@ -134,7 +130,7 @@ namespace osu.Game.Tests.Visual.DailyChallenge
                 {
                     Id = 2,
                     Username = "peppy",
-                    CoverUrl = "https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
+                    CoverUrl = TestResources.COVER_IMAGE_3,
                 }, RNG.Next(1_000_000), null);
 
                 feed.AddNewScore(ev);
@@ -146,7 +142,7 @@ namespace osu.Game.Tests.Visual.DailyChallenge
                 {
                     Id = 2,
                     Username = "peppy",
-                    CoverUrl = "https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
+                    CoverUrl = TestResources.COVER_IMAGE_3,
                 }, RNG.Next(1_000_000), RNG.Next(1, 1000));
 
                 feed.AddNewScore(ev);

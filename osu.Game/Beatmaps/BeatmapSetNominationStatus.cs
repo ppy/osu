@@ -19,7 +19,7 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// The number of nominations required so that the map is eligible for qualification.
         /// </summary>
-        [JsonProperty(@"required")]
-        public int Required { get; set; }
+        [JsonProperty(@"required_meta")]
+        public BeatmapSetNominationRequiredMeta RequiredMeta { get; set; } = new BeatmapSetNominationRequiredMeta();
     }
 }

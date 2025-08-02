@@ -54,7 +54,12 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// The key conversion input manager for this DrawableRuleset.
         /// </summary>
-        protected PassThroughInputManager KeyBindingInputManager;
+        protected PassThroughInputManager KeyBindingInputManager { get; }
+
+        /// <summary>
+        /// This configuration for this DrawableRuleset.
+        /// </summary>
+        protected IRulesetConfigManager Config { get; private set; }
 
         public override double GameplayStartTime => Objects.FirstOrDefault()?.StartTime - 2000 ?? 0;
 
@@ -65,21 +70,37 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         public override Playfield Playfield => playfield.Value;
 
+        public override PlayfieldAdjustmentContainer PlayfieldAdjustmentContainer => playfieldAdjustmentContainer;
+
         public override Container Overlays { get; } = new Container { RelativeSizeAxes = Axes.Both };
 
         public override IAdjustableAudioComponent Audio => audioContainer;
 
         private readonly AudioContainer audioContainer = new AudioContainer { RelativeSizeAxes = Axes.Both };
 
-        /// <summary>
-        /// A container which encapsulates the <see cref="Playfield"/> and provides any adjustments to
-        /// ensure correct scale and position.
-        /// </summary>
-        public virtual PlayfieldAdjustmentContainer PlayfieldAdjustmentContainer { get; private set; }
-
         public override Container FrameStableComponents { get; } = new Container { RelativeSizeAxes = Axes.Both };
 
         public override IFrameStableClock FrameStableClock => frameStabilityContainer;
+
+        public override IEnumerable<HitObject> Objects => Beatmap.HitObjects;
+
+        /// <summary>
+        /// The beatmap.
+        /// </summary>
+        [Cached(typeof(IBeatmap))]
+        public readonly Beatmap<TObject> Beatmap;
+
+        [Cached(typeof(IReadOnlyList<Mod>))]
+        public sealed override IReadOnlyList<Mod> Mods { get; }
+
+        [Resolved(CanBeNull = true)]
+        private OnScreenDisplay onScreenDisplay { get; set; }
+
+        private readonly PlayfieldAdjustmentContainer playfieldAdjustmentContainer;
+
+        private IDisposable configTracker;
+        private FrameStabilityContainer frameStabilityContainer;
+        private DrawableRulesetDependencies dependencies;
 
         private bool allowBackwardsSeeks;
 
@@ -108,25 +129,6 @@ namespace osu.Game.Rulesets.UI
         }
 
         /// <summary>
-        /// The beatmap.
-        /// </summary>
-        [Cached(typeof(IBeatmap))]
-        public readonly Beatmap<TObject> Beatmap;
-
-        public override IEnumerable<HitObject> Objects => Beatmap.HitObjects;
-
-        protected IRulesetConfigManager Config { get; private set; }
-
-        [Cached(typeof(IReadOnlyList<Mod>))]
-        public sealed override IReadOnlyList<Mod> Mods { get; }
-
-        private FrameStabilityContainer frameStabilityContainer;
-
-        private OnScreenDisplay onScreenDisplay;
-
-        private DrawableRulesetDependencies dependencies;
-
-        /// <summary>
         /// Creates a ruleset visualisation for the provided ruleset and beatmap.
         /// </summary>
         /// <param name="ruleset">The ruleset being represented.</param>
@@ -146,6 +148,7 @@ namespace osu.Game.Rulesets.UI
             RelativeSizeAxes = Axes.Both;
 
             KeyBindingInputManager = CreateInputManager();
+            playfieldAdjustmentContainer = CreatePlayfieldAdjustmentContainer();
             playfield = new Lazy<Playfield>(() => CreatePlayfield().With(p =>
             {
                 p.NewResult += (_, r) => NewResult?.Invoke(r);
@@ -156,6 +159,9 @@ namespace osu.Game.Rulesets.UI
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            if (Config != null)
+                configTracker = onScreenDisplay?.BeginTracking(this, Config);
 
             IsPaused.ValueChanged += paused =>
             {
@@ -169,13 +175,7 @@ namespace osu.Game.Rulesets.UI
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
             dependencies = new DrawableRulesetDependencies(Ruleset, base.CreateChildDependencies(parent));
-
             Config = dependencies.RulesetConfigManager;
-
-            onScreenDisplay = dependencies.Get<OnScreenDisplay>();
-            if (Config != null)
-                onScreenDisplay?.BeginTracking(this, Config);
-
             return dependencies;
         }
 
@@ -197,8 +197,7 @@ namespace osu.Game.Rulesets.UI
                     audioContainer.WithChild(KeyBindingInputManager
                         .WithChildren(new Drawable[]
                         {
-                            PlayfieldAdjustmentContainer = CreatePlayfieldAdjustmentContainer()
-                                .WithChild(Playfield),
+                            playfieldAdjustmentContainer.WithChild(Playfield),
                             Overlays
                         })),
                 }
@@ -301,6 +300,7 @@ namespace osu.Game.Rulesets.UI
 
             if (score == null)
             {
+                NewResult -= emitImportantFrame;
                 recordingInputManager.Recorder = null;
                 return;
             }
@@ -312,7 +312,10 @@ namespace osu.Game.Rulesets.UI
 
             recorder.ScreenSpaceToGamefield = Playfield.ScreenSpaceToGamefield;
 
+            NewResult += emitImportantFrame;
             recordingInputManager.Recorder = recorder;
+
+            void emitImportantFrame(JudgementResult judgementResult) => recordingInputManager.Recorder?.RecordFrame(true);
         }
 
         public override void SetReplayScore(Score replayScore)
@@ -406,11 +409,7 @@ namespace osu.Game.Rulesets.UI
         {
             base.Dispose(isDisposing);
 
-            if (Config != null)
-            {
-                onScreenDisplay?.StopTracking(this, Config);
-                Config = null;
-            }
+            configTracker?.Dispose();
 
             // Dispose the components created by this dependency container.
             dependencies?.Dispose();
@@ -455,6 +454,12 @@ namespace osu.Game.Rulesets.UI
         /// The playfield.
         /// </summary>
         public abstract Playfield Playfield { get; }
+
+        /// <summary>
+        /// A container which encapsulates the <see cref="Playfield"/> and provides any adjustments to
+        /// ensure correct scale and position.
+        /// </summary>
+        public abstract PlayfieldAdjustmentContainer PlayfieldAdjustmentContainer { get; }
 
         /// <summary>
         /// Content to be placed above hitobjects. Will be affected by frame stability and adjustments applied to <see cref="Audio"/>.
@@ -572,6 +577,11 @@ namespace osu.Game.Rulesets.UI
         /// Whether to display gameplay overlays, such as <see cref="HUDOverlay"/> and <see cref="BreakOverlay"/>.
         /// </summary>
         public virtual bool AllowGameplayOverlays => true;
+
+        /// <summary>
+        /// On mobile devices, this specifies whether this ruleset requires the device to be in portrait orientation.
+        /// </summary>
+        public virtual bool RequiresPortraitOrientation => false;
 
         /// <summary>
         /// Sets a replay to be used, overriding local input.

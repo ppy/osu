@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.LocalisationExtensions;
@@ -9,15 +10,16 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Effects;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Localisation;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Scoring;
 using osuTK;
-using Box = osu.Framework.Graphics.Shapes.Box;
-using Color4 = osuTK.Graphics.Color4;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
@@ -25,6 +27,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
     {
         private StreakPiece currentDaily = null!;
         private StreakPiece currentWeekly = null!;
+        private StreakPiece totalParticipation = null!;
         private StatisticsPiece bestDaily = null!;
         private StatisticsPiece bestWeekly = null!;
         private StatisticsPiece topTen = null!;
@@ -79,6 +82,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                                     Spacing = new Vector2(30f),
                                     Children = new[]
                                     {
+                                        totalParticipation = new StreakPiece(UsersStrings.ShowDailyChallengePlaycount),
                                         currentDaily = new StreakPiece(UsersStrings.ShowDailyChallengeDailyStreakCurrent),
                                         currentWeekly = new StreakPiece(UsersStrings.ShowDailyChallengeWeeklyStreakCurrent),
                                     }
@@ -112,16 +116,19 @@ namespace osu.Game.Overlays.Profile.Header.Components
             background.Colour = colourProvider.Background4;
             topBackground.Colour = colourProvider.Background5;
 
-            currentDaily.Value = UsersStrings.ShowDailyChallengeUnitDay(content.Statistics.DailyStreakCurrent.ToLocalisableString(@"N0"));
+            totalParticipation.Value = DailyChallengeStatsDisplayStrings.UnitDay(statistics.PlayCount.ToLocalisableString(@"N0"));
+            totalParticipation.ValueColour = colours.ForRankingTier(TierForPlayCount(statistics.PlayCount));
+
+            currentDaily.Value = DailyChallengeStatsDisplayStrings.UnitDay(content.Statistics.DailyStreakCurrent.ToLocalisableString(@"N0"));
             currentDaily.ValueColour = colours.ForRankingTier(TierForDaily(statistics.DailyStreakCurrent));
 
-            currentWeekly.Value = UsersStrings.ShowDailyChallengeUnitWeek(statistics.WeeklyStreakCurrent.ToLocalisableString(@"N0"));
+            currentWeekly.Value = DailyChallengeStatsDisplayStrings.UnitWeek(statistics.WeeklyStreakCurrent.ToLocalisableString(@"N0"));
             currentWeekly.ValueColour = colours.ForRankingTier(TierForWeekly(statistics.WeeklyStreakCurrent));
 
-            bestDaily.Value = UsersStrings.ShowDailyChallengeUnitDay(statistics.DailyStreakBest.ToLocalisableString(@"N0"));
+            bestDaily.Value = DailyChallengeStatsDisplayStrings.UnitDay(statistics.DailyStreakBest.ToLocalisableString(@"N0"));
             bestDaily.ValueColour = colours.ForRankingTier(TierForDaily(statistics.DailyStreakBest));
 
-            bestWeekly.Value = UsersStrings.ShowDailyChallengeUnitWeek(statistics.WeeklyStreakBest.ToLocalisableString(@"N0"));
+            bestWeekly.Value = DailyChallengeStatsDisplayStrings.UnitWeek(statistics.WeeklyStreakBest.ToLocalisableString(@"N0"));
             bestWeekly.ValueColour = colours.ForRankingTier(TierForWeekly(statistics.WeeklyStreakBest));
 
             topTen.Value = statistics.Top10PercentPlacements.ToLocalisableString(@"N0");
@@ -131,28 +138,31 @@ namespace osu.Game.Overlays.Profile.Header.Components
             topFifty.ValueColour = colourProvider.Content2;
         }
 
-        // reference: https://github.com/ppy/osu-web/blob/8206e0e91eeea80ccf92f0586561346dd40e085e/resources/js/profile-page/daily-challenge.tsx#L13-L43
+        // reference: https://github.com/ppy/osu-web/blob/a97f156014e00ea1aa315140da60542e798a9f06/resources/js/profile-page/daily-challenge.tsx#L13-L47
+
+        public static RankingTier TierForPlayCount(int playCount) => TierForDaily((int)Math.Floor(playCount / 3.0d));
+
         public static RankingTier TierForDaily(int daily)
         {
-            if (daily > 360)
+            if (daily >= 360)
                 return RankingTier.Lustrous;
 
-            if (daily > 240)
+            if (daily >= 240)
                 return RankingTier.Radiant;
 
-            if (daily > 120)
+            if (daily >= 120)
                 return RankingTier.Rhodium;
 
-            if (daily > 60)
+            if (daily >= 60)
                 return RankingTier.Platinum;
 
-            if (daily > 30)
+            if (daily >= 30)
                 return RankingTier.Gold;
 
-            if (daily > 10)
+            if (daily >= 10)
                 return RankingTier.Silver;
 
-            if (daily > 5)
+            if (daily >= 5)
                 return RankingTier.Bronze;
 
             return RankingTier.Iron;

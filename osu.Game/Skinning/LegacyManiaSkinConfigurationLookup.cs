@@ -37,11 +37,9 @@ namespace osu.Game.Skinning
     public enum LegacyManiaSkinConfigurationLookups
     {
         ColumnWidth,
-        ColumnSpacing,
         LightImage,
-        LeftLineWidth,
-        RightLineWidth,
         HitPosition,
+        ComboPosition,
         ScorePosition,
         LightPosition,
         StagePaddingTop,
@@ -55,18 +53,20 @@ namespace osu.Game.Skinning
         HoldNoteTailImage,
         HoldNoteBodyImage,
         HoldNoteLightImage,
-        HoldNoteLightScale,
         WidthForNoteHeightScale,
         ExplosionImage,
-        ExplosionScale,
         ColumnLineColour,
         JudgementLineColour,
         ColumnBackgroundColour,
         ColumnLightColour,
+        ComboBreakColour,
         MinimumColumnWidth,
         LeftStageImage,
         RightStageImage,
         BottomStageImage,
+
+        BarLineHeight,
+        BarLineColour,
 
         // ReSharper disable once InconsistentNaming
         Hit300g,
@@ -78,6 +78,16 @@ namespace osu.Game.Skinning
         Hit0,
         KeysUnderNotes,
         NoteBodyStyle,
-        LightFramePerSecond
+        LightFramePerSecond,
+
+        // The following lookup entries are not directly tied to skin.ini settings
+        // but are defined to simplify the process of determining such values.
+
+        LeftColumnSpacing,
+        RightColumnSpacing,
+        LeftLineWidth,
+        RightLineWidth,
+        ExplosionScale,
+        HoldNoteLightScale,
     }
 }

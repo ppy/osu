@@ -18,6 +18,7 @@ using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets.Mods;
@@ -135,10 +136,10 @@ namespace osu.Game.Tests.Visual.Gameplay
             var workingBeatmap = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
 
             // Add intro time to test quick retry skipping (TestQuickRetry).
-            workingBeatmap.BeatmapInfo.AudioLeadIn = 60000;
+            workingBeatmap.Beatmap.AudioLeadIn = 60000;
 
             // Set up data for testing disclaimer display.
-            workingBeatmap.BeatmapInfo.EpilepsyWarning = epilepsyWarning ?? false;
+            workingBeatmap.Beatmap.EpilepsyWarning = epilepsyWarning ?? false;
             workingBeatmap.BeatmapInfo.Status = onlineStatus ?? BeatmapOnlineStatus.Ranked;
 
             Beatmap.Value = workingBeatmap;
@@ -207,7 +208,25 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
-        public void TestBlockLoadViaFocus()
+        public void TestLoadNotBlockedViaArbitraryFocus()
+        {
+            AddStep("load dummy beatmap", () => resetPlayer(false));
+            AddUntilStep("wait for current", () => loader.IsCurrentScreen());
+
+            AddUntilStep("click settings slider", () =>
+            {
+                InputManager.MoveMouseTo(loader.ChildrenOfType<OsuSliderBar<float>>().First());
+                InputManager.Click(MouseButton.Left);
+
+                return InputManager.FocusedDrawable is OsuSliderBar<float>;
+            });
+
+            AddUntilStep("wait for load ready", () => player?.LoadState == LoadState.Ready);
+            AddUntilStep("loads", () => !loader.IsCurrentScreen());
+        }
+
+        [Test]
+        public void TestBlockLoadViaOverlayFocus()
         {
             AddStep("load dummy beatmap", () => resetPlayer(false));
             AddUntilStep("wait for current", () => loader.IsCurrentScreen());
@@ -523,7 +542,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("restart completed", () => getCurrentPlayer() != null && getCurrentPlayer() != previousPlayer);
             AddStep("release quick retry key", () => InputManager.ReleaseKey(Key.Tilde));
 
-            AddUntilStep("wait for player", () => getCurrentPlayer()?.LoadState == LoadState.Ready);
+            AddUntilStep("wait for player", () => getCurrentPlayer()?.LoadState >= LoadState.Ready);
 
             AddUntilStep("time reached zero", () => getCurrentPlayer()?.GameplayClockContainer.CurrentTime > 0);
             AddUntilStep("skip button not visible", () => !checkSkipButtonVisible());

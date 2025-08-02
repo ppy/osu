@@ -67,19 +67,19 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestLink()
         {
-            AddStep("set current path", () => markdownContainer.CurrentPath = $"{API.WebsiteRootUrl}/wiki/Article_styling_criteria/");
+            AddStep("set current path", () => markdownContainer.CurrentPath = $"{API.Endpoints.WebsiteUrl}/wiki/Article_styling_criteria/");
 
             AddStep("set '/wiki/Main_page''", () => markdownContainer.Text = "[wiki main page](/wiki/Main_page)");
-            AddAssert("check url", () => markdownContainer.Link.Url == $"{API.WebsiteRootUrl}/wiki/Main_page");
+            AddAssert("check url", () => markdownContainer.Link.Url == $"{API.Endpoints.WebsiteUrl}/wiki/Main_page");
 
             AddStep("set '../FAQ''", () => markdownContainer.Text = "[FAQ](../FAQ)");
-            AddAssert("check url", () => markdownContainer.Link.Url == $"{API.WebsiteRootUrl}/wiki/FAQ");
+            AddAssert("check url", () => markdownContainer.Link.Url == $"{API.Endpoints.WebsiteUrl}/wiki/FAQ");
 
             AddStep("set './Writing''", () => markdownContainer.Text = "[wiki writing guidline](./Writing)");
-            AddAssert("check url", () => markdownContainer.Link.Url == $"{API.WebsiteRootUrl}/wiki/Article_styling_criteria/Writing");
+            AddAssert("check url", () => markdownContainer.Link.Url == $"{API.Endpoints.WebsiteUrl}/wiki/Article_styling_criteria/Writing");
 
             AddStep("set 'Formatting''", () => markdownContainer.Text = "[wiki formatting guidline](Formatting)");
-            AddAssert("check url", () => markdownContainer.Link.Url == $"{API.WebsiteRootUrl}/wiki/Article_styling_criteria/Formatting");
+            AddAssert("check url", () => markdownContainer.Link.Url == $"{API.Endpoints.WebsiteUrl}/wiki/Article_styling_criteria/Formatting");
         }
 
         [Test]

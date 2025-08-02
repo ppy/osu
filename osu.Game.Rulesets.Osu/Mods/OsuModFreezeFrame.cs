@@ -43,7 +43,10 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             foreach (var obj in beatmap.HitObjects.OfType<OsuHitObject>())
             {
-                if (obj.NewCombo) { lastNewComboTime = obj.StartTime; }
+                if (obj.NewCombo)
+                {
+                    lastNewComboTime = obj.StartTime;
+                }
 
                 applyFadeInAdjustment(obj);
             }

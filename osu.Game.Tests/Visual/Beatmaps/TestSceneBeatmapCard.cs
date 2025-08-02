@@ -16,6 +16,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Beatmaps.Drawables.Cards;
 using osu.Game.Beatmaps.Drawables.Cards.Buttons;
+using osu.Game.Beatmaps.Drawables.Cards.Statistics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
@@ -63,7 +64,11 @@ namespace osu.Game.Tests.Visual.Beatmaps
             withStatistics.NominationStatus = new BeatmapSetNominationStatus
             {
                 Current = 1,
-                Required = 2
+                RequiredMeta =
+                {
+                    MainRuleset = 2,
+                    NonMainRuleset = 1,
+                }
             };
 
             var undownloadable = getUndownloadableBeatmapSet();
@@ -78,7 +83,11 @@ namespace osu.Game.Tests.Visual.Beatmaps
             someDifficulties.NominationStatus = new BeatmapSetNominationStatus
             {
                 Current = 2,
-                Required = 2
+                RequiredMeta =
+                {
+                    MainRuleset = 2,
+                    NonMainRuleset = 1,
+                }
             };
 
             var manyDifficulties = getManyDifficultiesBeatmapSet(100);
@@ -220,6 +229,9 @@ namespace osu.Game.Tests.Visual.Beatmaps
         }
 
         private Drawable createContent(OverlayColourScheme colourScheme, Func<APIBeatmapSet, Drawable> creationFunc)
+            => createContent(colourScheme, testCases.Select(creationFunc).ToArray());
+
+        private Drawable createContent(OverlayColourScheme colourScheme, Drawable[] cards)
         {
             var colourProvider = new OverlayColourProvider(colourScheme);
 
@@ -247,7 +259,7 @@ namespace osu.Game.Tests.Visual.Beatmaps
                             Direction = FillDirection.Full,
                             Padding = new MarginPadding(10),
                             Spacing = new Vector2(10),
-                            ChildrenEnumerable = testCases.Select(creationFunc)
+                            ChildrenEnumerable = cards
                         }
                     }
                 }
@@ -319,6 +331,55 @@ namespace osu.Game.Tests.Visual.Beatmaps
             AddAssert("first card is playing", () => firstCard().ChildrenOfType<PlayButton>().Single().Playing.Value);
 
             BeatmapCardNormal firstCard() => this.ChildrenOfType<BeatmapCardNormal>().First();
+        }
+
+        [Test]
+        public void TestNominations()
+        {
+            AddStep("create cards", () =>
+            {
+                var singleRuleset = CreateAPIBeatmapSet(Ruleset.Value);
+                singleRuleset.HypeStatus = new BeatmapSetHypeStatus();
+                singleRuleset.NominationStatus = new BeatmapSetNominationStatus
+                {
+                    Current = 4,
+                    RequiredMeta =
+                    {
+                        MainRuleset = 5,
+                        NonMainRuleset = 1,
+                    }
+                };
+
+                var multipleRulesets = getManyDifficultiesBeatmapSet(3);
+                multipleRulesets.HypeStatus = new BeatmapSetHypeStatus();
+                multipleRulesets.NominationStatus = new BeatmapSetNominationStatus
+                {
+                    Current = 4,
+                    RequiredMeta =
+                    {
+                        MainRuleset = 5,
+                        NonMainRuleset = 1,
+                    }
+                };
+
+                Child = createContent(OverlayColourScheme.Blue, new Drawable[]
+                {
+                    new BeatmapCardNormal(singleRuleset),
+                    new BeatmapCardNormal(multipleRulesets),
+                });
+            });
+
+            // first card: only has main ruleset, required nominations = main_ruleset = 5
+            AddAssert("first card has single ruleset", () => firstCard().BeatmapSet.Beatmaps.GroupBy(b => b.Ruleset).Count(), () => Is.EqualTo(1));
+            AddAssert("first card nominations = 4/5", () => firstCard().ChildrenOfType<NominationsStatistic>().Single().TooltipText.ToString(), () => Is.EqualTo("Nominations: 4/5"));
+
+            // second card: has non-main rulesets, required nominations = main_ruleset + non_main_ruleset * (count of non-main rulesets) = 5 + 1 * 2 = 7
+            AddAssert("second card has three rulesets", () => secondCard().BeatmapSet.Beatmaps.GroupBy(b => b.Ruleset).Count(), () => Is.EqualTo(3));
+            AddAssert("second card nominations = 4/7", () => secondCard().ChildrenOfType<NominationsStatistic>().Single().TooltipText.ToString(), () => Is.EqualTo("Nominations: 4/7"));
+
+            // order is reversed due to the cards being inside a reverse child-id fill flow.
+            BeatmapCardNormal firstCard() => this.ChildrenOfType<BeatmapCardNormal>().ElementAt(1);
+            BeatmapCardNormal secondCard() => this.ChildrenOfType<BeatmapCardNormal>().ElementAt(0);
         }
     }
 }

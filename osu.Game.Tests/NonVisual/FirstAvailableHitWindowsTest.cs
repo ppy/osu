@@ -33,7 +33,7 @@ namespace osu.Game.Tests.NonVisual
         public void TestResultIfOnlyParentHitWindowIsEmpty()
         {
             var testObject = new TestHitObject(HitWindows.Empty);
-            HitObject nested = new TestHitObject(new HitWindows());
+            HitObject nested = new TestHitObject(new DefaultHitWindows());
             testObject.AddNested(nested);
             testDrawableRuleset.HitObjects = new List<HitObject> { testObject };
 
@@ -43,8 +43,8 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestResultIfParentHitWindowsIsNotEmpty()
         {
-            var testObject = new TestHitObject(new HitWindows());
-            HitObject nested = new TestHitObject(new HitWindows());
+            var testObject = new TestHitObject(new DefaultHitWindows());
+            HitObject nested = new TestHitObject(new DefaultHitWindows());
             testObject.AddNested(nested);
             testDrawableRuleset.HitObjects = new List<HitObject> { testObject };
 
@@ -58,7 +58,7 @@ namespace osu.Game.Tests.NonVisual
             HitObject nested = new TestHitObject(HitWindows.Empty);
             firstObject.AddNested(nested);
 
-            var secondObject = new TestHitObject(new HitWindows());
+            var secondObject = new TestHitObject(new DefaultHitWindows());
             testDrawableRuleset.HitObjects = new List<HitObject> { firstObject, secondObject };
 
             Assert.AreSame(testDrawableRuleset.FirstAvailableHitWindows, secondObject.HitWindows);
@@ -96,6 +96,7 @@ namespace osu.Game.Tests.NonVisual
 
             public override IAdjustableAudioComponent Audio { get; }
             public override Playfield Playfield { get; }
+            public override PlayfieldAdjustmentContainer PlayfieldAdjustmentContainer { get; }
             public override Container Overlays { get; }
             public override Container FrameStableComponents { get; }
             public override IFrameStableClock FrameStableClock { get; }

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osu.Framework.Graphics;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
@@ -15,15 +16,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public partial class TestSceneMatchBeatmapDetailArea : OnlinePlayTestScene
     {
+        private Room room = null!;
+
         public override void SetUpSteps()
         {
             base.SetUpSteps();
 
             AddStep("create area", () =>
             {
-                SelectedRoom.Value = new Room();
-
-                Child = new MatchBeatmapDetailArea
+                Child = new MatchBeatmapDetailArea(room = new Room())
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -35,9 +36,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private void createNewItem()
         {
-            SelectedRoom.Value.Playlist.Add(new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
+            room.Playlist = room.Playlist.Append(new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
             {
-                ID = SelectedRoom.Value.Playlist.Count,
+                ID = room.Playlist.Count,
                 RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
                 RequiredMods = new[]
                 {
@@ -45,7 +46,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     new APIMod(new OsuModDoubleTime()),
                     new APIMod(new OsuModAutoplay())
                 }
-            });
+            }).ToArray();
         }
     }
 }

@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using NUnit.Framework;
@@ -21,12 +19,12 @@ namespace osu.Game.Tests.OnlinePlay
     [HeadlessTest]
     public partial class TestSceneCatchUpSyncManager : OsuTestScene
     {
-        private GameplayClockContainer master;
-        private SpectatorSyncManager syncManager;
+        private GameplayClockContainer master = null!;
+        private SpectatorSyncManager syncManager = null!;
 
-        private Dictionary<SpectatorPlayerClock, int> clocksById;
-        private SpectatorPlayerClock player1;
-        private SpectatorPlayerClock player2;
+        private Dictionary<SpectatorPlayerClock, int> clocksById = null!;
+        private SpectatorPlayerClock player1 = null!;
+        private SpectatorPlayerClock player2 = null!;
 
         [SetUp]
         public void Setup()

@@ -40,6 +40,11 @@ namespace osu.Game.Online.Spectator
         public readonly BindableInt Combo = new BindableInt();
 
         /// <summary>
+        /// The highest combo achieved in the score thus far.
+        /// </summary>
+        public readonly BindableInt HighestCombo = new BindableInt();
+
+        /// <summary>
         /// The <see cref="ScoringMode"/> used to calculate scores.
         /// </summary>
         public readonly Bindable<ScoringMode> Mode = new Bindable<ScoringMode>();
@@ -157,6 +162,7 @@ namespace osu.Game.Online.Spectator
 
             Accuracy.Value = frame.Header.Accuracy;
             Combo.Value = frame.Header.Combo;
+            HighestCombo.Value = frame.Header.MaxCombo;
             TotalScore.Value = frame.Header.TotalScore;
         }
 

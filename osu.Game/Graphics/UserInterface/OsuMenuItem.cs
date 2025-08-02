@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
 
@@ -10,6 +11,10 @@ namespace osu.Game.Graphics.UserInterface
     public class OsuMenuItem : MenuItem
     {
         public readonly MenuItemType Type;
+
+        public Hotkey Hotkey { get; init; }
+
+        public IconUsage Icon { get; init; }
 
         public OsuMenuItem(LocalisableString text, MenuItemType type = MenuItemType.Standard)
             : this(text, type, null)

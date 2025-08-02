@@ -13,7 +13,8 @@
     </Compile>
   </ItemGroup>
   <ItemGroup Label="Project References">
-    <ProjectReference Include="..\osu.Game\osu.Game.csproj" />
     <ProjectReference Include="..\osu.Game.Rulesets.Taiko\osu.Game.Rulesets.Taiko.csproj" />
+    <ProjectReference Include="..\osu.Game.Tests\osu.Game.Tests.csproj" />
+    <ProjectReference Include="..\osu.Game\osu.Game.csproj" />
   </ItemGroup>
 </Project>

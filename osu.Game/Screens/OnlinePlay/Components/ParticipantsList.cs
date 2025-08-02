@@ -1,21 +1,20 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
-using osu.Framework.Allocation;
+using System.ComponentModel;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Threading;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Rooms;
 using osu.Game.Users.Drawables;
 using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Components
 {
-    public partial class ParticipantsList : OnlinePlayComposite
+    public partial class ParticipantsList : CompositeDrawable
     {
         public const float TILE_SIZE = 35;
 
@@ -57,15 +56,29 @@ namespace osu.Game.Screens.OnlinePlay.Components
             }
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
+        private readonly Room room;
+
+        public ParticipantsList(Room room)
         {
-            RecentParticipants.CollectionChanged += (_, _) => updateParticipants();
+            this.room = room;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            room.PropertyChanged += onRoomPropertyChanged;
             updateParticipants();
         }
 
-        private ScheduledDelegate scheduledUpdate;
-        private FillFlowContainer<UserTile> tiles;
+        private void onRoomPropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(Room.RecentParticipants))
+                updateParticipants();
+        }
+
+        private ScheduledDelegate? scheduledUpdate;
+        private FillFlowContainer<UserTile>? tiles;
 
         private void updateParticipants()
         {
@@ -83,8 +96,8 @@ namespace osu.Game.Screens.OnlinePlay.Components
                     Spacing = Vector2.One
                 };
 
-                for (int i = 0; i < RecentParticipants.Count; i++)
-                    tiles.Add(new UserTile { User = RecentParticipants[i] });
+                for (int i = 0; i < room.RecentParticipants.Count; i++)
+                    tiles.Add(new UserTile { User = room.RecentParticipants[i] });
 
                 AddInternal(tiles);
 
@@ -92,9 +105,15 @@ namespace osu.Game.Screens.OnlinePlay.Components
             });
         }
 
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            room.PropertyChanged -= onRoomPropertyChanged;
+        }
+
         private partial class UserTile : CompositeDrawable
         {
-            public APIUser User
+            public APIUser? User
             {
                 get => avatar.User;
                 set => avatar.User = value;

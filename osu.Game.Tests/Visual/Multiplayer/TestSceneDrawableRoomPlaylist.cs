@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -39,9 +37,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public partial class TestSceneDrawableRoomPlaylist : MultiplayerTestScene
     {
-        private TestPlaylist playlist;
-
-        private BeatmapManager manager;
+        private TestPlaylist playlist = null!;
+        private BeatmapManager manager = null!;
 
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
@@ -106,6 +103,19 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("press down", () => InputManager.Key(Key.Down));
             AddAssert("no item selected", () => playlist.SelectedItem.Value == null);
+        }
+
+        [Test]
+        public void TestMarkCompleted()
+        {
+            createPlaylist();
+            AddStep("mark some items as complete", () =>
+            {
+                playlist.Items[0].MarkCompleted();
+                playlist.Items[2].MarkCompleted();
+                playlist.Items[3].MarkCompleted();
+                playlist.Items[5].MarkCompleted();
+            });
         }
 
         [Test]
@@ -199,14 +209,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestDownloadButtonHiddenWhenBeatmapExists()
         {
-            Live<BeatmapSetInfo> imported = null;
+            Live<BeatmapSetInfo> imported = null!;
 
             AddStep("import beatmap", () =>
             {
                 var beatmap = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo;
 
                 Debug.Assert(beatmap.BeatmapSet != null);
-                imported = manager.Import(beatmap.BeatmapSet);
+                imported = manager.Import(beatmap.BeatmapSet)!;
             });
 
             createPlaylistWithBeatmaps(() => imported.PerformRead(s => s.Beatmaps.Detach()));
@@ -378,7 +388,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             }
         });
 
-        private void createPlaylist(Action<TestPlaylist> setupPlaylist = null)
+        private void createPlaylist(Action<TestPlaylist>? setupPlaylist = null)
         {
             AddStep("create playlist", () =>
             {

@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -15,6 +16,7 @@ using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Overlays;
 using osuTK;
 
 namespace osu.Game.Screens.Import
@@ -28,6 +30,7 @@ namespace osu.Game.Screens.Import
         private TextFlowContainer currentFileText;
 
         private RoundedButton importButton;
+        private RoundedButton importAllButton;
 
         private const float duration = 300;
         private const float button_height = 50;
@@ -36,8 +39,8 @@ namespace osu.Game.Screens.Import
         [Resolved]
         private OsuGameBase game { get; set; }
 
-        [Resolved]
-        private OsuColour colours { get; set; }
+        [Cached]
+        private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
 
         [BackgroundDependencyLoader(true)]
         private void load()
@@ -52,11 +55,6 @@ namespace osu.Game.Screens.Import
                 Size = new Vector2(0.9f, 0.8f),
                 Children = new Drawable[]
                 {
-                    new Box
-                    {
-                        Colour = colours.GreySeaFoamDark,
-                        RelativeSizeAxes = Axes.Both,
-                    },
                     fileSelector = new OsuFileSelector(validFileExtensions: game.HandledExtensions.ToArray())
                     {
                         RelativeSizeAxes = Axes.Both,
@@ -72,13 +70,13 @@ namespace osu.Game.Screens.Import
                         {
                             new Box
                             {
-                                Colour = colours.GreySeaFoamDarker,
+                                Colour = colourProvider.Background4,
                                 RelativeSizeAxes = Axes.Both
                             },
                             new Container
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Padding = new MarginPadding { Bottom = button_height + button_vertical_margin * 2 },
+                                Padding = new MarginPadding { Bottom = button_height * 2 + button_vertical_margin * 3 },
                                 Child = new OsuScrollContainer
                                 {
                                     RelativeSizeAxes = Axes.Both,
@@ -101,14 +99,27 @@ namespace osu.Game.Screens.Import
                             },
                             importButton = new RoundedButton
                             {
-                                Text = "Import",
+                                Text = "Import selected file",
                                 Anchor = Anchor.BottomCentre,
                                 Origin = Anchor.BottomCentre,
                                 RelativeSizeAxes = Axes.X,
                                 Height = button_height,
                                 Width = 0.9f,
-                                Margin = new MarginPadding { Vertical = button_vertical_margin },
+                                Margin = new MarginPadding { Bottom = button_height + button_vertical_margin * 2 },
                                 Action = () => startImport(fileSelector.CurrentFile.Value?.FullName)
+                            },
+
+                            importAllButton = new RoundedButton
+                            {
+                                Text = "Import all files from directory",
+                                Anchor = Anchor.BottomCentre,
+                                Origin = Anchor.BottomCentre,
+                                RelativeSizeAxes = Axes.X,
+                                Height = button_height,
+                                Width = 0.9f,
+                                TooltipText = "Imports all osu files from selected directory",
+                                Margin = new MarginPadding { Vertical = button_vertical_margin },
+                                Action = () => startDirectoryImport(fileSelector.CurrentPath.Value?.FullName)
                             }
                         }
                     }
@@ -135,10 +146,20 @@ namespace osu.Game.Screens.Import
             return base.OnExiting(e);
         }
 
-        private void directoryChanged(ValueChangedEvent<DirectoryInfo> _)
+        private void directoryChanged(ValueChangedEvent<DirectoryInfo> directoryChangedEvent)
         {
             // this should probably be done by the selector itself, but let's do it here for now.
             fileSelector.CurrentFile.Value = null;
+
+            DirectoryInfo newDirectory = directoryChangedEvent.NewValue;
+            importAllButton.Enabled.Value =
+                // this will be `null` if the user clicked the "Computer" option (showing drives)
+                // handling that is difficult due to platform differences, and nobody sane wants that to work with the "import all" button anyway
+                newDirectory != null
+                // extra safety against various I/O errors (lack of access, deleted directory, etc.)
+                && newDirectory.Exists
+                // there must be at least one file in the current directory for the game to import (non-recursive)
+                && newDirectory.EnumerateFiles().Any(file => game.HandledExtensions.Contains(file.Extension));
         }
 
         private void fileChanged(ValueChangedEvent<FileInfo> selectedFile)
@@ -147,14 +168,14 @@ namespace osu.Game.Screens.Import
             currentFileText.Text = selectedFile.NewValue?.Name ?? "Select a file";
         }
 
-        private void startImport(string path)
+        private void startImport(params string[] paths)
         {
-            if (string.IsNullOrEmpty(path))
+            if (paths.Length == 0)
                 return;
 
             Task.Factory.StartNew(async () =>
             {
-                await game.Import(path).ConfigureAwait(false);
+                await game.Import(paths).ConfigureAwait(false);
 
                 // some files will be deleted after successful import, so we want to refresh the view.
                 Schedule(() =>
@@ -163,6 +184,20 @@ namespace osu.Game.Screens.Import
                     fileSelector.CurrentPath.TriggerChange();
                 });
             }, TaskCreationOptions.LongRunning);
+        }
+
+        private void startDirectoryImport(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+                return;
+
+            // get only files that match extensions handled by the game
+            IEnumerable<string> filesToImport = Directory.EnumerateFiles(path)
+                                                         .Where(file => game.HandledExtensions.Contains(Path.GetExtension(file)));
+            if (!filesToImport.Any())
+                return;
+
+            startImport(filesToImport.ToArray());
         }
     }
 }

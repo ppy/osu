@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Online.Multiplayer;
@@ -12,14 +10,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
     public partial class CreateMultiplayerMatchButton : CreateRoomButton
     {
-        private IBindable<bool> isConnected;
-        private IBindable<bool> operationInProgress;
+        private IBindable<bool> isConnected = null!;
+        private IBindable<bool> operationInProgress = null!;
 
         [Resolved]
-        private MultiplayerClient multiplayerClient { get; set; }
+        private MultiplayerClient multiplayerClient { get; set; } = null!;
 
         [Resolved]
-        private OngoingOperationTracker ongoingOperationTracker { get; set; }
+        private OngoingOperationTracker ongoingOperationTracker { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load()

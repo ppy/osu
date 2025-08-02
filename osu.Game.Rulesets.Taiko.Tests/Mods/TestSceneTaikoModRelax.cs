@@ -15,7 +15,26 @@ namespace osu.Game.Rulesets.Taiko.Tests.Mods
         [Test]
         public void TestRelax()
         {
-            var beatmap = new TaikoBeatmap
+            var beatmapForReplay = createBeatmap();
+
+            foreach (var ho in beatmapForReplay.HitObjects)
+                ho.ApplyDefaults(beatmapForReplay.ControlPointInfo, beatmapForReplay.Difficulty);
+
+            var replay = new TaikoAutoGenerator(beatmapForReplay).Generate();
+
+            foreach (var frame in replay.Frames.OfType<TaikoReplayFrame>().Where(r => r.Actions.Any()))
+                frame.Actions = [TaikoAction.LeftCentre];
+
+            CreateModTest(new ModTestData
+            {
+                Mod = new TaikoModRelax(),
+                CreateBeatmap = createBeatmap,
+                ReplayFrames = replay.Frames,
+                Autoplay = false,
+                PassCondition = () => Player.ScoreProcessor.HasCompleted.Value && Player.ScoreProcessor.Accuracy.Value == 1,
+            });
+
+            TaikoBeatmap createBeatmap() => new TaikoBeatmap
             {
                 HitObjects =
                 {
@@ -25,22 +44,6 @@ namespace osu.Game.Rulesets.Taiko.Tests.Mods
                     new Swell { StartTime = 1250, Duration = 500 },
                 }
             };
-            foreach (var ho in beatmap.HitObjects)
-                ho.ApplyDefaults(beatmap.ControlPointInfo, beatmap.Difficulty);
-
-            var replay = new TaikoAutoGenerator(beatmap).Generate();
-
-            foreach (var frame in replay.Frames.OfType<TaikoReplayFrame>().Where(r => r.Actions.Any()))
-                frame.Actions = [TaikoAction.LeftCentre];
-
-            CreateModTest(new ModTestData
-            {
-                Mod = new TaikoModRelax(),
-                Beatmap = beatmap,
-                ReplayFrames = replay.Frames,
-                Autoplay = false,
-                PassCondition = () => Player.ScoreProcessor.HasCompleted.Value && Player.ScoreProcessor.Accuracy.Value == 1,
-            });
         }
     }
 }

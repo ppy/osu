@@ -12,10 +12,11 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Beatmaps;
-using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
@@ -37,6 +38,9 @@ namespace osu.Game.Rulesets.Osu.Mods
                     if (e.NewValue || slider.Judged) return;
 
                     if (slider.Time.Current < slider.HitObject.StartTime)
+                        return;
+
+                    if ((slider.Clock as IGameplayClock)?.IsRewinding == true)
                         return;
 
                     var tail = slider.NestedHitObjects.OfType<StrictTrackingDrawableSliderTail>().First();
@@ -79,7 +83,12 @@ namespace osu.Game.Rulesets.Osu.Mods
             {
             }
 
-            public override Judgement CreateJudgement() => new OsuJudgement();
+            public override Judgement CreateJudgement() => new StrictTrackingTailJudgement();
+        }
+
+        public class StrictTrackingTailJudgement : SliderTailCircle.TailJudgement
+        {
+            public override HitResult MinResult => HitResult.LargeTickMiss;
         }
 
         private partial class StrictTrackingDrawableSliderTail : DrawableSliderTail
@@ -120,6 +129,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                                 Position = Position + Path.PositionAt(e.PathProgress),
                                 StackHeight = StackHeight,
                                 Scale = Scale,
+                                PathProgress = e.PathProgress,
                             });
                             break;
 
@@ -150,6 +160,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                                 Position = Position + Path.PositionAt(e.PathProgress),
                                 StackHeight = StackHeight,
                                 Scale = Scale,
+                                PathProgress = e.PathProgress,
                             });
                             break;
                     }

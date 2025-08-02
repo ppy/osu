@@ -62,7 +62,13 @@ namespace osu.Game.Rulesets.Difficulty
         /// <returns>A structure describing the difficulty of the beatmap.</returns>
         public DifficultyAttributes Calculate([NotNull] IEnumerable<Mod> mods, CancellationToken cancellationToken = default)
         {
+            using var timedCancellationSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+
+            if (!cancellationToken.CanBeCanceled)
+                cancellationToken = timedCancellationSource.Token;
+
             cancellationToken.ThrowIfCancellationRequested();
+            // ReSharper disable once PossiblyMistakenUseOfCancellationToken
             preProcess(mods, cancellationToken);
 
             var skills = CreateSkills(Beatmap, playableMods, clockRate);
@@ -98,7 +104,13 @@ namespace osu.Game.Rulesets.Difficulty
         /// <returns>The set of <see cref="TimedDifficultyAttributes"/>.</returns>
         public List<TimedDifficultyAttributes> CalculateTimed([NotNull] IEnumerable<Mod> mods, CancellationToken cancellationToken = default)
         {
+            using var timedCancellationSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+
+            if (!cancellationToken.CanBeCanceled)
+                cancellationToken = timedCancellationSource.Token;
+
             cancellationToken.ThrowIfCancellationRequested();
+            // ReSharper disable once PossiblyMistakenUseOfCancellationToken
             preProcess(mods, cancellationToken);
 
             var attribs = new List<TimedDifficultyAttributes>();
@@ -166,15 +178,10 @@ namespace osu.Game.Rulesets.Difficulty
         /// </summary>
         /// <param name="mods">The original list of <see cref="Mod"/>s.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
-        private void preProcess([NotNull] IEnumerable<Mod> mods, CancellationToken cancellationToken = default)
+        private void preProcess([NotNull] IEnumerable<Mod> mods, CancellationToken cancellationToken)
         {
             playableMods = mods.Select(m => m.DeepClone()).ToArray();
-
-            // Only pass through the cancellation token if it's non-default.
-            // This allows for the default timeout to be applied for playable beatmap construction.
-            Beatmap = cancellationToken == default
-                ? beatmap.GetPlayableBeatmap(ruleset, playableMods)
-                : beatmap.GetPlayableBeatmap(ruleset, playableMods, cancellationToken);
+            Beatmap = beatmap.GetPlayableBeatmap(ruleset, playableMods, cancellationToken);
 
             var track = new TrackVirtual(10000);
             playableMods.OfType<IApplicableToTrack>().ForEach(m => m.ApplyToTrack(track));
@@ -339,7 +346,86 @@ namespace osu.Game.Rulesets.Difficulty
             public double TotalBreakTime => baseBeatmap.TotalBreakTime;
             public IEnumerable<BeatmapStatistic> GetStatistics() => baseBeatmap.GetStatistics();
             public double GetMostCommonBeatLength() => baseBeatmap.GetMostCommonBeatLength();
+            public int BeatmapVersion => baseBeatmap.BeatmapVersion;
             public IBeatmap Clone() => new ProgressiveCalculationBeatmap(baseBeatmap.Clone());
+
+            public double AudioLeadIn
+            {
+                get => baseBeatmap.AudioLeadIn;
+                set => baseBeatmap.AudioLeadIn = value;
+            }
+
+            public float StackLeniency
+            {
+                get => baseBeatmap.StackLeniency;
+                set => baseBeatmap.StackLeniency = value;
+            }
+
+            public bool SpecialStyle
+            {
+                get => baseBeatmap.SpecialStyle;
+                set => baseBeatmap.SpecialStyle = value;
+            }
+
+            public bool LetterboxInBreaks
+            {
+                get => baseBeatmap.LetterboxInBreaks;
+                set => baseBeatmap.LetterboxInBreaks = value;
+            }
+
+            public bool WidescreenStoryboard
+            {
+                get => baseBeatmap.WidescreenStoryboard;
+                set => baseBeatmap.WidescreenStoryboard = value;
+            }
+
+            public bool EpilepsyWarning
+            {
+                get => baseBeatmap.EpilepsyWarning;
+                set => baseBeatmap.EpilepsyWarning = value;
+            }
+
+            public bool SamplesMatchPlaybackRate
+            {
+                get => baseBeatmap.SamplesMatchPlaybackRate;
+                set => baseBeatmap.SamplesMatchPlaybackRate = value;
+            }
+
+            public double DistanceSpacing
+            {
+                get => baseBeatmap.DistanceSpacing;
+                set => baseBeatmap.DistanceSpacing = value;
+            }
+
+            public int GridSize
+            {
+                get => baseBeatmap.GridSize;
+                set => baseBeatmap.GridSize = value;
+            }
+
+            public double TimelineZoom
+            {
+                get => baseBeatmap.TimelineZoom;
+                set => baseBeatmap.TimelineZoom = value;
+            }
+
+            public CountdownType Countdown
+            {
+                get => baseBeatmap.Countdown;
+                set => baseBeatmap.Countdown = value;
+            }
+
+            public int CountdownOffset
+            {
+                get => baseBeatmap.CountdownOffset;
+                set => baseBeatmap.CountdownOffset = value;
+            }
+
+            public int[] Bookmarks
+            {
+                get => baseBeatmap.Bookmarks;
+                set => baseBeatmap.Bookmarks = value;
+            }
 
             #endregion
         }

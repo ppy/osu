@@ -9,7 +9,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
-using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
 
 namespace osu.Game.Tests.Visual.Multiplayer
@@ -17,10 +16,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
     public partial class TestSceneRankRangePill : OsuTestScene
     {
         private readonly Mock<MultiplayerClient> multiplayerClient = new Mock<MultiplayerClient>();
-
-        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
-            // not used directly in component, but required due to it inheriting from OnlinePlayComposite.
-            new CachedModelDependencyContainer<Room>(base.CreateChildDependencies(parent));
 
         [BackgroundDependencyLoader]
         private void load()

@@ -30,6 +30,8 @@ namespace osu.Game.Screens.Play.HUD
     {
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
+        public override bool PropagatePositionalInputSubTree => alwaysShow.Value || touchActive.Value;
+
         public readonly Bindable<bool> IsPaused = new Bindable<bool>();
 
         public readonly Bindable<bool> ReplayLoaded = new Bindable<bool>();
@@ -39,6 +41,8 @@ namespace osu.Game.Screens.Play.HUD
         public Action Action { get; set; }
 
         private OsuSpriteText text;
+
+        private Bindable<bool> alwaysShow;
 
         public HoldForMenuButton()
         {
@@ -50,7 +54,7 @@ namespace osu.Game.Screens.Play.HUD
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(Player player)
+        private void load(Player player, OsuConfigManager config)
         {
             Children = new Drawable[]
             {
@@ -71,6 +75,8 @@ namespace osu.Game.Screens.Play.HUD
             };
 
             AutoSizeAxes = Axes.Both;
+
+            alwaysShow = config.GetBindable<bool>(OsuSetting.AlwaysShowHoldForMenuButton);
         }
 
         [Resolved]
@@ -117,9 +123,14 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.Update();
 
+            // While the button is hovered or still animating, keep fully visible.
             if (text.Alpha > 0 || button.Progress.Value > 0 || button.IsHovered)
                 Alpha = 1;
-            else
+            // When touch input is detected, keep visible at a constant opacity.
+            else if (touchActive.Value)
+                Alpha = 0.5f;
+            // Otherwise, if the user chooses, show it when the mouse is nearby.
+            else if (alwaysShow.Value)
             {
                 float minAlpha = touchActive.Value ? .08f : 0;
 
@@ -127,6 +138,8 @@ namespace osu.Game.Screens.Play.HUD
                     Math.Clamp(Clock.ElapsedFrameTime, 0, 200),
                     Alpha, Math.Clamp(1 - positionalAdjust, minAlpha, 1), 0, 200, Easing.OutQuint);
             }
+            else
+                Alpha = 0;
         }
 
         private partial class HoldButton : HoldToConfirmContainer, IKeyBindingHandler<GlobalAction>
@@ -149,14 +162,18 @@ namespace osu.Game.Screens.Play.HUD
             private bool pendingAnimation;
             private ScheduledDelegate shakeOperation;
 
+            private Bindable<bool> alwaysRequireHold;
+
             public HoldButton(bool isDangerousAction)
                 : base(isDangerousAction)
             {
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            private void load(OsuColour colours, OsuConfigManager config)
             {
+                alwaysRequireHold = config.GetBindable<bool>(OsuSetting.AlwaysRequireHoldingForPause);
+
                 Size = new Vector2(60);
 
                 Child = new CircularContainer
@@ -286,7 +303,13 @@ namespace osu.Game.Screens.Play.HUD
                 {
                     case GlobalAction.Back:
                         if (!pendingAnimation)
-                            BeginConfirm();
+                        {
+                            if (IsDangerousAction || alwaysRequireHold.Value)
+                                BeginConfirm();
+                            else
+                                Confirm();
+                        }
+
                         return true;
 
                     case GlobalAction.PauseGameplay:
@@ -294,7 +317,13 @@ namespace osu.Game.Screens.Play.HUD
                         if (ReplayLoaded.Value) return false;
 
                         if (!pendingAnimation)
-                            BeginConfirm();
+                        {
+                            if (IsDangerousAction || alwaysRequireHold.Value)
+                                BeginConfirm();
+                            else
+                                Confirm();
+                        }
+
                         return true;
                 }
 

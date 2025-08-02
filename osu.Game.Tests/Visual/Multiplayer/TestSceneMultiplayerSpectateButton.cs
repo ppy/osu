@@ -1,13 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
-using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -20,6 +17,8 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
+using osu.Game.Screens.OnlinePlay;
+using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
 using osu.Game.Tests.Resources;
 using osuTK;
@@ -28,13 +27,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public partial class TestSceneMultiplayerSpectateButton : MultiplayerTestScene
     {
-        private MultiplayerSpectateButton spectateButton;
-        private MatchStartControl startControl;
+        private MultiplayerSpectateButton spectateButton = null!;
+        private MatchStartControl startControl = null!;
+        private Room room = null!;
 
-        private readonly Bindable<PlaylistItem> selectedItem = new Bindable<PlaylistItem>();
-
-        private BeatmapSetInfo importedSet;
-        private BeatmapManager beatmaps;
+        private BeatmapSetInfo importedSet = null!;
+        private BeatmapManager beatmaps = null!;
 
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
@@ -50,40 +48,52 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             base.SetUpSteps();
 
+            AddStep("create room", () => room = CreateDefaultRoom());
+            AddStep("join room", () => JoinRoom(room));
+            WaitForJoined();
+
             AddStep("create button", () =>
             {
-                AvailabilityTracker.SelectedItem.BindTo(selectedItem);
-
                 importedSet = beatmaps.GetAllUsableBeatmapSets().First();
                 Beatmap.Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First());
-                selectedItem.Value = new PlaylistItem(Beatmap.Value.BeatmapInfo)
-                {
-                    RulesetID = Beatmap.Value.BeatmapInfo.Ruleset.OnlineID,
-                };
 
-                Child = new PopoverContainer
+                MultiplayerBeatmapAvailabilityTracker tracker = new MultiplayerBeatmapAvailabilityTracker();
+
+                Child = new DependencyProvidingContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Child = new FillFlowContainer
-                    {
-                        AutoSizeAxes = Axes.Both,
-                        Direction = FillDirection.Vertical,
-                        Children = new Drawable[]
+                    CachedDependencies =
+                    [
+                        (typeof(OnlinePlayBeatmapAvailabilityTracker), tracker)
+                    ],
+                    Children =
+                    [
+                        tracker,
+                        new PopoverContainer
                         {
-                            spectateButton = new MultiplayerSpectateButton
+                            RelativeSizeAxes = Axes.Both,
+                            Child = new FillFlowContainer
                             {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                Size = new Vector2(200, 50),
-                            },
-                            startControl = new MatchStartControl
-                            {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                Size = new Vector2(200, 50),
+                                AutoSizeAxes = Axes.Both,
+                                Direction = FillDirection.Vertical,
+                                Children = new Drawable[]
+                                {
+                                    spectateButton = new MultiplayerSpectateButton
+                                    {
+                                        Anchor = Anchor.Centre,
+                                        Origin = Anchor.Centre,
+                                        Size = new Vector2(200, 50)
+                                    },
+                                    startControl = new MatchStartControl
+                                    {
+                                        Anchor = Anchor.Centre,
+                                        Origin = Anchor.Centre,
+                                        Size = new Vector2(200, 50)
+                                    }
+                                }
                             }
                         }
-                    }
+                    ]
                 };
             });
         }

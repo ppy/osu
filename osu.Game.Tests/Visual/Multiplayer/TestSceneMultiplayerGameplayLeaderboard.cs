@@ -9,7 +9,7 @@ using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
-using osu.Game.Screens.Play.HUD;
+using osu.Game.Screens.Select.Leaderboards;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
@@ -25,27 +25,25 @@ namespace osu.Game.Tests.Visual.Multiplayer
             return user;
         }
 
-        protected override MultiplayerGameplayLeaderboard CreateLeaderboard()
-        {
-            return new TestLeaderboard(MultiplayerUsers.ToArray())
+        protected override MultiplayerLeaderboardProvider CreateLeaderboardProvider() =>
+            new TestLeaderboard(MultiplayerUsers.ToArray())
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
             };
-        }
 
         [Test]
         public void TestPerUserMods()
         {
-            AddStep("first user has no mods", () => Assert.That(((TestLeaderboard)Leaderboard).UserMods[0], Is.Empty));
+            AddStep("first user has no mods", () => Assert.That(((TestLeaderboard)LeaderboardProvider!).UserMods[0], Is.Empty));
             AddStep("last user has NF mod", () =>
             {
-                Assert.That(((TestLeaderboard)Leaderboard).UserMods[TOTAL_USERS - 1], Has.One.Items);
-                Assert.That(((TestLeaderboard)Leaderboard).UserMods[TOTAL_USERS - 1].Single(), Is.TypeOf<OsuModNoFail>());
+                Assert.That(((TestLeaderboard)LeaderboardProvider!).UserMods[TOTAL_USERS - 1], Has.One.Items);
+                Assert.That(((TestLeaderboard)LeaderboardProvider).UserMods[TOTAL_USERS - 1].Single(), Is.TypeOf<OsuModNoFail>());
             });
         }
 
-        private partial class TestLeaderboard : MultiplayerGameplayLeaderboard
+        private partial class TestLeaderboard : MultiplayerLeaderboardProvider
         {
             public Dictionary<int, IReadOnlyList<Mod>> UserMods => UserScores.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.ScoreProcessor.Mods);
 

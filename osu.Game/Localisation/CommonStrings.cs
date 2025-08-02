@@ -40,6 +40,11 @@ namespace osu.Game.Localisation
         public static LocalisableString Default => new TranslatableString(getKey(@"default"), @"Default");
 
         /// <summary>
+        /// "Rename"
+        /// </summary>
+        public static LocalisableString Rename => new TranslatableString(getKey(@"rename"), @"Rename");
+
+        /// <summary>
         /// "Export"
         /// </summary>
         public static LocalisableString Export => new TranslatableString(getKey(@"export"), @"Export");
@@ -173,6 +178,21 @@ namespace osu.Game.Localisation
         /// "General"
         /// </summary>
         public static LocalisableString General => new TranslatableString(getKey(@"general"), @"General");
+
+        /// <summary>
+        /// "Copy link"
+        /// </summary>
+        public static LocalisableString CopyLink => new TranslatableString(getKey(@"copy_link"), @"Copy link");
+
+        /// <summary>
+        /// "Manage..."
+        /// </summary>
+        public static LocalisableString Manage => new TranslatableString(getKey(@"manage"), @"Manage...");
+
+        /// <summary>
+        /// "Details..."
+        /// </summary>
+        public static LocalisableString Details => new TranslatableString(getKey(@"details"), @"Details...");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

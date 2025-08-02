@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Localisation;
@@ -39,6 +40,8 @@ using osu.Game.Scoring;
 using osu.Game.Screens.Edit.Setup;
 using osu.Game.Screens.Ranking.Statistics;
 using osu.Game.Skinning;
+using osu.Game.Utils;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu
 {
@@ -212,7 +215,8 @@ namespace osu.Game.Rulesets.Osu
                         new OsuModFreezeFrame(),
                         new OsuModBubbles(),
                         new OsuModSynesthesia(),
-                        new OsuModDepth()
+                        new OsuModDepth(),
+                        new OsuModBloom()
                     };
 
                 case ModType.System:
@@ -336,28 +340,48 @@ namespace osu.Game.Rulesets.Osu
             };
         }
 
-        public override IEnumerable<SetupSection> CreateEditorSetupSections() =>
+        public override IEnumerable<Drawable> CreateEditorSetupSections() =>
         [
+            new MetadataSection(),
             new OsuDifficultySection(),
-            new ColoursSection(),
+            new FillFlowContainer
+            {
+                AutoSizeAxes = Axes.Y,
+                Direction = FillDirection.Vertical,
+                Spacing = new Vector2(SetupScreen.SPACING),
+                Children = new Drawable[]
+                {
+                    new ResourcesSection
+                    {
+                        RelativeSizeAxes = Axes.X,
+                    },
+                    new ColoursSection
+                    {
+                        RelativeSizeAxes = Axes.X,
+                    }
+                }
+            },
+            new DesignSection(),
         ];
 
         /// <seealso cref="OsuHitObject.ApplyDefaultsToSelf"/>
         /// <seealso cref="OsuHitWindows"/>
-        public override BeatmapDifficulty GetRateAdjustedDisplayDifficulty(IBeatmapDifficultyInfo difficulty, double rate)
+        public override BeatmapDifficulty GetAdjustedDisplayDifficulty(IBeatmapInfo difficulty, IReadOnlyCollection<Mod> mods)
         {
-            BeatmapDifficulty adjustedDifficulty = new BeatmapDifficulty(difficulty);
+            BeatmapDifficulty adjustedDifficulty = base.GetAdjustedDisplayDifficulty(difficulty, mods);
+            double rate = ModUtils.CalculateRateWithMods(mods);
 
             double preempt = IBeatmapDifficultyInfo.DifficultyRange(adjustedDifficulty.ApproachRate, OsuHitObject.PREEMPT_MAX, OsuHitObject.PREEMPT_MID, OsuHitObject.PREEMPT_MIN);
             preempt /= rate;
             adjustedDifficulty.ApproachRate = (float)IBeatmapDifficultyInfo.InverseDifficultyRange(preempt, OsuHitObject.PREEMPT_MAX, OsuHitObject.PREEMPT_MID, OsuHitObject.PREEMPT_MIN);
 
-            var greatHitWindowRange = OsuHitWindows.OSU_RANGES.Single(range => range.Result == HitResult.Great);
-            double greatHitWindow = IBeatmapDifficultyInfo.DifficultyRange(adjustedDifficulty.OverallDifficulty, greatHitWindowRange.Min, greatHitWindowRange.Average, greatHitWindowRange.Max);
+            double greatHitWindow = IBeatmapDifficultyInfo.DifficultyRange(adjustedDifficulty.OverallDifficulty, OsuHitWindows.GREAT_WINDOW_RANGE);
             greatHitWindow /= rate;
-            adjustedDifficulty.OverallDifficulty = (float)IBeatmapDifficultyInfo.InverseDifficultyRange(greatHitWindow, greatHitWindowRange.Min, greatHitWindowRange.Average, greatHitWindowRange.Max);
+            adjustedDifficulty.OverallDifficulty = (float)IBeatmapDifficultyInfo.InverseDifficultyRange(greatHitWindow, OsuHitWindows.GREAT_WINDOW_RANGE);
 
             return adjustedDifficulty;
         }
+
+        public override bool EditorShowScrollSpeed => false;
     }
 }

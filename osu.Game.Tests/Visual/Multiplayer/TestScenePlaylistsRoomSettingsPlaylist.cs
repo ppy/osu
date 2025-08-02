@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,18 +26,18 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public partial class TestScenePlaylistsRoomSettingsPlaylist : OnlinePlayTestScene
     {
-        private TestPlaylist playlist;
+        private TestPlaylist playlist = null!;
 
         [Test]
         public void TestItemRemovedOnDeletion()
         {
-            PlaylistItem selectedItem = null;
+            PlaylistItem selectedItem = null!;
 
             createPlaylist();
 
             moveToItem(0);
             AddStep("click", () => InputManager.Click(MouseButton.Left));
-            AddStep("retrieve selection", () => selectedItem = playlist.SelectedItem.Value);
+            AddStep("retrieve selection", () => selectedItem = playlist.SelectedItem.Value!);
 
             moveToDeleteButton(0);
             AddStep("click delete button", () => InputManager.Click(MouseButton.Left));
@@ -122,7 +120,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             InputManager.MoveMouseTo(item.ChildrenOfType<DrawableRoomPlaylistItem.PlaylistRemoveButton>().ElementAt(0), offset);
         });
 
-        private void createPlaylist(Action<TestPlaylist> setupPlaylist = null)
+        private void createPlaylist(Action<TestPlaylist>? setupPlaylist = null)
         {
             AddStep("create playlist", () =>
             {

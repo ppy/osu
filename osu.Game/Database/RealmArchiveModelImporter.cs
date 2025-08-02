@@ -105,7 +105,6 @@ namespace osu.Game.Database
             }
 
             notification.Progress = 0;
-            notification.Text = $"{HumanisedModelName.Humanize(LetterCasing.Title)} import is initialising...";
 
             int current = 0;
 
@@ -113,65 +112,83 @@ namespace osu.Game.Database
 
             parameters.Batch |= tasks.Length >= minimum_items_considered_batch_import;
 
-            await Task.WhenAll(tasks.Select(async task =>
+            notification.Text = $"{HumanisedModelName.Humanize(LetterCasing.Title)} import is initialising...";
+            notification.State = ProgressNotificationState.Active;
+
+            await pauseIfNecessaryAsync(parameters, notification, notification.CancellationToken).ConfigureAwait(false);
+
+            try
             {
-                if (notification.CancellationToken.IsCancellationRequested)
-                    return;
-
-                try
+                await Parallel.ForEachAsync(tasks, notification.CancellationToken, async (task, cancellation) =>
                 {
-                    var model = await Import(task, parameters, notification.CancellationToken).ConfigureAwait(false);
+                    cancellation.ThrowIfCancellationRequested();
 
-                    lock (imported)
+                    try
                     {
-                        if (model != null)
-                            imported.Add(model);
-                        current++;
+                        await pauseIfNecessaryAsync(parameters, notification, cancellation).ConfigureAwait(false);
 
-                        notification.Text = $"Imported {current} of {tasks.Length} {HumanisedModelName}s";
-                        notification.Progress = (float)current / tasks.Length;
+                        var model = await Import(task, parameters, cancellation).ConfigureAwait(false);
+
+                        lock (imported)
+                        {
+                            if (model != null)
+                                imported.Add(model);
+                            current++;
+
+                            notification.Text = $"Imported {current} of {tasks.Length} {HumanisedModelName}s";
+                            notification.Progress = (float)current / tasks.Length;
+                        }
+                    }
+                    catch (OperationCanceledException cancelled)
+                    {
+                        // We don't want to abort the full import process based off difficulty calculator's internal cancellation
+                        // see https://github.com/ppy/osu/blob/91f3be5feaab0c73c17e1a8c270516aa9bee1e14/osu.Game/Rulesets/Difficulty/DifficultyCalculator.cs#L65.
+                        if (cancelled.CancellationToken == notification.CancellationToken)
+                            throw;
+
+                        Logger.Error(cancelled, $@"Timed out importing ({task})", LoggingTarget.Database);
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Error(e, $@"Could not import ({task})", LoggingTarget.Database);
+                    }
+                }).ConfigureAwait(false);
+            }
+            finally
+            {
+                if (imported.Count == 0)
+                {
+                    if (notification.CancellationToken.IsCancellationRequested)
+                    {
+                        notification.State = ProgressNotificationState.Cancelled;
+                    }
+                    else
+                    {
+                        notification.Text = $"{HumanisedModelName.Humanize(LetterCasing.Title)} import failed! Check logs for more information.";
+                        notification.State = ProgressNotificationState.Cancelled;
                     }
                 }
-                catch (OperationCanceledException)
-                {
-                }
-                catch (Exception e)
-                {
-                    Logger.Error(e, $@"Could not import ({task})", LoggingTarget.Database);
-                }
-            })).ConfigureAwait(false);
-
-            if (imported.Count == 0)
-            {
-                if (notification.CancellationToken.IsCancellationRequested)
-                {
-                    notification.State = ProgressNotificationState.Cancelled;
-                    return imported;
-                }
-
-                notification.Text = $"{HumanisedModelName.Humanize(LetterCasing.Title)} import failed! Check logs for more information.";
-                notification.State = ProgressNotificationState.Cancelled;
-            }
-            else
-            {
-                if (tasks.Length > imported.Count)
-                    notification.CompletionText = $"Imported {imported.Count} of {tasks.Length} {HumanisedModelName}s.";
-                else if (imported.Count > 1)
-                    notification.CompletionText = $"Imported {imported.Count} {HumanisedModelName}s!";
                 else
-                    notification.CompletionText = $"Imported {imported.First().GetDisplayString()}!";
-
-                if (imported.Count > 0 && PresentImport != null)
                 {
-                    notification.CompletionText += " Click to view.";
-                    notification.CompletionClickAction = () =>
-                    {
-                        PresentImport?.Invoke(imported);
-                        return true;
-                    };
-                }
+                    if (tasks.Length > imported.Count)
+                        notification.CompletionText = $"Imported {imported.Count} of {tasks.Length} {HumanisedModelName}s.";
+                    else if (imported.Count > 1)
+                        notification.CompletionText = $"Imported {imported.Count} {HumanisedModelName}s!";
+                    else
+                        notification.CompletionText = $"Imported {imported.First().GetDisplayString()}!";
 
-                notification.State = ProgressNotificationState.Completed;
+                    if (imported.Count > 0 && PresentImport != null)
+                    {
+                        notification.CompletionText += " Click to view.";
+                        notification.CompletionClickAction = () =>
+                        {
+                            PresentImport?.Invoke(imported);
+                            return true;
+                        };
+                    }
+
+                    notification.State = ProgressNotificationState.Completed;
+                }
             }
 
             return imported;
@@ -195,6 +212,7 @@ namespace osu.Game.Database
 
                 Directory.CreateDirectory(Path.GetDirectoryName(destinationPath)!);
 
+                // Consider using hard links here to make this instant.
                 using (var inStream = Files.Storage.GetStream(sourcePath))
                 using (var outStream = File.Create(destinationPath))
                     await inStream.CopyToAsync(outStream).ConfigureAwait(false);
@@ -285,8 +303,6 @@ namespace osu.Game.Database
         /// <param name="cancellationToken">An optional cancellation token.</param>
         public virtual Live<TModel>? ImportModel(TModel item, ArchiveReader? archive = null, ImportParameters parameters = default, CancellationToken cancellationToken = default) => Realm.Run(realm =>
         {
-            pauseIfNecessary(parameters, cancellationToken);
-
             TModel? existing;
 
             if (parameters.Batch && archive != null)
@@ -527,7 +543,8 @@ namespace osu.Game.Database
         /// <param name="model">The new model proposed for import.</param>
         /// <param name="realm">The current realm context.</param>
         /// <returns>An existing model which matches the criteria to skip importing, else null.</returns>
-        protected TModel? CheckForExisting(TModel model, Realm realm) => string.IsNullOrEmpty(model.Hash) ? null : realm.All<TModel>().FirstOrDefault(b => b.Hash == model.Hash);
+        protected TModel? CheckForExisting(TModel model, Realm realm) =>
+            string.IsNullOrEmpty(model.Hash) ? null : realm.All<TModel>().OrderBy(b => b.DeletePending).FirstOrDefault(b => b.Hash == model.Hash);
 
         /// <summary>
         /// Whether import can be skipped after finding an existing import early in the process.
@@ -574,21 +591,29 @@ namespace osu.Game.Database
         /// <returns>Whether to perform deletion.</returns>
         protected virtual bool ShouldDeleteArchive(string path) => false;
 
-        private void pauseIfNecessary(ImportParameters importParameters, CancellationToken cancellationToken)
+        private async Task pauseIfNecessaryAsync(ImportParameters importParameters, ProgressNotification notification, CancellationToken cancellationToken)
         {
             if (!PauseImports || importParameters.ImportImmediately)
                 return;
 
             Logger.Log($@"{GetType().Name} is being paused.");
 
+            // A paused state could obviously be entered mid-import (during the `Task.WhenAll` below),
+            // but in order to keep things simple let's focus on the most common scenario.
+            notification.Text = $"{HumanisedModelName.Humanize(LetterCasing.Title)} import is paused due to gameplay...";
+            notification.State = ProgressNotificationState.Queued;
+
             while (PauseImports)
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                Thread.Sleep(500);
+                await Task.Delay(500, cancellationToken).ConfigureAwait(false);
             }
 
             cancellationToken.ThrowIfCancellationRequested();
             Logger.Log($@"{GetType().Name} is being resumed.");
+
+            notification.Text = $"{HumanisedModelName.Humanize(LetterCasing.Title)} import is resuming...";
+            notification.State = ProgressNotificationState.Active;
         }
 
         private IEnumerable<string> getIDs(IEnumerable<INamedFile> files)

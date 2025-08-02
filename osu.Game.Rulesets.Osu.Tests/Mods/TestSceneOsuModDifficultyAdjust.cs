@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
         public void TestNoAdjustment() => CreateModTest(new ModTestData
         {
             Mod = new OsuModDifficultyAdjust(),
-            Beatmap = new Beatmap
+            CreateBeatmap = () => new Beatmap
             {
                 BeatmapInfo = new BeatmapInfo
                 {

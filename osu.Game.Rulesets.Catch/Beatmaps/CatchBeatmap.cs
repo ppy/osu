@@ -1,9 +1,11 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
+using osu.Game.Localisation;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Objects;
 
@@ -16,26 +18,30 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
             int fruits = HitObjects.Count(s => s is Fruit);
             int juiceStreams = HitObjects.Count(s => s is JuiceStream);
             int bananaShowers = HitObjects.Count(s => s is BananaShower);
+            int sum = Math.Max(1, fruits + juiceStreams);
 
             return new[]
             {
                 new BeatmapStatistic
                 {
-                    Name = @"Fruit Count",
+                    Name = BeatmapStatisticStrings.Fruits,
                     Content = fruits.ToString(),
                     CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Circles),
+                    BarDisplayLength = fruits / (float)sum,
                 },
                 new BeatmapStatistic
                 {
-                    Name = @"Juice Stream Count",
+                    Name = BeatmapStatisticStrings.JuiceStreams,
                     Content = juiceStreams.ToString(),
                     CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Sliders),
+                    BarDisplayLength = juiceStreams / (float)sum,
                 },
                 new BeatmapStatistic
                 {
-                    Name = @"Banana Shower Count",
+                    Name = BeatmapStatisticStrings.BananaShowers,
                     Content = bananaShowers.ToString(),
                     CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Spinners),
+                    BarDisplayLength = Math.Min(bananaShowers / 10f, 1),
                 }
             };
         }

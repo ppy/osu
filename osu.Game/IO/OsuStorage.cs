@@ -62,6 +62,11 @@ namespace osu.Game.IO
         }
 
         /// <summary>
+        /// Returns the <see cref="Storage"/> used for storing exported files.
+        /// </summary>
+        public virtual Storage GetExportStorage() => GetStorageForDirectory(@"exports");
+
+        /// <summary>
         /// Resets the custom storage path, changing the target storage to the default location.
         /// </summary>
         public void ResetCustomStoragePath()

@@ -136,6 +136,13 @@ namespace osu.Game.Tests.Visual.Settings
 
             public Bindable<float> Rotation { get; } = new Bindable<float>();
 
+            public BindableFloat PressureThreshold { get; } = new BindableFloat
+            {
+                MinValue = 0f,
+                MaxValue = 1f,
+                Precision = 0.005f,
+            };
+
             public IBindable<TabletInfo> Tablet => tablet;
 
             private readonly Bindable<TabletInfo> tablet = new Bindable<TabletInfo>();

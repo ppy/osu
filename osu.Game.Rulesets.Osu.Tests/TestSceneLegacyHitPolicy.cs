@@ -759,9 +759,9 @@ namespace osu.Game.Rulesets.Osu.Tests
                     BeatmapInfo =
                     {
                         Ruleset = new OsuRuleset().RulesetInfo,
-                        BeatmapVersion = LegacyBeatmapEncoder.FIRST_LAZER_VERSION // for correct offset treatment by score encoder
                     },
-                    ControlPointInfo = cpi
+                    ControlPointInfo = cpi,
+                    BeatmapVersion = LegacyBeatmapEncoder.FIRST_LAZER_VERSION // for correct offset treatment by score encoder
                 });
                 playableBeatmap = Beatmap.Value.GetPlayableBeatmap(new OsuRuleset().RulesetInfo);
             });

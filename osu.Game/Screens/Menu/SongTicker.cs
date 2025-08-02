@@ -8,6 +8,9 @@ using osu.Game.Graphics.Sprites;
 using osuTK;
 using osu.Game.Graphics;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Graphics.Effects;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 
@@ -27,26 +30,60 @@ namespace osu.Game.Screens.Menu
         public SongTicker()
         {
             AutoSizeAxes = Axes.Both;
-            Child = new FillFlowContainer
+            InternalChildren = new Drawable[]
             {
-                AutoSizeAxes = Axes.Both,
-                Direction = FillDirection.Vertical,
-                Spacing = new Vector2(0, 3),
-                Children = new Drawable[]
+                new Container
                 {
-                    title = new OsuSpriteText
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight,
+                    Position = new Vector2(5, -5),
+                    Padding = new MarginPadding(-5),
+                    RelativeSizeAxes = Axes.Both,
+                    Children = new Drawable[]
                     {
-                        Anchor = Anchor.TopRight,
-                        Origin = Anchor.TopRight,
-                        Font = OsuFont.GetFont(size: 24, weight: FontWeight.Light, italics: true)
-                    },
-                    artist = new OsuSpriteText
-                    {
-                        Anchor = Anchor.TopRight,
-                        Origin = Anchor.TopRight,
-                        Font = OsuFont.GetFont(size: 16)
+                        new CircularContainer
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Masking = true,
+                            EdgeEffect = new EdgeEffectParameters
+                            {
+                                Radius = 75,
+                                Type = EdgeEffectType.Shadow,
+                                Colour = OsuColour.Gray(0.04f).Opacity(0.3f),
+                            },
+                            Children = new Drawable[]
+                            {
+                                new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    AlwaysPresent = true,
+                                    Alpha = 0,
+                                },
+                            }
+                        },
                     }
-                }
+                },
+                new FillFlowContainer
+                {
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Vertical,
+                    Spacing = new Vector2(0, 3),
+                    Children = new Drawable[]
+                    {
+                        title = new OsuSpriteText
+                        {
+                            Anchor = Anchor.TopRight,
+                            Origin = Anchor.TopRight,
+                            Font = OsuFont.GetFont(size: 24, weight: FontWeight.Light, italics: true)
+                        },
+                        artist = new OsuSpriteText
+                        {
+                            Anchor = Anchor.TopRight,
+                            Origin = Anchor.TopRight,
+                            Font = OsuFont.GetFont(size: 16)
+                        }
+                    }
+                },
             };
         }
 

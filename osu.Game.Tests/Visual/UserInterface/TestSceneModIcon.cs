@@ -6,28 +6,88 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.UI;
+using osu.Game.Screens.Play.HUD;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public partial class TestSceneModIcon : OsuTestScene
+    public partial class TestSceneModIcon : OsuManualInputManagerTestScene
     {
+        private FillFlowContainer spreadOutFlow = null!;
+        private ModDisplay modDisplay = null!;
+
+        [SetUpSteps]
+        public void SetUpSteps()
+        {
+            AddStep("create flows", () =>
+            {
+                Child = new GridContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    RowDimensions = new[]
+                    {
+                        new Dimension(GridSizeMode.Relative, 0.5f),
+                        new Dimension(GridSizeMode.Relative, 0.5f),
+                    },
+                    Content = new[]
+                    {
+                        new Drawable[]
+                        {
+                            modDisplay = new ModDisplay
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                            }
+                        },
+                        new Drawable[]
+                        {
+                            spreadOutFlow = new FillFlowContainer
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                Direction = FillDirection.Full,
+                            }
+                        }
+                    }
+                };
+            });
+        }
+
+        private void addRange(IEnumerable<IMod> mods)
+        {
+            spreadOutFlow.AddRange(mods.Select(m => new ModIcon(m)));
+            modDisplay.Current.Value = modDisplay.Current.Value.Concat(mods.OfType<Mod>()).ToList();
+        }
+
         [Test]
         public void TestShowAllMods()
         {
             AddStep("create mod icons", () =>
             {
-                Child = new FillFlowContainer
+                addRange(Ruleset.Value.CreateInstance().CreateAllMods().Select(m =>
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Direction = FillDirection.Full,
-                    ChildrenEnumerable = Ruleset.Value.CreateInstance().CreateAllMods().Select(m => new ModIcon(m)),
-                };
+                    if (m is OsuModFlashlight fl)
+                        fl.FollowDelay.Value = 1245;
+
+                    if (m is OsuModDaycore dc)
+                        dc.SpeedChange.Value = 0.74f;
+
+                    if (m is OsuModDifficultyAdjust da)
+                        da.CircleSize.Value = 8.2f;
+
+                    if (m is ModAdaptiveSpeed ad)
+                        ad.AdjustPitch.Value = false;
+
+                    return m;
+                }));
             });
 
             AddStep("toggle selected", () =>
@@ -42,26 +102,22 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             AddStep("create mod icons", () =>
             {
-                Child = new FillFlowContainer
+                var rateAdjustMods = Ruleset.Value.CreateInstance().CreateAllMods()
+                                            .OfType<ModRateAdjust>();
+
+                addRange(rateAdjustMods.SelectMany(m =>
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Direction = FillDirection.Full,
-                    ChildrenEnumerable = Ruleset.Value.CreateInstance().CreateAllMods()
-                                                .OfType<ModRateAdjust>()
-                                                .SelectMany(m =>
-                                                {
-                                                    List<ModIcon> icons = new List<ModIcon> { new ModIcon(m) };
+                    List<Mod> mods = new List<Mod> { m };
 
-                                                    for (double i = m.SpeedChange.MinValue; i < m.SpeedChange.MaxValue; i += m.SpeedChange.Precision * 10)
-                                                    {
-                                                        m = (ModRateAdjust)m.DeepClone();
-                                                        m.SpeedChange.Value = i;
-                                                        icons.Add(new ModIcon(m));
-                                                    }
+                    for (double i = m.SpeedChange.MinValue; i < m.SpeedChange.MaxValue; i += m.SpeedChange.Precision * 10)
+                    {
+                        m = (ModRateAdjust)m.DeepClone();
+                        m.SpeedChange.Value = i;
+                        mods.Add(m);
+                    }
 
-                                                    return icons;
-                                                }),
-                };
+                    return mods;
+                }));
             });
 
             AddStep("adjust rates", () =>
@@ -81,21 +137,85 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestChangeModType()
         {
-            ModIcon icon = null!;
-
-            AddStep("create mod icon", () => Child = icon = new ModIcon(new OsuModDoubleTime()));
-            AddStep("change mod", () => icon.Mod = new OsuModEasy());
+            AddStep("create mod icon", () => addRange([new OsuModDoubleTime()]));
+            AddStep("change mod", () =>
+            {
+                foreach (var modIcon in this.ChildrenOfType<ModIcon>())
+                    modIcon.Mod = new OsuModEasy();
+            });
         }
 
         [Test]
         public void TestInterfaceModType()
         {
-            ModIcon icon = null!;
-
             var ruleset = new OsuRuleset();
 
-            AddStep("create mod icon", () => Child = icon = new ModIcon(ruleset.AllMods.First(m => m.Acronym == "DT")));
-            AddStep("change mod", () => icon.Mod = ruleset.AllMods.First(m => m.Acronym == "EZ"));
+            AddStep("create mod icon", () => addRange([ruleset.AllMods.First(m => m.Acronym == "DT")]));
+            AddStep("change mod", () =>
+            {
+                foreach (var modIcon in this.ChildrenOfType<ModIcon>())
+                    modIcon.Mod = ruleset.AllMods.First(m => m.Acronym == "EZ");
+            });
+        }
+
+        [Test]
+        public void TestDifficultyAdjust()
+        {
+            AddStep("create icons", () =>
+            {
+                addRange([
+                    new OsuModDifficultyAdjust
+                    {
+                        CircleSize = { Value = 8 }
+                    },
+                    new OsuModDifficultyAdjust
+                    {
+                        CircleSize = { Value = 5.5f }
+                    },
+                    new OsuModDifficultyAdjust
+                    {
+                        CircleSize = { Value = 8 },
+                        ApproachRate = { Value = 8 },
+                        OverallDifficulty = { Value = 8 },
+                        DrainRate = { Value = 8 },
+                    }
+                ]);
+            });
+        }
+
+        [Test]
+        public void TestTooltip()
+        {
+            OsuModDoubleTime mod = null!;
+
+            AddStep("create icon", () => addRange([mod = new OsuModDoubleTime()]));
+            AddStep("hover", () => InputManager.MoveMouseTo(this.ChildrenOfType<ModIcon>().First()));
+            AddUntilStep("tooltip displayed", () => getTooltip()?.IsPresent, () => Is.True);
+            AddAssert("tooltip text = \"Double Time\"", getTooltipText, () => Is.EqualTo("Double Time"));
+            AddAssert("tooltip settings empty", () => getTooltipSettingsLabels().Concat(getTooltipSettingsValues()), () => Is.Empty);
+
+            AddStep("change settings", () => mod.SpeedChange.Value = 1.75f);
+            AddAssert("tooltip text = \"Double Time\"", getTooltipText, () => Is.EqualTo("Double Time"));
+            AddAssert("tooltip settings updated",
+                () => getTooltipSettingsLabels().Concat(getTooltipSettingsValues()),
+                () => Is.EquivalentTo(new[] { "Speed ", "change", "1.75x" }));
+
+            AddStep("change settings", () => mod.SpeedChange.Value = 1.25f);
+            AddAssert("tooltip text = \"Double Time\"", getTooltipText, () => Is.EqualTo("Double Time"));
+            AddAssert("tooltip settings updated",
+                () => getTooltipSettingsLabels().Concat(getTooltipSettingsValues()),
+                () => Is.EquivalentTo(new[] { "Speed ", "change", "1.25x" }));
+
+            AddStep("rest settings", () => mod.SpeedChange.SetDefault());
+            AddAssert("tooltip text = \"Double Time\"", getTooltipText, () => Is.EqualTo("Double Time"));
+            AddAssert("tooltip settings empty", () => getTooltipSettingsLabels().Concat(getTooltipSettingsValues()), () => Is.Empty);
+
+            ModTooltip? getTooltip() => this.ChildrenOfType<ModTooltip>().SingleOrDefault();
+
+            // we could also just expose those directly from ModTooltip, but this works.
+            string getTooltipText() => getTooltip().ChildrenOfType<SpriteText>().First().Text.ToString();
+            IEnumerable<string> getTooltipSettingsLabels() => getTooltip().ChildrenOfType<TextFlowContainer>().First().ChildrenOfType<SpriteText>().Select(t => t.Text.ToString());
+            IEnumerable<string> getTooltipSettingsValues() => getTooltip().ChildrenOfType<TextFlowContainer>().Last().ChildrenOfType<SpriteText>().Select(t => t.Text.ToString());
         }
     }
 }

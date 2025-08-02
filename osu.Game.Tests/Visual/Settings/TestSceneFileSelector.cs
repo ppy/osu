@@ -1,37 +1,49 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using NUnit.Framework;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Overlays;
 using osu.Game.Tests.Visual.UserInterface;
 
 namespace osu.Game.Tests.Visual.Settings
 {
     public partial class TestSceneFileSelector : ThemeComparisonTestScene
     {
-        [Resolved]
-        private OsuColour colours { get; set; } = null!;
+        public TestSceneFileSelector()
+            : base(false)
+        {
+        }
 
         [Test]
         public void TestJpgFilesOnly()
         {
             AddStep("create", () =>
             {
-                ContentContainer.Children = new Drawable[]
+                var colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
+
+                ContentContainer.Child = new DependencyProvidingContainer
                 {
-                    new Box
+                    RelativeSizeAxes = Axes.Both,
+                    CachedDependencies = new (Type, object)[]
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = colours.GreySeaFoam
+                        (typeof(OverlayColourProvider), colourProvider)
                     },
-                    new OsuFileSelector(validFileExtensions: new[] { ".jpg" })
+                    Children = new Drawable[]
                     {
-                        RelativeSizeAxes = Axes.Both,
-                    },
+                        new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = colourProvider.Background3
+                        },
+                        new OsuFileSelector(validFileExtensions: new[] { ".jpg" })
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                        },
+                    }
                 };
             });
         }
