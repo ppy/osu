@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Game.Beatmaps.ControlPoints;
@@ -285,6 +286,63 @@ namespace osu.Game.Tests.NonVisual
             cpi.TimingPoints[0].BeatLength = 800;
 
             Assert.That(cpi.TimingPoints[0].BeatLength, Is.Not.EqualTo(cpiCopy.TimingPoints[0].BeatLength));
+        }
+
+        [Test]
+        public void TestBinarySearchEmptyList()
+        {
+            Assert.That(ControlPointInfo.BinarySearch(Array.Empty<TimingControlPoint>(), 0, EqualitySelection.FirstFound), Is.EqualTo(-1));
+            Assert.That(ControlPointInfo.BinarySearch(Array.Empty<TimingControlPoint>(), 0, EqualitySelection.Leftmost), Is.EqualTo(-1));
+            Assert.That(ControlPointInfo.BinarySearch(Array.Empty<TimingControlPoint>(), 0, EqualitySelection.Rightmost), Is.EqualTo(-1));
+        }
+
+        [TestCase(new[] { 1 }, 0, -1)]
+        [TestCase(new[] { 1 }, 1, 0)]
+        [TestCase(new[] { 1 }, 2, -2)]
+        [TestCase(new[] { 1, 3 }, 0, -1)]
+        [TestCase(new[] { 1, 3 }, 1, 0)]
+        [TestCase(new[] { 1, 3 }, 2, -2)]
+        [TestCase(new[] { 1, 3 }, 3, 1)]
+        [TestCase(new[] { 1, 3 }, 4, -3)]
+        public void TestBinarySearchUniqueScenarios(int[] values, int search, int expectedIndex)
+        {
+            var items = values.Select(t => new TimingControlPoint { Time = t }).ToArray();
+            Assert.That(ControlPointInfo.BinarySearch(items, search, EqualitySelection.FirstFound), Is.EqualTo(expectedIndex));
+            Assert.That(ControlPointInfo.BinarySearch(items, search, EqualitySelection.Leftmost), Is.EqualTo(expectedIndex));
+            Assert.That(ControlPointInfo.BinarySearch(items, search, EqualitySelection.Rightmost), Is.EqualTo(expectedIndex));
+        }
+
+        [TestCase(new[] { 1, 1 }, 1, 0)]
+        [TestCase(new[] { 1, 2, 2 }, 2, 1)]
+        [TestCase(new[] { 1, 2, 2, 2 }, 2, 1)]
+        [TestCase(new[] { 1, 2, 2, 2, 3 }, 2, 2)]
+        [TestCase(new[] { 1, 2, 2, 3 }, 2, 1)]
+        public void TestBinarySearchFirstFoundDuplicateScenarios(int[] values, int search, int expectedIndex)
+        {
+            var items = values.Select(t => new TimingControlPoint { Time = t }).ToArray();
+            Assert.That(ControlPointInfo.BinarySearch(items, search, EqualitySelection.FirstFound), Is.EqualTo(expectedIndex));
+        }
+
+        [TestCase(new[] { 1, 1 }, 1, 0)]
+        [TestCase(new[] { 1, 2, 2 }, 2, 1)]
+        [TestCase(new[] { 1, 2, 2, 2 }, 2, 1)]
+        [TestCase(new[] { 1, 2, 2, 2, 3 }, 2, 1)]
+        [TestCase(new[] { 1, 2, 2, 3 }, 2, 1)]
+        public void TestBinarySearchLeftMostDuplicateScenarios(int[] values, int search, int expectedIndex)
+        {
+            var items = values.Select(t => new TimingControlPoint { Time = t }).ToArray();
+            Assert.That(ControlPointInfo.BinarySearch(items, search, EqualitySelection.Leftmost), Is.EqualTo(expectedIndex));
+        }
+
+        [TestCase(new[] { 1, 1 }, 1, 1)]
+        [TestCase(new[] { 1, 2, 2 }, 2, 2)]
+        [TestCase(new[] { 1, 2, 2, 2 }, 2, 3)]
+        [TestCase(new[] { 1, 2, 2, 2, 3 }, 2, 3)]
+        [TestCase(new[] { 1, 2, 2, 3 }, 2, 2)]
+        public void TestBinarySearchRightMostDuplicateScenarios(int[] values, int search, int expectedIndex)
+        {
+            var items = values.Select(t => new TimingControlPoint { Time = t }).ToArray();
+            Assert.That(ControlPointInfo.BinarySearch(items, search, EqualitySelection.Rightmost), Is.EqualTo(expectedIndex));
         }
     }
 }

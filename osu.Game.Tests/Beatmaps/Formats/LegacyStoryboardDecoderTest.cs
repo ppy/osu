@@ -136,6 +136,24 @@ namespace osu.Game.Tests.Beatmaps.Formats
         }
 
         [Test]
+        public void TestNoopFadeTransformIsIgnoredForLifetime()
+        {
+            var decoder = new LegacyStoryboardDecoder();
+
+            using (var resStream = TestResources.OpenResource("noop-fade-transform-is-ignored-for-lifetime.osb"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var storyboard = decoder.Decode(stream);
+
+                StoryboardLayer background = storyboard.Layers.Single(l => l.Depth == 3);
+                Assert.AreEqual(2, background.Elements.Count);
+
+                Assert.AreEqual(1500, background.Elements[0].StartTime);
+                Assert.AreEqual(1500, background.Elements[1].StartTime);
+            }
+        }
+
+        [Test]
         public void TestOutOfOrderStartTimes()
         {
             var decoder = new LegacyStoryboardDecoder();
@@ -286,6 +304,29 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 // If we were to include the loop count, storyboards which loop for stupid long loop counts would continue playing the outro forever.
                 Assert.That(manyTimes.EndTime, Is.EqualTo(9000 + loop_duration));
             }
+        }
+
+        [Test]
+        public void TestVideoWithCustomFadeIn()
+        {
+            var decoder = new LegacyStoryboardDecoder();
+
+            using var resStream = TestResources.OpenResource("video-custom-alpha-transform.osb");
+            using var stream = new LineBufferedReader(resStream);
+
+            var storyboard = decoder.Decode(stream);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(storyboard.GetLayer(@"Video").Elements, Has.Count.EqualTo(1));
+                Assert.That(storyboard.GetLayer(@"Video").Elements.Single(), Is.InstanceOf<StoryboardVideo>());
+                Assert.That(storyboard.GetLayer(@"Video").Elements.Single().StartTime, Is.EqualTo(-5678));
+                Assert.That(((StoryboardVideo)storyboard.GetLayer(@"Video").Elements.Single()).Commands.Alpha.Single().StartTime, Is.EqualTo(1500));
+                Assert.That(((StoryboardVideo)storyboard.GetLayer(@"Video").Elements.Single()).Commands.Alpha.Single().EndTime, Is.EqualTo(1600));
+
+                Assert.That(storyboard.EarliestEventTime, Is.Null);
+                Assert.That(storyboard.LatestEventTime, Is.Null);
+            });
         }
 
         [Test]

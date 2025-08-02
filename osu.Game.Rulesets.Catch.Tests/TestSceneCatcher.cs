@@ -248,7 +248,8 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
             AddStep("enable hit lighting", () => config.SetValue(OsuSetting.HitLighting, true));
             AddStep("catch fruit", () => attemptCatch(new Fruit()));
-            AddAssert("correct hit lighting colour", () => catcher.ChildrenOfType<HitExplosion>().First()?.Entry?.ObjectColour == this.ChildrenOfType<DrawableCatchHitObject>().First().AccentColour.Value);
+            AddAssert("correct hit lighting colour",
+                () => catcher.ChildrenOfType<HitExplosion>().First()?.Entry?.ObjectColour == this.ChildrenOfType<DrawableCatchHitObject>().First().AccentColour.Value);
         }
 
         [Test]
@@ -257,6 +258,16 @@ namespace osu.Game.Rulesets.Catch.Tests
             AddStep("disable hit lighting", () => config.SetValue(OsuSetting.HitLighting, false));
             AddStep("catch fruit", () => attemptCatch(new Fruit()));
             AddAssert("no hit lighting", () => !catcher.ChildrenOfType<HitExplosion>().Any());
+        }
+
+        [Test]
+        public void TestAllExplodedObjectsAtUniquePositions()
+        {
+            AddStep("catch normal fruit", () => attemptCatch(new Fruit()));
+            AddStep("catch normal fruit", () => attemptCatch(new Fruit { IndexInBeatmap = 2, LastInCombo = true }));
+            AddAssert("two fruit at distinct x coordinates",
+                () => this.ChildrenOfType<CaughtFruit>().Select(f => f.DrawPosition.X).Distinct(),
+                () => Has.Exactly(2).Items);
         }
 
         private void checkPlate(int count) => AddAssert($"{count} objects on the plate", () => catcher.CaughtObjects.Count() == count);

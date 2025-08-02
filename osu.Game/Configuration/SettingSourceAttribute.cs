@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using JetBrains.Annotations;
@@ -15,6 +14,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
+using osu.Game.Utils;
 
 namespace osu.Game.Configuration
 {
@@ -186,6 +186,16 @@ namespace osu.Game.Configuration
 
                         break;
 
+                    case BindableColour4 bColour:
+                        yield return new SettingsColour
+                        {
+                            LabelText = attr.Label,
+                            TooltipText = attr.Description,
+                            Current = bColour
+                        };
+
+                        break;
+
                     case IBindable bindable:
                         var dropdownType = typeof(ModSettingsEnumDropdown<>).MakeGenericType(bindable.GetType().GetGenericArguments()[0]);
                         var dropdown = (Drawable)Activator.CreateInstance(dropdownType)!;
@@ -227,11 +237,11 @@ namespace osu.Game.Configuration
                 case Bindable<bool> b:
                     return b.Value;
 
+                case BindableColour4 c:
+                    return c.Value.ToHex();
+
                 case IBindable u:
-                    // An unknown (e.g. enum) generic type.
-                    var valueMethod = u.GetType().GetProperty(nameof(IBindable<int>.Value));
-                    Debug.Assert(valueMethod != null);
-                    return valueMethod.GetValue(u)!;
+                    return BindableValueAccessor.GetValue(u);
 
                 default:
                     // fall back for non-bindable cases.

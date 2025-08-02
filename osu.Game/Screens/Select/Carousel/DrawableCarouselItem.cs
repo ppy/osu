@@ -86,8 +86,6 @@ namespace osu.Game.Screens.Select.Carousel
             };
         }
 
-        public void SetMultiplicativeAlpha(float alpha) => Header.BorderContainer.Alpha = alpha;
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -165,6 +163,8 @@ namespace osu.Game.Screens.Select.Carousel
             Item.State.Value = CarouselItemState.Selected;
             return true;
         }
+
+        protected override bool OnHover(HoverEvent e) => true;
 
         protected override void Dispose(bool isDisposing)
         {

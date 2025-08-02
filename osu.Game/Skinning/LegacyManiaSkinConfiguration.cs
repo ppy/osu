@@ -39,7 +39,9 @@ namespace osu.Game.Skinning
 
         public float HitPosition = DEFAULT_HIT_POSITION;
         public float LightPosition = (480 - 413) * POSITION_SCALE_FACTOR;
+        public float ComboPosition = 111 * POSITION_SCALE_FACTOR;
         public float ScorePosition = 300 * POSITION_SCALE_FACTOR;
+        public float BarLineHeight = 1;
         public bool ShowJudgementLine = true;
         public bool KeysUnderNotes;
         public int LightFramePerSecond = 60;

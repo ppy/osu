@@ -223,7 +223,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         protected partial class OutroPlayer : TestPlayer
         {
-            public void ExitViaPause() => PerformExit(true);
+            public void ExitViaPause() => PerformExitWithConfirmation();
 
             public new FailOverlay FailOverlay => base.FailOverlay;
 

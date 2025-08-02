@@ -75,7 +75,7 @@ namespace osu.Game.Overlays.Chat
                                         Height = LineHeight,
                                         Colour = colourProvider?.Background5 ?? Colour4.White,
                                     },
-                                    Drawable.Empty(),
+                                    Empty(),
                                     new OsuSpriteText
                                     {
                                         Anchor = Anchor.CentreRight,
@@ -87,7 +87,7 @@ namespace osu.Game.Overlays.Chat
                                 }
                             },
                         },
-                        Drawable.Empty(),
+                        Empty(),
                         new Circle
                         {
                             Anchor = Anchor.Centre,

@@ -141,7 +141,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 }
             }
 
-            public override async Task<StarDifficulty?> GetDifficultyAsync(IBeatmapInfo beatmapInfo, IRulesetInfo? rulesetInfo = null, IEnumerable<Mod>? mods = null, CancellationToken cancellationToken = default)
+            public override async Task<StarDifficulty?> GetDifficultyAsync(IBeatmapInfo beatmapInfo, IRulesetInfo? rulesetInfo = null, IEnumerable<Mod>? mods = null, CancellationToken cancellationToken = default, int debounceDelay = 0)
             {
                 if (blockCalculation)
                 {
@@ -149,7 +149,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     await calculationBlocker.Task.ConfigureAwait(false);
                 }
 
-                return await base.GetDifficultyAsync(beatmapInfo, rulesetInfo, mods, cancellationToken).ConfigureAwait(false);
+                return await base.GetDifficultyAsync(beatmapInfo, rulesetInfo, mods, cancellationToken, 0).ConfigureAwait(false);
             }
         }
     }

@@ -20,7 +20,6 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Utils;
-using osuTK;
 
 namespace osu.Game.Overlays.Mods
 {
@@ -32,11 +31,6 @@ namespace osu.Game.Overlays.Mods
     {
         private StarRatingDisplay starRatingDisplay = null!;
         private BPMDisplay bpmDisplay = null!;
-
-        private VerticalAttributeDisplay circleSizeDisplay = null!;
-        private VerticalAttributeDisplay drainRateDisplay = null!;
-        private VerticalAttributeDisplay approachRateDisplay = null!;
-        private VerticalAttributeDisplay overallDifficultyDisplay = null!;
 
         public Bindable<IBeatmapInfo?> BeatmapInfo { get; } = new Bindable<IBeatmapInfo?>();
 
@@ -55,7 +49,7 @@ namespace osu.Game.Overlays.Mods
         protected IBindable<RulesetInfo> GameRuleset = null!;
 
         private CancellationTokenSource? cancellationSource;
-        private IBindable<StarDifficulty?> starDifficulty = null!;
+        private IBindable<StarDifficulty> starDifficulty = null!;
 
         public ITooltip<AdjustedAttributesTooltip.Data?> GetCustomTooltip() => new AdjustedAttributesTooltip();
 
@@ -66,34 +60,25 @@ namespace osu.Game.Overlays.Mods
         [BackgroundDependencyLoader]
         private void load()
         {
-            const float shear = OsuGame.SHEAR;
-
             LeftContent.AddRange(new Drawable[]
             {
                 starRatingDisplay = new StarRatingDisplay(default, animated: true)
                 {
                     Origin = Anchor.CentreLeft,
                     Anchor = Anchor.CentreLeft,
-                    Shear = new Vector2(-shear, 0),
+                    Shear = -OsuGame.SHEAR,
                 },
                 bpmDisplay = new BPMDisplay
                 {
                     Origin = Anchor.CentreLeft,
                     Anchor = Anchor.CentreLeft,
-                    Shear = new Vector2(-shear, 0),
+                    Shear = -OsuGame.SHEAR,
                     AutoSizeAxes = Axes.Y,
                     Width = 75,
                 }
             });
 
             RightContent.Alpha = 0;
-            RightContent.AddRange(new Drawable[]
-            {
-                circleSizeDisplay = new VerticalAttributeDisplay("CS") { Shear = new Vector2(-shear, 0), },
-                drainRateDisplay = new VerticalAttributeDisplay("HP") { Shear = new Vector2(-shear, 0), },
-                overallDifficultyDisplay = new VerticalAttributeDisplay("OD") { Shear = new Vector2(-shear, 0), },
-                approachRateDisplay = new VerticalAttributeDisplay("AR") { Shear = new Vector2(-shear, 0), },
-            });
         }
 
         protected override void LoadComplete()
@@ -137,7 +122,7 @@ namespace osu.Game.Overlays.Mods
             starDifficulty = difficultyCache.GetBindableDifficulty(BeatmapInfo.Value, (cancellationSource = new CancellationTokenSource()).Token);
             starDifficulty.BindValueChanged(s =>
             {
-                starRatingDisplay.Current.Value = s.NewValue ?? default;
+                starRatingDisplay.Current.Value = s.NewValue;
 
                 if (!starRatingDisplay.IsPresent)
                     starRatingDisplay.FinishTransforms(true);
@@ -176,23 +161,30 @@ namespace osu.Game.Overlays.Mods
 
             bpmDisplay.Current.Value = FormatUtils.RoundBPM(BeatmapInfo.Value.BPM, rate);
 
-            BeatmapDifficulty originalDifficulty = new BeatmapDifficulty(BeatmapInfo.Value.Difficulty);
-
-            foreach (var mod in Mods.Value.OfType<IApplicableToDifficulty>())
-                mod.ApplyToDifficulty(originalDifficulty);
-
             Ruleset ruleset = GameRuleset.Value.CreateInstance();
-            BeatmapDifficulty adjustedDifficulty = ruleset.GetRateAdjustedDisplayDifficulty(originalDifficulty, rate);
+            var displayAttributes = ruleset.GetBeatmapAttributesForDisplay(BeatmapInfo.Value, Mods.Value).ToList();
 
-            TooltipContent = new AdjustedAttributesTooltip.Data(originalDifficulty, adjustedDifficulty);
+            TooltipContent = new AdjustedAttributesTooltip.Data(displayAttributes);
 
-            approachRateDisplay.AdjustType.Value = VerticalAttributeDisplay.CalculateEffect(originalDifficulty.ApproachRate, adjustedDifficulty.ApproachRate);
-            overallDifficultyDisplay.AdjustType.Value = VerticalAttributeDisplay.CalculateEffect(originalDifficulty.OverallDifficulty, adjustedDifficulty.OverallDifficulty);
+            // if there are not enough attribute displays, make more
+            for (int i = RightContent.Count; i < displayAttributes.Count; i++)
+                RightContent.Add(new VerticalAttributeDisplay { Shear = -OsuGame.SHEAR });
 
-            circleSizeDisplay.Current.Value = adjustedDifficulty.CircleSize;
-            drainRateDisplay.Current.Value = adjustedDifficulty.DrainRate;
-            approachRateDisplay.Current.Value = adjustedDifficulty.ApproachRate;
-            overallDifficultyDisplay.Current.Value = adjustedDifficulty.OverallDifficulty;
+            // populate all attribute displays that need to be visible...
+            for (int i = 0; i < displayAttributes.Count; i++)
+            {
+                var attribute = displayAttributes[i];
+                var display = (VerticalAttributeDisplay)RightContent[i];
+
+                display.Label = attribute.Acronym;
+                display.Current.Value = attribute.AdjustedValue;
+                display.AdjustType.Value = VerticalAttributeDisplay.CalculateEffect(attribute.OriginalValue, attribute.AdjustedValue);
+                display.Alpha = 1;
+            }
+
+            // and hide any extra ones
+            for (int i = displayAttributes.Count; i < RightContent.Count; i++)
+                RightContent[i].Alpha = 0;
         });
 
         private void updateCollapsedState()

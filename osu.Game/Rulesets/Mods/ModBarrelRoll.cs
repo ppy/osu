@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
@@ -38,11 +39,20 @@ namespace osu.Game.Rulesets.Mods
         public override LocalisableString Description => "The whole playfield is on a wheel!";
         public override double ScoreMultiplier => 1;
 
-        public override string SettingDescription => $"{SpinSpeed.Value:N2} rpm {Direction.Value.GetDescription().ToLowerInvariant()}";
-
-        public void Update(Playfield playfield)
+        public override IEnumerable<(LocalisableString setting, LocalisableString value)> SettingDescription
         {
-            playfield.Rotation = CurrentRotation = (Direction.Value == RotationDirection.Counterclockwise ? -1 : 1) * 360 * (float)(playfield.Time.Current / 60000 * SpinSpeed.Value);
+            get
+            {
+                yield return ("Roll speed", $"{SpinSpeed.Value:N2} rpm");
+                yield return ("Direction", Direction.Value.GetDescription());
+            }
+        }
+
+        private PlayfieldAdjustmentContainer playfieldAdjustmentContainer = null!;
+
+        public virtual void Update(Playfield playfield)
+        {
+            playfieldAdjustmentContainer.Rotation = CurrentRotation = (Direction.Value == RotationDirection.Counterclockwise ? -1 : 1) * 360 * (float)(playfield.Time.Current / 60000 * SpinSpeed.Value);
         }
 
         public void ApplyToDrawableRuleset(DrawableRuleset<TObject> drawableRuleset)
@@ -52,7 +62,9 @@ namespace osu.Game.Rulesets.Mods
             var playfieldSize = drawableRuleset.Playfield.DrawSize;
             float minSide = MathF.Min(playfieldSize.X, playfieldSize.Y);
             float maxSide = MathF.Max(playfieldSize.X, playfieldSize.Y);
-            drawableRuleset.Playfield.Scale = new Vector2(minSide / maxSide);
+
+            playfieldAdjustmentContainer = drawableRuleset.PlayfieldAdjustmentContainer;
+            playfieldAdjustmentContainer.Scale = new Vector2(minSide / maxSide);
         }
     }
 }

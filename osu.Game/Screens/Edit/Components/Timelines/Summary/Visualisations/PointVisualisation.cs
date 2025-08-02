@@ -9,7 +9,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Visualisations
     /// <summary>
     /// Represents a singular point on a timeline part.
     /// </summary>
-    public partial class PointVisualisation : Circle
+    public partial class PointVisualisation : FastCircle
     {
         public readonly double StartTime;
 

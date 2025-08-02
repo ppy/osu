@@ -98,7 +98,7 @@ namespace osu.Game.Overlays
             apiUser.BindValueChanged(_ => Schedule(() =>
             {
                 if (api.IsLoggedIn)
-                    replaceResultsAreaContent(Drawable.Empty());
+                    replaceResultsAreaContent(Empty());
             }));
         }
 
@@ -198,7 +198,6 @@ namespace osu.Game.Overlays
         {
             c.Anchor = Anchor.TopCentre;
             c.Origin = Anchor.TopCentre;
-            c.Scale = new Vector2(0.8f);
         })).ToArray();
 
         private static ReverseChildIDFillFlowContainer<BeatmapCard> createCardContainerFor(IEnumerable<BeatmapCard> newCards)

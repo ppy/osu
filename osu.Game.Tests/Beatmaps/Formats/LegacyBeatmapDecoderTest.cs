@@ -42,9 +42,9 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 var decoder = Decoder.GetDecoder<Beatmap>(stream);
                 var working = new TestWorkingBeatmap(decoder.Decode(stream));
 
-                Assert.AreEqual(6, working.BeatmapInfo.BeatmapVersion);
-                Assert.AreEqual(6, working.Beatmap.BeatmapInfo.BeatmapVersion);
-                Assert.AreEqual(6, working.GetPlayableBeatmap(new OsuRuleset().RulesetInfo, Array.Empty<Mod>()).BeatmapInfo.BeatmapVersion);
+                Assert.AreEqual(6, working.Beatmap.BeatmapVersion);
+                Assert.That(working.Beatmap.BeatmapInfo.Ruleset.Name, Is.Not.EqualTo("null placeholder ruleset"));
+                Assert.AreEqual(6, working.GetPlayableBeatmap(new OsuRuleset().RulesetInfo, Array.Empty<Mod>()).BeatmapVersion);
             }
         }
 
@@ -59,9 +59,8 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 ((LegacyBeatmapDecoder)decoder).ApplyOffsets = applyOffsets;
                 var working = new TestWorkingBeatmap(decoder.Decode(stream));
 
-                Assert.AreEqual(4, working.BeatmapInfo.BeatmapVersion);
-                Assert.AreEqual(4, working.Beatmap.BeatmapInfo.BeatmapVersion);
-                Assert.AreEqual(4, working.GetPlayableBeatmap(new OsuRuleset().RulesetInfo, Array.Empty<Mod>()).BeatmapInfo.BeatmapVersion);
+                Assert.AreEqual(4, working.Beatmap.BeatmapVersion);
+                Assert.AreEqual(4, working.GetPlayableBeatmap(new OsuRuleset().RulesetInfo, Array.Empty<Mod>()).BeatmapVersion);
 
                 Assert.AreEqual(-1, working.BeatmapInfo.Metadata.PreviewTime);
             }
@@ -80,16 +79,16 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 var metadata = beatmap.Metadata;
 
                 Assert.AreEqual("03. Renatus - Soleily 192kbps.mp3", metadata.AudioFile);
-                Assert.AreEqual(0, beatmapInfo.AudioLeadIn);
+                Assert.AreEqual(0, beatmap.AudioLeadIn);
                 Assert.AreEqual(164471, metadata.PreviewTime);
-                Assert.AreEqual(0.7f, beatmapInfo.StackLeniency);
+                Assert.AreEqual(0.7f, beatmap.StackLeniency);
                 Assert.IsTrue(beatmapInfo.Ruleset.OnlineID == 0);
-                Assert.IsFalse(beatmapInfo.LetterboxInBreaks);
-                Assert.IsFalse(beatmapInfo.SpecialStyle);
-                Assert.IsFalse(beatmapInfo.WidescreenStoryboard);
-                Assert.IsFalse(beatmapInfo.SamplesMatchPlaybackRate);
-                Assert.AreEqual(CountdownType.None, beatmapInfo.Countdown);
-                Assert.AreEqual(0, beatmapInfo.CountdownOffset);
+                Assert.IsFalse(beatmap.LetterboxInBreaks);
+                Assert.IsFalse(beatmap.SpecialStyle);
+                Assert.IsFalse(beatmap.WidescreenStoryboard);
+                Assert.IsFalse(beatmap.SamplesMatchPlaybackRate);
+                Assert.AreEqual(CountdownType.None, beatmap.Countdown);
+                Assert.AreEqual(0, beatmap.CountdownOffset);
             }
         }
 
@@ -101,7 +100,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             using (var resStream = TestResources.OpenResource("Soleily - Renatus (Gamu) [Insane].osu"))
             using (var stream = new LineBufferedReader(resStream))
             {
-                var beatmapInfo = decoder.Decode(stream).BeatmapInfo;
+                var beatmap = decoder.Decode(stream);
 
                 int[] expectedBookmarks =
                 {
@@ -109,13 +108,13 @@ namespace osu.Game.Tests.Beatmaps.Formats
                     95901, 106450, 116999, 119637, 130186, 140735, 151285,
                     161834, 164471, 175020, 185570, 196119, 206669, 209306
                 };
-                Assert.AreEqual(expectedBookmarks.Length, beatmapInfo.Bookmarks.Length);
+                Assert.AreEqual(expectedBookmarks.Length, beatmap.Bookmarks.Length);
                 for (int i = 0; i < expectedBookmarks.Length; i++)
-                    Assert.AreEqual(expectedBookmarks[i], beatmapInfo.Bookmarks[i]);
-                Assert.AreEqual(1.8, beatmapInfo.DistanceSpacing);
-                Assert.AreEqual(4, beatmapInfo.BeatDivisor);
-                Assert.AreEqual(4, beatmapInfo.GridSize);
-                Assert.AreEqual(2, beatmapInfo.TimelineZoom);
+                    Assert.AreEqual(expectedBookmarks[i], beatmap.Bookmarks[i]);
+                Assert.AreEqual(1.8, beatmap.DistanceSpacing);
+                Assert.AreEqual(4, beatmap.BeatmapInfo.BeatDivisor);
+                Assert.AreEqual(4, beatmap.GridSize);
+                Assert.AreEqual(2, beatmap.TimelineZoom);
             }
         }
 
@@ -397,6 +396,35 @@ namespace osu.Game.Tests.Beatmaps.Formats
                     new Color4(255, 187, 255, 255),
                     new Color4(255, 177, 140, 255),
                     new Color4(100, 100, 100, 255), // alpha is specified as 100, but should be ignored.
+                };
+                Assert.AreEqual(expectedColors.Length, comboColors.Count);
+                for (int i = 0; i < expectedColors.Length; i++)
+                    Assert.AreEqual(expectedColors[i], comboColors[i]);
+            }
+        }
+
+        [Test]
+        public void TestComboColourCountIsLimitedToEight()
+        {
+            var decoder = new LegacySkinDecoder();
+
+            using (var resStream = TestResources.OpenResource("too-many-combo-colours.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var comboColors = decoder.Decode(stream).ComboColours;
+
+                Debug.Assert(comboColors != null);
+
+                Color4[] expectedColors =
+                {
+                    new Color4(142, 199, 255, 255),
+                    new Color4(255, 128, 128, 255),
+                    new Color4(128, 255, 255, 255),
+                    new Color4(128, 255, 128, 255),
+                    new Color4(255, 187, 255, 255),
+                    new Color4(255, 177, 140, 255),
+                    new Color4(100, 100, 100, 255),
+                    new Color4(142, 199, 255, 255),
                 };
                 Assert.AreEqual(expectedColors.Length, comboColors.Count);
                 for (int i = 0; i < expectedColors.Length; i++)
@@ -993,15 +1021,15 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
                 Assert.Multiple(() =>
                 {
-                    Assert.That(decoded.BeatmapInfo.AudioLeadIn, Is.EqualTo(0));
-                    Assert.That(decoded.BeatmapInfo.StackLeniency, Is.EqualTo(0.7f));
-                    Assert.That(decoded.BeatmapInfo.SpecialStyle, Is.False);
-                    Assert.That(decoded.BeatmapInfo.LetterboxInBreaks, Is.False);
-                    Assert.That(decoded.BeatmapInfo.WidescreenStoryboard, Is.False);
-                    Assert.That(decoded.BeatmapInfo.EpilepsyWarning, Is.False);
-                    Assert.That(decoded.BeatmapInfo.SamplesMatchPlaybackRate, Is.False);
-                    Assert.That(decoded.BeatmapInfo.Countdown, Is.EqualTo(CountdownType.Normal));
-                    Assert.That(decoded.BeatmapInfo.CountdownOffset, Is.EqualTo(0));
+                    Assert.That(decoded.AudioLeadIn, Is.EqualTo(0));
+                    Assert.That(decoded.StackLeniency, Is.EqualTo(0.7f));
+                    Assert.That(decoded.SpecialStyle, Is.False);
+                    Assert.That(decoded.LetterboxInBreaks, Is.False);
+                    Assert.That(decoded.WidescreenStoryboard, Is.False);
+                    Assert.That(decoded.EpilepsyWarning, Is.False);
+                    Assert.That(decoded.SamplesMatchPlaybackRate, Is.False);
+                    Assert.That(decoded.Countdown, Is.EqualTo(CountdownType.None));
+                    Assert.That(decoded.CountdownOffset, Is.EqualTo(0));
                     Assert.That(decoded.BeatmapInfo.Metadata.PreviewTime, Is.EqualTo(-1));
                     Assert.That(decoded.BeatmapInfo.Ruleset.OnlineID, Is.EqualTo(0));
                 });

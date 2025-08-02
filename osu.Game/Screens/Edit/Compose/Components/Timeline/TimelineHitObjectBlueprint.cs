@@ -30,7 +30,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
     public partial class TimelineHitObjectBlueprint : SelectionBlueprint<HitObject>
     {
-        private const float circle_size = 38;
+        private const float circle_size = 32;
 
         private Container? repeatsContainer;
 
@@ -441,7 +441,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                     double lengthOfOneRepeat = repeatHitObject.Duration / (repeatHitObject.RepeatCount + 1);
                                     int proposedCount = Math.Max(0, (int)Math.Round(proposedDuration / lengthOfOneRepeat) - 1);
 
-                                    if (proposedCount == repeatHitObject.RepeatCount || Precision.AlmostEquals(lengthOfOneRepeat, 0))
+                                    if (proposedCount == repeatHitObject.RepeatCount || Precision.AlmostEquals(lengthOfOneRepeat, 0, 1))
                                         return;
 
                                     repeatHitObject.RepeatCount = proposedCount;

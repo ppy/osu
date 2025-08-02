@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
@@ -11,6 +12,8 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
+using osu.Game.Rulesets.Taiko;
+using osu.Game.Tests.Resources;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Online
@@ -54,6 +57,16 @@ namespace osu.Game.Tests.Visual.Online
                     if (req is GetUserRequest getUserRequest)
                     {
                         getUserRequest.TriggerSuccess(TEST_USER);
+                        return true;
+                    }
+
+                    if (req is GetUserBeatmapsRequest getUserBeatmapsRequest)
+                    {
+                        getUserBeatmapsRequest.TriggerSuccess(new List<APIBeatmapSet>
+                        {
+                            CreateAPIBeatmapSet(),
+                            CreateAPIBeatmapSet()
+                        });
                         return true;
                     }
 
@@ -140,7 +153,7 @@ namespace osu.Game.Tests.Visual.Online
                             Username = $"Colorful #{hue}",
                             Id = 1,
                             CountryCode = CountryCode.JP,
-                            CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c2.jpg",
+                            CoverUrl = TestResources.COVER_IMAGE_2,
                             ProfileHue = hue,
                             PlayMode = "osu",
                         });
@@ -184,7 +197,7 @@ namespace osu.Game.Tests.Visual.Online
                 Username = $"Colorful #{hue}",
                 Id = 1,
                 CountryCode = CountryCode.JP,
-                CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c2.jpg",
+                CoverUrl = TestResources.COVER_IMAGE_2,
                 ProfileHue = hue,
                 PlayMode = "osu",
             }));
@@ -192,15 +205,28 @@ namespace osu.Game.Tests.Visual.Online
             int hue2 = 0;
 
             AddSliderStep("hue 2", 0, 360, 50, h => hue2 = h);
-            AddStep("show user", () => profile.ShowUser(new APIUser { Id = 1 }));
+            AddStep("show user", () => profile.ShowUser(new APIUser { Id = 2 }));
             AddWaitStep("wait some", 3);
 
             AddStep("complete request", () => pendingRequest.TriggerSuccess(new APIUser
             {
                 Username = $"Colorful #{hue2}",
-                Id = 1,
+                Id = 2,
                 CountryCode = CountryCode.JP,
-                CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c2.jpg",
+                CoverUrl = TestResources.COVER_IMAGE_2,
+                ProfileHue = hue2,
+                PlayMode = "osu",
+            }));
+
+            AddStep("show user different ruleset", () => profile.ShowUser(new APIUser { Id = 2 }, new TaikoRuleset().RulesetInfo));
+            AddWaitStep("wait some", 3);
+
+            AddStep("complete request", () => pendingRequest.TriggerSuccess(new APIUser
+            {
+                Username = $"Colorful #{hue2}",
+                Id = 2,
+                CountryCode = CountryCode.JP,
+                CoverUrl = TestResources.COVER_IMAGE_2,
                 ProfileHue = hue2,
                 PlayMode = "osu",
             }));
@@ -211,7 +237,7 @@ namespace osu.Game.Tests.Visual.Online
             Username = @"Somebody",
             Id = 1,
             CountryCode = CountryCode.JP,
-            CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c1.jpg",
+            CoverUrl = TestResources.COVER_IMAGE_1,
             JoinDate = DateTimeOffset.Now.AddDays(-1),
             LastVisit = DateTimeOffset.Now,
             Groups = new[]
@@ -321,6 +347,13 @@ namespace osu.Game.Tests.Visual.Online
             Twitter = "test_user",
             Discord = "test_user",
             Website = "https://google.com",
+            Team = new APITeam
+            {
+                Id = 1,
+                Name = "Collective Wangs",
+                ShortName = "WANG",
+                FlagUrl = "https://assets.ppy.sh/teams/flag/1/wanglogo.jpg",
+            }
         };
     }
 }

@@ -80,7 +80,7 @@ namespace osu.Game.Online.Chat
 
             fetchReq.Success += updates =>
             {
-                if (updates?.Presence != null)
+                if (updates.Presence != null)
                 {
                     foreach (var channel in updates.Presence)
                         joinChannel(channel);
