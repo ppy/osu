@@ -394,7 +394,7 @@ namespace osu.Game.Screens.Edit.Timing
                             {
                                 Colour = colourProvider.Colour1.Opacity(0.4f),
                                 BlurSigma = new Vector2(9f),
-                                Strength = 10,
+                                Strength = 2,
                                 PadExtent = true
                             }),
                         }
