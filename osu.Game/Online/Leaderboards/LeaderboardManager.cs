@@ -188,6 +188,13 @@ namespace osu.Game.Online.Leaderboards
             var newScoresArray = newScores.ToArray();
             scores.Value = LeaderboardScores.Success(newScoresArray, newScoresArray.Length, null);
         }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            localScoreSubscription?.Dispose();
+        }
     }
 
     public record LeaderboardCriteria(
