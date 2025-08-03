@@ -35,7 +35,7 @@ namespace osu.Game.Screens.Play
 
         public readonly BindableNumber<double> UserPlaybackRate = new BindableDouble(1)
         {
-            MinValue = 0.05,
+            MinValue = 0.1,
             MaxValue = 2,
             Precision = 0.01,
         };
@@ -206,7 +206,7 @@ namespace osu.Game.Screens.Play
             musicController.ResetTrackAdjustments();
 
             track.BindAdjustments(AdjustmentsFromMods);
-            track.AddAdjustment(AdjustableProperty.Frequency, UserPlaybackRate);
+            track.AddAdjustment(AdjustableProperty.Tempo, UserPlaybackRate);
 
             speedAdjustmentsApplied = true;
         }
@@ -217,7 +217,7 @@ namespace osu.Game.Screens.Play
                 return;
 
             track.UnbindAdjustments(AdjustmentsFromMods);
-            track.RemoveAdjustment(AdjustableProperty.Frequency, UserPlaybackRate);
+            track.RemoveAdjustment(AdjustableProperty.Tempo, UserPlaybackRate);
 
             speedAdjustmentsApplied = false;
         }
