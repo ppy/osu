@@ -8,7 +8,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
@@ -27,7 +26,7 @@ namespace osu.Game.Overlays.Mods
     /// On the mod select overlay, this provides a local updating view of BPM, star rating and other
     /// difficulty attributes so the user can have a better insight into what mods are changing.
     /// </summary>
-    public partial class BeatmapAttributesDisplay : ModFooterInformationDisplay, IHasCustomTooltip<AdjustedAttributesTooltip.Data?>
+    public partial class BeatmapAttributesDisplay : ModFooterInformationDisplay
     {
         private StarRatingDisplay starRatingDisplay = null!;
         private BPMDisplay bpmDisplay = null!;
@@ -50,10 +49,6 @@ namespace osu.Game.Overlays.Mods
 
         private CancellationTokenSource? cancellationSource;
         private IBindable<StarDifficulty> starDifficulty = null!;
-
-        public ITooltip<AdjustedAttributesTooltip.Data?> GetCustomTooltip() => new AdjustedAttributesTooltip();
-
-        public AdjustedAttributesTooltip.Data? TooltipContent { get; private set; }
 
         private const float transition_duration = 250;
 
@@ -164,8 +159,6 @@ namespace osu.Game.Overlays.Mods
             Ruleset ruleset = GameRuleset.Value.CreateInstance();
             var displayAttributes = ruleset.GetBeatmapAttributesForDisplay(BeatmapInfo.Value, Mods.Value).ToList();
 
-            TooltipContent = new AdjustedAttributesTooltip.Data(displayAttributes);
-
             // if there are not enough attribute displays, make more
             for (int i = RightContent.Count; i < displayAttributes.Count; i++)
                 RightContent.Add(new VerticalAttributeDisplay { Shear = -OsuGame.SHEAR });
@@ -175,16 +168,12 @@ namespace osu.Game.Overlays.Mods
             {
                 var attribute = displayAttributes[i];
                 var display = (VerticalAttributeDisplay)RightContent[i];
-
-                display.Label = attribute.Acronym;
-                display.Current.Value = attribute.AdjustedValue;
-                display.AdjustType.Value = VerticalAttributeDisplay.CalculateEffect(attribute.OriginalValue, attribute.AdjustedValue);
-                display.Alpha = 1;
+                display.SetAttribute(attribute);
             }
 
             // and hide any extra ones
             for (int i = displayAttributes.Count; i < RightContent.Count; i++)
-                RightContent[i].Alpha = 0;
+                ((VerticalAttributeDisplay)RightContent[i]).SetAttribute(null);
         });
 
         private void updateCollapsedState()
