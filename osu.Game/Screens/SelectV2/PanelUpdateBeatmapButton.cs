@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
@@ -145,6 +146,8 @@ namespace osu.Game.Screens.SelectV2
             base.OnHoverLost(e);
         }
 
+        public override LocalisableString TooltipText => Enabled.Value ? SongSelectStrings.UpdateBeatmapTooltip : string.Empty;
+
         private bool updateConfirmed;
 
         private void performUpdate()
@@ -182,7 +185,6 @@ namespace osu.Game.Screens.SelectV2
             if (download != null)
             {
                 Enabled.Value = false;
-                TooltipText = string.Empty;
 
                 download.DownloadProgressed += progress => progressFill.ResizeWidthTo(progress, 100, Easing.OutQuint);
                 download.Failure += _ => attachExistingDownload();
@@ -190,7 +192,6 @@ namespace osu.Game.Screens.SelectV2
             else
             {
                 Enabled.Value = true;
-                TooltipText = SongSelectStrings.UpdateBeatmapTooltip;
 
                 progressFill.ResizeWidthTo(0, 100, Easing.OutQuint);
             }
