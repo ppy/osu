@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Utils;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Difficulty;
 using osuTK;
@@ -23,7 +24,7 @@ namespace osu.Game.Overlays.Mods
 
         private RulesetBeatmapAttribute? attribute;
         private OsuSpriteText adjustedByModsText = null!;
-        private OsuSpriteText descriptionText = null!;
+        private OsuTextFlowContainer descriptionText = null!;
         private GridContainer metricsGrid = null!;
 
         [Resolved]
@@ -62,7 +63,11 @@ namespace osu.Game.Overlays.Mods
                             Spacing = new Vector2(10),
                             Children = new Drawable[]
                             {
-                                descriptionText = new OsuSpriteText(),
+                                descriptionText = new OsuTextFlowContainer
+                                {
+                                    AutoSizeAxes = Axes.Both,
+                                    MaximumSize = new Vector2(380, 0),
+                                },
                                 metricsGrid = new GridContainer
                                 {
                                     AutoSizeAxes = Axes.Both,
