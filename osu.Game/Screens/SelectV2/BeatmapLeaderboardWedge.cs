@@ -149,27 +149,33 @@ namespace osu.Game.Screens.SelectV2
                         Children = new Drawable[]
                         {
                             new WedgeBackground(),
-                            new Container
+                            // Required because wedge background blocks input from passing through
+                            // to the main context menu container above.
+                            new OsuContextMenuContainer
                             {
-                                RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y,
                                 Shear = -OsuGame.SHEAR,
-                                Padding = new MarginPadding { Top = 5f, Bottom = 5f, Left = 70f, Right = 10f },
-                                Children = new Drawable[]
+                                RelativeSizeAxes = Axes.Both,
+                                Child = new Container
                                 {
-                                    personalBestText = new OsuSpriteText
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Padding = new MarginPadding { Top = 5f, Bottom = 5f, Left = 70f, Right = 10f },
+                                    Children = new Drawable[]
                                     {
-                                        Colour = colourProvider.Content2,
-                                        Font = OsuFont.Style.Caption1.With(weight: FontWeight.SemiBold),
-                                    },
-                                    personalBestScoreContainer = new Container<BeatmapLeaderboardScore>
-                                    {
-                                        RelativeSizeAxes = Axes.X,
-                                        AutoSizeAxes = Axes.Y,
-                                        Margin = new MarginPadding { Top = 20f },
-                                    },
-                                }
-                            },
+                                        personalBestText = new OsuSpriteText
+                                        {
+                                            Colour = colourProvider.Content2,
+                                            Font = OsuFont.Style.Caption1.With(weight: FontWeight.SemiBold),
+                                        },
+                                        personalBestScoreContainer = new Container<BeatmapLeaderboardScore>
+                                        {
+                                            RelativeSizeAxes = Axes.X,
+                                            AutoSizeAxes = Axes.Y,
+                                            Margin = new MarginPadding { Top = 20f },
+                                        },
+                                    }
+                                },
+                            }
                         },
                     },
                     placeholderContainer = new Container<Placeholder>
@@ -241,7 +247,8 @@ namespace osu.Game.Screens.SelectV2
                 // For now, we forcefully refresh to keep things simple.
                 // In the future, removing this requirement may be deemed useful, but will need ample testing of edge case scenarios
                 // (like returning from gameplay after setting a new score, returning to song select after main menu).
-                leaderboardManager.FetchWithCriteria(new LeaderboardCriteria(fetchBeatmapInfo, fetchRuleset, Scope.Value, FilterBySelectedMods.Value ? mods.Value.ToArray() : null, fetchSorting), forceRefresh: true);
+                leaderboardManager.FetchWithCriteria(new LeaderboardCriteria(fetchBeatmapInfo, fetchRuleset, Scope.Value, FilterBySelectedMods.Value ? mods.Value.ToArray() : null, fetchSorting),
+                    forceRefresh: true);
 
                 if (!initialFetchComplete)
                 {
