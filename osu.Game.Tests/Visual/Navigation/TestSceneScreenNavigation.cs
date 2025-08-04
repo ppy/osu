@@ -680,7 +680,6 @@ namespace osu.Game.Tests.Visual.Navigation
             {
                 var dropdownItem = Game
                                    .ChildrenOfType<BeatmapLeaderboardWedge>().First()
-                                   .ChildrenOfType<OsuContextMenu>().First()
                                    .ChildrenOfType<DrawableOsuMenuItem>().First(i => i.Item.Text.ToString() == "Delete");
 
                 InputManager.MoveMouseTo(dropdownItem);
