@@ -404,9 +404,6 @@ namespace osu.Game.Screens.SelectV2
 
         private void beginLooping()
         {
-            if (!ControlGlobalMusic)
-                return;
-
             Debug.Assert(!isHandlingLooping);
 
             isHandlingLooping = true;
@@ -634,7 +631,23 @@ namespace osu.Game.Screens.SelectV2
 
             updateWedgeVisibility();
 
-            beginLooping();
+            if (ControlGlobalMusic)
+            {
+                // Avoid abruptly starting playback at preview point.
+                // Importantly, this should be done before looping is setup to ensure we get the correct imminent `IsPlaying` state.
+                if (!music.IsPlaying)
+                {
+                    music.DuckMomentarily(0, new DuckParameters
+                    {
+                        DuckDuration = 0,
+                        DuckVolumeTo = 0,
+                        RestoreDuration = 800,
+                        RestoreEasing = Easing.OutQuint
+                    });
+                }
+
+                beginLooping();
+            }
 
             ensureGlobalBeatmapValid();
 
