@@ -9,9 +9,9 @@ using osu.Game.Rulesets.Edit.Checks.Components;
 
 namespace osu.Game.Rulesets.Edit.Checks
 {
-    public class CheckSongFormat : IGeneralCheck
+    public class CheckSongFormat : ICheck
     {
-        public CheckMetadata Metadata => new CheckMetadata(CheckCategory.Audio, "Checks for song formats.");
+        public CheckMetadata Metadata => new CheckMetadata(CheckCategory.Audio, "Checks for song formats.", CheckScope.Beatmapset);
 
         public IEnumerable<IssueTemplate> PossibleTemplates => new IssueTemplate[]
         {

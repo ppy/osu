@@ -7,7 +7,7 @@ using osu.Game.Rulesets.Edit.Checks.Components;
 
 namespace osu.Game.Rulesets.Edit.Checks
 {
-    public class CheckAudioQuality : IGeneralCheck
+    public class CheckAudioQuality : ICheck
     {
         // This is a requirement as stated in the Ranking Criteria.
         // See https://osu.ppy.sh/wiki/en/Ranking_criteria#audio
@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Edit.Checks
         // There not existing a version with a bitrate of 128 kbps or higher is extremely rare.
         private const int min_bitrate = 128;
 
-        public CheckMetadata Metadata { get; } = new CheckMetadata(CheckCategory.Audio, "Too high or low audio bitrate");
+        public CheckMetadata Metadata { get; } = new CheckMetadata(CheckCategory.Audio, "Too high or low audio bitrate", CheckScope.Beatmapset);
 
         public IEnumerable<IssueTemplate> PossibleTemplates => new IssueTemplate[]
         {

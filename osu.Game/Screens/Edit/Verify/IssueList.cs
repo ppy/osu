@@ -106,11 +106,11 @@ namespace osu.Game.Screens.Edit.Verify
 
             switch (verify.VerifyChecksScope.Value)
             {
-                case VerifyChecksScope.Beatmapset:
+                case CheckScope.Beatmapset:
                     issues = filterByScope(generalVerifier.Run(context), true);
                     break;
 
-                case VerifyChecksScope.Difficulty:
+                case CheckScope.Difficulty:
                     var generalIssues = filterByScope(generalVerifier.Run(context), false);
                     var rulesetIssues = rulesetVerifier?.Run(context) ?? Enumerable.Empty<Issue>();
                     issues = generalIssues.Concat(rulesetIssues);
@@ -139,7 +139,7 @@ namespace osu.Game.Screens.Edit.Verify
         private IEnumerable<Issue> filterByScope(IEnumerable<Issue> issues, bool generalOnly)
         {
             return issues.Where(issue =>
-                generalOnly ? issue.Check is IGeneralCheck : issue.Check is not IGeneralCheck);
+                generalOnly ? issue.Check.Metadata.Scope == CheckScope.Beatmapset : issue.Check.Metadata.Scope == CheckScope.Difficulty);
         }
     }
 }

@@ -14,9 +14,9 @@ using File = TagLib.File;
 
 namespace osu.Game.Rulesets.Edit.Checks
 {
-    public class CheckAudioInVideo : IGeneralCheck
+    public class CheckAudioInVideo : ICheck
     {
-        public CheckMetadata Metadata => new CheckMetadata(CheckCategory.Audio, "Audio track in video files");
+        public CheckMetadata Metadata => new CheckMetadata(CheckCategory.Audio, "Audio track in video files", CheckScope.Beatmapset);
 
         public IEnumerable<IssueTemplate> PossibleTemplates => new IssueTemplate[]
         {

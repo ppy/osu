@@ -6,7 +6,7 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Rulesets.Edit.Checks.Components
 {
-    public enum VerifyChecksScope
+    public enum CheckScope
     {
         /// <summary>
         /// Run checks that apply to the current difficulty.

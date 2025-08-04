@@ -10,11 +10,11 @@ using osu.Game.Rulesets.Edit.Checks.Components;
 
 namespace osu.Game.Rulesets.Edit.Checks
 {
-    public class CheckTooShortAudioFiles : IGeneralCheck
+    public class CheckTooShortAudioFiles : ICheck
     {
         private const int ms_threshold = 25;
 
-        public CheckMetadata Metadata => new CheckMetadata(CheckCategory.Audio, "Too short audio files");
+        public CheckMetadata Metadata => new CheckMetadata(CheckCategory.Audio, "Too short audio files", CheckScope.Beatmapset);
 
         public IEnumerable<IssueTemplate> PossibleTemplates => new IssueTemplate[]
         {
