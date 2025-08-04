@@ -598,6 +598,18 @@ namespace osu.Game.Screens.SelectV2
 
             if (ControlGlobalMusic)
             {
+                // Avoid abruptly starting playback at preview point.
+                if (!music.IsPlaying)
+                {
+                    music.DuckMomentarily(0, new DuckParameters
+                    {
+                        DuckDuration = 0,
+                        DuckVolumeTo = 0,
+                        RestoreDuration = 800,
+                        RestoreEasing = Easing.OutQuint
+                    });
+                }
+
                 // restart playback on returning to song select, regardless.
                 // not sure this should be a permanent thing (we may want to leave a user pause paused even on returning)
                 music.ResetTrackAdjustments();
