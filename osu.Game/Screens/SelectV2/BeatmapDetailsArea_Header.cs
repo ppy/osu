@@ -124,9 +124,10 @@ namespace osu.Game.Screens.SelectV2
 
                 scopeDropdown.Current.BindValueChanged(scope =>
                 {
+                    sortDropdown.Current.Disabled = false;
+
                     if (scope.NewValue == BeatmapLeaderboardScope.Local)
                     {
-                        sortDropdown.Current.Disabled = false;
                         sortDropdown.Current.BindTo(configLeaderboardSortMode);
                     }
                     else
