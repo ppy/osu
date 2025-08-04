@@ -7,13 +7,13 @@ using osu.Game.Rulesets.Edit.Checks.Components;
 
 namespace osu.Game.Rulesets.Edit.Checks
 {
-    public abstract class CheckFilePresence : IGeneralCheck
+    public abstract class CheckFilePresence : ICheck
     {
         protected abstract CheckCategory Category { get; }
         protected abstract string TypeOfFile { get; }
         protected abstract string? GetFilename(IBeatmap beatmap);
 
-        public CheckMetadata Metadata => new CheckMetadata(Category, $"Missing {TypeOfFile}");
+        public CheckMetadata Metadata => new CheckMetadata(Category, $"Missing {TypeOfFile}", CheckScope.Beatmapset);
 
         public IEnumerable<IssueTemplate> PossibleTemplates => new IssueTemplate[]
         {

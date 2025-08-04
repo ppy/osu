@@ -8,9 +8,9 @@ using osu.Game.Rulesets.Edit.Checks.Components;
 
 namespace osu.Game.Rulesets.Edit.Checks
 {
-    public class CheckZeroByteFiles : IGeneralCheck
+    public class CheckZeroByteFiles : ICheck
     {
-        public CheckMetadata Metadata => new CheckMetadata(CheckCategory.Files, "Zero-byte files");
+        public CheckMetadata Metadata => new CheckMetadata(CheckCategory.Files, "Zero-byte files", CheckScope.Beatmapset);
 
         public IEnumerable<IssueTemplate> PossibleTemplates => new IssueTemplate[]
         {

@@ -14,13 +14,13 @@ using File = TagLib.File;
 
 namespace osu.Game.Rulesets.Edit.Checks
 {
-    public class CheckVideoResolution : IGeneralCheck
+    public class CheckVideoResolution : ICheck
     {
         private const int max_video_width = 1280;
 
         private const int max_video_height = 720;
 
-        public CheckMetadata Metadata => new CheckMetadata(CheckCategory.Resources, "Too high video resolution.");
+        public CheckMetadata Metadata => new CheckMetadata(CheckCategory.Resources, "Too high video resolution.", CheckScope.Beatmapset);
 
         public IEnumerable<IssueTemplate> PossibleTemplates => new IssueTemplate[]
         {

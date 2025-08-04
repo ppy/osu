@@ -9,9 +9,9 @@ using osu.Game.Rulesets.Edit.Checks.Components;
 
 namespace osu.Game.Rulesets.Edit.Checks
 {
-    public class CheckInconsistentMetadata : IGeneralCheck
+    public class CheckInconsistentMetadata : ICheck
     {
-        public CheckMetadata Metadata => new CheckMetadata(CheckCategory.Metadata, "Inconsistent metadata");
+        public CheckMetadata Metadata => new CheckMetadata(CheckCategory.Metadata, "Inconsistent metadata", CheckScope.Beatmapset);
 
         public IEnumerable<IssueTemplate> PossibleTemplates => new IssueTemplate[]
         {

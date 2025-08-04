@@ -8,7 +8,7 @@ using osu.Game.Rulesets.Edit.Checks.Components;
 
 namespace osu.Game.Rulesets.Edit.Checks
 {
-    public class CheckBackgroundQuality : IGeneralCheck
+    public class CheckBackgroundQuality : ICheck
     {
         // These are the requirements as stated in the Ranking Criteria.
         // See https://osu.ppy.sh/wiki/en/Ranking_Criteria#rules.5
@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Edit.Checks
         private const int low_width = 960;
         private const int low_height = 540;
 
-        public CheckMetadata Metadata { get; } = new CheckMetadata(CheckCategory.Resources, "Too high or low background resolution");
+        public CheckMetadata Metadata { get; } = new CheckMetadata(CheckCategory.Resources, "Too high or low background resolution", CheckScope.Beatmapset);
 
         public IEnumerable<IssueTemplate> PossibleTemplates => new IssueTemplate[]
         {

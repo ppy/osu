@@ -15,7 +15,7 @@ namespace osu.Game.Screens.Edit.Verify
         [BackgroundDependencyLoader]
         private void load(VerifyScreen verify)
         {
-            Flow.Add(new SettingsEnumDropdown<VerifyChecksScope>
+            Flow.Add(new SettingsEnumDropdown<CheckScope>
             {
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.CentreLeft,
