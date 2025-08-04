@@ -78,13 +78,15 @@ namespace osu.Game.Screens.SelectV2
                                         Origin = Anchor.CentreRight,
                                         Text = UserInterfaceStrings.SelectedMods,
                                         Height = 30f,
+                                        // Eyeballed to make spacing match. Because shear is silly and implemented in different ways between dropdown and button.
+                                        Margin = new MarginPadding { Left = -9.2f },
                                     },
                                     sortDropdown = new ShearedDropdown<LeaderboardSortMode>(BeatmapLeaderboardWedgeStrings.Sort)
                                     {
                                         Anchor = Anchor.TopRight,
                                         Origin = Anchor.TopRight,
                                         RelativeSizeAxes = Axes.X,
-                                        Width = 0,
+                                        Width = 0.4f,
                                         Items = Enum.GetValues<LeaderboardSortMode>(),
                                     },
                                     scopeDropdown = new ScopeDropdown
@@ -113,9 +115,6 @@ namespace osu.Game.Screens.SelectV2
                 scopeDropdown.Current.Value = tryMapDetailTabToLeaderboardScope(configDetailTab.Value) ?? scopeDropdown.Current.Value;
                 scopeDropdown.Current.BindValueChanged(_ => updateConfigDetailTab());
 
-                sortDropdown.Current.Value = configLeaderboardSortMode.Value;
-                sortDropdown.Current.BindValueChanged(v => configLeaderboardSortMode.Value = v.NewValue);
-
                 tabControl.Current.Value = configDetailTab.Value == BeatmapDetailTab.Details ? Selection.Details : Selection.Ranking;
                 tabControl.Current.BindValueChanged(v =>
                 {
@@ -123,11 +122,20 @@ namespace osu.Game.Screens.SelectV2
                     updateConfigDetailTab();
                 }, true);
 
-                scopeDropdown.Current.BindValueChanged(v =>
+                scopeDropdown.Current.BindValueChanged(scope =>
                 {
-                    bool isLocal = v.NewValue == BeatmapLeaderboardScope.Local;
-                    sortDropdown.ResizeWidthTo(isLocal ? 0.4f : 0, 300, Easing.OutQuint);
-                    sortDropdown.FadeTo(isLocal ? 1 : 0, 300, Easing.OutQuint);
+                    if (scope.NewValue == BeatmapLeaderboardScope.Local)
+                    {
+                        sortDropdown.Current.Disabled = false;
+                        sortDropdown.Current.BindTo(configLeaderboardSortMode);
+                    }
+                    else
+                    {
+                        // future implementation when we have web-side support.
+                        sortDropdown.Current.UnbindFrom(configLeaderboardSortMode);
+                        sortDropdown.Current.Value = LeaderboardSortMode.Score;
+                        sortDropdown.Current.Disabled = true;
+                    }
                 }, true);
             }
 
