@@ -20,6 +20,8 @@ namespace osu.Game.Screens.Ranking
     {
         private readonly IBindable<LeaderboardScores?> globalScores = new Bindable<LeaderboardScores?>();
 
+        private TaskCompletionSource<LeaderboardScores>? requestTaskSource;
+
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
 
@@ -37,6 +39,14 @@ namespace osu.Game.Screens.Ranking
             globalScores.BindTo(leaderboardManager.Scores);
         }
 
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (requestTaskSource?.Task.IsCompleted == false)
+                requestTaskSource.SetCanceled();
+        }
+
         protected override async Task<ScoreInfo[]> FetchScores()
         {
             Debug.Assert(Score != null);
@@ -48,7 +58,11 @@ namespace osu.Game.Screens.Ranking
                 leaderboardManager.CurrentCriteria?.Scope ?? BeatmapLeaderboardScope.Global,
                 leaderboardManager.CurrentCriteria?.ExactMods
             );
-            var requestTaskSource = new TaskCompletionSource<LeaderboardScores>();
+
+            Debug.Assert(requestTaskSource == null || requestTaskSource.Task.IsCompleted);
+
+            requestTaskSource = new TaskCompletionSource<LeaderboardScores>();
+
             globalScores.BindValueChanged(_ =>
             {
                 if (globalScores.Value != null && leaderboardManager.CurrentCriteria?.Equals(criteria) == true)
