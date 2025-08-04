@@ -43,6 +43,9 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
         private APIBeatmapSet? currentOnlineSet;
 
+        [Cached]
+        private RealmPopulatingOnlineLookupSource lookupSource = new RealmPopulatingOnlineLookupSource();
+
         [BackgroundDependencyLoader]
         private void load(RulesetStore rulesets)
         {
@@ -55,6 +58,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             AddRange(new Drawable[]
             {
+                lookupSource,
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,
