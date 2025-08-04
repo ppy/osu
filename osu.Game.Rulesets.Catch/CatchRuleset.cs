@@ -292,7 +292,7 @@ namespace osu.Game.Rulesets.Catch
                 Description = "Affects the size of fruits.",
                 AdditionalMetrics =
                 [
-                    new RulesetBeatmapAttribute.AdditionalMetric("Hit circle radius", (CatchHitObject.OBJECT_RADIUS * LegacyRulesetExtensions.CalculateScaleFromCircleSize(effectiveDifficulty.CircleSize)).ToLocalisableString("0.##"))
+                    new RulesetBeatmapAttribute.AdditionalMetric("Hit circle radius", (CatchHitObject.OBJECT_RADIUS * LegacyRulesetExtensions.CalculateScaleFromCircleSize(effectiveDifficulty.CircleSize)).ToLocalisableString("0.#"))
                 ]
             };
             yield return new RulesetBeatmapAttribute(SongSelectStrings.ApproachRate, @"AR", originalDifficulty.ApproachRate, effectiveDifficulty.ApproachRate, 10)
@@ -300,7 +300,7 @@ namespace osu.Game.Rulesets.Catch
                 Description = "Affects how early fruits fade in on the screen.",
                 AdditionalMetrics =
                 [
-                    new RulesetBeatmapAttribute.AdditionalMetric("Fade-in time", LocalisableString.Interpolate($@"{IBeatmapDifficultyInfo.DifficultyRange(effectiveDifficulty.ApproachRate, CatchHitObject.PREEMPT_RANGE):#,0.##}ms"))
+                    new RulesetBeatmapAttribute.AdditionalMetric("Fade-in time", LocalisableString.Interpolate($@"{IBeatmapDifficultyInfo.DifficultyRange(effectiveDifficulty.ApproachRate, CatchHitObject.PREEMPT_RANGE):#,0.##} ms"))
                 ]
             };
             yield return new RulesetBeatmapAttribute(SongSelectStrings.HPDrain, @"HP", originalDifficulty.DrainRate, effectiveDifficulty.DrainRate, 10)
