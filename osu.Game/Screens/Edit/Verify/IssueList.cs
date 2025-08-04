@@ -102,26 +102,10 @@ namespace osu.Game.Screens.Edit.Verify
 
         public void Refresh()
         {
-            IEnumerable<Issue> issues;
+            var issues = generalVerifier.Run(context);
 
-            switch (verify.VerifyChecksScope.Value)
-            {
-                case CheckScope.Beatmapset:
-                    issues = filterByScope(generalVerifier.Run(context), true);
-                    break;
-
-                case CheckScope.Difficulty:
-                    var generalIssues = filterByScope(generalVerifier.Run(context), false);
-                    var rulesetIssues = rulesetVerifier?.Run(context) ?? Enumerable.Empty<Issue>();
-                    issues = generalIssues.Concat(rulesetIssues);
-                    break;
-
-                default:
-                    var allGeneralIssues = generalVerifier.Run(context);
-                    var allRulesetIssues = rulesetVerifier?.Run(context) ?? Enumerable.Empty<Issue>();
-                    issues = allGeneralIssues.Concat(allRulesetIssues);
-                    break;
-            }
+            if (rulesetVerifier != null)
+                issues = issues.Concat(rulesetVerifier.Run(context));
 
             issues = filter(issues);
 
@@ -133,13 +117,9 @@ namespace osu.Game.Screens.Edit.Verify
 
         private IEnumerable<Issue> filter(IEnumerable<Issue> issues)
         {
-            return issues.Where(issue => !verify.HiddenIssueTypes.Contains(issue.Template.Type));
-        }
-
-        private IEnumerable<Issue> filterByScope(IEnumerable<Issue> issues, bool generalOnly)
-        {
             return issues.Where(issue =>
-                generalOnly ? issue.Check.Metadata.Scope == CheckScope.Beatmapset : issue.Check.Metadata.Scope == CheckScope.Difficulty);
+                !verify.HiddenIssueTypes.Contains(issue.Template.Type) &&
+                issue.Check.Metadata.Scope == verify.VerifyChecksScope.Value);
         }
     }
 }
