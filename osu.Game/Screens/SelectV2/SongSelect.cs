@@ -849,7 +849,7 @@ namespace osu.Game.Screens.SelectV2
             // For simplicity, disable this functionality on mobile.
             bool isTouchInput = e.CurrentState.Mouse.LastSource is ISourcedFromTouch;
 
-            if (e.Button == MouseButton.Left && !isTouchInput && mouseDownPriority)
+            if (e.PressedButtons.SequenceEqual([MouseButton.Left]) && !isTouchInput && mouseDownPriority)
             {
                 revealingBackground = Scheduler.AddDelayed(() =>
                 {
