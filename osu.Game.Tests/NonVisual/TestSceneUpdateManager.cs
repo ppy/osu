@@ -48,6 +48,13 @@ namespace osu.Game.Tests.NonVisual
             AddUntilStep("no check pending", () => !manager.IsPending);
         }
 
+        [TearDownSteps]
+        public void TeardownSteps()
+        {
+            // Importantly, this immediately saves the config, which cancels any pending background save.
+            AddStep("dispose config manager", () => config.Dispose());
+        }
+
         /// <summary>
         /// Updates should be checked when the release stream is changed.
         /// </summary>
