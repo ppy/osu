@@ -13,6 +13,7 @@ using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
@@ -53,10 +54,17 @@ namespace osu.Game.Tests.Visual.Multiplayer
             Dependencies.Cache(new RealmRulesetStore(Realm));
             Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, Realm, null, audio, Resources, host, Beatmap.Default));
             Dependencies.Cache(Realm);
+            Dependencies.CacheAs<BeatmapStore>(new RealmDetachedBeatmapStore());
 
             beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
 
             importedSet = beatmaps.GetAllUsableBeatmapSets().First();
+
+            Realm.Write(r =>
+            {
+                foreach (var beatmapInfo in r.All<BeatmapInfo>())
+                    beatmapInfo.OnlineMD5Hash = beatmapInfo.MD5Hash;
+            });
         }
 
         public override void SetUpSteps()

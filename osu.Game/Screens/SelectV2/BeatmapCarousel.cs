@@ -18,6 +18,7 @@ using osu.Framework.Graphics.Pooling;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Collections;
 using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Graphics;
@@ -98,17 +99,18 @@ namespace osu.Game.Screens.SelectV2
             {
                 matching = new BeatmapCarouselFilterMatching(() => Criteria!),
                 new BeatmapCarouselFilterSorting(() => Criteria!),
-                grouping = new BeatmapCarouselFilterGrouping(() => Criteria!),
+                grouping = new BeatmapCarouselFilterGrouping(() => Criteria!, () => detachedCollections())
             };
 
             AddInternal(loading = new LoadingLayer());
         }
 
         [BackgroundDependencyLoader]
-        private void load(BeatmapStore beatmapStore, AudioManager audio, OsuConfigManager config, CancellationToken? cancellationToken)
+        private void load(BeatmapStore beatmapStore, RealmAccess realm, AudioManager audio, OsuConfigManager config, CancellationToken? cancellationToken)
         {
             setupPools();
             detachedBeatmaps = beatmapStore.GetBeatmapSets(cancellationToken);
+            detachedCollections = () => realm.Run(r => r.All<BeatmapCollection>().AsEnumerable().Detach());
             loadSamples(audio);
 
             config.BindWith(OsuSetting.RandomSelectAlgorithm, randomAlgorithm);
@@ -143,10 +145,77 @@ namespace osu.Game.Screens.SelectV2
                     break;
 
                 case NotifyCollectionChangedAction.Remove:
+                    bool selectedSetDeleted = false;
+
                     foreach (var set in oldItems!)
                     {
                         foreach (var beatmap in set.Beatmaps)
+                        {
                             Items.RemoveAll(i => i is BeatmapInfo bi && beatmap.Equals(bi));
+                            selectedSetDeleted |= CheckModelEquality(CurrentSelection, beatmap);
+                        }
+                    }
+
+                    // After removing all items in this batch, we want to make an immediate reselection
+                    // based on adjacency to the previous selection if it was deleted.
+                    //
+                    // This needs to be done immediately to avoid song select making a random selection.
+                    // This needs to be done in this class because we need to know final display order.
+                    // This needs to be done with attention to detail of which beatmaps have not been deleted.
+                    if (selectedSetDeleted && CurrentSelectionIndex != null)
+                    {
+                        var items = GetCarouselItems()!;
+                        if (items.Count == 0)
+                            break;
+
+                        bool success = false;
+
+                        // Try selecting forwards first
+                        for (int i = CurrentSelectionIndex.Value + 1; i < items.Count; i++)
+                        {
+                            if (attemptSelection(items[i]))
+                            {
+                                success = true;
+                                break;
+                            }
+                        }
+
+                        if (success)
+                            break;
+
+                        // Then try backwards (we might be at the end of available items).
+                        for (int i = Math.Min(items.Count - 1, CurrentSelectionIndex.Value); i >= 0; i--)
+                        {
+                            if (attemptSelection(items[i]))
+                                break;
+                        }
+
+                        bool attemptSelection(CarouselItem item)
+                        {
+                            if (CheckValidForSetSelection(item))
+                            {
+                                if (item.Model is BeatmapInfo beatmapInfo)
+                                {
+                                    // check the new selection wasn't deleted above
+                                    if (!Items.Contains(beatmapInfo))
+                                        return false;
+
+                                    RequestSelection(beatmapInfo);
+                                    return true;
+                                }
+
+                                if (item.Model is BeatmapSetInfo beatmapSetInfo)
+                                {
+                                    if (oldItems.Contains(beatmapSetInfo))
+                                        return false;
+
+                                    RequestRecommendedSelection(beatmapSetInfo.Beatmaps);
+                                    return true;
+                                }
+                            }
+
+                            return false;
+                        }
                     }
 
                     break;
@@ -451,8 +520,7 @@ namespace osu.Game.Screens.SelectV2
 
         private Sample? sampleChangeDifficulty;
         private Sample? sampleChangeSet;
-        private Sample? sampleOpen;
-        private Sample? sampleClose;
+        private Sample? sampleToggleGroup;
 
         private double audioFeedbackLastPlaybackTime;
 
@@ -460,8 +528,7 @@ namespace osu.Game.Screens.SelectV2
         {
             sampleChangeDifficulty = audio.Samples.Get(@"SongSelect/select-difficulty");
             sampleChangeSet = audio.Samples.Get(@"SongSelect/select-expand");
-            sampleOpen = audio.Samples.Get(@"UI/menu-open");
-            sampleClose = audio.Samples.Get(@"UI/menu-close");
+            sampleToggleGroup = audio.Samples.Get(@"SongSelect/select-group");
 
             spinSample = audio.Samples.Get("SongSelect/random-spin");
             randomSelectSample = audio.Samples.Get(@"SongSelect/select-random");
@@ -474,10 +541,7 @@ namespace osu.Game.Screens.SelectV2
                 switch (item.Model)
                 {
                     case GroupDefinition:
-                        if (item.IsExpanded)
-                            sampleOpen?.Play();
-                        else
-                            sampleClose?.Play();
+                        sampleToggleGroup?.Play();
                         return;
 
                     case BeatmapSetInfo:
@@ -634,6 +698,8 @@ namespace osu.Game.Screens.SelectV2
         private Sample? spinSample;
         private Sample? randomSelectSample;
 
+        private Func<List<BeatmapCollection>> detachedCollections = null!;
+
         public bool NextRandom()
         {
             var carouselItems = GetCarouselItems();
@@ -667,10 +733,12 @@ namespace osu.Game.Screens.SelectV2
                 return false;
             }
 
-            Scheduler.Add(() =>
+            // CurrentSelectionItem won't be valid until UpdateAfterChildren.
+            // We probably want to fix this at some point since a few places are working-around this quirk.
+            ScheduleAfterChildren(() =>
             {
                 if (selectionBefore != null && CurrentSelectionItem != null)
-                    playSpinSample(distanceBetween(selectionBefore, CurrentSelectionItem), carouselItems.Count);
+                    playSpinSample(visiblePanelCountBetweenItems(selectionBefore, CurrentSelectionItem));
             });
 
             return true;
@@ -769,12 +837,12 @@ namespace osu.Game.Screens.SelectV2
             return true;
         }
 
-        public void PreviousRandom()
+        public bool PreviousRandom()
         {
             var carouselItems = GetCarouselItems();
 
             if (carouselItems?.Any() != true)
-                return;
+                return false;
 
             while (randomHistory.Any())
             {
@@ -784,7 +852,7 @@ namespace osu.Game.Screens.SelectV2
                 var previousBeatmapItem = carouselItems.FirstOrDefault(i => i.Model is BeatmapInfo b && b.Equals(previousBeatmap));
 
                 if (previousBeatmapItem == null)
-                    return;
+                    return false;
 
                 if (CurrentSelection is BeatmapInfo beatmapInfo)
                 {
@@ -792,25 +860,27 @@ namespace osu.Game.Screens.SelectV2
                         previouslyVisitedRandomBeatmaps.Remove(beatmapInfo);
 
                     if (CurrentSelectionItem == null)
-                        playSpinSample(0, carouselItems.Count);
+                        playSpinSample(0);
                     else
-                        playSpinSample(distanceBetween(previousBeatmapItem, CurrentSelectionItem), carouselItems.Count);
+                        playSpinSample(visiblePanelCountBetweenItems(previousBeatmapItem, CurrentSelectionItem));
                 }
 
                 RequestSelection(previousBeatmap);
-                break;
+                return true;
             }
+
+            return false;
         }
 
-        private double distanceBetween(CarouselItem item1, CarouselItem item2) => Math.Ceiling(Math.Abs(item1.CarouselYPosition - item2.CarouselYPosition) / PanelBeatmapSet.HEIGHT);
+        private double visiblePanelCountBetweenItems(CarouselItem item1, CarouselItem item2) => Math.Ceiling(Math.Abs(item1.CarouselYPosition - item2.CarouselYPosition) / PanelBeatmapSet.HEIGHT);
 
-        private void playSpinSample(double distance, int count)
+        private void playSpinSample(double distance)
         {
             var chan = spinSample?.GetChannel();
 
             if (chan != null)
             {
-                chan.Frequency.Value = 1f + Math.Min(1f, distance / count);
+                chan.Frequency.Value = 1f + Math.Clamp(distance / 200, 0, 1);
                 chan.Play();
             }
 
@@ -823,9 +893,31 @@ namespace osu.Game.Screens.SelectV2
     /// <summary>
     /// Defines a grouping header for a set of carousel items.
     /// </summary>
-    /// <param name="Order">The order of this group in the carousel, sorted using ascending order.</param>
-    /// <param name="Title">The title of this group.</param>
-    public record GroupDefinition(int Order, string Title);
+    public record GroupDefinition
+    {
+        /// <summary>
+        /// The order of this group in the carousel, sorted using ascending order.
+        /// </summary>
+        public int Order { get; }
+
+        /// <summary>
+        /// The title of this group.
+        /// </summary>
+        public string Title { get; }
+
+        private readonly string uncasedTitle;
+
+        public GroupDefinition(int order, string title)
+        {
+            Order = order;
+            Title = title;
+            uncasedTitle = title.ToLowerInvariant();
+        }
+
+        public virtual bool Equals(GroupDefinition? other) => uncasedTitle == other?.uncasedTitle;
+
+        public override int GetHashCode() => HashCode.Combine(uncasedTitle);
+    }
 
     /// <summary>
     /// Defines a grouping header for a set of carousel items grouped by star difficulty.

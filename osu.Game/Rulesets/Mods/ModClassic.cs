@@ -31,6 +31,6 @@ namespace osu.Game.Rulesets.Mods
         /// </summary>
         public sealed override bool Ranked => false;
 
-        public sealed override bool ValidForFreestyleAsRequiredMod => true;
+        public sealed override bool ValidForFreestyleAsRequiredMod => false;
     }
 }

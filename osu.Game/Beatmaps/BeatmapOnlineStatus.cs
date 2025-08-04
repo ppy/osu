@@ -18,6 +18,7 @@ namespace osu.Game.Beatmaps
         [Description("Local")]
         LocallyModified = -4,
 
+        [LocalisableDescription(typeof(SongSelectStrings), nameof(SongSelectStrings.StatusUnknown))]
         [Description("Unknown")]
         None = -3,
 

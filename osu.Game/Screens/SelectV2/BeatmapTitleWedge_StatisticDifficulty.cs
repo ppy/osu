@@ -13,6 +13,7 @@ using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
+using osu.Game.Rulesets.Difficulty;
 using osuTK;
 using osuTK.Graphics;
 
@@ -98,10 +99,11 @@ namespace osu.Game.Screens.SelectV2
                                 },
                             },
                         },
-                        labelText = new OsuSpriteText
+                        labelText = new TruncatingSpriteText
                         {
                             Margin = new MarginPadding { Top = 2f },
                             Font = OsuFont.Style.Caption1.With(weight: FontWeight.SemiBold),
+                            MaxWidth = 85,
                         },
                         new FillFlowContainer
                         {
@@ -190,7 +192,13 @@ namespace osu.Game.Screens.SelectV2
                 }
             }
 
-            public record Data(LocalisableString Label, float Value, float AdjustedValue, float Maximum, string? Content = null);
+            public record Data(LocalisableString Label, float Value, float AdjustedValue, float Maximum, string? Content = null)
+            {
+                public Data(RulesetBeatmapAttribute attribute)
+                    : this(attribute.Label, attribute.OriginalValue, attribute.AdjustedValue, attribute.MaxValue)
+                {
+                }
+            }
         }
     }
 }

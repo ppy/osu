@@ -33,11 +33,13 @@ using osu.Game.Screens.Ranking.Statistics;
 using osu.Game.Skinning;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Configuration;
+using osu.Game.Localisation;
 using osu.Game.Rulesets.Scoring.Legacy;
 using osu.Game.Rulesets.Taiko.Configuration;
 using osu.Game.Rulesets.Taiko.Edit.Setup;
 using osu.Game.Rulesets.Taiko.Skinning.Default;
 using osu.Game.Screens.Edit.Setup;
+using osu.Game.Utils;
 
 namespace osu.Game.Rulesets.Taiko
 {
@@ -270,16 +272,26 @@ namespace osu.Game.Rulesets.Taiko
         }
 
         /// <seealso cref="TaikoHitWindows"/>
-        public override BeatmapDifficulty GetRateAdjustedDisplayDifficulty(IBeatmapDifficultyInfo difficulty, double rate)
+        public override BeatmapDifficulty GetAdjustedDisplayDifficulty(IBeatmapInfo beatmapInfo, IReadOnlyCollection<Mod> mods)
         {
-            BeatmapDifficulty adjustedDifficulty = new BeatmapDifficulty(difficulty);
+            BeatmapDifficulty adjustedDifficulty = base.GetAdjustedDisplayDifficulty(beatmapInfo, mods);
+            double rate = ModUtils.CalculateRateWithMods(mods);
 
-            var greatHitWindowRange = TaikoHitWindows.TAIKO_RANGES.Single(range => range.Result == HitResult.Great);
-            double greatHitWindow = IBeatmapDifficultyInfo.DifficultyRange(adjustedDifficulty.OverallDifficulty, greatHitWindowRange.Min, greatHitWindowRange.Average, greatHitWindowRange.Max);
+            double greatHitWindow = IBeatmapDifficultyInfo.DifficultyRange(adjustedDifficulty.OverallDifficulty, TaikoHitWindows.GREAT_WINDOW_RANGE);
             greatHitWindow /= rate;
-            adjustedDifficulty.OverallDifficulty = (float)IBeatmapDifficultyInfo.InverseDifficultyRange(greatHitWindow, greatHitWindowRange.Min, greatHitWindowRange.Average, greatHitWindowRange.Max);
+            adjustedDifficulty.OverallDifficulty = (float)IBeatmapDifficultyInfo.InverseDifficultyRange(greatHitWindow, TaikoHitWindows.GREAT_WINDOW_RANGE);
 
             return adjustedDifficulty;
+        }
+
+        public override IEnumerable<RulesetBeatmapAttribute> GetBeatmapAttributesForDisplay(IBeatmapInfo beatmapInfo, IReadOnlyCollection<Mod> mods)
+        {
+            var originalDifficulty = beatmapInfo.Difficulty;
+            var adjustedDifficulty = GetAdjustedDisplayDifficulty(beatmapInfo, mods);
+
+            yield return new RulesetBeatmapAttribute(SongSelectStrings.Accuracy, @"OD", originalDifficulty.OverallDifficulty, adjustedDifficulty.OverallDifficulty, 10);
+            yield return new RulesetBeatmapAttribute(SongSelectStrings.HPDrain, @"HP", originalDifficulty.DrainRate, adjustedDifficulty.DrainRate, 10);
+            yield return new RulesetBeatmapAttribute(SongSelectStrings.ScrollSpeed, @"SS", 1f, (float)(adjustedDifficulty.SliderMultiplier / originalDifficulty.SliderMultiplier), 4);
         }
     }
 }

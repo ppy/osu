@@ -32,11 +32,6 @@ namespace osu.Game.Overlays.Mods
         private StarRatingDisplay starRatingDisplay = null!;
         private BPMDisplay bpmDisplay = null!;
 
-        private VerticalAttributeDisplay circleSizeDisplay = null!;
-        private VerticalAttributeDisplay drainRateDisplay = null!;
-        private VerticalAttributeDisplay approachRateDisplay = null!;
-        private VerticalAttributeDisplay overallDifficultyDisplay = null!;
-
         public Bindable<IBeatmapInfo?> BeatmapInfo { get; } = new Bindable<IBeatmapInfo?>();
 
         public Bindable<IReadOnlyList<Mod>> Mods { get; } = new Bindable<IReadOnlyList<Mod>>();
@@ -84,13 +79,6 @@ namespace osu.Game.Overlays.Mods
             });
 
             RightContent.Alpha = 0;
-            RightContent.AddRange(new Drawable[]
-            {
-                circleSizeDisplay = new VerticalAttributeDisplay("CS") { Shear = -OsuGame.SHEAR, },
-                approachRateDisplay = new VerticalAttributeDisplay("AR") { Shear = -OsuGame.SHEAR, },
-                overallDifficultyDisplay = new VerticalAttributeDisplay("OD") { Shear = -OsuGame.SHEAR, },
-                drainRateDisplay = new VerticalAttributeDisplay("HP") { Shear = -OsuGame.SHEAR, },
-            });
         }
 
         protected override void LoadComplete()
@@ -173,26 +161,30 @@ namespace osu.Game.Overlays.Mods
 
             bpmDisplay.Current.Value = FormatUtils.RoundBPM(BeatmapInfo.Value.BPM, rate);
 
-            BeatmapDifficulty originalDifficulty = new BeatmapDifficulty(BeatmapInfo.Value.Difficulty);
-            BeatmapDifficulty adjustedDifficulty = new BeatmapDifficulty(originalDifficulty);
-
-            foreach (var mod in Mods.Value.OfType<IApplicableToDifficulty>())
-                mod.ApplyToDifficulty(adjustedDifficulty);
-
             Ruleset ruleset = GameRuleset.Value.CreateInstance();
-            adjustedDifficulty = ruleset.GetRateAdjustedDisplayDifficulty(adjustedDifficulty, rate);
+            var displayAttributes = ruleset.GetBeatmapAttributesForDisplay(BeatmapInfo.Value, Mods.Value).ToList();
 
-            TooltipContent = new AdjustedAttributesTooltip.Data(originalDifficulty, adjustedDifficulty);
+            TooltipContent = new AdjustedAttributesTooltip.Data(displayAttributes);
 
-            circleSizeDisplay.AdjustType.Value = VerticalAttributeDisplay.CalculateEffect(originalDifficulty.CircleSize, adjustedDifficulty.CircleSize);
-            drainRateDisplay.AdjustType.Value = VerticalAttributeDisplay.CalculateEffect(originalDifficulty.DrainRate, adjustedDifficulty.DrainRate);
-            approachRateDisplay.AdjustType.Value = VerticalAttributeDisplay.CalculateEffect(originalDifficulty.ApproachRate, adjustedDifficulty.ApproachRate);
-            overallDifficultyDisplay.AdjustType.Value = VerticalAttributeDisplay.CalculateEffect(originalDifficulty.OverallDifficulty, adjustedDifficulty.OverallDifficulty);
+            // if there are not enough attribute displays, make more
+            for (int i = RightContent.Count; i < displayAttributes.Count; i++)
+                RightContent.Add(new VerticalAttributeDisplay { Shear = -OsuGame.SHEAR });
 
-            circleSizeDisplay.Current.Value = adjustedDifficulty.CircleSize;
-            drainRateDisplay.Current.Value = adjustedDifficulty.DrainRate;
-            approachRateDisplay.Current.Value = adjustedDifficulty.ApproachRate;
-            overallDifficultyDisplay.Current.Value = adjustedDifficulty.OverallDifficulty;
+            // populate all attribute displays that need to be visible...
+            for (int i = 0; i < displayAttributes.Count; i++)
+            {
+                var attribute = displayAttributes[i];
+                var display = (VerticalAttributeDisplay)RightContent[i];
+
+                display.Label = attribute.Acronym;
+                display.Current.Value = attribute.AdjustedValue;
+                display.AdjustType.Value = VerticalAttributeDisplay.CalculateEffect(attribute.OriginalValue, attribute.AdjustedValue);
+                display.Alpha = 1;
+            }
+
+            // and hide any extra ones
+            for (int i = displayAttributes.Count; i < RightContent.Count; i++)
+                RightContent[i].Alpha = 0;
         });
 
         private void updateCollapsedState()

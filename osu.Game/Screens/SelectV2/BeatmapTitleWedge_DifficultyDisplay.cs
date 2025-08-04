@@ -24,10 +24,8 @@ using osu.Game.Online;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
-using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Utils;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.SelectV2
@@ -243,7 +241,7 @@ namespace osu.Game.Screens.SelectV2
                 if (beatmap.IsDefault)
                 {
                     ratingAndNameContainer.FadeOut(300, Easing.OutQuint);
-                    countStatisticsDisplay.Statistics = Array.Empty<StatisticDifficulty.Data>();
+                    countStatisticsDisplay.FadeOut(300, Easing.OutQuint);
                 }
                 else
                 {
@@ -263,7 +261,7 @@ namespace osu.Game.Screens.SelectV2
             {
                 if (beatmap.IsDefault)
                 {
-                    countStatisticsDisplay.Statistics = Array.Empty<StatisticDifficulty.Data>();
+                    countStatisticsDisplay.FadeOut(300, Easing.OutQuint);
                     return;
                 }
 
@@ -281,6 +279,7 @@ namespace osu.Game.Screens.SelectV2
                         if (cancellationToken.IsCancellationRequested)
                             return;
 
+                        countStatisticsDisplay.FadeIn(200, Easing.OutQuint);
                         countStatisticsDisplay.Statistics = statistics;
                     });
                 }, cancellationToken);
@@ -295,48 +294,11 @@ namespace osu.Game.Screens.SelectV2
                     return;
                 }
 
-                BeatmapDifficulty originalDifficulty = beatmap.Value.BeatmapInfo.Difficulty;
-                BeatmapDifficulty adjustedDifficulty = new BeatmapDifficulty(originalDifficulty);
-
-                foreach (var mod in mods.Value.OfType<IApplicableToDifficulty>())
-                    mod.ApplyToDifficulty(adjustedDifficulty);
-
                 Ruleset rulesetInstance = ruleset.Value.CreateInstance();
 
-                double rate = ModUtils.CalculateRateWithMods(mods.Value);
-
-                adjustedDifficulty = rulesetInstance.GetRateAdjustedDisplayDifficulty(adjustedDifficulty, rate);
-                difficultyStatisticsDisplay.TooltipContent = new AdjustedAttributesTooltip.Data(originalDifficulty, adjustedDifficulty);
-
-                StatisticDifficulty.Data firstStatistic;
-
-                switch (ruleset.Value.OnlineID)
-                {
-                    case 3:
-                        // Account for mania differences locally for now.
-                        // Eventually this should be handled in a more modular way, allowing rulesets to return arbitrary difficulty attributes.
-                        ILegacyRuleset legacyRuleset = (ILegacyRuleset)rulesetInstance;
-
-                        // For the time being, the key count is static no matter what, because:
-                        // - The method doesn't have knowledge of the active keymods. Doing so may require considerations for filtering.
-                        // - Using the difficulty adjustment mod to adjust OD doesn't have an effect on conversion.
-                        int keyCount = legacyRuleset.GetKeyCount(beatmap.Value.BeatmapInfo, mods.Value);
-
-                        firstStatistic = new StatisticDifficulty.Data(BeatmapsetsStrings.ShowStatsCsMania, keyCount, keyCount, 10);
-                        break;
-
-                    default:
-                        firstStatistic = new StatisticDifficulty.Data(BeatmapsetsStrings.ShowStatsCs, originalDifficulty.CircleSize, adjustedDifficulty.CircleSize, 10);
-                        break;
-                }
-
-                difficultyStatisticsDisplay.Statistics = new[]
-                {
-                    firstStatistic,
-                    new StatisticDifficulty.Data(BeatmapsetsStrings.ShowStatsAr, originalDifficulty.ApproachRate, adjustedDifficulty.ApproachRate, 10),
-                    new StatisticDifficulty.Data(BeatmapsetsStrings.ShowStatsAccuracy, originalDifficulty.OverallDifficulty, adjustedDifficulty.OverallDifficulty, 10),
-                    new StatisticDifficulty.Data(BeatmapsetsStrings.ShowStatsDrain, originalDifficulty.DrainRate, adjustedDifficulty.DrainRate, 10),
-                };
+                var displayAttributes = rulesetInstance.GetBeatmapAttributesForDisplay(beatmap.Value.BeatmapInfo, mods.Value).ToList();
+                difficultyStatisticsDisplay.TooltipContent = new AdjustedAttributesTooltip.Data(displayAttributes);
+                difficultyStatisticsDisplay.Statistics = displayAttributes.Select(a => new StatisticDifficulty.Data(a)).ToList();
             });
 
             protected override void Update()

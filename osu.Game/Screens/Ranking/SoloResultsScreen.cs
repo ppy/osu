@@ -41,6 +41,7 @@ namespace osu.Game.Screens.Ranking
         {
             Debug.Assert(Score != null);
 
+            // sort mode intentionally omitted to default to score - results screen only supports sorting by score, so don't pass any other to avoid confusion
             var criteria = new LeaderboardCriteria(
                 Score.BeatmapInfo!,
                 Score.Ruleset,

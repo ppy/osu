@@ -90,7 +90,7 @@ namespace osu.Game
 
         public const int SAMPLE_CONCURRENCY = 6;
 
-        public const double SFX_STEREO_STRENGTH = 0.75;
+        public const double SFX_STEREO_STRENGTH = 0.6;
 
         /// <summary>
         /// Length of debounce (in milliseconds) for commonly occuring sample playbacks that could stack.
@@ -489,9 +489,10 @@ namespace osu.Game
             AddFont(Resources, @"Fonts/Inter/Inter-BoldItalic");
 
             AddFont(Resources, @"Fonts/Noto/Noto-Basic");
-            AddFont(Resources, @"Fonts/Noto/Noto-Hangul");
+            AddFont(Resources, @"Fonts/Noto/Noto-Bopomofo");
             AddFont(Resources, @"Fonts/Noto/Noto-CJK-Basic");
             AddFont(Resources, @"Fonts/Noto/Noto-CJK-Compatibility");
+            AddFont(Resources, @"Fonts/Noto/Noto-Hangul");
             AddFont(Resources, @"Fonts/Noto/Noto-Thai");
 
             AddFont(Resources, @"Fonts/Venera/Venera-Light");

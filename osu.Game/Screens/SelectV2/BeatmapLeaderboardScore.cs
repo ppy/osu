@@ -24,6 +24,7 @@ using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays;
@@ -45,6 +46,8 @@ namespace osu.Game.Screens.SelectV2
     public sealed partial class BeatmapLeaderboardScore : OsuClickableContainer, IHasContextMenu, IHasCustomTooltip<ScoreInfo>
     {
         public const int HEIGHT = 50;
+
+        public readonly ScoreInfo Score;
 
         public Bindable<IReadOnlyList<Mod>> SelectedMods = new Bindable<IReadOnlyList<Mod>>();
 
@@ -115,8 +118,6 @@ namespace osu.Game.Screens.SelectV2
         private Container rankLabelStandalone = null!;
         private Container rankLabelOverlay = null!;
 
-        private readonly ScoreInfo score;
-
         private readonly bool sheared;
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
@@ -130,7 +131,8 @@ namespace osu.Game.Screens.SelectV2
 
         public BeatmapLeaderboardScore(ScoreInfo score, bool sheared = true)
         {
-            this.score = score;
+            Score = score;
+
             this.sheared = sheared;
 
             Shear = sheared ? OsuGame.SHEAR : Vector2.Zero;
@@ -198,7 +200,7 @@ namespace osu.Game.Screens.SelectV2
                                 new UserCoverBackground
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    User = score.User,
+                                    User = Score.User,
                                     Shear = sheared ? -OsuGame.SHEAR : Vector2.Zero,
                                     Anchor = Anchor.BottomLeft,
                                     Origin = Anchor.BottomLeft,
@@ -224,7 +226,7 @@ namespace osu.Game.Screens.SelectV2
                                                 Masking = true,
                                                 Children = new Drawable[]
                                                 {
-                                                    new DelayedLoadWrapper(innerAvatar = new ClickableAvatar(score.User)
+                                                    new DelayedLoadWrapper(innerAvatar = new ClickableAvatar(Score.User)
                                                     {
                                                         Anchor = Anchor.Centre,
                                                         Origin = Anchor.Centre,
@@ -276,19 +278,19 @@ namespace osu.Game.Screens.SelectV2
                                                         Masking = true,
                                                         Children = new Drawable[]
                                                         {
-                                                            new UpdateableFlag(score.User.CountryCode)
+                                                            new UpdateableFlag(Score.User.CountryCode)
                                                             {
                                                                 Anchor = Anchor.CentreLeft,
                                                                 Origin = Anchor.CentreLeft,
                                                                 Size = new Vector2(20, 14),
                                                             },
-                                                            new UpdateableTeamFlag(score.User.Team)
+                                                            new UpdateableTeamFlag(Score.User.Team)
                                                             {
                                                                 Anchor = Anchor.CentreLeft,
                                                                 Origin = Anchor.CentreLeft,
                                                                 Size = new Vector2(30, 15),
                                                             },
-                                                            new DateLabel(score.Date)
+                                                            new DateLabel(Score.Date)
                                                             {
                                                                 Anchor = Anchor.CentreLeft,
                                                                 Origin = Anchor.CentreLeft,
@@ -301,7 +303,7 @@ namespace osu.Game.Screens.SelectV2
                                                     {
                                                         RelativeSizeAxes = Axes.X,
                                                         Shear = sheared ? -OsuGame.SHEAR : Vector2.Zero,
-                                                        Text = score.User.Username,
+                                                        Text = Score.User.Username,
                                                         Font = OsuFont.Style.Heading2,
                                                     }
                                                 }
@@ -323,9 +325,9 @@ namespace osu.Game.Screens.SelectV2
                                                     Direction = FillDirection.Horizontal,
                                                     Children = new Drawable[]
                                                     {
-                                                        new ScoreComponentLabel(BeatmapsetsStrings.ShowScoreboardHeadersCombo.ToUpper(), $"{score.MaxCombo.ToString()}x",
-                                                            score.MaxCombo == score.GetMaximumAchievableCombo(), 60),
-                                                        new ScoreComponentLabel(BeatmapsetsStrings.ShowScoreboardHeadersAccuracy.ToUpper(), score.DisplayAccuracy, score.Accuracy == 1,
+                                                        new ScoreComponentLabel(BeatmapsetsStrings.ShowScoreboardHeadersCombo.ToUpper(), $"{Score.MaxCombo.ToString()}x",
+                                                            Score.MaxCombo == Score.GetMaximumAchievableCombo(), 60),
+                                                        new ScoreComponentLabel(BeatmapsetsStrings.ShowScoreboardHeadersAccuracy.ToUpper(), Score.DisplayAccuracy, Score.Accuracy == 1,
                                                             55),
                                                     },
                                                     Alpha = 0,
@@ -357,7 +359,7 @@ namespace osu.Game.Screens.SelectV2
                                     Child = new Box
                                     {
                                         RelativeSizeAxes = Axes.Both,
-                                        Colour = ColourInfo.GradientHorizontal(backgroundColour.Opacity(0), OsuColour.ForRank(score.Rank)),
+                                        Colour = ColourInfo.GradientHorizontal(backgroundColour.Opacity(0), OsuColour.ForRank(Score.Rank)),
                                     },
                                 },
                                 new Box
@@ -366,7 +368,7 @@ namespace osu.Game.Screens.SelectV2
                                     Width = grade_width,
                                     Anchor = Anchor.TopRight,
                                     Origin = Anchor.TopRight,
-                                    Colour = OsuColour.ForRank(score.Rank),
+                                    Colour = OsuColour.ForRank(Score.Rank),
                                 },
                                 new TrianglesV2
                                 {
@@ -376,7 +378,7 @@ namespace osu.Game.Screens.SelectV2
                                     Origin = Anchor.TopRight,
                                     SpawnRatio = 2,
                                     Velocity = 0.7f,
-                                    Colour = ColourInfo.GradientHorizontal(backgroundColour.Opacity(0), OsuColour.ForRank(score.Rank).Darken(0.2f)),
+                                    Colour = ColourInfo.GradientHorizontal(backgroundColour.Opacity(0), OsuColour.ForRank(Score.Rank).Darken(0.2f)),
                                 },
                                 new Container
                                 {
@@ -390,9 +392,9 @@ namespace osu.Game.Screens.SelectV2
                                         Anchor = Anchor.Centre,
                                         Origin = Anchor.Centre,
                                         Spacing = new Vector2(-2),
-                                        Colour = DrawableRank.GetRankNameColour(score.Rank),
+                                        Colour = DrawableRank.GetRankNameColour(Score.Rank),
                                         Font = OsuFont.Numeric.With(size: 14),
-                                        Text = DrawableRank.GetRankName(score.Rank),
+                                        Text = DrawableRank.GetRankName(Score.Rank),
                                         ShadowColour = Color4.Black.Opacity(0.3f),
                                         ShadowOffset = new Vector2(0, 0.08f),
                                         Shadow = true,
@@ -420,7 +422,7 @@ namespace osu.Game.Screens.SelectV2
                                             new Box
                                             {
                                                 RelativeSizeAxes = Axes.Both,
-                                                Colour = ColourInfo.GradientHorizontal(backgroundColour.Opacity(0), OsuColour.ForRank(score.Rank).Opacity(0.5f)),
+                                                Colour = ColourInfo.GradientHorizontal(backgroundColour.Opacity(0), OsuColour.ForRank(Score.Rank).Opacity(0.5f)),
                                             },
                                             new FillFlowContainer
                                             {
@@ -437,7 +439,7 @@ namespace osu.Game.Screens.SelectV2
                                                         Anchor = Anchor.TopRight,
                                                         Origin = Anchor.TopRight,
                                                         UseFullGlyphHeight = false,
-                                                        Current = scoreManager.GetBindableTotalScoreString(score),
+                                                        Current = scoreManager.GetBindableTotalScoreString(Score),
                                                         Spacing = new Vector2(-1.5f),
                                                         Font = OsuFont.Style.Subtitle.With(weight: FontWeight.Light, fixedWidth: true),
                                                         Shear = sheared ? -OsuGame.SHEAR : Vector2.Zero,
@@ -503,10 +505,10 @@ namespace osu.Game.Screens.SelectV2
 
         private void updateModDisplay()
         {
-            if (score.Mods.Length > 0)
+            if (Score.Mods.Length > 0)
             {
                 modsContainer.Padding = new MarginPadding { Top = 4f };
-                modsContainer.ChildrenEnumerable = score.Mods.AsOrdered().Select(mod => new ModIcon(mod)
+                modsContainer.ChildrenEnumerable = Score.Mods.AsOrdered().Select(mod => new ModIcon(mod)
                 {
                     Scale = new Vector2(0.3f),
                     // trim mod icon height down to its true height for alignment purposes.
@@ -608,7 +610,7 @@ namespace osu.Game.Screens.SelectV2
 
         ITooltip<ScoreInfo> IHasCustomTooltip<ScoreInfo>.GetCustomTooltip() => new LeaderboardScoreTooltip(colourProvider);
 
-        ScoreInfo IHasCustomTooltip<ScoreInfo>.TooltipContent => score;
+        ScoreInfo IHasCustomTooltip<ScoreInfo>.TooltipContent => Score;
 
         MenuItem[] IHasContextMenu.ContextMenuItems
         {
@@ -617,18 +619,18 @@ namespace osu.Game.Screens.SelectV2
                 List<MenuItem> items = new List<MenuItem>();
 
                 // system mods should never be copied across regardless of anything.
-                var copyableMods = score.Mods.Where(m => IsValidMod.Invoke(m) && m.Type != ModType.System).ToArray();
+                var copyableMods = Score.Mods.Where(m => IsValidMod.Invoke(m) && m.Type != ModType.System).ToArray();
 
                 if (copyableMods.Length > 0)
-                    items.Add(new OsuMenuItem("Use these mods", MenuItemType.Highlighted, () => SelectedMods.Value = copyableMods));
+                    items.Add(new OsuMenuItem(SongSelectStrings.UseTheseMods, MenuItemType.Highlighted, () => SelectedMods.Value = copyableMods));
 
-                if (score.OnlineID > 0)
-                    items.Add(new OsuMenuItem(CommonStrings.CopyLink, MenuItemType.Standard, () => clipboard?.SetText($@"{api.Endpoints.WebsiteUrl}/scores/{score.OnlineID}")));
+                if (Score.OnlineID > 0)
+                    items.Add(new OsuMenuItem(CommonStrings.CopyLink, MenuItemType.Standard, () => clipboard?.SetText($@"{api.Endpoints.WebsiteUrl}/scores/{Score.OnlineID}")));
 
-                if (score.Files.Count <= 0) return items.ToArray();
+                if (Score.Files.Count <= 0) return items.ToArray();
 
-                items.Add(new OsuMenuItem(CommonStrings.Export, MenuItemType.Standard, () => scoreManager.Export(score)));
-                items.Add(new OsuMenuItem(Resources.Localisation.Web.CommonStrings.ButtonsDelete, MenuItemType.Destructive, () => dialogOverlay?.Push(new LocalScoreDeleteDialog(score))));
+                items.Add(new OsuMenuItem(CommonStrings.Export, MenuItemType.Standard, () => scoreManager.Export(Score)));
+                items.Add(new OsuMenuItem(Resources.Localisation.Web.CommonStrings.ButtonsDelete, MenuItemType.Destructive, () => dialogOverlay?.Push(new LocalScoreDeleteDialog(Score))));
 
                 return items.ToArray();
             }

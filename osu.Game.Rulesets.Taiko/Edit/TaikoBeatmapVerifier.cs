@@ -17,6 +17,9 @@ namespace osu.Game.Rulesets.Taiko.Edit
             // Compose
             new CheckConcurrentObjects(),
 
+            // Spread
+            new CheckTaikoLowestDiffDrainTime(),
+
             // Settings
             new CheckTaikoAbnormalDifficultySettings(),
         };

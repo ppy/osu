@@ -39,6 +39,7 @@ namespace osu.Game.Screens.Select
         public OptionalTextFilter Title;
         public OptionalTextFilter DifficultyName;
         public OptionalTextFilter Source;
+        public OptionalTextFilter UserTag;
 
         public OptionalRange<double> UserStarDifficulty = new OptionalRange<double>
         {

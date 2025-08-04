@@ -12,7 +12,9 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Game.Collections;
 using osu.Game.Configuration;
+using osu.Game.Database;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
@@ -49,6 +51,9 @@ namespace osu.Game.Screens.SelectV2
         [Resolved]
         private OsuConfigManager config { get; set; } = null!;
 
+        [Resolved]
+        private RealmAccess realm { get; set; } = null!;
+
         public LocalisableString StatusText
         {
             get => searchTextBox.StatusText;
@@ -58,6 +63,8 @@ namespace osu.Game.Screens.SelectV2
         public event Action<FilterCriteria>? CriteriaChanged;
 
         private FilterCriteria currentCriteria = null!;
+
+        private IDisposable? collectionsSubscription;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -151,14 +158,13 @@ namespace osu.Game.Screens.SelectV2
                             {
                                 new[]
                                 {
-                                    sortDropdown = new ShearedDropdown<SortMode>("Sort")
+                                    sortDropdown = new ShearedDropdown<SortMode>(SongSelectStrings.Sort)
                                     {
                                         RelativeSizeAxes = Axes.X,
                                         Items = Enum.GetValues<SortMode>(),
                                     },
                                     Empty(),
-                                    // todo: pending localisation
-                                    groupDropdown = new ShearedDropdown<GroupMode>("Group")
+                                    groupDropdown = new ShearedDropdown<GroupMode>(SongSelectStrings.Group)
                                     {
                                         RelativeSizeAxes = Axes.X,
                                         Items = Enum.GetValues<GroupMode>(),
@@ -209,8 +215,27 @@ namespace osu.Game.Screens.SelectV2
             showConvertedBeatmapsButton.Active.BindValueChanged(_ => updateCriteria());
             sortDropdown.Current.BindValueChanged(_ => updateCriteria());
             groupDropdown.Current.BindValueChanged(_ => updateCriteria());
-            collectionDropdown.Current.BindValueChanged(_ => updateCriteria());
+            collectionDropdown.Current.BindValueChanged(v =>
+            {
+                // The hope would be that this never arrives here, but due to bindings receiving changes before
+                // local ValueChanged events, that's not the case (see https://github.com/ppy/osu-framework/pull/1545).
+                if (v.NewValue is ManageCollectionsFilterMenuItem || v.OldValue is ManageCollectionsFilterMenuItem)
+                    return;
+
+                updateCriteria();
+            });
+            collectionsSubscription = realm.RegisterForNotifications(r => r.All<BeatmapCollection>(), (collections, changeSet) =>
+            {
+                if (changeSet != null && groupDropdown.Current.Value == GroupMode.Collections)
+                    updateCriteria();
+            });
             updateCriteria();
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            collectionsSubscription?.Dispose();
         }
 
         /// <summary>
@@ -269,7 +294,7 @@ namespace osu.Game.Screens.SelectV2
                 .FadeOut(SongSelect.ENTER_DURATION / 3, Easing.In);
         }
 
-        private partial class SongSelectSearchTextBox : ShearedFilterTextBox
+        internal partial class SongSelectSearchTextBox : ShearedFilterTextBox
         {
             protected override InnerSearchTextBox CreateInnerTextBox() => new InnerTextBox();
 

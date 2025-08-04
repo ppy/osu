@@ -21,6 +21,7 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Storyboards;
+using osu.Game.Tests;
 using osu.Game.Tests.Visual;
 using osuTK;
 
@@ -152,6 +153,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         }
 
         [Test]
+        [FlakyTest]
         public void TestSpinPerMinuteOnRewind()
         {
             double estimatedSpm = 0;
