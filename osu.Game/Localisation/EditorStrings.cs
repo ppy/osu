@@ -210,14 +210,14 @@ namespace osu.Game.Localisation
         public static LocalisableString OpenDiscussionPage => new TranslatableString(getKey(@"open_discussion_page"), @"Open beatmap discussion page");
 
         /// <summary>
-        /// "This difficulty"
+        /// "Difficulty"
         /// </summary>
-        public static LocalisableString ThisDifficulty => new TranslatableString(getKey(@"this_difficulty"), @"This difficulty");
+        public static LocalisableString Difficulty => new TranslatableString(getKey(@"this_difficulty"), @"Difficulty");
 
         /// <summary>
-        /// "General"
+        /// "Beatmapset"
         /// </summary>
-        public static LocalisableString General => new TranslatableString(getKey(@"general"), @"General");
+        public static LocalisableString Beatmapset => new TranslatableString(getKey(@"this_beatmapset"), @"Beatmapset");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
