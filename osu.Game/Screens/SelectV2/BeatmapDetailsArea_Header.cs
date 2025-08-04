@@ -78,13 +78,15 @@ namespace osu.Game.Screens.SelectV2
                                         Origin = Anchor.CentreRight,
                                         Text = UserInterfaceStrings.SelectedMods,
                                         Height = 30f,
+                                        // Eyeballed to make spacing match. Because shear is silly and implemented in different ways between dropdown and button.
+                                        Margin = new MarginPadding { Left = -9.2f },
                                     },
                                     sortDropdown = new ShearedDropdown<LeaderboardSortMode>(BeatmapLeaderboardWedgeStrings.Sort)
                                     {
                                         Anchor = Anchor.TopRight,
                                         Origin = Anchor.TopRight,
                                         RelativeSizeAxes = Axes.X,
-                                        Width = 0,
+                                        Width = 0.4f,
                                         Items = Enum.GetValues<LeaderboardSortMode>(),
                                     },
                                     scopeDropdown = new ScopeDropdown
@@ -126,8 +128,7 @@ namespace osu.Game.Screens.SelectV2
                 scopeDropdown.Current.BindValueChanged(v =>
                 {
                     bool isLocal = v.NewValue == BeatmapLeaderboardScope.Local;
-                    sortDropdown.ResizeWidthTo(isLocal ? 0.4f : 0, 300, Easing.OutQuint);
-                    sortDropdown.FadeTo(isLocal ? 1 : 0, 300, Easing.OutQuint);
+                    sortDropdown.Current.Disabled = !isLocal;
                 }, true);
             }
 
