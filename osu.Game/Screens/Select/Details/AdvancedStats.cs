@@ -21,6 +21,7 @@ using System.Linq;
 using osu.Game.Rulesets.Mods;
 using System.Threading;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using osu.Framework.Extensions;
 using osu.Framework.Localisation;
 using osu.Framework.Threading;
@@ -29,11 +30,12 @@ using osu.Game.Configuration;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
 using osu.Game.Overlays.Mods;
+using osu.Game.Rulesets.Difficulty;
 using osu.Game.Utils;
 
 namespace osu.Game.Screens.Select.Details
 {
-    public partial class AdvancedStats : Container, IHasCustomTooltip<AdjustedAttributesTooltip.Data>
+    public partial class AdvancedStats : Container
     {
         private readonly int columns;
 
@@ -42,9 +44,6 @@ namespace osu.Game.Screens.Select.Details
 
         protected FillFlowContainer Flow { get; private set; }
         private readonly StatisticRow starDifficulty;
-
-        public ITooltip<AdjustedAttributesTooltip.Data> GetCustomTooltip() => new AdjustedAttributesTooltip();
-        public AdjustedAttributesTooltip.Data TooltipContent { get; private set; }
 
         private IBeatmapInfo beatmapInfo;
 
@@ -160,7 +159,6 @@ namespace osu.Game.Screens.Select.Details
             if (BeatmapInfo != null && Ruleset.Value != null)
             {
                 var displayAttributes = Ruleset.Value.CreateInstance().GetBeatmapAttributesForDisplay(BeatmapInfo, Mods.Value).ToList();
-                TooltipContent = new AdjustedAttributesTooltip.Data(displayAttributes);
 
                 // if there are not enough attribute displays, make more
                 // the subtraction of 1 is to exclude the star rating row which is always present (and always last)
@@ -177,17 +175,13 @@ namespace osu.Game.Screens.Select.Details
                 for (int i = 0; i < displayAttributes.Count; i++)
                 {
                     var attribute = displayAttributes[i];
-                    var display = (StatisticRow)Flow.Where(r => r != starDifficulty).ElementAt(i);
-
-                    display.Title = attribute.Label;
-                    display.MaxValue = attribute.MaxValue;
-                    display.Value = (attribute.OriginalValue, attribute.AdjustedValue);
-                    display.Alpha = 1;
+                    var row = (StatisticRow)Flow.Where(r => r != starDifficulty).ElementAt(i);
+                    row.SetAttribute(attribute);
                 }
 
                 // and hide any extra ones
                 foreach (var row in Flow.Where(r => r != starDifficulty).Skip(displayAttributes.Count))
-                    row.Alpha = 0;
+                    ((StatisticRow)row).SetAttribute(null);
             }
 
             updateStarDifficulty();
@@ -233,7 +227,7 @@ namespace osu.Game.Screens.Select.Details
             starDifficultyCancellationSource?.Cancel();
         }
 
-        public partial class StatisticRow : Container, IHasAccentColour
+        public partial class StatisticRow : Container, IHasAccentColour, IHasCustomTooltip<RulesetBeatmapAttribute>
         {
             private const float value_width = 25;
             private const float name_width = 70;
@@ -352,6 +346,26 @@ namespace osu.Game.Screens.Select.Details
                     },
                 };
             }
+
+            public void SetAttribute([CanBeNull] RulesetBeatmapAttribute attribute)
+            {
+                if (attribute != null)
+                {
+                    Title = attribute.Label;
+                    MaxValue = attribute.MaxValue;
+                    Value = (attribute.OriginalValue, attribute.AdjustedValue);
+                    Alpha = 1;
+                }
+                else
+                    Alpha = 0;
+
+                TooltipContent = attribute;
+            }
+
+            public ITooltip<RulesetBeatmapAttribute> GetCustomTooltip() => new BeatmapAttributeTooltip();
+
+            [CanBeNull]
+            public RulesetBeatmapAttribute TooltipContent { get; set; }
         }
     }
 }

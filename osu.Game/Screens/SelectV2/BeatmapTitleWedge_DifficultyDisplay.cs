@@ -11,7 +11,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
@@ -23,7 +22,6 @@ using osu.Game.Localisation;
 using osu.Game.Online;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays;
-using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osuTK.Graphics;
@@ -62,7 +60,7 @@ namespace osu.Game.Screens.SelectV2
 
             private GridContainer ratingAndNameContainer = null!;
             private DifficultyStatisticsDisplay countStatisticsDisplay = null!;
-            private AdjustableDifficultyStatisticsDisplay difficultyStatisticsDisplay = null!;
+            private DifficultyStatisticsDisplay difficultyStatisticsDisplay = null!;
 
             private CancellationTokenSource? cancellationSource;
 
@@ -195,7 +193,7 @@ namespace osu.Game.Screens.SelectV2
                                                         RelativeSizeAxes = Axes.X,
                                                     },
                                                     Empty(),
-                                                    difficultyStatisticsDisplay = new AdjustableDifficultyStatisticsDisplay(autoSize: true),
+                                                    difficultyStatisticsDisplay = new DifficultyStatisticsDisplay(autoSize: true),
                                                 }
                                             },
                                         }
@@ -289,7 +287,6 @@ namespace osu.Game.Screens.SelectV2
             {
                 if (beatmap.IsDefault || ruleset.Value == null)
                 {
-                    difficultyStatisticsDisplay.TooltipContent = null;
                     difficultyStatisticsDisplay.Statistics = Array.Empty<StatisticDifficulty.Data>();
                     return;
                 }
@@ -297,7 +294,6 @@ namespace osu.Game.Screens.SelectV2
                 Ruleset rulesetInstance = ruleset.Value.CreateInstance();
 
                 var displayAttributes = rulesetInstance.GetBeatmapAttributesForDisplay(beatmap.Value.BeatmapInfo, mods.Value).ToList();
-                difficultyStatisticsDisplay.TooltipContent = new AdjustedAttributesTooltip.Data(displayAttributes);
                 difficultyStatisticsDisplay.Statistics = displayAttributes.Select(a => new StatisticDifficulty.Data(a)).ToList();
             });
 
@@ -323,21 +319,6 @@ namespace osu.Game.Screens.SelectV2
                 {
                     TooltipText = ContextMenuStrings.ViewProfile;
                     IdleColour = overlayColourProvider?.Light2 ?? colours.Blue;
-                }
-            }
-
-            private partial class AdjustableDifficultyStatisticsDisplay : DifficultyStatisticsDisplay, IHasCustomTooltip<AdjustedAttributesTooltip.Data>
-            {
-                [Resolved]
-                private OverlayColourProvider colourProvider { get; set; } = null!;
-
-                public ITooltip<AdjustedAttributesTooltip.Data> GetCustomTooltip() => new AdjustedAttributesTooltip(colourProvider);
-
-                public AdjustedAttributesTooltip.Data? TooltipContent { get; set; }
-
-                public AdjustableDifficultyStatisticsDisplay(bool autoSize)
-                    : base(autoSize)
-                {
                 }
             }
         }
