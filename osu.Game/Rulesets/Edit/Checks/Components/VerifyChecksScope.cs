@@ -11,13 +11,13 @@ namespace osu.Game.Rulesets.Edit.Checks.Components
         /// <summary>
         /// Run checks that apply to the current difficulty.
         /// </summary>
-        [LocalisableDescription(typeof(EditorStrings), nameof(EditorStrings.ThisDifficulty))]
-        ThisDifficulty,
+        [LocalisableDescription(typeof(EditorStrings), nameof(EditorStrings.Difficulty))]
+        Difficulty,
 
         /// <summary>
         /// Run checks that apply to the beatmapset as a whole.
         /// </summary>
-        [LocalisableDescription(typeof(EditorStrings), nameof(EditorStrings.General))]
-        General,
+        [LocalisableDescription(typeof(EditorStrings), nameof(EditorStrings.Beatmapset))]
+        Beatmapset,
     }
 }

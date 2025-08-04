@@ -106,11 +106,11 @@ namespace osu.Game.Screens.Edit.Verify
 
             switch (verify.VerifyChecksScope.Value)
             {
-                case VerifyChecksScope.General:
+                case VerifyChecksScope.Beatmapset:
                     issues = filterByScope(generalVerifier.Run(context), true);
                     break;
 
-                case VerifyChecksScope.ThisDifficulty:
+                case VerifyChecksScope.Difficulty:
                     var generalIssues = filterByScope(generalVerifier.Run(context), false);
                     var rulesetIssues = rulesetVerifier?.Run(context) ?? Enumerable.Empty<Issue>();
                     issues = generalIssues.Concat(rulesetIssues);
