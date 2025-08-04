@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Edit.Checks
                         }
 
                         // Check for BPM inconsistency
-                        if (Math.Abs(referencePoint.BeatLength - matchingPoint.BeatLength) > TimingCheckUtils.TIMING_TOLERANCE)
+                        if (Math.Abs(referencePoint.BeatLength - matchingPoint.BeatLength) > TimingCheckUtils.TIME_OFFSET_TOLERANCE_MS)
                         {
                             yield return new IssueTemplateInconsistentBPM(this).Create(referencePoint.Time, beatmap.BeatmapInfo.DifficultyName);
                         }
