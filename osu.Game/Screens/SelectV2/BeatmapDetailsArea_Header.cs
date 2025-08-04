@@ -115,9 +115,6 @@ namespace osu.Game.Screens.SelectV2
                 scopeDropdown.Current.Value = tryMapDetailTabToLeaderboardScope(configDetailTab.Value) ?? scopeDropdown.Current.Value;
                 scopeDropdown.Current.BindValueChanged(_ => updateConfigDetailTab());
 
-                sortDropdown.Current.Value = configLeaderboardSortMode.Value;
-                sortDropdown.Current.BindValueChanged(v => configLeaderboardSortMode.Value = v.NewValue);
-
                 tabControl.Current.Value = configDetailTab.Value == BeatmapDetailTab.Details ? Selection.Details : Selection.Ranking;
                 tabControl.Current.BindValueChanged(v =>
                 {
@@ -125,10 +122,20 @@ namespace osu.Game.Screens.SelectV2
                     updateConfigDetailTab();
                 }, true);
 
-                scopeDropdown.Current.BindValueChanged(v =>
+                scopeDropdown.Current.BindValueChanged(scope =>
                 {
-                    bool isLocal = v.NewValue == BeatmapLeaderboardScope.Local;
-                    sortDropdown.Current.Disabled = !isLocal;
+                    if (scope.NewValue == BeatmapLeaderboardScope.Local)
+                    {
+                        sortDropdown.Current.Disabled = false;
+                        sortDropdown.Current.BindTo(configLeaderboardSortMode);
+                    }
+                    else
+                    {
+                        // future implementation when we have web-side support.
+                        sortDropdown.Current.UnbindFrom(configLeaderboardSortMode);
+                        sortDropdown.Current.Value = LeaderboardSortMode.Score;
+                        sortDropdown.Current.Disabled = true;
+                    }
                 }, true);
             }
 
