@@ -22,6 +22,9 @@ namespace osu.Game.Rulesets.Taiko.Edit
 
             // Settings
             new CheckTaikoAbnormalDifficultySettings(),
+
+            // Timing
+            new CheckTaikoInconsistentSkipBarLine(),
         };
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
