@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Edit.Checks
 {
     public class CheckInconsistentMetadata : ICheck
     {
-        public CheckMetadata Metadata => new CheckMetadata(CheckCategory.Metadata, "Inconsistent metadata", CheckScope.Beatmapset);
+        public CheckMetadata Metadata => new CheckMetadata(CheckCategory.Metadata, "Inconsistent metadata", CheckScope.BeatmapSet);
 
         public IEnumerable<IssueTemplate> PossibleTemplates => new IssueTemplate[]
         {
