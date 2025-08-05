@@ -37,8 +37,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints
             base.EndPlacement(commit);
 
             // You typically only place the grid once, so we switch back to the last tool after placement.
-            if (commit && hitObjectComposer is OsuHitObjectComposer osuHitObjectComposer)
-                osuHitObjectComposer.SetLastTool();
+            // This may be committed due to switching to another tool, we don't want to change the tool if so.
+            if (commit && hitObjectComposer?.BlueprintContainer.CurrentTool is GridFromPointsTool)
+                hitObjectComposer.SetLastTool();
         }
 
         protected override bool OnClick(ClickEvent e)
