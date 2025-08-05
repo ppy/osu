@@ -20,7 +20,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 {
     public class OsuPerformanceCalculator : PerformanceCalculator
     {
-        // This value is false when scorev2 is enabled
         private bool usingClassicSliderAccuracy;
         private bool isLegacyScore;
 
