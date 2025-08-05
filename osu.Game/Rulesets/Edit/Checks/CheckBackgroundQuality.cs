@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Edit.Checks
         private const int low_width = 960;
         private const int low_height = 540;
 
-        public CheckMetadata Metadata { get; } = new CheckMetadata(CheckCategory.Resources, "Too high or low background resolution");
+        public CheckMetadata Metadata { get; } = new CheckMetadata(CheckCategory.Resources, "Too high or low background resolution", CheckScope.BeatmapSet);
 
         public IEnumerable<IssueTemplate> PossibleTemplates => new IssueTemplate[]
         {

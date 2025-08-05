@@ -94,6 +94,7 @@ namespace osu.Game.Screens.Edit.Verify
             base.LoadComplete();
 
             verify.InterpretedDifficulty.BindValueChanged(_ => Refresh());
+            verify.VerifyChecksScope.BindValueChanged(_ => Refresh());
             verify.HiddenIssueTypes.BindCollectionChanged((_, _) => Refresh());
 
             Refresh();
@@ -116,7 +117,9 @@ namespace osu.Game.Screens.Edit.Verify
 
         private IEnumerable<Issue> filter(IEnumerable<Issue> issues)
         {
-            return issues.Where(issue => !verify.HiddenIssueTypes.Contains(issue.Template.Type));
+            return issues.Where(issue =>
+                !verify.HiddenIssueTypes.Contains(issue.Template.Type) &&
+                issue.Check.Metadata.Scope == verify.VerifyChecksScope.Value);
         }
     }
 }

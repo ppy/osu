@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Edit.Checks
 
         private const int max_video_height = 720;
 
-        public CheckMetadata Metadata => new CheckMetadata(CheckCategory.Resources, "Too high video resolution.");
+        public CheckMetadata Metadata => new CheckMetadata(CheckCategory.Resources, "Too high video resolution.", CheckScope.BeatmapSet);
 
         public IEnumerable<IssueTemplate> PossibleTemplates => new IssueTemplate[]
         {
