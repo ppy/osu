@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Taiko.Edit.Checks
                     var matchingPoint = TimingCheckUtils.FindExactMatchingTimingPoint(timingPoints, referencePoint.Time);
 
                     if (matchingPoint == null)
-                        // Inconsistent timing points - that's handled by the main timing check, so skip
+                        // Inconsistent timing points - that's handled by `CheckInconsistentTimingControlPoints`, so skip
                         continue;
 
                     if (referencePoint.OmitFirstBarLine != matchingPoint.OmitFirstBarLine)
