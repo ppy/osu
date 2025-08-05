@@ -42,7 +42,14 @@ namespace osu.Game.Screens.SelectV2
             var request = new GetBeatmapSetRequest(id);
             var tcs = new TaskCompletionSource<APIBeatmapSet?>();
 
-            request.Success += onlineBeatmapSet =>
+            // async request success callback is a bit of a dangerous game, but there's some reasoning for it.
+            // - don't really want to use `IAPIAccess.PerformAsync()` because we still want to respect request queueing & online status checks
+            // - we want the realm write here to be async because it is known to be slow for some users with large beatmap collections
+            // - at the time of writing `RealmAccess.WriteAsync()` can only be safely called from update thread,
+            //   and API request completion callbacks are automatically marshaled onto update thread scheduler,
+            //   so calling `WriteAsync()` within the callback is a somewhat "nice" way of guaranteeing that the call is safe
+            //   (rather than having to enforce that `GetBeatmapSetAsync()` can only be called from update thread, or locally scheduling)
+            request.Success += async onlineBeatmapSet =>
             {
                 if (token.IsCancellationRequested)
                 {
@@ -52,7 +59,7 @@ namespace osu.Game.Screens.SelectV2
 
                 var tagsById = (onlineBeatmapSet.RelatedTags ?? []).ToDictionary(t => t.Id);
                 var onlineBeatmaps = onlineBeatmapSet.Beatmaps.ToDictionary(b => b.OnlineID);
-                realm.Write(r =>
+                await realm.WriteAsync(r =>
                 {
                     var beatmapSet = r.All<BeatmapSetInfo>().Where(b => b.OnlineID == id);
 
@@ -84,7 +91,7 @@ namespace osu.Game.Screens.SelectV2
                             }
                         }
                     }
-                });
+                }).ConfigureAwait(true);
                 tcs.SetResult(onlineBeatmapSet);
             };
             request.Failure += tcs.SetException;
