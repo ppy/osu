@@ -50,6 +50,7 @@ namespace osu.Game.Rulesets.Edit
             // Metadata
             new CheckTitleMarkers(),
             new CheckInconsistentMetadata(),
+            new CheckMissingGenreLanguage(),
         };
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
