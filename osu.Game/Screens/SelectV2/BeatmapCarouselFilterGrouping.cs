@@ -79,6 +79,8 @@ namespace osu.Game.Screens.SelectV2
 
                     foreach (var item in itemsInGroup)
                     {
+                        cancellationToken.ThrowIfCancellationRequested();
+
                         var beatmap = (BeatmapInfo)item.Model;
 
                         bool newBeatmapSet = lastBeatmap?.BeatmapSet!.ID != beatmap.BeatmapSet!.ID;
@@ -125,6 +127,8 @@ namespace osu.Game.Screens.SelectV2
                         i.IsVisible = i.Model is GroupDefinition || (group == null && (i.Model is BeatmapSetInfo || !BeatmapSetsGroupedTogether));
                     }
                 }
+
+                cancellationToken.ThrowIfCancellationRequested();
 
                 Interlocked.Exchange(ref setMap, newSetMap);
                 Interlocked.Exchange(ref groupMap, newGroupMap);
