@@ -30,8 +30,8 @@ namespace osu.Game.Screens.SelectV2
         /// </summary>
         public IDictionary<GroupDefinition, HashSet<CarouselItem>> GroupItems => groupMap;
 
-        private readonly Dictionary<BeatmapSetInfo, HashSet<CarouselItem>> setMap = new Dictionary<BeatmapSetInfo, HashSet<CarouselItem>>();
-        private readonly Dictionary<GroupDefinition, HashSet<CarouselItem>> groupMap = new Dictionary<GroupDefinition, HashSet<CarouselItem>>();
+        private Dictionary<BeatmapSetInfo, HashSet<CarouselItem>> setMap = new Dictionary<BeatmapSetInfo, HashSet<CarouselItem>>();
+        private Dictionary<GroupDefinition, HashSet<CarouselItem>> groupMap = new Dictionary<GroupDefinition, HashSet<CarouselItem>>();
 
         private readonly Func<FilterCriteria> getCriteria;
         private readonly Func<List<BeatmapCollection>>? getCollections;
@@ -46,8 +46,9 @@ namespace osu.Game.Screens.SelectV2
         {
             return await Task.Run(() =>
             {
-                setMap.Clear();
-                groupMap.Clear();
+                // preallocate space for the new mappings using last known estimates
+                var newSetMap = new Dictionary<BeatmapSetInfo, HashSet<CarouselItem>>(setMap.Count);
+                var newGroupMap = new Dictionary<GroupDefinition, HashSet<CarouselItem>>(groupMap.Count);
 
                 var criteria = getCriteria();
                 var newItems = new List<CarouselItem>();
@@ -67,7 +68,7 @@ namespace osu.Game.Screens.SelectV2
 
                     if (group != null)
                     {
-                        groupMap[group] = currentGroupItems = new HashSet<CarouselItem>();
+                        newGroupMap[group] = currentGroupItems = new HashSet<CarouselItem>();
 
                         addItem(groupItem = new CarouselItem(group)
                         {
@@ -84,8 +85,8 @@ namespace osu.Game.Screens.SelectV2
 
                         if (newBeatmapSet)
                         {
-                            if (!setMap.TryGetValue(beatmap.BeatmapSet!, out currentSetItems))
-                                setMap[beatmap.BeatmapSet!] = currentSetItems = new HashSet<CarouselItem>();
+                            if (!newSetMap.TryGetValue(beatmap.BeatmapSet!, out currentSetItems))
+                                newSetMap[beatmap.BeatmapSet!] = currentSetItems = new HashSet<CarouselItem>();
                         }
 
                         if (BeatmapSetsGroupedTogether)
@@ -125,6 +126,8 @@ namespace osu.Game.Screens.SelectV2
                     }
                 }
 
+                Interlocked.Exchange(ref setMap, newSetMap);
+                Interlocked.Exchange(ref groupMap, newGroupMap);
                 return newItems;
             }, cancellationToken).ConfigureAwait(false);
         }
