@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Edit.Checks
 {
     public class CheckSongFormat : ICheck
     {
-        public CheckMetadata Metadata => new CheckMetadata(CheckCategory.Audio, "Checks for song formats.", CheckScope.Beatmapset);
+        public CheckMetadata Metadata => new CheckMetadata(CheckCategory.Audio, "Checks for song formats.", CheckScope.BeatmapSet);
 
         public IEnumerable<IssueTemplate> PossibleTemplates => new IssueTemplate[]
         {

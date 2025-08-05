@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Edit.Checks
     {
         private const int ms_threshold = 25;
 
-        public CheckMetadata Metadata => new CheckMetadata(CheckCategory.Audio, "Too short audio files", CheckScope.Beatmapset);
+        public CheckMetadata Metadata => new CheckMetadata(CheckCategory.Audio, "Too short audio files", CheckScope.BeatmapSet);
 
         public IEnumerable<IssueTemplate> PossibleTemplates => new IssueTemplate[]
         {

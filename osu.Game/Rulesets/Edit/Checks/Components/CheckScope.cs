@@ -11,8 +11,8 @@ namespace osu.Game.Rulesets.Edit.Checks.Components
         Difficulty,
 
         /// <summary>
-        /// Run checks that apply to the beatmapset as a whole.
+        /// Run checks that apply to the beatmap set as a whole.
         /// </summary>
-        Beatmapset,
+        BeatmapSet,
     }
 }

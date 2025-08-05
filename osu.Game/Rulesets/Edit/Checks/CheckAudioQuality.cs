@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Edit.Checks
         // There not existing a version with a bitrate of 128 kbps or higher is extremely rare.
         private const int min_bitrate = 128;
 
-        public CheckMetadata Metadata { get; } = new CheckMetadata(CheckCategory.Audio, "Too high or low audio bitrate", CheckScope.Beatmapset);
+        public CheckMetadata Metadata { get; } = new CheckMetadata(CheckCategory.Audio, "Too high or low audio bitrate", CheckScope.BeatmapSet);
 
         public IEnumerable<IssueTemplate> PossibleTemplates => new IssueTemplate[]
         {
