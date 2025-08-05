@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 
             if (HitObject is IHasDuration endTimeData)
             {
-                // despite the beatmap originally made for mania, if the object is parsed as a slider rather than a hold, sliding samples should still be played.
+                // despite the beatmap originally being made for mania, if the object is parsed as a slider rather than a hold, sliding samples should still be played.
                 // this is seemingly only possible to achieve by modifying the .osu file directly, but online beatmaps that do that exist
                 // (see second and fourth notes of https://osu.ppy.sh/beatmapsets/73883#mania/216407)
                 bool playSlidingSamples = (HitObject is IHasLegacyHitObjectType hasType && hasType.LegacyType == LegacyHitObjectType.Slider) || HitObject is IHasPath;
