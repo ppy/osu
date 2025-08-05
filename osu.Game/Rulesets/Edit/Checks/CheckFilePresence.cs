@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Edit.Checks
         protected abstract string TypeOfFile { get; }
         protected abstract string? GetFilename(IBeatmap beatmap);
 
-        public CheckMetadata Metadata => new CheckMetadata(Category, $"Missing {TypeOfFile}");
+        public CheckMetadata Metadata => new CheckMetadata(Category, $"Missing {TypeOfFile}", CheckScope.BeatmapSet);
 
         public IEnumerable<IssueTemplate> PossibleTemplates => new IssueTemplate[]
         {
