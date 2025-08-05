@@ -427,6 +427,12 @@ namespace osu.Game.Rulesets.Difficulty
                 set => baseBeatmap.Bookmarks = value;
             }
 
+            public bool ComboFireInFrontOfStoryboard
+            {
+                get => baseBeatmap.ComboFireInFrontOfStoryboard;
+                set => baseBeatmap.ComboFireInFrontOfStoryboard = value;
+            }
+
             #endregion
         }
     }

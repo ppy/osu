@@ -109,6 +109,8 @@ namespace osu.Game.Beatmaps
 
         int[] Bookmarks { get; internal set; }
 
+        bool ComboFireInFrontOfStoryboard { get; internal set; }
+
         int BeatmapVersion { get; }
 
         /// <summary>

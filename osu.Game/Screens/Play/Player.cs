@@ -435,10 +435,14 @@ namespace osu.Game.Screens.Play
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
-                    new LegacyComboFire(ScoreProcessor),
+                    new LegacyComboFire(ScoreProcessor)
+                    {
+                        Depth = working.Beatmap.ComboFireInFrontOfStoryboard ? 1f : 3f,
+                    },
                     DimmableStoryboard = new DimmableStoryboard(GameplayState.Storyboard, GameplayState.Mods)
                     {
-                        RelativeSizeAxes = Axes.Both
+                        RelativeSizeAxes = Axes.Both,
+                        Depth = 2f,
                     },
                     letterboxOverlay = new LetterboxOverlay
                     {

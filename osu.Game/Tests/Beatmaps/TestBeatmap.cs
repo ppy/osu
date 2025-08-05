@@ -38,6 +38,7 @@ namespace osu.Game.Tests.Beatmaps
             GridSize = baseBeatmap.GridSize;
             TimelineZoom = baseBeatmap.TimelineZoom;
             CountdownOffset = baseBeatmap.CountdownOffset;
+            ComboFireInFrontOfStoryboard = baseBeatmap.ComboFireInFrontOfStoryboard;
 
             if (withHitObjects)
             {

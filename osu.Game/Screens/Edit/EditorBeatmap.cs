@@ -289,6 +289,12 @@ namespace osu.Game.Screens.Edit
             set => PlayableBeatmap.Bookmarks = value;
         }
 
+        public bool ComboFireInFrontOfStoryboard
+        {
+            get => PlayableBeatmap.ComboFireInFrontOfStoryboard;
+            set => PlayableBeatmap.ComboFireInFrontOfStoryboard = value;
+        }
+
         public int BeatmapVersion { get; set; }
 
         public IBeatmap Clone() => (EditorBeatmap)MemberwiseClone();
