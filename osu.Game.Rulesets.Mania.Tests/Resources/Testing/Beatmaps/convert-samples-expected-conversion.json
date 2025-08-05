@@ -5,6 +5,7 @@
       "StartTime": 1000.0,
       "EndTime": 2750.0,
       "Column": 1,
+      "PlaySlidingSamples": true,
       "NodeSamples": [
         ["Gameplay/normal-hitnormal"],
         ["Gameplay/soft-hitnormal"],
@@ -15,6 +16,7 @@
       "StartTime": 1875.0,
       "EndTime": 2750.0,
       "Column": 0,
+      "PlaySlidingSamples": true,
       "NodeSamples": [
         ["Gameplay/soft-hitnormal"],
         ["Gameplay/drum-hitnormal"]

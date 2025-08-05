@@ -355,7 +355,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         private void updateSlidingSample(ValueChangedEvent<bool> tracking)
         {
-            if (tracking.NewValue)
+            if (tracking.NewValue && HitObject.PlaySlidingSamples)
                 slidingSample?.Play();
             else
                 slidingSample?.Stop();
