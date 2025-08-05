@@ -435,6 +435,7 @@ namespace osu.Game.Screens.Play
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
+                    new LegacyComboFire(ScoreProcessor),
                     DimmableStoryboard = new DimmableStoryboard(GameplayState.Storyboard, GameplayState.Mods)
                     {
                         RelativeSizeAxes = Axes.Both

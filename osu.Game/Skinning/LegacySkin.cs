@@ -335,6 +335,23 @@ namespace osu.Game.Skinning
                 case SkinConfiguration.LegacySetting.InputOverlayText:
                     return SkinUtils.As<TValue>(new Bindable<Colour4>(Configuration.CustomColours.TryGetValue(@"InputOverlayText", out var colour) ? colour : Colour4.Black));
 
+                // In osu!stable, combo fire was toggled via game-wide config. It was enabled by default until around 2013.
+                //
+                // Here, combo fire can be toggled via a legacy skin setting. If not explicitly enabled or disabled, it
+                // will be enabled by default for legacy skins with version 1.x, which, going by date of latest
+                // available skin version, roughly corresponds with osu!stable's old behaviour.
+                case SkinConfiguration.LegacySetting.ComboFire:
+                    var value = genericLookup<SkinConfiguration.LegacySetting, TValue>(legacySetting);
+
+                    if (value != null)
+                        return value;
+
+                    // Enable combo fire by default for v1.x skins
+                    if (GetConfig<SkinConfiguration.LegacySetting, decimal>(SkinConfiguration.LegacySetting.Version)?.Value < 2m)
+                        return SkinUtils.As<TValue>(new Bindable<bool>(true));
+
+                    return null;
+
                 default:
                     return genericLookup<SkinConfiguration.LegacySetting, TValue>(legacySetting);
             }
