@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Edit.Checks
         public IEnumerable<IssueTemplate> PossibleTemplates => new IssueTemplate[]
         {
             new IssueTemplateInconsistentSetting(this, IssueType.Warning),
-            new IssueTemplateInconsistentSetting(this, IssueType.Negligible),
+            new IssueTemplateInconsistentSetting(this, IssueType.Negligible)
         };
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
@@ -27,6 +27,8 @@ namespace osu.Game.Rulesets.Edit.Checks
 
             var referenceBeatmap = context.Beatmap;
 
+            bool hasStoryboard = ResourcesCheckUtils.HasAnyStoryboardElementPresent(context.WorkingBeatmap);
+
             // Define fields to check
             var fieldsToCheck = new (IssueType issueType, string fieldName, Func<IBeatmap, object> fieldSelector)[]
             {
@@ -36,7 +38,7 @@ namespace osu.Game.Rulesets.Edit.Checks
                 (IssueType.Warning, "Epilepsy warning", b => b.EpilepsyWarning),
                 (IssueType.Warning, "Letterbox during breaks", b => b.LetterboxInBreaks),
                 (IssueType.Warning, "Samples match playback rate", b => b.SamplesMatchPlaybackRate),
-                (IssueType.Warning, "Widescreen support", b => b.WidescreenStoryboard),
+                (IssueType.Warning, "Widescreen support", b => hasStoryboard && b.WidescreenStoryboard),
                 (IssueType.Negligible, "Tick Rate", b => b.Difficulty.SliderTickRate),
             };
 
