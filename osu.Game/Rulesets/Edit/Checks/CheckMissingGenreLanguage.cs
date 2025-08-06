@@ -27,47 +27,30 @@ namespace osu.Game.Rulesets.Edit.Checks
 
             string tags = metadata.Tags.ToLowerInvariant();
 
-            bool genreFound = false;
-            bool languageFound = false;
-
-            foreach (SearchGenre genre in Enum.GetValues(typeof(SearchGenre)))
-            {
-                string genreString = getGenreLanguageString(genre);
-
-                if (containsAllWords(genreString, tags))
-                {
-                    genreFound = true;
-                    break;
-                }
-            }
-
-            foreach (SearchLanguage language in Enum.GetValues(typeof(SearchLanguage)))
-            {
-                string languageString = getGenreLanguageString(language);
-
-                if (containsAllWords(languageString, tags))
-                {
-                    languageFound = true;
-                    break;
-                }
-            }
-
-            if (!genreFound)
+            if (!hasTags<SearchGenre>(tags))
                 yield return new IssueTemplateMissingGenre(this).Create();
 
-            if (!languageFound)
+            if (!hasTags<SearchLanguage>(tags))
                 yield return new IssueTemplateMissingLanguage(this).Create();
         }
 
-        private static bool containsAllWords(string description, string tags)
+        private bool hasTags<T>(string tags) where T : Enum
         {
-            string[] words = description.ToLowerInvariant().Split(' ');
-            return words.All(tags.Contains);
+            foreach (T value in Enum.GetValues(typeof(T)))
+            {
+                string description = getGenreLanguageString(value);
+                string[] words = description.ToLowerInvariant().Split(' ');
+
+                if (words.All(tags.Contains))
+                    return true;
+            }
+
+            return false;
         }
 
         // "Video Game" and "Hip Hop" are multiple words that are properly formatted in the enum's description attribute,
         // so we need to use that and fall back to the enum's string value for the rest.
-        private static string getGenreLanguageString(Enum value)
+        private string getGenreLanguageString(Enum value)
         {
             var field = value.GetType().GetField(value.ToString());
             var attribute = field?.GetCustomAttribute<DescriptionAttribute>();
