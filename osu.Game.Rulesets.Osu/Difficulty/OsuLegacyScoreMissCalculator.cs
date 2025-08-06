@@ -47,7 +47,21 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             scoreBasedMissCount = Math.Max(scoreBasedMissCount, 1);
 
             // Cap result by very harsh version of combo-based miss count
-            return Math.Min(scoreBasedMissCount, maximumMissCount);
+            double missCount = Math.Min(scoreBasedMissCount, maximumMissCount);
+
+            // Every slider has *at least* 2 combo attributed in classic mechanics.
+            // Using this as a max means a score that loses 1 combo on a map can't possibly have been a slider break.
+            // It must have been a slider end.
+            int maxPossibleSliderBreaks = Math.Min(attributes.SliderCount, (attributes.MaxCombo - score.MaxCombo) / 2);
+
+            int scoreMissCount = score.Statistics.GetValueOrDefault(HitResult.Miss);
+
+            double sliderBreaks = missCount - scoreMissCount;
+
+            if (sliderBreaks > maxPossibleSliderBreaks)
+                missCount = scoreMissCount + maxPossibleSliderBreaks;
+
+            return missCount;
         }
 
         /// <summary>

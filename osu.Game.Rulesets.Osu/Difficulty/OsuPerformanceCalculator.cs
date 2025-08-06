@@ -113,16 +113,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             effectiveMissCount = Math.Max(countMiss, effectiveMissCount);
             effectiveMissCount = Math.Min(totalHits, effectiveMissCount);
 
-            // Every slider has *at least* 2 combo attributed.
-            // Using this as a max means a score that loses 1 combo on a map with 2 sliders can't possibly have a slider break
-            // They must have been missed slider ends.
-            int maxPossibleSliderBreaks = Math.Min(osuAttributes.SliderCount, (osuAttributes.MaxCombo - scoreMaxCombo) / 2);
-
-            double sliderBreaks = effectiveMissCount - countMiss;
-
-            if (sliderBreaks > maxPossibleSliderBreaks)
-                effectiveMissCount = countMiss + maxPossibleSliderBreaks;
-
             double multiplier = OsuDifficultyCalculator.CalculateDifficultyMultiplier(score.Mods, totalHits, osuAttributes.SpinnerCount);
 
             if (score.Mods.Any(m => m is OsuModNoFail))
