@@ -3,10 +3,13 @@
 
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Graphics;
+using osuTK;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Checks;
 using osu.Game.Tests.Beatmaps;
+using osu.Game.Storyboards;
 
 namespace osu.Game.Tests.Editing.Checks
 {
@@ -134,13 +137,25 @@ namespace osu.Game.Tests.Editing.Checks
         }
 
         [Test]
-        public void TestInconsistentWidescreenStoryboard()
+        public void TestInconsistentWidescreenSupport()
         {
             var beatmaps = createBeatmapSetWithSettings(
                 createSettings(widescreenStoryboard: true),
                 createSettings(widescreenStoryboard: false)
             );
             var context = createContextWithMultipleDifficulties(beatmaps.First(), beatmaps);
+
+            Assert.That(check.Run(context), Is.Empty);
+        }
+
+        [Test]
+        public void TestInconsistentWidescreenSupportWithStoryboard()
+        {
+            var beatmaps = createBeatmapSetWithSettings(
+                createSettings(widescreenStoryboard: true),
+                createSettings(widescreenStoryboard: false)
+            );
+            var context = createContextWithMultipleDifficulties(beatmaps.First(), beatmaps, hasStoryboard: true);
 
             var issues = check.Run(context).ToList();
 
@@ -238,11 +253,19 @@ namespace osu.Game.Tests.Editing.Checks
             return beatmaps;
         }
 
-        private BeatmapVerifierContext createContextWithMultipleDifficulties(IBeatmap currentBeatmap, IBeatmap[] allDifficulties)
+        private BeatmapVerifierContext createContextWithMultipleDifficulties(IBeatmap currentBeatmap, IBeatmap[] allDifficulties, bool hasStoryboard = false)
         {
+            Storyboard? storyboard = null;
+
+            if (hasStoryboard)
+            {
+                storyboard = new Storyboard();
+                storyboard.GetLayer("Background").Add(new StoryboardSprite("test.png", Anchor.Centre, Vector2.Zero));
+            }
+
             return new BeatmapVerifierContext(
                 currentBeatmap,
-                new TestWorkingBeatmap(currentBeatmap),
+                new TestWorkingBeatmap(currentBeatmap, storyboard),
                 DifficultyRating.ExpertPlus,
                 beatmapInfo => allDifficulties.FirstOrDefault(b => b.BeatmapInfo.Equals(beatmapInfo))
             );
