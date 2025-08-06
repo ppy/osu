@@ -47,9 +47,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             scoreBasedMissCount = Math.Max(scoreBasedMissCount, 1);
 
             // Cap result by very harsh version of combo-based miss count
-            double missCount = Math.Min(scoreBasedMissCount, maximumMissCount);
-
-            return missCount;
+            return Math.Min(scoreBasedMissCount, maximumMissCount);
         }
 
         /// <summary>
