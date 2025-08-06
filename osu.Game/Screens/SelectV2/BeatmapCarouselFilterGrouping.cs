@@ -220,11 +220,11 @@ namespace osu.Game.Screens.SelectV2
                     var collections = getCollections?.Invoke() ?? Enumerable.Empty<BeatmapCollection>();
                     return getGroupsBy(b => defineGroupByCollection(b, collections), items);
 
+                case GroupMode.MyMaps:
+                    return getGroupsBy(b => defineGroupByOwnMaps(b, criteria.LocalUserId, criteria.LocalUserUsername), items);
+
                 // TODO: need implementation
                 // case GroupMode.Favourites:
-                //     goto case GroupMode.None;
-                //
-                // case GroupMode.MyMaps:
                 //     goto case GroupMode.None;
                 //
                 // case GroupMode.RankAchieved:
@@ -393,6 +393,16 @@ namespace osu.Game.Screens.SelectV2
             }
 
             return new GroupDefinition(1, "Not in collection");
+        }
+
+        private GroupDefinition defineGroupByOwnMaps(BeatmapInfo beatmap, int? localUserId, string? localUserUsername)
+        {
+            var author = beatmap.BeatmapSet!.Metadata.Author;
+
+            if (author.OnlineID == localUserId || author.Username == localUserUsername)
+                return new GroupDefinition(0, "My maps");
+
+            return new GroupDefinition(1, "Not my maps");
         }
 
         private static T? aggregateMax<T>(BeatmapInfo b, Func<BeatmapInfo, T> func)

@@ -19,6 +19,8 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Select;
@@ -53,6 +55,11 @@ namespace osu.Game.Screens.SelectV2
 
         [Resolved]
         private RealmAccess realm { get; set; } = null!;
+
+        [Resolved]
+        private IAPIProvider api { get; set; } = null!;
+
+        private IBindable<APIUser>? localUser;
 
         public LocalisableString StatusText
         {
@@ -229,6 +236,10 @@ namespace osu.Game.Screens.SelectV2
                 if (changeSet != null && groupDropdown.Current.Value == GroupMode.Collections)
                     updateCriteria();
             });
+
+            localUser = api.LocalUser.GetBoundCopy();
+            localUser.BindValueChanged(_ => updateCriteria());
+
             updateCriteria();
         }
 
@@ -244,6 +255,7 @@ namespace osu.Game.Screens.SelectV2
         public FilterCriteria CreateCriteria()
         {
             string query = searchTextBox.Current.Value;
+            bool isValidUser = api.LocalUser.Value.Id > 1;
 
             var criteria = new FilterCriteria
             {
@@ -252,7 +264,9 @@ namespace osu.Game.Screens.SelectV2
                 AllowConvertedBeatmaps = showConvertedBeatmapsButton.Active.Value,
                 Ruleset = ruleset.Value,
                 Mods = mods.Value,
-                CollectionBeatmapMD5Hashes = collectionDropdown.Current.Value?.Collection?.PerformRead(c => c.BeatmapMD5Hashes).ToImmutableHashSet()
+                CollectionBeatmapMD5Hashes = collectionDropdown.Current.Value?.Collection?.PerformRead(c => c.BeatmapMD5Hashes).ToImmutableHashSet(),
+                LocalUserId = isValidUser ? api.LocalUser.Value.Id : null,
+                LocalUserUsername = isValidUser ? api.LocalUser.Value.Username : null,
             };
 
             if (!difficultyRangeSlider.LowerBound.IsDefault)
