@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit.Checks.Components;
 
@@ -29,37 +28,38 @@ namespace osu.Game.Rulesets.Edit.Checks
             var referenceBeatmap = context.Beatmap;
 
             // Define fields to check
-            var fieldsToCheck = new (IssueType issueType, string fieldName, Func<IBeatmap, string> fieldSelector)[]
+            var fieldsToCheck = new (IssueType issueType, string fieldName, Func<IBeatmap, object> fieldSelector)[]
             {
-                (IssueType.Warning, "Audio lead-in", b => b.AudioLeadIn.ToString(CultureInfo.InvariantCulture)),
-                (IssueType.Warning, "Countdown", b => b.Countdown.ToString()),
-                (IssueType.Warning, "Countdown offset", b => b.CountdownOffset.ToString()),
-                (IssueType.Warning, "Epilepsy warning", b => b.EpilepsyWarning.ToString()),
-                (IssueType.Warning, "Letterbox during breaks", b => b.LetterboxInBreaks.ToString()),
-                (IssueType.Warning, "Samples match playback rate", b => b.SamplesMatchPlaybackRate.ToString()),
-                (IssueType.Warning, "Widescreen support", b => b.WidescreenStoryboard.ToString()),
-                (IssueType.Negligible, "Tick Rate", b => b.Difficulty.SliderTickRate.ToString(CultureInfo.InvariantCulture)),
+                (IssueType.Warning, "Audio lead-in", b => b.AudioLeadIn),
+                (IssueType.Warning, "Countdown", b => b.Countdown),
+                (IssueType.Warning, "Countdown offset", b => b.CountdownOffset),
+                (IssueType.Warning, "Epilepsy warning", b => b.EpilepsyWarning),
+                (IssueType.Warning, "Letterbox during breaks", b => b.LetterboxInBreaks),
+                (IssueType.Warning, "Samples match playback rate", b => b.SamplesMatchPlaybackRate),
+                (IssueType.Warning, "Widescreen support", b => b.WidescreenStoryboard),
+                (IssueType.Negligible, "Tick Rate", b => b.Difficulty.SliderTickRate),
             };
 
-            foreach (var beatmap in difficulties)
+            // Iterate over each setting
+            foreach ((IssueType issueType, string fieldName, Func<IBeatmap, object> fieldSelector) in fieldsToCheck)
             {
-                if (beatmap == referenceBeatmap)
-                    continue;
+                object referenceValue = fieldSelector(referenceBeatmap);
 
-                // Check each setting for inconsistencies
-                foreach ((var issueType, string fieldName, var fieldSelector) in fieldsToCheck)
+                foreach (var beatmap in difficulties)
                 {
-                    string referenceField = fieldSelector(referenceBeatmap);
-                    string currentField = fieldSelector(beatmap);
+                    if (beatmap == referenceBeatmap)
+                        continue;
 
-                    if (referenceField != currentField)
+                    object currentValue = fieldSelector(beatmap);
+
+                    if (!EqualityComparer<object>.Default.Equals(referenceValue, currentValue))
                     {
                         yield return new IssueTemplateInconsistentSetting(this, issueType).Create(
                             fieldName,
                             referenceBeatmap.BeatmapInfo.DifficultyName,
                             beatmap.BeatmapInfo.DifficultyName,
-                            referenceField,
-                            currentField
+                            referenceValue.ToString() ?? string.Empty,
+                            currentValue.ToString() ?? string.Empty
                         );
                     }
                 }
