@@ -10,7 +10,7 @@ namespace osu.Game.Rulesets.Taiko.Edit.Checks
 {
     public class CheckTaikoInconsistentSkipBarLine : ICheck
     {
-        public CheckMetadata Metadata => new CheckMetadata(CheckCategory.Timing, "Inconsistent \"Skip Bar Line\" setting");
+        public CheckMetadata Metadata => new CheckMetadata(CheckCategory.Timing, "Inconsistent \"Skip Bar Line\" setting", CheckScope.BeatmapSet);
 
         public IEnumerable<IssueTemplate> PossibleTemplates => new IssueTemplate[]
         {
