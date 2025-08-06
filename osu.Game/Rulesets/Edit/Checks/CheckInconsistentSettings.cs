@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Edit.Checks
                 (IssueType.Warning, "Epilepsy warning", b => b.EpilepsyWarning.ToString()),
                 (IssueType.Warning, "Letterbox during breaks", b => b.LetterboxInBreaks.ToString()),
                 (IssueType.Warning, "Samples match playback rate", b => b.SamplesMatchPlaybackRate.ToString()),
-                (IssueType.Warning, "widescreen support", b => b.WidescreenStoryboard.ToString()),
+                (IssueType.Warning, "Widescreen support", b => b.WidescreenStoryboard.ToString()),
                 (IssueType.Negligible, "Tick Rate", b => b.Difficulty.SliderTickRate.ToString(CultureInfo.InvariantCulture)),
             };
 

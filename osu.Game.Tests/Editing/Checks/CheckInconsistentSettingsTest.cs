@@ -46,7 +46,7 @@ namespace osu.Game.Tests.Editing.Checks
 
             Assert.That(issues, Has.Count.EqualTo(1));
             Assert.That(issues[0].Template is CheckInconsistentSettings.IssueTemplateInconsistentSetting);
-            Assert.That(issues[0].ToString(), Contains.Substring("audio lead-in"));
+            Assert.That(issues[0].ToString(), Contains.Substring("Audio lead-in"));
             Assert.That(issues[0].ToString(), Contains.Substring("1000"));
             Assert.That(issues[0].ToString(), Contains.Substring("2000"));
         }
@@ -64,7 +64,7 @@ namespace osu.Game.Tests.Editing.Checks
 
             Assert.That(issues, Has.Count.EqualTo(1));
             Assert.That(issues[0].Template is CheckInconsistentSettings.IssueTemplateInconsistentSetting);
-            Assert.That(issues[0].ToString(), Contains.Substring("countdown"));
+            Assert.That(issues[0].ToString(), Contains.Substring("Countdown"));
             Assert.That(issues[0].ToString(), Contains.Substring("Normal"));
             Assert.That(issues[0].ToString(), Contains.Substring("None"));
         }
@@ -82,7 +82,7 @@ namespace osu.Game.Tests.Editing.Checks
 
             Assert.That(issues, Has.Count.EqualTo(1));
             Assert.That(issues[0].Template is CheckInconsistentSettings.IssueTemplateInconsistentSetting);
-            Assert.That(issues[0].ToString(), Contains.Substring("countdown offset"));
+            Assert.That(issues[0].ToString(), Contains.Substring("Countdown offset"));
         }
 
         [Test]
@@ -98,7 +98,7 @@ namespace osu.Game.Tests.Editing.Checks
 
             Assert.That(issues, Has.Count.EqualTo(1));
             Assert.That(issues[0].Template is CheckInconsistentSettings.IssueTemplateInconsistentSetting);
-            Assert.That(issues[0].ToString(), Contains.Substring("epilepsy warning"));
+            Assert.That(issues[0].ToString(), Contains.Substring("Epilepsy warning"));
         }
 
         [Test]
@@ -114,7 +114,7 @@ namespace osu.Game.Tests.Editing.Checks
 
             Assert.That(issues, Has.Count.EqualTo(1));
             Assert.That(issues[0].Template is CheckInconsistentSettings.IssueTemplateInconsistentSetting);
-            Assert.That(issues[0].ToString(), Contains.Substring("letterbox in breaks"));
+            Assert.That(issues[0].ToString(), Contains.Substring("Letterbox during breaks"));
         }
 
         [Test]
@@ -130,7 +130,7 @@ namespace osu.Game.Tests.Editing.Checks
 
             Assert.That(issues, Has.Count.EqualTo(1));
             Assert.That(issues[0].Template is CheckInconsistentSettings.IssueTemplateInconsistentSetting);
-            Assert.That(issues[0].ToString(), Contains.Substring("samples match playback rate"));
+            Assert.That(issues[0].ToString(), Contains.Substring("Samples match playback rate"));
         }
 
         [Test]
@@ -146,7 +146,7 @@ namespace osu.Game.Tests.Editing.Checks
 
             Assert.That(issues, Has.Count.EqualTo(1));
             Assert.That(issues[0].Template is CheckInconsistentSettings.IssueTemplateInconsistentSetting);
-            Assert.That(issues[0].ToString(), Contains.Substring("widescreen storyboard"));
+            Assert.That(issues[0].ToString(), Contains.Substring("Widescreen support"));
         }
 
         [Test]
@@ -162,7 +162,7 @@ namespace osu.Game.Tests.Editing.Checks
 
             Assert.That(issues, Has.Count.EqualTo(1));
             Assert.That(issues[0].Template is CheckInconsistentSettings.IssueTemplateInconsistentSetting);
-            Assert.That(issues[0].ToString(), Contains.Substring("slider tick rate"));
+            Assert.That(issues[0].ToString(), Contains.Substring("Tick Rate"));
         }
 
         [Test]
@@ -177,9 +177,9 @@ namespace osu.Game.Tests.Editing.Checks
             var issues = check.Run(context).ToList();
 
             Assert.That(issues, Has.Count.EqualTo(3));
-            Assert.That(issues.Count(i => i.ToString().Contains("audio lead-in")), Is.EqualTo(1));
-            Assert.That(issues.Count(i => i.ToString().Contains("countdown")), Is.EqualTo(1));
-            Assert.That(issues.Count(i => i.ToString().Contains("epilepsy warning")), Is.EqualTo(1));
+            Assert.That(issues.Count(i => i.ToString().Contains("Audio lead-in")), Is.EqualTo(1));
+            Assert.That(issues.Count(i => i.ToString().Contains("Countdown")), Is.EqualTo(1));
+            Assert.That(issues.Count(i => i.ToString().Contains("Epilepsy warning")), Is.EqualTo(1));
         }
 
         [Test]
