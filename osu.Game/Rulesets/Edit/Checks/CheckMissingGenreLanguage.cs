@@ -3,9 +3,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using System.Reflection;
+using osu.Framework.Extensions;
 using osu.Game.Overlays.BeatmapListing;
 using osu.Game.Rulesets.Edit.Checks.Components;
 
@@ -39,23 +38,13 @@ namespace osu.Game.Rulesets.Edit.Checks
         {
             foreach (var value in Enum.GetValues<T>())
             {
-                string description = getGenreLanguageString(value);
-                string[] words = description.ToLowerInvariant().Split(' ');
+                string[] words = value.GetDescription().ToLowerInvariant().Split(' ');
 
                 if (words.All(tags.Contains))
                     return true;
             }
 
             return false;
-        }
-
-        // "Video Game" and "Hip Hop" are multiple words that are properly formatted in the enum's description attribute,
-        // so we need to use that and fall back to the enum's string value for the rest.
-        private string getGenreLanguageString(Enum value)
-        {
-            var field = value.GetType().GetField(value.ToString());
-            var attribute = field?.GetCustomAttribute<DescriptionAttribute>();
-            return attribute?.Description ?? value.ToString();
         }
 
         public class IssueTemplateMissingGenre : IssueTemplate
