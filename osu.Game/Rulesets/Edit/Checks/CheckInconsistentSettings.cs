@@ -23,46 +23,49 @@ namespace osu.Game.Rulesets.Edit.Checks
             var difficulties = context.BeatmapsetDifficulties;
 
             if (difficulties.Count <= 1)
-                yield break;
+                return [];
 
             var referenceBeatmap = context.Beatmap;
 
             bool hasStoryboard = ResourcesCheckUtils.HasAnyStoryboardElementPresent(context.WorkingBeatmap);
 
-            // Define fields to check
-            var fieldsToCheck = new (IssueType issueType, string fieldName, Func<IBeatmap, object> fieldSelector)[]
-            {
-                (IssueType.Warning, "Audio lead-in", b => b.AudioLeadIn),
-                (IssueType.Warning, "Countdown", b => b.Countdown),
-                (IssueType.Warning, "Countdown offset", b => b.CountdownOffset),
-                (IssueType.Warning, "Epilepsy warning", b => b.EpilepsyWarning),
-                (IssueType.Warning, "Letterbox during breaks", b => b.LetterboxInBreaks),
-                (IssueType.Warning, "Samples match playback rate", b => b.SamplesMatchPlaybackRate),
-                (IssueType.Warning, "Widescreen support", b => hasStoryboard && b.WidescreenStoryboard),
-                (IssueType.Negligible, "Tick Rate", b => b.Difficulty.SliderTickRate),
-            };
+            var issues = new List<Issue>();
 
-            // Iterate over each setting
-            foreach ((IssueType issueType, string fieldName, Func<IBeatmap, object> fieldSelector) in fieldsToCheck)
+            // Define fields to check
+            checkIssue(IssueType.Warning, "Audio lead-in", b => b.AudioLeadIn);
+            checkIssue(IssueType.Warning, "Countdown", b => b.Countdown);
+            checkIssue(IssueType.Warning, "Countdown offset", b => b.CountdownOffset);
+            checkIssue(IssueType.Warning, "Epilepsy warning", b => b.EpilepsyWarning);
+            checkIssue(IssueType.Warning, "Letterbox during breaks", b => b.LetterboxInBreaks);
+            checkIssue(IssueType.Warning, "Samples match playback rate", b => b.SamplesMatchPlaybackRate);
+
+            if (hasStoryboard)
+                checkIssue(IssueType.Warning, "Widescreen support", b => b.WidescreenStoryboard);
+
+            checkIssue(IssueType.Negligible, "Tick Rate", b => b.Difficulty.SliderTickRate);
+            return issues;
+
+            void checkIssue<T>(IssueType issueType, string fieldName, Func<IBeatmap, T> fieldSelector)
+                where T : notnull // ideally this'd be `T : IEquatable<T>` but `Enum` doesn't implement it...
             {
-                object referenceValue = fieldSelector(referenceBeatmap);
+                var referenceValue = fieldSelector(referenceBeatmap);
 
                 foreach (var beatmap in difficulties)
                 {
                     if (beatmap == referenceBeatmap)
                         continue;
 
-                    object currentValue = fieldSelector(beatmap);
+                    var currentValue = fieldSelector(beatmap);
 
-                    if (!EqualityComparer<object>.Default.Equals(referenceValue, currentValue))
+                    if (!EqualityComparer<T>.Default.Equals(currentValue, referenceValue))
                     {
-                        yield return new IssueTemplateInconsistentSetting(this, issueType).Create(
+                        issues.Add(new IssueTemplateInconsistentSetting(this, issueType).Create(
                             fieldName,
                             referenceBeatmap.BeatmapInfo.DifficultyName,
                             beatmap.BeatmapInfo.DifficultyName,
                             referenceValue.ToString() ?? string.Empty,
                             currentValue.ToString() ?? string.Empty
-                        );
+                        ));
                     }
                 }
             }
