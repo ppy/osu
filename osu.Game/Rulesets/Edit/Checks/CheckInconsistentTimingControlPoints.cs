@@ -9,7 +9,7 @@ namespace osu.Game.Rulesets.Edit.Checks
 {
     public class CheckInconsistentTimingControlPoints : ICheck
     {
-        public CheckMetadata Metadata => new CheckMetadata(CheckCategory.Timing, "Inconsistent timing control points");
+        public CheckMetadata Metadata => new CheckMetadata(CheckCategory.Timing, "Inconsistent timing control points", CheckScope.BeatmapSet);
 
         public IEnumerable<IssueTemplate> PossibleTemplates => new IssueTemplate[]
         {
