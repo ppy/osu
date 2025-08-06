@@ -34,9 +34,10 @@ namespace osu.Game.Rulesets.Edit.Checks
                 yield return new IssueTemplateMissingLanguage(this).Create();
         }
 
-        private bool hasTags<T>(string tags) where T : Enum
+        private bool hasTags<T>(string tags)
+            where T : struct, Enum
         {
-            foreach (T value in Enum.GetValues(typeof(T)))
+            foreach (var value in Enum.GetValues<T>())
             {
                 string description = getGenreLanguageString(value);
                 string[] words = description.ToLowerInvariant().Split(' ');
