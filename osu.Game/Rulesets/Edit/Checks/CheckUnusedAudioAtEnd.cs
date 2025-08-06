@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit.Checks.Components;
-using osu.Game.Storyboards;
 
 namespace osu.Game.Rulesets.Edit.Checks
 {
@@ -31,7 +30,7 @@ namespace osu.Game.Rulesets.Edit.Checks
             {
                 double percentageLeft = Math.Abs(mappedPercentage - 100);
 
-                bool storyboardIsPresent = isAnyStoryboardElementPresent(context.WorkingBeatmap.Storyboard);
+                bool storyboardIsPresent = ResourcesCheckUtils.HasAnyStoryboardElementPresent(context.WorkingBeatmap);
 
                 if (storyboardIsPresent)
                 {
@@ -42,19 +41,6 @@ namespace osu.Game.Rulesets.Edit.Checks
                     yield return new IssueTemplateUnusedAudioAtEnd(this).Create(percentageLeft);
                 }
             }
-        }
-
-        private bool isAnyStoryboardElementPresent(Storyboard storyboard)
-        {
-            foreach (var layer in storyboard.Layers)
-            {
-                foreach (var _ in layer.Elements)
-                {
-                    return true;
-                }
-            }
-
-            return false;
         }
 
         public class IssueTemplateUnusedAudioAtEnd : IssueTemplate
