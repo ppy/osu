@@ -68,10 +68,13 @@ namespace osu.Game.Rulesets.Mania.UI
 
         private readonly Bindable<ManiaMobileLayout> mobileLayout = new Bindable<ManiaMobileLayout>();
 
+        private readonly BindableFloat noteWidth = new BindableFloat(1.0f);
+
         [BackgroundDependencyLoader]
         private void load(ManiaRulesetConfigManager? rulesetConfig)
         {
             rulesetConfig?.BindWith(ManiaRulesetSetting.MobileLayout, mobileLayout);
+            rulesetConfig?.BindWith(ManiaRulesetSetting.NoteWidth, noteWidth);
 
             mobileLayout.BindValueChanged(_ => invalidateLayout());
             skin.SourceChanged += invalidateLayout;
@@ -143,7 +146,7 @@ namespace osu.Game.Rulesets.Mania.UI
                 // only used by default skin (legacy skins get defaults set in LegacyManiaSkinConfiguration)
                 width ??= isSpecialColumn ? Column.SPECIAL_COLUMN_WIDTH : Column.COLUMN_WIDTH;
 
-                columns[i].Width = width.Value * mobileAdjust;
+                columns[i].Width = width.Value * mobileAdjust * noteWidth.Value;
             }
         }
 

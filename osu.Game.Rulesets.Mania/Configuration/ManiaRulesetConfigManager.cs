@@ -24,6 +24,7 @@ namespace osu.Game.Rulesets.Mania.Configuration
             SetDefault(ManiaRulesetSetting.ScrollDirection, ManiaScrollingDirection.Down);
             SetDefault(ManiaRulesetSetting.TimingBasedNoteColouring, false);
             SetDefault(ManiaRulesetSetting.MobileLayout, ManiaMobileLayout.Portrait);
+            SetDefault(ManiaRulesetSetting.NoteWidth, 1.0f, 0.1f, 3.0f, 0.1f);
         }
 
         public override TrackedSettings CreateTrackedSettings() => new TrackedSettings
@@ -33,6 +34,13 @@ namespace osu.Game.Rulesets.Mania.Configuration
                     rawValue: speed,
                     name: RulesetSettingsStrings.ScrollSpeed,
                     value: RulesetSettingsStrings.ScrollSpeedTooltip((int)DrawableManiaRuleset.ComputeScrollTime(speed), speed)
+                )
+            ),
+            new TrackedSetting<float>(ManiaRulesetSetting.NoteWidth,
+                scale => new SettingDescription(
+                    rawValue: scale,
+                    name: RulesetSettingsStrings.NoteWidth,
+                    value: $"{scale:N2}x"
                 )
             )
         };
@@ -44,5 +52,6 @@ namespace osu.Game.Rulesets.Mania.Configuration
         ScrollDirection,
         TimingBasedNoteColouring,
         MobileLayout,
+        NoteWidth
     }
 }
