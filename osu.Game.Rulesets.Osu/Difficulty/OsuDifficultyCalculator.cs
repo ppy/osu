@@ -291,7 +291,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             else if (mods.Any(m => m is OsuModDeflate))
             {
                 float deflateInitialScale = mods.OfType<OsuModDeflate>().First().StartScale.Value;
-                flashlightRating *= 1.0 - Math.Clamp((deflateInitialScale - 1) / 10, 0.0, 0.9);
+                flashlightRating *= Math.Clamp(DifficultyCalculationUtils.ReverseLerp(deflateInitialScale, 11, 1), 0.1, 1);
             }
 
             if (mods.Any(m => m is OsuModMagnetised))
