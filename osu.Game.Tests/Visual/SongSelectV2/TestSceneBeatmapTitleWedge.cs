@@ -43,6 +43,9 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
         private APIBeatmapSet? currentOnlineSet;
 
+        [Cached]
+        private RealmPopulatingOnlineLookupSource lookupSource = new RealmPopulatingOnlineLookupSource();
+
         [BackgroundDependencyLoader]
         private void load(RulesetStore rulesets)
         {
@@ -55,6 +58,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             AddRange(new Drawable[]
             {
+                lookupSource,
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -97,7 +101,9 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             selectBeatmap(null);
             AddAssert("check default title", () => titleWedge.DisplayedTitle == Beatmap.Default.BeatmapInfo.Metadata.Title);
             AddAssert("check default artist", () => titleWedge.DisplayedArtist == Beatmap.Default.BeatmapInfo.Metadata.Artist);
-            AddAssert("check no statistics", () => difficultyDisplay.ChildrenOfType<BeatmapTitleWedge.DifficultyStatisticsDisplay>().All(d => !d.Statistics.Any()));
+            AddAssert("statistics not visible",
+                () => difficultyDisplay.ChildrenOfType<BeatmapTitleWedge.DifficultyStatisticsDisplay>()
+                                       .All(d => d.Alpha == 0 || d.ChildrenOfType<BeatmapTitleWedge.StatisticDifficulty>().All(s => s.Alpha == 0)));
         }
 
         [Test]
@@ -164,8 +170,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 currentOnlineSet = onlineSet;
                 Beatmap.Value = working;
             });
-            AddAssert("play count = 10000", () => this.ChildrenOfType<BeatmapTitleWedge.Statistic>().ElementAt(0).Text.ToString() == "10,000");
-            AddAssert("favourites count = 2345", () => this.ChildrenOfType<BeatmapTitleWedge.FavouriteButton>().Single().Text.ToString() == "2,345");
+            AddUntilStep("play count is 10000", () => this.ChildrenOfType<BeatmapTitleWedge.Statistic>().ElementAt(0).Text.ToString(), () => Is.EqualTo("10,000"));
+            AddUntilStep("favourites count is 2345", () => this.ChildrenOfType<BeatmapTitleWedge.FavouriteButton>().Single().Text.ToString(), () => Is.EqualTo("2,345"));
             AddStep("online beatmapset with local diff", () =>
             {
                 var (working, onlineSet) = createTestBeatmap();
@@ -175,8 +181,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 currentOnlineSet = onlineSet;
                 Beatmap.Value = working;
             });
-            AddAssert("play count = -", () => this.ChildrenOfType<BeatmapTitleWedge.Statistic>().ElementAt(0).Text.ToString() == "-");
-            AddAssert("favourites count = 2345", () => this.ChildrenOfType<BeatmapTitleWedge.FavouriteButton>().Single().Text.ToString() == "2,345");
+            AddUntilStep("play count is -", () => this.ChildrenOfType<BeatmapTitleWedge.Statistic>().ElementAt(0).Text.ToString(), () => Is.EqualTo("-"));
+            AddUntilStep("favourites count is 2345", () => this.ChildrenOfType<BeatmapTitleWedge.FavouriteButton>().Single().Text.ToString(), () => Is.EqualTo("2,345"));
             AddStep("local beatmapset", () =>
             {
                 var (working, _) = createTestBeatmap();
@@ -184,8 +190,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 currentOnlineSet = null;
                 Beatmap.Value = working;
             });
-            AddAssert("play count = -", () => this.ChildrenOfType<BeatmapTitleWedge.Statistic>().ElementAt(0).Text.ToString() == "-");
-            AddAssert("favourites count = -", () => this.ChildrenOfType<BeatmapTitleWedge.FavouriteButton>().Single().Text.ToString() == "-");
+            AddUntilStep("play count is -", () => this.ChildrenOfType<BeatmapTitleWedge.Statistic>().ElementAt(0).Text.ToString(), () => Is.EqualTo("-"));
+            AddUntilStep("favourites count is -", () => this.ChildrenOfType<BeatmapTitleWedge.FavouriteButton>().Single().Text.ToString(), () => Is.EqualTo("-"));
         }
 
         [Test]
@@ -229,17 +235,17 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 currentOnlineSet = onlineSet;
                 Beatmap.Value = working;
             });
-            AddUntilStep("play count = 10000", () => this.ChildrenOfType<BeatmapTitleWedge.Statistic>().ElementAt(0).Text.ToString() == "10,000");
-            AddUntilStep("favourites count = 2345", () => this.ChildrenOfType<BeatmapTitleWedge.FavouriteButton>().Single().Text.ToString() == "2,345");
+            AddUntilStep("play count is 10000", () => this.ChildrenOfType<BeatmapTitleWedge.Statistic>().ElementAt(0).Text.ToString(), () => Is.EqualTo("10,000"));
+            AddUntilStep("favourites count is 2345", () => this.ChildrenOfType<BeatmapTitleWedge.FavouriteButton>().Single().Text.ToString(), () => Is.EqualTo("2,345"));
 
             AddStep("click favourite button", () => this.ChildrenOfType<BeatmapTitleWedge.FavouriteButton>().Single().TriggerClick());
             AddStep("allow request to complete", () => resetEvent.Set());
-            AddAssert("favourites count = 2346", () => this.ChildrenOfType<BeatmapTitleWedge.FavouriteButton>().Single().Text.ToString() == "2,346");
+            AddUntilStep("favourites count is 2346", () => this.ChildrenOfType<BeatmapTitleWedge.FavouriteButton>().Single().Text.ToString(), () => Is.EqualTo("2,346"));
 
             AddStep("reset event", () => resetEvent.Reset());
             AddStep("click favourite button", () => this.ChildrenOfType<BeatmapTitleWedge.FavouriteButton>().Single().TriggerClick());
             AddStep("allow request to complete", () => resetEvent.Set());
-            AddAssert("favourites count = 2345", () => this.ChildrenOfType<BeatmapTitleWedge.FavouriteButton>().Single().Text.ToString() == "2,345");
+            AddUntilStep("favourites count is 2345", () => this.ChildrenOfType<BeatmapTitleWedge.FavouriteButton>().Single().Text.ToString(), () => Is.EqualTo("2,345"));
 
             AddStep("reset event", () => resetEvent.Reset());
             AddStep("click favourite button", () => this.ChildrenOfType<BeatmapTitleWedge.FavouriteButton>().Single().TriggerClick());
@@ -254,7 +260,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 Beatmap.Value = working;
             });
             AddStep("allow request to complete", () => resetEvent.Set());
-            AddAssert("favourites count = 9999", () => this.ChildrenOfType<BeatmapTitleWedge.FavouriteButton>().Single().Text.ToString() == "9,999");
+            AddUntilStep("favourites count is 9999", () => this.ChildrenOfType<BeatmapTitleWedge.FavouriteButton>().Single().Text.ToString(), () => Is.EqualTo("9,999"));
 
             AddStep("set up request handler to fail", () =>
             {

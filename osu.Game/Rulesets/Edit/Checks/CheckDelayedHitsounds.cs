@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Edit.Checks
         private const int delay_threshold = 5;
         private const int delay_threshold_negligible = 1;
 
-        public CheckMetadata Metadata => new CheckMetadata(CheckCategory.Audio, "Delayed hit sounds.");
+        public CheckMetadata Metadata => new CheckMetadata(CheckCategory.Audio, "Delayed hit sounds.", CheckScope.BeatmapSet);
 
         public IEnumerable<IssueTemplate> PossibleTemplates => new IssueTemplate[]
         {

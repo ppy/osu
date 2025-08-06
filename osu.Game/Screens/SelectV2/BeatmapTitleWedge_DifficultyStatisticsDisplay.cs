@@ -144,11 +144,13 @@ namespace osu.Game.Screens.SelectV2
                     if (tiny)
                     {
                         statisticsFlow.Hide();
+                        // Slow fade hides fill flow layout weirdness.
                         tinyStatisticsGrid.FadeIn(200, Easing.InQuint);
                     }
                     else
                     {
                         tinyStatisticsGrid.Hide();
+                        // Slow fade hides fill flow layout weirdness.
                         statisticsFlow.FadeIn(200, Easing.InQuint);
                     }
 
@@ -164,12 +166,16 @@ namespace osu.Game.Screens.SelectV2
                 float statisticWidth = Math.Max(65, statisticsFlow.Max(s => s.LabelWidth));
 
                 foreach (var statistic in statisticsFlow)
+                {
                     statistic.Width = statisticWidth;
+                    // Slow fade hides fill flow layout weirdness.
+                    statistic.FadeIn(200, Easing.InQuint);
+                }
 
                 drawSizeLayout.Invalidate();
             });
 
-            private void updateStatistics()
+            private void updateStatistics() => Scheduler.AddOnce(() =>
             {
                 if (statisticsFlow.Select(s => s.Value.Label)
                                   .SequenceEqual(statistics.Select(s => s.Label)))
@@ -181,12 +187,13 @@ namespace osu.Game.Screens.SelectV2
                 {
                     statisticsFlow.ChildrenEnumerable = statistics.Select(d => new StatisticDifficulty
                     {
+                        Alpha = 0,
                         AccentColour = accentColour,
                         Value = d
                     });
                     updateStatisticsSizing();
                 }
-            }
+            });
 
             private void updateTinyStatistics()
             {

@@ -149,9 +149,8 @@ namespace osu.Game.Screens.Edit.Submission
             progress.BindValueChanged(_ => Scheduler.AddOnce(updateProgress), true);
 
             progressSampleChannel = progressSample?.GetChannel();
-            // TODO: add back once framework revert is reverted.
-            // if (progressSampleChannel != null)
-            //     progressSampleChannel.ManualFree = true;
+            if (progressSampleChannel != null)
+                progressSampleChannel.ManualFree = true;
         }
 
         public void SetNotStarted() => status.Value = StageStatusType.NotStarted;
