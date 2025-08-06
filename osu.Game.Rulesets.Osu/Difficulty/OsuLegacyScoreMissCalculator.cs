@@ -50,6 +50,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double missCount = Math.Min(scoreBasedMissCount, maximumMissCount);
 
             // Every slider has *at least* 2 combo attributed in classic mechanics.
+            // If they broke on a slider with a tick, then this still works since they would have lost at least 2 combo (the tick and the end)
             // Using this as a max means a score that loses 1 combo on a map can't possibly have been a slider break.
             // It must have been a slider end.
             int maxPossibleSliderBreaks = Math.Min(attributes.SliderCount, (attributes.MaxCombo - score.MaxCombo) / 2);
