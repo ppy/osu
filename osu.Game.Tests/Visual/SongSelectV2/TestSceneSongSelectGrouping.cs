@@ -6,6 +6,8 @@ using NUnit.Framework;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Extensions;
+using osu.Game.Models;
+using osu.Game.Online.API;
 using osu.Game.Screens.Select.Filter;
 using osu.Game.Screens.SelectV2;
 
@@ -14,6 +16,11 @@ namespace osu.Game.Tests.Visual.SongSelectV2
     public partial class TestSceneSongSelectGrouping : SongSelectTestScene
     {
         private BeatmapCarouselFilterGrouping grouping => Carousel.Filters.OfType<BeatmapCarouselFilterGrouping>().Single();
+
+        [SetUp]
+        public void SetUp() => Schedule(() => API.Logout());
+
+        #region Collection grouping
 
         [Test]
         public void TestCollectionGrouping()
@@ -111,5 +118,127 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             AddAssert("no-collection group not present", () => grouping.GroupItems.All(g => g.Key.Title != "Not in collection"));
         }
+
+        #endregion
+
+        #region My Maps grouping
+
+        [Test]
+        public void TestMyMapsGrouping()
+        {
+            ImportBeatmapForRuleset(s => ((RealmUser)s.Metadata.Author).Username = "user1", 0);
+            ImportBeatmapForRuleset(s => ((RealmUser)s.Metadata.Author).Username = "user2", 0);
+            ImportBeatmapForRuleset(s => ((RealmUser)s.Metadata.Author).Username = "user3", 0);
+
+            BeatmapSetInfo[] beatmapSets = null!;
+
+            AddStep("get beatmaps", () => beatmapSets = Beatmaps.GetAllUsableBeatmapSets().OrderBy(b => b.OnlineID).ToArray());
+
+            AddStep("log in", () =>
+            {
+                API.Login("user1", string.Empty);
+                API.AuthenticateSecondFactor("abcdefgh");
+            });
+
+            LoadSongSelect();
+            GroupBy(GroupMode.MyMaps);
+            WaitForFiltering();
+
+            AddAssert("'my maps' present", () =>
+            {
+                var group = grouping.GroupItems.Single(g => g.Key.Title == "My maps");
+                return group.Value.Select(i => i.Model).OfType<BeatmapSetInfo>().Single().Equals(beatmapSets[0]);
+            });
+
+            AddAssert("'not my maps' present", () =>
+            {
+                var group = grouping.GroupItems.Single(g => g.Key.Title == "Not my maps");
+                return group.Value.Select(i => i.Model).OfType<BeatmapSetInfo>().SequenceEqual(new[] { beatmapSets[1], beatmapSets[2] });
+            });
+        }
+
+        [Test]
+        public void TestMyMapsGroupingRenamedUsername()
+        {
+            ImportBeatmapForRuleset(s =>
+            {
+                ((RealmUser)s.Metadata.Author).Username = "user1_old";
+                ((RealmUser)s.Metadata.Author).OnlineID = DummyAPIAccess.DUMMY_USER_ID;
+            }, 0);
+            ImportBeatmapForRuleset(s => ((RealmUser)s.Metadata.Author).Username = "user2", 0);
+            ImportBeatmapForRuleset(s => ((RealmUser)s.Metadata.Author).Username = "user3", 0);
+
+            BeatmapSetInfo[] beatmapSets = null!;
+
+            AddStep("get beatmaps", () => beatmapSets = Beatmaps.GetAllUsableBeatmapSets().OrderBy(b => b.OnlineID).ToArray());
+
+            AddStep("log in", () =>
+            {
+                API.Login("user1", string.Empty);
+                API.AuthenticateSecondFactor("abcdefgh");
+            });
+
+            LoadSongSelect();
+            GroupBy(GroupMode.MyMaps);
+            WaitForFiltering();
+
+            AddAssert("'my maps' present", () =>
+            {
+                var group = grouping.GroupItems.Single(g => g.Key.Title == "My maps");
+                return group.Value.Select(i => i.Model).OfType<BeatmapSetInfo>().Single().Equals(beatmapSets[0]);
+            });
+
+            AddAssert("'not my maps' present", () =>
+            {
+                var group = grouping.GroupItems.Single(g => g.Key.Title == "Not my maps");
+                return group.Value.Select(i => i.Model).OfType<BeatmapSetInfo>().SequenceEqual(new[] { beatmapSets[1], beatmapSets[2] });
+            });
+        }
+
+        [Test]
+        public void TestMyMapsGroupingUpdatesOnUserChange()
+        {
+            ImportBeatmapForRuleset(s => ((RealmUser)s.Metadata.Author).Username = "user1", 0);
+            ImportBeatmapForRuleset(s => ((RealmUser)s.Metadata.Author).Username = "user2", 0);
+            ImportBeatmapForRuleset(s => ((RealmUser)s.Metadata.Author).Username = new GuestUser().Username, 0);
+
+            BeatmapSetInfo[] beatmapSets = null!;
+
+            AddStep("get beatmaps", () => beatmapSets = Beatmaps.GetAllUsableBeatmapSets().OrderBy(b => b.OnlineID).ToArray());
+
+            // stay logged out
+
+            LoadSongSelect();
+            GroupBy(GroupMode.MyMaps);
+            WaitForFiltering();
+
+            AddAssert("only 'not my maps' present", () =>
+            {
+                var group = grouping.GroupItems.Single();
+                return group.Key.Title == "Not my maps" && group.Value.Select(i => i.Model).OfType<BeatmapSetInfo>().SequenceEqual(new[] { beatmapSets[0], beatmapSets[1], beatmapSets[2] });
+            });
+
+            AddStep("log in", () =>
+            {
+                API.Login("user2", string.Empty);
+                API.AuthenticateSecondFactor("abcdefgh");
+            });
+
+            WaitForFiltering();
+
+            AddAssert("'my maps' present", () =>
+            {
+                var group = grouping.GroupItems.Single(g => g.Key.Title == "My maps");
+                return group.Value.Select(i => i.Model).OfType<BeatmapSetInfo>().Single().Equals(beatmapSets[1]);
+            });
+
+            AddAssert("'not my maps' present", () =>
+            {
+                var group = grouping.GroupItems.Single(g => g.Key.Title == "Not my maps");
+                return group.Value.Select(i => i.Model).OfType<BeatmapSetInfo>().SequenceEqual(new[] { beatmapSets[0], beatmapSets[2] });
+            });
+        }
+
+        #endregion
     }
 }
