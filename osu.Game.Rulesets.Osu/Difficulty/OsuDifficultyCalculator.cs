@@ -110,7 +110,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (flashlight is not null)
                 flashlightRating = osuRatingCalculator.ComputeFlashlightRating(flashlight.DifficultyValue());
 
-            double sliderFactor = aimRating > 0 ? aimRatingNoSliders / aimRating : 1;
+            double sliderFactor = aimRating > 0 ? Math.Min(aimRating, aimRatingNoSliders) / aimRating : 1;
 
             double sliderNestedScorePerObject = LegacyScoreUtils.CalculateNestedScorePerObject(beatmap, totalHits);
             double legacyScoreBaseMultiplier = LegacyScoreUtils.CalculateDifficultyPeppyStars(beatmap);
