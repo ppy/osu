@@ -1,20 +1,32 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using NUnit.Framework;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
+using osu.Framework.Development;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Extensions;
 using osu.Game.Models;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Scoring;
 using osu.Game.Screens.Select.Filter;
 using osu.Game.Screens.SelectV2;
+using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests.Visual.SongSelectV2
 {
+    /// <summary>
+    /// Test suite for grouping modes which require the presence of API / realm.
+    /// All other grouping modes are tested separately in <see cref="BeatmapCarouselFilterGroupingTest"/>.
+    /// </summary>
     public partial class TestSceneSongSelectGrouping : SongSelectTestScene
     {
         private BeatmapCarouselFilterGrouping grouping => Carousel.Filters.OfType<BeatmapCarouselFilterGrouping>().Single();
@@ -50,25 +62,10 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             GroupBy(GroupMode.Collections);
             WaitForFiltering();
 
-            AddAssert("first collection present", () =>
-            {
-                var group = grouping.GroupItems.Single(g => g.Key.Title == "My Collection #1");
-                return group.Value.Select(i => i.Model).OfType<BeatmapSetInfo>().Single().Equals(beatmapSets[0]);
-            });
-
-            AddAssert("second collection present", () =>
-            {
-                var group = grouping.GroupItems.Single(g => g.Key.Title == "My Collection #2");
-                return group.Value.Select(i => i.Model).OfType<BeatmapSetInfo>().Single().Equals(beatmapSets[1]);
-            });
-
-            AddAssert("third collection not present", () => grouping.GroupItems.All(g => g.Key.Title != "My Collection #3"));
-
-            AddAssert("no-collection group present", () =>
-            {
-                var group = grouping.GroupItems.Single(g => g.Key.Title == "Not in collection");
-                return group.Value.Select(i => i.Model).OfType<BeatmapSetInfo>().Single().Equals(beatmapSets[2]);
-            });
+            assertGroupPresent("My Collection #1", () => new[] { beatmapSets[0] });
+            assertGroupPresent("My Collection #2", () => new[] { beatmapSets[1] });
+            assertGroupPresent("Not in collection", () => new[] { beatmapSets[2] });
+            assertGroupsCount(3);
         }
 
         [Test]
@@ -112,13 +109,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             WaitForFiltering();
 
-            AddAssert("collection present", () =>
-            {
-                var group = grouping.GroupItems.Single(g => g.Key.Title == "My Collection #4");
-                return group.Value.Select(i => i.Model).OfType<BeatmapSetInfo>().Single().Equals(beatmapSet);
-            });
-
-            AddAssert("no-collection group not present", () => grouping.GroupItems.All(g => g.Key.Title != "Not in collection"));
+            assertGroupPresent("My Collection #4", () => new[] { beatmapSet });
+            assertGroupsCount(1);
         }
 
         #endregion
@@ -128,9 +120,9 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [Test]
         public void TestMyMapsGrouping()
         {
-            ImportBeatmapForRuleset(s => ((RealmUser)s.Metadata.Author).Username = "user1", 0);
-            ImportBeatmapForRuleset(s => ((RealmUser)s.Metadata.Author).Username = "user2", 0);
-            ImportBeatmapForRuleset(s => ((RealmUser)s.Metadata.Author).Username = "user3", 0);
+            ImportBeatmapForRuleset(s => ((RealmUser)s.Metadata.Author).Username = "user1", 3, 0);
+            ImportBeatmapForRuleset(s => ((RealmUser)s.Metadata.Author).Username = "user2", 3, 0);
+            ImportBeatmapForRuleset(s => ((RealmUser)s.Metadata.Author).Username = "user3", 3, 0);
 
             BeatmapSetInfo[] beatmapSets = null!;
 
@@ -146,11 +138,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             GroupBy(GroupMode.MyMaps);
             WaitForFiltering();
 
-            AddAssert("'my maps' present", () =>
-            {
-                var group = grouping.GroupItems.Single();
-                return group.Key.Title == "My maps" && group.Value.Select(i => i.Model).OfType<BeatmapSetInfo>().Single().Equals(beatmapSets[0]);
-            });
+            assertGroupPresent("My maps", () => new[] { beatmapSets[0] });
+            assertGroupsCount(1);
         }
 
         [Test]
@@ -160,9 +149,9 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             {
                 ((RealmUser)s.Metadata.Author).Username = "user1_old";
                 ((RealmUser)s.Metadata.Author).OnlineID = DummyAPIAccess.DUMMY_USER_ID;
-            }, 0);
-            ImportBeatmapForRuleset(s => ((RealmUser)s.Metadata.Author).Username = "user2", 0);
-            ImportBeatmapForRuleset(s => ((RealmUser)s.Metadata.Author).Username = "user3", 0);
+            }, 3, 0);
+            ImportBeatmapForRuleset(s => ((RealmUser)s.Metadata.Author).Username = "user2", 3, 0);
+            ImportBeatmapForRuleset(s => ((RealmUser)s.Metadata.Author).Username = "user3", 3, 0);
 
             BeatmapSetInfo[] beatmapSets = null!;
 
@@ -178,19 +167,16 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             GroupBy(GroupMode.MyMaps);
             WaitForFiltering();
 
-            AddAssert("'my maps' present", () =>
-            {
-                var group = grouping.GroupItems.Single();
-                return group.Key.Title == "My maps" && group.Value.Select(i => i.Model).OfType<BeatmapSetInfo>().Single().Equals(beatmapSets[0]);
-            });
+            assertGroupPresent("My maps", () => new[] { beatmapSets[0] });
+            assertGroupsCount(1);
         }
 
         [Test]
         public void TestMyMapsGroupingUpdatesOnUserChange()
         {
-            ImportBeatmapForRuleset(s => ((RealmUser)s.Metadata.Author).Username = "user1", 0);
-            ImportBeatmapForRuleset(s => ((RealmUser)s.Metadata.Author).Username = "user2", 0);
-            ImportBeatmapForRuleset(s => ((RealmUser)s.Metadata.Author).Username = new GuestUser().Username, 0);
+            ImportBeatmapForRuleset(s => ((RealmUser)s.Metadata.Author).Username = "user1", 3, 0);
+            ImportBeatmapForRuleset(s => ((RealmUser)s.Metadata.Author).Username = "user2", 3, 0);
+            ImportBeatmapForRuleset(s => ((RealmUser)s.Metadata.Author).Username = new GuestUser().Username, 3, 0);
 
             BeatmapSetInfo[] beatmapSets = null!;
 
@@ -213,17 +199,146 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             WaitForFiltering();
 
-            AddAssert("'my maps' present", () =>
-            {
-                var group = grouping.GroupItems.Single();
-                return group.Key.Title == "My maps" && group.Value.Select(i => i.Model).OfType<BeatmapSetInfo>().Single().Equals(beatmapSets[1]);
-            });
+            assertGroupPresent("My maps", () => new[] { beatmapSets[1] });
+            assertGroupsCount(1);
         }
 
         #endregion
 
+        #region Rank Achieved grouping
+
+        [Test]
+        public void TestRankAchievedGrouping()
+        {
+            ImportBeatmapForRuleset(_ => { }, 1, 0);
+            ImportBeatmapForRuleset(_ => { }, 1, 0);
+            ImportBeatmapForRuleset(_ => { }, 1, 0);
+            ImportBeatmapForRuleset(_ => { }, 1, 0);
+            ImportBeatmapForRuleset(_ => { }, 1, 0);
+
+            AddStep("log in", () =>
+            {
+                API.Login("user1", string.Empty); // match username in test scores.
+                API.AuthenticateSecondFactor("abcdefgh");
+            });
+
+            BeatmapSetInfo[] beatmapSets = null!;
+
+            AddStep("add scores", () =>
+            {
+                beatmapSets = Beatmaps.GetAllUsableBeatmapSets().OrderBy(b => b.OnlineID).ToArray();
+
+                ScoreManager.Import(createTestScoreInfo(beatmapSets[0].Beatmaps[0], ScoreRank.SH));
+                ScoreManager.Import(createTestScoreInfo(beatmapSets[1].Beatmaps[0], ScoreRank.A));
+                ScoreManager.Import(createTestScoreInfo(beatmapSets[2].Beatmaps[0], ScoreRank.C));
+
+                // score belonging to another user on an unplayed beatmap.
+                ScoreManager.Import(createTestScoreInfo(beatmapSets[3].Beatmaps[0], ScoreRank.XH, s => s.User = new APIUser { Id = 1337, Username = "user2" }));
+
+                // score belonging to another user on a played beatmap.
+                ScoreManager.Import(createTestScoreInfo(beatmapSets[0].Beatmaps[0], ScoreRank.XH, s => s.User = new APIUser { Id = 1337, Username = "user2" }));
+
+                // score belonging to local user but with less rank.
+                ScoreManager.Import(createTestScoreInfo(beatmapSets[0].Beatmaps[0], ScoreRank.D));
+            });
+
+            LoadSongSelect();
+            GroupBy(GroupMode.RankAchieved);
+            WaitForFiltering();
+
+            assertGroupPresent("S+", () => new[] { beatmapSets[0] });
+            assertGroupPresent("A", () => new[] { beatmapSets[1] });
+            assertGroupPresent("C", () => new[] { beatmapSets[2] });
+            assertGroupPresent("Unplayed", () => new[] { beatmapSets[3], beatmapSets[4] });
+            assertGroupsCount(4);
+        }
+
+        #endregion
+
+        #region Benchmarks
+
+        [Test]
+        public void TestPerformance()
+        {
+            const int sets_count = 100;
+            const int diffs_count = 100;
+
+            if (DebugUtils.IsNUnitRunning)
+                Assert.Ignore("For benchmarking purposes only.");
+
+            AddStep("log in", () =>
+            {
+                API.Login("user1", string.Empty); // match username in test scores.
+                API.AuthenticateSecondFactor("abcdefgh");
+            });
+
+            int count = 0;
+
+            AddStep("populate database", () =>
+            {
+                count = 0;
+
+                Task.Factory.StartNew(() =>
+                {
+                    for (int i = 0; i < sets_count; i++)
+                    {
+                        var liveSet = Beatmaps.Import(TestResources.CreateTestBeatmapSetInfo(diffs_count, Rulesets.AvailableRulesets.ToArray()))!;
+
+                        liveSet.PerformRead(s =>
+                        {
+                            foreach (var beatmap in s.Beatmaps
+                                                     .GroupBy(b => b.Ruleset.OnlineID)
+                                                     .Select(g => g.OrderBy(_ => RNG.Next()).Take(4)) // take 4 difficulties from each ruleset randomly
+                                                     .SelectMany(g => g))
+                            {
+                                for (int k = 0; k < 3; k++) // create 3 scores per difficulty
+                                    ScoreManager.Import(createTestScoreInfo(beatmap));
+                            }
+                        });
+
+                        count++;
+                    }
+                }, TaskCreationOptions.LongRunning);
+            });
+
+            AddUntilStep("wait for population", () => count, () => Is.GreaterThan(sets_count / 3));
+            AddUntilStep("this takes a while", () => count, () => Is.GreaterThan(sets_count / 3 * 2));
+            AddUntilStep("maybe they are done now", () => count, () => Is.EqualTo(sets_count));
+
+            LoadSongSelect();
+        }
+
+        #endregion
+
+        private void assertGroupsCount(int expected)
+        {
+            AddAssert($"groups = {expected}", () => grouping.GroupItems, () => Has.Count.EqualTo(expected));
+        }
+
+        private void assertGroupPresent(string name, Func<IEnumerable<BeatmapSetInfo>> getBeatmaps)
+        {
+            AddAssert($"\"{name}\" present", () =>
+            {
+                var group = grouping.GroupItems.Single(g => g.Key.Title == name);
+                var actualBeatmaps = group.Value.Select(i => i.Model).OfType<BeatmapInfo>().OrderBy(b => b.ID);
+                var expectedBeatmaps = getBeatmaps().SelectMany(s => s.Beatmaps).OrderBy(b => b.ID);
+                return actualBeatmaps.SequenceEqual(expectedBeatmaps);
+            });
+        }
+
         private NoResultsPlaceholder? getPlaceholder() => SongSelect.ChildrenOfType<NoResultsPlaceholder>().FirstOrDefault();
 
         private void checkMatchedBeatmaps(int expected) => AddUntilStep($"{expected} matching shown", () => Carousel.MatchedBeatmapsCount, () => Is.EqualTo(expected));
+
+        private ScoreInfo createTestScoreInfo(BeatmapInfo beatmap, ScoreRank? rank = null, Action<ScoreInfo>? applyToScore = null)
+        {
+            var score = TestResources.CreateTestScoreInfo(beatmap);
+            score.User = API.LocalUser.Value;
+            score.Rank = rank ?? Enum.GetValues<ScoreRank>().OrderBy(_ => RNG.Next()).First();
+            score.TotalScore = (long)(((double)score.Rank + 1) / (Enum.GetValues<ScoreRank>().Length + 1) * 1000000);
+            score.Date = DateTimeOffset.Now;
+            applyToScore?.Invoke(score);
+            return score;
+        }
     }
 }
