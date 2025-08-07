@@ -235,11 +235,12 @@ namespace osu.Game.Screens.SelectV2
             }
         }
 
-        private List<GroupMapping> getGroupsBy(Func<BeatmapInfo, GroupDefinition> getGroup, List<CarouselItem> items)
+        private List<GroupMapping> getGroupsBy(Func<BeatmapInfo, GroupDefinition?> getGroup, List<CarouselItem> items)
         {
             return items.GroupBy(i => getGroup((BeatmapInfo)i.Model))
-                        .OrderBy(s => s.Key.Order)
-                        .ThenBy(s => s.Key.Title)
+                        .Where(g => g.Key != null)
+                        .OrderBy(g => g.Key!.Order)
+                        .ThenBy(g => g.Key!.Title)
                         .Select(g => new GroupMapping(g.Key, g.ToList()))
                         .ToList();
         }
@@ -395,14 +396,15 @@ namespace osu.Game.Screens.SelectV2
             return new GroupDefinition(1, "Not in collection");
         }
 
-        private GroupDefinition defineGroupByOwnMaps(BeatmapInfo beatmap, int? localUserId, string? localUserUsername)
+        private GroupDefinition? defineGroupByOwnMaps(BeatmapInfo beatmap, int? localUserId, string? localUserUsername)
         {
             var author = beatmap.BeatmapSet!.Metadata.Author;
 
             if (author.OnlineID == localUserId || (author.OnlineID <= 1 && author.Username == localUserUsername))
                 return new GroupDefinition(0, "My maps");
 
-            return new GroupDefinition(1, "Not my maps");
+            // discard beatmaps not owned by the user.
+            return null;
         }
 
         private static T? aggregateMax<T>(BeatmapInfo b, Func<BeatmapInfo, T> func)
