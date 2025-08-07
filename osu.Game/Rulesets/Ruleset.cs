@@ -421,6 +421,13 @@ namespace osu.Game.Rulesets
         public virtual IRulesetFilterCriteria? CreateRulesetFilterCriteria() => null;
 
         /// <summary>
+        /// Creates ruleset-specific conversion support, used in filtering which beatmaps to show based on selected ruleset.
+        /// This interface describes which maps from other rulesets may be used without beatmap conversion enabled and which ones may be used when beatmap conversion is enabled.
+        /// If not set, osu treats this ruleset as the only native format and osu standard as only ruleset that maps can be converted from.
+        /// </summary>
+        public virtual IRulesetConvertSupport? GetRulesetMapConvertSupport() => null;
+
+        /// <summary>
         /// Can be overridden to add ruleset-specific sections to the editor beatmap setup screen.
         /// </summary>
         public virtual IEnumerable<Drawable> CreateEditorSetupSections() =>

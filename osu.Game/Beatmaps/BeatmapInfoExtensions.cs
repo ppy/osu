@@ -5,6 +5,7 @@ using System.Linq;
 using osu.Framework.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Filter;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Screens.Select;
 
@@ -67,12 +68,15 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Whether gameplay is allowed for this beatmap with the provided ruleset (via conversion or direct compatibility).
         /// </summary>
-        public static bool AllowGameplayWithRuleset(this IBeatmapInfo beatmap, RulesetInfo ruleset, bool allowConversion)
+        public static bool AllowGameplayWithRuleset(this IBeatmapInfo beatmap, RulesetInfo ruleset, bool allowConversion, IRulesetConvertSupport? convertSupport)
         {
             if (beatmap.Ruleset.ShortName == ruleset.ShortName)
                 return true;
 
             if (allowConversion && beatmap.Ruleset.OnlineID == 0 && ruleset.OnlineID != 0)
+                return true;
+
+            if (convertSupport?.CanBePlayed(ruleset, allowConversion) == true)
                 return true;
 
             return false;

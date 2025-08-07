@@ -555,7 +555,7 @@ namespace osu.Game.Screens.SelectV2
             if (criteria == null)
                 return false;
 
-            if (!beatmap.AllowGameplayWithRuleset(Ruleset.Value, criteria.AllowConvertedBeatmaps))
+            if (!beatmap.AllowGameplayWithRuleset(Ruleset.Value, criteria.AllowConvertedBeatmaps, criteria.RulesetConvertSupport))
                 return false;
 
             if (beatmap.Hidden)
