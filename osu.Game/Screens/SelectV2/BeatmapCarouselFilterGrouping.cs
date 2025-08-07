@@ -399,7 +399,7 @@ namespace osu.Game.Screens.SelectV2
         {
             var author = beatmap.BeatmapSet!.Metadata.Author;
 
-            if (author.OnlineID == localUserId || author.Username == localUserUsername)
+            if (author.OnlineID == localUserId || (author.OnlineID <= 1 && author.Username == localUserUsername))
                 return new GroupDefinition(0, "My maps");
 
             return new GroupDefinition(1, "Not my maps");
