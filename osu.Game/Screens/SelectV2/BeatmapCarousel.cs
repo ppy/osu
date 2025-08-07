@@ -54,7 +54,7 @@ namespace osu.Game.Screens.SelectV2
         /// <summary>
         /// Total number of beatmap difficulties displayed with the filter.
         /// </summary>
-        public int MatchedBeatmapsCount => grouping.BeatmapItemsCount;
+        public int MatchedBeatmapsCount => Filters.Last().BeatmapItemsCount;
 
         protected override float GetSpacingBetweenPanels(CarouselItem top, CarouselItem bottom)
         {
