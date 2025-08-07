@@ -140,6 +140,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 flashlightRating *= 1.0 - magnetisedStrength;
             }
 
+            if (mods.Any(m => m is OsuModDeflate))
+            {
+                float deflateInitialScale = mods.OfType<OsuModDeflate>().First().StartScale.Value;
+                flashlightRating *= Math.Clamp(DifficultyCalculationUtils.ReverseLerp(deflateInitialScale, 11, 1), 0.1, 1);
+            }
+
             double ratingMultiplier = 1.0;
 
             // Account for shorter maps having a higher ratio of 0 combo/100 combo flashlight radius.
