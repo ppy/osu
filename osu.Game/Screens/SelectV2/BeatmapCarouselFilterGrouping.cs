@@ -3,16 +3,22 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Extensions;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
+using osu.Game.Database;
 using osu.Game.Graphics.Carousel;
+using osu.Game.Models;
+using osu.Game.Rulesets;
+using osu.Game.Scoring;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
 using osu.Game.Utils;
+using Realms;
 
 namespace osu.Game.Screens.SelectV2
 {
@@ -39,12 +45,12 @@ namespace osu.Game.Screens.SelectV2
         private Dictionary<GroupDefinition, HashSet<CarouselItem>> groupMap = new Dictionary<GroupDefinition, HashSet<CarouselItem>>();
 
         private readonly Func<FilterCriteria> getCriteria;
-        private readonly Func<List<BeatmapCollection>>? getCollections;
+        private readonly Func<RealmAccess>? getRealm;
 
-        public BeatmapCarouselFilterGrouping(Func<FilterCriteria> getCriteria, Func<List<BeatmapCollection>>? getCollections)
+        public BeatmapCarouselFilterGrouping(Func<FilterCriteria> getCriteria, Func<RealmAccess>? getRealm)
         {
             this.getCriteria = getCriteria;
-            this.getCollections = getCollections;
+            this.getRealm = getRealm;
         }
 
         public async Task<List<CarouselItem>> Run(IEnumerable<CarouselItem> items, CancellationToken cancellationToken)
@@ -152,6 +158,8 @@ namespace osu.Game.Screens.SelectV2
                 return false;
             if (criteria.Sort == SortMode.LastPlayed && criteria.Group == GroupMode.LastPlayed)
                 return false;
+            if (criteria.Group == GroupMode.RankAchieved)
+                return false;
 
             // In the majority case we group sets together for display.
             return true;
@@ -225,17 +233,51 @@ namespace osu.Game.Screens.SelectV2
                     return getGroupsBy(b => defineGroupBySource(b.BeatmapSet!.Metadata.Source), items);
 
                 case GroupMode.Collections:
-                    var collections = getCollections?.Invoke() ?? Enumerable.Empty<BeatmapCollection>();
-                    return getGroupsBy(b => defineGroupByCollection(b, collections), items);
+                {
+                    var realm = getRealm?.Invoke();
+
+                    return realm?.Run(r =>
+                    {
+                        var collections = r.All<BeatmapCollection>().AsEnumerable();
+                        return getGroupsBy(b => defineGroupByCollection(b, collections), items);
+                    }) ?? new List<GroupMapping>();
+                }
 
                 case GroupMode.MyMaps:
                     return getGroupsBy(b => defineGroupByOwnMaps(b, criteria.LocalUserId, criteria.LocalUserUsername), items);
 
+                case GroupMode.RankAchieved:
+                {
+                    var realm = getRealm?.Invoke();
+
+                    var topRankMapping = new Dictionary<BeatmapInfo, ScoreRank>(items.Count);
+
+                    return realm?.Run(r =>
+                    {
+                        var allLocalScores = r.All<ScoreInfo>()
+                                              .Filter($"{nameof(ScoreInfo.User)}.{nameof(RealmUser.OnlineID)} == $0"
+                                                      + $" && {nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.Hash)} == {nameof(ScoreInfo.BeatmapHash)}"
+                                                      + $" && {nameof(ScoreInfo.Ruleset)}.{nameof(RulesetInfo.ShortName)} == $1"
+                                                      + $" && {nameof(ScoreInfo.DeletePending)} == false", criteria.LocalUserId, criteria.Ruleset?.ShortName)
+                                              .OrderByDescending(s => s.TotalScore)
+                                              .ThenBy(s => s.Date);
+
+                        foreach (var score in allLocalScores)
+                        {
+                            Debug.Assert(score.BeatmapInfo != null);
+
+                            if (topRankMapping.ContainsKey(score.BeatmapInfo))
+                                continue;
+
+                            topRankMapping[score.BeatmapInfo] = score.Rank;
+                        }
+
+                        return getGroupsBy(b => defineGroupByRankAchieved(b, topRankMapping), items);
+                    }) ?? new List<GroupMapping>();
+                }
+
                 // TODO: need implementation
                 // case GroupMode.Favourites:
-                //     goto case GroupMode.None;
-                //
-                // case GroupMode.RankAchieved:
                 //     goto case GroupMode.None;
 
                 default:
@@ -413,6 +455,14 @@ namespace osu.Game.Screens.SelectV2
 
             // discard beatmaps not owned by the user.
             return null;
+        }
+
+        private GroupDefinition defineGroupByRankAchieved(BeatmapInfo beatmap, Dictionary<BeatmapInfo, ScoreRank> topRankMapping)
+        {
+            if (topRankMapping.TryGetValue(beatmap, out var rank))
+                return new GroupDefinition(-(int)rank, rank.GetDescription());
+
+            return new GroupDefinition(int.MaxValue, "Unplayed");
         }
 
         private static T? aggregateMax<T>(BeatmapInfo b, Func<BeatmapInfo, T> func)
