@@ -3,6 +3,8 @@
 
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Extensions;
@@ -146,14 +148,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             AddAssert("'my maps' present", () =>
             {
-                var group = grouping.GroupItems.Single(g => g.Key.Title == "My maps");
-                return group.Value.Select(i => i.Model).OfType<BeatmapSetInfo>().Single().Equals(beatmapSets[0]);
-            });
-
-            AddAssert("'not my maps' present", () =>
-            {
-                var group = grouping.GroupItems.Single(g => g.Key.Title == "Not my maps");
-                return group.Value.Select(i => i.Model).OfType<BeatmapSetInfo>().SequenceEqual(new[] { beatmapSets[1], beatmapSets[2] });
+                var group = grouping.GroupItems.Single();
+                return group.Key.Title == "My maps" && group.Value.Select(i => i.Model).OfType<BeatmapSetInfo>().Single().Equals(beatmapSets[0]);
             });
         }
 
@@ -184,14 +180,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             AddAssert("'my maps' present", () =>
             {
-                var group = grouping.GroupItems.Single(g => g.Key.Title == "My maps");
-                return group.Value.Select(i => i.Model).OfType<BeatmapSetInfo>().Single().Equals(beatmapSets[0]);
-            });
-
-            AddAssert("'not my maps' present", () =>
-            {
-                var group = grouping.GroupItems.Single(g => g.Key.Title == "Not my maps");
-                return group.Value.Select(i => i.Model).OfType<BeatmapSetInfo>().SequenceEqual(new[] { beatmapSets[1], beatmapSets[2] });
+                var group = grouping.GroupItems.Single();
+                return group.Key.Title == "My maps" && group.Value.Select(i => i.Model).OfType<BeatmapSetInfo>().Single().Equals(beatmapSets[0]);
             });
         }
 
@@ -212,11 +202,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             GroupBy(GroupMode.MyMaps);
             WaitForFiltering();
 
-            AddAssert("only 'not my maps' present", () =>
-            {
-                var group = grouping.GroupItems.Single();
-                return group.Key.Title == "Not my maps" && group.Value.Select(i => i.Model).OfType<BeatmapSetInfo>().SequenceEqual(new[] { beatmapSets[0], beatmapSets[1], beatmapSets[2] });
-            });
+            AddUntilStep("wait for placeholder visible", () => getPlaceholder()?.State.Value == Visibility.Visible);
+            checkMatchedBeatmaps(0);
 
             AddStep("log in", () =>
             {
@@ -228,17 +215,15 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             AddAssert("'my maps' present", () =>
             {
-                var group = grouping.GroupItems.Single(g => g.Key.Title == "My maps");
-                return group.Value.Select(i => i.Model).OfType<BeatmapSetInfo>().Single().Equals(beatmapSets[1]);
-            });
-
-            AddAssert("'not my maps' present", () =>
-            {
-                var group = grouping.GroupItems.Single(g => g.Key.Title == "Not my maps");
-                return group.Value.Select(i => i.Model).OfType<BeatmapSetInfo>().SequenceEqual(new[] { beatmapSets[0], beatmapSets[2] });
+                var group = grouping.GroupItems.Single();
+                return group.Key.Title == "My maps" && group.Value.Select(i => i.Model).OfType<BeatmapSetInfo>().Single().Equals(beatmapSets[1]);
             });
         }
 
         #endregion
+
+        private NoResultsPlaceholder? getPlaceholder() => SongSelect.ChildrenOfType<NoResultsPlaceholder>().FirstOrDefault();
+
+        private void checkMatchedBeatmaps(int expected) => AddUntilStep($"{expected} matching shown", () => Carousel.MatchedBeatmapsCount, () => Is.EqualTo(expected));
     }
 }
