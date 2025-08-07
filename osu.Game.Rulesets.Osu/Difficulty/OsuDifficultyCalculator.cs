@@ -103,7 +103,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             var osuRatingCalculator = new OsuRatingCalculator(mods, totalHits, approachRate, overallDifficulty, mechanicalDifficultyRating, sliderFactor);
 
             double aimRating = osuRatingCalculator.ComputeAimRating(aimDifficultyValue);
-            double aimRatingNoSliders = osuRatingCalculator.ComputeAimRating(aimNoSlidersDifficultyValue);
             double speedRating = osuRatingCalculator.ComputeSpeedRating(speedDifficultyValue);
 
             double flashlightRating = 0.0;

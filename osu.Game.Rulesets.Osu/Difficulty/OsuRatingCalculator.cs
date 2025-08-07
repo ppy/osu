@@ -187,7 +187,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         public static double CalculateVisibilityBonus(Mod[] mods, double approachRate, double visibilityFactor = 1, double sliderFactor = 1)
         {
             // NOTE: TC's effect is only noticeable in performance calculations until lazer mods are accounted for server-side.
-            bool isAlwaysPartiallyVisible = mods.OfType<OsuModHidden>().Any(m => !m.OnlyFadeApproachCircles.Value) || mods.OfType<OsuModTraceable>().Any();
+            bool isAlwaysPartiallyVisible = mods.OfType<OsuModHidden>().Any(m => m.OnlyFadeApproachCircles.Value) || mods.OfType<OsuModTraceable>().Any();
 
             // Start from normal curve, rewarding lower AR up to AR7
             double readingBonus = 0.04 * (12.0 - Math.Max(approachRate, 7));
@@ -203,7 +203,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // Starting from AR0 - cap values so they won't grow to infinity
             if (approachRate < 0)
-                readingBonus += (isAlwaysPartiallyVisible ? 0.1 : 0.075) * (1 - Math.Pow(1.5, approachRate)) * sliderVisibilityFactor;
+                readingBonus += (isAlwaysPartiallyVisible ? 0.075 : 0.1) * (1 - Math.Pow(1.5, approachRate)) * sliderVisibilityFactor;
 
             return readingBonus;
         }
