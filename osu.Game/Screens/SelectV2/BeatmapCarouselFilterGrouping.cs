@@ -21,6 +21,11 @@ namespace osu.Game.Screens.SelectV2
         public bool BeatmapSetsGroupedTogether { get; private set; }
 
         /// <summary>
+        /// The total number of beatmap difficulties displayed post filter.
+        /// </summary>
+        public int BeatmapItemsCount { get; private set; }
+
+        /// <summary>
         /// Beatmap sets contain difficulties as related panels. This dictionary holds the relationships between set-difficulties to allow expanding them on selection.
         /// </summary>
         public IDictionary<BeatmapSetInfo, HashSet<CarouselItem>> SetItems => setMap;
@@ -56,6 +61,7 @@ namespace osu.Game.Screens.SelectV2
                 BeatmapSetsGroupedTogether = ShouldGroupBeatmapsTogether(criteria);
 
                 var groups = getGroups((List<CarouselItem>)items, criteria);
+                int displayedBeatmapsCount = 0;
 
                 foreach (var (group, itemsInGroup) in groups)
                 {
@@ -115,6 +121,7 @@ namespace osu.Game.Screens.SelectV2
 
                         addItem(item);
                         lastBeatmap = beatmap;
+                        displayedBeatmapsCount++;
                     }
 
                     void addItem(CarouselItem i)
@@ -132,6 +139,7 @@ namespace osu.Game.Screens.SelectV2
 
                 Interlocked.Exchange(ref setMap, newSetMap);
                 Interlocked.Exchange(ref groupMap, newGroupMap);
+                BeatmapItemsCount = displayedBeatmapsCount;
                 return newItems;
             }, cancellationToken).ConfigureAwait(false);
         }
