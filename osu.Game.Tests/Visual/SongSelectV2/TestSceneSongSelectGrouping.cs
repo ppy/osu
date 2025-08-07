@@ -334,7 +334,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         {
             var score = TestResources.CreateTestScoreInfo(beatmap);
             score.User = API.LocalUser.Value;
-            score.Rank = rank ?? Enum.GetValues<ScoreRank>().OrderBy(_ => RNG.Next()).First();
+            score.Rank = rank ?? Enum.GetValues<ScoreRank>().MinBy(_ => RNG.Next());
             score.TotalScore = (long)(((double)score.Rank + 1) / (Enum.GetValues<ScoreRank>().Length + 1) * 1000000);
             score.Date = DateTimeOffset.Now;
             applyToScore?.Invoke(score);
