@@ -245,7 +245,7 @@ namespace osu.Game.Tests.Editing.Checks
 
         private BeatmapVerifierContext createContext(IBeatmap currentBeatmap, IBeatmap[] allDifficulties)
         {
-            return new BeatmapVerifierContext(
+            return BeatmapVerifierContext.CreateWithBeatmapResolver(
                 currentBeatmap,
                 new TestWorkingBeatmap(currentBeatmap),
                 DifficultyRating.ExpertPlus,

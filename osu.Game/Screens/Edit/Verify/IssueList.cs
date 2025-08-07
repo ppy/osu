@@ -46,7 +46,7 @@ namespace osu.Game.Screens.Edit.Verify
             generalVerifier = new BeatmapVerifier();
             rulesetVerifier = beatmap.BeatmapInfo.Ruleset.CreateInstance().CreateBeatmapVerifier();
 
-            context = new BeatmapVerifierContext(
+            context = BeatmapVerifierContext.CreateWithBeatmapResolver(
                 beatmap,
                 workingBeatmap.Value,
                 verify.InterpretedDifficulty.Value,

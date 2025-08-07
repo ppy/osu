@@ -211,7 +211,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Editor.Checks
 
         private BeatmapVerifierContext createContextWithMultipleDifficulties(IBeatmap currentBeatmap, IBeatmap[] allDifficulties)
         {
-            return new BeatmapVerifierContext(
+            return BeatmapVerifierContext.CreateWithBeatmapResolver(
                 currentBeatmap,
                 new TestWorkingBeatmap(currentBeatmap),
                 DifficultyRating.ExpertPlus,
