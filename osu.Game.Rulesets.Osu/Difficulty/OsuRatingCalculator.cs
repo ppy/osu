@@ -181,9 +181,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         /// <summary>
         /// Calculates a visibility bonus that is applicable to Hidden and Traceable.
         /// </summary>
-        /// <summary>
-        /// Calculates a visibility bonus that is applicable to Hidden and Traceable.
-        /// </summary>
         public static double CalculateVisibilityBonus(Mod[] mods, double approachRate, double visibilityFactor = 1, double sliderFactor = 1)
         {
             // NOTE: TC's effect is only noticeable in performance calculations until lazer mods are accounted for server-side.
