@@ -41,8 +41,8 @@ namespace osu.Game.Screens.Select.Filter
         [LocalisableDescription(typeof(SongSelectStrings), nameof(SongSelectStrings.Length))]
         Length,
 
-        // [LocalisableDescription(typeof(SongSelectStrings), nameof(SongSelectStrings.MyMaps))]
-        // MyMaps,
+        [LocalisableDescription(typeof(SongSelectStrings), nameof(SongSelectStrings.MyMaps))]
+        MyMaps,
 
         // [LocalisableDescription(typeof(SongSelectStrings), nameof(SongSelectStrings.RankAchieved))]
         // RankAchieved,

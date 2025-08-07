@@ -118,6 +118,18 @@ namespace osu.Game.Screens.Select
 
         public IRulesetFilterCriteria? RulesetCriteria { get; set; }
 
+        /// <summary>
+        /// The user ID of the current local user, used to filter to own maps when <see cref="GroupMode.MyMaps"/> is selected.
+        /// Or null if the user is not logged in.
+        /// </summary>
+        public int? LocalUserId { get; set; }
+
+        /// <summary>
+        /// The username of the current local user, used to filter to own maps when <see cref="GroupMode.MyMaps"/> is selected.
+        /// Or null if the user is not logged in.
+        /// </summary>
+        public string? LocalUserUsername { get; set; }
+
         public readonly struct OptionalSet<T> : IEquatable<OptionalSet<T>>
             where T : struct, Enum
         {
