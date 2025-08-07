@@ -15,10 +15,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
     public static class ReadingEvaluator
     {
         private const double reading_window_size = 3000; // 3 seconds
-        private const double preempt_balancing_factor = 200000;
         private const double hidden_multiplier = 0.85;
         private const double density_multiplier = 0.8;
         private const double density_difficulty_base = 3.0;
+        private const double preempt_balancing_factor = 200000;
+        private const double preempt_starting_point = 475; // AR 9.83 in milliseconds
 
         public static double EvaluateDifficultyOf(int totalObjects, DifficultyHitObject current, double clockRate, double preempt, bool hidden)
         {
@@ -76,20 +77,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 // Apply a soft cap to general HD reading to account for partial memorization
                 hiddenDifficulty = Math.Pow(hiddenDifficulty, 0.65) * hidden_multiplier;
 
-                // Buff perfect stacks only if current note is completely invisible at the time you click the previous note.
                 var previousObj = currObj.Previous(0);
-                hiddenDifficulty += currObj.LazyJumpDistance == 0 &&
-                                    currObj.OpacityAt(previousObj.BaseObject.StartTime + preempt, hidden) == 0 &&
-                                    previousObj.StartTime + preempt > currObj.StartTime
-                    ? hidden_multiplier * 1303 / Math.Pow(currObj.StrainTime, 1.5) // Perfect stacks are harder the less time between notes
-                    : 0;
+                // Buff perfect stacks only if current note is completely invisible at the time you click the previous note.
+                if (currObj.LazyJumpDistance == 0 && currObj.OpacityAt(previousObj.BaseObject.StartTime + preempt, hidden) == 0 && previousObj.StartTime + preempt > currObj.StartTime)
+                    hiddenDifficulty += hidden_multiplier * 1303 / Math.Pow(currObj.StrainTime, 1.5); // Perfect stacks are harder the less time between notes
             }
 
             double preemptDifficulty = 0.0;
 
             // Arbitrary curve for the base value preempt difficulty should have as approach rate increases.
             // https://www.desmos.com/calculator/c175335a71
-            preemptDifficulty += preempt > 475 ? 0 : Math.Pow(475 - preempt, 2.5) / preempt_balancing_factor;
+            preemptDifficulty += Math.Pow((preempt_starting_point - preempt + Math.Abs(preempt - preempt_starting_point)) / 2, 2.5) / preempt_balancing_factor;
 
             preemptDifficulty *= constantAngleNerfFactor * velocity;
 

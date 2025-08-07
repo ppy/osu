@@ -209,9 +209,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // TC bonuses are excluded when blinds is present as the increased visual difficulty is unimportant when notes cannot be seen.
             if (score.Mods.Any(m => m is OsuModBlinds))
                 aimValue *= 1.3 + (totalHits * (0.0016 / (1 + 2 * effectiveMissCount)) * Math.Pow(accuracy, 16)) * (1 - 0.003 * attributes.DrainRate * attributes.DrainRate);
-            else if (score.Mods.Any(m => m is OsuModTraceable))
+            else if (score.Mods.OfType<OsuModHidden>().Any(m => m.OnlyFadeApproachCircles.Value) || score.Mods.Any(m => m is OsuModTraceable))
             {
-                aimValue *= 1.0 + OsuRatingCalculator.CalculateVisibilityBonus(score.Mods, approachRate);
+                aimValue *= 1.0 + OsuRatingCalculator.CalculateVisibilityBonus(approachRate);
             }
 
             aimValue *= accuracy;
@@ -245,9 +245,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 // Increasing the speed value by object count for Blinds isn't ideal, so the minimum buff is given.
                 speedValue *= 1.12;
             }
-            else if (score.Mods.Any(m => m is OsuModTraceable))
+            else if (score.Mods.OfType<OsuModHidden>().Any(m => m.OnlyFadeApproachCircles.Value) || score.Mods.Any(m => m is OsuModTraceable))
             {
-                speedValue *= 1.0 + OsuRatingCalculator.CalculateVisibilityBonus(score.Mods, approachRate);
+                speedValue *= 1.0 + OsuRatingCalculator.CalculateVisibilityBonus(approachRate);
             }
 
             double speedHighDeviationMultiplier = calculateSpeedHighDeviationNerf(attributes);
@@ -296,6 +296,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // Increasing the accuracy value by object count for Blinds isn't ideal, so the minimum buff is given.
             if (score.Mods.Any(m => m is OsuModBlinds))
                 accuracyValue *= 1.14;
+            else if (score.Mods.Any(m => m is OsuModTraceable))
+            {
+                // Decrease bonus for AR > 10
+                accuracyValue *= 1 + 0.08 * DifficultyCalculationUtils.ReverseLerp(approachRate, 11.5, 10);
+            }
 
             if (score.Mods.Any(m => m is OsuModFlashlight))
                 accuracyValue *= 1.02;

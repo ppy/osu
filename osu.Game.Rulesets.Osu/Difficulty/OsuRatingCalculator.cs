@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (mods.Any(m => m is OsuModAutopilot))
                 return 0;
 
-            double aimRating = CalculateDifficultyRating(aimDifficultyValue);
+            double aimRating = calculateDifficultyRating(aimDifficultyValue);
 
             if (mods.Any(m => m is OsuModTouchDevice))
                 aimRating = Math.Pow(aimRating, 0.8);
@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (mods.Any(m => m is OsuModRelax))
                 return 0;
 
-            double speedRating = CalculateDifficultyRating(speedDifficultyValue);
+            double speedRating = calculateDifficultyRating(speedDifficultyValue);
 
             if (mods.Any(m => m is OsuModAutopilot))
                 speedRating *= 0.5;
@@ -76,7 +76,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         public double ComputeReadingRating(double readingDifficultyValue)
         {
-            double readingRating = CalculateDifficultyRating(readingDifficultyValue);
+            double readingRating = calculateDifficultyRating(readingDifficultyValue);
 
             if (mods.Any(m => m is OsuModTouchDevice))
                 readingRating = Math.Pow(readingRating, 0.8);
@@ -105,7 +105,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (!mods.Any(m => m is OsuModFlashlight))
                 return 0;
 
-            double flashlightRating = CalculateDifficultyRating(flashlightDifficultyValue);
+            double flashlightRating = calculateDifficultyRating(flashlightDifficultyValue);
 
             if (mods.Any(m => m is OsuModTouchDevice))
                 flashlightRating = Math.Pow(flashlightRating, 0.8);
@@ -136,11 +136,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         /// <summary>
         /// Calculates a visibility bonus that is applicable to Hidden and Traceable.
         /// </summary>
-        public static double CalculateVisibilityBonus(Mod[] mods, double approachRate, double visibilityFactor = 1)
+        public static double CalculateVisibilityBonus(double approachRate, double visibilityFactor = 1)
         {
-            // NOTE: TC's effect is only noticeable in performance calculations until lazer mods are accounted for server-side.
-            bool isAlwaysPartiallyVisible = mods.OfType<OsuModHidden>().Any(m => m.OnlyFadeApproachCircles.Value) || mods.OfType<OsuModTraceable>().Any();
-
             // Start from normal curve, rewarding lower AR up to AR7
             double readingBonus = 0.04 * (12.0 - Math.Max(approachRate, 7));
 
@@ -148,15 +145,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // For AR up to 0 - reduce reward for very low ARs when object is visible
             if (approachRate < 7)
-                readingBonus += (isAlwaysPartiallyVisible ? 0.03 : 0.045) * (7.0 - Math.Max(approachRate, 0));
+                readingBonus += 0.03 * (7.0 - Math.Max(approachRate, 0));
 
             // Starting from AR0 - cap values so they won't grow to infinity
             if (approachRate < 0)
-                readingBonus += (isAlwaysPartiallyVisible ? 0.075 : 0.1) * (1 - Math.Pow(1.5, approachRate));
+                readingBonus += 0.075 * (1 - Math.Pow(1.5, approachRate));
 
             return readingBonus;
         }
 
-        public static double CalculateDifficultyRating(double difficultyValue) => Math.Sqrt(difficultyValue) * difficulty_multiplier;
+        private static double calculateDifficultyRating(double difficultyValue) => Math.Sqrt(difficultyValue) * difficulty_multiplier;
     }
 }
