@@ -242,11 +242,11 @@ namespace osu.Game.Tests.Editing.Checks
             // Use the current beatmap's star rating to determine its difficulty rating
             var currentDifficultyRating = StarDifficulty.GetDifficultyRating(currentBeatmap.BeatmapInfo.StarRating);
 
-            return new BeatmapVerifierContext(
+            return BeatmapVerifierContext.CreateWithBeatmapResolver(
                 currentBeatmap,
                 new TestWorkingBeatmap(currentBeatmap),
                 currentDifficultyRating,
-                beatmapInfo => difficultyDict.TryGetValue(beatmapInfo, out var workingBeatmap) ? workingBeatmap.Beatmap : null
+                beatmapInfo => allDifficulties.FirstOrDefault(b => b.BeatmapInfo.Equals(beatmapInfo))
             );
         }
 
