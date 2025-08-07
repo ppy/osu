@@ -196,7 +196,12 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 if (osuScreen.IsLoaded)
                     updateFooterButtons();
                 else
+                {
+                    // ensure the current buttons are immediately disabled on screen change (so they can't be pressed).
+                    Footer.SetButtons(Array.Empty<ScreenFooterButton>());
+
                     osuScreen.OnLoadComplete += _ => updateFooterButtons();
+                }
 
                 void updateFooterButtons()
                 {

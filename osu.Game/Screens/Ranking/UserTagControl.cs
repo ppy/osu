@@ -13,6 +13,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
@@ -43,6 +44,8 @@ namespace osu.Game.Screens.Ranking
         private readonly Bindable<APIBeatmap?> apiBeatmap = new Bindable<APIBeatmap?>();
 
         private AddNewTagUserTag addNewTagUserTag = null!;
+
+        private InputManager inputManager = null!;
 
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
@@ -124,6 +127,8 @@ namespace osu.Game.Screens.Ranking
             updateTags();
 
             displayedTags.BindCollectionChanged(displayTags, true);
+
+            inputManager = GetContainingInputManager()!;
         }
 
         private void updateTags()
@@ -251,7 +256,7 @@ namespace osu.Game.Screens.Ranking
         {
             base.Update();
 
-            if (!layout.IsValid && !IsHovered)
+            if (!layout.IsValid && !Contains(inputManager.CurrentState.Mouse.Position))
             {
                 var sortedTags = new Dictionary<UserTag, int>(
                     displayedTags.OrderByDescending(t => t.VoteCount.Value)

@@ -5,7 +5,6 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -113,15 +112,12 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                             AutoSizeAxes = Axes.Y,
                         }.With(t =>
                         {
-                            if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows || RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
-                            {
-                                t.NewLine();
-                                var formattedSource = MessageFormatter.FormatText(localisation.GetLocalisedString(TabletSettingsStrings.NoTabletDetectedDescription(
-                                    RuntimeInfo.OS == RuntimeInfo.Platform.Windows
-                                        ? @"https://opentabletdriver.net/Wiki/FAQ/Windows"
-                                        : @"https://opentabletdriver.net/Wiki/FAQ/Linux")));
-                                t.AddLinks(formattedSource.Text, formattedSource.Links);
-                            }
+                            t.NewLine();
+
+                            const string url = @"https://opentabletdriver.net/Wiki/FAQ/General";
+                            var formattedSource = MessageFormatter.FormatText(localisation.GetLocalisedString(TabletSettingsStrings.NoTabletDetectedDescription(url)));
+
+                            t.AddLinks(formattedSource.Text, formattedSource.Links);
                         }),
                     }
                 },
