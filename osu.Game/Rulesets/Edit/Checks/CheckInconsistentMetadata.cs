@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Edit.Checks
             if (difficulties.Count <= 1)
                 yield break;
 
-            var referenceBeatmap = difficulties.OrderByDescending(b => b.BeatmapInfo.StarRating).First();
+            var referenceBeatmap = context.Beatmap;
             var referenceMetadata = referenceBeatmap.Metadata;
 
             // Define metadata fields to check
