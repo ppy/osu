@@ -238,12 +238,20 @@ namespace osu.Game.Beatmaps
             });
         }
 
-        public int GetCacheVersion()
+        public bool IsAtLeastVersion(int version)
         {
-            using (var connection = getConnection())
+            try
             {
-                connection.Open();
-                return getCacheVersion(connection);
+                using (var connection = getConnection())
+                {
+                    connection.Open();
+                    return getCacheVersion(connection) >= version;
+                }
+            }
+            catch (SqliteException ex) when (ex.SqliteErrorCode == 26 || ex.SqliteErrorCode == 11) // SQLITE_NOTADB, SQLITE_CORRUPT
+            {
+                // if the database is corrupted then return `false` as the consumer may want to just refetch the db themselves
+                return false;
             }
         }
 
