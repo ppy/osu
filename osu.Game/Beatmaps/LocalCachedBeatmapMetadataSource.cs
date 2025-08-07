@@ -192,6 +192,13 @@ namespace osu.Game.Beatmaps
             {
                 try
                 {
+                    // `SqliteConnection` by default uses pooling.
+                    // disposing an `SqliteConnection` is not enough to get `Microsoft.Data.Sqlite` to close the database file.
+                    // this means that overwriting the file may fail if the pools are not cleared before trying.
+                    // this fails especially loudly on Windows because of Windows file delete semantics being exclusive-write
+                    // rather than Unix's "file is marked for deletion after last reader closes the fd".
+                    SqliteConnection.ClearAllPools();
+
                     using (var stream = File.OpenRead(cacheDownloadRequest.Filename))
                     using (var outStream = File.OpenWrite(cacheFilePath))
                     {
