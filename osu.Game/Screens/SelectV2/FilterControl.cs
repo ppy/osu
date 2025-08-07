@@ -56,10 +56,7 @@ namespace osu.Game.Screens.SelectV2
         [Resolved]
         private RealmAccess realm { get; set; } = null!;
 
-        [Resolved]
-        private IAPIProvider api { get; set; } = null!;
-
-        private IBindable<APIUser>? localUser;
+        private IBindable<APIUser> localUser = null!;
 
         public LocalisableString StatusText
         {
@@ -74,7 +71,7 @@ namespace osu.Game.Screens.SelectV2
         private IDisposable? collectionsSubscription;
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(IAPIProvider api)
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -187,6 +184,8 @@ namespace osu.Game.Screens.SelectV2
                     },
                 }
             };
+
+            localUser = api.LocalUser.GetBoundCopy();
         }
 
         protected override void LoadComplete()
@@ -237,7 +236,6 @@ namespace osu.Game.Screens.SelectV2
                     updateCriteria();
             });
 
-            localUser = api.LocalUser.GetBoundCopy();
             localUser.BindValueChanged(_ => updateCriteria());
 
             updateCriteria();
@@ -255,7 +253,7 @@ namespace osu.Game.Screens.SelectV2
         public FilterCriteria CreateCriteria()
         {
             string query = searchTextBox.Current.Value;
-            bool isValidUser = api.LocalUser.Value.Id > 1;
+            bool isValidUser = localUser.Value.Id > 1;
 
             var criteria = new FilterCriteria
             {
@@ -265,8 +263,8 @@ namespace osu.Game.Screens.SelectV2
                 Ruleset = ruleset.Value,
                 Mods = mods.Value,
                 CollectionBeatmapMD5Hashes = collectionDropdown.Current.Value?.Collection?.PerformRead(c => c.BeatmapMD5Hashes).ToImmutableHashSet(),
-                LocalUserId = isValidUser ? api.LocalUser.Value.Id : null,
-                LocalUserUsername = isValidUser ? api.LocalUser.Value.Username : null,
+                LocalUserId = isValidUser ? localUser.Value.Id : null,
+                LocalUserUsername = isValidUser ? localUser.Value.Username : null,
             };
 
             if (!difficultyRangeSlider.LowerBound.IsDefault)
