@@ -256,6 +256,8 @@ namespace osu.Game.Screens.Select
 
         private static bool tryUpdateCriteriaRange(ref FilterCriteria.OptionalRange<float> range, Operator op, float value, float tolerance = 0.05f)
         {
+            range.ExcludeIfInRange = false;
+
             switch (op)
             {
                 default:
@@ -281,6 +283,14 @@ namespace osu.Game.Screens.Select
                 case Operator.LessOrEqual:
                     range.Max = value + tolerance;
                     break;
+
+                case Operator.NotEqual:
+                    range.Min = value - tolerance;
+                    range.Max = value + tolerance;
+                    range.ExcludeIfInRange = true;
+                    if (tolerance == 0)
+                        range.IsLowerInclusive = range.IsUpperInclusive = true;
+                    break;
             }
 
             return true;
@@ -304,6 +314,8 @@ namespace osu.Game.Screens.Select
 
         private static bool tryUpdateCriteriaRange(ref FilterCriteria.OptionalRange<double> range, Operator op, double value, double tolerance = 0.05)
         {
+            range.ExcludeIfInRange = false;
+
             switch (op)
             {
                 default:
@@ -334,6 +346,14 @@ namespace osu.Game.Screens.Select
                     range.Max = value + tolerance;
                     if (tolerance == 0)
                         range.IsUpperInclusive = true;
+                    break;
+
+                case Operator.NotEqual:
+                    range.Min = value - tolerance;
+                    range.Max = value + tolerance;
+                    range.ExcludeIfInRange = true;
+                    if (tolerance == 0)
+                        range.IsLowerInclusive = range.IsUpperInclusive = true;
                     break;
             }
 
@@ -389,6 +409,40 @@ namespace osu.Game.Screens.Select
                     matchingValues.Add(parsedValue);
                 }
             }
+            else if (op == Operator.NotEqual && filterValue.Contains(','))
+            {
+                string[] splitValues = filterValue.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+                var allDefinedValues = Enum.GetValues<T>();
+                HashSet<T> excludedValues = new HashSet<T>();
+
+                foreach (string splitValue in splitValues)
+                {
+                    if (!tryParseEnum<T>(splitValue, out var parsedValue))
+                        return false;
+
+                    excludedValues.Add(parsedValue);
+                }
+
+                foreach (var definedValue in allDefinedValues)
+                {
+                    bool isExcludedValue = false;
+
+                    foreach (var excludedValue in excludedValues)
+                    {
+                        int compareResult = Comparer<T>.Default.Compare(definedValue, excludedValue);
+
+                        if (compareResult == 0)
+                        {
+                            isExcludedValue = true;
+                            break;
+                        }
+                    }
+
+                    if (!isExcludedValue)
+                        matchingValues.Add(definedValue);
+                }
+            }
             else
             {
                 if (!tryParseEnum<T>(filterValue, out var pivotValue))
@@ -422,6 +476,10 @@ namespace osu.Game.Screens.Select
                             if (compareResult > 0) matchingValues.Add(val);
                             break;
 
+                        case Operator.NotEqual:
+                            if (compareResult != 0) matchingValues.Add(val);
+                            break;
+
                         default:
                             return false;
                     }
@@ -435,6 +493,8 @@ namespace osu.Game.Screens.Select
         private static bool tryUpdateCriteriaRange<T>(ref FilterCriteria.OptionalRange<T> range, Operator op, T value)
             where T : struct
         {
+            range.ExcludeIfInRange = false;
+
             switch (op)
             {
                 default:
@@ -464,6 +524,13 @@ namespace osu.Game.Screens.Select
                 case Operator.LessOrEqual:
                     range.IsUpperInclusive = true;
                     range.Max = value;
+                    break;
+
+                case Operator.NotEqual:
+                    range.IsLowerInclusive = range.IsUpperInclusive = true;
+                    range.Min = value;
+                    range.Max = value;
+                    range.ExcludeIfInRange = true;
                     break;
             }
 
@@ -679,6 +746,8 @@ namespace osu.Game.Screens.Select
             try
             {
                 DateTimeOffset dateTimeOffset;
+                DateTimeOffset minDateTimeOffset;
+                DateTimeOffset maxDateTimeOffset;
 
                 switch (op)
                 {
@@ -736,9 +805,6 @@ namespace osu.Game.Screens.Select
 
                     case Operator.Equal:
 
-                        DateTimeOffset minDateTimeOffset;
-                        DateTimeOffset maxDateTimeOffset;
-
                         if (month == null)
                         {
                             month = 1;
@@ -762,6 +828,32 @@ namespace osu.Game.Screens.Select
                         maxDateTimeOffset = dateTimeOffsetFromDateOnly(year.Value, month.Value, day.Value).AddDays(1);
                         return tryUpdateCriteriaRange(ref dateRange, Operator.GreaterOrEqual, minDateTimeOffset)
                                && tryUpdateCriteriaRange(ref dateRange, Operator.Less, maxDateTimeOffset);
+
+                    case Operator.NotEqual:
+
+                        if (month == null)
+                        {
+                            month = 1;
+                            day = 1;
+                            minDateTimeOffset = dateTimeOffsetFromDateOnly(year.Value, month.Value, day.Value);
+                            maxDateTimeOffset = dateTimeOffsetFromDateOnly(year.Value, month.Value, day.Value).AddYears(1);
+                            return tryUpdateCriteriaRange(ref dateRange, Operator.Less, minDateTimeOffset)
+                                   || tryUpdateCriteriaRange(ref dateRange, Operator.GreaterOrEqual, maxDateTimeOffset);
+                        }
+
+                        if (day == null)
+                        {
+                            day = 1;
+                            minDateTimeOffset = dateTimeOffsetFromDateOnly(year.Value, month.Value, day.Value);
+                            maxDateTimeOffset = dateTimeOffsetFromDateOnly(year.Value, month.Value, day.Value).AddMonths(1);
+                            return tryUpdateCriteriaRange(ref dateRange, Operator.Less, minDateTimeOffset)
+                                   || tryUpdateCriteriaRange(ref dateRange, Operator.GreaterOrEqual, maxDateTimeOffset);
+                        }
+
+                        minDateTimeOffset = dateTimeOffsetFromDateOnly(year.Value, month.Value, day.Value);
+                        maxDateTimeOffset = dateTimeOffsetFromDateOnly(year.Value, month.Value, day.Value).AddDays(1);
+                        return tryUpdateCriteriaRange(ref dateRange, Operator.Less, minDateTimeOffset)
+                               || tryUpdateCriteriaRange(ref dateRange, Operator.GreaterOrEqual, maxDateTimeOffset);
 
                     default:
                         return false;
