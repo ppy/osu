@@ -122,6 +122,12 @@ namespace osu.Game.Rulesets.Edit
         protected override void PopIn() => this.FadeIn();
         protected override void PopOut() => this.FadeOut();
 
+        /// <summary>
+        /// Creates a toolbox group to be displayed at the top of the <see cref="HitObjectComposer"/>'s right toolbox while this <see cref="PlacementBlueprint"/> is active.
+        /// </summary>
+        /// <returns>The toolbox group to display in the composer's toolbox</returns>
+        public virtual EditorToolboxGroup? CreateToolboxGroup() => null;
+
         public enum PlacementState
         {
             Waiting,
