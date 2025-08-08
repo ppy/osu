@@ -179,6 +179,7 @@ namespace osu.Game.Screens.Select
             public T? Max;
             public bool IsLowerInclusive;
             public bool IsUpperInclusive;
+
             /// <summary>
             /// If true, only outside of MaxValue and MinValue will return true
             /// </summary>
@@ -221,6 +222,7 @@ namespace osu.Game.Screens.Select
                         return InvertSearch != (CultureInfo.InvariantCulture.CompareInfo.Compare(value, searchTerm, CompareOptions.OrdinalIgnoreCase) == 0);
                 }
             }
+
             public bool InvertSearch;
             private string searchTerm;
 

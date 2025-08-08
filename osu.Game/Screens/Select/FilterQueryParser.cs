@@ -78,6 +78,7 @@ namespace osu.Game.Screens.Select
                     // Unplayed beatmaps are filtered on DateTimeOffset.MinValue.
                     if (op == Operator.NotEqual)
                         played = !played;
+
                     if (played)
                     {
                         criteria.LastPlayed.Min = DateTimeOffset.MinValue;
@@ -499,7 +500,6 @@ namespace osu.Game.Screens.Select
         private static bool tryUpdateCriteriaRange<T>(ref FilterCriteria.OptionalRange<T> range, Operator op, T value)
             where T : struct
         {
-
             switch (op)
             {
                 default:
@@ -872,7 +872,7 @@ namespace osu.Game.Screens.Select
             catch (ArgumentOutOfRangeException)
             {
                 return false;
+            }
         }
     }
-            }
 }
