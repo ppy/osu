@@ -13,6 +13,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Audio;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -21,6 +22,7 @@ using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Osu.Skinning;
 using osu.Game.Rulesets.Osu.Skinning.Default;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Scoring.Legacy;
 using osu.Game.Screens.Ranking;
 using osu.Game.Skinning;
 
@@ -49,15 +51,18 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private PausableSkinnableSound maxBonusSample;
 
+        private double scoreDisplayMultiplier = 1.0;
+        private Bindable<ScoringMode> scoreDisplayMode;
+
         /// <summary>
         /// The amount of bonus score gained from spinning after the required number of spins, for display purposes.
         /// </summary>
-        public double CurrentBonusScore => score_per_tick * Math.Clamp(completedFullSpins.Value - HitObject.SpinsRequiredForBonus, 0, HitObject.MaximumBonusSpins);
+        public int CurrentBonusScore => (int)(scoreDisplayMultiplier * score_per_tick * Math.Clamp(completedFullSpins.Value - HitObject.SpinsRequiredForBonus, 0, HitObject.MaximumBonusSpins));
 
         /// <summary>
         /// The maximum amount of bonus score which can be achieved from extra spins.
         /// </summary>
-        public double MaximumBonusScore => score_per_tick * HitObject.MaximumBonusSpins;
+        public int MaximumBonusScore => (int)(scoreDisplayMultiplier * score_per_tick * HitObject.MaximumBonusSpins);
 
         public IBindable<int> CompletedFullSpins => completedFullSpins;
 
@@ -80,8 +85,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
+        [BackgroundDependencyLoader(true)]
+        private void load(OsuConfigManager config, ScoreProcessor scoreProcessor)
         {
             Origin = Anchor.Centre;
             RelativeSizeAxes = Axes.Both;
@@ -121,6 +126,36 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             });
 
             PositionBindable.BindValueChanged(pos => Position = pos.NewValue);
+
+            if (config == null || scoreProcessor == null)
+            {
+                scoreDisplayMultiplier = 1.0;
+                return;
+            }
+
+            scoreDisplayMode = config.GetBindable<ScoringMode>(OsuSetting.ScoreDisplayMode);
+            scoreDisplayMode.BindValueChanged(scoreMode =>
+            {
+                switch (scoreMode.NewValue)
+                {
+                    case ScoringMode.Standardised:
+                        scoreDisplayMultiplier = 1.0;
+                        break;
+
+                    case ScoringMode.Classic:
+                        int maxBasicJudgements = scoreProcessor.MaximumStatistics
+                                                 .Where(k => k.Key.IsBasic())
+                                                 .Select(k => k.Value)
+                                                 .DefaultIfEmpty(0)
+                                                 .Sum();
+
+                        scoreDisplayMultiplier = ScoreInfoExtensions.GetOsuClassicScoreMultiplier(maxBasicJudgements) * scoreProcessor.ScoreMultiplier;
+                        break;
+
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(scoreMode));
+                }
+            }, true);
         }
 
         protected override void LoadComplete()
