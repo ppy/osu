@@ -122,6 +122,9 @@ namespace osu.Game.Graphics.Carousel
                     // Even if the current selection matches, let's ensure the keyboard selection is reset
                     // to the newly selected object. This matches user expectations (for now).
                     currentKeyboardSelection = currentSelection;
+
+                    // The following line is commented out due to causing a weird bug
+                    // where the selection would jump back after scrolling away
                     //selectionValid.Invalidate();
                 }
             }
