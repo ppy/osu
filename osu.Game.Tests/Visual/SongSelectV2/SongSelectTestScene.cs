@@ -161,9 +161,9 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
         protected void WaitForFiltering() => AddUntilStep("wait for filtering", () => !SongSelect.IsFiltering);
 
-        protected void ImportBeatmapForRuleset(params int[] rulesetIds) => ImportBeatmapForRuleset(_ => { }, rulesetIds);
+        protected void ImportBeatmapForRuleset(params int[] rulesetIds) => ImportBeatmapForRuleset(_ => { }, 3, rulesetIds);
 
-        protected void ImportBeatmapForRuleset(Action<BeatmapSetInfo> applyToBeatmap, params int[] rulesetIds)
+        protected void ImportBeatmapForRuleset(Action<BeatmapSetInfo> applyToBeatmap, int difficultyCount, params int[] rulesetIds)
         {
             int beatmapsCount = 0;
 
@@ -171,7 +171,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             {
                 beatmapsCount = SongSelect.IsNull() ? 0 : Carousel.Filters.OfType<BeatmapCarouselFilterGrouping>().Single().SetItems.Count;
 
-                var beatmapSet = TestResources.CreateTestBeatmapSetInfo(3, Rulesets.AvailableRulesets.Where(r => rulesetIds.Contains(r.OnlineID)).ToArray());
+                var beatmapSet = TestResources.CreateTestBeatmapSetInfo(difficultyCount, Rulesets.AvailableRulesets.Where(r => rulesetIds.Contains(r.OnlineID)).ToArray());
                 applyToBeatmap(beatmapSet);
                 Beatmaps.Import(beatmapSet);
             });

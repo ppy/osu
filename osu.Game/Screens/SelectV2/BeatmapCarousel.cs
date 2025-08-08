@@ -18,7 +18,6 @@ using osu.Framework.Graphics.Pooling;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
-using osu.Game.Collections;
 using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Graphics;
@@ -50,6 +49,9 @@ namespace osu.Game.Screens.SelectV2
         private readonly LoadingLayer loading;
 
         private readonly BeatmapCarouselFilterGrouping grouping;
+
+        [Resolved]
+        private RealmAccess realm { get; set; } = null!;
 
         /// <summary>
         /// Total number of beatmap difficulties displayed with the filter.
@@ -98,7 +100,7 @@ namespace osu.Game.Screens.SelectV2
             {
                 new BeatmapCarouselFilterMatching(() => Criteria!),
                 new BeatmapCarouselFilterSorting(() => Criteria!),
-                grouping = new BeatmapCarouselFilterGrouping(() => Criteria!, () => detachedCollections())
+                grouping = new BeatmapCarouselFilterGrouping(() => Criteria!, () => realm)
             };
 
             AddInternal(loading = new LoadingLayer());
@@ -109,7 +111,6 @@ namespace osu.Game.Screens.SelectV2
         {
             setupPools();
             detachedBeatmaps = beatmapStore.GetBeatmapSets(cancellationToken);
-            detachedCollections = () => realm.Run(r => r.All<BeatmapCollection>().AsEnumerable().Detach());
             loadSamples(audio);
 
             config.BindWith(OsuSetting.RandomSelectAlgorithm, randomAlgorithm);
@@ -696,8 +697,6 @@ namespace osu.Game.Screens.SelectV2
 
         private Sample? spinSample;
         private Sample? randomSelectSample;
-
-        private Func<List<BeatmapCollection>> detachedCollections = null!;
 
         public bool NextRandom()
         {
