@@ -14,7 +14,6 @@ namespace osu.Game.Rulesets.Mania
         [LocalisableDescription(typeof(RulesetSettingsStrings), nameof(RulesetSettingsStrings.LandscapeExpandedColumns))]
         Landscape,
 
-        [LocalisableDescription(typeof(RulesetSettingsStrings), nameof(RulesetSettingsStrings.LandscapeTouchOverlay))]
         LandscapeWithOverlay,
     }
 }
