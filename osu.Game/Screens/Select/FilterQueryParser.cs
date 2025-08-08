@@ -256,7 +256,7 @@ namespace osu.Game.Screens.Select
 
         private static bool tryUpdateCriteriaRange(ref FilterCriteria.OptionalRange<float> range, Operator op, float value, float tolerance = 0.05f)
         {
-            range.ExcludeIfInRange = false;
+            range.InvertRange = false;
 
             switch (op)
             {
@@ -287,7 +287,7 @@ namespace osu.Game.Screens.Select
                 case Operator.NotEqual:
                     range.Min = value - tolerance;
                     range.Max = value + tolerance;
-                    range.ExcludeIfInRange = true;
+                    range.InvertRange = true;
                     if (tolerance == 0)
                         range.IsLowerInclusive = range.IsUpperInclusive = true;
                     break;
@@ -314,7 +314,7 @@ namespace osu.Game.Screens.Select
 
         private static bool tryUpdateCriteriaRange(ref FilterCriteria.OptionalRange<double> range, Operator op, double value, double tolerance = 0.05)
         {
-            range.ExcludeIfInRange = false;
+            range.InvertRange = false;
 
             switch (op)
             {
@@ -351,7 +351,7 @@ namespace osu.Game.Screens.Select
                 case Operator.NotEqual:
                     range.Min = value - tolerance;
                     range.Max = value + tolerance;
-                    range.ExcludeIfInRange = true;
+                    range.InvertRange = true;
                     if (tolerance == 0)
                         range.IsLowerInclusive = range.IsUpperInclusive = true;
                     break;
@@ -493,7 +493,7 @@ namespace osu.Game.Screens.Select
         private static bool tryUpdateCriteriaRange<T>(ref FilterCriteria.OptionalRange<T> range, Operator op, T value)
             where T : struct
         {
-            range.ExcludeIfInRange = false;
+            range.InvertRange = false;
 
             switch (op)
             {
@@ -530,7 +530,7 @@ namespace osu.Game.Screens.Select
                     range.IsLowerInclusive = range.IsUpperInclusive = true;
                     range.Min = value;
                     range.Max = value;
-                    range.ExcludeIfInRange = true;
+                    range.InvertRange = true;
                     break;
             }
 

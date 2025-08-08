@@ -158,10 +158,10 @@ namespace osu.Game.Screens.Select
                 {
                     int comparison = Comparer<T>.Default.Compare(value, Min.Value);
 
-                    if (comparison < 0 && !ExcludeIfInRange)
+                    if (comparison < 0 && !InvertRange)
                         return false;
 
-                    if (comparison == 0 && !IsLowerInclusive && !ExcludeIfInRange)
+                    if (comparison == 0 && !IsLowerInclusive && !InvertRange)
                         return false;
                 }
 
@@ -169,10 +169,10 @@ namespace osu.Game.Screens.Select
                 {
                     int comparison = Comparer<T>.Default.Compare(value, Max.Value);
 
-                    if (comparison > 0 && !ExcludeIfInRange)
+                    if (comparison > 0 && !InvertRange)
                         return false;
 
-                    if (comparison == 0 && !IsUpperInclusive && !ExcludeIfInRange)
+                    if (comparison == 0 && !IsUpperInclusive && !InvertRange)
                         return false;
                 }
 
@@ -181,13 +181,13 @@ namespace osu.Game.Screens.Select
                     int minComparison = Comparer<T>.Default.Compare(value, Min.Value);
                     int maxComparison = Comparer<T>.Default.Compare(value, Max.Value);
 
-                    if (minComparison > 0 && maxComparison < 0 && ExcludeIfInRange)
+                    if (minComparison > 0 && maxComparison < 0 && InvertRange)
                         return false;
 
-                    if (minComparison == 0 && IsLowerInclusive && ExcludeIfInRange)
+                    if (minComparison == 0 && IsLowerInclusive && InvertRange)
                         return false;
 
-                    if (maxComparison == 0 && IsUpperInclusive && ExcludeIfInRange)
+                    if (maxComparison == 0 && IsUpperInclusive && InvertRange)
                         return false;
                 }
 
@@ -198,7 +198,10 @@ namespace osu.Game.Screens.Select
             public T? Max;
             public bool IsLowerInclusive;
             public bool IsUpperInclusive;
-            public bool ExcludeIfInRange;
+            /// <summary>
+            /// If true, only outside of MaxValue and MinValue will return true;
+            /// </summary>
+            public bool InvertRange;
 
             public bool Equals(OptionalRange<T> other)
                 => EqualityComparer<T?>.Default.Equals(Min, other.Min)
