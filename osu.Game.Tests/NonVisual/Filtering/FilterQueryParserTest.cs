@@ -295,6 +295,16 @@ namespace osu.Game.Tests.NonVisual.Filtering
         }
 
         [Test]
+        public void TestPartialStatusNotMatch()
+        {
+            const string query = "status!=r";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.IsNotEmpty(filterCriteria.OnlineStatus.Values);
+            Assert.That(filterCriteria.OnlineStatus.Values, Does.Not.Contain(BeatmapOnlineStatus.Ranked));
+        }
+
+        [Test]
         public void TestApplyEqualStatusQueryWithMultipleValues()
         {
             const string query = "status=ranked,loved";
