@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
@@ -172,6 +173,11 @@ namespace osu.Game.Screens.Play
 
         public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
+        }
+
+        protected override void PerformFail()
+        {
+            // base logic intentionally suppressed
         }
     }
 }
