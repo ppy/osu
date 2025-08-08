@@ -19,6 +19,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         private SettingsButton resetOffsetsButton = null!;
         private SettingsButton restoreButton = null!;
         private SettingsButton undeleteButton = null!;
+        private SettingsButton downloadMissingVideosButton = null!;
 
         [BackgroundDependencyLoader]
         private void load(BeatmapManager beatmaps, IDialogOverlay? dialogOverlay)
@@ -81,6 +82,22 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                         undeleteButton.Enabled.Value = false;
                         Task.Run(beatmaps.UndeleteAll).ContinueWith(_ => Schedule(() => undeleteButton.Enabled.Value = true));
                     }
+                }
+            });
+
+            Add(downloadMissingVideosButton = new SettingsButton
+            {
+                Text = MaintenanceSettingsStrings.DownloadMissingBeatmapVideos,
+                Action = () =>
+                {
+                    var downloadMissingVideos = DownloadMissingVideos.Create(
+                        () => downloadMissingVideosButton.Enabled.Value = true,
+                        (count, confirmAction, cancelAction) => dialogOverlay?.Push(new DownloadMissingVideosDialog(count, confirmAction, cancelAction))
+                    );
+                    AddInternal(downloadMissingVideos);
+
+                    downloadMissingVideosButton.Enabled.Value = false;
+                    Task.Run(downloadMissingVideos.StartDownloadMissingVideos);
                 }
             });
         }

@@ -134,6 +134,21 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString StableDirectorySelectHeader => new TranslatableString(getKey(@"stable_directory_select_header"), @"Please select your osu!stable install location");
 
-        private static string getKey(string key) => $"{prefix}:{key}";
+        /// <summary>
+        /// "Download missing beatmap videos"
+        /// </summary>
+        public static LocalisableString DownloadMissingBeatmapVideos => new TranslatableString(getKey(@"download_missing_beatmap_videos"), @"Download missing beatmap videos");
+
+        /// <summary>
+        /// "No beatmap(s) with missing video(s) found :D"
+        /// </summary>
+        public static LocalisableString NoMissingVideosFound => new TranslatableString(getKey(@"no_missing_videos_found"), @"No beatmap(s) with missing video(s) found :D");
+
+        /// <summary>
+        /// "This will update {0} beatmap(s). Are you sure?"
+        /// </summary>
+        public static LocalisableString ConfirmDownloadVideos(int count) => new TranslatableString(getKey(@"confirm_download_videos"), @"This will update {0} beatmap(s). Are you sure?", count);
+
+        private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
