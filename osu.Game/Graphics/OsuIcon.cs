@@ -16,96 +16,6 @@ namespace osu.Game.Graphics
 {
     public static class OsuIcon
     {
-        #region Legacy spritesheet-based icons
-
-        private static IconUsage get(int icon) => new IconUsage((char)icon, @"osuFont");
-
-        // ruleset icons in circles
-        public static IconUsage RulesetOsu => get(0xe000);
-        public static IconUsage RulesetMania => get(0xe001);
-        public static IconUsage RulesetCatch => get(0xe002);
-        public static IconUsage RulesetTaiko => get(0xe003);
-
-        // ruleset icons without circles
-        public static IconUsage FilledCircle => get(0xe004);
-        public static IconUsage Logo => get(0xe006);
-        public static IconUsage ChevronDownCircle => get(0xe007);
-        public static IconUsage EditCircle => get(0xe033);
-        public static IconUsage LeftCircle => get(0xe034);
-        public static IconUsage RightCircle => get(0xe035);
-        public static IconUsage Charts => get(0xe036);
-        public static IconUsage Solo => get(0xe037);
-        public static IconUsage Multi => get(0xe038);
-        public static IconUsage Gear => get(0xe039);
-
-        // misc icons
-        public static IconUsage Bat => get(0xe008);
-        public static IconUsage Bubble => get(0xe009);
-        public static IconUsage BubblePop => get(0xe02e);
-        public static IconUsage Dice => get(0xe011);
-        public static IconUsage HeartBreak => get(0xe030);
-        public static IconUsage Hot => get(0xe031);
-        public static IconUsage ListSearch => get(0xe032);
-
-        //osu! playstyles
-        public static IconUsage PlayStyleTablet => get(0xe02a);
-        public static IconUsage PlayStyleMouse => get(0xe029);
-        public static IconUsage PlayStyleKeyboard => get(0xe02b);
-        public static IconUsage PlayStyleTouch => get(0xe02c);
-
-        // osu! difficulties
-        public static IconUsage EasyOsu => get(0xe015);
-        public static IconUsage NormalOsu => get(0xe016);
-        public static IconUsage HardOsu => get(0xe017);
-        public static IconUsage InsaneOsu => get(0xe018);
-        public static IconUsage ExpertOsu => get(0xe019);
-
-        // taiko difficulties
-        public static IconUsage EasyTaiko => get(0xe01a);
-        public static IconUsage NormalTaiko => get(0xe01b);
-        public static IconUsage HardTaiko => get(0xe01c);
-        public static IconUsage InsaneTaiko => get(0xe01d);
-        public static IconUsage ExpertTaiko => get(0xe01e);
-
-        // fruits difficulties
-        public static IconUsage EasyFruits => get(0xe01f);
-        public static IconUsage NormalFruits => get(0xe020);
-        public static IconUsage HardFruits => get(0xe021);
-        public static IconUsage InsaneFruits => get(0xe022);
-        public static IconUsage ExpertFruits => get(0xe023);
-
-        // mania difficulties
-        public static IconUsage EasyMania => get(0xe024);
-        public static IconUsage NormalMania => get(0xe025);
-        public static IconUsage HardMania => get(0xe026);
-        public static IconUsage InsaneMania => get(0xe027);
-        public static IconUsage ExpertMania => get(0xe028);
-
-        // mod icons
-        public static IconUsage ModPerfect => get(0xe049);
-        public static IconUsage ModAutopilot => get(0xe03a);
-        public static IconUsage ModAuto => get(0xe03b);
-        public static IconUsage ModCinema => get(0xe03c);
-        public static IconUsage ModDoubleTime => get(0xe03d);
-        public static IconUsage ModEasy => get(0xe03e);
-        public static IconUsage ModFlashlight => get(0xe03f);
-        public static IconUsage ModHalftime => get(0xe040);
-        public static IconUsage ModHardRock => get(0xe041);
-        public static IconUsage ModHidden => get(0xe042);
-        public static IconUsage ModNightcore => get(0xe043);
-        public static IconUsage ModNoFail => get(0xe044);
-        public static IconUsage ModRelax => get(0xe045);
-        public static IconUsage ModSpunOut => get(0xe046);
-        public static IconUsage ModSuddenDeath => get(0xe047);
-        public static IconUsage ModTarget => get(0xe048);
-
-        // Use "Icons/BeatmapDetails/mod-icon" instead
-        // public static IconUsage ModBg => Get(0xe04a);
-
-        #endregion
-
-        #region New single-file-based icons
-
         public const string FONT_NAME = @"Icons";
 
         public static IconUsage Audio => get(OsuIconMapping.Audio);
@@ -180,6 +90,121 @@ namespace osu.Game.Graphics
         public static IconUsage EditorWhistle => get(OsuIconMapping.EditorWhistle);
         public static IconUsage Tortoise => get(OsuIconMapping.Tortoise);
         public static IconUsage Hare => get(OsuIconMapping.Hare);
+
+        // ruleset icons in circles
+        public static IconUsage RulesetOsu => get(OsuIconMapping.RulesetOsu);
+        public static IconUsage RulesetMania => get(OsuIconMapping.RulesetMania);
+        public static IconUsage RulesetCatch => get(OsuIconMapping.RulesetCatch);
+        public static IconUsage RulesetTaiko => get(OsuIconMapping.RulesetTaiko);
+
+        // ruleset icons without circles
+        public static IconUsage FilledCircle => get(OsuIconMapping.FilledCircle);
+        public static IconUsage Logo => get(OsuIconMapping.Logo);
+        public static IconUsage ChevronDownCircle => get(OsuIconMapping.ChevronDownCircle);
+        public static IconUsage EditCircle => get(OsuIconMapping.EditCircle);
+        public static IconUsage LeftCircle => get(OsuIconMapping.LeftCircle);
+        public static IconUsage RightCircle => get(OsuIconMapping.RightCircle);
+        public static IconUsage Charts => get(OsuIconMapping.Charts);
+        public static IconUsage Solo => get(OsuIconMapping.Solo);
+        public static IconUsage Multi => get(OsuIconMapping.Multi);
+        public static IconUsage Gear => get(OsuIconMapping.Gear);
+
+        // misc icons
+        public static IconUsage Bat => get(OsuIconMapping.Bat);
+        public static IconUsage Bubble => get(OsuIconMapping.Bubble);
+        public static IconUsage BubblePop => get(OsuIconMapping.BubblePop);
+        public static IconUsage Dice => get(OsuIconMapping.Dice);
+        public static IconUsage HeartBreak => get(OsuIconMapping.HeartBreak);
+        public static IconUsage Hot => get(OsuIconMapping.Hot);
+        public static IconUsage ListSearch => get(OsuIconMapping.ListSearch);
+
+        // osu! playstyles
+        public static IconUsage PlayStyleTablet => get(OsuIconMapping.PlayStyleTablet);
+        public static IconUsage PlayStyleMouse => get(OsuIconMapping.PlayStyleMouse);
+        public static IconUsage PlayStyleKeyboard => get(OsuIconMapping.PlayStyleKeyboard);
+        public static IconUsage PlayStyleTouch => get(OsuIconMapping.PlayStyleTouch);
+
+        // osu! difficulties
+        public static IconUsage EasyOsu => get(OsuIconMapping.EasyOsu);
+        public static IconUsage NormalOsu => get(OsuIconMapping.NormalOsu);
+        public static IconUsage HardOsu => get(OsuIconMapping.HardOsu);
+        public static IconUsage InsaneOsu => get(OsuIconMapping.InsaneOsu);
+        public static IconUsage ExpertOsu => get(OsuIconMapping.ExpertOsu);
+
+        // taiko difficulties
+        public static IconUsage EasyTaiko => get(OsuIconMapping.EasyTaiko);
+        public static IconUsage NormalTaiko => get(OsuIconMapping.NormalTaiko);
+        public static IconUsage HardTaiko => get(OsuIconMapping.HardTaiko);
+        public static IconUsage InsaneTaiko => get(OsuIconMapping.InsaneTaiko);
+        public static IconUsage ExpertTaiko => get(OsuIconMapping.ExpertTaiko);
+
+        // fruits difficulties
+        public static IconUsage EasyFruits => get(OsuIconMapping.EasyFruits);
+        public static IconUsage NormalFruits => get(OsuIconMapping.NormalFruits);
+        public static IconUsage HardFruits => get(OsuIconMapping.HardFruits);
+        public static IconUsage InsaneFruits => get(OsuIconMapping.InsaneFruits);
+        public static IconUsage ExpertFruits => get(OsuIconMapping.ExpertFruits);
+
+        // mania difficulties
+        public static IconUsage EasyMania => get(OsuIconMapping.EasyMania);
+        public static IconUsage NormalMania => get(OsuIconMapping.NormalMania);
+        public static IconUsage HardMania => get(OsuIconMapping.HardMania);
+        public static IconUsage InsaneMania => get(OsuIconMapping.InsaneMania);
+        public static IconUsage ExpertMania => get(OsuIconMapping.ExpertMania);
+
+        // mod icons
+        public static IconUsage ModKey1 => get(OsuIconMapping.ModKey1);
+        public static IconUsage ModKey2 => get(OsuIconMapping.ModKey2);
+        public static IconUsage ModKey3 => get(OsuIconMapping.ModKey3);
+        public static IconUsage ModKey4 => get(OsuIconMapping.ModKey4);
+        public static IconUsage ModKey5 => get(OsuIconMapping.ModKey5);
+        public static IconUsage ModKey6 => get(OsuIconMapping.ModKey6);
+        public static IconUsage ModKey7 => get(OsuIconMapping.ModKey7);
+        public static IconUsage ModKey8 => get(OsuIconMapping.ModKey8);
+        public static IconUsage ModKey9 => get(OsuIconMapping.ModKey9);
+        public static IconUsage ModKey10 => get(OsuIconMapping.ModKey10);
+        public static IconUsage ModApproachDifferent => get(OsuIconMapping.ModApproachDifferent);
+        public static IconUsage ModAlternate => get(OsuIconMapping.ModAlternate);
+        public static IconUsage ModAuto => get(OsuIconMapping.ModAuto);
+        public static IconUsage ModAutopilot => get(OsuIconMapping.ModAutopilot);
+        public static IconUsage ModBlinds => get(OsuIconMapping.ModBlinds);
+        public static IconUsage ModCinema => get(OsuIconMapping.ModCinema);
+        public static IconUsage ModClassic => get(OsuIconMapping.ModClassic);
+        public static IconUsage ModConstantSpeed => get(OsuIconMapping.ModConstantSpeed);
+        public static IconUsage ModCover => get(OsuIconMapping.ModCover);
+        public static IconUsage ModDeflate => get(OsuIconMapping.ModDeflate);
+        public static IconUsage ModDepth => get(OsuIconMapping.ModDepth);
+        public static IconUsage ModDoubleTime => get(OsuIconMapping.ModDoubleTime);
+        public static IconUsage ModDifficultyAdjust => get(OsuIconMapping.ModDifficultyAdjust);
+        public static IconUsage ModEasy => get(OsuIconMapping.ModEasy);
+        public static IconUsage ModFadeIn => get(OsuIconMapping.ModFadeIn);
+        public static IconUsage ModFloatingFruits => get(OsuIconMapping.ModFloatingFruits);
+        public static IconUsage ModFlashlight => get(OsuIconMapping.ModFlashlight);
+        public static IconUsage ModGrow => get(OsuIconMapping.ModGrow);
+        public static IconUsage ModHalftime => get(OsuIconMapping.ModHalftime);
+        public static IconUsage ModHardRock => get(OsuIconMapping.ModHardRock);
+        public static IconUsage ModHidden => get(OsuIconMapping.ModHidden);
+        public static IconUsage ModHoldOff => get(OsuIconMapping.ModHoldOff);
+        public static IconUsage ModInvert => get(OsuIconMapping.ModInvert);
+        public static IconUsage ModMagnetised => get(OsuIconMapping.ModMagnetised);
+        public static IconUsage ModMirror => get(OsuIconMapping.ModMirror);
+        public static IconUsage ModMuted => get(OsuIconMapping.ModMuted);
+        public static IconUsage ModNightcore => get(OsuIconMapping.ModNightcore);
+        public static IconUsage ModNoFail => get(OsuIconMapping.ModNoFail);
+        public static IconUsage ModNoMod => get(OsuIconMapping.ModNoMod);
+        public static IconUsage ModNoScope => get(OsuIconMapping.ModNoScope);
+        public static IconUsage ModPerfect => get(OsuIconMapping.ModPerfect);
+        public static IconUsage ModRandom => get(OsuIconMapping.ModRandom);
+        public static IconUsage ModRelax => get(OsuIconMapping.ModRelax);
+        public static IconUsage ModSpinIn => get(OsuIconMapping.ModSpinIn);
+        public static IconUsage ModSpunOut => get(OsuIconMapping.ModSpunOut);
+        public static IconUsage ModSuddenDeath => get(OsuIconMapping.ModSuddenDeath);
+        public static IconUsage ModTarget => get(OsuIconMapping.ModTarget);
+        public static IconUsage ModTouchDevice => get(OsuIconMapping.ModTouchDevice);
+        public static IconUsage ModTransform => get(OsuIconMapping.ModTransform);
+        public static IconUsage ModWindDown => get(OsuIconMapping.ModWindDown);
+        public static IconUsage ModWindUp => get(OsuIconMapping.ModWindUp);
+        public static IconUsage ModWiggle => get(OsuIconMapping.ModWiggle);
 
         private static IconUsage get(OsuIconMapping glyph) => new IconUsage((char)glyph, FONT_NAME);
 
@@ -400,6 +425,297 @@ namespace osu.Game.Graphics
 
             [Description(@"hare")]
             Hare,
+
+            [Description(@"OsuFontIcons/ruleset-osu")]
+            RulesetOsu,
+
+            [Description(@"OsuFontIcons/ruleset-mania")]
+            RulesetMania,
+
+            [Description(@"OsuFontIcons/ruleset-catch")]
+            RulesetCatch,
+
+            [Description(@"OsuFontIcons/ruleset-taiko")]
+            RulesetTaiko,
+
+            [Description(@"OsuFontIcons/filled-circle")]
+            FilledCircle,
+
+            [Description(@"OsuFontIcons/logo")]
+            Logo,
+
+            [Description(@"OsuFontIcons/chevron-down-circle")]
+            ChevronDownCircle,
+
+            [Description(@"OsuFontIcons/edit-circle")]
+            EditCircle,
+
+            [Description(@"OsuFontIcons/left-circle")]
+            LeftCircle,
+
+            [Description(@"OsuFontIcons/right-circle")]
+            RightCircle,
+
+            [Description(@"OsuFontIcons/charts")]
+            Charts,
+
+            [Description(@"OsuFontIcons/solo")]
+            Solo,
+
+            [Description(@"OsuFontIcons/multi")]
+            Multi,
+
+            [Description(@"OsuFontIcons/gear")]
+            Gear,
+
+            [Description(@"OsuFontIcons/bat")]
+            Bat,
+
+            [Description(@"OsuFontIcons/bubble")]
+            Bubble,
+
+            [Description(@"OsuFontIcons/bubble-pop")]
+            BubblePop,
+
+            [Description(@"OsuFontIcons/dice")]
+            Dice,
+
+            [Description(@"OsuFontIcons/heart-break")]
+            HeartBreak,
+
+            [Description(@"OsuFontIcons/hot")]
+            Hot,
+
+            [Description(@"OsuFontIcons/list-search")]
+            ListSearch,
+
+            [Description(@"OsuFontIcons/play-style-tablet")]
+            PlayStyleTablet,
+
+            [Description(@"OsuFontIcons/play-style-mouse")]
+            PlayStyleMouse,
+
+            [Description(@"OsuFontIcons/play-style-keyboard")]
+            PlayStyleKeyboard,
+
+            [Description(@"OsuFontIcons/play-style-touch")]
+            PlayStyleTouch,
+
+            [Description(@"OsuFontIcons/osu-easy")]
+            EasyOsu,
+
+            [Description(@"OsuFontIcons/osu-normal")]
+            NormalOsu,
+
+            [Description(@"OsuFontIcons/osu-hard")]
+            HardOsu,
+
+            [Description(@"OsuFontIcons/osu-insane")]
+            InsaneOsu,
+
+            [Description(@"OsuFontIcons/osu-expert")]
+            ExpertOsu,
+
+            [Description(@"OsuFontIcons/taiko-easy")]
+            EasyTaiko,
+
+            [Description(@"OsuFontIcons/taiko-normal")]
+            NormalTaiko,
+
+            [Description(@"OsuFontIcons/taiko-hard")]
+            HardTaiko,
+
+            [Description(@"OsuFontIcons/taiko-insane")]
+            InsaneTaiko,
+
+            [Description(@"OsuFontIcons/taiko-expert")]
+            ExpertTaiko,
+
+            [Description(@"OsuFontIcons/fruits-easy")]
+            EasyFruits,
+
+            [Description(@"OsuFontIcons/fruits-normal")]
+            NormalFruits,
+
+            [Description(@"OsuFontIcons/fruits-hard")]
+            HardFruits,
+
+            [Description(@"OsuFontIcons/fruits-insane")]
+            InsaneFruits,
+
+            [Description(@"OsuFontIcons/fruits-expert")]
+            ExpertFruits,
+
+            [Description(@"OsuFontIcons/mania-easy")]
+            EasyMania,
+
+            [Description(@"OsuFontIcons/mania-normal")]
+            NormalMania,
+
+            [Description(@"OsuFontIcons/mania-hard")]
+            HardMania,
+
+            [Description(@"OsuFontIcons/mania-insane")]
+            InsaneMania,
+
+            [Description(@"OsuFontIcons/mania-expert")]
+            ExpertMania,
+
+            [Description(@"ModIcons/mod-key1")]
+            ModKey1,
+
+            [Description(@"ModIcons/mod-key2")]
+            ModKey2,
+
+            [Description(@"ModIcons/mod-key3")]
+            ModKey3,
+
+            [Description(@"ModIcons/mod-key4")]
+            ModKey4,
+
+            [Description(@"ModIcons/mod-key5")]
+            ModKey5,
+
+            [Description(@"ModIcons/mod-key6")]
+            ModKey6,
+
+            [Description(@"ModIcons/mod-key7")]
+            ModKey7,
+
+            [Description(@"ModIcons/mod-key8")]
+            ModKey8,
+
+            [Description(@"ModIcons/mod-key9")]
+            ModKey9,
+
+            [Description(@"ModIcons/mod-key10")]
+            ModKey10,
+
+            [Description(@"ModIcons/mod-alternate")]
+            ModAlternate,
+
+            [Description(@"ModIcons/mod-approach-different")]
+            ModApproachDifferent,
+
+            [Description(@"ModIcons/mod-auto")]
+            ModAuto,
+
+            [Description(@"ModIcons/mod-autopilot")]
+            ModAutopilot,
+
+            [Description(@"ModIcons/mod-blinds")]
+            ModBlinds,
+
+            [Description(@"ModIcons/mod-cinema")]
+            ModCinema,
+
+            [Description(@"ModIcons/mod-classic")]
+            ModClassic,
+
+            [Description(@"ModIcons/mod-constant-speed")]
+            ModConstantSpeed,
+
+            [Description(@"ModIcons/mod-cover")]
+            ModCover,
+
+            [Description(@"ModIcons/mod-double-time")]
+            ModDoubleTime,
+
+            [Description(@"ModIcons/mod-deflate")]
+            ModDeflate,
+
+            [Description(@"ModIcons/mod-depth")]
+            ModDepth,
+
+            [Description(@"ModIcons/mod-difficulty-adjust")]
+            ModDifficultyAdjust,
+
+            [Description(@"ModIcons/mod-easy")]
+            ModEasy,
+
+            [Description(@"ModIcons/mod-fade-in")]
+            ModFadeIn,
+
+            [Description(@"ModIcons/mod-flashlight")]
+            ModFlashlight,
+
+            [Description(@"ModIcons/mod-floating-fruits")]
+            ModFloatingFruits,
+
+            [Description(@"ModIcons/mod-grow")]
+            ModGrow,
+
+            [Description(@"ModIcons/mod-halftime")]
+            ModHalftime,
+
+            [Description(@"ModIcons/mod-hard-rock")]
+            ModHardRock,
+
+            [Description(@"ModIcons/mod-hidden")]
+            ModHidden,
+
+            [Description(@"ModIcons/mod-hold-off")]
+            ModHoldOff,
+
+            [Description(@"ModIcons/mod-invert")]
+            ModInvert,
+
+            [Description(@"ModIcons/mod-magnetised")]
+            ModMagnetised,
+
+            [Description(@"ModIcons/mod-mirror")]
+            ModMirror,
+
+            [Description(@"ModIcons/mod-muted")]
+            ModMuted,
+
+            [Description(@"ModIcons/mod-nightcore")]
+            ModNightcore,
+
+            [Description(@"ModIcons/mod-no-fail")]
+            ModNoFail,
+
+            [Description(@"ModIcons/mod-no-mod")]
+            ModNoMod,
+
+            [Description(@"ModIcons/mod-no-scope")]
+            ModNoScope,
+
+            [Description(@"ModIcons/mod-perfect")]
+            ModPerfect,
+
+            [Description(@"ModIcons/mod-random")]
+            ModRandom,
+
+            [Description(@"ModIcons/mod-relax")]
+            ModRelax,
+
+            [Description(@"ModIcons/mod-spin-in")]
+            ModSpinIn,
+
+            [Description(@"ModIcons/mod-spun-out")]
+            ModSpunOut,
+
+            [Description(@"ModIcons/mod-sudden-death")]
+            ModSuddenDeath,
+
+            [Description(@"ModIcons/mod-target")]
+            ModTarget,
+
+            [Description(@"ModIcons/mod-touch-device")]
+            ModTouchDevice,
+
+            [Description(@"ModIcons/mod-transform")]
+            ModTransform,
+
+            [Description(@"ModIcons/mod-wind-down")]
+            ModWindDown,
+
+            [Description(@"ModIcons/mod-wind-up")]
+            ModWindUp,
+
+            [Description(@"ModIcons/mod-wiggle")]
+            ModWiggle,
         }
 
         public class OsuIconStore : ITextureStore, ITexturedGlyphLookupStore
@@ -458,7 +774,5 @@ namespace osu.Game.Graphics
                 textures.Dispose();
             }
         }
-
-        #endregion
     }
 }
