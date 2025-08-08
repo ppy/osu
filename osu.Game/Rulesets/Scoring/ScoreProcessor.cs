@@ -175,6 +175,8 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         private double scoreMultiplier = 1;
 
+        public double ScoreMultiplier => scoreMultiplier;
+
         public Dictionary<HitResult, int> MaximumStatistics
         {
             get

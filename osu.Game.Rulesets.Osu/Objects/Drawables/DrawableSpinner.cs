@@ -51,18 +51,18 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private PausableSkinnableSound maxBonusSample;
 
-        private double classicMultiplier = 1.0;
+        private double scoreDisplayMultiplier = 1.0;
         private Bindable<ScoringMode> scoreDisplayMode;
 
         /// <summary>
         /// The amount of bonus score gained from spinning after the required number of spins, for display purposes.
         /// </summary>
-        public int CurrentBonusScore => (int)(classicMultiplier * score_per_tick * Math.Clamp(completedFullSpins.Value - HitObject.SpinsRequiredForBonus, 0, HitObject.MaximumBonusSpins));
+        public int CurrentBonusScore => (int)(scoreDisplayMultiplier * score_per_tick * Math.Clamp(completedFullSpins.Value - HitObject.SpinsRequiredForBonus, 0, HitObject.MaximumBonusSpins));
 
         /// <summary>
         /// The maximum amount of bonus score which can be achieved from extra spins.
         /// </summary>
-        public int MaximumBonusScore => (int)(classicMultiplier * score_per_tick * HitObject.MaximumBonusSpins);
+        public int MaximumBonusScore => (int)(scoreDisplayMultiplier * score_per_tick * HitObject.MaximumBonusSpins);
 
         public IBindable<int> CompletedFullSpins => completedFullSpins;
 
@@ -85,10 +85,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
         }
 
-#nullable enable
-
-        [BackgroundDependencyLoader]
-        private void load(OsuConfigManager? config = null, ScoreProcessor? scoreProcessor = null)
+        [BackgroundDependencyLoader(true)]
+        private void load(OsuConfigManager config, ScoreProcessor scoreProcessor)
         {
             Origin = Anchor.Centre;
             RelativeSizeAxes = Axes.Both;
@@ -131,6 +129,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             if (config == null || scoreProcessor == null)
             {
+                scoreDisplayMultiplier = 1.0;
                 return;
             }
 
@@ -140,11 +139,17 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 switch (scoreMode.NewValue)
                 {
                     case ScoringMode.Standardised:
-                        classicMultiplier = 1.0;
+                        scoreDisplayMultiplier = 1.0;
                         break;
 
                     case ScoringMode.Classic:
-                        classicMultiplier = scoreProcessor.GetOsuClassicScoreMultiplier();
+                        int maxBasicJudgements = scoreProcessor.MaximumStatistics
+                                                 .Where(k => k.Key.IsBasic())
+                                                 .Select(k => k.Value)
+                                                 .DefaultIfEmpty(0)
+                                                 .Sum();
+
+                        scoreDisplayMultiplier = ScoreInfoExtensions.GetOsuClassicScoreMultiplier(maxBasicJudgements) * scoreProcessor.ScoreMultiplier;
                         break;
 
                     default:
@@ -152,8 +157,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 }
             }, true);
         }
-
-#nullable disable
 
         protected override void LoadComplete()
         {

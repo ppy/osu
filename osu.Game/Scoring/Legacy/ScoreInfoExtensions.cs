@@ -54,7 +54,7 @@ namespace osu.Game.Scoring.Legacy
             switch (rulesetId)
             {
                 case 0:
-                    return (long)Math.Round(getOsuClassicScoreMultiplier(objectCount) * standardisedTotalScore);
+                    return (long)Math.Round(GetOsuClassicScoreMultiplier(objectCount) * standardisedTotalScore);
 
                 case 1:
                     return (long)Math.Round((objectCount * 1109 + 100000) * standardisedTotalScore / ScoreProcessor.MAX_SCORE);
@@ -68,18 +68,7 @@ namespace osu.Game.Scoring.Legacy
             }
         }
 
-        public static double GetOsuClassicScoreMultiplier(this ScoreProcessor scoreProcessor)
-        {
-            int maxBasicJudgements = scoreProcessor.MaximumStatistics
-                                       .Where(k => k.Key.IsBasic())
-                                       .Select(k => k.Value)
-                                       .DefaultIfEmpty(0)
-                                       .Sum();
-
-            return getOsuClassicScoreMultiplier(maxBasicJudgements);
-        }
-
-        private static double getOsuClassicScoreMultiplier(int objectCount)
+        public static double GetOsuClassicScoreMultiplier(int objectCount)
         {
             return (Math.Pow(objectCount, 2) * 32.57 + 100000) / ScoreProcessor.MAX_SCORE;
         }
