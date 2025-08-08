@@ -549,11 +549,8 @@ namespace osu.Game.Tests.NonVisual.Filtering
                     Artist = info.artist
                 },
                 DifficultyName = info.difficultyName
-
             })).ToList();
-
             var criteria = new FilterCriteria();
-
             FilterQueryParser.ApplyQueries(criteria, query);
             carouselBeatmaps.ForEach(b => b.Filter(criteria));
 
@@ -584,7 +581,8 @@ namespace osu.Game.Tests.NonVisual.Filtering
                 (5.0f, 3.0f, 7.0f, 10.0f, 2.78, 144.0, 260000.0)
             }).Select(info => new CarouselBeatmap(new BeatmapInfo
             {
-                Difficulty = new BeatmapDifficulty{
+                Difficulty = new BeatmapDifficulty
+                {
                     ApproachRate = info.ar,
                     OverallDifficulty = info.od,
                     DrainRate = info.hp,
@@ -593,7 +591,6 @@ namespace osu.Game.Tests.NonVisual.Filtering
                 BPM = info.bpm,
                 StarRating = info.star,
                 Length = info.length
-
             })).ToList();
 
             var criteria = new FilterCriteria();
@@ -614,7 +611,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
         [TestCase("status!=l", new[] { 0, 1, 2, 3, 4, 6 })]
         public void TestNotEqualSearchForEnumFilter(string query, int[] expectedBeatmapIndexes)
         {
-            var carouselBeatmaps = (new BeatmapOnlineStatus[]
+            var carouselBeatmaps = new[]
             {
                 BeatmapOnlineStatus.Ranked,
                 BeatmapOnlineStatus.Qualified,
@@ -623,14 +620,12 @@ namespace osu.Game.Tests.NonVisual.Filtering
                 BeatmapOnlineStatus.Approved,
                 BeatmapOnlineStatus.Loved,
                 BeatmapOnlineStatus.Ranked
-            }).Select(info => new CarouselBeatmap(new BeatmapInfo
+            }.Select(info => new CarouselBeatmap(new BeatmapInfo
             {
                 Status = info
-
             })).ToList();
 
             var criteria = new FilterCriteria();
-
             FilterQueryParser.ApplyQueries(criteria, query);
             carouselBeatmaps.ForEach(b => b.Filter(criteria));
 
@@ -682,7 +677,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
         [TestCase("submitted!=2012.10.21", new[] { 1, 2, 3, 4, 5, 6, 7 })]
         public void TestNotEqualSearchForDateFilter(string query, int[] expectedBeatmapIndexes)
         {
-            var carouselBeatmaps = (new DateTime[]
+            var carouselBeatmaps = new[]
             {
                 new DateTime(2012, 10, 21),
                 new DateTime(2012, 10, 11),
@@ -692,18 +687,15 @@ namespace osu.Game.Tests.NonVisual.Filtering
                 new DateTime(2013, 3, 14),
                 new DateTime(2014, 1, 15),
                 new DateTime(2014, 11, 16),
-            }).Select(info => new CarouselBeatmap(new BeatmapInfo
+            }.Select(info => new CarouselBeatmap(new BeatmapInfo
             {
                 BeatmapSet = new BeatmapSetInfo
                 {
                     DateRanked = new DateTimeOffset(info),
                     DateSubmitted = new DateTimeOffset(info),
                 }
-
             })).ToList();
-
             var criteria = new FilterCriteria();
-
             FilterQueryParser.ApplyQueries(criteria, query);
             carouselBeatmaps.ForEach(b => b.Filter(criteria));
 
