@@ -427,15 +427,18 @@ namespace osu.Game.Screens.Select
                 foreach (var definedValue in allDefinedValues)
                 {
                     bool isExcludedValue = false;
+
                     foreach (var excludedValue in excludedValues)
                     {
                         int compareResult = Comparer<T>.Default.Compare(definedValue, excludedValue);
+
                         if (compareResult == 0)
                         {
                             isExcludedValue = true;
                             break;
                         }
                     }
+
                     if (!isExcludedValue)
                         matchingValues.Add(definedValue);
                 }
@@ -476,6 +479,7 @@ namespace osu.Game.Screens.Select
                         case Operator.NotEqual:
                             if (compareResult != 0) matchingValues.Add(val);
                             break;
+
                         default:
                             return false;
                     }
@@ -490,6 +494,7 @@ namespace osu.Game.Screens.Select
             where T : struct
         {
             range.ExcludeIfInRange = false;
+
             switch (op)
             {
                 default:
