@@ -154,35 +154,36 @@ namespace osu.Game.Screens.Select
 
             public bool IsInRange(T value)
             {
+                bool lowerRangeSatisfied = true;
+                bool upperRangeSatisfied = true;
+
                 if (Min != null)
                 {
                     int comparison = Comparer<T>.Default.Compare(value, Min.Value);
-
-                    if (comparison < 0)
-                        return false;
-
-                    if (comparison == 0 && !IsLowerInclusive)
-                        return false;
+                    lowerRangeSatisfied = comparison > 0 || (comparison == 0 && IsLowerInclusive);
                 }
 
                 if (Max != null)
                 {
                     int comparison = Comparer<T>.Default.Compare(value, Max.Value);
-
-                    if (comparison > 0)
-                        return false;
-
-                    if (comparison == 0 && !IsUpperInclusive)
-                        return false;
+                    upperRangeSatisfied = comparison < 0 || (comparison == 0 && IsUpperInclusive);
                 }
 
-                return true;
+                bool result = lowerRangeSatisfied && upperRangeSatisfied;
+                if (InvertRange)
+                    result = !result;
+                return result;
             }
 
             public T? Min;
             public T? Max;
             public bool IsLowerInclusive;
             public bool IsUpperInclusive;
+
+            /// <summary>
+            /// If true, only outside of MaxValue and MinValue will return true
+            /// </summary>
+            public bool InvertRange;
 
             public bool Equals(OptionalRange<T> other)
                 => EqualityComparer<T?>.Default.Equals(Min, other.Min)

@@ -147,6 +147,30 @@ namespace osu.Game.Tests.NonVisual.Filtering
         }
 
         [Test]
+        [TestCase(true)]
+        [TestCase(false)]
+        public void TestCriteriaMatchingInvertedRange(bool inverted)
+        {
+            var exampleBeatmapInfo = getExampleBeatmap();
+            var criteria = new FilterCriteria
+            {
+                Ruleset = new RulesetInfo { OnlineID = 6 },
+                AllowConvertedBeatmaps = true,
+                StarDifficulty = new FilterCriteria.OptionalRange<double>
+                {
+                    Max = 4.0d,
+                    Min = 4.0d,
+                    IsLowerInclusive = true,
+                    IsUpperInclusive = true,
+                    InvertRange = inverted
+                }
+            };
+            var carouselItem = new CarouselBeatmap(exampleBeatmapInfo);
+            carouselItem.Filter(criteria);
+            Assert.AreEqual(inverted, carouselItem.Filtered.Value);
+        }
+
+        [Test]
         [TestCase("artist", false)]
         [TestCase("artist title author", false)]
         [TestCase("an artist", true)]
