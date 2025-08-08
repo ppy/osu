@@ -158,10 +158,10 @@ namespace osu.Game.Screens.Select
                 {
                     int comparison = Comparer<T>.Default.Compare(value, Min.Value);
 
-                    if (comparison < 0)
+                    if (comparison < 0 && !ExcludeIfInRange)
                         return false;
 
-                    if (comparison == 0 && !IsLowerInclusive)
+                    if (comparison == 0 && !IsLowerInclusive && !ExcludeIfInRange)
                         return false;
                 }
 
@@ -169,10 +169,25 @@ namespace osu.Game.Screens.Select
                 {
                     int comparison = Comparer<T>.Default.Compare(value, Max.Value);
 
-                    if (comparison > 0)
+                    if (comparison > 0 && !ExcludeIfInRange)
                         return false;
 
-                    if (comparison == 0 && !IsUpperInclusive)
+                    if (comparison == 0 && !IsUpperInclusive && !ExcludeIfInRange)
+                        return false;
+                }
+
+                if (Min != null && Max != null)
+                {
+                    int minComparison = Comparer<T>.Default.Compare(value, Min.Value);
+                    int maxComparison = Comparer<T>.Default.Compare(value, Max.Value);
+
+                    if (minComparison > 0 && maxComparison < 0 && ExcludeIfInRange)
+                        return false;
+
+                    if (minComparison == 0 && IsLowerInclusive && ExcludeIfInRange)
+                        return false;
+
+                    if (maxComparison == 0 && IsUpperInclusive && ExcludeIfInRange)
                         return false;
                 }
 
@@ -183,6 +198,7 @@ namespace osu.Game.Screens.Select
             public T? Max;
             public bool IsLowerInclusive;
             public bool IsUpperInclusive;
+            public bool ExcludeIfInRange;
 
             public bool Equals(OptionalRange<T> other)
                 => EqualityComparer<T?>.Default.Equals(Min, other.Min)
