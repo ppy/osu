@@ -53,6 +53,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
             config.BindWith(OsuSetting.ReleaseStream, configReleaseStream);
 
             bool isDesktop = RuntimeInfo.IsDesktop;
+            bool supportsExport = RuntimeInfo.OS != RuntimeInfo.Platform.Android;
             bool canCheckUpdates = updateManager?.CanCheckForUpdate == true;
 
             if (canCheckUpdates)
@@ -95,14 +96,20 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     Keywords = new[] { @"logs", @"files", @"access", "directory" },
                     Action = () => storage.PresentExternally(),
                 });
+            }
 
+            if (supportsExport)
+            {
                 Add(new SettingsButton
                 {
                     Text = GeneralSettingsStrings.ExportLogs,
                     Keywords = new[] { @"bug", "report", "logs", "files" },
                     Action = () => Task.Run(exportLogs),
                 });
+            }
 
+            if (isDesktop)
+            {
                 Add(new SettingsButton
                 {
                     Text = GeneralSettingsStrings.ChangeFolderLocation,
