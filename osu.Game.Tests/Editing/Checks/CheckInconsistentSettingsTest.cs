@@ -267,7 +267,7 @@ namespace osu.Game.Tests.Editing.Checks
                 currentBeatmap,
                 new TestWorkingBeatmap(currentBeatmap, storyboard),
                 DifficultyRating.ExpertPlus,
-                beatmapInfo => allDifficulties.FirstOrDefault(b => b.BeatmapInfo.Equals(beatmapInfo))
+                allDifficulties
             );
         }
     }
