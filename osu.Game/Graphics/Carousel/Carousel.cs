@@ -117,10 +117,6 @@ namespace osu.Game.Graphics.Carousel
                     currentSelection = currentKeyboardSelection;
                     SelectionValid.Invalidate();
                 }
-                else if (currentKeyboardSelection.Model != value)
-                {
-                    SelectionValid.Invalidate();
-                }
             }
         }
 
