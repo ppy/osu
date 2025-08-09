@@ -28,16 +28,22 @@ namespace osu.Game.Rulesets.Edit
         public DifficultyRating InterpretedDifficulty;
 
         /// <summary>
-        /// All beatmap difficulties in the same beatmapset, including the current beatmap.
+        /// All playable beatmap difficulties in the same beatmapset, including the current beatmap.
         /// </summary>
         public readonly IReadOnlyList<IBeatmap> BeatmapsetDifficulties;
 
-        public BeatmapVerifierContext(IBeatmap beatmap, IWorkingBeatmap workingBeatmap, DifficultyRating difficultyRating = DifficultyRating.ExpertPlus, IReadOnlyList<IBeatmap>? beatmapsetDifficulties = null)
+        /// <summary>
+        /// The working beatmapset difficulties, including the current working beatmap.
+        /// </summary>
+        public readonly IReadOnlyList<IWorkingBeatmap> WorkingBeatmapsetDifficulties;
+
+        public BeatmapVerifierContext(IBeatmap beatmap, IWorkingBeatmap workingBeatmap, DifficultyRating difficultyRating = DifficultyRating.ExpertPlus, IReadOnlyList<IBeatmap>? beatmapsetDifficulties = null, IReadOnlyList<IWorkingBeatmap>? workingBeatmapsetDifficulties = null)
         {
             Beatmap = beatmap;
             WorkingBeatmap = workingBeatmap;
             InterpretedDifficulty = difficultyRating;
             BeatmapsetDifficulties = beatmapsetDifficulties ?? new List<IBeatmap> { beatmap };
+            WorkingBeatmapsetDifficulties = workingBeatmapsetDifficulties ?? new List<IWorkingBeatmap> { workingBeatmap };
         }
 
         public static BeatmapVerifierContext Create(IBeatmap beatmap, IWorkingBeatmap workingBeatmap, DifficultyRating difficultyRating = DifficultyRating.ExpertPlus, BeatmapManager? beatmapManager = null)
@@ -50,6 +56,7 @@ namespace osu.Game.Rulesets.Edit
             }
 
             var difficulties = new List<IBeatmap>();
+            var workingDifficulties = new List<IWorkingBeatmap>();
 
             foreach (var beatmapInfo in beatmapSet.Beatmaps)
             {
@@ -57,20 +64,21 @@ namespace osu.Game.Rulesets.Edit
                 if (beatmapInfo.Equals(beatmap.BeatmapInfo))
                 {
                     difficulties.Add(beatmap);
+                    workingDifficulties.Add(workingBeatmap);
                     continue;
                 }
 
                 // Resolve other difficulties using BeatmapManager if available
-                if (beatmapManager != null)
-                {
-                    var working = beatmapManager.GetWorkingBeatmap(beatmapInfo);
-                    var playable = working.GetPlayableBeatmap(beatmapInfo.Ruleset);
-                    if (playable != null)
-                        difficulties.Add(playable);
-                }
+                var working = beatmapManager?.GetWorkingBeatmap(beatmapInfo);
+                if (working != null)
+                    workingDifficulties.Add(working);
+
+                var playable = working?.GetPlayableBeatmap(beatmapInfo.Ruleset);
+                if (playable != null)
+                    difficulties.Add(playable);
             }
 
-            return new BeatmapVerifierContext(beatmap, workingBeatmap, difficultyRating, difficulties);
+            return new BeatmapVerifierContext(beatmap, workingBeatmap, difficultyRating, difficulties, workingDifficulties);
         }
     }
 }
