@@ -215,7 +215,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Editor.Checks
                 currentBeatmap,
                 new TestWorkingBeatmap(currentBeatmap),
                 DifficultyRating.ExpertPlus,
-                beatmapInfo => allDifficulties.FirstOrDefault(b => b.BeatmapInfo.Equals(beatmapInfo))
+                allDifficulties
             );
         }
     }
