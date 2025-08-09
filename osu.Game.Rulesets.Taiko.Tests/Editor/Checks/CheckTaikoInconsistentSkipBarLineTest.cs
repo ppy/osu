@@ -211,11 +211,11 @@ namespace osu.Game.Rulesets.Taiko.Tests.Editor.Checks
 
         private BeatmapVerifierContext createContextWithMultipleDifficulties(IBeatmap currentBeatmap, IBeatmap[] allDifficulties)
         {
-            return BeatmapVerifierContext.CreateWithBeatmapResolver(
+            return new BeatmapVerifierContext(
                 currentBeatmap,
                 new TestWorkingBeatmap(currentBeatmap),
                 DifficultyRating.ExpertPlus,
-                beatmapInfo => allDifficulties.FirstOrDefault(b => b.BeatmapInfo.Equals(beatmapInfo))
+                allDifficulties
             );
         }
     }
