@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 using osu.Game.Beatmaps;
 using osu.Game.Extensions;
@@ -142,29 +143,19 @@ namespace osu.Game.Online.API.Requests.Responses
 
         public class APIRuleset : IRulesetInfo
         {
+            private static readonly Dictionary<int, string> id_to_short_name = new Dictionary<int, string>
+            {
+                { 0, "osu" },
+                { 1, "taiko" },
+                { 2, "fruits" },
+                { 3, "mania" }
+            };
+
             public int OnlineID { get; set; } = -1;
 
             public string Name => $@"{nameof(APIRuleset)} (ID: {OnlineID})";
 
-            public string ShortName
-            {
-                get
-                {
-                    // TODO: this should really not exist.
-                    switch (OnlineID)
-                    {
-                        case 0: return "osu";
-
-                        case 1: return "taiko";
-
-                        case 2: return "fruits";
-
-                        case 3: return "mania";
-
-                        default: throw new ArgumentOutOfRangeException();
-                    }
-                }
-            }
+            public string ShortName => getShortName();
 
             public string InstantiationInfo => string.Empty;
 
@@ -182,6 +173,14 @@ namespace osu.Game.Online.API.Requests.Responses
 
             // ReSharper disable once NonReadonlyMemberInGetHashCode
             public override int GetHashCode() => OnlineID;
+
+            private string getShortName()
+            {
+                if (id_to_short_name.TryGetValue(OnlineID, out string? shortName))
+                    return shortName;
+
+                throw new ArgumentOutOfRangeException(nameof(OnlineID), OnlineID, "Unknown ruleset online ID");
+            }
         }
 
         public class BeatmapOwner
