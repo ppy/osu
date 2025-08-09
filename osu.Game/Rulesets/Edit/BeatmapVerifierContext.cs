@@ -50,9 +50,9 @@ namespace osu.Game.Rulesets.Edit
         {
             var beatmapSet = beatmap.BeatmapInfo.BeatmapSet;
 
-            if (beatmapSet?.Beatmaps == null)
+            if (beatmapSet?.Beatmaps == null || beatmapSet.Beatmaps.Count == 1)
             {
-                return new BeatmapVerifierContext(beatmap, workingBeatmap, difficultyRating, new[] { beatmap });
+                return new BeatmapVerifierContext(beatmap, workingBeatmap);
             }
 
             var difficulties = new List<IBeatmap>();
