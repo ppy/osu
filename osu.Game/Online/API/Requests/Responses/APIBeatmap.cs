@@ -155,9 +155,7 @@ namespace osu.Game.Online.API.Requests.Responses
 
             public string Name => $@"{nameof(APIRuleset)} (ID: {OnlineID})";
 
-            public string ShortName => id_to_short_name.TryGetValue(OnlineID, out string? shortName)
-                ? shortName
-                : throw new ArgumentOutOfRangeException(nameof(OnlineID), OnlineID, "Unknown ruleset online ID");
+            public string ShortName => getShortName();
 
             public string InstantiationInfo => string.Empty;
 
@@ -175,6 +173,14 @@ namespace osu.Game.Online.API.Requests.Responses
 
             // ReSharper disable once NonReadonlyMemberInGetHashCode
             public override int GetHashCode() => OnlineID;
+
+            private string getShortName()
+            {
+                if (id_to_short_name.TryGetValue(OnlineID, out string? shortName))
+                    return shortName;
+
+                throw new ArgumentOutOfRangeException(nameof(OnlineID), OnlineID, "Unknown ruleset online ID");
+            }
         }
 
         public class BeatmapOwner
