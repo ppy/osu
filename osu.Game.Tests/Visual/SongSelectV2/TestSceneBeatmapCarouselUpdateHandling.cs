@@ -107,6 +107,23 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddAssert("visible panel is updateable beatmap", () => GetSelectedPanel()?.Item?.Model, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
         }
 
+        /// <summary>
+        /// Previously it was possible for selection to become invalid even if the value
+        /// that it is set to is the same as it is stored. This caused selection to become
+        /// "invalid" even though the selection was still correct.
+        /// </summary>
+        [Test]
+        public void TestSelectionValid()
+        {
+            Carousel.CurrentSelection = baseTestBeatmap.Beatmaps[0];
+            Carousel.GetSetSelectionValid().Validate();
+            object? selection = Carousel.CurrentSelection;            
+            Carousel.CurrentSelection = selection;
+            Assert.True(Carousel.GetSetSelectionValid().IsValid);
+            Carousel.CurrentSelection = selection;
+            Assert.True(Carousel.GetSetSelectionValid().IsValid);
+        }
+
         [Test] // Checks that we keep selection based on online ID where possible.
         public void TestSelectionHeldDifficultyNameChanged()
         {

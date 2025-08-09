@@ -453,6 +453,10 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 ActivationCount++;
                 base.HandleItemActivated(item);
             }
+            public Framework.Caching.Cached GetSetSelectionValid()
+            {
+                return SelectionValid;
+            }
 
             protected override async Task<IEnumerable<CarouselItem>> FilterAsync(bool clearExistingPanels = false)
             {
