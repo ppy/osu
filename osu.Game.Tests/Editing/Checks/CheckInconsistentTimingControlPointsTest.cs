@@ -245,11 +245,11 @@ namespace osu.Game.Tests.Editing.Checks
 
         private BeatmapVerifierContext createContext(IBeatmap currentBeatmap, IBeatmap[] allDifficulties)
         {
-            return BeatmapVerifierContext.CreateWithBeatmapResolver(
+            return new BeatmapVerifierContext(
                 currentBeatmap,
                 new TestWorkingBeatmap(currentBeatmap),
                 DifficultyRating.ExpertPlus,
-                beatmapInfo => allDifficulties.FirstOrDefault(b => b.BeatmapInfo.Equals(beatmapInfo))
+                allDifficulties
             );
         }
     }
