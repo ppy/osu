@@ -20,7 +20,7 @@ namespace osu.Game.Screens.Play.HUD
         [Resolved]
         private ScoreProcessor scoreProcessor { get; set; } = null!;
 
-        public UnstableRateCounter()
+        protected UnstableRateCounter()
         {
             Current.Value = 0;
         }
@@ -58,12 +58,8 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.Dispose(isDisposing);
 
-            if (scoreProcessor != null)
-            {
-                scoreProcessor.NewJudgement -= updateDisplay;
-                scoreProcessor.JudgementReverted -= updateDisplay;
-            }
+            scoreProcessor.NewJudgement -= updateDisplay;
+            scoreProcessor.JudgementReverted -= updateDisplay;
         }
-
     }
 }
