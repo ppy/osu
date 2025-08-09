@@ -117,6 +117,13 @@ namespace osu.Game.Graphics.Carousel
                     currentSelection = currentKeyboardSelection;
                     SelectionValid.Invalidate();
                 }
+                else if (!CheckModelEquality(currentKeyboardSelection.Model, value))
+                {
+                    // Even if the current selection matches, let's ensure the keyboard selection is reset
+                    // to the newly selected object. This matches user expectations (for now).
+                    currentKeyboardSelection = currentSelection;
+                    SelectionValid.Invalidate();
+                }
             }
         }
 
