@@ -115,7 +115,11 @@ namespace osu.Game.Graphics.Carousel
 
                     currentKeyboardSelection = new Selection(value);
                     currentSelection = currentKeyboardSelection;
-                    selectionValid.Invalidate();
+                    SelectionValid.Invalidate();
+                }
+                else if (currentKeyboardSelection.Model != value)
+                {
+                    SelectionValid.Invalidate();
                 }
             }
         }
@@ -134,7 +138,7 @@ namespace osu.Game.Graphics.Carousel
             (GetMaterialisedDrawableForItem(item) as ICarouselPanel)?.Activated();
             HandleItemActivated(item);
 
-            selectionValid.Invalidate();
+            SelectionValid.Invalidate();
         }
 
         /// <summary>
@@ -685,7 +689,7 @@ namespace osu.Game.Graphics.Carousel
         /// <summary>
         /// Becomes invalid when the current selection has changed and needs to be updated visually.
         /// </summary>
-        private readonly Cached selectionValid = new Cached();
+        protected readonly Cached SelectionValid = new Cached();
 
         private Selection currentKeyboardSelection = new Selection();
         private Selection currentSelection = new Selection();
@@ -693,7 +697,7 @@ namespace osu.Game.Graphics.Carousel
         private void setKeyboardSelection(object? model)
         {
             currentKeyboardSelection = new Selection(model);
-            selectionValid.Invalidate();
+            SelectionValid.Invalidate();
         }
 
         /// <summary>
@@ -792,14 +796,14 @@ namespace osu.Game.Graphics.Carousel
             visibleUpperBound = (float)(Scroll.Current - BleedTop);
             visibleHalfHeight = (DrawHeight + BleedBottom + BleedTop) / 2;
 
-            if (!selectionValid.IsValid)
+            if (!SelectionValid.IsValid)
             {
                 refreshAfterSelection();
 
                 // Always scroll to selection in this case (regardless of `UserScrolling` state), centering the selection.
                 ScrollToSelection();
 
-                selectionValid.Validate();
+                SelectionValid.Validate();
             }
 
             var range = getDisplayRange();
@@ -992,7 +996,7 @@ namespace osu.Game.Graphics.Carousel
         {
             // handles the vertical size of the carousel changing (ie. on window resize when aspect ratio has changed).
             if (invalidation.HasFlag(Invalidation.DrawSize))
-                selectionValid.Invalidate();
+                SelectionValid.Invalidate();
 
             return base.OnInvalidate(invalidation, source);
         }
