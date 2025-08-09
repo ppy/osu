@@ -17,6 +17,11 @@ namespace osu.Game.Rulesets.Difficulty.Skills
     public abstract class VariableLengthStrainSkill : Skill
     {
         /// <summary>
+        /// Multiplier applied to <see cref="DifficultyValue"/>
+        /// </summary>
+        protected virtual double DifficultyMultiplier => 1;
+
+        /// <summary>
         /// The weight by which each strain value decays.
         /// </summary>
         protected virtual double DecayWeight => 0.9;
@@ -25,13 +30,6 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// Integral from 0 to infinity of DecayWeight^x dx
         /// </summary>
         private double decayWeightIntegral => (DecayWeight - 1) / Math.Log(DecayWeight) * (1.0 / (1 - DecayWeight));
-
-        /// <summary>
-        /// Offset applied to time when starting the weighted sum for <see cref="DifficultyValue"/>.
-        /// Ensures continuous weighted sum matches normal weighted sum perfectly.
-        /// <remarks>https://www.desmos.com/calculator/ewecobp8td</remarks>
-        /// </summary>
-        protected double WeightedSumTimeOffset => Math.Log(Math.Log(DecayWeight) / (DecayWeight - 1)) / Math.Log(DecayWeight);
 
         /// <summary>
         /// The maximum length of each strain section.
@@ -230,7 +228,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             List<StrainPeak> strains = peaks.OrderByDescending(p => (p.Value, p.SectionLength)).ToList();
 
             // Time is measured in units of strains
-            double time = WeightedSumTimeOffset;
+            double time = 0;
 
             // Difficulty is a continuous weighted sum of the sorted strains
             for (int i = 0; i < strains.Count; i++)
@@ -240,7 +238,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
                 time += strains[i].SectionLength / MaxSectionLength;
             }
 
-            return difficulty;
+            return difficulty * DifficultyMultiplier;
         }
 
         /// <summary>

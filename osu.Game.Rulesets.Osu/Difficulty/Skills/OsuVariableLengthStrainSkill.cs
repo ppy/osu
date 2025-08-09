@@ -23,6 +23,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// </summary>
         protected virtual double ReducedStrainBaseline => 0.727;
 
+        protected override double DifficultyMultiplier => 1.058;
+
         protected OsuVariableLengthStrainSkill(Mod[] mods)
             : base(mods)
         {
@@ -65,7 +67,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             strains.RemoveRange(0, strainsToRemove);
 
             // Reset time for summing
-            time = WeightedSumTimeOffset;
+            time = 0;
 
             // Difficulty is a continuous weighted sum of the sorted strains
             foreach (StrainPeak strain in strains.OrderByDescending(s => s.Value))
@@ -75,7 +77,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 time += strain.SectionLength / MaxSectionLength;
             }
 
-            return difficulty;
+            return difficulty * DifficultyMultiplier;
         }
 
         public static double DifficultyToPerformance(double difficulty) => Math.Pow(5.0 * Math.Max(1.0, difficulty / 0.0675) - 4.0, 3.0) / 100000.0;
