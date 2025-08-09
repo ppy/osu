@@ -7,7 +7,6 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Timing;
-using osu.Game.Extensions;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Checks;
 using osu.Game.Rulesets.Objects;
@@ -229,24 +228,14 @@ namespace osu.Game.Tests.Editing.Checks
 
         private BeatmapVerifierContext createContextWithMultipleDifficulties(IBeatmap currentBeatmap, IEnumerable<IBeatmap> allDifficulties)
         {
-            var beatmapSet = new BeatmapSetInfo();
-            var beatmapInfos = allDifficulties.Select(d => d.BeatmapInfo).ToList();
-
-            // Set up the beatmapset with all difficulties
-            beatmapSet.Beatmaps.AddRange(beatmapInfos);
-            currentBeatmap.BeatmapInfo.BeatmapSet = beatmapSet;
-
-            // Create a resolver that returns the appropriate working beatmap for each difficulty
-            var difficultyDict = allDifficulties.ToDictionary(d => d.BeatmapInfo, d => new TestWorkingBeatmap(d));
-
-            // Use the current beatmap's star rating to determine its difficulty rating
+            var difficultiesArray = allDifficulties.ToArray();
             var currentDifficultyRating = StarDifficulty.GetDifficultyRating(currentBeatmap.BeatmapInfo.StarRating);
 
-            return BeatmapVerifierContext.CreateWithBeatmapResolver(
+            return new BeatmapVerifierContext(
                 currentBeatmap,
                 new TestWorkingBeatmap(currentBeatmap),
                 currentDifficultyRating,
-                beatmapInfo => allDifficulties.FirstOrDefault(b => b.BeatmapInfo.Equals(beatmapInfo))
+                difficultiesArray
             );
         }
 
