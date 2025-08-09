@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using osu.Game.Beatmaps;
 
@@ -33,13 +32,6 @@ namespace osu.Game.Rulesets.Edit
         /// </summary>
         public readonly IReadOnlyList<IBeatmap> BeatmapsetDifficulties;
 
-        /// <summary>
-        /// Creates a new <see cref="BeatmapVerifierContext"/> with the specified data.
-        /// </summary>
-        /// <param name="beatmap">The playable beatmap instance.</param>
-        /// <param name="workingBeatmap">The working beatmap instance.</param>
-        /// <param name="difficultyRating">The difficulty level of the beatmap.</param>
-        /// <param name="beatmapsetDifficulties">All beatmap difficulties in the same beatmapset.</param>
         public BeatmapVerifierContext(IBeatmap beatmap, IWorkingBeatmap workingBeatmap, DifficultyRating difficultyRating = DifficultyRating.ExpertPlus, IReadOnlyList<IBeatmap>? beatmapsetDifficulties = null)
         {
             Beatmap = beatmap;
@@ -48,15 +40,7 @@ namespace osu.Game.Rulesets.Edit
             BeatmapsetDifficulties = beatmapsetDifficulties ?? new List<IBeatmap> { beatmap };
         }
 
-        /// <summary>
-        /// Creates a new <see cref="BeatmapVerifierContext"/> with beatmap resolution.
-        /// </summary>
-        /// <param name="beatmap">The playable beatmap instance.</param>
-        /// <param name="workingBeatmap">The working beatmap instance.</param>
-        /// <param name="difficultyRating">The difficulty level of the beatmap.</param>
-        /// <param name="beatmapResolver">Resolver function to resolve other difficulties in the beatmapset.</param>
-        /// <returns>A new <see cref="BeatmapVerifierContext"/> with resolved beatmapset difficulties.</returns>
-        public static BeatmapVerifierContext CreateWithBeatmapResolver(IBeatmap beatmap, IWorkingBeatmap workingBeatmap, DifficultyRating difficultyRating = DifficultyRating.ExpertPlus, Func<BeatmapInfo, IBeatmap?>? beatmapResolver = null)
+        public static BeatmapVerifierContext Create(IBeatmap beatmap, IWorkingBeatmap workingBeatmap, DifficultyRating difficultyRating = DifficultyRating.ExpertPlus, BeatmapManager? beatmapManager = null)
         {
             var beatmapSet = beatmap.BeatmapInfo.BeatmapSet;
 
@@ -76,10 +60,14 @@ namespace osu.Game.Rulesets.Edit
                     continue;
                 }
 
-                // Try to resolve other difficulties using the provided resolver
-                var resolvedBeatmap = beatmapResolver?.Invoke(beatmapInfo);
-                if (resolvedBeatmap != null)
-                    difficulties.Add(resolvedBeatmap);
+                // Resolve other difficulties using BeatmapManager if available
+                if (beatmapManager != null)
+                {
+                    var working = beatmapManager.GetWorkingBeatmap(beatmapInfo);
+                    var playable = working.GetPlayableBeatmap(beatmapInfo.Ruleset);
+                    if (playable != null)
+                        difficulties.Add(playable);
+                }
             }
 
             return new BeatmapVerifierContext(beatmap, workingBeatmap, difficultyRating, difficulties);
