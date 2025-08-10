@@ -27,7 +27,6 @@ using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.Models;
 using osu.Game.Online.API;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
@@ -1309,14 +1308,14 @@ namespace osu.Game.Database
 
         private string? getRulesetShortNameFromLegacyID(long rulesetId)
         {
-            try
+            return rulesetId switch
             {
-                return new APIBeatmap.APIRuleset { OnlineID = (int)rulesetId }.ShortName;
-            }
-            catch
-            {
-                return null;
-            }
+                0 => @"osu",
+                1 => @"taiko",
+                2 => @"fruits",
+                3 => @"mania",
+                _ => null
+            };
         }
 
         /// <summary>
