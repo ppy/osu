@@ -6,6 +6,7 @@ using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Skinning;
 using osuTK;
@@ -114,6 +115,36 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                     }
 
                     return null;
+
+                case SkinComponentLookup<HitResult> resultComponent:
+                    switch (resultComponent.Component)
+                    {
+                        // osu!stable didn't show slider points on the tail, since that's where the slider judgement was shown. Here, sliderpoint30 will be shown on non-classic tails via SliderTailHit.
+                        case HitResult.LargeTickHit:
+                        case HitResult.SliderTailHit:
+                            if (hasSliderPoints())
+                                return new LegacySliderTickJudgementPiece();
+
+                            return base.GetDrawableComponent(lookup);
+
+                        // If slider points are showing and tick misses aren't provided by this skin, don't look up tick misses from any further skins.
+                        case HitResult.LargeTickMiss:
+                        case HitResult.IgnoreMiss:
+                            if (hasSliderPoints())
+                                return base.GetDrawableComponent(lookup) ?? Drawable.Empty();
+
+                            return base.GetDrawableComponent(lookup);
+
+                        default:
+                            return base.GetDrawableComponent(lookup);
+                    }
+
+                    bool hasSliderPoints() =>
+                        // https://github.com/peppy/osu-stable-reference/blob/0e91e49bc83fe8b21c3ba5f1eb2d5d06456eae84/osu!/GameModes/Play/Rulesets/Ruleset.cs#L799
+                        GetConfig<SkinConfiguration.LegacySetting, decimal>(SkinConfiguration.LegacySetting.Version)?.Value < 2m
+                        // Note that osu!stable didn't require both sliderpoint textures to be present like this. There's not enough information in the lookup to decide which of the textures should be used, so we can't handle them separately. The hope is that this won't break many skins because it'd be very odd to customise only one of these textures.
+                        && GetTexture("sliderpoint10") != null
+                        && GetTexture("sliderpoint30") != null;
 
                 case OsuSkinComponentLookup osuComponent:
                     switch (osuComponent.Component)
