@@ -232,7 +232,7 @@ jobs:
             --packTitle "osu! GU" \
             -i "$ICON_FILE" \
             -c "osx"
-        else
+        elif [[ "${{ matrix.os }}" == "windows-latest" ]]; then
           vpk pack \
             -u "osu-lazer-gu" \
             -v "${{ steps.version.outputs.semver }}" \
@@ -240,7 +240,42 @@ jobs:
             -e "${{ matrix.executable }}" \
             --packAuthors "osu! GooGuTeam" \
             --packTitle "osu! GU" \
-            -i "osu.Desktop/lazer.ico"
+            -i "osu.Desktop/lazer.ico" \
+            -c "win"
+        else
+          # Linux
+          vpk pack \
+            -u "osu-lazer-gu" \
+            -v "${{ steps.version.outputs.semver }}" \
+            -p "publish/${{ matrix.runtime }}" \
+            -e "${{ matrix.executable }}" \
+            --packAuthors "osu! GooGuTeam" \
+            --packTitle "osu! GU" \
+            -i "osu.Desktop/lazer.ico" \
+            -c "linux"
+        fi
+
+    - name: Normalize asset names (optional)
+      shell: bash
+      run: |
+        shopt -s nullglob
+        # Windows installer rename to install.exe if present
+        if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+          if [ -f "Releases/Setup.exe" ]; then
+            mv -f Releases/Setup.exe Releases/install.exe
+          fi
+        fi
+        # macOS zip rename if present
+        if [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+          if [[ "${{ matrix.runtime }}" == "osx-x64" ]]; then
+            for f in Releases/*osx-x64*.zip; do mv -f "$f" Releases/osu.app.Intel.zip; done
+          else
+            for f in Releases/*osx-arm64*.zip; do mv -f "$f" Releases/osu.app.Apple.Silicon.zip; done
+          fi
+        fi
+        # Linux AppImage rename if present
+        if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
+          for f in Releases/*.AppImage; do mv -f "$f" Releases/osu.AppImage; done
         fi
 
     - name: Upload build artifacts

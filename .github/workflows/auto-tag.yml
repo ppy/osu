@@ -1,0 +1,67 @@
+name: Auto tag from master
+
+on:
+  push:
+    branches: [ master ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  create-tag:
+    name: Create dated tag (yyyy.mdd.N-lazer)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+      
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Compute next tag
+        id: calc
+        shell: bash
+        env:
+          TZ: UTC
+        run: |
+          YEAR=$(date -u +%Y)
+          # month without leading zero
+          MONTH=$(date -u +%-m)
+          # day with leading zero
+          DAY=$(date -u +%d)
+          MDD="${MONTH}${DAY}"
+          BASE="${YEAR}.${MDD}"
+
+          # find highest N for existing tags vYYYY.MDD.N-lazer
+          MAXN=-1
+          while IFS= read -r t; do
+            # t like "v2025.710.3-lazer" -> grab N between last '.' and '-lazer'
+            N=$(echo "$t" | sed -E "s/^v${BASE}\.([0-9]+)-lazer$/\1/" || true)
+            if [[ "$N" =~ ^[0-9]+$ ]]; then
+              if (( N > MAXN )); then MAXN=$N; fi
+            fi
+          done < <(git tag -l "v${BASE}.*-lazer")
+
+          NEXT=$((MAXN+1))
+          VERSION="${BASE}.${NEXT}-lazer"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Computed tag: v$VERSION"
+
+      - name: Create and push tag
+        shell: bash
+        run: |
+          TAG="v${{ steps.calc.outputs.version }}"
+          if git rev-parse -q --verify "$TAG" >/dev/null; then
+            echo "Tag already exists: $TAG"
+            exit 0
+          fi
+          git tag -a "$TAG" -m "Auto release $TAG"
+          git push origin "$TAG"
+
+
