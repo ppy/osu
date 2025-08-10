@@ -11,6 +11,7 @@ using osu.Game.Configuration;
 using osu.Game.Localisation;
 using osu.Game.Overlays.Dialog;
 // using osu.Game.Overlays.Settings;
+using System.Text.RegularExpressions;
 
 namespace osu.Game.Overlays.Settings.Sections.Online
 {
@@ -69,6 +70,12 @@ namespace osu.Game.Overlays.Settings.Sections.Online
         private ScheduledDelegate? pendingDialog;
         private const double debounce_delay = 500;
 
+        // Require: https only + host (domain/localhost/IPv4/IPv6) + optional :port
+        // Disallow: trailing slash, path, query, fragment
+        private static readonly Regex customApiUrlPattern = new Regex(
+            pattern: @"^https://(?:localhost|(?:[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+)|(?:\d{1,3}\.){3}\d{1,3}|\[[0-9A-Fa-f:]+\])(?::\d{1,5})?$",
+            options: RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
         private void onCustomApiUrlChanged(ValueChangedEvent<string> e)
         {
             if (isInitialLoad)
@@ -94,7 +101,7 @@ namespace osu.Game.Overlays.Settings.Sections.Online
                 // Only allow restart when the value is a valid URL (http/https),
                 // or when clearing the field back to empty.
                 bool isEmpty = string.IsNullOrWhiteSpace(currentValue);
-                bool isValidUrl = isEmpty || isValidHttpUrl(currentValue);
+                bool isValidUrl = isEmpty || isValidCustomApiUrl(currentValue);
                 if (!isValidUrl)
                     return;
 
@@ -109,12 +116,7 @@ namespace osu.Game.Overlays.Settings.Sections.Online
             }, debounce_delay);
         }
 
-        private static bool isValidHttpUrl(string value)
-        {
-            if (!Uri.TryCreate(value, UriKind.Absolute, out var uri))
-                return false;
-            return uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps;
-        }
+        private static bool isValidCustomApiUrl(string value) => customApiUrlPattern.IsMatch(value);
 
         private void showRestartDialog()
         {

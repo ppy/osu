@@ -295,7 +295,11 @@ jobs:
         retention-days: 90
 
   release:
-    if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'release'
+    # Create a GitHub Release when triggered by:
+    # - tag push (v*)
+    # - release event
+    # - push to master/main (auto-generate date-based tag)
+    if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'release' || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
     needs: build
     runs-on: ubuntu-latest
     permissions:
@@ -319,14 +323,45 @@ jobs:
         done
         echo "Collected files:" && ls -al release-files || true
 
+    - name: Compute tag for release (when not on tag)
+      id: calc_tag
+      shell: bash
+      env:
+        TZ: UTC
+      run: |
+        if [[ "${{ startsWith(github.ref, 'refs/tags/') }}" == "true" ]]; then
+          TAG="${{ github.ref_name }}"
+        elif [[ "${{ github.event_name }}" == "release" ]]; then
+          TAG="${{ github.event.release.tag_name }}"
+        else
+          YEAR=$(date -u +%Y)
+          MONTH=$(date -u +%-m)
+          DAY=$(date -u +%d)
+          MDD="${MONTH}${DAY}"
+          BASE="${YEAR}.${MDD}"
+          git fetch --tags --force
+          MAXN=-1
+          while IFS= read -r t; do
+            N=$(echo "$t" | sed -E "s/^v${BASE}\.([0-9]+)-lazer$/\1/" || true)
+            if [[ "$N" =~ ^[0-9]+$ ]]; then
+              if (( N > MAXN )); then MAXN=$N; fi
+            fi
+          done < <(git tag -l "v${BASE}.*-lazer")
+          NEXT=$((MAXN+1))
+          TAG="v${BASE}.${NEXT}-lazer"
+        fi
+        echo "tag=$TAG" >> $GITHUB_OUTPUT
+        echo "Using tag: $TAG"
+
     - name: Create or update GitHub Release
       uses: softprops/action-gh-release@v1
       with:
-        tag_name: ${{ github.ref_name || github.event.release.tag_name }}
-        name: osu! GU ${{ github.ref_name || github.event.release.tag_name }}
+        tag_name: ${{ steps.calc_tag.outputs.tag }}
+        target_commitish: ${{ github.sha }}
+        name: osu! GU ${{ steps.calc_tag.outputs.tag }}
         files: release-files/**
         draft: false
-        prerelease: ${{ contains((github.ref_name || github.event.release.tag_name), 'alpha') || contains((github.ref_name || github.event.release.tag_name), 'beta') || contains((github.ref_name || github.event.release.tag_name), 'rc') }}
+        prerelease: ${{ contains(steps.calc_tag.outputs.tag, 'alpha') || contains(steps.calc_tag.outputs.tag, 'beta') || contains(steps.calc_tag.outputs.tag, 'rc') }}
         generate_release_notes: true
         body: |
           ## osu! GU ${{ github.ref_name || github.event.release.tag_name }}
