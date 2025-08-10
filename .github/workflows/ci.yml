@@ -56,6 +56,8 @@ jobs:
 
   test:
     name: Test
+    # disabled per request: keep only code quality checks
+    if: ${{ false }}
     runs-on: ${{matrix.os.fullname}}
     env:
       OSU_EXECUTION_MODE: ${{matrix.threadingMode}}
@@ -106,6 +108,8 @@ jobs:
 
   build-only-android:
     name: Build only (Android)
+    # disabled per request: keep only code quality checks
+    if: ${{ false }}
     runs-on: windows-latest
     timeout-minutes: 60
     steps:
@@ -131,6 +135,8 @@ jobs:
 
   build-only-ios:
     name: Build only (iOS)
+    # disabled per request: keep only code quality checks
+    if: ${{ false }}
     runs-on: macos-15
     timeout-minutes: 60
     steps:

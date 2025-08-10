@@ -12,6 +12,8 @@ on:
         description: 'Release version (e.g., 1.0.0)'
         required: false
         default: '1.0.0-dev'
+  release:
+    types: [ published ]
 
 env:
   DOTNET_VERSION: '8.0.x'
@@ -51,7 +53,8 @@ jobs:
       with:
         fetch-depth: 0
         # Ensure we have complete git history for version calculation
-        ref: ${{ github.sha }}
+        # Use the release tag when triggered by a Release event, otherwise the triggering SHA
+        ref: ${{ github.event_name == 'release' && github.event.release.tag_name || github.sha }}
 
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
@@ -131,7 +134,9 @@ jobs:
       id: version
       shell: bash
       run: |
-        if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+        if [[ "${{ github.event_name }}" == "release" ]]; then
+          VERSION="${{ github.event.release.tag_name }}"
+        elif [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
           VERSION="${{ github.event.inputs.version }}"
         elif [[ "${{ github.ref }}" == refs/tags/* ]]; then
           VERSION="${{ github.ref_name }}"
@@ -235,7 +240,7 @@ jobs:
         retention-days: 30
 
     - name: Upload installer (Release only)
-      if: startsWith(github.ref, 'refs/tags/v')
+      if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'release'
       uses: actions/upload-artifact@v4
       with:
         name: installer-${{ matrix.artifact-name }}
@@ -243,7 +248,7 @@ jobs:
         retention-days: 90
 
   release:
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'release'
     needs: build
     runs-on: ubuntu-latest
     permissions:
@@ -256,15 +261,15 @@ jobs:
         merge-multiple: true
         path: release-files
 
-    - name: Create GitHub Release
+    - name: Create or update GitHub Release
       uses: softprops/action-gh-release@v1
       with:
         files: release-files/*
         draft: false
-        prerelease: ${{ contains(github.ref_name, 'alpha') || contains(github.ref_name, 'beta') || contains(github.ref_name, 'rc') }}
+        prerelease: ${{ contains((github.ref_name || github.event.release.tag_name), 'alpha') || contains((github.ref_name || github.event.release.tag_name), 'beta') || contains((github.ref_name || github.event.release.tag_name), 'rc') }}
         generate_release_notes: true
         body: |
-          ## osu! GU ${{ github.ref_name }}
+          ## osu! GU ${{ github.ref_name || github.event.release.tag_name }}
 
           基于官方 osu!(lazer) 的自定义版本。
 

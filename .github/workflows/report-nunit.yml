@@ -17,8 +17,9 @@ permissions:
 jobs:
   annotate:
     name: Annotate CI run with test results
+    # disabled per request: tests are disabled; skip annotations
+    if: ${{ false && github.event.workflow_run.conclusion != 'cancelled' }}
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion != 'cancelled' }}
     timeout-minutes: 5
     steps:
       - name: Checkout
