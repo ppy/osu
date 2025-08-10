@@ -80,19 +80,25 @@ namespace osu.Game.Overlays.Settings.Sections.Online
 
             pendingDialog?.Cancel();
 
-            string newValue = e.NewValue ?? string.Empty;
+            string newValue = (e.NewValue ?? string.Empty).Trim();
 
             if (string.Equals(lastApiUrl, newValue, StringComparison.OrdinalIgnoreCase))
                 return;
 
             pendingDialog = Scheduler.AddDelayed(() =>
             {
-                string currentValue = customApiUrlTextBox.Current.Value ?? string.Empty;
+                string currentValue = (customApiUrlTextBox.Current.Value ?? string.Empty).Trim();
                 if (string.Equals(lastApiUrl, currentValue, StringComparison.OrdinalIgnoreCase))
                     return;
 
-                bool wasEmpty = string.IsNullOrWhiteSpace(lastApiUrl);
+                // Only allow restart when the value is a valid URL (http/https),
+                // or when clearing the field back to empty.
                 bool isEmpty = string.IsNullOrWhiteSpace(currentValue);
+                bool isValidUrl = isEmpty || isValidHttpUrl(currentValue);
+                if (!isValidUrl)
+                    return;
+
+                bool wasEmpty = string.IsNullOrWhiteSpace(lastApiUrl);
 
                 if (wasEmpty != isEmpty || (!wasEmpty && !isEmpty))
                 {
@@ -101,6 +107,13 @@ namespace osu.Game.Overlays.Settings.Sections.Online
 
                 lastApiUrl = currentValue;
             }, debounce_delay);
+        }
+
+        private static bool isValidHttpUrl(string value)
+        {
+            if (!Uri.TryCreate(value, UriKind.Absolute, out var uri))
+                return false;
+            return uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps;
         }
 
         private void showRestartDialog()

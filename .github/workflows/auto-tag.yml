@@ -55,6 +55,9 @@ jobs:
 
       - name: Create and push tag
         shell: bash
+        env:
+          REPO: ${{ github.repository }}
+          TOKEN: ${{ secrets.RELEASE_TOKEN }}
         run: |
           TAG="v${{ steps.calc.outputs.version }}"
           if git rev-parse -q --verify "$TAG" >/dev/null; then
@@ -62,6 +65,10 @@ jobs:
             exit 0
           fi
           git tag -a "$TAG" -m "Auto release $TAG"
-          git push origin "$TAG"
+          if [[ -z "$TOKEN" ]]; then
+            echo "RELEASE_TOKEN secret is missing. Please create a PAT with 'repo' and 'workflow' scopes and add it as RELEASE_TOKEN to this repo secrets."
+            exit 1
+          fi
+          git push "https://x-access-token:${TOKEN}@github.com/${REPO}.git" "$TAG"
 
 
