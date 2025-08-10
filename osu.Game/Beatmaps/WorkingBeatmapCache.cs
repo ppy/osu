@@ -4,7 +4,6 @@
 #nullable disable
 
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -130,39 +129,14 @@ namespace osu.Game.Beatmaps
 
         #endregion
 
-        private readonly struct PlayableBeatmapCacheKey : IEquatable<PlayableBeatmapCacheKey>
-        {
-            public readonly string RulesetShortName;
-            public readonly string ModsHash;
-
-            public PlayableBeatmapCacheKey(IRulesetInfo ruleset, IEnumerable<Mod> mods)
-            {
-                RulesetShortName = ruleset.ShortName;
-                ModsHash = string.Join(",", mods.Select(static m => m.Acronym).OrderBy(static a => a));
-            }
-
-            public bool Equals(PlayableBeatmapCacheKey other)
-            {
-                return RulesetShortName == other.RulesetShortName && ModsHash == other.ModsHash;
-            }
-
-            public override bool Equals(object obj)
-            {
-                return obj is PlayableBeatmapCacheKey other && Equals(other);
-            }
-
-            public override int GetHashCode()
-            {
-                return HashCode.Combine(RulesetShortName, ModsHash);
-            }
-        }
-
         private class BeatmapManagerWorkingBeatmap : WorkingBeatmap
         {
             [NotNull]
             private readonly IBeatmapResourceProvider resources;
 
-            private readonly ConcurrentDictionary<PlayableBeatmapCacheKey, IBeatmap> playableBeatmapCache = [];
+            private IBeatmap cachedPlayableBeatmap;
+            private string cachedRulesetShortName;
+            private string cachedModsHash;
 
             public BeatmapManagerWorkingBeatmap(BeatmapInfo beatmapInfo, [NotNull] IBeatmapResourceProvider resources)
                 : base(beatmapInfo, resources.AudioManager)
@@ -173,19 +147,26 @@ namespace osu.Game.Beatmaps
             public override IBeatmap GetPlayableBeatmap(IRulesetInfo ruleset, IReadOnlyList<Mod> mods, CancellationToken token)
             {
                 mods ??= Array.Empty<Mod>();
-                var cacheKey = new PlayableBeatmapCacheKey(ruleset, mods);
+                string currentRulesetShortName = ruleset.ShortName;
+                string currentModsHash = string.Join(",", mods.Select(static m => m.Acronym).OrderBy(static a => a));
 
-                if (playableBeatmapCache.TryGetValue(cacheKey, out var cachedBeatmap))
-                    return cachedBeatmap;
+                if (cachedPlayableBeatmap != null && cachedRulesetShortName == currentRulesetShortName && cachedModsHash == currentModsHash)
+                    return cachedPlayableBeatmap;
 
                 var playableBeatmap = base.GetPlayableBeatmap(ruleset, mods, token);
-                playableBeatmapCache.TryAdd(cacheKey, playableBeatmap);
+
+                cachedPlayableBeatmap = playableBeatmap;
+                cachedRulesetShortName = currentRulesetShortName;
+                cachedModsHash = currentModsHash;
+
                 return playableBeatmap;
             }
 
             internal void ClearPlayableBeatmapCache()
             {
-                playableBeatmapCache.Clear();
+                cachedPlayableBeatmap = null;
+                cachedRulesetShortName = null;
+                cachedModsHash = null;
             }
 
             protected override IBeatmap GetBeatmap()
