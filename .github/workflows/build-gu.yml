@@ -143,7 +143,6 @@ jobs:
         elif [[ "${{ github.ref }}" == "refs/heads/main" ]] || [[ "${{ github.ref }}" == "refs/heads/master" ]]; then
           # Use 3-part SemVer for main/master: 1.0.BUILDNUMBER
           COMMIT_COUNT=$(git rev-list --count HEAD)
-          # Use a reasonable build number
           BUILD_NUMBER=$((COMMIT_COUNT % 10000))
           VERSION="1.0.$BUILD_NUMBER"
         else
@@ -152,8 +151,22 @@ jobs:
           BUILD_NUMBER=$((COMMIT_COUNT % 10000))
           VERSION="0.9.$BUILD_NUMBER"
         fi
+
+        # Strip leading 'v' to form semver for packaging / display
+        SEMVER=${VERSION#v}
+        # Numeric only for assembly/file version (drop any pre-release/build metadata)
+        NUMERIC=${SEMVER%%-*}
+        # Ensure four-part version for FileVersion/AssemblyVersion
+        PARTS=$(echo "$NUMERIC" | awk -F. '{print NF}')
+        if [[ $PARTS -eq 1 ]]; then NUMERIC="$NUMERIC.0.0.0"; fi
+        if [[ $PARTS -eq 2 ]]; then NUMERIC="$NUMERIC.0.0"; fi
+        if [[ $PARTS -eq 3 ]]; then NUMERIC="$NUMERIC.0"; fi
+
         echo "version=$VERSION" >> $GITHUB_OUTPUT
-        echo "Building version: $VERSION"
+        echo "semver=$SEMVER" >> $GITHUB_OUTPUT
+        echo "assemblyVersion=$NUMERIC" >> $GITHUB_OUTPUT
+        echo "fileVersion=$NUMERIC" >> $GITHUB_OUTPUT
+        echo "Building version: $VERSION (semver: $SEMVER, assembly/file: $NUMERIC)"
 
     - name: Clean previous build artifacts
       shell: bash
@@ -187,9 +200,9 @@ jobs:
           --verbosity normal \
           -p:PublishSingleFile=false \
           -p:PublishTrimmed=false \
-          -p:Version=${{ steps.version.outputs.version }} \
-          -p:FileVersion=${{ steps.version.outputs.version }} \
-          -p:AssemblyVersion=${{ steps.version.outputs.version }} \
+          -p:Version=${{ steps.version.outputs.semver }} \
+          -p:FileVersion=${{ steps.version.outputs.fileVersion }} \
+          -p:AssemblyVersion=${{ steps.version.outputs.assemblyVersion }} \
           -p:InformationalVersion=${{ steps.version.outputs.version }}
 
     - name: Set executable permissions (Linux/macOS)
@@ -212,7 +225,7 @@ jobs:
 
           vpk pack \
             -u "osu-lazer-gu" \
-            -v "${{ steps.version.outputs.version }}" \
+            -v "${{ steps.version.outputs.semver }}" \
             -p "publish/${{ matrix.runtime }}" \
             -e "${{ matrix.executable }}" \
             --packAuthors "osu! GooGuTeam" \
@@ -222,7 +235,7 @@ jobs:
         else
           vpk pack \
             -u "osu-lazer-gu" \
-            -v "${{ steps.version.outputs.version }}" \
+            -v "${{ steps.version.outputs.semver }}" \
             -p "publish/${{ matrix.runtime }}" \
             -e "${{ matrix.executable }}" \
             --packAuthors "osu! GooGuTeam" \
