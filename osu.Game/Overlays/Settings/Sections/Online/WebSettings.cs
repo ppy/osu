@@ -67,7 +67,7 @@ namespace osu.Game.Overlays.Settings.Sections.Online
         private string lastApiUrl = string.Empty;
         private bool isInitialLoad = true;
         private ScheduledDelegate? pendingDialog;
-        private const double DebounceDelay = 500;
+        private const double debounce_delay = 500;
 
         private void onCustomApiUrlChanged(ValueChangedEvent<string> e)
         {
@@ -100,7 +100,7 @@ namespace osu.Game.Overlays.Settings.Sections.Online
                 }
 
                 lastApiUrl = currentValue;
-            }, DebounceDelay);
+            }, debounce_delay);
         }
 
         private void showRestartDialog()
