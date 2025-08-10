@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         [Resolved]
         private OsuConfigManager config { get; set; } = null!;
 
-        private Vector2 screenSpacePosition;
+        private Vector2? screenSpacePosition;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -65,7 +65,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             Lighting.ResetAnimation();
             Lighting.SetColourFrom(this, Result);
-            Position = Parent!.ToLocalSpace(screenSpacePosition);
+
+            if (screenSpacePosition != null)
+                Position = Parent!.ToLocalSpace(screenSpacePosition.Value);
         }
 
         protected override void ApplyHitAnimations()
