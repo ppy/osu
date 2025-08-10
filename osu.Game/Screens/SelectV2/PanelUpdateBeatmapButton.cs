@@ -9,16 +9,19 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Screens.Select.Carousel;
 using osuTK;
 using osuTK.Graphics;
+using CommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
 
 namespace osu.Game.Screens.SelectV2
 {
@@ -55,7 +58,8 @@ namespace osu.Game.Screens.SelectV2
 
         public PanelUpdateBeatmapButton()
         {
-            Size = new Vector2(72, 22f);
+            AutoSizeAxes = Axes.X;
+            Height = 22f;
         }
 
         private Bindable<bool> preferNoVideo = null!;
@@ -109,7 +113,7 @@ namespace osu.Game.Screens.SelectV2
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                             Font = OsuFont.Style.Body.With(weight: FontWeight.SemiBold),
-                            Text = "Update",
+                            Text = CommonStrings.ButtonsUpdate,
                         }
                     }
                 },
@@ -141,6 +145,8 @@ namespace osu.Game.Screens.SelectV2
             icon.Spin(4000, RotationDirection.Clockwise, icon.Rotation);
             base.OnHoverLost(e);
         }
+
+        public override LocalisableString TooltipText => Enabled.Value ? SongSelectStrings.UpdateBeatmapTooltip : string.Empty;
 
         private bool updateConfirmed;
 
@@ -179,7 +185,6 @@ namespace osu.Game.Screens.SelectV2
             if (download != null)
             {
                 Enabled.Value = false;
-                TooltipText = string.Empty;
 
                 download.DownloadProgressed += progress => progressFill.ResizeWidthTo(progress, 100, Easing.OutQuint);
                 download.Failure += _ => attachExistingDownload();
@@ -187,7 +192,6 @@ namespace osu.Game.Screens.SelectV2
             else
             {
                 Enabled.Value = true;
-                TooltipText = "Update beatmap with online changes";
 
                 progressFill.ResizeWidthTo(0, 100, Easing.OutQuint);
             }

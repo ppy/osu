@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -11,6 +12,7 @@ using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Graphics;
+using osu.Game.Localisation;
 using osu.Game.Rulesets.Catch.Beatmaps;
 using osu.Game.Rulesets.Catch.Difficulty;
 using osu.Game.Rulesets.Catch.Edit;
@@ -25,6 +27,7 @@ using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Scoring.Legacy;
@@ -151,6 +154,7 @@ namespace osu.Game.Rulesets.Catch
                         new CatchModFloatingFruits(),
                         new CatchModMuted(),
                         new CatchModNoScope(),
+                        new CatchModMovingFast(),
                     };
 
                 case ModType.System:
@@ -266,9 +270,9 @@ namespace osu.Game.Rulesets.Catch
         }
 
         /// <seealso cref="CatchHitObject.ApplyDefaultsToSelf"/>
-        public override BeatmapDifficulty GetAdjustedDisplayDifficulty(IBeatmapDifficultyInfo difficulty, IReadOnlyCollection<Mod> mods)
+        public override BeatmapDifficulty GetAdjustedDisplayDifficulty(IBeatmapInfo beatmapInfo, IReadOnlyCollection<Mod> mods)
         {
-            BeatmapDifficulty adjustedDifficulty = new BeatmapDifficulty(difficulty);
+            BeatmapDifficulty adjustedDifficulty = base.GetAdjustedDisplayDifficulty(beatmapInfo, mods);
             double rate = ModUtils.CalculateRateWithMods(mods);
 
             double preempt = IBeatmapDifficultyInfo.DifficultyRange(adjustedDifficulty.ApproachRate, CatchHitObject.PREEMPT_MAX, CatchHitObject.PREEMPT_MID, CatchHitObject.PREEMPT_MIN);
@@ -276,6 +280,33 @@ namespace osu.Game.Rulesets.Catch
             adjustedDifficulty.ApproachRate = (float)IBeatmapDifficultyInfo.InverseDifficultyRange(preempt, CatchHitObject.PREEMPT_MAX, CatchHitObject.PREEMPT_MID, CatchHitObject.PREEMPT_MIN);
 
             return adjustedDifficulty;
+        }
+
+        public override IEnumerable<RulesetBeatmapAttribute> GetBeatmapAttributesForDisplay(IBeatmapInfo beatmapInfo, IReadOnlyCollection<Mod> mods)
+        {
+            var originalDifficulty = beatmapInfo.Difficulty;
+            var effectiveDifficulty = GetAdjustedDisplayDifficulty(beatmapInfo, mods);
+
+            yield return new RulesetBeatmapAttribute(SongSelectStrings.CircleSize, @"CS", originalDifficulty.CircleSize, effectiveDifficulty.CircleSize, 10)
+            {
+                Description = "Affects the size of fruits.",
+                AdditionalMetrics =
+                [
+                    new RulesetBeatmapAttribute.AdditionalMetric("Hit circle radius", (CatchHitObject.OBJECT_RADIUS * LegacyRulesetExtensions.CalculateScaleFromCircleSize(effectiveDifficulty.CircleSize)).ToLocalisableString("0.#"))
+                ]
+            };
+            yield return new RulesetBeatmapAttribute(SongSelectStrings.ApproachRate, @"AR", originalDifficulty.ApproachRate, effectiveDifficulty.ApproachRate, 10)
+            {
+                Description = "Affects how early fruits fade in on the screen.",
+                AdditionalMetrics =
+                [
+                    new RulesetBeatmapAttribute.AdditionalMetric("Fade-in time", LocalisableString.Interpolate($@"{IBeatmapDifficultyInfo.DifficultyRange(effectiveDifficulty.ApproachRate, CatchHitObject.PREEMPT_RANGE):#,0.##} ms"))
+                ]
+            };
+            yield return new RulesetBeatmapAttribute(SongSelectStrings.HPDrain, @"HP", originalDifficulty.DrainRate, effectiveDifficulty.DrainRate, 10)
+            {
+                Description = "Affects the harshness of health drain and the health penalties for missing."
+            };
         }
 
         public override bool EditorShowScrollSpeed => false;

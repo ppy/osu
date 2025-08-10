@@ -319,7 +319,7 @@ namespace osu.Game.Screens.SelectV2
             if (wedgeAppearChannel1 == null)
                 return;
 
-            wedgeAppearChannel1.Balance.Value = -OsuGameBase.SFX_STEREO_STRENGTH;
+            wedgeAppearChannel1.Balance.Value = -OsuGameBase.SFX_STEREO_STRENGTH / 2;
             wedgeAppearChannel1.Frequency.Value = 0.98f + RNG.NextDouble(0.04f);
             wedgeAppearChannel1.Play();
 
@@ -329,7 +329,7 @@ namespace osu.Game.Screens.SelectV2
                 if (wedgeAppearChannel2 == null)
                     return;
 
-                wedgeAppearChannel2.Balance.Value = -OsuGameBase.SFX_STEREO_STRENGTH;
+                wedgeAppearChannel2.Balance.Value = -OsuGameBase.SFX_STEREO_STRENGTH / 2;
                 wedgeAppearChannel2.Frequency.Value = 0.90f + RNG.NextDouble(0.05f);
                 wedgeAppearChannel2.Play();
             }, 100);
@@ -341,7 +341,7 @@ namespace osu.Game.Screens.SelectV2
             if (wedgeHideChannel == null)
                 return;
 
-            wedgeHideChannel.Balance.Value = -OsuGameBase.SFX_STEREO_STRENGTH;
+            wedgeHideChannel.Balance.Value = -OsuGameBase.SFX_STEREO_STRENGTH / 2;
             wedgeHideChannel.Play();
         }
 

@@ -404,9 +404,6 @@ namespace osu.Game.Screens.SelectV2
 
         private void beginLooping()
         {
-            if (!ControlGlobalMusic)
-                return;
-
             Debug.Assert(!isHandlingLooping);
 
             isHandlingLooping = true;
@@ -509,8 +506,7 @@ namespace osu.Game.Screens.SelectV2
 
             // While filtering, let's not ever attempt to change selection.
             // This will be resolved after the filter completes, see `newItemsPresented`.
-            bool carouselStateIsValid = filterDebounce?.State != ScheduledDelegate.RunState.Waiting && !carousel.IsFiltering;
-            if (!carouselStateIsValid)
+            if (IsFiltering)
                 return false;
 
             // Refetch to be confident that the current selection is still valid. It may have been deleted or hidden.
@@ -595,6 +591,8 @@ namespace osu.Game.Screens.SelectV2
 
             ensureGlobalBeatmapValid();
 
+            detailsArea.Refresh();
+
             if (ControlGlobalMusic)
             {
                 // restart playback on returning to song select, regardless.
@@ -633,7 +631,23 @@ namespace osu.Game.Screens.SelectV2
 
             updateWedgeVisibility();
 
-            beginLooping();
+            if (ControlGlobalMusic)
+            {
+                // Avoid abruptly starting playback at preview point.
+                // Importantly, this should be done before looping is setup to ensure we get the correct imminent `IsPlaying` state.
+                if (!music.IsPlaying)
+                {
+                    music.DuckMomentarily(0, new DuckParameters
+                    {
+                        DuckDuration = 0,
+                        DuckVolumeTo = 0,
+                        RestoreDuration = 800,
+                        RestoreEasing = Easing.OutQuint
+                    });
+                }
+
+                beginLooping();
+            }
 
             ensureGlobalBeatmapValid();
 
@@ -738,6 +752,11 @@ namespace osu.Game.Screens.SelectV2
         /// </summary>
         public bool CarouselItemsPresented { get; private set; }
 
+        /// <summary>
+        /// Whether the carousel is or will be undergoing a filter operation.
+        /// </summary>
+        public bool IsFiltering => carousel.IsFiltering || filterDebounce?.State == ScheduledDelegate.RunState.Waiting;
+
         private const double filter_delay = 250;
 
         private ScheduledDelegate? filterDebounce;
@@ -752,7 +771,7 @@ namespace osu.Game.Screens.SelectV2
             // Criteria change may have included a ruleset change which made the current selection invalid.
             bool isSelectionValid = checkBeatmapValidForSelection(Beatmap.Value.BeatmapInfo, criteria);
 
-            filterDebounce = Scheduler.AddDelayed(() => { carousel.Filter(criteria, !isSelectionValid); }, isFirstFilter || !isSelectionValid ? 0 : filter_delay);
+            filterDebounce = Scheduler.AddDelayed(() => carousel.Filter(criteria, !isSelectionValid), isFirstFilter || !isSelectionValid ? 0 : filter_delay);
         }
 
         private void newItemsPresented(IEnumerable<CarouselItem> carouselItems)
@@ -830,7 +849,7 @@ namespace osu.Game.Screens.SelectV2
             // For simplicity, disable this functionality on mobile.
             bool isTouchInput = e.CurrentState.Mouse.LastSource is ISourcedFromTouch;
 
-            if (e.Button == MouseButton.Left && !isTouchInput && mouseDownPriority)
+            if (e.PressedButtons.SequenceEqual([MouseButton.Left]) && !isTouchInput && mouseDownPriority)
             {
                 revealingBackground = Scheduler.AddDelayed(() =>
                 {
@@ -958,7 +977,7 @@ namespace osu.Game.Screens.SelectV2
 
         public virtual IEnumerable<OsuMenuItem> GetForwardActions(BeatmapInfo beatmap)
         {
-            yield return new OsuMenuItem("Select", MenuItemType.Highlighted, () => SelectAndRun(beatmap, OnStart))
+            yield return new OsuMenuItem(GlobalActionKeyBindingStrings.Select, MenuItemType.Highlighted, () => SelectAndRun(beatmap, OnStart))
             {
                 Icon = FontAwesome.Solid.Check
             };
@@ -967,7 +986,7 @@ namespace osu.Game.Screens.SelectV2
 
             if (beatmap.OnlineID > 0)
             {
-                yield return new OsuMenuItem("Details...", MenuItemType.Standard, () => beatmapOverlay?.FetchAndShowBeatmap(beatmap.OnlineID));
+                yield return new OsuMenuItem(CommonStrings.Details, MenuItemType.Standard, () => beatmapOverlay?.FetchAndShowBeatmap(beatmap.OnlineID));
 
                 if (beatmap.GetOnlineURL(api, Ruleset.Value) is string url)
                     yield return new OsuMenuItem(CommonStrings.CopyLink, MenuItemType.Standard, () => (game as OsuGame)?.CopyToClipboard(url));
@@ -986,7 +1005,7 @@ namespace osu.Game.Screens.SelectV2
                                        .AsEnumerable()
                                        .Select(c => new CollectionToggleMenuItem(c.ToLive(realm), beatmap)).Cast<OsuMenuItem>().ToList();
 
-            collectionItems.Add(new OsuMenuItem("Manage...", MenuItemType.Standard, () => manageCollectionsDialog?.Show()));
+            collectionItems.Add(new OsuMenuItem(CommonStrings.Manage, MenuItemType.Standard, () => manageCollectionsDialog?.Show()));
 
             yield return new OsuMenuItem(CommonStrings.Collections) { Items = collectionItems };
         }
