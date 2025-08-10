@@ -230,8 +230,7 @@ jobs:
             -e "${{ matrix.executable }}" \
             --packAuthors "osu! GooGuTeam" \
             --packTitle "osu! GU" \
-            -i "$ICON_FILE" \
-            -c "osx"
+            -i "$ICON_FILE"
         elif [[ "${{ matrix.os }}" == "windows-latest" ]]; then
           vpk pack \
             -u "osu-lazer-gu" \
@@ -305,14 +304,27 @@ jobs:
     - name: Download all artifacts
       uses: actions/download-artifact@v4
       with:
-        pattern: installer-*
+        pattern: '*'
         merge-multiple: true
-        path: release-files
+        path: artifacts
+
+    - name: Collect release files
+      shell: bash
+      run: |
+        mkdir -p release-files
+        shopt -s globstar nullglob
+        # copy all files from any Releases/ folder in artifacts
+        for f in artifacts/**/Releases/*; do
+          cp -f "$f" release-files/
+        done
+        echo "Collected files:" && ls -al release-files || true
 
     - name: Create or update GitHub Release
       uses: softprops/action-gh-release@v1
       with:
-        files: release-files/*
+        tag_name: ${{ github.ref_name || github.event.release.tag_name }}
+        name: osu! GU ${{ github.ref_name || github.event.release.tag_name }}
+        files: release-files/**
         draft: false
         prerelease: ${{ contains((github.ref_name || github.event.release.tag_name), 'alpha') || contains((github.ref_name || github.event.release.tag_name), 'beta') || contains((github.ref_name || github.event.release.tag_name), 'rc') }}
         generate_release_notes: true
