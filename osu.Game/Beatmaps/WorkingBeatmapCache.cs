@@ -148,7 +148,7 @@ namespace osu.Game.Beatmaps
             {
                 mods ??= Array.Empty<Mod>();
                 string currentRulesetShortName = ruleset.ShortName;
-                string currentModsHash = string.Join(",", mods.Select(static m => m.Acronym).OrderBy(static a => a));
+                string currentModsHash = string.Join(',', mods.Select(static m => m.Acronym).Order());
 
                 if (cachedPlayableBeatmap != null && cachedRulesetShortName == currentRulesetShortName && cachedModsHash == currentModsHash)
                     return cachedPlayableBeatmap;
