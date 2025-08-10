@@ -87,7 +87,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             base.ApplyHitAnimations();
         }
 
-        protected override Drawable CreateDefaultJudgement(HitResult result) => new OsuJudgementPiece(result);
+        protected override Drawable CreateDefaultJudgement(HitResult result) =>
+            // Tick hits don't show a judgement by default
+            result.IsHit() && result.IsTick() ? Empty() : new OsuJudgementPiece(result);
 
         private partial class OsuJudgementPiece : DefaultJudgementPiece
         {
