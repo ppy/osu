@@ -211,7 +211,8 @@ jobs:
 
     - name: Show version
       shell: bash
-      run: echo "Building version: ${{ needs.version.outputs.version }} (semver: ${{ needs.version.outputs.semver }}, assembly/file: ${{ needs.version.outputs.fileVersion }})"
+      run: |
+        echo "Building version: ${{ needs.version.outputs.version }} (semver: ${{ needs.version.outputs.semver }}, assembly/file: ${{ needs.version.outputs.fileVersion }})"
 
     - name: Clean previous build artifacts
       shell: bash
