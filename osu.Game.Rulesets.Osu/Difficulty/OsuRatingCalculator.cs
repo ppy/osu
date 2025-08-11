@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
 
@@ -15,14 +16,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private readonly Mod[] mods;
         private readonly int totalHits;
         private readonly double overallDifficulty;
-        private readonly double sliderFactor;
 
-        public OsuRatingCalculator(Mod[] mods, int totalHits, double overallDifficulty, double sliderFactor)
+        public OsuRatingCalculator(Mod[] mods, int totalHits, double overallDifficulty)
         {
             this.mods = mods;
             this.totalHits = totalHits;
             this.overallDifficulty = overallDifficulty;
-            this.sliderFactor = sliderFactor;
         }
 
         public double ComputeAimRating(double aimDifficultyValue)
@@ -30,7 +29,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (mods.Any(m => m is OsuModAutopilot))
                 return 0;
 
-            double aimRating = calculateDifficultyRating(aimDifficultyValue);
+            double aimRating = CalculateDifficultyRating(aimDifficultyValue);
 
             if (mods.Any(m => m is OsuModTouchDevice))
                 aimRating = Math.Pow(aimRating, 0.8);
@@ -57,7 +56,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (mods.Any(m => m is OsuModRelax))
                 return 0;
 
-            double speedRating = calculateDifficultyRating(speedDifficultyValue);
+            double speedRating = CalculateDifficultyRating(speedDifficultyValue);
 
             if (mods.Any(m => m is OsuModAutopilot))
                 speedRating *= 0.5;
@@ -78,7 +77,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         public double ComputeReadingRating(double readingDifficultyValue)
         {
-            double readingRating = calculateDifficultyRating(readingDifficultyValue);
+            double readingRating = CalculateDifficultyRating(readingDifficultyValue);
 
             if (mods.Any(m => m is OsuModTouchDevice))
                 readingRating = Math.Pow(readingRating, 0.8);
@@ -107,7 +106,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (!mods.Any(m => m is OsuModFlashlight))
                 return 0;
 
-            double flashlightRating = calculateDifficultyRating(flashlightDifficultyValue);
+            double flashlightRating = CalculateDifficultyRating(flashlightDifficultyValue);
 
             if (mods.Any(m => m is OsuModTouchDevice))
                 flashlightRating = Math.Pow(flashlightRating, 0.8);
@@ -156,7 +155,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // For AR up to 0 - reduce reward for very low ARs when object is visible
             if (approachRate < 7)
-                readingBonus += 0.03 * (7.0 - Math.Max(approachRate, 0))  * sliderVisibilityFactor;
+                readingBonus += 0.03 * (7.0 - Math.Max(approachRate, 0)) * sliderVisibilityFactor;
 
             // Starting from AR0 - cap values so they won't grow to infinity
             if (approachRate < 0)
@@ -165,6 +164,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return readingBonus;
         }
 
-        private static double calculateDifficultyRating(double difficultyValue) => Math.Sqrt(difficultyValue) * difficulty_multiplier;
+        public static double CalculateDifficultyRating(double difficultyValue) => Math.Sqrt(difficultyValue) * difficulty_multiplier;
     }
 }

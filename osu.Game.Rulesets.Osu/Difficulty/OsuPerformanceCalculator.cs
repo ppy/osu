@@ -211,7 +211,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 aimValue *= 1.3 + (totalHits * (0.0016 / (1 + 2 * effectiveMissCount)) * Math.Pow(accuracy, 16)) * (1 - 0.003 * attributes.DrainRate * attributes.DrainRate);
             else if (score.Mods.OfType<OsuModHidden>().Any(m => m.OnlyFadeApproachCircles.Value) || score.Mods.Any(m => m is OsuModTraceable))
             {
-                aimValue *= 1.0 + OsuRatingCalculator.CalculateVisibilityBonus(score.Mods, approachRate, attributes.SliderFactor);
+                aimValue *= 1.0 + OsuRatingCalculator.CalculateVisibilityBonus(approachRate, attributes.SliderFactor);
             }
 
             aimValue *= accuracy;
