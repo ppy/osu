@@ -19,8 +19,94 @@ env:
   DOTNET_VERSION: '8.0.x'
 
 jobs:
+  auto_tag:
+    name: Auto tag from master
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+    - name: Checkout
+    
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: Create dated tag (yyyy.mdd.N-lazer)
+      shell: bash
+      env:
+        TZ: UTC
+      run: |
+        YEAR=$(date -u +%Y)
+        MONTH=$(date -u +%-m)
+        DAY=$(date -u +%d)
+        MDD="${MONTH}${DAY}"
+        BASE="${YEAR}.${MDD}"
+        git fetch --tags --force
+        MAXN=-1
+        while IFS= read -r t; do
+          N=$(echo "$t" | sed -E "s/^v${BASE}\.([0-9]+)-lazer$/\1/" || true)
+          if [[ "$N" =~ ^[0-9]+$ ]]; then
+            if (( N > MAXN )); then MAXN=$N; fi
+          fi
+        done < <(git tag -l "v${BASE}.*-lazer")
+        NEXT=$((MAXN+1))
+        TAG="v${BASE}.${NEXT}-lazer"
+        echo "Creating tag: $TAG"
+        git config user.name "github-actions[bot]"
+        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git tag -a "$TAG" -m "Release $TAG"
+        git push origin "$TAG"
+
+  version:
+    name: Compute version
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      semver: ${{ steps.version.outputs.semver }}
+      assemblyVersion: ${{ steps.version.outputs.assemblyVersion }}
+      fileVersion: ${{ steps.version.outputs.fileVersion }}
+    steps:
+    - name: Checkout (for commit count)
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: Determine version
+      id: version
+      shell: bash
+      run: |
+        if [[ "${{ github.event_name }}" == "release" ]]; then
+          VERSION="${{ github.event.release.tag_name }}"
+        elif [[ "${{ github.ref }}" == refs/tags/* ]]; then
+          VERSION="${{ github.ref_name }}"
+        elif [[ "${{ github.event_name }}" == "workflow_dispatch" ]] && [[ -n "${{ github.event.inputs.version }}" ]]; then
+          VERSION="${{ github.event.inputs.version }}"
+        elif [[ "${{ github.ref }}" == "refs/heads/main" ]] || [[ "${{ github.ref }}" == "refs/heads/master" ]]; then
+          COMMIT_COUNT=$(git rev-list --count HEAD)
+          BUILD_NUMBER=$((COMMIT_COUNT % 10000))
+          VERSION="1.0.$BUILD_NUMBER"
+        else
+          COMMIT_COUNT=$(git rev-list --count HEAD)
+          BUILD_NUMBER=$((COMMIT_COUNT % 10000))
+          VERSION="0.9.$BUILD_NUMBER"
+        fi
+
+        SEMVER=${VERSION#v}
+        NUMERIC=${SEMVER%%-*}
+        PARTS=$(echo "$NUMERIC" | awk -F. '{print NF}')
+        if [[ $PARTS -eq 1 ]]; then NUMERIC="$NUMERIC.0.0.0"; fi
+        if [[ $PARTS -eq 2 ]]; then NUMERIC="$NUMERIC.0.0"; fi
+        if [[ $PARTS -eq 3 ]]; then NUMERIC="$NUMERIC.0"; fi
+
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        echo "semver=$SEMVER" >> $GITHUB_OUTPUT
+        echo "assemblyVersion=$NUMERIC" >> $GITHUB_OUTPUT
+        echo "fileVersion=$NUMERIC" >> $GITHUB_OUTPUT
+        echo "Computed version: $VERSION (semver: $SEMVER, assembly/file: $NUMERIC)"
+
   build:
     name: Build ${{ matrix.os }}
+    if: github.event_name != 'push' || startsWith(github.ref, 'refs/tags/') || github.event_name == 'release' || github.event_name == 'workflow_dispatch'
+    needs: version
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     # Prevent concurrent builds from interfering with each other's NuGet operations
@@ -130,43 +216,9 @@ jobs:
           ${{ runner.os }}-${{ matrix.runtime }}-nuget-
           ${{ runner.os }}-nuget-
 
-    - name: Determine version
-      id: version
+    - name: Show version
       shell: bash
-      run: |
-        if [[ "${{ github.event_name }}" == "release" ]]; then
-          VERSION="${{ github.event.release.tag_name }}"
-        elif [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-          VERSION="${{ github.event.inputs.version }}"
-        elif [[ "${{ github.ref }}" == refs/tags/* ]]; then
-          VERSION="${{ github.ref_name }}"
-        elif [[ "${{ github.ref }}" == "refs/heads/main" ]] || [[ "${{ github.ref }}" == "refs/heads/master" ]]; then
-          # Use 3-part SemVer for main/master: 1.0.BUILDNUMBER
-          COMMIT_COUNT=$(git rev-list --count HEAD)
-          BUILD_NUMBER=$((COMMIT_COUNT % 10000))
-          VERSION="1.0.$BUILD_NUMBER"
-        else
-          # Dev builds use 3-part SemVer: 0.9.BUILDNUMBER
-          COMMIT_COUNT=$(git rev-list --count HEAD)
-          BUILD_NUMBER=$((COMMIT_COUNT % 10000))
-          VERSION="0.9.$BUILD_NUMBER"
-        fi
-
-        # Strip leading 'v' to form semver for packaging / display
-        SEMVER=${VERSION#v}
-        # Numeric only for assembly/file version (drop any pre-release/build metadata)
-        NUMERIC=${SEMVER%%-*}
-        # Ensure four-part version for FileVersion/AssemblyVersion
-        PARTS=$(echo "$NUMERIC" | awk -F. '{print NF}')
-        if [[ $PARTS -eq 1 ]]; then NUMERIC="$NUMERIC.0.0.0"; fi
-        if [[ $PARTS -eq 2 ]]; then NUMERIC="$NUMERIC.0.0"; fi
-        if [[ $PARTS -eq 3 ]]; then NUMERIC="$NUMERIC.0"; fi
-
-        echo "version=$VERSION" >> $GITHUB_OUTPUT
-        echo "semver=$SEMVER" >> $GITHUB_OUTPUT
-        echo "assemblyVersion=$NUMERIC" >> $GITHUB_OUTPUT
-        echo "fileVersion=$NUMERIC" >> $GITHUB_OUTPUT
-        echo "Building version: $VERSION (semver: $SEMVER, assembly/file: $NUMERIC)"
+      run: echo "Building version: ${{ needs.version.outputs.version }} (semver: ${{ needs.version.outputs.semver }}, assembly/file: ${{ needs.version.outputs.fileVersion }})"
 
     - name: Clean previous build artifacts
       shell: bash
@@ -200,10 +252,10 @@ jobs:
           --verbosity normal \
           -p:PublishSingleFile=false \
           -p:PublishTrimmed=false \
-          -p:Version=${{ steps.version.outputs.semver }} \
-          -p:FileVersion=${{ steps.version.outputs.fileVersion }} \
-          -p:AssemblyVersion=${{ steps.version.outputs.assemblyVersion }} \
-          -p:InformationalVersion=${{ steps.version.outputs.version }}
+          -p:Version=${{ needs.version.outputs.semver }} \
+          -p:FileVersion=${{ needs.version.outputs.fileVersion }} \
+          -p:AssemblyVersion=${{ needs.version.outputs.assemblyVersion }} \
+          -p:InformationalVersion=${{ needs.version.outputs.version }}
 
     - name: Set executable permissions (Linux/macOS)
       if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
@@ -223,18 +275,22 @@ jobs:
             echo "Using lazer.ico as fallback for macOS packaging"
           fi
 
+          CHANNEL="osx-x64"
+          if [[ "${{ matrix.runtime }}" == "osx-arm64" ]]; then CHANNEL="osx-arm64"; fi
+
           vpk pack \
             -u "osu-lazer-gu" \
-            -v "${{ steps.version.outputs.semver }}" \
+            -v "${{ needs.version.outputs.semver }}" \
             -p "publish/${{ matrix.runtime }}" \
             -e "${{ matrix.executable }}" \
             --packAuthors "osu! GooGuTeam" \
             --packTitle "osu! GU" \
-            -i "$ICON_FILE"
+            -i "$ICON_FILE" \
+            -c "$CHANNEL"
         elif [[ "${{ matrix.os }}" == "windows-latest" ]]; then
           vpk pack \
             -u "osu-lazer-gu" \
-            -v "${{ steps.version.outputs.semver }}" \
+            -v "${{ needs.version.outputs.semver }}" \
             -p "publish/${{ matrix.runtime }}" \
             -e "${{ matrix.executable }}" \
             --packAuthors "osu! GooGuTeam" \
@@ -245,7 +301,7 @@ jobs:
           # Linux
           vpk pack \
             -u "osu-lazer-gu" \
-            -v "${{ steps.version.outputs.semver }}" \
+            -v "${{ needs.version.outputs.semver }}" \
             -p "publish/${{ matrix.runtime }}" \
             -e "${{ matrix.executable }}" \
             --packAuthors "osu! GooGuTeam" \
@@ -268,8 +324,25 @@ jobs:
         if [[ "${{ matrix.os }}" == "macos-latest" ]]; then
           if [[ "${{ matrix.runtime }}" == "osx-x64" ]]; then
             for f in Releases/*osx-x64*.zip; do mv -f "$f" Releases/osu.app.Intel.zip; done
+            # Ensure nupkg channel naming uses osx-x64-full.nupkg
+            for f in Releases/*.nupkg; do
+              if [[ "$f" == *osx*full.nupkg ]] && [[ "$f" != *arm64* ]]; then
+                base=$(basename "$f")
+                mv -f "$f" "Releases/${base/osx-full.nupkg/osx-x64-full.nupkg}"
+              fi
+            done
           else
             for f in Releases/*osx-arm64*.zip; do mv -f "$f" Releases/osu.app.Apple.Silicon.zip; done
+            # Ensure nupkg channel naming uses osx-arm64-full.nupkg
+            for f in Releases/*.nupkg; do
+              if [[ "$f" == *osx*full.nupkg ]]; then
+                base=$(basename "$f")
+                # If upstream already names arm64 correctly, skip; otherwise replace generic osx-full
+                if [[ "$base" != *osx-arm64-full.nupkg ]]; then
+                  mv -f "$f" "Releases/${base/osx-full.nupkg/osx-arm64-full.nupkg}"
+                fi
+              fi
+            done
           fi
         fi
         # Linux AppImage rename if present
@@ -280,7 +353,7 @@ jobs:
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: ${{ matrix.artifact-name }}-${{ steps.version.outputs.version }}
+        name: ${{ matrix.artifact-name }}-${{ needs.version.outputs.version }}
         path: |
           publish/${{ matrix.runtime }}/
           Releases/
@@ -300,7 +373,7 @@ jobs:
     # - release event
     # - push to master/main (auto-generate date-based tag)
     if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'release' || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
-    needs: build
+    needs: [build, version]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -312,10 +385,6 @@ jobs:
         merge-multiple: true
         path: artifacts
 
-    - name: Checkout repository (for tag computation)
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
 
     - name: Collect release files
       shell: bash
@@ -328,48 +397,20 @@ jobs:
         done
         echo "Collected files:" && ls -al release-files || true
 
-    - name: Compute tag for release (when not on tag)
-      id: calc_tag
-      shell: bash
-      env:
-        TZ: UTC
-      run: |
-        if [[ "${{ startsWith(github.ref, 'refs/tags/') }}" == "true" ]]; then
-          TAG="${{ github.ref_name }}"
-        elif [[ "${{ github.event_name }}" == "release" ]]; then
-          TAG="${{ github.event.release.tag_name }}"
-        else
-          YEAR=$(date -u +%Y)
-          MONTH=$(date -u +%-m)
-          DAY=$(date -u +%d)
-          MDD="${MONTH}${DAY}"
-          BASE="${YEAR}.${MDD}"
-          git fetch --tags --force
-          MAXN=-1
-          while IFS= read -r t; do
-            N=$(echo "$t" | sed -E "s/^v${BASE}\.([0-9]+)-lazer$/\1/" || true)
-            if [[ "$N" =~ ^[0-9]+$ ]]; then
-              if (( N > MAXN )); then MAXN=$N; fi
-            fi
-          done < <(git tag -l "v${BASE}.*-lazer")
-          NEXT=$((MAXN+1))
-          TAG="v${BASE}.${NEXT}-lazer"
-        fi
-        echo "tag=$TAG" >> $GITHUB_OUTPUT
-        echo "Using tag: $TAG"
+    # Use the precomputed version as the tag
 
     - name: Create or update GitHub Release
       uses: softprops/action-gh-release@v1
       with:
-        tag_name: ${{ steps.calc_tag.outputs.tag }}
+        tag_name: ${{ needs.version.outputs.version }}
         target_commitish: ${{ github.sha }}
-        name: osu! GU ${{ steps.calc_tag.outputs.tag }}
+        name: osu! GU ${{ needs.version.outputs.version }}
         files: release-files/**
         draft: false
-        prerelease: ${{ contains(steps.calc_tag.outputs.tag, 'alpha') || contains(steps.calc_tag.outputs.tag, 'beta') || contains(steps.calc_tag.outputs.tag, 'rc') }}
+        prerelease: ${{ contains(needs.version.outputs.version, 'alpha') || contains(needs.version.outputs.version, 'beta') || contains(needs.version.outputs.version, 'rc') }}
         generate_release_notes: true
         body: |
-          ## osu! GU ${{ github.ref_name || github.event.release.tag_name }}
+          ## osu! GU ${{ needs.version.outputs.version }}
 
           基于官方 osu!(lazer) 的自定义版本。
 
