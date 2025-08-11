@@ -82,7 +82,7 @@ namespace osu.Game.Rulesets.Edit
                     others.Add(new VerifiedBeatmap(otherWorking, otherPlayable));
             }
 
-            return new BeatmapVerifierContext(current, difficultyRating);
+            return new BeatmapVerifierContext(current, difficultyRating, others);
         }
     }
 }
