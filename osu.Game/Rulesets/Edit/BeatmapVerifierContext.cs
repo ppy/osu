@@ -44,6 +44,11 @@ namespace osu.Game.Rulesets.Edit
             OtherDifficulties = otherDifficulties ?? new List<VerifiedBeatmap>();
         }
 
+        public BeatmapVerifierContext(IBeatmap beatmap, IWorkingBeatmap workingBeatmap, DifficultyRating difficultyRating = DifficultyRating.ExpertPlus)
+            : this(new VerifiedBeatmap(workingBeatmap, beatmap), difficultyRating)
+        {
+        }
+
         public static BeatmapVerifierContext Create(IBeatmap beatmap, IWorkingBeatmap workingBeatmap, DifficultyRating difficultyRating = DifficultyRating.ExpertPlus, BeatmapManager? beatmapManager = null)
         {
             var beatmapSet = beatmap.BeatmapInfo.BeatmapSet;
