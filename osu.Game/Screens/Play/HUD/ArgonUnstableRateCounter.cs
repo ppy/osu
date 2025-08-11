@@ -2,10 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Localisation.SkinComponents;
 using osu.Game.Skinning;
@@ -31,17 +31,10 @@ namespace osu.Game.Screens.Play.HUD
         [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.ShowLabel))]
         public Bindable<bool> ShowLabel { get; } = new BindableBool(true);
 
-        public override bool IsValid
+        [BackgroundDependencyLoader]
+        private void load()
         {
-            get => base.IsValid;
-            set
-            {
-                if (value == IsValid)
-                    return;
-
-                base.IsValid = value;
-                text.FadeTo(value ? 1 : alpha_when_invalid, 1000, Easing.OutQuint);
-            }
+            IsValid.BindValueChanged(v => text.FadeTo(v.NewValue ? 1 : alpha_when_invalid, 1000, Easing.OutQuint));
         }
 
         public override int DisplayedCount
@@ -70,8 +63,6 @@ namespace osu.Game.Screens.Play.HUD
                 digitsRequired++;
             return digitsRequired;
         }
-
-        protected override LocalisableString FormatCount(int count) => count.ToString(@"D");
 
         protected override IHasText CreateText() => text = new ArgonCounterTextComponent(Anchor.TopRight, "UR")
         {
