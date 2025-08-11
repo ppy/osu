@@ -22,13 +22,13 @@ namespace osu.Game.Rulesets.Edit.Checks
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
-            var difficulties = context.BeatmapsetDifficulties;
+            var difficulties = context.CurrentDifficulty.PlayablesetDifficulties;
 
             if (difficulties.Count <= 1)
                 yield break;
 
             // Use the current difficulty as reference
-            var referenceBeatmap = context.Beatmap;
+            var referenceBeatmap = context.CurrentDifficulty.Playable;
             var referenceTimingPoints = referenceBeatmap.ControlPointInfo.TimingPoints;
 
             foreach (var beatmap in difficulties)

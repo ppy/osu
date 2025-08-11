@@ -20,14 +20,14 @@ namespace osu.Game.Rulesets.Edit.Checks
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
-            var difficulties = context.BeatmapsetDifficulties;
+            var difficulties = context.CurrentDifficulty.PlayablesetDifficulties;
 
             if (difficulties.Count <= 1)
                 return [];
 
-            var referenceBeatmap = context.Beatmap;
+            var referenceBeatmap = context.CurrentDifficulty.Playable;
 
-            bool hasStoryboard = ResourcesCheckUtils.HasAnyStoryboardElementPresent(context.WorkingBeatmap);
+            bool hasStoryboard = ResourcesCheckUtils.HasAnyStoryboardElementPresent(context.CurrentDifficulty.Working);
 
             var issues = new List<Issue>();
 

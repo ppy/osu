@@ -21,12 +21,12 @@ namespace osu.Game.Rulesets.Edit.Checks
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
-            var difficulties = context.BeatmapsetDifficulties;
+            var difficulties = context.CurrentDifficulty.PlayablesetDifficulties;
 
             if (difficulties.Count <= 1)
                 yield break;
 
-            var referenceBeatmap = context.Beatmap;
+            var referenceBeatmap = context.CurrentDifficulty.Playable;
             var referenceMetadata = referenceBeatmap.Metadata;
 
             // Define metadata fields to check

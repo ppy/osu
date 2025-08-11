@@ -19,15 +19,15 @@ namespace osu.Game.Rulesets.Edit.Checks
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
-            var diffList = context.Beatmap.BeatmapInfo.BeatmapSet?.Beatmaps ?? new List<BeatmapInfo>();
-            int previewTime = context.Beatmap.BeatmapInfo.Metadata.PreviewTime;
+            var diffList = context.CurrentDifficulty.Playable.BeatmapInfo.BeatmapSet?.Beatmaps ?? new List<BeatmapInfo>();
+            int previewTime = context.CurrentDifficulty.Playable.BeatmapInfo.Metadata.PreviewTime;
 
             if (previewTime == -1)
                 yield return new IssueTemplateHasNoPreviewTime(this).Create();
 
             foreach (var diff in diffList)
             {
-                if (diff.Equals(context.Beatmap.BeatmapInfo))
+                if (diff.Equals(context.CurrentDifficulty.Playable.BeatmapInfo))
                     continue;
 
                 if (diff.Metadata.PreviewTime != previewTime)
