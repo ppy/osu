@@ -349,6 +349,15 @@ namespace osu.Game.Skinning
             });
         }
 
+        public void Rename(Live<SkinInfo> skin, string newName)
+        {
+            skin.PerformWrite(s =>
+            {
+                s.Name = newName;
+                skinImporter.UpdateSkinIniMetadata(s, s.Realm!);
+            });
+        }
+
         public void SetSkinFromConfiguration(string guidString)
         {
             Live<SkinInfo> skinInfo = null;

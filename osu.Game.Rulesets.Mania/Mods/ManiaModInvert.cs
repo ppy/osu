@@ -63,6 +63,7 @@ namespace osu.Game.Rulesets.Mania.Mods
                         StartTime = locations[i].startTime,
                         Duration = duration,
                         NodeSamples = new List<IList<HitSampleInfo>> { locations[i].samples, Array.Empty<HitSampleInfo>() }
+                        // intentionally don't play sliding samples here, it doesn't work in this mod.
                     });
                 }
 

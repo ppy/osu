@@ -39,6 +39,7 @@ namespace osu.Game.Screens.Select
         public OptionalTextFilter Title;
         public OptionalTextFilter DifficultyName;
         public OptionalTextFilter Source;
+        public OptionalTextFilter UserTag;
 
         public OptionalRange<double> UserStarDifficulty = new OptionalRange<double>
         {
@@ -116,6 +117,18 @@ namespace osu.Game.Screens.Select
         public IEnumerable<string>? CollectionBeatmapMD5Hashes { get; set; }
 
         public IRulesetFilterCriteria? RulesetCriteria { get; set; }
+
+        /// <summary>
+        /// The user ID of the current local user, used to filter to own maps when <see cref="GroupMode.MyMaps"/> is selected.
+        /// Or null if the user is not logged in.
+        /// </summary>
+        public int? LocalUserId { get; set; }
+
+        /// <summary>
+        /// The username of the current local user, used to filter to own maps when <see cref="GroupMode.MyMaps"/> is selected.
+        /// Or null if the user is not logged in.
+        /// </summary>
+        public string? LocalUserUsername { get; set; }
 
         public readonly struct OptionalSet<T> : IEquatable<OptionalSet<T>>
             where T : struct, Enum

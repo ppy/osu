@@ -21,12 +21,12 @@ namespace osu.Game.Rulesets.Osu.Objects
         /// <summary>
         /// The RPM required to clear the spinner at ODs [ 0, 5, 10 ].
         /// </summary>
-        private static readonly DifficultyRange clear_rpm_range = new DifficultyRange(90, 150, 225);
+        public static readonly DifficultyRange CLEAR_RPM_RANGE = new DifficultyRange(90, 150, 225);
 
         /// <summary>
         /// The RPM required to complete the spinner and receive full score at ODs [ 0, 5, 10 ].
         /// </summary>
-        private static readonly DifficultyRange complete_rpm_range = new DifficultyRange(250, 380, 430);
+        public static readonly DifficultyRange COMPLETE_RPM_RANGE = new DifficultyRange(250, 380, 430);
 
         public double EndTime
         {
@@ -63,10 +63,10 @@ namespace osu.Game.Rulesets.Osu.Objects
             base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
             // The average RPS required over the length of the spinner to clear the spinner.
-            double minRps = IBeatmapDifficultyInfo.DifficultyRange(difficulty.OverallDifficulty, clear_rpm_range) / 60;
+            double minRps = IBeatmapDifficultyInfo.DifficultyRange(difficulty.OverallDifficulty, CLEAR_RPM_RANGE) / 60;
 
             // The RPS required over the length of the spinner to receive full score (all normal + bonus ticks).
-            double maxRps = IBeatmapDifficultyInfo.DifficultyRange(difficulty.OverallDifficulty, complete_rpm_range) / 60;
+            double maxRps = IBeatmapDifficultyInfo.DifficultyRange(difficulty.OverallDifficulty, COMPLETE_RPM_RANGE) / 60;
 
             double secondsDuration = Duration / 1000;
 

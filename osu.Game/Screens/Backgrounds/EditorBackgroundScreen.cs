@@ -19,7 +19,6 @@ namespace osu.Game.Screens.Backgrounds
 {
     public partial class EditorBackgroundScreen : BackgroundScreen
     {
-        private readonly WorkingBeatmap beatmap;
         private readonly Container dimContainer;
 
         private CancellationTokenSource? cancellationTokenSource;
@@ -31,10 +30,14 @@ namespace osu.Game.Screens.Backgrounds
 
         private IFrameBasedClock? clockSource;
 
-        public EditorBackgroundScreen(WorkingBeatmap beatmap)
-        {
-            this.beatmap = beatmap;
+        // We retrieve IBindable<WorkingBeatmap> from our dependency cache instead of passing WorkingBeatmap directly into EditorBackgroundScreen.
+        // Otherwise, DummyWorkingBeatmap will be erroneously passed in whenever creating a new beatmap (since the Schedule() in the Editor that populates
+        // a new WorkingBeatmap with correct values generally runs after EditorBackgroundScreen is created), which causes any background changes to not be displayed.
+        [Resolved]
+        private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
 
+        public EditorBackgroundScreen()
+        {
             InternalChild = dimContainer = new Container
             {
                 RelativeSizeAxes = Axes.Both,
@@ -54,14 +57,14 @@ namespace osu.Game.Screens.Backgrounds
 
         private IEnumerable<Drawable> createContent() =>
         [
-            new BeatmapBackground(beatmap) { RelativeSizeAxes = Axes.Both, },
+            new BeatmapBackground(beatmap.Value) { RelativeSizeAxes = Axes.Both, },
             // this kooky container nesting is here because the storyboard needs a custom clock
             // but also needs it on an isolated-enough level that doesn't break screen stack expiry logic (which happens if the clock was put on `this`),
             // or doesn't make it literally impossible to fade the storyboard in/out in real time (which happens if the fade transforms were to be applied directly to the storyboard).
             new Container
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = new DrawableStoryboard(beatmap.Storyboard)
+                Child = new DrawableStoryboard(beatmap.Value.Storyboard)
                 {
                     Clock = clockSource ?? Clock,
                 }
@@ -82,7 +85,7 @@ namespace osu.Game.Screens.Backgrounds
             storyboardContainer.FadeTo(showStoryboard.Value ? 1 : 0, duration, Easing.OutQuint);
             // yes, this causes overdraw, but is also a (crude) fix for bad-looking transitions on screen entry
             // caused by the previous background on the background stack poking out from under this one and then instantly fading out
-            background.FadeColour(beatmap.Storyboard.ReplacesBackground && showStoryboard.Value ? Colour4.Black : Colour4.White, duration, Easing.OutQuint);
+            background.FadeColour(beatmap.Value.Storyboard.ReplacesBackground && showStoryboard.Value ? Colour4.Black : Colour4.White, duration, Easing.OutQuint);
         }
 
         public void ChangeClockSource(IFrameBasedClock frameBasedClock)
@@ -103,7 +106,7 @@ namespace osu.Game.Screens.Backgrounds
                 background = dimContainer.OfType<BeatmapBackground>().Single();
                 storyboardContainer = dimContainer.OfType<Container>().Single();
                 updateState(0);
-            }, (cancellationTokenSource ??= new CancellationTokenSource()).Token);
+            }, (cancellationTokenSource = new CancellationTokenSource()).Token);
         }
 
         public override bool Equals(BackgroundScreen? other)

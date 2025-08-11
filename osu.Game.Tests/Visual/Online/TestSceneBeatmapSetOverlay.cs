@@ -10,14 +10,16 @@ using osu.Game.Rulesets;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.BeatmapSet.Scores;
-using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.Select.Details;
@@ -193,7 +195,8 @@ namespace osu.Game.Tests.Visual.Online
                 overlay.ShowBeatmapSet(set);
             });
 
-            AddAssert("shown beatmaps of current ruleset", () => overlay.Header.HeaderContent.Picker.Difficulties.All(b => b.Beatmap.Ruleset.OnlineID == overlay.Header.RulesetSelector.Current.Value.OnlineID));
+            AddAssert("shown beatmaps of current ruleset",
+                () => overlay.Header.HeaderContent.Picker.Difficulties.All(b => b.Beatmap.Ruleset.OnlineID == overlay.Header.RulesetSelector.Current.Value.OnlineID));
             AddAssert("left-most beatmap selected", () => overlay.Header.HeaderContent.Picker.Difficulties.First().State == BeatmapPicker.DifficultySelectorState.Selected);
         }
 
@@ -271,7 +274,7 @@ namespace osu.Game.Tests.Visual.Online
         public void TestSelectedModsDontAffectStatistics()
         {
             AddStep("show map", () => overlay.ShowBeatmapSet(getBeatmapSet()));
-            AddAssert("AR displayed as 0", () => overlay.ChildrenOfType<AdvancedStats.StatisticRow>().Single(s => s.Title == BeatmapsetsStrings.ShowStatsAr).Value, () => Is.EqualTo((0, 0)));
+            AddAssert("AR displayed as 0", () => overlay.ChildrenOfType<AdvancedStats.StatisticRow>().Single(s => s.Title == SongSelectStrings.ApproachRate).Value, () => Is.EqualTo((0, 0)));
             AddStep("set AR10 diff adjust", () => SelectedMods.Value = new[]
             {
                 new OsuModDifficultyAdjust
@@ -279,7 +282,7 @@ namespace osu.Game.Tests.Visual.Online
                     ApproachRate = { Value = 10 }
                 }
             });
-            AddAssert("AR still displayed as 0", () => overlay.ChildrenOfType<AdvancedStats.StatisticRow>().Single(s => s.Title == BeatmapsetsStrings.ShowStatsAr).Value, () => Is.EqualTo((0, 0)));
+            AddAssert("AR still displayed as 0", () => overlay.ChildrenOfType<AdvancedStats.StatisticRow>().Single(s => s.Title == SongSelectStrings.ApproachRate).Value, () => Is.EqualTo((0, 0)));
         }
 
         [Test]
@@ -370,6 +373,39 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("move mouse to guest difficulty", () =>
             {
                 InputManager.MoveMouseTo(overlay.ChildrenOfType<DifficultyIcon>().ElementAt(1));
+            });
+        }
+
+        [Test]
+        public void TestBeatmapsetWithDeletedUser()
+        {
+            AddStep("show map with deleted user", () =>
+            {
+                JObject jsonBlob = JObject.FromObject(getBeatmapSet(), new JsonSerializer
+                {
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                });
+
+                jsonBlob["user"] = JToken.Parse(
+                    """
+                    {
+                        "avatar_url": null,
+                        "country_code": null,
+                        "default_group": "default",
+                        "id": null,
+                        "is_active": false,
+                        "is_bot": false,
+                        "is_deleted": true,
+                        "is_online": false,
+                        "is_supporter": false,
+                        "last_visit": null,
+                        "pm_friends_only": false,
+                        "profile_colour": null,
+                        "username": "[deleted user]"
+                    }
+                    """);
+
+                overlay.ShowBeatmapSet(JsonConvert.DeserializeObject<APIBeatmapSet>(JsonConvert.SerializeObject(jsonBlob)));
             });
         }
 
