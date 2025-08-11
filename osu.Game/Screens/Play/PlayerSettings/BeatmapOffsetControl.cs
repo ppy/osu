@@ -61,7 +61,11 @@ namespace osu.Game.Screens.Play.PlayerSettings
         [Resolved]
         private Player? player { get; set; }
 
+        [Resolved]
+        private OsuConfigManager config { get; set; } = null!;
+
         private double lastPlayMedian;
+        private double lastPlayUnstableRate;
         private double lastPlayBeatmapOffset;
         private HitEventTimingDistributionGraph? lastPlayGraph;
 
@@ -142,7 +146,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
         private void currentChanged(ValueChangedEvent<double> offset)
         {
-            Scheduler.AddOnce(updateOffset);
+            updateOffset();
 
             void updateOffset()
             {
@@ -231,9 +235,10 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
             lastValidScore = score.NewValue!;
             lastPlayMedian = median;
+            lastPlayUnstableRate = hitEvents.CalculateUnstableRate()!.Result;
             lastPlayBeatmapOffset = Current.Value;
 
-            LinkFlowContainer globalOffsetText;
+            LinkFlowContainer offsetText;
 
             referenceScoreContainer.AddRange(new Drawable[]
             {
@@ -242,32 +247,51 @@ namespace osu.Game.Screens.Play.PlayerSettings
                     RelativeSizeAxes = Axes.X,
                     Height = 50,
                 },
-                new AverageHitError(hitEvents),
+                new AverageHitError(hitEvents) { FontSize = OsuFont.Style.Caption1.Size },
                 calibrateFromLastPlayButton = new SettingsButton
                 {
                     Text = BeatmapOffsetControlStrings.CalibrateUsingLastPlay,
                     Action = () =>
                     {
-                        if (Current.Disabled)
-                            return;
-
-                        Current.Value = lastPlayBeatmapOffset - lastPlayMedian;
-                        lastAppliedScore.Value = lastValidScore;
+                        if (!Current.Disabled)
+                            applySuggestedOffset(proportionalToUnstableRate: false);
                     },
                 },
-                globalOffsetText = new LinkFlowContainer
+                offsetText = new LinkFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                 }
             });
 
-            if (settings != null)
+            if (config.Get<bool>(OsuSetting.AutomaticallyAdjustBeatmapOffset))
             {
-                globalOffsetText.AddText("You can also ");
-                globalOffsetText.AddLink("adjust the global offset", () => settings.ShowAtControl<AudioOffsetAdjustControl>());
-                globalOffsetText.AddText(" based off this play.");
+                applySuggestedOffset(proportionalToUnstableRate: true);
+                calibrateFromLastPlayButton.Hide();
+
+                offsetText.AddText($"Beatmap offset has automatically been adjusted to {Current.Value.ToStandardFormattedString(1)} ms.", t => t.Font = OsuFont.Style.Caption1);
+                offsetText.NewParagraph();
             }
+
+            offsetText.AddText("You can also ", t => t.Font = OsuFont.Style.Caption2);
+            offsetText.AddLink("adjust the global offset", () => settings?.ShowAtControl<AudioOffsetAdjustControl>(), creationParameters: t => t.Font = OsuFont.Style.Caption2);
+            offsetText.AddText(" based off this play.", t => t.Font = OsuFont.Style.Caption2);
+        }
+
+        private void applySuggestedOffset(bool proportionalToUnstableRate)
+        {
+            const double ur_adjustment_cutoff = 90;
+            const double exponential_factor = -0.0116;
+
+            double offsetAdjustment = lastPlayMedian;
+
+            if (proportionalToUnstableRate && lastPlayUnstableRate >= ur_adjustment_cutoff)
+                // A demonstrative graph of this algorithm is embedded in https://github.com/ppy/osu/discussions/30521.
+                // This ultimately prevents scores with high unstable rate from suggesting potentially invalid offsets.
+                offsetAdjustment *= Math.Exp(exponential_factor * (lastPlayUnstableRate - ur_adjustment_cutoff));
+
+            Current.Value = lastPlayBeatmapOffset - offsetAdjustment;
+            lastAppliedScore.Value = lastValidScore;
         }
 
         [Resolved]
