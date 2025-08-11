@@ -87,6 +87,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     TargetUser = friend
                 });
 
+                // this is dodgy but anything less dodgy is a lot of work
                 ((Bindable<LeaderboardScores?>)leaderboardManager.Scores).Value = LeaderboardScores.Success(new[]
                 {
                     new ScoreInfo { User = new APIUser { Username = "Top", Id = 2 }, TotalScore = 900_000, Accuracy = 0.99, MaxCombo = 999 },
@@ -117,6 +118,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 for (int i = 0; i < 32; i++)
                     scores.Add(new ScoreInfo { User = new APIUser { Username = $"Player {i + 1}" }, TotalScore = RNG.Next(700_000, 1_000_000) });
 
+                // this is dodgy but anything less dodgy is a lot of work
                 ((Bindable<LeaderboardScores?>)leaderboardManager.Scores).Value = LeaderboardScores.Success(scores, scores.Count, null);
                 gameplayState.ScoreProcessor.TotalScore.Value = 0;
             });
@@ -148,6 +150,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddStep("set scores", () =>
             {
+                // this is dodgy but anything less dodgy is a lot of work
                 ((Bindable<LeaderboardScores?>)leaderboardManager.Scores).Value = LeaderboardScores.Success(new[]
                 {
                     new ScoreInfo { User = new APIUser { Username = "peppy", Id = 2 }, TotalScore = 900_000, Accuracy = 0.99, MaxCombo = 999 },
@@ -165,6 +168,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddStep("set scores", () =>
             {
+                // this is dodgy but anything less dodgy is a lot of work
                 ((Bindable<LeaderboardScores?>)leaderboardManager.Scores).Value = LeaderboardScores.Success(new[]
                 {
                     new ScoreInfo { User = new APIUser { Username = "Quit", Id = 3 }, TotalScore = 100_000, Accuracy = 0.99, MaxCombo = 999 },
