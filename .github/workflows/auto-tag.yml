@@ -1,6 +1,8 @@
-name: Auto tag (manual only - deprecated)
+name: Auto tag from master
 
 on:
+  push:
+    branches: [ master, main ]
   workflow_dispatch:
 
 permissions:
@@ -10,7 +12,7 @@ jobs:
   create-tag:
     name: Create dated tag (yyyy.mdd.N-lazer)
     runs-on: ubuntu-latest
-    if: false # disabled; tagging handled in build-gu.yml
+    # When we push a tag, Build workflow (which listens to tags 'v*') will run and publish
     steps:
       - name: Checkout
       
