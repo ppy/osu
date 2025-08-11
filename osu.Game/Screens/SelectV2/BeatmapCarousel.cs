@@ -18,12 +18,17 @@ using osu.Framework.Graphics.Pooling;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Collections;
 using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Carousel;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Models;
+using osu.Game.Rulesets;
+using osu.Game.Scoring;
 using osu.Game.Screens.Select;
+using Realms;
 
 namespace osu.Game.Screens.SelectV2
 {
@@ -49,9 +54,6 @@ namespace osu.Game.Screens.SelectV2
         private readonly LoadingLayer loading;
 
         private readonly BeatmapCarouselFilterGrouping grouping;
-
-        [Resolved]
-        private RealmAccess realm { get; set; } = null!;
 
         /// <summary>
         /// Total number of beatmap difficulties displayed with the filter.
@@ -100,7 +102,7 @@ namespace osu.Game.Screens.SelectV2
             {
                 new BeatmapCarouselFilterMatching(() => Criteria!),
                 new BeatmapCarouselFilterSorting(() => Criteria!),
-                grouping = new BeatmapCarouselFilterGrouping(() => Criteria!, () => realm)
+                grouping = new BeatmapCarouselFilterGrouping(() => Criteria!, getDetachedCollections, buildTopRankMapping)
             };
 
             AddInternal(loading = new LoadingLayer());
@@ -620,6 +622,40 @@ namespace osu.Game.Screens.SelectV2
 
             return base.FilterAsync(clearExistingPanels);
         }
+
+        #endregion
+
+        #region Grouping
+
+        [Resolved]
+        private RealmAccess realm { get; set; } = null!;
+
+        private List<BeatmapCollection> getDetachedCollections() => realm.Run(r => r.All<BeatmapCollection>().Detach());
+
+        private Dictionary<Guid, ScoreRank> buildTopRankMapping(int? localUserId, string? ruleset) => realm.Run(r =>
+        {
+            var topRankMapping = new Dictionary<Guid, ScoreRank>();
+
+            var allLocalScores = r.All<ScoreInfo>()
+                                  .Filter($"{nameof(ScoreInfo.User)}.{nameof(RealmUser.OnlineID)} == $0"
+                                          + $" && {nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.Hash)} == {nameof(ScoreInfo.BeatmapHash)}"
+                                          + $" && {nameof(ScoreInfo.Ruleset)}.{nameof(RulesetInfo.ShortName)} == $1"
+                                          + $" && {nameof(ScoreInfo.DeletePending)} == false", localUserId, ruleset)
+                                  .OrderByDescending(s => s.TotalScore)
+                                  .ThenBy(s => s.Date);
+
+            foreach (var score in allLocalScores)
+            {
+                Debug.Assert(score.BeatmapInfo != null);
+
+                if (topRankMapping.ContainsKey(score.BeatmapInfo.ID))
+                    continue;
+
+                topRankMapping[score.BeatmapInfo.ID] = score.Rank;
+            }
+
+            return topRankMapping;
+        });
 
         #endregion
 
