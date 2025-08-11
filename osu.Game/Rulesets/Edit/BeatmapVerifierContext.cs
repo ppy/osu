@@ -44,6 +44,16 @@ namespace osu.Game.Rulesets.Edit
             OtherDifficulties = otherDifficulties ?? new List<VerifiedBeatmap>();
         }
 
+        public BeatmapVerifierContext(VerifiedBeatmap currentDifficulty, IReadOnlyList<VerifiedBeatmap>? otherDifficulties = null)
+        {
+            CurrentDifficulty = currentDifficulty;
+            InterpretedDifficulty = DifficultyRating.ExpertPlus;
+            OtherDifficulties = otherDifficulties ?? new List<VerifiedBeatmap>();
+        }
+
+        /// <summary>
+        /// Backwards-compatible constructor that allows creating a context from a single playable and working beatmap.
+        /// </summary>
         public BeatmapVerifierContext(IBeatmap beatmap, IWorkingBeatmap workingBeatmap, DifficultyRating difficultyRating = DifficultyRating.ExpertPlus)
             : this(new VerifiedBeatmap(workingBeatmap, beatmap), difficultyRating)
         {
