@@ -14,6 +14,9 @@ on:
         default: '1.0.0-dev'
   release:
     types: [ published ]
+  workflow_run:
+    workflows: [ "Auto tag from master" ]
+    types: [ completed ]
 
 env:
   DOTNET_VERSION: '8.0.x'
@@ -36,6 +39,25 @@ jobs:
       id: version
       shell: bash
       run: |
+        if [[ "${{ github.event_name }}" == "workflow_run" ]]; then
+          git fetch --tags --force
+          LAST_TAG=$(git tag -l 'v*' --sort=-creatordate | head -n1)
+          if [[ -n "$LAST_TAG" ]]; then
+            VERSION="$LAST_TAG"
+            SEMVER=${VERSION#v}
+            NUMERIC=${SEMVER%%-*}
+            PARTS=$(echo "$NUMERIC" | awk -F. '{print NF}')
+            if [[ $PARTS -eq 1 ]]; then NUMERIC="$NUMERIC.0.0.0"; fi
+            if [[ $PARTS -eq 2 ]]; then NUMERIC="$NUMERIC.0.0"; fi
+            if [[ $PARTS -eq 3 ]]; then NUMERIC="$NUMERIC.0"; fi
+            echo "version=$VERSION" >> $GITHUB_OUTPUT
+            echo "semver=$SEMVER" >> $GITHUB_OUTPUT
+            echo "assemblyVersion=$NUMERIC" >> $GITHUB_OUTPUT
+            echo "fileVersion=$NUMERIC" >> $GITHUB_OUTPUT
+            echo "Computed version from latest tag (workflow_run): $VERSION"
+            exit 0
+          fi
+        fi
         if [[ "${{ github.event_name }}" == "release" ]]; then
           VERSION="${{ github.event.release.tag_name }}"
         elif [[ "${{ github.ref }}" == refs/tags/* ]]; then
@@ -67,7 +89,7 @@ jobs:
 
   build:
     name: Build ${{ matrix.os }}
-    if: github.event_name != 'push' || startsWith(github.ref, 'refs/tags/') || github.event_name == 'release' || github.event_name == 'workflow_dispatch'
+    if: github.event_name != 'push' || startsWith(github.ref, 'refs/tags/') || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || github.event_name == 'workflow_run'
     needs: version
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
@@ -103,6 +125,15 @@ jobs:
         # Ensure we have complete git history for version calculation
         # Use the release tag when triggered by a Release event, otherwise the triggering SHA
         ref: ${{ github.event_name == 'release' && github.event.release.tag_name || github.sha }}
+
+    - name: Switch to latest tag (workflow_run)
+      if: github.event_name == 'workflow_run'
+      shell: bash
+      run: |
+        git fetch --tags --force
+        LAST_TAG=$(git tag -l 'v*' --sort=-creatordate | head -n1)
+        echo "Latest tag detected: $LAST_TAG"
+        git checkout "$LAST_TAG"
 
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
