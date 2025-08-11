@@ -22,6 +22,7 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Resources.Localisation.Web;
 using osuTK;
 using osuTK.Graphics;
 
@@ -159,6 +160,8 @@ namespace osu.Game.Screens.SelectV2
                 base.OnHoverLost(e);
                 hoverLayer.FadeOut(500, Easing.OutQuint);
             }
+
+            public override LocalisableString TooltipText => isFavourite.Value ? BeatmapsetsStrings.ShowDetailsUnfavourite.ToSentence() : BeatmapsetsStrings.ShowDetailsFavourite.ToSentence();
 
             // Note: `setLoading()` and `setBeatmapSet()` are called externally via their public counterparts by song select when the beatmap changes,
             // as well as internally in order to display the progress and result of the (un)favourite operation when the button is clicked.

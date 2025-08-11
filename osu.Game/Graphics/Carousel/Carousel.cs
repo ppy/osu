@@ -345,11 +345,6 @@ namespace osu.Game.Graphics.Carousel
                     {
                         log($"Performing {filter.GetType().ReadableName()}");
                         items = await filter.Run(items, cts.Token).ConfigureAwait(false);
-
-                        // To avoid shooting ourselves in the foot, ensure that we manifest a list after each filter.
-                        //
-                        // A future improvement may be passing a reference list through each filter rather than copying each time,
-                        // but this is the safest approach.
                     }
 
                     log("Updating Y positions");

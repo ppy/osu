@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Edit.Checks
 {
     public class CheckInconsistentMetadata : ICheck
     {
-        public CheckMetadata Metadata => new CheckMetadata(CheckCategory.Metadata, "Inconsistent metadata");
+        public CheckMetadata Metadata => new CheckMetadata(CheckCategory.Metadata, "Inconsistent metadata", CheckScope.BeatmapSet);
 
         public IEnumerable<IssueTemplate> PossibleTemplates => new IssueTemplate[]
         {
@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Edit.Checks
             if (difficulties.Count <= 1)
                 yield break;
 
-            var referenceBeatmap = difficulties.OrderByDescending(b => b.BeatmapInfo.StarRating).First();
+            var referenceBeatmap = context.Beatmap;
             var referenceMetadata = referenceBeatmap.Metadata;
 
             // Define metadata fields to check

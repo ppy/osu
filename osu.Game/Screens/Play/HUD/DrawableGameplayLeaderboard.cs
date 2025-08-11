@@ -62,6 +62,7 @@ namespace osu.Game.Screens.Play.HUD
                     RelativeSizeAxes = Axes.Both,
                     Child = Flow = new FillFlowContainer<DrawableGameplayLeaderboardScore>
                     {
+                        Alpha = 0f,
                         RelativeSizeAxes = Axes.X,
                         X = DrawableGameplayLeaderboardScore.SHEAR_WIDTH,
                         AutoSizeAxes = Axes.Y,
