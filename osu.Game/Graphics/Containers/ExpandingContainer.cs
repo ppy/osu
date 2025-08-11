@@ -76,12 +76,6 @@ namespace osu.Game.Graphics.Containers
             return true;
         }
 
-        protected override bool OnMouseMove(MouseMoveEvent e)
-        {
-            updateHoverExpansion();
-            return base.OnMouseMove(e);
-        }
-
         protected override void OnHoverLost(HoverLostEvent e)
         {
             if (hoverExpandEvent != null)

@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Extensions;
 using osu.Game.Beatmaps;
+using osu.Game.Collections;
 using osu.Game.Graphics.Carousel;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
@@ -20,6 +21,11 @@ namespace osu.Game.Screens.SelectV2
         public bool BeatmapSetsGroupedTogether { get; private set; }
 
         /// <summary>
+        /// The total number of beatmap difficulties displayed post filter.
+        /// </summary>
+        public int BeatmapItemsCount { get; private set; }
+
+        /// <summary>
         /// Beatmap sets contain difficulties as related panels. This dictionary holds the relationships between set-difficulties to allow expanding them on selection.
         /// </summary>
         public IDictionary<BeatmapSetInfo, HashSet<CarouselItem>> SetItems => setMap;
@@ -29,22 +35,25 @@ namespace osu.Game.Screens.SelectV2
         /// </summary>
         public IDictionary<GroupDefinition, HashSet<CarouselItem>> GroupItems => groupMap;
 
-        private readonly Dictionary<BeatmapSetInfo, HashSet<CarouselItem>> setMap = new Dictionary<BeatmapSetInfo, HashSet<CarouselItem>>();
-        private readonly Dictionary<GroupDefinition, HashSet<CarouselItem>> groupMap = new Dictionary<GroupDefinition, HashSet<CarouselItem>>();
+        private Dictionary<BeatmapSetInfo, HashSet<CarouselItem>> setMap = new Dictionary<BeatmapSetInfo, HashSet<CarouselItem>>();
+        private Dictionary<GroupDefinition, HashSet<CarouselItem>> groupMap = new Dictionary<GroupDefinition, HashSet<CarouselItem>>();
 
         private readonly Func<FilterCriteria> getCriteria;
+        private readonly Func<List<BeatmapCollection>>? getCollections;
 
-        public BeatmapCarouselFilterGrouping(Func<FilterCriteria> getCriteria)
+        public BeatmapCarouselFilterGrouping(Func<FilterCriteria> getCriteria, Func<List<BeatmapCollection>>? getCollections)
         {
             this.getCriteria = getCriteria;
+            this.getCollections = getCollections;
         }
 
         public async Task<List<CarouselItem>> Run(IEnumerable<CarouselItem> items, CancellationToken cancellationToken)
         {
             return await Task.Run(() =>
             {
-                setMap.Clear();
-                groupMap.Clear();
+                // preallocate space for the new mappings using last known estimates
+                var newSetMap = new Dictionary<BeatmapSetInfo, HashSet<CarouselItem>>(setMap.Count);
+                var newGroupMap = new Dictionary<GroupDefinition, HashSet<CarouselItem>>(groupMap.Count);
 
                 var criteria = getCriteria();
                 var newItems = new List<CarouselItem>();
@@ -52,6 +61,7 @@ namespace osu.Game.Screens.SelectV2
                 BeatmapSetsGroupedTogether = ShouldGroupBeatmapsTogether(criteria);
 
                 var groups = getGroups((List<CarouselItem>)items, criteria);
+                int displayedBeatmapsCount = 0;
 
                 foreach (var (group, itemsInGroup) in groups)
                 {
@@ -64,7 +74,7 @@ namespace osu.Game.Screens.SelectV2
 
                     if (group != null)
                     {
-                        groupMap[group] = currentGroupItems = new HashSet<CarouselItem>();
+                        newGroupMap[group] = currentGroupItems = new HashSet<CarouselItem>();
 
                         addItem(groupItem = new CarouselItem(group)
                         {
@@ -75,14 +85,16 @@ namespace osu.Game.Screens.SelectV2
 
                     foreach (var item in itemsInGroup)
                     {
+                        cancellationToken.ThrowIfCancellationRequested();
+
                         var beatmap = (BeatmapInfo)item.Model;
 
                         bool newBeatmapSet = lastBeatmap?.BeatmapSet!.ID != beatmap.BeatmapSet!.ID;
 
                         if (newBeatmapSet)
                         {
-                            if (!setMap.TryGetValue(beatmap.BeatmapSet!, out currentSetItems))
-                                setMap[beatmap.BeatmapSet!] = currentSetItems = new HashSet<CarouselItem>();
+                            if (!newSetMap.TryGetValue(beatmap.BeatmapSet!, out currentSetItems))
+                                newSetMap[beatmap.BeatmapSet!] = currentSetItems = new HashSet<CarouselItem>();
                         }
 
                         if (BeatmapSetsGroupedTogether)
@@ -109,6 +121,7 @@ namespace osu.Game.Screens.SelectV2
 
                         addItem(item);
                         lastBeatmap = beatmap;
+                        displayedBeatmapsCount++;
                     }
 
                     void addItem(CarouselItem i)
@@ -122,6 +135,11 @@ namespace osu.Game.Screens.SelectV2
                     }
                 }
 
+                cancellationToken.ThrowIfCancellationRequested();
+
+                Interlocked.Exchange(ref setMap, newSetMap);
+                Interlocked.Exchange(ref groupMap, newGroupMap);
+                BeatmapItemsCount = displayedBeatmapsCount;
                 return newItems;
             }, cancellationToken).ConfigureAwait(false);
         }
@@ -206,15 +224,15 @@ namespace osu.Game.Screens.SelectV2
                 case GroupMode.Source:
                     return getGroupsBy(b => defineGroupBySource(b.BeatmapSet!.Metadata.Source), items);
 
+                case GroupMode.Collections:
+                    var collections = getCollections?.Invoke() ?? Enumerable.Empty<BeatmapCollection>();
+                    return getGroupsBy(b => defineGroupByCollection(b, collections), items);
+
+                case GroupMode.MyMaps:
+                    return getGroupsBy(b => defineGroupByOwnMaps(b, criteria.LocalUserId, criteria.LocalUserUsername), items);
+
                 // TODO: need implementation
-                //
-                // case GroupMode.Collections:
-                //     goto case GroupMode.None;
-                //
                 // case GroupMode.Favourites:
-                //     goto case GroupMode.None;
-                //
-                // case GroupMode.MyMaps:
                 //     goto case GroupMode.None;
                 //
                 // case GroupMode.RankAchieved:
@@ -225,11 +243,12 @@ namespace osu.Game.Screens.SelectV2
             }
         }
 
-        private List<GroupMapping> getGroupsBy(Func<BeatmapInfo, GroupDefinition> getGroup, List<CarouselItem> items)
+        private List<GroupMapping> getGroupsBy(Func<BeatmapInfo, GroupDefinition?> getGroup, List<CarouselItem> items)
         {
             return items.GroupBy(i => getGroup((BeatmapInfo)i.Model))
-                        .OrderBy(s => s.Key.Order)
-                        .ThenBy(s => s.Key.Title)
+                        .Where(g => g.Key != null)
+                        .OrderBy(g => g.Key!.Order)
+                        .ThenBy(g => g.Key!.Title)
                         .Select(g => new GroupMapping(g.Key, g.ToList()))
                         .ToList();
         }
@@ -372,6 +391,28 @@ namespace osu.Game.Screens.SelectV2
                 return new GroupDefinition(1, "Unsourced");
 
             return new GroupDefinition(0, source);
+        }
+
+        private GroupDefinition defineGroupByCollection(BeatmapInfo beatmap, IEnumerable<BeatmapCollection> collections)
+        {
+            foreach (var collection in collections)
+            {
+                if (collection.BeatmapMD5Hashes.Contains(beatmap.MD5Hash))
+                    return new GroupDefinition(0, collection.Name);
+            }
+
+            return new GroupDefinition(1, "Not in collection");
+        }
+
+        private GroupDefinition? defineGroupByOwnMaps(BeatmapInfo beatmap, int? localUserId, string? localUserUsername)
+        {
+            var author = beatmap.BeatmapSet!.Metadata.Author;
+
+            if (author.OnlineID == localUserId || (author.OnlineID <= 1 && author.Username == localUserUsername))
+                return new GroupDefinition(0, "My maps");
+
+            // discard beatmaps not owned by the user.
+            return null;
         }
 
         private static T? aggregateMax<T>(BeatmapInfo b, Func<BeatmapInfo, T> func)

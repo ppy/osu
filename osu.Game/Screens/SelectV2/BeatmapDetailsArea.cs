@@ -97,5 +97,11 @@ namespace osu.Game.Screens.SelectV2
             contentContainer.Add(currentContent);
             currentContent.Show();
         }
+
+        public void Refresh()
+        {
+            if (currentContent is BeatmapLeaderboardWedge leaderboardWedge)
+                leaderboardWedge.RefetchScores();
+        }
     }
 }

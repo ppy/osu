@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Edit.Checks
 {
     public class CheckAudioInVideo : ICheck
     {
-        public CheckMetadata Metadata => new CheckMetadata(CheckCategory.Audio, "Audio track in video files");
+        public CheckMetadata Metadata => new CheckMetadata(CheckCategory.Audio, "Audio track in video files", CheckScope.BeatmapSet);
 
         public IEnumerable<IssueTemplate> PossibleTemplates => new IssueTemplate[]
         {
