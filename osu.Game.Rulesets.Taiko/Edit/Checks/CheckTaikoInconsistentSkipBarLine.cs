@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Taiko.Edit.Checks
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
-            var difficulties = context.BeatmapsetDifficulties;
+            var difficulties = context.CurrentDifficulty.PlayablesetDifficulties;
 
             if (difficulties.Count <= 1)
                 yield break;
@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Taiko.Edit.Checks
             if (taikoBeatmaps.Count <= 1)
                 yield break;
 
-            var referenceBeatmap = context.Beatmap;
+            var referenceBeatmap = context.CurrentDifficulty.Playable;
             var referenceTimingPoints = referenceBeatmap.ControlPointInfo.TimingPoints;
 
             foreach (var beatmap in taikoBeatmaps)
