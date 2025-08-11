@@ -3,6 +3,8 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
@@ -25,7 +27,7 @@ namespace osu.Game.Screens.Play.HUD
             Current.Value = 0;
         }
 
-        public virtual bool IsValid { get; set; }
+        public Bindable<bool> IsValid { get; } = new Bindable<bool>();
 
         protected override void LoadComplete()
         {
@@ -48,7 +50,7 @@ namespace osu.Game.Screens.Play.HUD
 
             double? unstableRate = unstableRateResult?.Result;
 
-            IsValid = unstableRate != null;
+            IsValid.Value = unstableRate != null;
 
             if (unstableRate != null)
                 Current.Value = (int)Math.Round(unstableRate.Value);
@@ -58,8 +60,11 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.Dispose(isDisposing);
 
-            scoreProcessor.NewJudgement -= updateDisplay;
-            scoreProcessor.JudgementReverted -= updateDisplay;
+            if (scoreProcessor.IsNotNull())
+            {
+                scoreProcessor.NewJudgement -= updateDisplay;
+                scoreProcessor.JudgementReverted -= updateDisplay;
+            }
         }
     }
 }
