@@ -7,6 +7,7 @@ using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Game.Rulesets.Judgements;
@@ -46,6 +47,13 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
+        public void TestDisplay()
+        {
+            AddSliderStep("UR", 0, 2000, 0, v => this.ChildrenOfType<UnstableRateCounter>().ForEach(c => c.Current.Value = v));
+            AddToggleStep("toggle validity", v => this.ChildrenOfType<UnstableRateCounter>().ForEach(c => c.IsValid.Value = v));
+        }
+
+        [Test]
         public void TestBasic()
         {
             // Needs multiples 2 by the nature of UR, and went for 4 to be safe.
@@ -66,7 +74,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             }, 4);
 
             AddUntilStep("UR is 0", () => this.ChildrenOfType<UnstableRateCounter>().All(c => c.Current.Value == 0));
-            AddUntilStep("Counter is invalid", () => this.ChildrenOfType<UnstableRateCounter>().All(c => !c.IsValid));
+            AddUntilStep("Counter is invalid", () => this.ChildrenOfType<UnstableRateCounter>().All(c => !c.IsValid.Value));
 
             //Sets a UR of 0 by creating 10 10ms offset judgements. Since average = offset, UR = 0
             AddRepeatStep("Set UR to 0", () => applyJudgement(10, false), 10);
