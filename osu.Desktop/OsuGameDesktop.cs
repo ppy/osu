@@ -123,7 +123,7 @@ namespace osu.Desktop
 
         public override bool RestartAppWhenExited()
         {
-            Task.Run(() => Velopack.UpdateExe.Start()).FireAndForget();
+            Task.Run(() => Velopack.UpdateExe.Start(waitPid: (uint)Environment.ProcessId)).FireAndForget();
             return true;
         }
 

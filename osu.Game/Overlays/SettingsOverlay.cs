@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Development;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -31,7 +30,7 @@ namespace osu.Game.Overlays
 
         protected override IEnumerable<SettingsSection> CreateSections()
         {
-            var sections = new List<SettingsSection>
+            return new List<SettingsSection>
             {
                 // This list should be kept in sync with ScreenBehaviour.
                 new GeneralSection(),
@@ -44,12 +43,8 @@ namespace osu.Game.Overlays
                 new GraphicsSection(),
                 new OnlineSection(),
                 new MaintenanceSection(),
+                new DebugSection()
             };
-
-            if (DebugUtils.IsDebugBuild)
-                sections.Add(new DebugSection());
-
-            return sections;
         }
 
         private readonly List<SettingsSubPanel> subPanels = new List<SettingsSubPanel>();

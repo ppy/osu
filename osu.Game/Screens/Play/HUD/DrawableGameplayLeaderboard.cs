@@ -28,6 +28,8 @@ namespace osu.Game.Screens.Play.HUD
 
         public DrawableGameplayLeaderboardScore? TrackedScore { get; private set; }
 
+        public bool AlwaysShown { get; init; }
+
         [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.CollapseDuringGameplay), nameof(SkinnableComponentStrings.CollapseDuringGameplayDescription))]
         public Bindable<bool> CollapseDuringGameplay { get; } = new BindableBool(true);
 
@@ -68,6 +70,7 @@ namespace osu.Game.Screens.Play.HUD
                     RelativeSizeAxes = Axes.Both,
                     Child = Flow = new FillFlowContainer<DrawableGameplayLeaderboardScore>
                     {
+                        Alpha = 0f,
                         RelativeSizeAxes = Axes.X,
                         X = xOffset,
                         AutoSizeAxes = Axes.Y,
@@ -117,7 +120,7 @@ namespace osu.Game.Screens.Play.HUD
             if (Flow.Alpha < 1)
                 scroll.ScrollToStart(false);
 
-            Flow.FadeTo(player?.Configuration.ShowLeaderboard != false && configVisibility.Value ? 1 : 0, 100, Easing.OutQuint);
+            Flow.FadeTo(player?.Configuration.ShowLeaderboard != false && (configVisibility.Value || AlwaysShown) ? 1 : 0, 100, Easing.OutQuint);
             expanded.Value = !CollapseDuringGameplay.Value || userPlayingState.Value != LocalUserPlayingState.Playing || holdingForHUD.Value;
         }
 

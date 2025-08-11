@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Edit.Checks
 {
     public class CheckHitsoundsFormat : ICheck
     {
-        public CheckMetadata Metadata => new CheckMetadata(CheckCategory.Audio, "Checks for hitsound formats.");
+        public CheckMetadata Metadata => new CheckMetadata(CheckCategory.Audio, "Checks for hitsound formats.", CheckScope.BeatmapSet);
 
         public IEnumerable<IssueTemplate> PossibleTemplates => new IssueTemplate[]
         {

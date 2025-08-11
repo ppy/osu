@@ -86,6 +86,11 @@ namespace osu.Game.Rulesets.Mania.Objects
         /// </summary>
         public HoldNoteBody Body { get; protected set; }
 
+        /// <summary>
+        /// Whether sliding samples should be played when held.
+        /// </summary>
+        public bool PlaySlidingSamples { get; init; }
+
         public override double MaximumJudgementOffset => Tail.MaximumJudgementOffset;
 
         protected override void CreateNestedHitObjects(CancellationToken cancellationToken)

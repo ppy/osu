@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Humanizer;
@@ -1054,13 +1053,6 @@ namespace osu.Game
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            if (RuntimeInfo.EntryAssembly.GetCustomAttribute<OfficialBuildAttribute>() == null)
-                Logger.Log(NotificationsStrings.NotOfficialBuild.ToString());
-
-            // Make sure the release stream setting matches the build which was just run.
-            if (Enum.TryParse<ReleaseStream>(Version.Split('-').Last(), true, out var releaseStream))
-                LocalConfig.SetValue(OsuSetting.ReleaseStream, releaseStream);
 
             var languages = Enum.GetValues<Language>();
 

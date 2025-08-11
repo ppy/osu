@@ -10,7 +10,7 @@ namespace osu.Game.Rulesets.Edit.Checks
 {
     public class CheckTitleMarkers : ICheck
     {
-        public CheckMetadata Metadata => new CheckMetadata(CheckCategory.Metadata, "Checks for incorrect formats of (TV Size) / (Game Ver.) / (Short Ver.) / (Cut Ver.) / (Sped Up Ver.) / etc in title.");
+        public CheckMetadata Metadata => new CheckMetadata(CheckCategory.Metadata, "Checks for incorrect formats of (TV Size) / (Game Ver.) / (Short Ver.) / (Cut Ver.) / (Sped Up Ver.) / etc in title.", CheckScope.BeatmapSet);
 
         public IEnumerable<IssueTemplate> PossibleTemplates => new IssueTemplate[]
         {
