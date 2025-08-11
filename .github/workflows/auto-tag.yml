@@ -1,8 +1,6 @@
-name: Auto tag from master
+name: Auto tag (manual only - deprecated)
 
 on:
-  push:
-    branches: [ master ]
   workflow_dispatch:
 
 permissions:
@@ -12,6 +10,7 @@ jobs:
   create-tag:
     name: Create dated tag (yyyy.mdd.N-lazer)
     runs-on: ubuntu-latest
+    if: false # disabled; tagging handled in build-gu.yml
     steps:
       - name: Checkout
       
