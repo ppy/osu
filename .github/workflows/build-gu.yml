@@ -312,6 +312,11 @@ jobs:
         merge-multiple: true
         path: artifacts
 
+    - name: Checkout repository (for tag computation)
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
     - name: Collect release files
       shell: bash
       run: |
