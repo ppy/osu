@@ -45,7 +45,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 User = new APIUser { Username = "You", Id = 3 }
             };
 
-            gameplayState = TestGameplayState.Create(new OsuRuleset(), null, new Score { ScoreInfo = localScore });
+            gameplayState = TestGameplayState.Create(new OsuRuleset(), null, new Score { ScoreInfo = localScore }, new Bindable<LocalUserPlayingState>(LocalUserPlayingState.Playing));
         }
 
         [BackgroundDependencyLoader]
@@ -61,7 +61,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("toggle collapsed", () =>
             {
                 if (leaderboard.IsNotNull())
-                    ((BindableBool)leaderboard.Expanded).Value = !leaderboard.Expanded.Value;
+                    leaderboard.CollapseDuringGameplay.Value = !leaderboard.CollapseDuringGameplay.Value;
             });
 
             AddStep("toggle black background", () => blackBackground?.FadeTo(1 - blackBackground.Alpha, 300, Easing.OutQuint));
@@ -208,6 +208,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                         },
                         leaderboard = new DrawableGameplayLeaderboard
                         {
+                            CollapseDuringGameplay = { Value = false },
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                         }
