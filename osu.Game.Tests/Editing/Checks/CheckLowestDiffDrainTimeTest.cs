@@ -231,12 +231,10 @@ namespace osu.Game.Tests.Editing.Checks
             var difficultiesArray = allDifficulties.ToArray();
             var currentDifficultyRating = StarDifficulty.GetDifficultyRating(currentBeatmap.BeatmapInfo.StarRating);
 
-            return new BeatmapVerifierContext(
-                currentBeatmap,
-                new TestWorkingBeatmap(currentBeatmap),
-                currentDifficultyRating,
-                difficultiesArray
-            );
+            var verifiedCurrentBeatmap = new BeatmapVerifierContext.VerifiedBeatmap(new TestWorkingBeatmap(currentBeatmap), currentBeatmap);
+            var verifiedOtherBeatmaps = difficultiesArray.Select(b => new BeatmapVerifierContext.VerifiedBeatmap(new TestWorkingBeatmap(b), b)).ToList();
+
+            return new BeatmapVerifierContext(verifiedCurrentBeatmap, currentDifficultyRating, verifiedOtherBeatmaps);
         }
 
         private class TestCheckLowestDiffDrainTime : CheckLowestDiffDrainTime
