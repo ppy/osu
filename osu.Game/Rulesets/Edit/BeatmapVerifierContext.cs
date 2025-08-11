@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Linq;
 using osu.Game.Beatmaps;
 
 namespace osu.Game.Rulesets.Edit
@@ -35,7 +36,7 @@ namespace osu.Game.Rulesets.Edit
         /// <summary>
         /// All beatmaps in the same beatmapset.
         /// </summary>
-        public IEnumerable<VerifiedBeatmap> AllDifficulties => [CurrentDifficulty, ..OtherDifficulties];
+        public IEnumerable<VerifiedBeatmap> AllDifficulties => OtherDifficulties.Prepend(CurrentDifficulty);
 
         public BeatmapVerifierContext(VerifiedBeatmap currentDifficulty, DifficultyRating difficultyRating = DifficultyRating.ExpertPlus, IReadOnlyList<VerifiedBeatmap>? otherDifficulties = null)
         {
