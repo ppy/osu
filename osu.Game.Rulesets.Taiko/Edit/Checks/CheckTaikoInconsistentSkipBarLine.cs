@@ -19,13 +19,11 @@ namespace osu.Game.Rulesets.Taiko.Edit.Checks
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
-            var difficulties = context.CurrentDifficulty.PlayablesetDifficulties;
-
-            if (difficulties.Count <= 1)
+            if (context.AllDifficulties.Count() <= 1)
                 yield break;
 
             // Inconsistent bar line omission only matters for osu!taiko difficulties, so only check those
-            var taikoBeatmaps = difficulties.Where(b => b.BeatmapInfo.Ruleset.ShortName == "taiko").ToList();
+            var taikoBeatmaps = context.AllDifficulties.Where(b => b.Playable.BeatmapInfo.Ruleset.ShortName == "taiko").ToList();
 
             if (taikoBeatmaps.Count <= 1)
                 yield break;
@@ -33,12 +31,11 @@ namespace osu.Game.Rulesets.Taiko.Edit.Checks
             var referenceBeatmap = context.CurrentDifficulty.Playable;
             var referenceTimingPoints = referenceBeatmap.ControlPointInfo.TimingPoints;
 
-            foreach (var beatmap in taikoBeatmaps)
-            {
-                if (beatmap == referenceBeatmap)
-                    continue;
+            var otherTaikoBeatmaps = taikoBeatmaps.Where(b => b.Playable != referenceBeatmap).ToList();
 
-                var timingPoints = beatmap.ControlPointInfo.TimingPoints;
+            foreach (var beatmap in otherTaikoBeatmaps)
+            {
+                var timingPoints = beatmap.Playable.ControlPointInfo.TimingPoints;
 
                 foreach (var referencePoint in referenceTimingPoints)
                 {
@@ -50,7 +47,7 @@ namespace osu.Game.Rulesets.Taiko.Edit.Checks
 
                     if (referencePoint.OmitFirstBarLine != matchingPoint.OmitFirstBarLine)
                     {
-                        yield return new IssueTemplateInconsistentOmitFirstBarLine(this).Create(referencePoint.Time, beatmap.BeatmapInfo.DifficultyName);
+                        yield return new IssueTemplateInconsistentOmitFirstBarLine(this).Create(referencePoint.Time, beatmap.Playable.BeatmapInfo.DifficultyName);
                     }
                 }
             }
