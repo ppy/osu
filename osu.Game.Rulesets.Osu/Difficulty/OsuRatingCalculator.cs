@@ -15,12 +15,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private readonly Mod[] mods;
         private readonly int totalHits;
         private readonly double overallDifficulty;
+        private readonly double sliderFactor;
 
-        public OsuRatingCalculator(Mod[] mods, int totalHits, double overallDifficulty)
+        public OsuRatingCalculator(Mod[] mods, int totalHits, double overallDifficulty, double sliderFactor)
         {
             this.mods = mods;
             this.totalHits = totalHits;
             this.overallDifficulty = overallDifficulty;
+            this.sliderFactor = sliderFactor;
         }
 
         public double ComputeAimRating(double aimDifficultyValue)
@@ -121,6 +123,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 flashlightRating *= 1.0 - magnetisedStrength;
             }
 
+            if (mods.Any(m => m is OsuModDeflate))
+            {
+                float deflateInitialScale = mods.OfType<OsuModDeflate>().First().StartScale.Value;
+                flashlightRating *= Math.Clamp(DifficultyCalculationUtils.ReverseLerp(deflateInitialScale, 11, 1), 0.1, 1);
+            }
+
             double ratingMultiplier = 1.0;
 
             // Account for shorter maps having a higher ratio of 0 combo/100 combo flashlight radius.
@@ -136,20 +144,23 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         /// <summary>
         /// Calculates a visibility bonus that is applicable to Hidden and Traceable.
         /// </summary>
-        public static double CalculateVisibilityBonus(double approachRate, double visibilityFactor = 1)
+        public static double CalculateVisibilityBonus(double approachRate, double visibilityFactor = 1, double sliderFactor = 1)
         {
             // Start from normal curve, rewarding lower AR up to AR7
             double readingBonus = 0.04 * (12.0 - Math.Max(approachRate, 7));
 
             readingBonus *= visibilityFactor;
 
+            // We want to reward slideraim on low AR less
+            double sliderVisibilityFactor = Math.Pow(sliderFactor, 3);
+
             // For AR up to 0 - reduce reward for very low ARs when object is visible
             if (approachRate < 7)
-                readingBonus += 0.03 * (7.0 - Math.Max(approachRate, 0));
+                readingBonus += 0.03 * (7.0 - Math.Max(approachRate, 0))  * sliderVisibilityFactor;
 
             // Starting from AR0 - cap values so they won't grow to infinity
             if (approachRate < 0)
-                readingBonus += 0.075 * (1 - Math.Pow(1.5, approachRate));
+                readingBonus += 0.075 * (1 - Math.Pow(1.5, approachRate)) * sliderVisibilityFactor;
 
             return readingBonus;
         }
