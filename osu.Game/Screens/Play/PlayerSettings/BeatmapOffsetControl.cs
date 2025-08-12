@@ -153,6 +153,9 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 // Negative is applied here because the play graph is considering a hit offset, not track (as we currently use for clocks).
                 lastPlayGraph?.UpdateOffset(-adjustmentSinceLastPlay);
 
+                // Calibration button may be hidden due to automatic offset adjustment, but it should be visible when the user manually adjusts their offset away from the applied suggestion.
+                calibrateFromLastPlayButton?.Show();
+
                 // ensure the previous write has completed. ignoring performance concerns, if we don't do this, the async writes could be out of sequence.
                 if (realmWriteTask?.IsCompleted == false)
                 {
