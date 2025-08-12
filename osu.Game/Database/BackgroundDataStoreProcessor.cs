@@ -700,9 +700,17 @@ namespace osu.Game.Database
                         if (lookupSucceeded)
                         {
                             Debug.Assert(result != null);
-                            beatmap.Metadata.UserTags.Clear();
-                            beatmap.Metadata.UserTags.AddRange(result.UserTags);
-                            return beatmap.Metadata.UserTags.Any();
+
+                            var userTags = result.UserTags.ToHashSet();
+
+                            if (!userTags.SetEquals(beatmap.Metadata.UserTags))
+                            {
+                                beatmap.Metadata.UserTags.Clear();
+                                beatmap.Metadata.UserTags.AddRange(userTags);
+                                return true;
+                            }
+
+                            return false;
                         }
 
                         Logger.Log(@$"Could not find {beatmap.GetDisplayString()} in local cache while backpopulating missing user tags");
