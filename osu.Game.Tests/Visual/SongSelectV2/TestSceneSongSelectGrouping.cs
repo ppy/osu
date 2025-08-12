@@ -6,9 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using NUnit.Framework;
-using osu.Framework.Testing;
-using osu.Framework.Development;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
@@ -258,13 +257,11 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         #region Benchmarks
 
         [Test]
+        [Explicit("Manual benchmark")]
         public void TestPerformance()
         {
             const int sets_count = 100;
             const int diffs_count = 100;
-
-            if (DebugUtils.IsNUnitRunning)
-                Assert.Ignore("For benchmarking purposes only.");
 
             AddStep("log in", () =>
             {
