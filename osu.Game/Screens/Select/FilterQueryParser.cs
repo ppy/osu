@@ -76,7 +76,8 @@ namespace osu.Game.Screens.Select
                         return false;
 
                     // Unplayed beatmaps are filtered on DateTimeOffset.MinValue.
-
+                    if (op == Operator.NotEqual)
+                        played = !played;
                     if (played)
                     {
                         criteria.LastPlayed.Min = DateTimeOffset.MinValue;
@@ -230,6 +231,11 @@ namespace osu.Game.Screens.Select
             switch (op)
             {
                 case Operator.Equal:
+                    textFilter.SearchTerm = value;
+                    return true;
+
+                case Operator.NotEqual:
+                    textFilter.InvertSearch = true;
                     textFilter.SearchTerm = value;
                     return true;
 
@@ -493,7 +499,6 @@ namespace osu.Game.Screens.Select
         private static bool tryUpdateCriteriaRange<T>(ref FilterCriteria.OptionalRange<T> range, Operator op, T value)
             where T : struct
         {
-            range.InvertRange = false;
 
             switch (op)
             {
@@ -587,13 +592,15 @@ namespace osu.Game.Screens.Select
         {
             switch (op)
             {
+                case Operator.NotEqual:
                 case Operator.Equal:
-                    // an equality filter is difficult to define for support here.
+                    // an equality or inequality filter is difficult to define for support here.
                     // if "3 months 2 days ago" means a single concrete time instant, such a filter is basically useless.
                     // if it means a range of 24 hours, then that is annoying to write and also comes with its own implications
                     // (does it mean "time instant 3 months 2 days ago, within 12 hours of tolerance either direction"?
                     // does it mean "the full calendar day, from midnight to midnight, 3 months 2 days ago"?)
                     // as such, for simplicity, just refuse to support this.
+                    // same applies to inequality, but instead 24 hours would be need to be left out
                     return false;
 
                 // for the remaining operators, since the value provided to this function is an "ago" type value
@@ -748,6 +755,7 @@ namespace osu.Game.Screens.Select
                 DateTimeOffset dateTimeOffset;
                 DateTimeOffset minDateTimeOffset;
                 DateTimeOffset maxDateTimeOffset;
+                dateRange.InvertRange = false;
 
                 switch (op)
                 {
@@ -831,14 +839,16 @@ namespace osu.Game.Screens.Select
 
                     case Operator.NotEqual:
 
+                        dateRange.InvertRange = true;
+
                         if (month == null)
                         {
                             month = 1;
                             day = 1;
                             minDateTimeOffset = dateTimeOffsetFromDateOnly(year.Value, month.Value, day.Value);
                             maxDateTimeOffset = dateTimeOffsetFromDateOnly(year.Value, month.Value, day.Value).AddYears(1);
-                            return tryUpdateCriteriaRange(ref dateRange, Operator.Less, minDateTimeOffset)
-                                   || tryUpdateCriteriaRange(ref dateRange, Operator.GreaterOrEqual, maxDateTimeOffset);
+                            return tryUpdateCriteriaRange(ref dateRange, Operator.GreaterOrEqual, minDateTimeOffset)
+                                   && tryUpdateCriteriaRange(ref dateRange, Operator.Less, maxDateTimeOffset);
                         }
 
                         if (day == null)
@@ -846,14 +856,14 @@ namespace osu.Game.Screens.Select
                             day = 1;
                             minDateTimeOffset = dateTimeOffsetFromDateOnly(year.Value, month.Value, day.Value);
                             maxDateTimeOffset = dateTimeOffsetFromDateOnly(year.Value, month.Value, day.Value).AddMonths(1);
-                            return tryUpdateCriteriaRange(ref dateRange, Operator.Less, minDateTimeOffset)
-                                   || tryUpdateCriteriaRange(ref dateRange, Operator.GreaterOrEqual, maxDateTimeOffset);
+                            return tryUpdateCriteriaRange(ref dateRange, Operator.GreaterOrEqual, minDateTimeOffset)
+                                   && tryUpdateCriteriaRange(ref dateRange, Operator.Less, maxDateTimeOffset);
                         }
 
-                        minDateTimeOffset = dateTimeOffsetFromDateOnly(year.Value, month.Value, day.Value);
-                        maxDateTimeOffset = dateTimeOffsetFromDateOnly(year.Value, month.Value, day.Value).AddDays(1);
-                        return tryUpdateCriteriaRange(ref dateRange, Operator.Less, minDateTimeOffset)
-                               || tryUpdateCriteriaRange(ref dateRange, Operator.GreaterOrEqual, maxDateTimeOffset);
+                        minDateTimeOffset = dateTimeOffsetFromDateOnly(year.Value, month.Value, day.Value).AddDays(-1);
+                        maxDateTimeOffset = dateTimeOffsetFromDateOnly(year.Value, month.Value, day.Value);
+                        return tryUpdateCriteriaRange(ref dateRange, Operator.GreaterOrEqual, minDateTimeOffset)
+                               && tryUpdateCriteriaRange(ref dateRange, Operator.Less, maxDateTimeOffset);
 
                     default:
                         return false;
@@ -862,7 +872,7 @@ namespace osu.Game.Screens.Select
             catch (ArgumentOutOfRangeException)
             {
                 return false;
-            }
         }
     }
+            }
 }
