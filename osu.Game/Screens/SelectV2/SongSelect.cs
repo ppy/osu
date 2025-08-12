@@ -467,7 +467,6 @@ namespace osu.Game.Screens.SelectV2
         /// - Immediately update the selection the carousel.
         /// - After <see cref="SELECTION_DEBOUNCE"/>, update the global beatmap. This in turn causes song select visuals (title, details, leaderboard) to update.
         ///   This debounce is intended to avoid high overheads from churning lookups while a user is changing selection via rapid keyboard operations.
-        ///   To complete the operation immediately, call <see cref="finaliseBeatmapSelection"/>.
         /// </remarks>
         /// <param name="beatmap">The beatmap to be selected.</param>
         private void queueBeatmapSelection(BeatmapInfo beatmap)
@@ -486,15 +485,6 @@ namespace osu.Game.Screens.SelectV2
 
                 Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap);
             }, SELECTION_DEBOUNCE);
-        }
-
-        /// <summary>
-        /// If any pending selection exists from <see cref="queueBeatmapSelection"/>, run it immediately.
-        /// </summary>
-        private void finaliseBeatmapSelection()
-        {
-            if (selectionDebounce?.State == ScheduledDelegate.RunState.Waiting)
-                selectionDebounce?.RunTask();
         }
 
         private bool ensureGlobalBeatmapValid()
@@ -548,6 +538,12 @@ namespace osu.Game.Screens.SelectV2
             finaliseBeatmapSelection();
 
             return validSelection;
+
+            void finaliseBeatmapSelection()
+            {
+                if (selectionDebounce?.State == ScheduledDelegate.RunState.Waiting)
+                    selectionDebounce?.RunTask();
+            }
         }
 
         private bool checkBeatmapValidForSelection(BeatmapInfo beatmap, FilterCriteria? criteria)
@@ -789,7 +785,12 @@ namespace osu.Game.Screens.SelectV2
             // but also in this case we want support for formatting a number within a string).
             filterControl.StatusText = count != 1 ? $"{count:#,0} matches" : $"{count:#,0} match";
 
-            ensureGlobalBeatmapValid();
+            // If there's already a selection update in progress, let's not interrupt it.
+            // Interrupting could cause the debounce interval to be reduced.
+            //
+            // `ensureGlobalBeatmapValid` is run post-selection which will resolve any pending incompatibilities (see `Beatmap` bindable callback).
+            if (selectionDebounce?.State != ScheduledDelegate.RunState.Waiting)
+                ensureGlobalBeatmapValid();
 
             updateWedgeVisibility();
         }
@@ -849,7 +850,7 @@ namespace osu.Game.Screens.SelectV2
             // For simplicity, disable this functionality on mobile.
             bool isTouchInput = e.CurrentState.Mouse.LastSource is ISourcedFromTouch;
 
-            if (e.PressedButtons.SequenceEqual([MouseButton.Left]) && !isTouchInput && mouseDownPriority)
+            if (!carousel.AbsoluteScrolling && !isTouchInput && mouseDownPriority)
             {
                 revealingBackground = Scheduler.AddDelayed(() =>
                 {
