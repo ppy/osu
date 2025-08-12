@@ -6,6 +6,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -295,7 +296,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("enable automatic adjust", () => localConfig.SetValue(OsuSetting.AutomaticallyAdjustBeatmapOffset, true));
             AddAssert("offset zero", () => offsetControl.Current.Value == 0);
 
-            AddStep("Set reference score", () =>
+            AddStep("set reference score", () =>
             {
                 offsetControl.ReferenceScore.Value = new ScoreInfo
                 {
@@ -304,8 +305,30 @@ namespace osu.Game.Tests.Visual.Gameplay
                 };
             });
 
-            AddAssert("No calibration button", () => !offsetControl.ChildrenOfType<SettingsButton>().Any(b => b.IsPresent));
+            AddAssert("no calibration button", () => !offsetControl.ChildrenOfType<SettingsButton>().Any(b => b.IsPresent));
+            AddAssert("offset adjustment text displayed", () => offsetControl.ChildrenOfType<IHasText>().Any(t => t.Text.ToString().Contains("adjusted")));
             AddAssert("offset adjusted", () => offsetControl.Current.Value == -average_error);
+
+            AddStep("set reference score", () =>
+            {
+                offsetControl.ReferenceScore.Value = new ScoreInfo
+                {
+                    HitEvents = TestSceneHitEventTimingDistributionGraph.CreateDistributedHitEvents(0),
+                    BeatmapInfo = Beatmap.Value.BeatmapInfo,
+                };
+            });
+
+            AddAssert("no calibration button", () => !offsetControl.ChildrenOfType<SettingsButton>().Any(b => b.IsPresent));
+            AddAssert("offset adjustment text not displayed", () => !offsetControl.ChildrenOfType<IHasText>().Any(t => t.Text.ToString().Contains("adjusted")));
+            AddAssert("offset still", () => offsetControl.Current.Value == -average_error);
+
+            AddStep("adjust offset manually", () => offsetControl.Current.Value = 0);
+            AddAssert("calibration button displayed", () => offsetControl.ChildrenOfType<SettingsButton>().Any(b => b.IsPresent));
+
+            AddUntilStep("has calibration button", () => offsetControl.ChildrenOfType<SettingsButton>().Any());
+            AddStep("press button", () => offsetControl.ChildrenOfType<SettingsButton>().Single().TriggerClick());
+            AddAssert("offset adjusted", () => offsetControl.Current.Value == -average_error);
+            AddUntilStep("button is disabled", () => !offsetControl.ChildrenOfType<SettingsButton>().Single().Enabled.Value);
         }
 
         [Test]
