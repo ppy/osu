@@ -39,8 +39,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             hitWindows.SetDifficulty(5);
         }
 
-        [SetUpSteps]
-        public void SetUp()
+        public override void SetUpSteps()
         {
             AddStep("Reset Score Processor", () => scoreProcessor.Reset());
             base.SetUpSteps();
@@ -87,16 +86,12 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddRepeatStep("Set UR to 250", () => applyJudgement(25, true), 4);
 
-            base.SetUpSteps();
-
             AddUntilStep("UR = 250", () => this.ChildrenOfType<UnstableRateCounter>().All(c => c.Current.Value == 250));
         }
 
         [Test]
         public void TestStaticRateChange()
         {
-            base.SetUpSteps();
-
             AddRepeatStep("Set UR to 250 at 1.5x", () => applyJudgement(25, true, 1.5), 4);
 
             AddUntilStep("UR = 250/1.5", () => this.ChildrenOfType<UnstableRateCounter>().All(c => c.Current.Value == (int)Math.Round(250.0 / 1.5)));
@@ -105,8 +100,6 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestDynamicRateChange()
         {
-            base.SetUpSteps();
-
             AddRepeatStep("Set UR to 100 at 1.0x", () => applyJudgement(10, true, 1.0), 4);
             AddRepeatStep("Bring UR to 100 at 1.5x", () => applyJudgement(15, true, 1.5), 4);
 
