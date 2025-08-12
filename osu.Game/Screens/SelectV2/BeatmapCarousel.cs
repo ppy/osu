@@ -102,7 +102,7 @@ namespace osu.Game.Screens.SelectV2
             {
                 new BeatmapCarouselFilterMatching(() => Criteria!),
                 new BeatmapCarouselFilterSorting(() => Criteria!),
-                grouping = new BeatmapCarouselFilterGrouping(() => Criteria!, getDetachedCollections, buildTopRankMapping)
+                grouping = new BeatmapCarouselFilterGrouping(() => Criteria!, getDetachedCollections, getTopRanksMapping)
             };
 
             AddInternal(loading = new LoadingLayer());
@@ -625,14 +625,14 @@ namespace osu.Game.Screens.SelectV2
 
         #endregion
 
-        #region Grouping
+        #region Database fetches for grouping support
 
         [Resolved]
         private RealmAccess realm { get; set; } = null!;
 
-        private List<BeatmapCollection> getDetachedCollections() => realm.Run(r => r.All<BeatmapCollection>().Detach());
+        private List<BeatmapCollection> getDetachedCollections() => realm.Run(r => r.All<BeatmapCollection>().AsEnumerable().Detach());
 
-        private Dictionary<Guid, ScoreRank> buildTopRankMapping(int? localUserId, string? ruleset) => realm.Run(r =>
+        private Dictionary<Guid, ScoreRank> getTopRanksMapping(FilterCriteria criteria) => realm.Run(r =>
         {
             var topRankMapping = new Dictionary<Guid, ScoreRank>();
 
@@ -640,7 +640,7 @@ namespace osu.Game.Screens.SelectV2
                                   .Filter($"{nameof(ScoreInfo.User)}.{nameof(RealmUser.OnlineID)} == $0"
                                           + $" && {nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.Hash)} == {nameof(ScoreInfo.BeatmapHash)}"
                                           + $" && {nameof(ScoreInfo.Ruleset)}.{nameof(RulesetInfo.ShortName)} == $1"
-                                          + $" && {nameof(ScoreInfo.DeletePending)} == false", localUserId, ruleset)
+                                          + $" && {nameof(ScoreInfo.DeletePending)} == false", criteria.LocalUserId, criteria.Ruleset?.ShortName)
                                   .OrderByDescending(s => s.TotalScore)
                                   .ThenBy(s => s.Date);
 

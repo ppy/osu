@@ -40,14 +40,14 @@ namespace osu.Game.Screens.SelectV2
         private Dictionary<GroupDefinition, HashSet<CarouselItem>> groupMap = new Dictionary<GroupDefinition, HashSet<CarouselItem>>();
 
         private readonly Func<FilterCriteria> getCriteria;
-        private readonly GetDetachedCollectionsDelegate getDetachedCollections;
-        private readonly BuildTopRankMappingDelegate buildTopRankMapping;
+        private readonly Func<List<BeatmapCollection>> getCollections;
+        private readonly Func<FilterCriteria, IReadOnlyDictionary<Guid, ScoreRank>> getLocalUserTopRanks;
 
-        public BeatmapCarouselFilterGrouping(Func<FilterCriteria> getCriteria, GetDetachedCollectionsDelegate getDetachedCollections, BuildTopRankMappingDelegate buildTopRankMapping)
+        public BeatmapCarouselFilterGrouping(Func<FilterCriteria> getCriteria, Func<List<BeatmapCollection>> getCollections, Func<FilterCriteria, IReadOnlyDictionary<Guid, ScoreRank>> getLocalUserTopRanks)
         {
             this.getCriteria = getCriteria;
-            this.getDetachedCollections = getDetachedCollections;
-            this.buildTopRankMapping = buildTopRankMapping;
+            this.getCollections = getCollections;
+            this.getLocalUserTopRanks = getLocalUserTopRanks;
         }
 
         public async Task<List<CarouselItem>> Run(IEnumerable<CarouselItem> items, CancellationToken cancellationToken)
@@ -190,7 +190,7 @@ namespace osu.Game.Screens.SelectV2
                         var date = b.LastPlayed;
 
                         if (BeatmapSetsGroupedTogether)
-                            date = aggregateMax(b, static b => (b.LastPlayed ?? DateTimeOffset.MinValue));
+                            date = aggregateMax(b, static b => b.LastPlayed ?? DateTimeOffset.MinValue);
 
                         if (date == null || date == DateTimeOffset.MinValue)
                             return new GroupDefinition(int.MaxValue, "Never");
@@ -231,7 +231,7 @@ namespace osu.Game.Screens.SelectV2
 
                 case GroupMode.Collections:
                 {
-                    var collections = getDetachedCollections();
+                    var collections = getCollections();
                     return getGroupsBy(b => defineGroupByCollection(b, collections), items);
                 }
 
@@ -240,7 +240,7 @@ namespace osu.Game.Screens.SelectV2
 
                 case GroupMode.RankAchieved:
                 {
-                    var topRankMapping = buildTopRankMapping(criteria.LocalUserId, criteria.Ruleset?.ShortName);
+                    var topRankMapping = getLocalUserTopRanks(criteria);
                     return getGroupsBy(b => defineGroupByRankAchieved(b, topRankMapping), items);
                 }
 
@@ -440,9 +440,5 @@ namespace osu.Game.Screens.SelectV2
         }
 
         private record GroupMapping(GroupDefinition? Group, List<CarouselItem> ItemsInGroup);
-
-        public delegate List<BeatmapCollection> GetDetachedCollectionsDelegate();
-
-        public delegate IReadOnlyDictionary<Guid, ScoreRank> BuildTopRankMappingDelegate(int? localUserId, string? ruleset);
     }
 }

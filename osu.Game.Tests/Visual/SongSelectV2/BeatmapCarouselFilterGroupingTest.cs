@@ -368,7 +368,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             var groupingFilter = new BeatmapCarouselFilterGrouping(
                 () => new FilterCriteria { Group = group },
                 () => new List<BeatmapCollection>(),
-                (_, _) => new Dictionary<Guid, ScoreRank>());
+                _ => new Dictionary<Guid, ScoreRank>());
 
             return await groupingFilter.Run(beatmapSets.SelectMany(s => s.Beatmaps.Select(b => new CarouselItem(b))).ToList(), CancellationToken.None);
         }
