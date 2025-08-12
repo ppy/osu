@@ -72,6 +72,11 @@ namespace osu.Game.Graphics.Carousel
         public bool IsFiltering => !filterTask.IsCompleted;
 
         /// <summary>
+        /// Whether absolute scrolling is currently triggered.
+        /// </summary>
+        public bool AbsoluteScrolling => Scroll.AbsoluteScrolling;
+
+        /// <summary>
         /// The number of times filter operations have been triggered.
         /// </summary>
         internal int FilterCount { get; private set; }
