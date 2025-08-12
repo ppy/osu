@@ -93,6 +93,16 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         /// </summary>
         public IEnumerable<Drawable> Content => cellContainer.OrderBy(c => c.FacadeIndex).Select(c => c.Content);
 
+        /// <summary>
+        /// Gets the maximised or the room host's cell.
+        /// </summary>
+        public Cell? GetMaximisedCell() => cellContainer.FirstOrDefault(c => c.IsMaximised);
+
+        /// <summary>
+        /// Gets all cells in the grid.
+        /// </summary>
+        public IReadOnlyList<Cell> GetAllCells() => cellContainer.OrderBy(c => c.FacadeIndex).ToList();
+
         // A depth value that gets decremented every time a new instance is maximised in order to reduce underlaps.
         private float maximisedInstanceDepth;
 

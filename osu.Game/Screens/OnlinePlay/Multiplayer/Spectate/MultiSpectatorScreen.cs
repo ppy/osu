@@ -178,17 +178,35 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         {
             base.Update();
 
-            if (!isCandidateAudioSource(currentAudioSource?.SpectatorPlayerClock))
-            {
-                currentAudioSource = instances.Where(i => isCandidateAudioSource(i.SpectatorPlayerClock)).MinBy(i => Math.Abs(i.SpectatorPlayerClock.CurrentTime - syncManager.CurrentMasterTime));
+            var maximisedPlayer = getMaximisedPlayer();
+            PlayerArea? candidateAudioSource = null;
 
-                // Only bind adjustments if there's actually a valid source, else just use the previous ones to ensure no sudden changes to audio.
-                if (currentAudioSource != null)
-                    bindAudioAdjustments(currentAudioSource);
+            if (maximisedPlayer != null && isCandidateAudioSource(maximisedPlayer.SpectatorPlayerClock))
+                candidateAudioSource = maximisedPlayer;
+            else if (!isCandidateAudioSource(currentAudioSource?.SpectatorPlayerClock))
+                candidateAudioSource = instances.Where(i => isCandidateAudioSource(i.SpectatorPlayerClock)).MinBy(i => Math.Abs(i.SpectatorPlayerClock.CurrentTime - syncManager.CurrentMasterTime));
+
+            if (candidateAudioSource != null && candidateAudioSource != currentAudioSource)
+            {
+                currentAudioSource = candidateAudioSource;
+                bindAudioAdjustments(currentAudioSource);
 
                 foreach (var instance in instances)
                     instance.Mute = instance != currentAudioSource;
             }
+        }
+
+        private PlayerArea? getMaximisedPlayer()
+        {
+            var cells = grid.GetAllCells();
+
+            for (int i = 0; i < instances.Length && i < cells.Count; i++)
+            {
+                if (cells[i].IsMaximised)
+                    return instances[i];
+            }
+
+            return null;
         }
 
         private void bindAudioAdjustments(PlayerArea first)
