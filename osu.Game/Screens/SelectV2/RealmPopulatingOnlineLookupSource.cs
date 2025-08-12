@@ -13,6 +13,7 @@ using osu.Game.Extensions;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
+using Realms;
 
 namespace osu.Game.Screens.SelectV2
 {
@@ -57,46 +58,49 @@ namespace osu.Game.Screens.SelectV2
                     return;
                 }
 
-                var tagsById = (onlineBeatmapSet.RelatedTags ?? []).ToDictionary(t => t.Id);
-                var onlineBeatmaps = onlineBeatmapSet.Beatmaps.ToDictionary(b => b.OnlineID);
-                await realm.WriteAsync(r =>
-                {
-                    var beatmapSet = r.All<BeatmapSetInfo>().Where(b => b.OnlineID == id);
-
-                    foreach (var dbBeatmapSet in beatmapSet)
-                    {
-                        dbBeatmapSet.Status = onlineBeatmapSet.Status;
-
-                        foreach (var dbBeatmap in dbBeatmapSet.Beatmaps)
-                        {
-                            if (onlineBeatmaps.TryGetValue(dbBeatmap.OnlineID, out var onlineBeatmap))
-                            {
-                                // compare `BeatmapUpdaterMetadataLookup`
-                                dbBeatmap.OnlineMD5Hash = onlineBeatmap.MD5Hash;
-                                dbBeatmap.LastOnlineUpdate = onlineBeatmap.LastUpdated;
-
-                                if (dbBeatmap.MatchesOnlineVersion)
-                                    dbBeatmap.Status = onlineBeatmap.Status;
-
-                                string[] userTagsArray = onlineBeatmap.TopTags?
-                                                                      .Select(t => (topTag: t, relatedTag: tagsById.GetValueOrDefault(t.TagId)))
-                                                                      .Where(t => t.relatedTag != null)
-                                                                      // see https://github.com/ppy/osu-web/blob/bb3bd2e7c6f84f26066df5ea20a81c77ec9bb60a/resources/js/beatmapsets-show/controller.ts#L103-L106 for sort criteria
-                                                                      .OrderByDescending(t => t.topTag.VoteCount)
-                                                                      .ThenBy(t => t.relatedTag!.Name)
-                                                                      .Select(t => t.relatedTag!.Name)
-                                                                      .ToArray() ?? [];
-                                dbBeatmap.Metadata.UserTags.Clear();
-                                dbBeatmap.Metadata.UserTags.AddRange(userTagsArray);
-                            }
-                        }
-                    }
-                }).ConfigureAwait(true);
+                await realm.WriteAsync(r => updateRealmBeatmapSet(r, onlineBeatmapSet)).ConfigureAwait(true);
                 tcs.SetResult(onlineBeatmapSet);
             };
             request.Failure += tcs.SetException;
             api.Queue(request);
             return tcs.Task;
+        }
+
+        private static void updateRealmBeatmapSet(Realm r, APIBeatmapSet onlineBeatmapSet)
+        {
+            var tagsById = (onlineBeatmapSet.RelatedTags ?? []).ToDictionary(t => t.Id);
+            var onlineBeatmaps = onlineBeatmapSet.Beatmaps.ToDictionary(b => b.OnlineID);
+
+            var dbBeatmapSets = r.All<BeatmapSetInfo>().Where(b => b.OnlineID == onlineBeatmapSet.OnlineID);
+
+            foreach (var dbBeatmapSet in dbBeatmapSets)
+            {
+                dbBeatmapSet.Status = onlineBeatmapSet.Status;
+
+                foreach (var dbBeatmap in dbBeatmapSet.Beatmaps)
+                {
+                    if (onlineBeatmaps.TryGetValue(dbBeatmap.OnlineID, out var onlineBeatmap))
+                    {
+                        // compare `BeatmapUpdaterMetadataLookup`
+                        dbBeatmap.OnlineMD5Hash = onlineBeatmap.MD5Hash;
+                        dbBeatmap.LastOnlineUpdate = onlineBeatmap.LastUpdated;
+
+                        if (dbBeatmap.MatchesOnlineVersion)
+                            dbBeatmap.Status = onlineBeatmap.Status;
+
+                        string[] userTagsArray = onlineBeatmap.TopTags?
+                                                              .Select(t => (topTag: t, relatedTag: tagsById.GetValueOrDefault(t.TagId)))
+                                                              .Where(t => t.relatedTag != null)
+                                                              // see https://github.com/ppy/osu-web/blob/bb3bd2e7c6f84f26066df5ea20a81c77ec9bb60a/resources/js/beatmapsets-show/controller.ts#L103-L106 for sort criteria
+                                                              .OrderByDescending(t => t.topTag.VoteCount)
+                                                              .ThenBy(t => t.relatedTag!.Name)
+                                                              .Select(t => t.relatedTag!.Name)
+                                                              .ToArray() ?? [];
+                        dbBeatmap.Metadata.UserTags.Clear();
+                        dbBeatmap.Metadata.UserTags.AddRange(userTagsArray);
+                    }
+                }
+            }
         }
     }
 }
