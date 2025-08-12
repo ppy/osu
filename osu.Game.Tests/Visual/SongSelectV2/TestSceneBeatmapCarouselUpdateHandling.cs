@@ -6,8 +6,10 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Testing;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Extensions;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.Select.Filter;
 using osu.Game.Screens.SelectV2;
@@ -59,6 +61,35 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             WaitForFiltering();
             AddAssert("drawables unchanged", () => Carousel.ChildrenOfType<Panel>(), () => Is.EqualTo(originalDrawables));
+        }
+
+        [Test]
+        public void TestScrollPositionMaintainedWhenSetUpdated()
+        {
+            PanelBeatmapSet panel = null!;
+
+            AddStep("find panel", () => panel = Carousel.ChildrenOfType<PanelBeatmapSet>().Single(p => p.ChildrenOfType<OsuSpriteText>().Any(t => t.Text.ToString() == "beatmap")));
+
+            AddStep("select panel", () => panel.TriggerClick());
+
+            AddStep("scroll to end", () =>
+            {
+                // must trigger a user scroll so that carousel doesn't follow the selection.
+                InputManager.MoveMouseTo(Carousel);
+                InputManager.ScrollVerticalBy(-1000);
+            });
+
+            AddUntilStep("is scrolled to end", () => Carousel.ChildrenOfType<UserTrackingScrollContainer>().Single().IsScrolledToEnd());
+
+            updateBeatmap(b => b.Metadata = new BeatmapMetadata
+            {
+                Artist = "updated test",
+                Title = $"beatmap {RNG.Next().ToString()}"
+            });
+
+            WaitForFiltering();
+
+            AddAssert("scroll is still at end", () => Carousel.ChildrenOfType<UserTrackingScrollContainer>().Single().IsScrolledToEnd());
         }
 
         [Test]
