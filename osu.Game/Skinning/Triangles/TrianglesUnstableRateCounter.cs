@@ -21,8 +21,15 @@ namespace osu.Game.Skinning.Triangles
         private void load(OsuColour colours)
         {
             Colour = colours.BlueLighter;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
             IsValid.BindValueChanged(e =>
-                DrawableCount.FadeTo(e.NewValue ? 1 : alpha_when_invalid, 1000, Easing.OutQuint));
+                DrawableCount.FadeTo(e.NewValue ? 1 : alpha_when_invalid, 1000, Easing.OutQuint), true);
+            FinishTransforms(true);
         }
 
         protected override IHasText CreateText() => new TextComponent

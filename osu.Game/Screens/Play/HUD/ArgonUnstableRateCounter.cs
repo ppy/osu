@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
@@ -31,10 +30,12 @@ namespace osu.Game.Screens.Play.HUD
         [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.ShowLabel))]
         public Bindable<bool> ShowLabel { get; } = new BindableBool(true);
 
-        [BackgroundDependencyLoader]
-        private void load()
+        protected override void LoadComplete()
         {
-            IsValid.BindValueChanged(v => text.FadeTo(v.NewValue ? 1 : alpha_when_invalid, 1000, Easing.OutQuint));
+            base.LoadComplete();
+
+            IsValid.BindValueChanged(v => text.FadeTo(v.NewValue ? 1 : alpha_when_invalid, 1000, Easing.OutQuint), true);
+            FinishTransforms(true);
         }
 
         public override int DisplayedCount
