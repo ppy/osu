@@ -11,6 +11,7 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Graphics.Carousel;
+using osu.Game.Scoring;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
 using osu.Game.Screens.SelectV2;
@@ -364,7 +365,11 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
         private static async Task<List<CarouselItem>> runGrouping(GroupMode group, List<BeatmapSetInfo> beatmapSets)
         {
-            var groupingFilter = new BeatmapCarouselFilterGrouping(() => new FilterCriteria { Group = group }, () => new List<BeatmapCollection>());
+            var groupingFilter = new BeatmapCarouselFilterGrouping(
+                () => new FilterCriteria { Group = group },
+                () => new List<BeatmapCollection>(),
+                _ => new Dictionary<Guid, ScoreRank>());
+
             return await groupingFilter.Run(beatmapSets.SelectMany(s => s.Beatmaps.Select(b => new CarouselItem(b))).ToList(), CancellationToken.None);
         }
 
