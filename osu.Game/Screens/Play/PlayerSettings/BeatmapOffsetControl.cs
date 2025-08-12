@@ -266,11 +266,15 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
             if (config.Get<bool>(OsuSetting.AutomaticallyAdjustBeatmapOffset))
             {
-                applySuggestedOffset(proportionalToUnstableRate: true);
+                bool offsetChanged = applySuggestedOffset(proportionalToUnstableRate: true);
+
                 calibrateFromLastPlayButton.Hide();
 
-                offsetText.AddText($"Beatmap offset has automatically been adjusted to {Current.Value.ToStandardFormattedString(1)} ms.", t => t.Font = OsuFont.Style.Caption1);
-                offsetText.NewParagraph();
+                if (offsetChanged)
+                {
+                    offsetText.AddText($"Beatmap offset was adjusted to {Current.Value.ToStandardFormattedString(1)} ms.", t => t.Font = OsuFont.Style.Caption1);
+                    offsetText.NewParagraph();
+                }
             }
 
             offsetText.AddText("You can also ", t => t.Font = OsuFont.Style.Caption2);
@@ -278,7 +282,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
             offsetText.AddText(" based off this play.", t => t.Font = OsuFont.Style.Caption2);
         }
 
-        private void applySuggestedOffset(bool proportionalToUnstableRate)
+        private bool applySuggestedOffset(bool proportionalToUnstableRate)
         {
             const double ur_adjustment_cutoff = 90;
             const double exponential_factor = -0.0116;
@@ -292,6 +296,8 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
             Current.Value = lastPlayBeatmapOffset - offsetAdjustment;
             lastAppliedScore.Value = lastValidScore;
+
+            return Math.Abs(Current.Value - lastPlayBeatmapOffset) > Current.Precision;
         }
 
         [Resolved]
