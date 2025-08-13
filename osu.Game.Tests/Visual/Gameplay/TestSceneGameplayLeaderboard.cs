@@ -66,6 +66,18 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("toggle black background", () => blackBackground?.FadeTo(1 - blackBackground.Alpha, 300, Easing.OutQuint));
 
+            AddSliderStep("leaderboard width", 0, 800, 300, v =>
+            {
+                if (leaderboard.IsNotNull())
+                    leaderboard.Width = v;
+            });
+
+            AddSliderStep("leaderboard height", 0, 1000, 300, v =>
+            {
+                if (leaderboard.IsNotNull())
+                    leaderboard.Height = v;
+            });
+
             AddSliderStep("set player score", 50, 1_000_000, 700_000, v => gameplayState.ScoreProcessor.TotalScore.Value = v);
         }
 
