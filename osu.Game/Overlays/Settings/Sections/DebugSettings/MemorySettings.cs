@@ -13,12 +13,13 @@ using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Database;
+using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.DebugSettings
 {
     public partial class MemorySettings : SettingsSubsection
     {
-        protected override LocalisableString Header => @"Memory";
+        protected override LocalisableString Header => DebugSettingsStrings.MemoryHeader;
 
         [BackgroundDependencyLoader]
         private void load(GameHost host, RealmAccess realm)
@@ -28,7 +29,7 @@ namespace osu.Game.Overlays.Settings.Sections.DebugSettings
 
             Add(new SettingsButton
             {
-                Text = @"Clear all caches",
+                Text = DebugSettingsStrings.ClearAllCaches,
                 Action = () =>
                 {
                     host.Collect();
@@ -41,7 +42,7 @@ namespace osu.Game.Overlays.Settings.Sections.DebugSettings
             SettingsEnumDropdown<GCLatencyMode> latencyModeDropdown;
             Add(latencyModeDropdown = new SettingsEnumDropdown<GCLatencyMode>
             {
-                LabelText = "GC mode",
+                LabelText = DebugSettingsStrings.GarbageCollectorMode,
             });
 
             latencyModeDropdown.Current.BindValueChanged(mode =>
@@ -130,7 +131,10 @@ namespace osu.Game.Overlays.Settings.Sections.DebugSettings
 
         private enum GCLatencyMode
         {
+            [LocalisableDescription(typeof(CommonStrings), nameof(CommonStrings.Default))]
             Default,
+
+            [LocalisableDescription(typeof(DebugSettingsStrings), nameof(DebugSettingsStrings.Interactive))]
             Interactive,
         }
     }

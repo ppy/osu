@@ -6,13 +6,14 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
+using osu.Game.Localisation;
 using osu.Game.Overlays.Settings.Sections.DebugSettings;
 
 namespace osu.Game.Overlays.Settings.Sections
 {
     public partial class DebugSection : SettingsSection
     {
-        public override LocalisableString Header => @"Debug";
+        public override LocalisableString Header => DebugSettingsStrings.DebugSectionHeader;
 
         public override Drawable CreateIcon() => new SpriteIcon
         {
