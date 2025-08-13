@@ -155,6 +155,10 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.Update();
 
+            // limit leaderboard dimensions to a sane minimum.
+            Width = Math.Max(Width, Flow.X + DrawableGameplayLeaderboardScore.MIN_WIDTH);
+            Height = Math.Max(Height, DrawableGameplayLeaderboardScore.PANEL_HEIGHT);
+
             requiresScroll = Flow.DrawHeight > Height;
 
             if (requiresScroll && TrackedScore != null)

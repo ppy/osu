@@ -27,6 +27,7 @@ namespace osu.Game.Screens.Play.HUD
 {
     public partial class DrawableGameplayLeaderboardScore : CompositeDrawable
     {
+        public const float MIN_WIDTH = extended_left_panel_width + avatar_size / 2 + 5;
 
         private const float left_panel_extension_width = 20;
 
