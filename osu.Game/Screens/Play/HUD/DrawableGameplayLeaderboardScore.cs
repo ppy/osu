@@ -10,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Layout;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -26,13 +27,11 @@ namespace osu.Game.Screens.Play.HUD
 {
     public partial class DrawableGameplayLeaderboardScore : CompositeDrawable
     {
-        public const float EXTENDED_WIDTH = extended_left_panel_width + right_panel_width;
 
         private const float left_panel_extension_width = 20;
 
         private const float regular_left_panel_width = avatar_size + avatar_size / 2;
         private const float extended_left_panel_width = regular_left_panel_width + left_panel_extension_width;
-        private const float right_panel_width = 180;
 
         private const float avatar_size = PANEL_HEIGHT;
 
@@ -98,6 +97,8 @@ namespace osu.Game.Screens.Play.HUD
         [Resolved]
         private OsuColour colours { get; set; } = null!;
 
+        private readonly LayoutValue drawSizeLayout = new LayoutValue(Invalidation.DrawSize);
+
         /// <summary>
         /// Creates a new <see cref="DrawableGameplayLeaderboardScore"/>.
         /// </summary>
@@ -116,10 +117,12 @@ namespace osu.Game.Screens.Play.HUD
             if (score.TeamColour != null)
                 BackgroundColour = score.TeamColour.Value;
 
-            AutoSizeAxes = Axes.X;
+            RelativeSizeAxes = Axes.X;
             Height = PANEL_HEIGHT;
 
             Shear = OsuGame.SHEAR;
+
+            AddLayout(drawSizeLayout);
         }
 
         [BackgroundDependencyLoader]
@@ -198,7 +201,6 @@ namespace osu.Game.Screens.Play.HUD
                     },
                     rightLayer = new Container
                     {
-                        Width = right_panel_width,
                         RelativeSizeAxes = Axes.Y,
                         // negative left margin to make the X position of the right layer directly at the avatar center (rendered behind it).
                         Margin = new MarginPadding { Left = -avatar_size / 2 },
@@ -210,8 +212,7 @@ namespace osu.Game.Screens.Play.HUD
                             },
                             scoreComponents = new Container
                             {
-                                Width = right_panel_width,
-                                RelativeSizeAxes = Axes.Y,
+                                RelativeSizeAxes = Axes.Both,
                                 Padding = new MarginPadding { Left = avatar_size / 2 + 4, Right = 20, Vertical = 5 },
                                 Shear = -OsuGame.SHEAR,
                                 Children = new Drawable[]
@@ -222,7 +223,7 @@ namespace osu.Game.Screens.Play.HUD
                                         AutoSizeAxes = Axes.Y,
                                         ColumnDimensions = new[]
                                         {
-                                            new Dimension(),
+                                            new Dimension(minSize: 1), // todo: zero width truncating text renders in a broken way for some reason.
                                             new Dimension(GridSizeMode.Absolute, 10),
                                             new Dimension(GridSizeMode.AutoSize),
                                         },
@@ -252,27 +253,42 @@ namespace osu.Game.Screens.Play.HUD
                                             }
                                         },
                                     },
-                                    new Container
+                                    new GridContainer
                                     {
                                         Anchor = Anchor.BottomLeft,
                                         Origin = Anchor.BottomLeft,
                                         RelativeSizeAxes = Axes.X,
                                         AutoSizeAxes = Axes.Y,
-                                        Children = new[]
+                                        ColumnDimensions = new[]
                                         {
-                                            scoreText = new OsuSpriteText
+                                            new Dimension(minSize: 1), // todo: zero width truncating text renders in a broken way for some reason.
+                                            new Dimension(GridSizeMode.Absolute, 10),
+                                            new Dimension(GridSizeMode.AutoSize),
+                                        },
+                                        RowDimensions = new[]
+                                        {
+                                            new Dimension(GridSizeMode.AutoSize),
+                                        },
+                                        Content = new[]
+                                        {
+                                            new[]
                                             {
-                                                Anchor = Anchor.BottomLeft,
-                                                Origin = Anchor.BottomLeft,
-                                                Font = OsuFont.Style.Body.With(weight: FontWeight.Regular),
-                                            },
-                                            comboText = new OsuSpriteText
-                                            {
-                                                Anchor = Anchor.BottomRight,
-                                                Origin = Anchor.BottomRight,
-                                                Font = OsuFont.Style.Caption2.With(weight: FontWeight.SemiBold),
-                                            },
-                                        }
+                                                scoreText = new TruncatingSpriteText
+                                                {
+                                                    Anchor = Anchor.BottomLeft,
+                                                    Origin = Anchor.BottomLeft,
+                                                    Font = OsuFont.Style.Body.With(weight: FontWeight.Regular),
+                                                    RelativeSizeAxes = Axes.X,
+                                                },
+                                                Empty(),
+                                                comboText = new OsuSpriteText
+                                                {
+                                                    Anchor = Anchor.BottomRight,
+                                                    Origin = Anchor.BottomRight,
+                                                    Font = OsuFont.Style.Caption2.With(weight: FontWeight.SemiBold),
+                                                },
+                                            }
+                                        },
                                     },
                                 },
                             }
@@ -311,7 +327,7 @@ namespace osu.Game.Screens.Play.HUD
         {
             if (expanded.NewValue)
             {
-                rightLayer.ResizeWidthTo(right_panel_width, panel_transition_duration, Easing.OutQuint);
+                rightLayer.ResizeWidthTo(computeRightLayerWidth(), panel_transition_duration, Easing.OutQuint);
                 scoreComponents.FadeIn(panel_transition_duration, Easing.OutQuint);
             }
             else
@@ -370,6 +386,24 @@ namespace osu.Game.Screens.Play.HUD
             rightLayerGradient.Colour = ColourInfo.GradientVertical(colours.Blue4.Opacity(0.25f), colours.Blue3.Opacity(0.6f));
             scorePanel.BorderColour = ColourInfo.GradientVertical(colours.Blue1.Opacity(0.2f), colours.Blue1);
         }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (!drawSizeLayout.IsValid)
+            {
+                if (Expanded.Value)
+                {
+                    rightLayer.ClearTransforms(targetMember: nameof(Width));
+                    rightLayer.Width = computeRightLayerWidth();
+                }
+
+                drawSizeLayout.Validate();
+            }
+        }
+
+        private float computeRightLayerWidth() => Math.Max(0, DrawWidth - extended_left_panel_width - avatar_size / 2);
 
         private partial class ScoreAvatar : CompositeDrawable
         {
