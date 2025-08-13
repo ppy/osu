@@ -162,5 +162,23 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddAssert("statistics still visible", () => display.ChildrenOfType<BeatmapTitleWedge.StatisticDifficulty>().First().Parent!.Alpha == 1);
             AddAssert("tiny statistics still hidden", () => display.ChildrenOfType<GridContainer>().Last().Alpha == 0);
         }
+
+        [Test]
+        public void TestMaximumLength()
+        {
+            AddStep("setup auto size", () => Child = display = new BeatmapTitleWedge.DifficultyStatisticsDisplay(true)
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+            });
+
+            AddStep("set long statistics", () => display.Statistics = new[]
+            {
+                new BeatmapTitleWedge.StatisticDifficulty.Data("Very Long Statistic 1", 0.2f, 0.2f, 1f),
+                new BeatmapTitleWedge.StatisticDifficulty.Data("Very Long Statistic 2", 0.7f, 0.7f, 1f),
+                new BeatmapTitleWedge.StatisticDifficulty.Data("Very Long Statistic 3", 0.4f, 0.8f, 1f),
+                new BeatmapTitleWedge.StatisticDifficulty.Data("Very Long Statistic 4", 0.3f, 0.3f, 1f),
+            });
+        }
     }
 }

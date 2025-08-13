@@ -85,7 +85,7 @@ namespace osu.Game.Rulesets.Mods
             flashlight.Colour = Color4.Black;
 
             flashlight.Combo.BindTo(Combo);
-            flashlight.GetPlayfieldScale = () => drawableRuleset.Playfield.Scale;
+            flashlight.GetPlayfieldScale = () => drawableRuleset.PlayfieldAdjustmentContainer.Scale;
 
             drawableRuleset.Overlays.Add(new Container
             {

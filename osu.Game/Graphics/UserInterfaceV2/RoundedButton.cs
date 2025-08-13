@@ -54,7 +54,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
         {
             // Many buttons have local colours, but this provides a sane default for all other cases.
             DefaultBackgroundColour = overlayColourProvider?.Colour3 ?? colours.Blue3;
-            triangleGradientSecondColour ??= overlayColourProvider?.Colour1 ?? colours.Blue3.Lighten(0.2f);
+            triangleGradientSecondColour ??= DefaultBackgroundColour.Lighten(0.2f);
         }
 
         protected override void LoadComplete()

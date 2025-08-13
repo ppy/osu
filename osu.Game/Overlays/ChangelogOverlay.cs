@@ -76,16 +76,18 @@ namespace osu.Game.Overlays
             Show();
         }
 
-        public void ShowBuild([NotNull] string updateStream, [NotNull] string version)
+        public void ShowBuild([NotNull] string version)
         {
-            ArgumentNullException.ThrowIfNull(updateStream);
             ArgumentNullException.ThrowIfNull(version);
 
             Show();
 
             performAfterFetch(() =>
             {
-                var build = builds.Find(b => b.Version == version && b.UpdateStream.Name == updateStream)
+                string versionPart = version.Split('-')[0];
+                string updateStream = version.Split('-')[1];
+
+                var build = builds.Find(b => b.Version == versionPart && b.UpdateStream.Name == updateStream)
                             ?? Streams.Find(s => s.Name == updateStream)?.LatestBuild;
 
                 if (build != null)
