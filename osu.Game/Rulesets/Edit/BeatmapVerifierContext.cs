@@ -45,25 +45,18 @@ namespace osu.Game.Rulesets.Edit
         /// </summary>
         public IEnumerable<VerifiedBeatmap> AllDifficulties => OtherDifficulties.Prepend(CurrentDifficulty);
 
-        public BeatmapVerifierContext(VerifiedBeatmap currentDifficulty, DifficultyRating difficultyRating = DifficultyRating.ExpertPlus, IReadOnlyList<VerifiedBeatmap>? otherDifficulties = null)
+        public BeatmapVerifierContext(VerifiedBeatmap currentDifficulty, IReadOnlyList<VerifiedBeatmap> otherDifficulties, DifficultyRating difficultyRating)
         {
             CurrentDifficulty = currentDifficulty;
             InterpretedDifficulty = difficultyRating;
-            OtherDifficulties = otherDifficulties ?? new List<VerifiedBeatmap>();
-        }
-
-        public BeatmapVerifierContext(VerifiedBeatmap currentDifficulty, IReadOnlyList<VerifiedBeatmap>? otherDifficulties = null)
-        {
-            CurrentDifficulty = currentDifficulty;
-            InterpretedDifficulty = DifficultyRating.ExpertPlus;
-            OtherDifficulties = otherDifficulties ?? new List<VerifiedBeatmap>();
+            OtherDifficulties = otherDifficulties;
         }
 
         /// <summary>
         /// Backwards-compatible constructor that allows creating a context from a single playable and working beatmap.
         /// </summary>
         public BeatmapVerifierContext(IBeatmap beatmap, IWorkingBeatmap workingBeatmap, DifficultyRating difficultyRating = DifficultyRating.ExpertPlus)
-            : this(new VerifiedBeatmap(workingBeatmap, beatmap), difficultyRating)
+            : this(new VerifiedBeatmap(workingBeatmap, beatmap), [], difficultyRating)
         {
         }
 
@@ -74,7 +67,7 @@ namespace osu.Game.Rulesets.Edit
             var current = new VerifiedBeatmap(workingBeatmap, beatmap);
 
             if (beatmapSet?.Beatmaps == null || beatmapSet.Beatmaps.Count == 1)
-                return new BeatmapVerifierContext(current, difficultyRating);
+                return new BeatmapVerifierContext(current, [], difficultyRating);
 
             var others = new List<VerifiedBeatmap>();
 
@@ -90,7 +83,7 @@ namespace osu.Game.Rulesets.Edit
                     others.Add(new VerifiedBeatmap(otherWorking, otherPlayable));
             }
 
-            return new BeatmapVerifierContext(current, difficultyRating, others);
+            return new BeatmapVerifierContext(current, others, difficultyRating);
         }
     }
 }

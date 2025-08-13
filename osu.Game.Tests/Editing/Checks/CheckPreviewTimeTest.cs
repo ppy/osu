@@ -87,7 +87,7 @@ namespace osu.Game.Tests.Editing.Checks
             var verifiedCurrentBeatmap = new BeatmapVerifierContext.VerifiedBeatmap(new TestWorkingBeatmap(currentBeatmap), currentBeatmap);
             var verifiedOtherBeatmaps = otherDifficulties.Select(b => new BeatmapVerifierContext.VerifiedBeatmap(new TestWorkingBeatmap(b), b)).ToList();
 
-            return new BeatmapVerifierContext(verifiedCurrentBeatmap, verifiedOtherBeatmaps);
+            return new BeatmapVerifierContext(verifiedCurrentBeatmap, verifiedOtherBeatmaps, DifficultyRating.ExpertPlus);
         }
     }
 }
