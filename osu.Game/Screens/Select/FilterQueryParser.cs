@@ -117,7 +117,10 @@ namespace osu.Game.Screens.Select
                     return TryUpdateCriteriaText(ref criteria.Source, op, value);
 
                 case "tag":
-                    return TryUpdateCriteriaText(ref criteria.UserTag, op, value);
+                    var tagFilter = new FilterCriteria.OptionalTextFilter();
+                    TryUpdateCriteriaText(ref tagFilter, op, value);
+                    criteria.UserTags.Add(tagFilter);
+                    return true;
 
                 default:
                     return criteria.RulesetCriteria?.TryParseCustomKeywordCriteria(key, op, value) ?? false;
