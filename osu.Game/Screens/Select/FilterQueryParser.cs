@@ -231,12 +231,11 @@ namespace osu.Game.Screens.Select
         {
             switch (op)
             {
-                case Operator.Equal:
-                    textFilter.SearchTerm = value;
-                    return true;
-
                 case Operator.NotEqual:
                     textFilter.InvertSearch = true;
+                    goto case Operator.Equal;
+
+                case Operator.Equal:
                     textFilter.SearchTerm = value;
                     return true;
 
@@ -270,9 +269,15 @@ namespace osu.Game.Screens.Select
                 default:
                     return false;
 
+                case Operator.NotEqual:
+                    range.InvertRange = true;
+                    goto case Operator.Equal;
+
                 case Operator.Equal:
                     range.Min = value - tolerance;
                     range.Max = value + tolerance;
+                    if (tolerance == 0)
+                        range.IsLowerInclusive = range.IsUpperInclusive = true;
                     break;
 
                 case Operator.Greater:
@@ -289,14 +294,6 @@ namespace osu.Game.Screens.Select
 
                 case Operator.LessOrEqual:
                     range.Max = value + tolerance;
-                    break;
-
-                case Operator.NotEqual:
-                    range.Min = value - tolerance;
-                    range.Max = value + tolerance;
-                    range.InvertRange = true;
-                    if (tolerance == 0)
-                        range.IsLowerInclusive = range.IsUpperInclusive = true;
                     break;
             }
 
@@ -328,6 +325,10 @@ namespace osu.Game.Screens.Select
                 default:
                     return false;
 
+                case Operator.NotEqual:
+                    range.InvertRange = true;
+                    goto case Operator.Equal;
+
                 case Operator.Equal:
                     range.Min = value - tolerance;
                     range.Max = value + tolerance;
@@ -353,14 +354,6 @@ namespace osu.Game.Screens.Select
                     range.Max = value + tolerance;
                     if (tolerance == 0)
                         range.IsUpperInclusive = true;
-                    break;
-
-                case Operator.NotEqual:
-                    range.Min = value - tolerance;
-                    range.Max = value + tolerance;
-                    range.InvertRange = true;
-                    if (tolerance == 0)
-                        range.IsLowerInclusive = range.IsUpperInclusive = true;
                     break;
             }
 
@@ -505,6 +498,10 @@ namespace osu.Game.Screens.Select
                 default:
                     return false;
 
+                case Operator.NotEqual:
+                    range.InvertRange = true;
+                    goto case Operator.Equal;
+
                 case Operator.Equal:
                     range.IsLowerInclusive = range.IsUpperInclusive = true;
                     range.Min = value;
@@ -529,13 +526,6 @@ namespace osu.Game.Screens.Select
                 case Operator.LessOrEqual:
                     range.IsUpperInclusive = true;
                     range.Max = value;
-                    break;
-
-                case Operator.NotEqual:
-                    range.IsLowerInclusive = range.IsUpperInclusive = true;
-                    range.Min = value;
-                    range.Max = value;
-                    range.InvertRange = true;
                     break;
             }
 
@@ -753,8 +743,6 @@ namespace osu.Game.Screens.Select
             try
             {
                 DateTimeOffset dateTimeOffset;
-                DateTimeOffset minDateTimeOffset;
-                DateTimeOffset maxDateTimeOffset;
                 dateRange.InvertRange = false;
 
                 switch (op)
@@ -811,35 +799,15 @@ namespace osu.Game.Screens.Select
                         dateTimeOffset = dateTimeOffsetFromDateOnly(year.Value, month.Value, day.Value).AddDays(1);
                         return tryUpdateCriteriaRange(ref dateRange, Operator.GreaterOrEqual, dateTimeOffset);
 
-                    case Operator.Equal:
-
-                        if (month == null)
-                        {
-                            month = 1;
-                            day = 1;
-                            minDateTimeOffset = dateTimeOffsetFromDateOnly(year.Value, month.Value, day.Value);
-                            maxDateTimeOffset = dateTimeOffsetFromDateOnly(year.Value, month.Value, day.Value).AddYears(1);
-                            return tryUpdateCriteriaRange(ref dateRange, Operator.GreaterOrEqual, minDateTimeOffset)
-                                   && tryUpdateCriteriaRange(ref dateRange, Operator.Less, maxDateTimeOffset);
-                        }
-
-                        if (day == null)
-                        {
-                            day = 1;
-                            minDateTimeOffset = dateTimeOffsetFromDateOnly(year.Value, month.Value, day.Value);
-                            maxDateTimeOffset = dateTimeOffsetFromDateOnly(year.Value, month.Value, day.Value).AddMonths(1);
-                            return tryUpdateCriteriaRange(ref dateRange, Operator.GreaterOrEqual, minDateTimeOffset)
-                                   && tryUpdateCriteriaRange(ref dateRange, Operator.Less, maxDateTimeOffset);
-                        }
-
-                        minDateTimeOffset = dateTimeOffsetFromDateOnly(year.Value, month.Value, day.Value);
-                        maxDateTimeOffset = dateTimeOffsetFromDateOnly(year.Value, month.Value, day.Value).AddDays(1);
-                        return tryUpdateCriteriaRange(ref dateRange, Operator.GreaterOrEqual, minDateTimeOffset)
-                               && tryUpdateCriteriaRange(ref dateRange, Operator.Less, maxDateTimeOffset);
-
                     case Operator.NotEqual:
 
                         dateRange.InvertRange = true;
+                        goto case Operator.Equal;
+
+                    case Operator.Equal:
+
+                        DateTimeOffset minDateTimeOffset;
+                        DateTimeOffset maxDateTimeOffset;
 
                         if (month == null)
                         {
