@@ -103,12 +103,17 @@ namespace osu.Game.Screens.SelectV2
             match &= !criteria.DifficultyName.HasFilter || criteria.DifficultyName.Matches(beatmap.DifficultyName);
             match &= !criteria.Source.HasFilter || criteria.Source.Matches(beatmap.Metadata.Source);
 
-            if (criteria.UserTag.HasFilter)
+            if (criteria.UserTags.Any())
             {
-                bool anyTagMatched = false;
-                foreach (string tag in beatmap.Metadata.UserTags)
-                    anyTagMatched |= criteria.UserTag.Matches(tag);
-                match &= anyTagMatched;
+                foreach (var tagFilter in criteria.UserTags)
+                {
+                    bool anyTagMatched = false;
+
+                    foreach (string tag in beatmap.Metadata.UserTags)
+                        anyTagMatched |= tagFilter.Matches(tag);
+
+                    match &= anyTagMatched;
+                }
             }
 
             match &= !criteria.UserStarDifficulty.HasFilter || criteria.UserStarDifficulty.IsInRange(beatmap.StarRating);
