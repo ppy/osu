@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit.Checks.Components;
 
@@ -20,14 +21,12 @@ namespace osu.Game.Rulesets.Edit.Checks
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
-            var difficulties = context.BeatmapsetDifficulties;
-
-            if (difficulties.Count <= 1)
+            if (context.AllDifficulties.Count() <= 1)
                 return [];
 
-            var referenceBeatmap = context.Beatmap;
+            var referenceBeatmap = context.CurrentDifficulty.Playable;
 
-            bool hasStoryboard = ResourcesCheckUtils.HasAnyStoryboardElementPresent(context.WorkingBeatmap);
+            bool hasStoryboard = ResourcesCheckUtils.HasAnyStoryboardElementPresent(context.CurrentDifficulty.Working);
 
             var issues = new List<Issue>();
 
@@ -50,19 +49,16 @@ namespace osu.Game.Rulesets.Edit.Checks
             {
                 var referenceValue = fieldSelector(referenceBeatmap);
 
-                foreach (var beatmap in difficulties)
+                foreach (var beatmap in context.OtherDifficulties)
                 {
-                    if (beatmap == referenceBeatmap)
-                        continue;
-
-                    var currentValue = fieldSelector(beatmap);
+                    var currentValue = fieldSelector(beatmap.Playable);
 
                     if (!EqualityComparer<T>.Default.Equals(currentValue, referenceValue))
                     {
                         issues.Add(new IssueTemplateInconsistentSetting(this, issueType).Create(
                             fieldName,
                             referenceBeatmap.BeatmapInfo.DifficultyName,
-                            beatmap.BeatmapInfo.DifficultyName,
+                            beatmap.Playable.BeatmapInfo.DifficultyName,
                             referenceValue.ToString() ?? string.Empty,
                             currentValue.ToString() ?? string.Empty
                         ));

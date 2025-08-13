@@ -29,11 +29,11 @@ namespace osu.Game.Rulesets.Edit.Checks
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
-            string audioFile = context.Beatmap.Metadata.AudioFile;
+            string audioFile = context.CurrentDifficulty.Playable.Metadata.AudioFile;
             if (string.IsNullOrEmpty(audioFile))
                 yield break;
 
-            var track = context.WorkingBeatmap.Track;
+            var track = context.CurrentDifficulty.Working.Track;
 
             if (track?.Bitrate == null || track.Bitrate.Value == 0)
                 yield return new IssueTemplateNoBitrate(this).Create();

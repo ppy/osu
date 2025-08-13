@@ -33,11 +33,11 @@ namespace osu.Game.Rulesets.Edit.Checks
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
-            string backgroundFile = context.Beatmap.Metadata.BackgroundFile;
+            string backgroundFile = context.CurrentDifficulty.Playable.Metadata.BackgroundFile;
             if (string.IsNullOrEmpty(backgroundFile))
                 yield break;
 
-            var texture = context.WorkingBeatmap.GetBackground();
+            var texture = context.CurrentDifficulty.Working.GetBackground();
             if (texture == null)
                 yield break;
 
@@ -49,9 +49,9 @@ namespace osu.Game.Rulesets.Edit.Checks
             else if (texture.Width < low_width || texture.Height < low_height)
                 yield return new IssueTemplateLowResolution(this).Create(texture.Width, texture.Height);
 
-            string? storagePath = context.Beatmap.BeatmapInfo.BeatmapSet?.GetPathForFile(backgroundFile);
+            string? storagePath = context.CurrentDifficulty.Playable.BeatmapInfo.BeatmapSet?.GetPathForFile(backgroundFile);
 
-            using (Stream stream = context.WorkingBeatmap.GetStream(storagePath))
+            using (Stream stream = context.CurrentDifficulty.Working.GetStream(storagePath))
             {
                 double filesizeMb = stream.Length / (1024d * 1024d);
 
