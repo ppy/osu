@@ -14,8 +14,15 @@ namespace osu.Game.Rulesets.Edit
     public class BeatmapVerifierContext
     {
         /// <summary>
-        /// A record containing the <see cref="IWorkingBeatmap"/> and playable <see cref="IBeatmap"/> versions of a beatmap.
+        /// Collects the constituent parts of a beatmap being verified.
         /// </summary>
+        /// <param name="Working">
+        /// Use this to access beatmap resources like its track, storyboard, waveform, or similar.
+        /// </param>
+        /// <param name="Playable">
+        /// The <see cref="IBeatmap"/> in its actual playable state after beatmap conversion.
+        /// Use this to inspect the actual beatmap contents, like its hitobjects, timing points, breaks, etc.
+        /// </param>
         public record VerifiedBeatmap(IWorkingBeatmap Working, IBeatmap Playable);
 
         /// <summary>
