@@ -860,8 +860,8 @@ namespace osu.Game.Screens.Select
                                    && tryUpdateCriteriaRange(ref dateRange, Operator.Less, maxDateTimeOffset);
                         }
 
-                        minDateTimeOffset = dateTimeOffsetFromDateOnly(year.Value, month.Value, day.Value).AddDays(-1);
-                        maxDateTimeOffset = dateTimeOffsetFromDateOnly(year.Value, month.Value, day.Value);
+                        minDateTimeOffset = dateTimeOffsetFromDateOnly(year.Value, month.Value, day.Value);
+                        maxDateTimeOffset = dateTimeOffsetFromDateOnly(year.Value, month.Value, day.Value).AddDays(1);
                         return tryUpdateCriteriaRange(ref dateRange, Operator.GreaterOrEqual, minDateTimeOffset)
                                && tryUpdateCriteriaRange(ref dateRange, Operator.Less, maxDateTimeOffset);
 
