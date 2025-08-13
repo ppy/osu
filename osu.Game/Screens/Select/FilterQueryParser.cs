@@ -232,7 +232,7 @@ namespace osu.Game.Screens.Select
             switch (op)
             {
                 case Operator.NotEqual:
-                    textFilter.InvertSearch = true;
+                    textFilter.ExcludeTerm = true;
                     goto case Operator.Equal;
 
                 case Operator.Equal:

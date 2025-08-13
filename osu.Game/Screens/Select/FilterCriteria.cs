@@ -207,23 +207,34 @@ namespace osu.Game.Screens.Select
                 if (string.IsNullOrEmpty(value))
                     return false;
 
+                bool result;
+
                 switch (MatchMode)
                 {
                     default:
                     case MatchMode.Substring:
                         // Note that we are using ordinal here to avoid performance issues caused by globalisation concerns.
                         // See https://github.com/ppy/osu/issues/11571 / https://github.com/dotnet/docs/issues/18423.
-                        return InvertSearch != value.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase);
+                        result = value.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase);
+                        break;
 
                     case MatchMode.IsolatedPhrase:
-                        return InvertSearch != Regex.IsMatch(value, $@"(^|\s){Regex.Escape(searchTerm)}($|\s)", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+                        result = Regex.IsMatch(value, $@"(^|\s){Regex.Escape(searchTerm)}($|\s)", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+                        break;
 
                     case MatchMode.FullPhrase:
-                        return InvertSearch != (CultureInfo.InvariantCulture.CompareInfo.Compare(value, searchTerm, CompareOptions.OrdinalIgnoreCase) == 0);
+                        result = CultureInfo.InvariantCulture.CompareInfo.Compare(value, searchTerm, CompareOptions.OrdinalIgnoreCase) == 0;
+                        break;
                 }
+
+                if (ExcludeTerm)
+                    result = !result;
+
+                return result;
             }
 
-            public bool InvertSearch;
+            public bool ExcludeTerm;
+
             private string searchTerm;
 
             public string SearchTerm
