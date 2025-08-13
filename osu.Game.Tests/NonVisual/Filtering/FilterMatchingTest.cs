@@ -424,7 +424,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
                                     .Where(b => !b.Filtered.Value)
                                     .Select(b => carouselBeatmaps.IndexOf(b)).ToArray();
 
-            Assert.That(visibleBeatmaps, Is.EqualTo(new int[] { 0, 2, 3, 5, 6 }));
+            Assert.That(visibleBeatmaps, Is.EqualTo(new[] { 0, 2, 3, 5, 6 }));
         }
 
         [TestCase("status!=ranked", new[] { 1, 2, 4, 5 })]
