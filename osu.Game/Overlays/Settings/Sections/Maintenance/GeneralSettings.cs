@@ -31,7 +31,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
             {
                 new SettingsButton
                 {
-                    Text = DebugSettingsStrings.ImportFiles,
+                    Text = MaintenanceSettingsStrings.ImportFiles,
                     Action = () =>
                     {
                         if (selector != null)
@@ -42,7 +42,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                 },
                 new SettingsButton
                 {
-                    Text = DebugSettingsStrings.RunLatencyCertifier,
+                    Text = MaintenanceSettingsStrings.RunLatencyCertifier,
                     Action = () => performer?.PerformFromScreen(menu => menu.Push(new LatencyCertifierScreen()))
                 }
             });

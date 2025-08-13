@@ -15,6 +15,16 @@ namespace osu.Game.Localisation
         public static LocalisableString MaintenanceSectionHeader => new TranslatableString(getKey(@"maintenance_section_header"), @"Maintenance");
 
         /// <summary>
+        /// "Import files"
+        /// </summary>
+        public static LocalisableString ImportFiles => new TranslatableString(getKey(@"import_files"), @"Import files");
+
+        /// <summary>
+        /// "Run latency certifier"
+        /// </summary>
+        public static LocalisableString RunLatencyCertifier => new TranslatableString(getKey(@"run_latency_certifier"), @"Run latency certifier");
+
+        /// <summary>
         /// "Select directory"
         /// </summary>
         public static LocalisableString SelectDirectory => new TranslatableString(getKey(@"select_directory"), @"Select directory");
