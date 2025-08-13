@@ -397,50 +397,27 @@ namespace osu.Game.Screens.Select
         {
             var matchingValues = new HashSet<T>();
 
-            if (op == Operator.Equal && filterValue.Contains(','))
+            if (filterValue.Contains(','))
             {
                 string[] splitValues = filterValue.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                HashSet<T> parsedValues = new HashSet<T>();
 
                 foreach (string splitValue in splitValues)
                 {
                     if (!tryParseEnum<T>(splitValue, out var parsedValue))
                         return false;
 
-                    matchingValues.Add(parsedValue);
-                }
-            }
-            else if (op == Operator.NotEqual && filterValue.Contains(','))
-            {
-                string[] splitValues = filterValue.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-
-                var allDefinedValues = Enum.GetValues<T>();
-                HashSet<T> excludedValues = new HashSet<T>();
-
-                foreach (string splitValue in splitValues)
-                {
-                    if (!tryParseEnum<T>(splitValue, out var parsedValue))
-                        return false;
-
-                    excludedValues.Add(parsedValue);
+                    parsedValues.Add(parsedValue);
                 }
 
-                foreach (var definedValue in allDefinedValues)
+                if (op == Operator.Equal)
                 {
-                    bool isExcludedValue = false;
-
-                    foreach (var excludedValue in excludedValues)
-                    {
-                        int compareResult = Comparer<T>.Default.Compare(definedValue, excludedValue);
-
-                        if (compareResult == 0)
-                        {
-                            isExcludedValue = true;
-                            break;
-                        }
-                    }
-
-                    if (!isExcludedValue)
-                        matchingValues.Add(definedValue);
+                    matchingValues.UnionWith(parsedValues);
+                }
+                else if (op == Operator.NotEqual)
+                {
+                    matchingValues.UnionWith(Enum.GetValues<T>());
+                    matchingValues.ExceptWith(parsedValues);
                 }
             }
             else

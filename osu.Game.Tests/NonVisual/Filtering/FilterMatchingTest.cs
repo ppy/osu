@@ -408,6 +408,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
         [TestCase("status!=r", new[] { 1, 2, 4, 5 })]
         [TestCase("status!=loved", new[] { 0, 1, 2, 3, 4, 6 })]
         [TestCase("status!=l", new[] { 0, 1, 2, 3, 4, 6 })]
+        [TestCase("status!=r,l", new[] { 1, 2, 4 })]
         public void TestNotEqualSearchForEnumFilter(string query, int[] expectedBeatmapIndexes)
         {
             var carouselBeatmaps = new[]
