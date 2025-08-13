@@ -117,6 +117,31 @@ namespace osu.Game.Localisation
             @"Invalid custom API server address. Enter only a hostname, optionally with a port. Paths are not allowed."
         );
 
+        /// <summary>
+        /// "Connected to default server"
+        /// </summary>
+        public static LocalisableString ConnectedToDefaultServer => new TranslatableString(getKey(@"connected_to_default_server"), @"Connected to default server");
+
+        /// <summary>
+        /// "Current server: {0}"
+        /// </summary>
+        public static LocalisableString CurrentServer(string serverName) => new TranslatableString(getKey(@"current_server"), @"Current server: {0}", serverName);
+
+        /// <summary>
+        /// "Official server (osu.ppy.sh)"
+        /// </summary>
+        public static LocalisableString OfficialServer => new TranslatableString(getKey(@"official_server"), @"Official server (osu.ppy.sh)");
+
+        /// <summary>
+        /// "Development server (dev.ppy.sh)"
+        /// </summary>
+        public static LocalisableString DevelopmentServer => new TranslatableString(getKey(@"development_server"), @"Development server (dev.ppy.sh)");
+
+        /// <summary>
+        /// "Default server"
+        /// </summary>
+        public static LocalisableString DefaultServer => new TranslatableString(getKey(@"default_server"), @"Default server");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

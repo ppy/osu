@@ -1331,6 +1331,9 @@ namespace osu.Game
 
             // Importantly, this should be run after binding PostNotification to the import handlers so they can present the import after game startup.
             handleStartupImport();
+            
+            // Show server information notification on startup
+            showServerInfoNotification();
         }
 
         private void handleBackButton()
@@ -1363,6 +1366,16 @@ namespace osu.Game
                     }
                 }
             }
+        }
+
+        private void showServerInfoNotification()
+        {
+            // Show server information notification after a brief delay to ensure all components are loaded
+            Scheduler.AddDelayed(() =>
+            {
+                string currentServerUrl = API.Endpoints.APIUrl;
+                Notifications.Post(new ServerInfoNotification(currentServerUrl));
+            }, 2000); // 2 second delay to allow other startup notifications to appear first
         }
 
         private void showOverlayAboveOthers(OverlayContainer overlay, OverlayContainer[] otherOverlays)
