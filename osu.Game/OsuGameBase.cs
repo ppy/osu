@@ -113,6 +113,13 @@ namespace osu.Game
             if (!string.IsNullOrEmpty(customUrl))
             {
                 customUrl = customUrl.TrimEnd('/');
+                
+                // Ensure the custom URL has a protocol scheme
+                if (!customUrl.StartsWith("http://", StringComparison.OrdinalIgnoreCase) && !customUrl.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+                {
+                    customUrl = "https://" + customUrl;
+                }
+                
                 config.APIUrl = customUrl;
                 config.WebsiteUrl = customUrl;
                 config.SpectatorUrl = $"{customUrl}/signalr/spectator";
