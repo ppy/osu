@@ -13,6 +13,7 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Configuration;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
@@ -323,11 +324,45 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("offset still", () => offsetControl.Current.Value == -average_error);
 
             AddStep("adjust offset manually", () => offsetControl.Current.Value = 0);
-            AddAssert("calibration button displayed", () => offsetControl.ChildrenOfType<SettingsButton>().Any(b => b.IsPresent));
+            AddUntilStep("calibration button displayed", () => offsetControl.ChildrenOfType<SettingsButton>().Any());
 
-            AddUntilStep("has calibration button", () => offsetControl.ChildrenOfType<SettingsButton>().Any());
             AddStep("press button", () => offsetControl.ChildrenOfType<SettingsButton>().Single().TriggerClick());
             AddAssert("offset adjusted", () => offsetControl.Current.Value == -average_error);
+            AddUntilStep("button is disabled", () => !offsetControl.ChildrenOfType<SettingsButton>().Single().Enabled.Value);
+        }
+
+        [Test]
+        public void TestAutomaticAdjustmentWithUnstableRate()
+        {
+            const double average_error = -25;
+            const int spread = 25;
+            const double expected_offset = 12.9; // due to high UR (~147). see BeatmapOffsetControl.computeSuggestedOffset()
+
+            AddStep("enable automatic adjust", () => localConfig.SetValue(OsuSetting.AutomaticallyAdjustBeatmapOffset, true));
+            AddAssert("offset zero", () => offsetControl.Current.Value == 0);
+
+            AddStep("set reference score", () =>
+            {
+                offsetControl.ReferenceScore.Value = new ScoreInfo
+                {
+                    // distribute the hit events such that it produces ~147 UR. setup taken from UnstableRateTest.
+                    HitEvents = Enumerable.Range((int)average_error - spread, spread * 2 + 1)
+                                          .Select(t => new HitEvent(t, 1.0, HitResult.Great, new HitObject(), null, null))
+                                          .ToList(),
+
+                    BeatmapInfo = Beatmap.Value.BeatmapInfo,
+                };
+            });
+
+            AddAssert("no calibration button", () => !offsetControl.ChildrenOfType<SettingsButton>().Any(b => b.IsPresent));
+            AddAssert("offset adjustment text displayed", () => offsetControl.ChildrenOfType<IHasText>().Any(t => t.Text.ToString().Contains("adjusted")));
+            AddAssert("offset adjusted", () => offsetControl.Current.Value == expected_offset);
+
+            AddStep("adjust offset manually", () => offsetControl.Current.Value = 0);
+            AddUntilStep("calibration button displayed", () => offsetControl.ChildrenOfType<SettingsButton>().Any());
+
+            AddStep("press button", () => offsetControl.ChildrenOfType<SettingsButton>().Single().TriggerClick());
+            AddAssert("offset adjusted", () => offsetControl.Current.Value == expected_offset);
             AddUntilStep("button is disabled", () => !offsetControl.ChildrenOfType<SettingsButton>().Single().Enabled.Value);
         }
 
