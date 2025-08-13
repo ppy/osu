@@ -27,10 +27,10 @@ namespace osu.Game.Rulesets.Edit.Checks
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
-            var beatmapSet = context.Beatmap.BeatmapInfo.BeatmapSet;
+            var beatmapSet = context.CurrentDifficulty.Playable.BeatmapInfo.BeatmapSet;
             var videoPaths = new List<string>();
 
-            foreach (var layer in context.WorkingBeatmap.Storyboard.Layers)
+            foreach (var layer in context.CurrentDifficulty.Working.Storyboard.Layers)
             {
                 foreach (var element in layer.Elements)
                 {
@@ -60,7 +60,7 @@ namespace osu.Game.Rulesets.Edit.Checks
                 try
                 {
                     // We use TagLib here for platform invariance; BASS cannot detect audio presence on Linux.
-                    using (Stream data = context.WorkingBeatmap.GetStream(storagePath))
+                    using (Stream data = context.CurrentDifficulty.Working.GetStream(storagePath))
                     using (File tagFile = TagLibUtils.GetTagLibFile(filename, data))
                     {
                         if (tagFile.Properties.AudioChannels == 0)
