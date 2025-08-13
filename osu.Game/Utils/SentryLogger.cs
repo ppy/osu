@@ -46,7 +46,7 @@ namespace osu.Game.Utils
 
             sentrySession = SentrySdk.Init(options =>
             {
-                options.Dsn = "https://ad9f78529cef40ac874afb95a9aca04e@sentry.ppy.sh/2";
+                options.Dsn = "https://78cf763c094444e5bc31bb035442b90f@glitchtip.g0v0.top/3";
                 options.AutoSessionTracking = true;
                 options.IsEnvironmentUser = false;
                 options.IsGlobalModeEnabled = true;
