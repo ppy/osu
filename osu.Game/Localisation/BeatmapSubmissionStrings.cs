@@ -159,6 +159,16 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString UploadNewBeatmap => new TranslatableString(getKey(@"upload_new_beatmap"), @"Upload NEW beatmap!");
 
+        /// <summary>
+        /// "Detected problems"
+        /// </summary>
+        public static LocalisableString VerifyProblems => new TranslatableString(getKey(@"verify_problems"), @"Detected problems");
+
+        /// <summary>
+        /// "Before proceeding, some problems were detected with your beatmap that violate the ranking criteria. If you're aiming to eventually rank your beatmap, it's recommended you fix these before submitting."
+        /// </summary>
+        public static LocalisableString VerifyProblemsDisclaimer => new TranslatableString(getKey(@"verify_problems_disclaimer"), @"Before proceeding, some problems were detected with your beatmap that violate the ranking criteria. If you're aiming to eventually rank your beatmap, it's recommended you fix these before submitting.");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
