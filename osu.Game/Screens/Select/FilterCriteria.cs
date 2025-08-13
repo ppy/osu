@@ -181,7 +181,7 @@ namespace osu.Game.Screens.Select
             public bool IsUpperInclusive;
 
             /// <summary>
-            /// If true, only outside of MaxValue and MinValue will return true
+            /// When <see langword="true"/>, the meaning of this filter is inverted, i.e. it will <i>exclude</i> items that satisfy this range.
             /// </summary>
             public bool InvertRange;
 
@@ -233,6 +233,9 @@ namespace osu.Game.Screens.Select
                 return result;
             }
 
+            /// <summary>
+            /// When <see langword="true"/>, the meaning of this filter is inverted, i.e. it will <i>exclude</i> items which match <see cref="SearchTerm"/>.
+            /// </summary>
             public bool ExcludeTerm;
 
             private string searchTerm;
