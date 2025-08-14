@@ -135,7 +135,7 @@ namespace osu.Game.Screens.SelectV2
 
                 public float LineBaseHeight => text.LineBaseHeight;
 
-                public Action<string>? PerformSearch { get; set; }
+                public Action<string>? PerformSearch { get; init; }
 
                 public TagsOverflowButton(string[] tags)
                 {
