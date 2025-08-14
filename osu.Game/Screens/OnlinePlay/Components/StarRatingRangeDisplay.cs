@@ -116,10 +116,10 @@ namespace osu.Game.Screens.OnlinePlay.Components
             else
             {
                 // When Playlist is not empty (in room) we compute actual range
-                IEnumerable<PlaylistItem> difficultyRangeSource = room.Playlist;
+                IReadOnlyList<PlaylistItem> difficultyRangeSource = room.Playlist.Where(item => !item.Expired).ToList();
 
-                if (!room.HasEnded)
-                    difficultyRangeSource = difficultyRangeSource.Where(playlistItem => !playlistItem.Expired);
+                if (difficultyRangeSource.Count == 0)
+                    difficultyRangeSource = room.Playlist;
 
                 var orderedDifficulties = difficultyRangeSource.Select(item => item.Beatmap)
                                                                .OrderBy(b => b.StarRating)

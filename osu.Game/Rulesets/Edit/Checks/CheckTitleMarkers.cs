@@ -31,8 +31,8 @@ namespace osu.Game.Rulesets.Edit.Checks
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
-            string romanisedTitle = context.Beatmap.Metadata.Title;
-            string unicodeTitle = context.Beatmap.Metadata.TitleUnicode;
+            string romanisedTitle = context.CurrentDifficulty.Playable.Metadata.Title;
+            string unicodeTitle = context.CurrentDifficulty.Playable.Metadata.TitleUnicode;
 
             foreach (var check in markerChecks)
             {

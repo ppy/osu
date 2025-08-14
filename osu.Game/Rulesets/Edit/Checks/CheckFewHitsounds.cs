@@ -48,16 +48,16 @@ namespace osu.Game.Rulesets.Edit.Checks
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
-            if (!context.Beatmap.HitObjects.Any())
+            if (!context.CurrentDifficulty.Playable.HitObjects.Any())
                 yield break;
 
             mapHasHitsounds = false;
             objectsWithoutHitsounds = 0;
-            lastHitsoundTime = context.Beatmap.HitObjects.First().StartTime;
+            lastHitsoundTime = context.CurrentDifficulty.Playable.HitObjects.First().StartTime;
 
             var hitObjectsIncludingNested = new List<HitObject>();
 
-            foreach (var hitObject in context.Beatmap.HitObjects)
+            foreach (var hitObject in context.CurrentDifficulty.Playable.HitObjects)
             {
                 // Samples play on the end of objects. Some objects have nested objects to accomplish playing them elsewhere (e.g. slider head/repeat).
                 foreach (var nestedHitObject in hitObject.NestedHitObjects)
