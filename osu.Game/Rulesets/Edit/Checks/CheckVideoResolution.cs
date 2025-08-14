@@ -30,8 +30,8 @@ namespace osu.Game.Rulesets.Edit.Checks
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
-            var beatmapSet = context.Beatmap.BeatmapInfo.BeatmapSet;
-            var videoPaths = getVideoPaths(context.WorkingBeatmap.Storyboard);
+            var beatmapSet = context.CurrentDifficulty.Playable.BeatmapInfo.BeatmapSet;
+            var videoPaths = getVideoPaths(context.CurrentDifficulty.Working.Storyboard);
 
             foreach (string filename in videoPaths)
             {
@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Edit.Checks
 
                 try
                 {
-                    using (Stream data = context.WorkingBeatmap.GetStream(storagePath))
+                    using (Stream data = context.CurrentDifficulty.Working.GetStream(storagePath))
                     using (File tagFile = TagLibUtils.GetTagLibFile(filename, data))
                     {
                         int height = tagFile.Properties.VideoHeight;

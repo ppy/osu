@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Edit.Checks
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
-            var metadata = context.Beatmap.BeatmapInfo.Metadata;
+            var metadata = context.CurrentDifficulty.Playable.BeatmapInfo.Metadata;
 
             string tags = metadata.Tags.ToLowerInvariant();
 

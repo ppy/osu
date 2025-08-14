@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Checks
     {
         public override IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
-            var hitObjects = context.Beatmap.HitObjects;
+            var hitObjects = context.CurrentDifficulty.Playable.HitObjects;
 
             for (int i = 0; i < hitObjects.Count - 1; ++i)
             {
