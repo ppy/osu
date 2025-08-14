@@ -146,42 +146,42 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
         private void currentChanged(ValueChangedEvent<double> offset)
         {
-            updateOffset();
+            // Negative is applied here because the play graph is considering a hit offset, not track (as we currently use for clocks).
+            lastPlayGraph?.UpdateOffset(-adjustmentSinceLastPlay);
 
-            void updateOffset()
+            // Calibration button may be hidden due to automatic offset adjustment, but it should be visible when the user manually adjusts their offset away from the applied suggestion.
+            calibrateFromLastPlayButton?.Show();
+
+            writeOffsetToBeatmap();
+        }
+
+        private void writeOffsetToBeatmap()
+        {
+            // ensure the previous write has completed. ignoring performance concerns, if we don't do this, the async writes could be out of sequence.
+            if (realmWriteTask?.IsCompleted == false)
             {
-                // Negative is applied here because the play graph is considering a hit offset, not track (as we currently use for clocks).
-                lastPlayGraph?.UpdateOffset(-adjustmentSinceLastPlay);
-
-                // Calibration button may be hidden due to automatic offset adjustment, but it should be visible when the user manually adjusts their offset away from the applied suggestion.
-                calibrateFromLastPlayButton?.Show();
-
-                // ensure the previous write has completed. ignoring performance concerns, if we don't do this, the async writes could be out of sequence.
-                if (realmWriteTask?.IsCompleted == false)
-                {
-                    Scheduler.AddOnce(updateOffset);
-                    return;
-                }
-
-                realmWriteTask = realm.WriteAsync(r =>
-                {
-                    var setInfo = r.Find<BeatmapSetInfo>(beatmap.Value.BeatmapSetInfo.ID);
-
-                    if (setInfo == null) // only the case for tests.
-                        return;
-
-                    // Apply to all difficulties in a beatmap set if they have the same audio
-                    // (they generally always share timing).
-                    foreach (var b in setInfo.Beatmaps)
-                    {
-                        BeatmapUserSettings userSettings = b.UserSettings;
-                        double val = Current.Value;
-
-                        if (userSettings.Offset != val && b.AudioEquals(beatmap.Value.BeatmapInfo))
-                            userSettings.Offset = val;
-                    }
-                });
+                Scheduler.AddOnce(writeOffsetToBeatmap);
+                return;
             }
+
+            realmWriteTask = realm.WriteAsync(r =>
+            {
+                var setInfo = r.Find<BeatmapSetInfo>(beatmap.Value.BeatmapSetInfo.ID);
+
+                if (setInfo == null) // only the case for tests.
+                    return;
+
+                // Apply to all difficulties in a beatmap set if they have the same audio
+                // (they generally always share timing).
+                foreach (var b in setInfo.Beatmaps)
+                {
+                    BeatmapUserSettings userSettings = b.UserSettings;
+                    double val = Current.Value;
+
+                    if (userSettings.Offset != val && b.AudioEquals(beatmap.Value.BeatmapInfo))
+                        userSettings.Offset = val;
+                }
+            });
         }
 
         private void scoreChanged(ValueChangedEvent<ScoreInfo?> score)
