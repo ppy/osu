@@ -19,7 +19,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    internal class OsuModMagnetised : Mod, IUpdatableByPlayfield, IApplicableToDrawableRuleset<OsuHitObject>
+    public class OsuModMagnetised : Mod, IUpdatableByPlayfield, IApplicableToDrawableRuleset<OsuHitObject>
     {
         public override string Name => "Magnetised";
         public override string Acronym => "MG";

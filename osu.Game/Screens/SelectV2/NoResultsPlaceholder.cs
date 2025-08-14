@@ -87,7 +87,7 @@ namespace osu.Game.Screens.SelectV2
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                             Font = OsuFont.Style.Title,
-                            Text = "No matching beatmaps"
+                            Text = SongSelectStrings.NoMatchingBeatmaps
                         },
                         textFlow = new LinkFlowContainer
                         {
@@ -148,7 +148,7 @@ namespace osu.Game.Screens.SelectV2
             }
             else
             {
-                textFlow.AddParagraph("No beatmaps match your filter criteria!");
+                textFlow.AddParagraph(SongSelectStrings.NoMatchingBeatmapsDescription);
                 textFlow.AddParagraph(string.Empty);
 
                 if (!string.IsNullOrEmpty(filter?.SearchText))
@@ -185,8 +185,8 @@ namespace osu.Game.Screens.SelectV2
                 {
                     addBulletPoint();
                     textFlow.AddText("Try ");
-                    textFlow.AddLink("enabling ", () => config.SetValue(OsuSetting.ShowConvertedBeatmaps, true));
-                    textFlow.AddText("automatic conversion!");
+                    textFlow.AddLink("enabling", () => config.SetValue(OsuSetting.ShowConvertedBeatmaps, true));
+                    textFlow.AddText(" automatic conversion!");
                 }
             }
 

@@ -131,7 +131,7 @@ jobs:
 
   build-only-ios:
     name: Build only (iOS)
-    runs-on: macos-latest
+    runs-on: macos-15
     timeout-minutes: 60
     steps:
       - name: Checkout
@@ -143,7 +143,7 @@ jobs:
           dotnet-version: "8.0.x"
 
       - name: Install .NET Workloads
-        run: dotnet workload install ios --from-rollback-file https://raw.githubusercontent.com/ppy/osu-framework/refs/heads/master/workloads.json
+        run: dotnet workload install ios
 
       - name: Build
         run: dotnet build -c Debug osu.iOS.slnf
