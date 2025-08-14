@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using System.Linq;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Edit.Checks.Components;
 using osu.Framework.Graphics.UserInterface;
@@ -81,15 +82,27 @@ namespace osu.Game.Screens.Edit.Submission
                     }
                 }
             };
+        }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
             Issues.BindCollectionChanged((_, __) => rebuildRows(), true);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            Issues.UnbindAll();
         }
 
         private void rebuildRows()
         {
             rowFlow.Clear(false);
 
-            foreach (var issue in Issues)
+            foreach (var issue in Issues
+                                  .OrderBy(i => i.Check.Metadata.Category)
+                                  .ThenBy(i => i.Time ?? double.MinValue))
             {
                 var drawable = new DrawableIssue
                 {
@@ -163,6 +176,7 @@ namespace osu.Game.Screens.Edit.Submission
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
+                                    TextAnchor = Anchor.TopLeft,
                                 }
                             }
                         }
@@ -175,6 +189,12 @@ namespace osu.Game.Screens.Edit.Submission
                 base.LoadComplete();
                 Current.BindValueChanged(_ => updateState(), true);
                 FinishTransforms(true);
+            }
+
+            protected override void Dispose(bool isDisposing)
+            {
+                base.Dispose(isDisposing);
+                current.UnbindAll();
             }
 
             private void updateState()

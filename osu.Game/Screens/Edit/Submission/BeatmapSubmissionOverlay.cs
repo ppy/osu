@@ -52,9 +52,7 @@ namespace osu.Game.Screens.Edit.Submission
             submissionProblemIssues.Clear();
             submissionProblemIssues.AddRange(issues.Where(i => i.Template.Type == IssueType.Problem));
 
-            bool hasProblems = submissionProblemIssues.Count > 0;
-
-            if (hasProblems)
+            if (submissionProblemIssues.Count > 0)
                 AddStep<ScreenSubmissionVerifyProblems>();
 
             AddStep<ScreenSubmissionSettings>();
