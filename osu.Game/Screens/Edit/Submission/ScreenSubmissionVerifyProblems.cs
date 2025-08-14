@@ -11,7 +11,6 @@ using osu.Game.Rulesets.Edit.Checks.Components;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterfaceV2;
-using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Screens.Edit.Submission
 {
@@ -38,32 +37,24 @@ namespace osu.Game.Screens.Edit.Submission
                     Colour = colours.Orange1,
                     Text = BeatmapSubmissionStrings.VerifyProblemsDisclaimer,
                 },
-                table = new SubmissionIssueTable { RelativeSizeAxes = Axes.X, Height = 300 },
-                new FillFlowContainer
+
+                new RoundedButton
                 {
-                    AutoSizeAxes = Axes.Y,
-                    RelativeSizeAxes = Axes.X,
-                    Direction = FillDirection.Horizontal,
-                    Margin = new MarginPadding { Top = 10 },
-                    Children = new Drawable[]
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
+                    Width = 300,
+                    Text = BeatmapSubmissionStrings.OpenBeatmapVerifier,
+                    Action = () =>
                     {
-                        new RoundedButton
+                        game?.PerformFromScreen(s =>
                         {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Width = 300,
-                            Text = BeatmapSubmissionStrings.OpenBeatmapVerifier,
-                            Action = () =>
-                            {
-                                game?.PerformFromScreen(s =>
-                                {
-                                    if (s is Editor editor)
-                                        editor.Mode.Value = EditorScreenMode.Verify;
-                                }, [typeof(Editor)]);
-                            },
-                        }
-                    }
-                }
+                            if (s is Editor editor)
+                                editor.Mode.Value = EditorScreenMode.Verify;
+                        }, [typeof(Editor)]);
+                    },
+                },
+
+                table = new SubmissionIssueTable { RelativeSizeAxes = Axes.X, Height = 350 },
             });
             table.SetIssues(submissionProblemIssues);
         }
