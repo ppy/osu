@@ -100,6 +100,38 @@ namespace osu.Game.Tests.Editing.Checks
             Assert.That(check.Run(context), Is.Empty);
         }
 
+        [Test]
+        public void TestPairwiseStartTimeMismatchAcrossNonCurrentDifficulties()
+        {
+            var beatmapCurrent = createBeatmapWithVideo("Diff A", "A.mp4", 0);
+            var beatmapB = createBeatmapWithVideo("Diff B", "X.mp4", 1000);
+            var beatmapC = createBeatmapWithVideo("Diff C", "X.mp4", 2000);
+
+            var context = createContext(beatmapCurrent, [beatmapB, beatmapC]);
+
+            var issues = check.Run(context).ToList();
+
+            Assert.That(issues, Has.Count.EqualTo(3));
+            Assert.That(issues.Count(i => i.Template is CheckVideoUsage.IssueTemplateDifferentVideo), Is.EqualTo(2));
+            Assert.That(issues.Count(i => i.Template is CheckVideoUsage.IssueTemplateDifferentStartTime), Is.EqualTo(1));
+        }
+
+        [Test]
+        public void TestPairwiseStartTimeMismatchWhenCurrentMissingVideo()
+        {
+            var beatmapCurrent = createBeatmapWithoutVideo("Diff A");
+            var beatmapB = createBeatmapWithVideo("Diff B", "X.mp4", 1000);
+            var beatmapC = createBeatmapWithVideo("Diff C", "X.mp4", 2000);
+
+            var context = createContext(beatmapCurrent, [beatmapB, beatmapC]);
+
+            var issues = check.Run(context).ToList();
+
+            Assert.That(issues, Has.Count.EqualTo(2));
+            Assert.That(issues.Count(i => i.Template is CheckVideoUsage.IssueTemplateMissingVideo), Is.EqualTo(1));
+            Assert.That(issues.Count(i => i.Template is CheckVideoUsage.IssueTemplateDifferentStartTime), Is.EqualTo(1));
+        }
+
         private BeatmapVerifierContext.VerifiedBeatmap createBeatmapWithVideo(string difficultyName, string path, double startTime)
         {
             var beatmap = new Beatmap
