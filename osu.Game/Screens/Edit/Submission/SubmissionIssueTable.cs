@@ -13,24 +13,17 @@ using osu.Game.Graphics.Sprites;
 using System.Linq;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Edit.Checks.Components;
-using osu.Framework.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Edit.Submission
 {
     public partial class SubmissionIssueTable : CompositeDrawable
     {
-        public BindableList<Issue> Issues { get; } = new BindableList<Issue>();
-
-        public const float COLUMN_WIDTH = 70;
-        public const float COLUMN_GAP = 10;
-        public const float ROW_HEIGHT = 25;
-        public const float ROW_HORIZONTAL_PADDING = 20;
-        public const int TEXT_SIZE = 14;
+        private readonly BindableList<Issue> issues = new BindableList<Issue>();
 
         public void SetIssues(IEnumerable<Issue> issues)
         {
-            Issues.Clear();
-            Issues.AddRange(issues);
+            this.issues.Clear();
+            this.issues.AddRange(issues);
         }
 
         private FillFlowContainer rowFlow = null!;
@@ -43,8 +36,8 @@ namespace osu.Game.Screens.Edit.Submission
                 new Container
                 {
                     RelativeSizeAxes = Axes.X,
-                    Height = ROW_HEIGHT,
-                    Padding = new MarginPadding { Horizontal = ROW_HORIZONTAL_PADDING },
+                    Height = Verify.IssueTable.ROW_HEIGHT,
+                    Padding = new MarginPadding { Horizontal = Verify.IssueTable.ROW_HORIZONTAL_PADDING },
                     Children = new Drawable[]
                     {
                         new HeaderText("Category")
@@ -56,20 +49,20 @@ namespace osu.Game.Screens.Edit.Submission
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
-                            Margin = new MarginPadding { Left = COLUMN_WIDTH + COLUMN_GAP },
+                            Margin = new MarginPadding { Left = Verify.IssueTable.COLUMN_WIDTH + Verify.IssueTable.COLUMN_GAP },
                         },
                         new HeaderText("Message")
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
-                            Margin = new MarginPadding { Left = 2 * (COLUMN_WIDTH + COLUMN_GAP) },
+                            Margin = new MarginPadding { Left = 2 * (Verify.IssueTable.COLUMN_WIDTH + Verify.IssueTable.COLUMN_GAP) },
                         },
                     }
                 },
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Top = ROW_HEIGHT },
+                    Padding = new MarginPadding { Top = Verify.IssueTable.ROW_HEIGHT },
                     Child = new OsuScrollContainer
                     {
                         RelativeSizeAxes = Axes.Both,
@@ -87,35 +80,28 @@ namespace osu.Game.Screens.Edit.Submission
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            Issues.BindCollectionChanged((_, __) => rebuildRows(), true);
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-            Issues.UnbindAll();
+            issues.BindCollectionChanged((_, __) => rebuildRows(), true);
         }
 
         private void rebuildRows()
         {
             rowFlow.Clear(false);
 
-            foreach (var issue in Issues
+            foreach (var issue in issues
                                   .OrderBy(i => i.Check.Metadata.Category)
                                   .ThenBy(i => i.Time ?? double.MinValue))
             {
-                var drawable = new DrawableIssue
+                var drawable = new DrawableIssue(issue)
                 {
                     RelativeSizeAxes = Axes.X,
                 };
-                drawable.Current.Value = issue;
                 rowFlow.Add(drawable);
             }
         }
 
-        public partial class DrawableIssue : CompositeDrawable, IHasCurrentValue<Issue>
+        public partial class DrawableIssue : CompositeDrawable
         {
-            private readonly BindableWithCurrent<Issue> current = new BindableWithCurrent<Issue>();
+            private readonly Issue issue;
 
             private Box background = null!;
             private OsuSpriteText issueCategoryText = null!;
@@ -125,10 +111,9 @@ namespace osu.Game.Screens.Edit.Submission
             [Resolved]
             private OverlayColourProvider colourProvider { get; set; } = null!;
 
-            public Bindable<Issue> Current
+            public DrawableIssue(Issue issue)
             {
-                get => current.Current;
-                set => current.Current = value;
+                this.issue = issue;
             }
 
             [BackgroundDependencyLoader]
@@ -147,21 +132,21 @@ namespace osu.Game.Screens.Edit.Submission
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        Padding = new MarginPadding { Horizontal = ROW_HORIZONTAL_PADDING, Vertical = 4 },
+                        Padding = new MarginPadding { Horizontal = Verify.IssueTable.ROW_HORIZONTAL_PADDING, Vertical = 4 },
                         Children = new Drawable[]
                         {
                             issueCategoryText = new OsuSpriteText
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
-                                Font = OsuFont.GetFont(size: TEXT_SIZE, weight: FontWeight.Bold),
+                                Font = OsuFont.GetFont(size: Verify.IssueTable.TEXT_SIZE, weight: FontWeight.Bold),
                             },
                             issueTimestampText = new OsuSpriteText
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
-                                Font = OsuFont.GetFont(size: TEXT_SIZE, weight: FontWeight.Bold),
-                                Margin = new MarginPadding { Left = COLUMN_WIDTH + COLUMN_GAP },
+                                Font = OsuFont.GetFont(size: Verify.IssueTable.TEXT_SIZE, weight: FontWeight.Bold),
+                                Margin = new MarginPadding { Left = Verify.IssueTable.COLUMN_WIDTH + Verify.IssueTable.COLUMN_GAP },
                             },
                             new Container
                             {
@@ -169,10 +154,10 @@ namespace osu.Game.Screens.Edit.Submission
                                 AutoSizeAxes = Axes.Y,
                                 Padding = new MarginPadding
                                 {
-                                    Left = 2 * (COLUMN_GAP + COLUMN_WIDTH),
+                                    Left = 2 * (Verify.IssueTable.COLUMN_GAP + Verify.IssueTable.COLUMN_WIDTH),
                                     Right = 0,
                                 },
-                                Child = issueDetailFlow = new OsuTextFlowContainer(cp => cp.Font = OsuFont.GetFont(size: TEXT_SIZE, weight: FontWeight.Medium))
+                                Child = issueDetailFlow = new OsuTextFlowContainer(cp => cp.Font = OsuFont.GetFont(size: Verify.IssueTable.TEXT_SIZE, weight: FontWeight.Medium))
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
@@ -187,21 +172,15 @@ namespace osu.Game.Screens.Edit.Submission
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                Current.BindValueChanged(_ => updateState(), true);
+                updateState();
                 FinishTransforms(true);
-            }
-
-            protected override void Dispose(bool isDisposing)
-            {
-                base.Dispose(isDisposing);
-                current.UnbindAll();
             }
 
             private void updateState()
             {
-                issueCategoryText.Text = Current.Value.Check.Metadata.Category.ToString();
-                issueTimestampText.Text = Current.Value.GetEditorTimestamp();
-                issueDetailFlow.Text = Current.Value.ToString();
+                issueCategoryText.Text = issue.Check.Metadata.Category.ToString();
+                issueTimestampText.Text = issue.GetEditorTimestamp();
+                issueDetailFlow.Text = issue.ToString();
 
                 background.FadeTo(0.15f, 100, Easing.OutQuint);
                 background.Colour = colourProvider.Background1;
@@ -213,7 +192,7 @@ namespace osu.Game.Screens.Edit.Submission
             public HeaderText(string text)
             {
                 Text = text;
-                Font = OsuFont.GetFont(size: TEXT_SIZE, weight: FontWeight.Bold);
+                Font = OsuFont.GetFont(size: Verify.IssueTable.TEXT_SIZE, weight: FontWeight.Bold);
             }
         }
     }
