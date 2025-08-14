@@ -218,5 +218,3 @@ namespace osu.Game.Screens.Edit.Submission
         }
     }
 }
-
-
