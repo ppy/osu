@@ -263,12 +263,10 @@ namespace osu.Game.Tests.Editing.Checks
                 storyboard.GetLayer("Background").Add(new StoryboardSprite("test.png", Anchor.Centre, Vector2.Zero));
             }
 
-            return new BeatmapVerifierContext(
-                currentBeatmap,
-                new TestWorkingBeatmap(currentBeatmap, storyboard),
-                DifficultyRating.ExpertPlus,
-                beatmapInfo => allDifficulties.FirstOrDefault(b => b.BeatmapInfo.Equals(beatmapInfo))
-            );
+            var verifiedCurrentBeatmap = new BeatmapVerifierContext.VerifiedBeatmap(new TestWorkingBeatmap(currentBeatmap, storyboard), currentBeatmap);
+            var verifiedOtherBeatmaps = allDifficulties.Select(b => new BeatmapVerifierContext.VerifiedBeatmap(new TestWorkingBeatmap(b, storyboard), b)).ToList();
+
+            return new BeatmapVerifierContext(verifiedCurrentBeatmap, verifiedOtherBeatmaps, DifficultyRating.ExpertPlus);
         }
     }
 }

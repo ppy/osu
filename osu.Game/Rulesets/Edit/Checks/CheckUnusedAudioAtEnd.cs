@@ -21,8 +21,8 @@ namespace osu.Game.Rulesets.Edit.Checks
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
-            double mappedLength = context.Beatmap.HitObjects.Any() ? context.Beatmap.GetLastObjectTime() : 0;
-            double trackLength = context.WorkingBeatmap.Track.Length;
+            double mappedLength = context.CurrentDifficulty.Playable.HitObjects.Any() ? context.CurrentDifficulty.Playable.GetLastObjectTime() : 0;
+            double trackLength = context.CurrentDifficulty.Working.Track.Length;
 
             double mappedPercentage = Math.Round(mappedLength / trackLength * 100);
 
@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Edit.Checks
             {
                 double percentageLeft = Math.Abs(mappedPercentage - 100);
 
-                bool storyboardIsPresent = ResourcesCheckUtils.HasAnyStoryboardElementPresent(context.WorkingBeatmap);
+                bool storyboardIsPresent = ResourcesCheckUtils.HasAnyStoryboardElementPresent(context.CurrentDifficulty.Working);
 
                 if (storyboardIsPresent)
                 {
