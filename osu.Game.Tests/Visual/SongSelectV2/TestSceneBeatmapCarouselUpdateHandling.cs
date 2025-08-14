@@ -139,40 +139,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddAssert("visible panel is updateable beatmap", () => GetSelectedPanel()?.Item?.Model, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
         }
 
-        [Test] // Checks that we don't crash if there exists a difficulty with the same name as the selected difficulty.
-        public void TestDifferentDifficultiesWithSameName()
-        {
-            SelectNextGroup();
-
-            WaitForSelection(1, 0);
-            AddAssert("selection is updateable beatmap", () => Carousel.CurrentSelection, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
-            AddAssert("visible panel is updateable beatmap", () => GetSelectedPanel()?.Item?.Model, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
-
-            // This scenario is pretty much silly, but it's possible to do.
-            // Remove original selected difficulty, and add two difficulties with same name but different valid online IDs.
-            updateBeatmap(null, bs =>
-            {
-                string selectedName = bs.Beatmaps[0].DifficultyName;
-                int selectedOnlineID = bs.Beatmaps[0].OnlineID;
-                bs.Beatmaps.RemoveAt(0);
-
-                var newBeatmap = createBeatmap(bs);
-                newBeatmap.DifficultyName = selectedName;
-                newBeatmap.OnlineID = selectedOnlineID + 1;
-                bs.Beatmaps.Add(newBeatmap);
-
-                newBeatmap = createBeatmap(bs);
-                newBeatmap.DifficultyName = selectedName;
-                newBeatmap.OnlineID = selectedOnlineID + 2;
-                bs.Beatmaps.Add(newBeatmap);
-            });
-
-            WaitForFiltering();
-
-            AddAssert("selection is updateable beatmap", () => Carousel.CurrentSelection, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
-            AddAssert("visible panel is updateable beatmap", () => GetSelectedPanel()?.Item?.Model, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
-        }
-
         [Test] // Checks that we don't crash if there exists a difficulty with the same online ID as the selected difficulty.
         public void TestDifferentDifficultiesWithSameOnlineID()
         {
@@ -182,13 +148,43 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddAssert("selection is updateable beatmap", () => Carousel.CurrentSelection, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
             AddAssert("visible panel is updateable beatmap", () => GetSelectedPanel()?.Item?.Model, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
 
-            // This scenario is also equally silly as the test above this one, but it's also possible to do.
-            // Add another difficulty with the same online ID but different name.
+            // Add another difficulty with same online ID.
             updateBeatmap(null, bs =>
             {
                 var newBeatmap = createBeatmap(bs);
-                newBeatmap.DifficultyName = "Copy";
                 newBeatmap.OnlineID = baseTestBeatmap.Beatmaps[0].OnlineID;
+                bs.Beatmaps.Add(newBeatmap);
+            });
+
+            WaitForFiltering();
+
+            AddAssert("selection is updateable beatmap", () => Carousel.CurrentSelection, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
+            AddAssert("visible panel is updateable beatmap", () => GetSelectedPanel()?.Item?.Model, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
+        }
+
+        [Test] // Checks that we don't crash if there exists a difficulty with the same name as the selected difficulty.
+        public void TestDifferentDifficultiesWithSameName()
+        {
+            SelectNextGroup();
+
+            WaitForSelection(1, 0);
+            AddAssert("selection is updateable beatmap", () => Carousel.CurrentSelection, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
+            AddAssert("visible panel is updateable beatmap", () => GetSelectedPanel()?.Item?.Model, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
+
+            // Remove original selected difficulty, and add two difficulties with same name as selection.
+            updateBeatmap(null, bs =>
+            {
+                string selectedName = bs.Beatmaps[0].DifficultyName;
+                bs.Beatmaps.RemoveAt(0);
+
+                var newBeatmap = createBeatmap(bs);
+                newBeatmap.DifficultyName = selectedName;
+                newBeatmap.OnlineID = -1;
+                bs.Beatmaps.Add(newBeatmap);
+
+                newBeatmap = createBeatmap(bs);
+                newBeatmap.DifficultyName = selectedName;
+                newBeatmap.OnlineID = -1;
                 bs.Beatmaps.Add(newBeatmap);
             });
 
