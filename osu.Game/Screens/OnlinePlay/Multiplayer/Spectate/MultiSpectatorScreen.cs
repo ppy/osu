@@ -137,6 +137,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             for (int i = 0; i < Users.Count; i++)
                 grid.Add(instances[i] = new PlayerArea(Users[i], syncManager.CreateManagedClock()));
 
+            grid.OnMaximisationChanged = onMaximisationChanged;
+
             LoadComponentAsync(leaderboardProvider, _ =>
             {
                 AddInternal(leaderboardProvider);
@@ -178,13 +180,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         {
             base.Update();
 
-            var maximisedPlayer = getMaximisedPlayer();
-            PlayerArea? candidateAudioSource = null;
+            if (isCandidateAudioSource(currentAudioSource?.SpectatorPlayerClock))
+                return;
 
-            if (maximisedPlayer != null && isCandidateAudioSource(maximisedPlayer.SpectatorPlayerClock))
-                candidateAudioSource = maximisedPlayer;
-            else if (!isCandidateAudioSource(currentAudioSource?.SpectatorPlayerClock))
-                candidateAudioSource = instances.Where(i => isCandidateAudioSource(i.SpectatorPlayerClock)).MinBy(i => Math.Abs(i.SpectatorPlayerClock.CurrentTime - syncManager.CurrentMasterTime));
+            var candidateAudioSource = instances.Where(i => isCandidateAudioSource(i.SpectatorPlayerClock))
+                                                .MinBy(i => Math.Abs(i.SpectatorPlayerClock.CurrentTime - syncManager.CurrentMasterTime));
 
             if (candidateAudioSource != null && candidateAudioSource != currentAudioSource)
             {
@@ -220,6 +220,29 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
         private bool isCandidateAudioSource(SpectatorPlayerClock? clock)
             => clock?.IsRunning == true && !clock.IsCatchingUp && !clock.WaitingOnFrames;
+
+        private void onMaximisationChanged()
+        {
+            var maximisedPlayer = getMaximisedPlayer();
+            PlayerArea? candidateAudioSource = null;
+
+            if (maximisedPlayer != null && isCandidateAudioSource(maximisedPlayer.SpectatorPlayerClock))
+                candidateAudioSource = maximisedPlayer;
+            else if (maximisedPlayer == null)
+            {
+                var hostPlayer = instances.FirstOrDefault(i => i.UserId == room.Host?.Id);
+                candidateAudioSource = (hostPlayer != null && isCandidateAudioSource(hostPlayer.SpectatorPlayerClock)) ? hostPlayer : null;
+            }
+
+            if (candidateAudioSource != null && candidateAudioSource != currentAudioSource)
+            {
+                currentAudioSource = candidateAudioSource;
+                bindAudioAdjustments(currentAudioSource);
+
+                foreach (var instance in instances)
+                    instance.Mute = instance != currentAudioSource;
+            }
+        }
 
         private void performInitialSeek()
         {

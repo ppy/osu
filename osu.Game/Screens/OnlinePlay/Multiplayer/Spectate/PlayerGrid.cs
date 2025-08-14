@@ -18,6 +18,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
     {
         public const float ANIMATION_DELAY = 400;
 
+        public Action? OnMaximisationChanged;
+
         /// <summary>
         /// A temporary limitation on the number of players, because only layouts up to 16 players are supported for a single screen.
         /// Todo: Can be removed in the future with scrolling support + performance improvements.
@@ -130,6 +132,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             }
 
             facadeContainer.ScaleTo(hasMaximised ? 0.95f : 1, ANIMATION_DELAY, Easing.OutQuint);
+
+            OnMaximisationChanged?.Invoke();
         }
 
         protected override void Update()
