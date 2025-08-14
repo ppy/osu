@@ -183,17 +183,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             if (isCandidateAudioSource(currentAudioSource?.SpectatorPlayerClock))
                 return;
 
-            var candidateAudioSource = instances.Where(i => isCandidateAudioSource(i.SpectatorPlayerClock))
-                                                .MinBy(i => Math.Abs(i.SpectatorPlayerClock.CurrentTime - syncManager.CurrentMasterTime));
-
-            if (candidateAudioSource != null && candidateAudioSource != currentAudioSource)
-            {
-                currentAudioSource = candidateAudioSource;
-                bindAudioAdjustments(currentAudioSource);
-
-                foreach (var instance in instances)
-                    instance.Mute = instance != currentAudioSource;
-            }
+            updateAudioSource();
         }
 
         private PlayerArea? getMaximisedPlayer()
@@ -221,27 +211,41 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         private bool isCandidateAudioSource(SpectatorPlayerClock? clock)
             => clock?.IsRunning == true && !clock.IsCatchingUp && !clock.WaitingOnFrames;
 
-        private void onMaximisationChanged()
-        {
-            var maximisedPlayer = getMaximisedPlayer();
-            PlayerArea? candidateAudioSource = null;
+        private void onMaximisationChanged() => updateAudioSource();
 
-            if (maximisedPlayer != null && isCandidateAudioSource(maximisedPlayer.SpectatorPlayerClock))
-                candidateAudioSource = maximisedPlayer;
-            else if (maximisedPlayer == null)
-            {
-                var hostPlayer = instances.FirstOrDefault(i => i.UserId == room.Host?.Id);
-                candidateAudioSource = (hostPlayer != null && isCandidateAudioSource(hostPlayer.SpectatorPlayerClock)) ? hostPlayer : null;
-            }
+        private void updateAudioSource()
+        {
+            var candidateAudioSource = selectAudioSource();
 
             if (candidateAudioSource != null && candidateAudioSource != currentAudioSource)
-            {
-                currentAudioSource = candidateAudioSource;
-                bindAudioAdjustments(currentAudioSource);
+                setAudioSource(candidateAudioSource);
+        }
 
-                foreach (var instance in instances)
-                    instance.Mute = instance != currentAudioSource;
+        private PlayerArea? selectAudioSource()
+        {
+            var maximisedPlayer = getMaximisedPlayer();
+
+            if (maximisedPlayer != null && isCandidateAudioSource(maximisedPlayer.SpectatorPlayerClock))
+                return maximisedPlayer;
+
+            if (maximisedPlayer == null)
+            {
+                var hostPlayer = instances.FirstOrDefault(i => i.UserId == room.Host?.Id);
+                if (hostPlayer != null && isCandidateAudioSource(hostPlayer.SpectatorPlayerClock))
+                    return hostPlayer;
             }
+
+            return instances.Where(i => isCandidateAudioSource(i.SpectatorPlayerClock))
+                            .MinBy(i => Math.Abs(i.SpectatorPlayerClock.CurrentTime - syncManager.CurrentMasterTime));
+        }
+
+        private void setAudioSource(PlayerArea audioSource)
+        {
+            currentAudioSource = audioSource;
+            bindAudioAdjustments(currentAudioSource);
+
+            foreach (var instance in instances)
+                instance.Mute = instance != currentAudioSource;
         }
 
         private void performInitialSeek()
