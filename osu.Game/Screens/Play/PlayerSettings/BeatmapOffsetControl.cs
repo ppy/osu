@@ -296,7 +296,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
             Current.Value = suggestedOffset;
             lastAppliedScore.Value = lastValidScore;
 
-            return Math.Abs(Current.Value - lastPlayBeatmapOffset) > Current.Precision;
+            return !Precision.AlmostEquals(Current.Value, lastOffset, Current.Precision / 2);
         }
 
         [Resolved]
