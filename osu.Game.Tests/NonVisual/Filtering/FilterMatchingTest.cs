@@ -305,7 +305,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
         public void TestCriteriaMatchingUserTags(string query, bool filtered)
         {
             var beatmap = getExampleBeatmap();
-            var criteria = new FilterCriteria { UserTag = { SearchTerm = query } };
+            var criteria = new FilterCriteria { UserTags = [new FilterCriteria.OptionalTextFilter { SearchTerm = query }] };
             var carouselItem = new CarouselBeatmap(beatmap);
             carouselItem.Filter(criteria);
 
@@ -313,10 +313,46 @@ namespace osu.Game.Tests.NonVisual.Filtering
         }
 
         [Test]
+        public void TestCriteriaMatchingMultipleTagsAtOnce()
+        {
+            var beatmap = getExampleBeatmap();
+            var criteria = new FilterCriteria
+            {
+                UserTags =
+                [
+                    new FilterCriteria.OptionalTextFilter { SearchTerm = "\"song representation/simple\"!" },
+                    new FilterCriteria.OptionalTextFilter { SearchTerm = "\"style/clean\"!" }
+                ]
+            };
+            var carouselItem = new CarouselBeatmap(beatmap);
+            carouselItem.Filter(criteria);
+
+            Assert.AreEqual(false, carouselItem.Filtered.Value);
+        }
+
+        [Test]
+        public void TestCriteriaAllTagFiltersMustMatch()
+        {
+            var beatmap = getExampleBeatmap();
+            var criteria = new FilterCriteria
+            {
+                UserTags =
+                [
+                    new FilterCriteria.OptionalTextFilter { SearchTerm = "\"song representation/simple\"!" },
+                    new FilterCriteria.OptionalTextFilter { SearchTerm = "\"style/dirty\"!" }
+                ]
+            };
+            var carouselItem = new CarouselBeatmap(beatmap);
+            carouselItem.Filter(criteria);
+
+            Assert.AreEqual(true, carouselItem.Filtered.Value);
+        }
+
+        [Test]
         public void TestBeatmapMustHaveAtLeastOneTagIfUserTagFilterActive()
         {
             var beatmap = getExampleBeatmap();
-            var criteria = new FilterCriteria { UserTag = { SearchTerm = "simple" } };
+            var criteria = new FilterCriteria { UserTags = [new FilterCriteria.OptionalTextFilter { SearchTerm = "simple" }] };
             var carouselItem = new CarouselBeatmap(beatmap);
             carouselItem.BeatmapInfo.Metadata.UserTags.Clear();
             carouselItem.Filter(criteria);
