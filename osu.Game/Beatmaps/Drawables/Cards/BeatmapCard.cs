@@ -103,7 +103,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             }
         }
 
-        public MenuItem[] ContextMenuItems => new MenuItem[]
+        public virtual MenuItem[] ContextMenuItems => new MenuItem[]
         {
             new OsuMenuItem(ContextMenuStrings.ViewBeatmap, MenuItemType.Highlighted, Action),
         };

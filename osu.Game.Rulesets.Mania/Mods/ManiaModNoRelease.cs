@@ -80,7 +80,9 @@ namespace osu.Game.Rulesets.Mania.Mods
                 StartTime = hold.StartTime;
                 Duration = hold.Duration;
                 Column = hold.Column;
+                Samples = hold.Samples;
                 NodeSamples = hold.NodeSamples;
+                PlaySlidingSamples = hold.PlaySlidingSamples;
             }
 
             protected override void CreateNestedHitObjects(CancellationToken cancellationToken)

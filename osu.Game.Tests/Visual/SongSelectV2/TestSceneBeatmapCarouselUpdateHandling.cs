@@ -6,8 +6,10 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Testing;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Extensions;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.Select.Filter;
 using osu.Game.Screens.SelectV2;
@@ -62,6 +64,35 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         }
 
         [Test]
+        public void TestScrollPositionMaintainedWhenSetUpdated()
+        {
+            PanelBeatmapSet panel = null!;
+
+            AddStep("find panel", () => panel = Carousel.ChildrenOfType<PanelBeatmapSet>().Single(p => p.ChildrenOfType<OsuSpriteText>().Any(t => t.Text.ToString() == "beatmap")));
+
+            AddStep("select panel", () => panel.TriggerClick());
+
+            AddStep("scroll to end", () =>
+            {
+                // must trigger a user scroll so that carousel doesn't follow the selection.
+                InputManager.MoveMouseTo(Carousel);
+                InputManager.ScrollVerticalBy(-1000);
+            });
+
+            AddUntilStep("is scrolled to end", () => Carousel.ChildrenOfType<UserTrackingScrollContainer>().Single().IsScrolledToEnd());
+
+            updateBeatmap(b => b.Metadata = new BeatmapMetadata
+            {
+                Artist = "updated test",
+                Title = $"beatmap {RNG.Next().ToString()}"
+            });
+
+            WaitForFiltering();
+
+            AddAssert("scroll is still at end", () => Carousel.ChildrenOfType<UserTrackingScrollContainer>().Single().IsScrolledToEnd());
+        }
+
+        [Test]
         public void TestBeatmapSetMetadataUpdated()
         {
             PanelBeatmapSet panel = null!;
@@ -94,9 +125,9 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [Test]
         public void TestSelectionHeld()
         {
-            SelectNextGroup();
+            SelectNextSet();
 
-            WaitForSelection(1, 0);
+            WaitForSetSelection(1, 0);
             AddAssert("selection is updateable beatmap", () => Carousel.CurrentSelection, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
             AddAssert("visible panel is updateable beatmap", () => GetSelectedPanel()?.Item?.Model, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
 
@@ -110,9 +141,9 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [Test] // Checks that we keep selection based on online ID where possible.
         public void TestSelectionHeldDifficultyNameChanged()
         {
-            SelectNextGroup();
+            SelectNextSet();
 
-            WaitForSelection(1, 0);
+            WaitForSetSelection(1, 0);
             AddAssert("selection is updateable beatmap", () => Carousel.CurrentSelection, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
             AddAssert("visible panel is updateable beatmap", () => GetSelectedPanel()?.Item?.Model, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
 
@@ -126,9 +157,9 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [Test] // Checks that we fallback to keeping selection based on difficulty name.
         public void TestSelectionHeldDifficultyOnlineIDChanged()
         {
-            SelectNextGroup();
+            SelectNextSet();
 
-            WaitForSelection(1, 0);
+            WaitForSetSelection(1, 0);
             AddAssert("selection is updateable beatmap", () => Carousel.CurrentSelection, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
             AddAssert("visible panel is updateable beatmap", () => GetSelectedPanel()?.Item?.Model, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
 
@@ -227,7 +258,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             Guid[] originalOrder = null!;
 
             SortBy(SortMode.Artist);
-            WaitForFiltering();
 
             AddAssert("Items in descending added order", () => Carousel.PostFilterBeatmaps.Select(b => b.BeatmapSet!.DateAdded), () => Is.Ordered.Descending);
             AddStep("Save order", () => originalOrder = Carousel.PostFilterBeatmaps.Select(b => b.ID).ToArray());
@@ -243,7 +273,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddAssert("Order didn't change", () => Carousel.PostFilterBeatmaps.Select(b => b.ID), () => Is.EqualTo(originalOrder));
 
             SortBy(SortMode.Title);
-            WaitForFiltering();
 
             AddAssert("Order didn't change", () => Carousel.PostFilterBeatmaps.Select(b => b.ID), () => Is.EqualTo(originalOrder));
         }
@@ -280,7 +309,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             Guid[] originalOrder = null!;
 
             SortBy(SortMode.Artist);
-            WaitForFiltering();
 
             AddAssert("Items in descending added order", () => Carousel.PostFilterBeatmaps.Select(b => b.BeatmapSet!.DateAdded), () => Is.Ordered.Descending);
             AddStep("Save order", () => originalOrder = Carousel.PostFilterBeatmaps.Select(b => b.ID).ToArray());
@@ -307,7 +335,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddAssert("Order didn't change", () => Carousel.PostFilterBeatmaps.Select(b => b.ID), () => Is.EqualTo(originalOrder));
 
             SortBy(SortMode.Title);
-            WaitForFiltering();
 
             AddAssert("Order didn't change", () => Carousel.PostFilterBeatmaps.Select(b => b.ID), () => Is.EqualTo(originalOrder));
         }

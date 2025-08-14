@@ -171,13 +171,13 @@ namespace osu.Game.Rulesets.Taiko.Tests.Judgements
             beatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = 6 });
             beatmap.ControlPointInfo.Add(0, new EffectControlPoint { ScrollSpeed = 10 });
 
-            var hitWindows = new HitWindows();
+            var hitWindows = new DefaultHitWindows();
             hitWindows.SetDifficulty(beatmap.Difficulty.OverallDifficulty);
 
             PerformTest(new List<ReplayFrame>
             {
                 new TaikoReplayFrame(0),
-                new TaikoReplayFrame(hit_time - hitWindows.WindowFor(HitResult.Great), TaikoAction.LeftCentre),
+                new TaikoReplayFrame(hit_time - (hitWindows.WindowFor(HitResult.Great) + 0.1), TaikoAction.LeftCentre),
             }, beatmap);
 
             AssertJudgementCount(1);

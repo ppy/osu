@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             get
             {
-                if (UserAdjustedSettingsCount != 1)
+                if (!IsExactlyOneSettingChanged(CircleSize, ApproachRate, OverallDifficulty, DrainRate))
                     return string.Empty;
 
                 if (!CircleSize.IsDefault) return format("CS", CircleSize);

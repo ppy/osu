@@ -18,6 +18,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
+using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Users;
 
 namespace osu.Game.Screens.Edit.GameplayTest
@@ -31,6 +32,9 @@ namespace osu.Game.Screens.Edit.GameplayTest
 
         [Resolved]
         private MusicController musicController { get; set; } = null!;
+
+        [Cached(typeof(IGameplayLeaderboardProvider))]
+        private EmptyGameplayLeaderboardProvider leaderboardProvider = new EmptyGameplayLeaderboardProvider();
 
         public EditorPlayer(Editor editor)
             : base(new PlayerConfiguration { ShowResults = false })

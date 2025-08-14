@@ -1,25 +1,26 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Diagnostics;
 using osu.Framework.Localisation;
 using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Screens.Ranking.Statistics.User
 {
-    public partial class PerformancePointsChangeRow : RankingChangeRow<decimal?>
+    public partial class PerformancePointsChangeRow : RankingChangeRow<int?>
     {
         public PerformancePointsChangeRow()
-            : base(stats => stats.PP)
+            : base(stats => stats.PP != null ? (int)Math.Round(stats.PP.Value) : null)
         {
         }
 
         protected override LocalisableString Label => RankingsStrings.StatPerformance;
 
-        protected override LocalisableString FormatCurrentValue(decimal? current)
+        protected override LocalisableString FormatCurrentValue(int? current)
             => current == null ? string.Empty : LocalisableString.Interpolate($@"{current:N0}pp");
 
-        protected override int CalculateDifference(decimal? previous, decimal? current, out LocalisableString formattedDifference)
+        protected override int CalculateDifference(int? previous, int? current, out LocalisableString formattedDifference)
         {
             if (previous == null && current == null)
             {

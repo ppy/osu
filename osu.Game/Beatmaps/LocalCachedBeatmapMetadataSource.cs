@@ -46,7 +46,7 @@ namespace osu.Game.Beatmaps
             this.storage = storage;
 
             if (shouldFetchCache())
-                prepareLocalCache();
+                FetchCache();
         }
 
         private bool shouldFetchCache()
@@ -105,7 +105,11 @@ namespace osu.Game.Beatmaps
                     switch (getCacheVersion(db))
                     {
                         case 2:
+                            // can be removed 20260123
                             return queryCacheVersion2(db, beatmapInfo, out onlineMetadata);
+
+                        case 3:
+                            return queryCacheVersion3(db, beatmapInfo, out onlineMetadata);
                     }
                 }
 
@@ -127,7 +131,7 @@ namespace osu.Game.Beatmaps
                             return false;
 
                         tryPurgeCache();
-                        prepareLocalCache();
+                        FetchCache();
                         return false;
                 }
 
@@ -161,7 +165,7 @@ namespace osu.Game.Beatmaps
         private SqliteConnection getConnection() =>
             new SqliteConnection(string.Concat(@"Data Source=", storage.GetFullPath(@"online.db", true)));
 
-        private void prepareLocalCache()
+        public Task FetchCache()
         {
             bool isRefetch = storage.Exists(cache_database_name);
 
@@ -188,6 +192,13 @@ namespace osu.Game.Beatmaps
             {
                 try
                 {
+                    // `SqliteConnection` by default uses pooling.
+                    // disposing an `SqliteConnection` is not enough to get `Microsoft.Data.Sqlite` to close the database file.
+                    // this means that overwriting the file may fail if the pools are not cleared before trying.
+                    // this fails especially loudly on Windows because of Windows file delete semantics being exclusive-write
+                    // rather than Unix's "file is marked for deletion after last reader closes the fd".
+                    SqliteConnection.ClearAllPools();
+
                     using (var stream = File.OpenRead(cacheDownloadRequest.Filename))
                     using (var outStream = File.OpenWrite(cacheFilePath))
                     {
@@ -214,7 +225,7 @@ namespace osu.Game.Beatmaps
                 }
             };
 
-            Task.Run(async () =>
+            return Task.Run(async () =>
             {
                 try
                 {
@@ -227,12 +238,20 @@ namespace osu.Game.Beatmaps
             });
         }
 
-        public int GetCacheVersion()
+        public bool IsAtLeastVersion(int version)
         {
-            using (var connection = getConnection())
+            try
             {
-                connection.Open();
-                return getCacheVersion(connection);
+                using (var connection = getConnection())
+                {
+                    connection.Open();
+                    return getCacheVersion(connection) >= version;
+                }
+            }
+            catch (SqliteException ex) when (ex.SqliteErrorCode == 26 || ex.SqliteErrorCode == 11) // SQLITE_NOTADB, SQLITE_CORRUPT
+            {
+                // if the database is corrupted then return `false` as the consumer may want to just refetch the db themselves
+                return false;
             }
         }
 
@@ -263,6 +282,16 @@ namespace osu.Game.Beatmaps
 
                 return reader.GetInt32(0);
             }
+        }
+
+        public DateTime? GetCacheFetchDate()
+        {
+            string path = storage.GetFullPath(cache_database_name);
+            var file = new FileInfo(path);
+            if (!file.Exists)
+                return null;
+
+            return file.LastWriteTime;
         }
 
         private bool queryCacheVersion2(SqliteConnection db, BeatmapInfo beatmapInfo, out OnlineBeatmapMetadata? onlineMetadata)
@@ -309,6 +338,63 @@ namespace osu.Game.Beatmaps
 
             onlineMetadata = null;
             return false;
+        }
+
+        private bool queryCacheVersion3(SqliteConnection db, BeatmapInfo beatmapInfo, out OnlineBeatmapMetadata? onlineMetadata)
+        {
+            Debug.Assert(beatmapInfo.BeatmapSet != null);
+
+            using (var cmd = db.CreateCommand())
+            {
+                cmd.CommandText =
+                    """
+                    SELECT `b`.`beatmapset_id`, `b`.`beatmap_id`, `b`.`approved`, `b`.`user_id`, `b`.`checksum`, `b`.`last_update`, `s`.`submit_date`, `s`.`approved_date`
+                    FROM `osu_beatmaps` AS `b`
+                    JOIN `osu_beatmapsets` AS `s` ON `s`.`beatmapset_id` = `b`.`beatmapset_id`
+                    WHERE (`b`.`checksum` = @MD5Hash OR `b`.`filename` = @Path)
+                    """;
+
+                cmd.Parameters.Add(new SqliteParameter(@"@MD5Hash", beatmapInfo.MD5Hash));
+                cmd.Parameters.Add(new SqliteParameter(@"@Path", beatmapInfo.Path));
+
+                using (var reader = cmd.ExecuteReader())
+                {
+                    if (!reader.Read())
+                    {
+                        onlineMetadata = null;
+                        return false;
+                    }
+
+                    logForModel(beatmapInfo.BeatmapSet, $@"Cached local retrieval for {beatmapInfo} (cache version 3).");
+
+                    onlineMetadata = new OnlineBeatmapMetadata
+                    {
+                        BeatmapSetID = reader.GetInt32(0),
+                        BeatmapID = reader.GetInt32(1),
+                        BeatmapStatus = (BeatmapOnlineStatus)reader.GetByte(2),
+                        BeatmapSetStatus = (BeatmapOnlineStatus)reader.GetByte(2),
+                        AuthorID = reader.GetInt32(3),
+                        MD5Hash = reader.GetString(4),
+                        LastUpdated = reader.GetDateTimeOffset(5),
+                        DateSubmitted = reader.GetDateTimeOffset(6),
+                        DateRanked = reader.GetDateTimeOffset(7),
+                    };
+                }
+            }
+
+            using (var tagsCommand = db.CreateCommand())
+            {
+                tagsCommand.CommandText = "SELECT `name` FROM `tags` WHERE `id` IN (SELECT `tag_id` FROM `beatmap_tags` WHERE `beatmap_id` = @BeatmapID)";
+                tagsCommand.Parameters.Add(new SqliteParameter(@"@BeatmapID", onlineMetadata.BeatmapID));
+
+                using (var tagsReader = tagsCommand.ExecuteReader())
+                {
+                    while (tagsReader.Read())
+                        onlineMetadata.UserTags.Add(tagsReader.GetString(0));
+                }
+            }
+
+            return true;
         }
 
         private static void log(string message)

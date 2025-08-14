@@ -17,6 +17,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Configuration;
 using osu.Game.Extensions;
+using osu.Game.Localisation;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Difficulty;
@@ -380,15 +381,39 @@ namespace osu.Game.Rulesets
         public virtual LocalisableString GetDisplayNameForHitResult(HitResult result) => result.GetLocalisableDescription();
 
         /// <summary>
-        /// Applies changes to difficulty attributes for presenting to a user a rough estimate of how rate adjust mods affect difficulty.
+        /// Applies changes to difficulty attributes for presenting to a user a rough estimate of how mods affect difficulty.
         /// Importantly, this should NOT BE USED FOR ANY CALCULATIONS.
         ///
         /// It is also not always correct, and arguably is never correct depending on your frame of mind.
         /// </summary>
-        /// <param name="difficulty">>The <see cref="IBeatmapDifficultyInfo"/> that will be adjusted.</param>
-        /// <param name="rate">The rate adjustment multiplier from mods. For example 1.5 for DT.</param>
+        /// <param name="beatmapInfo">The <see cref="IBeatmapInfo"/> for which to display the adjusted difficulty.</param>
+        /// <param name="mods">The active mods.</param>
         /// <returns>The adjusted difficulty attributes.</returns>
-        public virtual BeatmapDifficulty GetRateAdjustedDisplayDifficulty(IBeatmapDifficultyInfo difficulty, double rate) => new BeatmapDifficulty(difficulty);
+        public virtual BeatmapDifficulty GetAdjustedDisplayDifficulty(IBeatmapInfo beatmapInfo, IReadOnlyCollection<Mod> mods)
+        {
+            BeatmapDifficulty adjustedDifficulty = new BeatmapDifficulty(beatmapInfo.Difficulty);
+
+            foreach (var mod in mods.OfType<IApplicableToDifficulty>())
+                mod.ApplyToDifficulty(adjustedDifficulty);
+
+            return adjustedDifficulty;
+        }
+
+        /// <summary>
+        /// Returns a list of <see cref="RulesetBeatmapAttribute"/>s to be displayed wherever it is wanted to display a given beatmap's difficulty information.
+        /// The returned data includes both material changes to difficulty from <see cref="IApplicableToDifficulty"/> mods,
+        /// as well as "effective" adjustments coming from <see cref="GetAdjustedDisplayDifficulty"/>.
+        /// </summary>
+        public virtual IEnumerable<RulesetBeatmapAttribute> GetBeatmapAttributesForDisplay(IBeatmapInfo beatmapInfo, IReadOnlyCollection<Mod> mods)
+        {
+            var originalDifficulty = beatmapInfo.Difficulty;
+            var adjustedDifficulty = GetAdjustedDisplayDifficulty(beatmapInfo, mods);
+
+            yield return new RulesetBeatmapAttribute(SongSelectStrings.CircleSize, @"CS", originalDifficulty.CircleSize, adjustedDifficulty.CircleSize, 10);
+            yield return new RulesetBeatmapAttribute(SongSelectStrings.ApproachRate, @"AR", originalDifficulty.ApproachRate, adjustedDifficulty.ApproachRate, 10);
+            yield return new RulesetBeatmapAttribute(SongSelectStrings.Accuracy, @"OD", originalDifficulty.OverallDifficulty, adjustedDifficulty.OverallDifficulty, 10);
+            yield return new RulesetBeatmapAttribute(SongSelectStrings.HPDrain, @"HP", originalDifficulty.DrainRate, adjustedDifficulty.DrainRate, 10);
+        }
 
         /// <summary>
         /// Creates ruleset-specific beatmap filter criteria to be used on the song select screen.

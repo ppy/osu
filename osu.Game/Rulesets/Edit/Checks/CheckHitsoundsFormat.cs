@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Edit.Checks
 {
     public class CheckHitsoundsFormat : ICheck
     {
-        public CheckMetadata Metadata => new CheckMetadata(CheckCategory.Audio, "Checks for hitsound formats.");
+        public CheckMetadata Metadata => new CheckMetadata(CheckCategory.Audio, "Checks for hitsound formats.", CheckScope.BeatmapSet);
 
         public IEnumerable<IssueTemplate> PossibleTemplates => new IssueTemplate[]
         {
@@ -23,8 +23,8 @@ namespace osu.Game.Rulesets.Edit.Checks
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
-            var beatmapSet = context.Beatmap.BeatmapInfo.BeatmapSet;
-            var audioFile = beatmapSet?.GetFile(context.Beatmap.Metadata.AudioFile);
+            var beatmapSet = context.CurrentDifficulty.Playable.BeatmapInfo.BeatmapSet;
+            var audioFile = beatmapSet?.GetFile(context.CurrentDifficulty.Playable.Metadata.AudioFile);
 
             if (beatmapSet == null) yield break;
 
@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Edit.Checks
             {
                 if (audioFile != null && ReferenceEquals(file.File, audioFile.File)) continue;
 
-                using (Stream data = context.WorkingBeatmap.GetStream(file.File.GetStoragePath()))
+                using (Stream data = context.CurrentDifficulty.Working.GetStream(file.File.GetStoragePath()))
                 {
                     if (data == null)
                         continue;

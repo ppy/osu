@@ -5,7 +5,6 @@ using System;
 using NUnit.Framework;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Rulesets.Mania.Mods;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Rulesets.Mania.Tests
@@ -38,7 +37,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             new object[] { LegacyMods.Key2, new[] { typeof(ManiaModKey2) } },
             new object[] { LegacyMods.Mirror, new[] { typeof(ManiaModMirror) } },
             new object[] { LegacyMods.HardRock | LegacyMods.DoubleTime, new[] { typeof(ManiaModHardRock), typeof(ManiaModDoubleTime) } },
-            new object[] { LegacyMods.ScoreV2, new[] { typeof(ModScoreV2) } },
+            new object[] { LegacyMods.ScoreV2, new[] { typeof(ManiaModScoreV2) } },
         };
 
         [TestCaseSource(nameof(mania_mod_mapping))]
