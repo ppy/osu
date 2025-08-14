@@ -173,9 +173,9 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [Test] // Checks that we don't crash if there exists a difficulty with the same online ID as the selected difficulty.
         public void TestDifferentDifficultiesWithSameOnlineID()
         {
-            SelectNextGroup();
+            SelectNextSet();
 
-            WaitForSelection(1, 0);
+            WaitForSetSelection(1, 0);
             AddAssert("selection is updateable beatmap", () => Carousel.CurrentSelection, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
             AddAssert("visible panel is updateable beatmap", () => GetSelectedPanel()?.Item?.Model, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
 
@@ -196,9 +196,9 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [Test] // Checks that we don't crash if there exists a difficulty with the same name as the selected difficulty.
         public void TestDifferentDifficultiesWithSameName()
         {
-            SelectNextGroup();
+            SelectNextSet();
 
-            WaitForSelection(1, 0);
+            WaitForSetSelection(1, 0);
             AddAssert("selection is updateable beatmap", () => Carousel.CurrentSelection, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
             AddAssert("visible panel is updateable beatmap", () => GetSelectedPanel()?.Item?.Model, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
 
