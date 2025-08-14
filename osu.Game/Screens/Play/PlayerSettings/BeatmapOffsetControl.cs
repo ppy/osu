@@ -64,10 +64,10 @@ namespace osu.Game.Screens.Play.PlayerSettings
         [Resolved]
         private OsuConfigManager config { get; set; } = null!;
 
-        private double lastPlayMedian;
-        private double lastPlayUnstableRate;
         private double lastPlayBeatmapOffset;
         private HitEventTimingDistributionGraph? lastPlayGraph;
+
+        private double suggestedOffset;
 
         private SettingsButton? calibrateFromLastPlayButton;
 
@@ -237,9 +237,13 @@ namespace osu.Game.Screens.Play.PlayerSettings
             }
 
             lastValidScore = score.NewValue!;
-            lastPlayMedian = median;
-            lastPlayUnstableRate = hitEvents.CalculateUnstableRate()!.Result;
             lastPlayBeatmapOffset = Current.Value;
+
+            double unstableRate = hitEvents.CalculateUnstableRate()!.Result;
+
+            bool autoAdjustBeatmapOffset = config.Get<bool>(OsuSetting.AutomaticallyAdjustBeatmapOffset);
+
+            suggestedOffset = computeSuggestedOffset(median, unstableRate, lastPlayBeatmapOffset, proportionalToUnstableRate: autoAdjustBeatmapOffset);
 
             LinkFlowContainer offsetText;
 
@@ -257,7 +261,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                     Action = () =>
                     {
                         if (!Current.Disabled)
-                            applySuggestedOffset(proportionalToUnstableRate: false);
+                            applySuggestedOffset();
                     },
                 },
                 offsetText = new LinkFlowContainer
@@ -267,9 +271,9 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 }
             });
 
-            if (config.Get<bool>(OsuSetting.AutomaticallyAdjustBeatmapOffset))
+            if (autoAdjustBeatmapOffset && !Current.Disabled)
             {
-                bool offsetChanged = applySuggestedOffset(proportionalToUnstableRate: true);
+                bool offsetChanged = applySuggestedOffset();
 
                 calibrateFromLastPlayButton.Hide();
 
@@ -285,19 +289,11 @@ namespace osu.Game.Screens.Play.PlayerSettings
             offsetText.AddText(" based off this play.", t => t.Font = OsuFont.Style.Caption2);
         }
 
-        private bool applySuggestedOffset(bool proportionalToUnstableRate)
+        private bool applySuggestedOffset()
         {
-            const double ur_adjustment_cutoff = 90;
-            const double exponential_factor = -0.0116;
+            double lastOffset = Current.Value;
 
-            double offsetAdjustment = lastPlayMedian;
-
-            if (proportionalToUnstableRate && lastPlayUnstableRate >= ur_adjustment_cutoff)
-                // A demonstrative graph of this algorithm is embedded in https://github.com/ppy/osu/discussions/30521.
-                // This ultimately prevents scores with high unstable rate from suggesting potentially invalid offsets.
-                offsetAdjustment *= Math.Exp(exponential_factor * (lastPlayUnstableRate - ur_adjustment_cutoff));
-
-            Current.Value = lastPlayBeatmapOffset - offsetAdjustment;
+            Current.Value = suggestedOffset;
             lastAppliedScore.Value = lastValidScore;
 
             return Math.Abs(Current.Value - lastPlayBeatmapOffset) > Current.Precision;
@@ -319,7 +315,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
             bool allow = allowOffsetAdjust;
 
             if (calibrateFromLastPlayButton != null)
-                calibrateFromLastPlayButton.Enabled.Value = allow && !Precision.AlmostEquals(lastPlayMedian, adjustmentSinceLastPlay, Current.Precision / 2);
+                calibrateFromLastPlayButton.Enabled.Value = allow && !Precision.AlmostEquals(suggestedOffset, Current.Value, Current.Precision / 2);
 
             Current.Disabled = !allow;
         }
@@ -351,6 +347,21 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
         public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
+        }
+
+        private static double computeSuggestedOffset(double median, double unstableRate, double currentOffset, bool proportionalToUnstableRate)
+        {
+            const double ur_adjustment_cutoff = 90;
+            const double exponential_factor = -0.0116;
+
+            double offsetAdjustment = median;
+
+            if (proportionalToUnstableRate && unstableRate >= ur_adjustment_cutoff)
+                // A demonstrative graph of this algorithm is embedded in https://github.com/ppy/osu/discussions/30521.
+                // This ultimately prevents scores with high unstable rate from suggesting potentially invalid offsets.
+                offsetAdjustment *= Math.Exp(exponential_factor * (unstableRate - ur_adjustment_cutoff));
+
+            return currentOffset - offsetAdjustment;
         }
 
         public static LocalisableString GetOffsetExplanatoryText(double offset)
