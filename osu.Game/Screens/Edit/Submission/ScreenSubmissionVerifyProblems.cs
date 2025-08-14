@@ -10,6 +10,8 @@ using osu.Framework.Graphics;
 using osu.Game.Rulesets.Edit.Checks.Components;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.UserInterfaceV2;
+using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Screens.Edit.Submission
 {
@@ -20,6 +22,9 @@ namespace osu.Game.Screens.Edit.Submission
 
         [Resolved]
         private BindableList<Issue> submissionProblemIssues { get; set; } = null!;
+
+        [Resolved]
+        private OsuGame? game { get; set; }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
@@ -34,6 +39,31 @@ namespace osu.Game.Screens.Edit.Submission
                     Text = BeatmapSubmissionStrings.VerifyProblemsDisclaimer,
                 },
                 table = new SubmissionIssueTable { RelativeSizeAxes = Axes.X, Height = 300 },
+                new FillFlowContainer
+                {
+                    AutoSizeAxes = Axes.Y,
+                    RelativeSizeAxes = Axes.X,
+                    Direction = FillDirection.Horizontal,
+                    Margin = new MarginPadding { Top = 10 },
+                    Children = new Drawable[]
+                    {
+                        new RoundedButton
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Width = 300,
+                            Text = BeatmapSubmissionStrings.OpenBeatmapVerifier,
+                            Action = () =>
+                            {
+                                game?.PerformFromScreen(s =>
+                                {
+                                    if (s is Editor editor)
+                                        editor.Mode.Value = EditorScreenMode.Verify;
+                                }, [typeof(Editor)]);
+                            },
+                        }
+                    }
+                }
             });
             table.SetIssues(submissionProblemIssues);
         }
