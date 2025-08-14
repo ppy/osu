@@ -117,7 +117,7 @@ namespace osu.Game.Screens.SelectV2
                 Add(overflowButton = new TagsOverflowButton(tags)
                 {
                     Alpha = 0f,
-                    PerformSearch = PerformSearch,
+                    PerformSearch = s => PerformSearch?.Invoke(s),
                 });
 
                 drawSizeLayout.Invalidate();
