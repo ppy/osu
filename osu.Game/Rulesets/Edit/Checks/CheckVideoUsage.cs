@@ -1,7 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Game.Rulesets.Edit.Checks.Components;
 
 namespace osu.Game.Rulesets.Edit.Checks
@@ -28,43 +30,74 @@ namespace osu.Game.Rulesets.Edit.Checks
                 {
                     if (ResourcesCheckUtils.GetDifficultyVideo(otherDifficulty.Working) != null)
                     {
-                        yield return new IssueTemplateMissingVideo(this).Create(otherDifficulty.Playable.BeatmapInfo.DifficultyName);
+                        yield return new IssueTemplateMissingVideo(this).Create(context.CurrentDifficulty.Playable.BeatmapInfo.DifficultyName);
 
                         break;
                     }
                 }
-
-                yield break;
             }
 
-            string referencePath = currentVideo.Path;
-            double referenceStart = currentVideo.StartTime;
-
-            foreach (var otherDifficulty in context.OtherDifficulties)
+            // If current has a video, check for missing video on other difficulties and warn about different files vs current.
+            if (currentVideo != null)
             {
-                var otherVideo = ResourcesCheckUtils.GetDifficultyVideo(otherDifficulty.Working);
-                string difficultyName = otherDifficulty.Playable.BeatmapInfo.DifficultyName;
+                string referencePath = currentVideo.Path;
 
-                // If other difficulty has no video -> problem
-                if (otherVideo == null)
+                foreach (var otherDifficulty in context.OtherDifficulties)
                 {
-                    yield return new IssueTemplateMissingVideo(this).Create(difficultyName);
+                    var otherVideo = ResourcesCheckUtils.GetDifficultyVideo(otherDifficulty.Working);
+                    string difficultyName = otherDifficulty.Playable.BeatmapInfo.DifficultyName;
 
-                    continue;
+                    // If other difficulty has no video -> problem
+                    if (otherVideo == null)
+                    {
+                        yield return new IssueTemplateMissingVideo(this).Create(difficultyName);
+
+                        continue;
+                    }
+
+                    // Different video used (relative to current) -> warning
+                    if (!string.Equals(otherVideo.Path, referencePath, StringComparison.OrdinalIgnoreCase))
+                    {
+                        yield return new IssueTemplateDifferentVideo(this).Create(difficultyName, referencePath, otherVideo.Path);
+                    }
                 }
+            }
 
-                // Different video used -> warning
-                if (!string.Equals(otherVideo.Path, referencePath, System.StringComparison.OrdinalIgnoreCase))
+            // Pairwise check: for each video file used across all difficulties, ensure all start times match.
+            // Build a list of all difficulties with a video present (including current).
+            var allWithVideos = new List<(string DifficultyName, string Path, double StartTime)>();
+
+            if (currentVideo != null)
+                allWithVideos.Add((context.CurrentDifficulty.Playable.BeatmapInfo.DifficultyName, currentVideo.Path, currentVideo.StartTime));
+
+            foreach (var other in context.OtherDifficulties)
+            {
+                var video = ResourcesCheckUtils.GetDifficultyVideo(other.Working);
+
+                if (video != null)
                 {
-                    yield return new IssueTemplateDifferentVideo(this).Create(difficultyName, referencePath, otherVideo.Path);
-
-                    continue;
+                    string name = other.Playable.BeatmapInfo.DifficultyName;
+                    allWithVideos.Add((name, video.Path, video.StartTime));
                 }
+            }
 
-                // Same video but different start times -> problem
-                if (!referenceStart.Equals(otherVideo.StartTime))
+            // Group by video path (case-insensitive) and compare start times pairwise within each group.
+            foreach (var group in allWithVideos.GroupBy(v => v.Path, StringComparer.OrdinalIgnoreCase))
+            {
+                var list = group.ToList();
+
+                for (int i = 0; i < list.Count; i++)
                 {
-                    yield return new IssueTemplateDifferentStartTime(this).Create(referencePath, difficultyName, referenceStart, otherVideo.StartTime);
+                    for (int j = i + 1; j < list.Count; j++)
+                    {
+                        if (!list[i].StartTime.Equals(list[j].StartTime))
+                        {
+                            yield return new IssueTemplateDifferentStartTime(this).Create(
+                                group.Key,
+                                list[i].DifficultyName, list[i].StartTime,
+                                list[j].DifficultyName, list[j].StartTime);
+                        }
+                    }
                 }
             }
         }
@@ -83,12 +116,12 @@ namespace osu.Game.Rulesets.Edit.Checks
         public class IssueTemplateDifferentStartTime : IssueTemplate
         {
             public IssueTemplateDifferentStartTime(ICheck check)
-                : base(check, IssueType.Problem, "Video start time differs for \"{0}\" in \"{1}\" (current: {2:0} ms, other: {3:0} ms).")
+                : base(check, IssueType.Problem, "Video start time differs for \"{0}\" between \"{1}\" ({2:0} ms) and \"{3}\" ({4:0} ms).")
             {
             }
 
-            public Issue Create(string path, string otherDifficulty, double currentStartMs, double otherStartMs)
-                => new Issue(this, path, otherDifficulty, currentStartMs, otherStartMs);
+            public Issue Create(string path, string difficultyA, double startA, string difficultyB, double startB)
+                => new Issue(this, path, difficultyA, startA, difficultyB, startB);
         }
 
         public class IssueTemplateMissingVideo : IssueTemplate
