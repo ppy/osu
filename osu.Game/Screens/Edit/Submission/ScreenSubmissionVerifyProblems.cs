@@ -22,11 +22,8 @@ namespace osu.Game.Screens.Edit.Submission
         [Resolved]
         private BindableList<Issue> submissionProblemIssues { get; set; } = null!;
 
-        [Resolved]
-        private OsuGame? game { get; set; }
-
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, OsuGame? game)
         {
             Content.AddRange(new Drawable[]
             {
