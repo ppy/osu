@@ -63,6 +63,12 @@ namespace osu.Game.Screens.Play.PlayerSettings
         [Resolved]
         private Player? player { get; set; }
 
+        [Resolved]
+        private SettingsOverlay? settings { get; set; }
+
+        // the last play graph is relative to the offset at the point of the last play, so we need to factor that out for some usages.
+        private double adjustmentSinceLastPlay => lastPlayBeatmapOffset - Current.Value;
+
         private double lastPlayMedian;
         private double lastPlayUnstableRate;
         private double lastPlayBeatmapOffset;
@@ -71,6 +77,8 @@ namespace osu.Game.Screens.Play.PlayerSettings
         private IDisposable? beatmapOffsetSubscription;
         private Task? realmWriteTask;
         private ScoreInfo? lastValidScore;
+
+        private bool allowOffsetAdjust => player?.AllowCriticalSettingsAdjustment != false;
 
         public BeatmapOffsetControl()
         {
@@ -138,8 +146,53 @@ namespace osu.Game.Screens.Play.PlayerSettings
             ReferenceScore.BindValueChanged(scoreChanged, true);
         }
 
-        // the last play graph is relative to the offset at the point of the last play, so we need to factor that out for some usages.
-        private double adjustmentSinceLastPlay => lastPlayBeatmapOffset - Current.Value;
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+        {
+            // To match stable, this should adjust by 5 ms, or 1 ms when holding alt.
+            // But that is hard to make work with global actions due to the operating mode.
+            // Let's use the more precise as a default for now.
+            const double amount = 1;
+
+            switch (e.Action)
+            {
+                case GlobalAction.IncreaseOffset:
+                    if (!Current.Disabled)
+                        Current.Value += amount;
+                    return true;
+
+                case GlobalAction.DecreaseOffset:
+                    if (!Current.Disabled)
+                        Current.Value -= amount;
+                    return true;
+            }
+
+            return false;
+        }
+
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
+        {
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            bool allow = allowOffsetAdjust;
+
+            if (calibrateFromLastPlayButton != null)
+            {
+                double suggestedOffset = computeSuggestedOffset(lastPlayMedian, lastPlayUnstableRate, lastPlayBeatmapOffset);
+                calibrateFromLastPlayButton.Enabled.Value = allow && !Precision.AlmostEquals(suggestedOffset, Current.Value, Current.Precision / 2);
+            }
+
+            Current.Disabled = !allow;
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            beatmapOffsetSubscription?.Dispose();
+        }
 
         private void currentChanged(ValueChangedEvent<double> offset)
         {
@@ -206,7 +259,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 return;
 
             // affecting unstable rate here is used as a substitute of determining if a hit event represents a *timed* hit event,
-            // i.e. an user input that the user had to *time to the track*,
+            // i.e. a user input that the user had to *time to the track*,
             // i.e. one that it *makes sense to use* when doing anything with timing and offsets.
             bool hasEnoughUsableEvents = hitEvents.Count(HitEventExtensions.AffectsUnstableRate) >= 50;
 
@@ -297,57 +350,22 @@ namespace osu.Game.Screens.Play.PlayerSettings
             return !Precision.AlmostEquals(Current.Value, lastOffset, Current.Precision / 2);
         }
 
-        [Resolved]
-        private SettingsOverlay? settings { get; set; }
-
-        protected override void Dispose(bool isDisposing)
+        public static LocalisableString GetOffsetExplanatoryText(double offset)
         {
-            base.Dispose(isDisposing);
-            beatmapOffsetSubscription?.Dispose();
-        }
+            string formatOffset = offset.ToStandardFormattedString(1);
 
-        protected override void Update()
-        {
-            base.Update();
+            return formatOffset == "0"
+                ? LocalisableString.Interpolate($@"{formatOffset} ms")
+                : LocalisableString.Interpolate($@"{formatOffset} ms {getEarlyLateText(offset)}");
 
-            bool allow = allowOffsetAdjust;
-
-            if (calibrateFromLastPlayButton != null)
+            LocalisableString getEarlyLateText(double value)
             {
-                double suggestedOffset = computeSuggestedOffset(lastPlayMedian, lastPlayUnstableRate, lastPlayBeatmapOffset);
-                calibrateFromLastPlayButton.Enabled.Value = allow && !Precision.AlmostEquals(suggestedOffset, Current.Value, Current.Precision / 2);
+                Debug.Assert(value != 0);
+
+                return value > 0
+                    ? BeatmapOffsetControlStrings.HitObjectsAppearEarlier
+                    : BeatmapOffsetControlStrings.HitObjectsAppearLater;
             }
-
-            Current.Disabled = !allow;
-        }
-
-        private bool allowOffsetAdjust => player?.AllowCriticalSettingsAdjustment != false;
-
-        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
-        {
-            // To match stable, this should adjust by 5 ms, or 1 ms when holding alt.
-            // But that is hard to make work with global actions due to the operating mode.
-            // Let's use the more precise as a default for now.
-            const double amount = 1;
-
-            switch (e.Action)
-            {
-                case GlobalAction.IncreaseOffset:
-                    if (!Current.Disabled)
-                        Current.Value += amount;
-                    return true;
-
-                case GlobalAction.DecreaseOffset:
-                    if (!Current.Disabled)
-                        Current.Value -= amount;
-                    return true;
-            }
-
-            return false;
-        }
-
-        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
-        {
         }
 
         private static double computeSuggestedOffset(double median, double unstableRate, double currentOffset)
@@ -365,24 +383,6 @@ namespace osu.Game.Screens.Play.PlayerSettings
             }
 
             return currentOffset - offsetAdjustment;
-        }
-
-        public static LocalisableString GetOffsetExplanatoryText(double offset)
-        {
-            string formatOffset = offset.ToStandardFormattedString(1);
-
-            return formatOffset == "0"
-                ? LocalisableString.Interpolate($@"{formatOffset} ms")
-                : LocalisableString.Interpolate($@"{formatOffset} ms {getEarlyLateText(offset)}");
-
-            LocalisableString getEarlyLateText(double value)
-            {
-                Debug.Assert(value != 0);
-
-                return value > 0
-                    ? BeatmapOffsetControlStrings.HitObjectsAppearEarlier
-                    : BeatmapOffsetControlStrings.HitObjectsAppearLater;
-            }
         }
 
         private partial class OffsetSliderBar : PlayerSliderBar<double>
