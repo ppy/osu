@@ -65,10 +65,10 @@ namespace osu.Game.Rulesets.Edit.Checks
 
             // Pairwise check: for each video file used across all difficulties, ensure all start times match.
             // Build a list of all difficulties with a video present (including current).
-            var allWithVideos = new List<(string DifficultyName, string Path, double StartTime)>();
+            var allDifficultiesWithVideo = new List<(string DifficultyName, string Path, double StartTime)>();
 
             if (currentVideo != null)
-                allWithVideos.Add((context.CurrentDifficulty.Playable.BeatmapInfo.DifficultyName, currentVideo.Path, currentVideo.StartTime));
+                allDifficultiesWithVideo.Add((context.CurrentDifficulty.Playable.BeatmapInfo.DifficultyName, currentVideo.Path, currentVideo.StartTime));
 
             foreach (var other in context.OtherDifficulties)
             {
@@ -77,25 +77,25 @@ namespace osu.Game.Rulesets.Edit.Checks
                 if (video != null)
                 {
                     string name = other.Playable.BeatmapInfo.DifficultyName;
-                    allWithVideos.Add((name, video.Path, video.StartTime));
+                    allDifficultiesWithVideo.Add((name, video.Path, video.StartTime));
                 }
             }
 
             // Group by video path (case-insensitive) and compare start times pairwise within each group.
-            foreach (var group in allWithVideos.GroupBy(v => v.Path, StringComparer.OrdinalIgnoreCase))
+            foreach (var groupedByVideoPath in allDifficultiesWithVideo.GroupBy(v => v.Path, StringComparer.OrdinalIgnoreCase))
             {
-                var list = group.ToList();
+                var difficultiesWithSameVideo = groupedByVideoPath.ToList();
 
-                for (int i = 0; i < list.Count; i++)
+                for (int i = 0; i < difficultiesWithSameVideo.Count; i++)
                 {
-                    for (int j = i + 1; j < list.Count; j++)
+                    for (int j = i + 1; j < difficultiesWithSameVideo.Count; j++)
                     {
-                        if (!list[i].StartTime.Equals(list[j].StartTime))
+                        if (!difficultiesWithSameVideo[i].StartTime.Equals(difficultiesWithSameVideo[j].StartTime))
                         {
                             yield return new IssueTemplateDifferentStartTime(this).Create(
-                                group.Key,
-                                list[i].DifficultyName, list[i].StartTime,
-                                list[j].DifficultyName, list[j].StartTime);
+                                groupedByVideoPath.Key,
+                                difficultiesWithSameVideo[i].DifficultyName, difficultiesWithSameVideo[i].StartTime,
+                                difficultiesWithSameVideo[j].DifficultyName, difficultiesWithSameVideo[j].StartTime);
                         }
                     }
                 }
