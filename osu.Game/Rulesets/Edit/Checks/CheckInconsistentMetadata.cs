@@ -21,12 +21,10 @@ namespace osu.Game.Rulesets.Edit.Checks
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
-            var difficulties = context.BeatmapsetDifficulties;
-
-            if (difficulties.Count <= 1)
+            if (context.AllDifficulties.Count() <= 1)
                 yield break;
 
-            var referenceBeatmap = context.Beatmap;
+            var referenceBeatmap = context.CurrentDifficulty.Playable;
             var referenceMetadata = referenceBeatmap.Metadata;
 
             // Define metadata fields to check
@@ -40,12 +38,9 @@ namespace osu.Game.Rulesets.Edit.Checks
                 ("creator", m => m.Author.Username)
             };
 
-            foreach (var beatmap in difficulties)
+            foreach (var beatmap in context.OtherDifficulties)
             {
-                if (beatmap == referenceBeatmap)
-                    continue;
-
-                var currentMetadata = beatmap.Metadata;
+                var currentMetadata = beatmap.Playable.Metadata;
 
                 // Check each metadata field for inconsistencies
                 foreach ((string fieldName, var fieldSelector) in fieldsToCheck)
@@ -58,7 +53,7 @@ namespace osu.Game.Rulesets.Edit.Checks
                         yield return new IssueTemplateInconsistentOtherFields(this).Create(
                             fieldName,
                             referenceBeatmap.BeatmapInfo.DifficultyName,
-                            beatmap.BeatmapInfo.DifficultyName,
+                            beatmap.Playable.BeatmapInfo.DifficultyName,
                             referenceField,
                             currentField
                         );
@@ -77,7 +72,7 @@ namespace osu.Game.Rulesets.Edit.Checks
                     {
                         yield return new IssueTemplateInconsistentTags(this).Create(
                             referenceBeatmap.BeatmapInfo.DifficultyName,
-                            beatmap.BeatmapInfo.DifficultyName,
+                            beatmap.Playable.BeatmapInfo.DifficultyName,
                             difference
                         );
                     }

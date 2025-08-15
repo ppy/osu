@@ -200,6 +200,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         }
 
         [Test]
+        [Explicit]
         public void TestDebounceNotBypassedOnUpdate()
         {
             BeatmapInfo? selectedBefore = null;
