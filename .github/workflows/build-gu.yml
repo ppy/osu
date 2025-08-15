@@ -30,6 +30,7 @@ jobs:
       semver: ${{ steps.version.outputs.semver }}
       assemblyVersion: ${{ steps.version.outputs.assemblyVersion }}
       fileVersion: ${{ steps.version.outputs.fileVersion }}
+      androidVersionCode: ${{ steps.version.outputs.androidVersionCode }}
     steps:
     - name: Checkout (for commit count)
       uses: actions/checkout@v4
@@ -54,7 +55,11 @@ jobs:
             echo "semver=$SEMVER" >> $GITHUB_OUTPUT
             echo "assemblyVersion=$NUMERIC" >> $GITHUB_OUTPUT
             echo "fileVersion=$NUMERIC" >> $GITHUB_OUTPUT
-            echo "Computed version from latest tag (workflow_run): $VERSION"
+            # 计算 Android VersionCode - 从版本号中提取数字部分
+            VERSION_NUMBERS=$(echo "$SEMVER" | sed 's/-.*$//' | tr -d '.')
+            ANDROID_VERSION_CODE="$VERSION_NUMBERS"
+            echo "androidVersionCode=$ANDROID_VERSION_CODE" >> $GITHUB_OUTPUT
+            echo "Computed version from latest tag (workflow_run): $VERSION (android: $ANDROID_VERSION_CODE)"
             exit 0
           fi
         fi
@@ -85,7 +90,14 @@ jobs:
         echo "semver=$SEMVER" >> $GITHUB_OUTPUT
         echo "assemblyVersion=$NUMERIC" >> $GITHUB_OUTPUT
         echo "fileVersion=$NUMERIC" >> $GITHUB_OUTPUT
-        echo "Computed version: $VERSION (semver: $SEMVER, assembly/file: $NUMERIC)"
+        
+        # 计算 Android VersionCode (必须是整数)
+        # 从版本号中提取数字部分，例如: v2025.815.5-lazer -> 2025.815.5 -> 20258155
+        VERSION_NUMBERS=$(echo "$SEMVER" | sed 's/-.*$//' | tr -d '.')
+        ANDROID_VERSION_CODE="$VERSION_NUMBERS"
+        echo "androidVersionCode=$ANDROID_VERSION_CODE" >> $GITHUB_OUTPUT
+        
+        echo "Computed version: $VERSION (semver: $SEMVER, assembly/file: $NUMERIC, android: $ANDROID_VERSION_CODE)"
 
   build:
     name: Build ${{ matrix.os }}
@@ -244,7 +256,7 @@ jobs:
     - name: Show version
       shell: bash
       run: |
-        echo "Building version: ${{ needs.version.outputs.version }} (semver: ${{ needs.version.outputs.semver }}, assembly/file: ${{ needs.version.outputs.fileVersion }})"
+        echo "Building version: ${{ needs.version.outputs.version }} (semver: ${{ needs.version.outputs.semver }}, assembly/file: ${{ needs.version.outputs.fileVersion }}, android: ${{ needs.version.outputs.androidVersionCode }})"
 
     - name: Clean previous build artifacts
       shell: bash
@@ -326,7 +338,7 @@ jobs:
             --verbosity normal \
             --no-restore \
             -p:Version=${{ needs.version.outputs.semver }} \
-            -p:ApplicationVersion=${{ needs.version.outputs.fileVersion }} \
+            -p:ApplicationVersion=${{ needs.version.outputs.androidVersionCode }} \
             -p:ApplicationDisplayVersion=${{ needs.version.outputs.semver }} \
             -p:AndroidSdkDirectory=$ANDROID_SDK_ROOT \
             -p:AndroidKeyStore=true \
