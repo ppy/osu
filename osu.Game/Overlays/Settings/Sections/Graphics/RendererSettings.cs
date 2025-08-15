@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Extensions;
@@ -9,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osu.Game.Configuration;
+using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Overlays.Dialog;
@@ -22,12 +24,12 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
         private bool automaticRendererInUse;
 
         [BackgroundDependencyLoader]
-        private void load(FrameworkConfigManager config, OsuConfigManager osuConfig, IDialogOverlay? dialogOverlay, OsuGame? game, GameHost host)
+        private void load(FrameworkConfigManager config, OsuConfigManager osuConfig, IDialogOverlay? dialogOverlay, OsuGame? game, GameHost host, IDLSSProvider? dlssProvider)
         {
             var renderer = config.GetBindable<RendererType>(FrameworkSetting.Renderer);
             automaticRendererInUse = renderer.Value == RendererType.Automatic;
 
-            Children = new Drawable[]
+            var children = new List<Drawable>
             {
                 new RendererSettingsDropdown
                 {
@@ -57,6 +59,24 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     Current = osuConfig.GetBindable<bool>(OsuSetting.ShowFpsDisplay)
                 },
             };
+
+            // Add DLSS settings if available
+            if (dlssProvider?.Available == true)
+            {
+                var dlssSetting = osuConfig.GetBindable<bool>(OsuSetting.UseDLSS);
+                
+                children.Add(new SettingsCheckbox
+                {
+                    LabelText = GraphicsSettingsStrings.DLSS,
+                    Current = dlssSetting,
+                    Keywords = new[] { @"dlss", @"nvidia", @"frame generation", @"ai upscaling" },
+                });
+
+                // Bind the setting to the DLSS provider
+                dlssSetting.BindValueChanged(enabled => dlssProvider.Enabled = enabled.NewValue, true);
+            }
+
+            Children = children.ToArray();
 
             renderer.BindValueChanged(r =>
             {

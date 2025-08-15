@@ -116,6 +116,10 @@ jobs:
             runtime: osx-arm64
             artifact-name: osu-gu-macos-apple-silicon
             executable: osu-gu!
+          - os: ubuntu-latest
+            runtime: android
+            artifact-name: osu-gu-android
+            executable: osu-gu.apk
 
     steps:
     - name: Checkout code
@@ -139,6 +143,28 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: Setup Android SDK (Android only)
+      if: matrix.runtime == 'android'
+      uses: android-actions/setup-android@v3
+      with:
+        api-level: 34
+        build-tools: 34.0.0
+        ndk-version: 25.2.9519653
+
+    - name: Setup Java JDK (Android only)
+      if: matrix.runtime == 'android'
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'microsoft'
+        java-version: '17'
+
+    - name: Install Android Workload (Android only)
+      if: matrix.runtime == 'android'
+      shell: bash
+      run: |
+        dotnet workload install android
+        dotnet workload restore
 
     - name: Install Velopack CLI
       shell: bash
@@ -225,38 +251,76 @@ jobs:
       timeout-minutes: 15
       shell: bash
       run: |
-        echo "Restoring packages for runtime: ${{ matrix.runtime }}"
-        dotnet restore osu.Desktop/osu.Desktop.csproj \
-          --runtime ${{ matrix.runtime }} \
-          --verbosity normal \
-          --configfile nuget.config \
-          --no-cache \
-          --force
+        if [[ "${{ matrix.runtime }}" == "android" ]]; then
+          echo "Restoring packages for Android"
+          dotnet restore osu.Android/osu.Android.csproj \
+            --verbosity normal \
+            --configfile nuget.config \
+            --no-cache \
+            --force
+        else
+          echo "Restoring packages for runtime: ${{ matrix.runtime }}"
+          dotnet restore osu.Desktop/osu.Desktop.csproj \
+            --runtime ${{ matrix.runtime }} \
+            --verbosity normal \
+            --configfile nuget.config \
+            --no-cache \
+            --force
+        fi
 
     - name: Build and publish
       shell: bash
       run: |
-        echo "Publishing for runtime: ${{ matrix.runtime }}"
-        dotnet publish osu.Desktop/osu.Desktop.csproj \
-          --self-contained \
-          --runtime ${{ matrix.runtime }} \
-          --configuration Release \
-          --output "publish/${{ matrix.runtime }}" \
-          --no-restore \
-          --verbosity normal \
-          -p:PublishSingleFile=false \
-          -p:PublishTrimmed=false \
-          -p:Version=${{ needs.version.outputs.semver }} \
-          -p:FileVersion=${{ needs.version.outputs.fileVersion }} \
-          -p:AssemblyVersion=${{ needs.version.outputs.assemblyVersion }} \
-          -p:InformationalVersion=${{ needs.version.outputs.version }}
+        if [[ "${{ matrix.runtime }}" == "android" ]]; then
+          echo "Building Android APK"
+          dotnet publish osu.Android/osu.Android.csproj \
+            --configuration Release \
+            --output "publish/${{ matrix.runtime }}" \
+            --no-restore \
+            --verbosity normal \
+            -p:Version=${{ needs.version.outputs.semver }} \
+            -p:ApplicationVersion=${{ needs.version.outputs.fileVersion }} \
+            -p:ApplicationDisplayVersion=${{ needs.version.outputs.semver }} \
+            -p:ApplicationId=com.googuteam.osu.gu \
+            -p:ApplicationTitle="osu! GU" \
+            -p:AndroidPackageFormat=apk \
+            -p:AndroidSigningKeyPass="" \
+            -p:AndroidSigningStorePass=""
+        else
+          echo "Publishing for runtime: ${{ matrix.runtime }}"
+          dotnet publish osu.Desktop/osu.Desktop.csproj \
+            --self-contained \
+            --runtime ${{ matrix.runtime }} \
+            --configuration Release \
+            --output "publish/${{ matrix.runtime }}" \
+            --no-restore \
+            --verbosity normal \
+            -p:PublishSingleFile=false \
+            -p:PublishTrimmed=false \
+            -p:Version=${{ needs.version.outputs.semver }} \
+            -p:FileVersion=${{ needs.version.outputs.fileVersion }} \
+            -p:AssemblyVersion=${{ needs.version.outputs.assemblyVersion }} \
+            -p:InformationalVersion=${{ needs.version.outputs.version }}
+        fi
 
     - name: Set executable permissions (Linux/macOS)
       if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
       shell: bash
-      run: chmod +x "publish/${{ matrix.runtime }}/${{ matrix.executable }}"
+      run: |
+        if [[ "${{ matrix.runtime }}" != "android" ]]; then
+          chmod +x "publish/${{ matrix.runtime }}/${{ matrix.executable }}"
+        fi
+
+    - name: Move APK to standard location (Android only)
+      if: matrix.runtime == 'android'
+      shell: bash
+      run: |
+        # Find the generated APK and move it to a standard location
+        find publish/android -name "*.apk" -type f | head -1 | xargs -I {} cp {} publish/android/osu-gu.apk
+        ls -la publish/android/
 
     - name: Create Velopack package
+      if: matrix.runtime != 'android'
       shell: bash
       run: |
         if [[ "${{ matrix.os }}" == "macos-latest" ]]; then
@@ -304,6 +368,18 @@ jobs:
             -c "linux"
         fi
 
+    - name: Create Android release files (Android only)
+      if: matrix.runtime == 'android'
+      shell: bash
+      run: |
+        mkdir -p Releases
+        # Copy APK to Releases folder with version info
+        cp publish/android/osu-gu.apk "Releases/osu-gu-${{ needs.version.outputs.semver }}.apk"
+        # Create a symbolic link for easy access
+        ln -sf "osu-gu-${{ needs.version.outputs.semver }}.apk" "Releases/osu-gu.apk"
+        echo "Android APK created:"
+        ls -la Releases/
+
     - name: Normalize asset names (optional)
       shell: bash
       run: |
@@ -341,7 +417,12 @@ jobs:
         fi
         # Linux AppImage rename if present
         if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
-          for f in Releases/*.AppImage; do mv -f "$f" Releases/osu.AppImage; done
+          if [[ "${{ matrix.runtime }}" == "android" ]]; then
+            # Keep Android APK names as they are
+            echo "Android APK files preserved as-is"
+          else
+            for f in Releases/*.AppImage; do mv -f "$f" Releases/osu.AppImage; done
+          fi
         fi
 
     - name: Upload build artifacts
@@ -449,13 +530,21 @@ jobs:
           - **Linux**: 下载 `osu-gu-linux` 安装包
           - **macOS (Intel)**: 下载 `osu-gu-macos-intel` 安装包
           - **macOS (Apple Silicon)**: 下载 `osu-gu-macos-apple-silicon` 安装包
+          - **Android**: 下载 `osu-gu-android` APK 文件
 
           ### 安装说明
 
+          #### 桌面版 (Windows/Linux/macOS)
           1. 下载对应平台的安装程序
           2. 运行安装程序并按提示安装
           3. 该版本使用独立数据目录 (`osu-gu`)，不会与官方版本冲突
           4. 保持使用官方 `osu://` 协议
+
+          #### Android 版
+          1. 下载 APK 文件到您的 Android 设备
+          2. 在设备设置中启用"未知来源"应用安装
+          3. 点击 APK 文件进行安装
+          4. 需要 Android 5.0 (API 21) 或更高版本
 
           ### 平台特殊说明
 
@@ -464,10 +553,16 @@ jobs:
           - Apple Silicon Mac (M1/M2/M3) 请下载 `osu-gu-macos-apple-silicon`
           - 首次运行可能需要在系统偏好设置中允许来自未知开发者的应用
 
+          **Android 用户**:
+          - 需要 Android 5.0 (API 21) 或更高版本
+          - 建议至少 3GB RAM 和 2GB 可用存储空间
+          - 首次运行需要网络连接下载游戏资源
+
           ### 注意事项
 
-          - 需要 .NET 8.0 运行时（安装程序会自动检查）
+          - 桌面版需要 .NET 8.0 运行时（安装程序会自动检查）
           - 首次运行可能需要较长时间进行初始化
+          - Android 版本为独立 APK，不会与 Google Play 版本冲突
 
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

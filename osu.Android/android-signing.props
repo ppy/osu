@@ -1,0 +1,18 @@
+<!-- Android Signing Configuration -->
+<!-- This file can be used to configure APK signing for release builds -->
+<!-- For CI/CD, these properties can be overridden via command line parameters -->
+<Project>
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <!-- Default debug signing (for development builds) -->
+    <AndroidSigningKeyStore Condition="'$(AndroidSigningKeyStore)' == ''">debug.keystore</AndroidSigningKeyStore>
+    <AndroidSigningKeyAlias Condition="'$(AndroidSigningKeyAlias)' == ''">androiddebugkey</AndroidSigningKeyAlias>
+    <AndroidSigningKeyPass Condition="'$(AndroidSigningKeyPass)' == ''">android</AndroidSigningKeyPass>
+    <AndroidSigningStorePass Condition="'$(AndroidSigningStorePass)' == ''">android</AndroidSigningStorePass>
+    
+    <!-- For production builds, these should be set via environment variables or build parameters -->
+    <!-- -p:AndroidSigningKeyStore=path/to/release.keystore -->
+    <!-- -p:AndroidSigningKeyAlias=release_key -->
+    <!-- -p:AndroidSigningKeyPass=your_key_password -->
+    <!-- -p:AndroidSigningStorePass=your_store_password -->
+  </PropertyGroup>
+</Project>

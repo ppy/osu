@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="sh.ppy.osulazer" android:installLocation="auto">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.googuteam.osu.gu" android:installLocation="auto">
 	<uses-sdk android:minSdkVersion="21" android:targetSdkVersion="34" />
 	<application android:allowBackup="true"
 				 android:supportsRtl="true"
-				 android:label="osu!"
+				 android:label="osu! GU"
 				 android:icon="@mipmap/ic_launcher"
 				 android:roundIcon="@mipmap/ic_launcher" />
 	<!-- for editor usage -->
@@ -17,4 +17,5 @@
 		Care needs to be taken to ensure runtime permission checks target the correct permission for the API level.
 	-->
 	<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32"/>
+</manifest>
 </manifest>
