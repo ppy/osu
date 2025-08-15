@@ -8,10 +8,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
-using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
-using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
@@ -41,7 +39,6 @@ namespace osu.Game.Screens.Play
         private bool isAutoplayPlayback => GameplayState.Mods.OfType<ModAutoplay>().Any();
 
         private double? lastFrameTime;
-        private ReplayFailIndicator failIndicator;
 
         protected override bool CheckModsAllowFailure()
         {
@@ -100,17 +97,6 @@ namespace osu.Game.Screens.Play
                 playbackSettings.UserPlaybackRate.BindTo(master.UserPlaybackRate);
 
             HUDOverlay.PlayerSettingsOverlay.AddAtStart(playbackSettings);
-            HUDOverlay.Add(failIndicator = new ReplayFailIndicator(GameplayClockContainer)
-            {
-                GoToResults = () =>
-                {
-                    if (!this.IsCurrentScreen())
-                        return;
-
-                    ValidForResume = false;
-                    this.Push(new SoloResultsScreen(Score.ScoreInfo));
-                }
-            });
         }
 
         protected override void PrepareReplay()
@@ -186,19 +172,6 @@ namespace osu.Game.Screens.Play
 
         public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
-        }
-
-        protected override void PerformFail()
-        {
-            // base logic intentionally suppressed - we have our own custom fail interaction
-            failIndicator.Display();
-        }
-
-        public override bool OnExiting(ScreenExitEvent e)
-        {
-            // safety against filters or samples from the indicator playing long after the screen is exited
-            failIndicator.RemoveAndDisposeImmediately();
-            return base.OnExiting(e);
         }
     }
 }

@@ -82,6 +82,17 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
+        public void TestForwardPlaybackGuarantee()
+        {
+            hookForwardPlaybackCheck();
+
+            AddUntilStep("wait for forward playback", () => Player.GameplayClockContainer.CurrentTime > 1000);
+            AddStep("seek before gameplay", () => Player.GameplayClockContainer.Seek(-5000));
+
+            checkForwardPlayback();
+        }
+
+        [Test]
         public void TestPauseWithLargeOffset()
         {
             AddStep("force large offset", () =>

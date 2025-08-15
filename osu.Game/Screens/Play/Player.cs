@@ -932,6 +932,13 @@ namespace osu.Game.Screens.Play
 
         #region Fail Logic
 
+        /// <summary>
+        /// Invoked when gameplay has permanently failed.
+        /// </summary>
+        protected virtual void OnFail()
+        {
+        }
+
         protected FailOverlay FailOverlay { get; private set; }
 
         private FailAnimationContainer failAnimationContainer;
@@ -945,55 +952,48 @@ namespace osu.Game.Screens.Play
             if (!CheckModsAllowFailure())
                 return false;
 
-            PerformFail();
-            return true;
-        }
-
-        /// <summary>
-        /// Called when the player is determined to have failed.
-        /// </summary>
-        protected virtual void PerformFail()
-        {
-            Debug.Assert(!GameplayState.HasFailed);
-            Debug.Assert(!GameplayState.HasPassed);
-            Debug.Assert(!GameplayState.HasQuit);
-
-            GameplayState.HasFailed = true;
-
-            updateGameplayState();
-
-            // There is a chance that we could be in a paused state as the ruleset's internal clock (see FrameStabilityContainer)
-            // could process an extra frame after the GameplayClock is stopped.
-            // In such cases we want the fail state to precede a user triggered pause.
-            if (PauseOverlay.State.Value == Visibility.Visible)
-                PauseOverlay.Hide();
-
-            bool restartOnFail = GameplayState.Mods.OfType<IApplicableFailOverride>().Any(m => m.RestartOnFail);
-            if (!restartOnFail)
-                failAnimationContainer.Start();
-
-            // Failures can be triggered either by a judgement, or by a mod.
-            //
-            // For the case of a judgement, due to ordering considerations, ScoreProcessor will not have received
-            // the final judgement which triggered the failure yet (see DrawableRuleset.NewResult handling above).
-            //
-            // A schedule here ensures that any lingering judgements from the current frame are applied before we
-            // finalise the score as "failed".
-            Schedule(() =>
+            if (Configuration.AllowFailAnimation)
             {
-                ConcludeFailedScore(Score);
+                Debug.Assert(!GameplayState.HasFailed);
+                Debug.Assert(!GameplayState.HasPassed);
+                Debug.Assert(!GameplayState.HasQuit);
 
-                if (restartOnFail)
-                    Restart(true);
-            });
-        }
+                GameplayState.HasFailed = true;
 
-        /// <summary>
-        /// Performs last operations on the supplied <paramref name="score"/> before this <see cref="Player"/> is definitively exited due to failing.
-        /// </summary>
-        protected virtual void ConcludeFailedScore(Score score)
-        {
-            ScoreProcessor.FailScore(score.ScoreInfo);
+                updateGameplayState();
+
+                // There is a chance that we could be in a paused state as the ruleset's internal clock (see FrameStabilityContainer)
+                // could process an extra frame after the GameplayClock is stopped.
+                // In such cases we want the fail state to precede a user triggered pause.
+                if (PauseOverlay.State.Value == Visibility.Visible)
+                    PauseOverlay.Hide();
+
+                bool restartOnFail = GameplayState.Mods.OfType<IApplicableFailOverride>().Any(m => m.RestartOnFail);
+                if (!restartOnFail)
+                    failAnimationContainer.Start();
+
+                // Failures can be triggered either by a judgement, or by a mod.
+                //
+                // For the case of a judgement, due to ordering considerations, ScoreProcessor will not have received
+                // the final judgement which triggered the failure yet (see DrawableRuleset.NewResult handling above).
+                //
+                // A schedule here ensures that any lingering judgements from the current frame are applied before we
+                // finalise the score as "failed".
+                Schedule(() =>
+                {
+                    ScoreProcessor.FailScore(Score.ScoreInfo);
+                    OnFail();
+
+                    if (restartOnFail)
+                        Restart(true);
+                });
+            }
+            else
+            {
+                ScoreProcessor.FailScore(Score.ScoreInfo);
+            }
+
+            return true;
         }
 
         /// <summary>

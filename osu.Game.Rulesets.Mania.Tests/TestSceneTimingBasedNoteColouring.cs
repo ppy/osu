@@ -47,6 +47,8 @@ namespace osu.Game.Rulesets.Mania.Tests
                         drawableRuleset = (DrawableManiaRuleset)Ruleset.Value.CreateInstance().CreateDrawableRulesetWith(createTestBeatmap())
                     }
                 };
+
+                drawableRuleset.AllowBackwardsSeeks = true;
             });
             AddStep("retrieve config bindable", () =>
             {
