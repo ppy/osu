@@ -283,11 +283,16 @@ namespace osu.Game.Screens.Play
             //   (as the solo gameplay leaderboard provider uses the global leaderboard manager to populate itself)
             // - the sort mode is not specified and defaults to `Score` which is good because gameplay leaderboards only support sorting by score.
             //   this may change at some point in the future, at which point specifying a sort mode should be considered.
+            refetchLeaderboard(force: false);
+        }
+
+        private void refetchLeaderboard(bool force)
+        {
             leaderboardManager?.FetchWithCriteria(new LeaderboardCriteria(
                 Beatmap.Value.BeatmapInfo,
                 Ruleset.Value,
                 leaderboardManager?.CurrentCriteria?.Scope ?? BeatmapLeaderboardScope.Global,
-                leaderboardManager?.CurrentCriteria?.ExactMods));
+                leaderboardManager?.CurrentCriteria?.ExactMods), force);
         }
 
         #region Screen handling
@@ -497,6 +502,11 @@ namespace osu.Game.Screens.Play
             QuickRestart = quickRestartRequested;
             hideOverlays = true;
             ValidForResume = true;
+            // when retrying, it is desired to refetch the global state leaderboard so that the user's previous score can show up on the leaderboard, if it needs to.
+            // that said, only do this when the user is *not* quick-retrying.
+            // this avoids the quick retry becoming longer than it needs to (because an extra API request has to complete before gameplay can start),
+            // and if the user is quick-retrying, their last score is most likely not important for global leaderboards, or the user won't care.
+            refetchLeaderboard(force: !quickRestartRequested);
         }
 
         private void contentIn(double delayBeforeSideDisplays = 0)
