@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -18,13 +17,8 @@ namespace osu.Game.Screens.Edit.Submission
 {
     public partial class SubmissionIssueTable : CompositeDrawable
     {
-        private readonly BindableList<Issue> issues = new BindableList<Issue>();
-
-        public void SetIssues(IEnumerable<Issue> issues)
-        {
-            this.issues.Clear();
-            this.issues.AddRange(issues);
-        }
+        [Resolved]
+        private BindableList<Issue> issues { get; set; } = null!;
 
         private FillFlowContainer rowFlow = null!;
 
@@ -80,7 +74,7 @@ namespace osu.Game.Screens.Edit.Submission
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            issues.BindCollectionChanged((_, __) => rebuildRows(), true);
+            issues.BindCollectionChanged((_, _) => rebuildRows(), true);
         }
 
         private void rebuildRows()

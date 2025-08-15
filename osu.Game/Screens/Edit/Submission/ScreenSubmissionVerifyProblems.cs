@@ -5,9 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Localisation;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Game.Rulesets.Edit.Checks.Components;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterfaceV2;
@@ -17,11 +15,6 @@ namespace osu.Game.Screens.Edit.Submission
     [LocalisableDescription(typeof(BeatmapSubmissionStrings), nameof(BeatmapSubmissionStrings.VerifyProblems))]
     public partial class ScreenSubmissionVerifyProblems : WizardScreen
     {
-        private SubmissionIssueTable table = null!;
-
-        [Resolved]
-        private BindableList<Issue> submissionProblemIssues { get; set; } = null!;
-
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, OsuGame? game)
         {
@@ -51,9 +44,8 @@ namespace osu.Game.Screens.Edit.Submission
                     },
                 },
 
-                table = new SubmissionIssueTable { RelativeSizeAxes = Axes.X, Height = 350 },
+                new SubmissionIssueTable { RelativeSizeAxes = Axes.X, Height = 350 },
             });
-            table.SetIssues(submissionProblemIssues);
         }
     }
 }
