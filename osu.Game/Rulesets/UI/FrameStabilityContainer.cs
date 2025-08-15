@@ -154,7 +154,8 @@ namespace osu.Game.Rulesets.UI
                     state = PlaybackState.NotValid;
             }
 
-            bool allowReferenceClockSeeks = hasReplayAttached || DebugUtils.IsNUnitRunning || !FrameStablePlayback;
+            // TODO: replace IsDebugBuild with a framework flag which asserts we are in a test scene, interactively or otherwise.
+            bool allowReferenceClockSeeks = hasReplayAttached || DebugUtils.IsNUnitRunning || DebugUtils.IsDebugBuild || !FrameStablePlayback;
 
             // This is a hotfix for ongoing bass issues we are trying to resolve (see https://www.un4seen.com/forum/?topic=20482.msg145474#msg145474)
             // In gameplay we should always be seeking using the
