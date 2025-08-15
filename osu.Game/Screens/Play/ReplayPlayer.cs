@@ -194,6 +194,13 @@ namespace osu.Game.Screens.Play
             failIndicator.Display();
         }
 
+        public override void OnSuspending(ScreenTransitionEvent e)
+        {
+            // safety against filters or samples from the indicator playing long after the screen is exited
+            failIndicator.RemoveAndDisposeImmediately();
+            base.OnSuspending(e);
+        }
+
         public override bool OnExiting(ScreenExitEvent e)
         {
             // safety against filters or samples from the indicator playing long after the screen is exited
