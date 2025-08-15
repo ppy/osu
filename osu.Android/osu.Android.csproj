@@ -1,6 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\osu.Android.props" />
-  <Import Project="android-signing.props" Condition="Exists('android-signing.props')" />
   <PropertyGroup>
     <TargetFramework>net8.0-android</TargetFramework>
     <OutputType>Exe</OutputType>
@@ -9,8 +8,6 @@
     <Version>0.0.0</Version>
     <ApplicationVersion Condition=" '$(ApplicationVersion)' == '' ">1</ApplicationVersion>
     <ApplicationDisplayVersion Condition=" '$(ApplicationDisplayVersion)' == '' ">$(Version)</ApplicationDisplayVersion>
-    <ApplicationId Condition=" '$(ApplicationId)' == '' ">com.googuteam.osu.gu</ApplicationId>
-    <ApplicationTitle Condition=" '$(ApplicationTitle)' == '' ">osu! GU</ApplicationTitle>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\osu.Game.Rulesets.Catch\osu.Game.Rulesets.Catch.csproj" />
