@@ -116,6 +116,10 @@ jobs:
             runtime: osx-arm64
             artifact-name: osu-gu-macos-apple-silicon
             executable: osu-gu!
+          - os: ubuntu-latest
+            runtime: android
+            artifact-name: osu-gu-android
+            executable: osu.Android-Signed.apk
 
     steps:
     - name: Checkout code
@@ -139,6 +143,24 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: Setup Java for Android (Android only)
+      if: matrix.runtime == 'android'
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'microsoft'
+        java-version: '11'
+
+    - name: Setup Android SDK (Android only)
+      if: matrix.runtime == 'android'
+      uses: android-actions/setup-android@v3
+
+    - name: Install Android workload (Android only)
+      if: matrix.runtime == 'android'
+      shell: bash
+      run: |
+        dotnet workload install android
+        dotnet workload list
 
     - name: Install Velopack CLI
       shell: bash
@@ -218,7 +240,11 @@ jobs:
       shell: bash
       run: |
         echo "Cleaning previous build artifacts for ${{ matrix.runtime }}"
-        rm -rf osu.Desktop/bin osu.Desktop/obj
+        if [[ "${{ matrix.runtime }}" == "android" ]]; then
+          rm -rf osu.Android/bin osu.Android/obj
+        else
+          rm -rf osu.Desktop/bin osu.Desktop/obj
+        fi
         rm -rf publish/${{ matrix.runtime }}
 
     - name: Restore dependencies for specific runtime
@@ -226,37 +252,103 @@ jobs:
       shell: bash
       run: |
         echo "Restoring packages for runtime: ${{ matrix.runtime }}"
-        dotnet restore osu.Desktop/osu.Desktop.csproj \
-          --runtime ${{ matrix.runtime }} \
-          --verbosity normal \
-          --configfile nuget.config \
-          --no-cache \
-          --force
+        if [[ "${{ matrix.runtime }}" == "android" ]]; then
+          dotnet restore osu.Android/osu.Android.csproj \
+            --verbosity normal \
+            --configfile nuget.config \
+            --no-cache \
+            --force
+        else
+          dotnet restore osu.Desktop/osu.Desktop.csproj \
+            --runtime ${{ matrix.runtime }} \
+            --verbosity normal \
+            --configfile nuget.config \
+            --no-cache \
+            --force
+        fi
+
+    - name: Setup Android signing (Android only)
+      if: matrix.runtime == 'android'
+      shell: bash
+      env:
+        ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+      run: |
+        echo "Setting up Android keystore for signing..."
+        # 从 Secrets 中获取 base64 编码的 keystore
+        if [[ -n "$ANDROID_KEYSTORE_BASE64" ]]; then
+          echo "Using keystore from GitHub Secrets"
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > osu.keystore
+        else
+          echo "No keystore found in secrets, creating temporary one..."
+          keytool -genkey -v \
+            -keystore osu.keystore \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000 \
+            -alias osu \
+            -storepass temp123 \
+            -keypass temp123 \
+            -dname "CN=osu-gu-temp,OU=osu-gu,O=osu-gu,L=Unknown,S=Unknown,C=Unknown"
+          echo "WARNING: Using temporary keystore! Please configure ANDROID_KEYSTORE_BASE64 secret for production builds."
+        fi
 
     - name: Build and publish
       shell: bash
+      env:
+        ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+        ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+        ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
       run: |
-        echo "Publishing for runtime: ${{ matrix.runtime }}"
-        dotnet publish osu.Desktop/osu.Desktop.csproj \
-          --self-contained \
-          --runtime ${{ matrix.runtime }} \
-          --configuration Release \
-          --output "publish/${{ matrix.runtime }}" \
-          --no-restore \
-          --verbosity normal \
-          -p:PublishSingleFile=false \
-          -p:PublishTrimmed=false \
-          -p:Version=${{ needs.version.outputs.semver }} \
-          -p:FileVersion=${{ needs.version.outputs.fileVersion }} \
-          -p:AssemblyVersion=${{ needs.version.outputs.assemblyVersion }} \
-          -p:InformationalVersion=${{ needs.version.outputs.version }}
+        echo "Building for runtime: ${{ matrix.runtime }}"
+        if [[ "${{ matrix.runtime }}" == "android" ]]; then
+          # Build Android APK
+          # 设置签名参数，优先使用 Secrets 中的值，否则使用默认值
+          KEYSTORE_PASS="${ANDROID_KEYSTORE_PASSWORD:-temp123}"
+          KEY_ALIAS="${ANDROID_KEY_ALIAS:-osu}"
+          KEY_PASS="${ANDROID_KEY_PASSWORD:-temp123}"
+          
+          dotnet publish osu.Android/osu.Android.csproj \
+            --configuration Release \
+            --verbosity normal \
+            --no-restore \
+            -p:Version=${{ needs.version.outputs.semver }} \
+            -p:ApplicationVersion=${{ needs.version.outputs.fileVersion }} \
+            -p:ApplicationDisplayVersion=${{ needs.version.outputs.semver }} \
+            -p:AndroidSdkDirectory=$ANDROID_SDK_ROOT \
+            -p:AndroidKeyStore=true \
+            -p:AndroidSigningKeyStore=../osu.keystore \
+            -p:AndroidSigningKeyAlias="$KEY_ALIAS" \
+            -p:AndroidSigningKeyPass="$KEY_PASS" \
+            -p:AndroidSigningStorePass="$KEYSTORE_PASS"
+          
+          # Create output directory and copy APK
+          mkdir -p "publish/${{ matrix.runtime }}"
+          find osu.Android/bin/Release/ -name "*.apk" -exec cp {} "publish/${{ matrix.runtime }}/${{ matrix.executable }}" \;
+        else
+          # Desktop build
+          dotnet publish osu.Desktop/osu.Desktop.csproj \
+            --self-contained \
+            --runtime ${{ matrix.runtime }} \
+            --configuration Release \
+            --output "publish/${{ matrix.runtime }}" \
+            --no-restore \
+            --verbosity normal \
+            -p:PublishSingleFile=false \
+            -p:PublishTrimmed=false \
+            -p:Version=${{ needs.version.outputs.semver }} \
+            -p:FileVersion=${{ needs.version.outputs.fileVersion }} \
+            -p:AssemblyVersion=${{ needs.version.outputs.assemblyVersion }} \
+            -p:InformationalVersion=${{ needs.version.outputs.version }}
+        fi
 
     - name: Set executable permissions (Linux/macOS)
-      if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
+      if: (matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest') && matrix.runtime != 'android'
       shell: bash
       run: chmod +x "publish/${{ matrix.runtime }}/${{ matrix.executable }}"
 
     - name: Create Velopack package
+      if: matrix.runtime != 'android'
       shell: bash
       run: |
         if [[ "${{ matrix.os }}" == "macos-latest" ]]; then
@@ -340,8 +432,15 @@ jobs:
           fi
         fi
         # Linux AppImage rename if present
-        if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
+        if [[ "${{ matrix.os }}" == "ubuntu-latest" ]] && [[ "${{ matrix.runtime }}" == "linux-x64" ]]; then
           for f in Releases/*.AppImage; do mv -f "$f" Releases/osu.AppImage; done
+        fi
+        # Android APK rename
+        if [[ "${{ matrix.runtime }}" == "android" ]]; then
+          mkdir -p Releases
+          if [ -f "publish/${{ matrix.runtime }}/${{ matrix.executable }}" ]; then
+            cp "publish/${{ matrix.runtime }}/${{ matrix.executable }}" "Releases/osu-gu.apk"
+          fi
         fi
 
     - name: Upload build artifacts
@@ -449,13 +548,21 @@ jobs:
           - **Linux**: 下载 `osu-gu-linux` 安装包
           - **macOS (Intel)**: 下载 `osu-gu-macos-intel` 安装包
           - **macOS (Apple Silicon)**: 下载 `osu-gu-macos-apple-silicon` 安装包
+          - **Android**: 下载 `osu-gu-android` APK 文件
 
           ### 安装说明
 
+          **桌面版 (Windows/Linux/macOS)**:
           1. 下载对应平台的安装程序
           2. 运行安装程序并按提示安装
           3. 该版本使用独立数据目录 (`osu-gu`)，不会与官方版本冲突
           4. 保持使用官方 `osu://` 协议
+
+          **Android 版**:
+          1. 下载 `osu-gu.apk` 文件
+          2. 在设备上启用"未知来源"安装权限
+          3. 打开 APK 文件进行安装
+          4. 首次启动可能需要授予存储权限
 
           ### 平台特殊说明
 
@@ -464,9 +571,14 @@ jobs:
           - Apple Silicon Mac (M1/M2/M3) 请下载 `osu-gu-macos-apple-silicon`
           - 首次运行可能需要在系统偏好设置中允许来自未知开发者的应用
 
+          **Android 用户**:
+          - 需要 Android 5.0 (API 21) 或更高版本
+          - 建议至少 2GB RAM 和 4GB 可用存储空间
+          - 支持 ARM 和 x86 架构
+
           ### 注意事项
 
-          - 需要 .NET 8.0 运行时（安装程序会自动检查）
+          - 桌面版需要 .NET 8.0 运行时（安装程序会自动检查）
           - 首次运行可能需要较长时间进行初始化
 
       env:
