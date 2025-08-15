@@ -100,7 +100,7 @@ namespace osu.Game.Screens.Play
                 playbackSettings.UserPlaybackRate.BindTo(master.UserPlaybackRate);
 
             HUDOverlay.PlayerSettingsOverlay.AddAtStart(playbackSettings);
-            HUDOverlay.Add(failIndicator = new ReplayFailIndicator(GameplayClockContainer)
+            AddInternal(failIndicator = new ReplayFailIndicator(GameplayClockContainer)
             {
                 GoToResults = () =>
                 {
