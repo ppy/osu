@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Checks
             if (context.InterpretedDifficulty > DifficultyRating.Easy)
                 yield break;
 
-            foreach (var hitObject in context.Beatmap.HitObjects)
+            foreach (var hitObject in context.CurrentDifficulty.Playable.HitObjects)
             {
                 if (hitObject is Slider slider && slider.SpanDuration < span_duration_threshold)
                     yield return new IssueTemplateTooShort(this).Create(slider);

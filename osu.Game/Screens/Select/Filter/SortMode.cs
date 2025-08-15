@@ -17,20 +17,20 @@ namespace osu.Game.Screens.Select.Filter
         [LocalisableDescription(typeof(SongSelectStrings), nameof(SongSelectStrings.BPM))]
         BPM,
 
-        [LocalisableDescription(typeof(SongSelectStrings), nameof(SongSelectStrings.DateSubmitted))]
-        DateSubmitted,
-
         [LocalisableDescription(typeof(SongSelectStrings), nameof(SongSelectStrings.DateAdded))]
         DateAdded,
 
         [LocalisableDescription(typeof(SongSelectStrings), nameof(SongSelectStrings.DateRanked))]
         DateRanked,
 
-        [LocalisableDescription(typeof(SongSelectStrings), nameof(SongSelectStrings.LastPlayed))]
-        LastPlayed,
+        [LocalisableDescription(typeof(SongSelectStrings), nameof(SongSelectStrings.DateSubmitted))]
+        DateSubmitted,
 
         [LocalisableDescription(typeof(SongSelectStrings), nameof(SongSelectStrings.Difficulty))]
         Difficulty,
+
+        [LocalisableDescription(typeof(SongSelectStrings), nameof(SongSelectStrings.LastPlayed))]
+        LastPlayed,
 
         [LocalisableDescription(typeof(SongSelectStrings), nameof(SongSelectStrings.Length))]
         Length,
