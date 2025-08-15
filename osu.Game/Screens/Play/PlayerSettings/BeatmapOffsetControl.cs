@@ -40,6 +40,8 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
         private Bindable<ScoreInfo?> lastAppliedScore { get; } = new Bindable<ScoreInfo?>();
 
+        private readonly Bindable<bool> autoAdjustBeatmapOffset = new Bindable<bool>();
+
         public BindableDouble Current { get; } = new BindableDouble
         {
             MinValue = -50,
@@ -61,18 +63,12 @@ namespace osu.Game.Screens.Play.PlayerSettings
         [Resolved]
         private Player? player { get; set; }
 
-        [Resolved]
-        private OsuConfigManager config { get; set; } = null!;
-
+        private double lastPlayMedian;
+        private double lastPlayUnstableRate;
         private double lastPlayBeatmapOffset;
         private HitEventTimingDistributionGraph? lastPlayGraph;
-
-        private double suggestedOffset;
-
         private SettingsButton? calibrateFromLastPlayButton;
-
         private IDisposable? beatmapOffsetSubscription;
-
         private Task? realmWriteTask;
         private ScoreInfo? lastValidScore;
 
@@ -107,9 +103,10 @@ namespace osu.Game.Screens.Play.PlayerSettings
         }
 
         [BackgroundDependencyLoader]
-        private void load(SessionStatics statics)
+        private void load(SessionStatics statics, OsuConfigManager config)
         {
             statics.BindWith(Static.LastAppliedOffsetScore, lastAppliedScore);
+            config.BindWith(OsuSetting.AutomaticallyAdjustBeatmapOffset, autoAdjustBeatmapOffset);
         }
 
         protected override void LoadComplete()
@@ -202,7 +199,10 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
             var hitEvents = score.NewValue.HitEvents;
 
-            if (!(hitEvents.CalculateMedianHitError() is double median))
+            if (hitEvents.CalculateMedianHitError() is not double median)
+                return;
+
+            if (hitEvents.CalculateUnstableRate()?.Result is not double unstableRate)
                 return;
 
             // affecting unstable rate here is used as a substitute of determining if a hit event represents a *timed* hit event,
@@ -239,13 +239,9 @@ namespace osu.Game.Screens.Play.PlayerSettings
             }
 
             lastValidScore = score.NewValue!;
+            lastPlayMedian = median;
+            lastPlayUnstableRate = unstableRate;
             lastPlayBeatmapOffset = Current.Value;
-
-            double unstableRate = hitEvents.CalculateUnstableRate()!.Result;
-
-            bool autoAdjustBeatmapOffset = config.Get<bool>(OsuSetting.AutomaticallyAdjustBeatmapOffset);
-
-            suggestedOffset = computeSuggestedOffset(median, unstableRate, lastPlayBeatmapOffset, proportionalToUnstableRate: autoAdjustBeatmapOffset);
 
             LinkFlowContainer offsetText;
 
@@ -273,7 +269,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 }
             });
 
-            if (autoAdjustBeatmapOffset && !Current.Disabled)
+            if (autoAdjustBeatmapOffset.Value && !Current.Disabled)
             {
                 bool offsetChanged = applySuggestedOffset();
 
@@ -295,7 +291,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
         {
             double lastOffset = Current.Value;
 
-            Current.Value = suggestedOffset;
+            Current.Value = computeSuggestedOffset(lastPlayMedian, lastPlayUnstableRate, lastPlayBeatmapOffset, proportionalToUnstableRate: autoAdjustBeatmapOffset.Value);
             lastAppliedScore.Value = lastValidScore;
 
             return !Precision.AlmostEquals(Current.Value, lastOffset, Current.Precision / 2);
@@ -317,7 +313,10 @@ namespace osu.Game.Screens.Play.PlayerSettings
             bool allow = allowOffsetAdjust;
 
             if (calibrateFromLastPlayButton != null)
+            {
+                double suggestedOffset = computeSuggestedOffset(lastPlayMedian, lastPlayUnstableRate, lastPlayBeatmapOffset, proportionalToUnstableRate: autoAdjustBeatmapOffset.Value);
                 calibrateFromLastPlayButton.Enabled.Value = allow && !Precision.AlmostEquals(suggestedOffset, Current.Value, Current.Precision / 2);
+            }
 
             Current.Disabled = !allow;
         }
