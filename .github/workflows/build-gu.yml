@@ -149,11 +149,19 @@ jobs:
       uses: actions/setup-java@v4
       with:
         distribution: 'microsoft'
-        java-version: '11'
+        java-version: '17'
 
     - name: Setup Android SDK (Android only)
       if: matrix.runtime == 'android'
       uses: android-actions/setup-android@v3
+      with:
+        cmdline-tools-version: 8512546
+
+    - name: Accept Android SDK licenses (Android only)
+      if: matrix.runtime == 'android'
+      shell: bash
+      run: |
+        yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --licenses || true
 
     - name: Install Android workload (Android only)
       if: matrix.runtime == 'android'
@@ -161,6 +169,8 @@ jobs:
       run: |
         dotnet workload install android
         dotnet workload list
+        echo "Android SDK Root: $ANDROID_SDK_ROOT"
+        echo "Java Home: $JAVA_HOME"
 
     - name: Install Velopack CLI
       shell: bash
@@ -307,6 +317,9 @@ jobs:
           KEYSTORE_PASS="${ANDROID_KEYSTORE_PASSWORD:-temp123}"
           KEY_ALIAS="${ANDROID_KEY_ALIAS:-osu}"
           KEY_PASS="${ANDROID_KEY_PASSWORD:-temp123}"
+          
+          echo "Using Java version: $(java -version 2>&1 | head -n 1)"
+          echo "Android SDK Root: $ANDROID_SDK_ROOT"
           
           dotnet publish osu.Android/osu.Android.csproj \
             --configuration Release \
