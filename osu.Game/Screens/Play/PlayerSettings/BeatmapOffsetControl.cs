@@ -152,6 +152,8 @@ namespace osu.Game.Screens.Play.PlayerSettings
             // Calibration button may be hidden due to automatic offset adjustment, but it should be visible when the user manually adjusts their offset away from the applied suggestion.
             calibrateFromLastPlayButton?.Show();
 
+            // This is intentionally not scheduled as the offset may be changed while the control is hidden and cannot process its scheduler.
+            // This is the case when auto-adjustment is enabled and the offset is adjusted while the player is quick-retrying.
             writeOffsetToBeatmap();
         }
 
