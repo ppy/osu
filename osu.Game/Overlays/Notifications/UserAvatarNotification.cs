@@ -31,13 +31,20 @@ namespace osu.Game.Overlays.Notifications
                 IconContent.Masking = true;
                 IconContent.CornerRadius = CORNER_RADIUS;
                 IconContent.ChangeChildDepth(IconDrawable, float.MinValue);
-                IconContent.OnUpdate += _ => IconContent.Width = IconContent.BoundingBox.Height;
 
                 LoadComponentAsync(Avatar = new DrawableAvatar(user)
                 {
                     FillMode = FillMode.Fill,
                 }, IconContent.Add);
             }
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (user != null)
+                IconContent.Width = IconContent.DrawHeight;
         }
     }
 }
