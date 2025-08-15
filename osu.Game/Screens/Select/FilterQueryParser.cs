@@ -419,6 +419,8 @@ namespace osu.Game.Screens.Select
                     matchingValues.UnionWith(Enum.GetValues<T>());
                     matchingValues.ExceptWith(parsedValues);
                 }
+                else
+                    return false;
             }
             else
             {
