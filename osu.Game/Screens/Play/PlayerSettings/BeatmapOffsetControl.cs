@@ -291,7 +291,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
         {
             double lastOffset = Current.Value;
 
-            Current.Value = computeSuggestedOffset(lastPlayMedian, lastPlayUnstableRate, lastPlayBeatmapOffset, proportionalToUnstableRate: autoAdjustBeatmapOffset.Value);
+            Current.Value = computeSuggestedOffset(lastPlayMedian, lastPlayUnstableRate, lastPlayBeatmapOffset);
             lastAppliedScore.Value = lastValidScore;
 
             return !Precision.AlmostEquals(Current.Value, lastOffset, Current.Precision / 2);
@@ -314,7 +314,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
             if (calibrateFromLastPlayButton != null)
             {
-                double suggestedOffset = computeSuggestedOffset(lastPlayMedian, lastPlayUnstableRate, lastPlayBeatmapOffset, proportionalToUnstableRate: autoAdjustBeatmapOffset.Value);
+                double suggestedOffset = computeSuggestedOffset(lastPlayMedian, lastPlayUnstableRate, lastPlayBeatmapOffset);
                 calibrateFromLastPlayButton.Enabled.Value = allow && !Precision.AlmostEquals(suggestedOffset, Current.Value, Current.Precision / 2);
             }
 
@@ -350,17 +350,19 @@ namespace osu.Game.Screens.Play.PlayerSettings
         {
         }
 
-        private static double computeSuggestedOffset(double median, double unstableRate, double currentOffset, bool proportionalToUnstableRate)
+        private static double computeSuggestedOffset(double median, double unstableRate, double currentOffset)
         {
             const double ur_adjustment_cutoff = 90;
             const double exponential_factor = -0.0116;
 
             double offsetAdjustment = median;
 
-            if (proportionalToUnstableRate && unstableRate >= ur_adjustment_cutoff)
+            if (unstableRate >= ur_adjustment_cutoff)
+            {
                 // A demonstrative graph of this algorithm is embedded in https://github.com/ppy/osu/discussions/30521.
                 // This ultimately prevents scores with high unstable rate from suggesting potentially invalid offsets.
                 offsetAdjustment *= Math.Exp(exponential_factor * (unstableRate - ur_adjustment_cutoff));
+            }
 
             return currentOffset - offsetAdjustment;
         }
