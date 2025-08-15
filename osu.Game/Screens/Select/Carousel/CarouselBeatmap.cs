@@ -84,12 +84,17 @@ namespace osu.Game.Screens.Select.Carousel
             match &= !criteria.DifficultyName.HasFilter || criteria.DifficultyName.Matches(BeatmapInfo.DifficultyName);
             match &= !criteria.Source.HasFilter || criteria.Source.Matches(BeatmapInfo.Metadata.Source);
 
-            if (criteria.UserTag.HasFilter)
+            if (criteria.UserTags.Any())
             {
-                bool anyTagMatched = false;
-                foreach (string tag in BeatmapInfo.Metadata.UserTags)
-                    anyTagMatched |= criteria.UserTag.Matches(tag);
-                match &= anyTagMatched;
+                foreach (var tagFilter in criteria.UserTags)
+                {
+                    bool anyTagMatched = false;
+
+                    foreach (string tag in BeatmapInfo.Metadata.UserTags)
+                        anyTagMatched |= tagFilter.Matches(tag);
+
+                    match &= anyTagMatched;
+                }
             }
 
             match &= !criteria.UserStarDifficulty.HasFilter || criteria.UserStarDifficulty.IsInRange(BeatmapInfo.StarRating);

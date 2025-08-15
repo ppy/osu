@@ -58,7 +58,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public readonly Bindable<Color4> AccentColour = new Bindable<Color4>(Color4.Black);
 
-        private IBindable<ManiaMobileLayout> mobilePlayStyle = null!;
+        private IBindable<bool> touchOverlay = null!;
 
         private float leftColumnSpacing;
         private float rightColumnSpacing;
@@ -123,7 +123,7 @@ namespace osu.Game.Rulesets.Mania.UI
             RegisterPool<HoldNoteBody, DrawableHoldNoteBody>(10, 50);
 
             if (rulesetConfig != null)
-                mobilePlayStyle = rulesetConfig.GetBindable<ManiaMobileLayout>(ManiaRulesetSetting.MobileLayout);
+                touchOverlay = rulesetConfig.GetBindable<bool>(ManiaRulesetSetting.TouchOverlay);
         }
 
         private void onSourceChanged()
@@ -214,7 +214,7 @@ namespace osu.Game.Rulesets.Mania.UI
         protected override bool OnTouchDown(TouchDownEvent e)
         {
             // if touch overlay is visible, disallow columns from handling touch directly.
-            if (mobilePlayStyle.Value == ManiaMobileLayout.LandscapeWithOverlay)
+            if (touchOverlay.Value)
                 return false;
 
             maniaInputManager?.KeyBindingContainer.TriggerPressed(Action.Value);

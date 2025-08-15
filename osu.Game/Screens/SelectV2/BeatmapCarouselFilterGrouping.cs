@@ -10,6 +10,7 @@ using osu.Framework.Extensions;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Graphics.Carousel;
+using osu.Game.Scoring;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
 using osu.Game.Utils;
@@ -39,12 +40,14 @@ namespace osu.Game.Screens.SelectV2
         private Dictionary<GroupDefinition, HashSet<CarouselItem>> groupMap = new Dictionary<GroupDefinition, HashSet<CarouselItem>>();
 
         private readonly Func<FilterCriteria> getCriteria;
-        private readonly Func<List<BeatmapCollection>>? getCollections;
+        private readonly Func<List<BeatmapCollection>> getCollections;
+        private readonly Func<FilterCriteria, IReadOnlyDictionary<Guid, ScoreRank>> getLocalUserTopRanks;
 
-        public BeatmapCarouselFilterGrouping(Func<FilterCriteria> getCriteria, Func<List<BeatmapCollection>>? getCollections)
+        public BeatmapCarouselFilterGrouping(Func<FilterCriteria> getCriteria, Func<List<BeatmapCollection>> getCollections, Func<FilterCriteria, IReadOnlyDictionary<Guid, ScoreRank>> getLocalUserTopRanks)
         {
             this.getCriteria = getCriteria;
             this.getCollections = getCollections;
+            this.getLocalUserTopRanks = getLocalUserTopRanks;
         }
 
         public async Task<List<CarouselItem>> Run(IEnumerable<CarouselItem> items, CancellationToken cancellationToken)
@@ -152,6 +155,8 @@ namespace osu.Game.Screens.SelectV2
                 return false;
             if (criteria.Sort == SortMode.LastPlayed && criteria.Group == GroupMode.LastPlayed)
                 return false;
+            if (criteria.Group == GroupMode.RankAchieved)
+                return false;
 
             // In the majority case we group sets together for display.
             return true;
@@ -185,7 +190,7 @@ namespace osu.Game.Screens.SelectV2
                         var date = b.LastPlayed;
 
                         if (BeatmapSetsGroupedTogether)
-                            date = aggregateMax(b, static b => (b.LastPlayed ?? DateTimeOffset.MinValue));
+                            date = aggregateMax(b, static b => b.LastPlayed ?? DateTimeOffset.MinValue);
 
                         if (date == null || date == DateTimeOffset.MinValue)
                             return new GroupDefinition(int.MaxValue, "Never");
@@ -225,17 +230,22 @@ namespace osu.Game.Screens.SelectV2
                     return getGroupsBy(b => defineGroupBySource(b.BeatmapSet!.Metadata.Source), items);
 
                 case GroupMode.Collections:
-                    var collections = getCollections?.Invoke() ?? Enumerable.Empty<BeatmapCollection>();
+                {
+                    var collections = getCollections();
                     return getGroupsBy(b => defineGroupByCollection(b, collections), items);
+                }
 
                 case GroupMode.MyMaps:
                     return getGroupsBy(b => defineGroupByOwnMaps(b, criteria.LocalUserId, criteria.LocalUserUsername), items);
 
+                case GroupMode.RankAchieved:
+                {
+                    var topRankMapping = getLocalUserTopRanks(criteria);
+                    return getGroupsBy(b => defineGroupByRankAchieved(b, topRankMapping), items);
+                }
+
                 // TODO: need implementation
                 // case GroupMode.Favourites:
-                //     goto case GroupMode.None;
-                //
-                // case GroupMode.RankAchieved:
                 //     goto case GroupMode.None;
 
                 default:
@@ -413,6 +423,14 @@ namespace osu.Game.Screens.SelectV2
 
             // discard beatmaps not owned by the user.
             return null;
+        }
+
+        private GroupDefinition defineGroupByRankAchieved(BeatmapInfo beatmap, IReadOnlyDictionary<Guid, ScoreRank> topRankMapping)
+        {
+            if (topRankMapping.TryGetValue(beatmap.ID, out var rank))
+                return new GroupDefinition(-(int)rank, rank.GetDescription());
+
+            return new GroupDefinition(int.MaxValue, "Unplayed");
         }
 
         private static T? aggregateMax<T>(BeatmapInfo b, Func<BeatmapInfo, T> func)

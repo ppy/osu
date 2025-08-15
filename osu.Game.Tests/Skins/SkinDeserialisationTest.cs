@@ -13,10 +13,10 @@ using osu.Game.Audio;
 using osu.Game.IO;
 using osu.Game.IO.Archives;
 using osu.Game.Screens.Menu;
-using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.HUD.HitErrorMeters;
 using osu.Game.Skinning;
 using osu.Game.Skinning.Components;
+using osu.Game.Skinning.Triangles;
 using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests.Skins
@@ -77,6 +77,8 @@ namespace osu.Game.Tests.Skins
             "Archives/modified-argon-20250214.osk",
             // Covers skinnable leaderboard
             "Archives/modified-argon-20250424.osk",
+            // Covers "Argon" unstable rate counter
+            "Archives/modified-argon-20250809.osk",
         };
 
         /// <summary>
@@ -170,7 +172,7 @@ namespace osu.Game.Tests.Skins
             {
                 var skin = new TestSkin(new SkinInfo(), null, storage);
                 Assert.That(skin.LayoutInfos[GlobalSkinnableContainers.MainHUDComponents].AllDrawables.ToArray(), Has.Length.EqualTo(8));
-                Assert.That(skin.LayoutInfos[GlobalSkinnableContainers.MainHUDComponents].AllDrawables.Select(i => i.Type), Contains.Item(typeof(UnstableRateCounter)));
+                Assert.That(skin.LayoutInfos[GlobalSkinnableContainers.MainHUDComponents].AllDrawables.Select(i => i.Type), Contains.Item(typeof(TrianglesUnstableRateCounter)));
                 Assert.That(skin.LayoutInfos[GlobalSkinnableContainers.MainHUDComponents].AllDrawables.Select(i => i.Type), Contains.Item(typeof(ColourHitErrorMeter)));
                 Assert.That(skin.LayoutInfos[GlobalSkinnableContainers.MainHUDComponents].AllDrawables.Select(i => i.Type), Contains.Item(typeof(LegacySongProgress)));
             }

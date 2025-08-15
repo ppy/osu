@@ -23,7 +23,6 @@ namespace osu.Game.Screens.Edit.Submission
     [LocalisableDescription(typeof(BeatmapSubmissionStrings), nameof(BeatmapSubmissionStrings.SubmissionSettings))]
     public partial class ScreenSubmissionSettings : WizardScreen
     {
-        private readonly BindableBool notifyOnDiscussionReplies = new BindableBool();
         private readonly BindableBool loadInBrowserAfterSubmission = new BindableBool();
 
         public override LocalisableString? NextStepText => BeatmapSubmissionStrings.ConfirmSubmission;
@@ -34,7 +33,6 @@ namespace osu.Game.Screens.Edit.Submission
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager configManager, OsuColour colours)
         {
-            configManager.BindWith(OsuSetting.EditorSubmissionNotifyOnDiscussionReplies, settings.NotifyOnDiscussionReplies);
             configManager.BindWith(OsuSetting.EditorSubmissionLoadInBrowserAfterSubmission, loadInBrowserAfterSubmission);
 
             Content.Add(new FillFlowContainer

@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -15,47 +16,114 @@ using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Leaderboards;
+using osu.Game.Rulesets.Osu;
+using osu.Game.Scoring;
+using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Select.Leaderboards;
-using osuTK;
+using osu.Game.Tests.Gameplay;
+using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    [TestFixture]
     public partial class TestSceneGameplayLeaderboard : OsuTestScene
     {
-        private TestDrawableGameplayLeaderboard leaderboard = null!;
+        private Box? blackBackground;
+        private DrawableGameplayLeaderboard leaderboard = null!;
 
-        [Cached(typeof(IGameplayLeaderboardProvider))]
-        private TestGameplayLeaderboardProvider leaderboardProvider = new TestGameplayLeaderboardProvider();
+        [Cached]
+        private readonly LeaderboardManager leaderboardManager = new LeaderboardManager();
 
-        private readonly BindableLong playerScore = new BindableLong();
+        [Cached]
+        private readonly GameplayState gameplayState;
 
         public TestSceneGameplayLeaderboard()
         {
-            AddStep("toggle expanded", () =>
+            var localScore = new ScoreInfo
+            {
+                User = new APIUser { Username = "You", Id = 3 }
+            };
+
+            gameplayState = TestGameplayState.Create(new OsuRuleset(), null, new Score { ScoreInfo = localScore }, new Bindable<LocalUserPlayingState>(LocalUserPlayingState.Playing));
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            LoadComponent(leaderboardManager);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            AddStep("toggle collapsed", () =>
             {
                 if (leaderboard.IsNotNull())
                     leaderboard.CollapseDuringGameplay.Value = !leaderboard.CollapseDuringGameplay.Value;
             });
 
-            AddSliderStep("set player score", 50, 5000000, 1222333, v => playerScore.Value = v);
+            AddStep("toggle black background", () => blackBackground?.FadeTo(1 - blackBackground.Alpha, 300, Easing.OutQuint));
+
+            AddSliderStep("set player score", 50, 1_000_000, 700_000, v => gameplayState.ScoreProcessor.TotalScore.Value = v);
+        }
+
+        [Test]
+        public void TestDisplay()
+        {
+            AddStep("set scores", () =>
+            {
+                var friend = new APIUser { Username = "Friend", Id = 1337 };
+
+                var api = (DummyAPIAccess)API;
+
+                api.Friends.Clear();
+                api.Friends.Add(new APIRelation
+                {
+                    Mutual = true,
+                    RelationType = RelationType.Friend,
+                    TargetID = friend.OnlineID,
+                    TargetUser = friend
+                });
+
+                // this is dodgy but anything less dodgy is a lot of work
+                ((Bindable<LeaderboardScores?>)leaderboardManager.Scores).Value = LeaderboardScores.Success(new[]
+                {
+                    new ScoreInfo { User = new APIUser { Username = "Top", Id = 2 }, TotalScore = 900_000, Accuracy = 0.99, MaxCombo = 999 },
+                    new ScoreInfo { User = new APIUser { Username = "Second", Id = 14 }, TotalScore = 800_000, Accuracy = 0.9, MaxCombo = 888 },
+                    new ScoreInfo { User = friend, TotalScore = 700_000, Accuracy = 0.88, MaxCombo = 777 },
+                }, 3, null);
+            });
+
+            createLeaderboard();
+
+            AddStep("set score to 650k", () => gameplayState.ScoreProcessor.TotalScore.Value = 650_000);
+            AddUntilStep("wait for 4th spot", () => leaderboard.TrackedScore!.ScorePosition.Value, () => Is.EqualTo(4));
+            AddStep("set score to 750k", () => gameplayState.ScoreProcessor.TotalScore.Value = 750_000);
+            AddUntilStep("wait for 3rd spot", () => leaderboard.TrackedScore!.ScorePosition.Value, () => Is.EqualTo(3));
+            AddStep("set score to 850k", () => gameplayState.ScoreProcessor.TotalScore.Value = 850_000);
+            AddUntilStep("wait for 2nd spot", () => leaderboard.TrackedScore!.ScorePosition.Value, () => Is.EqualTo(2));
+            AddStep("set score to 950k", () => gameplayState.ScoreProcessor.TotalScore.Value = 950_000);
+            AddUntilStep("wait for 1st spot", () => leaderboard.TrackedScore!.ScorePosition.Value, () => Is.EqualTo(1));
         }
 
         [Test]
         public void TestLayoutWithManyScores()
         {
-            createLeaderboard();
-
-            AddStep("add many scores in one go", () =>
+            AddStep("set scores", () =>
             {
-                for (int i = 0; i < 32; i++)
-                    leaderboardProvider.CreateRandomScore(new APIUser { Username = $"Player {i + 1}" });
+                var scores = new List<ScoreInfo>();
 
-                // Add player at end to force an animation down the whole list.
-                playerScore.Value = 0;
-                leaderboardProvider.CreateLeaderboardScore(playerScore, new APIUser { Username = "You", Id = 3 }, true);
+                for (int i = 0; i < 32; i++)
+                    scores.Add(new ScoreInfo { User = new APIUser { Username = $"Player {i + 1}" }, TotalScore = RNG.Next(700_000, 1_000_000) });
+
+                // this is dodgy but anything less dodgy is a lot of work
+                ((Bindable<LeaderboardScores?>)leaderboardManager.Scores).Value = LeaderboardScores.Success(scores, scores.Count, null);
+                gameplayState.ScoreProcessor.TotalScore.Value = 0;
             });
+
+            createLeaderboard();
 
             // Gameplay leaderboard has custom scroll logic, which when coupled with LayoutDuration
             // has caused layout to not work in the past.
@@ -68,80 +136,51 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddUntilStep("wait for tracked score fully visible", () => leaderboard.ScreenSpaceDrawQuad.Intersects(leaderboard.TrackedScore!.ScreenSpaceDrawQuad));
 
-            AddStep("change score to middle", () => playerScore.Value = 1000000);
+            AddStep("change score to middle", () => gameplayState.ScoreProcessor.TotalScore.Value = 850_000);
             AddWaitStep("wait for movement", 5);
             AddUntilStep("wait for tracked score fully visible", () => leaderboard.ScreenSpaceDrawQuad.Intersects(leaderboard.TrackedScore!.ScreenSpaceDrawQuad));
 
-            AddStep("change score to first", () => playerScore.Value = 5000000);
+            AddStep("change score to first", () => gameplayState.ScoreProcessor.TotalScore.Value = 1_000_000);
             AddWaitStep("wait for movement", 5);
             AddUntilStep("wait for tracked score fully visible", () => leaderboard.ScreenSpaceDrawQuad.Intersects(leaderboard.TrackedScore!.ScreenSpaceDrawQuad));
-        }
-
-        [Test]
-        public void TestRandomScores()
-        {
-            createLeaderboard();
-            addLocalPlayer();
-
-            int playerNumber = 1;
-            AddRepeatStep("add player with random score", () => leaderboardProvider.CreateRandomScore(new APIUser { Username = $"Player {playerNumber++}" }), 10);
         }
 
         [Test]
         public void TestExistingUsers()
         {
-            createLeaderboard();
-            addLocalPlayer();
+            AddStep("set scores", () =>
+            {
+                // this is dodgy but anything less dodgy is a lot of work
+                ((Bindable<LeaderboardScores?>)leaderboardManager.Scores).Value = LeaderboardScores.Success(new[]
+                {
+                    new ScoreInfo { User = new APIUser { Username = "peppy", Id = 2 }, TotalScore = 900_000, Accuracy = 0.99, MaxCombo = 999 },
+                    new ScoreInfo { User = new APIUser { Username = "smoogipoo", Id = 1040328 }, TotalScore = 800_000, Accuracy = 0.9, MaxCombo = 888 },
+                    new ScoreInfo { User = new APIUser { Username = "flyte", Id = 3103765 }, TotalScore = 700_000, Accuracy = 0.9, MaxCombo = 888 },
+                    new ScoreInfo { User = new APIUser { Username = "frenzibyte", Id = 14210502 }, TotalScore = 600_000, Accuracy = 0.9, MaxCombo = 777 },
+                }, 4, null);
+            });
 
-            AddStep("add peppy", () => leaderboardProvider.CreateRandomScore(new APIUser { Username = "peppy", Id = 2 }));
-            AddStep("add smoogipoo", () => leaderboardProvider.CreateRandomScore(new APIUser { Username = "smoogipoo", Id = 1040328 }));
-            AddStep("add flyte", () => leaderboardProvider.CreateRandomScore(new APIUser { Username = "flyte", Id = 3103765 }));
-            AddStep("add frenzibyte", () => leaderboardProvider.CreateRandomScore(new APIUser { Username = "frenzibyte", Id = 14210502 }));
+            createLeaderboard();
         }
 
         [Test]
-        public void TestFriendScore()
+        public void TestQuitScore()
         {
-            APIUser friend = new APIUser { Username = "my friend", Id = 10000 };
-
-            createLeaderboard();
-            addLocalPlayer();
-
-            AddStep("Add friend to API", () =>
+            AddStep("set scores", () =>
             {
-                var api = (DummyAPIAccess)API;
-
-                api.Friends.Clear();
-                api.Friends.Add(new APIRelation
+                // this is dodgy but anything less dodgy is a lot of work
+                ((Bindable<LeaderboardScores?>)leaderboardManager.Scores).Value = LeaderboardScores.Success(new[]
                 {
-                    Mutual = true,
-                    RelationType = RelationType.Friend,
-                    TargetID = friend.OnlineID,
-                    TargetUser = friend
-                });
+                    new ScoreInfo { User = new APIUser { Username = "Quit", Id = 3 }, TotalScore = 100_000, Accuracy = 0.99, MaxCombo = 999 },
+                }, 1, null);
             });
 
-            int playerNumber = 1;
+            createLeaderboard();
 
-            AddRepeatStep("add 3 other players", () => leaderboardProvider.CreateRandomScore(new APIUser { Username = $"Player {playerNumber++}" }), 3);
-            AddUntilStep("no pink color scores",
-                () => leaderboard.ChildrenOfType<Box>().Select(b => ((Colour4)b.Colour).ToHex()),
-                () => Does.Not.Contain("#FF549A"));
-
-            AddRepeatStep("add 3 friend score", () => leaderboardProvider.CreateRandomScore(friend), 3);
-            AddUntilStep("at least one friend score is pink",
-                () => leaderboard.GetAllScoresForUsername("my friend")
-                                 .SelectMany(score => score.ChildrenOfType<Box>())
-                                 .Select(b => ((Colour4)b.Colour).ToHex()),
-                () => Does.Contain("#FF549A"));
-        }
-
-        private void addLocalPlayer()
-        {
-            AddStep("add local player", () =>
+            AddStep("mark score as quit", () =>
             {
-                playerScore.Value = 1222333;
-                leaderboardProvider.CreateLeaderboardScore(playerScore, new APIUser { Username = "You", Id = 3 }, true);
+                var quitScore = this.ChildrenOfType<SoloGameplayLeaderboardProvider>().Single().Scores.Single(s => s.User.Username == "Quit");
+                quitScore.HasQuit.Value = true;
             });
         }
 
@@ -149,38 +188,33 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddStep("create leaderboard", () =>
             {
-                leaderboardProvider.Scores.Clear();
-                Child = leaderboard = new TestDrawableGameplayLeaderboard
+                SoloGameplayLeaderboardProvider soloGameplayLeaderboardProvider;
+
+                Child = new DependencyProvidingContainer
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Scale = new Vector2(2),
+                    RelativeSizeAxes = Axes.Both,
+                    CachedDependencies = new (Type, object)[]
+                    {
+                        (typeof(IGameplayLeaderboardProvider), soloGameplayLeaderboardProvider = new SoloGameplayLeaderboardProvider()),
+                    },
+                    Children = new Drawable[]
+                    {
+                        soloGameplayLeaderboardProvider,
+                        blackBackground = new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = Color4.Black,
+                            Alpha = 0f,
+                        },
+                        leaderboard = new DrawableGameplayLeaderboard
+                        {
+                            CollapseDuringGameplay = { Value = false },
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                        }
+                    }
                 };
             });
-        }
-
-        private partial class TestDrawableGameplayLeaderboard : DrawableGameplayLeaderboard
-        {
-            public float Spacing => Flow.Spacing.Y;
-
-            public IEnumerable<DrawableGameplayLeaderboardScore> GetAllScoresForUsername(string username)
-                => Flow.Where(i => i.User?.Username == username);
-        }
-
-        public class TestGameplayLeaderboardProvider : IGameplayLeaderboardProvider
-        {
-            public BindableList<GameplayLeaderboardScore> Scores { get; } = new BindableList<GameplayLeaderboardScore>();
-
-            public GameplayLeaderboardScore CreateRandomScore(APIUser user) => CreateLeaderboardScore(new BindableLong(RNG.Next(0, 5_000_000)), user);
-
-            public GameplayLeaderboardScore CreateLeaderboardScore(BindableLong totalScore, APIUser user, bool isTracked = false)
-            {
-                var score = new GameplayLeaderboardScore(user, isTracked, totalScore);
-                Scores.Add(score);
-                return score;
-            }
-
-            IBindableList<GameplayLeaderboardScore> IGameplayLeaderboardProvider.Scores => Scores;
         }
     }
 }

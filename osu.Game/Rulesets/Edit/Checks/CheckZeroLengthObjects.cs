@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Edit.Checks
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
-            foreach (var hitObject in context.Beatmap.HitObjects)
+            foreach (var hitObject in context.CurrentDifficulty.Playable.HitObjects)
             {
                 if (!(hitObject is IHasDuration hasDuration))
                     continue;

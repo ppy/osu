@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
@@ -88,11 +87,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
-        public void TestExpiredItemsNotIncludedIfRoomOpen()
+        public void TestRangeUsesNonExpiredItemsIfThereAreAny()
         {
             AddStep("set up room", () =>
             {
-                room.EndDate = null;
                 room.Playlist =
                 [
                     new PlaylistItem(new BeatmapInfo { StarRating = 1 }) { ID = TestResources.GetNextTestID(), Expired = true },
@@ -109,11 +107,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
-        public void TestExpiredItemsIncludedIfRoomEnded()
+        public void TestRangeUsesAllItemsIfAllAreExpired()
         {
             AddStep("set up room", () =>
             {
-                room.EndDate = DateTimeOffset.Now;
                 room.Playlist =
                 [
                     new PlaylistItem(new BeatmapInfo { StarRating = 1 }) { ID = TestResources.GetNextTestID(), Expired = true },
