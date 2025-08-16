@@ -129,25 +129,40 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             var slider = new Slider { StartTime = Time.Current, ClassicSliderBehaviour = classic };
             slider.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
-            OsuHitObject hitObject = hitObjectIndex switch
-            {
-                0 => new SliderHeadCircle { StartTime = Time.Current, ClassicSliderBehaviour = classic },
-                1 => new SliderTick { StartTime = Time.Current },
-                2 => new SliderRepeat(slider) { StartTime = Time.Current },
-                3 => new SliderTailCircle(slider) { StartTime = Time.Current, ClassicSliderBehaviour = classic },
-                4 => slider,
-                _ => throw new UnreachableException(),
-            };
 
-            DrawableOsuHitObject drawableHitObject = hitObject switch
+            OsuHitObject hitObject;
+            DrawableOsuHitObject drawableHitObject;
+
+            switch (hitObjectIndex)
             {
-                SliderHeadCircle head => new DrawableSliderHead(head),
-                SliderTick tick => new DrawableSliderTick(tick),
-                SliderRepeat repeat => new DrawableSliderRepeat(repeat),
-                SliderTailCircle tail => new DrawableSliderTail(tail),
-                Slider s => new DrawableSlider(s),
-                _ => throw new UnreachableException(),
-            };
+                case 0:
+                    hitObject = new SliderHeadCircle { StartTime = Time.Current, ClassicSliderBehaviour = classic };
+                    drawableHitObject = new DrawableSliderHead((SliderHeadCircle)hitObject);
+                    break;
+
+                case 1:
+                    hitObject = new SliderTick { StartTime = Time.Current };
+                    drawableHitObject = new DrawableSliderTick((SliderTick)hitObject);
+                    break;
+
+                case 2:
+                    hitObject = new SliderRepeat(slider) { StartTime = Time.Current };
+                    drawableHitObject = new DrawableSliderRepeat((SliderRepeat)hitObject);
+                    break;
+
+                case 3:
+                    hitObject = new SliderTailCircle(slider) { StartTime = Time.Current, ClassicSliderBehaviour = classic };
+                    drawableHitObject = new DrawableSliderTail((SliderTailCircle)hitObject);
+                    break;
+
+                case 4:
+                    hitObject = slider;
+                    drawableHitObject = new DrawableSlider(slider);
+                    break;
+
+                default:
+                    throw new UnreachableException();
+            }
 
             if (!drawableHitObject.DisplayResult)
                 return;
