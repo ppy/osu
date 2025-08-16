@@ -89,9 +89,6 @@ namespace osu.Game.Rulesets.Judgements
         {
             Result = result;
             JudgedHitObject = judgedObject?.HitObject;
-
-            if (JudgementBody?.Drawable is IAppliesJudgementResult appliesResult)
-                appliesResult.ApplyJudgementResult(Result);
         }
 
         protected override void FreeAfterUse()
