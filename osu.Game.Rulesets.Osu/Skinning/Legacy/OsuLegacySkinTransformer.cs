@@ -125,7 +125,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                             if (getSliderPointTexture(resultComponent.Component) is Texture texture)
                                 return new LegacyJudgementPieceSliderTickHit { Texture = texture };
 
-                            return base.GetDrawableComponent(lookup);
+                            break;
 
                         // If the corresponding hit result displays a judgement and the miss texture isn't provided by this skin, don't look up the miss texture from any further skins.
                         case HitResult.LargeTickMiss:
@@ -135,11 +135,10 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                                     : HitResult.SliderTailHit) != null)
                                 return base.GetDrawableComponent(lookup) ?? Drawable.Empty();
 
-                            return base.GetDrawableComponent(lookup);
-
-                        default:
-                            return base.GetDrawableComponent(lookup);
+                            break;
                     }
+
+                    return base.GetDrawableComponent(lookup);
 
                     Texture? getSliderPointTexture(HitResult result)
                     {
