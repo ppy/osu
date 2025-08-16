@@ -5,6 +5,8 @@ using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Osu.Objects;
@@ -126,6 +128,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             container.Clear(false);
 
             var slider = new Slider { StartTime = Time.Current, ClassicSliderBehaviour = classic };
+            slider.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
             OsuHitObject hitObject = hitObjectIndex switch
             {
                 0 => new SliderHeadCircle { StartTime = Time.Current, ClassicSliderBehaviour = classic },
@@ -147,10 +150,6 @@ namespace osu.Game.Rulesets.Osu.Tests
             };
 
             if (!drawableHitObject.DisplayResult)
-                return;
-
-            // TODO: This shouldn't be here. Removing it causes a crash on classic behaviour and I don't know why -- it happens any time the slider from above is applied to a DrawableJudgement, but the error comes from something about transforms on the Argon judgement piece, which doesn't seem to be related to the hit object.
-            if (hitObject is Slider)
                 return;
 
             var result = new OsuJudgementResult(hitObject, hitObject.Judgement)
