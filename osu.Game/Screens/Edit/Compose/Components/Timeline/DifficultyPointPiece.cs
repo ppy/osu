@@ -140,6 +140,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             {
                 base.LoadComplete();
                 ScheduleAfterChildren(() => GetContainingFocusManager()!.ChangeFocus(sliderVelocitySlider));
+                sliderVelocitySlider.OnCommit += (_, _) => this.HidePopover();
             }
         }
     }
