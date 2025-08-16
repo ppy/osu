@@ -12,7 +12,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
-    public partial class LegacySliderTickJudgementPiece : Sprite, IAnimatableJudgement, IAppliesJudgementResult
+    public partial class LegacyJudgementPieceSliderTickHit : Sprite, IAnimatableJudgement, IAppliesJudgementResult
     {
         private Texture? texture10;
         private Texture? texture30;
