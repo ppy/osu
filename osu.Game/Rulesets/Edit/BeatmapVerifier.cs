@@ -31,6 +31,7 @@ namespace osu.Game.Rulesets.Edit
             new CheckDelayedHitsounds(),
             new CheckSongFormat(),
             new CheckHitsoundsFormat(),
+            new CheckInconsistentAudio(),
 
             // Files
             new CheckZeroByteFiles(),
