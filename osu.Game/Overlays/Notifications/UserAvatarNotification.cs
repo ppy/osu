@@ -26,18 +26,20 @@ namespace osu.Game.Overlays.Notifications
         [BackgroundDependencyLoader]
         private void load()
         {
-            if (user != null)
-            {
-                IconContent.Masking = true;
-                IconContent.CornerRadius = CORNER_RADIUS;
-                IconContent.ChangeChildDepth(IconDrawable, float.MinValue);
-                IconContent.OnUpdate += _ => IconContent.Width = IconContent.BoundingBox.Height;
+            IconContent.Masking = true;
+            IconContent.CornerRadius = CORNER_RADIUS;
+            IconContent.ChangeChildDepth(IconDrawable, float.MinValue);
 
-                LoadComponentAsync(Avatar = new DrawableAvatar(user)
-                {
-                    FillMode = FillMode.Fill,
-                }, IconContent.Add);
-            }
+            LoadComponentAsync(Avatar = new DrawableAvatar(user)
+            {
+                FillMode = FillMode.Fill,
+            }, IconContent.Add);
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+            IconContent.Width = IconContent.DrawHeight;
         }
     }
 }
