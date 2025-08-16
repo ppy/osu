@@ -1,10 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.Sprites;
@@ -20,12 +20,10 @@ namespace osu.Game.Rulesets.Osu.Tests
     public partial class TestSceneDrawableJudgementSliderTicks : OsuSkinnableTestScene
     {
         private bool classic;
-        private readonly Container<DrawableOsuJudgement>[,,] judgementContainers;
         private readonly JudgementPooler<DrawableOsuJudgement>[] judgementPools;
 
         public TestSceneDrawableJudgementSliderTicks()
         {
-            judgementContainers = new Container<DrawableOsuJudgement>[Rows * Cols, 5, 2];
             judgementPools = new JudgementPooler<DrawableOsuJudgement>[Rows * Cols];
         }
 
@@ -83,7 +81,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                                     "repeat",
                                     "tail",
                                     "slider",
-                                }.Select((label, hitObjectIndex) => new Drawable[]
+                                }.Select(label => new Drawable[]
                                 {
                                     new OsuSpriteText
                                     {
@@ -91,10 +89,8 @@ namespace osu.Game.Rulesets.Osu.Tests
                                         Anchor = Anchor.CentreRight,
                                         Origin = Anchor.CentreRight,
                                     },
-                                    judgementContainers[cellIndex, hitObjectIndex, 0] =
-                                        new Container<DrawableOsuJudgement> { RelativeSizeAxes = Axes.Both },
-                                    judgementContainers[cellIndex, hitObjectIndex, 1] =
-                                        new Container<DrawableOsuJudgement> { RelativeSizeAxes = Axes.Both },
+                                    new Container<DrawableOsuJudgement> { RelativeSizeAxes = Axes.Both },
+                                    new Container<DrawableOsuJudgement> { RelativeSizeAxes = Axes.Both },
                                 })).ToArray(),
                         },
                     },
@@ -114,65 +110,42 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             for (int cellIndex = 0; cellIndex < Rows * Cols; cellIndex++)
             {
-                for (int hitObjectIndex = 0; hitObjectIndex < 5; hitObjectIndex++)
+                var slider = new Slider { StartTime = Time.Current, ClassicSliderBehaviour = classic };
+                slider.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
+
+                var drawableHitObjects = new DrawableOsuHitObject[]
                 {
-                    createJudgement(cellIndex, hitObjectIndex, true);
-                    createJudgement(cellIndex, hitObjectIndex, false);
+                    new DrawableSliderHead(new SliderHeadCircle { StartTime = Time.Current, ClassicSliderBehaviour = classic }),
+                    new DrawableSliderTick(new SliderTick { StartTime = Time.Current }),
+                    new DrawableSliderRepeat(new SliderRepeat(slider) { StartTime = Time.Current }),
+                    new DrawableSliderTail(new SliderTailCircle(slider) { StartTime = Time.Current, ClassicSliderBehaviour = classic }),
+                    new DrawableSlider(slider),
+                };
+
+                var containers = Cell(cellIndex).ChildrenOfType<Container<DrawableOsuJudgement>>().ToArray();
+
+                for (int i = 0; i < drawableHitObjects.Length; i++)
+                {
+                    createJudgement(judgementPools[cellIndex], containers[i * 2], drawableHitObjects[i], true);
+                    createJudgement(judgementPools[cellIndex], containers[i * 2 + 1], drawableHitObjects[i], false);
                 }
             }
         }
 
-        private void createJudgement(int cellIndex, int hitObjectIndex, bool hit)
+        private void createJudgement(JudgementPooler<DrawableOsuJudgement> pool, Container<DrawableOsuJudgement> container, DrawableOsuHitObject drawableHitObject, bool hit)
         {
-            var container = judgementContainers[cellIndex, hitObjectIndex, hit ? 0 : 1];
             container.Clear(false);
-
-            var slider = new Slider { StartTime = Time.Current, ClassicSliderBehaviour = classic };
-            slider.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
-
-            OsuHitObject hitObject;
-            DrawableOsuHitObject drawableHitObject;
-
-            switch (hitObjectIndex)
-            {
-                case 0:
-                    hitObject = new SliderHeadCircle { StartTime = Time.Current, ClassicSliderBehaviour = classic };
-                    drawableHitObject = new DrawableSliderHead((SliderHeadCircle)hitObject);
-                    break;
-
-                case 1:
-                    hitObject = new SliderTick { StartTime = Time.Current };
-                    drawableHitObject = new DrawableSliderTick((SliderTick)hitObject);
-                    break;
-
-                case 2:
-                    hitObject = new SliderRepeat(slider) { StartTime = Time.Current };
-                    drawableHitObject = new DrawableSliderRepeat((SliderRepeat)hitObject);
-                    break;
-
-                case 3:
-                    hitObject = new SliderTailCircle(slider) { StartTime = Time.Current, ClassicSliderBehaviour = classic };
-                    drawableHitObject = new DrawableSliderTail((SliderTailCircle)hitObject);
-                    break;
-
-                case 4:
-                    hitObject = slider;
-                    drawableHitObject = new DrawableSlider(slider);
-                    break;
-
-                default:
-                    throw new UnreachableException();
-            }
 
             if (!drawableHitObject.DisplayResult)
                 return;
 
+            var hitObject = drawableHitObject.HitObject;
             var result = new OsuJudgementResult(hitObject, hitObject.Judgement)
             {
                 Type = hit ? hitObject.Judgement.MaxResult : hitObject.Judgement.MinResult,
             };
 
-            var judgement = judgementPools[cellIndex].Get(result.Type, d =>
+            var judgement = pool.Get(result.Type, d =>
             {
                 d.Anchor = Anchor.Centre;
                 d.Origin = Anchor.Centre;
