@@ -7,6 +7,7 @@ using ManagedBass;
 using osu.Framework.Audio.Callbacks;
 using osu.Game.Beatmaps;
 using osu.Game.Extensions;
+using osu.Game.Models;
 using osu.Game.Rulesets.Edit.Checks.Components;
 
 namespace osu.Game.Rulesets.Edit.Checks
@@ -24,13 +25,22 @@ namespace osu.Game.Rulesets.Edit.Checks
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
             var beatmapSet = context.CurrentDifficulty.Playable.BeatmapInfo.BeatmapSet;
-            var audioFile = beatmapSet?.GetFile(context.CurrentDifficulty.Playable.Metadata.AudioFile);
 
             if (beatmapSet == null) yield break;
 
+            // Collect all audio files from all difficulties to exclude them from the check, as they aren't hitsounds.
+            var audioFiles = new HashSet<RealmNamedFileUsage>(ReferenceEqualityComparer.Instance);
+
+            foreach (var difficulty in context.AllDifficulties)
+            {
+                var audioFile = beatmapSet.GetFile(difficulty.Playable.Metadata.AudioFile);
+                if (audioFile != null)
+                    audioFiles.Add(audioFile);
+            }
+
             foreach (var file in beatmapSet.Files)
             {
-                if (audioFile != null && ReferenceEquals(file.File, audioFile.File)) continue;
+                if (audioFiles.Contains(file)) continue;
 
                 using (Stream data = context.CurrentDifficulty.Working.GetStream(file.File.GetStoragePath()))
                 {
