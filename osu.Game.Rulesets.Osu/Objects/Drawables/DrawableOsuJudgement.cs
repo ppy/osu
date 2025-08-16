@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         [Resolved]
         private OsuConfigManager config { get; set; } = null!;
 
-        private Vector2 screenSpacePosition;
+        private Vector2? screenSpacePosition;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -65,7 +65,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             Lighting.ResetAnimation();
             Lighting.SetColourFrom(this, Result);
-            Position = Parent!.ToLocalSpace(screenSpacePosition);
+
+            if (screenSpacePosition != null)
+                Position = Parent!.ToLocalSpace(screenSpacePosition.Value);
         }
 
         protected override void ApplyHitAnimations()
@@ -87,7 +89,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             base.ApplyHitAnimations();
         }
 
-        protected override Drawable CreateDefaultJudgement(HitResult result) => new OsuJudgementPiece(result);
+        protected override Drawable CreateDefaultJudgement(HitResult result) =>
+            // Tick hits don't show a judgement by default
+            result.IsHit() && result.IsTick() ? Empty() : new OsuJudgementPiece(result);
 
         private partial class OsuJudgementPiece : DefaultJudgementPiece
         {
