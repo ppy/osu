@@ -77,7 +77,7 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
             {
                 Content.Masking = false;
                 Content.CornerRadius = 0;
-                Icon.X = 4.5f;
+                Icon.X = 4f;
             }
 
             protected override SpriteText CreateText() => new ExpandableSpriteText
@@ -85,7 +85,8 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
                 Depth = -1,
                 Origin = Anchor.CentreLeft,
                 Anchor = Anchor.CentreLeft,
-                X = 31f
+                X = 18f,
+                Font = Editor.Fonts.Default,
             };
         }
     }
