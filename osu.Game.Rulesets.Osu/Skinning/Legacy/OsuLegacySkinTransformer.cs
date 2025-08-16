@@ -123,7 +123,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         case HitResult.LargeTickHit:
                         case HitResult.SliderTailHit:
                             if (hasSliderPoints())
-                                return new LegacySliderTickJudgementPiece();
+                                return new LegacyJudgementPieceSliderTickHit();
 
                             return base.GetDrawableComponent(lookup);
 
