@@ -7,7 +7,7 @@ using osu.Framework.Localisation;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    internal class OsuModGrow : OsuModObjectScaleTween
+    public class OsuModGrow : OsuModObjectScaleTween
     {
         public override string Name => "Grow";
 
