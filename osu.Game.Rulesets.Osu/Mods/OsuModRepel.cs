@@ -19,7 +19,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    internal class OsuModRepel : Mod, IUpdatableByPlayfield, IApplicableToDrawableRuleset<OsuHitObject>
+    public class OsuModRepel : Mod, IUpdatableByPlayfield, IApplicableToDrawableRuleset<OsuHitObject>
     {
         public override string Name => "Repel";
         public override string Acronym => "RP";
