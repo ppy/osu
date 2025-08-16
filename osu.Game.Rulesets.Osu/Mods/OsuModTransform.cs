@@ -6,6 +6,7 @@ using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
+using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
@@ -18,7 +19,7 @@ namespace osu.Game.Rulesets.Osu.Mods
     {
         public override string Name => "Transform";
         public override string Acronym => "TR";
-        public override IconUsage? Icon => FontAwesome.Solid.ArrowsAlt;
+        public override IconUsage? Icon => OsuIcon.ModTransform;
         public override ModType Type => ModType.Fun;
         public override LocalisableString Description => "Everything rotates. EVERYTHING.";
         public override double ScoreMultiplier => 1;

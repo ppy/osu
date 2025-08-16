@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
@@ -26,7 +27,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override LocalisableString Description => "Play with blinds on your screen.";
         public override string Acronym => "BL";
 
-        public override IconUsage? Icon => FontAwesome.Solid.Adjust;
+        public override IconUsage? Icon => OsuIcon.ModBlinds;
         public override ModType Type => ModType.DifficultyIncrease;
 
         public override double ScoreMultiplier => UsesDefaultConfiguration ? 1.12 : 1;
