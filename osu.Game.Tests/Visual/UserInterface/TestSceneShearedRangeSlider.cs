@@ -115,8 +115,8 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("click 75%", () =>
             {
                 // save out original positions so we can use as absolute selection range.
-                lowerBoundNub = shearedRangeSlider.ChildrenOfType<ShearedNub>().Last().ScreenSpaceDrawQuad.Centre - OsuGame.SHEAR * 2;
-                upperBoundNub = shearedRangeSlider.ChildrenOfType<ShearedNub>().First().ScreenSpaceDrawQuad.Centre - OsuGame.SHEAR * 2;
+                lowerBoundNub = shearedRangeSlider.ChildrenOfType<ShearedNub>().Last().ScreenSpaceDrawQuad.TopRight - OsuGame.SHEAR * 2;
+                upperBoundNub = shearedRangeSlider.ChildrenOfType<ShearedNub>().First().ScreenSpaceDrawQuad.TopLeft - OsuGame.SHEAR * 2;
 
                 InputManager.MoveMouseTo(lowerBoundNub + new Vector2((upperBoundNub.X - lowerBoundNub.X) * 0.75f, 0));
                 InputManager.Click(MouseButton.Left);
