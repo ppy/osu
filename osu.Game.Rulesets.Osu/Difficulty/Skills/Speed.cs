@@ -65,7 +65,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             // We're sorting from highest to lowest note.
             foreach (double note in notes.OrderDescending())
             {
-                // Use a harmonic sum for note which effectively buffs maps with more notes, especially if note difficulties are consistent.
+                // Use a harmonic sum which effectively buffs maps with more notes, especially if note difficulties are consistent.
                 // Constants are arbitrary and give good values.
                 // https://www.desmos.com/calculator/gquji01mlg
                 double weight = (1.0 + (20.0 / (1 + index))) / (Math.Pow(index, 0.85) + 1.0 + (20.0 / (1.0 + index)));
@@ -115,12 +115,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             if (sliderStrains.Count == 0)
                 return 0;
 
-            double consistentTopNote = DifficultyValue() / noteWeights.Sum(); // What would the top strain be if all strain values were identical
+            double consistentTopNote = DifficultyValue() / noteWeights.Sum(); // What would the top note be if all note values were identical
 
             if (consistentTopNote == 0)
                 return 0;
 
-            // Use a weighted sum of all strains. Constants are arbitrary and give nice values
+            // Use a weighted sum of all notes. Constants are arbitrary and give nice values
             return sliderStrains.Sum(s => DifficultyCalculationUtils.Logistic(s / consistentTopNote, 3, 5, 1.1));
         }
     }
