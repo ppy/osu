@@ -133,6 +133,7 @@ namespace osu.Game.Skinning.Components
             if (anyBracketsContainOperations(numberedTemplate))
             {
                 int[] bracketStartPositions = getOperatorContainingBracketPos(numberedTemplate);
+
                 for (int i = 0; i < bracketStartPositions.Length; i++)
                 {
                     string calculatedTemplate = numberedTemplate;
@@ -142,17 +143,20 @@ namespace osu.Game.Skinning.Components
                     if (!checkOperatorCorrectness(calculatedTemplate, bracketStartPositions[i], bracketEndPosition)
                         || !checkRoundBracketCorrectness(calculatedTemplate, bracketStartPositions[i], bracketEndPosition))
                         continue;
+
                     replaceMinus(ref calculatedTemplate, bracketStartPositions[i], bracketEndPosition);
                     addImpliedMultiplication(ref calculatedTemplate, bracketStartPositions[i], bracketEndPosition);
                     //Recalculate endPosition since both of the above function add new characters,
                     //therefore offsetting things.
                     bracketEndPosition = calculatedTemplate.IndexOf('}', bracketStartPositions[i]);
                     int operatorCount = 0;
+
                     for (int j = bracketStartPositions[i]; j < bracketEndPosition; j++)
                     {
                         if (mathOperators.Contains(calculatedTemplate[j]))
                             operatorCount++;
                     }
+
                     string[] variableTexts = new string[operatorCount + 1];
                     string[] operatorSymbols = new string[operatorCount];
                     int[] operatorPriority = new int[operatorCount];
@@ -164,6 +168,7 @@ namespace osu.Game.Skinning.Components
                     double result = doConversionCalculation(variableTexts, operatorSymbols, operatorPriority);
                     if (double.IsNaN(result))
                         continue;
+
                     values.Add(result.ToLocalisableString(@"0.##"));
                     //Set endposition again to ensure that it replaces the right substring.
                     bracketEndPosition = numberedTemplate.IndexOf('}', bracketStartPositions[i]);
@@ -174,6 +179,7 @@ namespace osu.Game.Skinning.Components
                     changeInLength -= numberedTemplate.Length;
                     if (i == bracketStartPositions.Length - 1)
                         continue;
+
                     for (int j = i + 1; j < bracketStartPositions.Length; ++j)
                     {
                         bracketStartPositions[j] -= changeInLength;
@@ -293,7 +299,8 @@ namespace osu.Game.Skinning.Components
             }
         }
 
-        private string mathOperators = "+-*/%";
+        private const string mathOperators = "+-*/%";
+
         private bool anyBracketsContainOperations(string input)
         {
             for (int i = 0; i < input.Length; ++i)
@@ -304,12 +311,15 @@ namespace osu.Game.Skinning.Components
                 int openingBracketPos = input.IndexOf('{', i);
                 if (openingBracketPos == -1)
                     return false;
+
                 int closingBracketPos = input.IndexOf('}', openingBracketPos);
                 if (closingBracketPos == -1)
                     return false;
+
                 int openingResult = input.IndexOf('{', openingBracketPos);
                 if (openingResult == -1)
                     return false;
+
                 //For consistent behaviour we only calculate the most inside brackets
                 //For example: if you write { {CircleSize} } then the other ones remain
                 //intact. This while loop looks for such openings.
@@ -319,20 +329,24 @@ namespace osu.Game.Skinning.Components
                     if (openingResult != -1 && openingResult < closingBracketPos)
                         openingBracketPos = openingResult;
                 }
+
                 //We only check the insides of brackets, not the outside.
                 string bracketInside = input.Substring(openingBracketPos, closingBracketPos - openingBracketPos - 1);
                 i = closingBracketPos;
+
                 for (int j = 0; j < mathOperators.Length; ++j)
                 {
                     if (bracketInside.Contains(mathOperators[j]))
                         return true;
                 }
+
                 //Due to implied multiplication, brackets can be "valid" operators
                 //though only if there is anything besides these brackets
                 if ((bracketInside.Contains('(') || bracketInside.Contains(')'))
                     && bracketInside.Replace("(", "").Replace(")", "").Length > 0)
                     return true;
             }
+
             return false;
         }
 
@@ -344,6 +358,7 @@ namespace osu.Game.Skinning.Components
         private int[] getOperatorContainingBracketPos(string input)
         {
             List<int> openingBracketPositions = new List<int>();
+
             for (int i = 0; i < input.Length; ++i)
             {
                 //If there are brackets inside of brackets then only the most inside
@@ -352,12 +367,15 @@ namespace osu.Game.Skinning.Components
                 int openingBracketPos = input.IndexOf('{', i);
                 if (openingBracketPos == -1)
                     break;
+
                 int closingBracketPos = input.IndexOf('}', openingBracketPos);
                 if (closingBracketPos == -1)
                     break;
+
                 int openingResult = input.IndexOf('{', openingBracketPos);
                 if (openingResult == -1)
                     break;
+
                 //For consistent behaviour we only calculate the most inside brackets
                 //For example: if you write { {CircleSize} } then the other ones remain
                 //intact. This while loop looks for such openings.
@@ -367,9 +385,11 @@ namespace osu.Game.Skinning.Components
                     if (openingResult != -1 && openingResult < closingBracketPos)
                         openingBracketPos = openingResult;
                 }
+
                 //We only check the insides of brackets to not get false positives
                 string bracketInside = input.Substring(openingBracketPos, closingBracketPos - openingBracketPos - 1);
                 i = closingBracketPos;
+
                 for (int j = 0; j < mathOperators.Length; ++j)
                 {
                     if (bracketInside.Contains(mathOperators[j]))
@@ -378,10 +398,12 @@ namespace osu.Game.Skinning.Components
                         break;
                     }
                 }
+
                 if ((bracketInside.Contains('(') || bracketInside.Contains(')'))
                     && !openingBracketPositions.Contains(openingBracketPos))
                     openingBracketPositions.Add(openingBracketPos);
             }
+
             return openingBracketPositions.ToArray();
         }
 
@@ -401,11 +423,13 @@ namespace osu.Game.Skinning.Components
                     j = input.IndexOf(mathOperators[i], j);
                     if (j == -1 || j >= end)
                         break;
+
                     if (j != 0)
                         //Check if operator is next to a {
                         if ((input[j - 1] == '{'
                             || mathOperators.Contains(input[j - 1])) && input[j] != '-')
                             return false;
+
                     if (j != input.Length - 1)
                         //Check if operator is next to a }
                         if ((input[j + 1] == '}'
@@ -413,6 +437,7 @@ namespace osu.Game.Skinning.Components
                             return false;
                 }
             }
+
             return true;
         }
 
@@ -432,6 +457,7 @@ namespace osu.Game.Skinning.Components
             int closingBracketPos = start;
             if (input.Contains("()"))
                 return false;
+
             while (openingBracketPos != -1 || closingBracketPos != -1)
             {
                 if (openingBracketPos != -1 && openingBracketPos < end)
@@ -444,6 +470,7 @@ namespace osu.Game.Skinning.Components
                 if (openingBracketPos > closingBracketPos)
                     return false;
             }
+
             return true;
         }
 
@@ -455,27 +482,22 @@ namespace osu.Game.Skinning.Components
         /// <param name="end">The closing bracket's index (exclusive)</param>
         private void replaceMinus(ref string input, int start, int end)
         {
-            string numbers = "1234567890";
+            const string numbers = "1234567890";
+
             for (int i = start; i < end; ++i)
             {
                 end = input.IndexOf('}', start);
                 i = input.IndexOf('-', i);
                 if (i == -1 || i >= end)
                     break;
+
                 if (i != 0 && i != input.Length)
                 {
-                    //The first check (!numbers.Contains(input[i - 1]) && (mathOperators.Contains(input[i - 1])
-                    //                  || input[i - 1] == '{' || input[i - 1] == '(') && numbers.Contains(input[i + 1])))
-                    //handles all cases where a number receives the minus sign
-                    //The second check (((mathOperators.Contains(input[i - 1]) || input[i - 1] == '{'
-                    //    || input[i - 1] == '(')
-                    //    && (!numbers.Contains(input[i + 1]) && !mathOperators.Contains(input[i + 1])))
-                    //handles all cases where a variable receives the minus sign
-                    if ((!numbers.Contains(input[i - 1]) && (mathOperators.Contains(input[i - 1])
-                        || input[i - 1] == '{' || input[i - 1] == '(') && numbers.Contains(input[i + 1]))
-                        || ((mathOperators.Contains(input[i - 1]) || input[i - 1] == '{'
-                        || input[i - 1] == '(')
-                        && (!numbers.Contains(input[i + 1]) && !mathOperators.Contains(input[i + 1]))))
+                    bool isAfterNumber = numbers.Contains(input[i - 1]);
+                    bool isAfterMathSymbol = mathOperators.Contains(input[i - 1]) || input[i - 1] == '{' || input[i - 1] == '(';
+                    bool isBeforeNumber = numbers.Contains(input[i + 1]);
+                    bool isBeforeMathOperator = mathOperators.Contains(input[i + 1]);
+                    if ((!isAfterNumber && isAfterMathSymbol && isBeforeNumber) || (isAfterMathSymbol && !isBeforeNumber && !isBeforeMathOperator))
                         input = string.Concat(input.Substring(0, i), "_", input.Substring(i + 1, input.Length - i - 1));
                 }
             }
@@ -489,15 +511,17 @@ namespace osu.Game.Skinning.Components
         /// <param name="end">The closing bracket's index (exclusive)</param>
         private void addImpliedMultiplication(ref string input, int start, int end)
         {
-            string numbers = "1234567890";
+            const string numbers = "1234567890";
             string insideBracket = input.Substring(start + 1, end - start - 1).Replace(")(", ")*(");
             input = string.Concat(input.Substring(0, start + 1), insideBracket, input.Substring(end, input.Length - end));
+
             for (int i = start; i < end; ++i)
             {
                 end = input.IndexOf('}', start);
                 i = input.IndexOf('(', i);
                 if (i == -1 || i >= end)
                     break;
+
                 if (i != 0)
                 {
                     if (numbers.Contains(input[i - 1]))
@@ -518,6 +542,7 @@ namespace osu.Game.Skinning.Components
             //so it would be better to skip the ones which aren't used
             //Note: This is future proofing for when more are added
             bool[] skipOperator = new bool[mathOperators.Length];
+
             for (int i = 0; i < mathOperators.Length; ++i)
             {
                 skipOperator[i] = !variableTexts[0].Contains(mathOperators[i]);
@@ -527,11 +552,13 @@ namespace osu.Game.Skinning.Components
             {
                 if (skipOperator[mathOperatorIndex])
                     continue;
+
                 for (int splitTextIndex = 0; splitTextIndex < trueLength; ++splitTextIndex)
                 {
                     string[] split = variableTexts[splitTextIndex].Split(mathOperators[mathOperatorIndex]);
                     if (split.Length < 2)
                         continue;
+
                     //We first move out of the way the already stored variables
                     //It starts from the last index and store items at split length minus one lower
                     //So if 7 is the last index and it was split between 3 then the stored
@@ -541,6 +568,7 @@ namespace osu.Game.Skinning.Components
                     {
                         int movedFromIndex = movedToIndex - split.Length + 1;
                         variableTexts[movedToIndex] = variableTexts[movedFromIndex];
+
                         //operator related arrays' length is one less than variableTexts' length
                         if (movedToIndex != variableTexts.Length - 1)
                         {
@@ -548,16 +576,19 @@ namespace osu.Game.Skinning.Components
                             operatorPriority[movedToIndex] = operatorPriority[movedFromIndex];
                         }
                     }
+
                     //Then add the splits to the created empty places
                     for (int k = 0; k < split.Length; ++k)
                     {
                         variableTexts[splitTextIndex + k] = split[k];
+
                         if (k != split.Length - 1)
                         {
                             operatorSymbols[splitTextIndex + k] = mathOperators[mathOperatorIndex].ToString();
                             operatorPriority[splitTextIndex + k] = mathOperatorIndex;
                         }
                     }
+
                     //The split values don't gonna contain the operator
                     //they were split by so we can skip them.
                     trueLength += split.Length - 1;
@@ -566,6 +597,7 @@ namespace osu.Game.Skinning.Components
             }
 
             int giveHigherPriority = 0;
+
             for (int i = 0; i < operatorSymbols.Length; ++i)
             {
                 //priority is given to operators which are inside ()
@@ -584,11 +616,13 @@ namespace osu.Game.Skinning.Components
         {
             double[] variableValues = new double[variableTexts.Length];
             BeatmapAttribute[] beatmapAttributes = Enum.GetValues<BeatmapAttribute>();
+
             for (int i = 0; i < variableTexts.Length; ++i)
             {
                 bool isValueNegative = variableTexts[i].Trim('(')[0] == '_';
                 bool isBeatmapAttribute = false;
                 variableTexts[i] = variableTexts[i].Trim('(', ')', '_');
+
                 for (int j = 0; j < beatmapAttributes.Length; ++j)
                 {
                     if (beatmapAttributes[j].ToString() == variableTexts[i])
@@ -599,6 +633,7 @@ namespace osu.Game.Skinning.Components
                             variableValues[i] *= -1;
                         break;
                     }
+
                     if (variableTexts[i] == "Value")
                     {
                         variableValues[i] = getLabelValue(Attribute.Value);
@@ -608,8 +643,10 @@ namespace osu.Game.Skinning.Components
                         break;
                     }
                 }
+
                 if (isBeatmapAttribute)
                     continue;
+
                 if (!double.TryParse(variableTexts[i], out variableValues[i]))
                 {
                     variableValues[i] = double.NaN;
@@ -624,27 +661,33 @@ namespace osu.Game.Skinning.Components
             //Ordering priorities so that everything calculated in expected order
             List<int> decreasingPriorities = new List<int>();
             int previousMaxPriority = int.MaxValue;
+
             for (int i = 0; i < operatorPriority.Length; ++i)
             {
                 int maxPriority = 0;
+
                 for (int j = 0; j < operatorPriority.Length; ++j)
                 {
                     if (operatorPriority[j] > maxPriority && operatorPriority[j] < previousMaxPriority)
                         maxPriority = operatorPriority[j];
                 }
+
                 previousMaxPriority = maxPriority;
                 decreasingPriorities.Add(maxPriority);
             }
 
             int prioritiesTrueLength = operatorPriority.Length;
+
             for (int i = 0; i < decreasingPriorities.Count; ++i)
             {
                 for (int j = 0; j < prioritiesTrueLength; ++j)
                 {
                     if (operatorPriority[j] != decreasingPriorities[i])
                         continue;
+
                     variableValues[j] = doMathOperation(operatorSymbols[j], variableValues[j], variableValues[j + 1]);
                     prioritiesTrueLength--;
+
                     //Overwrite already used variable, calculated operator
                     for (int k = j; k < prioritiesTrueLength; ++k)
                     {
@@ -652,9 +695,11 @@ namespace osu.Game.Skinning.Components
                         operatorPriority[k] = operatorPriority[k + 1];
                         variableValues[k + 1] = variableValues[k + 2];
                     }
+
                     --j;
                 }
             }
+
             return variableValues[0];
         }
 
@@ -664,17 +709,23 @@ namespace osu.Game.Skinning.Components
             {
                 case "+":
                     return value1 + value2;
+
                 case "-":
                     return value1 - value2;
+
                 case "*":
                     return value1 * value2;
+
                 case "/":
                     if (value2 == 0)
                         return double.NaN;
+
                     return value1 / value2;
+
                 case "%":
                     return value1 % value2;
             }
+
             return double.NaN;
         }
 
