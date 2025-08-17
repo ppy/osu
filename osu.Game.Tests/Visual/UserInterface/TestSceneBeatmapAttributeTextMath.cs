@@ -28,11 +28,10 @@ using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public partial class TestSceneBeatmapAttributeText : OsuTestScene
+    public partial class TestSceneBeatmapAttributeTextMath : OsuTestScene
     {
         private readonly BeatmapAttributeText text;
-
-        public TestSceneBeatmapAttributeText()
+        public TestSceneBeatmapAttributeTextMath()
         {
             Child = text = new BeatmapAttributeText
             {
@@ -73,111 +72,40 @@ namespace osu.Game.Tests.Visual.UserInterface
             });
         });
 
-        [TestCase(BeatmapAttribute.CircleSize, "Circle Size: 1")]
-        [TestCase(BeatmapAttribute.HPDrain, "HP Drain: 2")]
-        [TestCase(BeatmapAttribute.Accuracy, "Accuracy: 3")]
-        [TestCase(BeatmapAttribute.ApproachRate, "Approach Rate: 4")]
-        [TestCase(BeatmapAttribute.Title, "Title: _Title")]
-        [TestCase(BeatmapAttribute.Artist, "Artist: _Artist")]
-        [TestCase(BeatmapAttribute.Creator, "Creator: _Creator")]
-        [TestCase(BeatmapAttribute.DifficultyName, "Difficulty: _Difficulty")]
-        [TestCase(BeatmapAttribute.Source, "Source: _Source")]
-        [TestCase(BeatmapAttribute.RankedStatus, "Beatmap Status: Loved")]
-        public void TestAttributeDisplay(BeatmapAttribute attribute, string expectedText)
+        [TestCase("{CircleSize+1}", "2")]
+        [TestCase("{CircleSize+-1}", "0")]
+        [TestCase("{CircleSize-1}", "0")]
+        [TestCase("{-CircleSize}", "-1")]
+        [TestCase("{ {-CircleSize}", "{ -1")]
+        [TestCase("{(-CircleSize)}", "-1")]
+        [TestCase("{-(CircleSize)}", "-1")]
+        [TestCase("{(-Circleize)}", "{(-Circleize)}")]
+        [TestCase("{4+ApproachRate/4}", "5")]
+        [TestCase("{(4+ApproachRate)/4}", "2")]
+        [TestCase("{-CircleSize} {CircleSize+0} {CircleSize+}", "-1 1 {CircleSize+}")]
+        [TestCase("{-CircleSize} {CircleSize +0} {CircleSize+0}", "-1 {CircleSize +0} 1")]
+        [TestCase("{()()()()}", "{()()()()}")]
+        [TestCase("{-()()()()}", "{-()()()()}")]
+        [TestCase("{()+()+()+()}", "{()+()+()+()}")]
+        [TestCase("{(ApproachRate)(ApproachRate)(ApproachRate)(ApproachRate)}", "256")]
+        [TestCase("{(ApproachRate-(ApproachRate*ApproachRate*ApproachRate))}", "-60")]
+        [TestCase("{1/0}", "{1/0}")]
+        [TestCase("{1%0}", "{1%0}")]
+        [TestCase("{(-1)+1*1*1+(-1-1)}", "-2")]
+        [TestCase("{4%3}", "1")]
+        [TestCase("{4%1.5}", "{4%1.5}")]
+        [TestCase("{-1}", "-1")]
+        [TestCase("{(-1)}", "-1")]
+        [TestCase("{4(CircleSize)}", "4")]
+        [TestCase("{(ApproachRate)(ApproachRate)}", "16")]
+        [TestCase("(ApproachRate-CircleSize)(Accuracy)={(ApproachRate-CircleSize)(Accuracy)}", "(ApproachRate-CircleSize)(Accuracy)=9")]
+        public void TestAttributeMathDisplay(string inputText, string expectedText)
         {
-            AddStep($"set attribute: {attribute}", () => text.Attribute.Value = attribute);
+            AddStep($"set text: \"{inputText}\"", () => text.Template.Value = inputText);
             AddAssert("check correct text", getText, () => Is.EqualTo(expectedText));
         }
 
-        [Test]
-        public void TestChangeBeatmap()
-        {
-            AddStep("set title attribute", () => text.Attribute.Value = BeatmapAttribute.Title);
-            AddAssert("check initial title", getText, () => Is.EqualTo("Title: _Title"));
-
-            AddStep("change to beatmap with another title", () => Beatmap.Value = CreateWorkingBeatmap(new TestBeatmap(new OsuRuleset().RulesetInfo)
-            {
-                BeatmapInfo =
-                {
-                    Metadata =
-                    {
-                        Title = "Another"
-                    }
-                }
-            }));
-
-            AddAssert("check new title", getText, () => Is.EqualTo("Title: Another"));
-        }
-
-        [Test]
-        public void TestWithMods()
-        {
-            AddStep("set beatmap", () => Beatmap.Value = CreateWorkingBeatmap(new TestBeatmap(new OsuRuleset().RulesetInfo)
-            {
-                BeatmapInfo =
-                {
-                    BPM = 100,
-                    Length = 30000,
-                    Difficulty =
-                    {
-                        ApproachRate = 10,
-                        CircleSize = 9.5f
-                    }
-                }
-            }));
-
-            test(BeatmapAttribute.BPM, new OsuModDoubleTime(), "BPM: 100", "BPM: 150");
-            test(BeatmapAttribute.Length, new OsuModDoubleTime(), "Length: 00:30", "Length: 00:20");
-            test(BeatmapAttribute.ApproachRate, new OsuModDoubleTime(), "Approach Rate: 10", "Approach Rate: 11");
-            test(BeatmapAttribute.CircleSize, new OsuModHardRock(), "Circle Size: 9.5", "Circle Size: 10");
-
-            void test(BeatmapAttribute attribute, Mod mod, string before, string after)
-            {
-                AddStep($"set attribute: {attribute}", () => text.Attribute.Value = attribute);
-                AddAssert("check text is correct", getText, () => Is.EqualTo(before));
-
-                AddStep("add DT mod", () => SelectedMods.Value = new[] { mod });
-                AddAssert("check text is correct", getText, () => Is.EqualTo(after));
-                AddStep("clear mods", () => SelectedMods.SetDefault());
-            }
-        }
-
-        [Test]
-        public void TestStarRating()
-        {
-            AddStep("set test ruleset", () => Ruleset.Value = new TestRuleset().RulesetInfo);
-            AddStep("set star rating attribute", () => text.Attribute.Value = BeatmapAttribute.StarRating);
-            AddAssert("check star rating is 0", getText, () => Is.EqualTo("Star Rating: 0.00"));
-
-            // Adding mod
-            TestMod mod = null!;
-            AddStep("add mod with difficulty 1", () => SelectedMods.Value = new[] { mod = new TestMod { Difficulty = { Value = 1 } } });
-            AddUntilStep("check star rating is 1", getText, () => Is.EqualTo("Star Rating: 1.00"));
-
-            // Changing mod setting
-            AddStep("change mod difficulty to 2", () => mod.Difficulty.Value = 2);
-            AddUntilStep("check star rating is 2", getText, () => Is.EqualTo("Star Rating: 2.00"));
-        }
-
-        [Test]
-        public void TestMaxPp()
-        {
-            AddStep("set test ruleset", () => Ruleset.Value = new TestRuleset().RulesetInfo);
-            AddStep("set max pp attribute", () => text.Attribute.Value = BeatmapAttribute.MaxPP);
-            AddAssert("check max pp is 0", getText, () => Is.EqualTo("Max PP: 0"));
-
-            // Adding mod
-            TestMod mod = null!;
-            AddStep("add mod with pp 1", () => SelectedMods.Value = new[] { mod = new TestMod { Performance = { Value = 1 } } });
-            AddUntilStep("check max pp is 1", getText, () => Is.EqualTo("Max PP: 1"));
-
-            // Changing mod setting
-            AddStep("change mod pp to 2", () => mod.Performance.Value = 2);
-            AddUntilStep("check max pp is 2", getText, () => Is.EqualTo("Max PP: 2"));
-        }
-
         private string getText() => text.ChildrenOfType<SpriteText>().Single().Text.ToString();
-
         private class TestRuleset : Ruleset
         {
             public override IEnumerable<Mod> GetModsFor(ModType type) => new[]
