@@ -180,6 +180,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         {
             private readonly double deltaDifferenceEpsilon;
 
+            private bool deltaSimilarity(int delta) => Math.Abs(Delta - delta) < deltaDifferenceEpsilon;
+
             public Island(double epsilon)
             {
                 deltaDifferenceEpsilon = epsilon;
@@ -205,9 +207,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             public bool IsSimilarPolarity(Island other)
             {
-                // TODO: consider islands to be of similar polarity only if they're having the same average delta (we don't want to consider 3 singletaps similar to a triple)
-                //       naively adding delta check here breaks _a lot_ of maps because of the flawed ratio calculation
-                return DeltaCount % 2 == other.DeltaCount % 2;
+                return deltaSimilarity(other.Delta) &&
+                DeltaCount % 2 == other.DeltaCount % 2;
             }
 
             public bool Equals(Island? other)
@@ -215,7 +216,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 if (other == null)
                     return false;
 
-                return Math.Abs(Delta - other.Delta) < deltaDifferenceEpsilon &&
+                return deltaSimilarity(other.Delta) &&
                        DeltaCount == other.DeltaCount;
             }
 
