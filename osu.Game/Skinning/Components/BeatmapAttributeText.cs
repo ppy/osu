@@ -490,7 +490,8 @@ namespace osu.Game.Skinning.Components
         private void addImpliedMultiplication(ref string input, int start, int end)
         {
             string numbers = "1234567890";
-            input = input.Replace(")(", ")*(");
+            string insideBracket = input.Substring(start + 1, end - start - 1).Replace(")(", ")*(");
+            input = string.Concat(input.Substring(0, start + 1), insideBracket, input.Substring(end, input.Length - end));
             for (int i = start; i < end; ++i)
             {
                 end = input.IndexOf('}', start);

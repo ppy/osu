@@ -115,6 +115,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         [TestCase("{(-1)}", "-1")]
         [TestCase("{4(CircleSize)}", "4")]
         [TestCase("{(ApproachRate)(ApproachRate)}", "16")]
+        [TestCase("(ApproachRate-CircleSize)(Accuracy)={(ApproachRate-CircleSize)(Accuracy)}", "(ApproachRate-CircleSize)(Accuracy)=9")]
         public void TestAttributeMathDisplay(string inputText, string expectedText)
         {
             AddStep($"set text: \"{inputText}\"", () => text.Template.Value = inputText);
