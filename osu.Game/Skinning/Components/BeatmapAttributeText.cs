@@ -425,16 +425,18 @@ namespace osu.Game.Skinning.Components
                         break;
 
                     if (j != 0)
+                    {
                         //Check if operator is next to a {
-                        if ((input[j - 1] == '{'
-                            || mathoperators.Contains(input[j - 1])) && input[j] != '-')
+                        if ((input[j - 1] == '{' || mathoperators.Contains(input[j - 1])) && input[j] != '-')
                             return false;
+                    }
 
                     if (j != input.Length - 1)
+                    {
                         //Check if operator is next to a }
-                        if ((input[j + 1] == '}'
-                            || mathoperators.Contains(input[j + 1])) && input[j + 1] != '-')
+                        if ((input[j + 1] == '}' || mathoperators.Contains(input[j + 1])) && input[j + 1] != '-')
                             return false;
+                    }
                 }
             }
 
