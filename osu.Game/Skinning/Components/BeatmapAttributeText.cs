@@ -130,6 +130,51 @@ namespace osu.Game.Skinning.Components
                 }
             }
 
+            if (anyBracketsContainOperations(numberedTemplate))
+            {
+                int[] bracketStartPositions = getOperatorContainingBracketPos(numberedTemplate);
+                for (int i = 0; i < bracketStartPositions.Length; i++)
+                {
+                    string calculatedTemplate = numberedTemplate;
+                    int bracketEndPosition = calculatedTemplate.IndexOf('}', bracketStartPositions[i]);
+                    //Ensure that operators, round brackets, and absolute symbols are correct
+                    //otherwise it won't be calculated
+                    if (!checkOperatorCorrectness(calculatedTemplate, bracketStartPositions[i], bracketEndPosition))
+                        continue;
+                    int operatorCount = 0;
+                    for (int j = bracketStartPositions[i]; j < bracketEndPosition; j++)
+                    {
+                        if (mathOperators.Contains(calculatedTemplate[j]))
+                            operatorCount++;
+                    }
+                    string[] variableTexts = new string[operatorCount + 1];
+                    string[] operatorSymbols = new string[operatorCount];
+                    int[] operatorPriority = new int[operatorCount];
+                    //Get the inside of brackets
+                    variableTexts[0] = calculatedTemplate.Substring(bracketStartPositions[i] + 1, bracketEndPosition - bracketStartPositions[i] - 1);
+                    //Split the text up into operators and variables
+                    splitUpOperatorText(ref variableTexts, ref operatorSymbols, ref operatorPriority);
+                    //Convert variables, values to double and do math calculation
+                    double result = doConversionCalculation(variableTexts, operatorSymbols, operatorPriority);
+                    if (double.IsNaN(result))
+                        continue;
+                    values.Add(result.ToLocalisableString(@"0.##"));
+                    //Set endposition again to ensure that it replaces the right substring.
+                    bracketEndPosition = numberedTemplate.IndexOf('}', bracketStartPositions[i]);
+                    //Since we replace characters with a single number we have to also offset
+                    //the next positions by the amount of characters replaced.
+                    int changeInLength = numberedTemplate.Length;
+                    numberedTemplate = string.Concat(numberedTemplate.Substring(0, bracketStartPositions[i]), values.Count - 1, numberedTemplate.Substring(bracketEndPosition + 1, numberedTemplate.Length - bracketEndPosition - 1));
+                    changeInLength -= numberedTemplate.Length;
+                    if (i == bracketStartPositions.Length - 1)
+                        continue;
+                    for (int j = i + 1; j < bracketStartPositions.Length; ++j)
+                    {
+                        bracketStartPositions[j] -= changeInLength;
+                    }
+                }
+            }
+
             text.Text = LocalisableString.Format(numberedTemplate, values.ToArray());
         }
 
@@ -232,6 +277,316 @@ namespace osu.Game.Skinning.Components
 
                 default:
                     return string.Empty;
+            }
+
+            BeatmapDifficulty computeDifficulty()
+            {
+                return ruleset.Value is RulesetInfo rulesetInfo
+                    ? rulesetInfo.CreateInstance().GetAdjustedDisplayDifficulty(beatmap.Value.BeatmapInfo, mods.Value)
+                    : new BeatmapDifficulty(beatmap.Value.BeatmapInfo.Difficulty);
+            }
+        }
+
+        private string mathOperators = "+-*/%";
+        private bool anyBracketsContainOperations(string input)
+        {
+            for (int i = 0; i < input.Length; ++i)
+            {
+                //If there are brackets inside of brackets then only the most inside
+                //one is considered.
+                //Get to opening bracket
+                int openingBracketPos = input.IndexOf('{', i);
+                if (openingBracketPos == -1)
+                    return false;
+                int closingBracketPos = input.IndexOf('}', openingBracketPos);
+                if (closingBracketPos == -1)
+                    return false;
+                int openingResult = input.IndexOf('{', openingBracketPos);
+                if (openingResult == -1)
+                    return false;
+                //For consistent behaviour we only calculate the most inside brackets
+                //For example: if you write { {CircleSize} } then the other ones remain
+                //intact. This while loop looks for such openings.
+                while (openingResult < closingBracketPos && openingResult != -1)
+                {
+                    openingResult = input.IndexOf('{', openingBracketPos + 1);
+                    if (openingResult != -1 && openingResult < closingBracketPos)
+                        openingBracketPos = openingResult;
+                }
+                //We only check the insides of brackets, not the outside.
+                string bracketInside = input.Substring(openingBracketPos, closingBracketPos - openingBracketPos - 1);
+                i = closingBracketPos;
+                for (int j = 0; j < mathOperators.Length; ++j)
+                {
+                    if (bracketInside.Contains(mathOperators[j]))
+                        return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Gets the operator containing brackets.
+        /// </summary>
+        /// <param name="input">The string containing operators, brackets, values</param>
+        /// <returns>Returns the position of the opening brackets of brackets which contain operators.</returns>
+        private int[] getOperatorContainingBracketPos(string input)
+        {
+            List<int> openingBracketPositions = new List<int>();
+            for (int i = 0; i < input.Length; ++i)
+            {
+                //If there are brackets inside of brackets then only the most inside
+                //one is considered.
+                //Get to opening bracket
+                int openingBracketPos = input.IndexOf('{', i);
+                if (openingBracketPos == -1)
+                    break;
+                int closingBracketPos = input.IndexOf('}', openingBracketPos);
+                if (closingBracketPos == -1)
+                    break;
+                int openingResult = input.IndexOf('{', openingBracketPos);
+                if (openingResult == -1)
+                    break;
+                //For consistent behaviour we only calculate the most inside brackets
+                //For example: if you write { {CircleSize} } then the other ones remain
+                //intact. This while loop looks for such openings.
+                while (openingResult < closingBracketPos && openingResult != -1)
+                {
+                    openingResult = input.IndexOf('{', openingBracketPos + 1);
+                    if (openingResult != -1 && openingResult < closingBracketPos)
+                        openingBracketPos = openingResult;
+                }
+                //We only check the insides of brackets to not get false positives
+                string bracketInside = input.Substring(openingBracketPos, closingBracketPos - openingBracketPos - 1);
+                i = closingBracketPos;
+                for (int j = 0; j < mathOperators.Length; ++j)
+                {
+                    if (bracketInside.Contains(mathOperators[j]))
+                    {
+                        openingBracketPositions.Add(openingBracketPos);
+                        break;
+                    }
+                }
+            }
+            return openingBracketPositions.ToArray();
+        }
+
+        /// <summary>
+        /// Checks if the operators inside of specific brackets have values between them.
+        /// </summary>
+        /// <param name="input">The string containing operators, brackets, values</param>
+        /// <param name="start">The opening bracket's index (inclusive)</param>
+        /// <param name="end">The closing bracket's index (exclusive)</param>
+        /// <returns>Returns true if every operator has a value inbetween them.</returns>
+        private bool checkOperatorCorrectness(string input, int start, int end)
+        {
+            for (int i = 0; i < mathOperators.Length; ++i)
+            {
+                for (int j = start; j < end; ++j)
+                {
+                    j = input.IndexOf(mathOperators[i], j);
+                    if (j == -1 || j >= end)
+                        break;
+                    if (j != 0)
+                        //Check if operator is next to a {
+                        if (input[j - 1] == '{'
+                            || mathOperators.Contains(input[j - 1]))
+                            return false;
+                    if (j != input.Length - 1)
+                        //Check if operator is next to a }
+                        if (input[j + 1] == '}'
+                            || mathOperators.Contains(input[j + 1]))
+                            return false;
+                }
+            }
+            return true;
+        }
+
+        private void splitUpOperatorText(ref string[] variableTexts, ref string[] operatorSymbols, ref int[] operatorPriority)
+        {
+            //Since variables array isn't used completely we need to keep
+            //its true length in a variable
+            int trueLength = 1;
+
+            //A lot of the time only one or two operators will be used
+            //so it would be better to skip the ones which aren't used
+            //Note: This is future proofing for when more are added
+            bool[] skipOperator = new bool[mathOperators.Length];
+            for (int i = 0; i < mathOperators.Length; ++i)
+            {
+                skipOperator[i] = !variableTexts[0].Contains(mathOperators[i]);
+            }
+
+            for (int mathOperatorIndex = 0; mathOperatorIndex < mathOperators.Length; ++mathOperatorIndex)
+            {
+                if (skipOperator[mathOperatorIndex])
+                    continue;
+                for (int splitTextIndex = 0; splitTextIndex < trueLength; ++splitTextIndex)
+                {
+                    string[] split = variableTexts[splitTextIndex].Split(mathOperators[mathOperatorIndex]);
+                    if (split.Length < 2)
+                        continue;
+                    //We first move out of the way the already stored variables
+                    //It starts from the last index and store items at split length minus one lower
+                    //So if 7 is the last index and it was split between 3 then the stored
+                    //variable at index 5 (7 - (3 - 1)) move to 7. This way nothing is
+                    //overwritten.
+                    for (int movedToIndex = variableTexts.Length - 1; movedToIndex > splitTextIndex + split.Length - 2; --movedToIndex)
+                    {
+                        int movedFromIndex = movedToIndex - split.Length + 1;
+                        variableTexts[movedToIndex] = variableTexts[movedFromIndex];
+                        //operator related arrays' length is one less than variableTexts' length
+                        if (movedToIndex != variableTexts.Length - 1)
+                        {
+                            operatorSymbols[movedToIndex] = operatorSymbols[movedFromIndex];
+                            operatorPriority[movedToIndex] = operatorPriority[movedFromIndex];
+                        }
+                    }
+                    //Then add the splits to the created empty places
+                    for (int k = 0; k < split.Length; ++k)
+                    {
+                        variableTexts[splitTextIndex + k] = split[k];
+                        if (k != split.Length - 1)
+                        {
+                            operatorSymbols[splitTextIndex + k] = mathOperators[mathOperatorIndex].ToString();
+                            operatorPriority[splitTextIndex + k] = mathOperatorIndex;
+                        }
+                    }
+                    //The split values don't gonna contain the operator
+                    //they were split by so we can skip them.
+                    trueLength += split.Length - 1;
+                    splitTextIndex += split.Length - 1;
+                }
+            }
+        }
+
+        private double doConversionCalculation(string[] variableTexts, string[] operatorSymbols, int[] operatorPriority)
+        {
+            double[] variableValues = new double[variableTexts.Length];
+            BeatmapAttribute[] beatmapAttributes = Enum.GetValues<BeatmapAttribute>();
+            for (int i = 0; i < variableTexts.Length; ++i)
+            {
+                bool isBeatmapAttribute = false;
+                for (int j = 0; j < beatmapAttributes.Length; ++j)
+                {
+                    if (beatmapAttributes[j].ToString() == variableTexts[i])
+                    {
+                        variableValues[i] = getLabelValue(beatmapAttributes[j]);
+                        isBeatmapAttribute = true;
+                        break;
+                    }
+                    if (variableTexts[i] == "Value")
+                    {
+                        variableValues[i] = getLabelValue(Attribute.Value);
+                        isBeatmapAttribute = true;
+                        break;
+                    }
+                }
+                if (isBeatmapAttribute)
+                    continue;
+                if (!double.TryParse(variableTexts[i], out variableValues[i]))
+                {
+                    variableValues[i] = double.NaN;
+                }
+            }
+
+            //Ordering priorities so that everything calculated in expected order
+            List<int> decreasingPriorities = new List<int>();
+            int previousMaxPriority = int.MaxValue;
+            for (int i = 0; i < operatorPriority.Length; ++i)
+            {
+                int maxPriority = 0;
+                for (int j = 0; j < operatorPriority.Length; ++j)
+                {
+                    if (operatorPriority[j] > maxPriority && operatorPriority[j] < previousMaxPriority)
+                        maxPriority = operatorPriority[j];
+                }
+                previousMaxPriority = maxPriority;
+                decreasingPriorities.Add(maxPriority);
+            }
+
+            int prioritiesTrueLength = operatorPriority.Length;
+            for (int i = 0; i < decreasingPriorities.Count; ++i)
+            {
+                for (int j = 0; j < prioritiesTrueLength; ++j)
+                {
+                    if (operatorPriority[j] != decreasingPriorities[i])
+                        continue;
+                    variableValues[j] = doMathOperation(operatorSymbols[j], variableValues[j], variableValues[j + 1]);
+                    prioritiesTrueLength--;
+                    //Overwrite already used variable, calculated operator
+                    for (int k = j; k < prioritiesTrueLength; ++k)
+                    {
+                        operatorSymbols[k] = operatorSymbols[k + 1];
+                        operatorPriority[k] = operatorPriority[k + 1];
+                        variableValues[k + 1] = variableValues[k + 2];
+                    }
+                    --j;
+                }
+            }
+            return variableValues[0];
+        }
+
+        private double doMathOperation(string operatorChar, double value1, double value2)
+        {
+            switch (operatorChar)
+            {
+                case "+":
+                    return value1 + value2;
+                case "-":
+                    return value1 - value2;
+                case "*":
+                    return value1 * value2;
+                case "/":
+                    if (value2 == 0)
+                        return double.NaN;
+                    return value1 / value2;
+                case "%":
+                    return value1 % value2;
+            }
+            return double.NaN;
+        }
+
+        private double getLabelValue(BeatmapAttribute attribute)
+        {
+            switch (attribute)
+            {
+                case BeatmapAttribute.CircleSize:
+                    return Math.Round(computeDifficulty().CircleSize, 2);
+
+                case BeatmapAttribute.Accuracy:
+                    return Math.Round(computeDifficulty().OverallDifficulty, 2);
+
+                case BeatmapAttribute.HPDrain:
+                    return Math.Round(computeDifficulty().DrainRate, 2);
+
+                case BeatmapAttribute.ApproachRate:
+                    return Math.Round(computeDifficulty().ApproachRate, 2);
+
+                case BeatmapAttribute.StarRating:
+                    return (starDifficulty?.Stars ?? 0).FloorToDecimalDigits(2);
+
+                case BeatmapAttribute.Title:
+                case BeatmapAttribute.Artist:
+                case BeatmapAttribute.DifficultyName:
+                case BeatmapAttribute.Creator:
+                case BeatmapAttribute.Source:
+                    return double.NaN;
+
+                case BeatmapAttribute.RankedStatus:
+                    return beatmap.Value.BeatmapSetInfo.StatusInt;
+
+                case BeatmapAttribute.Length:
+                    return Math.Floor(Math.Round(beatmap.Value.BeatmapInfo.Length / ModUtils.CalculateRateWithMods(mods.Value)) / 1000.0);
+
+                case BeatmapAttribute.BPM:
+                    return FormatUtils.RoundBPM(beatmap.Value.BeatmapInfo.BPM, ModUtils.CalculateRateWithMods(mods.Value));
+
+                case BeatmapAttribute.MaxPP:
+                    return Math.Round(starDifficulty?.PerformanceAttributes?.Total ?? 0, MidpointRounding.AwayFromZero);
+
+                default:
+                    return double.NaN;
             }
 
             BeatmapDifficulty computeDifficulty()
