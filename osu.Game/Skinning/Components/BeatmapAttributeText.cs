@@ -142,6 +142,11 @@ namespace osu.Game.Skinning.Components
                     if (!checkOperatorCorrectness(calculatedTemplate, bracketStartPositions[i], bracketEndPosition)
                         || !checkRoundBracketCorrectness(calculatedTemplate, bracketStartPositions[i], bracketEndPosition))
                         continue;
+                    replaceMinus(ref calculatedTemplate, bracketStartPositions[i], bracketEndPosition);
+                    addImpliedMultiplication(ref calculatedTemplate, bracketStartPositions[i], bracketEndPosition);
+                    //Recalculate endPosition since both of the above function add new characters,
+                    //therefore offsetting things.
+                    bracketEndPosition = calculatedTemplate.IndexOf('}', bracketStartPositions[i]);
                     int operatorCount = 0;
                     for (int j = bracketStartPositions[i]; j < bracketEndPosition; j++)
                     {
@@ -322,6 +327,11 @@ namespace osu.Game.Skinning.Components
                     if (bracketInside.Contains(mathOperators[j]))
                         return true;
                 }
+                //Due to implied multiplication, brackets can be "valid" operators
+                //though only if there is anything besides these brackets
+                if ((bracketInside.Contains('(') || bracketInside.Contains(')'))
+                    && bracketInside.Replace("(", "").Replace(")", "").Length > 0)
+                    return true;
             }
             return false;
         }
@@ -368,6 +378,9 @@ namespace osu.Game.Skinning.Components
                         break;
                     }
                 }
+                if ((bracketInside.Contains('(') || bracketInside.Contains(')'))
+                    && !openingBracketPositions.Contains(openingBracketPos))
+                    openingBracketPositions.Add(openingBracketPos);
             }
             return openingBracketPositions.ToArray();
         }
@@ -390,13 +403,13 @@ namespace osu.Game.Skinning.Components
                         break;
                     if (j != 0)
                         //Check if operator is next to a {
-                        if (input[j - 1] == '{'
-                            || mathOperators.Contains(input[j - 1]))
+                        if ((input[j - 1] == '{'
+                            || mathOperators.Contains(input[j - 1])) && input[j] != '-')
                             return false;
                     if (j != input.Length - 1)
                         //Check if operator is next to a }
-                        if (input[j + 1] == '}'
-                            || mathOperators.Contains(input[j + 1]))
+                        if ((input[j + 1] == '}'
+                            || mathOperators.Contains(input[j + 1])) && input[j + 1] != '-')
                             return false;
                 }
             }
@@ -432,6 +445,66 @@ namespace osu.Game.Skinning.Components
                     return false;
             }
             return true;
+        }
+
+        /// <summary>
+        /// Replaces '-' with '_' which are after an operator or with -1* if its before a (.
+        /// </summary>
+        /// <param name="input">The string containing operators, brackets, values</param>
+        /// <param name="start">The opening bracket's index (inclusive)</param>
+        /// <param name="end">The closing bracket's index (exclusive)</param>
+        private void replaceMinus(ref string input, int start, int end)
+        {
+            string numbers = "1234567890";
+            for (int i = start; i < end; ++i)
+            {
+                end = input.IndexOf('}', start);
+                i = input.IndexOf('-', i);
+                if (i == -1 || i >= end)
+                    break;
+                if (i != 0 && i != input.Length)
+                {
+                    //The first check (!numbers.Contains(input[i - 1]) && (mathOperators.Contains(input[i - 1])
+                    //                  || input[i - 1] == '{' || input[i - 1] == '(') && numbers.Contains(input[i + 1])))
+                    //handles all cases where a number receives the minus sign
+                    //The second check (((mathOperators.Contains(input[i - 1]) || input[i - 1] == '{'
+                    //    || input[i - 1] == '(')
+                    //    && (!numbers.Contains(input[i + 1]) && !mathOperators.Contains(input[i + 1])))
+                    //handles all cases where a variable receives the minus sign
+                    if ((!numbers.Contains(input[i - 1]) && (mathOperators.Contains(input[i - 1])
+                        || input[i - 1] == '{' || input[i - 1] == '(') && numbers.Contains(input[i + 1]))
+                        || ((mathOperators.Contains(input[i - 1]) || input[i - 1] == '{'
+                        || input[i - 1] == '(')
+                        && (!numbers.Contains(input[i + 1]) && !mathOperators.Contains(input[i + 1]))))
+                        input = string.Concat(input.Substring(0, i), "_", input.Substring(i + 1, input.Length - i - 1));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Adds * betweem )( or x( (Where x is a number)
+        /// </summary>
+        /// <param name="input">The string containing operators, brackets, values</param>
+        /// <param name="start">The opening bracket's index (inclusive)</param>
+        /// <param name="end">The closing bracket's index (exclusive)</param>
+        private void addImpliedMultiplication(ref string input, int start, int end)
+        {
+            string numbers = "1234567890";
+            input = input.Replace(")(", ")*(");
+            for (int i = start; i < end; ++i)
+            {
+                end = input.IndexOf('}', start);
+                i = input.IndexOf('(', i);
+                if (i == -1 || i >= end)
+                    break;
+                if (i != 0)
+                {
+                    if (numbers.Contains(input[i - 1]))
+                    {
+                        input = string.Concat(input.Substring(0, i), "*(", input.Substring(i + 1, input.Length - i - 1));
+                    }
+                }
+            }
         }
 
         private void splitUpOperatorText(ref string[] variableTexts, ref string[] operatorSymbols, ref int[] operatorPriority)
@@ -499,9 +572,9 @@ namespace osu.Game.Skinning.Components
                 //the length of mathOperators multiplied by the amount of brackets
                 //it is in
                 if (variableTexts[i].Length - variableTexts[i].TrimStart('(').Length > 0)
-                    giveHigherPriority += mathOperators.Length * (variableTexts[i].Length - variableTexts[i].TrimStart('(', '|').Length);
+                    giveHigherPriority += mathOperators.Length * (variableTexts[i].Length - variableTexts[i].TrimStart('(').Length);
                 if (variableTexts[i].Length - variableTexts[i].TrimEnd(')').Length > 0)
-                    giveHigherPriority -= mathOperators.Length * (variableTexts[i].Length - variableTexts[i].TrimEnd(')', '|').Length);
+                    giveHigherPriority -= mathOperators.Length * (variableTexts[i].Length - variableTexts[i].TrimEnd(')').Length);
                 operatorPriority[i] += giveHigherPriority;
             }
         }
@@ -512,20 +585,25 @@ namespace osu.Game.Skinning.Components
             BeatmapAttribute[] beatmapAttributes = Enum.GetValues<BeatmapAttribute>();
             for (int i = 0; i < variableTexts.Length; ++i)
             {
+                bool isValueNegative = variableTexts[i].Trim('(')[0] == '_';
                 bool isBeatmapAttribute = false;
-                variableTexts[i] = variableTexts[i].Trim('(', ')');
+                variableTexts[i] = variableTexts[i].Trim('(', ')', '_');
                 for (int j = 0; j < beatmapAttributes.Length; ++j)
                 {
                     if (beatmapAttributes[j].ToString() == variableTexts[i])
                     {
                         variableValues[i] = getLabelValue(beatmapAttributes[j]);
                         isBeatmapAttribute = true;
+                        if (isValueNegative)
+                            variableValues[i] *= -1;
                         break;
                     }
                     if (variableTexts[i] == "Value")
                     {
                         variableValues[i] = getLabelValue(Attribute.Value);
                         isBeatmapAttribute = true;
+                        if (isValueNegative)
+                            variableValues[i] *= -1;
                         break;
                     }
                 }
@@ -534,6 +612,11 @@ namespace osu.Game.Skinning.Components
                 if (!double.TryParse(variableTexts[i], out variableValues[i]))
                 {
                     variableValues[i] = double.NaN;
+                }
+                else
+                {
+                    if (isValueNegative)
+                        variableValues[i] *= -1;
                 }
             }
 
