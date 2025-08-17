@@ -137,9 +137,10 @@ namespace osu.Game.Skinning.Components
                 {
                     string calculatedTemplate = numberedTemplate;
                     int bracketEndPosition = calculatedTemplate.IndexOf('}', bracketStartPositions[i]);
-                    //Ensure that operators, round brackets, and absolute symbols are correct
+                    //Ensure that operators, and round brackets are correct
                     //otherwise it won't be calculated
-                    if (!checkOperatorCorrectness(calculatedTemplate, bracketStartPositions[i], bracketEndPosition))
+                    if (!checkOperatorCorrectness(calculatedTemplate, bracketStartPositions[i], bracketEndPosition)
+                        || !checkRoundBracketCorrectness(calculatedTemplate, bracketStartPositions[i], bracketEndPosition))
                         continue;
                     int operatorCount = 0;
                     for (int j = bracketStartPositions[i]; j < bracketEndPosition; j++)
@@ -402,6 +403,37 @@ namespace osu.Game.Skinning.Components
             return true;
         }
 
+        /// <summary>
+        /// Checks the brackets are placed correctly and there are equal amounts of them.
+        /// </summary>
+        /// <param name="input">The string containing operators, brackets, values</param>
+        /// <param name="start">The opening bracket's index (inclusive)</param>
+        /// <param name="end">The closing bracket's index (exclusive)</param>
+        /// <returns>Returns false if opening and closing bracket amounts not equal or if they are placed incorrectly.</returns>
+        private bool checkRoundBracketCorrectness(string input, int start, int end)
+        {
+            //"Why not treat it as an operator?"
+            //Because it would cause many headaches and also it isn't doing something
+            //to two values, but just makes the operators inside of it have higher priority
+            int openingBracketPos = start;
+            int closingBracketPos = start;
+            if (input.Contains("()"))
+                return false;
+            while (openingBracketPos != -1 || closingBracketPos != -1)
+            {
+                if (openingBracketPos != -1 && openingBracketPos < end)
+                    openingBracketPos = input.IndexOf('(', openingBracketPos + 1);
+                if (closingBracketPos != -1 && closingBracketPos < end)
+                    closingBracketPos = input.IndexOf(')', closingBracketPos + 1);
+                if ((openingBracketPos == -1 && closingBracketPos != -1)
+                    || (openingBracketPos != -1 && closingBracketPos == -1))
+                    return false;
+                if (openingBracketPos > closingBracketPos)
+                    return false;
+            }
+            return true;
+        }
+
         private void splitUpOperatorText(ref string[] variableTexts, ref string[] operatorSymbols, ref int[] operatorPriority)
         {
             //Since variables array isn't used completely we need to keep
@@ -458,6 +490,20 @@ namespace osu.Game.Skinning.Components
                     splitTextIndex += split.Length - 1;
                 }
             }
+
+            int giveHigherPriority = 0;
+            for (int i = 0; i < operatorSymbols.Length; ++i)
+            {
+                //priority is given to operators which are inside ()
+                //priority is their index in the mathOperators plus
+                //the length of mathOperators multiplied by the amount of brackets
+                //it is in
+                if (variableTexts[i].Length - variableTexts[i].TrimStart('(').Length > 0)
+                    giveHigherPriority += mathOperators.Length * (variableTexts[i].Length - variableTexts[i].TrimStart('(', '|').Length);
+                if (variableTexts[i].Length - variableTexts[i].TrimEnd(')').Length > 0)
+                    giveHigherPriority -= mathOperators.Length * (variableTexts[i].Length - variableTexts[i].TrimEnd(')', '|').Length);
+                operatorPriority[i] += giveHigherPriority;
+            }
         }
 
         private double doConversionCalculation(string[] variableTexts, string[] operatorSymbols, int[] operatorPriority)
@@ -467,6 +513,7 @@ namespace osu.Game.Skinning.Components
             for (int i = 0; i < variableTexts.Length; ++i)
             {
                 bool isBeatmapAttribute = false;
+                variableTexts[i] = variableTexts[i].Trim('(', ')');
                 for (int j = 0; j < beatmapAttributes.Length; ++j)
                 {
                     if (beatmapAttributes[j].ToString() == variableTexts[i])
