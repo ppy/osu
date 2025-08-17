@@ -89,6 +89,38 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("check correct text", getText, () => Is.EqualTo(expectedText));
         }
 
+        [TestCase("{CircleSize+1}", "2")]
+        [TestCase("{CircleSize+-1}", "0")]
+        [TestCase("{CircleSize-1}", "0")]
+        [TestCase("{-CircleSize}", "-1")]
+        [TestCase("{ {-CircleSize}", "{ -1")]
+        [TestCase("{(-CircleSize)}", "-1")]
+        [TestCase("{-(CircleSize)}", "-1")]
+        [TestCase("{(-Circleize)}", "{(-Circleize)}")]
+        [TestCase("{4+ApproachRate/4}", "5")]
+        [TestCase("{(4+ApproachRate)/4}", "2")]
+        [TestCase("{-CircleSize} {CircleSize+0} {CircleSize+}", "-1 1 {CircleSize+}")]
+        [TestCase("{-CircleSize} {CircleSize +0} {CircleSize+0}", "-1 {CircleSize +0} 1")]
+        [TestCase("{()()()()}", "{()()()()}")]
+        [TestCase("{-()()()()}", "{-()()()()}")]
+        [TestCase("{()+()+()+()}", "{()+()+()+()}")]
+        [TestCase("{(ApproachRate)(ApproachRate)(ApproachRate)(ApproachRate)}", "256")]
+        [TestCase("{(ApproachRate-(ApproachRate*ApproachRate*ApproachRate))}", "-60")]
+        [TestCase("{1/0}", "{1/0}")]
+        [TestCase("{1%0}", "{1%0}")]
+        [TestCase("{(-1)+1*1*1+(-1-1)}", "-2")]
+        [TestCase("{4%3}", "1")]
+        [TestCase("{4%1.5}", "{4%1.5}")]
+        [TestCase("{-1}", "-1")]
+        [TestCase("{(-1)}", "-1")]
+        [TestCase("{4(CircleSize)}", "4")]
+        [TestCase("{(ApproachRate)(ApproachRate)}", "16")]
+        public void TestAttributeMathDisplay(string inputText, string expectedText)
+        {
+            AddStep($"set text: \"{inputText}\"", () => text.Template.Value = inputText);
+            AddAssert("check correct text", getText, () => Is.EqualTo(expectedText));
+        }
+
         [Test]
         public void TestChangeBeatmap()
         {
