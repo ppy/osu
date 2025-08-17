@@ -654,10 +654,12 @@ namespace osu.Game.Skinning.Components
                 bool canBeParsed = true;
 
                 string noNumbers = variableTexts[i];
+
                 for (int j = 0; j < numbers.Length; ++j)
                 {
                     noNumbers = noNumbers.Replace(numbers[j].ToString(), "");
                 }
+
                 noNumbers = noNumbers.Replace(".", "");
                 if (noNumbers.Length > 0)
                     canBeParsed = false;
