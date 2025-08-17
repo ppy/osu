@@ -15,6 +15,7 @@ using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Play.HUD;
@@ -165,7 +166,7 @@ namespace osu.Game.Screens.Play
                                 },
                                 new Drawable[]
                                 {
-                                    new MetadataLineLabel("Mapper"),
+                                    new MetadataLineLabel(PlayerLoaderStrings.ShowInfoMapper),
                                     new MetadataLineInfo(metadata.Author.Username)
                                 }
                             }
