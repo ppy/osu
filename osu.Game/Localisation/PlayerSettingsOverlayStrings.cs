@@ -29,6 +29,36 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString SeekForwardSeconds(double arg0) => new TranslatableString(getKey(@"seek_forward_seconds"), @"Seek forward {0} seconds", arg0);
 
+        /// <summary>
+        /// "Playback speed"
+        /// </summary>
+        public static LocalisableString PlaybackSpeed => new TranslatableString(getKey(@"playback_speed"), @"Playback speed");
+
+        /// <summary>
+        /// "Show click markers"
+        /// </summary>
+        public static LocalisableString ShowClickMarkers => new TranslatableString(getKey(@"show_click_markers"), @"Show click markers");
+
+        /// <summary>
+        /// "Show frame markers"
+        /// </summary>
+        public static LocalisableString ShowFrameMarkers => new TranslatableString(getKey(@"show_frame_markers"), @"Show frame markers");
+
+        /// <summary>
+        /// "Show cursor path"
+        /// </summary>
+        public static LocalisableString ShowCursorPath => new TranslatableString(getKey(@"show_cursor_path"), @"Show cursor path");
+
+        /// <summary>
+        /// "Hide gameplay cursor"
+        /// </summary>
+        public static LocalisableString HideGameplayCursor => new TranslatableString(getKey(@"hide_gameplay_cursor"), @"Hide gameplay cursor");
+
+        /// <summary>
+        /// "Display length"
+        /// </summary>
+        public static LocalisableString DisplayLength => new TranslatableString(getKey(@"display_length"), @"Display length");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
