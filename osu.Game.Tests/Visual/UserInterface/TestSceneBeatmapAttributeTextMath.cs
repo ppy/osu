@@ -83,7 +83,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         [TestCase("{4%1.5}", "1")]
         [TestCase("{-1}", "-1")]
         [TestCase("{(-1)}", "-1")]
-        [TestCase("{(CircleSize+)(CircleSize)}", "-1")]
+        [TestCase("{(CircleSize+)(CircleSize)}", "{(CircleSize+)(CircleSize)}")]
         [TestCase("{4(CircleSize)}", "4")]
         [TestCase("{(ApproachRate)(ApproachRate)}", "16")]
         [TestCase("(ApproachRate-CircleSize)(Accuracy)={(ApproachRate-CircleSize)(Accuracy)}", "(ApproachRate-CircleSize)(Accuracy)=9")]
