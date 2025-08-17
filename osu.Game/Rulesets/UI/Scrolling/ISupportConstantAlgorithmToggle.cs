@@ -10,6 +10,6 @@ namespace osu.Game.Rulesets.UI.Scrolling
     /// </summary>
     public interface ISupportConstantAlgorithmToggle : IDrawableScrollingRuleset
     {
-        public BindableBool ShowSpeedChanges { get; }
+        BindableBool ShowSpeedChanges { get; }
     }
 }

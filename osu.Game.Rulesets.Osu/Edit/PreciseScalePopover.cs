@@ -139,11 +139,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             base.LoadComplete();
 
-            ScheduleAfterChildren(() =>
-            {
-                scaleInput.TakeFocus();
-                scaleInput.SelectAll();
-            });
+            ScheduleAfterChildren(() => scaleInput.TakeFocus());
             scaleInput.Current.BindValueChanged(scale => scaleInfo.Value = scaleInfo.Value with { Scale = scale.NewValue });
 
             xCheckBox.Current.BindValueChanged(_ =>

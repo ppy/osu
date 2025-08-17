@@ -3,10 +3,10 @@
 
 using System;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
@@ -40,37 +40,31 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         private void load(DrawableHitObject drawableObject)
         {
             drawableRepeat = (DrawableSliderRepeat)drawableObject;
-            drawableRepeat.ApplyCustomUpdateState += updateStateTransforms;
         }
 
-        private void updateStateTransforms(DrawableHitObject hitObject, ArmedState state)
+        protected override void Update()
         {
-            const double move_out_duration = 35;
-            const double move_in_duration = 250;
-            const double total = 300;
+            base.Update();
 
-            switch (state)
+            if (Time.Current >= drawableRepeat.HitStateUpdateTime && drawableRepeat.State.Value == ArmedState.Hit)
             {
-                case ArmedState.Idle:
-                    InternalChild.ScaleTo(1.3f, move_out_duration, Easing.Out)
-                                 .Then()
-                                 .ScaleTo(1f, move_in_duration, Easing.Out)
-                                 .Loop(total - (move_in_duration + move_out_duration));
-                    break;
-
-                case ArmedState.Hit:
-                    double animDuration = Math.Min(300, drawableRepeat.HitObject.SpanDuration);
-                    InternalChild.ScaleTo(1.5f, animDuration, Easing.Out);
-                    break;
+                double animDuration = Math.Min(300, drawableRepeat.HitObject.SpanDuration);
+                Scale = new Vector2(Interpolation.ValueAt(Time.Current, 1, 1.5f, drawableRepeat.HitStateUpdateTime, drawableRepeat.HitStateUpdateTime + animDuration, Easing.Out));
             }
-        }
+            else
+            {
+                const float scale_amount = 1.3f;
 
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
+                const double move_out_duration = 35;
+                const double move_in_duration = 250;
+                const double total = 300;
 
-            if (drawableRepeat.IsNotNull())
-                drawableRepeat.ApplyCustomUpdateState -= updateStateTransforms;
+                double loopCurrentTime = (Time.Current - drawableRepeat.AnimationStartTime.Value) % total;
+                if (loopCurrentTime < move_out_duration)
+                    Scale = new Vector2(Interpolation.ValueAt(loopCurrentTime, 1, scale_amount, 0, move_out_duration, Easing.Out));
+                else
+                    Scale = new Vector2(Interpolation.ValueAt(loopCurrentTime, scale_amount, 1f, move_out_duration, move_out_duration + move_in_duration, Easing.Out));
+            }
         }
     }
 }

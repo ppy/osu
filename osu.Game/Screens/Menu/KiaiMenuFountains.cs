@@ -3,10 +3,9 @@
 
 using System;
 using osu.Framework.Allocation;
-using osu.Framework.Audio.Track;
 using osu.Framework.Graphics;
+using osu.Framework.Platform;
 using osu.Framework.Utils;
-using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Screens.Menu
@@ -16,12 +15,17 @@ namespace osu.Game.Screens.Menu
         private StarFountain leftFountain = null!;
         private StarFountain rightFountain = null!;
 
+        [Resolved]
+        private GameHost host { get; set; } = null!;
+
+        private StarFountainSounds sounds = null!;
+
         [BackgroundDependencyLoader]
         private void load()
         {
             RelativeSizeAxes = Axes.Both;
 
-            Children = new[]
+            Children = new Drawable[]
             {
                 leftFountain = new StarFountain
                 {
@@ -35,32 +39,28 @@ namespace osu.Game.Screens.Menu
                     Origin = Anchor.BottomRight,
                     X = -250,
                 },
+                sounds = new StarFountainSounds()
             };
         }
 
         private bool isTriggered;
 
-        private double? lastTrigger;
-
-        protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
+        protected override void Update()
         {
-            base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
+            base.Update();
 
-            if (effectPoint.KiaiMode && !isTriggered)
+            if (EffectPoint.KiaiMode && !isTriggered)
             {
-                bool isNearEffectPoint = Math.Abs(BeatSyncSource.Clock.CurrentTime - effectPoint.Time) < 500;
+                bool isNearEffectPoint = Math.Abs(BeatSyncSource.Clock.CurrentTime - EffectPoint.Time) < 500;
                 if (isNearEffectPoint)
                     Shoot();
             }
 
-            isTriggered = effectPoint.KiaiMode;
+            isTriggered = EffectPoint.KiaiMode;
         }
 
         public void Shoot()
         {
-            if (lastTrigger != null && Clock.CurrentTime - lastTrigger < 500)
-                return;
-
             int direction = RNG.Next(-1, 2);
 
             switch (direction)
@@ -81,7 +81,9 @@ namespace osu.Game.Screens.Menu
                     break;
             }
 
-            lastTrigger = Clock.CurrentTime;
+            // Don't play SFX when game is in background, as it can be a bit noisy.
+            if (host.IsActive.Value)
+                sounds.Play();
         }
     }
 }

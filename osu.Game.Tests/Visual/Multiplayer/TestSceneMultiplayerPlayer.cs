@@ -22,6 +22,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
     {
         private MultiplayerPlayer player = null!;
 
+        public override void SetUpSteps()
+        {
+            base.SetUpSteps();
+            AddStep("join room", () => JoinRoom(CreateDefaultRoom()));
+            WaitForJoined();
+        }
+
         [Test]
         public void TestGameplay()
         {

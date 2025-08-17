@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -13,11 +14,14 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Setup
 {
+    [Cached]
     public partial class SetupScreen : EditorScreen
     {
         public const float COLUMN_WIDTH = 450;
         public const float SPACING = 28;
         public const float MAX_WIDTH = 2 * COLUMN_WIDTH + SPACING;
+
+        public Action? MetadataChanged { get; set; }
 
         public SetupScreen()
             : base(EditorScreenMode.SongSetup)

@@ -53,6 +53,14 @@ namespace osu.Game.Tournament
             return new ProductionEndpointConfiguration();
         }
 
+        public override void SetHost(GameHost host)
+        {
+            base.SetHost(host);
+
+            if (host.Window != null)
+                host.Window.Title = $"{Name} [tournament client]";
+        }
+
         private TournamentSpriteText initialisationText = null!;
 
         [BackgroundDependencyLoader]

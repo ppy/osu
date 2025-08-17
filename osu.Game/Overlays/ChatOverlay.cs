@@ -228,7 +228,8 @@ namespace osu.Game.Overlays
                     return true;
 
                 case PlatformAction.DocumentClose:
-                    channelManager.LeaveChannel(currentChannel.Value);
+                    if (currentChannel.Value?.Type != ChannelType.Team)
+                        channelManager.LeaveChannel(currentChannel.Value);
                     return true;
 
                 case PlatformAction.TabRestore:

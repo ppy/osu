@@ -28,6 +28,7 @@ using osu.Game.Skinning;
 using osu.Game.Storyboards;
 using osu.Game.Tests.Resources;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Tests.Beatmaps.Formats
 {
@@ -184,6 +185,57 @@ namespace osu.Game.Tests.Beatmaps.Formats
             Assert.That(decodedSlider.Path.ControlPoints.Count, Is.EqualTo(5));
         }
 
+        [Test]
+        public void TestOnlyEightComboColoursEncoded()
+        {
+            var beatmapSkin = new LegacyBeatmapSkin(new BeatmapInfo(), null)
+            {
+                Configuration =
+                {
+                    CustomComboColours =
+                    {
+                        new Color4(1, 1, 1, 255),
+                        new Color4(2, 2, 2, 255),
+                        new Color4(3, 3, 3, 255),
+                        new Color4(4, 4, 4, 255),
+                        new Color4(5, 5, 5, 255),
+                        new Color4(6, 6, 6, 255),
+                        new Color4(7, 7, 7, 255),
+                        new Color4(8, 8, 8, 255),
+                        new Color4(9, 9, 9, 255),
+                    }
+                }
+            };
+
+            var decodedAfterEncode = decodeFromLegacy(encodeToLegacy((new Beatmap(), beatmapSkin)), string.Empty);
+            Assert.That(decodedAfterEncode.skin.Configuration.CustomComboColours, Has.Count.EqualTo(8));
+        }
+
+        [Test]
+        public void TestEncodeStabilityOfSliderWithFractionalCoordinates()
+        {
+            Slider originalSlider = new Slider
+            {
+                Position = new Vector2(0.6f),
+                Path = new SliderPath(new[]
+                {
+                    new PathControlPoint(Vector2.Zero, PathType.PERFECT_CURVE),
+                    new PathControlPoint(new Vector2(25.6f, 78.4f)),
+                    new PathControlPoint(new Vector2(55.8f, 34.2f)),
+                })
+            };
+            var beatmap = new Beatmap
+            {
+                HitObjects = { originalSlider }
+            };
+
+            var encoded = encodeToLegacy((beatmap, new TestLegacySkin(beatmaps_resource_store, string.Empty)));
+            var decodedAfterEncode = decodeFromLegacy(encoded, string.Empty, version: LegacyBeatmapEncoder.FIRST_LAZER_VERSION);
+            var decodedSlider = (Slider)decodedAfterEncode.beatmap.HitObjects[0];
+            Assert.That(decodedSlider.Path.ControlPoints.Select(p => p.Position),
+                Is.EquivalentTo(originalSlider.Path.ControlPoints.Select(p => p.Position)));
+        }
+
         private bool areComboColoursEqual(IHasComboColours a, IHasComboColours b)
         {
             // equal to null, no need to SequenceEqual
@@ -206,12 +258,14 @@ namespace osu.Game.Tests.Beatmaps.Formats
             }
         }
 
-        private (IBeatmap beatmap, TestLegacySkin skin) decodeFromLegacy(Stream stream, string name)
+        private (IBeatmap beatmap, TestLegacySkin skin) decodeFromLegacy(Stream stream, string name, int version = LegacyDecoder<Beatmap>.LATEST_VERSION)
         {
             using (var reader = new LineBufferedReader(stream))
             {
-                var beatmap = new LegacyBeatmapDecoder { ApplyOffsets = false }.Decode(reader);
+                var beatmap = new LegacyBeatmapDecoder(version) { ApplyOffsets = false }.Decode(reader);
                 var beatmapSkin = new TestLegacySkin(beatmaps_resource_store, name);
+                stream.Seek(0, SeekOrigin.Begin);
+                beatmapSkin.Configuration = new LegacySkinDecoder().Decode(reader);
                 return (convert(beatmap), beatmapSkin);
             }
         }

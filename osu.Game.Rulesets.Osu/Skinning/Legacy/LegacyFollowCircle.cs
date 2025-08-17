@@ -22,9 +22,9 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
         protected override void OnSliderPress()
         {
-            Debug.Assert(ParentObject != null);
+            Debug.Assert(DrawableObject != null);
 
-            double remainingTime = Math.Max(0, ParentObject.HitStateUpdateTime - Time.Current);
+            double remainingTime = Math.Max(0, DrawableObject.HitStateUpdateTime - Time.Current);
 
             // Note that the scale adjust here is 2 instead of DrawableSliderBall.FOLLOW_AREA to match legacy behaviour.
             // This means the actual tracking area for gameplay purposes is larger than the sprite (but skins may be accounting for this).

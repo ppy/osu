@@ -28,7 +28,6 @@ namespace osu.Game.Graphics.Backgrounds
         [Resolved]
         private IAPIProvider api { get; set; }
 
-        private readonly IBindable<APIState> apiState = new Bindable<APIState>();
         private Bindable<SeasonalBackgroundMode> seasonalBackgroundMode;
         private Bindable<APISeasonalBackgrounds> seasonalBackgrounds;
 
@@ -47,13 +46,12 @@ namespace osu.Game.Graphics.Backgrounds
                     SeasonalBackgroundChanged?.Invoke();
             });
 
-            apiState.BindTo(api.State);
-            apiState.BindValueChanged(fetchSeasonalBackgrounds, true);
+            fetchSeasonalBackgrounds();
         }
 
-        private void fetchSeasonalBackgrounds(ValueChangedEvent<APIState> stateChanged)
+        private void fetchSeasonalBackgrounds()
         {
-            if (seasonalBackgrounds.Value != null || stateChanged.NewValue != APIState.Online)
+            if (seasonalBackgrounds.Value != null)
                 return;
 
             var request = new GetSeasonalBackgroundsRequest();

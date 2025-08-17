@@ -14,7 +14,6 @@ namespace osu.Game.Online
     /// A static class providing the list of types requiring workarounds for serialisation in SignalR.
     /// </summary>
     /// <seealso cref="SignalRUnionWorkaroundResolver"/>
-    /// <seealso cref="SignalRDerivedTypeWorkaroundJsonConverter"/>
     internal static class SignalRWorkaroundTypes
     {
         internal static readonly IReadOnlyList<(Type derivedType, Type baseType)> BASE_TYPE_MAPPING = new[]
@@ -44,6 +43,8 @@ namespace osu.Game.Online
             (typeof(UserActivity.EditingBeatmap), typeof(UserActivity)),
             (typeof(UserActivity.ModdingBeatmap), typeof(UserActivity)),
             (typeof(UserActivity.TestingBeatmap), typeof(UserActivity)),
+            (typeof(UserActivity.InDailyChallengeLobby), typeof(UserActivity)),
+            (typeof(UserActivity.PlayingDailyChallenge), typeof(UserActivity)),
         };
     }
 }

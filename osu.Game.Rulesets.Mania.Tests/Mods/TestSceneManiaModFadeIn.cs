@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
         {
             CreateModTest(new ModTestData
             {
-                Mod = new ManiaModHidden(),
+                Mod = new ManiaModFadeIn(),
                 PassCondition = () => checkCoverage(ManiaModHidden.MIN_COVERAGE)
             });
         }
@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
         {
             CreateModTest(new ModTestData
             {
-                Mod = new ManiaModHidden(),
+                Mod = new ManiaModFadeIn(),
                 PassCondition = () => checkCoverage(ManiaModHidden.MIN_COVERAGE)
             });
 
@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
         {
             CreateModTest(new ModTestData
             {
-                Mod = new ManiaModHidden(),
+                Mod = new ManiaModFadeIn(),
                 PassCondition = () => checkCoverage(ManiaModHidden.MAX_COVERAGE)
             });
 
@@ -60,7 +60,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
         {
             CreateModTest(new ModTestData
             {
-                Mod = new ManiaModHidden(),
+                Mod = new ManiaModFadeIn(),
                 PassCondition = () => checkCoverage(ManiaModHidden.MAX_COVERAGE)
             });
 
@@ -73,7 +73,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
         {
             CreateModTest(new ModTestData
             {
-                Mod = new ManiaModHidden(),
+                Mod = new ManiaModFadeIn(),
                 CreateBeatmap = () => new Beatmap
                 {
                     HitObjects = Enumerable.Range(1, 100).Select(i => (HitObject)new Note { StartTime = 1000 + 200 * i }).ToList(),

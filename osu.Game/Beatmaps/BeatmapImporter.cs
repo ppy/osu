@@ -72,58 +72,66 @@ namespace osu.Game.Beatmaps
 
             first.PerformWrite(updated =>
             {
-                var realm = updated.Realm;
-
-                Logger.Log($"Beatmap \"{updated}\" update completed successfully", LoggingTarget.Database);
-
-                // Re-fetch as we are likely on a different thread.
-                original = realm!.Find<BeatmapSetInfo>(originalId)!;
-
-                // Generally the import process will do this for us if the OnlineIDs match,
-                // but that isn't a guarantee (ie. if the .osu file doesn't have OnlineIDs populated).
-                original.DeletePending = true;
-
-                // Transfer local values which should be persisted across a beatmap update.
-                updated.DateAdded = originalDateAdded;
-
-                transferCollectionReferences(realm, original, updated);
-
-                foreach (var beatmap in original.Beatmaps.ToArray())
+                try
                 {
-                    var updatedBeatmap = updated.Beatmaps.FirstOrDefault(b => b.Hash == beatmap.Hash);
+                    var realm = updated.Realm;
 
-                    if (updatedBeatmap != null)
+                    // Re-fetch as we are likely on a different thread.
+                    original = realm!.Find<BeatmapSetInfo>(originalId)!;
+
+                    // Generally the import process will do this for us if the OnlineIDs match,
+                    // but that isn't a guarantee (ie. if the .osu file doesn't have OnlineIDs populated).
+                    original.DeletePending = true;
+
+                    // Transfer local values which should be persisted across a beatmap update.
+                    updated.DateAdded = originalDateAdded;
+
+                    transferCollectionReferences(realm, original, updated);
+
+                    foreach (var beatmap in original.Beatmaps.ToArray())
                     {
-                        // If the updated beatmap matches an existing one, transfer any user data across..
-                        if (beatmap.Scores.Any())
+                        var updatedBeatmap = updated.Beatmaps.FirstOrDefault(b => b.Hash == beatmap.Hash);
+
+                        if (updatedBeatmap != null)
                         {
-                            Logger.Log($"Transferring {beatmap.Scores.Count()} scores for unchanged difficulty \"{beatmap}\"", LoggingTarget.Database);
+                            // If the updated beatmap matches an existing one, transfer any user data across..
+                            if (beatmap.Scores.Any())
+                            {
+                                Logger.Log($"Transferring {beatmap.Scores.Count()} scores for unchanged difficulty \"{beatmap}\"", LoggingTarget.Database);
 
-                            foreach (var score in beatmap.Scores)
-                                score.BeatmapInfo = updatedBeatmap;
+                                foreach (var score in beatmap.Scores)
+                                    score.BeatmapInfo = updatedBeatmap;
+                            }
+
+                            // ..then nuke the old beatmap completely.
+                            // this is done instead of a soft deletion to avoid a user potentially creating weird
+                            // interactions, like restoring the outdated beatmap then updating a second time
+                            // (causing user data to be wiped).
+                            original.Beatmaps.Remove(beatmap);
+
+                            realm.Remove(beatmap.Metadata);
+                            realm.Remove(beatmap);
                         }
-
-                        // ..then nuke the old beatmap completely.
-                        // this is done instead of a soft deletion to avoid a user potentially creating weird
-                        // interactions, like restoring the outdated beatmap then updating a second time
-                        // (causing user data to be wiped).
-                        original.Beatmaps.Remove(beatmap);
-
-                        realm.Remove(beatmap.Metadata);
-                        realm.Remove(beatmap);
+                        else
+                        {
+                            // If the beatmap differs in the original, leave it in a soft-deleted state but reset online info.
+                            // This caters to the case where a user has made modifications they potentially want to restore,
+                            // but after restoring we want to ensure it can't be used to trigger an update of the beatmap.
+                            beatmap.ResetOnlineInfo();
+                        }
                     }
-                    else
-                    {
-                        // If the beatmap differs in the original, leave it in a soft-deleted state but reset online info.
-                        // This caters to the case where a user has made modifications they potentially want to restore,
-                        // but after restoring we want to ensure it can't be used to trigger an update of the beatmap.
-                        beatmap.ResetOnlineInfo();
-                    }
+
+                    // If the original has no beatmaps left, delete the set as well.
+                    if (!original.Beatmaps.Any())
+                        realm.Remove(original);
+
+                    Logger.Log($"Beatmap \"{updated}\" update completed successfully", LoggingTarget.Database);
                 }
-
-                // If the original has no beatmaps left, delete the set as well.
-                if (!original.Beatmaps.Any())
-                    realm.Remove(original);
+                catch (Exception ex)
+                {
+                    Logger.Error(ex, $"Failed to update beatmap \"{updated}\"", LoggingTarget.Database);
+                    throw;
+                }
             });
 
             return first;

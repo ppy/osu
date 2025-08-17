@@ -31,9 +31,12 @@ namespace osu.Game.Graphics.UserInterfaceV2
         public LocalisableString Caption { get; init; }
         public LocalisableString HintText { get; init; }
 
+        public BindableBool CanAdd { get; } = new BindableBool(true);
+
         private Box background = null!;
         private FormFieldCaption caption = null!;
         private FillFlowContainer flow = null!;
+        private RoundedButton addButton = null!;
 
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
@@ -46,8 +49,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             Masking = true;
             CornerRadius = 5;
-
-            RoundedButton button;
 
             InternalChildren = new Drawable[]
             {
@@ -76,7 +77,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                             AutoSizeAxes = Axes.Y,
                             Direction = FillDirection.Full,
                             Spacing = new Vector2(5),
-                            Child = button = new RoundedButton
+                            Child = addButton = new RoundedButton
                             {
                                 Action = addNewColour,
                                 Size = new Vector2(70),
@@ -87,7 +88,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 },
             };
 
-            flow.SetLayoutPosition(button, float.MaxValue);
+            flow.SetLayoutPosition(addButton, float.MaxValue);
         }
 
         protected override void LoadComplete()
@@ -98,6 +99,19 @@ namespace osu.Game.Graphics.UserInterfaceV2
             {
                 if (args.Action != NotifyCollectionChangedAction.Replace)
                     updateColours();
+            }, true);
+            CanAdd.BindValueChanged(canAdd =>
+            {
+                if (canAdd.NewValue)
+                {
+                    addButton.Enabled.Value = true;
+                    addButton.TooltipText = string.Empty;
+                }
+                else
+                {
+                    addButton.Enabled.Value = false;
+                    addButton.TooltipText = "Maximum combo colours reached";
+                }
             }, true);
             updateState();
         }

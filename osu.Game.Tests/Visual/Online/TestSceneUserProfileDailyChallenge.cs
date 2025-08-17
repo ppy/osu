@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Testing;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Profile;
@@ -20,24 +21,16 @@ namespace osu.Game.Tests.Visual.Online
     public partial class TestSceneUserProfileDailyChallenge : OsuManualInputManagerTestScene
     {
         [Cached]
-        public readonly Bindable<UserProfileData?> User = new Bindable<UserProfileData?>(new UserProfileData(new APIUser(), new OsuRuleset().RulesetInfo));
+        private readonly Bindable<UserProfileData?> userProfileData = new Bindable<UserProfileData?>(new UserProfileData(new APIUser(), new OsuRuleset().RulesetInfo));
 
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Pink);
 
-        protected override void LoadComplete()
+        private DailyChallengeStatsDisplay display = null!;
+
+        [SetUpSteps]
+        public void SetUpSteps()
         {
-            base.LoadComplete();
-
-            DailyChallengeStatsDisplay display = null!;
-
-            AddSliderStep("daily", 0, 999, 2, v => update(s => s.DailyStreakCurrent = v));
-            AddSliderStep("daily best", 0, 999, 2, v => update(s => s.DailyStreakBest = v));
-            AddSliderStep("weekly", 0, 250, 1, v => update(s => s.WeeklyStreakCurrent = v));
-            AddSliderStep("weekly best", 0, 250, 1, v => update(s => s.WeeklyStreakBest = v));
-            AddSliderStep("top 10%", 0, 999, 0, v => update(s => s.Top10PercentPlacements = v));
-            AddSliderStep("top 50%", 0, 999, 0, v => update(s => s.Top50PercentPlacements = v));
-            AddSliderStep("playcount", 0, 1500, 1, v => update(s => s.PlayCount = v));
             AddStep("create", () =>
             {
                 Clear();
@@ -51,16 +44,40 @@ namespace osu.Game.Tests.Visual.Online
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Scale = new Vector2(1f),
-                    User = { BindTarget = User },
+                    User = { BindTarget = userProfileData },
                 });
             });
+
+            AddStep("set local user", () => update(s => s.UserID = API.LocalUser.Value.Id));
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            AddSliderStep("daily", 0, 999, 2, v => update(s => s.DailyStreakCurrent = v));
+            AddSliderStep("daily best", 0, 999, 2, v => update(s => s.DailyStreakBest = v));
+            AddSliderStep("weekly", 0, 250, 1, v => update(s => s.WeeklyStreakCurrent = v));
+            AddSliderStep("weekly best", 0, 250, 1, v => update(s => s.WeeklyStreakBest = v));
+            AddSliderStep("top 10%", 0, 999, 0, v => update(s => s.Top10PercentPlacements = v));
+            AddSliderStep("top 50%", 0, 999, 0, v => update(s => s.Top50PercentPlacements = v));
+            AddSliderStep("playcount", 0, 1500, 1, v => update(s => s.PlayCount = v));
+        }
+
+        [Test]
+        public void TestStates()
+        {
+            AddStep("played today", () => update(s => s.LastUpdate = DateTimeOffset.UtcNow.Date));
+            AddStep("played yesterday", () => update(s => s.LastUpdate = DateTimeOffset.UtcNow.Date.AddDays(-1)));
+            AddStep("change to non-local user", () => update(s => s.UserID = API.LocalUser.Value.Id + 1000));
+
             AddStep("hover", () => InputManager.MoveMouseTo(display));
         }
 
         private void update(Action<APIUserDailyChallengeStatistics> change)
         {
-            change.Invoke(User.Value!.User.DailyChallengeStatistics);
-            User.Value = new UserProfileData(User.Value.User, User.Value.Ruleset);
+            change.Invoke(userProfileData.Value!.User.DailyChallengeStatistics);
+            userProfileData.Value = new UserProfileData(userProfileData.Value.User, userProfileData.Value.Ruleset);
         }
 
         [Test]

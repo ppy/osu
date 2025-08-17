@@ -44,6 +44,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString PleaseInvestInAnOsuSupporterTagToViewThisLeaderboard => new TranslatableString(getKey(@"please_invest_in_an_osu_supporter_tag_to_view_this_leaderboard"), @"Please invest in an osu!supporter tag to view this leaderboard!");
 
+        /// <summary>
+        /// "You are not on a team. Maybe you should join one!"
+        /// </summary>
+        public static LocalisableString NoTeam => new TranslatableString(getKey(@"no_team"), @"You are not on a team. Maybe you should join one!");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

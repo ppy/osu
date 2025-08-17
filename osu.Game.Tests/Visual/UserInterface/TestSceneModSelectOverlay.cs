@@ -993,7 +993,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("column not scrolled", () => modSelectOverlay.ChildrenOfType<ModSelectOverlay.ColumnScrollContainer>().Single().IsScrolledToStart());
 
             AddStep("move mouse away", () => InputManager.MoveMouseTo(Vector2.Zero));
-            AddAssert("customisation panel closed",
+            AddUntilStep("customisation panel closed",
                 () => this.ChildrenOfType<ModCustomisationPanel>().Single().ExpandedState.Value,
                 () => Is.EqualTo(ModCustomisationPanel.ModCustomisationPanelState.Collapsed));
 
@@ -1001,6 +1001,35 @@ namespace osu.Game.Tests.Visual.UserInterface
                 AddAssert("search focused", () => this.ChildrenOfType<ShearedSearchTextBox>().Single().HasFocus);
             else
                 AddAssert("search still not focused", () => !this.ChildrenOfType<ShearedSearchTextBox>().Single().HasFocus);
+        }
+
+        /// <summary>
+        /// Tests that recreating the mod panels (by setting the global available mods) also refreshes the active states.
+        /// </summary>
+        [Test]
+        public void TestActiveStatesRefreshedOnPanelsCreated()
+        {
+            createScreen();
+            changeRuleset(0);
+
+            Bindable<IReadOnlyList<Mod>> selectedMods = null!;
+
+            AddStep("bind mods to local bindable", () =>
+            {
+                selectedMods = new Bindable<IReadOnlyList<Mod>>([]);
+
+                modSelectOverlay.SelectedMods.UnbindFrom(SelectedMods);
+                modSelectOverlay.SelectedMods.BindTo(selectedMods);
+            });
+
+            AddStep("activate PF", () => selectedMods.Value = [new OsuModPerfect()]);
+            AddAssert("OsuModPerfect panel active", () => getPanelForMod(typeof(OsuModPerfect)).Active.Value);
+
+            changeRuleset(1);
+            AddAssert("TaikoModPerfect panel not active", () => !getPanelForMod(typeof(TaikoModPerfect)).Active.Value);
+
+            changeRuleset(0);
+            AddAssert("OsuModPerfect panel active", () => getPanelForMod(typeof(OsuModPerfect)).Active.Value);
         }
 
         private void waitForColumnLoad() => AddUntilStep("all column content loaded", () =>
@@ -1018,7 +1047,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         private void assertCustomisationToggleState(bool disabled, bool active)
         {
             AddUntilStep($"customisation panel is {(disabled ? "" : "not ")}disabled", () => modSelectOverlay.ChildrenOfType<ModCustomisationPanel>().Single().Enabled.Value == !disabled);
-            AddAssert($"customisation panel is {(active ? "" : "not ")}active",
+            AddUntilStep($"customisation panel is {(active ? "" : "not ")}active",
                 () => modSelectOverlay.ChildrenOfType<ModCustomisationPanel>().Single().ExpandedState.Value,
                 () => active ? Is.Not.EqualTo(ModCustomisationPanel.ModCustomisationPanelState.Collapsed) : Is.EqualTo(ModCustomisationPanel.ModCustomisationPanelState.Collapsed));
         }
@@ -1030,7 +1059,10 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private partial class TestModSelectOverlay : UserModSelectOverlay
         {
-            protected override bool ShowPresets => true;
+            public TestModSelectOverlay()
+            {
+                ShowPresets = true;
+            }
         }
 
         private class TestUnimplementedMod : Mod

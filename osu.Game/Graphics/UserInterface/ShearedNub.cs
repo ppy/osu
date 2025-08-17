@@ -21,39 +21,54 @@ namespace osu.Game.Graphics.UserInterface
     {
         public Action? OnDoubleClicked { get; init; }
 
-        protected const float BORDER_WIDTH = 3;
-
         public const int HEIGHT = 30;
         public const float EXPANDED_SIZE = 50;
-
-        public static readonly Vector2 SHEAR = new Vector2(0.15f, 0);
+        public const float CORNER_RADIUS = 5;
 
         private readonly Box fill;
         private readonly Container main;
+        private readonly Container shadow;
 
-        /// <summary>
-        ///  Implements the shape for the nub, allowing for any type of container to be used.
-        /// </summary>
-        /// <returns></returns>
         public ShearedNub()
         {
             Size = new Vector2(EXPANDED_SIZE, HEIGHT);
-            InternalChild = main = new Container
+            InternalChildren = new Drawable[]
             {
-                Shear = SHEAR,
-                BorderColour = Colour4.White,
-                BorderThickness = BORDER_WIDTH,
-                Masking = true,
-                CornerRadius = 5,
-                RelativeSizeAxes = Axes.Both,
-                Anchor = Anchor.TopCentre,
-                Origin = Anchor.TopCentre,
-                Child = fill = new Box
+                shadow = new Container
                 {
+                    Shear = OsuGame.SHEAR,
+                    Masking = true,
+                    CornerRadius = CORNER_RADIUS,
                     RelativeSizeAxes = Axes.Both,
-                    Alpha = 0,
-                    AlwaysPresent = true,
-                }
+                    EdgeEffect = new EdgeEffectParameters
+                    {
+                        Type = EdgeEffectType.Shadow,
+                        Radius = 20f,
+                    },
+                    Child = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Alpha = 0,
+                        AlwaysPresent = true,
+                    }
+                },
+                main = new Container
+                {
+                    Shear = OsuGame.SHEAR,
+                    BorderColour = Colour4.White,
+                    BorderThickness = 8f,
+                    Masking = true,
+                    CornerRadius = CORNER_RADIUS,
+                    RelativeSizeAxes = Axes.Both,
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
+                    Child = fill = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Alpha = 0,
+                        AlwaysPresent = true,
+                    }
+                },
             };
         }
 
@@ -78,6 +93,7 @@ namespace osu.Game.Graphics.UserInterface
             base.LoadComplete();
 
             Current.BindValueChanged(onCurrentValueChanged, true);
+            FinishTransforms(true);
         }
 
         private bool glowing;
@@ -91,22 +107,22 @@ namespace osu.Game.Graphics.UserInterface
                     return;
 
                 glowing = value;
+                updateDisplay();
+            }
+        }
 
-                if (value)
-                {
-                    main.FadeColour(GlowingAccentColour.Lighten(0.1f), 40, Easing.OutQuint)
-                        .Then()
-                        .FadeColour(GlowingAccentColour, 800, Easing.OutQuint);
+        private Color4 shadowColour = Color4.Black.Opacity(0f);
 
-                    main.FadeEdgeEffectTo(Color4.White.Opacity(0.1f), 40, Easing.OutQuint)
-                        .Then()
-                        .FadeEdgeEffectTo(GlowColour.Opacity(0.1f), 800, Easing.OutQuint);
-                }
-                else
-                {
-                    main.FadeEdgeEffectTo(GlowColour.Opacity(0), 800, Easing.OutQuint);
-                    main.FadeColour(AccentColour, 800, Easing.OutQuint);
-                }
+        public Color4 ShadowColour
+        {
+            get => shadowColour;
+            set
+            {
+                if (shadowColour == value)
+                    return;
+
+                shadowColour = value;
+                shadow.FadeEdgeEffectTo(value, 800, Easing.OutQuint);
             }
         }
 
@@ -132,8 +148,7 @@ namespace osu.Game.Graphics.UserInterface
             set
             {
                 accentColour = value;
-                if (!Glowing)
-                    main.Colour = value;
+                updateDisplay();
             }
         }
 
@@ -145,8 +160,7 @@ namespace osu.Game.Graphics.UserInterface
             set
             {
                 glowingAccentColour = value;
-                if (Glowing)
-                    main.Colour = value;
+                updateDisplay();
             }
         }
 
@@ -158,10 +172,7 @@ namespace osu.Game.Graphics.UserInterface
             set
             {
                 glowColour = value;
-
-                var effect = main.EdgeEffect;
-                effect.Colour = Glowing ? value : value.Opacity(0);
-                main.EdgeEffect = effect;
+                updateDisplay();
             }
         }
 
@@ -179,7 +190,26 @@ namespace osu.Game.Graphics.UserInterface
             else
             {
                 main.ResizeWidthTo(0.75f, duration, Easing.OutQuint);
-                main.TransformTo(nameof(BorderThickness), BORDER_WIDTH, duration, Easing.OutQuint);
+                main.TransformTo(nameof(BorderThickness), 8f, duration, Easing.OutQuint);
+            }
+        }
+
+        private void updateDisplay()
+        {
+            if (Glowing)
+            {
+                main.FadeColour(GlowingAccentColour.Lighten(0.1f), 40, Easing.OutQuint)
+                    .Then()
+                    .FadeColour(GlowingAccentColour, 800, Easing.OutQuint);
+
+                main.FadeEdgeEffectTo(Color4.White.Opacity(0.1f), 40, Easing.OutQuint)
+                    .Then()
+                    .FadeEdgeEffectTo(GlowColour.Opacity(0.1f), 800, Easing.OutQuint);
+            }
+            else
+            {
+                main.FadeEdgeEffectTo(GlowColour.Opacity(0), 800, Easing.OutQuint);
+                main.FadeColour(AccentColour, 800, Easing.OutQuint);
             }
         }
 

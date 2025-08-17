@@ -3,39 +3,33 @@
 
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.Multiplayer;
-using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 {
-    public partial class ParticipantsList : CompositeDrawable
+    public partial class ParticipantsList : VirtualisedListContainer<MultiplayerRoomUser, ParticipantPanel>
     {
-        private FillFlowContainer<ParticipantPanel> panels = null!;
-        private ParticipantPanel? currentHostPanel;
+        private BindableList<MultiplayerRoomUser> participants => RowData;
+
+        private MultiplayerRoomUser? currentHost;
 
         [Resolved]
         private MultiplayerClient client { get; set; } = null!;
 
-        [BackgroundDependencyLoader]
-        private void load()
+        public ParticipantsList()
+            : base(ParticipantPanel.HEIGHT, initialPoolSize: 20)
         {
-            InternalChild = new OsuScrollContainer
-            {
-                RelativeSizeAxes = Axes.Both,
-                ScrollbarVisible = false,
-                Child = panels = new FillFlowContainer<ParticipantPanel>
-                {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Direction = FillDirection.Vertical,
-                    Spacing = new Vector2(0, 2)
-                }
-            };
         }
+
+        protected override ScrollContainer<Drawable> CreateScrollContainer() => new OsuScrollContainer
+        {
+            ScrollbarVisible = false,
+        };
 
         protected override void LoadComplete()
         {
@@ -50,36 +44,38 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
         private void updateState()
         {
             if (client.Room == null)
-                panels.Clear();
+                participants.Clear();
             else
             {
                 // Remove panels for users no longer in the room.
-                foreach (var p in panels)
+                for (int i = participants.Count - 1; i >= 0; i--)
                 {
+                    var participant = participants[i];
+
                     // Note that we *must* use reference equality here, as this call is scheduled and a user may have left and joined since it was last run.
-                    if (client.Room.Users.All(u => !ReferenceEquals(p.User, u)))
-                        p.Expire();
+                    if (client.Room.Users.All(u => !ReferenceEquals(participant, u)))
+                        participants.RemoveAt(i);
                 }
 
                 // Add panels for all users new to the room.
-                foreach (var user in client.Room.Users.Except(panels.Select(p => p.User)))
-                    panels.Add(new ParticipantPanel(user));
+                foreach (var user in client.Room.Users.Except(participants))
+                    participants.Add(user);
 
-                if (currentHostPanel == null || !currentHostPanel.User.Equals(client.Room.Host))
+                if (currentHost == null || !currentHost.Equals(client.Room.Host))
                 {
-                    // Reset position of previous host back to normal, if one existing.
-                    if (currentHostPanel != null && panels.Contains(currentHostPanel))
-                        panels.SetLayoutPosition(currentHostPanel, 0);
-
-                    currentHostPanel = null;
+                    currentHost = null;
 
                     // Change position of new host to display above all participants.
                     if (client.Room.Host != null)
                     {
-                        currentHostPanel = panels.SingleOrDefault(u => u.User.Equals(client.Room.Host));
+                        currentHost = participants.SingleOrDefault(u => u.Equals(client.Room.Host));
+                        int currentHostIndex = participants.IndexOf(client.Room.Host);
 
-                        if (currentHostPanel != null)
-                            panels.SetLayoutPosition(currentHostPanel, -1);
+                        if (currentHostIndex > 0)
+                        {
+                            participants.Move(currentHostIndex, 0);
+                            currentHost = participants[0];
+                        }
                     }
                 }
             }

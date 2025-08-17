@@ -165,7 +165,8 @@ namespace osu.Game.Screens.OnlinePlay
             d.RequestDeletion = i => RequestDeletion?.Invoke(i);
             d.RequestResults = i =>
             {
-                SelectedItem.Value = i;
+                if (AllowSelection)
+                    SelectedItem.Value = i;
                 RequestResults?.Invoke(i);
             };
             d.RequestEdit = i => RequestEdit?.Invoke(i);
@@ -204,7 +205,7 @@ namespace osu.Game.Screens.OnlinePlay
                 ScrollContainer.ScrollIntoView(drawableItem);
         }
 
-        #region Key selection logic (shared with BeatmapCarousel and RoomsContainer)
+        #region Key selection logic (shared with BeatmapCarousel and RoomListing)
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {

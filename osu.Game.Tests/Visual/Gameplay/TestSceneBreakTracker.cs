@@ -40,11 +40,16 @@ namespace osu.Game.Tests.Visual.Gameplay
                     RelativeSizeAxes = Axes.Both,
                 },
                 breakTracker = new TestBreakTracker(),
-                breakOverlay = new BreakOverlay(true, new ScoreProcessor(new OsuRuleset()))
+                breakOverlay = new BreakOverlay(new ScoreProcessor(new OsuRuleset()))
                 {
                     ProcessCustomClock = false,
                     BreakTracker = breakTracker,
-                }
+                },
+                new LetterboxOverlay
+                {
+                    ProcessCustomClock = false,
+                    BreakTracker = breakTracker,
+                },
             };
         }
 

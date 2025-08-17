@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -29,7 +28,7 @@ namespace osu.Game.Skinning.Components
     [UsedImplicitly]
     public partial class BeatmapAttributeText : FontAdjustableSkinComponent
     {
-        [SettingSource(typeof(BeatmapAttributeTextStrings), nameof(BeatmapAttributeTextStrings.Attribute), nameof(BeatmapAttributeTextStrings.AttributeDescription))]
+        [SettingSource(typeof(BeatmapAttributeTextStrings), nameof(BeatmapAttributeTextStrings.Attribute))]
         public Bindable<BeatmapAttribute> Attribute { get; } = new Bindable<BeatmapAttribute>(BeatmapAttribute.StarRating);
 
         [SettingSource(typeof(BeatmapAttributeTextStrings), nameof(BeatmapAttributeTextStrings.Template), nameof(BeatmapAttributeTextStrings.TemplateDescription))]
@@ -48,7 +47,7 @@ namespace osu.Game.Skinning.Components
         private BeatmapDifficultyCache difficultyCache { get; set; } = null!;
 
         private readonly OsuSpriteText text;
-        private IBindable<StarDifficulty?>? difficultyBindable;
+        private IBindable<StarDifficulty>? difficultyBindable;
         private CancellationTokenSource? difficultyCancellationSource;
         private ModSettingChangeTracker? modSettingTracker;
         private StarDifficulty? starDifficulty;
@@ -237,18 +236,9 @@ namespace osu.Game.Skinning.Components
 
             BeatmapDifficulty computeDifficulty()
             {
-                BeatmapDifficulty difficulty = new BeatmapDifficulty(beatmap.Value.BeatmapInfo.Difficulty);
-
-                foreach (var mod in mods.Value.OfType<IApplicableToDifficulty>())
-                    mod.ApplyToDifficulty(difficulty);
-
-                if (ruleset.Value is RulesetInfo rulesetInfo)
-                {
-                    double rate = ModUtils.CalculateRateWithMods(mods.Value);
-                    difficulty = rulesetInfo.CreateInstance().GetRateAdjustedDisplayDifficulty(difficulty, rate);
-                }
-
-                return difficulty;
+                return ruleset.Value is RulesetInfo rulesetInfo
+                    ? rulesetInfo.CreateInstance().GetAdjustedDisplayDifficulty(beatmap.Value.BeatmapInfo, mods.Value)
+                    : new BeatmapDifficulty(beatmap.Value.BeatmapInfo.Difficulty);
             }
         }
 

@@ -2,12 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
+using System.Collections.Generic;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Extensions;
 
 namespace osu.Game.Rulesets.Mods
 {
@@ -26,6 +27,8 @@ namespace osu.Game.Rulesets.Mods
         public override double ScoreMultiplier => 0.5;
 
         public override bool RequiresConfiguration => true;
+
+        public override bool ValidForFreestyleAsRequiredMod => true;
 
         public override Type[] IncompatibleMods => new[] { typeof(ModEasy), typeof(ModHardRock) };
 
@@ -65,23 +68,50 @@ namespace osu.Game.Rulesets.Mods
             }
         }
 
-        public override string SettingDescription
+        public override string ExtendedIconInformation
         {
             get
             {
-                string drainRate = DrainRate.IsDefault ? string.Empty : $"HP {DrainRate.Value:N1}";
-                string overallDifficulty = OverallDifficulty.IsDefault ? string.Empty : $"OD {OverallDifficulty.Value:N1}";
+                if (!IsExactlyOneSettingChanged(OverallDifficulty, DrainRate))
+                    return string.Empty;
 
-                return string.Join(", ", new[]
-                {
-                    drainRate,
-                    overallDifficulty
-                }.Where(s => !string.IsNullOrEmpty(s)));
+                if (!OverallDifficulty.IsDefault) return format("OD", OverallDifficulty);
+                if (!DrainRate.IsDefault) return format("HP", DrainRate);
+
+                return string.Empty;
+
+                string format(string acronym, DifficultyBindable bindable) => $"{acronym}{bindable.Value!.Value.ToStandardFormattedString(1)}";
             }
         }
 
-        public void ReadFromDifficulty(IBeatmapDifficultyInfo difficulty)
+        protected bool IsExactlyOneSettingChanged(params DifficultyBindable[] difficultySettings)
         {
+            DifficultyBindable? changedSetting = null;
+
+            foreach (var setting in difficultySettings)
+            {
+                if (setting.IsDefault)
+                    continue;
+
+                if (changedSetting != null)
+                    return false;
+
+                changedSetting = setting;
+            }
+
+            return changedSetting != null;
+        }
+
+        public override IEnumerable<(LocalisableString setting, LocalisableString value)> SettingDescription
+        {
+            get
+            {
+                if (!DrainRate.IsDefault)
+                    yield return ("HP drain", $"{DrainRate.Value:N1}");
+
+                if (!OverallDifficulty.IsDefault)
+                    yield return ("Accuracy", $"{OverallDifficulty.Value:N1}");
+            }
         }
 
         public void ApplyToDifficulty(BeatmapDifficulty difficulty) => ApplySettings(difficulty);

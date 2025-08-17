@@ -180,7 +180,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             Quad scaledQuad = GeometryUtils.GetSurroundingQuad(new OsuHitObject[] { slider });
             (bool xInBounds, bool yInBounds) = isQuadInBounds(scaledQuad);
 
-            if (xInBounds && yInBounds && slider.Path.HasValidLength)
+            if (xInBounds && yInBounds && slider.Path.HasValidLengthForPlacement)
                 return;
 
             for (int i = 0; i < slider.Path.ControlPoints.Count; i++)
@@ -263,12 +263,12 @@ namespace osu.Game.Rulesets.Osu.Edit
                 {
                     case Axes.X:
                         (sLowerBound, sUpperBound) = computeBounds(lowerBounds - b, upperBounds - b, a);
-                        s.X = MathHelper.Clamp(s.X, sLowerBound, sUpperBound);
+                        s.X = Math.Clamp(s.X, sLowerBound, sUpperBound);
                         break;
 
                     case Axes.Y:
                         (sLowerBound, sUpperBound) = computeBounds(lowerBounds - a, upperBounds - a, b);
-                        s.Y = MathHelper.Clamp(s.Y, sLowerBound, sUpperBound);
+                        s.Y = Math.Clamp(s.Y, sLowerBound, sUpperBound);
                         break;
 
                     case Axes.Both:
@@ -276,11 +276,11 @@ namespace osu.Game.Rulesets.Osu.Edit
                         // Therefore the ratio s.X / s.Y will be maintained
                         (sLowerBound, sUpperBound) = computeBounds(lowerBounds, upperBounds, a * s.X + b * s.Y);
                         s.X = s.X < 0
-                            ? MathHelper.Clamp(s.X, s.X * sUpperBound, s.X * sLowerBound)
-                            : MathHelper.Clamp(s.X, s.X * sLowerBound, s.X * sUpperBound);
+                            ? Math.Clamp(s.X, s.X * sUpperBound, s.X * sLowerBound)
+                            : Math.Clamp(s.X, s.X * sLowerBound, s.X * sUpperBound);
                         s.Y = s.Y < 0
-                            ? MathHelper.Clamp(s.Y, s.Y * sUpperBound, s.Y * sLowerBound)
-                            : MathHelper.Clamp(s.Y, s.Y * sLowerBound, s.Y * sUpperBound);
+                            ? Math.Clamp(s.Y, s.Y * sUpperBound, s.Y * sLowerBound)
+                            : Math.Clamp(s.Y, s.Y * sLowerBound, s.Y * sUpperBound);
                         break;
                 }
 
