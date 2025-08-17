@@ -208,7 +208,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             public bool IsSimilarPolarity(Island other)
             {
                 return deltaSimilarity(other.Delta) &&
-                DeltaCount % 2 == other.DeltaCount % 2;
+                       DeltaCount % 2 == other.DeltaCount % 2;
             }
 
             public bool Equals(Island? other)
