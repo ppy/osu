@@ -13,6 +13,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.Formats;
 using osu.Game.Configuration;
 using osu.Game.Extensions;
 using osu.Game.Graphics.Sprites;
@@ -300,6 +301,7 @@ namespace osu.Game.Skinning.Components
         }
 
         private const string mathoperators = "+-*/%";
+        private const string numbers = "1234567890";
 
         private bool anyBracketsContainOperations(string input)
         {
@@ -389,6 +391,9 @@ namespace osu.Game.Skinning.Components
                 //We only check the insides of brackets to not get false positives
                 string bracketInside = input.Substring(openingBracketPos, closingBracketPos - openingBracketPos - 1);
                 i = closingBracketPos;
+
+                if (bracketInside.Contains(' '))
+                    continue;
 
                 for (int j = 0; j < mathoperators.Length; ++j)
                 {
@@ -484,8 +489,6 @@ namespace osu.Game.Skinning.Components
         /// <param name="end">The closing bracket's index (exclusive)</param>
         private void replaceMinus(ref string input, int start, int end)
         {
-            const string numbers = "1234567890";
-
             for (int i = start; i < end; ++i)
             {
                 end = input.IndexOf('}', start);
@@ -513,7 +516,6 @@ namespace osu.Game.Skinning.Components
         /// <param name="end">The closing bracket's index (exclusive)</param>
         private void addImpliedMultiplication(ref string input, int start, int end)
         {
-            const string numbers = "1234567890";
             string insideBracket = input.Substring(start + 1, end - start - 1).Replace(")(", ")*(");
             input = string.Concat(input.Substring(0, start + 1), insideBracket, input.Substring(end, input.Length - end));
 
@@ -649,12 +651,25 @@ namespace osu.Game.Skinning.Components
                 if (isBeatmapAttribute)
                     continue;
 
-                if (!double.TryParse(variableTexts[i], out variableValues[i]))
+                bool canBeParsed = true;
+
+                string noNumbers = variableTexts[i];
+                for (int j = 0; j < numbers.Length; ++j)
+                {
+                    noNumbers = noNumbers.Replace(numbers[j].ToString(), "");
+                }
+                noNumbers = noNumbers.Replace(".", "");
+                if (noNumbers.Length > 0)
+                    canBeParsed = false;
+
+                if (!canBeParsed)
                 {
                     variableValues[i] = double.NaN;
                 }
                 else
                 {
+                    variableValues[i] = Parsing.ParseDouble(variableTexts[i]);
+
                     if (isValueNegative)
                         variableValues[i] *= -1;
                 }
@@ -725,6 +740,9 @@ namespace osu.Game.Skinning.Components
                     return value1 / value2;
 
                 case "%":
+                    if (value2 == 0)
+                        return double.NaN;
+
                     return value1 % value2;
             }
 

@@ -80,7 +80,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         [TestCase("{1%0}", "{1%0}")]
         [TestCase("{(-1)+1*1*1+(-1-1)}", "-2")]
         [TestCase("{4%3}", "1")]
-        [TestCase("{4%1.5}", "{4%1.5}")]
+        [TestCase("{4%1.5}", "1")]
         [TestCase("{-1}", "-1")]
         [TestCase("{(-1)}", "-1")]
         [TestCase("{4(CircleSize)}", "4")]
