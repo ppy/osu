@@ -115,10 +115,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         #region Reduce AR (IApplicableToDifficulty)
 
-        public void ReadFromDifficulty(IBeatmapDifficultyInfo difficulty)
-        {
-        }
-
         public void ApplyToDifficulty(BeatmapDifficulty difficulty)
         {
             // Decrease AR to increase preempt time
@@ -230,7 +226,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                 // If samples aren't available at the exact start time of the object,
                 // use samples (without additions) in the closest original hit object instead
-                obj.Samples = samples ?? getClosestHitObject(originalHitObjects, obj.StartTime).Samples.Where(s => !HitSampleInfo.AllAdditions.Contains(s.Name)).ToList();
+                obj.Samples = samples ?? getClosestHitObject(originalHitObjects, obj.StartTime).Samples.Where(s => !HitSampleInfo.ALL_ADDITIONS.Contains(s.Name)).ToList();
             }
         }
 

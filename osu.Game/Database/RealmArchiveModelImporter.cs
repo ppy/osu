@@ -139,9 +139,14 @@ namespace osu.Game.Database
                             notification.Progress = (float)current / tasks.Length;
                         }
                     }
-                    catch (OperationCanceledException)
+                    catch (OperationCanceledException cancelled)
                     {
-                        throw;
+                        // We don't want to abort the full import process based off difficulty calculator's internal cancellation
+                        // see https://github.com/ppy/osu/blob/91f3be5feaab0c73c17e1a8c270516aa9bee1e14/osu.Game/Rulesets/Difficulty/DifficultyCalculator.cs#L65.
+                        if (cancelled.CancellationToken == notification.CancellationToken)
+                            throw;
+
+                        Logger.Error(cancelled, $@"Timed out importing ({task})", LoggingTarget.Database);
                     }
                     catch (Exception e)
                     {

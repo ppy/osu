@@ -216,6 +216,35 @@ namespace osu.Game.Tests.Scores.IO
         }
 
         [Test]
+        public void TestScoreWithInvalidModCombinationsWillNotImport()
+        {
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
+            {
+                try
+                {
+                    var osu = LoadOsuIntoHost(host, true);
+
+                    var beatmap = BeatmapImportHelper.LoadOszIntoOsu(osu, TestResources.GetQuickTestBeatmapForImport()).GetResultSafely();
+
+                    var toImport = new ScoreInfo
+                    {
+                        User = new APIUser { Username = "Test user" },
+                        BeatmapInfo = beatmap.Beatmaps.First(),
+                        Ruleset = new OsuRuleset().RulesetInfo,
+                        ClientVersion = "12345",
+                        Mods = new Mod[] { new OsuModHalfTime(), new OsuModDoubleTime() },
+                    };
+
+                    Assert.Throws<InvalidOperationException>(() => LoadScoreIntoOsu(osu, toImport));
+                }
+                finally
+                {
+                    host.Exit();
+                }
+            }
+        }
+
+        [Test]
         public void TestImportStatistics()
         {
             using (HeadlessGameHost host = new CleanRunHeadlessGameHost())

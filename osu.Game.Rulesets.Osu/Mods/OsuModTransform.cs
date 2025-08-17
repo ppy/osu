@@ -14,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    internal class OsuModTransform : ModWithVisibilityAdjustment
+    public class OsuModTransform : ModWithVisibilityAdjustment
     {
         public override string Name => "Transform";
         public override string Acronym => "TR";

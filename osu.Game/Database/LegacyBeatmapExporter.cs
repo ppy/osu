@@ -42,7 +42,10 @@ namespace osu.Game.Database
                 return null;
 
             using var contentStreamReader = new LineBufferedReader(contentStream);
-            var beatmapContent = new LegacyBeatmapDecoder().Decode(contentStreamReader);
+
+            // FIRST_LAZER_VERSION is specified here to avoid flooring object coordinates on decode via `(int)` casts.
+            // we will be making integers out of them lower down, but in a slightly different manner (rounding rather than truncating)
+            var beatmapContent = new LegacyBeatmapDecoder(LegacyBeatmapEncoder.FIRST_LAZER_VERSION).Decode(contentStreamReader);
 
             var workingBeatmap = new FlatWorkingBeatmap(beatmapContent);
             var playableBeatmap = workingBeatmap.GetPlayableBeatmap(beatmapInfo.Ruleset);
@@ -58,6 +61,20 @@ namespace osu.Game.Database
                 Configuration = new LegacySkinDecoder().Decode(skinStreamReader)
             };
 
+            MutateBeatmap(model, playableBeatmap);
+
+            // Encode to legacy format
+            var stream = new MemoryStream();
+            using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
+                new LegacyBeatmapEncoder(playableBeatmap, beatmapSkin).Encode(sw);
+
+            stream.Seek(0, SeekOrigin.Begin);
+
+            return stream;
+        }
+
+        protected virtual void MutateBeatmap(BeatmapSetInfo beatmapSet, IBeatmap playableBeatmap)
+        {
             // Convert beatmap elements to be compatible with legacy format
             // So we truncate time and position values to integers, and convert paths with multiple segments to Bézier curves
 
@@ -93,6 +110,12 @@ namespace osu.Game.Database
 
                 hitObject.StartTime = Math.Floor(hitObject.StartTime);
 
+                if (hitObject is IHasXPosition hasXPosition)
+                    hasXPosition.X = MathF.Round(hasXPosition.X);
+
+                if (hitObject is IHasYPosition hasYPosition)
+                    hasYPosition.Y = MathF.Round(hasYPosition.Y);
+
                 if (hitObject is not IHasPath hasPath) continue;
 
                 // stable's hit object parsing expects the entire slider to use only one type of curve,
@@ -111,28 +134,31 @@ namespace osu.Game.Database
                 if (BezierConverter.CountSegments(hasPath.Path.ControlPoints) <= 1
                     && hasPath.Path.ControlPoints[0].Type!.Value.Degree == null) continue;
 
-                var newControlPoints = BezierConverter.ConvertToModernBezier(hasPath.Path.ControlPoints);
-
-                // Truncate control points to integer positions
-                foreach (var pathControlPoint in newControlPoints)
-                {
-                    pathControlPoint.Position = new Vector2(
-                        (float)Math.Floor(pathControlPoint.Position.X),
-                        (float)Math.Floor(pathControlPoint.Position.Y));
-                }
+                var convertedToBezier = BezierConverter.ConvertToModernBezier(hasPath.Path.ControlPoints);
 
                 hasPath.Path.ControlPoints.Clear();
-                hasPath.Path.ControlPoints.AddRange(newControlPoints);
+
+                for (int i = 0; i < convertedToBezier.Count; i++)
+                {
+                    var convertedPoint = convertedToBezier[i];
+
+                    // Truncate control points to integer positions
+                    var position = new Vector2(
+                        (float)Math.Floor(convertedPoint.Position.X),
+                        (float)Math.Floor(convertedPoint.Position.Y));
+
+                    // stable only supports a single curve type specification per slider.
+                    // we exploit the fact that the converted-to-Bézier path only has Bézier segments,
+                    // and thus we specify the Bézier curve type once ever at the start of the slider.
+                    hasPath.Path.ControlPoints.Add(new PathControlPoint(position, i == 0 ? PathType.BEZIER : null));
+
+                    // however, the Bézier path as output by the converter has multiple segments.
+                    // `LegacyBeatmapEncoder` will attempt to encode this by emitting per-control-point curve type specs which don't do anything for stable.
+                    // instead, stable expects control points that start a segment to be present in the path twice in succession.
+                    if (convertedPoint.Type == PathType.BEZIER && i > 0)
+                        hasPath.Path.ControlPoints.Add(new PathControlPoint(position));
+                }
             }
-
-            // Encode to legacy format
-            var stream = new MemoryStream();
-            using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
-                new LegacyBeatmapEncoder(playableBeatmap, beatmapSkin).Encode(sw);
-
-            stream.Seek(0, SeekOrigin.Begin);
-
-            return stream;
         }
 
         protected override string FileExtension => @".osz";
