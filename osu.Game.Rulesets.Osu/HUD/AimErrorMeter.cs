@@ -62,7 +62,7 @@ namespace osu.Game.Rulesets.Osu.HUD
 
         private Container averagePositionMarker = null!;
         private Container averagePositionMarkerRotationContainer = null!;
-        private Vector2 averagePosition;
+        private Vector2? averagePosition;
 
         private readonly DrawablePool<HitPositionMarker> hitPositionPool = new DrawablePool<HitPositionMarker>(30);
         private Container hitPositionMarkerContainer = null!;
@@ -347,7 +347,9 @@ namespace osu.Game.Rulesets.Osu.HUD
                 hitPositionMarkerContainer.Add(drawableHit);
             });
 
-            averagePositionMarker.MoveTo(averagePosition = (hitPosition + averagePosition) / 2, 800, Easing.OutQuint);
+            var newAveragePosition = (hitPosition + (averagePosition ?? hitPosition)) / 2;
+            averagePositionMarker.MoveTo(newAveragePosition, 800, Easing.OutQuint);
+            averagePosition = newAveragePosition;
             lastObjectPosition = ((OsuHitObject)circleJudgement.HitObject).StackedPosition;
         }
 
@@ -369,7 +371,8 @@ namespace osu.Game.Rulesets.Osu.HUD
 
         public override void Clear()
         {
-            averagePositionMarker.MoveTo(averagePosition = Vector2.Zero, 800, Easing.OutQuint);
+            averagePosition = null;
+            averagePositionMarker.MoveTo(Vector2.Zero, 800, Easing.OutQuint);
             lastObjectPosition = null;
 
             foreach (var h in hitPositionMarkerContainer)
