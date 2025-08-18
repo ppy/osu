@@ -1,7 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
@@ -305,7 +307,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
         public void TestCriteriaMatchingUserTags(string query, bool filtered)
         {
             var beatmap = getExampleBeatmap();
-            var criteria = new FilterCriteria { UserTag = { SearchTerm = query } };
+            var criteria = new FilterCriteria { UserTags = [new FilterCriteria.OptionalTextFilter { SearchTerm = query }] };
             var carouselItem = new CarouselBeatmap(beatmap);
             carouselItem.Filter(criteria);
 
@@ -313,10 +315,46 @@ namespace osu.Game.Tests.NonVisual.Filtering
         }
 
         [Test]
+        public void TestCriteriaMatchingMultipleTagsAtOnce()
+        {
+            var beatmap = getExampleBeatmap();
+            var criteria = new FilterCriteria
+            {
+                UserTags =
+                [
+                    new FilterCriteria.OptionalTextFilter { SearchTerm = "\"song representation/simple\"!" },
+                    new FilterCriteria.OptionalTextFilter { SearchTerm = "\"style/clean\"!" }
+                ]
+            };
+            var carouselItem = new CarouselBeatmap(beatmap);
+            carouselItem.Filter(criteria);
+
+            Assert.AreEqual(false, carouselItem.Filtered.Value);
+        }
+
+        [Test]
+        public void TestCriteriaAllTagFiltersMustMatch()
+        {
+            var beatmap = getExampleBeatmap();
+            var criteria = new FilterCriteria
+            {
+                UserTags =
+                [
+                    new FilterCriteria.OptionalTextFilter { SearchTerm = "\"song representation/simple\"!" },
+                    new FilterCriteria.OptionalTextFilter { SearchTerm = "\"style/dirty\"!" }
+                ]
+            };
+            var carouselItem = new CarouselBeatmap(beatmap);
+            carouselItem.Filter(criteria);
+
+            Assert.AreEqual(true, carouselItem.Filtered.Value);
+        }
+
+        [Test]
         public void TestBeatmapMustHaveAtLeastOneTagIfUserTagFilterActive()
         {
             var beatmap = getExampleBeatmap();
-            var criteria = new FilterCriteria { UserTag = { SearchTerm = "simple" } };
+            var criteria = new FilterCriteria { UserTags = [new FilterCriteria.OptionalTextFilter { SearchTerm = "simple" }] };
             var carouselItem = new CarouselBeatmap(beatmap);
             carouselItem.BeatmapInfo.Metadata.UserTags.Clear();
             carouselItem.Filter(criteria);
@@ -335,6 +373,167 @@ namespace osu.Game.Tests.NonVisual.Filtering
             carouselItem.Filter(criteria);
 
             Assert.AreEqual(matchCustomCriteria == false, carouselItem.Filtered.Value);
+        }
+
+        [TestCase("title!=Title", new[] { 2, 4, 6 })]
+        [TestCase("title!=\"Title1\"", new[] { 2, 3, 4, 5, 6 })]
+        [TestCase("title!=\"Title1\"!", new[] { 2, 3, 4, 5, 6 })]
+        public void TestNotEqualSearchForTextFilters(string query, int[] expectedBeatmapIndexes)
+        {
+            string[] titles =
+            [
+                "Title1",
+                "Title1",
+                "My[Favourite]Song",
+                "Title",
+                "Another One",
+                "Diff in title",
+                "a",
+            ];
+
+            var carouselBeatmaps = titles.Select(title => new CarouselBeatmap(new BeatmapInfo
+            {
+                Metadata = new BeatmapMetadata
+                {
+                    Title = title,
+                },
+            })).ToList();
+
+            var criteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(criteria, query);
+            carouselBeatmaps.ForEach(b => b.Filter(criteria));
+
+            int[] visibleBeatmaps = carouselBeatmaps
+                                    .Where(b => !b.Filtered.Value)
+                                    .Select(b => carouselBeatmaps.IndexOf(b)).ToArray();
+            Assert.That(visibleBeatmaps, Is.EqualTo(expectedBeatmapIndexes));
+        }
+
+        [Test]
+        public void TestNotEqualSearchForNumberFilters()
+        {
+            double[] starRatings =
+            [
+                2.78,
+                1.78,
+                1.55,
+                3.78,
+                1.78,
+                1.55,
+                2.78
+            ];
+
+            var carouselBeatmaps = starRatings.Select(starRating => new CarouselBeatmap(new BeatmapInfo
+            {
+                StarRating = starRating,
+            })).ToList();
+
+            var criteria = new FilterCriteria();
+
+            FilterQueryParser.ApplyQueries(criteria, "star!=1.78");
+            carouselBeatmaps.ForEach(b => b.Filter(criteria));
+
+            int[] visibleBeatmaps = carouselBeatmaps
+                                    .Where(b => !b.Filtered.Value)
+                                    .Select(b => carouselBeatmaps.IndexOf(b)).ToArray();
+
+            Assert.That(visibleBeatmaps, Is.EqualTo(new[] { 0, 2, 3, 5, 6 }));
+        }
+
+        [TestCase("status!=ranked", new[] { 1, 2, 4, 5 })]
+        [TestCase("status!=r", new[] { 1, 2, 4, 5 })]
+        [TestCase("status!=loved", new[] { 0, 1, 2, 3, 4, 6 })]
+        [TestCase("status!=l", new[] { 0, 1, 2, 3, 4, 6 })]
+        [TestCase("status!=r,l", new[] { 1, 2, 4 })]
+        public void TestNotEqualSearchForEnumFilter(string query, int[] expectedBeatmapIndexes)
+        {
+            var carouselBeatmaps = new[]
+            {
+                BeatmapOnlineStatus.Ranked,
+                BeatmapOnlineStatus.Qualified,
+                BeatmapOnlineStatus.Approved,
+                BeatmapOnlineStatus.Ranked,
+                BeatmapOnlineStatus.Approved,
+                BeatmapOnlineStatus.Loved,
+                BeatmapOnlineStatus.Ranked
+            }.Select(info => new CarouselBeatmap(new BeatmapInfo
+            {
+                Status = info
+            })).ToList();
+
+            var criteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(criteria, query);
+            carouselBeatmaps.ForEach(b => b.Filter(criteria));
+
+            int[] visibleBeatmaps = carouselBeatmaps
+                                    .Where(b => !b.Filtered.Value)
+                                    .Select(b => carouselBeatmaps.IndexOf(b)).ToArray();
+
+            Assert.That(visibleBeatmaps, Is.EqualTo(expectedBeatmapIndexes));
+        }
+
+        [TestCase("played!=1", new[] { 1, 4, 5 })]
+        [TestCase("played!=0", new[] { 0, 2, 3, 6, 7 })]
+        public void TestNotEqualSearchForBooleanFilter(string query, int[] expectedBeatmapIndexes)
+        {
+            var carouselBeatmaps = (new DateTimeOffset?[]
+            {
+                new DateTimeOffset(2012, 10, 21, 12, 13, 24, TimeSpan.Zero),
+                null,
+                new DateTimeOffset(2012, 11, 12, 23, 10, 13, TimeSpan.Zero),
+                new DateTimeOffset(2013, 2, 13, 11, 43, 23, TimeSpan.Zero),
+                null,
+                null,
+                new DateTimeOffset(2014, 1, 15, 20, 13, 24, TimeSpan.Zero),
+                new DateTimeOffset(2014, 11, 16, 0, 13, 23, TimeSpan.Zero),
+            }).Select(lastPlayed => new CarouselBeatmap(new BeatmapInfo
+            {
+                LastPlayed = lastPlayed
+            })).ToList();
+
+            var criteria = new FilterCriteria();
+
+            FilterQueryParser.ApplyQueries(criteria, query);
+            carouselBeatmaps.ForEach(b => b.Filter(criteria));
+
+            int[] visibleBeatmaps = carouselBeatmaps
+                                    .Where(b => !b.Filtered.Value)
+                                    .Select(b => carouselBeatmaps.IndexOf(b)).ToArray();
+
+            Assert.That(visibleBeatmaps, Is.EqualTo(expectedBeatmapIndexes));
+        }
+
+        [TestCase("ranked!=2012", new[] { 3, 4, 5, 6, 7 })]
+        [TestCase("ranked!=2012.11", new[] { 0, 1, 3, 4, 5, 6, 7 })]
+        [TestCase("ranked!=2012.10.21", new[] { 1, 2, 3, 4, 5, 6, 7 })]
+        public void TestNotEqualSearchForDateFilter(string query, int[] expectedBeatmapIndexes)
+        {
+            var carouselBeatmaps = new[]
+            {
+                new DateTimeOffset(2012, 10, 21, 13, 42, 13, TimeSpan.Zero),
+                new DateTimeOffset(2012, 10, 11, 2, 33, 43, TimeSpan.Zero),
+                new DateTimeOffset(2012, 11, 12, 10, 22, 32, TimeSpan.Zero),
+                new DateTimeOffset(2013, 2, 13, 5, 19, 0, TimeSpan.Zero),
+                new DateTimeOffset(2013, 2, 13, 11, 23, 35, TimeSpan.Zero),
+                new DateTimeOffset(2013, 3, 14, 9, 9, 1, TimeSpan.Zero),
+                new DateTimeOffset(2014, 1, 15, 10, 5, 0, TimeSpan.Zero),
+                new DateTimeOffset(2014, 11, 16, 23, 27, 0, TimeSpan.Zero),
+            }.Select(dateRanked => new CarouselBeatmap(new BeatmapInfo
+            {
+                BeatmapSet = new BeatmapSetInfo
+                {
+                    DateRanked = dateRanked,
+                }
+            })).ToList();
+            var criteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(criteria, query);
+            carouselBeatmaps.ForEach(b => b.Filter(criteria));
+
+            int[] visibleBeatmaps = carouselBeatmaps
+                                    .Where(b => !b.Filtered.Value)
+                                    .Select(b => carouselBeatmaps.IndexOf(b)).ToArray();
+
+            Assert.That(visibleBeatmaps, Is.EqualTo(expectedBeatmapIndexes));
         }
 
         private class CustomCriteria : IRulesetFilterCriteria

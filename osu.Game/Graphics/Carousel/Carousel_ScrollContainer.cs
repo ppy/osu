@@ -120,9 +120,12 @@ namespace osu.Game.Graphics.Carousel
 
             #region Absolute scrolling
 
-            private bool absoluteScrolling;
+            /// <summary>
+            /// Whether absolute scrolling is currently triggered.
+            /// </summary>
+            public bool AbsoluteScrolling { get; private set; }
 
-            protected override bool IsDragging => base.IsDragging || absoluteScrolling;
+            protected override bool IsDragging => base.IsDragging || AbsoluteScrolling;
 
             public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
             {
@@ -169,7 +172,7 @@ namespace osu.Game.Graphics.Carousel
 
             protected override bool OnMouseMove(MouseMoveEvent e)
             {
-                if (absoluteScrolling)
+                if (AbsoluteScrolling)
                 {
                     ScrollToAbsolutePosition(e.CurrentState.Mouse.Position);
                     return true;
@@ -181,10 +184,10 @@ namespace osu.Game.Graphics.Carousel
             private void beginAbsoluteScrolling(UIEvent e)
             {
                 ScrollToAbsolutePosition(e.CurrentState.Mouse.Position);
-                absoluteScrolling = true;
+                AbsoluteScrolling = true;
             }
 
-            private void endAbsoluteScrolling() => absoluteScrolling = false;
+            private void endAbsoluteScrolling() => AbsoluteScrolling = false;
 
             #endregion
 

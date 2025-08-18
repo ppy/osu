@@ -246,27 +246,26 @@ namespace osu.Game.Screens.Play
             return paused;
         }
 
-        protected override void OnFail()
+        protected override void ConcludeFailedScore(Score score)
         {
-            base.OnFail();
-
-            submitFromFailOrQuit();
+            base.ConcludeFailedScore(score);
+            submitFromFailOrQuit(score);
         }
 
         public override bool OnExiting(ScreenExitEvent e)
         {
             bool exiting = base.OnExiting(e);
-            submitFromFailOrQuit();
+            submitFromFailOrQuit(Score);
             statics.SetValue(Static.LastLocalUserScore, Score?.ScoreInfo.DeepClone());
             return exiting;
         }
 
-        private void submitFromFailOrQuit()
+        private void submitFromFailOrQuit(Score score)
         {
             if (LoadedBeatmapSuccessfully)
             {
                 // compare: https://github.com/ppy/osu/blob/ccf1acce56798497edfaf92d3ece933469edcf0a/osu.Game/Screens/Play/Player.cs#L848-L851
-                var scoreCopy = Score.DeepClone();
+                var scoreCopy = score.DeepClone();
 
                 Task.Run(async () =>
                 {

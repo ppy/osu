@@ -409,8 +409,8 @@ namespace osu.Game.Online.API
             SecondFactorCode = code;
         }
 
-        public IHubClientConnector GetHubConnector(string clientName, string endpoint, bool preferMessagePack) =>
-            new HubClientConnector(clientName, endpoint, this, versionHash, preferMessagePack);
+        public IHubClientConnector GetHubConnector(string clientName, string endpoint) =>
+            new HubClientConnector(clientName, endpoint, this, versionHash);
 
         public IChatClient GetChatClient() => new WebSocketChatClient(this);
 

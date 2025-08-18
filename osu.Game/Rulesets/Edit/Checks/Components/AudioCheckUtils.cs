@@ -46,13 +46,13 @@ namespace osu.Game.Rulesets.Edit.Checks.Components
         /// <returns>The ChannelType of the audio file, or <see cref="ChannelType.Unknown"/> if detection fails.</returns>
         public static ChannelType GetAudioFormatFromFile(BeatmapVerifierContext context, string filename)
         {
-            var beatmapSet = context.Beatmap.BeatmapInfo.BeatmapSet;
+            var beatmapSet = context.CurrentDifficulty.Playable.BeatmapInfo.BeatmapSet;
             var audioFile = beatmapSet?.GetFile(filename);
 
             if (beatmapSet == null || audioFile == null)
                 return ChannelType.Unknown;
 
-            using (Stream data = context.WorkingBeatmap.GetStream(audioFile.File.GetStoragePath()))
+            using (Stream data = context.CurrentDifficulty.Working.GetStream(audioFile.File.GetStoragePath()))
                 return GetAudioFormat(data);
         }
     }

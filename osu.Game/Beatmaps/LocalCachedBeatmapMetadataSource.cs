@@ -192,6 +192,13 @@ namespace osu.Game.Beatmaps
             {
                 try
                 {
+                    // `SqliteConnection` by default uses pooling.
+                    // disposing an `SqliteConnection` is not enough to get `Microsoft.Data.Sqlite` to close the database file.
+                    // this means that overwriting the file may fail if the pools are not cleared before trying.
+                    // this fails especially loudly on Windows because of Windows file delete semantics being exclusive-write
+                    // rather than Unix's "file is marked for deletion after last reader closes the fd".
+                    SqliteConnection.ClearAllPools();
+
                     using (var stream = File.OpenRead(cacheDownloadRequest.Filename))
                     using (var outStream = File.OpenWrite(cacheFilePath))
                     {
@@ -231,12 +238,20 @@ namespace osu.Game.Beatmaps
             });
         }
 
-        public int GetCacheVersion()
+        public bool IsAtLeastVersion(int version)
         {
-            using (var connection = getConnection())
+            try
             {
-                connection.Open();
-                return getCacheVersion(connection);
+                using (var connection = getConnection())
+                {
+                    connection.Open();
+                    return getCacheVersion(connection) >= version;
+                }
+            }
+            catch (SqliteException ex) when (ex.SqliteErrorCode == 26 || ex.SqliteErrorCode == 11) // SQLITE_NOTADB, SQLITE_CORRUPT
+            {
+                // if the database is corrupted then return `false` as the consumer may want to just refetch the db themselves
+                return false;
             }
         }
 

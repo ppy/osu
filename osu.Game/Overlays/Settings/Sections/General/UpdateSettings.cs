@@ -12,6 +12,7 @@ using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Statistics;
 using osu.Game.Configuration;
+using osu.Game.IO;
 using osu.Game.Localisation;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays.Dialog;
@@ -39,20 +40,20 @@ namespace osu.Game.Overlays.Settings.Sections.General
         private INotificationOverlay? notifications { get; set; }
 
         [Resolved]
-        private Storage storage { get; set; } = null!;
-
-        [Resolved]
         private OsuGame? game { get; set; }
 
         [Resolved]
         private IDialogOverlay? dialogOverlay { get; set; }
 
+        private Storage exportStorage = null!;
+
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(OsuConfigManager config, Storage storage)
         {
             config.BindWith(OsuSetting.ReleaseStream, configReleaseStream);
 
             bool isDesktop = RuntimeInfo.IsDesktop;
+            bool supportsExport = RuntimeInfo.OS != RuntimeInfo.Platform.Android;
             bool canCheckUpdates = updateManager?.CanCheckForUpdate == true;
 
             if (canCheckUpdates)
@@ -95,20 +96,28 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     Keywords = new[] { @"logs", @"files", @"access", "directory" },
                     Action = () => storage.PresentExternally(),
                 });
+            }
 
+            if (supportsExport)
+            {
                 Add(new SettingsButton
                 {
                     Text = GeneralSettingsStrings.ExportLogs,
                     Keywords = new[] { @"bug", "report", "logs", "files" },
                     Action = () => Task.Run(exportLogs),
                 });
+            }
 
+            if (isDesktop)
+            {
                 Add(new SettingsButton
                 {
                     Text = GeneralSettingsStrings.ChangeFolderLocation,
                     Action = () => game?.PerformFromScreen(menu => menu.Push(new MigrationSelectScreen()))
                 });
             }
+
+            exportStorage = (storage as OsuStorage)?.GetExportStorage() ?? storage.GetStorageForDirectory(@"exports");
         }
 
         private void releaseStreamChanged(ValueChangedEvent<ReleaseStream> stream)
@@ -178,7 +187,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
 
             notifications?.Post(notification);
 
-            const string archive_filename = "exports/compressed-logs.zip";
+            const string archive_filename = "compressed-logs.zip";
 
             try
             {
@@ -187,7 +196,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
 
                 var logStorage = Logger.Storage;
 
-                using (var outStream = storage.CreateFileSafely(archive_filename))
+                using (var outStream = exportStorage.CreateFileSafely(archive_filename))
                 using (var zip = ZipArchive.Create())
                 {
                     foreach (string? f in logStorage.GetFiles(string.Empty, "*.log"))
@@ -201,12 +210,12 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 notification.State = ProgressNotificationState.Cancelled;
 
                 // cleanup if export is failed or canceled.
-                storage.Delete(archive_filename);
+                exportStorage.Delete(archive_filename);
                 throw;
             }
 
             notification.CompletionText = "Exported logs! Click to view.";
-            notification.CompletionClickAction = () => storage.PresentFileExternally(archive_filename);
+            notification.CompletionClickAction = () => exportStorage.PresentFileExternally(archive_filename);
 
             notification.State = ProgressNotificationState.Completed;
         }

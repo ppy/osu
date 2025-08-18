@@ -72,11 +72,15 @@ namespace osu.Game.Database
         [Resolved]
         private OsuConfigManager config { get; set; } = null!;
 
+        private LocalCachedBeatmapMetadataSource localMetadataSource = null!;
+
         protected virtual int TimeToSleepDuringGameplay => 30000;
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            localMetadataSource = new LocalCachedBeatmapMetadataSource(storage);
 
             ProcessingTask = Task.Factory.StartNew(() =>
             {
@@ -532,8 +536,6 @@ namespace osu.Game.Database
 
         private void backpopulateMissingSubmissionAndRankDates()
         {
-            var localMetadataSource = new LocalCachedBeatmapMetadataSource(storage);
-
             if (!localMetadataSource.Available)
             {
                 Logger.Log("Cannot backpopulate missing submission/rank dates because the local metadata cache is missing.");
@@ -542,7 +544,7 @@ namespace osu.Game.Database
 
             try
             {
-                if (localMetadataSource.GetCacheVersion() < 2)
+                if (!localMetadataSource.IsAtLeastVersion(2))
                 {
                     Logger.Log("Cannot backpopulate missing submission/rank dates because the local metadata cache is too old.");
                     return;
@@ -630,14 +632,12 @@ namespace osu.Game.Database
 
         private void backpopulateUserTags()
         {
-            var localMetadataSource = new LocalCachedBeatmapMetadataSource(storage);
-
-            if (!localMetadataSource.Available || localMetadataSource.GetCacheVersion() < 3)
+            if (!localMetadataSource.Available || !localMetadataSource.IsAtLeastVersion(3))
             {
                 Logger.Log(@"Local metadata cache has too low version to backpopulate user tags, attempting refetch...");
                 localMetadataSource.FetchCache().WaitSafely();
 
-                if (!localMetadataSource.Available || localMetadataSource.GetCacheVersion() < 3)
+                if (!localMetadataSource.Available || !localMetadataSource.IsAtLeastVersion(3))
                 {
                     Logger.Log(@"Local metadata cache refetch failed. Aborting user tags backpopulation.");
                     return;
@@ -700,9 +700,17 @@ namespace osu.Game.Database
                         if (lookupSucceeded)
                         {
                             Debug.Assert(result != null);
-                            beatmap.Metadata.UserTags.Clear();
-                            beatmap.Metadata.UserTags.AddRange(result.UserTags);
-                            return beatmap.Metadata.UserTags.Any();
+
+                            var userTags = result.UserTags.ToHashSet();
+
+                            if (!userTags.SetEquals(beatmap.Metadata.UserTags))
+                            {
+                                beatmap.Metadata.UserTags.Clear();
+                                beatmap.Metadata.UserTags.AddRange(userTags);
+                                return true;
+                            }
+
+                            return false;
                         }
 
                         Logger.Log(@$"Could not find {beatmap.GetDisplayString()} in local cache while backpopulating missing user tags");

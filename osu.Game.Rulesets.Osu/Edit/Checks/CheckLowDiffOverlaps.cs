@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Checks
             if (context.InterpretedDifficulty > DifficultyRating.Easy)
                 yield break;
 
-            var hitObjects = context.Beatmap.HitObjects;
+            var hitObjects = context.CurrentDifficulty.Playable.HitObjects;
 
             for (int i = 0; i < hitObjects.Count - 1; ++i)
             {
