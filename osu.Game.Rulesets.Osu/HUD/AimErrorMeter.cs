@@ -342,7 +342,7 @@ namespace osu.Game.Rulesets.Osu.HUD
                 hitPositionMarkerContainer.Add(drawableHit);
             });
 
-            var newAveragePosition = (hitPosition + (averagePosition ?? hitPosition)) / 2;
+            var newAveragePosition = 0.1f * hitPosition + 0.9f * (averagePosition ?? hitPosition);
             averagePositionMarker.MoveTo(newAveragePosition, 800, Easing.OutQuint);
             averagePosition = newAveragePosition;
             lastObjectPosition = ((OsuHitObject)circleJudgement.HitObject).StackedPosition;
@@ -434,7 +434,7 @@ namespace osu.Game.Rulesets.Osu.HUD
                 MarkerSize.BindTo(aimErrorMeter.HitMarkerSize);
                 MarkerSize.BindValueChanged(size => Size = new Vector2(size.NewValue), true);
                 Style.BindTo(aimErrorMeter.HitMarkerStyle);
-                Style.BindValueChanged(style => content.Rotation = style.NewValue == AimErrorMeter.MarkerStyle.X ? 0 : 45, true);
+                Style.BindValueChanged(style => content.Rotation = style.NewValue == MarkerStyle.X ? 0 : 45, true);
             }
 
             protected override void PrepareForUse()
