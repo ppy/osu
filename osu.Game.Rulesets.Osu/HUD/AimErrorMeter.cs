@@ -285,7 +285,6 @@ namespace osu.Game.Rulesets.Osu.HUD
 
             PositionDisplayStyle.BindValueChanged(s =>
             {
-                // reset hit position to let it re-stat in the new mode
                 Clear();
 
                 if (s.NewValue == PositionDisplay.Normalised)
@@ -297,8 +296,7 @@ namespace osu.Game.Rulesets.Osu.HUD
                 else
                 {
                     arrowBackgroundContainer.FadeOut(100);
-                    // consider that component rotate is meaningless and will cause confusing in absolute mode.
-                    // so let component in rotate fixed when in absolute mapping mode.
+                    // when in absolute mode, rotation of the aim error meter as a whole should not affect how the component is displayed
                     RemoveInternal(mainContainer, false);
                     rotateFixedContainer.Add(mainContainer);
                 }
@@ -325,7 +323,6 @@ namespace osu.Game.Rulesets.Osu.HUD
                 }
             }
 
-            // the Vector2 for component is X (-0.5, 0.5), Y (-0.5, 0.5)
             Vector2 hitPosition;
 
             if (PositionDisplayStyle.Value == PositionDisplay.Normalised && lastObjectPosition != null)
