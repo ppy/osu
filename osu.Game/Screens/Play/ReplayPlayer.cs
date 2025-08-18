@@ -197,8 +197,7 @@ namespace osu.Game.Screens.Play
 
         public override void OnSuspending(ScreenTransitionEvent e)
         {
-            // safety against filters or samples from the indicator playing long after the screen is exited
-            failIndicator.RemoveAndDisposeImmediately();
+            stopAllAudioEffects();
             base.OnSuspending(e);
         }
 
@@ -207,6 +206,18 @@ namespace osu.Game.Screens.Play
             // safety against filters or samples from the indicator playing long after the screen is exited
             failIndicator.RemoveAndDisposeImmediately();
             return base.OnExiting(e);
+        }
+
+        private void stopAllAudioEffects()
+        {
+            // safety against filters or samples from the indicator playing long after the screen is exited
+            failIndicator.RemoveAndDisposeImmediately();
+
+            if (GameplayClockContainer is MasterGameplayClockContainer master)
+            {
+                playbackSettings.UserPlaybackRate.UnbindFrom(master.UserPlaybackRate);
+                master.UserPlaybackRate.SetDefault();
+            }
         }
     }
 }
