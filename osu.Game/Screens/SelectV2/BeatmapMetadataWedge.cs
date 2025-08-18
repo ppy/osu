@@ -440,6 +440,7 @@ namespace osu.Game.Screens.SelectV2
             string[] tags = realm.Run(r =>
             {
                 // need to refetch because `beatmap.Value.BeatmapInfo` is not going to have the latest tags
+                r.Refresh();
                 var refetchedBeatmap = r.Find<BeatmapInfo>(beatmap.Value.BeatmapInfo.ID);
                 return refetchedBeatmap?.Metadata.UserTags.ToArray() ?? [];
             });
