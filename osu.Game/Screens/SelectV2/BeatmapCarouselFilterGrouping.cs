@@ -10,6 +10,7 @@ using osu.Framework.Extensions;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Graphics.Carousel;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Scoring;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
@@ -42,12 +43,14 @@ namespace osu.Game.Screens.SelectV2
         private readonly Func<FilterCriteria> getCriteria;
         private readonly Func<List<BeatmapCollection>> getCollections;
         private readonly Func<FilterCriteria, IReadOnlyDictionary<Guid, ScoreRank>> getLocalUserTopRanks;
+        private readonly Func<IReadOnlyList<APIBeatmapSet>> getFavourites;
 
-        public BeatmapCarouselFilterGrouping(Func<FilterCriteria> getCriteria, Func<List<BeatmapCollection>> getCollections, Func<FilterCriteria, IReadOnlyDictionary<Guid, ScoreRank>> getLocalUserTopRanks)
+        public BeatmapCarouselFilterGrouping(Func<FilterCriteria> getCriteria, Func<List<BeatmapCollection>> getCollections, Func<FilterCriteria, IReadOnlyDictionary<Guid, ScoreRank>> getLocalUserTopRanks, Func<IReadOnlyList<APIBeatmapSet>> getFavourites)
         {
             this.getCriteria = getCriteria;
             this.getCollections = getCollections;
             this.getLocalUserTopRanks = getLocalUserTopRanks;
+            this.getFavourites = getFavourites;
         }
 
         public async Task<List<CarouselItem>> Run(IEnumerable<CarouselItem> items, CancellationToken cancellationToken)
@@ -244,9 +247,8 @@ namespace osu.Game.Screens.SelectV2
                     return getGroupsBy(b => defineGroupByRankAchieved(b, topRankMapping), items);
                 }
 
-                // TODO: need implementation
-                // case GroupMode.Favourites:
-                //     goto case GroupMode.None;
+                case GroupMode.Favourites:
+                    return getGroupsBy(b => defineGroupByFavourites(b, getFavourites()), items);
 
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -431,6 +433,15 @@ namespace osu.Game.Screens.SelectV2
                 return new GroupDefinition(-(int)rank, rank.GetDescription());
 
             return new GroupDefinition(int.MaxValue, "Unplayed");
+        }
+
+        private GroupDefinition? defineGroupByFavourites(BeatmapInfo beatmap, IReadOnlyList<APIBeatmapSet> favourites)
+        {
+            if (favourites.Any(s => s.OnlineID == beatmap.BeatmapSet!.OnlineID))
+                return new GroupDefinition(0, "My favourites");
+
+            // discard beatmaps not favourited by the user.
+            return null;
         }
 
         private static T? aggregateMax<T>(BeatmapInfo b, Func<BeatmapInfo, T> func)
