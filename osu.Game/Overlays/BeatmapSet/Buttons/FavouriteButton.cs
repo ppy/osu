@@ -13,7 +13,6 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Overlays.Notifications;
 using osu.Game.Resources.Localisation.Web;
 using osuTK;
 using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
@@ -68,7 +67,10 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
 
                 request?.Cancel();
 
-                request = new PostBeatmapFavouriteRequest(BeatmapSet.Value.OnlineID, favourited.Value ? BeatmapFavouriteAction.UnFavourite : BeatmapFavouriteAction.Favourite);
+                if (!favourited.Value)
+                    request = api.AddToFavourites(BeatmapSet.Value);
+                else
+                    request = api.RemoveFromFavourites(BeatmapSet.Value);
 
                 request.Success += () =>
                 {
@@ -76,16 +78,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                     loading.Hide();
                 };
 
-                request.Failure += e =>
-                {
-                    notifications?.Post(new SimpleNotification
-                    {
-                        Text = e.Message,
-                        Icon = FontAwesome.Solid.Times,
-                    });
-
-                    loading.Hide();
-                };
+                request.Failure += _ => loading.Hide();
 
                 api.Queue(request);
             };

@@ -27,6 +27,7 @@ namespace osu.Game.Screens.Ranking
         private LoadingLayer loading = null!;
 
         private readonly IBindable<APIUser> localUser = new Bindable<APIUser>();
+        private readonly IBindableList<APIBeatmapSet> beatmapFavourites = new BindableList<APIBeatmapSet>();
 
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
@@ -59,6 +60,9 @@ namespace osu.Game.Screens.Ranking
 
             localUser.BindTo(api.LocalUser);
             localUser.BindValueChanged(_ => updateUser(), true);
+
+            beatmapFavourites.BindTo(api.BeatmapFavourites);
+            beatmapFavourites.BindCollectionChanged((_, _) => updateFavouriteStatus(), true);
         }
 
         private void getBeatmapSet()
@@ -69,7 +73,7 @@ namespace osu.Game.Screens.Ranking
             beatmapSetRequest.Success += beatmapSet =>
             {
                 this.beatmapSet = beatmapSet;
-                current.Value = new BeatmapSetFavouriteState(this.beatmapSet.HasFavourited, this.beatmapSet.FavouriteCount);
+                updateFavouriteStatus();
 
                 loading.Hide();
                 Enabled.Value = true;
@@ -99,21 +103,20 @@ namespace osu.Game.Screens.Ranking
             var actionType = current.Value.Favourited ? BeatmapFavouriteAction.UnFavourite : BeatmapFavouriteAction.Favourite;
 
             favouriteRequest?.Cancel();
-            favouriteRequest = new PostBeatmapFavouriteRequest(beatmapSet.OnlineID, actionType);
+
+            if (actionType == BeatmapFavouriteAction.Favourite)
+                favouriteRequest = api.AddToFavourites(beatmapSet);
+            else
+                favouriteRequest = api.RemoveFromFavourites(beatmapSet);
 
             favouriteRequest.Success += () =>
             {
-                bool favourited = actionType == BeatmapFavouriteAction.Favourite;
-
-                current.Value = new BeatmapSetFavouriteState(favourited, current.Value.FavouriteCount + (favourited ? 1 : -1));
-
                 Enabled.Value = true;
                 loading.Hide();
             };
-            favouriteRequest.Failure += e =>
-            {
-                Logger.Error(e, $"Failed to {actionType.ToString().ToLowerInvariant()} beatmap: {e.Message}");
 
+            favouriteRequest.Failure += _ =>
+            {
                 Schedule(() =>
                 {
                     Enabled.Value = true;
@@ -124,6 +127,14 @@ namespace osu.Game.Screens.Ranking
             api.Queue(favouriteRequest);
         }
 
+        private void updateFavouriteStatus()
+        {
+            if (!api.IsLoggedIn || beatmapSet == null)
+                current.Value = new BeatmapSetFavouriteState(false, 0);
+            else
+                current.Value = api.GetFavouriteState(beatmapSet);
+        }
+
         private void updateUser()
         {
             if (!(localUser.Value is GuestUser) && BeatmapSetInfo.OnlineID > 0)
@@ -131,7 +142,7 @@ namespace osu.Game.Screens.Ranking
             else
             {
                 Enabled.Value = false;
-                current.Value = new BeatmapSetFavouriteState(false, 0);
+                updateFavouriteStatus();
                 updateState();
                 TooltipText = BeatmapsetsStrings.ShowDetailsFavouriteLogin;
             }

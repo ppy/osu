@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Game.Beatmaps.Drawables.Cards;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -21,7 +22,6 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
-using osu.Game.Overlays.Notifications;
 using osu.Game.Resources.Localisation.Web;
 using osuTK;
 using osuTK.Graphics;
@@ -52,8 +52,7 @@ namespace osu.Game.Screens.SelectV2
             [Resolved]
             private IAPIProvider api { get; set; } = null!;
 
-            [Resolved]
-            private INotificationOverlay? notifications { get; set; }
+            private readonly IBindableList<APIBeatmapSet> beatmapFavourites = new BindableList<APIBeatmapSet>();
 
             internal LocalisableString Text => valueText.Text;
 
@@ -149,6 +148,14 @@ namespace osu.Game.Screens.SelectV2
                 Action = toggleFavourite;
             }
 
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                beatmapFavourites.BindTo(api.BeatmapFavourites);
+                beatmapFavourites.BindCollectionChanged((_, _) => updateFavouriteState());
+            }
+
             protected override bool OnHover(HoverEvent e)
             {
                 hoverLayer.FadeIn(500, Easing.OutQuint);
@@ -204,10 +211,12 @@ namespace osu.Game.Screens.SelectV2
             {
                 Enabled.Value = onlineBeatmapSet != null;
 
-                if (loadingSpinner.State.Value == Visibility.Hidden)
-                    valueText.Text = onlineBeatmapSet?.FavouriteCount.ToLocalisableString(@"N0") ?? "-";
+                BeatmapSetFavouriteState? state = onlineBeatmapSet == null ? null : api.GetFavouriteState(onlineBeatmapSet);
 
-                isFavourite.Value = onlineBeatmapSet?.HasFavourited == true;
+                if (loadingSpinner.State.Value == Visibility.Hidden)
+                    valueText.Text = state?.FavouriteCount.ToLocalisableString(@"N0") ?? "-";
+
+                isFavourite.Value = state?.Favourited == true;
 
                 background.FadeColour(isFavourite.Value ? colours.Pink4.Darken(1f).Opacity(0.5f) : Color4.Black.Opacity(0.2f), 500, Easing.OutQuint);
                 valueText.FadeColour(isFavourite.Value ? colours.Pink1 : colourProvider.Content2, 500, Easing.OutQuint);
@@ -223,23 +232,14 @@ namespace osu.Game.Screens.SelectV2
                 // there's also the part where we want to call `setLoading()` here to show the spinner, but that also sets `onlineBeatmapSet` to null.
                 var beatmapSet = onlineBeatmapSet;
 
-                favouriteRequest = new PostBeatmapFavouriteRequest(beatmapSet.OnlineID, isFavourite.Value ? BeatmapFavouriteAction.UnFavourite : BeatmapFavouriteAction.Favourite);
-                favouriteRequest.Success += () =>
-                {
-                    bool hasFavourited = favouriteRequest.Action == BeatmapFavouriteAction.Favourite;
-                    beatmapSet.HasFavourited = hasFavourited;
-                    beatmapSet.FavouriteCount += hasFavourited ? 1 : -1;
-                    setBeatmapSet(beatmapSet, withHeartAnimation: hasFavourited);
-                };
-                favouriteRequest.Failure += e =>
-                {
-                    notifications?.Post(new SimpleNotification
-                    {
-                        Text = e.Message,
-                        Icon = FontAwesome.Solid.Times,
-                    });
-                    setBeatmapSet(beatmapSet, withHeartAnimation: false);
-                };
+                if (!isFavourite.Value)
+                    favouriteRequest = api.AddToFavourites(beatmapSet);
+                else
+                    favouriteRequest = api.RemoveFromFavourites(beatmapSet);
+
+                favouriteRequest.Success += () => setBeatmapSet(beatmapSet, withHeartAnimation: favouriteRequest.Action == BeatmapFavouriteAction.Favourite);
+                favouriteRequest.Failure += _ => setBeatmapSet(beatmapSet);
+
                 api.Queue(favouriteRequest);
                 setLoading();
             }
