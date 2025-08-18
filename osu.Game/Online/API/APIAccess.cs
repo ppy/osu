@@ -59,6 +59,7 @@ namespace osu.Game.Online.API
         public IBindable<APIUser> LocalUser => localUser;
         public IBindableList<APIRelation> Friends => friends;
         public IBindableList<APIRelation> Blocks => blocks;
+        public IBindableList<APIBeatmapSet> BeatmapFavourites => beatmapFavourites;
 
         public INotificationsClient NotificationsClient { get; }
 
@@ -68,6 +69,7 @@ namespace osu.Game.Online.API
 
         private BindableList<APIRelation> friends { get; } = new BindableList<APIRelation>();
         private BindableList<APIRelation> blocks { get; } = new BindableList<APIRelation>();
+        private BindableList<APIBeatmapSet> beatmapFavourites { get; } = new BindableList<APIBeatmapSet>();
 
         protected bool HasLogin => authentication.Token.Value != null || (!string.IsNullOrEmpty(ProvidedUsername) && !string.IsNullOrEmpty(password));
 
@@ -339,6 +341,8 @@ namespace osu.Game.Online.API
                         configSupporter.Value = me.IsSupporter;
                         state.Value = me.SessionVerified ? APIState.Online : APIState.RequiresSecondFactorAuth;
                         failureCount = 0;
+
+                        updateLocalFavourites();
                     };
 
                     if (!handleRequest(userReq))
@@ -673,6 +677,82 @@ namespace osu.Game.Online.API
             };
 
             Queue(blocksReq);
+        }
+
+        private void updateLocalFavourites()
+        {
+            if (!IsLoggedIn)
+                return;
+
+            var favourites = new List<APIBeatmapSet>();
+
+            propagateLocalFavourites(favourites, () =>
+            {
+                beatmapFavourites.Clear();
+                beatmapFavourites.AddRange(favourites);
+            });
+        }
+
+        private void propagateLocalFavourites(List<APIBeatmapSet> list, Action onSuccess, PaginationParameters? currentParams = null)
+        {
+            if (!IsLoggedIn)
+                return;
+
+            currentParams ??= new PaginationParameters(0, 100);
+
+            var favouritesReq = new GetUserBeatmapsRequest(LocalUser.Value.Id, BeatmapSetType.Favourite, currentParams.Value);
+            favouritesReq.Failure += ex =>
+            {
+                if (ex is not WebRequestFlushedException)
+                    state.Value = APIState.Failing;
+            };
+            favouritesReq.Success += res =>
+            {
+                if (res.Count == 0)
+                {
+                    onSuccess();
+                    return;
+                }
+
+                list.AddRange(res);
+
+                var paramsForNext = new PaginationParameters(currentParams.Value.Offset + currentParams.Value.Limit, currentParams.Value.Limit);
+                propagateLocalFavourites(list, onSuccess, paramsForNext);
+            };
+
+            Queue(favouritesReq);
+        }
+
+        public PostBeatmapFavouriteRequest AddToFavourites(APIBeatmapSet beatmapSet)
+        {
+            var favouriteReq = new PostBeatmapFavouriteRequest(beatmapSet.OnlineID, BeatmapFavouriteAction.Favourite);
+            favouriteReq.Failure += ex =>
+            {
+                Logger.Error(ex, $"Failed to add beatmap to favourites: {ex.Message}");
+            };
+            favouriteReq.Success += () =>
+            {
+                beatmapFavourites.Add(beatmapSet);
+            };
+
+            Queue(favouriteReq);
+            return favouriteReq;
+        }
+
+        public PostBeatmapFavouriteRequest RemoveFromFavourites(APIBeatmapSet beatmapSet)
+        {
+            var unFavouriteReq = new PostBeatmapFavouriteRequest(beatmapSet.OnlineID, BeatmapFavouriteAction.UnFavourite);
+            unFavouriteReq.Failure += ex =>
+            {
+                Logger.Error(ex, $"Failed to remove beatmap from favourites: {ex.Message}");
+            };
+            unFavouriteReq.Success += () =>
+            {
+                beatmapFavourites.RemoveAll(s => s.OnlineID == beatmapSet.OnlineID);
+            };
+
+            Queue(unFavouriteReq);
+            return unFavouriteReq;
         }
 
         private static APIUser createGuestUser() => new GuestUser();
