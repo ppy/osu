@@ -34,6 +34,9 @@ namespace osu.Game.Screens.Play.HUD
         private const float regular_left_panel_width = avatar_size + avatar_size / 2;
         private const float extended_left_panel_width = regular_left_panel_width + left_panel_extension_width;
 
+        private const float accuracy_combo_width_cutoff = 150;
+        private const float username_score_width_cutoff = 50;
+
         private const float avatar_size = PANEL_HEIGHT;
 
         public const float PANEL_HEIGHT = 38f;
@@ -224,8 +227,7 @@ namespace osu.Game.Screens.Play.HUD
                                         AutoSizeAxes = Axes.Y,
                                         ColumnDimensions = new[]
                                         {
-                                            new Dimension(minSize: 1), // todo: zero width truncating text renders in a broken way for some reason.
-                                            new Dimension(GridSizeMode.Absolute, 10),
+                                            new Dimension(),
                                             new Dimension(GridSizeMode.AutoSize),
                                         },
                                         RowDimensions = new[]
@@ -244,7 +246,6 @@ namespace osu.Game.Screens.Play.HUD
                                                     Font = OsuFont.Style.Caption1.With(weight: FontWeight.SemiBold),
                                                     RelativeSizeAxes = Axes.X,
                                                 },
-                                                Empty(),
                                                 accuracyText = new OsuSpriteText
                                                 {
                                                     Anchor = Anchor.BottomLeft,
@@ -262,8 +263,7 @@ namespace osu.Game.Screens.Play.HUD
                                         AutoSizeAxes = Axes.Y,
                                         ColumnDimensions = new[]
                                         {
-                                            new Dimension(minSize: 1), // todo: zero width truncating text renders in a broken way for some reason.
-                                            new Dimension(GridSizeMode.Absolute, 10),
+                                            new Dimension(),
                                             new Dimension(GridSizeMode.AutoSize),
                                         },
                                         RowDimensions = new[]
@@ -281,7 +281,6 @@ namespace osu.Game.Screens.Play.HUD
                                                     Font = OsuFont.Style.Body.With(weight: FontWeight.Regular),
                                                     RelativeSizeAxes = Axes.X,
                                                 },
-                                                Empty(),
                                                 comboText = new OsuSpriteText
                                                 {
                                                     Anchor = Anchor.BottomRight,
@@ -399,6 +398,16 @@ namespace osu.Game.Screens.Play.HUD
                     rightLayer.ClearTransforms(targetMember: nameof(Width));
                     rightLayer.Width = computeRightLayerWidth();
                 }
+
+                bool showAccuracyAndCombo = rightLayer.Width >= accuracy_combo_width_cutoff;
+
+                accuracyText.Alpha = showAccuracyAndCombo ? 1 : 0;
+                comboText.Alpha = showAccuracyAndCombo ? 1 : 0;
+
+                bool showUsernameAndScore = rightLayer.Width >= username_score_width_cutoff;
+
+                usernameText.Alpha = showUsernameAndScore ? 1 : 0;
+                scoreText.Alpha = showUsernameAndScore ? 1 : 0;
 
                 drawSizeLayout.Validate();
             }
