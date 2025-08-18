@@ -327,10 +327,8 @@ namespace osu.Game.Rulesets.Osu.HUD
 
             if (PositionDisplayStyle.Value == PositionDisplay.Normalised && lastObjectPosition != null)
             {
-                // let local center in (0.5, 0.5) to prevent localRadius in calculate will get zero.
-                // then manual subtraction 0.5 to match component mapping.
                 hitPosition = AccuracyHeatmap.FindRelativeHitPosition(lastObjectPosition.Value, ((OsuHitObject)circleJudgement.HitObject).StackedEndPosition,
-                    circleJudgement.CursorPositionAtHit.Value, objectRadius, new Vector2(0.5f), inner_portion, 45) - new Vector2(0.5f);
+                    circleJudgement.CursorPositionAtHit.Value, objectRadius, 45) * 0.5f;
             }
             else
             {
