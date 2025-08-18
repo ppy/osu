@@ -36,15 +36,15 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             base.LoadComplete();
 
-            AddSliderStep("Hit position size", 0f, 12f, 7f, t =>
+            AddSliderStep("Hit marker size", 0f, 12f, 7f, t =>
             {
                 if (aimErrorMeter.IsNotNull())
-                    aimErrorMeter.HitPositionSize.Value = t;
+                    aimErrorMeter.HitMarkerSize.Value = t;
             });
-            AddSliderStep("Average position size", 1f, 25f, 7f, t =>
+            AddSliderStep("Average position marker size", 1f, 25f, 7f, t =>
             {
                 if (aimErrorMeter.IsNotNull())
-                    aimErrorMeter.AverageSize.Value = t;
+                    aimErrorMeter.AverageMarkerSize.Value = t;
             });
         }
 
@@ -139,10 +139,10 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestDifferentStyle()
         {
-            AddStep("Switch hit position style to +", () => aimErrorMeter.HitPositionStyle.Value = AimErrorMeter.HitStyle.Plus);
-            AddStep("Switch hit position style to x", () => aimErrorMeter.HitPositionStyle.Value = AimErrorMeter.HitStyle.X);
-            AddStep("Switch average position style to +", () => aimErrorMeter.AverageStyle.Value = AimErrorMeter.HitStyle.Plus);
-            AddStep("Switch average position style to x", () => aimErrorMeter.AverageStyle.Value = AimErrorMeter.HitStyle.X);
+            AddStep("Switch hit position marker style to +", () => aimErrorMeter.HitMarkerStyle.Value = AimErrorMeter.MarkerStyle.Plus);
+            AddStep("Switch hit position marker style to x", () => aimErrorMeter.HitMarkerStyle.Value = AimErrorMeter.MarkerStyle.X);
+            AddStep("Switch average position marker style to +", () => aimErrorMeter.AverageMarkerStyle.Value = AimErrorMeter.MarkerStyle.Plus);
+            AddStep("Switch average position marker style to x", () => aimErrorMeter.AverageMarkerStyle.Value = AimErrorMeter.MarkerStyle.X);
         }
 
         private partial class TestAimErrorMeter : AimErrorMeter

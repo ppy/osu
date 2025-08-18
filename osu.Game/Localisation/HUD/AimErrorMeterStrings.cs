@@ -10,75 +10,65 @@ namespace osu.Game.Localisation.HUD
         private const string prefix = @"osu.Game.Resources.Localisation.HUD.AimErrorMeterStrings";
 
         /// <summary>
-        /// "Hit position size"
+        /// "Hit marker size"
         /// </summary>
-        public static LocalisableString HitPositionSize => new TranslatableString(getKey(@"hit_position_size"), "Hit position size");
+        public static LocalisableString HitMarkerSize => new TranslatableString(getKey(@"hit_marker_size"), @"Hit marker size");
 
         /// <summary>
-        /// "How big of hit position should be."
+        /// "Controls the size of the markers displayed after every hit."
         /// </summary>
-        public static LocalisableString HitPositionSizeDescription => new TranslatableString(getKey("hit_point_size_description"), "How big of hit position should be.");
+        public static LocalisableString HitMarkerSizeDescription => new TranslatableString(getKey(@"hit_marker_size_description"), @"Controls the size of the markers displayed after every hit.");
 
         /// <summary>
-        /// "Hit position style"
+        /// "Hit marker style"
         /// </summary>
-        public static LocalisableString HitPositionStyle => new TranslatableString(getKey(@"hit_position_style"), "Hit position style");
+        public static LocalisableString HitMarkerStyle => new TranslatableString(getKey(@"hit_marker_style"), @"Hit marker style");
 
         /// <summary>
-        /// "The style of hit position."
+        /// "The visual style of the hit markers."
         /// </summary>
-        public static LocalisableString HitPositionStyleDescription => new TranslatableString(getKey("hit_position_style_description"), "The style of hit position.");
+        public static LocalisableString HitMarkerStyleDescription => new TranslatableString(getKey(@"hit_marker_style_description"), @"The visual style of the hit markers.");
 
         /// <summary>
-        /// "Average position size"
+        /// "Average position marker size"
         /// </summary>
-        public static LocalisableString AverageSize => new TranslatableString(getKey(@"average_size"), "Average position size");
+        public static LocalisableString AverageMarkerSize => new TranslatableString(getKey(@"average_marker_size"), @"Average position marker size");
 
         /// <summary>
-        /// "How big of average position should be."
+        /// "Controls the size of the marker showing average hit position."
         /// </summary>
-        public static LocalisableString AverageSizeDescription => new TranslatableString(getKey("average_size_description"), "How big of average position should be.");
+        public static LocalisableString AverageMarkerSizeDescription => new TranslatableString(getKey(@"average_marker_size_description"), @"Controls the size of the marker showing average hit position.");
 
         /// <summary>
-        /// "Average position style"
+        /// "Average position marker style"
         /// </summary>
-        public static LocalisableString AverageStyle => new TranslatableString(getKey(@"average_style"), "Average position style");
+        public static LocalisableString AverageMarkerStyle => new TranslatableString(getKey(@"average_marker_style"), @"Average position marker style");
 
         /// <summary>
-        /// "The style of average position."
+        /// "The visual style of the average position marker."
         /// </summary>
-        public static LocalisableString AverageStyleDescription => new TranslatableString(getKey("average_style_description"), "The style of average position.");
+        public static LocalisableString AverageMarkerStyleDescription => new TranslatableString(getKey(@"average_marker_style_description"), @"The visual style of the average position marker.");
 
         /// <summary>
-        /// "Position mapping"
+        /// "Position display style"
         /// </summary>
-        public static LocalisableString PositionStyle => new TranslatableString(getKey("position_style"), "Position mapping");
+        public static LocalisableString PositionDisplayStyle => new TranslatableString(getKey(@"position_style"), @"Position display style");
 
         /// <summary>
-        /// "Should hit point relative of last object"
+        /// "Controls whether positions displayed on the meter are absolute (as seen on screen) or normalised (relative to the direction of movement from previous object)."
         /// </summary>
-        public static LocalisableString PositionStyleDescription => new TranslatableString(getKey("position_style_description"), "Should hit point relative of last object");
-
-        /// <summary>
-        /// "X"
-        /// </summary>
-        public static LocalisableString StyleX => new TranslatableString(getKey("style_x"), "X");
-
-        /// <summary>
-        /// "+"
-        /// </summary>
-        public static LocalisableString StylePlus => new TranslatableString(getKey("style_plus"), "+");
+        public static LocalisableString PositionDisplayStyleDescription => new TranslatableString(getKey(@"position_style_description"), @"Controls whether positions displayed on the meter are absolute (as seen on screen) or normalised (relative to the direction of movement from previous object).");
 
         /// <summary>
         /// "Absolute"
         /// </summary>
-        public static LocalisableString Absolute => new TranslatableString(getKey("absolute"), "Absolute");
+        public static LocalisableString Absolute => new TranslatableString(getKey(@"absolute"), @"Absolute");
 
         /// <summary>
-        /// "Relative"
+        /// "Normalised"
         /// </summary>
-        public static LocalisableString Relative => new TranslatableString(getKey("relative"), "Relative");
+        public static LocalisableString Normalised => new TranslatableString(getKey(@"normalised"), @"Normalised");
 
-        private static string getKey(string key) => $"{prefix}:{key}";
+        private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
