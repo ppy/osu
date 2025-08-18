@@ -353,20 +353,18 @@ namespace osu.Game.Rulesets.Osu.HUD
 
         private Color4 getColourForPosition(Vector2 position)
         {
-            switch (Vector2.Distance(position, Vector2.Zero))
-            {
-                case >= 0.5f * inner_portion:
-                    return colours.Red;
+            float distance = Vector2.Distance(position, Vector2.Zero);
 
-                case >= 0.35f * inner_portion:
-                    return colours.Yellow;
+            if (distance >= 0.5f * inner_portion)
+                return colours.Red;
 
-                case >= 0.2f * inner_portion:
-                    return colours.Green;
+            if (distance >= 0.35f * inner_portion)
+                return colours.Yellow;
 
-                default:
-                    return colours.Blue;
-            }
+            if (distance >= 0.2f * inner_portion)
+                return colours.Green;
+
+            return colours.Blue;
         }
 
         public override void Clear()
