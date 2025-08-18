@@ -155,8 +155,11 @@ namespace osu.Game.Screens.Play
                 failSample.Play();
             }
 
-            if (Time.Current < failTime)
+            if (Time.Current < failTime && failSamplePlaybackInitiated)
+            {
                 failSamplePlaybackInitiated = false;
+                failSample.Stop();
+            }
         }
 
         protected override void Dispose(bool isDisposing)
