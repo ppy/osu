@@ -80,7 +80,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
                 gameObject = new CircularContainer
                 {
-                    Size = new Vector2(108),
+                    Size = new Vector2(2 * OsuHitObject.OBJECT_RADIUS),
                     Position = new Vector2(256, 192),
                     Colour = Color4.Yellow,
                     Masking = true,
@@ -107,7 +107,8 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
-            aimErrorMeter.AddPoint(gameObject.ToLocalSpace(e.ScreenSpaceMouseDownPosition) - new Vector2(54));
+            // the division by 2 is because CS=5 applies a 0.5x (plus fudge) multiplier to `OBJECT_RADIUS`
+            aimErrorMeter.AddPoint((gameObject.ToLocalSpace(e.ScreenSpaceMouseDownPosition) - new Vector2(OsuHitObject.OBJECT_RADIUS)) / 2);
             return true;
         }
 
@@ -119,10 +120,10 @@ namespace osu.Game.Rulesets.Osu.Tests
                 automaticAdditionDelegate = Scheduler.AddDelayed(() =>
                 {
                     var randomPos = new Vector2(
-                        RNG.NextSingle(0, 108),
-                        RNG.NextSingle(0, 108));
+                        RNG.NextSingle(0, 2 * OsuHitObject.OBJECT_RADIUS),
+                        RNG.NextSingle(0, 2 * OsuHitObject.OBJECT_RADIUS));
 
-                    aimErrorMeter.AddPoint(randomPos - new Vector2(54));
+                    aimErrorMeter.AddPoint(randomPos - new Vector2(OsuHitObject.OBJECT_RADIUS));
                     InputManager.MoveMouseTo(gameObject.ToScreenSpace(randomPos));
                 }, 1, true);
             });
