@@ -12,6 +12,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
@@ -49,6 +50,9 @@ namespace osu.Game.Screens.SelectV2
         private Box backgroundDifficultyTint = null!;
 
         private TrianglesV2 triangles = null!;
+
+        [Resolved]
+        private IRulesetStore rulesets { get; set; } = null!;
 
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
@@ -215,7 +219,7 @@ namespace osu.Game.Screens.SelectV2
             Debug.Assert(Item != null);
             var beatmap = (BeatmapInfo)Item.Model;
 
-            difficultyIcon.Icon = beatmap.Ruleset.CreateInstance().CreateIcon();
+            difficultyIcon.Icon = getRulesetIcon(beatmap.Ruleset);
 
             localRank.Beatmap = beatmap;
             difficultyText.Text = beatmap.DifficultyName;
@@ -223,6 +227,16 @@ namespace osu.Game.Screens.SelectV2
 
             computeStarRating();
             updateKeyCount();
+        }
+
+        private Drawable getRulesetIcon(RulesetInfo rulesetInfo)
+        {
+            var rulesetInstance = rulesets.GetRuleset(rulesetInfo.ShortName)?.CreateInstance();
+
+            if (rulesetInstance is null)
+                return new SpriteIcon { Icon = FontAwesome.Regular.QuestionCircle };
+
+            return rulesetInstance.CreateIcon();
         }
 
         protected override void FreeAfterUse()
