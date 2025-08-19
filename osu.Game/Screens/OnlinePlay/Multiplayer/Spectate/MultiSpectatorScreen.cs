@@ -178,17 +178,31 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         {
             base.Update();
 
-            if (!isCandidateAudioSource(currentAudioSource?.SpectatorPlayerClock))
-            {
-                currentAudioSource = instances.Where(i => isCandidateAudioSource(i.SpectatorPlayerClock)).MinBy(i => Math.Abs(i.SpectatorPlayerClock.CurrentTime - syncManager.CurrentMasterTime));
+            checkAudioSource();
+        }
 
-                // Only bind adjustments if there's actually a valid source, else just use the previous ones to ensure no sudden changes to audio.
-                if (currentAudioSource != null)
-                    bindAudioAdjustments(currentAudioSource);
+        private void checkAudioSource()
+        {
+            // always use the maximised player instance as the current audio source if there is one
+            if (grid.MaximisedCell?.Content is PlayerArea maximisedPlayer && maximisedPlayer == currentAudioSource)
+                return;
 
-                foreach (var instance in instances)
-                    instance.Mute = instance != currentAudioSource;
-            }
+            // if there is no maximised player instance and the previous audio source is still good to use, keep using it
+            if (grid.MaximisedCell == null && isCandidateAudioSource(currentAudioSource?.SpectatorPlayerClock))
+                return;
+
+            // at this point we're in one of the following scenarios:
+            // - the maximised player instance is not the current audio source => we want to switch to the maximised player instance
+            // - there is no maximised player instance, and the previous audio source is stopped => find another running audio source
+            currentAudioSource = grid.MaximisedCell?.Content as PlayerArea
+                                 ?? instances.Where(i => isCandidateAudioSource(i.SpectatorPlayerClock)).MinBy(i => Math.Abs(i.SpectatorPlayerClock.CurrentTime - syncManager.CurrentMasterTime));
+
+            // Only bind adjustments if there's actually a valid source, else just use the previous ones to ensure no sudden changes to audio.
+            if (currentAudioSource != null)
+                bindAudioAdjustments(currentAudioSource);
+
+            foreach (var instance in instances)
+                instance.Mute = instance != currentAudioSource;
         }
 
         private void bindAudioAdjustments(PlayerArea first)
