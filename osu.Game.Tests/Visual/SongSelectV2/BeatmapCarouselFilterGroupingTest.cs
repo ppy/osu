@@ -11,6 +11,7 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Graphics.Carousel;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Scoring;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
@@ -368,7 +369,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             var groupingFilter = new BeatmapCarouselFilterGrouping(
                 () => new FilterCriteria { Group = group },
                 () => new List<BeatmapCollection>(),
-                _ => new Dictionary<Guid, ScoreRank>());
+                _ => new Dictionary<Guid, ScoreRank>(),
+                () => new List<APIBeatmapSet>());
 
             return await groupingFilter.Run(beatmapSets.SelectMany(s => s.Beatmaps.Select(b => new CarouselItem(b))).ToList(), CancellationToken.None);
         }
