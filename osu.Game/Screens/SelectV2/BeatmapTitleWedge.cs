@@ -3,17 +3,14 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
-using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Configuration;
@@ -42,6 +39,9 @@ namespace osu.Game.Screens.SelectV2
         [Resolved]
         private IBindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
 
+        [Resolved]
+        private IBindable<RealmPopulatingOnlineLookupSource.BeatmapSetLookupResult> onlineLookupResult { get; set; } = null!;
+
         protected override bool StartHidden => true;
 
         private ModSettingChangeTracker? settingChangeTracker;
@@ -67,13 +67,6 @@ namespace osu.Game.Screens.SelectV2
 
         [Resolved]
         private LocalisationManager localisation { get; set; } = null!;
-
-        [Resolved]
-        private RealmPopulatingOnlineLookupSource onlineLookupSource { get; set; } = null!;
-
-        private RealmPopulatingOnlineLookupSource.BeatmapSetLookupResult? lastLookupResult;
-        private CancellationTokenSource? cancellationTokenSource;
-        private Task<RealmPopulatingOnlineLookupSource.BeatmapSetLookupResult>? currentFetchTask;
 
         private FillFlowContainer statisticsFlow = null!;
 
@@ -186,6 +179,7 @@ namespace osu.Game.Screens.SelectV2
 
             working.BindValueChanged(_ => updateDisplay());
             ruleset.BindValueChanged(_ => updateDisplay());
+            onlineLookupResult.BindValueChanged(_ => updateDisplay());
 
             mods.BindValueChanged(m =>
             {
@@ -226,7 +220,6 @@ namespace osu.Game.Screens.SelectV2
         {
             var metadata = working.Value.Metadata;
             var beatmapInfo = working.Value.BeatmapInfo;
-            var beatmapSetInfo = working.Value.BeatmapSetInfo;
 
             statusPill.Status = beatmapInfo.Status;
 
@@ -239,10 +232,6 @@ namespace osu.Game.Screens.SelectV2
             artistLink.Action = () => songSelect?.Search(artistText.GetPreferred(localisation.CurrentParameters.Value.PreferOriginalScript));
 
             updateLengthAndBpmStatistics();
-
-            if (lastLookupResult == null || lastLookupResult.Online?.OnlineID != beatmapSetInfo.OnlineID)
-                refetchBeatmapSet();
-
             updateOnlineDisplay();
         }
 
@@ -285,39 +274,18 @@ namespace osu.Game.Screens.SelectV2
             }, token);
         }
 
-        private void refetchBeatmapSet()
-        {
-            var beatmapSetInfo = working.Value.BeatmapSetInfo;
-
-            cancellationTokenSource?.Cancel();
-            lastLookupResult = null;
-
-            cancellationTokenSource = new CancellationTokenSource();
-            currentFetchTask = onlineLookupSource.LookupOnlineAsync(beatmapSetInfo);
-            currentFetchTask.ContinueWith(t =>
-            {
-                if (t.IsCompletedSuccessfully)
-                    lastLookupResult = t.GetResultSafely();
-                if (t.Exception != null)
-                    Logger.Log($"Error when fetching online beatmap set: {t.Exception}", LoggingTarget.Network);
-                Scheduler.AddOnce(updateOnlineDisplay);
-            });
-        }
-
         private void updateOnlineDisplay()
         {
-            if (currentFetchTask?.IsCompleted == false)
+            if (onlineLookupResult.Value == null)
             {
                 playCount.Value = null;
                 favouriteButton.SetLoading();
             }
             else
             {
-                Debug.Assert(lastLookupResult != null);
-
-                var onlineBeatmap = lastLookupResult.Online?.Beatmaps.SingleOrDefault(b => b.OnlineID == working.Value.BeatmapInfo.OnlineID);
+                var onlineBeatmap = onlineLookupResult.Value.Online?.Beatmaps.SingleOrDefault(b => b.OnlineID == working.Value.BeatmapInfo.OnlineID);
                 playCount.Value = new StatisticPlayCount.Data(onlineBeatmap?.PlayCount ?? -1, onlineBeatmap?.UserPlayCount ?? -1);
-                favouriteButton.SetBeatmapSet(lastLookupResult.Online);
+                favouriteButton.SetBeatmapSet(onlineLookupResult.Value.Online);
 
                 // the online fetch may have also updated the beatmap's status.
                 // this needs to be checked against the *local* beatmap model rather than the online one, because it's not known here whether the status change has occurred or not
@@ -325,7 +293,7 @@ namespace osu.Game.Screens.SelectV2
                 // it also has to be handled explicitly like this because the working beatmap's `BeatmapInfo` will not receive these updates due to being detached
                 // (and because of https://github.com/ppy/osu/blob/4b73afd1957a9161e2956fc4191c8114d9958372/osu.Game/Screens/SelectV2/SongSelect.cs#L487-L488
                 // which prevents working beatmap refetches caused by changes to the realm model of perceived low importance).
-                statusPill.Status = lastLookupResult.Local.Status;
+                statusPill.Status = onlineLookupResult.Value.Local.Status;
             }
         }
     }

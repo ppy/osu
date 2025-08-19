@@ -5,11 +5,14 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -133,8 +136,7 @@ namespace osu.Game.Screens.SelectV2
         [Resolved]
         private IDialogOverlay? dialogOverlay { get; set; }
 
-        [Cached]
-        private RealmPopulatingOnlineLookupSource onlineLookupSource = new RealmPopulatingOnlineLookupSource();
+        private readonly RealmPopulatingOnlineLookupSource onlineLookupSource = new RealmPopulatingOnlineLookupSource();
 
         private Bindable<bool> configBackgroundBlur = null!;
 
@@ -349,6 +351,7 @@ namespace osu.Game.Screens.SelectV2
                 ensurePlayingSelected();
                 updateBackgroundDim();
                 updateWedgeVisibility();
+                fetchOnlineInfo();
             });
         }
 
@@ -950,6 +953,41 @@ namespace osu.Game.Screens.SelectV2
             }
 
             return base.OnKeyDown(e);
+        }
+
+        #endregion
+
+        #region Online lookups
+
+        [Cached(typeof(IBindable<RealmPopulatingOnlineLookupSource.BeatmapSetLookupResult?>))]
+        private readonly Bindable<RealmPopulatingOnlineLookupSource.BeatmapSetLookupResult?> lastLookupResult = new Bindable<RealmPopulatingOnlineLookupSource.BeatmapSetLookupResult?>();
+
+        private CancellationTokenSource? onlineLookupCancellation;
+        private Task<RealmPopulatingOnlineLookupSource.BeatmapSetLookupResult>? currentOnlineLookup;
+
+        private void fetchOnlineInfo()
+        {
+            var beatmapSetInfo = Beatmap.Value.BeatmapSetInfo;
+
+            if (lastLookupResult.Value?.Online?.OnlineID == beatmapSetInfo.OnlineID)
+                return;
+
+            onlineLookupCancellation?.Cancel();
+            lastLookupResult.Value = null;
+
+            onlineLookupCancellation = new CancellationTokenSource();
+            currentOnlineLookup = onlineLookupSource.LookupOnlineAsync(beatmapSetInfo);
+            currentOnlineLookup.ContinueWith(t => Schedule(() =>
+            {
+                if (t.IsCompletedSuccessfully)
+                    lastLookupResult.Value = t.GetResultSafely();
+
+                if (t.Exception != null)
+                {
+                    Logger.Log($"Error when fetching online beatmap set: {t.Exception}", LoggingTarget.Network);
+                    lastLookupResult.Value = new RealmPopulatingOnlineLookupSource.BeatmapSetLookupResult(null, Beatmap.Value.BeatmapSetInfo);
+                }
+            }));
         }
 
         #endregion

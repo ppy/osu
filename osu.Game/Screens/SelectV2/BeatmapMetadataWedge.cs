@@ -2,18 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Diagnostics;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Logging;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
@@ -54,10 +49,10 @@ namespace osu.Game.Screens.SelectV2
         private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
 
         [Resolved]
-        private IAPIProvider api { get; set; } = null!;
+        private IBindable<RealmPopulatingOnlineLookupSource.BeatmapSetLookupResult> onlineLookupResult { get; set; } = null!;
 
         [Resolved]
-        private RealmPopulatingOnlineLookupSource onlineLookupSource { get; set; } = null!;
+        private IAPIProvider api { get; set; } = null!;
 
         private IBindable<APIState> apiState = null!;
 
@@ -250,6 +245,7 @@ namespace osu.Game.Screens.SelectV2
         {
             base.LoadComplete();
             beatmap.BindValueChanged(_ => updateDisplay());
+            onlineLookupResult.BindValueChanged(_ => updateDisplay());
 
             apiState = api.State.GetBoundCopy();
             apiState.BindValueChanged(_ => Scheduler.AddOnce(updateDisplay), true);
@@ -279,7 +275,7 @@ namespace osu.Game.Screens.SelectV2
             // Needs some experimentation on what looks good.
 
             var beatmapInfo = beatmap.Value.BeatmapInfo;
-            var currentOnlineBeatmap = lastLookupResult?.Online?.Beatmaps.SingleOrDefault(b => b.OnlineID == beatmapInfo.OnlineID);
+            var currentOnlineBeatmap = onlineLookupResult.Value?.Online?.Beatmaps.SingleOrDefault(b => b.OnlineID == beatmapInfo.OnlineID);
 
             if (State.Value == Visibility.Visible && currentOnlineBeatmap != null)
             {
@@ -361,38 +357,12 @@ namespace osu.Game.Screens.SelectV2
             submitted.Date = beatmapSetInfo.DateSubmitted;
             ranked.Date = beatmapSetInfo.DateRanked;
 
-            if (lastLookupResult == null || lastLookupResult.Online?.OnlineID != beatmapSetInfo.OnlineID)
-                refetchBeatmapSet();
-
             updateOnlineDisplay();
-        }
-
-        private RealmPopulatingOnlineLookupSource.BeatmapSetLookupResult? lastLookupResult;
-        private CancellationTokenSource? cancellationTokenSource;
-        private Task<RealmPopulatingOnlineLookupSource.BeatmapSetLookupResult>? currentFetchTask;
-
-        private void refetchBeatmapSet()
-        {
-            var beatmapSetInfo = beatmap.Value.BeatmapSetInfo;
-
-            cancellationTokenSource?.Cancel();
-            lastLookupResult = null;
-
-            cancellationTokenSource = new CancellationTokenSource();
-            currentFetchTask = onlineLookupSource.LookupOnlineAsync(beatmapSetInfo);
-            currentFetchTask.ContinueWith(t =>
-            {
-                if (t.IsCompletedSuccessfully)
-                    lastLookupResult = t.GetResultSafely();
-                if (t.Exception != null)
-                    Logger.Log($"Error when fetching online beatmap set: {t.Exception}", LoggingTarget.Network);
-                Scheduler.AddOnce(updateOnlineDisplay);
-            });
         }
 
         private void updateOnlineDisplay()
         {
-            if (currentFetchTask?.IsCompleted == false)
+            if (onlineLookupResult.Value == null)
             {
                 genre.Data = null;
                 language.Data = null;
@@ -400,9 +370,7 @@ namespace osu.Game.Screens.SelectV2
                 return;
             }
 
-            Debug.Assert(lastLookupResult != null);
-
-            if (lastLookupResult.Online == null)
+            if (onlineLookupResult.Value.Online == null)
             {
                 genre.Data = ("-", null);
                 language.Data = ("-", null);
@@ -411,7 +379,7 @@ namespace osu.Game.Screens.SelectV2
             {
                 var beatmapInfo = beatmap.Value.BeatmapInfo;
 
-                var onlineBeatmapSet = lastLookupResult.Online;
+                var onlineBeatmapSet = onlineLookupResult.Value.Online;
                 var onlineBeatmap = onlineBeatmapSet.Beatmaps.SingleOrDefault(b => b.OnlineID == beatmapInfo.OnlineID);
 
                 genre.Data = (onlineBeatmapSet.Genre.Name, () => songSelect?.Search(onlineBeatmapSet.Genre.Name));
@@ -426,7 +394,7 @@ namespace osu.Game.Screens.SelectV2
                 }
             }
 
-            updateUserTags(lastLookupResult.Local);
+            updateUserTags(onlineLookupResult.Value.Local);
             updateSubWedgeVisibility();
         }
 
