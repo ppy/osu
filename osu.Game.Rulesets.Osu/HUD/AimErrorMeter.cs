@@ -456,7 +456,7 @@ namespace osu.Game.Rulesets.Osu.HUD
 
         public enum MarkerStyle
         {
-            [Description("X")]
+            [Description("x")]
             X,
 
             [Description("+")]
