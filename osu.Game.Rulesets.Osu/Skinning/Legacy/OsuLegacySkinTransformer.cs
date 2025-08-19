@@ -5,7 +5,9 @@ using System;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Textures;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Skinning;
 using osuTK;
@@ -114,6 +116,39 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                     }
 
                     return null;
+
+                case SkinComponentLookup<HitResult> resultComponent:
+                    switch (resultComponent.Component)
+                    {
+                        case HitResult.LargeTickHit:
+                        case HitResult.SliderTailHit:
+                            if (getSliderPointTexture(resultComponent.Component) is Texture texture)
+                                return new LegacyJudgementPieceSliderTickHit { Texture = texture };
+
+                            break;
+
+                        // If the corresponding hit result displays a judgement and the miss texture isn't provided by this skin, don't look up the miss texture from any further skins.
+                        case HitResult.LargeTickMiss:
+                        case HitResult.IgnoreMiss:
+                            if (getSliderPointTexture(resultComponent.Component == HitResult.LargeTickMiss
+                                    ? HitResult.LargeTickHit
+                                    : HitResult.SliderTailHit) != null)
+                                return base.GetDrawableComponent(lookup) ?? Drawable.Empty();
+
+                            break;
+                    }
+
+                    return base.GetDrawableComponent(lookup);
+
+                    Texture? getSliderPointTexture(HitResult result)
+                    {
+                        // https://github.com/peppy/osu-stable-reference/blob/0e91e49bc83fe8b21c3ba5f1eb2d5d06456eae84/osu!/GameModes/Play/Rulesets/Ruleset.cs#L799
+                        if (GetConfig<SkinConfiguration.LegacySetting, decimal>(SkinConfiguration.LegacySetting.Version)?.Value < 2m)
+                            // Note that osu!stable used sliderpoint30 for heads and repeats, and sliderpoint10 for ticks, but the mapping is intentionally changed here so that each texture represents one type of HitResult.
+                            return GetTexture(result == HitResult.LargeTickHit ? "sliderpoint30" : "sliderpoint10");
+
+                        return null;
+                    }
 
                 case OsuSkinComponentLookup osuComponent:
                     switch (osuComponent.Component)
