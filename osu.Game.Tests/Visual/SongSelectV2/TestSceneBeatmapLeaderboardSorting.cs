@@ -7,6 +7,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
@@ -42,7 +43,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         private DialogOverlay dialogOverlay = null!;
 
         private LeaderboardManager leaderboardManager = null!;
-        private RealmPopulatingOnlineLookupSource lookupSource = null!;
+
+        private readonly IBindable<Screens.SelectV2.SongSelect.BeatmapSetLookupResult?> onlineLookupResult = new Bindable<Screens.SelectV2.SongSelect.BeatmapSetLookupResult?>();
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
@@ -52,7 +54,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, Realm, null, dependencies.Get<AudioManager>(), Resources, dependencies.Get<GameHost>(), Beatmap.Default));
             dependencies.Cache(scoreManager = new ScoreManager(rulesetStore, () => beatmapManager, LocalStorage, Realm, API));
             dependencies.Cache(leaderboardManager = new LeaderboardManager());
-            dependencies.Cache(lookupSource = new RealmPopulatingOnlineLookupSource());
+            dependencies.CacheAs(onlineLookupResult);
 
             Dependencies.Cache(Realm);
 
@@ -68,7 +70,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             });
 
             LoadComponent(leaderboardManager);
-            LoadComponent(lookupSource);
 
             Child = contentContainer = new OsuContextMenuContainer
             {
