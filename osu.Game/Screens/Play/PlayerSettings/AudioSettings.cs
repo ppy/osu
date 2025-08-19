@@ -19,7 +19,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
         private readonly PlayerCheckbox beatmapHitsoundsToggle;
 
         public AudioSettings()
-            : base(PlayerLoaderStrings.AudioSettingsTitle)
+            : base(PlayerSettingsStrings.AudioSettingsTitle)
         {
             Children = new Drawable[]
             {
