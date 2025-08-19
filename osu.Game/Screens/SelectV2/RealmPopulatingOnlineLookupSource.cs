@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -38,10 +39,13 @@ namespace osu.Game.Screens.SelectV2
         [Resolved]
         private RealmAccess realm { get; set; } = null!;
 
-        public Task<APIBeatmapSet?> GetBeatmapSetAsync(int id, CancellationToken token = default)
+        public Task<BeatmapSetLookupResult> LookupOnlineAsync(BeatmapSetInfo localBeatmapSet, CancellationToken token = default)
         {
-            var request = new GetBeatmapSetRequest(id);
-            var tcs = new TaskCompletionSource<APIBeatmapSet?>();
+            if (localBeatmapSet.OnlineID <= 0)
+                return Task.FromResult(new BeatmapSetLookupResult(null, localBeatmapSet));
+
+            var request = new GetBeatmapSetRequest(localBeatmapSet.OnlineID);
+            var tcs = new TaskCompletionSource<BeatmapSetLookupResult>();
 
             // async request success callback is a bit of a dangerous game, but there's some reasoning for it.
             // - don't really want to use `IAPIAccess.PerformAsync()` because we still want to respect request queueing & online status checks
@@ -58,59 +62,65 @@ namespace osu.Game.Screens.SelectV2
                     return;
                 }
 
-                await realm.WriteAsync(r => updateRealmBeatmapSet(r, onlineBeatmapSet)).ConfigureAwait(true);
-                tcs.SetResult(onlineBeatmapSet);
+                var updatedLocalBeatmapSet = await realm.WriteAsync(r => updateRealmBeatmapSet(r, localBeatmapSet.ID, onlineBeatmapSet)).ConfigureAwait(true);
+                tcs.SetResult(new BeatmapSetLookupResult(onlineBeatmapSet, updatedLocalBeatmapSet));
             };
             request.Failure += tcs.SetException;
             api.Queue(request);
             return tcs.Task;
         }
 
-        private static void updateRealmBeatmapSet(Realm r, APIBeatmapSet onlineBeatmapSet)
+        private static BeatmapSetInfo updateRealmBeatmapSet(Realm r, Guid localBeatmapSetId, APIBeatmapSet onlineBeatmapSet)
         {
             var tagsById = (onlineBeatmapSet.RelatedTags ?? []).ToDictionary(t => t.Id);
             var onlineBeatmaps = onlineBeatmapSet.Beatmaps.ToDictionary(b => b.OnlineID);
 
-            var dbBeatmapSets = r.All<BeatmapSetInfo>().Where(b => b.OnlineID == onlineBeatmapSet.OnlineID);
+            var dbBeatmapSet = r.Find<BeatmapSetInfo>(localBeatmapSetId)!;
 
-            foreach (var dbBeatmapSet in dbBeatmapSets)
+            // note that every single write to realm models is preceded by a guard, even if it technically would write the same value back.
+            // the reason this matters is that doing so avoids triggering realm subscription callbacks.
+            // unfortunately in terms of subscriptions realm treats *every* write to any realm object as a modification,
+            // even if the write was redundant and had no observable effect.
+
+            if (dbBeatmapSet.Status != onlineBeatmapSet.Status)
+                dbBeatmapSet.Status = onlineBeatmapSet.Status;
+
+            foreach (var dbBeatmap in dbBeatmapSet.Beatmaps)
             {
-                // note that every single write to realm models is preceded by a guard, even if it technically would write the same value back.
-                // the reason this matters is that doing so avoids triggering realm subscription callbacks.
-                // unfortunately in terms of subscriptions realm treats *every* write to any realm object as a modification,
-                // even if the write was redundant and had no observable effect.
-
-                if (dbBeatmapSet.Status != onlineBeatmapSet.Status)
-                    dbBeatmapSet.Status = onlineBeatmapSet.Status;
-
-                foreach (var dbBeatmap in dbBeatmapSet.Beatmaps)
+                if (onlineBeatmaps.TryGetValue(dbBeatmap.OnlineID, out var onlineBeatmap))
                 {
-                    if (onlineBeatmaps.TryGetValue(dbBeatmap.OnlineID, out var onlineBeatmap))
+                    // compare `BeatmapUpdaterMetadataLookup`
+                    if (dbBeatmap.OnlineMD5Hash != onlineBeatmap.MD5Hash)
+                        dbBeatmap.OnlineMD5Hash = onlineBeatmap.MD5Hash;
+
+                    if (dbBeatmap.LastOnlineUpdate != onlineBeatmap.LastUpdated)
+                        dbBeatmap.LastOnlineUpdate = onlineBeatmap.LastUpdated;
+
+                    if (dbBeatmap.MatchesOnlineVersion && dbBeatmap.Status != onlineBeatmap.Status)
+                        dbBeatmap.Status = onlineBeatmap.Status;
+
+                    HashSet<string> userTags = onlineBeatmap.TopTags?
+                                                            .Select(t => (topTag: t, relatedTag: tagsById.GetValueOrDefault(t.TagId)))
+                                                            .Where(t => t.relatedTag != null)
+                                                            .Select(t => t.relatedTag!.Name)
+                                                            .ToHashSet() ?? [];
+
+                    if (!userTags.SetEquals(dbBeatmap.Metadata.UserTags))
                     {
-                        // compare `BeatmapUpdaterMetadataLookup`
-                        if (dbBeatmap.OnlineMD5Hash != onlineBeatmap.MD5Hash)
-                            dbBeatmap.OnlineMD5Hash = onlineBeatmap.MD5Hash;
-
-                        if (dbBeatmap.LastOnlineUpdate != onlineBeatmap.LastUpdated)
-                            dbBeatmap.LastOnlineUpdate = onlineBeatmap.LastUpdated;
-
-                        if (dbBeatmap.MatchesOnlineVersion && dbBeatmap.Status != onlineBeatmap.Status)
-                            dbBeatmap.Status = onlineBeatmap.Status;
-
-                        HashSet<string> userTags = onlineBeatmap.TopTags?
-                                                                .Select(t => (topTag: t, relatedTag: tagsById.GetValueOrDefault(t.TagId)))
-                                                                .Where(t => t.relatedTag != null)
-                                                                .Select(t => t.relatedTag!.Name)
-                                                                .ToHashSet() ?? [];
-
-                        if (!userTags.SetEquals(dbBeatmap.Metadata.UserTags))
-                        {
-                            dbBeatmap.Metadata.UserTags.Clear();
-                            dbBeatmap.Metadata.UserTags.AddRange(userTags);
-                        }
+                        dbBeatmap.Metadata.UserTags.Clear();
+                        dbBeatmap.Metadata.UserTags.AddRange(userTags);
                     }
                 }
             }
+
+            return dbBeatmapSet.Detach();
         }
+
+        /// <summary>
+        /// Represents the result of <see cref="RealmPopulatingOnlineLookupSource.LookupOnlineAsync(BeatmapSetInfo,CancellationToken)"/>.
+        /// </summary>
+        /// <param name="Online">Contains the data of the beatmap set looked up from API. Can be <see langword="null"/> if the set cannot be looked up online.</param>
+        /// <param name="Local">Contains the state of the beatmap set in the local database, including any updates applied from <see cref="Online"/>.</param>
+        public record BeatmapSetLookupResult(APIBeatmapSet? Online, BeatmapSetInfo Local);
     }
 }

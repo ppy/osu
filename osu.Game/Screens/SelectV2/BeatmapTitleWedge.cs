@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,12 +17,10 @@ using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Configuration;
-using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -72,12 +71,9 @@ namespace osu.Game.Screens.SelectV2
         [Resolved]
         private RealmPopulatingOnlineLookupSource onlineLookupSource { get; set; } = null!;
 
-        [Resolved]
-        private RealmAccess realm { get; set; } = null!;
-
-        private APIBeatmapSet? currentOnlineBeatmapSet;
+        private RealmPopulatingOnlineLookupSource.BeatmapSetLookupResult? lastLookupResult;
         private CancellationTokenSource? cancellationTokenSource;
-        private Task<APIBeatmapSet?>? currentFetchTask;
+        private Task<RealmPopulatingOnlineLookupSource.BeatmapSetLookupResult>? currentFetchTask;
 
         private FillFlowContainer statisticsFlow = null!;
 
@@ -244,7 +240,7 @@ namespace osu.Game.Screens.SelectV2
 
             updateLengthAndBpmStatistics();
 
-            if (currentOnlineBeatmapSet == null || currentOnlineBeatmapSet.OnlineID != beatmapSetInfo.OnlineID)
+            if (lastLookupResult == null || lastLookupResult.Online?.OnlineID != beatmapSetInfo.OnlineID)
                 refetchBeatmapSet();
 
             updateOnlineDisplay();
@@ -294,21 +290,18 @@ namespace osu.Game.Screens.SelectV2
             var beatmapSetInfo = working.Value.BeatmapSetInfo;
 
             cancellationTokenSource?.Cancel();
-            currentOnlineBeatmapSet = null;
+            lastLookupResult = null;
 
-            if (beatmapSetInfo.OnlineID >= 1)
+            cancellationTokenSource = new CancellationTokenSource();
+            currentFetchTask = onlineLookupSource.LookupOnlineAsync(beatmapSetInfo);
+            currentFetchTask.ContinueWith(t =>
             {
-                cancellationTokenSource = new CancellationTokenSource();
-                currentFetchTask = onlineLookupSource.GetBeatmapSetAsync(beatmapSetInfo.OnlineID);
-                currentFetchTask.ContinueWith(t =>
-                {
-                    if (t.IsCompletedSuccessfully)
-                        currentOnlineBeatmapSet = t.GetResultSafely();
-                    if (t.Exception != null)
-                        Logger.Log($"Error when fetching online beatmap set: {t.Exception}", LoggingTarget.Network);
-                    Scheduler.AddOnce(updateOnlineDisplay);
-                });
-            }
+                if (t.IsCompletedSuccessfully)
+                    lastLookupResult = t.GetResultSafely();
+                if (t.Exception != null)
+                    Logger.Log($"Error when fetching online beatmap set: {t.Exception}", LoggingTarget.Network);
+                Scheduler.AddOnce(updateOnlineDisplay);
+            });
         }
 
         private void updateOnlineDisplay()
@@ -320,9 +313,11 @@ namespace osu.Game.Screens.SelectV2
             }
             else
             {
-                var onlineBeatmap = currentOnlineBeatmapSet?.Beatmaps.SingleOrDefault(b => b.OnlineID == working.Value.BeatmapInfo.OnlineID);
+                Debug.Assert(lastLookupResult != null);
+
+                var onlineBeatmap = lastLookupResult.Online?.Beatmaps.SingleOrDefault(b => b.OnlineID == working.Value.BeatmapInfo.OnlineID);
                 playCount.Value = new StatisticPlayCount.Data(onlineBeatmap?.PlayCount ?? -1, onlineBeatmap?.UserPlayCount ?? -1);
-                favouriteButton.SetBeatmapSet(currentOnlineBeatmapSet);
+                favouriteButton.SetBeatmapSet(lastLookupResult.Online);
 
                 // the online fetch may have also updated the beatmap's status.
                 // this needs to be checked against the *local* beatmap model rather than the online one, because it's not known here whether the status change has occurred or not
@@ -330,13 +325,7 @@ namespace osu.Game.Screens.SelectV2
                 // it also has to be handled explicitly like this because the working beatmap's `BeatmapInfo` will not receive these updates due to being detached
                 // (and because of https://github.com/ppy/osu/blob/4b73afd1957a9161e2956fc4191c8114d9958372/osu.Game/Screens/SelectV2/SongSelect.cs#L487-L488
                 // which prevents working beatmap refetches caused by changes to the realm model of perceived low importance).
-                var status = realm.Run(r =>
-                {
-                    var refetchedBeatmap = r.Find<BeatmapInfo>(working.Value.BeatmapInfo.ID);
-                    return refetchedBeatmap?.Status;
-                });
-                if (status != null)
-                    statusPill.Status = status.Value;
+                statusPill.Status = lastLookupResult.Local.Status;
             }
         }
     }
