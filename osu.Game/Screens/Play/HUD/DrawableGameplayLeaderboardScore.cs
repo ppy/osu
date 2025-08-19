@@ -399,18 +399,18 @@ namespace osu.Game.Screens.Play.HUD
                     rightLayer.Width = computeRightLayerWidth();
                 }
 
-                bool showAccuracyAndCombo = rightLayer.Width >= accuracy_combo_width_cutoff;
-
-                accuracyText.Alpha = showAccuracyAndCombo ? 1 : 0;
-                comboText.Alpha = showAccuracyAndCombo ? 1 : 0;
-
-                bool showUsernameAndScore = rightLayer.Width >= username_score_width_cutoff;
-
-                usernameText.Alpha = showUsernameAndScore ? 1 : 0;
-                scoreText.Alpha = showUsernameAndScore ? 1 : 0;
-
                 drawSizeLayout.Validate();
             }
+
+            bool showAccuracyAndCombo = rightLayer.Width >= accuracy_combo_width_cutoff;
+
+            accuracyText.Alpha = showAccuracyAndCombo ? 1 : 0;
+            comboText.Alpha = showAccuracyAndCombo ? 1 : 0;
+
+            bool showUsernameAndScore = rightLayer.Width >= username_score_width_cutoff;
+
+            usernameText.Alpha = showUsernameAndScore ? 1 : 0;
+            scoreText.Alpha = showUsernameAndScore ? 1 : 0;
         }
 
         private float computeRightLayerWidth() => Math.Max(0, DrawWidth - extended_left_panel_width - avatar_size / 2);
