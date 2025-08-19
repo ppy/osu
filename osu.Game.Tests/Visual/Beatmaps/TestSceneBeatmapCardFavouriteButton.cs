@@ -35,7 +35,11 @@ namespace osu.Game.Tests.Visual.Beatmaps
             AddStep("create beatmap set", () =>
             {
                 beatmapSetInfo = CreateAPIBeatmapSet(Ruleset.Value);
-                beatmapSetInfo.HasFavourited = favourited;
+
+                if (favourited)
+                    API.AddToFavourites(beatmapSetInfo);
+                else
+                    API.RemoveFromFavourites(beatmapSetInfo);
             });
             AddStep("create button", () => Child = button = new FavouriteButton(beatmapSetInfo)
             {

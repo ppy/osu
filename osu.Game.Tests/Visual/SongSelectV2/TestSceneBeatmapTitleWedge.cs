@@ -254,6 +254,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 var (working, onlineSet) = createTestBeatmap();
                 onlineSet.FavouriteCount = 9999;
                 onlineSet.HasFavourited = true;
+                API.AddToFavourites(onlineSet);
                 working.BeatmapSetInfo.OnlineID = onlineSet.OnlineID = 99999;
 
                 currentOnlineSet = onlineSet;

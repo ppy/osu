@@ -75,11 +75,8 @@ namespace osu.Game.Tests.Visual.Beatmaps
             undownloadable.LastUpdated = DateTimeOffset.Now.AddYears(-1);
 
             var someDifficulties = getManyDifficultiesBeatmapSet(11);
-            someDifficulties.Title = someDifficulties.TitleUnicode = "favourited";
             someDifficulties.Title = someDifficulties.TitleUnicode = "some difficulties";
             someDifficulties.Status = BeatmapOnlineStatus.Qualified;
-            someDifficulties.HasFavourited = true;
-            someDifficulties.FavouriteCount = 1;
             someDifficulties.NominationStatus = new BeatmapSetNominationStatus
             {
                 Current = 2,
@@ -93,20 +90,33 @@ namespace osu.Game.Tests.Visual.Beatmaps
             var manyDifficulties = getManyDifficultiesBeatmapSet(100);
             manyDifficulties.Status = BeatmapOnlineStatus.Pending;
 
+            var favourited = getManyDifficultiesBeatmapSet(11);
+            favourited.Title = favourited.TitleUnicode = "favourited";
+            favourited.Status = BeatmapOnlineStatus.Qualified;
+            favourited.NominationStatus = new BeatmapSetNominationStatus
+            {
+                Current = 2,
+                RequiredMeta =
+                {
+                    MainRuleset = 2,
+                    NonMainRuleset = 1,
+                }
+            };
+
             var explicitMap = CreateAPIBeatmapSet(Ruleset.Value);
-            explicitMap.Title = someDifficulties.TitleUnicode = "explicit beatmap";
+            explicitMap.Title = explicitMap.TitleUnicode = "explicit beatmap";
             explicitMap.HasExplicitContent = true;
 
             var spotlightMap = CreateAPIBeatmapSet(Ruleset.Value);
-            spotlightMap.Title = someDifficulties.TitleUnicode = "spotlight beatmap";
+            spotlightMap.Title = spotlightMap.TitleUnicode = "spotlight beatmap";
             spotlightMap.FeaturedInSpotlight = true;
 
             var featuredMap = CreateAPIBeatmapSet(Ruleset.Value);
-            featuredMap.Title = someDifficulties.TitleUnicode = "featured artist beatmap";
+            featuredMap.Title = featuredMap.TitleUnicode = "featured artist beatmap";
             featuredMap.TrackId = 1;
 
             var allBadgesMap = CreateAPIBeatmapSet(Ruleset.Value);
-            allBadgesMap.Title = someDifficulties.TitleUnicode = "all-badges beatmap";
+            allBadgesMap.Title = allBadgesMap.TitleUnicode = "all-badges beatmap";
             allBadgesMap.HasExplicitContent = true;
             allBadgesMap.FeaturedInSpotlight = true;
             allBadgesMap.TrackId = 2;
@@ -126,6 +136,7 @@ namespace osu.Game.Tests.Visual.Beatmaps
                 undownloadable,
                 someDifficulties,
                 manyDifficulties,
+                favourited,
                 explicitMap,
                 spotlightMap,
                 featuredMap,
@@ -135,6 +146,9 @@ namespace osu.Game.Tests.Visual.Beatmaps
 
             foreach (var testCase in testCases)
                 testCase.OnlineID = online_id;
+
+            favourited.OnlineID = 1; // assign favourited a unique online ID so it's the only one marked as favourited.
+            API.AddToFavourites(favourited);
         }
 
         private APIBeatmapSet getUndownloadableBeatmapSet() => new APIBeatmapSet
