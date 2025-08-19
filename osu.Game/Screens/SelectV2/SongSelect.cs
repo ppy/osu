@@ -977,17 +977,17 @@ namespace osu.Game.Screens.SelectV2
 
             onlineLookupCancellation = new CancellationTokenSource();
             currentOnlineLookup = onlineLookupSource.LookupOnlineAsync(beatmapSetInfo);
-            currentOnlineLookup.ContinueWith(t => Schedule(() =>
+            currentOnlineLookup.ContinueWith(t =>
             {
                 if (t.IsCompletedSuccessfully)
-                    lastLookupResult.Value = t.GetResultSafely();
+                    Schedule(() => lastLookupResult.Value = t.GetResultSafely());
 
                 if (t.Exception != null)
                 {
                     Logger.Log($"Error when fetching online beatmap set: {t.Exception}", LoggingTarget.Network);
-                    lastLookupResult.Value = new RealmPopulatingOnlineLookupSource.BeatmapSetLookupResult(null, Beatmap.Value.BeatmapSetInfo);
+                    Schedule(() => lastLookupResult.Value = new RealmPopulatingOnlineLookupSource.BeatmapSetLookupResult(null, Beatmap.Value.BeatmapSetInfo));
                 }
-            }));
+            });
         }
 
         #endregion
