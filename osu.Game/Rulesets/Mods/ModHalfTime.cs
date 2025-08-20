@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Mods
     {
         public override string Name => "Half Time";
         public override string Acronym => "HT";
-        public override IconUsage? Icon => OsuIcon.ModHalftime;
+        public override IconUsage? Icon => OsuIcon.ModHalfTime;
         public override ModType Type => ModType.DifficultyReduction;
         public override LocalisableString Description => "Less zoom...";
         public override bool Ranked => SpeedChange.IsDefault;
