@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -15,7 +14,6 @@ using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Shaders.Types;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
-using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.OpenGL.Vertices;
@@ -85,7 +83,7 @@ namespace osu.Game.Rulesets.Mods
             flashlight.Colour = Color4.Black;
 
             flashlight.Combo.BindTo(Combo);
-            flashlight.GetPlayfieldScale = () => drawableRuleset.PlayfieldAdjustmentContainer.Scale;
+            flashlight.Playfield = drawableRuleset.Playfield;
 
             drawableRuleset.Overlays.Add(new Container
             {
@@ -111,7 +109,7 @@ namespace osu.Game.Rulesets.Mods
 
             public override bool RemoveCompletedTransforms => false;
 
-            internal Func<Vector2>? GetPlayfieldScale;
+            internal Playfield Playfield { get; set; } = null!;
 
             private readonly float defaultFlashlightSize;
             private readonly float sizeMultiplier;
@@ -155,15 +153,6 @@ namespace osu.Game.Rulesets.Mods
             public float GetSize()
             {
                 float size = defaultFlashlightSize * sizeMultiplier;
-
-                if (GetPlayfieldScale != null)
-                {
-                    Vector2 playfieldScale = GetPlayfieldScale();
-
-                    Debug.Assert(Precision.AlmostEquals(Math.Abs(playfieldScale.X), Math.Abs(playfieldScale.Y)),
-                        @"Playfield has non-proportional scaling. Flashlight implementations should be revisited with regard to balance.");
-                    size *= Math.Abs(playfieldScale.X);
-                }
 
                 if (isBreakTime.Value)
                     size *= 2.5f;
@@ -265,7 +254,11 @@ namespace osu.Game.Rulesets.Mods
                     shader = Source.shader;
                     screenSpaceDrawQuad = Source.ScreenSpaceDrawQuad;
                     flashlightPosition = Vector2Extensions.Transform(Source.FlashlightPosition, DrawInfo.Matrix);
-                    flashlightSize = Source.FlashlightSize * DrawInfo.Matrix.ExtractScale().Xy;
+
+                    // scale the flashlight based on the playfield to match gameplay components scale.
+                    Vector2 drawInfoScale = Source.Playfield.DrawInfo.Matrix.ExtractScale().Xy;
+                    flashlightSize = Source.FlashlightSize * drawInfoScale;
+
                     flashlightDim = Source.FlashlightDim;
                     flashlightSmoothness = Source.flashlightSmoothness;
                 }
