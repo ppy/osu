@@ -4,11 +4,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
@@ -21,6 +23,9 @@ namespace osu.Game.Tests.Visual.UserInterface
     {
         private FillFlowContainer spreadOutFlow = null!;
         private ModDisplay modDisplay = null!;
+
+        [Resolved]
+        private RulesetStore rulesetStore { get; set; } = null!;
 
         [SetUpSteps]
         public void SetUpSteps()
@@ -70,9 +75,26 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestShowAllMods()
         {
-            AddStep("create mod icons", () =>
+            createModIconsForRuleset(0);
+            createModIconsForRuleset(1);
+            createModIconsForRuleset(2);
+            createModIconsForRuleset(3);
+
+            AddStep("toggle selected", () =>
             {
-                addRange(Ruleset.Value.CreateInstance().CreateAllMods().Select(m =>
+                foreach (var icon in this.ChildrenOfType<ModIcon>())
+                    icon.Selected.Toggle();
+            });
+        }
+
+        private void createModIconsForRuleset(int rulesetId)
+        {
+            AddStep($"create mod icons for ruleset {rulesetId}", () =>
+            {
+                spreadOutFlow.Clear();
+                modDisplay.Current.Value = [];
+
+                addRange(rulesetStore.GetRuleset(rulesetId)!.CreateInstance().CreateAllMods().Select(m =>
                 {
                     if (m is OsuModFlashlight fl)
                         fl.FollowDelay.Value = 1245;
@@ -88,12 +110,6 @@ namespace osu.Game.Tests.Visual.UserInterface
 
                     return m;
                 }));
-            });
-
-            AddStep("toggle selected", () =>
-            {
-                foreach (var icon in this.ChildrenOfType<ModIcon>())
-                    icon.Selected.Toggle();
             });
         }
 
