@@ -149,13 +149,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddUntilStep("wait for panel load", () => panel.ChildrenOfType<DrawableRoomParticipantsList>().Any());
 
-            AddAssert("password icon hidden", () => Precision.AlmostEquals(0, panel.ChildrenOfType<RoomPanel.CornerIcon>().Single().Alpha));
+            AddAssert("password icon hidden", () => Precision.AlmostEquals(0, panel.ChildrenOfType<RoomPanel.CornerIcon>().First().Alpha));
 
             AddStep("set password", () => room.Password = "password");
-            AddAssert("password icon visible", () => Precision.AlmostEquals(1, panel.ChildrenOfType<RoomPanel.CornerIcon>().Single().Alpha));
+            AddAssert("password icon visible", () => Precision.AlmostEquals(1, panel.ChildrenOfType<RoomPanel.CornerIcon>().First().Alpha));
 
             AddStep("unset password", () => room.Password = string.Empty);
-            AddAssert("password icon hidden", () => Precision.AlmostEquals(0, panel.ChildrenOfType<RoomPanel.CornerIcon>().Single().Alpha));
+            AddAssert("password icon hidden", () => Precision.AlmostEquals(0, panel.ChildrenOfType<RoomPanel.CornerIcon>().First().Alpha));
         }
 
         [Test]
