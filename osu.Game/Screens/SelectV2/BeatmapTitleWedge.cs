@@ -293,7 +293,7 @@ namespace osu.Game.Screens.SelectV2
                 // it also has to be handled explicitly like this because the working beatmap's `BeatmapInfo` will not receive these updates due to being detached
                 // (and because of https://github.com/ppy/osu/blob/4b73afd1957a9161e2956fc4191c8114d9958372/osu.Game/Screens/SelectV2/SongSelect.cs#L487-L488
                 // which prevents working beatmap refetches caused by changes to the realm model of perceived low importance).
-                statusPill.Status = onlineLookupResult.Value.Local.Status;
+                statusPill.Status = onlineLookupResult.Value.Local.Beatmaps.SingleOrDefault(b => b.ID == working.Value.BeatmapInfo.ID)?.Status ?? statusPill.Status;
             }
         }
     }
