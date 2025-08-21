@@ -82,6 +82,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         }),
                         createLoungeRoom(new Room
                         {
+                            Name = "Pinned room",
+                            Pinned = true,
+                            EndDate = DateTimeOffset.Now.AddDays(1),
+                            Type = MatchType.HeadToHead,
+                            Playlist = [item1],
+                            CurrentPlaylistItem = item1
+                        }),
+                        createLoungeRoom(new Room
+                        {
                             Name = "Private room",
                             Password = "*",
                             EndDate = DateTimeOffset.Now.AddDays(1),
@@ -140,13 +149,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddUntilStep("wait for panel load", () => panel.ChildrenOfType<DrawableRoomParticipantsList>().Any());
 
-            AddAssert("password icon hidden", () => Precision.AlmostEquals(0, panel.ChildrenOfType<RoomPanel.PasswordProtectedIcon>().Single().Alpha));
+            AddAssert("password icon hidden", () => Precision.AlmostEquals(0, panel.ChildrenOfType<RoomPanel.CornerIcon>().Single().Alpha));
 
             AddStep("set password", () => room.Password = "password");
-            AddAssert("password icon visible", () => Precision.AlmostEquals(1, panel.ChildrenOfType<RoomPanel.PasswordProtectedIcon>().Single().Alpha));
+            AddAssert("password icon visible", () => Precision.AlmostEquals(1, panel.ChildrenOfType<RoomPanel.CornerIcon>().Single().Alpha));
 
             AddStep("unset password", () => room.Password = string.Empty);
-            AddAssert("password icon hidden", () => Precision.AlmostEquals(0, panel.ChildrenOfType<RoomPanel.PasswordProtectedIcon>().Single().Alpha));
+            AddAssert("password icon hidden", () => Precision.AlmostEquals(0, panel.ChildrenOfType<RoomPanel.CornerIcon>().Single().Alpha));
         }
 
         [Test]
