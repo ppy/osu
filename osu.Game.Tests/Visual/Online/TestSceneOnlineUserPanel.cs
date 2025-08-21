@@ -52,19 +52,6 @@ namespace osu.Game.Tests.Visual.Online
                         Spacing = new Vector2(10f),
                         Children = new Drawable[]
                         {
-                            new OnlineUserBrickPanel(new APIUser
-                            {
-                                Username = @"flyte",
-                                Id = 3103765,
-                                CoverUrl = @"https://assets.ppy.sh/user-cover-presets/1/df28696b58541a9e67f6755918951d542d93bdf1da41720fcca2fd2c1ea8cf51.jpeg",
-                            }),
-                            new OnlineUserBrickPanel(new APIUser
-                            {
-                                Username = @"peppy",
-                                Id = 2,
-                                Colour = "99EB47",
-                                CoverUrl = @"https://assets.ppy.sh/user-profile-covers/8195163/4a8e2ad5a02a2642b631438cfa6c6bd7e2f9db289be881cb27df18331f64144c.jpeg",
-                            }),
                             new OnlineUserGridPanel(new APIUser
                             {
                                 Username = @"flyte",
