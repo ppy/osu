@@ -66,6 +66,18 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("toggle black background", () => blackBackground?.FadeTo(1 - blackBackground.Alpha, 300, Easing.OutQuint));
 
+            AddSliderStep("leaderboard width", 0, 800, 300, v =>
+            {
+                if (leaderboard.IsNotNull())
+                    leaderboard.Width = v;
+            });
+
+            AddSliderStep("leaderboard height", 0, 1000, 300, v =>
+            {
+                if (leaderboard.IsNotNull())
+                    leaderboard.Height = v;
+            });
+
             AddSliderStep("set player score", 50, 1_000_000, 700_000, v => gameplayState.ScoreProcessor.TotalScore.Value = v);
         }
 
@@ -105,6 +117,45 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("set score to 850k", () => gameplayState.ScoreProcessor.TotalScore.Value = 850_000);
             AddUntilStep("wait for 2nd spot", () => leaderboard.TrackedScore!.ScorePosition.Value, () => Is.EqualTo(2));
             AddStep("set score to 950k", () => gameplayState.ScoreProcessor.TotalScore.Value = 950_000);
+            AddUntilStep("wait for 1st spot", () => leaderboard.TrackedScore!.ScorePosition.Value, () => Is.EqualTo(1));
+        }
+
+        [Test]
+        public void TestLongScores()
+        {
+            AddStep("set scores", () =>
+            {
+                var friend = new APIUser { Username = "Friend", Id = 1337 };
+
+                var api = (DummyAPIAccess)API;
+
+                api.Friends.Clear();
+                api.Friends.Add(new APIRelation
+                {
+                    Mutual = true,
+                    RelationType = RelationType.Friend,
+                    TargetID = friend.OnlineID,
+                    TargetUser = friend
+                });
+
+                // this is dodgy but anything less dodgy is a lot of work
+                ((Bindable<LeaderboardScores?>)leaderboardManager.Scores).Value = LeaderboardScores.Success(new[]
+                {
+                    new ScoreInfo { User = new APIUser { Username = "Top", Id = 2 }, TotalScore = 900_000_000, Accuracy = 0.99, MaxCombo = 999999 },
+                    new ScoreInfo { User = new APIUser { Username = "Second", Id = 14 }, TotalScore = 800_000_000, Accuracy = 0.9, MaxCombo = 888888 },
+                    new ScoreInfo { User = friend, TotalScore = 700_000_000, Accuracy = 0.88, MaxCombo = 777777 },
+                }, 3, null);
+            });
+
+            createLeaderboard();
+
+            AddStep("set score to 650k", () => gameplayState.ScoreProcessor.TotalScore.Value = 650_000_000);
+            AddUntilStep("wait for 4th spot", () => leaderboard.TrackedScore!.ScorePosition.Value, () => Is.EqualTo(4));
+            AddStep("set score to 750k", () => gameplayState.ScoreProcessor.TotalScore.Value = 750_000_000);
+            AddUntilStep("wait for 3rd spot", () => leaderboard.TrackedScore!.ScorePosition.Value, () => Is.EqualTo(3));
+            AddStep("set score to 850k", () => gameplayState.ScoreProcessor.TotalScore.Value = 850_000_000);
+            AddUntilStep("wait for 2nd spot", () => leaderboard.TrackedScore!.ScorePosition.Value, () => Is.EqualTo(2));
+            AddStep("set score to 950k", () => gameplayState.ScoreProcessor.TotalScore.Value = 950_000_000);
             AddUntilStep("wait for 1st spot", () => leaderboard.TrackedScore!.ScorePosition.Value, () => Is.EqualTo(1));
         }
 
