@@ -27,13 +27,13 @@ namespace osu.Game.Rulesets.Edit.Checks
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
-            var beatmapSet = context.Beatmap.BeatmapInfo.BeatmapSet;
-            var audioFile = beatmapSet?.GetFile(context.Beatmap.Metadata.AudioFile);
+            var beatmapSet = context.CurrentDifficulty.Playable.BeatmapInfo.BeatmapSet;
+            var audioFile = beatmapSet?.GetFile(context.CurrentDifficulty.Playable.Metadata.AudioFile);
 
             if (beatmapSet == null) yield break;
             if (audioFile == null) yield break;
 
-            var audioFormat = AudioCheckUtils.GetAudioFormatFromFile(context, context.Beatmap.Metadata.AudioFile);
+            var audioFormat = AudioCheckUtils.GetAudioFormatFromFile(context, context.CurrentDifficulty.Playable.Metadata.AudioFile);
 
             // If the format is not supported by BASS
             if (audioFormat == 0)

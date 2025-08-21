@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Game.Rulesets.Edit.Checks.Components;
 
 namespace osu.Game.Rulesets.Edit.Checks
@@ -22,21 +23,16 @@ namespace osu.Game.Rulesets.Edit.Checks
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
-            var difficulties = context.BeatmapsetDifficulties;
-
-            if (difficulties.Count <= 1)
+            if (context.AllDifficulties.Count() <= 1)
                 yield break;
 
             // Use the current difficulty as reference
-            var referenceBeatmap = context.Beatmap;
+            var referenceBeatmap = context.CurrentDifficulty.Playable;
             var referenceTimingPoints = referenceBeatmap.ControlPointInfo.TimingPoints;
 
-            foreach (var beatmap in difficulties)
+            foreach (var beatmap in context.OtherDifficulties)
             {
-                if (beatmap == referenceBeatmap)
-                    continue;
-
-                var timingPoints = beatmap.ControlPointInfo.TimingPoints;
+                var timingPoints = beatmap.Playable.ControlPointInfo.TimingPoints;
 
                 // Check each timing point in the reference against this difficulty
                 foreach (var referencePoint in referenceTimingPoints)
@@ -44,28 +40,30 @@ namespace osu.Game.Rulesets.Edit.Checks
                     var matchingPoint = TimingCheckUtils.FindMatchingTimingPoint(timingPoints, referencePoint.Time);
                     var exactMatchingPoint = TimingCheckUtils.FindExactMatchingTimingPoint(timingPoints, referencePoint.Time);
 
+                    string currentDifficultyName = beatmap.Playable.BeatmapInfo.DifficultyName;
+
                     if (matchingPoint == null)
                     {
-                        yield return new IssueTemplateMissingTimingPoint(this).Create(referencePoint.Time, beatmap.BeatmapInfo.DifficultyName);
+                        yield return new IssueTemplateMissingTimingPoint(this).Create(referencePoint.Time, currentDifficultyName);
                     }
                     else
                     {
                         // Check for meter signature inconsistency
                         if (!referencePoint.TimeSignature.Equals(matchingPoint.TimeSignature))
                         {
-                            yield return new IssueTemplateInconsistentMeter(this).Create(referencePoint.Time, beatmap.BeatmapInfo.DifficultyName);
+                            yield return new IssueTemplateInconsistentMeter(this).Create(referencePoint.Time, currentDifficultyName);
                         }
 
                         // Check for BPM inconsistency
                         if (Math.Abs(referencePoint.BeatLength - matchingPoint.BeatLength) > TimingCheckUtils.TIME_OFFSET_TOLERANCE_MS)
                         {
-                            yield return new IssueTemplateInconsistentBPM(this).Create(referencePoint.Time, beatmap.BeatmapInfo.DifficultyName);
+                            yield return new IssueTemplateInconsistentBPM(this).Create(referencePoint.Time, currentDifficultyName);
                         }
 
                         // Check for exact timing match (decimal precision)
                         if (exactMatchingPoint == null)
                         {
-                            yield return new IssueTemplateMissingTimingPointMinor(this).Create(referencePoint.Time, beatmap.BeatmapInfo.DifficultyName);
+                            yield return new IssueTemplateMissingTimingPointMinor(this).Create(referencePoint.Time, currentDifficultyName);
                         }
                     }
                 }
@@ -78,11 +76,11 @@ namespace osu.Game.Rulesets.Edit.Checks
 
                     if (matchingReferencePoint == null)
                     {
-                        yield return new IssueTemplateExtraTimingPoint(this).Create(timingPoint.Time, beatmap.BeatmapInfo.DifficultyName);
+                        yield return new IssueTemplateExtraTimingPoint(this).Create(timingPoint.Time, beatmap.Playable.BeatmapInfo.DifficultyName);
                     }
                     else if (exactMatchingReferencePoint == null)
                     {
-                        yield return new IssueTemplateMissingTimingPointMinor(this).Create(timingPoint.Time, beatmap.BeatmapInfo.DifficultyName);
+                        yield return new IssueTemplateMissingTimingPointMinor(this).Create(timingPoint.Time, beatmap.Playable.BeatmapInfo.DifficultyName);
                     }
                 }
             }

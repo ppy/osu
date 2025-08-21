@@ -15,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    internal class OsuModWiggle : ModWithVisibilityAdjustment
+    public class OsuModWiggle : ModWithVisibilityAdjustment
     {
         public override string Name => "Wiggle";
         public override string Acronym => "WG";

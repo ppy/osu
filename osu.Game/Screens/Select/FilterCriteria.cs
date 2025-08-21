@@ -39,7 +39,7 @@ namespace osu.Game.Screens.Select
         public OptionalTextFilter Title;
         public OptionalTextFilter DifficultyName;
         public OptionalTextFilter Source;
-        public OptionalTextFilter UserTag;
+        public List<OptionalTextFilter> UserTags = [];
 
         public OptionalRange<double> UserStarDifficulty = new OptionalRange<double>
         {
@@ -154,35 +154,36 @@ namespace osu.Game.Screens.Select
 
             public bool IsInRange(T value)
             {
+                bool lowerRangeSatisfied = true;
+                bool upperRangeSatisfied = true;
+
                 if (Min != null)
                 {
                     int comparison = Comparer<T>.Default.Compare(value, Min.Value);
-
-                    if (comparison < 0)
-                        return false;
-
-                    if (comparison == 0 && !IsLowerInclusive)
-                        return false;
+                    lowerRangeSatisfied = comparison > 0 || (comparison == 0 && IsLowerInclusive);
                 }
 
                 if (Max != null)
                 {
                     int comparison = Comparer<T>.Default.Compare(value, Max.Value);
-
-                    if (comparison > 0)
-                        return false;
-
-                    if (comparison == 0 && !IsUpperInclusive)
-                        return false;
+                    upperRangeSatisfied = comparison < 0 || (comparison == 0 && IsUpperInclusive);
                 }
 
-                return true;
+                bool result = lowerRangeSatisfied && upperRangeSatisfied;
+                if (InvertRange)
+                    result = !result;
+                return result;
             }
 
             public T? Min;
             public T? Max;
             public bool IsLowerInclusive;
             public bool IsUpperInclusive;
+
+            /// <summary>
+            /// When <see langword="true"/>, the meaning of this filter is inverted, i.e. it will <i>exclude</i> items that satisfy this range.
+            /// </summary>
+            public bool InvertRange;
 
             public bool Equals(OptionalRange<T> other)
                 => EqualityComparer<T?>.Default.Equals(Min, other.Min)
@@ -206,21 +207,36 @@ namespace osu.Game.Screens.Select
                 if (string.IsNullOrEmpty(value))
                     return false;
 
+                bool result;
+
                 switch (MatchMode)
                 {
                     default:
                     case MatchMode.Substring:
                         // Note that we are using ordinal here to avoid performance issues caused by globalisation concerns.
                         // See https://github.com/ppy/osu/issues/11571 / https://github.com/dotnet/docs/issues/18423.
-                        return value.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase);
+                        result = value.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase);
+                        break;
 
                     case MatchMode.IsolatedPhrase:
-                        return Regex.IsMatch(value, $@"(^|\s){Regex.Escape(searchTerm)}($|\s)", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+                        result = Regex.IsMatch(value, $@"(^|\s){Regex.Escape(searchTerm)}($|\s)", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+                        break;
 
                     case MatchMode.FullPhrase:
-                        return CultureInfo.InvariantCulture.CompareInfo.Compare(value, searchTerm, CompareOptions.OrdinalIgnoreCase) == 0;
+                        result = CultureInfo.InvariantCulture.CompareInfo.Compare(value, searchTerm, CompareOptions.OrdinalIgnoreCase) == 0;
+                        break;
                 }
+
+                if (ExcludeTerm)
+                    result = !result;
+
+                return result;
             }
+
+            /// <summary>
+            /// When <see langword="true"/>, the meaning of this filter is inverted, i.e. it will <i>exclude</i> items which match <see cref="SearchTerm"/>.
+            /// </summary>
+            public bool ExcludeTerm;
 
             private string searchTerm;
 
