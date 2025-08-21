@@ -850,7 +850,7 @@ namespace osu.Game.Screens.SelectV2
             // For simplicity, disable this functionality on mobile.
             bool isTouchInput = e.CurrentState.Mouse.LastSource is ISourcedFromTouch;
 
-            if (!carousel.AbsoluteScrolling && !isTouchInput && mouseDownPriority)
+            if (!carousel.AbsoluteScrolling && !isTouchInput && mouseDownPriority && revealingBackground == null)
             {
                 revealingBackground = Scheduler.AddDelayed(() =>
                 {
