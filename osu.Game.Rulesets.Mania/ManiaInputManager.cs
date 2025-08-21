@@ -1,9 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.ComponentModel;
 using osu.Framework.Allocation;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Localisation;
+using osu.Game.Localisation;
 using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Mania
@@ -19,64 +20,64 @@ namespace osu.Game.Rulesets.Mania
 
     public enum ManiaAction
     {
-        [Description("Key 1")]
+        [LocalisableDescription(typeof(RulesetActionsStrings), nameof(RulesetActionsStrings.ManiaKey1))]
         Key1,
 
-        [Description("Key 2")]
+        [LocalisableDescription(typeof(RulesetActionsStrings), nameof(RulesetActionsStrings.ManiaKey2))]
         Key2,
 
-        [Description("Key 3")]
+        [LocalisableDescription(typeof(RulesetActionsStrings), nameof(RulesetActionsStrings.ManiaKey3))]
         Key3,
 
-        [Description("Key 4")]
+        [LocalisableDescription(typeof(RulesetActionsStrings), nameof(RulesetActionsStrings.ManiaKey4))]
         Key4,
 
-        [Description("Key 5")]
+        [LocalisableDescription(typeof(RulesetActionsStrings), nameof(RulesetActionsStrings.ManiaKey5))]
         Key5,
 
-        [Description("Key 6")]
+        [LocalisableDescription(typeof(RulesetActionsStrings), nameof(RulesetActionsStrings.ManiaKey6))]
         Key6,
 
-        [Description("Key 7")]
+        [LocalisableDescription(typeof(RulesetActionsStrings), nameof(RulesetActionsStrings.ManiaKey7))]
         Key7,
 
-        [Description("Key 8")]
+        [LocalisableDescription(typeof(RulesetActionsStrings), nameof(RulesetActionsStrings.ManiaKey8))]
         Key8,
 
-        [Description("Key 9")]
+        [LocalisableDescription(typeof(RulesetActionsStrings), nameof(RulesetActionsStrings.ManiaKey9))]
         Key9,
 
-        [Description("Key 10")]
+        [LocalisableDescription(typeof(RulesetActionsStrings), nameof(RulesetActionsStrings.ManiaKey10))]
         Key10,
 
-        [Description("Key 11")]
+        [LocalisableDescription(typeof(RulesetActionsStrings), nameof(RulesetActionsStrings.ManiaKey11))]
         Key11,
 
-        [Description("Key 12")]
+        [LocalisableDescription(typeof(RulesetActionsStrings), nameof(RulesetActionsStrings.ManiaKey12))]
         Key12,
 
-        [Description("Key 13")]
+        [LocalisableDescription(typeof(RulesetActionsStrings), nameof(RulesetActionsStrings.ManiaKey13))]
         Key13,
 
-        [Description("Key 14")]
+        [LocalisableDescription(typeof(RulesetActionsStrings), nameof(RulesetActionsStrings.ManiaKey14))]
         Key14,
 
-        [Description("Key 15")]
+        [LocalisableDescription(typeof(RulesetActionsStrings), nameof(RulesetActionsStrings.ManiaKey15))]
         Key15,
 
-        [Description("Key 16")]
+        [LocalisableDescription(typeof(RulesetActionsStrings), nameof(RulesetActionsStrings.ManiaKey16))]
         Key16,
 
-        [Description("Key 17")]
+        [LocalisableDescription(typeof(RulesetActionsStrings), nameof(RulesetActionsStrings.ManiaKey17))]
         Key17,
 
-        [Description("Key 18")]
+        [LocalisableDescription(typeof(RulesetActionsStrings), nameof(RulesetActionsStrings.ManiaKey18))]
         Key18,
 
-        [Description("Key 19")]
+        [LocalisableDescription(typeof(RulesetActionsStrings), nameof(RulesetActionsStrings.ManiaKey19))]
         Key19,
 
-        [Description("Key 20")]
+        [LocalisableDescription(typeof(RulesetActionsStrings), nameof(RulesetActionsStrings.ManiaKey20))]
         Key20,
     }
 }
