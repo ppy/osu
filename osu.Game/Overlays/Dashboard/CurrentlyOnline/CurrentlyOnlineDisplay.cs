@@ -80,7 +80,7 @@ namespace osu.Game.Overlays.Dashboard.CurrentlyOnline
                                         PlaceholderText = HomeStrings.SearchPlaceholder,
                                     },
                                     Empty(),
-                                    userListToolbar = new UserListToolbar
+                                    userListToolbar = new UserListToolbar(false)
                                     {
                                         Anchor = Anchor.CentreRight,
                                         Origin = Anchor.CentreRight,

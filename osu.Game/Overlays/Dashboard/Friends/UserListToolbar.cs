@@ -16,11 +16,16 @@ namespace osu.Game.Overlays.Dashboard.Friends
 
         public Bindable<OverlayPanelDisplayStyle> DisplayStyle => styleControl.Current;
 
+        private readonly Bindable<OverlayPanelDisplayStyle> configDisplayStyle = new Bindable<OverlayPanelDisplayStyle>();
+
+        private readonly bool supportsBrickMode;
         private readonly UserSortTabControl sortControl;
         private readonly OverlayPanelDisplayStyleControl styleControl;
 
-        public UserListToolbar()
+        public UserListToolbar(bool supportsBrickMode)
         {
+            this.supportsBrickMode = supportsBrickMode;
+
             AutoSizeAxes = Axes.Both;
 
             AddInternal(new FillFlowContainer
@@ -35,7 +40,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                     },
-                    styleControl = new OverlayPanelDisplayStyleControl
+                    styleControl = new OverlayPanelDisplayStyleControl(supportsBrickMode)
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
@@ -48,7 +53,25 @@ namespace osu.Game.Overlays.Dashboard.Friends
         private void load(OsuConfigManager config)
         {
             config.BindWith(OsuSetting.DashboardSortMode, SortCriteria);
-            config.BindWith(OsuSetting.DashboardDisplayStyle, DisplayStyle);
+            config.BindWith(OsuSetting.DashboardDisplayStyle, configDisplayStyle);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            configDisplayStyle.BindValueChanged(style =>
+            {
+                if (style.NewValue == OverlayPanelDisplayStyle.Brick && !supportsBrickMode)
+                    DisplayStyle.Value = OverlayPanelDisplayStyle.Card;
+                else
+                    DisplayStyle.Value = style.NewValue;
+            }, true);
+
+            DisplayStyle.BindValueChanged(style =>
+            {
+                configDisplayStyle.Value = style.NewValue;
+            }, true);
         }
     }
 }

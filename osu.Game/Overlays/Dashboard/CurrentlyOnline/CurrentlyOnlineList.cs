@@ -113,9 +113,6 @@ namespace osu.Game.Overlays.Dashboard.CurrentlyOnline
 
                 case OverlayPanelDisplayStyle.List:
                     return new OnlineUserListPanel(user);
-
-                case OverlayPanelDisplayStyle.Brick:
-                    return new OnlineUserBrickPanel(user);
             }
         }
 
