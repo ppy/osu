@@ -36,7 +36,7 @@
     </PackageReference>
     <PackageReference Include="Realm" Version="20.1.0" />
     <PackageReference Include="ppy.osu.Framework" Version="2025.808.0" />
-    <PackageReference Include="ppy.osu.Game.Resources" Version="2025.819.0" />
+    <PackageReference Include="ppy.osu.Game.Resources" Version="2025.821.0" />
     <PackageReference Include="Sentry" Version="5.1.1" />
     <!-- Held back due to 0.34.0 failing AOT compilation on ZstdSharp.dll dependency. -->
     <PackageReference Include="SharpCompress" Version="0.39.0" />
