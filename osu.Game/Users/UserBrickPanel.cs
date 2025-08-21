@@ -24,7 +24,8 @@ namespace osu.Game.Users
         [BackgroundDependencyLoader]
         private void load()
         {
-            Background.FadeTo(0.2f);
+            // Matches osu!web styling.
+            Background.FadeOut();
         }
 
         protected override Drawable CreateLayout() => new FillFlowContainer
