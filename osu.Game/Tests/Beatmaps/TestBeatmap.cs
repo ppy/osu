@@ -36,6 +36,7 @@ namespace osu.Game.Tests.Beatmaps
             SamplesMatchPlaybackRate = baseBeatmap.SamplesMatchPlaybackRate;
             DistanceSpacing = baseBeatmap.DistanceSpacing;
             GridSize = baseBeatmap.GridSize;
+            GridType = baseBeatmap.GridType;
             TimelineZoom = baseBeatmap.TimelineZoom;
             CountdownOffset = baseBeatmap.CountdownOffset;
 

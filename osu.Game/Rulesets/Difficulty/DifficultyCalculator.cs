@@ -403,6 +403,12 @@ namespace osu.Game.Rulesets.Difficulty
                 set => baseBeatmap.GridSize = value;
             }
 
+            public int GridType
+            {
+                get => baseBeatmap.GridType;
+                set => baseBeatmap.GridType = value;
+            }
+
             public double TimelineZoom
             {
                 get => baseBeatmap.TimelineZoom;

@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -177,7 +176,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             base.LoadComplete();
 
-            gridTypeButtons.Items.First().Select();
+            gridTypeButtons.Items[editorBeatmap.GridType].Select();
 
             StartPositionX.BindValueChanged(x =>
             {
@@ -218,6 +217,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                 GridLinesRotation.Disabled = v.NewValue == PositionSnapGridType.Circle;
 
                 gridTypeButtons.Items[(int)v.NewValue].Select();
+                editorBeatmap.GridType = (int)v.NewValue;
 
                 switch (v.NewValue)
                 {

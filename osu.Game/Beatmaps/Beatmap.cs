@@ -134,6 +134,8 @@ namespace osu.Game.Beatmaps
 
         public int GridSize { get; set; }
 
+        public int GridType { get; set; }
+
         public double TimelineZoom { get; set; } = 1.0;
 
         public CountdownType Countdown { get; set; } = CountdownType.None;
