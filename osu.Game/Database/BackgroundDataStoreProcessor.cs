@@ -558,9 +558,15 @@ namespace osu.Game.Database
 
             Logger.Log("Querying for beatmap sets that contain missing submission/rank date...");
 
+            // find all ranked beatmap sets with missing date ranked or date submitted that have at least one difficulty ranked as well.
+            // the reason for checking ranked status of the difficulties is that they can be locally modified or unknown too, and for those the lookup is likely to fail.
+            // this is because metadata lookups are primarily based on file hash, so they will fail to match if the beatmap does not match the online version
+            // (which is likely to be the case if the beatmap is locally modified or unknown).
+            // that said, one difficulty in ranked state is enough for the backpopulation to work.
             HashSet<Guid> beatmapSetIds = realmAccess.Run(r => new HashSet<Guid>(
                 r.All<BeatmapSetInfo>()
-                 .Where(b => b.StatusInt > 0 && (b.DateRanked == null || b.DateSubmitted == null))
+                 .Filter($@"{nameof(BeatmapSetInfo.StatusInt)} > 0 && ({nameof(BeatmapSetInfo.DateRanked)} == null || {nameof(BeatmapSetInfo.DateSubmitted)} == null) "
+                         + $@"&& ANY {nameof(BeatmapSetInfo.Beatmaps)}.{nameof(BeatmapInfo.StatusInt)} > 0")
                  .AsEnumerable()
                  .Select(b => b.ID)));
 
@@ -591,11 +597,7 @@ namespace osu.Game.Database
                     {
                         BeatmapSetInfo beatmapSet = r.Find<BeatmapSetInfo>(id)!;
 
-                        // we want any ranked representative of the set.
-                        // the reason for checking ranked status of the difficulty is that it can be locally modified,
-                        // at which point the lookup will fail - but there might still be another unmodified difficulty on which it will work.
-                        if (beatmapSet.Beatmaps.FirstOrDefault(b => b.Status >= BeatmapOnlineStatus.Ranked) is not BeatmapInfo beatmap)
-                            return false;
+                        var beatmap = beatmapSet.Beatmaps.First(b => b.Status >= BeatmapOnlineStatus.Ranked);
 
                         bool lookupSucceeded = localMetadataSource.TryLookup(beatmap, out var result);
 
