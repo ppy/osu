@@ -12,7 +12,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
     {
         public new ManiaHitObject BaseObject => (ManiaHitObject)base.BaseObject;
         public List<DifficultyHitObject> Objects { get; }
-        public double EndTime => BaseObject.GetEndTime();
         public int Column => BaseObject.Column;
 
         public ManiaDifficultyHitObject(HitObject hitObject, HitObject lastObject, double clockRate, List<DifficultyHitObject> objects, int index)
