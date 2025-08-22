@@ -11,6 +11,144 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
     public class ManiaDifficultyHitObject : DifficultyHitObject
     {
         public new ManiaHitObject BaseObject => (ManiaHitObject)base.BaseObject;
+        public List<DifficultyHitObject> Objects { get; }
+        public double EndTime => BaseObject.GetEndTime();
+        public int Column => BaseObject.Column;
+
+        public ManiaDifficultyHitObject(HitObject hitObject, HitObject lastObject, double clockRate, List<DifficultyHitObject> objects, int index)
+            : base(hitObject, lastObject, clockRate, objects, index)
+        {
+            this.Objects = objects;
+        }
+
+        public bool IsColumnActive(int column)
+        {
+            double currentTime = StartTime;
+
+            if (Column == column)
+                return true;
+
+            for (int i = Index - 1; i >= 0; i--)
+            {
+                if (!(Objects[i] is ManiaDifficultyHitObject obj))
+                    continue;
+
+                if (System.Math.Abs(obj.StartTime - currentTime) >= 5)
+                    break;
+
+                if (obj.Column == column)
+                    return true;
+            }
+
+            for (int i = Index + 1; i < Objects.Count; i++)
+            {
+                if (!(Objects[i] is ManiaDifficultyHitObject obj))
+                    continue;
+
+                if (System.Math.Abs(obj.StartTime - currentTime) >= 5)
+                    break;
+
+                if (obj.Column == column)
+                    return true;
+            }
+
+            return false;
+        }
+
+        public int GetLongNoteCount()
+        {
+            double currentTime = StartTime;
+            int lnCount = 0;
+
+            // Check this object
+            if (BaseObject is HoldNote)
+                lnCount++;
+
+            // Check previous objects at the same time
+            for (int i = Index - 1; i >= 0; i--)
+            {
+                if (!(Objects[i] is ManiaDifficultyHitObject obj))
+                    continue;
+
+                if (System.Math.Abs(obj.StartTime - currentTime) >= 5)
+                    break;
+
+                if (obj.BaseObject is HoldNote)
+                    lnCount++;
+            }
+
+            // Check next objects at the same time
+            for (int i = Index + 1; i < Objects.Count; i++)
+            {
+                if (!(Objects[i] is ManiaDifficultyHitObject obj))
+                    continue;
+
+                if (System.Math.Abs(obj.StartTime - currentTime) >= 5)
+                    break;
+
+                if (obj.BaseObject is HoldNote)
+                    lnCount++;
+            }
+
+            return lnCount;
+        }
+
+        public double GetAverageLongNoteLength()
+        {
+            double currentTime = StartTime;
+            double totalLength = 0.0;
+            int lnCount = 0;
+
+            // Check this object
+            if (BaseObject is HoldNote currentHold)
+            {
+                totalLength += currentHold.Duration;
+                lnCount++;
+            }
+
+            // Check previous objects at the same time
+            for (int i = Index - 1; i >= 0; i--)
+            {
+                if (!(Objects[i] is ManiaDifficultyHitObject obj))
+                    continue;
+
+                if (System.Math.Abs(obj.StartTime - currentTime) >= 5)
+                    break;
+
+                if (obj.BaseObject is HoldNote hold)
+                {
+                    totalLength += hold.Duration;
+                    lnCount++;
+                }
+            }
+
+            // Check next objects at the same time
+            for (int i = Index + 1; i < Objects.Count; i++)
+            {
+                if (!(Objects[i] is ManiaDifficultyHitObject obj))
+                    continue;
+
+                if (System.Math.Abs(obj.StartTime - currentTime) >= 5)
+                    break;
+
+                if (obj.BaseObject is HoldNote hold)
+                {
+                    totalLength += hold.Duration;
+                    lnCount++;
+                }
+            }
+
+            return lnCount > 0 ? totalLength / lnCount : 0.0;
+        }
+
+        /// <summary>
+        /// Checks if this chord contains any long notes
+        /// </summary>
+        public bool HasLongNotes() => GetLongNoteCount() > 0;
+    }
+    /*public class ManiaDifficultyHitObject : DifficultyHitObject
+    {
+        public new ManiaHitObject BaseObject => (ManiaHitObject)base.BaseObject;
 
         private readonly List<DifficultyHitObject>[] perColumnObjects;
 
@@ -66,5 +204,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
             int index = columnIndex + (forwardsIndex + 1);
             return index >= 0 && index < perColumnObjects[Column].Count ? (ManiaDifficultyHitObject)perColumnObjects[Column][index] : null;
         }
-    }
+    }*/
+
 }

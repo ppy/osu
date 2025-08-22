@@ -1,17 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using osu.Framework.Utils;
-using osu.Game.Rulesets.Difficulty.Preprocessing;
-using osu.Game.Rulesets.Difficulty.Utils;
-using osu.Game.Rulesets.Mania.Difficulty.Preprocessing;
 
 namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
 {
     public class OverallStrainEvaluator
     {
-        private const double release_threshold = 30;
+        /*private const double release_threshold = 30;
 
         public static double EvaluateDifficultyOf(DifficultyHitObject current)
         {
@@ -56,6 +51,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
                 holdAddition = DifficultyCalculationUtils.Logistic(x: closestEndTime, multiplier: 0.27, midpointOffset: release_threshold);
 
             return (1 + holdAddition) * holdFactor;
-        }
+        }*/
     }
 }
