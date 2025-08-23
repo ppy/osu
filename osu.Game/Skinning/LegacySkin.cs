@@ -418,6 +418,19 @@ namespace osu.Game.Skinning
                                 };
                             }
 
+                            var defaultComponents = new List<Drawable>
+                            {
+                                new LegacyScoreCounter(),
+                                new LegacyAccuracyCounter(),
+                                new LegacySongProgress(),
+                                new LegacyHealthDisplay(),
+                                new BarHitErrorMeter(),
+                            };
+
+                            // In osu!stable, combo fire was toggled via game-wide config. It was enabled by default until around 2013. With combo fire now a skin element, the default state can be approximated using the skin's version.
+                            if (GetConfig<SkinConfiguration.LegacySetting, decimal>(SkinConfiguration.LegacySetting.Version)?.Value < 2m)
+                                defaultComponents.Add(new LegacyComboFire());
+
                             return new DefaultSkinComponentsContainer(container =>
                             {
                                 var score = container.OfType<LegacyScoreCounter>().FirstOrDefault();
@@ -448,14 +461,7 @@ namespace osu.Game.Skinning
                                 }
                             })
                             {
-                                Children = new Drawable[]
-                                {
-                                    new LegacyScoreCounter(),
-                                    new LegacyAccuracyCounter(),
-                                    new LegacySongProgress(),
-                                    new LegacyHealthDisplay(),
-                                    new BarHitErrorMeter(),
-                                }
+                                Children = defaultComponents,
                             };
                     }
 
