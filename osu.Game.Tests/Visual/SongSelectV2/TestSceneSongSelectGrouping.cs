@@ -254,6 +254,71 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
         #endregion
 
+        #region Favourites grouping
+
+        [Test]
+        public void TestFavouritesGrouping()
+        {
+            List<APIBeatmapSet> onlineSets = new List<APIBeatmapSet>();
+
+            ImportBeatmapForRuleset(s =>
+            {
+                s.Beatmaps[0].Metadata.Title = "Favourited beatmap set";
+
+                var onlineSet = new APIBeatmapSet
+                {
+                    OnlineID = s.OnlineID,
+                    HasFavourited = true
+                };
+
+                onlineSets.Add(onlineSet);
+                API.AddToFavourites(onlineSet);
+            }, 3, 0);
+            ImportBeatmapForRuleset(s =>
+            {
+                s.Beatmaps[0].Metadata.Title = "Another beatmap set";
+
+                var onlineSet = new APIBeatmapSet
+                {
+                    OnlineID = s.OnlineID,
+                    HasFavourited = false
+                };
+
+                onlineSets.Add(onlineSet);
+            }, 3, 0);
+
+            BeatmapSetInfo[] beatmapSets = null!;
+
+            AddStep("get beatmaps", () => beatmapSets = Beatmaps.GetAllUsableBeatmapSets().ToArray());
+
+            LoadSongSelect();
+            GroupBy(GroupMode.Favourites);
+            WaitForFiltering();
+
+            assertGroupPresent("My favourites", () => new[] { beatmapSets[0] });
+            assertGroupsCount(1);
+
+            AddStep("mark beatmap as unfavourited", () => API.RemoveFromFavourites(onlineSets[0]));
+            WaitForFiltering();
+
+            AddUntilStep("wait for placeholder visible", () => getPlaceholder()?.State.Value == Visibility.Visible);
+            checkMatchedBeatmaps(0);
+
+            AddStep("mark second beatmap as favourited", () => API.AddToFavourites(onlineSets[1]));
+            WaitForFiltering();
+
+            assertGroupPresent("My favourites", () => new[] { beatmapSets[1] });
+            assertGroupsCount(1);
+
+            AddStep("mark first beatmap as favourited", () => API.AddToFavourites(onlineSets[0]));
+            WaitForFiltering();
+
+            assertGroupPresent("My favourites", () => new[] { beatmapSets[0], beatmapSets[1] });
+            assertGroupsCount(1);
+        }
+
+        #endregion
+
         #region Benchmarks
 
         [Test]

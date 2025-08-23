@@ -25,6 +25,8 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Carousel;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Models;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
 using osu.Game.Screens.Select;
@@ -102,7 +104,7 @@ namespace osu.Game.Screens.SelectV2
             {
                 new BeatmapCarouselFilterMatching(() => Criteria!),
                 new BeatmapCarouselFilterSorting(() => Criteria!),
-                grouping = new BeatmapCarouselFilterGrouping(() => Criteria!, getDetachedCollections, getTopRanksMapping)
+                grouping = new BeatmapCarouselFilterGrouping(() => Criteria!, getDetachedCollections, getTopRanksMapping, getFavourites)
             };
 
             AddInternal(loading = new LoadingLayer());
@@ -627,10 +629,13 @@ namespace osu.Game.Screens.SelectV2
 
         #endregion
 
-        #region Database fetches for grouping support
+        #region Database/API fetches for grouping support
 
         [Resolved]
         private RealmAccess realm { get; set; } = null!;
+
+        [Resolved]
+        private IAPIProvider api { get; set; } = null!;
 
         private List<BeatmapCollection> getDetachedCollections() => realm.Run(r => r.All<BeatmapCollection>().AsEnumerable().Detach());
 
@@ -658,6 +663,8 @@ namespace osu.Game.Screens.SelectV2
 
             return topRankMapping;
         });
+
+        private IReadOnlyList<APIBeatmapSet> getFavourites() => api.BeatmapFavourites;
 
         #endregion
 

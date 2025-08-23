@@ -27,6 +27,9 @@ namespace osu.Game.Online.API
 
         public BindableList<APIRelation> Friends { get; } = new BindableList<APIRelation>();
         public BindableList<APIRelation> Blocks { get; } = new BindableList<APIRelation>();
+        public IBindableList<APIBeatmapSet> BeatmapFavourites => beatmapFavourites;
+
+        private readonly BindableList<APIBeatmapSet> beatmapFavourites = new BindableList<APIBeatmapSet>();
 
         public DummyNotificationsClient NotificationsClient { get; } = new DummyNotificationsClient();
         INotificationsClient IAPIProvider.NotificationsClient => NotificationsClient;
@@ -183,6 +186,22 @@ namespace osu.Game.Online.API
 
         public void UpdateLocalBlocks()
         {
+        }
+
+        public PostBeatmapFavouriteRequest AddToFavourites(APIBeatmapSet beatmapSet)
+        {
+            var req = new PostBeatmapFavouriteRequest(beatmapSet.OnlineID, BeatmapFavouriteAction.Favourite);
+            Perform(req);
+            beatmapFavourites.Add(beatmapSet);
+            return req;
+        }
+
+        public PostBeatmapFavouriteRequest RemoveFromFavourites(APIBeatmapSet beatmapSet)
+        {
+            var req = new PostBeatmapFavouriteRequest(beatmapSet.OnlineID, BeatmapFavouriteAction.UnFavourite);
+            Perform(req);
+            beatmapFavourites.RemoveAll(s => s.OnlineID == beatmapSet.OnlineID);
+            return req;
         }
 
         public IHubClientConnector? GetHubConnector(string clientName, string endpoint) => null;

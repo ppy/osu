@@ -167,7 +167,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         {
             int beatmapsCount = 0;
 
-            AddStep($"import test map for ruleset {rulesetIds}", () =>
+            AddStep($"import test map for ruleset {string.Join(", ", rulesetIds)}", () =>
             {
                 beatmapsCount = SongSelect.IsNull() ? 0 : Carousel.Filters.OfType<BeatmapCarouselFilterGrouping>().Single().SetItems.Count;
 

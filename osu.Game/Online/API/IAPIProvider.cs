@@ -5,6 +5,7 @@ using System;
 using System.Threading.Tasks;
 using osu.Framework.Bindables;
 using osu.Game.Localisation;
+using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Online.Notifications.WebSocket;
@@ -27,6 +28,11 @@ namespace osu.Game.Online.API
         /// The users blocked by the local user.
         /// </summary>
         IBindableList<APIRelation> Blocks { get; }
+
+        /// <summary>
+        /// The beatmaps favourited by the user.
+        /// </summary>
+        IBindableList<APIBeatmapSet> BeatmapFavourites { get; }
 
         /// <summary>
         /// The language supplied by this provider to API requests.
@@ -118,6 +124,8 @@ namespace osu.Game.Online.API
         /// </summary>
         void Logout();
 
+        // todo: all of these friends/blocks/favourites methods should eventually be moved to a separate component, away from IAPIProvider / APIAccess.
+
         /// <summary>
         /// Update the friends status of the current user.
         /// </summary>
@@ -127,6 +135,18 @@ namespace osu.Game.Online.API
         /// Update the list of users blocked by the current user.
         /// </summary>
         void UpdateLocalBlocks();
+
+        /// <summary>
+        /// Adds the given beatmap set to the favourited list.
+        /// </summary>
+        /// <returns>An API request sent to the server for performing this operation.</returns>
+        PostBeatmapFavouriteRequest AddToFavourites(APIBeatmapSet beatmapSet);
+
+        /// <summary>
+        /// Removes the given beatmap from the favourited list.
+        /// </summary>
+        /// <returns>An API request sent to the server for performing this operation.</returns>
+        PostBeatmapFavouriteRequest RemoveFromFavourites(APIBeatmapSet beatmapSet);
 
         /// <summary>
         /// Schedule a callback to run on the update thread.

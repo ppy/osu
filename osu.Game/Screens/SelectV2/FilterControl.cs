@@ -57,6 +57,7 @@ namespace osu.Game.Screens.SelectV2
         private RealmAccess realm { get; set; } = null!;
 
         private IBindable<APIUser> localUser = null!;
+        private IBindableList<APIBeatmapSet> beatmapFavourites = null!;
 
         public LocalisableString StatusText
         {
@@ -186,6 +187,9 @@ namespace osu.Game.Screens.SelectV2
             };
 
             localUser = api.LocalUser.GetBoundCopy();
+
+            beatmapFavourites = new BindableList<APIBeatmapSet>();
+            beatmapFavourites.BindTo(api.BeatmapFavourites);
         }
 
         protected override void LoadComplete()
@@ -237,6 +241,12 @@ namespace osu.Game.Screens.SelectV2
             });
 
             localUser.BindValueChanged(_ => updateCriteria());
+
+            beatmapFavourites.BindCollectionChanged((_, _) =>
+            {
+                if (groupDropdown.Current.Value == GroupMode.Favourites)
+                    updateCriteria();
+            });
 
             updateCriteria();
         }
