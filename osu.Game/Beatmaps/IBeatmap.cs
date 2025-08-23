@@ -102,7 +102,7 @@ namespace osu.Game.Beatmaps
 
         int GridRotation { get; internal set; }
 
-        string GridOffset { get; internal set; }
+        string? GridOffset { get; internal set; }
 
         double TimelineZoom { get; internal set; }
 
