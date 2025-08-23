@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Bindables;
@@ -19,12 +20,16 @@ namespace osu.Game.Rulesets.Mania
     public class ManiaFilterCriteria : IRulesetFilterCriteria
     {
         private readonly HashSet<int> includedKeyCounts = Enumerable.Range(1, LegacyBeatmapDecoder.MAX_MANIA_KEY_COUNT).ToHashSet();
+        private FilterCriteria.OptionalRange<float> longNoteRatio;
 
         public bool Matches(BeatmapInfo beatmapInfo, FilterCriteria criteria)
         {
             int keyCount = ManiaBeatmapConverter.GetColumnCount(LegacyBeatmapConversionDifficultyInfo.FromBeatmapInfo(beatmapInfo), criteria.Mods);
 
-            return includedKeyCounts.Contains(keyCount);
+            bool keyCountMatch = includedKeyCounts.Contains(keyCount);
+            bool longNoteRatioMatch = !longNoteRatio.HasFilter || longNoteRatio.IsInRange(calculatelongNoteRatio(beatmapInfo));
+
+            return keyCountMatch && longNoteRatioMatch;
         }
 
         public bool TryParseCustomKeywordCriteria(string key, Operator op, string strValues)
@@ -84,9 +89,22 @@ namespace osu.Game.Rulesets.Mania
                             return false;
                     }
                 }
+
+                case "ln":
+                case "lns":
+                    return FilterQueryParser.TryUpdateCriteriaRange(ref longNoteRatio, op, strValues);
             }
 
             return false;
+        }
+
+        private static float calculatelongNoteRatio(BeatmapInfo beatmapInfo)
+        {
+            int holdNotes = beatmapInfo.EndTimeObjectCount;
+            int totalNotes = beatmapInfo.TotalObjectCount;
+            int sum = Math.Max(1, totalNotes);
+
+            return holdNotes / (float)sum * 100;
         }
 
         public bool FilterMayChangeFromMods(ValueChangedEvent<IReadOnlyList<Mod>> mods)
