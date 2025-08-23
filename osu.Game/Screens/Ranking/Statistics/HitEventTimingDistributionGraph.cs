@@ -68,7 +68,7 @@ namespace osu.Game.Screens.Ranking.Statistics
             if (hitEvents.Count == 0)
                 return;
 
-            binSize = Math.Ceiling(hitEvents.Max(e => Math.Abs(e.TimeOffset)) / timing_distribution_bins);
+            binSize = Math.Ceiling(hitEvents.Max(e => Math.Abs(getAdjustedTimeOffset(e))) / timing_distribution_bins);
 
             // Prevent div-by-0 by enforcing a minimum bin size
             binSize = Math.Max(1, binSize);
@@ -91,7 +91,8 @@ namespace osu.Game.Screens.Ranking.Statistics
 
             foreach (var e in hitEvents)
             {
-                double time = e.TimeOffset + hitOffset;
+                double adjustedTimeOffset = getAdjustedTimeOffset(e);
+                double time = adjustedTimeOffset + hitOffset;
 
                 double binOffset = time / binSize;
 
@@ -350,7 +351,30 @@ namespace osu.Game.Screens.Ranking.Statistics
 
             private float offsetForValue(float value) => maxValue == 0 ? 0 : (1 - minimum_height) * value / maxValue;
 
-            private float heightForValue(float value) => minimum_height + offsetForValue(value);
+        private float heightForValue(float value) => minimum_height + offsetForValue(value);
+        }
+
+        /// <summary>
+        /// Gets the time offset adjusted for gameplay rate.
+        /// For osu!mania, hit windows are already adjusted by SpeedMultiplier to remain constant in real-world time,
+        /// so no additional rate adjustment is needed. For other rulesets, we divide by GameplayRate.
+        /// </summary>
+        private double getAdjustedTimeOffset(HitEvent hitEvent)
+        {
+            // Check if this is a mania hit window by checking the type name
+            // We can't directly reference ManiaHitWindows here due to dependency constraints
+            bool isManiaHitWindow = hitEvent.HitObject.HitWindows != null && hitEvent.HitObject.HitWindows.GetType().Name == "ManiaHitWindows";
+            
+            if (isManiaHitWindow)
+            {
+                // In mania, hit windows are already adjusted to remain constant in real-world time
+                // via SpeedMultiplier, so we don't need to adjust for GameplayRate
+                return hitEvent.TimeOffset;
+            }
+            
+            // For other rulesets (osu!standard, taiko, catch), adjust for gameplay rate
+            // similar to unstable rate calculation
+            return hitEvent.GameplayRate.HasValue ? hitEvent.TimeOffset / hitEvent.GameplayRate.Value : hitEvent.TimeOffset;
         }
     }
 }
