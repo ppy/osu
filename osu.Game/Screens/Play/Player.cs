@@ -145,6 +145,8 @@ namespace osu.Game.Screens.Play
 
         public BreakOverlay BreakOverlay;
 
+        public Container ComboFireProxyContainer;
+
         private LetterboxOverlay letterboxOverlay;
 
         /// <summary>
@@ -435,8 +437,9 @@ namespace osu.Game.Screens.Play
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
-                    new LegacyComboFire(ScoreProcessor)
+                    ComboFireProxyContainer = new Container
                     {
+                        RelativeSizeAxes = Axes.Both,
                         Depth = working.Beatmap.ComboFireInFrontOfStoryboard ? 1f : 3f,
                     },
                     DimmableStoryboard = new DimmableStoryboard(GameplayState.Storyboard, GameplayState.Mods)
