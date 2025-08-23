@@ -11,7 +11,9 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Pooling;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
+using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
@@ -33,6 +35,8 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override LocalisableString Description => "Don't let their popping distract you!";
 
         public override double ScoreMultiplier => 1;
+
+        public override IconUsage? Icon => OsuIcon.ModBubbles;
 
         public override ModType Type => ModType.Fun;
 

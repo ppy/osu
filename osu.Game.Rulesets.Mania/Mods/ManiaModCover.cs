@@ -4,8 +4,10 @@
 using System;
 using System.Linq;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
+using osu.Game.Graphics;
 using osu.Game.Rulesets.Mania.UI;
 
 namespace osu.Game.Rulesets.Mania.Mods
@@ -14,6 +16,7 @@ namespace osu.Game.Rulesets.Mania.Mods
     {
         public override string Name => "Cover";
         public override string Acronym => "CO";
+        public override IconUsage? Icon => OsuIcon.ModCover;
 
         public override LocalisableString Description => @"Decrease the playfield's viewing area.";
 
