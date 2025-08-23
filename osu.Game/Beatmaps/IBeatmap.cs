@@ -100,6 +100,8 @@ namespace osu.Game.Beatmaps
 
         int GridType { get; internal set; }
 
+        int GridRotation { get; internal set; }
+
         double TimelineZoom { get; internal set; }
 
         CountdownType Countdown { get; internal set; }

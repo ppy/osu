@@ -269,6 +269,13 @@ namespace osu.Game.Screens.Edit
             set => PlayableBeatmap.GridType = value;
         }
 
+        public int GridRotation
+        {
+            get => PlayableBeatmap.GridRotation;
+            set => PlayableBeatmap.GridRotation = value;
+        }
+
+
         public double TimelineZoom
         {
             get => PlayableBeatmap.TimelineZoom;
