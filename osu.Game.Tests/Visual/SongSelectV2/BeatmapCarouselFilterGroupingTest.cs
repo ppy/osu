@@ -11,6 +11,7 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Graphics.Carousel;
+using osu.Game.Scoring;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
 using osu.Game.Screens.SelectV2;
@@ -234,6 +235,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             addBeatmapSet(applyBPM(95), beatmapSets, out var beatmap95);
             addBeatmapSet(applyBPM(269.5), beatmapSets, out var beatmap269);
             addBeatmapSet(applyBPM(270), beatmapSets, out var beatmap270);
+            addBeatmapSet(applyBPM(299), beatmapSets, out var beatmap299);
             addBeatmapSet(applyBPM(300), beatmapSets, out var beatmap300);
             addBeatmapSet(applyBPM(330), beatmapSets, out var beatmap330);
 
@@ -242,7 +244,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             assertGroup(results, 1, "60 - 70 BPM", new[] { beatmap59, beatmap60 }, ref total);
             assertGroup(results, 2, "90 - 100 BPM", new[] { beatmap90, beatmap95 }, ref total);
             assertGroup(results, 3, "270 - 280 BPM", new[] { beatmap269, beatmap270 }, ref total);
-            assertGroup(results, 4, "Over 300 BPM", new[] { beatmap300, beatmap330 }, ref total);
+            assertGroup(results, 4, "290 - 300 BPM", new[] { beatmap299 }, ref total);
+            assertGroup(results, 5, "Over 300 BPM", new[] { beatmap300, beatmap330 }, ref total);
             assertTotal(results, total);
         }
 
@@ -364,7 +367,11 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
         private static async Task<List<CarouselItem>> runGrouping(GroupMode group, List<BeatmapSetInfo> beatmapSets)
         {
-            var groupingFilter = new BeatmapCarouselFilterGrouping(() => new FilterCriteria { Group = group }, () => new List<BeatmapCollection>());
+            var groupingFilter = new BeatmapCarouselFilterGrouping(
+                () => new FilterCriteria { Group = group },
+                () => new List<BeatmapCollection>(),
+                _ => new Dictionary<Guid, ScoreRank>());
+
             return await groupingFilter.Run(beatmapSets.SelectMany(s => s.Beatmaps.Select(b => new CarouselItem(b))).ToList(), CancellationToken.None);
         }
 

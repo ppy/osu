@@ -6,6 +6,7 @@ using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
+using osu.Framework.Development;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
@@ -25,8 +26,7 @@ namespace osu.Game.Rulesets.UI
     {
         public ReplayInputHandler? ReplayInputHandler { get; set; }
 
-        public bool AllowBackwardsSeeks { get; set; }
-        private double? lastBackwardsSeekLogTime;
+        private int invalidBassTimeLogCount;
 
         /// <summary>
         /// The number of CPU milliseconds to spend at most during seek catch-up.
@@ -154,22 +154,28 @@ namespace osu.Game.Rulesets.UI
                     state = PlaybackState.NotValid;
             }
 
-            // This is a hotfix for https://github.com/ppy/osu/issues/26879 while we figure how the hell time is seeking
-            // backwards by 11,850 ms for some users during gameplay.
+            // TODO: replace IsDebugBuild with a framework flag which asserts we are in a test scene, interactively or otherwise.
+            bool allowReferenceClockSeeks = hasReplayAttached || DebugUtils.IsNUnitRunning || DebugUtils.IsDebugBuild || !FrameStablePlayback;
+
+            // This is a hotfix for ongoing bass issues we are trying to resolve (see https://www.un4seen.com/forum/?topic=20482.msg145474#msg145474)
             //
-            // It basically says that "while we're running in frame stable mode, and don't have a replay attached,
-            // time should never go backwards". If it does, we stop running gameplay until it returns to normal.
-            if (!hasReplayAttached && FrameStablePlayback && proposedTime > referenceClock.CurrentTime && !AllowBackwardsSeeks)
+            // In testing this triggers *very* rarely even when set to super low values (10 ms). The cases we're worried about involve multi-second jumps.
+            // A difference of more than 500 ms seems like a sane number we should never exceed.
+            if (!allowReferenceClockSeeks && Math.Abs(proposedTime - referenceClock.CurrentTime) > 1500)
             {
-                if (lastBackwardsSeekLogTime == null || Math.Abs(Clock.CurrentTime - lastBackwardsSeekLogTime.Value) > 1000)
+                if (invalidBassTimeLogCount < 10)
                 {
-                    lastBackwardsSeekLogTime = Clock.CurrentTime;
-                    Logger.Log($"Denying backwards seek during gameplay (reference: {referenceClock.CurrentTime:N2} stable: {proposedTime:N2})");
+                    invalidBassTimeLogCount++;
+                    Logger.Log("Ignoring likely invalid time value provided by BASS during gameplay");
+                    Logger.Log($"- provided: {referenceClock.CurrentTime:N2}");
+                    Logger.Log($"- expected: {proposedTime:N2}");
                 }
 
                 state = PlaybackState.NotValid;
                 return;
             }
+
+            invalidBassTimeLogCount = 0;
 
             // if the proposed time is the same as the current time, assume that the clock will continue progressing in the same direction as previously.
             // this avoids spurious flips in direction from -1 to 1 during rewinds.

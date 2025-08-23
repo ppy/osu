@@ -72,11 +72,15 @@ namespace osu.Game.Database
         [Resolved]
         private OsuConfigManager config { get; set; } = null!;
 
+        private LocalCachedBeatmapMetadataSource localMetadataSource = null!;
+
         protected virtual int TimeToSleepDuringGameplay => 30000;
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            localMetadataSource = new LocalCachedBeatmapMetadataSource(storage);
 
             ProcessingTask = Task.Factory.StartNew(() =>
             {
@@ -532,8 +536,6 @@ namespace osu.Game.Database
 
         private void backpopulateMissingSubmissionAndRankDates()
         {
-            var localMetadataSource = new LocalCachedBeatmapMetadataSource(storage);
-
             if (!localMetadataSource.Available)
             {
                 Logger.Log("Cannot backpopulate missing submission/rank dates because the local metadata cache is missing.");
@@ -542,7 +544,7 @@ namespace osu.Game.Database
 
             try
             {
-                if (localMetadataSource.GetCacheVersion() < 2)
+                if (!localMetadataSource.IsAtLeastVersion(2))
                 {
                     Logger.Log("Cannot backpopulate missing submission/rank dates because the local metadata cache is too old.");
                     return;
@@ -556,9 +558,15 @@ namespace osu.Game.Database
 
             Logger.Log("Querying for beatmap sets that contain missing submission/rank date...");
 
+            // find all ranked beatmap sets with missing date ranked or date submitted that have at least one difficulty ranked as well.
+            // the reason for checking ranked status of the difficulties is that they can be locally modified or unknown too, and for those the lookup is likely to fail.
+            // this is because metadata lookups are primarily based on file hash, so they will fail to match if the beatmap does not match the online version
+            // (which is likely to be the case if the beatmap is locally modified or unknown).
+            // that said, one difficulty in ranked state is enough for the backpopulation to work.
             HashSet<Guid> beatmapSetIds = realmAccess.Run(r => new HashSet<Guid>(
                 r.All<BeatmapSetInfo>()
-                 .Where(b => b.StatusInt > 0 && (b.DateRanked == null || b.DateSubmitted == null))
+                 .Filter($@"{nameof(BeatmapSetInfo.StatusInt)} > 0 && ({nameof(BeatmapSetInfo.DateRanked)} == null || {nameof(BeatmapSetInfo.DateSubmitted)} == null) "
+                         + $@"&& ANY {nameof(BeatmapSetInfo.Beatmaps)}.{nameof(BeatmapInfo.StatusInt)} > 0")
                  .AsEnumerable()
                  .Select(b => b.ID)));
 
@@ -589,11 +597,7 @@ namespace osu.Game.Database
                     {
                         BeatmapSetInfo beatmapSet = r.Find<BeatmapSetInfo>(id)!;
 
-                        // we want any ranked representative of the set.
-                        // the reason for checking ranked status of the difficulty is that it can be locally modified,
-                        // at which point the lookup will fail - but there might still be another unmodified difficulty on which it will work.
-                        if (beatmapSet.Beatmaps.FirstOrDefault(b => b.Status >= BeatmapOnlineStatus.Ranked) is not BeatmapInfo beatmap)
-                            return false;
+                        var beatmap = beatmapSet.Beatmaps.First(b => b.Status >= BeatmapOnlineStatus.Ranked);
 
                         bool lookupSucceeded = localMetadataSource.TryLookup(beatmap, out var result);
 
@@ -630,14 +634,12 @@ namespace osu.Game.Database
 
         private void backpopulateUserTags()
         {
-            var localMetadataSource = new LocalCachedBeatmapMetadataSource(storage);
-
-            if (!localMetadataSource.Available || localMetadataSource.GetCacheVersion() < 3)
+            if (!localMetadataSource.Available || !localMetadataSource.IsAtLeastVersion(3))
             {
                 Logger.Log(@"Local metadata cache has too low version to backpopulate user tags, attempting refetch...");
                 localMetadataSource.FetchCache().WaitSafely();
 
-                if (!localMetadataSource.Available || localMetadataSource.GetCacheVersion() < 3)
+                if (!localMetadataSource.Available || !localMetadataSource.IsAtLeastVersion(3))
                 {
                     Logger.Log(@"Local metadata cache refetch failed. Aborting user tags backpopulation.");
                     return;
@@ -700,9 +702,17 @@ namespace osu.Game.Database
                         if (lookupSucceeded)
                         {
                             Debug.Assert(result != null);
-                            beatmap.Metadata.UserTags.Clear();
-                            beatmap.Metadata.UserTags.AddRange(result.UserTags);
-                            return beatmap.Metadata.UserTags.Any();
+
+                            var userTags = result.UserTags.ToHashSet();
+
+                            if (!userTags.SetEquals(beatmap.Metadata.UserTags))
+                            {
+                                beatmap.Metadata.UserTags.Clear();
+                                beatmap.Metadata.UserTags.AddRange(userTags);
+                                return true;
+                            }
+
+                            return false;
                         }
 
                         Logger.Log(@$"Could not find {beatmap.GetDisplayString()} in local cache while backpopulating missing user tags");

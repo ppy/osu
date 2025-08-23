@@ -72,6 +72,11 @@ namespace osu.Game.Graphics.Carousel
         public bool IsFiltering => !filterTask.IsCompleted;
 
         /// <summary>
+        /// Whether absolute scrolling is currently triggered.
+        /// </summary>
+        public bool AbsoluteScrolling => Scroll.AbsoluteScrolling;
+
+        /// <summary>
         /// The number of times filter operations have been triggered.
         /// </summary>
         internal int FilterCount { get; private set; }
@@ -113,14 +118,21 @@ namespace osu.Game.Graphics.Carousel
                     if (currentSelection.Model != null)
                         HandleItemDeselected(currentSelection.Model);
 
-                    currentKeyboardSelection = new Selection(value);
-                    currentSelection = currentKeyboardSelection;
+                    currentSelection = new Selection(value);
+                    currentKeyboardSelection = currentSelection;
                     selectionValid.Invalidate();
                 }
-                else if (currentKeyboardSelection.Model != value)
+
+                // Check keyboard selection equality separately.
+                //
+                // If current selection set to an already-selected value, we want to ensure
+                // that keyboard selection (which basically represents the "visual" tracking of selection)
+                // is still reset back to the newly set value.
+                //
+                // The main case this handles is when a set header is clicked and we want to make sure one of its
+                // "children" are re-selected.
+                if (!CheckModelEquality(currentKeyboardSelection.Model, value))
                 {
-                    // Even if the current selection matches, let's ensure the keyboard selection is reset
-                    // to the newly selected object. This matches user expectations (for now).
                     currentKeyboardSelection = currentSelection;
                     selectionValid.Invalidate();
                 }
@@ -345,11 +357,6 @@ namespace osu.Game.Graphics.Carousel
                     {
                         log($"Performing {filter.GetType().ReadableName()}");
                         items = await filter.Run(items, cts.Token).ConfigureAwait(false);
-
-                        // To avoid shooting ourselves in the foot, ensure that we manifest a list after each filter.
-                        //
-                        // A future improvement may be passing a reference list through each filter rather than copying each time,
-                        // but this is the safest approach.
                     }
 
                     log("Updating Y positions");

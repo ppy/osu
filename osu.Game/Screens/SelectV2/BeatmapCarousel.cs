@@ -24,7 +24,11 @@ using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Carousel;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Models;
+using osu.Game.Rulesets;
+using osu.Game.Scoring;
 using osu.Game.Screens.Select;
+using Realms;
 
 namespace osu.Game.Screens.SelectV2
 {
@@ -49,13 +53,12 @@ namespace osu.Game.Screens.SelectV2
 
         private readonly LoadingLayer loading;
 
-        private readonly BeatmapCarouselFilterMatching matching;
         private readonly BeatmapCarouselFilterGrouping grouping;
 
         /// <summary>
         /// Total number of beatmap difficulties displayed with the filter.
         /// </summary>
-        public int MatchedBeatmapsCount => matching.BeatmapItemsCount;
+        public int MatchedBeatmapsCount => Filters.Last().BeatmapItemsCount;
 
         protected override float GetSpacingBetweenPanels(CarouselItem top, CarouselItem bottom)
         {
@@ -97,9 +100,9 @@ namespace osu.Game.Screens.SelectV2
 
             Filters = new ICarouselFilter[]
             {
-                matching = new BeatmapCarouselFilterMatching(() => Criteria!),
+                new BeatmapCarouselFilterMatching(() => Criteria!),
                 new BeatmapCarouselFilterSorting(() => Criteria!),
-                grouping = new BeatmapCarouselFilterGrouping(() => Criteria!, () => detachedCollections())
+                grouping = new BeatmapCarouselFilterGrouping(() => Criteria!, getDetachedCollections, getTopRanksMapping)
             };
 
             AddInternal(loading = new LoadingLayer());
@@ -110,7 +113,6 @@ namespace osu.Game.Screens.SelectV2
         {
             setupPools();
             detachedBeatmaps = beatmapStore.GetBeatmapSets(cancellationToken);
-            detachedCollections = () => realm.Run(r => r.All<BeatmapCollection>().AsEnumerable().Detach());
             loadSamples(audio);
 
             config.BindWith(OsuSetting.RandomSelectAlgorithm, randomAlgorithm);
@@ -240,9 +242,11 @@ namespace osu.Game.Screens.SelectV2
                         int previousIndex = Items.IndexOf(beatmap);
                         Debug.Assert(previousIndex >= 0);
 
+                        // we're intentionally being lenient with there being two difficulties with equal online ID or difficulty name.
+                        // this can be the case when the user modifies the beatmap using the editor's "external edit" feature.
                         BeatmapInfo? matchingNewBeatmap =
-                            newSetBeatmaps.SingleOrDefault(b => b.OnlineID > 0 && b.OnlineID == beatmap.OnlineID) ??
-                            newSetBeatmaps.SingleOrDefault(b => b.DifficultyName == beatmap.DifficultyName && b.Ruleset.Equals(beatmap.Ruleset));
+                            newSetBeatmaps.FirstOrDefault(b => b.OnlineID > 0 && b.OnlineID == beatmap.OnlineID) ??
+                            newSetBeatmaps.FirstOrDefault(b => b.DifficultyName == beatmap.DifficultyName && b.Ruleset.Equals(beatmap.Ruleset));
 
                         if (matchingNewBeatmap != null)
                         {
@@ -623,6 +627,40 @@ namespace osu.Game.Screens.SelectV2
 
         #endregion
 
+        #region Database fetches for grouping support
+
+        [Resolved]
+        private RealmAccess realm { get; set; } = null!;
+
+        private List<BeatmapCollection> getDetachedCollections() => realm.Run(r => r.All<BeatmapCollection>().AsEnumerable().Detach());
+
+        private Dictionary<Guid, ScoreRank> getTopRanksMapping(FilterCriteria criteria) => realm.Run(r =>
+        {
+            var topRankMapping = new Dictionary<Guid, ScoreRank>();
+
+            var allLocalScores = r.All<ScoreInfo>()
+                                  .Filter($"{nameof(ScoreInfo.User)}.{nameof(RealmUser.OnlineID)} == $0"
+                                          + $" && {nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.Hash)} == {nameof(ScoreInfo.BeatmapHash)}"
+                                          + $" && {nameof(ScoreInfo.Ruleset)}.{nameof(RulesetInfo.ShortName)} == $1"
+                                          + $" && {nameof(ScoreInfo.DeletePending)} == false", criteria.LocalUserId, criteria.Ruleset?.ShortName)
+                                  .OrderByDescending(s => s.TotalScore)
+                                  .ThenBy(s => s.Date);
+
+            foreach (var score in allLocalScores)
+            {
+                Debug.Assert(score.BeatmapInfo != null);
+
+                if (topRankMapping.ContainsKey(score.BeatmapInfo.ID))
+                    continue;
+
+                topRankMapping[score.BeatmapInfo.ID] = score.Rank;
+            }
+
+            return topRankMapping;
+        });
+
+        #endregion
+
         #region Drawable pooling
 
         private readonly DrawablePool<PanelBeatmap> beatmapPanelPool = new DrawablePool<PanelBeatmap>(100);
@@ -697,8 +735,6 @@ namespace osu.Game.Screens.SelectV2
 
         private Sample? spinSample;
         private Sample? randomSelectSample;
-
-        private Func<List<BeatmapCollection>> detachedCollections = null!;
 
         public bool NextRandom()
         {
