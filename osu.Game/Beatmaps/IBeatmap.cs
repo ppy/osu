@@ -102,6 +102,8 @@ namespace osu.Game.Beatmaps
 
         int GridRotation { get; internal set; }
 
+        string GridOffset { get; internal set; }
+
         double TimelineZoom { get; internal set; }
 
         CountdownType Countdown { get; internal set; }

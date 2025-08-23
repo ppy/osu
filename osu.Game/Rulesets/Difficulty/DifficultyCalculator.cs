@@ -415,6 +415,12 @@ namespace osu.Game.Rulesets.Difficulty
                 set => baseBeatmap.GridRotation = value;
             }
 
+            public string GridOffset
+            {
+                get => baseBeatmap.GridOffset;
+                set => baseBeatmap.GridOffset = value;
+            }
+
             public double TimelineZoom
             {
                 get => baseBeatmap.TimelineZoom;

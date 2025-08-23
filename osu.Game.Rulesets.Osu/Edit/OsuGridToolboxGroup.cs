@@ -171,6 +171,9 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             Spacing.Value = editorBeatmap.GridSize;
             GridLinesRotation.Value = editorBeatmap.GridRotation;
+            string[] gridCoordinates = editorBeatmap.GridOffset.Split(',');
+            StartPositionX.Value = Convert.ToInt32(gridCoordinates[0]);
+            StartPositionY.Value = Convert.ToInt32(gridCoordinates[1]);
         }
 
         protected override void LoadComplete()
@@ -197,6 +200,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             {
                 StartPositionX.Value = pos.NewValue.X;
                 StartPositionY.Value = pos.NewValue.Y;
+                editorBeatmap.GridOffset = ((int)pos.NewValue.X).ToString() + "," + ((int)pos.NewValue.Y).ToString();
             });
 
             Spacing.BindValueChanged(spacing =>
