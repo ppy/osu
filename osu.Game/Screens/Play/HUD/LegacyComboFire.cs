@@ -119,7 +119,7 @@ namespace osu.Game.Screens.Play.HUD
             private IBindable<bool>? isBreakBindable;
 
             private float breakAlphaBacking = 1;
-            private float comboAlphaBacking = 1;
+            private float comboAlphaBacking;
 
             /// <summary>
             /// Separate internal alpha control to fade out during breaks, regardless of HUD setting.
@@ -148,6 +148,8 @@ namespace osu.Game.Screens.Play.HUD
             }
 
             private void computeAlpha() => Alpha = breakAlpha * comboAlpha;
+
+            private FireColour fireColour;
 
             private float orangeToBlueLerp { get; set; }
 
@@ -196,11 +198,11 @@ namespace osu.Game.Screens.Play.HUD
 
             private void onComboChange(ValueChangedEvent<int> combo)
             {
-                FireColour oldColour = getColour(combo.OldValue);
-                FireColour newColour = getColour(combo.NewValue);
+                FireColour oldColour = fireColour;
+                fireColour = getColour(combo.NewValue);
 
                 // When the new colour is None, let the fade out transformation handle alpha changes
-                if (newColour != FireColour.None)
+                if (fireColour != FireColour.None)
                 {
                     alphaFactor = Math.Clamp
                     (
@@ -211,10 +213,10 @@ namespace osu.Game.Screens.Play.HUD
                 }
 
                 // Don't play transforms if the colour didn't change
-                if (oldColour == newColour)
+                if (oldColour == fireColour)
                     return;
 
-                if (newColour == FireColour.None)
+                if (fireColour == FireColour.None)
                     this.TransformTo(nameof(comboAlpha), 0f, fade_duration);
                 else
                 {
@@ -224,7 +226,7 @@ namespace osu.Game.Screens.Play.HUD
                     this.TransformTo
                     (
                         nameof(orangeToBlueLerp),
-                        newValue: newColour == FireColour.Orange ? 0f : 1f,
+                        newValue: fireColour == FireColour.Orange ? 0f : 1f,
                         // If fading in from no colour, set the fire colour immediately
                         duration: oldColour == FireColour.None ? 0 : fade_duration
                     );
