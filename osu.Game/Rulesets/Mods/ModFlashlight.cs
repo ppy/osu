@@ -325,8 +325,9 @@ namespace osu.Game.Rulesets.Mods
         }
 
         /// <summary>
-        /// The purpose of this component is to track any changes to <see cref="Playfield.DrawInfo"/> (technically its parent),
-        /// in order for the flashlight to invalidate its draw node and read any changes in the playfield's scaling.
+        /// The purpose of this component is to track any changes to <c>Playfield.Parent.DrawInfo</c>
+        /// (by being added to the content of <see cref="PlayfieldAdjustmentContainer"/>).
+        /// All in order for the flashlight to invalidate its draw node and read any changes in the playfield's scaling.
         /// </summary>
         internal partial class PlayfieldDrawInfoTracker : Component
         {
