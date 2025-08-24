@@ -69,11 +69,11 @@ namespace osu.Game.Screens.Play.HUD
             if (player != null && skinEditor == null)
                 player.ComboFireProxyContainer.Add(CreateProxy());
 
-            // Inside the skin editor toolbox, don't use the reciprocal heights trick.
+            // Adjust heights to make better use of available space in the skin editor toolbox.
             if (skinEditor != null)
             {
                 Height = 1;
-                inner.Height = 1;
+                inner.Height = 1.8f;
             }
         }
 
