@@ -14,6 +14,7 @@ using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Shaders.Types;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
+using osu.Game.Overlays.SkinEditor;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
 using osuTK;
@@ -32,6 +33,14 @@ namespace osu.Game.Screens.Play.HUD
     {
         public bool UsesFixedAnchor { get; set; }
 
+        [Resolved]
+        private Player? player { get; set; }
+
+        [Resolved]
+        private SkinEditor? skinEditor { get; set; }
+
+        private readonly LegacyComboFireInner inner;
+
         public LegacyComboFire()
         {
             // The reciprocal heights specified here make this component's representation in the skin editor more bearable, only covering the bottom quarter of the screen (by default) instead of the whole thing.
@@ -42,13 +51,30 @@ namespace osu.Game.Screens.Play.HUD
             RelativeSizeAxes = Axes.Both;
             Height = skin_editor_height;
 
-            AddInternal(new LegacyComboFireInner
+            AddInternal(inner = new LegacyComboFireInner
             {
                 Anchor = Anchor.BottomLeft,
                 Origin = Anchor.BottomLeft,
                 RelativeSizeAxes = Axes.Both,
                 Height = 1 / skin_editor_height,
             });
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            // Proxy into the player's combo fire container to draw at the correct depth.
+            // Skip proxying if inside the skin editor toolbox.
+            if (player != null && skinEditor == null)
+                player.ComboFireProxyContainer.Add(CreateProxy());
+
+            // Inside the skin editor toolbox, don't use the reciprocal heights trick.
+            if (skinEditor != null)
+            {
+                Height = 1;
+                inner.Height = 1;
+            }
         }
 
         private partial class LegacyComboFireInner : Drawable
@@ -154,8 +180,6 @@ namespace osu.Game.Screens.Play.HUD
 
                 if (player != null)
                 {
-                    player.ComboFireProxyContainer.Add(CreateProxy());
-
                     isBreakBindable = player.IsBreakTime.GetBoundCopy();
                     isBreakBindable.BindValueChanged(_ => this.TransformTo(nameof(breakAlpha), isBreakBindable.Value ? 0f : 1f, HUDOverlay.FADE_DURATION, HUDOverlay.FADE_EASING), true);
                 }
