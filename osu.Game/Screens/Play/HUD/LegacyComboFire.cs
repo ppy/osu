@@ -3,7 +3,6 @@
 
 using System;
 using System.Runtime.InteropServices;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -124,8 +123,7 @@ namespace osu.Game.Screens.Play.HUD
 
             private void computeAlpha() => Alpha = breakAlpha * comboAlpha;
 
-            [UsedImplicitly(ImplicitUseKindFlags.Assign)] // Assigned by transform
-            private float orangeToBlueLerp;
+            private float orangeToBlueLerp { get; set; }
 
             /// <summary>
             /// An alpha control passed directly to the shader for use in a final alpha multiplication step.
