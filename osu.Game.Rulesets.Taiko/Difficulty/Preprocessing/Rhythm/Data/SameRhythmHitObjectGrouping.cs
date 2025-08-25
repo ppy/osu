@@ -20,6 +20,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Rhythm.Data
 
         public readonly SameRhythmHitObjectGrouping? Previous;
 
+        private static readonly double snap_tolerance = IntervalGroupingUtils.MarginOfError;
+
         /// <summary>
         /// <see cref="DifficultyHitObject.StartTime"/> of the first hit object.
         /// </summary>
@@ -42,8 +44,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Rhythm.Data
         /// </summary>
         public readonly double HitObjectIntervalRatio;
 
-        private const double snap_tolerance = 5.0; // Tolerance for snapping intervals to the previous group in ms.
-
         /// <inheritdoc/>
         public double Interval { get; }
 
@@ -53,13 +53,14 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Rhythm.Data
             HitObjects = hitObjects;
 
             // Cluster and normalise each hitobjects delta-time.
-            var normaliseHitObjects = DeltaTimeNormaliser.Normalise(hitObjects, 5.0);
+            var normaliseHitObjects = DeltaTimeNormaliser.Normalise(hitObjects, snap_tolerance);
 
             var normalisedHitObjectDeltaTime = hitObjects
                                                .Skip(1)
                                                .Select(hitObject => normaliseHitObjects[hitObject])
                                                .ToList();
 
+            // Secondary check to ensure there isn't any 'noise' or outliers by taking the modal delta time.
             double modalDelta = normalisedHitObjectDeltaTime.Count > 0
                 ? normalisedHitObjectDeltaTime
                   .Select(deltaTime => Math.Round(deltaTime))
