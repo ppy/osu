@@ -85,6 +85,7 @@ namespace osu.Game.Screens.Ranking
         public bool IsLocalPlay { get; init; }
 
         private Sample? popInSample;
+
         [Resolved]
         private PreviewTrackManager previewTrackManager { get; set; } = null!;
 
@@ -218,7 +219,6 @@ namespace osu.Game.Screens.Ranking
                 allowHotkeyRetry = true;
             }
 
-
             if (allowHotkeyRetry)
             {
                 AddInternal(new HotkeyRetryOverlay
@@ -239,14 +239,11 @@ namespace osu.Game.Screens.Ranking
             if (Score?.BeatmapInfo?.BeatmapSet != null && Score.BeatmapInfo.BeatmapSet.OnlineID > 0)
                 buttons.Add(new FavouriteButton(Score.BeatmapInfo.BeatmapSet));
         }
+
         protected override void Dispose(bool isDisposing)
         {
-            if (previewTrackManager != null)
-            {
-                previewTrackManager.PreviewTrackStarted -= stopApplause;
-                previewTrackManager.PreviewTrackStopped -= resumeApplause;
-            }
-
+            previewTrackManager.PreviewTrackStarted -= stopApplause;
+            previewTrackManager.PreviewTrackStopped -= resumeApplause;
             base.Dispose(isDisposing);
         }
 
@@ -326,6 +323,7 @@ namespace osu.Game.Screens.Ranking
                 rankApplauseSound.Play();
             });
         }
+
         private void stopApplause()
         {
             rankApplauseSound?.Stop();
