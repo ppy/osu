@@ -727,7 +727,7 @@ namespace osu.Game.Database
                 }
                 catch (Exception e)
                 {
-                    Logger.Log(@$"Failed to update ranked/submitted dates for beatmap set {id}: {e}");
+                    Logger.Log(@$"Failed to update user tags for beatmap {id}: {e}");
                     ++failedCount;
                 }
             }
