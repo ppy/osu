@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
@@ -21,6 +22,9 @@ namespace osu.Game.Audio
         private ITrackStore trackStore = null!;
 
         protected TrackManagerPreviewTrack? CurrentTrack;
+
+        public event Action? PreviewTrackStarted;
+        public event Action? PreviewTrackStopped;
 
         public PreviewTrackManager(IAdjustableAudioComponent mainTrackAdjustments)
         {
@@ -47,6 +51,7 @@ namespace osu.Game.Audio
                 CurrentTrack?.Stop();
                 CurrentTrack = track;
                 mainTrackAdjustments.AddAdjustment(AdjustableProperty.Volume, muteBindable);
+                PreviewTrackStarted?.Invoke();
             });
 
             track.Stopped += () => Schedule(() =>
@@ -56,6 +61,7 @@ namespace osu.Game.Audio
 
                 CurrentTrack = null;
                 mainTrackAdjustments.RemoveAdjustment(AdjustableProperty.Volume, muteBindable);
+                PreviewTrackStopped?.Invoke();
             });
 
             return track;

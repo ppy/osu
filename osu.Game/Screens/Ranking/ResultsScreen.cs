@@ -85,6 +85,8 @@ namespace osu.Game.Screens.Ranking
         public bool IsLocalPlay { get; init; }
 
         private Sample? popInSample;
+        [Resolved]
+        private PreviewTrackManager previewTrackManager { get; set; } = null!;
 
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
@@ -102,6 +104,8 @@ namespace osu.Game.Screens.Ranking
             FillFlowContainer buttons;
 
             popInSample = audio.Samples.Get(@"UI/overlay-pop-in");
+            previewTrackManager.PreviewTrackStarted += stopApplause;
+            previewTrackManager.PreviewTrackStopped += resumeApplause;
 
             InternalChild = new PopoverContainer
             {
@@ -214,6 +218,7 @@ namespace osu.Game.Screens.Ranking
                 allowHotkeyRetry = true;
             }
 
+
             if (allowHotkeyRetry)
             {
                 AddInternal(new HotkeyRetryOverlay
@@ -233,6 +238,16 @@ namespace osu.Game.Screens.Ranking
 
             if (Score?.BeatmapInfo?.BeatmapSet != null && Score.BeatmapInfo.BeatmapSet.OnlineID > 0)
                 buttons.Add(new FavouriteButton(Score.BeatmapInfo.BeatmapSet));
+        }
+        protected override void Dispose(bool isDisposing)
+        {
+            if (previewTrackManager != null)
+            {
+                previewTrackManager.PreviewTrackStarted -= stopApplause;
+                previewTrackManager.PreviewTrackStopped -= resumeApplause;
+            }
+
+            base.Dispose(isDisposing);
         }
 
         protected override void LoadComplete()
@@ -310,6 +325,15 @@ namespace osu.Game.Screens.Ranking
                 rankApplauseSound.VolumeTo(applause_volume);
                 rankApplauseSound.Play();
             });
+        }
+        private void stopApplause()
+        {
+            rankApplauseSound?.Stop();
+        }
+
+        private void resumeApplause()
+        {
+            rankApplauseSound?.Play();
         }
 
         #endregion
