@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.LocalisationExtensions;
@@ -165,20 +164,18 @@ namespace osu.Game.Beatmaps.Drawables
                                       .ToArray();
 
                 var dots = this.OfType<DifficultyDot>().ToArray();
-                int count = Math.Min(visibleBeatmaps.Length, dots.Length);
 
-                for (int i = 0; i < count; i++)
+                for (int i = 0; i < dots.Length; i++)
                 {
-                    var beatmap = visibleBeatmaps[i];
-                    var dot = dots[i];
+                    if (collapsed || i >= visibleBeatmaps.Length)
+                    {
+                        dots[i].Alpha = 0;
+                        continue;
+                    }
 
-                    dot.Alpha = collapsed ? 0 : 1;
-                    if (!collapsed)
-                        dot.StarDifficulty = beatmap.StarRating;
+                    dots[i].Alpha = 1;
+                    dots[i].StarDifficulty = visibleBeatmaps[i].StarRating;
                 }
-
-                for (int i = count; i < dots.Length; i++)
-                    dots[i].Alpha = 0;
             }
         }
 
