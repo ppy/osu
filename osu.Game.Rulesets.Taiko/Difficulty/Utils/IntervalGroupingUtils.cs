@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Utils
 
             for (; i < objects.Count - 1; i++)
             {
-                if (!Precision.AlmostEquals(objects[i].Interval, objects[i + 1].Interval, 5.0))
+                if (!Precision.AlmostEquals(objects[i].Interval, objects[i + 1].Interval, MarginOfError))
                 {
                     // When an interval change occurs, include the object with the differing interval in the case it increased
                     // See https://github.com/ppy/osu/pull/31636#discussion_r1942368372 for rationale.
