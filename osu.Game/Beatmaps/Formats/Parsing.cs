@@ -5,7 +5,6 @@ using System;
 using System.Globalization;
 using osuTK;
 using System.Text.RegularExpressions;
-using osu.Framework.Logging;
 
 namespace osu.Game.Beatmaps.Formats
 {

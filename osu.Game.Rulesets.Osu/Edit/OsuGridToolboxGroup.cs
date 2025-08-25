@@ -19,7 +19,6 @@ using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components.RadioButtons;
 using osuTK;
 using osuTK.Graphics;
-using osu.Framework.Logging;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
@@ -174,7 +173,6 @@ namespace osu.Game.Rulesets.Osu.Edit
             GridLinesRotation.Value = editorBeatmap.GridRotation;
             StartPositionX.Value = editorBeatmap.GridOffset.X;
             StartPositionY.Value = editorBeatmap.GridOffset.Y;
-            Logger.Log($"GridOffset has been set from .osu file as {editorBeatmap.GridOffset}", level: LogLevel.Error);
         }
 
         protected override void LoadComplete()
@@ -202,7 +200,6 @@ namespace osu.Game.Rulesets.Osu.Edit
                 StartPositionX.Value = pos.NewValue.X;
                 StartPositionY.Value = pos.NewValue.Y;
                 editorBeatmap.GridOffset = pos.NewValue;
-                Logger.Log($"Current GridOffset {pos.NewValue} has been written to .osu file as {editorBeatmap.GridOffset}", level: LogLevel.Error);
             });
 
             Spacing.BindValueChanged(spacing =>
