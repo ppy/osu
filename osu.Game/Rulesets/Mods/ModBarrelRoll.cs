@@ -2,11 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
+using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI;
 using osuTK;
@@ -35,10 +38,18 @@ namespace osu.Game.Rulesets.Mods
 
         public override string Name => "Barrel Roll";
         public override string Acronym => "BR";
+        public override IconUsage? Icon => OsuIcon.ModBarrelRoll;
         public override LocalisableString Description => "The whole playfield is on a wheel!";
         public override double ScoreMultiplier => 1;
 
-        public override string SettingDescription => $"{SpinSpeed.Value:N2} rpm {Direction.Value.GetDescription().ToLowerInvariant()}";
+        public override IEnumerable<(LocalisableString setting, LocalisableString value)> SettingDescription
+        {
+            get
+            {
+                yield return ("Roll speed", $"{SpinSpeed.Value:N2} rpm");
+                yield return ("Direction", Direction.Value.GetDescription());
+            }
+        }
 
         private PlayfieldAdjustmentContainer playfieldAdjustmentContainer = null!;
 

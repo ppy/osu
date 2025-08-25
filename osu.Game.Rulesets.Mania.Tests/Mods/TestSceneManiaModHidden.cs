@@ -74,7 +74,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
             CreateModTest(new ModTestData
             {
                 Mod = new ManiaModHidden(),
-                Beatmap = new Beatmap
+                CreateBeatmap = () => new Beatmap
                 {
                     HitObjects = Enumerable.Range(1, 100).Select(i => (HitObject)new Note { StartTime = 1000 + 200 * i }).ToList(),
                     Breaks = { new BreakPeriod(2000, 28000) }

@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Sample;
@@ -17,6 +18,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Testing;
 using osu.Framework.Testing.Input;
 using osu.Game.Audio;
+using osu.Game.Rulesets.Osu.Skinning;
 using osu.Game.Rulesets.Osu.Skinning.Legacy;
 using osu.Game.Rulesets.Osu.UI.Cursor;
 using osu.Game.Skinning;
@@ -103,6 +105,23 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddStep("contract", () => this.ChildrenOfType<CursorTrail>().Single().NewPartScale = Vector2.One);
         }
 
+        [Test]
+        public void TestRotation()
+        {
+            createTest(() =>
+            {
+                var skinContainer = new LegacySkinContainer(renderer, provideMiddle: true, enableRotation: true);
+                var legacyCursorTrail = new LegacyRotatingCursorTrail(skinContainer)
+                {
+                    NewPartScale = new Vector2(10)
+                };
+
+                skinContainer.Child = legacyCursorTrail;
+
+                return skinContainer;
+            });
+        }
+
         private void createTest(Func<Drawable> createContent) => AddStep("create trail", () =>
         {
             Clear();
@@ -121,12 +140,14 @@ namespace osu.Game.Rulesets.Osu.Tests
             private readonly IRenderer renderer;
             private readonly bool provideMiddle;
             private readonly bool provideCursor;
+            private readonly bool enableRotation;
 
-            public LegacySkinContainer(IRenderer renderer, bool provideMiddle, bool provideCursor = true)
+            public LegacySkinContainer(IRenderer renderer, bool provideMiddle, bool provideCursor = true, bool enableRotation = false)
             {
                 this.renderer = renderer;
                 this.provideMiddle = provideMiddle;
                 this.provideCursor = provideCursor;
+                this.enableRotation = enableRotation;
 
                 RelativeSizeAxes = Axes.Both;
             }
@@ -152,7 +173,19 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             public ISample GetSample(ISampleInfo sampleInfo) => null;
 
-            public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => null;
+            public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
+            {
+                switch (lookup)
+                {
+                    case OsuSkinConfiguration osuLookup:
+                        if (osuLookup == OsuSkinConfiguration.CursorTrailRotate)
+                            return SkinUtils.As<TValue>(new BindableBool(enableRotation));
+
+                        break;
+                }
+
+                return null;
+            }
 
             public ISkin FindProvider(Func<ISkin, bool> lookupFunction) => lookupFunction(this) ? this : null;
 
@@ -183,6 +216,20 @@ namespace osu.Game.Rulesets.Osu.Tests
                 Vector2 rPos = new Vector2((float)Math.Cos(angle), (float)Math.Sin(angle));
 
                 MoveMouseTo(ToScreenSpace(DrawSize / 2 + DrawSize / 3 * rPos));
+            }
+        }
+
+        private partial class LegacyRotatingCursorTrail : LegacyCursorTrail
+        {
+            public LegacyRotatingCursorTrail([NotNull] ISkin skin)
+                : base(skin)
+            {
+            }
+
+            protected override void Update()
+            {
+                base.Update();
+                PartRotation += (float)(Time.Elapsed * 0.1);
             }
         }
     }

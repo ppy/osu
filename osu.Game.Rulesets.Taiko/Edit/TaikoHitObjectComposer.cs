@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using osu.Framework.Allocation;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
@@ -12,6 +13,7 @@ using osu.Game.Screens.Edit.Compose.Components;
 
 namespace osu.Game.Rulesets.Taiko.Edit
 {
+    [Cached]
     public partial class TaikoHitObjectComposer : ScrollingHitObjectComposer<TaikoHitObject>
     {
         protected override bool ApplyHorizontalCentering => false;

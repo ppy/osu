@@ -10,11 +10,13 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Login;
 using osu.Game.Overlays.Settings;
+using osu.Game.Tests.Visual.Online;
 using osu.Game.Users;
 using osu.Game.Users.Drawables;
 using osuTK.Input;
@@ -27,13 +29,16 @@ namespace osu.Game.Tests.Visual.Menus
         private DummyAPIAccess dummyAPI => (DummyAPIAccess)API;
 
         private LoginOverlay loginOverlay = null!;
+        private OsuConfigManager localConfig = null!;
 
-        [Resolved]
-        private OsuConfigManager configManager { get; set; } = null!;
+        [Cached(typeof(LocalUserStatisticsProvider))]
+        private readonly TestSceneUserPanel.TestUserStatisticsProvider statisticsProvider = new TestSceneUserPanel.TestUserStatisticsProvider();
 
         [BackgroundDependencyLoader]
         private void load()
         {
+            Dependencies.Cache(localConfig = new OsuConfigManager(LocalStorage));
+
             Child = loginOverlay = new LoginOverlay
             {
                 Anchor = Anchor.Centre,
@@ -44,6 +49,7 @@ namespace osu.Game.Tests.Visual.Menus
         [SetUpSteps]
         public void SetUpSteps()
         {
+            AddStep("reset online state", () => localConfig.SetValue(OsuSetting.UserOnlineStatus, UserStatus.Online));
             AddStep("show login overlay", () => loginOverlay.Show());
         }
 
@@ -84,7 +90,7 @@ namespace osu.Game.Tests.Visual.Menus
             AddStep("clear handler", () => dummyAPI.HandleRequest = null);
 
             assertDropdownState(UserAction.Online);
-            AddStep("change user state", () => dummyAPI.LocalUser.Value.Status.Value = UserStatus.DoNotDisturb);
+            AddStep("change user state", () => localConfig.SetValue(OsuSetting.UserOnlineStatus, UserStatus.DoNotDisturb));
             assertDropdownState(UserAction.DoNotDisturb);
         }
 
@@ -170,6 +176,7 @@ namespace osu.Game.Tests.Visual.Menus
             AddStep("enter code", () => loginOverlay.ChildrenOfType<OsuTextBox>().First().Text = "88800088");
             assertAPIState(APIState.Online);
 
+            AddStep("feed statistics", () => statisticsProvider.UpdateStatistics(new UserStatistics(), Ruleset.Value));
             AddStep("click on flag", () =>
             {
                 InputManager.MoveMouseTo(loginOverlay.ChildrenOfType<UpdateableFlag>().First());
@@ -182,31 +189,31 @@ namespace osu.Game.Tests.Visual.Menus
         public void TestUncheckingRememberUsernameClearsIt()
         {
             AddStep("logout", () => API.Logout());
-            AddStep("set username", () => configManager.SetValue(OsuSetting.Username, "test_user"));
-            AddStep("set remember password", () => configManager.SetValue(OsuSetting.SavePassword, true));
+            AddStep("set username", () => localConfig.SetValue(OsuSetting.Username, "test_user"));
+            AddStep("set remember password", () => localConfig.SetValue(OsuSetting.SavePassword, true));
             AddStep("uncheck remember username", () =>
             {
                 InputManager.MoveMouseTo(loginOverlay.ChildrenOfType<SettingsCheckbox>().First());
                 InputManager.Click(MouseButton.Left);
             });
-            AddAssert("remember username off", () => configManager.Get<bool>(OsuSetting.SaveUsername), () => Is.False);
-            AddAssert("remember password off", () => configManager.Get<bool>(OsuSetting.SavePassword), () => Is.False);
-            AddAssert("username cleared", () => configManager.Get<string>(OsuSetting.Username), () => Is.Empty);
+            AddAssert("remember username off", () => localConfig.Get<bool>(OsuSetting.SaveUsername), () => Is.False);
+            AddAssert("remember password off", () => localConfig.Get<bool>(OsuSetting.SavePassword), () => Is.False);
+            AddAssert("username cleared", () => localConfig.Get<string>(OsuSetting.Username), () => Is.Empty);
         }
 
         [Test]
         public void TestUncheckingRememberPasswordClearsToken()
         {
             AddStep("logout", () => API.Logout());
-            AddStep("set token", () => configManager.SetValue(OsuSetting.Token, "test_token"));
-            AddStep("set remember password", () => configManager.SetValue(OsuSetting.SavePassword, true));
+            AddStep("set token", () => localConfig.SetValue(OsuSetting.Token, "test_token"));
+            AddStep("set remember password", () => localConfig.SetValue(OsuSetting.SavePassword, true));
             AddStep("uncheck remember token", () =>
             {
                 InputManager.MoveMouseTo(loginOverlay.ChildrenOfType<SettingsCheckbox>().Last());
                 InputManager.Click(MouseButton.Left);
             });
-            AddAssert("remember password off", () => configManager.Get<bool>(OsuSetting.SavePassword), () => Is.False);
-            AddAssert("token cleared", () => configManager.Get<string>(OsuSetting.Token), () => Is.Empty);
+            AddAssert("remember password off", () => localConfig.Get<bool>(OsuSetting.SavePassword), () => Is.False);
+            AddAssert("token cleared", () => localConfig.Get<string>(OsuSetting.Token), () => Is.Empty);
         }
     }
 }

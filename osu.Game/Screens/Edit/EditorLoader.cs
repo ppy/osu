@@ -36,7 +36,7 @@ namespace osu.Game.Screens.Edit
 
         public override float BackgroundParallaxAmount => 0.1f;
 
-        public override bool AllowBackButton => false;
+        public override bool AllowUserExit => false;
 
         public override bool HideOverlaysOnEnter => true;
 

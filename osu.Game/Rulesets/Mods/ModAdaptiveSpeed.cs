@@ -6,10 +6,12 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Graphics;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
@@ -26,6 +28,8 @@ namespace osu.Game.Rulesets.Mods
         public override string Acronym => "AS";
 
         public override LocalisableString Description => "Let track speed adapt to you.";
+
+        public override IconUsage? Icon => OsuIcon.ModAdaptiveSpeed;
 
         public override ModType Type => ModType.Fun;
 
@@ -173,10 +177,10 @@ namespace osu.Game.Rulesets.Mods
             };
             drawable.OnRevertResult += (_, result) =>
             {
-                if (!ratesForRewinding.ContainsKey(result.HitObject)) return;
+                if (!ratesForRewinding.TryGetValue(result.HitObject, out double rate)) return;
                 if (!shouldProcessResult(result)) return;
 
-                recentRates.Insert(0, ratesForRewinding[result.HitObject]);
+                recentRates.Insert(0, rate);
                 ratesForRewinding.Remove(result.HitObject);
 
                 recentRates.RemoveAt(recentRates.Count - 1);
@@ -205,7 +209,7 @@ namespace osu.Game.Rulesets.Mods
         {
             foreach (var hitObject in hitObjects)
             {
-                if (!(hitObject.HitWindows is HitWindows.EmptyHitWindows))
+                if (hitObject.HitWindows != HitWindows.Empty)
                     yield return hitObject;
 
                 foreach (HitObject nested in getAllApplicableHitObjects(hitObject.NestedHitObjects))

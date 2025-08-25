@@ -18,6 +18,11 @@ using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets.Mods;
@@ -63,6 +68,9 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Cached(typeof(BatteryInfo))]
         private readonly LocalBatteryInfo batteryInfo = new LocalBatteryInfo();
 
+        [Cached]
+        private readonly LeaderboardManager leaderboardManager;
+
         private readonly ChangelogOverlay changelogOverlay;
 
         private double savedTrackVolume;
@@ -73,6 +81,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddRange(new Drawable[]
             {
+                leaderboardManager = new LeaderboardManager(),
                 notificationOverlay = new NotificationOverlay
                 {
                     Anchor = Anchor.TopRight,
@@ -135,10 +144,10 @@ namespace osu.Game.Tests.Visual.Gameplay
             var workingBeatmap = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
 
             // Add intro time to test quick retry skipping (TestQuickRetry).
-            workingBeatmap.BeatmapInfo.AudioLeadIn = 60000;
+            workingBeatmap.Beatmap.AudioLeadIn = 60000;
 
             // Set up data for testing disclaimer display.
-            workingBeatmap.BeatmapInfo.EpilepsyWarning = epilepsyWarning ?? false;
+            workingBeatmap.Beatmap.EpilepsyWarning = epilepsyWarning ?? false;
             workingBeatmap.BeatmapInfo.Status = onlineStatus ?? BeatmapOnlineStatus.Ranked;
 
             Beatmap.Value = workingBeatmap;
@@ -207,7 +216,25 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
-        public void TestBlockLoadViaFocus()
+        public void TestLoadNotBlockedViaArbitraryFocus()
+        {
+            AddStep("load dummy beatmap", () => resetPlayer(false));
+            AddUntilStep("wait for current", () => loader.IsCurrentScreen());
+
+            AddUntilStep("click settings slider", () =>
+            {
+                InputManager.MoveMouseTo(loader.ChildrenOfType<OsuSliderBar<float>>().First());
+                InputManager.Click(MouseButton.Left);
+
+                return InputManager.FocusedDrawable is OsuSliderBar<float>;
+            });
+
+            AddUntilStep("wait for load ready", () => player?.LoadState == LoadState.Ready);
+            AddUntilStep("loads", () => !loader.IsCurrentScreen());
+        }
+
+        [Test]
+        public void TestBlockLoadViaOverlayFocus()
         {
             AddStep("load dummy beatmap", () => resetPlayer(false));
             AddUntilStep("wait for current", () => loader.IsCurrentScreen());
@@ -343,6 +370,45 @@ namespace osu.Game.Tests.Visual.Gameplay
                 audioManager.VolumeTrack.Value = 0.5;
                 volumeOverlay.IsMuted.Value = true;
             }, () => !volumeOverlay.IsMuted.Value && audioManager.Volume.Value == 0.5 && audioManager.VolumeTrack.Value == 0.5);
+        }
+
+        [Test]
+        public void TestLeaderboardForciblyRefetchedOnRestart([Values] bool quickRestart)
+        {
+            int leaderboardRequestsHandled = 0;
+            AddStep("set up request handling", () => ((DummyAPIAccess)API).HandleRequest = req =>
+            {
+                switch (req)
+                {
+                    case GetScoresRequest getScores:
+                        leaderboardRequestsHandled++;
+                        getScores.TriggerSuccess(new APIScoresCollection { Scores = [] });
+                        return true;
+
+                    default:
+                        return false;
+                }
+            });
+
+            AddStep("load player", () => resetPlayer(true));
+
+            AddUntilStep("wait for loader to become current", () => loader.IsCurrentScreen());
+            AddUntilStep("wait for player to be current", () => player.IsCurrentScreen());
+            AddAssert("leaderboard fetched once", () => leaderboardRequestsHandled, () => Is.EqualTo(1));
+
+            AddStep("restart player", () =>
+            {
+                var lastPlayer = player;
+                player = null;
+                lastPlayer.Restart(quickRestart);
+            });
+
+            AddUntilStep("wait for player to be current", () => player.IsCurrentScreen());
+
+            if (quickRestart)
+                AddAssert("leaderboard not refetched", () => leaderboardRequestsHandled, () => Is.EqualTo(1));
+            else
+                AddAssert("leaderboard fetched twice", () => leaderboardRequestsHandled, () => Is.EqualTo(2));
         }
 
         /// <remarks>
@@ -523,7 +589,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("restart completed", () => getCurrentPlayer() != null && getCurrentPlayer() != previousPlayer);
             AddStep("release quick retry key", () => InputManager.ReleaseKey(Key.Tilde));
 
-            AddUntilStep("wait for player", () => getCurrentPlayer()?.LoadState == LoadState.Ready);
+            AddUntilStep("wait for player", () => getCurrentPlayer()?.LoadState >= LoadState.Ready);
 
             AddUntilStep("time reached zero", () => getCurrentPlayer()?.GameplayClockContainer.CurrentTime > 0);
             AddUntilStep("skip button not visible", () => !checkSkipButtonVisible());

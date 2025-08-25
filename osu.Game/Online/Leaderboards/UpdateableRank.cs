@@ -11,7 +11,9 @@ namespace osu.Game.Online.Leaderboards
 {
     public partial class UpdateableRank : ModelBackedDrawable<ScoreRank?>
     {
-        protected override double TransformDuration => 600;
+        private readonly bool animate;
+
+        protected override double TransformDuration => animate ? 600 : 0;
         protected override bool TransformImmediately => true;
 
         public ScoreRank? Rank
@@ -20,8 +22,10 @@ namespace osu.Game.Online.Leaderboards
             set => Model = value;
         }
 
-        public UpdateableRank(ScoreRank? rank = null)
+        public UpdateableRank(ScoreRank? rank = null, bool animate = true)
         {
+            this.animate = animate;
+
             Rank = rank;
         }
 
@@ -58,7 +62,6 @@ namespace osu.Game.Online.Leaderboards
         protected override TransformSequence<Drawable> ApplyHideTransforms(Drawable drawable)
         {
             drawable.ScaleTo(1.8f, TransformDuration, Easing.Out);
-
             return base.ApplyHideTransforms(drawable);
         }
     }

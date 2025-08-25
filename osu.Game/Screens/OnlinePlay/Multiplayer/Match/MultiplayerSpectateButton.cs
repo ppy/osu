@@ -30,12 +30,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         [Resolved]
         private MultiplayerClient client { get; set; } = null!;
 
-        [Resolved]
-        private IBindable<PlaylistItem?> currentItem { get; set; } = null!;
+        private readonly RoundedButton button;
 
         private IBindable<bool> operationInProgress = null!;
-
-        private readonly RoundedButton button;
 
         public MultiplayerSpectateButton()
         {
@@ -54,7 +51,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
             client.ToggleSpectate().ContinueWith(_ => endOperation());
 
-            void endOperation() => clickOperation?.Dispose();
+            void endOperation() => clickOperation.Dispose();
         }
 
         [BackgroundDependencyLoader]
@@ -71,7 +68,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         {
             base.LoadComplete();
 
-            currentItem.BindValueChanged(_ => Scheduler.AddOnce(checkForAutomaticDownload), true);
             client.RoomUpdated += onRoomUpdated;
             updateState();
         }
@@ -115,13 +111,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
         private CancellationTokenSource? downloadCheckCancellation;
 
+        private int? lastDownloadCheckedBeatmapId;
+
         private void checkForAutomaticDownload()
         {
-            PlaylistItem? item = currentItem.Value;
-
-            downloadCheckCancellation?.Cancel();
-
-            if (item == null)
+            if (client.Room == null)
                 return;
 
             if (!automaticallyDownload.Value)
@@ -136,10 +130,23 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             if (client.LocalUser?.State != MultiplayerUserState.Spectating)
                 return;
 
+            MultiplayerPlaylistItem item = client.Room.CurrentPlaylistItem;
+
+            // This method is called every time anything changes in the room.
+            // This could result in download requests firing far too often, when we only expect them to fire once per beatmap.
+            //
+            // Without this check, we would see especially egregious behaviour when a user has hit the download rate limit.
+            if (lastDownloadCheckedBeatmapId == item.BeatmapID)
+                return;
+
+            lastDownloadCheckedBeatmapId = item.BeatmapID;
+
+            downloadCheckCancellation?.Cancel();
+
             // In a perfect world we'd use BeatmapAvailability, but there's no event-driven flow for when a selection changes.
             // ie. if selection changes from "not downloaded" to another "not downloaded" we wouldn't get a value changed raised.
             beatmapLookupCache
-                .GetBeatmapAsync(item.Beatmap.OnlineID, (downloadCheckCancellation = new CancellationTokenSource()).Token)
+                .GetBeatmapAsync(item.BeatmapID, (downloadCheckCancellation = new CancellationTokenSource()).Token)
                 .ContinueWith(resolved => Schedule(() =>
                 {
                     var beatmapSet = resolved.GetResultSafely()?.BeatmapSet;

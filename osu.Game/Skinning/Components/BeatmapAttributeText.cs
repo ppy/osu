@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -29,7 +28,7 @@ namespace osu.Game.Skinning.Components
     [UsedImplicitly]
     public partial class BeatmapAttributeText : FontAdjustableSkinComponent
     {
-        [SettingSource(typeof(BeatmapAttributeTextStrings), nameof(BeatmapAttributeTextStrings.Attribute), nameof(BeatmapAttributeTextStrings.AttributeDescription))]
+        [SettingSource(typeof(BeatmapAttributeTextStrings), nameof(BeatmapAttributeTextStrings.Attribute))]
         public Bindable<BeatmapAttribute> Attribute { get; } = new Bindable<BeatmapAttribute>(BeatmapAttribute.StarRating);
 
         [SettingSource(typeof(BeatmapAttributeTextStrings), nameof(BeatmapAttributeTextStrings.Template), nameof(BeatmapAttributeTextStrings.TemplateDescription))]
@@ -48,7 +47,7 @@ namespace osu.Game.Skinning.Components
         private BeatmapDifficultyCache difficultyCache { get; set; } = null!;
 
         private readonly OsuSpriteText text;
-        private IBindable<StarDifficulty?>? difficultyBindable;
+        private IBindable<StarDifficulty>? difficultyBindable;
         private CancellationTokenSource? difficultyCancellationSource;
         private ModSettingChangeTracker? modSettingTracker;
         private StarDifficulty? starDifficulty;
@@ -177,6 +176,9 @@ namespace osu.Game.Skinning.Components
                 case BeatmapAttribute.BPM:
                     return BeatmapsetsStrings.ShowStatsBpm;
 
+                case BeatmapAttribute.MaxPP:
+                    return BeatmapAttributeTextStrings.MaxPP;
+
                 default:
                     return string.Empty;
             }
@@ -208,22 +210,25 @@ namespace osu.Game.Skinning.Components
                     return beatmap.Value.BeatmapInfo.Status.GetLocalisableDescription();
 
                 case BeatmapAttribute.BPM:
-                    return FormatUtils.RoundBPM(beatmap.Value.BeatmapInfo.BPM, ModUtils.CalculateRateWithMods(mods.Value)).ToLocalisableString(@"F2");
+                    return FormatUtils.RoundBPM(beatmap.Value.BeatmapInfo.BPM, ModUtils.CalculateRateWithMods(mods.Value)).ToLocalisableString(@"0.##");
 
                 case BeatmapAttribute.CircleSize:
-                    return computeDifficulty().CircleSize.ToLocalisableString(@"F2");
+                    return computeDifficulty().CircleSize.ToLocalisableString(@"0.##");
 
                 case BeatmapAttribute.HPDrain:
-                    return computeDifficulty().DrainRate.ToLocalisableString(@"F2");
+                    return computeDifficulty().DrainRate.ToLocalisableString(@"0.##");
 
                 case BeatmapAttribute.Accuracy:
-                    return computeDifficulty().OverallDifficulty.ToLocalisableString(@"F2");
+                    return computeDifficulty().OverallDifficulty.ToLocalisableString(@"0.##");
 
                 case BeatmapAttribute.ApproachRate:
-                    return computeDifficulty().ApproachRate.ToLocalisableString(@"F2");
+                    return computeDifficulty().ApproachRate.ToLocalisableString(@"0.##");
 
                 case BeatmapAttribute.StarRating:
-                    return (starDifficulty?.Stars ?? 0).ToLocalisableString(@"F2");
+                    return (starDifficulty?.Stars ?? 0).FormatStarRating();
+
+                case BeatmapAttribute.MaxPP:
+                    return Math.Round(starDifficulty?.PerformanceAttributes?.Total ?? 0, MidpointRounding.AwayFromZero).ToLocalisableString();
 
                 default:
                     return string.Empty;
@@ -231,18 +236,9 @@ namespace osu.Game.Skinning.Components
 
             BeatmapDifficulty computeDifficulty()
             {
-                BeatmapDifficulty difficulty = new BeatmapDifficulty(beatmap.Value.BeatmapInfo.Difficulty);
-
-                foreach (var mod in mods.Value.OfType<IApplicableToDifficulty>())
-                    mod.ApplyToDifficulty(difficulty);
-
-                if (ruleset.Value is RulesetInfo rulesetInfo)
-                {
-                    double rate = ModUtils.CalculateRateWithMods(mods.Value);
-                    difficulty = rulesetInfo.CreateInstance().GetRateAdjustedDisplayDifficulty(difficulty, rate);
-                }
-
-                return difficulty;
+                return ruleset.Value is RulesetInfo rulesetInfo
+                    ? rulesetInfo.CreateInstance().GetAdjustedDisplayDifficulty(beatmap.Value.BeatmapInfo, mods.Value)
+                    : new BeatmapDifficulty(beatmap.Value.BeatmapInfo.Difficulty);
             }
         }
 
@@ -279,5 +275,6 @@ namespace osu.Game.Skinning.Components
         RankedStatus,
         BPM,
         Source,
+        MaxPP
     }
 }

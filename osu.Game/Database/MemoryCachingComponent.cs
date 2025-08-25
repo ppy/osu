@@ -35,8 +35,9 @@ namespace osu.Game.Database
         /// Retrieve the cached value for the given lookup.
         /// </summary>
         /// <param name="lookup">The lookup to retrieve.</param>
-        /// <param name="token">An optional <see cref="CancellationToken"/> to cancel the operation.</param>
-        protected async Task<TValue?> GetAsync(TLookup lookup, CancellationToken token = default)
+        /// <param name="cancellationToken">An optional <see cref="CancellationToken"/> to cancel the operation.</param>
+        /// <param name="computationDelay">In the case a cached lookup was not possible, a value in milliseconds of to wait until performing potentially intensive lookup.</param>
+        protected async Task<TValue?> GetAsync(TLookup lookup, CancellationToken cancellationToken = default, int computationDelay = 0)
         {
             if (CheckExists(lookup, out TValue? existing))
             {
@@ -44,7 +45,10 @@ namespace osu.Game.Database
                 return existing;
             }
 
-            var computed = await ComputeValueAsync(lookup, token).ConfigureAwait(false);
+            if (computationDelay > 0)
+                await Task.Delay(computationDelay, cancellationToken).ConfigureAwait(false);
+
+            var computed = await ComputeValueAsync(lookup, cancellationToken).ConfigureAwait(false);
 
             statistics.Value.MissCount++;
 
