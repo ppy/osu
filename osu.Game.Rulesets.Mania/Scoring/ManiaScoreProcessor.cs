@@ -37,12 +37,14 @@ namespace osu.Game.Rulesets.Mania.Scoring
             return getBaseComboScoreForResult(result.Type) * Math.Min(Math.Max(0.5, Math.Log(result.ComboAfterJudgement, combo_base)), Math.Log(400, combo_base));
         }
 
+        public bool ClassicModActive { get; set; }
+
         public override int GetBaseScoreForResult(HitResult result)
         {
             switch (result)
             {
                 case HitResult.Perfect:
-                    return 305;
+                    return ClassicModActive ? 300 : 305;
             }
 
             return base.GetBaseScoreForResult(result);

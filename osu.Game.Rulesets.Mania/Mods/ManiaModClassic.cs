@@ -5,10 +5,12 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Scoring;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Scoring;
+using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Mania.Mods
 {
-    public class ManiaModClassic : ModClassic, IApplicableToBeatmap
+    public class ManiaModClassic : ModClassic, IApplicableToBeatmap, IApplicableToScoreProcessor
     {
         public void ApplyToBeatmap(IBeatmap beatmap)
         {
@@ -37,5 +39,13 @@ namespace osu.Game.Rulesets.Mania.Mods
                 }
             }
         }
+
+        public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
+        {
+            var processor = (ManiaScoreProcessor)scoreProcessor;
+            processor.ClassicModActive = true;
+        }
+
+        public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
     }
 }
