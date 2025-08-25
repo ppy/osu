@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Mania
             int keyCount = ManiaBeatmapConverter.GetColumnCount(LegacyBeatmapConversionDifficultyInfo.FromBeatmapInfo(beatmapInfo), criteria.Mods);
 
             bool keyCountMatch = includedKeyCounts.Contains(keyCount);
-            bool longNoteRatioMatch = !longNoteRatio.HasFilter || longNoteRatio.IsInRange(calculatelongNoteRatio(beatmapInfo));
+            bool longNoteRatioMatch = !longNoteRatio.HasFilter || (!isConvertedBeatMap(beatmapInfo, criteria) && longNoteRatio.IsInRange(calculateLongNoteRatio(beatmapInfo)));
 
             return keyCountMatch && longNoteRatioMatch;
         }
@@ -98,15 +98,6 @@ namespace osu.Game.Rulesets.Mania
             return false;
         }
 
-        private static float calculatelongNoteRatio(BeatmapInfo beatmapInfo)
-        {
-            int holdNotes = beatmapInfo.EndTimeObjectCount;
-            int totalNotes = beatmapInfo.TotalObjectCount;
-            int sum = Math.Max(1, totalNotes);
-
-            return holdNotes / (float)sum * 100;
-        }
-
         public bool FilterMayChangeFromMods(ValueChangedEvent<IReadOnlyList<Mod>> mods)
         {
             if (includedKeyCounts.Count != LegacyBeatmapDecoder.MAX_MANIA_KEY_COUNT)
@@ -120,6 +111,20 @@ namespace osu.Game.Rulesets.Mania
             }
 
             return false;
+        }
+
+        private static bool isConvertedBeatMap(BeatmapInfo beatmapInfo, FilterCriteria criteria)
+        {
+            return criteria.Ruleset == null || beatmapInfo.Ruleset.ShortName != criteria.Ruleset!.ShortName;
+        }
+
+        private static float calculateLongNoteRatio(BeatmapInfo beatmapInfo)
+        {
+            int holdNotes = beatmapInfo.EndTimeObjectCount;
+            int totalNotes = beatmapInfo.TotalObjectCount;
+            int sum = Math.Max(1, totalNotes);
+
+            return holdNotes / (float)sum * 100;
         }
     }
 }
