@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 using osu.Framework.Lists;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.IO.Serialization.Converters;
+using osuTK;
 
 namespace osu.Game.Beatmaps
 {
@@ -137,6 +138,8 @@ namespace osu.Game.Beatmaps
         public int GridType { get; set; }
 
         public int GridRotation { get; set; }
+
+        public Vector2 GridOffset { get; set; }
 
         public double TimelineZoom { get; set; } = 1.0;
 

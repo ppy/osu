@@ -19,6 +19,7 @@ using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Skinning;
+using osuTK;
 
 namespace osu.Game.Screens.Edit
 {
@@ -273,6 +274,12 @@ namespace osu.Game.Screens.Edit
         {
             get => PlayableBeatmap.GridRotation;
             set => PlayableBeatmap.GridRotation = value;
+        }
+
+        public Vector2 GridOffset
+        {
+            get => PlayableBeatmap.GridOffset;
+            set => PlayableBeatmap.GridOffset = value;
         }
 
         public double TimelineZoom

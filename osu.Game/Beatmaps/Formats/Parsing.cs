@@ -3,6 +3,9 @@
 
 using System;
 using System.Globalization;
+using osuTK;
+using System.Text.RegularExpressions;
+using osu.Framework.Logging;
 
 namespace osu.Game.Beatmaps.Formats
 {
@@ -45,6 +48,16 @@ namespace osu.Game.Beatmaps.Formats
 
             if (output < -parseLimit) throw new OverflowException("Value is too low");
             if (output > parseLimit) throw new OverflowException("Value is too high");
+
+            return output;
+        }
+
+        // This null parseLimit doesn't make any sense, but otherwise I can't write boundaries :/ 
+        public static Vector2 ParseVector2(string input, Vector2? tempParseLimit = null)
+        {
+            string vectorPattern = @"\((.+)\; (.+)\)";
+            Match vectorCoords = Regex.Match(input, vectorPattern);
+            Vector2 output = new Vector2(float.Parse(vectorCoords.Groups[1].Value, CultureInfo.InvariantCulture), float.Parse(vectorCoords.Groups[2].Value, CultureInfo.InvariantCulture));
 
             return output;
         }
