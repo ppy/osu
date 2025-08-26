@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,17 +29,17 @@ namespace osu.Game.Screens.Play
 
         private readonly Func<IBeatmap, IReadOnlyList<Mod>, Score> createScore;
 
-        private PlaybackSettings playbackSettings;
+        private PlaybackSettings playbackSettings = null!;
 
         [Cached(typeof(IGameplayLeaderboardProvider))]
         private readonly SoloGameplayLeaderboardProvider leaderboardProvider = new SoloGameplayLeaderboardProvider();
 
-        protected override UserActivity InitialActivity => new UserActivity.WatchingReplay(Score.ScoreInfo);
+        protected override UserActivity? InitialActivity => new UserActivity.WatchingReplay(Score.ScoreInfo);
 
         private bool isAutoplayPlayback => GameplayState.Mods.OfType<ModAutoplay>().Any();
 
         private double? lastFrameTime;
-        private ReplayFailIndicator failIndicator;
+        private ReplayFailIndicator failIndicator = null!;
 
         protected override bool CheckModsAllowFailure()
         {
@@ -60,12 +58,12 @@ namespace osu.Game.Screens.Play
             return false;
         }
 
-        public ReplayPlayer(Score score, PlayerConfiguration configuration = null)
+        public ReplayPlayer(Score score, PlayerConfiguration? configuration = null)
             : this((_, _) => score, configuration)
         {
         }
 
-        public ReplayPlayer(Func<IBeatmap, IReadOnlyList<Mod>, Score> createScore, PlayerConfiguration configuration = null)
+        public ReplayPlayer(Func<IBeatmap, IReadOnlyList<Mod>, Score> createScore, PlayerConfiguration? configuration = null)
             : base(configuration)
         {
             this.createScore = createScore;
