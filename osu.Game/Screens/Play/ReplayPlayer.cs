@@ -32,7 +32,9 @@ namespace osu.Game.Screens.Play
         [Cached(typeof(IGameplayLeaderboardProvider))]
         private readonly SoloGameplayLeaderboardProvider leaderboardProvider = new SoloGameplayLeaderboardProvider();
 
-        protected override UserActivity? InitialActivity => new UserActivity.WatchingReplay(Score.ScoreInfo);
+        protected override UserActivity? InitialActivity =>
+            // score may be null if LoadedBeatmapSuccessfully is false.
+            Score == null ? null : new UserActivity.WatchingReplay(Score.ScoreInfo);
 
         private bool isAutoplayPlayback => GameplayState.Mods.OfType<ModAutoplay>().Any();
 
