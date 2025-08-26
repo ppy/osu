@@ -20,16 +20,16 @@ namespace osu.Game.Rulesets.Mania
     public class ManiaFilterCriteria : IRulesetFilterCriteria
     {
         private readonly HashSet<int> includedKeyCounts = Enumerable.Range(1, LegacyBeatmapDecoder.MAX_MANIA_KEY_COUNT).ToHashSet();
-        private FilterCriteria.OptionalRange<float> longNoteRatio;
+        private FilterCriteria.OptionalRange<float> longNotePercentage;
 
         public bool Matches(BeatmapInfo beatmapInfo, FilterCriteria criteria)
         {
             int keyCount = ManiaBeatmapConverter.GetColumnCount(LegacyBeatmapConversionDifficultyInfo.FromBeatmapInfo(beatmapInfo), criteria.Mods);
 
             bool keyCountMatch = includedKeyCounts.Contains(keyCount);
-            bool longNoteRatioMatch = !longNoteRatio.HasFilter || (!isConvertedBeatMap(beatmapInfo, criteria) && longNoteRatio.IsInRange(calculateLongNoteRatio(beatmapInfo)));
+            bool longNotePercentageMatch = !longNotePercentage.HasFilter || (!isConvertedBeatmap(beatmapInfo) && longNotePercentage.IsInRange(calculateLongNotePercentage(beatmapInfo)));
 
-            return keyCountMatch && longNoteRatioMatch;
+            return keyCountMatch && longNotePercentageMatch;
         }
 
         public bool TryParseCustomKeywordCriteria(string key, Operator op, string strValues)
@@ -92,7 +92,7 @@ namespace osu.Game.Rulesets.Mania
 
                 case "ln":
                 case "lns":
-                    return FilterQueryParser.TryUpdateCriteriaRange(ref longNoteRatio, op, strValues);
+                    return FilterQueryParser.TryUpdateCriteriaRange(ref longNotePercentage, op, strValues);
             }
 
             return false;
@@ -113,18 +113,17 @@ namespace osu.Game.Rulesets.Mania
             return false;
         }
 
-        private static bool isConvertedBeatMap(BeatmapInfo beatmapInfo, FilterCriteria criteria)
+        private static bool isConvertedBeatmap(BeatmapInfo beatmapInfo)
         {
-            return criteria.Ruleset == null || beatmapInfo.Ruleset.ShortName != criteria.Ruleset!.ShortName;
+            return !beatmapInfo.Ruleset.Equals(new ManiaRuleset().RulesetInfo);
         }
 
-        private static float calculateLongNoteRatio(BeatmapInfo beatmapInfo)
+        private static float calculateLongNotePercentage(BeatmapInfo beatmapInfo)
         {
             int holdNotes = beatmapInfo.EndTimeObjectCount;
-            int totalNotes = beatmapInfo.TotalObjectCount;
-            int sum = Math.Max(1, totalNotes);
+            int totalNotes = Math.Max(1, beatmapInfo.TotalObjectCount);
 
-            return holdNotes / (float)sum * 100;
+            return holdNotes / (float)totalNotes * 100;
         }
     }
 }
