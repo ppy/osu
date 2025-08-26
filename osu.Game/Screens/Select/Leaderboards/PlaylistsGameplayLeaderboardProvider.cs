@@ -65,8 +65,12 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             // touching the public bindable must happen on the update thread for general thread safety,
             // since we may have external subscribers bound already
-            Schedule(() => scores.AddRange(scoresToShow));
-            Scheduler.AddDelayed(sort, 1000, true);
+            Schedule(() =>
+            {
+                scores.AddRange(scoresToShow);
+                sort();
+                Scheduler.AddDelayed(sort, 1000, true);
+            });
         }
 
         // logic shared with SoloGameplayLeaderboardProvider
