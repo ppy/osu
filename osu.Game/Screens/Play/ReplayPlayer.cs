@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,17 +29,19 @@ namespace osu.Game.Screens.Play
 
         private readonly Func<IBeatmap, IReadOnlyList<Mod>, Score> createScore;
 
-        private PlaybackSettings playbackSettings;
-
         [Cached(typeof(IGameplayLeaderboardProvider))]
         private readonly SoloGameplayLeaderboardProvider leaderboardProvider = new SoloGameplayLeaderboardProvider();
 
-        protected override UserActivity InitialActivity => new UserActivity.WatchingReplay(Score.ScoreInfo);
+        protected override UserActivity? InitialActivity =>
+            // score may be null if LoadedBeatmapSuccessfully is false.
+            Score == null ? null : new UserActivity.WatchingReplay(Score.ScoreInfo);
 
         private bool isAutoplayPlayback => GameplayState.Mods.OfType<ModAutoplay>().Any();
 
         private double? lastFrameTime;
-        private ReplayFailIndicator failIndicator;
+
+        private ReplayFailIndicator? failIndicator;
+        private PlaybackSettings? playbackSettings;
 
         protected override bool CheckModsAllowFailure()
         {
@@ -60,12 +60,12 @@ namespace osu.Game.Screens.Play
             return false;
         }
 
-        public ReplayPlayer(Score score, PlayerConfiguration configuration = null)
+        public ReplayPlayer(Score score, PlayerConfiguration? configuration = null)
             : this((_, _) => score, configuration)
         {
         }
 
-        public ReplayPlayer(Func<IBeatmap, IReadOnlyList<Mod>, Score> createScore, PlayerConfiguration configuration = null)
+        public ReplayPlayer(Func<IBeatmap, IReadOnlyList<Mod>, Score> createScore, PlayerConfiguration? configuration = null)
             : base(configuration)
         {
             this.createScore = createScore;
@@ -133,6 +133,9 @@ namespace osu.Game.Screens.Play
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
+            if (!LoadedBeatmapSuccessfully)
+                return false;
+
             switch (e.Action)
             {
                 case GlobalAction.StepReplayBackward:
@@ -144,11 +147,11 @@ namespace osu.Game.Screens.Play
                     return true;
 
                 case GlobalAction.SeekReplayBackward:
-                    SeekInDirection(-5 * (float)playbackSettings.UserPlaybackRate.Value);
+                    SeekInDirection(-5 * (float)playbackSettings!.UserPlaybackRate.Value);
                     return true;
 
                 case GlobalAction.SeekReplayForward:
-                    SeekInDirection(5 * (float)playbackSettings.UserPlaybackRate.Value);
+                    SeekInDirection(5 * (float)playbackSettings!.UserPlaybackRate.Value);
                     return true;
 
                 case GlobalAction.TogglePauseReplay:
@@ -192,7 +195,7 @@ namespace osu.Game.Screens.Play
         {
             // base logic intentionally suppressed - we have our own custom fail interaction
             ScoreProcessor.FailScore(Score.ScoreInfo);
-            failIndicator.Display();
+            failIndicator!.Display();
         }
 
         public override void OnSuspending(ScreenTransitionEvent e)
@@ -204,18 +207,18 @@ namespace osu.Game.Screens.Play
         public override bool OnExiting(ScreenExitEvent e)
         {
             // safety against filters or samples from the indicator playing long after the screen is exited
-            failIndicator.RemoveAndDisposeImmediately();
+            failIndicator?.RemoveAndDisposeImmediately();
             return base.OnExiting(e);
         }
 
         private void stopAllAudioEffects()
         {
             // safety against filters or samples from the indicator playing long after the screen is exited
-            failIndicator.RemoveAndDisposeImmediately();
+            failIndicator?.RemoveAndDisposeImmediately();
 
             if (GameplayClockContainer is MasterGameplayClockContainer master)
             {
-                playbackSettings.UserPlaybackRate.UnbindFrom(master.UserPlaybackRate);
+                playbackSettings?.UserPlaybackRate.UnbindFrom(master.UserPlaybackRate);
                 master.UserPlaybackRate.SetDefault();
             }
         }
