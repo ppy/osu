@@ -29,8 +29,6 @@ namespace osu.Game.Screens.Play
 
         private readonly Func<IBeatmap, IReadOnlyList<Mod>, Score> createScore;
 
-        private PlaybackSettings playbackSettings = null!;
-
         [Cached(typeof(IGameplayLeaderboardProvider))]
         private readonly SoloGameplayLeaderboardProvider leaderboardProvider = new SoloGameplayLeaderboardProvider();
 
@@ -39,7 +37,9 @@ namespace osu.Game.Screens.Play
         private bool isAutoplayPlayback => GameplayState.Mods.OfType<ModAutoplay>().Any();
 
         private double? lastFrameTime;
-        private ReplayFailIndicator failIndicator = null!;
+
+        private ReplayFailIndicator? failIndicator;
+        private PlaybackSettings? playbackSettings;
 
         protected override bool CheckModsAllowFailure()
         {
@@ -131,6 +131,9 @@ namespace osu.Game.Screens.Play
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
+            if (!LoadedBeatmapSuccessfully)
+                return false;
+
             switch (e.Action)
             {
                 case GlobalAction.StepReplayBackward:
@@ -142,11 +145,11 @@ namespace osu.Game.Screens.Play
                     return true;
 
                 case GlobalAction.SeekReplayBackward:
-                    SeekInDirection(-5 * (float)playbackSettings.UserPlaybackRate.Value);
+                    SeekInDirection(-5 * (float)playbackSettings!.UserPlaybackRate.Value);
                     return true;
 
                 case GlobalAction.SeekReplayForward:
-                    SeekInDirection(5 * (float)playbackSettings.UserPlaybackRate.Value);
+                    SeekInDirection(5 * (float)playbackSettings!.UserPlaybackRate.Value);
                     return true;
 
                 case GlobalAction.TogglePauseReplay:
@@ -190,7 +193,7 @@ namespace osu.Game.Screens.Play
         {
             // base logic intentionally suppressed - we have our own custom fail interaction
             ScoreProcessor.FailScore(Score.ScoreInfo);
-            failIndicator.Display();
+            failIndicator!.Display();
         }
 
         public override void OnSuspending(ScreenTransitionEvent e)
@@ -202,18 +205,18 @@ namespace osu.Game.Screens.Play
         public override bool OnExiting(ScreenExitEvent e)
         {
             // safety against filters or samples from the indicator playing long after the screen is exited
-            failIndicator.RemoveAndDisposeImmediately();
+            failIndicator?.RemoveAndDisposeImmediately();
             return base.OnExiting(e);
         }
 
         private void stopAllAudioEffects()
         {
             // safety against filters or samples from the indicator playing long after the screen is exited
-            failIndicator.RemoveAndDisposeImmediately();
+            failIndicator?.RemoveAndDisposeImmediately();
 
             if (GameplayClockContainer is MasterGameplayClockContainer master)
             {
-                playbackSettings.UserPlaybackRate.UnbindFrom(master.UserPlaybackRate);
+                playbackSettings?.UserPlaybackRate.UnbindFrom(master.UserPlaybackRate);
                 master.UserPlaybackRate.SetDefault();
             }
         }
