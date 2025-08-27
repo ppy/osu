@@ -143,6 +143,9 @@ namespace osu.Game.Screens.SelectV2
             switch (changed.Action)
             {
                 case NotifyCollectionChangedAction.Add:
+                    if (!newItems!.Any())
+                        return;
+
                     Items.AddRange(newItems!.SelectMany(s => s.Beatmaps));
                     break;
 
