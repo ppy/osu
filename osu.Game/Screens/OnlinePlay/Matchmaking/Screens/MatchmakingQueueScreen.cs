@@ -219,7 +219,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens
                                 LighterColour = colours.Blue1,
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                                Action = () => client.JoinMatchmakingQueue(),
+                                Action = () => client.JoinMatchmakingQueue().FireAndForget(),
                                 Text = "Begin queueing",
                             }
                         }
@@ -303,11 +303,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens
                                 Origin = Anchor.Centre,
                                 Action = () =>
                                 {
-                                    client.MatchmakingAcceptInvitation()
-                                          .FireAndForget(() => Schedule(() =>
-                                          {
-                                              SetState(MatchmakingScreenState.AcceptedWaitingForRoom);
-                                          }));
+                                    client.MatchmakingAcceptInvitation().FireAndForget();
+                                    SetState(MatchmakingScreenState.AcceptedWaitingForRoom);
                                 },
                                 Text = "Join match!",
                             }
