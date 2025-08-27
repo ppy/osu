@@ -4,6 +4,8 @@
 using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.ObjectExtensions;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.Matchmaking;
@@ -13,21 +15,60 @@ using osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Results;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens
 {
-    public partial class MatchmakingScreenStack : ScreenStack
+    public partial class MatchmakingScreenStack : CompositeDrawable
     {
         [Resolved]
         private MultiplayerClient client { get; set; } = null!;
 
-        public MatchmakingScreenStack()
+        private ScreenStack screenStack = null!;
+
+        [BackgroundDependencyLoader]
+        private void load()
         {
-            Masking = true;
+            RelativeSizeAxes = Axes.Both;
+            Padding = new MarginPadding(10);
+
+            InternalChild = new GridContainer
+            {
+                RelativeSizeAxes = Axes.Both,
+                RowDimensions = new[] { new Dimension(), new Dimension(GridSizeMode.AutoSize) },
+                Content = new Drawable[][]
+                {
+                    [
+                        new GridContainer
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            ColumnDimensions = new[] { new Dimension(), new Dimension(GridSizeMode.Absolute, 20), new Dimension(GridSizeMode.AutoSize)},
+                            Padding = new MarginPadding { Bottom = 20 },
+                            Content = new Drawable?[][]
+                            {
+                                [
+                                    screenStack = new ScreenStack(),
+                                    null,
+                                    new PlayerPanelList
+                                    {
+                                        RelativeSizeAxes = Axes.Y,
+                                        Width = 200,
+                                    }
+                                ]
+                            }
+                        }
+                    ],
+                    [
+                        new StageDisplay
+                        {
+                            RelativeSizeAxes = Axes.X
+                        }
+                    ]
+                }
+            };
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            Push(new IdleScreen());
+            screenStack.Push(new IdleScreen());
 
             client.MatchRoomStateChanged += onMatchRoomStateChanged;
             onMatchRoomStateChanged(client.Room!.MatchState);
@@ -43,21 +84,21 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens
                 case MatchmakingRoomStatus.RoomStart:
                 case MatchmakingRoomStatus.RoundStart:
                 case MatchmakingRoomStatus.RoundEnd:
-                    while (CurrentScreen is not IdleScreen)
-                        Exit();
+                    while (screenStack.CurrentScreen is not IdleScreen)
+                        screenStack.Exit();
                     break;
 
                 case MatchmakingRoomStatus.UserPicks:
-                    Push(new PickScreen());
+                    screenStack.Push(new PickScreen());
                     break;
 
                 case MatchmakingRoomStatus.SelectBeatmap:
-                    Debug.Assert(CurrentScreen is PickScreen);
-                    ((PickScreen)CurrentScreen).RollFinalBeatmap(matchmakingState.CandidateItems, matchmakingState.CandidateItem);
+                    Debug.Assert(screenStack.CurrentScreen is PickScreen);
+                    ((PickScreen)screenStack.CurrentScreen).RollFinalBeatmap(matchmakingState.CandidateItems, matchmakingState.CandidateItem);
                     break;
 
                 case MatchmakingRoomStatus.RoomEnd:
-                    Push(new ResultsScreen());
+                    screenStack.Push(new ResultsScreen());
                     break;
             }
         });

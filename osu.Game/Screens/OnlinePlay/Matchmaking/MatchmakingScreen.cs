@@ -115,30 +115,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
                                                 RelativeSizeAxes = Axes.Both,
                                                 Colour = Color4Extensions.FromHex(@"3e3a44") // Temporary.
                                             },
-                                            new GridContainer
-                                            {
-                                                RelativeSizeAxes = Axes.Both,
-                                                Padding = new MarginPadding(10),
-                                                RowDimensions =
-                                                [
-                                                    new Dimension(),
-                                                    new Dimension(GridSizeMode.Absolute, row_padding),
-                                                    new Dimension(GridSizeMode.AutoSize)
-                                                ],
-                                                Content = new Drawable[]?[]
-                                                {
-                                                    [
-                                                        new MatchmakingScreenStack()
-                                                    ],
-                                                    null,
-                                                    [
-                                                        new StageDisplay
-                                                        {
-                                                            RelativeSizeAxes = Axes.X
-                                                        }
-                                                    ]
-                                                }
-                                            }
+                                            new MatchmakingScreenStack(),
                                         }
                                     }
                                 ],

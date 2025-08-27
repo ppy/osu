@@ -13,7 +13,6 @@ using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Screens;
 using osu.Game.Tests.Visual.Multiplayer;
-using osuTK;
 
 namespace osu.Game.Tests.Visual.Matchmaking
 {
@@ -47,7 +46,6 @@ namespace osu.Game.Tests.Visual.Matchmaking
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both,
-                    Size = new Vector2(0.7f)
                 };
             });
 
