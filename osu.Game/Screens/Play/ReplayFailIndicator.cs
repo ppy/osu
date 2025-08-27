@@ -36,6 +36,7 @@ namespace osu.Game.Screens.Play
         private SkinnableSound failSample = null!;
         private AudioFilter failLowPassFilter = null!;
         private AudioFilter failHighPassFilter = null!;
+        private Container content = null!;
 
         private double? failTime;
 
@@ -44,7 +45,6 @@ namespace osu.Game.Screens.Play
 
         public ReplayFailIndicator(GameplayClockContainer gameplayClockContainer)
         {
-            AlwaysPresent = true;
             Clock = this.gameplayClockContainer = gameplayClockContainer;
         }
 
@@ -54,7 +54,6 @@ namespace osu.Game.Screens.Play
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
             AutoSizeAxes = Axes.Both;
-            Alpha = 0;
 
             track = beatmap.Value.Track;
 
@@ -65,13 +64,14 @@ namespace osu.Game.Screens.Play
                 failSample = new SkinnableSound(new SampleInfo(@"Gameplay/failsound")),
                 failLowPassFilter = new AudioFilter(audio.TrackMixer),
                 failHighPassFilter = new AudioFilter(audio.TrackMixer, BQFType.HighPass),
-                new Container
+                content = new Container
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     AutoSizeAxes = Axes.Both,
                     Masking = true,
                     CornerRadius = 20,
+                    Alpha = 0,
                     Children = new Drawable[]
                     {
                         new Box
@@ -132,7 +132,7 @@ namespace osu.Game.Screens.Play
                 // intentionally shorter than the actual fail animation
                 const double audio_sweep_duration = 1000;
 
-                this.FadeInFromZero(200, Easing.OutQuint);
+                content.FadeInFromZero(200, Easing.OutQuint);
                 this.ScaleTo(1.1f, audio_sweep_duration, Easing.OutElasticHalf);
                 this.TransformBindableTo(trackFreq, 0, audio_sweep_duration);
                 this.TransformBindableTo(volumeAdjustment, 0.5);
@@ -155,8 +155,11 @@ namespace osu.Game.Screens.Play
                 failSample.Play();
             }
 
-            if (Time.Current < failTime)
+            if (Time.Current < failTime && failSamplePlaybackInitiated)
+            {
                 failSamplePlaybackInitiated = false;
+                failSample.Stop();
+            }
         }
 
         protected override void Dispose(bool isDisposing)
