@@ -382,16 +382,19 @@ namespace osu.Game.Screens.SelectV2
                         //   We use `BeatmapDifficultyCache` and don't want to know about these.
                         // - Background user tag population runs and causes a realm update.
                         //   We don't display user tags so want to ignore this.
-                        if (
+                        bool equalForDisplayPurposes =
                             // covers metadata changes
                             oldBeatmap.Hash == newBeatmap.Hash &&
-                            // displayed
+                            // sanity check
+                            oldBeatmap.OnlineID == newBeatmap.OnlineID &&
+                            // displayed on panel
                             oldBeatmap.Status == newBeatmap.Status &&
-                            // displayed
+                            // displayed on panel
                             oldBeatmap.DifficultyName == newBeatmap.DifficultyName &&
-                            // sanity
-                            oldBeatmap.OnlineID == newBeatmap.OnlineID
-                        )
+                            // hidden changed, needs re-filter
+                            oldBeatmap.Hidden == newBeatmap.Hidden;
+
+                        if (equalForDisplayPurposes)
                             return false;
                     }
 
