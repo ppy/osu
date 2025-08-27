@@ -59,11 +59,7 @@ namespace osu.Game.Rulesets.Scoring
 
         protected override void RevertResultInternal(JudgementResult result)
         {
-            // TODO: this is rudimentary as to make rewinding failed replays work,
-            // but it also acts up (sometimes rewinding a replay several times around the fail boundary moves the point of fail forward).
-            // needs further investigation.
-            if (result.FailedAtJudgement)
-                HasFailed = false;
+            HasFailed = result.FailedAtJudgement;
 
             if (HasFailed)
                 return;
