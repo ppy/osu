@@ -14,7 +14,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Idle
 {
-    public class PlayerPanel : CompositeDrawable
+    public partial class PlayerPanel : CompositeDrawable
     {
         public readonly MultiplayerRoomUser User;
 

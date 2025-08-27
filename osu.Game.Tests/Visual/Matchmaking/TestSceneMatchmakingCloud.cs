@@ -11,7 +11,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Matchmaking
 {
-    public class TestSceneMatchmakingCloud : OsuTestScene
+    public partial class TestSceneMatchmakingCloud : OsuTestScene
     {
         private MatchmakingCloud cloud = null!;
 

@@ -6,7 +6,7 @@ using osu.Framework.Screens;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens
 {
-    public class MatchmakingSubScreen : Screen
+    public partial class MatchmakingSubScreen : Screen
     {
         public MatchmakingSubScreen()
         {

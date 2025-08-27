@@ -9,7 +9,7 @@ using osuTK.Input;
 
 namespace osu.Game.Screens.Menu
 {
-    public class MatchmakingButton : MainMenuButton
+    public partial class MatchmakingButton : MainMenuButton
     {
         public MatchmakingButton(string sampleName, Color4 colour, Action<MainMenuButton, UIEvent>? clickAction = null, params Key[] triggerKeys)
             : base("matchmaking", sampleName, FontAwesome.Solid.Newspaper, colour, clickAction, triggerKeys)

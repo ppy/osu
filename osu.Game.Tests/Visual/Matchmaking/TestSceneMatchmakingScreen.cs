@@ -23,7 +23,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Matchmaking
 {
-    public class TestSceneMatchmakingScreen : MultiplayerTestScene
+    public partial class TestSceneMatchmakingScreen : MultiplayerTestScene
     {
         private const int user_count = 8;
         private const int beatmap_count = 50;

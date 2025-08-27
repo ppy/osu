@@ -26,7 +26,7 @@ using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens
 {
-    public class MatchmakingQueueScreen : OsuScreen
+    public partial class MatchmakingQueueScreen : OsuScreen
     {
         private Container mainContent = null!;
 

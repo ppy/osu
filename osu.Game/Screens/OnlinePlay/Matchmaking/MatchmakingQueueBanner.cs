@@ -18,7 +18,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking
 {
-    public class MatchmakingQueueBanner : CompositeDrawable
+    public partial class MatchmakingQueueBanner : CompositeDrawable
     {
         [Resolved]
         private MultiplayerClient client { get; set; } = null!;

@@ -7,7 +7,7 @@ using osu.Framework.Screens;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Idle
 {
-    public class IdleScreen : MatchmakingSubScreen
+    public partial class IdleScreen : MatchmakingSubScreen
     {
         [BackgroundDependencyLoader]
         private void load()

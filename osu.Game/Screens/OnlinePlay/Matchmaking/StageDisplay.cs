@@ -12,7 +12,7 @@ using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking
 {
-    public class StageDisplay : CompositeDrawable
+    public partial class StageDisplay : CompositeDrawable
     {
         public static readonly (MatchmakingRoomStatus status, LocalisableString text)[] DISPLAYED_STAGES =
         [

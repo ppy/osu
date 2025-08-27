@@ -13,7 +13,7 @@ using osu.Game.Online.Multiplayer.MatchTypes.Matchmaking;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking
 {
-    public class StageText : CompositeDrawable
+    public partial class StageText : CompositeDrawable
     {
         [Resolved]
         private MultiplayerClient client { get; set; } = null!;

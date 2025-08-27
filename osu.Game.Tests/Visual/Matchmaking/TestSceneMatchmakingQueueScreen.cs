@@ -11,7 +11,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Matchmaking
 {
-    public class TestSceneMatchmakingQueueScreen : ScreenTestScene
+    public partial class TestSceneMatchmakingQueueScreen : ScreenTestScene
     {
         private MatchmakingQueueScreen? queueScreen => Stack.CurrentScreen as MatchmakingQueueScreen;
 

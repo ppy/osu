@@ -11,7 +11,7 @@ using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Idle
 {
-    public class PlayerPanelList : CompositeDrawable
+    public partial class PlayerPanelList : CompositeDrawable
     {
         [Resolved]
         private MultiplayerClient client { get; set; } = null!;

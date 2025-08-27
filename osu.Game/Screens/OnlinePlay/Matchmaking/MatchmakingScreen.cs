@@ -32,7 +32,7 @@ using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking
 {
-    public class MatchmakingScreen : OsuScreen
+    public partial class MatchmakingScreen : OsuScreen
     {
         /// <summary>
         /// Padding between rows of the content.

@@ -55,7 +55,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
             };
         }
 
-        public class MovingAvatar : MatchmakingAvatar
+        public partial class MovingAvatar : MatchmakingAvatar
         {
             private float angle;
             private float angularSpeed;

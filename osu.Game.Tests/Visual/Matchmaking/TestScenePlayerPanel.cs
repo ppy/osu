@@ -12,7 +12,7 @@ using osu.Game.Tests.Visual.Multiplayer;
 
 namespace osu.Game.Tests.Visual.Matchmaking
 {
-    public class TestScenePlayerPanel : MultiplayerTestScene
+    public partial class TestScenePlayerPanel : MultiplayerTestScene
     {
         public override void SetUpSteps()
         {

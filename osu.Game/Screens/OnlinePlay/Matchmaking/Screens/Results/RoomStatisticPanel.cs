@@ -11,7 +11,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Results
 {
-    public class RoomStatisticPanel : CompositeDrawable
+    public partial class RoomStatisticPanel : CompositeDrawable
     {
         private readonly Color4 backgroundColour = Color4.SaddleBrown;
 

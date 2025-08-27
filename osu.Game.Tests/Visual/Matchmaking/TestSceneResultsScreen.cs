@@ -15,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Matchmaking
 {
-    public class TestSceneResultsScreen : MultiplayerTestScene
+    public partial class TestSceneResultsScreen : MultiplayerTestScene
     {
         private const int invalid_user_id = 1;
 

@@ -18,7 +18,7 @@ using osu.Game.Tests.Visual.Multiplayer;
 
 namespace osu.Game.Tests.Visual.Matchmaking
 {
-    public class TestSceneMatchmakingQueueBanner : MultiplayerTestScene
+    public partial class TestSceneMatchmakingQueueBanner : MultiplayerTestScene
     {
         private readonly Mock<TestPerformerFromScreenRunner> performer = new Mock<TestPerformerFromScreenRunner>();
 

@@ -14,7 +14,7 @@ using osu.Game.Screens.OnlinePlay.Matchmaking.Screens;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking
 {
-    public class MatchmakingController : Component
+    public partial class MatchmakingController : Component
     {
         public readonly Bindable<MatchmakingQueueScreen.MatchmakingScreenState> CurrentState = new Bindable<MatchmakingQueueScreen.MatchmakingScreenState>();
 

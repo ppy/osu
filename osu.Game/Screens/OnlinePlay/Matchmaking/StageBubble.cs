@@ -17,7 +17,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking
 {
-    internal class StageBubble : CompositeDrawable
+    internal partial class StageBubble : CompositeDrawable
     {
         private readonly Color4 backgroundColour = Color4.Salmon;
 
