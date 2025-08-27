@@ -14,6 +14,11 @@ namespace osu.Game.Skinning
 {
     public sealed partial class LegacySpriteText : OsuSpriteText
     {
+        /// <summary>
+        /// The Private Use Area character representing performance points.
+        /// </summary>
+        public const char PP = '\uebd9';
+
         public Vector2? MaxSizePerGlyph { get; init; }
         public bool FixedWidth { get; init; }
 
@@ -23,7 +28,7 @@ namespace osu.Game.Skinning
 
         protected override char FixedWidthReferenceCharacter => '5';
 
-        protected override char[] FixedWidthExcludeCharacters => new[] { ',', '.', '%', 'x' };
+        protected override char[] FixedWidthExcludeCharacters => new[] { ',', '.', '%', 'x', PP };
 
         // ReSharper disable once UnusedMember.Global
         // being unused is the point here
@@ -115,6 +120,9 @@ namespace osu.Game.Skinning
 
                     case '%':
                         return "percent";
+
+                    case PP:
+                        return "pp";
 
                     default:
                         return character.ToString();
