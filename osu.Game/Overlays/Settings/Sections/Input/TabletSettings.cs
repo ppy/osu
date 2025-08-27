@@ -167,7 +167,16 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                             Text = TabletSettingsStrings.ConformToCurrentGameAspectRatio,
                             Action = () =>
                             {
-                                forceAspectRatio((float)host.Window.ClientSize.Width / host.Window.ClientSize.Height);
+                                float gameplayWidth = host.Window.ClientSize.Width;
+                                float gameplayHeight = host.Window.ClientSize.Height;
+
+                                if (osuConfig.Get<ScalingMode>(OsuSetting.Scaling) == ScalingMode.Everything)
+                                {
+                                    gameplayWidth *= osuConfig.Get<float>(OsuSetting.ScalingSizeX);
+                                    gameplayHeight *= osuConfig.Get<float>(OsuSetting.ScalingSizeY);
+                                }
+
+                                forceAspectRatio(gameplayWidth / gameplayHeight);
                             },
                             CanBeShown = { BindTarget = enabled }
                         },
