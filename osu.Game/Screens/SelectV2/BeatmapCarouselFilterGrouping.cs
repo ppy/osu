@@ -43,7 +43,8 @@ namespace osu.Game.Screens.SelectV2
         private readonly Func<List<BeatmapCollection>> getCollections;
         private readonly Func<FilterCriteria, IReadOnlyDictionary<Guid, ScoreRank>> getLocalUserTopRanks;
 
-        public BeatmapCarouselFilterGrouping(Func<FilterCriteria> getCriteria, Func<List<BeatmapCollection>> getCollections, Func<FilterCriteria, IReadOnlyDictionary<Guid, ScoreRank>> getLocalUserTopRanks)
+        public BeatmapCarouselFilterGrouping(Func<FilterCriteria> getCriteria, Func<List<BeatmapCollection>> getCollections,
+                                             Func<FilterCriteria, IReadOnlyDictionary<Guid, ScoreRank>> getLocalUserTopRanks)
         {
             this.getCriteria = getCriteria;
             this.getCollections = getCollections;
@@ -189,9 +190,6 @@ namespace osu.Game.Screens.SelectV2
                     {
                         var date = b.LastPlayed;
 
-                        if (BeatmapSetsGroupedTogether)
-                            date = aggregateMax(b, static b => b.LastPlayed ?? DateTimeOffset.MinValue);
-
                         if (date == null || date == DateTimeOffset.MinValue)
                             return new GroupDefinition(int.MaxValue, "Never");
 
@@ -202,29 +200,13 @@ namespace osu.Game.Screens.SelectV2
                     return getGroupsBy(b => defineGroupByStatus(b.BeatmapSet!.Status), items);
 
                 case GroupMode.BPM:
-                    return getGroupsBy(b =>
-                    {
-                        double bpm = FormatUtils.RoundBPM(b.BPM);
-
-                        if (BeatmapSetsGroupedTogether)
-                            bpm = aggregateMax(b, bb => FormatUtils.RoundBPM(bb.BPM));
-
-                        return defineGroupByBPM(bpm);
-                    }, items);
+                    return getGroupsBy(b => defineGroupByBPM(FormatUtils.RoundBPM(b.BPM)), items);
 
                 case GroupMode.Difficulty:
                     return getGroupsBy(b => defineGroupByStars(b.StarRating), items);
 
                 case GroupMode.Length:
-                    return getGroupsBy(b =>
-                    {
-                        double length = b.Length;
-
-                        if (BeatmapSetsGroupedTogether)
-                            length = aggregateMax(b, bb => bb.Length);
-
-                        return defineGroupByLength(length);
-                    }, items);
+                    return getGroupsBy(b => defineGroupByLength(b.Length), items);
 
                 case GroupMode.Source:
                     return getGroupsBy(b => defineGroupBySource(b.BeatmapSet!.Metadata.Source), items);
@@ -431,12 +413,6 @@ namespace osu.Game.Screens.SelectV2
                 return new GroupDefinition(-(int)rank, rank.GetDescription());
 
             return new GroupDefinition(int.MaxValue, "Unplayed");
-        }
-
-        private static T? aggregateMax<T>(BeatmapInfo b, Func<BeatmapInfo, T> func)
-        {
-            var beatmaps = b.BeatmapSet!.Beatmaps.Where(bb => !bb.Hidden);
-            return beatmaps.Max(func);
         }
 
         private record GroupMapping(GroupDefinition? Group, List<CarouselItem> ItemsInGroup);
