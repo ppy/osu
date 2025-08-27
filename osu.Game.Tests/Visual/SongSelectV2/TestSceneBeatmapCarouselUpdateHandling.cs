@@ -22,12 +22,16 @@ namespace osu.Game.Tests.Visual.SongSelectV2
     {
         private BeatmapSetInfo baseTestBeatmap = null!;
 
+        private const int initial_filter_count = 3;
+
         [SetUpSteps]
         public void SetUpSteps()
         {
             RemoveAllBeatmaps();
             CreateCarousel();
+            WaitForFiltering();
             AddBeatmaps(1, 3);
+            WaitForFiltering();
             AddStep("generate and add test beatmap", () =>
             {
                 baseTestBeatmap = TestResources.CreateTestBeatmapSetInfo(3);
@@ -42,8 +46,9 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                     b.Metadata = metadata;
                 BeatmapSets.Add(baseTestBeatmap);
             });
-
             WaitForFiltering();
+
+            AddAssert("filter count correct", () => Carousel.FilterCount, () => Is.EqualTo(initial_filter_count));
         }
 
         [Test]
@@ -81,12 +86,18 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             AddUntilStep("is scrolled to end", () => Carousel.ChildrenOfType<UserTrackingScrollContainer>().Single().IsScrolledToEnd());
 
-            updateBeatmap(b => b.Metadata = new BeatmapMetadata
+            updateBeatmap(b =>
             {
-                Artist = "updated test",
-                Title = $"beatmap {RNG.Next().ToString()}"
+                // hash will be updated when important metadata changes, such as title, difficulty, author etc.
+                b.Hash = "new hash";
+                b.Metadata = new BeatmapMetadata
+                {
+                    Artist = "updated test",
+                    Title = $"beatmap {RNG.Next().ToString()}"
+                };
             });
 
+            assertDidFilter();
             WaitForFiltering();
 
             AddAssert("scroll is still at end", () => Carousel.ChildrenOfType<UserTrackingScrollContainer>().Single().IsScrolledToEnd());
@@ -113,8 +124,14 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             AddStep("find panel", () => panel = Carousel.ChildrenOfType<PanelBeatmapSet>().Single(p => p.ChildrenOfType<OsuSpriteText>().Any(t => t.Text.ToString() == "beatmap")));
 
-            updateBeatmap(b => b.Metadata = metadata);
+            updateBeatmap(b =>
+            {
+                b.Metadata = metadata;
+                // hash will be updated when important metadata changes, such as title, difficulty, author etc.
+                b.Hash = "new hash";
+            });
 
+            assertDidFilter();
             WaitForFiltering();
 
             AddAssert("drawables unchanged", () => Carousel.ChildrenOfType<Panel>(), () => Is.EqualTo(originalDrawables));
@@ -123,7 +140,41 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         }
 
         [Test]
-        public void TestSelectionHeld()
+        public void TestOnlineStatusUpdated()
+        {
+            List<Panel> originalDrawables = new List<Panel>();
+
+            AddStep("store drawable references", () =>
+            {
+                originalDrawables.Clear();
+                originalDrawables.AddRange(Carousel.ChildrenOfType<Panel>().ToList());
+            });
+
+            updateBeatmap(b => b.Status = BeatmapOnlineStatus.Graveyard);
+
+            assertDidFilter();
+            WaitForFiltering();
+
+            AddAssert("drawables unchanged", () => Carousel.ChildrenOfType<Panel>(), () => Is.EqualTo(originalDrawables));
+        }
+
+        [Test]
+        public void TestNoUpdateTriggeredOnUserTagsChange()
+        {
+            var metadata = new BeatmapMetadata
+            {
+                Artist = "updated test",
+                Title = "new beatmap title",
+                UserTags = { "hi" }
+            };
+
+            updateBeatmap(b => b.Metadata = metadata);
+            assertDidNotFilter();
+        }
+
+        [TestCase(false)]
+        [TestCase(true)]
+        public void TestSelectionHeld(bool hashChanged)
         {
             SelectNextSet();
 
@@ -131,7 +182,17 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddAssert("selection is updateable beatmap", () => Carousel.CurrentSelection, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
             AddAssert("visible panel is updateable beatmap", () => GetSelectedPanel()?.Item?.Model, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
 
-            updateBeatmap();
+            updateBeatmap(b =>
+            {
+                if (hashChanged)
+                    b.Hash = "new hash";
+            });
+
+            if (hashChanged)
+                assertDidFilter();
+            else
+                assertDidNotFilter();
+
             WaitForFiltering();
 
             AddAssert("selection is updateable beatmap", () => Carousel.CurrentSelection, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
@@ -148,6 +209,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddAssert("visible panel is updateable beatmap", () => GetSelectedPanel()?.Item?.Model, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
 
             updateBeatmap(b => b.DifficultyName = "new name");
+            assertDidFilter();
             WaitForFiltering();
 
             AddAssert("selection is updateable beatmap", () => Carousel.CurrentSelection, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
@@ -164,6 +226,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddAssert("visible panel is updateable beatmap", () => GetSelectedPanel()?.Item?.Model, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
 
             updateBeatmap(b => b.OnlineID = b.OnlineID + 1);
+            assertDidFilter();
             WaitForFiltering();
 
             AddAssert("selection is updateable beatmap", () => Carousel.CurrentSelection, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
@@ -338,6 +401,10 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             AddAssert("Order didn't change", () => Carousel.PostFilterBeatmaps.Select(b => b.ID), () => Is.EqualTo(originalOrder));
         }
+
+        private void assertDidFilter() => AddAssert("did filter", () => Carousel.FilterCount, () => Is.EqualTo(initial_filter_count + 1));
+
+        private void assertDidNotFilter() => AddAssert("did not filter", () => Carousel.FilterCount, () => Is.EqualTo(initial_filter_count));
 
         private void updateBeatmap(Action<BeatmapInfo>? updateBeatmap = null, Action<BeatmapSetInfo>? updateSet = null)
         {
