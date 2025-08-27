@@ -9,6 +9,7 @@ using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Extensions;
+using osu.Game.Graphics;
 
 namespace osu.Game.Rulesets.Mods
 {
@@ -22,7 +23,7 @@ namespace osu.Game.Rulesets.Mods
 
         public override ModType Type => ModType.Conversion;
 
-        public override IconUsage? Icon => FontAwesome.Solid.Hammer;
+        public override IconUsage? Icon => OsuIcon.ModDifficultyAdjust;
 
         public override double ScoreMultiplier => 0.5;
 

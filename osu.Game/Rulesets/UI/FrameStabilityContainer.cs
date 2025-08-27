@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.UI
     {
         public ReplayInputHandler? ReplayInputHandler { get; set; }
 
-        private double? lastBackwardsSeekLogTime;
+        private int invalidBassTimeLogCount;
 
         /// <summary>
         /// The number of CPU milliseconds to spend at most during seek catch-up.
@@ -161,11 +161,11 @@ namespace osu.Game.Rulesets.UI
             //
             // In testing this triggers *very* rarely even when set to super low values (10 ms). The cases we're worried about involve multi-second jumps.
             // A difference of more than 500 ms seems like a sane number we should never exceed.
-            if (!allowReferenceClockSeeks && Math.Abs(proposedTime - referenceClock.CurrentTime) > 500)
+            if (!allowReferenceClockSeeks && Math.Abs(proposedTime - referenceClock.CurrentTime) > 1500)
             {
-                if (lastBackwardsSeekLogTime == null || Math.Abs(Clock.CurrentTime - lastBackwardsSeekLogTime.Value) > 1000)
+                if (invalidBassTimeLogCount < 10)
                 {
-                    lastBackwardsSeekLogTime = Clock.CurrentTime;
+                    invalidBassTimeLogCount++;
                     Logger.Log("Ignoring likely invalid time value provided by BASS during gameplay");
                     Logger.Log($"- provided: {referenceClock.CurrentTime:N2}");
                     Logger.Log($"- expected: {proposedTime:N2}");
@@ -174,6 +174,8 @@ namespace osu.Game.Rulesets.UI
                 state = PlaybackState.NotValid;
                 return;
             }
+
+            invalidBassTimeLogCount = 0;
 
             // if the proposed time is the same as the current time, assume that the clock will continue progressing in the same direction as previously.
             // this avoids spurious flips in direction from -1 to 1 during rewinds.

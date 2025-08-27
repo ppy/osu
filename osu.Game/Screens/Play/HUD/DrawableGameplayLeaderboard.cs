@@ -54,7 +54,7 @@ namespace osu.Game.Screens.Play.HUD
             // Extra lenience is applied so the scores don't get cut off from the left due to elastic easing transforms.
             float xOffset = DrawableGameplayLeaderboardScore.SHEAR_WIDTH + DrawableGameplayLeaderboardScore.ELASTIC_WIDTH_LENIENCE;
 
-            Width = DrawableGameplayLeaderboardScore.EXTENDED_WIDTH + xOffset;
+            Width = 260 + xOffset;
             Height = 300;
 
             InternalChildren = new Drawable[]
@@ -154,6 +154,10 @@ namespace osu.Game.Screens.Play.HUD
         protected override void Update()
         {
             base.Update();
+
+            // limit leaderboard dimensions to a sane minimum.
+            Width = Math.Max(Width, Flow.X + DrawableGameplayLeaderboardScore.MIN_WIDTH);
+            Height = Math.Max(Height, DrawableGameplayLeaderboardScore.PANEL_HEIGHT);
 
             requiresScroll = Flow.DrawHeight > Height;
 
