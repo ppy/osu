@@ -107,7 +107,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Pick
             if (!panelLookup.Remove(id, out var panel))
                 return;
 
-            panelGridContainer.Remove(panel, true);
+            panel.Expire();
         }
 
         public void SetUserSelection(APIUser user, long itemId, bool selected)
