@@ -356,6 +356,52 @@ namespace osu.Game.Screens.SelectV2
             }
         }
 
+        protected override bool HandleItemsChanged(NotifyCollectionChangedEventArgs args)
+        {
+            switch (args.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                case NotifyCollectionChangedAction.Remove:
+                case NotifyCollectionChangedAction.Move:
+                case NotifyCollectionChangedAction.Reset:
+                    return true;
+
+                case NotifyCollectionChangedAction.Replace:
+                    var oldBeatmaps = args.OldItems!.OfType<BeatmapInfo>().ToList();
+                    var newBeatmaps = args.NewItems!.OfType<BeatmapInfo>().ToList();
+
+                    for (int i = 0; i < oldBeatmaps.Count; i++)
+                    {
+                        var oldBeatmap = oldBeatmaps[i];
+                        var newBeatmap = newBeatmaps[i];
+
+                        // Ignore changes which don't concern us.
+                        //
+                        // Here are some examples of things that can go wrong:
+                        // - Background difficulty calculation runs and causes a realm update.
+                        //   We use `BeatmapDifficultyCache` and don't want to know about these.
+                        // - Background user tag population runs and causes a realm update.
+                        //   We don't display user tags so want to ignore this.
+                        if (
+                            // covers metadata changes
+                            oldBeatmap.Hash == newBeatmap.Hash &&
+                            // displayed
+                            oldBeatmap.Status == newBeatmap.Status &&
+                            // displayed
+                            oldBeatmap.DifficultyName == newBeatmap.DifficultyName &&
+                            // sanity
+                            oldBeatmap.OnlineID == newBeatmap.OnlineID
+                        )
+                            return false;
+                    }
+
+                    return true;
+
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
         protected override void HandleFilterCompleted()
         {
             base.HandleFilterCompleted();
