@@ -79,7 +79,7 @@ namespace osu.Game.Graphics.Carousel
         /// <summary>
         /// The number of times filter operations have been triggered.
         /// </summary>
-        internal int FilterCount { get; private set; }
+        public int FilterCount { get; private set; }
 
         /// <summary>
         /// The number of displayable items currently being tracked (before filtering).
