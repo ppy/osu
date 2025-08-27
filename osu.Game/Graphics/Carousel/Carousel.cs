@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
@@ -211,6 +212,12 @@ namespace osu.Game.Graphics.Carousel
         }
 
         /// <summary>
+        /// Called when <see cref="Items"/> changes in any way.
+        /// </summary>
+        /// <returns>Whether a re-filter is required.</returns>
+        protected virtual bool HandleItemsChanged(NotifyCollectionChangedEventArgs args) => true;
+
+        /// <summary>
         /// Fired after a filter operation completed.
         /// </summary>
         protected virtual void HandleFilterCompleted()
@@ -301,7 +308,11 @@ namespace osu.Game.Graphics.Carousel
                 RelativeSizeAxes = Axes.Both,
             };
 
-            Items.BindCollectionChanged((_, _) => filterAfterItemsChanged.Invalidate());
+            Items.BindCollectionChanged((_, args) =>
+            {
+                if (HandleItemsChanged(args))
+                    filterAfterItemsChanged.Invalidate();
+            });
         }
 
         [BackgroundDependencyLoader]
