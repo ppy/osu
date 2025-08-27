@@ -179,6 +179,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens
 
             dialogOverlay.Push(new ConfirmDiscardChangesDialog(() =>
             {
+                if (!this.IsCurrentScreen())
+                    this.MakeCurrent();
+
                 exitConfirmed = true;
                 this.Exit();
             }));
