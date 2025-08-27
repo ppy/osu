@@ -199,17 +199,8 @@ namespace osu.Game.Screens.SelectV2
         {
             base.LoadComplete();
 
-            ruleset.BindValueChanged(_ =>
-            {
-                computeStarRating();
-                updateKeyCount();
-            });
-
-            mods.BindValueChanged(_ =>
-            {
-                computeStarRating();
-                updateKeyCount();
-            }, true);
+            ruleset.BindValueChanged(_ => updateKeyCount());
+            mods.BindValueChanged(_ => updateKeyCount(), true);
         }
 
         protected override void PrepareForUse()
