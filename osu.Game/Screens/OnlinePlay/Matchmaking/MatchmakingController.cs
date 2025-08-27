@@ -22,10 +22,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
         private MultiplayerClient client { get; set; } = null!;
 
         [Resolved]
-        private INotificationOverlay notifications { get; set; } = null!;
+        private INotificationOverlay? notifications { get; set; }
 
         [Resolved]
-        private IPerformFromScreenRunner performer { get; set; } = null!;
+        private IPerformFromScreenRunner? performer { get; set; }
 
         private ProgressNotification? backgroundNotification;
         private Notification? readyNotification;
@@ -110,7 +110,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
             if (backgroundNotification != null)
                 return;
 
-            notifications.Post(backgroundNotification = new ProgressNotification
+            notifications?.Post(backgroundNotification = new ProgressNotification
             {
                 Text = "Searching for opponents...",
                 CompletionTarget = n => notifications.Post(readyNotification = n),
@@ -118,7 +118,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
                 CompletionClickAction = () =>
                 {
                     client.MatchmakingAcceptInvitation().FireAndForget();
-                    performer.PerformFromScreen(s => s.Push(new MatchmakingIntroScreen()));
+                    performer?.PerformFromScreen(s => s.Push(new MatchmakingIntroScreen()));
 
                     closeNotifications();
                     return true;

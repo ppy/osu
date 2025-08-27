@@ -46,9 +46,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens
         private MultiplayerClient client { get; set; } = null!;
 
         [Resolved]
-        private INotificationOverlay notificationOverlay { get; set; } = null!;
-
-        [Resolved]
         private IDialogOverlay dialogOverlay { get; set; } = null!;
 
         [Resolved]

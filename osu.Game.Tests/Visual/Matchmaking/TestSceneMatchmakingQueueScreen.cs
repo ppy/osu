@@ -3,9 +3,11 @@
 
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Screens.OnlinePlay.Matchmaking;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Screens;
 using osu.Game.Users;
 
@@ -13,6 +15,9 @@ namespace osu.Game.Tests.Visual.Matchmaking
 {
     public partial class TestSceneMatchmakingQueueScreen : ScreenTestScene
     {
+        [Cached]
+        private readonly MatchmakingController controller = new MatchmakingController();
+
         private MatchmakingQueueScreen? queueScreen => Stack.CurrentScreen as MatchmakingQueueScreen;
 
         [SetUpSteps]
