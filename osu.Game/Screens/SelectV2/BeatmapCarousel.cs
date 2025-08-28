@@ -143,6 +143,9 @@ namespace osu.Game.Screens.SelectV2
             switch (changed.Action)
             {
                 case NotifyCollectionChangedAction.Add:
+                    if (!newItems!.Any())
+                        return;
+
                     Items.AddRange(newItems!.SelectMany(s => s.Beatmaps));
                     break;
 
@@ -350,6 +353,57 @@ namespace osu.Game.Screens.SelectV2
                     if (grouping.BeatmapSetsGroupedTogether)
                         setExpandedSet(beatmapInfo);
                     break;
+            }
+        }
+
+        protected override bool HandleItemsChanged(NotifyCollectionChangedEventArgs args)
+        {
+            switch (args.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                case NotifyCollectionChangedAction.Remove:
+                case NotifyCollectionChangedAction.Move:
+                case NotifyCollectionChangedAction.Reset:
+                    return true;
+
+                case NotifyCollectionChangedAction.Replace:
+                    var oldBeatmaps = args.OldItems!.OfType<BeatmapInfo>().ToList();
+                    var newBeatmaps = args.NewItems!.OfType<BeatmapInfo>().ToList();
+
+                    for (int i = 0; i < oldBeatmaps.Count; i++)
+                    {
+                        var oldBeatmap = oldBeatmaps[i];
+                        var newBeatmap = newBeatmaps[i];
+
+                        // Ignore changes which don't concern us.
+                        //
+                        // Here are some examples of things that can go wrong:
+                        // - Background difficulty calculation runs and causes a realm update.
+                        //   We use `BeatmapDifficultyCache` and don't want to know about these.
+                        // - Background user tag population runs and causes a realm update.
+                        //   We don't display user tags so want to ignore this.
+                        bool equalForDisplayPurposes =
+                            // covers metadata changes
+                            oldBeatmap.Hash == newBeatmap.Hash &&
+                            // sanity check
+                            oldBeatmap.OnlineID == newBeatmap.OnlineID &&
+                            // displayed on panel
+                            oldBeatmap.Status == newBeatmap.Status &&
+                            // displayed on panel
+                            oldBeatmap.DifficultyName == newBeatmap.DifficultyName &&
+                            // hidden changed, needs re-filter
+                            oldBeatmap.Hidden == newBeatmap.Hidden &&
+                            // might be used for grouping, returning from gameplay
+                            oldBeatmap.LastPlayed == newBeatmap.LastPlayed;
+
+                        if (equalForDisplayPurposes)
+                            return false;
+                    }
+
+                    return true;
+
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
         }
 
