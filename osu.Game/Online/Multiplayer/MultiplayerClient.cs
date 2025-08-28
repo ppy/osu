@@ -313,14 +313,14 @@ namespace osu.Game.Online.Multiplayer
                     {
                         await scheduledReset.ConfigureAwait(false);
                         await LeaveRoomInternal().ConfigureAwait(false);
-                    });
+                    }).ConfigureAwait(false);
                 }
                 finally
                 {
                     await runOnUpdateThreadAsync(() =>
                     {
                         pendingRequests.Clear();
-                    });
+                    }).ConfigureAwait(false);
                 }
             });
         }
