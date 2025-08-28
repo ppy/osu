@@ -440,7 +440,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             public BeatmapInfo? SelectedBeatmapInfo => CurrentSelection as BeatmapInfo;
             public BeatmapSetInfo? SelectedBeatmapSet => SelectedBeatmapInfo?.BeatmapSet;
 
-            public new BeatmapSetInfo? ExpandedBeatmapSet => base.ExpandedBeatmapSet;
+            public new BeatmapSetUnderGrouping? ExpandedBeatmapSet => base.ExpandedBeatmapSet;
             public new GroupDefinition? ExpandedGroup => base.ExpandedGroup;
 
             public TestBeatmapCarousel()
