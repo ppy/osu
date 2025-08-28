@@ -16,11 +16,13 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Collections;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Carousel;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
+using osu.Game.Scoring;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
 using osu.Game.Screens.SelectV2;
@@ -443,6 +445,9 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             public new GroupedBeatmapSet? ExpandedBeatmapSet => base.ExpandedBeatmapSet;
             public new GroupDefinition? ExpandedGroup => base.ExpandedGroup;
 
+            public Func<List<BeatmapCollection>> AllCollections { get; set; } = () => [];
+            public Func<FilterCriteria, Dictionary<Guid, ScoreRank>> BeatmapInfoGuidToTopRankMapping { get; set; } = _ => new Dictionary<Guid, ScoreRank>();
+
             public TestBeatmapCarousel()
             {
                 RequestPresentBeatmap = _ => RequestPresentBeatmapCount++;
@@ -464,6 +469,9 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 PostFilterBeatmaps = items.Select(i => i.Model).OfType<BeatmapInfo>();
                 return items;
             }
+
+            protected override List<BeatmapCollection> GetAllCollections() => AllCollections.Invoke();
+            protected override Dictionary<Guid, ScoreRank> GetBeatmapInfoGuidToTopRankMapping(FilterCriteria criteria) => BeatmapInfoGuidToTopRankMapping.Invoke(criteria);
         }
     }
 }
