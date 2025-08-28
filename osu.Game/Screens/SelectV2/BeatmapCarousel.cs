@@ -392,7 +392,9 @@ namespace osu.Game.Screens.SelectV2
                             // displayed on panel
                             oldBeatmap.DifficultyName == newBeatmap.DifficultyName &&
                             // hidden changed, needs re-filter
-                            oldBeatmap.Hidden == newBeatmap.Hidden;
+                            oldBeatmap.Hidden == newBeatmap.Hidden &&
+                            // might be used for grouping, returning from gameplay
+                            oldBeatmap.LastPlayed == newBeatmap.LastPlayed;
 
                         if (equalForDisplayPurposes)
                             return false;
