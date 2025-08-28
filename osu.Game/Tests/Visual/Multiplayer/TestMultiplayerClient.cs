@@ -762,13 +762,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         public override async Task JoinMatchmakingQueue()
         {
-            await ((IMultiplayerClient)this).MatchmakingQueueJoined();
-            await ((IMultiplayerClient)this).MatchmakingQueueStatusChanged(new MatchmakingQueueStatus.Searching());
+            await ((IMultiplayerClient)this).MatchmakingQueueJoined().ConfigureAwait(false);
+            await ((IMultiplayerClient)this).MatchmakingQueueStatusChanged(new MatchmakingQueueStatus.Searching()).ConfigureAwait(false);
         }
 
         public override async Task LeaveMatchmakingQueue()
         {
-            await ((IMultiplayerClient)this).MatchmakingQueueLeft();
+            await ((IMultiplayerClient)this).MatchmakingQueueLeft().ConfigureAwait(false);
         }
 
         public override Task MatchmakingAcceptInvitation()
