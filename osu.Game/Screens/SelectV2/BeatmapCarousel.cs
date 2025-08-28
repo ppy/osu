@@ -41,12 +41,12 @@ namespace osu.Game.Screens.SelectV2
         /// <summary>
         /// From the provided beatmaps, select the most appropriate one for the user's skill.
         /// </summary>
-        public required Action<IEnumerable<BeatmapInfo>> RequestRecommendedSelection { private get; init; }
+        public required Action<IEnumerable<GroupedBeatmap>> RequestRecommendedSelection { private get; init; }
 
         /// <summary>
         /// Selection requested for the provided beatmap.
         /// </summary>
-        public required Action<BeatmapInfo> RequestSelection { private get; init; }
+        public required Action<GroupedBeatmap> RequestSelection { private get; init; }
 
         public const float SPACING = 3f;
 
@@ -158,7 +158,7 @@ namespace osu.Game.Screens.SelectV2
                         foreach (var beatmap in set.Beatmaps)
                         {
                             Items.RemoveAll(i => i is BeatmapInfo bi && beatmap.Equals(bi));
-                            selectedSetDeleted |= CheckModelEquality(CurrentSelection, beatmap);
+                            selectedSetDeleted |= CheckModelEquality((CurrentSelection as GroupedBeatmap)?.Beatmap, beatmap);
                         }
                     }
 
@@ -206,7 +206,7 @@ namespace osu.Game.Screens.SelectV2
                                     if (!Items.Contains(groupedBeatmap.Beatmap))
                                         return false;
 
-                                    RequestSelection(groupedBeatmap.Beatmap);
+                                    RequestSelection(groupedBeatmap);
                                     return true;
                                 }
 
@@ -215,7 +215,7 @@ namespace osu.Game.Screens.SelectV2
                                     if (oldItems.Contains(groupedSet.BeatmapSet))
                                         return false;
 
-                                    RequestRecommendedSelection(groupedSet.BeatmapSet.Beatmaps);
+                                    selectRecommendedDifficultyForBeatmapSet(groupedSet);
                                     return true;
                                 }
                             }
@@ -256,8 +256,12 @@ namespace osu.Game.Screens.SelectV2
                         {
                             // TODO: should this exist in song select instead of here?
                             // we need to ensure the global beatmap is also updated alongside changes.
-                            if (CurrentSelection != null && CheckModelEquality(beatmap, CurrentSelection))
-                                RequestSelection(matchingNewBeatmap);
+                            if (CurrentSelection is GroupedBeatmap currentBeatmapUnderGrouping)
+                            {
+                                var candidateSelection = currentBeatmapUnderGrouping with { Beatmap = beatmap };
+                                if (CheckModelEquality(candidateSelection, CurrentSelection))
+                                    RequestSelection(candidateSelection);
+                            }
 
                             Items.ReplaceRange(previousIndex, 1, [matchingNewBeatmap]);
                             newSetBeatmaps.Remove(matchingNewBeatmap);
@@ -309,8 +313,8 @@ namespace osu.Game.Screens.SelectV2
                         setExpandedGroup(group);
 
                         // If the active selection is within this group, it should get keyboard focus immediately.
-                        if (CurrentSelectionItem?.IsVisible == true && CurrentSelection is BeatmapInfo info)
-                            RequestSelection(info);
+                        if (CurrentSelectionItem?.IsVisible == true && CurrentSelection is GroupedBeatmap gb)
+                            RequestSelection(gb);
 
                         return;
 
@@ -325,7 +329,7 @@ namespace osu.Game.Screens.SelectV2
                             return;
                         }
 
-                        RequestSelection(groupedBeatmap.Beatmap);
+                        RequestSelection(groupedBeatmap);
                         return;
                 }
             }
@@ -429,7 +433,7 @@ namespace osu.Game.Screens.SelectV2
             // Selecting a set isn't valid – let's re-select the first visible difficulty.
             if (grouping.SetItems.TryGetValue(set, out var items))
             {
-                var beatmaps = items.Select(i => i.Model).OfType<GroupedBeatmap>().Select(b => b.Beatmap);
+                var beatmaps = items.Select(i => i.Model).OfType<GroupedBeatmap>();
                 RequestRecommendedSelection(beatmaps);
             }
         }
@@ -463,9 +467,9 @@ namespace osu.Game.Screens.SelectV2
                 }
             }
 
-            var beatmaps = items.Select(i => i.Model).OfType<BeatmapInfo>();
+            var beatmaps = items.Select(i => i.Model).OfType<GroupedBeatmap>();
 
-            if (beatmaps.Any(b => b.Equals(CurrentSelection as BeatmapInfo)))
+            if (beatmaps.Any(b => b.Equals(CurrentSelection as GroupedBeatmap)))
                 return;
 
             RequestRecommendedSelection(beatmaps);
@@ -784,8 +788,8 @@ namespace osu.Game.Screens.SelectV2
         #region Random selection handling
 
         private readonly Bindable<RandomSelectAlgorithm> randomAlgorithm = new Bindable<RandomSelectAlgorithm>();
-        private readonly List<BeatmapInfo> previouslyVisitedRandomBeatmaps = new List<BeatmapInfo>();
-        private readonly List<BeatmapInfo> randomHistory = new List<BeatmapInfo>();
+        private readonly HashSet<BeatmapInfo> previouslyVisitedRandomBeatmaps = new HashSet<BeatmapInfo>();
+        private readonly List<GroupedBeatmap> randomHistory = new List<GroupedBeatmap>();
 
         private Sample? spinSample;
         private Sample? randomSelectSample;
@@ -798,7 +802,7 @@ namespace osu.Game.Screens.SelectV2
                 return false;
 
             var selectionBefore = CurrentSelectionItem;
-            var beatmapBefore = selectionBefore?.Model as BeatmapInfo;
+            var beatmapBefore = selectionBefore?.Model as GroupedBeatmap;
 
             bool success;
 
@@ -808,7 +812,7 @@ namespace osu.Game.Screens.SelectV2
                 randomHistory.Add(beatmapBefore);
                 // keep track of visited beatmaps for "RandomPermutation" random tracking.
                 // note that this is reset when we run out of beatmaps, while `randomHistory` is not.
-                previouslyVisitedRandomBeatmaps.Add(beatmapBefore);
+                previouslyVisitedRandomBeatmaps.Add(beatmapBefore.Beatmap);
             }
 
             if (grouping.BeatmapSetsGroupedTogether)
@@ -836,29 +840,29 @@ namespace osu.Game.Screens.SelectV2
 
         private bool nextRandomBeatmap()
         {
-            ICollection<BeatmapInfo> visibleBeatmaps = ExpandedGroup != null
+            ICollection<GroupedBeatmap> visibleBeatmaps = ExpandedGroup != null
                 // In the case of grouping, users expect random to only operate on the expanded group.
                 // This is going to incur some overhead as we don't have a group-beatmapset mapping currently.
                 //
                 // If this becomes an issue, we could either store a mapping, or run the random algorithm many times
                 // using the `SetItems` method until we get a group HIT.
-                ? grouping.GroupItems[ExpandedGroup].Select(i => i.Model).OfType<BeatmapInfo>().ToArray()
-                : GetCarouselItems()!.Select(i => i.Model).OfType<BeatmapInfo>().ToArray();
+                ? grouping.GroupItems[ExpandedGroup].Select(i => i.Model).OfType<GroupedBeatmap>().ToArray()
+                : GetCarouselItems()!.Select(i => i.Model).OfType<GroupedBeatmap>().ToArray();
 
-            BeatmapInfo beatmap;
+            GroupedBeatmap beatmap;
 
             switch (randomAlgorithm.Value)
             {
                 case RandomSelectAlgorithm.RandomPermutation:
                 {
-                    ICollection<BeatmapInfo> notYetVisitedBeatmaps = visibleBeatmaps.Except(previouslyVisitedRandomBeatmaps).ToList();
+                    ICollection<GroupedBeatmap> notYetVisitedBeatmaps = visibleBeatmaps.ExceptBy(previouslyVisitedRandomBeatmaps, gb => gb.Beatmap).ToList();
 
                     if (!notYetVisitedBeatmaps.Any())
                     {
-                        previouslyVisitedRandomBeatmaps.RemoveAll(b => visibleBeatmaps.Contains(b));
+                        previouslyVisitedRandomBeatmaps.ExceptWith(visibleBeatmaps.Select(b => b.Beatmap));
                         notYetVisitedBeatmaps = visibleBeatmaps;
-                        if (CurrentSelection is BeatmapInfo beatmapInfo)
-                            notYetVisitedBeatmaps = notYetVisitedBeatmaps.Except([beatmapInfo]).ToList();
+                        if (CurrentSelection is GroupedBeatmap groupedBeatmap)
+                            notYetVisitedBeatmaps = notYetVisitedBeatmaps.Except([groupedBeatmap]).ToList();
                     }
 
                     if (notYetVisitedBeatmaps.Count == 0)
@@ -882,7 +886,7 @@ namespace osu.Game.Screens.SelectV2
 
         private bool nextRandomSet()
         {
-            ICollection<GroupedBeatmapSet> visibleSetsUnderGrouping = ExpandedGroup != null
+            ICollection<GroupedBeatmapSet> visibleGroupedSets = ExpandedGroup != null
                 // In the case of grouping, users expect random to only operate on the expanded group.
                 // This is going to incur some overhead as we don't have a group-beatmapset mapping currently.
                 //
@@ -899,14 +903,14 @@ namespace osu.Game.Screens.SelectV2
                 case RandomSelectAlgorithm.RandomPermutation:
                 {
                     ICollection<GroupedBeatmapSet> notYetVisitedSets =
-                        visibleSetsUnderGrouping.ExceptBy(previouslyVisitedRandomBeatmaps.Select(b => b.BeatmapSet!), groupedSet => groupedSet.BeatmapSet).ToList();
+                        visibleGroupedSets.ExceptBy(previouslyVisitedRandomBeatmaps.Select(b => b.BeatmapSet!), groupedSet => groupedSet.BeatmapSet).ToList();
 
                     if (!notYetVisitedSets.Any())
                     {
-                        previouslyVisitedRandomBeatmaps.RemoveAll(b => visibleSetsUnderGrouping.Any(groupedSet => groupedSet.BeatmapSet.Equals(b.BeatmapSet!)));
-                        notYetVisitedSets = visibleSetsUnderGrouping;
-                        if (CurrentSelection is BeatmapInfo beatmapInfo)
-                            notYetVisitedSets = notYetVisitedSets.ExceptBy([beatmapInfo.BeatmapSet!], groupedSet => groupedSet.BeatmapSet).ToList();
+                        previouslyVisitedRandomBeatmaps.ExceptWith(visibleGroupedSets.SelectMany(setUnderGrouping => setUnderGrouping.BeatmapSet.Beatmaps));
+                        notYetVisitedSets = visibleGroupedSets;
+                        if (CurrentSelection is GroupedBeatmap groupedBeatmap)
+                            notYetVisitedSets = notYetVisitedSets.ExceptBy([groupedBeatmap.Beatmap.BeatmapSet!], groupedSet => groupedSet.BeatmapSet).ToList();
                     }
 
                     if (notYetVisitedSets.Count == 0)
@@ -917,7 +921,7 @@ namespace osu.Game.Screens.SelectV2
                 }
 
                 case RandomSelectAlgorithm.Random:
-                    set = visibleSetsUnderGrouping.ElementAt(RNG.Next(visibleSetsUnderGrouping.Count));
+                    set = visibleGroupedSets.ElementAt(RNG.Next(visibleGroupedSets.Count));
                     break;
 
                 default:
@@ -940,15 +944,15 @@ namespace osu.Game.Screens.SelectV2
                 var previousBeatmap = randomHistory[^1];
                 randomHistory.RemoveAt(randomHistory.Count - 1);
 
-                var previousBeatmapItem = carouselItems.FirstOrDefault(i => i.Model is BeatmapInfo b && b.Equals(previousBeatmap));
+                var previousBeatmapItem = carouselItems.FirstOrDefault(i => i.Model is GroupedBeatmap gb && gb.Equals(previousBeatmap));
 
                 if (previousBeatmapItem == null)
                     return false;
 
-                if (CurrentSelection is BeatmapInfo beatmapInfo)
+                if (CurrentSelection is GroupedBeatmap groupedBeatmap)
                 {
                     if (randomAlgorithm.Value == RandomSelectAlgorithm.RandomPermutation)
-                        previouslyVisitedRandomBeatmaps.Remove(beatmapInfo);
+                        previouslyVisitedRandomBeatmaps.Remove(groupedBeatmap.Beatmap);
 
                     if (CurrentSelectionItem == null)
                         playSpinSample(0);
