@@ -283,8 +283,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 // offset by one because the group itself is included in the items list.
                 CarouselItem item = groupingFilter.GroupItems[groupDefinition].ElementAt(panel + 1);
 
-                return (Carousel.CurrentSelection as BeatmapInfo)?
-                    .Equals(item.Model as BeatmapInfo) == true;
+                return (Carousel.CurrentSelection as GroupedBeatmap)?
+                    .Equals(item.Model as GroupedBeatmap) == true;
             });
         }
 
@@ -293,7 +293,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             if (diff != null)
             {
                 AddUntilStep($"selected is set{set} diff{diff.Value}",
-                    () => (Carousel.CurrentSelection as BeatmapInfo),
+                    () => (Carousel.CurrentSelection as GroupedBeatmap)?.Beatmap,
                     () => Is.EqualTo(BeatmapSets[set].Beatmaps[diff.Value]));
             }
             else
@@ -466,7 +466,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 if (FilterDelay != 0)
                     await Task.Delay(FilterDelay).ConfigureAwait(true);
 
-                PostFilterBeatmaps = items.Select(i => i.Model).OfType<BeatmapInfo>();
+                PostFilterBeatmaps = items.Select(i => i.Model).OfType<GroupedBeatmap>().Select(i => i.Beatmap);
                 return items;
             }
 
