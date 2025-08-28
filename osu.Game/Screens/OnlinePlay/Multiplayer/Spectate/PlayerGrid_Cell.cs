@@ -16,7 +16,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         /// <summary>
         /// A cell of the grid. Contains the content and tracks to the linked facade.
         /// </summary>
-        private partial class Cell : CompositeDrawable
+        public partial class Cell : CompositeDrawable
         {
             /// <summary>
             /// The index of the original facade of this cell.
@@ -32,11 +32,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             /// An action that toggles the maximisation state of this cell.
             /// </summary>
             public Action<Cell>? ToggleMaximisationState;
-
-            /// <summary>
-            /// Whether this cell is currently maximised.
-            /// </summary>
-            public bool IsMaximised { get; private set; }
 
             private Facade facade;
 
@@ -83,7 +78,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             public void SetFacade(Facade newFacade, bool isMaximised)
             {
                 facade = newFacade;
-                IsMaximised = isMaximised;
                 isAnimating = true;
 
                 TweenEdgeEffectTo(new EdgeEffectParameters
