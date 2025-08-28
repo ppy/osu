@@ -168,6 +168,12 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 stamina.GetCurrentStrainPeaks().ToList()
             );
 
+            if (peaks.Count == 0)
+            {
+                consistencyFactor = 0;
+                return 0;
+            }
+
             double difficulty = 0;
             double weight = 1;
 
@@ -183,6 +189,12 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 colour.GetObjectStrains().ToList(),
                 stamina.GetObjectStrains().ToList()
             );
+
+            if (hitObjectStrainPeaks.Count == 0)
+            {
+                consistencyFactor = 0;
+                return 0;
+            }
 
             // The average of the top 5% of strain peaks from hit objects.
             double topAverageHitObjectStrain = hitObjectStrainPeaks.OrderDescending().Take(1 + hitObjectStrainPeaks.Count / 20).Average();
