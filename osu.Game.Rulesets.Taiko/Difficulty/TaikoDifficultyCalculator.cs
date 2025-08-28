@@ -168,6 +168,12 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 stamina.GetCurrentStrainPeaks().ToList()
             );
 
+            if (peaks.Count == 0)
+            {
+                consistencyFactor = 0;
+                return 0;
+            }
+
             double difficulty = 0;
             double weight = 1;
 
