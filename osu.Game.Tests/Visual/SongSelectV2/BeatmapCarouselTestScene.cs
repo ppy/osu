@@ -117,13 +117,15 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                                     NewItemsPresented = _ => NewItemsPresentedInvocationCount++,
                                     RequestSelection = b =>
                                     {
-                                        BeatmapRequestedSelections.Push(b);
+                                        BeatmapRequestedSelections.Push(b.Beatmap);
                                         Carousel.CurrentSelection = b;
                                     },
-                                    RequestRecommendedSelection = beatmaps =>
+                                    RequestRecommendedSelection = groupedBeatmaps =>
                                     {
-                                        BeatmapSetRequestedSelections.Push(beatmaps.First().BeatmapSet!);
-                                        Carousel.CurrentSelection = BeatmapRecommendationFunction?.Invoke(beatmaps) ?? beatmaps.First();
+                                        var recommendedBeatmap = BeatmapRecommendationFunction?.Invoke(groupedBeatmaps.Select(gb => gb.Beatmap)) ?? groupedBeatmaps.First().Beatmap;
+                                        var recommendedGroupedBeatmap = groupedBeatmaps.First(gb => gb.Beatmap.Equals(recommendedBeatmap));
+                                        BeatmapSetRequestedSelections.Push(recommendedBeatmap.BeatmapSet!);
+                                        Carousel.CurrentSelection = recommendedGroupedBeatmap;
                                     },
                                     BleedTop = 50,
                                     BleedBottom = 50,
@@ -439,7 +441,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             public IEnumerable<BeatmapInfo> PostFilterBeatmaps = null!;
 
-            public BeatmapInfo? SelectedBeatmapInfo => CurrentSelection as BeatmapInfo;
+            public BeatmapInfo? SelectedBeatmapInfo => (CurrentSelection as GroupedBeatmap)?.Beatmap;
             public BeatmapSetInfo? SelectedBeatmapSet => SelectedBeatmapInfo?.BeatmapSet;
 
             public new GroupedBeatmapSet? ExpandedBeatmapSet => base.ExpandedBeatmapSet;
