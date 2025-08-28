@@ -12,6 +12,7 @@ using osu.Game.Online.Multiplayer.MatchTypes.Matchmaking;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Idle;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Pick;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Results;
+using osu.Game.Screens.OnlinePlay.Matchmaking.Screens.RoundResults;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens
 {
@@ -38,7 +39,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens
                         new GridContainer
                         {
                             RelativeSizeAxes = Axes.Both,
-                            ColumnDimensions = new[] { new Dimension(), new Dimension(GridSizeMode.Absolute, 20), new Dimension(GridSizeMode.AutoSize)},
+                            ColumnDimensions = new[] { new Dimension(), new Dimension(GridSizeMode.Absolute, 20), new Dimension(GridSizeMode.AutoSize) },
                             Padding = new MarginPadding { Bottom = 20 },
                             Content = new Drawable?[][]
                             {
@@ -83,7 +84,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens
             {
                 case MatchmakingRoomStatus.RoomStart:
                 case MatchmakingRoomStatus.RoundStart:
-                case MatchmakingRoomStatus.RoundEnd:
                     while (screenStack.CurrentScreen is not IdleScreen)
                         screenStack.Exit();
                     break;
@@ -95,6 +95,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens
                 case MatchmakingRoomStatus.SelectBeatmap:
                     Debug.Assert(screenStack.CurrentScreen is PickScreen);
                     ((PickScreen)screenStack.CurrentScreen).RollFinalBeatmap(matchmakingState.CandidateItems, matchmakingState.CandidateItem);
+                    break;
+
+                case MatchmakingRoomStatus.RoundEnd:
+                    screenStack.Push(new RoundResultsScreen());
                     break;
 
                 case MatchmakingRoomStatus.RoomEnd:

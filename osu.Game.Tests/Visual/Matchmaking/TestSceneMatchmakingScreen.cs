@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Extensions;
@@ -9,12 +11,16 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
+using osu.Framework.Utils;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.Matchmaking;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Scoring;
 using osu.Game.Screens.OnlinePlay.Matchmaking;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Pick;
 using osu.Game.Tests.Visual.Multiplayer;
@@ -59,6 +65,8 @@ namespace osu.Game.Tests.Visual.Matchmaking
             });
 
             WaitForJoined();
+
+            setupRequestHandler();
 
             AddStep("load match", () =>
             {
@@ -162,6 +170,13 @@ namespace osu.Game.Tests.Visual.Matchmaking
             // Finish gameplay.
             AddWaitStep("wait", 5);
 
+            AddStep("round end", () => MultiplayerClient.ChangeMatchRoomState(new MatchmakingRoomState
+            {
+                RoomStatus = MatchmakingRoomStatus.RoundEnd
+            }).WaitSafely());
+
+            AddWaitStep("wait", 10);
+
             AddStep("room end", () =>
             {
                 MatchmakingRoomState state = new MatchmakingRoomState
@@ -178,6 +193,64 @@ namespace osu.Game.Tests.Visual.Matchmaking
                 state.Users[localUserId].Rounds[1].Statistics[HitResult.LargeBonus] = 1;
 
                 MultiplayerClient.ChangeMatchRoomState(state).WaitSafely();
+            });
+        }
+
+        private void setupRequestHandler()
+        {
+            AddStep("setup request handler", () =>
+            {
+                Func<APIRequest, bool>? defaultRequestHandler = null;
+
+                ((DummyAPIAccess)API).HandleRequest = request =>
+                {
+                    switch (request)
+                    {
+                        case GetBeatmapsRequest getBeatmaps:
+                            getBeatmaps.TriggerSuccess(new GetBeatmapsResponse
+                            {
+                                Beatmaps = getBeatmaps.BeatmapIds.Select(id => new APIBeatmap
+                                {
+                                    OnlineID = id,
+                                    StarRating = id,
+                                    DifficultyName = $"Beatmap {id}",
+                                    BeatmapSet = new APIBeatmapSet
+                                    {
+                                        Title = $"Title {id}",
+                                        Artist = $"Artist {id}",
+                                        AuthorString = $"Author {id}"
+                                    }
+                                }).ToList()
+                            });
+                            return true;
+
+                        case IndexPlaylistScoresRequest index:
+                            var result = new IndexedMultiplayerScores();
+
+                            for (int i = 0; i < 8; ++i)
+                            {
+                                result.Scores.Add(new MultiplayerScore
+                                {
+                                    ID = i,
+                                    Accuracy = 1 - (float)i / 16,
+                                    Position = i + 1,
+                                    EndedAt = DateTimeOffset.Now,
+                                    Passed = true,
+                                    Rank = (ScoreRank)RNG.Next((int)ScoreRank.D, (int)ScoreRank.XH),
+                                    MaxCombo = 1000 - i,
+                                    TotalScore = (long)(1_000_000 * (1 - (float)i / 16)),
+                                    User = new APIUser { Username = $"user {i}" },
+                                    Statistics = new Dictionary<HitResult, int>()
+                                });
+                            }
+
+                            index.TriggerSuccess(result);
+                            return true;
+
+                        default:
+                            return defaultRequestHandler?.Invoke(request) ?? false;
+                    }
+                };
             });
         }
     }

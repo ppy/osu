@@ -235,7 +235,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
         private void onLoadRequested() => Scheduler.Add(() =>
         {
             updateGameplayState();
-            this.Push(new MultiplayerPlayerLoader(() => new MultiplayerPlayer(new Room(room), new PlaylistItem(client.Room!.CurrentPlaylistItem), room.Users.ToArray())));
+            this.Push(new MultiplayerPlayerLoader(() => new MatchmakingPlayer(new Room(room), new PlaylistItem(client.Room!.CurrentPlaylistItem), room.Users.ToArray())));
         });
 
         private void checkForAutomaticDownload()
