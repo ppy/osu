@@ -159,14 +159,21 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             });
         }
 
-        protected void ImportBeatmapForRuleset(params int[] rulesetIds)
+        protected void WaitForFiltering() => AddUntilStep("wait for filtering", () => !SongSelect.IsFiltering);
+
+        protected void ImportBeatmapForRuleset(params int[] rulesetIds) => ImportBeatmapForRuleset(_ => { }, 3, rulesetIds);
+
+        protected void ImportBeatmapForRuleset(Action<BeatmapSetInfo> applyToBeatmap, int difficultyCount, params int[] rulesetIds)
         {
             int beatmapsCount = 0;
 
             AddStep($"import test map for ruleset {rulesetIds}", () =>
             {
                 beatmapsCount = SongSelect.IsNull() ? 0 : Carousel.Filters.OfType<BeatmapCarouselFilterGrouping>().Single().SetItems.Count;
-                Beatmaps.Import(TestResources.CreateTestBeatmapSetInfo(3, Rulesets.AvailableRulesets.Where(r => rulesetIds.Contains(r.OnlineID)).ToArray()));
+
+                var beatmapSet = TestResources.CreateTestBeatmapSetInfo(difficultyCount, Rulesets.AvailableRulesets.Where(r => rulesetIds.Contains(r.OnlineID)).ToArray());
+                applyToBeatmap(beatmapSet);
+                Beatmaps.Import(beatmapSet);
             });
 
             // This is specifically for cases where the add is happening post song select load.

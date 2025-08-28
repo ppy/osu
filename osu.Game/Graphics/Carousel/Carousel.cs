@@ -17,14 +17,12 @@ using osu.Framework.Extensions.PolygonExtensions;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Pooling;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Layout;
 using osu.Framework.Logging;
 using osu.Framework.Utils;
-using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
 using osu.Game.Online.Multiplayer;
 using osuTK;
@@ -74,6 +72,11 @@ namespace osu.Game.Graphics.Carousel
         public bool IsFiltering => !filterTask.IsCompleted;
 
         /// <summary>
+        /// Whether absolute scrolling is currently triggered.
+        /// </summary>
+        public bool AbsoluteScrolling => Scroll.AbsoluteScrolling;
+
+        /// <summary>
         /// The number of times filter operations have been triggered.
         /// </summary>
         internal int FilterCount { get; private set; }
@@ -115,14 +118,21 @@ namespace osu.Game.Graphics.Carousel
                     if (currentSelection.Model != null)
                         HandleItemDeselected(currentSelection.Model);
 
-                    currentKeyboardSelection = new Selection(value);
-                    currentSelection = currentKeyboardSelection;
+                    currentSelection = new Selection(value);
+                    currentKeyboardSelection = currentSelection;
                     selectionValid.Invalidate();
                 }
-                else if (currentKeyboardSelection.Model != value)
+
+                // Check keyboard selection equality separately.
+                //
+                // If current selection set to an already-selected value, we want to ensure
+                // that keyboard selection (which basically represents the "visual" tracking of selection)
+                // is still reset back to the newly set value.
+                //
+                // The main case this handles is when a set header is clicked and we want to make sure one of its
+                // "children" are re-selected.
+                if (!CheckModelEquality(currentKeyboardSelection.Model, value))
                 {
-                    // Even if the current selection matches, let's ensure the keyboard selection is reset
-                    // to the newly selected object. This matches user expectations (for now).
                     currentKeyboardSelection = currentSelection;
                     selectionValid.Invalidate();
                 }
@@ -281,11 +291,11 @@ namespace osu.Game.Graphics.Carousel
 
         #region Initialisation
 
-        protected readonly CarouselScrollContainer Scroll;
+        protected readonly ScrollContainer Scroll;
 
         protected Carousel()
         {
-            InternalChild = Scroll = new CarouselScrollContainer
+            InternalChild = Scroll = new ScrollContainer
             {
                 Masking = false,
                 RelativeSizeAxes = Axes.Both,
@@ -347,11 +357,6 @@ namespace osu.Game.Graphics.Carousel
                     {
                         log($"Performing {filter.GetType().ReadableName()}");
                         items = await filter.Run(items, cts.Token).ConfigureAwait(false);
-
-                        // To avoid shooting ourselves in the foot, ensure that we manifest a list after each filter.
-                        //
-                        // A future improvement may be passing a reference list through each filter rather than copying each time,
-                        // but this is the safest approach.
                     }
 
                     log("Updating Y positions");
@@ -1027,166 +1032,6 @@ namespace osu.Game.Graphics.Carousel
         private record DisplayRange(int First, int Last)
         {
             public static readonly DisplayRange EMPTY = new DisplayRange(-1, -1);
-        }
-
-        /// <summary>
-        /// Implementation of scroll container which handles very large vertical lists by internally using <c>double</c> precision
-        /// for pre-display Y values.
-        /// </summary>
-        public partial class CarouselScrollContainer : UserTrackingScrollContainer, IKeyBindingHandler<GlobalAction>
-        {
-            public readonly Container Panels;
-
-            public void SetLayoutHeight(float height) => Panels.Height = height;
-
-            /// <summary>
-            /// Allow handling right click scroll outside of the carousel's display area.
-            /// </summary>
-            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
-
-            public CarouselScrollContainer()
-            {
-                // Managing our own custom layout within ScrollContent causes feedback with public ScrollContainer calculations,
-                // so we must maintain one level of separation from ScrollContent.
-                base.Add(Panels = new Container
-                {
-                    Name = "Layout content",
-                    RelativeSizeAxes = Axes.X,
-                });
-            }
-
-            public override void OffsetScrollPosition(double offset)
-            {
-                base.OffsetScrollPosition(offset);
-
-                foreach (var panel in Panels)
-                    ((ICarouselPanel)panel).DrawYPosition += offset;
-            }
-
-            public override void Clear(bool disposeChildren)
-            {
-                Panels.Height = 0;
-                Panels.Clear(disposeChildren);
-            }
-
-            public override void Add(Drawable drawable)
-            {
-                if (drawable is not ICarouselPanel)
-                    throw new InvalidOperationException($"Carousel panel drawables must implement {typeof(ICarouselPanel)}");
-
-                Panels.Add(drawable);
-            }
-
-            public override double GetChildPosInContent(Drawable d, Vector2 offset)
-            {
-                if (d is not ICarouselPanel panel)
-                    return base.GetChildPosInContent(d, offset);
-
-                return panel.DrawYPosition + offset.X;
-            }
-
-            protected override void ApplyCurrentToContent()
-            {
-                Debug.Assert(ScrollDirection == Direction.Vertical);
-
-                double scrollableExtent = -Current + ScrollableExtent * ScrollContent.RelativeAnchorPosition.Y;
-
-                foreach (var d in Panels)
-                    d.Y = (float)(((ICarouselPanel)d).DrawYPosition + scrollableExtent);
-            }
-
-            #region Scrollbar padding
-
-            public float ScrollbarPaddingTop { get; set; } = 5;
-            public float ScrollbarPaddingBottom { get; set; } = 5;
-
-            protected override float ToScrollbarPosition(double scrollPosition)
-            {
-                if (Precision.AlmostEquals(0, ScrollableExtent))
-                    return 0;
-
-                return (float)(ScrollbarPaddingTop + (ScrollbarMovementExtent - (ScrollbarPaddingTop + ScrollbarPaddingBottom)) * (scrollPosition / ScrollableExtent));
-            }
-
-            protected override float FromScrollbarPosition(float scrollbarPosition)
-            {
-                if (Precision.AlmostEquals(0, ScrollbarMovementExtent))
-                    return 0;
-
-                return (float)(ScrollableExtent * ((scrollbarPosition - ScrollbarPaddingTop) / (ScrollbarMovementExtent - (ScrollbarPaddingTop + ScrollbarPaddingBottom))));
-            }
-
-            #endregion
-
-            #region Absolute scrolling
-
-            private bool absoluteScrolling;
-
-            protected override bool IsDragging => base.IsDragging || absoluteScrolling;
-
-            public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
-            {
-                switch (e.Action)
-                {
-                    case GlobalAction.AbsoluteScrollSongList:
-                        beginAbsoluteScrolling(e);
-                        return true;
-                }
-
-                return false;
-            }
-
-            public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
-            {
-                switch (e.Action)
-                {
-                    case GlobalAction.AbsoluteScrollSongList:
-                        endAbsoluteScrolling();
-                        break;
-                }
-            }
-
-            protected override bool OnMouseDown(MouseDownEvent e)
-            {
-                if (e.Button == MouseButton.Right)
-                {
-                    // To avoid conflicts with context menus, disallow absolute scroll if it looks like things will fall over.
-                    if (GetContainingInputManager()!.HoveredDrawables.OfType<IHasContextMenu>().Any())
-                        return false;
-
-                    beginAbsoluteScrolling(e);
-                }
-
-                return base.OnMouseDown(e);
-            }
-
-            protected override void OnMouseUp(MouseUpEvent e)
-            {
-                if (e.Button == MouseButton.Right)
-                    endAbsoluteScrolling();
-                base.OnMouseUp(e);
-            }
-
-            protected override bool OnMouseMove(MouseMoveEvent e)
-            {
-                if (absoluteScrolling)
-                {
-                    ScrollToAbsolutePosition(e.CurrentState.Mouse.Position);
-                    return true;
-                }
-
-                return base.OnMouseMove(e);
-            }
-
-            private void beginAbsoluteScrolling(UIEvent e)
-            {
-                ScrollToAbsolutePosition(e.CurrentState.Mouse.Position);
-                absoluteScrolling = true;
-            }
-
-            private void endAbsoluteScrolling() => absoluteScrolling = false;
-
-            #endregion
         }
 
         #endregion

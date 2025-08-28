@@ -10,6 +10,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Screens.Select.Filter;
 using osu.Game.Screens.SelectV2;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.SongSelectV2
 {
@@ -196,6 +197,43 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             AddAssert("selected beatmap below", () => selectedBeatmap!.BeatmapSet, () => Is.EqualTo(hiddenBeatmap.BeatmapSet));
             assertPanelSelected<PanelBeatmap>(0);
+        }
+
+        [Test]
+        [Explicit]
+        public void TestDebounceNotBypassedOnUpdate()
+        {
+            BeatmapInfo? selectedBefore = null;
+            BeatmapInfo? selectedBeatmapDuringDebounce = null;
+
+            // we're testing the song select side debounce, so let's make filtering immediate
+            AddStep("set filter debounce delay to zero", () => Carousel.DebounceDelay = 0);
+
+            WaitForFiltering();
+
+            AddUntilStep("wait for global beatmap selection", () => !Beatmap.IsDefault);
+
+            AddStep("store selection", () => selectedBefore = Beatmap.Value.BeatmapInfo);
+
+            AddStep("traverse to next panel and update simultaneously", () =>
+            {
+                InputManager.Key(Key.Right);
+
+                Beatmaps.Delete(Beatmaps.GetAllUsableBeatmapSets().Last());
+
+                // check selection during debounce
+                Scheduler.AddDelayed(() => selectedBeatmapDuringDebounce = Beatmap.Value.BeatmapInfo, Screens.SelectV2.SongSelect.SELECTION_DEBOUNCE / 2f);
+            });
+
+            WaitForFiltering();
+
+            AddUntilStep("wait for pre-debounce selection", () => selectedBeatmapDuringDebounce, () => Is.Not.Null);
+
+            AddAssert("selection during debounce didn't change", () => selectedBeatmapDuringDebounce, () => Is.EqualTo(selectedBefore));
+
+            // Due to nunit runs having limited precision this tends to fail when headless, even though you'd expect the previous step to fail.
+            // Interactively, things fail as expected.
+            AddUntilStep("selection has changed after debounce", () => selectedBeatmapDuringDebounce, () => Is.Not.EqualTo(Beatmap.Value.BeatmapInfo));
         }
 
         private void waitForFiltering(int filterCount = 1)

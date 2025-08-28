@@ -37,7 +37,11 @@ namespace osu.Game.Screens.Select.Leaderboards
             var scoresToShow = new List<GameplayLeaderboardScore>();
 
             var scoresRequest = new IndexPlaylistScoresRequest(room.RoomID!.Value, playlistItem.ID);
-            scoresRequest.Success += response =>
+            api.Perform(scoresRequest);
+
+            var response = scoresRequest.Response;
+
+            if (response != null)
             {
                 isPartial = response.Scores.Count < response.TotalScores;
 
@@ -50,8 +54,7 @@ namespace osu.Game.Screens.Select.Leaderboards
 
                 if (response.UserScore != null && response.Scores.All(s => s.ID != response.UserScore.ID))
                     scoresToShow.Add(new GameplayLeaderboardScore(response.UserScore, tracked: false, GameplayLeaderboardScore.ComboDisplayMode.Highest));
-            };
-            api.Perform(scoresRequest);
+            }
 
             if (gameplayState != null)
             {
@@ -62,8 +65,12 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             // touching the public bindable must happen on the update thread for general thread safety,
             // since we may have external subscribers bound already
-            Schedule(() => scores.AddRange(scoresToShow));
-            Scheduler.AddDelayed(sort, 1000, true);
+            Schedule(() =>
+            {
+                scores.AddRange(scoresToShow);
+                sort();
+                Scheduler.AddDelayed(sort, 1000, true);
+            });
         }
 
         // logic shared with SoloGameplayLeaderboardProvider

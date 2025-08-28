@@ -295,6 +295,16 @@ namespace osu.Game.Tests.NonVisual.Filtering
         }
 
         [Test]
+        public void TestPartialStatusNotMatch()
+        {
+            const string query = "status!=r";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.IsNotEmpty(filterCriteria.OnlineStatus.Values);
+            Assert.That(filterCriteria.OnlineStatus.Values, Does.Not.Contain(BeatmapOnlineStatus.Ranked));
+        }
+
+        [Test]
         public void TestApplyEqualStatusQueryWithMultipleValues()
         {
             const string query = "status=ranked,loved";
@@ -755,6 +765,18 @@ namespace osu.Game.Tests.NonVisual.Filtering
             FilterQueryParser.ApplyQueries(filterCriteria, $"played={query}");
             Assert.AreEqual(true, filterCriteria.LastPlayed.HasFilter);
             Assert.AreEqual(matched, filterCriteria.LastPlayed.IsInRange(reference));
+        }
+
+        [Test]
+        public void TestMultipleTextFilters()
+        {
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, "tag=\"simple\" tag=\"clean\"!");
+            Assert.That(filterCriteria.UserTags, Has.Count.EqualTo(2));
+            Assert.That(filterCriteria.UserTags[0].SearchTerm, Is.EqualTo("simple"));
+            Assert.That(filterCriteria.UserTags[0].MatchMode, Is.EqualTo(FilterCriteria.MatchMode.IsolatedPhrase));
+            Assert.That(filterCriteria.UserTags[1].SearchTerm, Is.EqualTo("clean"));
+            Assert.That(filterCriteria.UserTags[1].MatchMode, Is.EqualTo(FilterCriteria.MatchMode.FullPhrase));
         }
     }
 }

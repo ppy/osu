@@ -3,6 +3,7 @@
 
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
 using osuTK.Graphics;
 
@@ -42,7 +43,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (targetJudgement == null || targetResult == null)
                 Colour = Color4.White;
             else
-                Colour = targetResult.IsHit ? targetJudgement.AccentColour : Color4.Transparent;
+                Colour = targetResult.IsHit && !targetResult.Type.IsTick() ? targetJudgement.AccentColour : Color4.Transparent;
         }
     }
 }

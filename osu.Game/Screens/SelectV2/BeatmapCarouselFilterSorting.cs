@@ -16,6 +16,8 @@ namespace osu.Game.Screens.SelectV2
 {
     public class BeatmapCarouselFilterSorting : ICarouselFilter
     {
+        public int BeatmapItemsCount { get; private set; }
+
         private readonly Func<FilterCriteria> getCriteria;
 
         public BeatmapCarouselFilterSorting(Func<FilterCriteria> getCriteria)
@@ -28,6 +30,8 @@ namespace osu.Game.Screens.SelectV2
             var criteria = getCriteria();
 
             bool groupedSets = BeatmapCarouselFilterGrouping.ShouldGroupBeatmapsTogether(criteria);
+
+            BeatmapItemsCount = items.Count();
 
             return items.Order(Comparer<CarouselItem>.Create((a, b) =>
             {

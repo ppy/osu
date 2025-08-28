@@ -2,7 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Localisation;
 using osu.Game.Database;
+using osu.Game.Localisation;
 
 namespace osu.Game.Collections
 {
@@ -20,7 +22,7 @@ namespace osu.Game.Collections
         /// <summary>
         /// The name of the collection.
         /// </summary>
-        public string CollectionName { get; }
+        public LocalisableString CollectionName { get; }
 
         /// <summary>
         /// Creates a new <see cref="CollectionFilterMenuItem"/>.
@@ -32,7 +34,7 @@ namespace osu.Game.Collections
             Collection = collection;
         }
 
-        protected CollectionFilterMenuItem(string name)
+        protected CollectionFilterMenuItem(LocalisableString name)
         {
             CollectionName = name;
         }
@@ -53,7 +55,7 @@ namespace osu.Game.Collections
     public class AllBeatmapsCollectionFilterMenuItem : CollectionFilterMenuItem
     {
         public AllBeatmapsCollectionFilterMenuItem()
-            : base("All beatmaps")
+            : base(CollectionsStrings.AllBeatmaps)
         {
         }
 
@@ -65,7 +67,7 @@ namespace osu.Game.Collections
     public class ManageCollectionsFilterMenuItem : CollectionFilterMenuItem
     {
         public ManageCollectionsFilterMenuItem()
-            : base("Manage collections...")
+            : base(CollectionsStrings.ManageCollections)
         {
         }
 

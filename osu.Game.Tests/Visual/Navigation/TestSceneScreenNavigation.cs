@@ -680,7 +680,6 @@ namespace osu.Game.Tests.Visual.Navigation
             {
                 var dropdownItem = Game
                                    .ChildrenOfType<BeatmapLeaderboardWedge>().First()
-                                   .ChildrenOfType<OsuContextMenu>().First()
                                    .ChildrenOfType<DrawableOsuMenuItem>().First(i => i.Item.Text.ToString() == "Delete");
 
                 InputManager.MoveMouseTo(dropdownItem);
@@ -695,44 +694,6 @@ namespace osu.Game.Tests.Visual.Navigation
             AddUntilStep("ensure score is pending deletion", () => Game.Realm.Run(r => r.Find<ScoreInfo>(score.ID)?.DeletePending == true));
 
             AddUntilStep("wait for score panel removal", () => scorePanel.Parent == null);
-        }
-
-        [TestCase(true)]
-        [TestCase(false)]
-        public void TestSongContinuesAfterExitPlayer(bool withUserPause)
-        {
-            Player player = null;
-
-            IWorkingBeatmap beatmap() => Game.Beatmap.Value;
-
-            Screens.SelectV2.SongSelect songSelect = null;
-            PushAndConfirm(() => songSelect = new SoloSongSelect());
-            AddUntilStep("wait for song select", () => songSelect.CarouselItemsPresented);
-
-            AddStep("import beatmap", () => BeatmapImportHelper.LoadOszIntoOsu(Game, virtualTrack: true).WaitSafely());
-
-            AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
-
-            if (withUserPause)
-                AddStep("pause", () => Game.Dependencies.Get<MusicController>().Stop(true));
-
-            AddStep("press enter", () => InputManager.Key(Key.Enter));
-
-            AddUntilStep("wait for player", () =>
-            {
-                DismissAnyNotifications();
-                return (player = Game.ScreenStack.CurrentScreen as Player) != null;
-            });
-
-            AddUntilStep("wait for fail", () => player.GameplayState.HasFailed);
-
-            AddUntilStep("wait for track stop", () => !Game.MusicController.IsPlaying);
-            AddAssert("Ensure time before preview point", () => Game.MusicController.CurrentTrack.CurrentTime < beatmap().BeatmapInfo.Metadata.PreviewTime);
-
-            pushEscape();
-
-            AddUntilStep("wait for track playing", () => Game.MusicController.IsPlaying);
-            AddAssert("Ensure time wasn't reset to preview point", () => Game.MusicController.CurrentTrack.CurrentTime < beatmap().BeatmapInfo.Metadata.PreviewTime);
         }
 
         [Test]

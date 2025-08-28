@@ -70,14 +70,6 @@ namespace osu.Game.Tests.Visual
 
             AddStep($"Load player for {CreatePlayerRuleset().Description}", LoadPlayer);
             AddUntilStep("player loaded", () => Player.IsLoaded && Player.Alpha == 1);
-
-            if (AllowBackwardsSeeks)
-            {
-                AddStep("allow backwards seeking", () =>
-                {
-                    Player.DrawableRuleset.AllowBackwardsSeeks = AllowBackwardsSeeks;
-                });
-            }
         }
 
         protected virtual bool AllowFail => false;

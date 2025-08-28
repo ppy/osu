@@ -126,12 +126,7 @@ namespace osu.Game.Tests.Visual.Navigation
             AddUntilStep("wait for accuracy counter", () => Game.ChildrenOfType<ArgonAccuracyCounter>().Any(counter => counter.Position != new Vector2()));
             AddStep("dump state of accuracy meter", () => state = JsonConvert.SerializeObject(Game.ChildrenOfType<ArgonAccuracyCounter>().First().CreateSerialisedInfo()));
             AddStep("add any component", () => Game.ChildrenOfType<SkinComponentToolbox.ToolboxComponentButton>().First().TriggerClick());
-            AddStep("undo", () =>
-            {
-                InputManager.PressKey(Key.ControlLeft);
-                InputManager.Key(Key.Z);
-                InputManager.ReleaseKey(Key.ControlLeft);
-            });
+            AddStep("undo", () => InputManager.Keys(PlatformAction.Undo));
             AddUntilStep("only one accuracy meter left",
                 () => Game.ChildrenOfType<Player>().Single().ChildrenOfType<ArgonAccuracyCounter>().Count(),
                 () => Is.EqualTo(1));
@@ -163,12 +158,7 @@ namespace osu.Game.Tests.Visual.Navigation
             AddUntilStep("wait for accuracy counter", () => Game.ChildrenOfType<ArgonAccuracyCounter>().Any(counter => counter.Position != new Vector2()));
             AddStep("dump state of accuracy meter", () => state = JsonConvert.SerializeObject(Game.ChildrenOfType<ArgonAccuracyCounter>().First().CreateSerialisedInfo()));
             AddStep("add any component", () => Game.ChildrenOfType<SkinComponentToolbox.ToolboxComponentButton>().First().TriggerClick());
-            AddStep("undo", () =>
-            {
-                InputManager.PressKey(Key.ControlLeft);
-                InputManager.Key(Key.Z);
-                InputManager.ReleaseKey(Key.ControlLeft);
-            });
+            AddStep("undo", () => InputManager.Keys(PlatformAction.Undo));
             AddUntilStep("only one accuracy meter left",
                 () => Game.ChildrenOfType<Player>().Single().ChildrenOfType<ArgonAccuracyCounter>().Count(),
                 () => Is.EqualTo(1));
@@ -190,12 +180,7 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddUntilStep("wait for components", () => skinEditor.ChildrenOfType<SkinBlueprint>().Any());
 
-            AddStep("select all components", () =>
-            {
-                InputManager.PressKey(Key.ControlLeft);
-                InputManager.Key(Key.A);
-                InputManager.ReleaseKey(Key.ControlLeft);
-            });
+            AddStep("select all components", () => InputManager.Keys(PlatformAction.SelectAll));
 
             AddUntilStep("components selected", () => skinEditor.SelectedComponents.Count > 0);
 

@@ -1,58 +1,59 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.ComponentModel;
+using osu.Framework.Localisation;
+using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Select.Filter
 {
     public enum GroupMode
     {
-        [Description("None")]
+        [LocalisableDescription(typeof(SongSelectStrings), nameof(SongSelectStrings.None))]
         None,
 
-        [Description("Artist")]
+        [LocalisableDescription(typeof(SongSelectStrings), nameof(SongSelectStrings.Artist))]
         Artist,
 
-        [Description("Author")]
+        [LocalisableDescription(typeof(SongSelectStrings), nameof(SongSelectStrings.Author))]
         Author,
 
-        [Description("BPM")]
+        [LocalisableDescription(typeof(SongSelectStrings), nameof(SongSelectStrings.BPM))]
         BPM,
 
-        // [Description("Collections")]
-        // Collections,
+        [LocalisableDescription(typeof(SongSelectStrings), nameof(SongSelectStrings.Collections))]
+        Collections,
 
-        [Description("Date Added")]
+        [LocalisableDescription(typeof(SongSelectStrings), nameof(SongSelectStrings.DateAdded))]
         DateAdded,
 
-        [Description("Date Ranked")]
+        [LocalisableDescription(typeof(SongSelectStrings), nameof(SongSelectStrings.DateRanked))]
         DateRanked,
 
-        [Description("Difficulty")]
+        [LocalisableDescription(typeof(SongSelectStrings), nameof(SongSelectStrings.Difficulty))]
         Difficulty,
 
-        // [Description("Favourites")]
+        // [LocalisableDescription(typeof(SongSelectStrings), nameof(SongSelectStrings.Favourites))]
         // Favourites,
 
-        [Description("Last Played")]
+        [LocalisableDescription(typeof(SongSelectStrings), nameof(SongSelectStrings.LastPlayed))]
         LastPlayed,
 
-        [Description("Length")]
+        [LocalisableDescription(typeof(SongSelectStrings), nameof(SongSelectStrings.Length))]
         Length,
 
-        // [Description("My Maps")]
-        // MyMaps,
+        [LocalisableDescription(typeof(SongSelectStrings), nameof(SongSelectStrings.MyMaps))]
+        MyMaps,
 
-        // [Description("Rank Achieved")]
-        // RankAchieved,
+        [LocalisableDescription(typeof(SongSelectStrings), nameof(SongSelectStrings.RankAchieved))]
+        RankAchieved,
 
-        [Description("Ranked Status")]
+        [LocalisableDescription(typeof(SongSelectStrings), nameof(SongSelectStrings.RankedStatus))]
         RankedStatus,
 
-        [Description("Source")]
+        [LocalisableDescription(typeof(SongSelectStrings), nameof(SongSelectStrings.Source))]
         Source,
 
-        [Description("Title")]
+        [LocalisableDescription(typeof(SongSelectStrings), nameof(SongSelectStrings.Title))]
         Title,
     }
 }

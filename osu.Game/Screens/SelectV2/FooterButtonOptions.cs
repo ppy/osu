@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Input.Bindings;
+using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Screens.Footer;
 
@@ -28,7 +29,7 @@ namespace osu.Game.Screens.SelectV2
         [BackgroundDependencyLoader]
         private void load(OsuColour colour)
         {
-            Text = "Options";
+            Text = SongSelectStrings.Options;
             Icon = FontAwesome.Solid.Cog;
             AccentColour = colour.Purple1;
             Hotkey = GlobalAction.ToggleBeatmapOptions;

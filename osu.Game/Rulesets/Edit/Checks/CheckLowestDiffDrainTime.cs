@@ -27,27 +27,28 @@ namespace osu.Game.Rulesets.Edit.Checks
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
-            IReadOnlyList<IBeatmap> difficulties = context.BeatmapsetDifficulties
-                                                          .Where(d => d.BeatmapInfo.Ruleset.Equals(context.Beatmap.BeatmapInfo.Ruleset))
-                                                          .ToList();
+            // Filter to only include difficulties with the same ruleset as the current one
+            var difficulties = context.AllDifficulties
+                                      .Where(d => d.Playable.BeatmapInfo.Ruleset.Equals(context.CurrentDifficulty.Playable.BeatmapInfo.Ruleset))
+                                      .ToList();
 
             if (difficulties.Count == 0)
                 yield break;
 
-            var lowestDifficulty = difficulties.OrderBy(b => b.BeatmapInfo.StarRating).First();
+            var lowestDifficulty = difficulties.OrderBy(b => b.Playable.BeatmapInfo.StarRating).First();
 
             // Get difficulty rating for the lowest difficulty
-            DifficultyRating lowestDifficultyRating = lowestDifficulty == context.Beatmap
+            DifficultyRating lowestDifficultyRating = lowestDifficulty.Playable == context.CurrentDifficulty.Playable
                 ? context.InterpretedDifficulty
-                : StarDifficulty.GetDifficultyRating(lowestDifficulty.BeatmapInfo.StarRating);
+                : StarDifficulty.GetDifficultyRating(lowestDifficulty.Playable.BeatmapInfo.StarRating);
 
-            double drainTime = context.Beatmap.CalculateDrainLength();
-            double playTime = context.Beatmap.CalculatePlayableLength();
+            double drainTime = context.CurrentDifficulty.Playable.CalculateDrainLength();
+            double playTime = context.CurrentDifficulty.Playable.CalculatePlayableLength();
 
-            bool isHighestDifficulty = difficulties.OrderByDescending(b => b.BeatmapInfo.StarRating).First() == context.Beatmap;
+            bool isHighestDifficulty = difficulties.OrderByDescending(b => b.Playable.BeatmapInfo.StarRating).First() == context.CurrentDifficulty;
 
             // Use play time unless it's the highest difficulty and has significant breaks
-            bool canUsePlayTime = !isHighestDifficulty || context.Beatmap.TotalBreakTime < break_time_leniency;
+            bool canUsePlayTime = !isHighestDifficulty || context.CurrentDifficulty.Playable.TotalBreakTime < break_time_leniency;
 
             double effectiveTime = canUsePlayTime ? playTime : drainTime;
             double thresholdReduction = canUsePlayTime ? 0 : break_time_leniency;

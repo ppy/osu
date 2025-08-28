@@ -11,11 +11,13 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Tests.Resources;
@@ -65,8 +67,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [Test]
         public void TestEmptyCollectionFilterContainsAllBeatmaps()
         {
-            assertCollectionDropdownContains("All beatmaps");
-            assertCollectionHeaderDisplays("All beatmaps");
+            assertCollectionDropdownContains(CollectionsStrings.AllBeatmaps);
+            assertCollectionHeaderDisplays(CollectionsStrings.AllBeatmaps);
         }
 
         [Test]
@@ -195,8 +197,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [Test]
         public void TestManageCollectionsFilterIsNotSelected()
         {
-            bool received = false;
-
             addExpandHeaderStep();
 
             AddStep("add collection", () => writeAndRefresh(r => r.Add(new BeatmapCollection(name: "1", new List<string> { "abc" }))));
@@ -210,12 +210,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             addExpandHeaderStep();
 
-            AddStep("watch for filter requests", () =>
-            {
-                received = false;
-                dropdown.ChildrenOfType<CollectionDropdown>().First().RequestFilter = () => received = true;
-            });
-
             AddStep("click manage collections filter", () =>
             {
                 int lastItemIndex = dropdown.ChildrenOfType<CollectionDropdown>().Single().Items.Count() - 1;
@@ -224,8 +218,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             });
 
             AddAssert("collection filter still selected", () => dropdown.Current.Value.CollectionName == "1");
-
-            AddAssert("filter request not fired", () => !received);
         }
 
         private void writeAndRefresh(Action<Realm> action) => Realm.Write(r =>
@@ -236,13 +228,13 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
         private BeatmapCollection getFirstCollection() => Realm.Run(r => r.All<BeatmapCollection>().First());
 
-        private void assertCollectionHeaderDisplays(string collectionName, bool shouldDisplay = true)
+        private void assertCollectionHeaderDisplays(LocalisableString collectionName, bool shouldDisplay = true)
             => AddUntilStep($"collection dropdown header displays '{collectionName}'",
                 () => shouldDisplay == dropdown.ChildrenOfType<CollectionDropdown.ShearedDropdownHeader>().Any(h => h.ChildrenOfType<SpriteText>().Any(t => t.Text == collectionName)));
 
         private void assertFirstButtonIs(IconUsage icon) => AddUntilStep($"button is {icon.Icon.ToString()}", () => getAddOrRemoveButton(1).Icon.Equals(icon));
 
-        private void assertCollectionDropdownContains(string collectionName, bool shouldContain = true) =>
+        private void assertCollectionDropdownContains(LocalisableString collectionName, bool shouldContain = true) =>
             AddUntilStep($"collection dropdown {(shouldContain ? "contains" : "does not contain")} '{collectionName}'",
                 // A bit of a roundabout way of going about this, see: https://github.com/ppy/osu-framework/issues/3871 + https://github.com/ppy/osu-framework/issues/3872
                 () => shouldContain == dropdown.ChildrenOfType<Menu.DrawableMenuItem>().Any(i => i.ChildrenOfType<CompositeDrawable>().OfType<IHasText>().First().Text == collectionName));

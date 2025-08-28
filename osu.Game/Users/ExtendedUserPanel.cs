@@ -111,21 +111,21 @@ namespace osu.Game.Users
             else
                 LastVisitMessage.FadeTo(0);
 
-            // Set status message based on activity (if we have one) and status is not offline
-            if (activity != null && status != UserStatus.Offline)
-            {
-                statusMessage.Text = activity.GetStatus();
-                statusMessage.TooltipText = activity.GetDetails() ?? string.Empty;
-                statusIcon.FadeColour(activity.GetAppropriateColour(Colours), 500, Easing.OutQuint);
-            }
-
-            // Otherwise use only status
-            else
+            if (activity == null || status == UserStatus.Offline)
             {
                 statusMessage.Text = status.GetLocalisableDescription();
                 statusMessage.TooltipText = string.Empty;
-                statusIcon.FadeColour(status.GetAppropriateColour(Colours), 500, Easing.OutQuint);
             }
+            else
+            {
+                statusMessage.Text = activity.GetStatus();
+                statusMessage.TooltipText = activity.GetDetails() ?? string.Empty;
+            }
+
+            if (activity == null || status != UserStatus.Online)
+                statusIcon.FadeColour(status.GetAppropriateColour(Colours), 500, Easing.OutQuint);
+            else
+                statusIcon.FadeColour(activity.GetAppropriateColour(Colours), 500, Easing.OutQuint);
 
             lastStatus = status;
             lastActivity = activity;

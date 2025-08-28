@@ -33,26 +33,6 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
         public void TestComboBasedSize([Values] bool comboBasedSize) => CreateModTest(new ModTestData { Mod = new OsuModFlashlight { ComboBasedSize = { Value = comboBasedSize } }, PassCondition = () => true });
 
         [Test]
-        public void TestPlayfieldBasedSize()
-        {
-            OsuModFlashlight flashlight;
-            CreateModTest(new ModTestData
-            {
-                Mods = [flashlight = new OsuModFlashlight(), new OsuModBarrelRoll()],
-                PassCondition = () =>
-                {
-                    var flashlightOverlay = Player.DrawableRuleset.Overlays
-                                                  .ChildrenOfType<ModFlashlight<OsuHitObject>.Flashlight>()
-                                                  .First();
-
-                    // the combo check is here because the flashlight radius decreases for the first time at 100 combo
-                    // and hardcoding it here eliminates the need to meddle in flashlight internals further by e.g. exposing `GetComboScaleFor()`
-                    return flashlightOverlay.GetSize() < flashlight.DefaultFlashlightSize && Player.GameplayState.ScoreProcessor.Combo.Value < 100;
-                }
-            });
-        }
-
-        [Test]
         public void TestSliderDimsOnlyAfterStartTime()
         {
             bool sliderDimmedBeforeStartTime = false;

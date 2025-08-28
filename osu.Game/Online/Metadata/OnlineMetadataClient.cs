@@ -56,7 +56,7 @@ namespace osu.Game.Online.Metadata
         {
             // Importantly, we are intentionally not using MessagePack here to correctly support derived class serialization.
             // More information on the limitations / reasoning can be found in osu-server-spectator's initialisation code.
-            connector = api.GetHubConnector(nameof(OnlineMetadataClient), endpoint, false);
+            connector = api.GetHubConnector(nameof(OnlineMetadataClient), endpoint);
 
             if (connector != null)
             {

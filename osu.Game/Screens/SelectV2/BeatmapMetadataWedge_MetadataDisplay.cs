@@ -165,8 +165,8 @@ namespace osu.Game.Screens.SelectV2
             {
                 clear();
 
-                contentTags.Tags = tags;
                 contentTags.PerformSearch = searchAction;
+                contentTags.Tags = tags;
             }
 
             private void setLoading()

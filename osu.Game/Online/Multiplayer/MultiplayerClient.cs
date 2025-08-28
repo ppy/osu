@@ -11,6 +11,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Development;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Database;
 using osu.Game.Localisation;
 using osu.Game.Online.API;
@@ -583,16 +584,14 @@ namespace osu.Game.Online.Multiplayer
 
             if (apiUser == null || apiRoom == null) return;
 
-            PostNotification?.Invoke(
-                new UserAvatarNotification(apiUser, NotificationsStrings.InvitedYouToTheMultiplayer(apiUser.Username, apiRoom.Name))
+            PostNotification?.Invoke(new MultiplayerInvitationNotification(apiUser, apiRoom)
+            {
+                Activated = () =>
                 {
-                    Activated = () =>
-                    {
-                        PresentMatch?.Invoke(apiRoom, password);
-                        return true;
-                    }
+                    PresentMatch?.Invoke(apiRoom, password);
+                    return true;
                 }
-            );
+            });
 
             Task<Room?> getRoomAsync(long id)
             {
@@ -1106,5 +1105,15 @@ namespace osu.Game.Online.Multiplayer
         public abstract Task MatchmakingToggleSelection(long playlistItemId);
 
         public abstract Task MatchmakingSkipToNextStage();
+
+        private partial class MultiplayerInvitationNotification : UserAvatarNotification
+        {
+            protected override IconUsage CloseButtonIcon => FontAwesome.Solid.Times;
+
+            public MultiplayerInvitationNotification(APIUser user, Room room)
+                : base(user, NotificationsStrings.InvitedYouToTheMultiplayer(user.Username, room.Name))
+            {
+            }
+        }
     }
 }

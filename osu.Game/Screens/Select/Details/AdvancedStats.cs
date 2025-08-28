@@ -16,10 +16,12 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Beatmaps;
 using osu.Framework.Bindables;
 using System.Collections.Generic;
-using osu.Game.Rulesets.Mods;
+using System.Diagnostics;
 using System.Linq;
+using osu.Game.Rulesets.Mods;
 using System.Threading;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using osu.Framework.Extensions;
 using osu.Framework.Localisation;
 using osu.Framework.Threading;
@@ -28,20 +30,20 @@ using osu.Game.Configuration;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
 using osu.Game.Overlays.Mods;
+using osu.Game.Rulesets.Difficulty;
 using osu.Game.Utils;
 
 namespace osu.Game.Screens.Select.Details
 {
-    public partial class AdvancedStats : Container, IHasCustomTooltip<AdjustedAttributesTooltip.Data>
+    public partial class AdvancedStats : Container
     {
+        private readonly int columns;
+
         [Resolved]
         private BeatmapDifficultyCache difficultyCache { get; set; }
 
-        protected readonly StatisticRow FirstValue, HpDrain, Accuracy, ApproachRate;
+        protected FillFlowContainer Flow { get; private set; }
         private readonly StatisticRow starDifficulty;
-
-        public ITooltip<AdjustedAttributesTooltip.Data> GetCustomTooltip() => new AdjustedAttributesTooltip();
-        public AdjustedAttributesTooltip.Data TooltipContent { get; private set; }
 
         private IBeatmapInfo beatmapInfo;
 
@@ -77,65 +79,48 @@ namespace osu.Game.Screens.Select.Details
 
         public AdvancedStats(int columns = 1)
         {
+            this.columns = columns;
+
             switch (columns)
             {
                 case 1:
-                    Child = new FillFlowContainer
+                    Child = Flow = new FillFlowContainer
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         Children = new[]
                         {
-                            FirstValue = new StatisticRow(), // circle size/key amount
-                            HpDrain = new StatisticRow { Title = BeatmapsetsStrings.ShowStatsDrain },
-                            Accuracy = new StatisticRow { Title = BeatmapsetsStrings.ShowStatsAccuracy },
-                            ApproachRate = new StatisticRow { Title = BeatmapsetsStrings.ShowStatsAr },
-                            starDifficulty = new StatisticRow(10, true) { Title = BeatmapsetsStrings.ShowStatsStars },
+                            starDifficulty = new StatisticRow(forceDecimalPlaces: true)
+                            {
+                                Title = BeatmapsetsStrings.ShowStatsStars,
+                                MaxValue = 10,
+                            },
                         },
                     };
                     break;
 
                 case 2:
-                    Child = new FillFlowContainer
+                    Child = Flow = new FillFlowContainer
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         Direction = FillDirection.Full,
                         Children = new[]
                         {
-                            FirstValue = new StatisticRow
+                            starDifficulty = new StatisticRow(forceDecimalPlaces: true)
                             {
-                                Width = 0.5f,
-                                Padding = new MarginPadding { Right = 5, Vertical = 2.5f },
-                            }, // circle size/key amount
-                            HpDrain = new StatisticRow
-                            {
-                                Title = BeatmapsetsStrings.ShowStatsDrain,
-                                Width = 0.5f,
-                                Padding = new MarginPadding { Left = 5, Vertical = 2.5f },
-                            },
-                            Accuracy = new StatisticRow
-                            {
-                                Title = BeatmapsetsStrings.ShowStatsAccuracy,
-                                Width = 0.5f,
-                                Padding = new MarginPadding { Right = 5, Vertical = 2.5f },
-                            },
-                            ApproachRate = new StatisticRow
-                            {
-                                Title = BeatmapsetsStrings.ShowStatsAr,
-                                Width = 0.5f,
-                                Padding = new MarginPadding { Left = 5, Vertical = 2.5f },
-                            },
-                            starDifficulty = new StatisticRow(10, true)
-                            {
+                                MaxValue = 10,
                                 Title = BeatmapsetsStrings.ShowStatsStars,
                                 Width = 0.5f,
-                                Padding = new MarginPadding { Right = 5, Vertical = 2.5f },
+                                Padding = new MarginPadding { Horizontal = 5, Vertical = 2.5f },
                             },
                         },
                     };
                     break;
             }
+
+            Debug.Assert(Flow != null);
+            Flow.SetLayoutPosition(starDifficulty, float.MaxValue);
         }
 
         [BackgroundDependencyLoader]
@@ -171,51 +156,33 @@ namespace osu.Game.Screens.Select.Details
 
         private void updateStatistics()
         {
-            IBeatmapDifficultyInfo baseDifficulty = BeatmapInfo?.Difficulty;
-            BeatmapDifficulty adjustedDifficulty = null;
-
-            if (baseDifficulty != null)
+            if (BeatmapInfo != null && Ruleset.Value != null)
             {
-                BeatmapDifficulty originalDifficulty = new BeatmapDifficulty(baseDifficulty);
+                var displayAttributes = Ruleset.Value.CreateInstance().GetBeatmapAttributesForDisplay(BeatmapInfo, Mods.Value).ToList();
 
-                foreach (var mod in Mods.Value.OfType<IApplicableToDifficulty>())
-                    mod.ApplyToDifficulty(originalDifficulty);
-
-                adjustedDifficulty = originalDifficulty;
-
-                if (Ruleset.Value != null)
+                // if there are not enough attribute displays, make more
+                // the subtraction of 1 is to exclude the star rating row which is always present (and always last)
+                for (int i = Flow.Count - 1; i < displayAttributes.Count; i++)
                 {
-                    adjustedDifficulty = Ruleset.Value.CreateInstance().GetAdjustedDisplayDifficulty(originalDifficulty, Mods.Value);
-
-                    TooltipContent = new AdjustedAttributesTooltip.Data(originalDifficulty, adjustedDifficulty);
+                    Flow.Add(new StatisticRow
+                    {
+                        Width = columns == 1 ? 1 : 0.5f,
+                        Padding = columns == 1 ? new MarginPadding() : new MarginPadding { Horizontal = 5, Vertical = 2.5f },
+                    });
                 }
+
+                // populate all attribute displays that need to be visible...
+                for (int i = 0; i < displayAttributes.Count; i++)
+                {
+                    var attribute = displayAttributes[i];
+                    var row = (StatisticRow)Flow.Where(r => r != starDifficulty).ElementAt(i);
+                    row.SetAttribute(attribute);
+                }
+
+                // and hide any extra ones
+                foreach (var row in Flow.Where(r => r != starDifficulty).Skip(displayAttributes.Count))
+                    ((StatisticRow)row).SetAttribute(null);
             }
-
-            switch (Ruleset.Value?.OnlineID)
-            {
-                case 3:
-                    // Account for mania differences locally for now.
-                    // Eventually this should be handled in a more modular way, allowing rulesets to return arbitrary difficulty attributes.
-                    ILegacyRuleset legacyRuleset = (ILegacyRuleset)Ruleset.Value.CreateInstance();
-
-                    // For the time being, the key count is static no matter what, because:
-                    // a) The method doesn't have knowledge of the active keymods. Doing so may require considerations for filtering.
-                    // b) Using the difficulty adjustment mod to adjust OD doesn't have an effect on conversion.
-                    int keyCount = baseDifficulty == null ? 0 : legacyRuleset.GetKeyCount(BeatmapInfo, Mods.Value);
-
-                    FirstValue.Title = BeatmapsetsStrings.ShowStatsCsMania;
-                    FirstValue.Value = (keyCount, keyCount);
-                    break;
-
-                default:
-                    FirstValue.Title = BeatmapsetsStrings.ShowStatsCs;
-                    FirstValue.Value = (baseDifficulty?.CircleSize ?? 0, adjustedDifficulty?.CircleSize);
-                    break;
-            }
-
-            HpDrain.Value = (baseDifficulty?.DrainRate ?? 0, adjustedDifficulty?.DrainRate);
-            Accuracy.Value = (baseDifficulty?.OverallDifficulty ?? 0, adjustedDifficulty?.OverallDifficulty);
-            ApproachRate.Value = (baseDifficulty?.ApproachRate ?? 0, adjustedDifficulty?.ApproachRate);
 
             updateStarDifficulty();
         }
@@ -260,12 +227,11 @@ namespace osu.Game.Screens.Select.Details
             starDifficultyCancellationSource?.Cancel();
         }
 
-        public partial class StatisticRow : Container, IHasAccentColour
+        public partial class StatisticRow : Container, IHasAccentColour, IHasCustomTooltip<RulesetBeatmapAttribute>
         {
             private const float value_width = 25;
             private const float name_width = 70;
 
-            private readonly float maxValue;
             private readonly bool forceDecimalPlaces;
             private readonly OsuSpriteText name, valueText;
             private readonly Bar bar;
@@ -280,6 +246,8 @@ namespace osu.Game.Screens.Select.Details
                 set => name.Text = value;
             }
 
+            public float MaxValue { get; set; }
+
             private (float baseValue, float? adjustedValue)? value;
 
             public (float baseValue, float? adjustedValue) Value
@@ -292,10 +260,10 @@ namespace osu.Game.Screens.Select.Details
 
                     this.value = value;
 
-                    bar.Length = value.baseValue / maxValue;
+                    bar.Length = value.baseValue / MaxValue;
 
                     valueText.Text = (value.adjustedValue ?? value.baseValue).ToString(forceDecimalPlaces ? "0.00" : "0.##");
-                    ModBar.Length = (value.adjustedValue ?? 0) / maxValue;
+                    ModBar.Length = (value.adjustedValue ?? 0) / MaxValue;
 
                     if (Precision.AlmostEquals(value.baseValue, value.adjustedValue ?? value.baseValue, 0.05f))
                         ModBar.AccentColour = valueText.Colour = Color4.White;
@@ -312,9 +280,8 @@ namespace osu.Game.Screens.Select.Details
                 set => bar.AccentColour = value;
             }
 
-            public StatisticRow(float maxValue = 10, bool forceDecimalPlaces = false)
+            public StatisticRow(bool forceDecimalPlaces = false)
             {
-                this.maxValue = maxValue;
                 this.forceDecimalPlaces = forceDecimalPlaces;
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
@@ -379,6 +346,26 @@ namespace osu.Game.Screens.Select.Details
                     },
                 };
             }
+
+            public void SetAttribute([CanBeNull] RulesetBeatmapAttribute attribute)
+            {
+                if (attribute != null)
+                {
+                    Title = attribute.Label;
+                    MaxValue = attribute.MaxValue;
+                    Value = (attribute.OriginalValue, attribute.AdjustedValue);
+                    Alpha = 1;
+                }
+                else
+                    Alpha = 0;
+
+                TooltipContent = attribute;
+            }
+
+            public ITooltip<RulesetBeatmapAttribute> GetCustomTooltip() => new BeatmapAttributeTooltip();
+
+            [CanBeNull]
+            public RulesetBeatmapAttribute TooltipContent { get; set; }
         }
     }
 }

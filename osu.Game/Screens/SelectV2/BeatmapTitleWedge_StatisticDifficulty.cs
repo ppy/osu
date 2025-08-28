@@ -7,12 +7,15 @@ using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Mods;
+using osu.Game.Rulesets.Difficulty;
 using osuTK;
 using osuTK.Graphics;
 
@@ -20,7 +23,7 @@ namespace osu.Game.Screens.SelectV2
 {
     public partial class BeatmapTitleWedge
     {
-        public partial class StatisticDifficulty : CompositeDrawable, IHasAccentColour
+        public partial class StatisticDifficulty : CompositeDrawable, IHasAccentColour, IHasCustomTooltip<RulesetBeatmapAttribute?>
         {
             private Data value = new Data(string.Empty, 0, 0, 0);
 
@@ -191,7 +194,16 @@ namespace osu.Game.Screens.SelectV2
                 }
             }
 
-            public record Data(LocalisableString Label, float Value, float AdjustedValue, float Maximum, string? Content = null);
+            public record Data(LocalisableString Label, float Value, float AdjustedValue, float Maximum, string? Content = null, RulesetBeatmapAttribute? BeatmapAttribute = null)
+            {
+                public Data(RulesetBeatmapAttribute attribute)
+                    : this(attribute.Label, attribute.OriginalValue, attribute.AdjustedValue, attribute.MaxValue, BeatmapAttribute: attribute)
+                {
+                }
+            }
+
+            public ITooltip<RulesetBeatmapAttribute?> GetCustomTooltip() => new BeatmapAttributeTooltip();
+            public RulesetBeatmapAttribute? TooltipContent => value.BeatmapAttribute;
         }
     }
 }

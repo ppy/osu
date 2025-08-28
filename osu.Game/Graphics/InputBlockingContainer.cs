@@ -8,6 +8,8 @@ namespace osu.Game.Graphics
 {
     /// <summary>
     /// A simple container which blocks input events from travelling through it.
+    ///
+    /// Note that this will block right clicks as well. Special care needs to be taken to not break context menus from displaying.
     /// </summary>
     public partial class InputBlockingContainer : Container
     {

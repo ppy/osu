@@ -19,6 +19,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osuTK;
 using osuTK.Graphics;
+using WebCommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
 
 namespace osu.Game.Screens.SelectV2
 {
@@ -33,6 +34,7 @@ namespace osu.Game.Screens.SelectV2
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
         private Drawable iconContainer = null!;
+        private Box backgroundBorder = null!;
         private Box contentBackground = null!;
         private OsuSpriteText starRatingText = null!;
         private CircularContainer countPill = null!;
@@ -49,6 +51,7 @@ namespace osu.Game.Screens.SelectV2
             {
                 AlwaysPresent = true,
                 RelativeSizeAxes = Axes.Y,
+                Alpha = 0f,
                 Child = new SpriteIcon
                 {
                     Anchor = Anchor.Centre,
@@ -57,31 +60,33 @@ namespace osu.Game.Screens.SelectV2
                     Size = new Vector2(12),
                 },
             };
-            Background = new Container
+
+            Background = backgroundBorder = new Box
             {
                 RelativeSizeAxes = Axes.Both,
-                Children = new Drawable[]
-                {
-                    contentBackground = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                    },
-                    triangles = new TrianglesV2
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Thickness = 0.02f,
-                        SpawnRatio = 0.6f,
-                    },
-                    glow = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Width = 0.5f,
-                    },
-                },
+                Colour = colourProvider.Highlight1,
             };
+
             AccentColour = colourProvider.Highlight1;
             Content.Children = new Drawable[]
             {
+                contentBackground = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                },
+                triangles = new TrianglesV2
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Thickness = 0.02f,
+                    SpawnRatio = 0.6f,
+                    Colour = ColourInfo.GradientHorizontal(colourProvider.Background6, colourProvider.Background5)
+                },
+                glow = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Width = 0.5f,
+                    Colour = ColourInfo.GradientHorizontal(colourProvider.Highlight1, colourProvider.Highlight1.Opacity(0f)),
+                },
                 new FillFlowContainer
                 {
                     Anchor = Anchor.CentreLeft,
@@ -147,6 +152,7 @@ namespace osu.Game.Screens.SelectV2
             ratingColour = starNumber >= 9 ? OsuColour.Gray(0.2f) : colours.ForStarDifficulty(starNumber);
 
             AccentColour = ratingColour;
+            backgroundBorder.Colour = ratingColour;
             contentBackground.Colour = ratingColour.Darken(1f);
             glow.Colour = ColourInfo.GradientHorizontal(ratingColour, ratingColour.Opacity(0f));
 
@@ -210,7 +216,7 @@ namespace osu.Game.Screens.SelectV2
 
                 return new MenuItem[]
                 {
-                    new OsuMenuItem(Expanded.Value ? "Collapse" : "Expand", MenuItemType.Highlighted, () => TriggerClick())
+                    new OsuMenuItem(Expanded.Value ? WebCommonStrings.ButtonsCollapse.ToSentence() : WebCommonStrings.ButtonsExpand.ToSentence(), MenuItemType.Highlighted, () => TriggerClick())
                 };
             }
         }

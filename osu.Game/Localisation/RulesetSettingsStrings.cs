@@ -95,9 +95,14 @@ namespace osu.Game.Localisation
         public static LocalisableString MobileLayout => new TranslatableString(getKey(@"mobile_layout"), @"Mobile layout");
 
         /// <summary>
-        /// "Portrait (expanded columns)"
+        /// "Portrait"
         /// </summary>
-        public static LocalisableString PortraitExpandedColumns => new TranslatableString(getKey(@"portrait_expanded_columns"), @"Portrait (expanded columns)");
+        public static LocalisableString Portrait => new TranslatableString(getKey(@"portrait"), @"Portrait");
+
+        /// <summary>
+        /// "Landscape"
+        /// </summary>
+        public static LocalisableString Landscape => new TranslatableString(getKey(@"landscape"), @"Landscape");
 
         /// <summary>
         /// "Landscape (expanded columns)"
@@ -105,9 +110,9 @@ namespace osu.Game.Localisation
         public static LocalisableString LandscapeExpandedColumns => new TranslatableString(getKey(@"landscape_expanded_columns"), @"Landscape (expanded columns)");
 
         /// <summary>
-        /// "Landscape (touch overlay)"
+        /// "Touch overlay"
         /// </summary>
-        public static LocalisableString LandscapeTouchOverlay => new TranslatableString(getKey(@"landscape_touch_overlay"), @"Landscape (touch overlay)");
+        public static LocalisableString TouchOverlay => new TranslatableString(getKey(@"touch_overlay"), @"Touch overlay");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

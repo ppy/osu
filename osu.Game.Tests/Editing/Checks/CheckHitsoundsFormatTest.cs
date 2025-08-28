@@ -117,6 +117,52 @@ namespace osu.Game.Tests.Editing.Checks
             }
         }
 
+        [Test]
+        public void TestBeatmapAudioTracksExemptedFromCheck()
+        {
+            using (var resourceStream = TestResources.OpenResource("Samples/corrupt.wav"))
+            {
+                var beatmapSet = new BeatmapSetInfo
+                {
+                    Files =
+                    {
+                        CheckTestHelpers.CreateMockFile("wav"),
+                        CheckTestHelpers.CreateMockFile("mp3")
+                    }
+                };
+
+                var firstPlayable = new Beatmap<HitObject>
+                {
+                    BeatmapInfo = new BeatmapInfo
+                    {
+                        BeatmapSet = beatmapSet,
+                        Metadata = new BeatmapMetadata { AudioFile = beatmapSet.Files[0].Filename }
+                    }
+                };
+                var firstWorking = new Mock<TestWorkingBeatmap>(firstPlayable, null, null);
+                firstWorking.Setup(w => w.GetStream(It.IsAny<string>())).Returns(resourceStream);
+
+                var secondPlayable = new Beatmap<HitObject>
+                {
+                    BeatmapInfo = new BeatmapInfo
+                    {
+                        BeatmapSet = beatmapSet,
+                        Metadata = new BeatmapMetadata { AudioFile = beatmapSet.Files[1].Filename }
+                    }
+                };
+                var secondWorking = new Mock<TestWorkingBeatmap>(secondPlayable, null, null);
+                secondWorking.Setup(w => w.GetStream(It.IsAny<string>())).Returns(resourceStream);
+
+                var context = new BeatmapVerifierContext(
+                    new BeatmapVerifierContext.VerifiedBeatmap(firstWorking.Object, firstPlayable),
+                    [new BeatmapVerifierContext.VerifiedBeatmap(secondWorking.Object, secondPlayable)],
+                    DifficultyRating.ExpertPlus);
+
+                var issues = check.Run(context).ToList();
+                Assert.That(issues, Is.Empty);
+            }
+        }
+
         private BeatmapVerifierContext getContext(Stream? resourceStream)
         {
             var mockWorkingBeatmap = new Mock<TestWorkingBeatmap>(beatmap, null, null);

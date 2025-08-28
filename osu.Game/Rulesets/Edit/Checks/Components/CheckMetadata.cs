@@ -15,10 +15,16 @@ namespace osu.Game.Rulesets.Edit.Checks.Components
         /// </summary>
         public readonly string Description;
 
-        public CheckMetadata(CheckCategory category, string description)
+        /// <summary>
+        /// Specifies whether this check is difficulty-specific or applies to the entire beatmapset. Set to <see cref="CheckScope.Difficulty"/> by default.
+        /// </summary>
+        public readonly CheckScope Scope;
+
+        public CheckMetadata(CheckCategory category, string description, CheckScope scope = CheckScope.Difficulty)
         {
             Category = category;
             Description = description;
+            Scope = scope;
         }
     }
 }

@@ -167,7 +167,13 @@ namespace osu.Game.Rulesets.UI
                         {
                             Origin = Anchor.Centre,
                             Anchor = Anchor.Centre,
-                            Size = new Vector2(45),
+                            RelativeSizeAxes = Axes.Both,
+                            // the mod icon assets in `osu-resources` are sized such that they are flush with the hexagonal background with no shadow baked in.
+                            // the `Icons/BeatmapDetails/mod-icon` asset (of size 135x100) has a shadow and some extra transparent pixels baked in.
+                            // the hexagonal background on that asset, excluding its shadow and the transparent pixels, is 131px wide and 92px high.
+                            // height is divided by 135 rather than by 100, because this entire component is square-sized.
+                            Width = 131 / 135f,
+                            Height = 92 / 135f,
                             Icon = FontAwesome.Solid.Question
                         },
                         adjustmentMarker = new Container

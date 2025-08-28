@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Edit.Checks
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
-            foreach (var hitObject in context.Beatmap.HitObjects)
+            foreach (var hitObject in context.CurrentDifficulty.Playable.HitObjects)
             {
                 // Worth keeping in mind: The samples of an object always play at its end time.
                 // Objects like spinners have no sound at its start because of this, while hold notes have nested objects to accomplish this.
