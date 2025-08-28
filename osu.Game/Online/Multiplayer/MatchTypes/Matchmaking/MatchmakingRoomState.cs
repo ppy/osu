@@ -27,10 +27,10 @@ namespace osu.Game.Online.Multiplayer.MatchTypes.Matchmaking
         public MatchmakingRoomStatus RoomStatus { get; set; }
 
         /// <summary>
-        /// The current round number.
+        /// The current round number (1-based).
         /// </summary>
         [Key(1)]
-        public int Round { get; set; }
+        public int CurrentRound { get; set; }
 
         /// <summary>
         /// The playlist items that were picked as gameplay candidates.
@@ -53,9 +53,9 @@ namespace osu.Game.Online.Multiplayer.MatchTypes.Matchmaking
         /// <summary>
         /// Advances to the next round.
         /// </summary>
-        public void NextRound()
+        public void AdvanceRound()
         {
-            Round++;
+            CurrentRound++;
         }
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace osu.Game.Online.Multiplayer.MatchTypes.Matchmaking
         /// </list>
         /// </remarks>
         /// <param name="scores">The scores to apply.</param>
-        public void SetScores(SoloScoreInfo[] scores)
+        public void RecordScores(SoloScoreInfo[] scores)
         {
             SoloScoreInfo[] orderedScores = scores.OrderByDescending(s => s.TotalScore).ToArray();
 
@@ -85,7 +85,7 @@ namespace osu.Game.Online.Multiplayer.MatchTypes.Matchmaking
                     MatchmakingUser mmUser = Users[score.UserID];
                     mmUser.Points += placement_points[placement - 1];
 
-                    MatchmakingRound mmRound = mmUser.Rounds[Round];
+                    MatchmakingRound mmRound = mmUser.Rounds[CurrentRound];
                     mmRound.Placement = placement;
                     mmRound.TotalScore = score.TotalScore;
                     mmRound.Accuracy = score.Accuracy;
@@ -95,7 +95,7 @@ namespace osu.Game.Online.Multiplayer.MatchTypes.Matchmaking
             }
 
             int i = 1;
-            foreach (var user in Users.Order(new MatchmakingUserComparer(Round)))
+            foreach (var user in Users.Order(new MatchmakingUserComparer(CurrentRound)))
                 user.Placement = i++;
         }
     }

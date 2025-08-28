@@ -226,7 +226,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Results
             long smallestScoreDifference = long.MaxValue;
             int smallestScoreDifferenceUserId = 0;
 
-            for (int round = 1; round <= state.Round; round++)
+            for (int round = 1; round <= state.CurrentRound; round++)
             {
                 long roundHighestScore = long.MinValue;
                 int roundHighestScoreUserId = 0;

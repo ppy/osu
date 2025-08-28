@@ -166,7 +166,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
             {
                 MatchmakingRoomState state = new MatchmakingRoomState
                 {
-                    Round = 1,
+                    CurrentRound = 1,
                     RoomStatus = MatchmakingRoomStatus.RoomEnd
                 };
 

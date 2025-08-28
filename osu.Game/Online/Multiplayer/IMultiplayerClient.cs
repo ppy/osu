@@ -154,7 +154,6 @@ namespace osu.Game.Online.Multiplayer
         /// <summary>
         /// Signals that the local user was placed in the matchmaking queue.
         /// </summary>
-        /// <returns></returns>
         Task MatchmakingQueueJoined();
 
         /// <summary>

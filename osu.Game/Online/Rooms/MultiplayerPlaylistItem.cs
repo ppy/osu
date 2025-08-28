@@ -121,32 +121,22 @@ namespace osu.Game.Online.Rooms
         }
 
         public bool Equals(MultiplayerPlaylistItem? other)
-        {
-            if (other is null) return false;
-            if (ReferenceEquals(this, other)) return true;
-
-            return ID == other.ID
-                   && OwnerID == other.OwnerID
-                   && BeatmapID == other.BeatmapID
-                   && BeatmapChecksum == other.BeatmapChecksum
-                   && RulesetID == other.RulesetID
-                   && RequiredMods.SequenceEqual(other.RequiredMods)
-                   && AllowedMods.SequenceEqual(other.AllowedMods)
-                   && Expired == other.Expired
-                   && PlaylistOrder == other.PlaylistOrder
-                   && PlayedAt == other.PlayedAt
-                   && StarRating == other.StarRating
-                   && Freestyle == other.Freestyle;
-        }
+            => other != null
+               && ID == other.ID
+               && OwnerID == other.OwnerID
+               && BeatmapID == other.BeatmapID
+               && BeatmapChecksum == other.BeatmapChecksum
+               && RulesetID == other.RulesetID
+               && RequiredMods.SequenceEqual(other.RequiredMods)
+               && AllowedMods.SequenceEqual(other.AllowedMods)
+               && Expired == other.Expired
+               && PlaylistOrder == other.PlaylistOrder
+               && PlayedAt == other.PlayedAt
+               && StarRating == other.StarRating
+               && Freestyle == other.Freestyle;
 
         public override bool Equals(object? obj)
-        {
-            if (obj is null) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != GetType()) return false;
-
-            return Equals((MultiplayerPlaylistItem)obj);
-        }
+            => obj is MultiplayerPlaylistItem other && Equals(other);
 
         [SuppressMessage("ReSharper", "NonReadonlyMemberInGetHashCode")]
         public override int GetHashCode()

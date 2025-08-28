@@ -53,7 +53,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
             {
                 var state = new MatchmakingRoomState
                 {
-                    Round = 6,
+                    CurrentRound = 6,
                     RoomStatus = MatchmakingRoomStatus.RoomEnd
                 };
 
@@ -64,7 +64,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
                 state.Users[localUserId].Points = 8;
                 state.Users[invalid_user_id].Placement = 2;
                 state.Users[invalid_user_id].Points = 7;
-                for (int round = 1; round <= state.Round; round++)
+                for (int round = 1; round <= state.CurrentRound; round++)
                     state.Users[localUserId].Rounds[round].Placement = round;
 
                 // Highest score.

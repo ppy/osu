@@ -120,8 +120,16 @@ namespace osu.Game.Online.Multiplayer
         /// <exception cref="UserBlocksPMsException">The invited user does not accept private messages.</exception>
         Task InvitePlayer(int userId);
 
+        /// <summary>
+        /// Raise a candidate playlist item to be played in the current round.
+        /// </summary>
+        /// <param name="playlistItemId">The playlist item.</param>
         Task MatchmakingToggleSelection(long playlistItemId);
 
+        /// <summary>
+        /// Debug only - skips to the next stage of the matchmaking room.
+        /// </summary>
+        /// <returns></returns>
         Task MatchmakingSkipToNextStage();
     }
 }

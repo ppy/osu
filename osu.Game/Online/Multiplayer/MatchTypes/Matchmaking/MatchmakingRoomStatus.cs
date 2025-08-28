@@ -12,7 +12,7 @@ namespace osu.Game.Online.Multiplayer.MatchTypes.Matchmaking
     public enum MatchmakingRoomStatus
     {
         /// <summary>
-        /// Room starts. Some players may still be joining.
+        /// Room starts. Some clients may still be joining.
         /// </summary>
         RoomStart,
 
@@ -22,22 +22,22 @@ namespace osu.Game.Online.Multiplayer.MatchTypes.Matchmaking
         RoundStart,
 
         /// <summary>
-        /// Users pick beatmaps.
+        /// Clients pick beatmaps.
         /// </summary>
         UserPicks,
 
         /// <summary>
-        /// Servers selects the next beatmap.
+        /// Server selects the next beatmap.
         /// </summary>
         SelectBeatmap,
 
         /// <summary>
-        /// Wait for players to download + set the beatmap.
+        /// Gameplay beatmap is revealed - wait for clients to download and set the beatmap.
         /// </summary>
         PrepareBeatmap,
 
         /// <summary>
-        /// Wait for players to preview the beatmap before gameplay.
+        /// Preview time before gameplay starts.
         /// </summary>
         PrepareGameplay,
 
@@ -47,12 +47,12 @@ namespace osu.Game.Online.Multiplayer.MatchTypes.Matchmaking
         Gameplay,
 
         /// <summary>
-        /// Round ends. Some players may be viewing results.
+        /// Round ends. Some clients may still be viewing results.
         /// </summary>
         RoundEnd,
 
         /// <summary>
-        /// Room ends. Some players may still be chatting.
+        /// Room ends. Some clients may still be chatting.
         /// </summary>
         RoomEnd
     }

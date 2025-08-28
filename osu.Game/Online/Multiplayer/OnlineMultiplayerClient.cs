@@ -320,12 +320,6 @@ namespace osu.Game.Online.Multiplayer
             return connector.Disconnect();
         }
 
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-            connector?.Dispose();
-        }
-
         public override Task JoinMatchmakingLobby()
         {
             if (!IsConnected.Value)
@@ -396,6 +390,12 @@ namespace osu.Game.Online.Multiplayer
 
             Debug.Assert(connection != null);
             return connection.InvokeAsync(nameof(IMultiplayerServer.MatchmakingSkipToNextStage));
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            connector?.Dispose();
         }
     }
 }

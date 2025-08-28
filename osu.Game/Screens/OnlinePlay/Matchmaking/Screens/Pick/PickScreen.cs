@@ -6,7 +6,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 
@@ -18,9 +17,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Pick
 
         [Resolved]
         private MultiplayerClient client { get; set; } = null!;
-
-        [Resolved]
-        private IAPIProvider api { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -77,7 +73,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Pick
             base.Dispose(isDisposing);
 
             if (client.IsNotNull())
+            {
                 client.ItemAdded -= onItemAdded;
+                client.MatchmakingItemSelected -= onItemSelected;
+                client.MatchmakingItemDeselected -= onItemDeselected;
+            }
         }
     }
 }
