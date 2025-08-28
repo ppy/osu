@@ -73,6 +73,15 @@ namespace osu.Game.Screens.SelectV2
 
         private Box backgroundBorder = null!;
 
+        private GroupedBeatmap groupedBeatmap
+        {
+            get
+            {
+                Debug.Assert(Item != null);
+                return (GroupedBeatmap)Item!.Model;
+            }
+        }
+
         public PanelBeatmapStandalone()
         {
             PanelXOffset = 20;
@@ -219,9 +228,7 @@ namespace osu.Game.Screens.SelectV2
         {
             base.PrepareForUse();
 
-            Debug.Assert(Item != null);
-
-            var beatmap = (BeatmapInfo)Item.Model;
+            var beatmap = groupedBeatmap.Beatmap;
             var beatmapSet = beatmap.BeatmapSet!;
 
             beatmapBackground.Beatmap = beatmaps.GetWorkingBeatmap(beatmap);
@@ -262,7 +269,7 @@ namespace osu.Game.Screens.SelectV2
             if (Item == null)
                 return;
 
-            var beatmap = (BeatmapInfo)Item.Model;
+            var beatmap = groupedBeatmap.Beatmap;
 
             starDifficultyBindable = difficultyCache.GetBindableDifficulty(beatmap, starDifficultyCancellationSource.Token, SongSelect.SELECTION_DEBOUNCE);
             starDifficultyBindable.BindValueChanged(starDifficulty =>
@@ -300,7 +307,7 @@ namespace osu.Game.Screens.SelectV2
             if (Item == null)
                 return;
 
-            var beatmap = (BeatmapInfo)Item.Model;
+            var beatmap = groupedBeatmap.Beatmap;
 
             if (ruleset.Value.OnlineID == 3)
             {
@@ -326,7 +333,7 @@ namespace osu.Game.Screens.SelectV2
                 List<MenuItem> items = new List<MenuItem>();
 
                 if (songSelect != null)
-                    items.AddRange(songSelect.GetForwardActions((BeatmapInfo)Item.Model));
+                    items.AddRange(songSelect.GetForwardActions(groupedBeatmap.Beatmap));
 
                 return items.ToArray();
             }
