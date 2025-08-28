@@ -147,7 +147,7 @@ namespace osu.Game.Rulesets.Mania.Tests
         }
 
         [TestCase]
-        public void TestFilterIntersection()
+        public void TestKeysFilterIntersection()
         {
             var criteria = new ManiaFilterCriteria();
             criteria.TryParseCustomKeywordCriteria("keys", Operator.Greater, "4");
@@ -175,13 +175,140 @@ namespace osu.Game.Rulesets.Mania.Tests
         }
 
         [TestCase]
-        public void TestInvalidFilters()
+        public void TestInvalidKeysFilters()
         {
             var criteria = new ManiaFilterCriteria();
 
             Assert.False(criteria.TryParseCustomKeywordCriteria("keys", Operator.Equal, "some text"));
             Assert.False(criteria.TryParseCustomKeywordCriteria("keys", Operator.NotEqual, "4,some text"));
             Assert.False(criteria.TryParseCustomKeywordCriteria("keys", Operator.GreaterOrEqual, "4,5,6"));
+        }
+
+        [TestCase]
+        public void TestLnsEqual()
+        {
+            var criteria = new ManiaFilterCriteria();
+            var filterCriteria = new FilterCriteria
+            {
+                Ruleset = new ManiaRuleset().RulesetInfo
+            };
+
+            criteria.TryParseCustomKeywordCriteria("lns", Operator.Equal, "0");
+            BeatmapInfo beatmapInfo1 = new BeatmapInfo(new ManiaRuleset().RulesetInfo)
+            {
+                TotalObjectCount = 0,
+                EndTimeObjectCount = 0
+            };
+            Assert.True(criteria.Matches(beatmapInfo1, filterCriteria));
+
+            criteria.TryParseCustomKeywordCriteria("lns", Operator.Equal, "0");
+            BeatmapInfo beatmapInfo2 = new BeatmapInfo(new ManiaRuleset().RulesetInfo)
+            {
+                TotalObjectCount = 100,
+                EndTimeObjectCount = 0
+            };
+            Assert.True(criteria.Matches(beatmapInfo2, filterCriteria));
+
+            criteria.TryParseCustomKeywordCriteria("lns", Operator.Equal, "100");
+            BeatmapInfo beatmapInfo3 = new BeatmapInfo(new ManiaRuleset().RulesetInfo)
+            {
+                TotalObjectCount = 100,
+                EndTimeObjectCount = 100
+            };
+            Assert.True(criteria.Matches(beatmapInfo3, filterCriteria));
+
+            criteria.TryParseCustomKeywordCriteria("lns", Operator.Equal, "1");
+            BeatmapInfo beatmapInfo4 = new BeatmapInfo(new ManiaRuleset().RulesetInfo)
+            {
+                TotalObjectCount = 100,
+                EndTimeObjectCount = 1
+            };
+            Assert.True(criteria.Matches(beatmapInfo4, filterCriteria));
+
+            criteria.TryParseCustomKeywordCriteria("lns", Operator.Equal, "0.1");
+            BeatmapInfo beatmapInfo5 = new BeatmapInfo(new ManiaRuleset().RulesetInfo)
+            {
+                TotalObjectCount = 1000,
+                EndTimeObjectCount = 1
+            };
+            Assert.True(criteria.Matches(beatmapInfo5, filterCriteria));
+        }
+
+        [TestCase]
+        public void TestLnsGreaterOrEqual()
+        {
+            var criteria = new ManiaFilterCriteria();
+            var filterCriteria = new FilterCriteria
+            {
+                Ruleset = new ManiaRuleset().RulesetInfo
+            };
+
+            criteria.TryParseCustomKeywordCriteria("lns", Operator.GreaterOrEqual, "0");
+            BeatmapInfo beatmapInfo1 = new BeatmapInfo(new ManiaRuleset().RulesetInfo)
+            {
+                TotalObjectCount = 0,
+                EndTimeObjectCount = 0
+            };
+            Assert.True(criteria.Matches(beatmapInfo1, filterCriteria));
+
+            criteria.TryParseCustomKeywordCriteria("lns", Operator.GreaterOrEqual, "0");
+            BeatmapInfo beatmapInfo2 = new BeatmapInfo(new ManiaRuleset().RulesetInfo)
+            {
+                TotalObjectCount = 100,
+                EndTimeObjectCount = 0
+            };
+            Assert.True(criteria.Matches(beatmapInfo2, filterCriteria));
+
+            criteria.TryParseCustomKeywordCriteria("lns", Operator.GreaterOrEqual, "100");
+            BeatmapInfo beatmapInfo3 = new BeatmapInfo(new ManiaRuleset().RulesetInfo)
+            {
+                TotalObjectCount = 100,
+                EndTimeObjectCount = 100
+            };
+            Assert.True(criteria.Matches(beatmapInfo3, filterCriteria));
+
+            criteria.TryParseCustomKeywordCriteria("lns", Operator.GreaterOrEqual, "1");
+            BeatmapInfo beatmapInfo4 = new BeatmapInfo(new ManiaRuleset().RulesetInfo)
+            {
+                TotalObjectCount = 100,
+                EndTimeObjectCount = 1
+            };
+            Assert.True(criteria.Matches(beatmapInfo4, filterCriteria));
+
+            criteria.TryParseCustomKeywordCriteria("lns", Operator.GreaterOrEqual, "0.1");
+            BeatmapInfo beatmapInfo5 = new BeatmapInfo(new ManiaRuleset().RulesetInfo)
+            {
+                TotalObjectCount = 1000,
+                EndTimeObjectCount = 1
+            };
+            Assert.True(criteria.Matches(beatmapInfo5, filterCriteria));
+        }
+
+        [TestCase]
+        public void TestLnsNotManiaRuleset()
+        {
+            var criteria = new ManiaFilterCriteria();
+            var filterCriteria = new FilterCriteria
+            {
+                Ruleset = new ManiaRuleset().RulesetInfo
+            };
+
+            criteria.TryParseCustomKeywordCriteria("lns", Operator.LessOrEqual, "100");
+            BeatmapInfo beatmapInfo = new BeatmapInfo
+            {
+                TotalObjectCount = 100,
+                EndTimeObjectCount = 50
+            };
+            Assert.False(criteria.Matches(beatmapInfo, filterCriteria));
+        }
+
+        [TestCase]
+        public void TestInvalidLnsFilters()
+        {
+            var criteria = new ManiaFilterCriteria();
+
+            Assert.False(criteria.TryParseCustomKeywordCriteria("lns", Operator.Equal, "some text"));
+            Assert.False(criteria.TryParseCustomKeywordCriteria("lns", Operator.GreaterOrEqual, "1some text"));
         }
     }
 }
