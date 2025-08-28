@@ -62,11 +62,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Rhythm.Data
 
             // Secondary check to ensure there isn't any 'noise' or outliers by taking the modal delta time.
             double modalDelta = normalisedHitObjectDeltaTime.Count > 0
-                ? normalisedHitObjectDeltaTime
-                  .Select(deltaTime => Math.Round(deltaTime))
-                  .GroupBy(deltaTime => deltaTime)
-                  .OrderByDescending(group => group.Count())
-                  .First().Key
+                ? Math.Round(normalisedHitObjectDeltaTime[0])
                 : 0;
 
             // Calculate the average interval between hitobjects.
