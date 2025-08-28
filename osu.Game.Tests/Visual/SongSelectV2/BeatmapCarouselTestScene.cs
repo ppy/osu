@@ -237,7 +237,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
                 // Using groupingFilter.SetItems.Count alone doesn't work.
                 // When sorting by difficulty, there can be more than one set panel for the same set displayed.
-                return groupingFilter.SetItems.Sum(s => s.Value.Count(i => i.Model is BeatmapSetInfo));
+                return groupingFilter.SetItems.Sum(s => s.Value.Count(i => i.Model is BeatmapSetUnderGrouping));
             }, () => Is.EqualTo(expected));
         }
 
