@@ -248,6 +248,30 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         }
 
         [Test]
+        public void TestRewindOverGroupingModeChange()
+        {
+            const int local_set_count = 3;
+
+            SortAndGroupBy(SortMode.Artist, GroupMode.Artist);
+            AddBeatmaps(local_set_count, 3);
+            WaitForDrawablePanels();
+
+            SelectNextSet();
+
+            for (int i = 0; i < local_set_count; i++)
+                nextRandom();
+
+            SortAndGroupBy(SortMode.Title, GroupMode.LastPlayed);
+            WaitForDrawablePanels();
+
+            for (int i = 0; i < local_set_count; i++)
+            {
+                prevRandomSet();
+                checkRewindCorrectSet();
+            }
+        }
+
+        [Test]
         public void TestRandomThenRewindSameFrame()
         {
             AddBeatmaps(10, 3, true);
