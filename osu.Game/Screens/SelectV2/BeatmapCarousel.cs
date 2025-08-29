@@ -441,10 +441,13 @@ namespace osu.Game.Screens.SelectV2
             var currentGroupedBeatmap = CurrentSelection as GroupedBeatmap;
 
             // The filter might have changed the set of available groups, which means that the current selection may point to a stale group.
-            // Check whether the current selection's group still exists.
-            if (currentGroupedBeatmap?.Group != null && grouping.GroupItems.ContainsKey(currentGroupedBeatmap.Group))
+            // Check whether that is the case.
+            bool groupingRemainsOff = currentGroupedBeatmap?.Group == null && grouping.GroupItems.Count == 0;
+            bool groupStillExists = currentGroupedBeatmap?.Group != null && grouping.GroupItems.ContainsKey(currentGroupedBeatmap.Group);
+
+            if (groupingRemainsOff || groupStillExists)
             {
-                // If the group still exists, then only update the visual state of the selected item.
+                // Only update the visual state of the selected item.
                 HandleItemSelected(currentGroupedBeatmap);
             }
             else if (currentGroupedBeatmap != null)
