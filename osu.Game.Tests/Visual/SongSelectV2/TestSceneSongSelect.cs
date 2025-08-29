@@ -23,7 +23,9 @@ using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Screens.SelectV2;
+using osu.Game.Tests.Resources;
 using osuTK.Input;
+using BeatmapCarousel = osu.Game.Screens.SelectV2.BeatmapCarousel;
 using FooterButtonMods = osu.Game.Screens.SelectV2.FooterButtonMods;
 using FooterButtonOptions = osu.Game.Screens.SelectV2.FooterButtonOptions;
 using FooterButtonRandom = osu.Game.Screens.SelectV2.FooterButtonRandom;
@@ -300,6 +302,28 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 InputManager.Key(Key.Down);
                 InputManager.ReleaseKey(Key.ControlLeft);
             });
+        }
+
+        /// <summary>
+        /// Last played and rank achieved may have changed, so we want to make sure filtering runs on resume to song select.
+        /// </summary>
+        [Test]
+        public void TestFilteringRunsAfterReturningFromGameplay()
+        {
+            AddStep("import actual beatmap", () => Beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()));
+            LoadSongSelect();
+
+            AddUntilStep("wait for filtered", () => SongSelect.ChildrenOfType<BeatmapCarousel>().Single().FilterCount, () => Is.EqualTo(1));
+
+            AddStep("enter gameplay", () => InputManager.Key(Key.Enter));
+
+            AddUntilStep("wait for player", () => Stack.CurrentScreen is Player);
+            AddUntilStep("wait for fail", () => ((Player)Stack.CurrentScreen).GameplayState.HasFailed);
+
+            AddStep("exit gameplay", () => InputManager.Key(Key.Escape));
+            AddStep("exit gameplay", () => InputManager.Key(Key.Escape));
+
+            AddUntilStep("wait for filtered", () => SongSelect.ChildrenOfType<BeatmapCarousel>().Single().FilterCount, () => Is.EqualTo(2));
         }
 
         [Test]
