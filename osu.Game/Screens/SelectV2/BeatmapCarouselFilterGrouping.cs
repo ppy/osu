@@ -121,11 +121,12 @@ namespace osu.Game.Screens.SelectV2
                         {
                             if (groupItem != null)
                                 groupItem.NestedItemCount++;
-
-                            item.DrawHeight = PanelBeatmapStandalone.HEIGHT;
                         }
 
-                        addItem(new CarouselItem(new GroupedBeatmap(group, beatmap)));
+                        addItem(new CarouselItem(new GroupedBeatmap(group, beatmap))
+                        {
+                            DrawHeight = BeatmapSetsGroupedTogether ? PanelBeatmap.HEIGHT : PanelBeatmapStandalone.HEIGHT,
+                        });
                         lastBeatmap = beatmap;
                         displayedBeatmapsCount++;
                     }
