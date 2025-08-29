@@ -8,6 +8,8 @@ using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Screens.Edit;
+using FontWeight = osu.Game.Graphics.FontWeight;
 
 namespace osu.Game.Rulesets.Edit
 {
@@ -66,6 +68,11 @@ namespace osu.Game.Rulesets.Edit
         [Resolved(canBeNull: true)]
         private IExpandingContainer? expandingContainer { get; set; }
 
+        public ExpandableButton()
+        {
+            Height = Editor.BUTTON_HEIGHT;
+        }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -83,7 +90,7 @@ namespace osu.Game.Rulesets.Edit
                 {
                     SpriteText.Anchor = Anchor.Centre;
                     SpriteText.Origin = Anchor.Centre;
-                    SpriteText.Font = OsuFont.GetFont(weight: FontWeight.Bold);
+                    SpriteText.Font = Editor.Fonts.Default.With(weight: FontWeight.Bold);
                     base.Height = actualHeight;
                     Background.Show();
                     Triangles?.Show();
@@ -92,7 +99,7 @@ namespace osu.Game.Rulesets.Edit
                 {
                     SpriteText.Anchor = Anchor.CentreLeft;
                     SpriteText.Origin = Anchor.CentreLeft;
-                    SpriteText.Font = OsuFont.GetFont(weight: FontWeight.Regular);
+                    SpriteText.Font = Editor.Fonts.Default;
                     base.Height = actualHeight / 2;
                     Background.Hide();
                     Triangles?.Hide();
