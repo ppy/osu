@@ -29,21 +29,22 @@ namespace osu.Game.Screens.SelectV2
         /// <summary>
         /// Beatmap sets contain difficulties as related panels. This dictionary holds the relationships between set-difficulties to allow expanding them on selection.
         /// </summary>
-        public IDictionary<BeatmapSetInfo, HashSet<CarouselItem>> SetItems => setMap;
+        public IDictionary<GroupedBeatmapSet, HashSet<CarouselItem>> SetItems => setMap;
 
         /// <summary>
         /// Groups contain children which are group-selectable. This dictionary holds the relationships between groups-panels to allow expanding them on selection.
         /// </summary>
         public IDictionary<GroupDefinition, HashSet<CarouselItem>> GroupItems => groupMap;
 
-        private Dictionary<BeatmapSetInfo, HashSet<CarouselItem>> setMap = new Dictionary<BeatmapSetInfo, HashSet<CarouselItem>>();
+        private Dictionary<GroupedBeatmapSet, HashSet<CarouselItem>> setMap = new Dictionary<GroupedBeatmapSet, HashSet<CarouselItem>>();
         private Dictionary<GroupDefinition, HashSet<CarouselItem>> groupMap = new Dictionary<GroupDefinition, HashSet<CarouselItem>>();
 
         private readonly Func<FilterCriteria> getCriteria;
         private readonly Func<List<BeatmapCollection>> getCollections;
         private readonly Func<FilterCriteria, IReadOnlyDictionary<Guid, ScoreRank>> getLocalUserTopRanks;
 
-        public BeatmapCarouselFilterGrouping(Func<FilterCriteria> getCriteria, Func<List<BeatmapCollection>> getCollections, Func<FilterCriteria, IReadOnlyDictionary<Guid, ScoreRank>> getLocalUserTopRanks)
+        public BeatmapCarouselFilterGrouping(Func<FilterCriteria> getCriteria, Func<List<BeatmapCollection>> getCollections,
+                                             Func<FilterCriteria, IReadOnlyDictionary<Guid, ScoreRank>> getLocalUserTopRanks)
         {
             this.getCriteria = getCriteria;
             this.getCollections = getCollections;
@@ -55,7 +56,7 @@ namespace osu.Game.Screens.SelectV2
             return await Task.Run(() =>
             {
                 // preallocate space for the new mappings using last known estimates
-                var newSetMap = new Dictionary<BeatmapSetInfo, HashSet<CarouselItem>>(setMap.Count);
+                var newSetMap = new Dictionary<GroupedBeatmapSet, HashSet<CarouselItem>>(setMap.Count);
                 var newGroupMap = new Dictionary<GroupDefinition, HashSet<CarouselItem>>(groupMap.Count);
 
                 var criteria = getCriteria();
@@ -93,11 +94,12 @@ namespace osu.Game.Screens.SelectV2
                         var beatmap = (BeatmapInfo)item.Model;
 
                         bool newBeatmapSet = lastBeatmap?.BeatmapSet!.ID != beatmap.BeatmapSet!.ID;
+                        var groupedBeatmapSet = new GroupedBeatmapSet(group, beatmap.BeatmapSet!);
 
                         if (newBeatmapSet)
                         {
-                            if (!newSetMap.TryGetValue(beatmap.BeatmapSet!, out currentSetItems))
-                                newSetMap[beatmap.BeatmapSet!] = currentSetItems = new HashSet<CarouselItem>();
+                            if (!newSetMap.TryGetValue(groupedBeatmapSet, out currentSetItems))
+                                newSetMap[groupedBeatmapSet] = currentSetItems = new HashSet<CarouselItem>();
                         }
 
                         if (BeatmapSetsGroupedTogether)
@@ -107,7 +109,7 @@ namespace osu.Game.Screens.SelectV2
                                 if (groupItem != null)
                                     groupItem.NestedItemCount++;
 
-                                addItem(new CarouselItem(beatmap.BeatmapSet!)
+                                addItem(new CarouselItem(groupedBeatmapSet)
                                 {
                                     DrawHeight = PanelBeatmapSet.HEIGHT,
                                     DepthLayer = -1
@@ -134,7 +136,7 @@ namespace osu.Game.Screens.SelectV2
                         currentGroupItems?.Add(i);
                         currentSetItems?.Add(i);
 
-                        i.IsVisible = i.Model is GroupDefinition || (group == null && (i.Model is BeatmapSetInfo || !BeatmapSetsGroupedTogether));
+                        i.IsVisible = i.Model is GroupDefinition || (group == null && (i.Model is GroupedBeatmapSet || !BeatmapSetsGroupedTogether));
                     }
                 }
 
@@ -189,9 +191,6 @@ namespace osu.Game.Screens.SelectV2
                     {
                         var date = b.LastPlayed;
 
-                        if (BeatmapSetsGroupedTogether)
-                            date = aggregateMax(b, static b => b.LastPlayed ?? DateTimeOffset.MinValue);
-
                         if (date == null || date == DateTimeOffset.MinValue)
                             return new GroupDefinition(int.MaxValue, "Never");
 
@@ -202,29 +201,13 @@ namespace osu.Game.Screens.SelectV2
                     return getGroupsBy(b => defineGroupByStatus(b.BeatmapSet!.Status), items);
 
                 case GroupMode.BPM:
-                    return getGroupsBy(b =>
-                    {
-                        double bpm = FormatUtils.RoundBPM(b.BPM);
-
-                        if (BeatmapSetsGroupedTogether)
-                            bpm = aggregateMax(b, bb => FormatUtils.RoundBPM(bb.BPM));
-
-                        return defineGroupByBPM(bpm);
-                    }, items);
+                    return getGroupsBy(b => defineGroupByBPM(FormatUtils.RoundBPM(b.BPM)), items);
 
                 case GroupMode.Difficulty:
                     return getGroupsBy(b => defineGroupByStars(b.StarRating), items);
 
                 case GroupMode.Length:
-                    return getGroupsBy(b =>
-                    {
-                        double length = b.Length;
-
-                        if (BeatmapSetsGroupedTogether)
-                            length = aggregateMax(b, bb => bb.Length);
-
-                        return defineGroupByLength(length);
-                    }, items);
+                    return getGroupsBy(b => defineGroupByLength(b.Length), items);
 
                 case GroupMode.Source:
                     return getGroupsBy(b => defineGroupBySource(b.BeatmapSet!.Metadata.Source), items);
@@ -431,12 +414,6 @@ namespace osu.Game.Screens.SelectV2
                 return new GroupDefinition(-(int)rank, rank.GetDescription());
 
             return new GroupDefinition(int.MaxValue, "Unplayed");
-        }
-
-        private static T? aggregateMax<T>(BeatmapInfo b, Func<BeatmapInfo, T> func)
-        {
-            var beatmaps = b.BeatmapSet!.Beatmaps.Where(bb => !bb.Hidden);
-            return beatmaps.Max(func);
         }
 
         private record GroupMapping(GroupDefinition? Group, List<CarouselItem> ItemsInGroup);
