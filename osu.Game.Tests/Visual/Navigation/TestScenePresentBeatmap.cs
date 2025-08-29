@@ -181,7 +181,7 @@ namespace osu.Game.Tests.Visual.Navigation
             AddUntilStep("beatmap in song select", () =>
             {
                 var songSelect = (SoloSongSelect)Game.ScreenStack.CurrentScreen;
-                return songSelect.ChildrenOfType<BeatmapCarousel>().Single().GetCarouselItems()!.Any(i => i.Model is BeatmapSetUnderGrouping bsug && bsug.BeatmapSet.MatchesOnlineID(getImport()));
+                return songSelect.ChildrenOfType<BeatmapCarousel>().Single().GetCarouselItems()!.Any(i => i.Model is GroupedBeatmapSet gbs && gbs.BeatmapSet.MatchesOnlineID(getImport()));
             });
         }
 

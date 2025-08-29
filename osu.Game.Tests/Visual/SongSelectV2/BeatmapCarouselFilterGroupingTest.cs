@@ -42,7 +42,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             ];
 
             var results = await runGrouping(GroupMode.None, beatmapSets);
-            Assert.That(results.Select(r => r.Model).OfType<BeatmapSetUnderGrouping>().Select(setUnderGrouping => setUnderGrouping.BeatmapSet), Is.EquivalentTo(beatmapSets));
+            Assert.That(results.Select(r => r.Model).OfType<GroupedBeatmapSet>().Select(groupedSet => groupedSet.BeatmapSet), Is.EquivalentTo(beatmapSets));
             Assert.That(results.Select(r => r.Model).OfType<BeatmapInfo>(), Is.EquivalentTo(allBeatmaps));
             assertTotal(results, beatmapSets.Count + allBeatmaps.Length);
         }
