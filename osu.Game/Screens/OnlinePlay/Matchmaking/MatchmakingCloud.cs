@@ -46,7 +46,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
 
             InternalChildren = new Drawable[]
             {
-                usersContainer = new AspectContainer()
+                usersContainer = new AspectContainer
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,

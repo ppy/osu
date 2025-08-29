@@ -9,11 +9,14 @@ using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.Matchmaking;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Idle;
 using osu.Game.Tests.Visual.Multiplayer;
+using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Matchmaking
 {
     public partial class TestScenePlayerPanel : MultiplayerTestScene
     {
+        private PlayerPanel panel = null!;
+
         public override void SetUpSteps()
         {
             base.SetUpSteps();
@@ -21,11 +24,16 @@ namespace osu.Game.Tests.Visual.Matchmaking
             AddStep("join room", () => JoinRoom(CreateDefaultRoom()));
             WaitForJoined();
 
-            AddStep("add panel", () => Child = new PlayerPanel(new MultiplayerRoomUser(1)
+            AddStep("add panel", () => Child = panel = new PlayerPanel(new MultiplayerRoomUser(1)
             {
                 User = new APIUser
                 {
-                    Username = "Player 1",
+                    Username = @"peppy",
+                    Id = 2,
+                    Colour = "99EB47",
+                    CountryCode = CountryCode.AU,
+                    CoverUrl = @"https://assets.ppy.sh/user-profile-covers/8195163/4a8e2ad5a02a2642b631438cfa6c6bd7e2f9db289be881cb27df18331f64144c.jpeg",
+                    Statistics = new UserStatistics { GlobalRank = null, CountryRank = null }
                 }
             })
             {
@@ -46,15 +54,17 @@ namespace osu.Game.Tests.Visual.Matchmaking
                     UserDictionary =
                     {
                         {
-                            1, new MatchmakingUser
+                            2, new MatchmakingUser
                             {
-                                UserId = 1,
+                                UserId = 2,
                                 Placement = ++rank
                             }
                         }
                     }
                 }
             }).WaitSafely());
+
+            AddToggleStep("toggle horizontal", h => panel.Horizontal = h);
         }
 
         [Test]

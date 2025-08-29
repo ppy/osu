@@ -29,7 +29,6 @@ using osu.Game.Input.Bindings;
 using osu.Game.IO;
 using osu.Game.Localisation;
 using osu.Game.Online.API;
-using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Overlays.SkinEditor;
@@ -86,9 +85,6 @@ namespace osu.Game.Screens.Menu
 
         [Resolved(canBeNull: true)]
         private IDialogOverlay dialogOverlay { get; set; }
-
-        [Resolved]
-        private MultiplayerClient multiplayerClient { get; set; }
 
         // used to stop kiai fountain samples when navigating to other screens
         IBindable<bool> ISamplePlaybackDisabler.SamplePlaybackDisabled => samplePlaybackDisabled;

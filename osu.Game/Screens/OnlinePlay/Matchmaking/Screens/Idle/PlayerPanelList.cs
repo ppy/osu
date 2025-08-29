@@ -16,6 +16,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Idle
         [Resolved]
         private MultiplayerClient client { get; set; } = null!;
 
+        public bool Horizontal { get; init; }
+
         private FillFlowContainer<PlayerPanel> panels = null!;
 
         [BackgroundDependencyLoader]
@@ -50,6 +52,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Idle
         {
             panels.Add(new PlayerPanel(user)
             {
+                Horizontal = Horizontal,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
             });
@@ -57,7 +60,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Idle
 
         private void onUserLeft(MultiplayerRoomUser user) => Scheduler.Add(() =>
         {
-            panels.Single(p => p.User.Equals(user)).Expire();
+            panels.Single(p => p.RoomUser.Equals(user)).Expire();
         });
 
         private void onRoomStateChanged(MatchRoomState? state) => Scheduler.Add(() =>
@@ -67,7 +70,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Idle
 
             foreach (var panel in panels)
             {
-                if (matchmakingState.Users.UserDictionary.TryGetValue(panel.User.UserID, out MatchmakingUser? user))
+                if (matchmakingState.Users.UserDictionary.TryGetValue(panel.User.Id, out MatchmakingUser? user))
                     panels.SetLayoutPosition(panel, user.Placement);
                 else
                     panels.SetLayoutPosition(panel, float.MaxValue);

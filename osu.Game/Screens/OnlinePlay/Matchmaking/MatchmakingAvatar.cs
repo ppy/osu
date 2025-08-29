@@ -17,8 +17,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
     {
         public static readonly Vector2 SIZE = new Vector2(30);
 
-        public bool Expired { get; private set; }
-
         private readonly APIUser user;
         private readonly bool isOwnUser;
 

@@ -13,6 +13,7 @@ using osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Idle;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Pick;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Results;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Screens.RoundResults;
+using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens
 {
@@ -48,8 +49,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens
                                     null,
                                     new PlayerPanelList
                                     {
+                                        Horizontal = true,
                                         RelativeSizeAxes = Axes.Y,
-                                        Width = 200,
+                                        Width = 250,
+                                        Scale = new Vector2(0.8f),
                                     }
                                 ]
                             }

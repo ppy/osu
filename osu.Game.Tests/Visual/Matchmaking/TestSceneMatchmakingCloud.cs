@@ -19,7 +19,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
         {
             base.LoadComplete();
 
-            Child = cloud = new MatchmakingCloud()
+            Child = cloud = new MatchmakingCloud
             {
                 RelativeSizeAxes = Axes.Both,
             };
