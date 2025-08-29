@@ -987,7 +987,11 @@ namespace osu.Game.Screens.SelectV2
                 var previousBeatmap = randomHistory[^1];
                 randomHistory.RemoveAt(randomHistory.Count - 1);
 
-                var previousBeatmapItem = carouselItems.FirstOrDefault(i => i.Model is GroupedBeatmap gb && gb.Equals(previousBeatmap));
+                // when going back through rewind history, we may no longer be in the same grouping mode.
+                // the user wants to go back to the beatmap first and foremost, so the most important thing is to find a panel that corresponds to the beatmap.
+                // going back to the same group is a nice-to-have, but a secondary concern.
+                var previousBeatmapItem = carouselItems.Where(i => i.Model is GroupedBeatmap gb && gb.Beatmap.Equals(previousBeatmap.Beatmap))
+                                                       .MaxBy(i => ((GroupedBeatmap)i.Model).Group == previousBeatmap.Group);
 
                 if (previousBeatmapItem == null)
                     return false;
@@ -1003,7 +1007,7 @@ namespace osu.Game.Screens.SelectV2
                         playSpinSample(visiblePanelCountBetweenItems(previousBeatmapItem, CurrentSelectionItem));
                 }
 
-                RequestSelection(previousBeatmap);
+                RequestSelection((GroupedBeatmap)previousBeatmapItem.Model);
                 return true;
             }
 
