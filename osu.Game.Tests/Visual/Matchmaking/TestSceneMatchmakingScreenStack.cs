@@ -70,7 +70,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
             AddWaitStep("wait for scroll", 5);
             AddStep("pick", () => MultiplayerClient.ChangeMatchRoomState(new MatchmakingRoomState
             {
-                RoomStatus = MatchmakingRoomStatus.UserPicks
+                Stage = MatchmakingStage.UserBeatmapSelect
             }).WaitSafely());
 
             AddWaitStep("wait for scroll", 5);
@@ -87,7 +87,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
 
                 MultiplayerClient.ChangeMatchRoomState(new MatchmakingRoomState
                 {
-                    RoomStatus = MatchmakingRoomStatus.SelectBeatmap,
+                    Stage = MatchmakingStage.ServerBeatmapFinalised,
                     CandidateItems = beatmaps.Select(b => b.ID).ToArray(),
                     CandidateItem = beatmaps[0].ID
                 }).WaitSafely();
@@ -99,7 +99,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
                 var state = new MatchmakingRoomState
                 {
                     CurrentRound = 1,
-                    RoomStatus = MatchmakingRoomStatus.RoomEnd
+                    Stage = MatchmakingStage.Ended
                 };
 
                 int localUserId = API.LocalUser.Value.OnlineID;

@@ -8,9 +8,9 @@ using osu.Game.Online.Multiplayer.MatchTypes.Matchmaking;
 namespace osu.Game.Online.Matchmaking
 {
     [MessagePackObject]
-    public class MatchmakingStatusCountdown : MultiplayerCountdown
+    public class MatchmakingStageCountdown : MultiplayerCountdown
     {
         [Key(2)]
-        public MatchmakingRoomStatus Status { get; set; }
+        public MatchmakingStage Stage { get; set; }
     }
 }

@@ -49,23 +49,23 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
             if (state is not MatchmakingRoomState matchmakingState)
                 return;
 
-            text.Text = getTextForStatus(matchmakingState.RoomStatus);
+            text.Text = getTextForStatus(matchmakingState.Stage);
         });
 
-        private LocalisableString getTextForStatus(MatchmakingRoomStatus status)
+        private LocalisableString getTextForStatus(MatchmakingStage status)
         {
             switch (status)
             {
-                case MatchmakingRoomStatus.RoomStart:
+                case MatchmakingStage.WaitingForClientsJoin:
                     return "Players are joining the match...";
 
-                case MatchmakingRoomStatus.PrepareBeatmap:
+                case MatchmakingStage.WaitingForClientsBeatmapDownload:
                     return "Players are downloading the beatmap...";
 
-                case MatchmakingRoomStatus.Gameplay:
+                case MatchmakingStage.Gameplay:
                     return "Game is in progress...";
 
-                case MatchmakingRoomStatus.RoomEnd:
+                case MatchmakingStage.Ended:
                     return "Thanks for playing! The match will close shortly.";
 
                 default:

@@ -83,28 +83,28 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens
             if (state is not MatchmakingRoomState matchmakingState)
                 return;
 
-            switch (matchmakingState.RoomStatus)
+            switch (matchmakingState.Stage)
             {
-                case MatchmakingRoomStatus.RoomStart:
-                case MatchmakingRoomStatus.RoundStart:
+                case MatchmakingStage.WaitingForClientsJoin:
+                case MatchmakingStage.RoundWarmupTime:
                     while (screenStack.CurrentScreen is not IdleScreen)
                         screenStack.Exit();
                     break;
 
-                case MatchmakingRoomStatus.UserPicks:
+                case MatchmakingStage.UserBeatmapSelect:
                     screenStack.Push(new PickScreen());
                     break;
 
-                case MatchmakingRoomStatus.SelectBeatmap:
+                case MatchmakingStage.ServerBeatmapFinalised:
                     Debug.Assert(screenStack.CurrentScreen is PickScreen);
                     ((PickScreen)screenStack.CurrentScreen).RollFinalBeatmap(matchmakingState.CandidateItems, matchmakingState.CandidateItem);
                     break;
 
-                case MatchmakingRoomStatus.RoundEnd:
+                case MatchmakingStage.ResultsDisplaying:
                     screenStack.Push(new RoundResultsScreen());
                     break;
 
-                case MatchmakingRoomStatus.RoomEnd:
+                case MatchmakingStage.Ended:
                     screenStack.Push(new ResultsScreen());
                     break;
             }

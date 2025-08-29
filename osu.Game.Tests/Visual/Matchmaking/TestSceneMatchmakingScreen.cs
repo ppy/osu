@@ -101,7 +101,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
 
             AddStep("round start", () => MultiplayerClient.ChangeMatchRoomState(new MatchmakingRoomState
             {
-                RoomStatus = MatchmakingRoomStatus.RoundStart
+                Stage = MatchmakingStage.RoundWarmupTime
             }).WaitSafely());
 
             // Next round starts with picks.
@@ -109,7 +109,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
 
             AddStep("pick", () => MultiplayerClient.ChangeMatchRoomState(new MatchmakingRoomState
             {
-                RoomStatus = MatchmakingRoomStatus.UserPicks
+                Stage = MatchmakingStage.UserBeatmapSelect
             }).WaitSafely());
 
             // Make some selections
@@ -142,7 +142,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
 
                 MultiplayerClient.ChangeMatchRoomState(new MatchmakingRoomState
                 {
-                    RoomStatus = MatchmakingRoomStatus.SelectBeatmap,
+                    Stage = MatchmakingStage.ServerBeatmapFinalised,
                     CandidateItems = beatmaps.Select(b => b.ID).ToArray(),
                     CandidateItem = beatmaps[0].ID
                 }).WaitSafely();
@@ -153,7 +153,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
 
             AddStep("prepare gameplay", () => MultiplayerClient.ChangeMatchRoomState(new MatchmakingRoomState
             {
-                RoomStatus = MatchmakingRoomStatus.PrepareGameplay
+                Stage = MatchmakingStage.GameplayWarmupTime
             }).WaitSafely());
 
             // Start gameplay.
@@ -161,7 +161,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
 
             AddStep("gameplay", () => MultiplayerClient.ChangeMatchRoomState(new MatchmakingRoomState
             {
-                RoomStatus = MatchmakingRoomStatus.Gameplay
+                Stage = MatchmakingStage.Gameplay
             }).WaitSafely());
 
             AddStep("start gameplay", () => MultiplayerClient.StartMatch().WaitSafely());
@@ -172,7 +172,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
 
             AddStep("round end", () => MultiplayerClient.ChangeMatchRoomState(new MatchmakingRoomState
             {
-                RoomStatus = MatchmakingRoomStatus.RoundEnd
+                Stage = MatchmakingStage.ResultsDisplaying
             }).WaitSafely());
 
             AddWaitStep("wait", 10);
@@ -182,7 +182,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
                 MatchmakingRoomState state = new MatchmakingRoomState
                 {
                     CurrentRound = 1,
-                    RoomStatus = MatchmakingRoomStatus.RoomEnd
+                    Stage = MatchmakingStage.Ended
                 };
 
                 int localUserId = API.LocalUser.Value.OnlineID;

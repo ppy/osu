@@ -26,18 +26,18 @@ namespace osu.Game.Tests.Visual.Matchmaking
             });
         }
 
-        [TestCase(MatchmakingRoomStatus.RoomStart)]
-        [TestCase(MatchmakingRoomStatus.RoundStart)]
-        [TestCase(MatchmakingRoomStatus.UserPicks)]
-        [TestCase(MatchmakingRoomStatus.SelectBeatmap)]
-        [TestCase(MatchmakingRoomStatus.PrepareBeatmap)]
-        [TestCase(MatchmakingRoomStatus.PrepareGameplay)]
-        [TestCase(MatchmakingRoomStatus.Gameplay)]
-        [TestCase(MatchmakingRoomStatus.RoundEnd)]
-        [TestCase(MatchmakingRoomStatus.RoomEnd)]
-        public void TestStatus(MatchmakingRoomStatus status)
+        [TestCase(MatchmakingStage.WaitingForClientsJoin)]
+        [TestCase(MatchmakingStage.RoundWarmupTime)]
+        [TestCase(MatchmakingStage.UserBeatmapSelect)]
+        [TestCase(MatchmakingStage.ServerBeatmapFinalised)]
+        [TestCase(MatchmakingStage.WaitingForClientsBeatmapDownload)]
+        [TestCase(MatchmakingStage.GameplayWarmupTime)]
+        [TestCase(MatchmakingStage.Gameplay)]
+        [TestCase(MatchmakingStage.ResultsDisplaying)]
+        [TestCase(MatchmakingStage.Ended)]
+        public void TestStatus(MatchmakingStage status)
         {
-            AddStep("set status", () => MultiplayerClient.ChangeMatchRoomState(new MatchmakingRoomState { RoomStatus = status }).WaitSafely());
+            AddStep("set status", () => MultiplayerClient.ChangeMatchRoomState(new MatchmakingRoomState { Stage = status }).WaitSafely());
         }
     }
 }

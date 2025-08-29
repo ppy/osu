@@ -53,7 +53,7 @@ namespace osu.Game.Online
             (typeof(MatchmakingQueueStatus.MatchFound), typeof(MatchmakingQueueStatus)),
             (typeof(MatchmakingQueueStatus.JoiningMatch), typeof(MatchmakingQueueStatus)),
             (typeof(MatchmakingRoomState), typeof(MatchRoomState)),
-            (typeof(MatchmakingStatusCountdown), typeof(MultiplayerCountdown))
+            (typeof(MatchmakingStageCountdown), typeof(MultiplayerCountdown))
         };
     }
 }

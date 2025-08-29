@@ -33,18 +33,18 @@ namespace osu.Game.Tests.Visual.Matchmaking
         [Test]
         public void TestStartCountdown()
         {
-            foreach (var status in Enum.GetValues<MatchmakingRoomStatus>())
+            foreach (var status in Enum.GetValues<MatchmakingStage>())
             {
                 AddStep($"{status}", () =>
                 {
                     MultiplayerClient.ChangeMatchRoomState(new MatchmakingRoomState
                     {
-                        RoomStatus = status
+                        Stage = status
                     }).WaitSafely();
 
-                    MultiplayerClient.StartCountdown(new MatchmakingStatusCountdown
+                    MultiplayerClient.StartCountdown(new MatchmakingStageCountdown
                     {
-                        Status = status,
+                        Stage = status,
                         TimeRemaining = TimeSpan.FromSeconds(5)
                     }).WaitSafely();
                 });

@@ -22,7 +22,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
             AddStep("join room", () => JoinRoom(CreateDefaultRoom()));
             WaitForJoined();
 
-            AddStep("add bubble", () => Child = new StageBubble(MatchmakingRoomStatus.RoundStart, "Next Round")
+            AddStep("add bubble", () => Child = new StageBubble(MatchmakingStage.RoundWarmupTime, "Next Round")
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -35,9 +35,9 @@ namespace osu.Game.Tests.Visual.Matchmaking
         {
             MultiplayerCountdown countdown = null!;
 
-            AddStep("start countdown", () => MultiplayerClient.StartCountdown(countdown = new MatchmakingStatusCountdown
+            AddStep("start countdown", () => MultiplayerClient.StartCountdown(countdown = new MatchmakingStageCountdown
             {
-                Status = MatchmakingRoomStatus.RoundStart,
+                Stage = MatchmakingStage.RoundWarmupTime,
                 TimeRemaining = TimeSpan.FromSeconds(5)
             }).WaitSafely());
 

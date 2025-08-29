@@ -212,7 +212,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
             if (client.Room?.MatchState is not MatchmakingRoomState matchmakingState)
                 return;
 
-            if (matchmakingState.RoomStatus != MatchmakingRoomStatus.PrepareBeatmap)
+            if (matchmakingState.Stage != MatchmakingStage.WaitingForClientsBeatmapDownload)
                 return;
 
             MultiplayerPlaylistItem item = client.Room!.CurrentPlaylistItem;

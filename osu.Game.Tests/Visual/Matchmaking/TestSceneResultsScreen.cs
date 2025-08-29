@@ -54,7 +54,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
                 var state = new MatchmakingRoomState
                 {
                     CurrentRound = 6,
-                    RoomStatus = MatchmakingRoomStatus.RoomEnd
+                    Stage = MatchmakingStage.Ended
                 };
 
                 int localUserId = API.LocalUser.Value.OnlineID;

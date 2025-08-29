@@ -14,13 +14,13 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
 {
     public partial class StageDisplay : CompositeDrawable
     {
-        public static readonly (MatchmakingRoomStatus status, LocalisableString text)[] DISPLAYED_STAGES =
+        public static readonly (MatchmakingStage status, LocalisableString text)[] DISPLAYED_STAGES =
         [
-            (MatchmakingRoomStatus.RoundStart, "Next Round"),
-            (MatchmakingRoomStatus.UserPicks, "Pick"),
-            (MatchmakingRoomStatus.PrepareGameplay, "GLHF!"),
-            (MatchmakingRoomStatus.RoundEnd, "Results"),
-            (MatchmakingRoomStatus.RoomEnd, "Match End")
+            (MatchmakingStage.RoundWarmupTime, "Next Round"),
+            (MatchmakingStage.UserBeatmapSelect, "Beatmap Selection"),
+            (MatchmakingStage.GameplayWarmupTime, "Get Ready"),
+            (MatchmakingStage.ResultsDisplaying, "Results"),
+            (MatchmakingStage.Ended, "Match End")
         ];
 
         public StageDisplay()

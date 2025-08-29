@@ -163,7 +163,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Results
 
         private void onRoomStateChanged(MatchRoomState? state) => Scheduler.Add(() =>
         {
-            if (state is not MatchmakingRoomState matchmakingState || matchmakingState.RoomStatus != MatchmakingRoomStatus.RoomEnd)
+            if (state is not MatchmakingRoomState matchmakingState || matchmakingState.Stage != MatchmakingStage.Ended)
                 return;
 
             populateUserStatistics(matchmakingState);

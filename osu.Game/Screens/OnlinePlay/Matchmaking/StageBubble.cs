@@ -24,16 +24,16 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
         [Resolved]
         private MultiplayerClient client { get; set; } = null!;
 
-        private readonly MatchmakingRoomStatus status;
+        private readonly MatchmakingStage stage;
         private readonly LocalisableString displayText;
         private Drawable progressBar = null!;
 
         private DateTimeOffset countdownStartTime;
         private DateTimeOffset countdownEndTime;
 
-        public StageBubble(MatchmakingRoomStatus status, LocalisableString displayText)
+        public StageBubble(MatchmakingStage stage, LocalisableString displayText)
         {
-            this.status = status;
+            this.stage = stage;
             this.displayText = displayText;
 
             AutoSizeAxes = Axes.Y;
@@ -106,7 +106,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
             if (state is not MatchmakingRoomState matchmakingState)
                 return;
 
-            if (matchmakingState.RoomStatus == MatchmakingRoomStatus.RoundStart)
+            if (matchmakingState.Stage == MatchmakingStage.RoundWarmupTime)
             {
                 countdownStartTime = countdownEndTime = DateTimeOffset.Now;
                 activate();
@@ -115,7 +115,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
 
         private void onCountdownStarted(MultiplayerCountdown countdown) => Scheduler.Add(() =>
         {
-            if (countdown is not MatchmakingStatusCountdown matchmakingStatusCountdown || matchmakingStatusCountdown.Status != status)
+            if (countdown is not MatchmakingStageCountdown matchmakingStatusCountdown || matchmakingStatusCountdown.Stage != stage)
                 return;
 
             countdownStartTime = DateTimeOffset.Now;
@@ -125,7 +125,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
 
         private void onCountdownStopped(MultiplayerCountdown countdown) => Scheduler.Add(() =>
         {
-            if (countdown is not MatchmakingStatusCountdown matchmakingStatusCountdown || matchmakingStatusCountdown.Status != status)
+            if (countdown is not MatchmakingStageCountdown matchmakingStatusCountdown || matchmakingStatusCountdown.Stage != stage)
                 return;
 
             countdownEndTime = DateTimeOffset.Now;

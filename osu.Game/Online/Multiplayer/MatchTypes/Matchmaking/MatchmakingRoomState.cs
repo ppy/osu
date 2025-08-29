@@ -24,7 +24,7 @@ namespace osu.Game.Online.Multiplayer.MatchTypes.Matchmaking
         /// The current room status.
         /// </summary>
         [Key(0)]
-        public MatchmakingRoomStatus RoomStatus { get; set; }
+        public MatchmakingStage Stage { get; set; }
 
         /// <summary>
         /// The current round number (1-based).
