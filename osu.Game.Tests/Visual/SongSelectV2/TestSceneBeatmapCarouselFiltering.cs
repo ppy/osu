@@ -397,7 +397,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             SelectNextPanel();
             AddAssert("keyboard selected is first set",
-                () => (GetKeyboardSelectedPanel()?.Item?.Model as BeatmapSetUnderGrouping)?.BeatmapSet,
+                () => (GetKeyboardSelectedPanel()?.Item?.Model as GroupedBeatmapSet)?.BeatmapSet,
                 () => Is.EqualTo(BeatmapSets.First()));
         }
 
@@ -416,7 +416,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             SelectPrevPanel();
             AddAssert("keyboard selected is last set",
-                () => (GetKeyboardSelectedPanel()?.Item?.Model as BeatmapSetUnderGrouping)?.BeatmapSet,
+                () => (GetKeyboardSelectedPanel()?.Item?.Model as GroupedBeatmapSet)?.BeatmapSet,
                 () => Is.EqualTo(BeatmapSets.Last()));
         }
 
@@ -433,7 +433,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             SelectPrevPanel();
             AddAssert("keyboard selected is first set",
-                () => (GetKeyboardSelectedPanel()?.Item?.Model as BeatmapSetUnderGrouping)?.BeatmapSet,
+                () => (GetKeyboardSelectedPanel()?.Item?.Model as GroupedBeatmapSet)?.BeatmapSet,
                 () => Is.EqualTo(BeatmapSets.First()));
         }
 
@@ -451,7 +451,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             // Single result is automatically selected for us, so we iterate once backwards to the set header.
             SelectPrevPanel();
             AddAssert("keyboard selected is second set",
-                () => (GetKeyboardSelectedPanel()?.Item?.Model as BeatmapSetUnderGrouping)?.BeatmapSet,
+                () => (GetKeyboardSelectedPanel()?.Item?.Model as GroupedBeatmapSet)?.BeatmapSet,
                 () => Is.EqualTo(BeatmapSets.Last()));
         }
     }

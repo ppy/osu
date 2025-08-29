@@ -67,12 +67,12 @@ namespace osu.Game.Screens.SelectV2
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; } = null!;
 
-        private BeatmapSetUnderGrouping beatmapSetUnderGrouping
+        private GroupedBeatmapSet groupedBeatmapSet
         {
             get
             {
                 Debug.Assert(Item != null);
-                return (BeatmapSetUnderGrouping)Item!.Model;
+                return (GroupedBeatmapSet)Item!.Model;
             }
         }
 
@@ -188,7 +188,7 @@ namespace osu.Game.Screens.SelectV2
         {
             base.PrepareForUse();
 
-            var beatmapSet = beatmapSetUnderGrouping.BeatmapSet;
+            var beatmapSet = groupedBeatmapSet.BeatmapSet;
 
             // Choice of background image matches BSS implementation (always uses the lowest `beatmap_id` from the set).
             setBackground.Beatmap = beatmaps.GetWorkingBeatmap(beatmapSet.Beatmaps.MinBy(b => b.OnlineID));
@@ -222,7 +222,7 @@ namespace osu.Game.Screens.SelectV2
                 if (Item == null)
                     return Array.Empty<MenuItem>();
 
-                var beatmapSet = beatmapSetUnderGrouping.BeatmapSet;
+                var beatmapSet = groupedBeatmapSet.BeatmapSet;
 
                 List<MenuItem> items = new List<MenuItem>();
 
@@ -275,7 +275,7 @@ namespace osu.Game.Screens.SelectV2
 
         private MenuItem createCollectionMenuItem(BeatmapCollection collection)
         {
-            var beatmapSet = beatmapSetUnderGrouping.BeatmapSet;
+            var beatmapSet = groupedBeatmapSet.BeatmapSet;
 
             TernaryState state;
 

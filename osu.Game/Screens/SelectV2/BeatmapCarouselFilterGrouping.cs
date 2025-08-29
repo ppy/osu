@@ -29,14 +29,14 @@ namespace osu.Game.Screens.SelectV2
         /// <summary>
         /// Beatmap sets contain difficulties as related panels. This dictionary holds the relationships between set-difficulties to allow expanding them on selection.
         /// </summary>
-        public IDictionary<BeatmapSetUnderGrouping, HashSet<CarouselItem>> SetItems => setMap;
+        public IDictionary<GroupedBeatmapSet, HashSet<CarouselItem>> SetItems => setMap;
 
         /// <summary>
         /// Groups contain children which are group-selectable. This dictionary holds the relationships between groups-panels to allow expanding them on selection.
         /// </summary>
         public IDictionary<GroupDefinition, HashSet<CarouselItem>> GroupItems => groupMap;
 
-        private Dictionary<BeatmapSetUnderGrouping, HashSet<CarouselItem>> setMap = new Dictionary<BeatmapSetUnderGrouping, HashSet<CarouselItem>>();
+        private Dictionary<GroupedBeatmapSet, HashSet<CarouselItem>> setMap = new Dictionary<GroupedBeatmapSet, HashSet<CarouselItem>>();
         private Dictionary<GroupDefinition, HashSet<CarouselItem>> groupMap = new Dictionary<GroupDefinition, HashSet<CarouselItem>>();
 
         private readonly Func<FilterCriteria> getCriteria;
@@ -56,7 +56,7 @@ namespace osu.Game.Screens.SelectV2
             return await Task.Run(() =>
             {
                 // preallocate space for the new mappings using last known estimates
-                var newSetMap = new Dictionary<BeatmapSetUnderGrouping, HashSet<CarouselItem>>(setMap.Count);
+                var newSetMap = new Dictionary<GroupedBeatmapSet, HashSet<CarouselItem>>(setMap.Count);
                 var newGroupMap = new Dictionary<GroupDefinition, HashSet<CarouselItem>>(groupMap.Count);
 
                 var criteria = getCriteria();
@@ -94,12 +94,12 @@ namespace osu.Game.Screens.SelectV2
                         var beatmap = (BeatmapInfo)item.Model;
 
                         bool newBeatmapSet = lastBeatmap?.BeatmapSet!.ID != beatmap.BeatmapSet!.ID;
-                        var beatmapSetUnderGrouping = new BeatmapSetUnderGrouping(group, beatmap.BeatmapSet!);
+                        var groupedBeatmapSet = new GroupedBeatmapSet(group, beatmap.BeatmapSet!);
 
                         if (newBeatmapSet)
                         {
-                            if (!newSetMap.TryGetValue(beatmapSetUnderGrouping, out currentSetItems))
-                                newSetMap[beatmapSetUnderGrouping] = currentSetItems = new HashSet<CarouselItem>();
+                            if (!newSetMap.TryGetValue(groupedBeatmapSet, out currentSetItems))
+                                newSetMap[groupedBeatmapSet] = currentSetItems = new HashSet<CarouselItem>();
                         }
 
                         if (BeatmapSetsGroupedTogether)
@@ -109,7 +109,7 @@ namespace osu.Game.Screens.SelectV2
                                 if (groupItem != null)
                                     groupItem.NestedItemCount++;
 
-                                addItem(new CarouselItem(beatmapSetUnderGrouping)
+                                addItem(new CarouselItem(groupedBeatmapSet)
                                 {
                                     DrawHeight = PanelBeatmapSet.HEIGHT,
                                     DepthLayer = -1
@@ -136,7 +136,7 @@ namespace osu.Game.Screens.SelectV2
                         currentGroupItems?.Add(i);
                         currentSetItems?.Add(i);
 
-                        i.IsVisible = i.Model is GroupDefinition || (group == null && (i.Model is BeatmapSetUnderGrouping || !BeatmapSetsGroupedTogether));
+                        i.IsVisible = i.Model is GroupDefinition || (group == null && (i.Model is GroupedBeatmapSet || !BeatmapSetsGroupedTogether));
                     }
                 }
 
