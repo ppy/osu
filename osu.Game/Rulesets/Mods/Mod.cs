@@ -56,7 +56,7 @@ namespace osu.Game.Rulesets.Mods
                 {
                     var bindable = (IBindable)property.GetValue(this)!;
 
-                    if (!bindable.IsDefault)
+                    if (bindable.IsDefault)
                         continue;
 
                     string valueText;
