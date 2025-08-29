@@ -418,9 +418,21 @@ namespace osu.Game.Screens.SelectV2
             // Store selected group before handling selection (it may implicitly change the expanded group).
             var groupForReselection = ExpandedGroup;
 
-            // Ensure correct post-selection logic is handled on the new items list.
-            // This will update the visual state of the selected item.
-            HandleItemSelected(CurrentSelection);
+            var currentGroupedBeatmap = CurrentSelection as GroupedBeatmap;
+
+            // The filter might have changed the set of available groups, which means that the current selection may point to a stale group.
+            // Check whether the current selection's group still exists.
+            if (currentGroupedBeatmap?.Group != null && grouping.GroupItems.ContainsKey(currentGroupedBeatmap.Group))
+            {
+                // If the group still exists, then only update the visual state of the selected item.
+                HandleItemSelected(currentGroupedBeatmap);
+            }
+            else if (currentGroupedBeatmap != null)
+            {
+                // If the group no longer exists, grab an arbitrary other instance of the beatmap under the first group encountered.
+                var newSelection = GetCarouselItems()?.Select(i => i.Model).OfType<GroupedBeatmap>().FirstOrDefault(gb => gb.Beatmap.Equals(currentGroupedBeatmap.Beatmap));
+                CurrentSelection = newSelection;
+            }
 
             // If a group was selected that is not the one containing the selection, attempt to reselect it.
             // If the original group was not found, ExpandedGroup will already have been updated to a valid value in `HandleItemSelected` above.
