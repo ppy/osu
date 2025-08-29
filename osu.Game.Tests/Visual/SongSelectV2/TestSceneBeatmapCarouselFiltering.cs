@@ -396,7 +396,9 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             ApplyToFilterAndWaitForFilter("filter first away", c => c.UserStarDifficulty.Min = 3);
 
             SelectNextPanel();
-            AddAssert("keyboard selected is first set", () => GetKeyboardSelectedPanel()?.Item?.Model, () => Is.EqualTo(BeatmapSets.First()));
+            AddAssert("keyboard selected is first set",
+                () => (GetKeyboardSelectedPanel()?.Item?.Model as GroupedBeatmapSet)?.BeatmapSet,
+                () => Is.EqualTo(BeatmapSets.First()));
         }
 
         [Test]
@@ -413,7 +415,9 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             ApplyToFilterAndWaitForFilter("filter first away", c => c.UserStarDifficulty.Min = 3);
 
             SelectPrevPanel();
-            AddAssert("keyboard selected is last set", () => GetKeyboardSelectedPanel()?.Item?.Model, () => Is.EqualTo(BeatmapSets.Last()));
+            AddAssert("keyboard selected is last set",
+                () => (GetKeyboardSelectedPanel()?.Item?.Model as GroupedBeatmapSet)?.BeatmapSet,
+                () => Is.EqualTo(BeatmapSets.Last()));
         }
 
         [Test]
@@ -428,7 +432,9 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             ApplyToFilterAndWaitForFilter("filter last set away", c => c.SearchText = BeatmapSets.First().Metadata.Title);
 
             SelectPrevPanel();
-            AddAssert("keyboard selected is first set", () => GetKeyboardSelectedPanel()?.Item?.Model, () => Is.EqualTo(BeatmapSets.First()));
+            AddAssert("keyboard selected is first set",
+                () => (GetKeyboardSelectedPanel()?.Item?.Model as GroupedBeatmapSet)?.BeatmapSet,
+                () => Is.EqualTo(BeatmapSets.First()));
         }
 
         [Test]
@@ -444,7 +450,9 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             // Single result is automatically selected for us, so we iterate once backwards to the set header.
             SelectPrevPanel();
-            AddAssert("keyboard selected is second set", () => GetKeyboardSelectedPanel()?.Item?.Model, () => Is.EqualTo(BeatmapSets.Last()));
+            AddAssert("keyboard selected is second set",
+                () => (GetKeyboardSelectedPanel()?.Item?.Model as GroupedBeatmapSet)?.BeatmapSet,
+                () => Is.EqualTo(BeatmapSets.Last()));
         }
     }
 }
