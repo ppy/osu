@@ -451,7 +451,10 @@ namespace osu.Game.Screens.SelectV2
             {
                 // If the group no longer exists, grab an arbitrary other instance of the beatmap under the first group encountered.
                 var newSelection = GetCarouselItems()?.Select(i => i.Model).OfType<GroupedBeatmap>().FirstOrDefault(gb => gb.Beatmap.Equals(currentGroupedBeatmap.Beatmap));
-                CurrentSelection = newSelection;
+                // Only change the selection if we actually got a positive hit.
+                // This is necessary so that selection isn't lost if the panel reappears later due to e.g. unapplying some filter criteria that made it disappear in the first place.
+                if (newSelection != null)
+                    CurrentSelection = newSelection;
             }
 
             // If a group was selected that is not the one containing the selection, attempt to reselect it.
