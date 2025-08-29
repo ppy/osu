@@ -535,8 +535,7 @@ namespace osu.Game.Screens.SelectV2
 
                 if (validBeatmaps.Any())
                 {
-                    // TODO: this needs a primitive that tells the carousel "I need this beatmap to be selected, you figure out the grouping".
-                    //requestRecommendedSelection(validBeatmaps);
+                    carousel.CurrentSelection = difficultyRecommender?.GetRecommendedBeatmap(validBeatmaps) ?? validBeatmaps.First();
                     return true;
                 }
             }
