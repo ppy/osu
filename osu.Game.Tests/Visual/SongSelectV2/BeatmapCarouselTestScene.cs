@@ -237,7 +237,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
                 // Using groupingFilter.SetItems.Count alone doesn't work.
                 // When sorting by difficulty, there can be more than one set panel for the same set displayed.
-                return groupingFilter.SetItems.Sum(s => s.Value.Count(i => i.Model is BeatmapSetInfo));
+                return groupingFilter.SetItems.Sum(s => s.Value.Count(i => i.Model is GroupedBeatmapSet));
             }, () => Is.EqualTo(expected));
         }
 
@@ -440,7 +440,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             public BeatmapInfo? SelectedBeatmapInfo => CurrentSelection as BeatmapInfo;
             public BeatmapSetInfo? SelectedBeatmapSet => SelectedBeatmapInfo?.BeatmapSet;
 
-            public new BeatmapSetInfo? ExpandedBeatmapSet => base.ExpandedBeatmapSet;
+            public new GroupedBeatmapSet? ExpandedBeatmapSet => base.ExpandedBeatmapSet;
             public new GroupDefinition? ExpandedGroup => base.ExpandedGroup;
 
             public TestBeatmapCarousel()
