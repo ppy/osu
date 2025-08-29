@@ -300,7 +300,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             }
             else
             {
-                AddUntilStep($"selected is set{set}", () => BeatmapSets[set].Beatmaps.Contains(Carousel.CurrentSelection));
+                AddUntilStep($"selected is set{set}", () => BeatmapSets[set].Beatmaps.Contains(((GroupedBeatmap)Carousel.CurrentSelection!).Beatmap));
             }
         }
 

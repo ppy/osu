@@ -201,13 +201,13 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 int diff = i;
 
                 AddStep($"select diff {diff}", () => Carousel.CurrentSelection = chosenBeatmap = BeatmapSets[20].Beatmaps[diff]);
-                AddUntilStep("selection changed", () => Carousel.CurrentSelection, () => Is.EqualTo(chosenBeatmap));
+                AddUntilStep("selection changed", () => ((GroupedBeatmap)Carousel.CurrentSelection!).Beatmap, () => Is.EqualTo(chosenBeatmap));
 
                 SortBy(SortMode.Difficulty);
-                AddAssert("selection retained", () => Carousel.CurrentSelection, () => Is.EqualTo(chosenBeatmap));
+                AddAssert("selection retained", () => ((GroupedBeatmap)Carousel.CurrentSelection!).Beatmap, () => Is.EqualTo(chosenBeatmap));
 
                 SortBy(SortMode.Title);
-                AddAssert("selection retained", () => Carousel.CurrentSelection, () => Is.EqualTo(chosenBeatmap));
+                AddAssert("selection retained", () => ((GroupedBeatmap)Carousel.CurrentSelection!).Beatmap, () => Is.EqualTo(chosenBeatmap));
             }
         }
 
