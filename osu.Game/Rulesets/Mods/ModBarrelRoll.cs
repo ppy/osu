@@ -46,8 +46,10 @@ namespace osu.Game.Rulesets.Mods
         {
             get
             {
-                yield return ("Roll speed", $"{SpinSpeed.Value:N2} rpm");
-                yield return ("Direction", Direction.Value.GetDescription());
+                if (!SpinSpeed.IsDefault)
+                    yield return ("Roll speed", $"{SpinSpeed.Value:N2} rpm");
+                if (!Direction.IsDefault)
+                    yield return ("Direction", Direction.Value.GetDescription());
             }
         }
 
@@ -55,7 +57,8 @@ namespace osu.Game.Rulesets.Mods
 
         public virtual void Update(Playfield playfield)
         {
-            playfieldAdjustmentContainer.Rotation = CurrentRotation = (Direction.Value == RotationDirection.Counterclockwise ? -1 : 1) * 360 * (float)(playfield.Time.Current / 60000 * SpinSpeed.Value);
+            playfieldAdjustmentContainer.Rotation =
+                CurrentRotation = (Direction.Value == RotationDirection.Counterclockwise ? -1 : 1) * 360 * (float)(playfield.Time.Current / 60000 * SpinSpeed.Value);
         }
 
         public void ApplyToDrawableRuleset(DrawableRuleset<TObject> drawableRuleset)
