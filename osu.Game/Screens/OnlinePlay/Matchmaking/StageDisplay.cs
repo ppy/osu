@@ -1,91 +1,73 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Localisation;
+using osu.Game.Graphics.Containers;
 using osu.Game.Online.Multiplayer.MatchTypes.Matchmaking;
-using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking
 {
     public partial class StageDisplay : CompositeDrawable
     {
-        public static readonly (MatchmakingStage status, LocalisableString text)[] DISPLAYED_STAGES =
-        [
-            (MatchmakingStage.RoundWarmupTime, "Next Round"),
-            (MatchmakingStage.UserBeatmapSelect, "Beatmap Selection"),
-            (MatchmakingStage.GameplayWarmupTime, "Get Ready"),
-            (MatchmakingStage.ResultsDisplaying, "Results"),
-            (MatchmakingStage.Ended, "Match End")
-        ];
+        private OsuScrollContainer scroll = null!;
+        private FillFlowContainer flow = null!;
 
         public StageDisplay()
         {
+            RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            List<Dimension> columnDimensions = new List<Dimension>();
-            List<Drawable> columnContent = new List<Drawable>();
+            // TODO: get this from somewhere?
+            const int round_count = 5;
 
-            for (int i = 0; i < DISPLAYED_STAGES.Length; i++)
+            InternalChildren = new Drawable[]
             {
-                if (i > 0)
+                scroll = new OsuScrollContainer(Direction.Horizontal)
                 {
-                    columnDimensions.Add(new Dimension(GridSizeMode.AutoSize));
-                    columnContent.Add(new SpriteIcon
+                    ScrollbarOverlapsContent = false,
+                    ScrollbarVisible = false,
+                    RelativeSizeAxes = Axes.X,
+                    Height = 36,
+                    Child = flow = new FillFlowContainer
                     {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Size = new Vector2(16),
-                        Icon = FontAwesome.Solid.ArrowRight,
-                        Margin = new MarginPadding { Horizontal = 10 }
-                    });
-                }
-
-                columnDimensions.Add(new Dimension());
-                columnContent.Add(new StageBubble(DISPLAYED_STAGES[i].status, DISPLAYED_STAGES[i].text)
+                        AutoSizeAxes = Axes.Both,
+                        Direction = FillDirection.Horizontal,
+                    },
+                },
+                new StageText
                 {
-                    RelativeSizeAxes = Axes.X
-                });
-            }
-
-            InternalChild = new GridContainer
-            {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-                RowDimensions =
-                [
-                    new Dimension(GridSizeMode.AutoSize),
-                    new Dimension(GridSizeMode.AutoSize)
-                ],
-                Content = new Drawable[][]
-                {
-                    [
-                        new GridContainer
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            ColumnDimensions = columnDimensions.ToArray(),
-                            RowDimensions = [new Dimension(GridSizeMode.AutoSize)],
-                            Content = new[] { columnContent.ToArray() }
-                        }
-                    ],
-                    [
-                        new StageText
-                        {
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre
-                        }
-                    ]
+                    Margin = new MarginPadding { Top = 36 + 5, Bottom = 5 },
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre
                 }
             };
+
+            flow.Add(new StageBubble(null, MatchmakingStage.WaitingForClientsJoin, "Waiting for other users"));
+
+            for (int i = 1; i <= round_count; i++)
+            {
+                flow.Add(new StageBubble(i, MatchmakingStage.RoundWarmupTime, "Next Round"));
+                flow.Add(new StageBubble(i, MatchmakingStage.UserBeatmapSelect, "Beatmap Selection"));
+                flow.Add(new StageBubble(i, MatchmakingStage.GameplayWarmupTime, "Get Ready"));
+                flow.Add(new StageBubble(i, MatchmakingStage.ResultsDisplaying, "Results"));
+            }
+
+            flow.Add(new StageBubble(null, MatchmakingStage.Ended, "Match End"));
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+            var drawable = flow.FirstOrDefault(d => d is StageBubble b && b.Active);
+            if (drawable != null)
+                scroll.ScrollTo(drawable);
         }
     }
 }
