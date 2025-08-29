@@ -308,7 +308,12 @@ namespace osu.Game.Screens.SelectV2
                     if (CurrentSelection is GroupedBeatmap groupedBeatmap && beatmapInfo.Equals(groupedBeatmap.Beatmap))
                         return;
 
-                    value = GetCarouselItems()?.Select(item => item.Model).OfType<GroupedBeatmap>().FirstOrDefault(gb => gb.Beatmap.Equals(beatmapInfo));
+                    // it is not universally guaranteed that the carousel items will be materialised at the time this is set.
+                    // therefore, in cases where it is known that they will not be, default to a null group.
+                    // even if grouping is active, this will be rectified to a correct group on the next invocation of `HandleFilterCompleted()`.
+                    value = IsLoaded && !IsFiltering
+                        ? GetCarouselItems()?.Select(item => item.Model).OfType<GroupedBeatmap>().FirstOrDefault(gb => gb.Beatmap.Equals(beatmapInfo))
+                        : new GroupedBeatmap(null, beatmapInfo);
                 }
 
                 base.CurrentSelection = value;
