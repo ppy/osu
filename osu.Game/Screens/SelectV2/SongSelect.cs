@@ -653,6 +653,7 @@ namespace osu.Game.Screens.SelectV2
 
             ensurePlayingSelected();
             updateBackgroundDim();
+            fetchOnlineInfo();
         }
 
         private void onLeavingScreen()
