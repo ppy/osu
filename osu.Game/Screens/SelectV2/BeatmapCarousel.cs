@@ -295,6 +295,26 @@ namespace osu.Game.Screens.SelectV2
         protected override bool ShouldActivateOnKeyboardSelection(CarouselItem item) =>
             grouping.BeatmapSetsGroupedTogether && item.Model is GroupedBeatmap;
 
+        public override object? CurrentSelection
+        {
+            get => base.CurrentSelection;
+            set
+            {
+                // this is a special pathway for external consumers who only care about showing some particular copy of a beatmap
+                // (there could be multiple panels for one beatmap due to grouping).
+                // in this pathway we basically figure out what group to use internally, and continue working with `GroupedBeatmap` all the way after that.
+                if (value is BeatmapInfo beatmapInfo)
+                {
+                    if (CurrentSelection is GroupedBeatmap groupedBeatmap && beatmapInfo.Equals(groupedBeatmap.Beatmap))
+                        return;
+
+                    value = GetCarouselItems()?.Select(item => item.Model).OfType<GroupedBeatmap>().FirstOrDefault(gb => gb.Beatmap.Equals(beatmapInfo));
+                }
+
+                base.CurrentSelection = value;
+            }
+        }
+
         protected override void HandleItemActivated(CarouselItem item)
         {
             try
