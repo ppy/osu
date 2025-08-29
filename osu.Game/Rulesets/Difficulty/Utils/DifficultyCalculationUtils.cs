@@ -190,5 +190,13 @@ namespace osu.Game.Rulesets.Difficulty.Utils
         /// </summary>
         /// <param name="x">Value to calculate the function for</param>
         public static double ErfcInv(double x) => ErfInv(1 - x);
+
+        /// <summary>
+        /// Power (generalised) mean function (https://en.m.wikipedia.org/wiki/Power_mean)
+        /// </summary>
+        public static double PowerMean(double exponent, params double[] values)
+        {
+            return Math.Pow(values.Select(x => Math.Pow(x, exponent)).Sum(), 1.0 / exponent);
+        }
     }
 }
