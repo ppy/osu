@@ -21,7 +21,7 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Matchmaking;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays;
-using osu.Game.Screens.Menu;
+using osu.Game.Overlays.Dialog;
 using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens
@@ -176,14 +176,17 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens
             if (currentState.Value == MatchmakingScreenState.Idle)
                 return false;
 
-            dialogOverlay.Push(new ConfirmDiscardChangesDialog(() =>
+            if (dialogOverlay.CurrentDialog is ConfirmDialog confirmDialog)
+                confirmDialog.PerformOkAction();
+            else
             {
-                if (!this.IsCurrentScreen())
-                    this.MakeCurrent();
-
-                exitConfirmed = true;
-                this.Exit();
-            }));
+                dialogOverlay.Push(new ConfirmDialog("Are you sure you want to leave the matchmaking queue?", () =>
+                {
+                    exitConfirmed = true;
+                    if (this.IsCurrentScreen())
+                        this.Exit();
+                }));
+            }
 
             return true;
         }

@@ -23,6 +23,7 @@ using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.Matchmaking;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Dialog;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Footer;
 using osu.Game.Screens.OnlinePlay.Match.Components;
@@ -63,6 +64,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
 
         [Resolved]
         private BeatmapModelDownloader beatmapDownloader { get; set; } = null!;
+
+        [Resolved]
+        private IDialogOverlay dialogOverlay { get; set; } = null!;
 
         private readonly MultiplayerRoom room;
 
@@ -278,13 +282,32 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
                 }));
         }
 
+        private bool exitConfirmed;
+
         public override bool OnExiting(ScreenExitEvent e)
         {
             if (base.OnExiting(e))
                 return true;
 
-            client.LeaveRoom().FireAndForget();
-            return false;
+            if (exitConfirmed)
+            {
+                client.LeaveRoom().FireAndForget();
+                return false;
+            }
+
+            if (dialogOverlay.CurrentDialog is ConfirmDialog confirmDialog)
+                confirmDialog.PerformOkAction();
+            else
+            {
+                dialogOverlay.Push(new ConfirmDialog("Are you sure you want to leave this multiplayer match?", () =>
+                {
+                    exitConfirmed = true;
+                    if (this.IsCurrentScreen())
+                        this.Exit();
+                }));
+            }
+
+            return true;
         }
 
         public override void OnResuming(ScreenTransitionEvent e)
