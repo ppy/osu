@@ -6,13 +6,10 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Extensions;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
@@ -36,16 +33,6 @@ namespace osu.Game.Tests.Visual.Matchmaking
 
         private MultiplayerRoomUser[] users = null!;
         private MatchmakingScreen screen = null!;
-
-        public TestSceneMatchmakingScreen()
-        {
-            Add(new BackButton
-            {
-                Anchor = Anchor.BottomLeft,
-                Origin = Anchor.BottomLeft,
-                State = { Value = Visibility.Visible }
-            });
-        }
 
         public override void SetUpSteps()
         {

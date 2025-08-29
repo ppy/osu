@@ -23,6 +23,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens
 
         public override bool? ApplyModTrackAdjustments => true;
 
+        public override bool ShowFooter => true;
+
         private Container introContent = null!;
 
         private Container titleContainer = null!;
