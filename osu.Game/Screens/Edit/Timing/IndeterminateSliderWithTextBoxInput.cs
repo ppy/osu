@@ -49,6 +49,12 @@ namespace osu.Game.Screens.Edit.Timing
         private readonly SettingsSlider<T> slider;
         private readonly LabelledTextBox textBox;
 
+        public event TextBox.OnCommitHandler OnCommit
+        {
+            add => textBox.OnCommit += value;
+            remove => textBox.OnCommit -= value;
+        }
+
         /// <summary>
         /// Creates an <see cref="IndeterminateSliderWithTextBoxInput{T}"/>.
         /// </summary>
