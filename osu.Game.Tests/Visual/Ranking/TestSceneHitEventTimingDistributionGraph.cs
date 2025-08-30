@@ -150,6 +150,29 @@ namespace osu.Game.Tests.Visual.Ranking
             }).ToList());
         }
 
+        [Test]
+        public void TestRateAdjustment()
+        {
+            // Test that timing distribution correctly adjusts for rate changes in non-mania rulesets
+            // At 1.2x rate, a -24ms TimeOffset should be displayed as -20ms (-24/1.2)
+            createTest(new List<HitEvent>
+            {
+                // These hits at 1.2x rate should be displayed at their adjusted positions
+                new HitEvent(-24, 1.2, HitResult.Great, placeholder_object, placeholder_object, null), // Should appear at -20ms
+                new HitEvent(-12, 1.2, HitResult.Great, placeholder_object, placeholder_object, null), // Should appear at -10ms
+                new HitEvent(0, 1.2, HitResult.Great, placeholder_object, placeholder_object, null),   // Should appear at 0ms
+                new HitEvent(12, 1.2, HitResult.Great, placeholder_object, placeholder_object, null),  // Should appear at +10ms
+                new HitEvent(24, 1.2, HitResult.Great, placeholder_object, placeholder_object, null),  // Should appear at +20ms
+                
+                // For comparison, hits at 1.0x rate should appear at their raw TimeOffset
+                new HitEvent(-20, 1.0, HitResult.Perfect, placeholder_object, placeholder_object, null), // Should appear at -20ms
+                new HitEvent(-10, 1.0, HitResult.Perfect, placeholder_object, placeholder_object, null), // Should appear at -10ms
+                new HitEvent(0, 1.0, HitResult.Perfect, placeholder_object, placeholder_object, null),   // Should appear at 0ms
+                new HitEvent(10, 1.0, HitResult.Perfect, placeholder_object, placeholder_object, null),  // Should appear at +10ms
+                new HitEvent(20, 1.0, HitResult.Perfect, placeholder_object, placeholder_object, null),  // Should appear at +20ms
+            });
+        }
+
         private void createTest(List<HitEvent> events) => AddStep("create test", () =>
         {
             Children = new Drawable[]
