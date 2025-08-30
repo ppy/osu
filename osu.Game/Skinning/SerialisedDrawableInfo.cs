@@ -35,6 +35,8 @@ namespace osu.Game.Skinning
 
         public Vector2 Scale { get; set; } = Vector2.One;
 
+        public float Alpha { get; set; } = 1f;
+
         public float? Width { get; set; }
 
         public float? Height { get; set; }
@@ -66,6 +68,7 @@ namespace osu.Game.Skinning
             Position = component.Position;
             Rotation = component.Rotation;
             Scale = component.Scale;
+            Alpha = component.Alpha;
 
             if ((component as CompositeDrawable)?.AutoSizeAxes.HasFlag(Axes.X) != true)
                 Width = component.Width;

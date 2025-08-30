@@ -25,6 +25,7 @@ namespace osu.Game.Skinning
             component.Scale = drawableInfo.Scale;
             component.Anchor = drawableInfo.Anchor;
             component.Origin = drawableInfo.Origin;
+            component.Alpha = drawableInfo.Alpha;
 
             if (component is ISerialisableDrawable serialisableDrawable)
             {

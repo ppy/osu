@@ -3,6 +3,7 @@
 
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Configuration;
@@ -23,10 +24,21 @@ namespace osu.Game.Overlays.SkinEditor
 
         private readonly Drawable component;
 
+        /// <summary>
+        /// Default setting for all skin HUD components
+        /// </summary>
+        private BindableFloat alpha { get; } = new BindableFloat(1f)
+        {
+            MinValue = 0.05f,
+            MaxValue = 1f,
+            Precision = 0.01f,
+        };
+
         public SkinSettingsToolbox(Drawable component)
             : base(SkinEditorStrings.Settings(component.GetType().Name))
         {
             this.component = component;
+            alpha.Value = this.component.Alpha;
 
             base.Content.Add(Content = new FillFlowContainer
             {
@@ -40,7 +52,14 @@ namespace osu.Game.Overlays.SkinEditor
         [BackgroundDependencyLoader]
         private void load()
         {
-            var controls = component.CreateSettingsControls().ToArray();
+            var controls = component.CreateSettingsControls().ToArray().Append(
+                new SettingsSlider<float>
+                {
+                    LabelText = "Alpha",
+                    TooltipText = "Object visibility",
+                    Current = alpha,
+                    KeyboardStep = 0.1f,
+                });
 
             Content.AddRange(controls);
 
@@ -51,6 +70,13 @@ namespace osu.Game.Overlays.SkinEditor
                 // We will want to expose a SettingCommitted or similar to make this work better.
                 c.SettingChanged += () => changeHandler?.SaveState();
             }
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            alpha.BindValueChanged(a => component.Alpha = a.NewValue);
         }
     }
 }
