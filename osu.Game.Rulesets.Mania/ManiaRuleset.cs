@@ -436,6 +436,8 @@ namespace osu.Game.Rulesets.Mania
                 perfectHitWindow /= ManiaModHardRock.HIT_WINDOW_DIFFICULTY_MULTIPLIER;
             else if (mods.Any(m => m is ManiaModEasy))
                 perfectHitWindow /= ManiaModEasy.HIT_WINDOW_DIFFICULTY_MULTIPLIER;
+            else if (mods.Any(m => m is ManiaModDifficultyAdjust))
+                perfectHitWindow /= ManiaModDifficultyAdjust.CurrentHitWindowDifficultyMultiplier;
 
             adjustedDifficulty.OverallDifficulty = (float)IBeatmapDifficultyInfo.InverseDifficultyRange(perfectHitWindow, ManiaHitWindows.PERFECT_WINDOW_RANGE);
             adjustedDifficulty.CircleSize = ManiaBeatmapConverter.GetColumnCount(LegacyBeatmapConversionDifficultyInfo.FromBeatmapInfo(beatmapInfo), mods);
