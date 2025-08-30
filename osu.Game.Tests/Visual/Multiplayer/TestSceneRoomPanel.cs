@@ -82,6 +82,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         }),
                         createLoungeRoom(new Room
                         {
+                            Name = "Pinned room",
+                            Pinned = true,
+                            EndDate = DateTimeOffset.Now.AddDays(1),
+                            Type = MatchType.HeadToHead,
+                            Playlist = [item1],
+                            CurrentPlaylistItem = item1
+                        }),
+                        createLoungeRoom(new Room
+                        {
                             Name = "Private room",
                             Password = "*",
                             EndDate = DateTimeOffset.Now.AddDays(1),
@@ -121,9 +130,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 };
             });
 
-            AddUntilStep("wait for panel load", () => rooms.Count == 7);
-            AddUntilStep("correct status text", () => rooms.ChildrenOfType<OsuSpriteText>().Count(s => s.Text.ToString().StartsWith("Currently playing", StringComparison.Ordinal)) == 2);
-            AddUntilStep("correct status text", () => rooms.ChildrenOfType<OsuSpriteText>().Count(s => s.Text.ToString().StartsWith("Ready to play", StringComparison.Ordinal)) == 5);
+            AddUntilStep("wait for panel load", () => rooms.Count, () => Is.EqualTo(8));
+            AddUntilStep("\"currently playing\" room count correct", () => rooms.ChildrenOfType<OsuSpriteText>().Count(s => s.Text.ToString().StartsWith("Currently playing", StringComparison.Ordinal)), () => Is.EqualTo(3));
+            AddUntilStep("\"ready to play\" room count correct", () => rooms.ChildrenOfType<OsuSpriteText>().Count(s => s.Text.ToString().StartsWith("Ready to play", StringComparison.Ordinal)), () => Is.EqualTo(4));
         }
 
         [Test]
@@ -140,13 +149,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddUntilStep("wait for panel load", () => panel.ChildrenOfType<DrawableRoomParticipantsList>().Any());
 
-            AddAssert("password icon hidden", () => Precision.AlmostEquals(0, panel.ChildrenOfType<RoomPanel.PasswordProtectedIcon>().Single().Alpha));
+            AddAssert("password icon hidden", () => Precision.AlmostEquals(0, panel.ChildrenOfType<RoomPanel.CornerIcon>().First().Alpha));
 
             AddStep("set password", () => room.Password = "password");
-            AddAssert("password icon visible", () => Precision.AlmostEquals(1, panel.ChildrenOfType<RoomPanel.PasswordProtectedIcon>().Single().Alpha));
+            AddAssert("password icon visible", () => Precision.AlmostEquals(1, panel.ChildrenOfType<RoomPanel.CornerIcon>().First().Alpha));
 
             AddStep("unset password", () => room.Password = string.Empty);
-            AddAssert("password icon hidden", () => Precision.AlmostEquals(0, panel.ChildrenOfType<RoomPanel.PasswordProtectedIcon>().Single().Alpha));
+            AddAssert("password icon hidden", () => Precision.AlmostEquals(0, panel.ChildrenOfType<RoomPanel.CornerIcon>().First().Alpha));
         }
 
         [Test]
