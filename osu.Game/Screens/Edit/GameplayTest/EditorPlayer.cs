@@ -14,7 +14,6 @@ using osu.Game.Overlays;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
@@ -55,12 +54,18 @@ namespace osu.Game.Screens.Edit.GameplayTest
             return masterGameplayClockContainer;
         }
 
+        protected override void LoadAsyncComplete()
+        {
+            base.LoadAsyncComplete();
+
+            preventMissOnPreviousHitObjects();
+        }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
             markPreviousObjectsHit();
-            markVisibleDrawableObjectsHit();
 
             ScoreProcessor.HasCompleted.BindValueChanged(completed =>
             {
@@ -111,38 +116,39 @@ namespace osu.Game.Screens.Edit.GameplayTest
             }
         }
 
-        private void markVisibleDrawableObjectsHit()
+        private void preventMissOnPreviousHitObjects()
         {
-            if (!DrawableRuleset.Playfield.IsLoaded)
+            void preventMiss(HitObject hitObject)
             {
-                Schedule(markVisibleDrawableObjectsHit);
-                return;
-            }
+                if (hitObject.StartTime > editorState.Time)
+                    return;
 
-            foreach (var drawableObject in enumerateDrawableObjects(DrawableRuleset.Playfield.AllHitObjects, editorState.Time))
-            {
-                if (drawableObject.Entry == null)
-                    continue;
+                var drawableObject = DrawableRuleset.Playfield.HitObjectContainer
+                                                    .AliveObjects
+                                                    .LastOrDefault(it => it.HitObject == hitObject);
+
+                if (drawableObject?.Entry == null)
+                    return;
 
                 var result = drawableObject.CreateResult(drawableObject.HitObject.Judgement);
                 result.Type = result.Judgement.MaxResult;
                 drawableObject.Entry.Result = result;
             }
 
-            static IEnumerable<DrawableHitObject> enumerateDrawableObjects(IEnumerable<DrawableHitObject> drawableObjects, double cutoffTime)
+            void removeListener()
             {
-                foreach (var drawableObject in drawableObjects)
+                if (!DrawableRuleset.Playfield.IsLoaded)
                 {
-                    foreach (var nested in enumerateDrawableObjects(drawableObject.NestedHitObjects, cutoffTime))
-                    {
-                        if (nested.HitObject.GetEndTime() < cutoffTime)
-                            yield return nested;
-                    }
-
-                    if (drawableObject.HitObject.GetEndTime() < cutoffTime)
-                        yield return drawableObject;
+                    Schedule(removeListener);
+                    return;
                 }
+
+                DrawableRuleset.Playfield.HitObjectUsageBegan -= preventMiss;
             }
+
+            DrawableRuleset.Playfield.HitObjectUsageBegan += preventMiss;
+
+            Schedule(removeListener);
         }
 
         protected override void PrepareReplay()
