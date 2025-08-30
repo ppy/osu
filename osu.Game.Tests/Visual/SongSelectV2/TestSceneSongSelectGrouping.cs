@@ -317,7 +317,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddAssert($"\"{name}\" present", () =>
             {
                 var group = grouping.GroupItems.Single(g => g.Key.Title == name);
-                var actualBeatmaps = group.Value.Select(i => i.Model).OfType<BeatmapInfo>().OrderBy(b => b.ID);
+                var actualBeatmaps = group.Value.Select(i => i.Model).OfType<GroupedBeatmap>().Select(gb => gb.Beatmap).OrderBy(b => b.ID);
                 var expectedBeatmaps = getBeatmaps().SelectMany(s => s.Beatmaps).OrderBy(b => b.ID);
                 return actualBeatmaps.SequenceEqual(expectedBeatmaps);
             });

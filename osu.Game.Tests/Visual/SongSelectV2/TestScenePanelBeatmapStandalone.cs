@@ -104,21 +104,21 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                     {
                         new PanelBeatmapStandalone
                         {
-                            Item = new CarouselItem(beatmap)
+                            Item = new CarouselItem(new GroupedBeatmap(null, beatmap))
                         },
                         new PanelBeatmapStandalone
                         {
-                            Item = new CarouselItem(beatmap),
+                            Item = new CarouselItem(new GroupedBeatmap(null, beatmap)),
                             KeyboardSelected = { Value = true }
                         },
                         new PanelBeatmapStandalone
                         {
-                            Item = new CarouselItem(beatmap),
+                            Item = new CarouselItem(new GroupedBeatmap(null, beatmap)),
                             Selected = { Value = true }
                         },
                         new PanelBeatmapStandalone
                         {
-                            Item = new CarouselItem(beatmap),
+                            Item = new CarouselItem(new GroupedBeatmap(null, beatmap)),
                             KeyboardSelected = { Value = true },
                             Selected = { Value = true }
                         },
