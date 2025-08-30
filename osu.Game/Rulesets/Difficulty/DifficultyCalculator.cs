@@ -19,6 +19,7 @@ using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Utils;
+using osuTK;
 
 namespace osu.Game.Rulesets.Difficulty
 {
@@ -401,6 +402,24 @@ namespace osu.Game.Rulesets.Difficulty
             {
                 get => baseBeatmap.GridSize;
                 set => baseBeatmap.GridSize = value;
+            }
+
+            public int GridType
+            {
+                get => baseBeatmap.GridType;
+                set => baseBeatmap.GridType = value;
+            }
+
+            public int GridRotation
+            {
+                get => baseBeatmap.GridRotation;
+                set => baseBeatmap.GridRotation = value;
+            }
+
+            public Vector2 GridOffset
+            {
+                get => baseBeatmap.GridOffset;
+                set => baseBeatmap.GridOffset = value;
             }
 
             public double TimelineZoom
