@@ -14,6 +14,11 @@ namespace osu.Game.Rulesets.Mania
         private readonly InputKey[] stage1RightKeys;
         private readonly InputKey[] stage2LeftKeys;
         private readonly InputKey[] stage2RightKeys;
+        private readonly InputKey[] stage1SecondaryLeftKeys;
+        private readonly InputKey[] stage1SecondaryRightKeys;
+        private readonly InputKey[] stage2SecondaryLeftKeys;
+        private readonly InputKey[] stage2SecondaryRightKeys;
+
 
         public DualStageVariantGenerator(int singleStageVariant)
         {
@@ -27,6 +32,12 @@ namespace osu.Game.Rulesets.Mania
 
                 stage2LeftKeys = new[] { InputKey.S, InputKey.D, InputKey.F, InputKey.G, InputKey.B };
                 stage2RightKeys = new[] { InputKey.N, InputKey.J, InputKey.K, InputKey.L, InputKey.Semicolon };
+
+                stage1SecondaryLeftKeys = new[] { InputKey.None, InputKey.None, InputKey.None, InputKey.None, InputKey.None };
+                stage1SecondaryRightKeys = new[] { InputKey.None, InputKey.None, InputKey.None, InputKey.None, InputKey.None };
+
+                stage2SecondaryLeftKeys = new[] { InputKey.None, InputKey.None, InputKey.None, InputKey.None, InputKey.None };
+                stage2SecondaryRightKeys = new[] { InputKey.None, InputKey.None, InputKey.None, InputKey.None, InputKey.None };
             }
             else
             {
@@ -35,6 +46,12 @@ namespace osu.Game.Rulesets.Mania
 
                 stage2LeftKeys = new[] { InputKey.S, InputKey.D, InputKey.F, InputKey.G };
                 stage2RightKeys = new[] { InputKey.J, InputKey.K, InputKey.L, InputKey.Semicolon };
+
+                stage1SecondaryLeftKeys = new[] { InputKey.None, InputKey.None, InputKey.None, InputKey.None };
+                stage1SecondaryRightKeys = new[] { InputKey.None, InputKey.None, InputKey.None, InputKey.None };
+
+                stage2SecondaryLeftKeys = new[] { InputKey.None, InputKey.None, InputKey.None, InputKey.None };
+                stage2SecondaryRightKeys = new[] { InputKey.None, InputKey.None, InputKey.None, InputKey.None };
             }
         }
 
@@ -44,14 +61,20 @@ namespace osu.Game.Rulesets.Mania
             {
                 LeftKeys = stage1LeftKeys,
                 RightKeys = stage1RightKeys,
+                SecondaryLeftKeys = stage1SecondaryLeftKeys,
+                SecondaryRightKeys = stage1SecondaryRightKeys,
                 SpecialKey = InputKey.V,
+                SecondarySpecialKey = InputKey.Space
             }.GenerateKeyBindingsFor(singleStageVariant);
 
             var stage2Bindings = new VariantMappingGenerator
             {
                 LeftKeys = stage2LeftKeys,
                 RightKeys = stage2RightKeys,
+                SecondaryLeftKeys = stage2SecondaryLeftKeys,
+                SecondaryRightKeys = stage2SecondaryRightKeys,
                 SpecialKey = InputKey.B,
+                SecondarySpecialKey = InputKey.Enter,
                 ActionStart = (ManiaAction)singleStageVariant,
             }.GenerateKeyBindingsFor(singleStageVariant);
 
