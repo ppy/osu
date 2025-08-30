@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Mania.Mods
         [SettingSource("Hit Window Adjustment", "Adjust hit window timings as if Hard Rock or Easy were enabled.")]
         public Bindable<HitWindowAdjustmentType> HitWindowAdjustment { get; } = new Bindable<HitWindowAdjustmentType>(HitWindowAdjustmentType.Off);
 
-        public static double CurrentHitWindowDifficultyMultiplier;
+        public static double CurrentHitWindowDifficultyMultiplier = 1;
 
         void IApplicableToHitObject.ApplyToHitObject(HitObject hitObject)
         {
@@ -29,6 +29,7 @@ namespace osu.Game.Rulesets.Mania.Mods
                     CurrentHitWindowDifficultyMultiplier = 1 / 1.4;
                     break;
 
+                case HitWindowAdjustmentType.Off:
                 default:
                     CurrentHitWindowDifficultyMultiplier = 1;
                     break;
