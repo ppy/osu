@@ -12,25 +12,26 @@ namespace osu.Game.Rulesets.Mania.Mods
 {
     public class ManiaModDifficultyAdjust : ModDifficultyAdjust, IApplicableToHitObject
     {
-        [SettingSource("Apply to hit objects", "Adjust the timings as if Hard Rock or Easy is enabled.")]
+        [SettingSource("Hit Window Adjustment", "Adjust hit window timings as if Hard Rock or Easy were enabled.")]
         public Bindable<HitWindowAdjustmentType> HitWindowAdjustment { get; } = new Bindable<HitWindowAdjustmentType>(HitWindowAdjustmentType.Off);
 
         public static double CurrentHitWindowDifficultyMultiplier;
 
         void IApplicableToHitObject.ApplyToHitObject(HitObject hitObject)
         {
-            if (HitWindowAdjustment.Value == HitWindowAdjustmentType.HardRock)
+            switch (HitWindowAdjustment.Value)
             {
-                CurrentHitWindowDifficultyMultiplier = 1.4;
-            }
+                case HitWindowAdjustmentType.HardRock:
+                    CurrentHitWindowDifficultyMultiplier = 1.4;
+                    break;
 
-            else if (HitWindowAdjustment.Value == HitWindowAdjustmentType.Easy)
-            {
-                CurrentHitWindowDifficultyMultiplier = 1 / 1.4;
-            }
-            else
-            {
-                CurrentHitWindowDifficultyMultiplier = 1;
+                case HitWindowAdjustmentType.Easy:
+                    CurrentHitWindowDifficultyMultiplier = 1 / 1.4;
+                    break;
+
+                default:
+                    CurrentHitWindowDifficultyMultiplier = 1;
+                    break;
             }
 
             switch (hitObject)
