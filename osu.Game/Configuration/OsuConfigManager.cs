@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using osu.Framework;
 using osu.Framework.Bindables;
 using osu.Framework.Configuration;
@@ -22,6 +23,7 @@ using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
 using osu.Game.Screens.Select.Leaderboards;
+using osu.Game.Screens.SelectV2;
 using osu.Game.Skinning;
 using osu.Game.Users;
 
@@ -51,6 +53,7 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.SongSelectGroupMode, GroupMode.None);
             SetDefault(OsuSetting.SongSelectSortingMode, SortMode.Title);
+            SetDefault(OsuSetting.SongSelectCircleSizeMode, CsItemIds.ALL.First().Id);
 
             SetDefault(OsuSetting.RandomSelectAlgorithm, RandomSelectAlgorithm.RandomPermutation);
             SetDefault(OsuSetting.ModSelectHotkeyStyle, ModSelectHotkeyStyle.Sequential);
@@ -399,6 +402,7 @@ namespace osu.Game.Configuration
         DisplayStarsMaximum,
         SongSelectGroupMode,
         SongSelectSortingMode,
+        SongSelectCircleSizeMode,
         RandomSelectAlgorithm,
         ModSelectHotkeyStyle,
         ShowFpsDisplay,

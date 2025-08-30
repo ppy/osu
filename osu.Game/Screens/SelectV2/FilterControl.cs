@@ -43,6 +43,7 @@ namespace osu.Game.Screens.SelectV2
         private ShearedDropdown<SortMode> sortDropdown = null!;
         private ShearedDropdown<GroupMode> groupDropdown = null!;
         private CollectionDropdown collectionDropdown = null!;
+        private CircleSizeSelector csSelector = null!;
 
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; } = null!;
@@ -181,6 +182,10 @@ namespace osu.Game.Screens.SelectV2
                                 }
                             }
                         },
+                        csSelector = new CircleSizeSelector
+                        {
+                            RelativeSizeAxes = Axes.X,
+                        },
                     },
                 }
             };
@@ -238,6 +243,9 @@ namespace osu.Game.Screens.SelectV2
 
             localUser.BindValueChanged(_ => updateCriteria());
 
+            csSelector.Current.BindValueChanged(_ => updateCriteria());
+            csSelector.CircleSizeFilter.SelectionChanged += updateCriteria;
+
             updateCriteria();
         }
 
@@ -273,10 +281,42 @@ namespace osu.Game.Screens.SelectV2
             if (!difficultyRangeSlider.UpperBound.IsDefault)
                 criteria.UserStarDifficulty.Max = difficultyRangeSlider.UpperBound.Value;
 
+            applyCircleSizeFilter(criteria);
+
             criteria.RulesetCriteria = ruleset.Value.CreateInstance().CreateRulesetFilterCriteria();
 
             FilterQueryParser.ApplyQueries(criteria, query);
             return criteria;
+        }
+
+        private void applyCircleSizeFilter(FilterCriteria criteria)
+        {
+            var selectedModeIds = csSelector.CircleSizeFilter.SelectedModeIds;
+
+            if (selectedModeIds.Count == 0 || selectedModeIds.Contains("All"))
+                return;
+
+            var selectedModes = CsItemIds.ALL
+                                         .Where(m => selectedModeIds.Contains(m.Id) && m.CsValue.HasValue)
+                                         .Select(m => m.CsValue!.Value)
+                                         .ToList();
+
+            if (selectedModes.Count == 0)
+                return;
+
+            criteria.DiscreteCircleSizeValues = new List<float>(selectedModes);
+
+            if (ruleset.Value.OnlineID != 3)
+            {
+                // For no mania rulesets, ±0.5 is an intuitive range.
+                criteria.CircleSize = new FilterCriteria.OptionalRange<float>
+                {
+                    Min = selectedModes.Min() - 0.5f,
+                    Max = selectedModes.Max() + 0.5f,
+                    IsLowerInclusive = false,
+                    IsUpperInclusive = false
+                };
+            }
         }
 
         private void updateCriteria()

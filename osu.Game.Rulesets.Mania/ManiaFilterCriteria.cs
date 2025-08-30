@@ -29,6 +29,11 @@ namespace osu.Game.Rulesets.Mania
             bool keyCountMatch = includedKeyCounts.Contains(keyCount);
             bool longNotePercentageMatch = !longNotePercentage.HasFilter || (!isConvertedBeatmap(beatmapInfo) && longNotePercentage.IsInRange(calculateLongNotePercentage(beatmapInfo)));
 
+            if (criteria.DiscreteCircleSizeValues?.Any() == true)
+            {
+                keyCountMatch = criteria.DiscreteCircleSizeValues.Contains(keyCount);
+            }
+
             return keyCountMatch && longNotePercentageMatch;
         }
 

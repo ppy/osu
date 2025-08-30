@@ -116,6 +116,8 @@ namespace osu.Game.Screens.Select
         /// </summary>
         public IEnumerable<string>? CollectionBeatmapMD5Hashes { get; set; }
 
+        public List<float>? DiscreteCircleSizeValues { get; set; }
+
         public IRulesetFilterCriteria? RulesetCriteria { get; set; }
 
         /// <summary>
