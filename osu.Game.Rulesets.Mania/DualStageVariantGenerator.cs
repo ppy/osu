@@ -19,7 +19,6 @@ namespace osu.Game.Rulesets.Mania
         private readonly InputKey[] stage2SecondaryLeftKeys;
         private readonly InputKey[] stage2SecondaryRightKeys;
 
-
         public DualStageVariantGenerator(int singleStageVariant)
         {
             this.singleStageVariant = singleStageVariant;
