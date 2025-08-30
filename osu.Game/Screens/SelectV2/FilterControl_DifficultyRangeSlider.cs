@@ -111,7 +111,7 @@ namespace osu.Game.Screens.SelectV2
             {
                 float borderStart = LowerBoundSlider.NormalizedValue * LowerBoundSlider.UsableWidth / LowerBoundSlider.DrawWidth;
                 float borderEnd = UpperBoundSlider.NormalizedValue * UpperBoundSlider.UsableWidth / UpperBoundSlider.DrawWidth;
-                borderEnd += UpperBoundSlider.NubWidth / UpperBoundSlider.DrawWidth;
+                borderEnd += UpperBoundSlider.NubWidth / UpperBoundSlider.DrawWidth * 2;
 
                 borderContainer.MoveToX(borderStart, instant ? 0 : 250, Easing.OutQuint);
                 borderContainer.ResizeWidthTo(borderEnd - borderStart, instant ? 0 : 250, Easing.OutQuint);
