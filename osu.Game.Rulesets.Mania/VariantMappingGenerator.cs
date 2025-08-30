@@ -15,15 +15,21 @@ namespace osu.Game.Rulesets.Mania
         /// </summary>
         public InputKey[] LeftKeys;
 
+        public InputKey[] SecondaryLeftKeys;
+
         /// <summary>
         /// All the <see cref="InputKey"/>s available to the right hand.
         /// </summary>
         public InputKey[] RightKeys;
 
+        public InputKey[] SecondaryRightKeys;
+
         /// <summary>
         /// The <see cref="InputKey"/> for the special key.
         /// </summary>
         public InputKey SpecialKey;
+
+        public InputKey SecondarySpecialKey;
 
         /// <summary>
         /// The <see cref="ManiaAction"/> at which the columns should begin.
@@ -42,13 +48,22 @@ namespace osu.Game.Rulesets.Mania
             var bindings = new List<KeyBinding>();
 
             for (int i = LeftKeys.Length - columns / 2; i < LeftKeys.Length; i++)
-                bindings.Add(new KeyBinding(LeftKeys[i], currentAction++));
+            {
+                bindings.Add(new KeyBinding(LeftKeys[i], currentAction));
+                bindings.Add(new KeyBinding(SecondaryLeftKeys[i], currentAction++));
+            }
 
             if (columns % 2 == 1)
-                bindings.Add(new KeyBinding(SpecialKey, currentAction++));
+            {
+                bindings.Add(new KeyBinding(SpecialKey, currentAction));
+                bindings.Add(new KeyBinding(SecondarySpecialKey, currentAction++));
+            }
 
             for (int i = 0; i < columns / 2; i++)
-                bindings.Add(new KeyBinding(RightKeys[i], currentAction++));
+            {
+                bindings.Add(new KeyBinding(RightKeys[i], currentAction));
+                bindings.Add(new KeyBinding(SecondaryRightKeys[i], currentAction++));
+            }
 
             return bindings;
         }
