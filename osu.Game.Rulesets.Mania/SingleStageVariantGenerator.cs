@@ -23,8 +23,8 @@ namespace osu.Game.Rulesets.Mania
             {
                 leftKeys = new[] { InputKey.A, InputKey.S, InputKey.D, InputKey.F, InputKey.V };
                 rightKeys = new[] { InputKey.N, InputKey.J, InputKey.K, InputKey.L, InputKey.Semicolon };
-                secondaryLeftKeys = new[] { InputKey.Q, InputKey.W, InputKey.E, InputKey.R, InputKey.G };
-                secondaryRightKeys = new[] { InputKey.H, InputKey.I, InputKey.O, InputKey.P, InputKey.BracketLeft };
+                secondaryLeftKeys = new[] { InputKey.Q, InputKey.W, InputKey.E, InputKey.R, InputKey.B };
+                secondaryRightKeys = new[] { InputKey.M, InputKey.I, InputKey.O, InputKey.P, InputKey.BracketLeft };
             }
             else
             {
