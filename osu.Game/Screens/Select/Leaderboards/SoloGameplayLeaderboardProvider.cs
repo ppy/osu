@@ -61,6 +61,7 @@ namespace osu.Game.Screens.Select.Leaderboards
             Scheduler.AddDelayed(sort, 1000, true);
         }
 
+        // logic shared with PlaylistsGameplayLeaderboardProvider
         private void sort()
         {
             if (sorting.IsValid)

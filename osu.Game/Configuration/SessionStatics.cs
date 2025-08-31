@@ -8,6 +8,8 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osu.Game.Scoring;
+using osu.Game.Screens.Play.HUD;
+using osu.Game.Skinning;
 using osu.Game.Users;
 
 namespace osu.Game.Configuration
@@ -25,6 +27,7 @@ namespace osu.Game.Configuration
             SetDefault(Static.FeaturedArtistDisclaimerShownOnce, false);
             SetDefault(Static.LastHoverSoundPlaybackTime, (double?)null);
             SetDefault(Static.LastModSelectPanelSamplePlaybackTime, (double?)null);
+            SetDefault(Static.LastRankChangeSamplePlaybackTime, (double?)null);
             SetDefault<APISeasonalBackgrounds?>(Static.SeasonalBackgrounds, null);
             SetDefault(Static.TouchInputActive, RuntimeInfo.IsMobile);
             SetDefault<ScoreInfo?>(Static.LastLocalUserScore, null);
@@ -71,6 +74,12 @@ namespace osu.Game.Configuration
         /// Used to debounce <see cref="ModSelectPanel"/> on/off sounds game-wide to avoid volume saturation, especially in activating mod presets with many mods.
         /// </summary>
         LastModSelectPanelSamplePlaybackTime,
+
+        /// <summary>
+        /// The last playback time in milliseconds of a rank up/down sample (in <see cref="DefaultRankDisplay"/> and <see cref="LegacyRankDisplay"/>).
+        /// Used to debounce rank change sounds game-wide to avoid potential volume saturation from multiple simultaneous playback.
+        /// </summary>
+        LastRankChangeSamplePlaybackTime,
 
         /// <summary>
         /// Whether the last positional input received was a touch input.

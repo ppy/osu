@@ -267,6 +267,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                 {
                     yield return new StatisticItem("Tag the beatmap!", () => new UserTagControl(newScore.BeatmapInfo)
                     {
+                        Writable = true,
                         RelativeSizeAxes = Axes.X,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
@@ -274,12 +275,31 @@ namespace osu.Game.Screens.Ranking.Statistics
                 }
                 else
                 {
-                    yield return new StatisticItem("Tag the beatmap!", () => new OsuTextFlowContainer(cp => cp.Font = OsuFont.GetFont(size: StatisticItem.FONT_SIZE, weight: FontWeight.SemiBold))
+                    yield return new StatisticItem("Tag the beatmap!", () => new FillFlowContainer<CompositeDrawable>
                     {
+                        Children = new CompositeDrawable[]
+                        {
+                            new OsuTextFlowContainer(cp => cp.Font = OsuFont.GetFont(size: StatisticItem.FONT_SIZE, weight: FontWeight.SemiBold))
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                TextAnchor = Anchor.Centre,
+                                Text = preventTaggingReason,
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                            },
+                            new UserTagControl(newScore.BeatmapInfo)
+                            {
+                                Writable = false,
+                                RelativeSizeAxes = Axes.X,
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                            }
+                        },
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        TextAnchor = Anchor.Centre,
-                        Text = preventTaggingReason,
+                        Direction = FillDirection.Vertical,
+                        Spacing = new Vector2(4),
                     });
                 }
             }

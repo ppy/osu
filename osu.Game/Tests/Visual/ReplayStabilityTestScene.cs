@@ -57,6 +57,11 @@ namespace osu.Game.Tests.Visual
 
             AddStep(@"exit player", () => currentPlayer.Exit());
 
+            // The incoming beatmap is ruleset-typed in every usage, so the incoming hitobjects will be used as-is rather than being converted.
+            // Because we'll be re-using the beatmap (thus also the hitobjects), we need to make sure the previous player has been fully disposed.
+            AddUntilStep("player exited", () => !currentPlayer.IsCurrentScreen());
+            AddStep("dispose player", () => currentPlayer.Dispose());
+
             AddStep(@"encode and decode score", () =>
             {
                 var encoder = new LegacyScoreEncoder(originalScore, beatmap);

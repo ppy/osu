@@ -5,10 +5,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Configuration;
+using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Taiko.Beatmaps;
 using osu.Game.Rulesets.Taiko.Objects;
@@ -21,6 +23,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
         public override string Acronym => "SR";
         public override double ScoreMultiplier => 0.6;
         public override LocalisableString Description => "Simplify tricky rhythms!";
+        public override IconUsage? Icon => OsuIcon.ModSimplifiedRhythm;
         public override ModType Type => ModType.DifficultyReduction;
 
         [SettingSource("1/3 to 1/2 conversion", "Converts 1/3 patterns to 1/2 rhythm.")]

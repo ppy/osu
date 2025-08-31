@@ -221,6 +221,7 @@ namespace osu.Game.Skinning
             jsonContent = jsonContent.Replace(@"osu.Game.Screens.Play.HUD.LegacyComboCounter", @"osu.Game.Skinning.LegacyComboCounter");
             jsonContent = jsonContent.Replace(@"osu.Game.Skinning.LegacyComboCounter", @"osu.Game.Skinning.LegacyDefaultComboCounter");
             jsonContent = jsonContent.Replace(@"osu.Game.Screens.Play.HUD.PerformancePointsCounter", @"osu.Game.Skinning.Triangles.TrianglesPerformancePointsCounter");
+            jsonContent = jsonContent.Replace(@"osu.Game.Screens.Play.HUD.UnstableRateCounter", @"osu.Game.Skinning.Triangles.TrianglesUnstableRateCounter");
 
             try
             {

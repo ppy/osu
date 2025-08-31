@@ -54,7 +54,7 @@ namespace osu.Game.Screens.SelectV2
         {
             AutoSizeAxes = Axes.Both;
 
-            InternalChild = updateable = new UpdateableRank
+            InternalChild = updateable = new UpdateableRank(animate: false)
             {
                 Size = new Vector2(40, 20),
                 Alpha = 0,
