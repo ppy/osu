@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Mania.Mods
                     yield return setting;
 
                 if (!HitWindowAdjustment.IsDefault)
-                    yield return ("Hit Window Adjustment", HitWindowAdjustment.GetDescription());
+                    yield return ("Hit Window Adjustment", HitWindowAdjustment.Value.GetDescription());
             }
         }
 
