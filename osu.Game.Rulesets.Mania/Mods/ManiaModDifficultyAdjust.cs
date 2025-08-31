@@ -1,7 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
+using System.ComponentModel;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
+using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Scoring;
@@ -16,6 +20,18 @@ namespace osu.Game.Rulesets.Mania.Mods
         public Bindable<HitWindowAdjustmentType> HitWindowAdjustment { get; } = new Bindable<HitWindowAdjustmentType>(HitWindowAdjustmentType.Off);
 
         public static double CurrentHitWindowDifficultyMultiplier = 1;
+
+        public override IEnumerable<(LocalisableString setting, LocalisableString value)> SettingDescription
+        {
+            get
+            {
+                foreach (var setting in base.SettingDescription)
+                    yield return setting;
+
+                if (!HitWindowAdjustment.IsDefault)
+                    yield return ("Hit Window Adjustment", HitWindowAdjustment.GetDescription());
+            }
+        }
 
         void IApplicableToHitObject.ApplyToHitObject(HitObject hitObject)
         {
@@ -50,8 +66,13 @@ namespace osu.Game.Rulesets.Mania.Mods
 
         public enum HitWindowAdjustmentType
         {
+            [Description("Off")]
             Off,
+
+            [Description("Hard Rock")]
             HardRock,
+
+            [Description("Easy")]
             Easy
         }
     }
