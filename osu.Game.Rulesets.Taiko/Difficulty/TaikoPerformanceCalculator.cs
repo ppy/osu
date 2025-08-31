@@ -79,7 +79,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
         private double computeDifficultyValue(ScoreInfo score, TaikoDifficultyAttributes attributes, bool isConvert, bool isClassic)
         {
-            if (estimatedUnstableRate == null)
+            if (estimatedUnstableRate == null || totalDifficultHits == 0)
                 return 0;
 
             // The estimated unstable rate for 100% accuracy, at which all rhythm difficulty has been played successfully.
