@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Rhythm.Data
 
         public readonly SameRhythmHitObjectGrouping? Previous;
 
-        private static readonly double snap_tolerance = IntervalGroupingUtils.MarginOfError;
+        private const double snap_tolerance = IntervalGroupingUtils.MARGIN_OF_ERROR;
 
         /// <summary>
         /// <see cref="DifficultyHitObject.StartTime"/> of the first hit object.
