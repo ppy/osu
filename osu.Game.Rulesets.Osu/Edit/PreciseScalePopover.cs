@@ -140,7 +140,11 @@ namespace osu.Game.Rulesets.Osu.Edit
             base.LoadComplete();
 
             ScheduleAfterChildren(() => scaleInput.TakeFocus());
-            scaleInput.Current.BindValueChanged(scale => scaleInfo.Value = scaleInfo.Value with { Scale = scale.NewValue });
+            scaleInput.Current.BindValueChanged(scale =>
+            {
+                if (scaleHandler.OperationInProgress.Value)
+                    scaleInfo.Value = scaleInfo.Value with { Scale = scale.NewValue };
+            });
 
             xCheckBox.Current.BindValueChanged(_ =>
             {
