@@ -19,6 +19,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 {
     public class OsuPerformanceCalculator : PerformanceCalculator
     {
+        public const double PERFORMANCE_BASE_MULTIPLIER = 1.14; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things.
+
         private bool usingClassicSliderAccuracy;
         private bool usingScoreV2;
 
@@ -113,10 +115,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             effectiveMissCount = Math.Max(countMiss, effectiveMissCount);
             effectiveMissCount = Math.Min(totalHits, effectiveMissCount);
 
-            double multiplier = OsuDifficultyCalculator.CalculateDifficultyMultiplier(score.Mods, totalHits, osuAttributes.SpinnerCount);
+            double multiplier = PERFORMANCE_BASE_MULTIPLIER;
 
             if (score.Mods.Any(m => m is OsuModNoFail))
                 multiplier *= Math.Max(0.90, 1.0 - 0.02 * effectiveMissCount);
+
+            if (score.Mods.Any(m => m is OsuModSpunOut) && totalHits > 0)
+                multiplier *= 1.0 - Math.Pow((double)osuAttributes.SpinnerCount / totalHits, 0.85);
 
             if (score.Mods.Any(h => h is OsuModRelax))
             {
