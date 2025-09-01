@@ -19,6 +19,7 @@ using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.OnlinePlay.Lounge;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
+using osu.Game.Screens.OnlinePlay.Playlists;
 using osu.Game.Tests.Beatmaps;
 using osuTK;
 
@@ -38,10 +39,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("create rooms", () =>
             {
-                PlaylistItem item1 = new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo)
+                PlaylistItem item1 = new PlaylistItem(new APIBeatmap
                 {
-                    BeatmapInfo = { StarRating = 2.5 }
-                }.BeatmapInfo);
+                    OnlineBeatmapSetID = 173612,
+                    OnlineID = 502132,
+                });
 
                 PlaylistItem item2 = new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo)
                 {
@@ -72,6 +74,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     Spacing = new Vector2(10),
                     Children = new Drawable[]
                     {
+                        createMultiplayerPanel(new Room
+                        {
+                            Name = "Multiplayer room",
+                            EndDate = DateTimeOffset.Now.AddDays(1),
+                            Type = MatchType.HeadToHead,
+                            Playlist = [item1],
+                            CurrentPlaylistItem = item1
+                        }),
                         createLoungeRoom(new Room
                         {
                             Name = "Multiplayer room",
@@ -97,6 +107,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
                             Type = MatchType.HeadToHead,
                             Playlist = [item3],
                             CurrentPlaylistItem = item3
+                        }),
+                        createPlaylistRoomPanel(new Room
+                        {
+                            Name = "Playlist room with multiple beatmaps",
+                            Status = RoomStatus.Playing,
+                            EndDate = DateTimeOffset.Now.AddDays(1),
+                            Playlist = [item1, item2],
+                            CurrentPlaylistItem = item1
                         }),
                         createLoungeRoom(new Room
                         {
@@ -130,9 +148,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 };
             });
 
-            AddUntilStep("wait for panel load", () => rooms.Count, () => Is.EqualTo(8));
-            AddUntilStep("\"currently playing\" room count correct", () => rooms.ChildrenOfType<OsuSpriteText>().Count(s => s.Text.ToString().StartsWith("Currently playing", StringComparison.Ordinal)), () => Is.EqualTo(3));
-            AddUntilStep("\"ready to play\" room count correct", () => rooms.ChildrenOfType<OsuSpriteText>().Count(s => s.Text.ToString().StartsWith("Ready to play", StringComparison.Ordinal)), () => Is.EqualTo(4));
+            AddUntilStep("wait for panel load", () => rooms.Count, () => Is.EqualTo(10));
+            AddUntilStep("\"currently playing\" room count correct",
+                () => rooms.ChildrenOfType<OsuSpriteText>().Count(s => s.Text.ToString().StartsWith("Currently playing", StringComparison.Ordinal)), () => Is.EqualTo(4));
+            AddUntilStep("\"ready to play\" room count correct", () => rooms.ChildrenOfType<OsuSpriteText>().Count(s => s.Text.ToString().StartsWith("Ready to play", StringComparison.Ordinal)),
+                () => Is.EqualTo(5));
         }
 
         [Test]
@@ -207,7 +227,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 {
                     new MultiplayerRoomPanel(new Room
                     {
-                        Name = "This room has a very very long title enough to make the external link button reach the participants list on the right side unless the test window is very wide, at which point I don't know, hi.",
+                        Name =
+                            "This room has a very very long title enough to make the external link button reach the participants list on the right side unless the test window is very wide, at which point I don't know, hi.",
                         QueueMode = QueueMode.HostOnly,
                         Type = MatchType.HeadToHead,
                         RoomID = 1337,
@@ -231,7 +252,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 {
                     new MultiplayerRoomPanel(room = new Room
                     {
-                        Name = "This room has a very very long title enough to make the external link button reach the participants list on the right side unless the test window is very wide, at which point I don't know, hi.",
+                        Name =
+                            "This room has a very very long title enough to make the external link button reach the participants list on the right side unless the test window is very wide, at which point I don't know, hi.",
                         QueueMode = QueueMode.HostOnly,
                         Type = MatchType.HeadToHead,
                     }),
@@ -241,6 +263,41 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("set room ID", () => room.RoomID = 1337);
             AddWaitStep("wait", 3);
             AddStep("clear room ID", () => room.RoomID = null);
+        }
+
+        private RoomPanel createPlaylistRoomPanel(Room room)
+        {
+            room.Host ??= new APIUser { Username = "peppy", Id = 2 };
+
+            if (room.RecentParticipants.Count == 0)
+            {
+                room.RecentParticipants = Enumerable.Range(0, 20).Select(i => new APIUser
+                {
+                    Id = i,
+                    Username = $"User {i}"
+                }).ToArray();
+            }
+
+            return new PlaylistsRoomPanel(room)
+            {
+                SelectedItem = new Bindable<PlaylistItem?>(room.CurrentPlaylistItem),
+            };
+        }
+
+        private RoomPanel createMultiplayerPanel(Room room)
+        {
+            room.Host ??= new APIUser { Username = "peppy", Id = 2 };
+
+            if (room.RecentParticipants.Count == 0)
+            {
+                room.RecentParticipants = Enumerable.Range(0, 20).Select(i => new APIUser
+                {
+                    Id = i,
+                    Username = $"User {i}"
+                }).ToArray();
+            }
+
+            return new MultiplayerRoomPanel(room);
         }
 
         private RoomPanel createLoungeRoom(Room room)
