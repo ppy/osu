@@ -124,27 +124,28 @@ namespace osu.Game.Screens.Edit.GameplayTest
         {
             void preventMiss(HitObject hitObject)
             {
-                if (hitObject.StartTime > editorState.Time)
-                    return;
-
                 var drawableObject = DrawableRuleset.Playfield.HitObjectContainer
                                                     .AliveObjects
                                                     .LastOrDefault(it => it.HitObject == hitObject);
 
-                preventMissOnDrawable(drawableObject);
+                if (drawableObject != null)
+                    preventMissOnDrawable(drawableObject);
             }
 
-            void preventMissOnDrawable(DrawableHitObject? drawableObject)
+            void preventMissOnDrawable(DrawableHitObject drawableObject)
             {
-                if (drawableObject?.Entry == null)
+                if (drawableObject.Entry == null)
                     return;
-
-                var result = drawableObject.CreateResult(drawableObject.HitObject.Judgement);
-                result.Type = result.Judgement.MaxResult;
-                drawableObject.Entry.Result = result;
 
                 foreach (var nested in drawableObject.NestedHitObjects)
                     preventMissOnDrawable(nested);
+
+                if (drawableObject.HitObject.GetEndTime() < editorState.Time)
+                {
+                    var result = drawableObject.CreateResult(drawableObject.HitObject.Judgement);
+                    result.Type = result.Judgement.MaxResult;
+                    drawableObject.Entry.Result = result;
+                }
             }
 
             void removeListener()
