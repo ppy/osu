@@ -59,8 +59,11 @@ namespace osu.Game.Screens.Edit.GameplayTest
         {
             base.LoadAsyncComplete();
 
-            preventMissOnPreviousHitObjects();
-            markPreviousObjectsHit();
+            if (DrawableRuleset != null)
+            {
+                preventMissOnPreviousHitObjects();
+                markPreviousObjectsHit();
+            }
         }
 
         protected override void LoadComplete()
