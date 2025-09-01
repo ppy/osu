@@ -157,7 +157,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             rotationInfo.BindValueChanged(rotation =>
             {
-                // can happen if the popover is dismessed by a keyboard key press while dragging UI controls
+                // can happen if the popover is dismissed by a keyboard key press while dragging UI controls
                 if (!rotationHandler.OperationInProgress.Value)
                     return;
 
