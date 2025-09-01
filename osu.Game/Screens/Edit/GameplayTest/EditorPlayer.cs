@@ -60,13 +60,12 @@ namespace osu.Game.Screens.Edit.GameplayTest
             base.LoadAsyncComplete();
 
             preventMissOnPreviousHitObjects();
+            markPreviousObjectsHit();
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            markPreviousObjectsHit();
 
             ScoreProcessor.HasCompleted.BindValueChanged(completed =>
             {
