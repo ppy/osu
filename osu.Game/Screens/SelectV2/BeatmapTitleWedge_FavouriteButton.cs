@@ -229,7 +229,10 @@ namespace osu.Game.Screens.SelectV2
                     bool hasFavourited = favouriteRequest.Action == BeatmapFavouriteAction.Favourite;
                     beatmapSet.HasFavourited = hasFavourited;
                     beatmapSet.FavouriteCount += hasFavourited ? 1 : -1;
-                    setBeatmapSet(beatmapSet, withHeartAnimation: hasFavourited);
+
+                    // if the beatmap set reference changed under the callback, abort visual updates to avoid showing stale data
+                    if (onlineBeatmapSet == null || ReferenceEquals(beatmapSet, onlineBeatmapSet))
+                        setBeatmapSet(beatmapSet, withHeartAnimation: hasFavourited);
                 };
                 favouriteRequest.Failure += e =>
                 {
@@ -238,7 +241,10 @@ namespace osu.Game.Screens.SelectV2
                         Text = e.Message,
                         Icon = FontAwesome.Solid.Times,
                     });
-                    setBeatmapSet(beatmapSet, withHeartAnimation: false);
+
+                    // if the beatmap set reference changed under the callback, abort visual updates to avoid showing stale data
+                    if (onlineBeatmapSet == null || ReferenceEquals(beatmapSet, onlineBeatmapSet))
+                        setBeatmapSet(beatmapSet, withHeartAnimation: false);
                 };
                 api.Queue(favouriteRequest);
                 setLoading();

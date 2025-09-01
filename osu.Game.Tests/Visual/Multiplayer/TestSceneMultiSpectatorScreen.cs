@@ -28,6 +28,7 @@ using osu.Game.Storyboards;
 using osu.Game.Tests.Beatmaps.IO;
 using osuTK;
 using osuTK.Graphics;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
@@ -303,8 +304,68 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        [Explicit("Test relies on timing of arriving frames to exercise assertions which doesn't work headless.")]
+        public void TestMaximisedUserIsAudioSource()
+        {
+            start(new[] { PLAYER_1_ID, PLAYER_2_ID });
+            loadSpectateScreen();
+
+            // With no frames, the synchronisation state will be TooFarAhead.
+            // In this state, all players should be muted.
+            assertMuted(PLAYER_1_ID, true);
+            assertMuted(PLAYER_2_ID, true);
+
+            // Send frames for both players.
+            sendFrames(PLAYER_1_ID, 20);
+            sendFrames(PLAYER_2_ID, 40);
+
+            waitUntilRunning(PLAYER_1_ID);
+            AddStep("maximise player 1", () =>
+            {
+                InputManager.MoveMouseTo(getInstance(PLAYER_1_ID));
+                InputManager.Click(MouseButton.Left);
+            });
+            assertMuted(PLAYER_1_ID, false);
+            assertMuted(PLAYER_2_ID, true);
+
+            waitUntilPaused(PLAYER_1_ID);
+            assertMuted(PLAYER_1_ID, false);
+            assertMuted(PLAYER_2_ID, true);
+
+            AddStep("minimise player 1", () =>
+            {
+                InputManager.MoveMouseTo(getInstance(PLAYER_1_ID));
+                InputManager.Click(MouseButton.Left);
+            });
+            assertMuted(PLAYER_1_ID, true);
+            assertMuted(PLAYER_2_ID, false);
+
+            AddStep("maximise player 2", () =>
+            {
+                InputManager.MoveMouseTo(getInstance(PLAYER_2_ID));
+                InputManager.Click(MouseButton.Left);
+            });
+            assertMuted(PLAYER_1_ID, true);
+            assertMuted(PLAYER_2_ID, false);
+
+            waitUntilPaused(PLAYER_2_ID);
+            sendFrames(PLAYER_1_ID, 60);
+
+            assertMuted(PLAYER_1_ID, true);
+            assertMuted(PLAYER_2_ID, false);
+
+            AddStep("minimise player 2", () =>
+            {
+                InputManager.MoveMouseTo(getInstance(PLAYER_2_ID));
+                InputManager.Click(MouseButton.Left);
+            });
+            assertMuted(PLAYER_1_ID, false);
+            assertMuted(PLAYER_2_ID, true);
+        }
+
+        [Test]
         [FlakyTest]
-        public void TestMostInSyncUserIsAudioSource()
+        public void TestMostInSyncUserIsAudioSourceIfNoneMaximised()
         {
             start(new[] { PLAYER_1_ID, PLAYER_2_ID });
             loadSpectateScreen();

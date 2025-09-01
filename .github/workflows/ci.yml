@@ -148,9 +148,7 @@ jobs:
       # https://github.com/dotnet/macios/issues/19157
       # https://github.com/actions/runner-images/issues/12758
       - name: Use Xcode 16.4
-        run: |
-          sudo xcode-select -switch /Applications/Xcode_16.4.app
-          xcodebuild -downloadPlatform iOS
+        run: sudo xcode-select -switch /Applications/Xcode_16.4.app
 
       - name: Build
         run: dotnet build -c Debug osu.iOS.slnf

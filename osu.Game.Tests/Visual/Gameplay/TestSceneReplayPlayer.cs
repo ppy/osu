@@ -25,6 +25,14 @@ namespace osu.Game.Tests.Visual.Gameplay
         protected TestReplayPlayer Player = null!;
 
         [Test]
+        public void TestFailedBeatmapLoad()
+        {
+            loadPlayerWithBeatmap(new TestBeatmap(new OsuRuleset().RulesetInfo, withHitObjects: false));
+
+            AddUntilStep("wait for exit", () => Player.IsCurrentScreen());
+        }
+
+        [Test]
         public void TestPauseViaSpace()
         {
             loadPlayerWithBeatmap();

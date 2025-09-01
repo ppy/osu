@@ -94,7 +94,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddAssert("no-collection group present", () =>
             {
                 var group = grouping.GroupItems.Single(g => g.Key.Title == "Not in collection");
-                return group.Value.Select(i => i.Model).OfType<BeatmapSetInfo>().Single().Equals(beatmapSet);
+                return group.Value.Select(i => i.Model).OfType<GroupedBeatmapSet>().Single().BeatmapSet.Equals(beatmapSet);
             });
 
             AddStep("add beatmap to collection", () =>
