@@ -60,15 +60,16 @@ namespace osu.Game.Screens.Edit.GameplayTest
             base.LoadAsyncComplete();
 
             if (DrawableRuleset != null)
-            {
                 preventMissOnPreviousHitObjects();
-                markPreviousObjectsHit();
-            }
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            // this will notify components such as the skin's combo counter, which needs to happen on the update thread
+            // and therefore can't happen alongside `preventMissOnPreviousHitObjects()` in `LoadAsyncComplete()`
+            markPreviousObjectsHit();
 
             ScoreProcessor.HasCompleted.BindValueChanged(completed =>
             {
