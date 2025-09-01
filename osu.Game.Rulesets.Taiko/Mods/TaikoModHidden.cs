@@ -40,15 +40,26 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
         protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state)
         {
-            ApplyNormalVisibilityState(hitObject, state);
+            applyHiddenState(hitObject, state, true);
         }
 
         protected override void ApplyNormalVisibilityState(DrawableHitObject hitObject, ArmedState state)
+        {
+            applyHiddenState(hitObject, state, false);
+        }
+
+        private void applyHiddenState(DrawableHitObject hitObject, ArmedState state, bool increaseVisibility)
         {
             switch (hitObject)
             {
                 case DrawableDrumRollTick:
                 case DrawableHit:
+                    if (increaseVisibility)
+                    {
+                        hitObject.FadeIn(hitObject.HitObject.HitWindows.WindowFor(HitResult.Miss));
+                        break;
+                    }
+
                     double preempt = drawableRuleset.TimeRange.Value / drawableRuleset.ControlPointAt(hitObject.HitObject.StartTime).Multiplier;
                     double start = hitObject.HitObject.StartTime - preempt * fade_out_start_time;
                     double duration = preempt * fade_out_duration;
