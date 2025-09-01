@@ -1011,7 +1011,7 @@ namespace osu.Game.Screens.SelectV2
 
             lastLookupResult.Value = BeatmapSetLookupResult.InProgress();
             onlineLookupCancellation = new CancellationTokenSource();
-            currentOnlineLookup = onlineLookupSource.GetBeatmapSetAsync(beatmapSetInfo.OnlineID);
+            currentOnlineLookup = onlineLookupSource.GetBeatmapSetAsync(beatmapSetInfo.OnlineID, onlineLookupCancellation.Token);
             currentOnlineLookup.ContinueWith(t =>
             {
                 if (t.IsCompletedSuccessfully)
