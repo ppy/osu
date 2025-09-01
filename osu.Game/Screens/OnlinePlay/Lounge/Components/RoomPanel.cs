@@ -31,7 +31,6 @@ using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Screens.OnlinePlay.Components;
 using osuTK;
-using osuTK.Graphics;
 using Container = osu.Framework.Graphics.Containers.Container;
 
 namespace osu.Game.Screens.OnlinePlay.Lounge.Components
@@ -39,7 +38,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
     public abstract partial class RoomPanel : CompositeDrawable, IHasContextMenu
     {
         protected const float CORNER_RADIUS = 10;
-        private const float height = 100;
+        private const float height = 80;
 
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
@@ -80,12 +79,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
             Masking = true;
             CornerRadius = CORNER_RADIUS;
-            EdgeEffect = new EdgeEffectParameters
-            {
-                Type = EdgeEffectType.Shadow,
-                Colour = Color4.Black.Opacity(40),
-                Radius = 5,
-            };
         }
 
         [BackgroundDependencyLoader]
@@ -97,6 +90,13 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 Origin = Anchor.CentreRight,
                 RelativeSizeAxes = Axes.Y,
                 AutoSizeAxes = Axes.X
+            };
+
+            EdgeEffect = new EdgeEffectParameters
+            {
+                Type = EdgeEffectType.Shadow,
+                Colour = colourProvider.Background6.Opacity(0.4f),
+                Radius = 4,
             };
 
             InternalChildren = new Drawable[]
@@ -118,7 +118,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                         Name = @"Room content",
                         RelativeSizeAxes = Axes.Both,
                         // This negative padding resolves 1px gaps between this background and the background above.
-                        Padding = new MarginPadding { Left = 20, Vertical = -0.5f },
+                        Padding = new MarginPadding { Left = 10, Vertical = -0.5f },
                         Child = new Container
                         {
                             RelativeSizeAxes = Axes.Both,
@@ -158,8 +158,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                                 RelativeSizeAxes = Axes.Both,
                                                 Padding = new MarginPadding
                                                 {
-                                                    Left = 20,
-                                                    Right = DrawableRoomParticipantsList.SHEAR_WIDTH,
+                                                    Left = 10,
+                                                    Right = 10,
                                                     Vertical = 5
                                                 },
                                                 Children = new Drawable[]
@@ -516,12 +516,12 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                         {
                             statusText = new OsuSpriteText
                             {
-                                Font = OsuFont.Default.With(size: 16),
+                                Font = OsuFont.Style.Caption2,
                                 Colour = colours.Lime1
                             },
                             beatmapText = new LinkFlowContainer(s =>
                             {
-                                s.Font = OsuFont.Default.With(size: 16);
+                                s.Font = OsuFont.Style.Caption2;
                                 s.Colour = colours.Lime1;
                             })
                             {
@@ -636,7 +636,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                     {
                         Anchor = Anchor.BottomLeft,
                         Origin = Anchor.BottomLeft,
-                        Font = OsuFont.GetFont(size: 28),
+                        Font = OsuFont.Style.Heading2,
                     },
                     linkButton = new ExternalLinkButton
                     {
