@@ -194,8 +194,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
                 roomFlow.Add(drawableRoom);
 
-                // Always show spotlight playlists at the top of the listing.
-                roomFlow.SetLayoutPosition(drawableRoom, room.Category > RoomCategory.Normal ? float.MinValue : -(room.RoomID ?? 0));
+                roomFlow.SetLayoutPosition(drawableRoom, room.Pinned ? float.MinValue : -(room.RoomID ?? 0));
             }
 
             applyFilterCriteria(Filter.Value);
