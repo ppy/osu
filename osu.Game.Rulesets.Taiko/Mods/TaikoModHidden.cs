@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
@@ -40,26 +40,21 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
         protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state)
         {
-            applyHiddenState(hitObject, state, true);
+            switch (hitObject)
+            {
+                case DrawableDrumRollTick:
+                case DrawableHit:
+                    hitObject.FadeIn(hitObject.HitObject.HitWindows.WindowFor(HitResult.Miss));
+                    break;
+            }
         }
 
         protected override void ApplyNormalVisibilityState(DrawableHitObject hitObject, ArmedState state)
-        {
-            applyHiddenState(hitObject, state, false);
-        }
-
-        private void applyHiddenState(DrawableHitObject hitObject, ArmedState state, bool increaseVisibility)
         {
             switch (hitObject)
             {
                 case DrawableDrumRollTick:
                 case DrawableHit:
-                    if (increaseVisibility)
-                    {
-                        hitObject.FadeIn(hitObject.HitObject.HitWindows.WindowFor(HitResult.Miss));
-                        break;
-                    }
-
                     double preempt = drawableRuleset.TimeRange.Value / drawableRuleset.ControlPointAt(hitObject.HitObject.StartTime).Multiplier;
                     double start = hitObject.HitObject.StartTime - preempt * fade_out_start_time;
                     double duration = preempt * fade_out_duration;
