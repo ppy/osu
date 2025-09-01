@@ -323,7 +323,7 @@ namespace osu.Game.Rulesets.Osu.HUD
             if (PositionDisplayStyle.Value == PositionDisplay.Normalised && lastObjectPosition != null)
             {
                 hitPosition = AccuracyHeatmap.FindRelativeHitPosition(lastObjectPosition.Value, ((OsuHitObject)circleJudgement.HitObject).StackedEndPosition,
-                    circleJudgement.CursorPositionAtHit.Value, objectRadius, 45) * 0.5f;
+                    circleJudgement.CursorPositionAtHit.Value, objectRadius, 45) * (inner_portion / 2);
             }
             else
             {

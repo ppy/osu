@@ -17,6 +17,6 @@
     <MtouchInterpreter>-all</MtouchInterpreter>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="ppy.osu.Framework.iOS" Version="2025.808.0" />
+    <PackageReference Include="ppy.osu.Framework.iOS" Version="2025.829.0" />
   </ItemGroup>
 </Project>
