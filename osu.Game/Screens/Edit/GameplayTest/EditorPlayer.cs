@@ -134,13 +134,10 @@ namespace osu.Game.Screens.Edit.GameplayTest
 
             void preventMissOnDrawable(DrawableHitObject drawableObject)
             {
-                if (drawableObject.Entry == null)
-                    return;
-
                 foreach (var nested in drawableObject.NestedHitObjects)
                     preventMissOnDrawable(nested);
 
-                if (drawableObject.HitObject.GetEndTime() < editorState.Time)
+                if (drawableObject.Entry != null && drawableObject.HitObject.GetEndTime() < editorState.Time)
                 {
                     var result = drawableObject.CreateResult(drawableObject.HitObject.Judgement);
                     result.Type = result.Judgement.MaxResult;
