@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
             {
                 case DrawableDrumRollTick:
                 case DrawableHit:
-                    hitObject.FadeIn(hitObject.HitObject.HitWindows.WindowFor(HitResult.Miss));
+                    hitObject.FadeIn(hitObject.HitObject.HitWindows.WindowFor(HitResult.Great));
                     break;
             }
         }
