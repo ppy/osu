@@ -59,7 +59,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         private DrawableRoomParticipantsList? drawableRoomParticipantsList;
         private RoomSpecialCategoryPill? specialCategoryPill;
-        private PasswordProtectedIcon? passwordIcon;
+        private CornerIcon? passwordIcon;
+        private CornerIcon? pinnedIcon;
         private EndDateInfo? endDateInfo;
         private RoomNameLine? roomName;
         private DelayedLoadWrapper wrapper = null!;
@@ -88,7 +89,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         }
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colours)
+        private void load(OverlayColourProvider colourProvider, OsuColour colours)
         {
             ButtonsContainer = new Container
             {
@@ -104,7 +105,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colours.Background5,
+                    Colour = colourProvider.Background5,
                 },
                 CreateBackground().With(d =>
                 {
@@ -128,7 +129,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                 new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Colour = colours.Background5,
+                                    Colour = colourProvider.Background5,
                                     Width = 0.2f,
                                 },
                                 new Box
@@ -136,7 +137,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                     Anchor = Anchor.TopRight,
                                     Origin = Anchor.TopRight,
                                     RelativeSizeAxes = Axes.Both,
-                                    Colour = ColourInfo.GradientHorizontal(colours.Background5, colours.Background5.Opacity(0.3f)),
+                                    Colour = ColourInfo.GradientHorizontal(colourProvider.Background5, colourProvider.Background5.Opacity(0.3f)),
                                     Width = 0.8f,
                                 },
                                 new GridContainer
@@ -254,7 +255,28 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                         }
                                     }
                                 },
-                                passwordIcon = new PasswordProtectedIcon { Alpha = 0 }
+                                passwordIcon = new CornerIcon
+                                {
+                                    Alpha = 0,
+                                    Background = { Colour = colours.Gray8, },
+                                    Icon =
+                                    {
+                                        Icon = FontAwesome.Solid.Lock,
+                                        Colour = colours.Gray3,
+                                        Rotation = 45,
+                                    },
+                                },
+                                pinnedIcon = new CornerIcon
+                                {
+                                    Alpha = 0,
+                                    Background = { Colour = colours.Orange2 },
+                                    Icon =
+                                    {
+                                        Icon = FontAwesome.Solid.Thumbtack,
+                                        Colour = colours.Gray3,
+                                        Rotation = 45,
+                                    },
+                                }
                             },
                         },
                     }, 0)
@@ -283,6 +305,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 updateRoomCategory();
                 updateRoomType();
                 updateRoomHasPassword();
+                updateRoomPinned();
             };
 
             SelectedItem.BindValueChanged(onSelectedItemChanged, true);
@@ -310,6 +333,10 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
                 case nameof(Room.HasPassword):
                     updateRoomHasPassword();
+                    break;
+
+                case nameof(Room.Pinned):
+                    updateRoomPinned();
                     break;
             }
         }
@@ -369,6 +396,12 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         {
             if (passwordIcon != null)
                 passwordIcon.Alpha = Room.HasPassword ? 1 : 0;
+        }
+
+        private void updateRoomPinned()
+        {
+            if (pinnedIcon != null)
+                pinnedIcon.Alpha = Room.Pinned ? 1 : 0;
         }
 
         private int numberOfAvatars = 7;
@@ -534,10 +567,12 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             }
         }
 
-        public partial class PasswordProtectedIcon : CompositeDrawable
+        public partial class CornerIcon : CompositeDrawable
         {
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            public SpriteIcon Icon { get; }
+            public Box Background { get; }
+
+            public CornerIcon()
             {
                 Anchor = Anchor.TopRight;
                 Origin = Anchor.TopRight;
@@ -546,20 +581,19 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
                 InternalChildren = new Drawable[]
                 {
-                    new Box
+                    Background = new Box
                     {
                         Anchor = Anchor.TopRight,
                         Origin = Anchor.TopCentre,
-                        Colour = colours.Gray5,
                         Rotation = 45,
                         RelativeSizeAxes = Axes.Both,
                         Width = 2,
                     },
-                    new SpriteIcon
+                    Icon = new SpriteIcon
                     {
-                        Icon = FontAwesome.Solid.Lock,
                         Anchor = Anchor.TopRight,
-                        Origin = Anchor.TopRight,
+                        Origin = Anchor.Centre,
+                        Position = new Vector2(-13, 13),
                         Margin = new MarginPadding(6),
                         Size = new Vector2(14),
                     }
