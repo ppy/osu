@@ -14,6 +14,7 @@ using osu.Game.Overlays;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
@@ -127,12 +128,20 @@ namespace osu.Game.Screens.Edit.GameplayTest
                                                     .AliveObjects
                                                     .LastOrDefault(it => it.HitObject == hitObject);
 
+                preventMissOnDrawable(drawableObject);
+            }
+
+            void preventMissOnDrawable(DrawableHitObject? drawableObject)
+            {
                 if (drawableObject?.Entry == null)
                     return;
 
                 var result = drawableObject.CreateResult(drawableObject.HitObject.Judgement);
                 result.Type = result.Judgement.MaxResult;
                 drawableObject.Entry.Result = result;
+
+                foreach (var nested in drawableObject.NestedHitObjects)
+                    preventMissOnDrawable(nested);
             }
 
             void removeListener()
