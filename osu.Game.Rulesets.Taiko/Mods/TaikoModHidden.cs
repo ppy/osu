@@ -40,12 +40,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
         protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state)
         {
-            switch (hitObject)
-            {
-                case DrawableDrumRollTick:
-                case DrawableHit:
-                    break;
-            }
+            // intentional no-op
         }
 
         protected override void ApplyNormalVisibilityState(DrawableHitObject hitObject, ArmedState state)
