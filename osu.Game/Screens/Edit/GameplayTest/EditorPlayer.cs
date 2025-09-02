@@ -128,7 +128,7 @@ namespace osu.Game.Screens.Edit.GameplayTest
             {
                 var drawableObject = DrawableRuleset.Playfield.HitObjectContainer
                                                     .AliveObjects
-                                                    .LastOrDefault(it => it.HitObject == hitObject);
+                                                    .SingleOrDefault(it => it.HitObject == hitObject);
 
                 if (drawableObject != null)
                     preventMissOnDrawable(drawableObject);
