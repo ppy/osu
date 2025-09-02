@@ -63,7 +63,7 @@ namespace osu.Game.Rulesets.Mania
                 SecondaryLeftKeys = stage1SecondaryLeftKeys,
                 SecondaryRightKeys = stage1SecondaryRightKeys,
                 SpecialKey = InputKey.V,
-                SecondarySpecialKey = InputKey.Space
+                SecondarySpecialKey = InputKey.None
             }.GenerateKeyBindingsFor(singleStageVariant);
 
             var stage2Bindings = new VariantMappingGenerator
@@ -73,7 +73,7 @@ namespace osu.Game.Rulesets.Mania
                 SecondaryLeftKeys = stage2SecondaryLeftKeys,
                 SecondaryRightKeys = stage2SecondaryRightKeys,
                 SpecialKey = InputKey.B,
-                SecondarySpecialKey = InputKey.Enter,
+                SecondarySpecialKey = InputKey.None,
                 ActionStart = (ManiaAction)singleStageVariant,
             }.GenerateKeyBindingsFor(singleStageVariant);
 

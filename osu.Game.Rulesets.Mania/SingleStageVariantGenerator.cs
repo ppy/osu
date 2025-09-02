@@ -23,15 +23,15 @@ namespace osu.Game.Rulesets.Mania
             {
                 leftKeys = new[] { InputKey.A, InputKey.S, InputKey.D, InputKey.F, InputKey.V };
                 rightKeys = new[] { InputKey.N, InputKey.J, InputKey.K, InputKey.L, InputKey.Semicolon };
-                secondaryLeftKeys = new[] { InputKey.Q, InputKey.W, InputKey.E, InputKey.R, InputKey.B };
-                secondaryRightKeys = new[] { InputKey.M, InputKey.I, InputKey.O, InputKey.P, InputKey.BracketLeft };
+                secondaryLeftKeys = new[] { InputKey.None, InputKey.None, InputKey.None, InputKey.None, InputKey.None };
+                secondaryRightKeys = new[] { InputKey.None, InputKey.None, InputKey.None, InputKey.None, InputKey.None };
             }
             else
             {
                 leftKeys = new[] { InputKey.A, InputKey.S, InputKey.D, InputKey.F };
                 rightKeys = new[] { InputKey.J, InputKey.K, InputKey.L, InputKey.Semicolon };
-                secondaryLeftKeys = new[] { InputKey.Q, InputKey.W, InputKey.E, InputKey.R };
-                secondaryRightKeys = new[] { InputKey.I, InputKey.O, InputKey.P, InputKey.BracketLeft };
+                secondaryLeftKeys = new[] { InputKey.None, InputKey.None, InputKey.None, InputKey.None };
+                secondaryRightKeys = new[] { InputKey.None, InputKey.None, InputKey.None, InputKey.None };
             }
         }
 
@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Mania
             RightKeys = rightKeys,
             SecondaryRightKeys = secondaryRightKeys,
             SpecialKey = InputKey.Space,
-            SecondarySpecialKey = InputKey.Enter
+            SecondarySpecialKey = InputKey.None
         }.GenerateKeyBindingsFor(variant);
     }
 }
