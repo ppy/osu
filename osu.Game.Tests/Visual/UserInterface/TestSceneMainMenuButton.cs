@@ -13,8 +13,8 @@ using osu.Game.Online.Metadata;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Screens.Menu;
+using osuTK.Graphics;
 using osuTK.Input;
-using Color4 = osuTK.Graphics.Color4;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
@@ -176,6 +176,29 @@ namespace osu.Game.Tests.Visual.UserInterface
                 RoomID = 1234
             }));
             AddAssert("no notification posted", () => notificationOverlay.AllNotifications.Count(), () => Is.Zero);
+        }
+
+        [Test]
+        public void TestMatchmaking()
+        {
+            AddStep("add content", () =>
+            {
+                Children = new Drawable[]
+                {
+                    new DependencyProvidingContainer
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        AutoSizeAxes = Axes.Both,
+                        Child = new MatchmakingButton(@"button-default-select", new Color4(102, 68, 204, 255), (_, _) => { }, 0, Key.D)
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            ButtonSystemState = ButtonSystemState.TopLevel,
+                        },
+                    },
+                };
+            });
         }
     }
 }

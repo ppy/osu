@@ -17,6 +17,7 @@ using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Matchmaking;
 using osu.Game.Online.Multiplayer.Countdown;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays.Notifications;
@@ -26,7 +27,7 @@ using osu.Game.Utils;
 
 namespace osu.Game.Online.Multiplayer
 {
-    public abstract partial class MultiplayerClient : Component, IMultiplayerClient, IMultiplayerRoomServer
+    public abstract partial class MultiplayerClient : Component, IMultiplayerClient, IMultiplayerRoomServer, IMatchmakingServer
     {
         public Action<Notification>? PostNotification { protected get; set; }
 
@@ -112,6 +113,22 @@ namespace osu.Game.Online.Multiplayer
         /// </summary>
         public event Action? Disconnecting;
 
+        public event Action<MultiplayerCountdown>? CountdownStarted;
+
+        public event Action<MultiplayerCountdown>? CountdownStopped;
+
+        public event Action<MultiplayerRoomUser, MultiplayerUserState>? UserStateChanged;
+
+        public event Action? MatchmakingQueueJoined;
+        public event Action? MatchmakingQueueLeft;
+        public event Action? MatchmakingRoomInvited;
+        public event Action<long>? MatchmakingRoomReady;
+        public event Action<MatchmakingLobbyStatus>? MatchmakingLobbyStatusChanged;
+        public event Action<MatchmakingQueueStatus>? MatchmakingQueueStatusChanged;
+        public event Action<int, long>? MatchmakingItemSelected;
+        public event Action<int, long>? MatchmakingItemDeselected;
+        public event Action<MatchRoomState>? MatchRoomStateChanged;
+
         /// <summary>
         /// Whether the <see cref="MultiplayerClient"/> is currently connected.
         /// This is NOT thread safe and usage should be scheduled.
@@ -179,9 +196,13 @@ namespace osu.Game.Online.Multiplayer
         {
             IsConnected.BindValueChanged(connected => Scheduler.Add(() =>
             {
-                // clean up local room state on server disconnect.
-                if (!connected.NewValue && Room != null)
-                    LeaveRoom();
+                if (!connected.NewValue)
+                {
+                    if (Room != null)
+                        LeaveRoom();
+
+                    MatchmakingQueueLeft?.Invoke();
+                }
             }));
         }
 
@@ -253,6 +274,9 @@ namespace osu.Game.Online.Multiplayer
 
                 Room = joinedRoom;
                 APIRoom = apiRoom;
+
+                while (pendingRequests.TryDequeue(out Action? action))
+                    action();
 
                 APIRoom.RoomID = joinedRoom.RoomID;
                 APIRoom.ChannelId = joinedRoom.ChannelID;
@@ -640,6 +664,7 @@ namespace osu.Game.Online.Multiplayer
                 user.State = state;
                 updateUserPlayingState(userId, state);
 
+                UserStateChanged?.Invoke(user, state);
                 RoomUpdated?.Invoke();
             });
 
@@ -672,6 +697,7 @@ namespace osu.Game.Online.Multiplayer
                 Debug.Assert(Room != null);
 
                 Room.MatchState = state;
+                MatchRoomStateChanged?.Invoke(state);
                 RoomUpdated?.Invoke();
             });
 
@@ -688,6 +714,7 @@ namespace osu.Game.Online.Multiplayer
                 {
                     case CountdownStartedEvent countdownStartedEvent:
                         Room.ActiveCountdowns.Add(countdownStartedEvent.Countdown);
+                        CountdownStarted?.Invoke(countdownStartedEvent.Countdown);
 
                         switch (countdownStartedEvent.Countdown)
                         {
@@ -700,8 +727,13 @@ namespace osu.Game.Online.Multiplayer
 
                     case CountdownStoppedEvent countdownStoppedEvent:
                         MultiplayerCountdown? countdown = Room.ActiveCountdowns.FirstOrDefault(countdown => countdown.ID == countdownStoppedEvent.ID);
+
                         if (countdown != null)
+                        {
                             Room.ActiveCountdowns.Remove(countdown);
+                            CountdownStopped?.Invoke(countdown);
+                        }
+
                         break;
                 }
 
@@ -1000,6 +1032,80 @@ namespace osu.Game.Online.Multiplayer
             });
             return Task.CompletedTask;
         }
+
+        Task IMatchmakingClient.MatchmakingQueueJoined()
+        {
+            Scheduler.Add(() => MatchmakingQueueJoined?.Invoke());
+            return Task.CompletedTask;
+        }
+
+        Task IMatchmakingClient.MatchmakingQueueLeft()
+        {
+            Scheduler.Add(() => MatchmakingQueueLeft?.Invoke());
+            return Task.CompletedTask;
+        }
+
+        Task IMatchmakingClient.MatchmakingRoomInvited()
+        {
+            Scheduler.Add(() => MatchmakingRoomInvited?.Invoke());
+            return Task.CompletedTask;
+        }
+
+        Task IMatchmakingClient.MatchmakingRoomReady(long roomId)
+        {
+            Scheduler.Add(() => MatchmakingRoomReady?.Invoke(roomId));
+            return Task.CompletedTask;
+        }
+
+        Task IMatchmakingClient.MatchmakingLobbyStatusChanged(MatchmakingLobbyStatus status)
+        {
+            Scheduler.Add(() => MatchmakingLobbyStatusChanged?.Invoke(status));
+            return Task.CompletedTask;
+        }
+
+        Task IMatchmakingClient.MatchmakingQueueStatusChanged(MatchmakingQueueStatus status)
+        {
+            Scheduler.Add(() => MatchmakingQueueStatusChanged?.Invoke(status));
+            return Task.CompletedTask;
+        }
+
+        Task IMatchmakingClient.MatchmakingItemSelected(int userId, long playlistItemId)
+        {
+            Scheduler.Add(() =>
+            {
+                MatchmakingItemSelected?.Invoke(userId, playlistItemId);
+                RoomUpdated?.Invoke();
+            });
+
+            return Task.CompletedTask;
+        }
+
+        Task IMatchmakingClient.MatchmakingItemDeselected(int userId, long playlistItemId)
+        {
+            Scheduler.Add(() =>
+            {
+                MatchmakingItemDeselected?.Invoke(userId, playlistItemId);
+                RoomUpdated?.Invoke();
+            });
+
+            return Task.CompletedTask;
+        }
+
+        public abstract Task MatchmakingJoinLobby();
+
+        public abstract Task MatchmakingLeaveLobby();
+
+        public abstract Task MatchmakingJoinQueue(MatchmakingSettings settings);
+
+        public abstract Task MatchmakingLeaveQueue();
+
+        public abstract Task MatchmakingAcceptInvitation();
+
+        public abstract Task MatchmakingDeclineInvitation();
+
+        public abstract Task MatchmakingToggleSelection(long playlistItemId);
+
+        public abstract Task MatchmakingSkipToNextStage();
 
         private partial class MultiplayerInvitationNotification : UserAvatarNotification
         {
