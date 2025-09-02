@@ -36,8 +36,13 @@ namespace osu.Game.Skinning
 
         private Bindable<double?> lastSamplePlaybackTime = null!;
 
+        private readonly Bindable<double?> lastRankChangeTime = new Bindable<double?>();
+
         private IBindable<ScoreRank> rank = null!;
+
         private ScoreRank lastRank;
+
+        private const int minimum_update_rate = 3000;
 
         public LegacyRankDisplay()
         {
@@ -70,43 +75,55 @@ namespace osu.Game.Skinning
             rank = scoreProcessor.Rank.GetBoundCopy();
             rank.BindValueChanged(r =>
             {
-                var texture = source.GetTexture($"ranking-{r.NewValue}-small");
+                bool enoughTimeElapsed = !lastRankChangeTime.Value.HasValue || Time.Current - lastRankChangeTime.Value >= minimum_update_rate;
 
-                rankDisplay.Texture = texture;
-
-                if (texture != null)
-                {
-                    var transientRank = new Sprite
-                    {
-                        Texture = texture,
-                        Blending = BlendingParameters.Additive,
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        BypassAutoSizeAxes = Axes.Both,
-                    };
-                    AddInternal(transientRank);
-                    transientRank.FadeOutFromOne(500, Easing.Out)
-                                 .ScaleTo(new Vector2(1.625f), 500, Easing.Out)
-                                 .Expire();
-                }
-
-                bool enoughTimeElapsed = !lastSamplePlaybackTime.Value.HasValue || Time.Current - lastSamplePlaybackTime.Value >= OsuGameBase.SAMPLE_DEBOUNCE_TIME;
-
-                // Don't play rank-down sfx on quit/retry
-                if (r.NewValue != r.OldValue && r.NewValue > ScoreRank.F && PlaySamples.Value && enoughTimeElapsed)
-                {
-                    if (r.NewValue > lastRank)
-                        rankUpSample.Play();
-                    else
-                        rankDownSample.Play();
-
-                    lastSamplePlaybackTime.Value = Time.Current;
-                }
-
-                lastRank = r.NewValue;
+                Scheduler.CancelDelayedTasks();
+                if (enoughTimeElapsed || r.NewValue == ScoreRank.F)
+                    onRankChange(r);
+                else
+                    Scheduler.AddDelayed(onRankChange, r, (double)lastRankChangeTime.Value! - Time.Current + minimum_update_rate);
             }, true);
 
             FinishTransforms(true);
+        }
+
+        private void onRankChange(ValueChangedEvent<ScoreRank> r)
+        {
+            var texture = source.GetTexture($"ranking-{r.NewValue}-small");
+
+            rankDisplay.Texture = texture;
+
+            if (texture != null)
+            {
+                var transientRank = new Sprite
+                {
+                    Texture = texture,
+                    Blending = BlendingParameters.Additive,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    BypassAutoSizeAxes = Axes.Both,
+                };
+                AddInternal(transientRank);
+                transientRank.FadeOutFromOne(500, Easing.Out)
+                             .ScaleTo(new Vector2(1.625f), 500, Easing.Out)
+                             .Expire();
+            }
+
+            bool enoughSampleTimeElapsed = !lastSamplePlaybackTime.Value.HasValue || Time.Current - lastSamplePlaybackTime.Value >= OsuGameBase.SAMPLE_DEBOUNCE_TIME;
+
+            // Don't play rank-down sfx on quit/retry and entering
+            if (r.NewValue != lastRank && r.NewValue > ScoreRank.F && PlaySamples.Value && enoughSampleTimeElapsed && lastRankChangeTime.Value.HasValue)
+            {
+                if (r.NewValue > lastRank)
+                    rankUpSample.Play();
+                else
+                    rankDownSample.Play();
+
+                lastSamplePlaybackTime.Value = Time.Current;
+            }
+
+            lastRank = r.NewValue;
+            lastRankChangeTime.Value = Time.Current;
         }
     }
 }
