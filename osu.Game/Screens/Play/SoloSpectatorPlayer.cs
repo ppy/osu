@@ -45,6 +45,26 @@ namespace osu.Game.Screens.Play
             });
         }
 
+        #region Fail handling
+
+        protected override bool CheckModsAllowFailure()
+        {
+            if (!allowFail)
+                return false;
+
+            return base.CheckModsAllowFailure();
+        }
+
+        private bool allowFail;
+
+        /// <summary>
+        /// Should be called when it is apparent that the player being spectated has failed.
+        /// This will subsequently stop blocking the fail screen from displaying (usually done out of safety).
+        /// </summary>
+        public void AllowFail() => allowFail = true;
+
+        #endregion
+
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
