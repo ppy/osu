@@ -202,6 +202,7 @@ namespace osu.Game.Online.Multiplayer
 
             await joinOrLeaveTaskChain.Add(async () =>
             {
+                await runOnUpdateThreadAsync(() => pendingRequests.Clear(), cancellationSource.Token).ConfigureAwait(false);
                 var multiplayerRoom = await CreateRoomInternal(new MultiplayerRoom(room)).ConfigureAwait(false);
                 await setupJoinedRoom(room, multiplayerRoom, cancellationSource.Token).ConfigureAwait(false);
             }, cancellationSource.Token).ConfigureAwait(false);
@@ -225,6 +226,7 @@ namespace osu.Game.Online.Multiplayer
 
             await joinOrLeaveTaskChain.Add(async () =>
             {
+                await runOnUpdateThreadAsync(() => pendingRequests.Clear(), cancellationSource.Token).ConfigureAwait(false);
                 var multiplayerRoom = await JoinRoomInternal(room.RoomID.Value, password ?? room.Password).ConfigureAwait(false);
                 await setupJoinedRoom(room, multiplayerRoom, cancellationSource.Token).ConfigureAwait(false);
             }, cancellationSource.Token).ConfigureAwait(false);
