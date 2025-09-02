@@ -20,6 +20,7 @@ using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.UI;
+using osu.Game.Scoring;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Spectate;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
@@ -496,6 +497,18 @@ namespace osu.Game.Tests.Visual.Multiplayer
             sprite.Commands.AddAlpha(Easing.None, -2000, 0, 0, 1);
             b.Storyboard.GetLayer("Background").Add(sprite);
         });
+
+        [Test]
+        public void TestFRankDisplay()
+        {
+            int[] userIds = getPlayerIds(1);
+
+            start(userIds);
+            loadSpectateScreen();
+
+            sendFrames(userIds, 1000);
+            AddUntilStep("player has F rank", () => this.ChildrenOfType<MultiSpectatorPlayer>().All(msp => msp.GameplayState.ScoreProcessor.Rank.Value == ScoreRank.F));
+        }
 
         private void testLeadIn(Action<WorkingBeatmap>? applyToBeatmap = null)
         {
