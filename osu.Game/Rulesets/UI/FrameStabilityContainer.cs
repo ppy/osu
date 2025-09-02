@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.UI
         private readonly FramedClock framedClock;
 
         [Resolved]
-        private OsuGame game { get; set; } = null!;
+        private OsuGame? game { get; set; }
 
         private readonly Stopwatch stopwatch = new Stopwatch();
 
@@ -166,7 +166,7 @@ namespace osu.Game.Rulesets.UI
             // A difference of more than 500 ms seems like a sane number we should never exceed.
             //
             // Double-checking against the parent clock ensures we don't accidentally freeze time when the game stutters due to a long running frame.
-            if (!allowReferenceClockSeeks && Math.Abs(proposedTime - referenceClock.CurrentTime) > 500 && game.Clock.ElapsedFrameTime <= 500)
+            if (!allowReferenceClockSeeks && Math.Abs(proposedTime - referenceClock.CurrentTime) > 500 && game?.Clock.ElapsedFrameTime <= 500)
             {
                 if (invalidBassTimeLogCount < 10)
                 {
