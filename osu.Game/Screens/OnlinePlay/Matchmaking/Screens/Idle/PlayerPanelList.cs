@@ -3,6 +3,7 @@
 
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Online.Multiplayer;
@@ -76,5 +77,17 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Idle
                     panels.SetLayoutPosition(panel, float.MaxValue);
             }
         });
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (client.IsNotNull())
+            {
+                client.MatchRoomStateChanged -= onRoomStateChanged;
+                client.UserJoined -= onUserJoined;
+                client.UserLeft -= onUserLeft;
+            }
+        }
     }
 }
