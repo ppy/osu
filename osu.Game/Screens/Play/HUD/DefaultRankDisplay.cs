@@ -34,7 +34,13 @@ namespace osu.Game.Screens.Play.HUD
 
         private Bindable<double?> lastSamplePlaybackTime = null!;
 
+        private readonly Bindable<double?> lastRankChangeTime = new Bindable<double?>();
+
         private IBindable<ScoreRank> rank = null!;
+
+        private ScoreRank lastRank;
+
+        private const int minimum_update_rate = 3000;
 
         public DefaultRankDisplay()
         {
@@ -67,21 +73,34 @@ namespace osu.Game.Screens.Play.HUD
             rank = scoreProcessor.Rank.GetBoundCopy();
             rank.BindValueChanged(r =>
             {
-                bool enoughTimeElapsed = !lastSamplePlaybackTime.Value.HasValue || Time.Current - lastSamplePlaybackTime.Value >= OsuGameBase.SAMPLE_DEBOUNCE_TIME;
+                bool enoughTimeElapsed = !lastRankChangeTime.Value.HasValue || Time.Current - lastSamplePlaybackTime.Value >= minimum_update_rate;
 
-                // Don't play rank-down sfx on quit/retry
-                if (r.NewValue != r.OldValue && r.NewValue > ScoreRank.F && PlaySamples.Value && enoughTimeElapsed)
-                {
-                    if (r.NewValue > rankDisplay.Rank)
-                        rankUpSample.Play();
-                    else
-                        rankDownSample.Play();
-
-                    lastSamplePlaybackTime.Value = Time.Current;
-                }
-
-                rankDisplay.Rank = r.NewValue;
+                Scheduler.CancelDelayedTasks();
+                if (enoughTimeElapsed || r.NewValue == ScoreRank.F)
+                    onRankChange(r);
+                else
+                    Scheduler.AddDelayed(onRankChange, r, (double)lastRankChangeTime.Value! - Time.Current + minimum_update_rate);
             }, true);
+        }
+
+        private void onRankChange(ValueChangedEvent<ScoreRank> r)
+        {
+            bool enoughSampleTimeElapsed = !lastSamplePlaybackTime.Value.HasValue || Time.Current - lastSamplePlaybackTime.Value >= OsuGameBase.SAMPLE_DEBOUNCE_TIME;
+
+            // Don't play rank-down sfx on quit/retry and entering
+            if (r.NewValue != lastRank && r.NewValue > ScoreRank.F && PlaySamples.Value && enoughSampleTimeElapsed && lastRankChangeTime.Value.HasValue)
+            {
+                if (r.NewValue > lastRank)
+                    rankUpSample.Play();
+                else
+                    rankDownSample.Play();
+
+                lastSamplePlaybackTime.Value = Time.Current;
+            }
+
+            rankDisplay.Rank = r.NewValue;
+            lastRank = r.NewValue;
+            lastRankChangeTime.Value = Time.Current;
         }
     }
 }
