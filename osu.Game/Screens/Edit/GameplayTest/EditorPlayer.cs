@@ -59,6 +59,8 @@ namespace osu.Game.Screens.Edit.GameplayTest
         {
             base.LoadAsyncComplete();
 
+            // `preventMissOnPreviousHitObjects()` needs to be called to install its hooks before drawable hit objects get the chance to run update logic,
+            // because it will not work otherwise due to being too late (various effects of the objects getting missed will have already taken place).
             if (DrawableRuleset != null)
                 preventMissOnPreviousHitObjects();
         }
