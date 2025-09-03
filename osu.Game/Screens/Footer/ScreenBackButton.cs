@@ -19,6 +19,19 @@ namespace osu.Game.Screens.Footer
     {
         public const float BUTTON_WIDTH = 240;
 
+        public sealed override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
+        {
+            // Ensure clicks in the corner of the screen still trigger the back button.
+            // Need to apply more than 1x inflation due to shear.
+            var inputRectangle = DrawRectangle.Inflate(new MarginPadding
+            {
+                Left = OsuGame.SCREEN_EDGE_MARGIN * 2,
+                Bottom = OsuGame.SCREEN_EDGE_MARGIN * 2,
+            });
+
+            return inputRectangle.Contains(ToLocalSpace(screenSpacePos));
+        }
+
         public ScreenBackButton()
             : base(BUTTON_WIDTH)
         {

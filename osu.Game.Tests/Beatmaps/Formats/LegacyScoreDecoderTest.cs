@@ -13,6 +13,7 @@ using osu.Framework.Extensions;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.Legacy;
+using osu.Game.Extensions;
 using osu.Game.IO.Legacy;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Replays;
@@ -155,10 +156,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             var scoreInfo = TestResources.CreateTestScoreInfo(ruleset);
             var beatmap = new TestBeatmap(ruleset)
             {
-                BeatmapInfo =
-                {
-                    BeatmapVersion = beatmapVersion
-                }
+                BeatmapVersion = beatmapVersion
             };
 
             var score = new Score
@@ -324,6 +322,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 CountryCode = CountryCode.PL
             };
             scoreInfo.ClientVersion = "2023.1221.0";
+            scoreInfo.Pauses.AddRange([111111, 222222, 333333]);
 
             var beatmap = new TestBeatmap(ruleset);
             var score = new Score
@@ -348,6 +347,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.That(decodedAfterEncode.ScoreInfo.Mods, Is.EqualTo(scoreInfo.Mods));
                 Assert.That(decodedAfterEncode.ScoreInfo.ClientVersion, Is.EqualTo("2023.1221.0"));
                 Assert.That(decodedAfterEncode.ScoreInfo.RealmUser.OnlineID, Is.EqualTo(3035836));
+                Assert.That(decodedAfterEncode.ScoreInfo.Pauses, Is.EquivalentTo(new[] { 111111, 222222, 333333 }));
             });
         }
 
@@ -633,14 +633,14 @@ namespace osu.Game.Tests.Beatmaps.Formats
                     MD5Hash = md5Hash,
                     Ruleset = new OsuRuleset().RulesetInfo,
                     Difficulty = new BeatmapDifficulty(),
-                    BeatmapVersion = beatmapVersion,
                 },
-                // needs to have at least one objects so that `StandardisedScoreMigrationTools` doesn't die
+                // needs to have at least one object so that `StandardisedScoreMigrationTools` doesn't die
                 // when trying to recompute total score.
                 HitObjects =
                 {
                     new HitCircle()
-                }
+                },
+                BeatmapVersion = beatmapVersion,
             });
         }
     }

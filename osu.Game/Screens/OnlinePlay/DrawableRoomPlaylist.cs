@@ -165,7 +165,8 @@ namespace osu.Game.Screens.OnlinePlay
             d.RequestDeletion = i => RequestDeletion?.Invoke(i);
             d.RequestResults = i =>
             {
-                SelectedItem.Value = i;
+                if (AllowSelection)
+                    SelectedItem.Value = i;
                 RequestResults?.Invoke(i);
             };
             d.RequestEdit = i => RequestEdit?.Invoke(i);

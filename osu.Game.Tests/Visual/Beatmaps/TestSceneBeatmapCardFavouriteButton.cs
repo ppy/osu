@@ -91,6 +91,6 @@ namespace osu.Game.Tests.Visual.Beatmaps
         }
 
         private void assertCorrectIcon(bool favourited) => AddAssert("icon correct",
-            () => this.ChildrenOfType<SpriteIcon>().Single().Icon.Equals(favourited ? FontAwesome.Solid.Heart : FontAwesome.Regular.Heart));
+            () => this.ChildrenOfType<SpriteIcon>().First().Icon.Equals(favourited ? FontAwesome.Solid.Heart : FontAwesome.Regular.Heart));
     }
 }

@@ -3,14 +3,13 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
-using osu.Framework.Layout;
+using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -28,8 +27,6 @@ namespace osu.Game.Overlays
         private const float transition_duration = 250;
         private const int header_height = 30;
         private const int corner_radius = 5;
-
-        private readonly Cached headerTextVisibilityCache = new Cached();
 
         protected override Container<Drawable> Content => content;
 
@@ -156,13 +153,9 @@ namespace osu.Game.Overlays
         {
             base.Update();
 
-            if (!headerTextVisibilityCache.IsValid)
-            {
-                // These toolbox grouped may be contracted to only show icons.
-                // For now, let's hide the header to avoid text truncation weirdness in such cases.
-                headerText.FadeTo(headerText.DrawWidth < DrawWidth ? 1 : 0, 150, Easing.OutQuint);
-                headerTextVisibilityCache.Validate();
-            }
+            // These toolbox grouped may be contracted to only show icons.
+            // For now, let's hide the header to avoid text truncation weirdness in such cases.
+            headerText.Alpha = (float)Interpolation.DampContinuously(headerText.Alpha, headerText.DrawWidth < DrawWidth ? 1 : 0, 40, Time.Elapsed);
 
             // Dragged child finished its drag operation.
             if (draggedChild != null && inputManager.DraggedDrawable != draggedChild)
@@ -170,14 +163,6 @@ namespace osu.Game.Overlays
                 draggedChild = null;
                 updateExpandedState(true);
             }
-        }
-
-        protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
-        {
-            if (invalidation.HasFlag(Invalidation.DrawSize))
-                headerTextVisibilityCache.Invalidate();
-
-            return base.OnInvalidate(invalidation, source);
         }
 
         private void updateExpandedState(bool animate)

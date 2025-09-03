@@ -3,30 +3,23 @@
 
 #nullable disable
 
-using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Rulesets.UI.Scrolling;
+using osuTK;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
     public partial class DrawableManiaJudgement : DrawableJudgement
     {
-        private IBindable<ScrollingDirection> direction;
-
-        [BackgroundDependencyLoader]
-        private void load(IScrollingInfo scrollingInfo)
+        public DrawableManiaJudgement()
         {
-            direction = scrollingInfo.Direction.GetBoundCopy();
-            direction.BindValueChanged(_ => onDirectionChanged(), true);
-        }
-
-        private void onDirectionChanged()
-        {
-            Anchor = direction.Value == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre;
-            Origin = Anchor.Centre;
+            // Extend the dimensions of this drawable to the entire parenting container.
+            // This allows skin implementations (i.e. LegacyManiaJudgementPiece) to freely choose the anchor based on skin settings.
+            Anchor = Anchor.TopLeft;
+            Origin = Anchor.TopLeft;
+            RelativeSizeAxes = Axes.Both;
+            Size = new Vector2(1f);
         }
 
         protected override Drawable CreateDefaultJudgement(HitResult result) => new DefaultManiaJudgementPiece(result);

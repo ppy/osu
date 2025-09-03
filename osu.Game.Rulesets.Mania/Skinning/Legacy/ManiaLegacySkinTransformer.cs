@@ -98,6 +98,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                             {
                                 var combo = container.ChildrenOfType<LegacyManiaComboCounter>().FirstOrDefault();
                                 var spectatorList = container.OfType<SpectatorList>().FirstOrDefault();
+                                var leaderboard = container.OfType<DrawableGameplayLeaderboard>().FirstOrDefault();
 
                                 if (combo != null)
                                 {
@@ -112,10 +113,18 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                                     spectatorList.Origin = Anchor.BottomLeft;
                                     spectatorList.Position = new Vector2(10, -10);
                                 }
+
+                                if (leaderboard != null)
+                                {
+                                    leaderboard.Anchor = Anchor.CentreLeft;
+                                    leaderboard.Origin = Anchor.CentreLeft;
+                                    leaderboard.X = 10;
+                                }
                             })
                             {
                                 new LegacyManiaComboCounter(),
                                 new SpectatorList(),
+                                new DrawableGameplayLeaderboard(),
                             };
                     }
 

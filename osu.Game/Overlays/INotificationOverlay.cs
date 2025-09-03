@@ -34,7 +34,7 @@ namespace osu.Game.Overlays
         /// <summary>
         /// Whether there are any ongoing operations, such as imports or downloads.
         /// </summary>
-        public bool HasOngoingOperations => OngoingOperations.Any();
+        bool HasOngoingOperations => OngoingOperations.Any();
 
         /// <summary>
         /// All current displayed notifications, whether in the toast tray or a section.
@@ -44,6 +44,6 @@ namespace osu.Game.Overlays
         /// <summary>
         /// All ongoing operations (ie. any <see cref="ProgressNotification"/> not in a completed or cancelled state).
         /// </summary>
-        public IEnumerable<ProgressNotification> OngoingOperations => AllNotifications.OfType<ProgressNotification>().Where(p => p.Ongoing);
+        IEnumerable<ProgressNotification> OngoingOperations => AllNotifications.OfType<ProgressNotification>().Where(p => p.Ongoing);
     }
 }

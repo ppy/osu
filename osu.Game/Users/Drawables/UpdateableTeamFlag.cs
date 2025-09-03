@@ -8,8 +8,10 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Users.Drawables
@@ -64,6 +66,12 @@ namespace osu.Game.Users.Drawables
 
             public LocalisableString TooltipText { get; }
 
+            [Resolved]
+            private OsuGame? game { get; set; }
+
+            [Resolved]
+            private IAPIProvider api { get; set; } = null!;
+
             public TeamFlag(APITeam team)
             {
                 this.team = team;
@@ -90,6 +98,12 @@ namespace osu.Game.Users.Drawables
                         FillMode = FillMode.Fit,
                     }
                 };
+            }
+
+            protected override bool OnClick(ClickEvent e)
+            {
+                game?.OpenUrlExternally($"{api.Endpoints.WebsiteUrl}/teams/{team.Id}");
+                return true;
             }
         }
     }

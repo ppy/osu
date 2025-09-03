@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public override BindableBool ComboBasedSize { get; } = new BindableBool(true);
 
-        public override float DefaultFlashlightSize => 200;
+        public override float DefaultFlashlightSize => 125;
 
         private OsuFlashlight flashlight = null!;
 

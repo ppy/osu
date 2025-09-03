@@ -13,25 +13,21 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         /// <summary>
         /// The difficulty corresponding to the rhythm skill.
         /// </summary>
-        [JsonProperty("rhythm_difficulty")]
         public double RhythmDifficulty { get; set; }
 
         /// <summary>
         /// The difficulty corresponding to the reading skill.
         /// </summary>
-        [JsonProperty("reading_difficulty")]
         public double ReadingDifficulty { get; set; }
 
         /// <summary>
         /// The difficulty corresponding to the colour skill.
         /// </summary>
-        [JsonProperty("colour_difficulty")]
         public double ColourDifficulty { get; set; }
 
         /// <summary>
         /// The difficulty corresponding to the stamina skill.
         /// </summary>
-        [JsonProperty("stamina_difficulty")]
         public double StaminaDifficulty { get; set; }
 
         /// <summary>
@@ -40,13 +36,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         [JsonProperty("mono_stamina_factor")]
         public double MonoStaminaFactor { get; set; }
 
-        [JsonProperty("rhythm_difficult_strains")]
         public double RhythmTopStrains { get; set; }
 
-        [JsonProperty("colour_difficult_strains")]
         public double ColourTopStrains { get; set; }
 
-        [JsonProperty("stamina_difficult_strains")]
         public double StaminaTopStrains { get; set; }
 
         public override IEnumerable<(int attributeId, object value)> ToDatabaseAttributes()

@@ -67,6 +67,12 @@ namespace osu.Game.Screens.Play.HUD
             }
         }
 
+        public FillDirection FillDirection
+        {
+            get => iconsContainer.Direction;
+            set => iconsContainer.Direction = value;
+        }
+
         private readonly FillFlowContainer<ModIcon> iconsContainer;
 
         public ModDisplay(bool showExtendedInformation = true)
@@ -122,13 +128,13 @@ namespace osu.Game.Screens.Play.HUD
         private void expand(double duration = 500)
         {
             if (ExpansionMode != ExpansionMode.AlwaysContracted)
-                iconsContainer.TransformSpacingTo(new Vector2(5, 0), duration, Easing.OutQuint);
+                iconsContainer.TransformSpacingTo(new Vector2(5, -10), duration, Easing.OutQuint);
         }
 
         private void contract(double duration = 500)
         {
             if (ExpansionMode != ExpansionMode.AlwaysExpanded)
-                iconsContainer.TransformSpacingTo(new Vector2(-25, 0), duration, Easing.OutQuint);
+                iconsContainer.TransformSpacingTo(new Vector2(-25), duration, Easing.OutQuint);
         }
 
         protected override bool OnHover(HoverEvent e)

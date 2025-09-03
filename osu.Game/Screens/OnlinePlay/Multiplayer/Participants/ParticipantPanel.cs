@@ -7,12 +7,13 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
-using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Pooling;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
@@ -36,9 +37,17 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 {
-    public partial class ParticipantPanel : CompositeDrawable, IHasContextMenu
+    public partial class ParticipantPanel : PoolableDrawable, IHasContextMenu, IHasCurrentValue<MultiplayerRoomUser>
     {
-        public readonly MultiplayerRoomUser User;
+        public const int HEIGHT = 40;
+
+        public Bindable<MultiplayerRoomUser> Current
+        {
+            get => current.Current;
+            set => current.Current = value;
+        }
+
+        private readonly BindableWithCurrent<MultiplayerRoomUser> current = new BindableWithCurrent<MultiplayerRoomUser>(new MultiplayerRoomUser(-1));
 
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
@@ -51,6 +60,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 
         private SpriteIcon crown = null!;
 
+        private UserCoverBackground userCover = null!;
+        private UpdateableAvatar userAvatar = null!;
+        private UpdateableFlag userFlag = null!;
+        private OsuSpriteText username = null!;
+        private Container teamFlagContainer = null!;
         private OsuSpriteText userRankText = null!;
         private StyleDisplayIcon userStyleDisplay = null!;
         private ModDisplay userModsDisplay = null!;
@@ -58,19 +72,15 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 
         private IconButton kickButton = null!;
 
-        public ParticipantPanel(MultiplayerRoomUser user)
+        public ParticipantPanel()
         {
-            User = user;
-
             RelativeSizeAxes = Axes.X;
-            Height = 40;
+            Height = HEIGHT;
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            var user = User.User;
-
             var backgroundColour = Color4Extensions.FromHex("#33413C");
 
             InternalChild = new GridContainer
@@ -96,7 +106,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                             Colour = Color4Extensions.FromHex("#F7E65D"),
                             Alpha = 0
                         },
-                        new TeamDisplay(User),
+                        new TeamDisplay { Current = Current },
                         new Container
                         {
                             RelativeSizeAxes = Axes.Both,
@@ -109,13 +119,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                                     RelativeSizeAxes = Axes.Both,
                                     Colour = backgroundColour
                                 },
-                                new UserCoverBackground
+                                userCover = new UserCoverBackground
                                 {
                                     Anchor = Anchor.CentreRight,
                                     Origin = Anchor.CentreRight,
                                     RelativeSizeAxes = Axes.Both,
                                     Width = 0.75f,
-                                    User = user,
                                     Colour = ColourInfo.GradientHorizontal(Color4.White.Opacity(0), Color4.White.Opacity(0.25f))
                                 },
                                 new FillFlowContainer
@@ -125,33 +134,30 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                                     Direction = FillDirection.Horizontal,
                                     Children = new Drawable[]
                                     {
-                                        new UpdateableAvatar
+                                        userAvatar = new UpdateableAvatar
                                         {
                                             Anchor = Anchor.CentreLeft,
                                             Origin = Anchor.CentreLeft,
                                             RelativeSizeAxes = Axes.Both,
                                             FillMode = FillMode.Fit,
-                                            User = user
                                         },
-                                        new UpdateableFlag
+                                        userFlag = new UpdateableFlag
                                         {
                                             Anchor = Anchor.CentreLeft,
                                             Origin = Anchor.CentreLeft,
                                             Size = new Vector2(28, 20),
-                                            CountryCode = user?.CountryCode ?? default
                                         },
-                                        new UpdateableTeamFlag(user?.Team)
+                                        teamFlagContainer = new Container
                                         {
+                                            AutoSizeAxes = Axes.Both,
                                             Anchor = Anchor.CentreLeft,
                                             Origin = Anchor.CentreLeft,
-                                            Size = new Vector2(40, 20),
                                         },
-                                        new OsuSpriteText
+                                        username = new OsuSpriteText
                                         {
                                             Anchor = Anchor.CentreLeft,
                                             Origin = Anchor.CentreLeft,
                                             Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 18),
-                                            Text = user?.Username ?? string.Empty
                                         },
                                         userRankText = new OsuSpriteText
                                         {
@@ -198,18 +204,51 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                             Origin = Anchor.Centre,
                             Alpha = 0,
                             Margin = new MarginPadding(4),
-                            Action = () => client.KickUser(User.UserID).FireAndForget(),
+                            Action = () => client.KickUser(current.Value.UserID).FireAndForget(),
                         },
                     },
                 }
             };
         }
 
-        protected override void LoadComplete()
+        protected override void PrepareForUse()
         {
-            base.LoadComplete();
+            base.PrepareForUse();
 
             client.RoomUpdated += onRoomUpdated;
+            updateUser();
+            FinishTransforms(true);
+        }
+
+        protected override void FreeAfterUse()
+        {
+            base.FreeAfterUse();
+
+            client.RoomUpdated -= onRoomUpdated;
+            // this is a safety measure.
+            // `MultiplayerRoomUser` has equality members overridden to compare by `UserID` only.
+            // `MultiplayerClient` only delivers updates of fields values to specific object references.
+            // if this operation is not done here, in a scenario wherein a user quits and rejoins a room,
+            // it is possible for a single poolable panel to be freed and then used for the same user with the same ID,
+            // which at bindable level will lead to `current` not changing (because of the overridden equality member),
+            // which will lead to this instance not showing any updates for the user in question
+            // because it's associated with an object reference that `MultiplayerClient` is no longer updating.
+            current.SetDefault();
+        }
+
+        private void updateUser()
+        {
+            var user = current.Value.User;
+
+            userCover.User = user;
+            userAvatar.User = user;
+            userFlag.CountryCode = user?.CountryCode ?? default;
+            teamFlagContainer.Child = new UpdateableTeamFlag(user?.Team)
+            {
+                Size = new Vector2(40, 20)
+            };
+            username.Text = user?.Username ?? string.Empty;
+
             updateState();
         }
 
@@ -222,13 +261,15 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 
             const double fade_time = 50;
 
+            var user = current.Value;
+
             if (client.Room.GetCurrentItem() is MultiplayerPlaylistItem currentItem)
             {
-                int userBeatmapId = User.BeatmapId ?? currentItem.BeatmapID;
-                int userRulesetId = User.RulesetId ?? currentItem.RulesetID;
+                int userBeatmapId = user.BeatmapId ?? currentItem.BeatmapID;
+                int userRulesetId = user.RulesetId ?? currentItem.RulesetID;
                 Ruleset? userRuleset = rulesets.GetRuleset(userRulesetId)?.CreateInstance();
 
-                int? currentModeRank = userRuleset == null ? null : User.User?.RulesetsStatistics?.GetValueOrDefault(userRuleset.ShortName)?.GlobalRank;
+                int? currentModeRank = userRuleset == null ? null : user.User?.RulesetsStatistics?.GetValueOrDefault(userRuleset.ShortName)?.GlobalRank;
                 userRankText.Text = currentModeRank != null ? $"#{currentModeRank.Value:N0}" : string.Empty;
 
                 if (userBeatmapId == currentItem.BeatmapID && userRulesetId == currentItem.RulesetID)
@@ -238,12 +279,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 
                 // If the mods are updated at the end of the frame, the flow container will skip a reflow cycle: https://github.com/ppy/osu-framework/issues/4187
                 // This looks particularly jarring here, so re-schedule the update to that start of our frame as a fix.
-                Schedule(() => userModsDisplay.Current.Value = userRuleset == null ? Array.Empty<Mod>() : User.Mods.Select(m => m.ToMod(userRuleset)).ToList());
+                Schedule(() => userModsDisplay.Current.Value = userRuleset == null ? Array.Empty<Mod>() : user.Mods.Select(m => m.ToMod(userRuleset)).ToList());
             }
 
-            userStateDisplay.UpdateStatus(User.State, User.BeatmapAvailability);
+            userStateDisplay.UpdateStatus(user.State, user.BeatmapAvailability);
 
-            if (User.BeatmapAvailability.State == DownloadState.LocallyAvailable && User.State != MultiplayerUserState.Spectating)
+            if (user.BeatmapAvailability.State == DownloadState.LocallyAvailable && user.State != MultiplayerUserState.Spectating)
             {
                 userModsDisplay.FadeIn(fade_time);
                 userStyleDisplay.FadeIn(fade_time);
@@ -254,8 +295,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                 userStyleDisplay.FadeOut(fade_time);
             }
 
-            kickButton.Alpha = client.IsHost && !User.Equals(client.LocalUser) ? 1 : 0;
-            crown.Alpha = client.Room.Host?.Equals(User) == true ? 1 : 0;
+            kickButton.Alpha = client.IsHost && !user.Equals(client.LocalUser) ? 1 : 0;
+            crown.Alpha = client.Room.Host?.Equals(user) == true ? 1 : 0;
         }
 
         public MenuItem[]? ContextMenuItems
@@ -265,15 +306,17 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                 if (client.Room == null)
                     return null;
 
+                var user = current.Value;
+
                 // If the local user is targetted.
-                if (User.UserID == api.LocalUser.Value.Id)
+                if (user.UserID == api.LocalUser.Value.Id)
                     return null;
 
                 // If the local user is not the host of the room.
                 if (client.Room.Host?.UserID != api.LocalUser.Value.Id)
                     return null;
 
-                int targetUser = User.UserID;
+                int targetUser = user.UserID;
 
                 return new MenuItem[]
                 {
@@ -295,14 +338,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                     })
                 };
             }
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-
-            if (client.IsNotNull())
-                client.RoomUpdated -= onRoomUpdated;
         }
 
         public partial class KickButton : IconButton

@@ -106,22 +106,7 @@ namespace osu.Game.Screens.Ranking.Expanded
                         Direction = FillDirection.Vertical,
                         Children = new Drawable[]
                         {
-                            new TruncatingSpriteText
-                            {
-                                Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre,
-                                Text = new RomanisableString(metadata.TitleUnicode, metadata.Title),
-                                Font = OsuFont.Torus.With(size: 20, weight: FontWeight.SemiBold),
-                                MaxWidth = ScorePanel.EXPANDED_WIDTH - padding * 2,
-                            },
-                            new TruncatingSpriteText
-                            {
-                                Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre,
-                                Text = new RomanisableString(metadata.ArtistUnicode, metadata.Artist),
-                                Font = OsuFont.Torus.With(size: 14, weight: FontWeight.SemiBold),
-                                MaxWidth = ScorePanel.EXPANDED_WIDTH - padding * 2,
-                            },
+                            new ClickableMetadata(beatmap.OnlineID, metadata),
                             new Container
                             {
                                 Anchor = Anchor.TopCentre,
@@ -314,6 +299,48 @@ namespace osu.Game.Screens.Ranking.Expanded
             {
                 Text = LocalisableString.Format("Played on {0}",
                     time.ToLocalTime().ToLocalisableString(prefer24HourTime.Value ? @"d MMMM yyyy HH:mm" : @"d MMMM yyyy h:mm tt"));
+            }
+        }
+
+        internal partial class ClickableMetadata : OsuHoverContainer
+        {
+            [Resolved]
+            private OsuGame? game { get; set; }
+
+            public ClickableMetadata(int beatmapId, IBeatmapMetadataInfo metadata)
+            {
+                AutoSizeAxes = Axes.Both;
+
+                Anchor = Anchor.TopCentre;
+                Origin = Anchor.TopCentre;
+
+                Child = new FillFlowContainer
+                {
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Vertical,
+                    Children = new Drawable[]
+                    {
+                        new TruncatingSpriteText
+                        {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            Text = new RomanisableString(metadata.TitleUnicode, metadata.Title),
+                            Font = OsuFont.Torus.With(size: 20, weight: FontWeight.SemiBold),
+                            MaxWidth = ScorePanel.EXPANDED_WIDTH - padding * 2,
+                        },
+                        new TruncatingSpriteText
+                        {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            Text = new RomanisableString(metadata.ArtistUnicode, metadata.Artist),
+                            Font = OsuFont.Torus.With(size: 14, weight: FontWeight.SemiBold),
+                            MaxWidth = ScorePanel.EXPANDED_WIDTH - padding * 2,
+                        }
+                    }
+                };
+
+                if (beatmapId > 0)
+                    Action = () => game?.ShowBeatmap(beatmapId);
             }
         }
     }

@@ -108,7 +108,10 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             public bool IsRunning => true;
 
-            public double TrueGameplayRate { set => adjustableAudioComponent.Tempo.Value = value; }
+            public double TrueGameplayRate
+            {
+                set => adjustableAudioComponent.Tempo.Value = value;
+            }
 
             private readonly AudioAdjustments adjustableAudioComponent = new AudioAdjustments();
 

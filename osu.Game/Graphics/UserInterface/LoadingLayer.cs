@@ -4,7 +4,6 @@
 #nullable disable
 
 using System;
-using JetBrains.Annotations;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
@@ -21,9 +20,6 @@ namespace osu.Game.Graphics.UserInterface
     public partial class LoadingLayer : LoadingSpinner
     {
         private readonly bool blockInput;
-
-        [CanBeNull]
-        protected Box BackgroundDimLayer { get; }
 
         /// <summary>
         /// Construct a new loading spinner.
@@ -42,11 +38,11 @@ namespace osu.Game.Graphics.UserInterface
 
             if (dimBackground)
             {
-                AddInternal(BackgroundDimLayer = new Box
+                AddInternal(new Box
                 {
                     Depth = float.MaxValue,
                     Colour = Color4.Black,
-                    Alpha = 0,
+                    Alpha = 0.5f,
                     RelativeSizeAxes = Axes.Both,
                 });
             }
@@ -74,23 +70,11 @@ namespace osu.Game.Graphics.UserInterface
             return true;
         }
 
-        protected override void PopIn()
-        {
-            BackgroundDimLayer?.FadeTo(0.5f, TRANSITION_DURATION * 2, Easing.OutQuint);
-            base.PopIn();
-        }
-
-        protected override void PopOut()
-        {
-            BackgroundDimLayer?.FadeOut(TRANSITION_DURATION, Easing.OutQuint);
-            base.PopOut();
-        }
-
         protected override void Update()
         {
             base.Update();
 
-            MainContents.Size = new Vector2(Math.Clamp(Math.Min(DrawWidth, DrawHeight) * 0.25f, 20, 100));
+            MainContents.Size = new Vector2(Math.Clamp(Math.Min(DrawWidth, DrawHeight) * 0.25f, 20, 80));
         }
     }
 }

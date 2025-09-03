@@ -32,7 +32,7 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// This beatmap's difficulty settings.
         /// </summary>
-        public BeatmapDifficulty Difficulty { get; set; }
+        BeatmapDifficulty Difficulty { get; set; }
 
         /// <summary>
         /// The control points in this beatmap.
@@ -108,6 +108,8 @@ namespace osu.Game.Beatmaps
         int CountdownOffset { get; internal set; }
 
         int[] Bookmarks { get; internal set; }
+
+        int BeatmapVersion { get; }
 
         /// <summary>
         /// Creates a shallow-clone of this beatmap and returns it.

@@ -14,7 +14,7 @@ namespace osu.Game.Screens.Edit
 {
     public class BindableBeatDivisor : BindableInt
     {
-        public static readonly int[] PREDEFINED_DIVISORS = { 1, 2, 3, 4, 6, 8, 12, 16 };
+        public static readonly int[] PREDEFINED_DIVISORS = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 16 };
 
         public const int MINIMUM_DIVISOR = 1;
         public const int MAXIMUM_DIVISOR = 64;
@@ -128,6 +128,11 @@ namespace osu.Game.Screens.Edit
 
                 case 12:
                     return colours.YellowDarker;
+
+                case 5:
+                case 7:
+                case 9:
+                    return colours.GreenLight;
 
                 default:
                     return Color4.Red;

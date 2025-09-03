@@ -57,6 +57,9 @@ namespace osu.Game.Online.Metadata
         /// <summary>
         /// Attempts to retrieve the presence of a user.
         /// </summary>
+        /// <remarks>
+        /// This will return data if the client is currently receiving presence data. See <see cref="BeginWatchingUserPresence"/>.
+        /// </remarks>
         /// <param name="userId">The user ID.</param>
         /// <returns>The user presence, or null if not available or the user's offline.</returns>
         public UserPresence? GetPresence(int userId)

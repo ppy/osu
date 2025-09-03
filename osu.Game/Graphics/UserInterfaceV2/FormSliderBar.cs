@@ -68,6 +68,11 @@ namespace osu.Game.Graphics.UserInterfaceV2
         /// </summary>
         public LocalisableString HintText { get; init; }
 
+        /// <summary>
+        /// A custom step value for each key press which actuates a change on this control.
+        /// </summary>
+        public float KeyboardStep { get; init; }
+
         private Box background = null!;
         private Box flashLayer = null!;
         private FormTextBox.InnerTextBox textBox = null!;
@@ -140,6 +145,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                             Origin = Anchor.CentreRight,
                             RelativeSizeAxes = Axes.X,
                             Width = 0.5f,
+                            KeyboardStep = KeyboardStep,
                             Current = currentNumberInstantaneous,
                             OnCommit = () => current.Value = currentNumberInstantaneous.Value,
                         }
@@ -306,6 +312,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 Height = 40;
                 RelativeSizeAxes = Axes.X;
                 RangePadding = nub_width / 2;
+
                 Children = new Drawable[]
                 {
                     new Container

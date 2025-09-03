@@ -31,13 +31,13 @@ using osu.Game.Online.Chat;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapSet;
-using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Users.Drawables;
 using osuTK;
 using osuTK.Graphics;
+using osu.Game.Localisation;
 
 namespace osu.Game.Screens.OnlinePlay
 {
@@ -76,6 +76,7 @@ namespace osu.Game.Screens.OnlinePlay
 
         private readonly DelayedLoadWrapper onScreenLoader;
         private readonly IBindable<bool> valid = new Bindable<bool>();
+        private readonly IBindable<bool> completed = new Bindable<bool>();
 
         private IBeatmapInfo? beatmap;
         private IRulesetInfo? ruleset;
@@ -128,9 +129,7 @@ namespace osu.Game.Screens.OnlinePlay
             Item = item;
 
             valid.BindTo(item.Valid);
-
-            if (item.Expired)
-                Colour = OsuColour.Gray(0.5f);
+            completed.BindTo(item.Completed);
         }
 
         [BackgroundDependencyLoader]
@@ -528,9 +527,27 @@ namespace osu.Game.Screens.OnlinePlay
 
         private IEnumerable<Drawable> createButtons() => new[]
         {
-            beatmap == null ? Empty() : new PlaylistDownloadButton(beatmap),
+            new CompletionIcon
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Visible = { BindTarget = completed }
+            },
+            beatmap == null
+                ? Empty().With(d =>
+                {
+                    d.Anchor = Anchor.Centre;
+                    d.Origin = Anchor.Centre;
+                })
+                : new PlaylistDownloadButton(beatmap)
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                },
             showResultsButton = new GrayButton(FontAwesome.Solid.ChartPie)
             {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
                 Size = new Vector2(30, 30),
                 Action = () => RequestResults?.Invoke(Item),
                 Alpha = AllowShowingResults ? 1 : 0,
@@ -538,13 +555,17 @@ namespace osu.Game.Screens.OnlinePlay
             },
             editButton = new PlaylistEditButton
             {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
                 Size = new Vector2(30, 30),
                 Alpha = AllowEditing ? 1 : 0,
                 Action = () => RequestEdit?.Invoke(Item),
-                TooltipText = CommonStrings.ButtonsEdit
+                TooltipText = Resources.Localisation.Web.CommonStrings.ButtonsEdit
             },
             removeButton = new PlaylistRemoveButton
             {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
                 Size = new Vector2(30, 30),
                 Alpha = AllowDeletion ? 1 : 0,
                 Action = () => RequestDeletion?.Invoke(Item),
@@ -770,6 +791,65 @@ namespace osu.Game.Screens.OnlinePlay
             {
                 this.allowInteraction = allowInteraction;
             }
+        }
+
+        private partial class CompletionIcon : CompositeDrawable, IHasTooltip
+        {
+            public readonly BindableBool Visible = new BindableBool();
+
+            [Resolved]
+            private OsuColour colours { get; set; } = null!;
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                InternalChild = new CircularContainer
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Size = new Vector2(16),
+                    Masking = true,
+                    Colour = colours.Lime0,
+                    Children = new Drawable[]
+                    {
+                        new Box
+                        {
+                            RelativeSizeAxes = Axes.Both
+                        },
+                        new SpriteIcon
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            RelativeSizeAxes = Axes.Both,
+                            Scale = new Vector2(0.5f),
+                            Colour = OsuColour.Gray(0.5f),
+                            Icon = FontAwesome.Solid.Check
+                        }
+                    }
+                };
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                Visible.BindValueChanged(onVisibleChanged, true);
+            }
+
+            private void onVisibleChanged(ValueChangedEvent<bool> visible)
+            {
+                if (visible.NewValue)
+                {
+                    Size = new Vector2(16);
+                    Alpha = 1;
+                }
+                else
+                {
+                    Size = Vector2.Zero;
+                    Alpha = 0;
+                }
+            }
+
+            public LocalisableString TooltipText => DrawableRoomPlaylistItemStrings.CompletedTooltip;
         }
     }
 }

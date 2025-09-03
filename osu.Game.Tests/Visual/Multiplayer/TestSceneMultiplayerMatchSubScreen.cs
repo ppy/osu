@@ -1,16 +1,19 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
@@ -51,15 +54,25 @@ namespace osu.Game.Tests.Visual.Multiplayer
             Dependencies.Cache(new RealmRulesetStore(Realm));
             Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, Realm, null, audio, Resources, host, Beatmap.Default));
             Dependencies.Cache(Realm);
+            Dependencies.CacheAs<BeatmapStore>(new RealmDetachedBeatmapStore());
 
             beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
 
             importedSet = beatmaps.GetAllUsableBeatmapSets().First();
+
+            Realm.Write(r =>
+            {
+                foreach (var beatmapInfo in r.All<BeatmapInfo>())
+                    beatmapInfo.OnlineMD5Hash = beatmapInfo.MD5Hash;
+            });
         }
 
-        [SetUpSteps]
-        public void SetupSteps()
+        public override void SetUpSteps()
         {
+            base.SetUpSteps();
+
+            AddUntilStep("wait for mod select removed", () => this.ChildrenOfType<MultiplayerUserModSelectOverlay>().Count(), () => Is.Zero);
+
             AddStep("load match", () =>
             {
                 room = new Room { Name = "Test Room" };
@@ -185,7 +198,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("mod select contents loaded",
                 () => this.ChildrenOfType<ModColumn>().Any() && this.ChildrenOfType<ModColumn>().All(col => col.IsLoaded && col.ItemsLoaded));
             AddUntilStep("mod select contains only double time mod",
-                () => this.ChildrenOfType<RoomSubScreen>().Single().UserModsSelectOverlay
+                () => this.ChildrenOfType<MultiplayerUserModSelectOverlay>().Single()
                           .ChildrenOfType<ModPanel>()
                           .SingleOrDefault(panel => panel.Visible)?.Mod is OsuModDoubleTime);
         }
@@ -211,7 +224,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("press toggle mod select key", () => InputManager.Key(Key.F1));
 
-            AddUntilStep("mod select shown", () => this.ChildrenOfType<RoomSubScreen>().Single().UserModsSelectOverlay.State.Value == Visibility.Visible);
+            AddUntilStep("mod select shown", () => this.ChildrenOfType<MultiplayerUserModSelectOverlay>().Single().State.Value == Visibility.Visible);
         }
 
         [Test]
@@ -234,7 +247,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("press toggle mod select key", () => InputManager.Key(Key.F1));
 
             AddWaitStep("wait some", 3);
-            AddAssert("mod select not shown", () => this.ChildrenOfType<RoomSubScreen>().Single().UserModsSelectOverlay.State.Value == Visibility.Hidden);
+            AddAssert("mod select not shown", () => this.ChildrenOfType<MultiplayerUserModSelectOverlay>().Single().State.Value == Visibility.Hidden);
         }
 
         [Test]
@@ -303,13 +316,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("wait for join", () => RoomJoined);
 
             ClickButtonWhenEnabled<UserModSelectButton>();
-            AddAssert("mod select shows unranked", () => this.ChildrenOfType<RankingInformationDisplay>().Single().Ranked.Value == false);
+            AddUntilStep("mod select shows unranked", () => this.ChildrenOfType<RankingInformationDisplay>().Single().Ranked.Value == false);
             AddAssert("score multiplier = 1.20", () => this.ChildrenOfType<RankingInformationDisplay>().Single().ModMultiplier.Value, () => Is.EqualTo(1.2).Within(0.01));
 
-            AddStep("select flashlight", () => screen.UserModsSelectOverlay.ChildrenOfType<ModPanel>().Single(m => m.Mod is ModFlashlight).TriggerClick());
+            AddStep("select flashlight", () => this.ChildrenOfType<MultiplayerUserModSelectOverlay>().Single().ChildrenOfType<ModPanel>().Single(m => m.Mod is ModFlashlight).TriggerClick());
             AddAssert("score multiplier = 1.35", () => this.ChildrenOfType<RankingInformationDisplay>().Single().ModMultiplier.Value, () => Is.EqualTo(1.35).Within(0.01));
 
-            AddStep("change flashlight setting", () => ((OsuModFlashlight)screen.UserModsSelectOverlay.SelectedMods.Value.Single()).FollowDelay.Value = 1200);
+            AddStep("change flashlight setting", () => ((OsuModFlashlight)this.ChildrenOfType<MultiplayerUserModSelectOverlay>().Single().SelectedMods.Value.Single()).FollowDelay.Value = 1200);
             AddAssert("score multiplier = 1.20", () => this.ChildrenOfType<RankingInformationDisplay>().Single().ModMultiplier.Value, () => Is.EqualTo(1.2).Within(0.01));
         }
 
@@ -330,10 +343,123 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddUntilStep("wait for join", () => RoomJoined);
 
-            AddUntilStep("button visible", () => this.ChildrenOfType<DrawableMatchRoom>().Single().ChangeSettingsButton?.Alpha, () => Is.GreaterThan(0));
+            AddUntilStep("button visible", () => this.ChildrenOfType<MultiplayerRoomPanel>().Single().ChangeSettingsButton.Alpha, () => Is.GreaterThan(0));
             AddStep("join other user", void () => MultiplayerClient.AddUser(new APIUser { Id = PLAYER_1_ID }));
             AddStep("make other user host", () => MultiplayerClient.TransferHost(PLAYER_1_ID));
-            AddAssert("button hidden", () => this.ChildrenOfType<DrawableMatchRoom>().Single().ChangeSettingsButton?.Alpha, () => Is.EqualTo(0));
+            AddAssert("button hidden", () => this.ChildrenOfType<MultiplayerRoomPanel>().Single().ChangeSettingsButton.Alpha, () => Is.EqualTo(0));
+        }
+
+        [Test]
+        public void TestUserModSelectUpdatesWhenNotVisible()
+        {
+            AddStep("add playlist item", () =>
+            {
+                room.Playlist =
+                [
+                    new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
+                    {
+                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
+                        AllowedMods = [new APIMod(new OsuModFlashlight())]
+                    }
+                ];
+            });
+
+            ClickButtonWhenEnabled<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>();
+            AddUntilStep("wait for join", () => RoomJoined);
+
+            // 1. Open the mod select overlay and enable flashlight
+
+            ClickButtonWhenEnabled<UserModSelectButton>();
+            AddUntilStep("mod select contents loaded", () => this.ChildrenOfType<ModColumn>().Any() && this.ChildrenOfType<ModColumn>().All(col => col.IsLoaded && col.ItemsLoaded));
+            AddStep("click flashlight panel", () =>
+            {
+                ModPanel panel = this.ChildrenOfType<ModPanel>().Single(p => p.Mod is OsuModFlashlight);
+                InputManager.MoveMouseTo(panel);
+                InputManager.Click(MouseButton.Left);
+            });
+            AddUntilStep("flashlight mod enabled", () => MultiplayerClient.ClientRoom!.Users[0].Mods.Any());
+
+            // 2. Close the mod select overlay, edit the playlist to disable allowed mods, and then edit it again to re-enable allowed mods.
+
+            AddStep("close mod select overlay", () => this.ChildrenOfType<MultiplayerUserModSelectOverlay>().Single().Hide());
+            AddUntilStep("mod select overlay not present", () => !this.ChildrenOfType<MultiplayerUserModSelectOverlay>().Single().IsPresent);
+            AddStep("disable allowed mods", () => MultiplayerClient.EditPlaylistItem(new MultiplayerPlaylistItem(new PlaylistItem(MultiplayerClient.ServerRoom!.Playlist[0])
+            {
+                AllowedMods = []
+            })));
+            // This would normally be done as part of the above operation with an actual server.
+            AddStep("disable user mods", () => MultiplayerClient.ChangeUserMods(API.LocalUser.Value.OnlineID, Array.Empty<APIMod>()));
+            AddUntilStep("flashlight mod disabled", () => !MultiplayerClient.ClientRoom!.Users[0].Mods.Any());
+            AddStep("re-enable allowed mods", () => MultiplayerClient.EditPlaylistItem(new MultiplayerPlaylistItem(new PlaylistItem(MultiplayerClient.ServerRoom!.Playlist[0])
+            {
+                AllowedMods = [new APIMod(new OsuModFlashlight())]
+            })));
+            AddAssert("flashlight mod still disabled", () => !MultiplayerClient.ClientRoom!.Users[0].Mods.Any());
+
+            // 3. Open the mod select overlay, check that the flashlight mod panel is deactivated.
+
+            ClickButtonWhenEnabled<UserModSelectButton>();
+            AddUntilStep("mod select contents loaded", () => this.ChildrenOfType<ModColumn>().Any() && this.ChildrenOfType<ModColumn>().All(col => col.IsLoaded && col.ItemsLoaded));
+            AddAssert("flashlight mod still disabled", () => !MultiplayerClient.ClientRoom!.Users[0].Mods.Any());
+            AddAssert("flashlight mod panel not activated", () => !this.ChildrenOfType<ModPanel>().Single(p => p.Mod is OsuModFlashlight).Active.Value);
+        }
+
+        [Test]
+        public void TestStartCountdown()
+        {
+            AddStep("set playlist", () =>
+            {
+                room.Playlist =
+                [
+                    new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First()).BeatmapInfo)
+                    {
+                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID
+                    }
+                ];
+            });
+
+            ClickButtonWhenEnabled<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>();
+
+            AddUntilStep("wait for room join", () => RoomJoined);
+
+            AddStep("click countdown button", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<MultiplayerCountdownButton>().Single());
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddStep("start a countdown", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<Popover>().Single().ChildrenOfType<Button>().First());
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddUntilStep("countdown started", () => MultiplayerClient.ServerRoom!.ActiveCountdowns.Any());
+        }
+
+        [Test]
+        public void TestSettingsRemainsOpenOnRoomUpdate()
+        {
+            AddStep("set playlist", () =>
+            {
+                room.Playlist =
+                [
+                    new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First()).BeatmapInfo)
+                    {
+                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID
+                    }
+                ];
+            });
+
+            ClickButtonWhenEnabled<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>();
+
+            AddUntilStep("wait for room join", () => RoomJoined);
+
+            AddStep("open settings", () => this.ChildrenOfType<MultiplayerMatchSettingsOverlay>().Single().Show());
+            AddAssert("settings opened", () => this.ChildrenOfType<MultiplayerMatchSettingsOverlay>().Single().State.Value, () => Is.EqualTo(Visibility.Visible));
+
+            AddStep("trigger room update", () => MultiplayerClient.AddPlaylistItem(MultiplayerClient.ServerRoom!.Playlist[0].Clone()));
+            AddAssert("settings still open", () => this.ChildrenOfType<MultiplayerMatchSettingsOverlay>().Single().State.Value, () => Is.EqualTo(Visibility.Visible));
         }
 
         private partial class TestMultiplayerMatchSubScreen : MultiplayerMatchSubScreen

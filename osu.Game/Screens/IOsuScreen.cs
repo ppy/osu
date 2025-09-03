@@ -79,7 +79,9 @@ namespace osu.Game.Screens
 
         /// <summary>
         /// Whether the back button should be displayed in this screen.
+        /// Note that this property is ignored when <see cref="ShowFooter"/> is <c>true</c>.
         /// </summary>
+        // todo: make this work with footer.
         IBindable<bool> BackButtonVisibility { get; }
 
         /// <summary>
@@ -97,7 +99,7 @@ namespace osu.Game.Screens
         Bindable<RulesetInfo> Ruleset { get; }
 
         /// <summary>
-        /// A list of footer buttons to be added to the game footer, or empty to display no buttons.
+        /// Buttons to be added to the game's footer toolbar.
         /// </summary>
         IReadOnlyList<ScreenFooterButton> CreateFooterButtons();
 

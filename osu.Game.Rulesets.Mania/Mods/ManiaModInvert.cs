@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mods;
@@ -23,7 +24,7 @@ namespace osu.Game.Rulesets.Mania.Mods
 
         public override LocalisableString Description => "Hold the keys. To the beat.";
 
-        public override IconUsage? Icon => FontAwesome.Solid.YinYang;
+        public override IconUsage? Icon => OsuIcon.ModInvert;
 
         public override ModType Type => ModType.Conversion;
 
@@ -42,8 +43,7 @@ namespace osu.Game.Rulesets.Mania.Mods
                 var locations = column.OfType<Note>().Select(n => (startTime: n.StartTime, samples: n.Samples))
                                       .Concat(column.OfType<HoldNote>().SelectMany(h => new[]
                                       {
-                                          (startTime: h.StartTime, samples: h.GetNodeSamples(0)),
-                                          (startTime: h.EndTime, samples: h.GetNodeSamples(1))
+                                          (startTime: h.StartTime, samples: h.GetNodeSamples(0))
                                       }))
                                       .OrderBy(h => h.startTime).ToList();
 
@@ -64,6 +64,7 @@ namespace osu.Game.Rulesets.Mania.Mods
                         StartTime = locations[i].startTime,
                         Duration = duration,
                         NodeSamples = new List<IList<HitSampleInfo>> { locations[i].samples, Array.Empty<HitSampleInfo>() }
+                        // intentionally don't play sliding samples here, it doesn't work in this mod.
                     });
                 }
 
