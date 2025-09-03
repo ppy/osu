@@ -7,7 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Threading;
-using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays.Settings;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.IPC;
@@ -25,7 +25,6 @@ namespace osu.Game.Tournament.Screens.Gameplay
         private readonly BindableBool warmup = new BindableBool();
 
         public readonly Bindable<TourneyState> State = new Bindable<TourneyState>();
-        private OsuButton warmupButton = null!;
         private MatchIPCInfo ipc = null!;
 
         [Resolved]
@@ -40,6 +39,8 @@ namespace osu.Game.Tournament.Screens.Gameplay
         private void load(MatchIPCInfo ipc)
         {
             this.ipc = ipc;
+
+            LabelledSwitchButton chatToggle;
 
             AddRangeInternal(new Drawable[]
             {
@@ -96,17 +97,14 @@ namespace osu.Game.Tournament.Screens.Gameplay
                 {
                     Children = new Drawable[]
                     {
-                        warmupButton = new TourneyButton
+                        new LabelledSwitchButton
                         {
-                            RelativeSizeAxes = Axes.X,
-                            Text = GameplayScreenStrings.WarmupStage,
-                            Action = () => warmup.Toggle()
+                            Label = GameplayScreenStrings.WarmupStage,
+                            Current = warmup,
                         },
-                        new TourneyButton
+                        chatToggle = new LabelledSwitchButton
                         {
-                            RelativeSizeAxes = Axes.X,
-                            Text = GameplayScreenStrings.ToggleChat,
-                            Action = () => { State.Value = State.Value == TourneyState.Idle ? TourneyState.Playing : TourneyState.Idle; }
+                            Label = GameplayScreenStrings.ToggleChat,
                         },
                         new SettingsSlider<int>
                         {
@@ -124,13 +122,12 @@ namespace osu.Game.Tournament.Screens.Gameplay
                 }
             });
 
+            State.BindValueChanged(state => chatToggle.Current.Value = State.Value == TourneyState.Idle, true);
+            chatToggle.Current.BindValueChanged(v => State.Value = v.NewValue ? TourneyState.Idle : TourneyState.Playing);
+
             LadderInfo.ChromaKeyWidth.BindValueChanged(width => chroma.Width = width.NewValue, true);
 
-            warmup.BindValueChanged(w =>
-            {
-                warmupButton.Alpha = !w.NewValue ? 0.5f : 1;
-                header.ShowScores = !w.NewValue;
-            }, true);
+            warmup.BindValueChanged(w => header.ShowScores = !w.NewValue, true);
         }
 
         protected override void LoadComplete()

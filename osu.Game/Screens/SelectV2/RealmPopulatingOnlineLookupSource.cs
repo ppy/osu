@@ -43,6 +43,8 @@ namespace osu.Game.Screens.SelectV2
             var request = new GetBeatmapSetRequest(id);
             var tcs = new TaskCompletionSource<APIBeatmapSet?>();
 
+            token.Register(() => request.Cancel());
+
             // async request success callback is a bit of a dangerous game, but there's some reasoning for it.
             // - don't really want to use `IAPIAccess.PerformAsync()` because we still want to respect request queueing & online status checks
             // - we want the realm write here to be async because it is known to be slow for some users with large beatmap collections

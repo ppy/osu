@@ -4,7 +4,6 @@
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Testing;
-using osu.Game.Beatmaps;
 using osu.Game.Screens.Select.Filter;
 using osu.Game.Screens.SelectV2;
 using osuTK;
@@ -90,7 +89,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             CheckHasSelection();
             AddAssert("drawable selection non-null", () => selection, () => Is.Not.Null);
-            AddAssert("drawable selection matches carousel selection", () => selection, () => Is.EqualTo(Carousel.CurrentSelection));
+            AddAssert("drawable selection matches carousel selection", () => selection, () => Is.EqualTo(Carousel.CurrentGroupedBeatmap));
 
             RemoveAllBeatmaps();
             AddUntilStep("no drawable selection", GetSelectedPanel, () => Is.Null);
@@ -101,9 +100,9 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             CheckHasSelection();
             AddAssert("no drawable selection", GetSelectedPanel, () => Is.Null);
 
-            AddStep("add previous selection", () => BeatmapSets.Add(((BeatmapInfo)selection!).BeatmapSet!));
+            AddStep("add previous selection", () => BeatmapSets.Add(((GroupedBeatmap)selection!).Beatmap.BeatmapSet!));
 
-            AddAssert("selection matches original carousel selection", () => selection, () => Is.EqualTo(Carousel.CurrentSelection));
+            AddAssert("selection matches original carousel selection", () => selection, () => Is.EqualTo(Carousel.CurrentGroupedBeatmap));
             AddUntilStep("drawable selection restored", () => GetSelectedPanel()?.Item?.Model, () => Is.EqualTo(selection));
             AddAssert("carousel item is visible", () => GetSelectedPanel()?.Item?.IsVisible, () => Is.True);
         }
@@ -390,15 +389,15 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
         private void checkSelectionIterating(bool isIterating)
         {
-            object? selection = null;
+            GroupedBeatmap? selection = null;
 
             for (int i = 0; i < 3; i++)
             {
-                AddStep("store selection", () => selection = Carousel.CurrentSelection);
+                AddStep("store selection", () => selection = Carousel.CurrentGroupedBeatmap);
                 if (isIterating)
-                    AddUntilStep("selection changed", () => Carousel.CurrentSelection != selection);
+                    AddUntilStep("selection changed", () => Carousel.CurrentGroupedBeatmap != selection);
                 else
-                    AddUntilStep("selection not changed", () => Carousel.CurrentSelection == selection);
+                    AddUntilStep("selection not changed", () => Carousel.CurrentGroupedBeatmap == selection);
             }
         }
     }
