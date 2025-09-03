@@ -17,6 +17,7 @@ using osu.Game.Scoring.Legacy;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Utils;
 using Realms;
 
 namespace osu.Game.Scoring
@@ -58,7 +59,7 @@ namespace osu.Game.Scoring
                     {
                         // In the case of a missing beatmap, let's attempt to resolve it and show a prompt to the user to download the required beatmap.
                         var req = new GetBeatmapRequest(new BeatmapInfo { MD5Hash = notFound.Hash });
-                        req.Success += res => PostNotification?.Invoke(new MissingBeatmapNotification(res, archive, notFound.Hash));
+                        req.Success += res => PostNotification?.Invoke(new MissingBeatmapNotification(res, notFound.Hash, archive));
                         api.Queue(req);
                     }
 
@@ -89,6 +90,9 @@ namespace osu.Game.Scoring
             // Under no circumstance do we want these to be written to realm as null.
             ArgumentNullException.ThrowIfNull(model.BeatmapInfo);
             ArgumentNullException.ThrowIfNull(model.Ruleset);
+
+            if (!ModUtils.CheckCompatibleSet(model.Mods))
+                throw new InvalidOperationException(@"The score specifies an incompatible set of mods!");
 
             if (string.IsNullOrEmpty(model.StatisticsJson))
                 model.StatisticsJson = JsonConvert.SerializeObject(model.Statistics);

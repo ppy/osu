@@ -27,7 +27,6 @@ using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
-using osu.Game.Screens.OnlinePlay.Match;
 using osu.Game.Users;
 using osuTK;
 using osuTK.Graphics;
@@ -174,7 +173,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                                         {
                                             d.Anchor = Anchor.BottomLeft;
                                             d.Origin = Anchor.BottomLeft;
-                                            d.Size = new Vector2(150, 37.5f);
+                                            d.Size = new Vector2(150, 30f);
                                             d.Action = () => Open();
                                         })),
                                         new FillFlowContainer
@@ -218,10 +217,10 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             filter.BindValueChanged(_ =>
             {
                 roomListing.Rooms.Clear();
-                hasListingResults.Value = false;
-                listingPoller.PollImmediately();
+                RefreshRooms();
             });
 
+            updateLoadingLayer();
             updateFilter();
         }
 
@@ -335,7 +334,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             popoverContainer.HidePopover();
         }
 
-        public void Join(Room room, string? password, Action<Room>? onSuccess = null, Action<string>? onFailure = null) => Schedule(() =>
+        public void Join(Room room, string? password, Action<Room>? onSuccess = null, Action<string, Exception?>? onFailure = null) => Schedule(() =>
         {
             if (joiningRoomOperation != null)
                 return;
@@ -348,15 +347,19 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                 joiningRoomOperation?.Dispose();
                 joiningRoomOperation = null;
                 onSuccess?.Invoke(room);
-            }, error =>
+            }, (message, exception) =>
             {
                 joiningRoomOperation?.Dispose();
                 joiningRoomOperation = null;
-                onFailure?.Invoke(error);
+
+                if (onFailure != null)
+                    onFailure(message, exception);
+                else
+                    Logger.Error(exception, message);
             });
         });
 
-        protected abstract void JoinInternal(Room room, string? password, Action<Room> onSuccess, Action<string> onFailure);
+        protected abstract void JoinInternal(Room room, string? password, Action<Room> onSuccess, Action<string, Exception?> onFailure);
 
         public void OpenCopy(Room room)
         {
@@ -411,7 +414,11 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
         protected virtual void OpenNewRoom(Room room) => this.Push(CreateRoomSubScreen(room));
 
-        public void RefreshRooms() => listingPoller.PollImmediately();
+        public void RefreshRooms()
+        {
+            hasListingResults.Value = false;
+            listingPoller.PollImmediately();
+        }
 
         private void updateLoadingLayer()
         {
@@ -439,6 +446,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         /// <returns>The created <see cref="Room"/>.</returns>
         protected abstract Room CreateNewRoom();
 
-        protected abstract RoomSubScreen CreateRoomSubScreen(Room room);
+        protected abstract OnlinePlaySubScreen CreateRoomSubScreen(Room room);
     }
 }

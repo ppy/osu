@@ -15,7 +15,6 @@ using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Lounge;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
-using osu.Game.Screens.OnlinePlay.Match;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
@@ -74,9 +73,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             Type = MatchType.HeadToHead,
         };
 
-        protected override RoomSubScreen CreateRoomSubScreen(Room room) => new MultiplayerMatchSubScreen(room);
+        protected override OnlinePlaySubScreen CreateRoomSubScreen(Room room) => new MultiplayerMatchSubScreen(room);
 
-        protected override void JoinInternal(Room room, string? password, Action<Room> onSuccess, Action<string> onFailure)
+        protected override void JoinInternal(Room room, string? password, Action<Room> onSuccess, Action<string, Exception?> onFailure)
         {
             client.JoinRoom(room, password).ContinueWith(result =>
             {
@@ -84,12 +83,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                     onSuccess(room);
                 else
                 {
-                    const string message = "Failed to join multiplayer room.";
+                    Exception? exception = result.Exception?.AsSingular();
 
-                    if (result.Exception != null)
-                        Logger.Error(result.Exception, message);
-
-                    onFailure.Invoke(result.Exception?.AsSingular().Message ?? message);
+                    if (exception?.GetHubExceptionMessage() is string message)
+                        onFailure(message, exception);
+                    else
+                        onFailure($"Failed to join multiplayer room. {exception?.Message}", exception);
                 }
             });
         }

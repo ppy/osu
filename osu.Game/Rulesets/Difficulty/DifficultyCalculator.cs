@@ -68,6 +68,7 @@ namespace osu.Game.Rulesets.Difficulty
                 cancellationToken = timedCancellationSource.Token;
 
             cancellationToken.ThrowIfCancellationRequested();
+            // ReSharper disable once PossiblyMistakenUseOfCancellationToken
             preProcess(mods, cancellationToken);
 
             var skills = CreateSkills(Beatmap, playableMods, clockRate);
@@ -109,6 +110,7 @@ namespace osu.Game.Rulesets.Difficulty
                 cancellationToken = timedCancellationSource.Token;
 
             cancellationToken.ThrowIfCancellationRequested();
+            // ReSharper disable once PossiblyMistakenUseOfCancellationToken
             preProcess(mods, cancellationToken);
 
             var attribs = new List<TimedDifficultyAttributes>();
@@ -344,6 +346,7 @@ namespace osu.Game.Rulesets.Difficulty
             public double TotalBreakTime => baseBeatmap.TotalBreakTime;
             public IEnumerable<BeatmapStatistic> GetStatistics() => baseBeatmap.GetStatistics();
             public double GetMostCommonBeatLength() => baseBeatmap.GetMostCommonBeatLength();
+            public int BeatmapVersion => baseBeatmap.BeatmapVersion;
             public IBeatmap Clone() => new ProgressiveCalculationBeatmap(baseBeatmap.Clone());
 
             public double AudioLeadIn

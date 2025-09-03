@@ -15,7 +15,6 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Lounge;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
-using osu.Game.Screens.OnlinePlay.Match;
 
 namespace osu.Game.Screens.OnlinePlay.Playlists
 {
@@ -61,7 +60,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             return criteria;
         }
 
-        protected override void JoinInternal(Room room, string? password, Action<Room> onSuccess, Action<string> onFailure)
+        protected override void JoinInternal(Room room, string? password, Action<Room> onSuccess, Action<string, Exception?> onFailure)
         {
             var joinRoomRequest = new JoinRoomRequest(room, password);
 
@@ -69,7 +68,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             joinRoomRequest.Failure += exception =>
             {
                 if (exception is not OperationCanceledException)
-                    onFailure(exception.Message);
+                    onFailure($"Failed to open playlist. {exception.Message}", exception);
             };
 
             api.Queue(joinRoomRequest);
@@ -95,7 +94,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             };
         }
 
-        protected override RoomSubScreen CreateRoomSubScreen(Room room) => new PlaylistsRoomSubScreen(room);
+        protected override OnlinePlaySubScreen CreateRoomSubScreen(Room room) => new PlaylistsRoomSubScreen(room);
 
         private enum PlaylistsCategory
         {

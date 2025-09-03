@@ -218,23 +218,36 @@ namespace osu.Game.Beatmaps
         }
 
         /// <summary>
-        /// Delete a beatmap difficulty.
+        /// Hide a beatmap difficulty.
+        /// Will fail if all difficulties are about to be hidden.
         /// </summary>
         /// <param name="beatmapInfo">The beatmap difficulty to hide.</param>
-        public void Hide(BeatmapInfo beatmapInfo)
+        public bool Hide(BeatmapInfo beatmapInfo)
         {
-            Realm.Run(r =>
+            return Realm.Run(r =>
             {
                 using (var transaction = r.BeginWrite())
                 {
                     if (!beatmapInfo.IsManaged)
                         beatmapInfo = r.Find<BeatmapInfo>(beatmapInfo.ID)!;
 
+                    if (!CanHide(beatmapInfo))
+                        return false;
+
                     beatmapInfo.Hidden = true;
                     transaction.Commit();
+                    return true;
                 }
             });
         }
+
+        public bool CanHide(BeatmapInfo beatmapInfo) => Realm.Run(r =>
+        {
+            if (!beatmapInfo.IsManaged)
+                beatmapInfo = r.Find<BeatmapInfo>(beatmapInfo.ID)!;
+
+            return beatmapInfo.BeatmapSet!.Beatmaps.Count(b => !b.Hidden) > 1;
+        });
 
         /// <summary>
         /// Restore a beatmap difficulty.
@@ -298,7 +311,21 @@ namespace osu.Game.Beatmaps
         /// <param name="query">The query.</param>
         /// <returns>The first result for the provided query, or null if no results were found.</returns>
         public BeatmapInfo? QueryBeatmap(Expression<Func<BeatmapInfo, bool>> query) => Realm.Run(r =>
-            r.All<BeatmapInfo>().Filter($"{nameof(BeatmapInfo.BeatmapSet)}.{nameof(BeatmapSetInfo.DeletePending)} == false").FirstOrDefault(query)?.Detach());
+            r.All<BeatmapInfo>().Filter($@"{nameof(BeatmapInfo.BeatmapSet)}.{nameof(BeatmapSetInfo.DeletePending)} == false").FirstOrDefault(query)?.Detach());
+
+        /// <summary>
+        /// Perform a lookup query on available <see cref="BeatmapInfo"/>s.
+        /// Use this overload instead of <see cref="QueryBeatmap(System.Linq.Expressions.Expression{System.Func{osu.Game.Beatmaps.BeatmapInfo,bool}})"/>
+        /// when Realm is unable to transform an expression to the internal Realm query syntax.
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <param name="arguments">The arguments for the query.</param>
+        /// <returns>The first result for the provided query, or null if no results were found.</returns>
+        public BeatmapInfo? QueryBeatmap(string query, params QueryArgument[] arguments) => Realm.Run(r =>
+            r.All<BeatmapInfo>()
+             .Filter($@"{nameof(BeatmapInfo.BeatmapSet)}.{nameof(BeatmapSetInfo.DeletePending)} == false")
+             .Filter(query, arguments)
+             .FirstOrDefault()?.Detach());
 
         /// <summary>
         /// A default representation of a WorkingBeatmap to use when no beatmap is available.

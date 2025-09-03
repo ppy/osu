@@ -7,13 +7,13 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Development;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Framework.Testing;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Localisation;
 using osu.Game.Overlays.Settings;
 using osu.Game.Overlays.Settings.Sections;
@@ -30,7 +30,7 @@ namespace osu.Game.Overlays
 
         protected override IEnumerable<SettingsSection> CreateSections()
         {
-            var sections = new List<SettingsSection>
+            return new List<SettingsSection>
             {
                 // This list should be kept in sync with ScreenBehaviour.
                 new GeneralSection(),
@@ -43,12 +43,8 @@ namespace osu.Game.Overlays
                 new GraphicsSection(),
                 new OnlineSection(),
                 new MaintenanceSection(),
+                new DebugSection()
             };
-
-            if (DebugUtils.IsDebugBuild)
-                sections.Add(new DebugSection());
-
-            return sections;
         }
 
         private readonly List<SettingsSubPanel> subPanels = new List<SettingsSubPanel>();
@@ -56,7 +52,13 @@ namespace osu.Game.Overlays
         private SettingsSubPanel lastOpenedSubPanel;
 
         protected override Drawable CreateHeader() => new SettingsHeader(Title, Description);
-        protected override Drawable CreateFooter() => new SettingsFooter();
+
+        protected override Drawable CreateFooter() => new OsuContextMenuContainer
+        {
+            RelativeSizeAxes = Axes.X,
+            AutoSizeAxes = Axes.Y,
+            Child = new SettingsFooter()
+        };
 
         public SettingsOverlay()
             : base(false)

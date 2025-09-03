@@ -28,6 +28,7 @@ using osu.Game.Extensions;
 using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
 using osu.Game.Screens.Select.Carousel;
+using osu.Game.Screens.Select.Filter;
 using osuTK;
 using osuTK.Input;
 
@@ -123,7 +124,7 @@ namespace osu.Game.Screens.Select
 
         private void loadNewRoot()
         {
-            beatmapsSplitOut = activeCriteria.SplitOutDifficulties;
+            beatmapsSplitOut = activeCriteria.Sort == SortMode.Difficulty;
 
             // Ensure no changes are made to the list while we are initialising items.
             // We'll catch up on changes via subscriptions anyway.
@@ -656,7 +657,7 @@ namespace osu.Game.Screens.Select
             {
                 PendingFilter = null;
 
-                if (activeCriteria.SplitOutDifficulties != beatmapsSplitOut)
+                if ((activeCriteria.Sort == SortMode.Difficulty) != beatmapsSplitOut)
                 {
                     loadNewRoot();
                     return;
@@ -700,13 +701,13 @@ namespace osu.Game.Screens.Select
             switch (e.Action)
             {
                 case GlobalAction.SelectNext:
-                case GlobalAction.SelectNextGroup:
-                    SelectNext(1, e.Action == GlobalAction.SelectNextGroup);
+                case GlobalAction.ActivateNextSet:
+                    SelectNext(1, e.Action == GlobalAction.ActivateNextSet);
                     return true;
 
                 case GlobalAction.SelectPrevious:
-                case GlobalAction.SelectPreviousGroup:
-                    SelectNext(-1, e.Action == GlobalAction.SelectPreviousGroup);
+                case GlobalAction.ActivatePreviousSet:
+                    SelectNext(-1, e.Action == GlobalAction.ActivatePreviousSet);
                     return true;
             }
 

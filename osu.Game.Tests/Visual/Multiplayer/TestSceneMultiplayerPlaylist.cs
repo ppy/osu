@@ -6,7 +6,6 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
-using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Platform;
@@ -32,7 +31,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private BeatmapManager beatmaps = null!;
         private BeatmapSetInfo importedSet = null!;
         private BeatmapInfo importedBeatmap = null!;
-        private Room room = null!;
 
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
@@ -47,19 +45,17 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             base.SetUpSteps();
 
-            AddStep("create room", () => room = CreateDefaultRoom());
-            AddStep("join room", () => JoinRoom(room));
+            AddStep("join room", () => JoinRoom(CreateDefaultRoom()));
             WaitForJoined();
 
             AddStep("create list", () =>
             {
-                Child = list = new MultiplayerPlaylist(room)
+                Child = list = new MultiplayerPlaylist
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both,
-                    Size = new Vector2(0.4f, 0.8f),
-                    SelectedItem = new Bindable<PlaylistItem?>()
+                    Size = new Vector2(0.4f, 0.8f)
                 };
             });
 
@@ -158,37 +154,36 @@ namespace osu.Game.Tests.Visual.Multiplayer
             assertQueueTabCount(0);
         }
 
-        [Ignore("Expired items are initially removed from the room.")]
         [Test]
         public void TestJoinRoomWithMixedItemsAddedInCorrectLists()
         {
             AddStep("leave room", () => MultiplayerClient.LeaveRoom());
             AddUntilStep("wait for room part", () => !RoomJoined);
 
-            AddStep("join room with items", () =>
+            AddStep("join room with expired items", () =>
             {
-                API.Queue(new CreateRoomRequest(new Room
-                {
-                    Name = "test name",
-                    Playlist =
-                    [
-                        new PlaylistItem(new TestBeatmap(Ruleset.Value).BeatmapInfo)
-                        {
-                            RulesetID = Ruleset.Value.OnlineID
-                        },
-                        new PlaylistItem(new TestBeatmap(Ruleset.Value).BeatmapInfo)
-                        {
-                            RulesetID = Ruleset.Value.OnlineID,
-                            Expired = true
-                        }
-                    ]
-                }));
+                Room room = CreateDefaultRoom();
+                room.Playlist =
+                [
+                    new PlaylistItem(new TestBeatmap(Ruleset.Value).BeatmapInfo)
+                    {
+                        RulesetID = Ruleset.Value.OnlineID
+                    },
+                    new PlaylistItem(new TestBeatmap(Ruleset.Value).BeatmapInfo)
+                    {
+                        RulesetID = Ruleset.Value.OnlineID,
+                        Expired = true
+                    }
+                ];
+
+                JoinRoom(room);
             });
 
-            AddUntilStep("wait for room join", () => RoomJoined);
+            WaitForJoined();
 
-            assertItemInQueueListStep(1, 0);
-            assertItemInHistoryListStep(2, 0);
+            // IDs are offset by 1 because we've joined two rooms in this test.
+            assertItemInQueueListStep(2, 0);
+            assertItemInHistoryListStep(3, 0);
         }
 
         [Test]
@@ -220,7 +215,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         /// </summary>
         private void addItemStep(bool expired = false, int? userId = null) => AddStep("add item", () =>
         {
-            MultiplayerClient.AddUserPlaylistItem(userId ?? API.LocalUser.Value.OnlineID, TestMultiplayerClient.CreateMultiplayerPlaylistItem(new PlaylistItem(importedBeatmap)
+            MultiplayerClient.AddUserPlaylistItem(userId ?? API.LocalUser.Value.OnlineID, new MultiplayerPlaylistItem(new PlaylistItem(importedBeatmap)
             {
                 Expired = expired,
                 PlayedAt = DateTimeOffset.Now

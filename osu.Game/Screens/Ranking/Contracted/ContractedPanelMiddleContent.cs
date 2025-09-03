@@ -108,12 +108,10 @@ namespace osu.Game.Screens.Ranking.Contracted
                                                 Offset = new Vector2(0, 1),
                                             }
                                         },
-                                        new OsuSpriteText
+                                        new ClickableUsername(score.User)
                                         {
                                             Anchor = Anchor.TopCentre,
                                             Origin = Anchor.TopCentre,
-                                            Text = score.RealmUser.Username,
-                                            Font = OsuFont.GetFont(size: 16, weight: FontWeight.SemiBold)
                                         },
                                         new FillFlowContainer
                                         {
