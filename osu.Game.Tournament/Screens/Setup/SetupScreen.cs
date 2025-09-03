@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
@@ -84,6 +85,10 @@ namespace osu.Game.Tournament.Screens.Setup
             var fileBasedIpc = ipc as FileBasedIPC;
             fillFlow.Children = new Drawable[]
             {
+                new LanguageSwitcher
+                {
+                    Label = GeneralSettingsStrings.LanguageDropdown,
+                },
                 new ActionableInfo
                 {
                     Label = SetupStrings.CurrentIPCSource,
