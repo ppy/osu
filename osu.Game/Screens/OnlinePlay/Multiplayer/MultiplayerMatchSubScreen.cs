@@ -280,7 +280,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                                                             new AddItemButton
                                                                             {
                                                                                 RelativeSizeAxes = Axes.X,
-                                                                                Height = 40,
+                                                                                Height = 30,
                                                                                 Text = "Add item",
                                                                                 Action = () => ShowSongSelect()
                                                                             },

@@ -45,8 +45,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         private readonly ScrollContainer<Drawable> scroll;
         private readonly FillFlowContainer<LoungeRoomPanel> roomFlow;
 
-        private const float display_scale = 0.8f;
-
         // handle deselection
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
@@ -58,7 +56,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 RelativeSizeAxes = Axes.Both,
                 Anchor = Anchor.TopCentre,
                 Origin = Anchor.TopCentre,
-                Width = display_scale,
+                Width = 0.8f,
                 ScrollbarOverlapsContent = false,
                 Padding = new MarginPadding { Right = 5 },
                 Child = new OsuContextMenuContainer
@@ -188,14 +186,11 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                     SelectedRoom = selectedRoom,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Scale = new Vector2(display_scale),
-                    Width = 1 / display_scale,
                 };
 
                 roomFlow.Add(drawableRoom);
 
-                // Always show spotlight playlists at the top of the listing.
-                roomFlow.SetLayoutPosition(drawableRoom, room.Category > RoomCategory.Normal ? float.MinValue : -(room.RoomID ?? 0));
+                roomFlow.SetLayoutPosition(drawableRoom, room.Pinned ? float.MinValue : -(room.RoomID ?? 0));
             }
 
             applyFilterCriteria(Filter.Value);
