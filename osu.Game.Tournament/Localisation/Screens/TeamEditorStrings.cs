@@ -60,9 +60,25 @@ namespace osu.Game.Tournament.Localisation.Screens
         public static LocalisableString DeleteTeam => new TranslatableString(getKey(@"delete_team"), @"Delete Team");
 
         /// <summary>
+        /// "Delete Player"
+        /// </summary>
+        public static LocalisableString DeletePlayer => new TranslatableString(getKey(@"delete_player"), @"Delete Player");
+
+        /// <summary>
+        /// "User ID"
+        /// </summary>
+        public static LocalisableString UserId => new TranslatableString(getKey(@"user_id"), @"User ID");
+
+        /// <summary>
         /// "Add all countries"
         /// </summary>
         public static LocalisableString AddAllCountries => new TranslatableString(getKey(@"add_all_countries"), @"Add all countries");
+
+        /// <summary>
+        /// "Acronym '{0}' is already in use by team(s): {1}"
+        /// </summary>
+        public static LocalisableString AcronymOccupiedPrompt(string acronym, string teams) => new TranslatableString(getKey(@"acronym_occupied_prompt"),
+            @"Acronym '{0}' is already in use by team(s): {1}", acronym, teams);
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

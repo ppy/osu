@@ -3,6 +3,7 @@
 
 using System;
 using osu.Game.Overlays.Dialog;
+using osu.Game.Tournament.Localisation;
 using osu.Game.Tournament.Models;
 
 namespace osu.Game.Tournament.Screens.Editors.Components
@@ -11,7 +12,9 @@ namespace osu.Game.Tournament.Screens.Editors.Components
     {
         public DeleteRoundDialog(TournamentRound round, Action action)
         {
-            HeaderText = round.Name.Value.Length > 0 ? $@"Delete round ""{round.Name.Value}""?" : @"Delete unnamed round?";
+            HeaderText = round.Name.Value.Length > 0
+                ? DialogStrings.DeleteRoundPrompt(round.Name.Value)
+                : DialogStrings.DeleteUnnamedRoundPrompt;
             DangerousAction = action;
         }
     }
