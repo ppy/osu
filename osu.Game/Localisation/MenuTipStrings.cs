@@ -155,6 +155,11 @@ namespace osu.Game.Localisation
         public static LocalisableString RightMouseAbsoluteScroll => new TranslatableString(getKey(@"right_mouse_absolute_scroll"), @"Try holding your right mouse button near the beatmap carousel to quickly scroll to an absolute position!");
 
         /// <summary>
+        /// "Shift-click on a beatmap panel in the beatmap listing overlay to quickly download or view the beatmap in song select!"
+        /// </summary>
+        public static LocalisableString ShiftClickInBeatmapOverlay => new TranslatableString(getKey(@"shift_click_in_beatmap_overlay"), @"Shift-click on a beatmap panel in the beatmap listing overlay to quickly download or view the beatmap in song select!");
+
+        /// <summary>
         /// "a tip for you:"
         /// </summary>
         public static LocalisableString MenuTipTitle => new TranslatableString(getKey(@"menu_tip_title"), @"a tip for you:");
