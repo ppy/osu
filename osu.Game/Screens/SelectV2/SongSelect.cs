@@ -370,7 +370,55 @@ namespace osu.Game.Screens.SelectV2
                 new Dimension(),
                 new Dimension(GridSizeMode.Relative, 0.5f, minSize: 500, maxSize: 700 + widescreenBonusWidth * 300),
             };
+
+            updateDebounce();
         }
+
+        #region Selection debounce
+
+        private BeatmapInfo? debounceQueuedSelection;
+        private double debounceElapsedTime;
+
+        private void debounceQueueSelection(BeatmapInfo beatmap)
+        {
+            debounceQueuedSelection = beatmap;
+            debounceElapsedTime = 0;
+        }
+
+        private void updateDebounce()
+        {
+            if (debounceQueuedSelection == null) return;
+
+            debounceElapsedTime += Clock.ElapsedFrameTime;
+
+            if (debounceElapsedTime >= SELECTION_DEBOUNCE)
+                performDebounceSelection();
+        }
+
+        private void performDebounceSelection()
+        {
+            if (debounceQueuedSelection == null) return;
+
+            try
+            {
+                if (Beatmap.Value.BeatmapInfo.Equals(debounceQueuedSelection))
+                    return;
+
+                Beatmap.Value = beatmaps.GetWorkingBeatmap(debounceQueuedSelection);
+            }
+            finally
+            {
+                cancelDebounceSelection();
+            }
+        }
+
+        private void cancelDebounceSelection()
+        {
+            debounceQueuedSelection = null;
+            debounceElapsedTime = 0;
+        }
+
+        #endregion
 
         #region Audio
 
@@ -435,8 +483,6 @@ namespace osu.Game.Screens.SelectV2
 
         #region Selection handling
 
-        private ScheduledDelegate? selectionDebounce;
-
         /// <summary>
         /// Finalises selection on the given <see cref="BeatmapInfo"/> and runs the provided action if possible.
         /// </summary>
@@ -452,7 +498,7 @@ namespace osu.Game.Screens.SelectV2
 
             // To ensure sanity, cancel any pending selection as we are about to force a selection.
             // Carousel selection will update to the forced selection via a call of `ensureGlobalBeatmapValid` below, or when song select becomes current again.
-            selectionDebounce?.Cancel();
+            cancelDebounceSelection();
 
             // Forced refetch is important here to guarantee correct invalidation across all difficulties (editor specific).
             Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap, true);
@@ -481,14 +527,7 @@ namespace osu.Game.Screens.SelectV2
             carousel.CurrentSelection = beatmap;
 
             // Debounce consideration is to avoid beatmap churn on key repeat selection.
-            selectionDebounce?.Cancel();
-            selectionDebounce = Scheduler.AddDelayed(() =>
-            {
-                if (Beatmap.Value.BeatmapInfo.Equals(beatmap))
-                    return;
-
-                Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap);
-            }, SELECTION_DEBOUNCE);
+            debounceQueueSelection(beatmap);
         }
 
         private bool ensureGlobalBeatmapValid()
@@ -496,7 +535,7 @@ namespace osu.Game.Screens.SelectV2
             if (!this.IsCurrentScreen())
                 return false;
 
-            finaliseBeatmapSelection();
+            performDebounceSelection();
 
             // While filtering, let's not ever attempt to change selection.
             // This will be resolved after the filter completes, see `newItemsPresented`.
@@ -517,7 +556,7 @@ namespace osu.Game.Screens.SelectV2
             if (Beatmap.IsDefault)
             {
                 validSelection = carousel.NextRandom();
-                finaliseBeatmapSelection();
+                performDebounceSelection();
                 return validSelection;
             }
 
@@ -539,15 +578,9 @@ namespace osu.Game.Screens.SelectV2
 
             // If all else fails, use the default beatmap.
             Beatmap.SetDefault();
-            finaliseBeatmapSelection();
+            performDebounceSelection();
 
             return validSelection;
-
-            void finaliseBeatmapSelection()
-            {
-                if (selectionDebounce?.State == ScheduledDelegate.RunState.Waiting)
-                    selectionDebounce?.RunTask();
-            }
         }
 
         private bool checkBeatmapValidForSelection(BeatmapInfo beatmap, FilterCriteria? criteria)
@@ -794,7 +827,7 @@ namespace osu.Game.Screens.SelectV2
             // Interrupting could cause the debounce interval to be reduced.
             //
             // `ensureGlobalBeatmapValid` is run post-selection which will resolve any pending incompatibilities (see `Beatmap` bindable callback).
-            if (selectionDebounce?.State != ScheduledDelegate.RunState.Waiting)
+            if (debounceQueuedSelection == null)
                 ensureGlobalBeatmapValid();
 
             updateWedgeVisibility();
