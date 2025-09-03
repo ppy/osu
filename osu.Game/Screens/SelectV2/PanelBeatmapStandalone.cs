@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -73,14 +72,7 @@ namespace osu.Game.Screens.SelectV2
 
         private Box backgroundBorder = null!;
 
-        private GroupedBeatmap groupedBeatmap
-        {
-            get
-            {
-                Debug.Assert(Item != null);
-                return (GroupedBeatmap)Item!.Model;
-            }
-        }
+        private BeatmapInfo beatmap => ((GroupedBeatmap)Item!.Model).Beatmap;
 
         public PanelBeatmapStandalone()
         {
@@ -228,7 +220,6 @@ namespace osu.Game.Screens.SelectV2
         {
             base.PrepareForUse();
 
-            var beatmap = groupedBeatmap.Beatmap;
             var beatmapSet = beatmap.BeatmapSet!;
 
             beatmapBackground.Beatmap = beatmaps.GetWorkingBeatmap(beatmap);
@@ -269,8 +260,6 @@ namespace osu.Game.Screens.SelectV2
             if (Item == null)
                 return;
 
-            var beatmap = groupedBeatmap.Beatmap;
-
             starDifficultyBindable = difficultyCache.GetBindableDifficulty(beatmap, starDifficultyCancellationSource.Token, SongSelect.SELECTION_DEBOUNCE);
             starDifficultyBindable.BindValueChanged(starDifficulty =>
             {
@@ -307,8 +296,6 @@ namespace osu.Game.Screens.SelectV2
             if (Item == null)
                 return;
 
-            var beatmap = groupedBeatmap.Beatmap;
-
             if (ruleset.Value.OnlineID == 3)
             {
                 // Account for mania differences locally for now.
@@ -333,7 +320,7 @@ namespace osu.Game.Screens.SelectV2
                 List<MenuItem> items = new List<MenuItem>();
 
                 if (songSelect != null)
-                    items.AddRange(songSelect.GetForwardActions(groupedBeatmap.Beatmap));
+                    items.AddRange(songSelect.GetForwardActions(beatmap));
 
                 return items.ToArray();
             }
