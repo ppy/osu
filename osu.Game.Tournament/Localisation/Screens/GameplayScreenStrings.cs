@@ -10,14 +10,14 @@ namespace osu.Game.Tournament.Localisation.Screens
         private const string prefix = @"osu.Game.Resources.Localisation.Tournament.Screens.GameplayScreen";
 
         /// <summary>
-        /// "Warmup stage"
+        /// "Warmup"
         /// </summary>
-        public static LocalisableString WarmupStage => new TranslatableString(getKey(@"warmup_stage"), @"Warmup stage");
+        public static LocalisableString Warmup => new TranslatableString(getKey(@"warmup"), @"Warmup");
 
         /// <summary>
-        /// "Toggle chat"
+        /// "Show chat"
         /// </summary>
-        public static LocalisableString ToggleChat => new TranslatableString(getKey(@"toggle_chat"), @"Toggle chat");
+        public static LocalisableString ShowChat => new TranslatableString(getKey(@"show_chat"), @"Show chat");
 
         /// <summary>
         /// "Chroma width"

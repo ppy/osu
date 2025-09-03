@@ -99,12 +99,12 @@ namespace osu.Game.Tournament.Screens.Gameplay
                     {
                         new LabelledSwitchButton
                         {
-                            Label = GameplayScreenStrings.WarmupStage,
+                            Label = GameplayScreenStrings.Warmup,
                             Current = warmup,
                         },
                         chatToggle = new LabelledSwitchButton
                         {
-                            Label = GameplayScreenStrings.ToggleChat,
+                            Label = GameplayScreenStrings.ShowChat,
                         },
                         new SettingsSlider<int>
                         {
