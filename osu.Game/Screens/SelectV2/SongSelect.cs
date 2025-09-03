@@ -479,7 +479,7 @@ namespace osu.Game.Screens.SelectV2
             if (!this.IsCurrentScreen())
                 return;
 
-            carousel.CurrentSelection = groupedBeatmap;
+            carousel.CurrentGroupedBeatmap = groupedBeatmap;
 
             // Debounce consideration is to avoid beatmap churn on key repeat selection.
             selectionDebounce?.Cancel();
@@ -512,7 +512,7 @@ namespace osu.Game.Screens.SelectV2
 
             if (validSelection)
             {
-                carousel.CurrentSelection = currentBeatmap.BeatmapInfo;
+                carousel.CurrentBeatmap = currentBeatmap.BeatmapInfo;
                 return true;
             }
 
@@ -535,7 +535,7 @@ namespace osu.Game.Screens.SelectV2
 
                 if (validBeatmaps.Any())
                 {
-                    carousel.CurrentSelection = difficultyRecommender?.GetRecommendedBeatmap(validBeatmaps) ?? validBeatmaps.First();
+                    carousel.CurrentBeatmap = difficultyRecommender?.GetRecommendedBeatmap(validBeatmaps) ?? validBeatmaps.First();
                     return true;
                 }
             }

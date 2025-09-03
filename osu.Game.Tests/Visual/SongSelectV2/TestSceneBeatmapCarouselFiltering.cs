@@ -130,14 +130,14 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             SelectNextPanel();
             Select();
 
-            AddStep("record selection", () => selectedID = ((GroupedBeatmap)Carousel.CurrentSelection!).Beatmap.ID);
+            AddStep("record selection", () => selectedID = Carousel.CurrentBeatmap!.ID);
 
             for (int i = 0; i < 5; i++)
             {
                 ApplyToFilterAndWaitForFilter("filter all", c => c.SearchText = Guid.NewGuid().ToString());
-                AddAssert("selection not changed", () => ((GroupedBeatmap)Carousel.CurrentSelection!).Beatmap.ID == selectedID);
+                AddAssert("selection not changed", () => Carousel.CurrentBeatmap!.ID == selectedID);
                 ApplyToFilterAndWaitForFilter("remove filter", c => c.SearchText = string.Empty);
-                AddAssert("selection not changed", () => ((GroupedBeatmap)Carousel.CurrentSelection!).Beatmap.ID == selectedID);
+                AddAssert("selection not changed", () => Carousel.CurrentBeatmap!.ID == selectedID);
             }
         }
 
@@ -177,14 +177,14 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             SelectNextSet();
 
-            AddStep("record selection", () => selectedID = ((GroupedBeatmap)Carousel.CurrentSelection!).Beatmap.ID);
+            AddStep("record selection", () => selectedID = Carousel.CurrentBeatmap!.ID);
 
             for (int i = 0; i < 5; i++)
             {
                 ApplyToFilterAndWaitForFilter("filter all", c => c.SearchText = Guid.NewGuid().ToString());
-                AddAssert("selection not changed", () => ((GroupedBeatmap)Carousel.CurrentSelection!).Beatmap.ID == selectedID);
+                AddAssert("selection not changed", () => Carousel.CurrentBeatmap!.ID == selectedID);
                 ApplyToFilterAndWaitForFilter("remove filter", c => c.SearchText = string.Empty);
-                AddAssert("selection not changed", () => ((GroupedBeatmap)Carousel.CurrentSelection!).Beatmap.ID == selectedID);
+                AddAssert("selection not changed", () => Carousel.CurrentBeatmap!.ID == selectedID);
             }
         }
 
@@ -200,14 +200,14 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             {
                 int diff = i;
 
-                AddStep($"select diff {diff}", () => Carousel.CurrentSelection = chosenBeatmap = BeatmapSets[20].Beatmaps[diff]);
-                AddUntilStep("selection changed", () => ((GroupedBeatmap)Carousel.CurrentSelection!).Beatmap, () => Is.EqualTo(chosenBeatmap));
+                AddStep($"select diff {diff}", () => Carousel.CurrentBeatmap = chosenBeatmap = BeatmapSets[20].Beatmaps[diff]);
+                AddUntilStep("selection changed", () => Carousel.CurrentBeatmap, () => Is.EqualTo(chosenBeatmap));
 
                 SortBy(SortMode.Difficulty);
-                AddAssert("selection retained", () => ((GroupedBeatmap)Carousel.CurrentSelection!).Beatmap, () => Is.EqualTo(chosenBeatmap));
+                AddAssert("selection retained", () => Carousel.CurrentBeatmap, () => Is.EqualTo(chosenBeatmap));
 
                 SortBy(SortMode.Title);
-                AddAssert("selection retained", () => ((GroupedBeatmap)Carousel.CurrentSelection!).Beatmap, () => Is.EqualTo(chosenBeatmap));
+                AddAssert("selection retained", () => Carousel.CurrentBeatmap, () => Is.EqualTo(chosenBeatmap));
             }
         }
 

@@ -295,28 +295,47 @@ namespace osu.Game.Screens.SelectV2
         protected override bool ShouldActivateOnKeyboardSelection(CarouselItem item) =>
             grouping.BeatmapSetsGroupedTogether && item.Model is GroupedBeatmap;
 
-        public override object? CurrentSelection
+        /// <summary>
+        /// The currently selected <see cref="GroupedBeatmap"/>.
+        /// </summary>
+        /// <remarks>
+        /// The selection is never reset due to not existing. It can be set to anything.
+        /// If no matching carousel item exists, there will be no visually selected item while waiting for potential new item which matches.
+        /// </remarks>
+        public GroupedBeatmap? CurrentGroupedBeatmap
         {
-            get => base.CurrentSelection;
+            get => CurrentSelection as GroupedBeatmap;
+            set => CurrentSelection = value;
+        }
+
+        /// <summary>
+        /// The currently selected <see cref="BeatmapInfo"/>.
+        /// </summary>
+        /// <remarks>
+        /// This is a property mostly dedicated to external consumers who only care about showing some particular copy of a beatmap
+        /// (there could be multiple panels for one beatmap due to grouping).
+        /// Through this property, the carousel basically figures out what group to use internally.
+        /// </remarks>
+        public BeatmapInfo? CurrentBeatmap
+        {
+            get => CurrentGroupedBeatmap?.Beatmap;
             set
             {
-                // this is a special pathway for external consumers who only care about showing some particular copy of a beatmap
-                // (there could be multiple panels for one beatmap due to grouping).
-                // in this pathway we basically figure out what group to use internally, and continue working with `GroupedBeatmap` all the way after that.
-                if (value is BeatmapInfo beatmapInfo)
+                if (value == null)
                 {
-                    if (CurrentSelection is GroupedBeatmap groupedBeatmap && beatmapInfo.Equals(groupedBeatmap.Beatmap))
-                        return;
-
-                    // it is not universally guaranteed that the carousel items will be materialised at the time this is set.
-                    // therefore, in cases where it is known that they will not be, default to a null group.
-                    // even if grouping is active, this will be rectified to a correct group on the next invocation of `HandleFilterCompleted()`.
-                    value = IsLoaded && !IsFiltering
-                        ? GetCarouselItems()?.Select(item => item.Model).OfType<GroupedBeatmap>().FirstOrDefault(gb => gb.Beatmap.Equals(beatmapInfo))
-                        : new GroupedBeatmap(null, beatmapInfo);
+                    CurrentGroupedBeatmap = null;
+                    return;
                 }
 
-                base.CurrentSelection = value;
+                if (CurrentGroupedBeatmap != null && value.Equals(CurrentGroupedBeatmap.Beatmap))
+                    return;
+
+                // it is not universally guaranteed that the carousel items will be materialised at the time this is set.
+                // therefore, in cases where it is known that they will not be, default to a null group.
+                // even if grouping is active, this will be rectified to a correct group on the next invocation of `HandleFilterCompleted()`.
+                CurrentGroupedBeatmap = IsLoaded && !IsFiltering
+                    ? GetCarouselItems()?.Select(item => item.Model).OfType<GroupedBeatmap>().FirstOrDefault(gb => gb.Beatmap.Equals(value))
+                    : new GroupedBeatmap(null, value);
             }
         }
 
