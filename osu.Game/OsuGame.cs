@@ -1791,6 +1791,7 @@ namespace osu.Game
             if (newScreen == null)
                 Exit();
         }
+
         public enum PositionSnapGridType
         {
             Square,

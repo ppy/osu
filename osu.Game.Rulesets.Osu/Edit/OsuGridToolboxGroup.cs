@@ -173,8 +173,8 @@ namespace osu.Game.Rulesets.Osu.Edit
             Spacing.Value = editorBeatmap.GridSize;
             GridLinesRotation.Value = editorBeatmap.GridRotation;
 
-            Vector2 GridOffset = Vector2.Zero;
             // Only changing offset, if we're finding one in metadata
+
             if (editorBeatmap.GridOffset != Vector2.Zero)
             {
                 StartPositionX.Value = editorBeatmap.GridOffset.X;
