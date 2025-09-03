@@ -5,8 +5,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
+using osu.Game.Models;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Select.Leaderboards;
+using Realms;
 
 namespace osu.Game.Scoring
 {
@@ -64,5 +66,17 @@ namespace osu.Game.Scoring
         /// <param name="score">The <see cref="ScoreInfo"/> to compute the maximum achievable combo for.</param>
         /// <returns>The maximum achievable combo.</returns>
         public static int GetMaximumAchievableCombo(this ScoreInfo score) => score.MaximumStatistics.Where(kvp => kvp.Key.AffectsCombo()).Sum(kvp => kvp.Value);
+
+        /// <summary>
+        /// Performs a realm filter that returns all scores that belong to the user with the given <paramref name="userId"/>.
+        /// <see langword="null"/> <paramref name="userId"/> (for guests) is supported.
+        /// </summary>
+        public static IQueryable<ScoreInfo> GetAllLocalScoresForUser(this Realm realm, int? userId)
+        {
+            return realm.All<ScoreInfo>()
+                        .Filter($@"{nameof(ScoreInfo.User)}.{nameof(RealmUser.OnlineID)} == $0"
+                                + $@" && {nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.Hash)} == {nameof(ScoreInfo.BeatmapHash)}"
+                                + $@" && {nameof(ScoreInfo.DeletePending)} == false", userId);
+        }
     }
 }
