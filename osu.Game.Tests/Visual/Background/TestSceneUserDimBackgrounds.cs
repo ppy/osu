@@ -325,7 +325,7 @@ namespace osu.Game.Tests.Visual.Background
         private void setupUserSettings()
         {
             AddUntilStep("Song select is current", () => songSelect.IsCurrentScreen());
-            AddUntilStep("Song select has selection", () => songSelect.Carousel?.CurrentSelection != null);
+            AddUntilStep("Song select has selection", () => songSelect.Carousel?.CurrentGroupedBeatmap != null);
             AddStep("Set default user settings", () =>
             {
                 SelectedMods.Value = new[] { new OsuModNoFail() };

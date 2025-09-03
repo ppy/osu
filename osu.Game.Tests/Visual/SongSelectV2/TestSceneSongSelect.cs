@@ -320,9 +320,9 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddUntilStep("wait for player", () => Stack.CurrentScreen is Player);
             AddUntilStep("wait for fail", () => ((Player)Stack.CurrentScreen).GameplayState.HasFailed);
 
-            AddStep("exit gameplay", () => InputManager.Key(Key.Escape));
-            AddStep("exit gameplay", () => InputManager.Key(Key.Escape));
+            AddStep("exit gameplay", () => Stack.CurrentScreen.Exit());
 
+            AddUntilStep("wait for song select", () => Stack.CurrentScreen is Screens.SelectV2.SongSelect);
             AddUntilStep("wait for filtered", () => SongSelect.ChildrenOfType<BeatmapCarousel>().Single().FilterCount, () => Is.EqualTo(2));
         }
 
