@@ -400,7 +400,8 @@ namespace osu.Game.Screens.SelectV2
         {
             if (debounceQueuedSelection == null) return;
 
-            debounceElapsedTime += Clock.ElapsedFrameTime;
+            // avoid debounce running early if there's a single long frame.
+            debounceElapsedTime += Math.Min(1000 / 60.0, Clock.ElapsedFrameTime);
 
             if (debounceElapsedTime >= SELECTION_DEBOUNCE)
                 performDebounceSelection();
