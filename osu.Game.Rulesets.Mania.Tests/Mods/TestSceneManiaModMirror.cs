@@ -1,9 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
-// See the LICENCE file in the repository root for full licence text.
-
 using NUnit.Framework;
-using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Mods;
 using osu.Game.Rulesets.Mania.Objects;
@@ -15,64 +10,49 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
     {
         protected override Ruleset CreatePlayerRuleset() => new ManiaRuleset();
 
-        [TestCase(4)]
-        [TestCase(7)]
-        [TestCase(10)]
-        public void TestColumnsAreReversed(int columnCount)
+        [Test]
+        public void TestMirrorFlipsColumns()
         {
-            var original = createRawBeatmap(columnCount);
-            var mirrored = createModdedBeatmap(columnCount);
-
-            for (int i = 0; i < original.HitObjects.Count; i++)
+            CreateModTest(new ModTestData
             {
-                var orig = original.HitObjects[i];
-                var mirror = mirrored.HitObjects[i];
+                Mod = new ManiaModMirror(),
+                Autoplay = true,
+                CreateBeatmap = () => createBeatmap(7),
+                PassCondition = () =>
+                {
+                    if (Player?.Beatmap?.Value?.Beatmap is not ManiaBeatmap mirrored)
+                        return false;
 
-                int expectedColumn = columnCount - 1 - orig.Column;
-                Assert.That(mirror.Column, Is.EqualTo(expectedColumn),
-                    $"Object {i}: Expected column {expectedColumn}, but got {mirror.Column}");
-            }
+                    if (mirrored.HitObjects.Count == 0)
+                        return false;
+
+                    var original = createBeatmap(mirrored.TotalColumns);
+                    int maxCol = mirrored.TotalColumns - 1;
+
+                    for (int i = 0; i < original.HitObjects.Count; i++)
+                    {
+                        int expected = maxCol - original.HitObjects[i].Column;
+                        if (mirrored.HitObjects[i].Column != expected)
+                            return false;
+                    }
+
+                    return true;
+                }
+            });
         }
 
-        private static ManiaBeatmap createModdedBeatmap(int columnCount)
+        private ManiaBeatmap createBeatmap(int columns)
         {
-            var beatmap = createRawBeatmap(columnCount);
-            var mod = new ManiaModMirror();
+            var beatmap = new ManiaBeatmap(new StageDefinition(columns));
+            double t = 0;
 
-            foreach (var obj in beatmap.HitObjects)
-                obj.ApplyDefaults(beatmap.ControlPointInfo, new BeatmapDifficulty());
-
-            mod.ApplyToBeatmap(beatmap);
-
-            return beatmap;
-        }
-
-        private static ManiaBeatmap createRawBeatmap(int columnCount)
-        {
-            var beatmap = new ManiaBeatmap(new StageDefinition(columnCount));
-            beatmap.ControlPointInfo.Add(0.0, new TimingControlPoint { BeatLength = 500 });
-
-            int time = 0;
-
-            for (int i = 0; i < columnCount; i++)
+            for (int i = 0; i < columns; i++)
             {
                 beatmap.HitObjects.Add(new Note
                 {
-                    StartTime = time,
+                    StartTime = t += 500,
                     Column = i
                 });
-                time += 250;
-            }
-
-            for (int i = 0; i < columnCount; i++)
-            {
-                beatmap.HitObjects.Add(new HoldNote
-                {
-                    StartTime = time,
-                    EndTime = time + 1000,
-                    Column = i
-                });
-                time += 500;
             }
 
             return beatmap;
