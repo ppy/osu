@@ -10,6 +10,7 @@ using System.Text;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Legacy;
+using osu.Game.Graphics.OpenGL.Vertices;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Objects.Types;
@@ -117,7 +118,8 @@ namespace osu.Game.Beatmaps.Formats
             writer.WriteLine(FormattableString.Invariant($"GridSize: {beatmap.GridSize}"));
             writer.WriteLine(FormattableString.Invariant($"GridType: {beatmap.GridType}"));
             writer.WriteLine(FormattableString.Invariant($"GridRotation: {beatmap.GridRotation}"));
-            writer.WriteLine(FormattableString.Invariant($"GridOffset: {beatmap.GridOffset}"));
+            writer.WriteLine(FormattableString.Invariant($"GridOffset: {beatmap.GridOffset.X},{beatmap.GridOffset.Y}"));
+            // writer.WriteLine(FormattableString.Invariant($"GridOffset: {beatmap.GridOffset.X},{beatmap.GridOffset.Y}"));
             writer.WriteLine(FormattableString.Invariant($"TimelineZoom: {beatmap.TimelineZoom}"));
         }
 

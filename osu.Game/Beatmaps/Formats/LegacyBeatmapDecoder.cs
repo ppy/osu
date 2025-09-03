@@ -18,6 +18,7 @@ using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Screens.Edit;
 using osu.Game.Utils;
+using osuTK;
 
 namespace osu.Game.Beatmaps.Formats
 {
@@ -342,7 +343,12 @@ namespace osu.Game.Beatmaps.Formats
                     break;
 
                 case @"GridOffset":
-                    beatmap.GridOffset = Parsing.ParseVector2(pair.Value);
+                    float[] position = pair.Value.Split(',').Select(v =>
+                    {
+                        bool result = float.TryParse(v, out float val);
+                        return new { result, val };
+                    }).Where(p => p.result).Select(p => p.val).ToArray();
+                    beatmap.GridOffset = new Vector2(position[0], position[1]);
                     break;
 
                 case @"TimelineZoom":

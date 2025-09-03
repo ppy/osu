@@ -52,21 +52,5 @@ namespace osu.Game.Beatmaps.Formats
 
             return output;
         }
-
-        public static Vector2 ParseVector2(string input)
-        {
-            // I hope it's correct to do it that way, since otherwise idk how else can I set boundaries. Technically editor handles it on it's own, but idk
-            Vector2 parseLimit = new Vector2(MAX_COORDINATE_VALUE, MAX_COORDINATE_VALUE);
-
-            Match vectorCoords = Regex.Match(input, VECTOR_PATTERN);
-            Vector2 output = new Vector2(float.Parse(vectorCoords.Groups[1].Value, CultureInfo.InvariantCulture), float.Parse(vectorCoords.Groups[2].Value, CultureInfo.InvariantCulture));
-
-            if (output.X < -parseLimit.X) throw new OverflowException("Value X is too low");
-            if (output.Y < -parseLimit.Y) throw new OverflowException("Value Y is too low");
-            if (output.X > parseLimit.X) throw new OverflowException("Value X is too high");
-            if (output.Y > parseLimit.Y) throw new OverflowException("Value Y is too high");
-
-            return output;
-        }
     }
 }
