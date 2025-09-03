@@ -21,6 +21,9 @@ namespace osu.Game.Skinning.Components
         public readonly JudgementCount Result;
 
         public IBindable<float> WireframeOpacity => textComponent.WireframeOpacity;
+
+        public IBindable<int?> WireframeDigits { get; } = new Bindable<int?>();
+
         public IBindable<bool> ShowLabel => textComponent.ShowLabel;
 
         private readonly ArgonCounterTextComponent textComponent;
@@ -39,13 +42,15 @@ namespace osu.Game.Skinning.Components
 
         private void updateWireframe()
         {
-            int wireframeLength = Math.Max(2, textComponent.Text.ToString().Length);
-            textComponent.WireframeTemplate = new string('#', wireframeLength);
+            textComponent.WireframeTemplate = new string('#', WireframeDigits.Value ?? Math.Max(2, textComponent.Text.ToString().Length));
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            WireframeDigits.BindValueChanged(_ => updateWireframe());
+
             displayedValue.BindTo(Result.ResultCount);
             displayedValue.BindValueChanged(v =>
             {
@@ -64,6 +69,6 @@ namespace osu.Game.Skinning.Components
         }
 
         protected override void PopIn() => this.FadeIn(JudgementCounterDisplay.TRANSFORM_DURATION, Easing.OutQuint);
-        protected override void PopOut() => this.FadeOut(100);
+        protected override void PopOut() => this.FadeOut();
     }
 }
