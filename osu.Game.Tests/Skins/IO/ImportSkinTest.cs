@@ -316,6 +316,13 @@ namespace osu.Game.Tests.Skins.IO
                     var skinManager = osu.Dependencies.Get<SkinManager>();
                     var externalEdit = await skinManager.BeginExternalEditing(import.PerformRead(s => s.Detach())); // should not fail
 
+                    Assert.That(Directory.Exists(externalEdit.MountedPath));
+                    Assert.That(new DirectoryInfo(externalEdit.MountedPath).GetFiles().Select(f => f.Name), Is.EquivalentTo(new[]
+                    {
+                        "skin.ini",
+                        "test.png"
+                    }));
+
                     Task finishTask = Task.CompletedTask;
                     host.UpdateThread.Scheduler.Add(() => finishTask = externalEdit.Finish());
                     await finishTask;
