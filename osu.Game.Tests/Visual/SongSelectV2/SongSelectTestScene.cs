@@ -22,8 +22,6 @@ using osu.Game.Overlays.Toolbar;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
-using osu.Game.Screens;
-using osu.Game.Screens.Footer;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Select.Filter;
 using osu.Game.Screens.SelectV2;
@@ -42,9 +40,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
         protected Screens.SelectV2.SongSelect SongSelect { get; private set; } = null!;
         protected BeatmapCarousel Carousel => SongSelect.ChildrenOfType<BeatmapCarousel>().Single();
-
-        [Cached]
-        protected readonly ScreenFooter Footer;
 
         [Cached]
         private readonly OsuLogo logo;
@@ -71,10 +66,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                         new Toolbar
                         {
                             State = { Value = Visibility.Visible },
-                        },
-                        Footer = new ScreenFooter
-                        {
-                            BackButtonPressed = () => Stack.CurrentScreen.Exit(),
                         },
                         logo = new OsuLogo
                         {
@@ -109,14 +100,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         private void load()
         {
             Add(beatmapStore);
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            Stack.ScreenPushed += updateFooter;
-            Stack.ScreenExited += updateFooter;
         }
 
         public override void SetUpSteps()
@@ -207,38 +190,5 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         }
 
         protected void WaitForSuspension() => AddUntilStep("wait for not current", () => !SongSelect.AsNonNull().IsCurrentScreen());
-
-        private void updateFooter(IScreen? _, IScreen? newScreen)
-        {
-            if (newScreen is OsuScreen osuScreen && osuScreen.ShowFooter)
-            {
-                Footer.Show();
-
-                if (osuScreen.IsLoaded)
-                    updateFooterButtons();
-                else
-                {
-                    // ensure the current buttons are immediately disabled on screen change (so they can't be pressed).
-                    Footer.SetButtons(Array.Empty<ScreenFooterButton>());
-
-                    osuScreen.OnLoadComplete += _ => updateFooterButtons();
-                }
-
-                void updateFooterButtons()
-                {
-                    var buttons = osuScreen.CreateFooterButtons();
-
-                    osuScreen.LoadComponentsAgainstScreenDependencies(buttons);
-
-                    Footer.SetButtons(buttons);
-                    Footer.Show();
-                }
-            }
-            else
-            {
-                Footer.Hide();
-                Footer.SetButtons(Array.Empty<ScreenFooterButton>());
-            }
-        }
     }
 }
