@@ -44,6 +44,8 @@ namespace osu.Game.Skinning.Components
         [SettingSource(typeof(JudgementCounterDisplayStrings), nameof(JudgementCounterDisplayStrings.FlowDirection))]
         public Bindable<Direction> FlowDirection { get; } = new Bindable<Direction>();
 
+        private readonly Bindable<int?> wireframeDigits = new Bindable<int?>();
+
         protected FillFlowContainer<ArgonJudgementCounter> CounterFlow = null!;
 
         [BackgroundDependencyLoader]
@@ -59,9 +61,13 @@ namespace osu.Game.Skinning.Components
 
             foreach (var counter in judgementCountController.Counters)
             {
-                ArgonJudgementCounter counterComponent = new ArgonJudgementCounter(counter);
-                counterComponent.WireframeOpacity.BindTo(WireframeOpacity);
-                counterComponent.ShowLabel.BindTo(ShowLabel);
+                counter.ResultCount.BindValueChanged(_ => updateWireframeDigits());
+                ArgonJudgementCounter counterComponent = new ArgonJudgementCounter(counter)
+                {
+                    WireframeOpacity = { BindTarget = WireframeOpacity },
+                    WireframeDigits = { BindTarget = wireframeDigits },
+                    ShowLabel = { BindTarget = ShowLabel },
+                };
                 CounterFlow.Add(counterComponent);
             }
         }
@@ -71,7 +77,7 @@ namespace osu.Game.Skinning.Components
             base.LoadComplete();
             Mode.BindValueChanged(_ => updateVisibility());
             ShowMaxJudgement.BindValueChanged(_ => updateVisibility(), true);
-            FlowDirection.BindValueChanged(d => CounterFlow.Direction = getFillDirection(d.NewValue), true);
+            FlowDirection.BindValueChanged(_ => updateFlowDirection(), true);
         }
 
         private void updateVisibility()
@@ -85,6 +91,21 @@ namespace osu.Game.Skinning.Components
                 else
                     counter.Hide();
             }
+
+            updateWireframeDigits();
+        }
+
+        private void updateFlowDirection()
+        {
+            CounterFlow.Direction = getFillDirection(FlowDirection.Value);
+            updateWireframeDigits();
+        }
+
+        private void updateWireframeDigits()
+        {
+            wireframeDigits.Value = FlowDirection.Value == Direction.Vertical
+                ? Math.Max(2, CounterFlow.Children.Where(counter => counter.State.Value == Visibility.Visible).Max(counter => counter.Result.ResultCount.Value).ToString().Length)
+                : null;
         }
 
         private bool shouldBeVisible(int index, ArgonJudgementCounter counter)

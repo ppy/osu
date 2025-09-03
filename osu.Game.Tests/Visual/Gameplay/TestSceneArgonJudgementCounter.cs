@@ -101,6 +101,19 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("Set direction vertical", () => counterDisplay.FlowDirection.Value = Direction.Vertical);
             AddStep("Set direction horizontal", () => counterDisplay.FlowDirection.Value = Direction.Horizontal);
+
+            AddStep("add 100 ok judgements", () =>
+            {
+                for (int i = 0; i < 100; i++)
+                    applyOneJudgement(HitResult.Ok);
+            });
+            AddStep("add 1000 great judgements", () =>
+            {
+                for (int i = 0; i < 1000; i++)
+                    applyOneJudgement(HitResult.Great);
+            });
+
+            AddToggleStep("toggle max judgement display", t => counterDisplay.ShowMaxJudgement.Value = t);
         }
 
         [Test]
