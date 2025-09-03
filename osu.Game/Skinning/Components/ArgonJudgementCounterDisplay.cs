@@ -10,7 +10,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
-using osu.Game.Graphics;
 using osu.Game.Localisation.HUD;
 using osu.Game.Localisation.SkinComponents;
 using osu.Game.Rulesets.Scoring;
@@ -48,7 +47,7 @@ namespace osu.Game.Skinning.Components
         protected FillFlowContainer<ArgonJudgementCounter> CounterFlow = null!;
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
             AutoSizeAxes = Axes.Both;
             InternalChild = CounterFlow = new FillFlowContainer<ArgonJudgementCounter>
@@ -61,9 +60,8 @@ namespace osu.Game.Skinning.Components
             foreach (var counter in judgementCountController.Counters)
             {
                 ArgonJudgementCounter counterComponent = new ArgonJudgementCounter(counter);
-                counterComponent.TextComponent.WireframeOpacity.BindTo(WireframeOpacity);
-                counterComponent.TextComponent.ShowLabel.BindTo(ShowLabel);
-                counterComponent.DisplayedValue.BindTo(counter.ResultCount);
+                counterComponent.WireframeOpacity.BindTo(WireframeOpacity);
+                counterComponent.ShowLabel.BindTo(ShowLabel);
                 CounterFlow.Add(counterComponent);
             }
         }
@@ -71,9 +69,9 @@ namespace osu.Game.Skinning.Components
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            Mode.BindValueChanged(_ => updateVisibility(), true);
+            Mode.BindValueChanged(_ => updateVisibility());
             ShowMaxJudgement.BindValueChanged(_ => updateVisibility(), true);
-            FlowDirection.BindValueChanged(d => CounterFlow.Direction = getFillDirection(d.NewValue));
+            FlowDirection.BindValueChanged(d => CounterFlow.Direction = getFillDirection(d.NewValue), true);
         }
 
         private void updateVisibility()
@@ -94,7 +92,7 @@ namespace osu.Game.Skinning.Components
             if (index == 0 && !ShowMaxJudgement.Value)
                 return false;
 
-            var hitResult = counter.JudgementCounter.Types.First();
+            var hitResult = counter.Result.Types.First();
             if (hitResult.IsBasic())
                 return true;
 
@@ -110,7 +108,7 @@ namespace osu.Game.Skinning.Components
                     return true;
 
                 default:
-                    throw new ArgumentOutOfRangeException();
+                    throw new ArgumentOutOfRangeException(nameof(Mode), Mode.Value, null);
             }
         }
 
@@ -125,7 +123,7 @@ namespace osu.Game.Skinning.Components
                     return FillDirection.Vertical;
 
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(flow), flow, @"Unsupported direction");
+                    throw new ArgumentOutOfRangeException(nameof(flow), flow, null);
             }
         }
 

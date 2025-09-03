@@ -155,7 +155,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("Show all judgements", () => counterDisplay.Mode.Value = ArgonJudgementCounterDisplay.DisplayMode.All);
             AddAssert("Check no duplicates",
                 () => counterDisplay.CounterFlow.ChildrenOfType<ArgonJudgementCounter>().Count(),
-                () => Is.EqualTo(counterDisplay.CounterFlow.ChildrenOfType<ArgonJudgementCounter>().Select(c => c.JudgementName).Distinct().Count()));
+                () => Is.EqualTo(counterDisplay.CounterFlow.ChildrenOfType<ArgonJudgementCounter>().Select(c => c.Result.DisplayName).Distinct().Count()));
         }
 
         [Test]
@@ -174,8 +174,8 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private int hiddenCount()
         {
-            var num = counterDisplay.CounterFlow.Children.First(child => child.JudgementCounter.Types.Contains(HitResult.LargeTickHit));
-            return num.JudgementCounter.ResultCount.Value;
+            var num = counterDisplay.CounterFlow.Children.First(child => child.Result.Types.Contains(HitResult.LargeTickHit));
+            return num.Result.ResultCount.Value;
         }
 
         private partial class TestArgonJudgementCounterDisplay : ArgonJudgementCounterDisplay
