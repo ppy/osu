@@ -264,7 +264,7 @@ namespace osu.Game.Screens.SelectV2
 
             var beatmap = (BeatmapInfo)Item.Model;
 
-            starDifficultyBindable = difficultyCache.GetBindableDifficulty(beatmap, starDifficultyCancellationSource.Token, SongSelect.SELECTION_DEBOUNCE);
+            starDifficultyBindable = difficultyCache.GetBindableDifficulty(beatmap, starDifficultyCancellationSource.Token, SongSelect.DIFFICULTY_CALCULATION_DEBOUNCE);
             starDifficultyBindable.BindValueChanged(starDifficulty =>
             {
                 starRatingDisplay.Current.Value = starDifficulty.NewValue;
