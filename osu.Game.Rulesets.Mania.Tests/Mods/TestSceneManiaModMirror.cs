@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using NUnit.Framework;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Mods;
@@ -23,7 +24,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
                 CreateBeatmap = () => createBeatmap(7),
                 PassCondition = () =>
                 {
-                    if (Player?.Beatmap?.Value?.Beatmap is not ManiaBeatmap mirrored)
+                    if (Player?.Beatmap.Value?.Beatmap is not ManiaBeatmap mirrored)
                         return false;
 
                     if (mirrored.HitObjects.Count == 0)
@@ -32,14 +33,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
                     var original = createBeatmap(mirrored.TotalColumns);
                     int maxCol = mirrored.TotalColumns - 1;
 
-                    for (int i = 0; i < original.HitObjects.Count; i++)
-                    {
-                        int expected = maxCol - original.HitObjects[i].Column;
-                        if (mirrored.HitObjects[i].Column != expected)
-                            return false;
-                    }
-
-                    return true;
+                    return !original.HitObjects.Select(t => maxCol - t.Column).Where((expected, i) => mirrored.HitObjects[i].Column != expected).Any();
                 }
             });
         }
