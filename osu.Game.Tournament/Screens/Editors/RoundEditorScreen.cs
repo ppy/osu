@@ -14,6 +14,7 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Settings;
 using osu.Game.Tournament.Components;
+using osu.Game.Tournament.Localisation.Screens;
 using osu.Game.Tournament.Models;
 using osu.Game.Tournament.Screens.Editors.Components;
 using osuTK;
@@ -65,31 +66,31 @@ namespace osu.Game.Tournament.Screens.Editors
                         {
                             new SettingsTextBox
                             {
-                                LabelText = "Name",
+                                LabelText = RoundEditorStrings.RoundName,
                                 Width = 0.33f,
                                 Current = Model.Name
                             },
                             new SettingsTextBox
                             {
-                                LabelText = "Description",
+                                LabelText = RoundEditorStrings.RoundDescription,
                                 Width = 0.33f,
                                 Current = Model.Description
                             },
                             new DateTextBox
                             {
-                                LabelText = "Start Time",
+                                LabelText = RoundEditorStrings.StartTime,
                                 Width = 0.33f,
                                 Current = Model.StartDate
                             },
                             new SettingsSlider<int>
                             {
-                                LabelText = "# of Bans",
+                                LabelText = RoundEditorStrings.NumOfBans,
                                 Width = 0.33f,
                                 Current = Model.BanCount
                             },
                             new SettingsSlider<int>
                             {
-                                LabelText = "Best of",
+                                LabelText = RoundEditorStrings.BestOf,
                                 Width = 0.33f,
                                 Current = Model.BestOf
                             },
@@ -97,7 +98,7 @@ namespace osu.Game.Tournament.Screens.Editors
                             {
                                 Width = 0.2f,
                                 Margin = new MarginPadding(10),
-                                Text = "Add beatmap",
+                                Text = RoundEditorStrings.AddBeatmap,
                                 Action = () => beatmapEditor.CreateNew()
                             },
                             beatmapEditor
@@ -109,7 +110,7 @@ namespace osu.Game.Tournament.Screens.Editors
                         Origin = Anchor.CentreRight,
                         RelativeSizeAxes = Axes.None,
                         Width = 150,
-                        Text = "Delete Round",
+                        Text = RoundEditorStrings.DeleteRound,
                         Action = () => dialogOverlay?.Push(new DeleteRoundDialog(Model, () =>
                         {
                             Expire();
@@ -195,14 +196,14 @@ namespace osu.Game.Tournament.Screens.Editors
                                 {
                                     new SettingsNumberBox
                                     {
-                                        LabelText = "Beatmap ID",
+                                        LabelText = RoundEditorStrings.BeatmapID,
                                         RelativeSizeAxes = Axes.None,
                                         Width = 200,
                                         Current = beatmapId,
                                     },
                                     new SettingsTextBox
                                     {
-                                        LabelText = "Mods",
+                                        LabelText = RoundEditorStrings.Mods,
                                         RelativeSizeAxes = Axes.None,
                                         Width = 200,
                                         Current = mods,
@@ -219,7 +220,7 @@ namespace osu.Game.Tournament.Screens.Editors
                                 Origin = Anchor.CentreRight,
                                 RelativeSizeAxes = Axes.None,
                                 Width = 150,
-                                Text = "Delete Beatmap",
+                                Text = RoundEditorStrings.DeleteBeatmap,
                                 Action = () =>
                                 {
                                     Expire();

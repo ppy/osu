@@ -17,6 +17,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Localisation;
+using osu.Game.Tournament.Localisation.Screens;
 using osu.Game.Tournament.Models;
 using osu.Game.Tournament.Screens.Drawings.Components;
 using osuTK;

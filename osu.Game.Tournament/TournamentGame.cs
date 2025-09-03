@@ -85,7 +85,7 @@ namespace osu.Game.Tournament
                     {
                         Depth = float.MinValue,
                     },
-                    heightWarning = new WarningBox("Please make the window wider")
+                    heightWarning = new WarningBox(BaseStrings.AspectRatioWarning)
                     {
                         Anchor = Anchor.BottomCentre,
                         Origin = Anchor.BottomCentre,

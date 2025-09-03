@@ -3,11 +3,11 @@
 
 using osu.Framework.Localisation;
 
-namespace osu.Game.Tournament.Localisation
+namespace osu.Game.Tournament.Localisation.Screens
 {
     public class DrawingsStrings
     {
-        private const string prefix = @"osu.Game.Resources.Custom.Localisation.Tournament.Drawings";
+        private const string prefix = @"osu.Game.Resources.Localisation.Tournament.Screens.Drawings";
 
         /// <summary>
         /// "No drawings.txt file found. Please create one and restart the client."

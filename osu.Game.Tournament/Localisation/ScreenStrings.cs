@@ -7,7 +7,7 @@ namespace osu.Game.Tournament.Localisation
 {
     public class ScreenStrings
     {
-        private const string prefix = @"osu.Game.Resources.Custom.Localisation.Tournament.Screen";
+        private const string prefix = @"osu.Game.Resources.Localisation.Tournament.Screen";
 
         /// <summary>
         /// "Setup"
@@ -48,11 +48,6 @@ namespace osu.Game.Tournament.Localisation
         /// "Seeding"
         /// </summary>
         public static LocalisableString Seeding => new TranslatableString(getKey(@"seeding"), @"Seeding");
-
-        /// <summary>
-        /// "Board"
-        /// </summary>
-        public static LocalisableString Board => new TranslatableString(getKey(@"board"), @"Board");
 
         /// <summary>
         /// "Map Pool"

@@ -7,7 +7,7 @@ namespace osu.Game.Tournament.Localisation.Screens
 {
     public class BracketEditorStrings
     {
-        private const string prefix = @"osu.Game.Resources.Custom.Localisation.Tournament.Screens.BracketEditor";
+        private const string prefix = @"osu.Game.Resources.Localisation.Tournament.Screens.BracketEditor";
 
         /// <summary>
         /// "Losers {0}"
@@ -30,9 +30,29 @@ namespace osu.Game.Tournament.Localisation.Screens
         public static LocalisableString ResetTeams => new TranslatableString(getKey(@"reset_teams"), @"Reset teams");
 
         /// <summary>
+        /// "Team 1"
+        /// </summary>
+        public static LocalisableString TeamFirst => new TranslatableString(getKey(@"team_first"), @"Team 1");
+
+        /// <summary>
+        /// "Team 2"
+        /// </summary>
+        public static LocalisableString TeamSecond => new TranslatableString(getKey(@"team_second"), @"Team 2");
+
+        /// <summary>
+        /// "Round"
+        /// </summary>
+        public static LocalisableString Round => new TranslatableString(getKey(@"round"), @"Round");
+
+        /// <summary>
         /// "Losers Bracket"
         /// </summary>
         public static LocalisableString LosersBracket => new TranslatableString(getKey(@"losers_bracket"), @"Losers Bracket");
+
+        /// <summary>
+        /// "Match Time"
+        /// </summary>
+        public static LocalisableString MatchTime => new TranslatableString(getKey(@"match_time"), @"Match Time");
 
         /// <summary>
         /// "Set as current"

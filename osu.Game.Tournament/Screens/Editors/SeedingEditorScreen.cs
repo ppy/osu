@@ -13,6 +13,7 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Settings;
 using osu.Game.Tournament.Components;
+using osu.Game.Tournament.Localisation.Screens;
 using osu.Game.Tournament.Models;
 using osuTK;
 
@@ -65,13 +66,13 @@ namespace osu.Game.Tournament.Screens.Editors
                         {
                             new SettingsTextBox
                             {
-                                LabelText = "Mod",
+                                LabelText = RoundEditorStrings.Mods,
                                 Width = 0.33f,
                                 Current = Model.Mod
                             },
                             new SettingsSlider<int>
                             {
-                                LabelText = "Seed",
+                                LabelText = RoundEditorStrings.Seed,
                                 Width = 0.33f,
                                 Current = Model.Seed
                             },
@@ -79,7 +80,7 @@ namespace osu.Game.Tournament.Screens.Editors
                             {
                                 Width = 0.2f,
                                 Margin = new MarginPadding(10),
-                                Text = "Add beatmap",
+                                Text = RoundEditorStrings.AddBeatmap,
                                 Action = () => beatmapEditor.CreateNew()
                             },
                             beatmapEditor
@@ -91,7 +92,7 @@ namespace osu.Game.Tournament.Screens.Editors
                         Origin = Anchor.CentreRight,
                         RelativeSizeAxes = Axes.None,
                         Width = 150,
-                        Text = "Delete result",
+                        Text = RoundEditorStrings.DeleteResult,
                         Action = () =>
                         {
                             Expire();
@@ -177,21 +178,21 @@ namespace osu.Game.Tournament.Screens.Editors
                                 {
                                     new SettingsNumberBox
                                     {
-                                        LabelText = "Beatmap ID",
+                                        LabelText = RoundEditorStrings.BeatmapID,
                                         RelativeSizeAxes = Axes.None,
                                         Width = 200,
                                         Current = beatmapId,
                                     },
                                     new SettingsSlider<int>
                                     {
-                                        LabelText = "Seed",
+                                        LabelText = RoundEditorStrings.Seed,
                                         RelativeSizeAxes = Axes.None,
                                         Width = 200,
                                         Current = beatmap.Seed
                                     },
                                     new SettingsTextBox
                                     {
-                                        LabelText = "Score",
+                                        LabelText = RoundEditorStrings.Score,
                                         RelativeSizeAxes = Axes.None,
                                         Width = 200,
                                         Current = score,
@@ -208,7 +209,7 @@ namespace osu.Game.Tournament.Screens.Editors
                                 Origin = Anchor.CentreRight,
                                 RelativeSizeAxes = Axes.None,
                                 Width = 150,
-                                Text = "Delete Beatmap",
+                                Text = RoundEditorStrings.DeleteBeatmap,
                                 Action = () =>
                                 {
                                     Expire();

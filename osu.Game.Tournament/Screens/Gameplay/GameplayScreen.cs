@@ -11,6 +11,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.IPC;
+using osu.Game.Tournament.Localisation.Screens;
 using osu.Game.Tournament.Models;
 using osu.Game.Tournament.Screens.Gameplay.Components;
 using osu.Game.Tournament.Screens.MapPool;
@@ -98,24 +99,24 @@ namespace osu.Game.Tournament.Screens.Gameplay
                         warmupButton = new TourneyButton
                         {
                             RelativeSizeAxes = Axes.X,
-                            Text = "Toggle warmup",
+                            Text = GameplayScreenStrings.WarmupStage,
                             Action = () => warmup.Toggle()
                         },
                         new TourneyButton
                         {
                             RelativeSizeAxes = Axes.X,
-                            Text = "Toggle chat",
+                            Text = GameplayScreenStrings.ToggleChat,
                             Action = () => { State.Value = State.Value == TourneyState.Idle ? TourneyState.Playing : TourneyState.Idle; }
                         },
                         new SettingsSlider<int>
                         {
-                            LabelText = "Chroma width",
+                            LabelText = GameplayScreenStrings.ChromaWidth,
                             Current = LadderInfo.ChromaKeyWidth,
                             KeyboardStep = 1,
                         },
                         new SettingsSlider<int>
                         {
-                            LabelText = "Players per team",
+                            LabelText = GameplayScreenStrings.PlayersPerTeam,
                             Current = LadderInfo.PlayersPerTeam,
                             KeyboardStep = 1,
                         },
