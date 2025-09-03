@@ -199,12 +199,12 @@ namespace osu.Game.Rulesets.Osu.Edit
                 // Take the axis closest to the direction we want to flip over.
                 switch (gridToolbox.GridType.Value)
                 {
-                    case PositionSnapGridType.Square:
+                    case OsuGame.PositionSnapGridType.Square:
                         flipAxis = GeometryUtils.RotateVector(Vector2.UnitX, -((gridToolbox.GridLinesRotation.Value + 360 + 45) % 90 - 45));
                         flipAxis = direction == Direction.Vertical ? flipAxis.PerpendicularLeft : flipAxis;
                         break;
 
-                    case PositionSnapGridType.Triangle:
+                    case OsuGame.PositionSnapGridType.Triangle:
                         // Hex grid has 3 axes, so you can not directly flip over one of the axes,
                         // however it's still possible to achieve that flip by combining multiple flips over the other axes.
                         // Angle degree range for vertical = (-120, -60]

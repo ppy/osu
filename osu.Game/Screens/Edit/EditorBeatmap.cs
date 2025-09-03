@@ -264,7 +264,7 @@ namespace osu.Game.Screens.Edit
             set => PlayableBeatmap.GridSize = value;
         }
 
-        public int GridType
+        public OsuGame.PositionSnapGridType GridType
         {
             get => PlayableBeatmap.GridType;
             set => PlayableBeatmap.GridType = value;

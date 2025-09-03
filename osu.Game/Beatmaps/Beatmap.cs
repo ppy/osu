@@ -135,7 +135,7 @@ namespace osu.Game.Beatmaps
 
         public int GridSize { get; set; }
 
-        public int GridType { get; set; }
+        public OsuGame.PositionSnapGridType GridType { get; set; }
 
         public int GridRotation { get; set; }
 

@@ -99,7 +99,7 @@ namespace osu.Game.Beatmaps
 
         int GridSize { get; internal set; }
 
-        int GridType { get; internal set; }
+        OsuGame.PositionSnapGridType GridType { get; internal set; }
 
         int GridRotation { get; internal set; }
 

@@ -404,7 +404,7 @@ namespace osu.Game.Rulesets.Difficulty
                 set => baseBeatmap.GridSize = value;
             }
 
-            public int GridType
+            public OsuGame.PositionSnapGridType GridType
             {
                 get => baseBeatmap.GridType;
                 set => baseBeatmap.GridType = value;

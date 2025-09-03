@@ -335,7 +335,7 @@ namespace osu.Game.Beatmaps.Formats
                     break;
 
                 case @"GridType":
-                    beatmap.GridType = Parsing.ParseInt(pair.Value);
+                    beatmap.GridType = Enum.Parse<OsuGame.PositionSnapGridType>(pair.Value);
                     break;
 
                 case @"GridRotation":
