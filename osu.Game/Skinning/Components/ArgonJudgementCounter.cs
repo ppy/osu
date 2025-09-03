@@ -18,45 +18,44 @@ namespace osu.Game.Skinning.Components
 {
     public sealed partial class ArgonJudgementCounter : VisibilityContainer
     {
-        public ArgonCounterTextComponent TextComponent;
-        private OsuColour colours = null!;
-        public readonly JudgementCount JudgementCounter;
-        public BindableInt DisplayedValue = new BindableInt();
-        public string JudgementName;
+        public readonly JudgementCount Result;
 
-        public ArgonJudgementCounter(JudgementCount judgementCounter)
+        public IBindable<float> WireframeOpacity => textComponent.WireframeOpacity;
+        public IBindable<bool> ShowLabel => textComponent.ShowLabel;
+
+        private readonly ArgonCounterTextComponent textComponent;
+        private readonly BindableInt displayedValue = new BindableInt();
+
+        [Resolved]
+        private OsuColour colours { get; set; } = null!;
+
+        public ArgonJudgementCounter(JudgementCount result)
         {
-            JudgementCounter = judgementCounter;
-            JudgementName = judgementCounter.DisplayName.ToUpper().ToString();
+            Result = result;
 
             AutoSizeAxes = Axes.Both;
-            AddInternal(TextComponent = new ArgonCounterTextComponent(Anchor.TopRight, judgementCounter.DisplayName.ToUpper()));
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            this.colours = colours;
+            AddInternal(textComponent = new ArgonCounterTextComponent(Anchor.TopRight, result.DisplayName.ToUpper()));
         }
 
         private void updateWireframe()
         {
-            int wireframeLenght = Math.Max(2, TextComponent.Text.ToString().Length);
-            TextComponent.WireframeTemplate = new string('#', wireframeLenght);
+            int wireframeLength = Math.Max(2, textComponent.Text.ToString().Length);
+            textComponent.WireframeTemplate = new string('#', wireframeLength);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            DisplayedValue.BindValueChanged(v =>
+            displayedValue.BindTo(Result.ResultCount);
+            displayedValue.BindValueChanged(v =>
             {
-                TextComponent.Text = v.NewValue.ToString();
+                textComponent.Text = v.NewValue.ToString();
                 updateWireframe();
             }, true);
 
-            var result = JudgementCounter.Types.First();
-            TextComponent.LabelColour.Value = getJudgementColor(result);
-            TextComponent.ShowLabel.BindValueChanged(v => TextComponent.TextColour.Value = !v.NewValue ? getJudgementColor(result) : Color4.White);
+            var result = Result.Types.First();
+            textComponent.LabelColour.Value = getJudgementColor(result);
+            textComponent.ShowLabel.BindValueChanged(v => textComponent.TextColour.Value = !v.NewValue ? getJudgementColor(result) : Color4.White);
         }
 
         private Color4 getJudgementColor(HitResult result)
