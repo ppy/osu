@@ -3,8 +3,6 @@
 
 using System;
 using System.Globalization;
-using osuTK;
-using System.Text.RegularExpressions;
 
 namespace osu.Game.Beatmaps.Formats
 {
