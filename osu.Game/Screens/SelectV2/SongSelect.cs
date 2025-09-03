@@ -65,7 +65,7 @@ namespace osu.Game.Screens.SelectV2
     {
         // this is intentionally slightly higher than key repeat, but low enough to not impede user experience.
         // this avoids rapid churn loading when iterating the carousel using keyboard.
-        public const int SELECTION_DEBOUNCE = 100;
+        public const int SELECTION_DEBOUNCE = 150;
 
         private const float logo_scale = 0.4f;
         private const double fade_duration = 300;
