@@ -63,9 +63,20 @@ namespace osu.Game.Screens.SelectV2
     [Cached(typeof(ISongSelect))]
     public abstract partial class SongSelect : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>, ISongSelect
     {
-        // this is intentionally slightly higher than key repeat, but low enough to not impede user experience.
-        // this avoids rapid churn loading when iterating the carousel using keyboard.
+        /// <summary>
+        /// A debounce that governs how long after a panel is selected before the rest of song select (and the game at large)
+        /// updates to show that selection.
+        ///
+        /// This is intentionally slightly higher than key repeat, but low enough to not impede user experience.
+        /// </summary>
         public const int SELECTION_DEBOUNCE = 150;
+
+        /// <summary>
+        /// A general "global" debounce to be applied to anything aggressive difficulty calculation at song select,
+        /// either after selection or after a panel comes on screen. Value should be low enough that users don't complain,
+        /// but otherwise as high as possible to reduce overheads.
+        /// </summary>
+        public const int DIFFICULTY_CALCULATION_DEBOUNCE = 150;
 
         private const float logo_scale = 0.4f;
         private const double fade_duration = 300;
@@ -1035,6 +1046,7 @@ namespace osu.Game.Screens.SelectV2
                 return;
 
             onlineLookupCancellation?.Cancel();
+            onlineLookupCancellation = null;
 
             if (beatmapSetInfo.OnlineID < 0)
             {
