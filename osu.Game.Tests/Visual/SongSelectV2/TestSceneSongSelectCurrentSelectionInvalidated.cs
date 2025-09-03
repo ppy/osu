@@ -27,7 +27,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
     /// </summary>
     public partial class TestSceneSongSelectCurrentSelectionInvalidated : SongSelectTestScene
     {
-        private BeatmapInfo? selectedBeatmap => (Carousel.CurrentSelection as GroupedBeatmap)?.Beatmap;
+        private BeatmapInfo? selectedBeatmap => Carousel.CurrentBeatmap;
         private BeatmapSetInfo? selectedBeatmapSet => selectedBeatmap?.BeatmapSet;
 
         [SetUpSteps]

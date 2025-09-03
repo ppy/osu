@@ -118,14 +118,14 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                                     RequestSelection = b =>
                                     {
                                         BeatmapRequestedSelections.Push(b.Beatmap);
-                                        Carousel.CurrentSelection = b;
+                                        Carousel.CurrentGroupedBeatmap = b;
                                     },
                                     RequestRecommendedSelection = groupedBeatmaps =>
                                     {
                                         var recommendedBeatmap = BeatmapRecommendationFunction?.Invoke(groupedBeatmaps.Select(gb => gb.Beatmap)) ?? groupedBeatmaps.First().Beatmap;
                                         var recommendedGroupedBeatmap = groupedBeatmaps.First(gb => gb.Beatmap.Equals(recommendedBeatmap));
                                         BeatmapSetRequestedSelections.Push(recommendedBeatmap.BeatmapSet!);
-                                        Carousel.CurrentSelection = recommendedGroupedBeatmap;
+                                        Carousel.CurrentGroupedBeatmap = recommendedGroupedBeatmap;
                                     },
                                     BleedTop = 50,
                                     BleedBottom = 50,
@@ -219,8 +219,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
         protected void Select() => AddStep("select", () => InputManager.Key(Key.Enter));
 
-        protected void CheckNoSelection() => AddAssert("has no selection", () => Carousel.CurrentSelection, () => Is.Null);
-        protected void CheckHasSelection() => AddAssert("has selection", () => Carousel.CurrentSelection, () => Is.Not.Null);
+        protected void CheckNoSelection() => AddAssert("has no selection", () => Carousel.CurrentGroupedBeatmap, () => Is.Null);
+        protected void CheckHasSelection() => AddAssert("has selection", () => Carousel.CurrentGroupedBeatmap, () => Is.Not.Null);
 
         protected void CheckRequestPresentCount(int expected) =>
             AddAssert($"check present count is {expected}", () => Carousel.RequestPresentBeatmapCount, () => Is.EqualTo(expected));
@@ -285,8 +285,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 // offset by one because the group itself is included in the items list.
                 CarouselItem item = groupingFilter.GroupItems[groupDefinition].ElementAt(panel + 1);
 
-                return (Carousel.CurrentSelection as GroupedBeatmap)?
-                    .Equals(item.Model as GroupedBeatmap) == true;
+                return Carousel.CurrentGroupedBeatmap?.Equals(item.Model as GroupedBeatmap) == true;
             });
         }
 
@@ -295,12 +294,12 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             if (diff != null)
             {
                 AddUntilStep($"selected is set{set} diff{diff.Value}",
-                    () => (Carousel.CurrentSelection as GroupedBeatmap)?.Beatmap,
+                    () => Carousel.CurrentBeatmap,
                     () => Is.EqualTo(BeatmapSets[set].Beatmaps[diff.Value]));
             }
             else
             {
-                AddUntilStep($"selected is set{set}", () => BeatmapSets[set].Beatmaps.Contains(((GroupedBeatmap)Carousel.CurrentSelection!).Beatmap));
+                AddUntilStep($"selected is set{set}", () => BeatmapSets[set].Beatmaps.Contains(Carousel.CurrentBeatmap!));
             }
         }
 
@@ -419,7 +418,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                                 tracked: {Carousel.ItemsTracked}
                                 displayable: {Carousel.DisplayableItems}
                                 displayed: {Carousel.VisibleItems}
-                                selected: {Carousel.CurrentSelection}
+                                selected: {Carousel.CurrentGroupedBeatmap}
                                 """);
 
             void createHeader(string text)
