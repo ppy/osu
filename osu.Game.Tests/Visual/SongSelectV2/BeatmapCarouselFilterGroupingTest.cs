@@ -43,7 +43,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             var results = await runGrouping(GroupMode.None, beatmapSets);
             Assert.That(results.Select(r => r.Model).OfType<GroupedBeatmapSet>().Select(groupedSet => groupedSet.BeatmapSet), Is.EquivalentTo(beatmapSets));
-            Assert.That(results.Select(r => r.Model).OfType<BeatmapInfo>(), Is.EquivalentTo(allBeatmaps));
+            Assert.That(results.Select(r => r.Model).OfType<GroupedBeatmap>().Select(groupedBeatmap => groupedBeatmap.Beatmap), Is.EquivalentTo(allBeatmaps));
             assertTotal(results, beatmapSets.Count + allBeatmaps.Length);
         }
 
@@ -391,7 +391,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             var groupModel = (GroupDefinition)groupItem.Model;
 
             Assert.That(groupModel.Title, Is.EqualTo(expectedTitle));
-            Assert.That(itemsInGroup.Select(i => i.Model).OfType<BeatmapInfo>(), Is.EquivalentTo(expectedBeatmaps));
+            Assert.That(itemsInGroup.Select(i => i.Model).OfType<GroupedBeatmap>().Select(gb => gb.Beatmap), Is.EquivalentTo(expectedBeatmaps));
 
             totalItems += itemsInGroup.Count() + 1;
         }
