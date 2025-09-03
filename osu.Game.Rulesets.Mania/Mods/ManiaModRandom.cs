@@ -32,46 +32,49 @@ namespace osu.Game.Rulesets.Mania.Mods
             int availableColumns = maniaBeatmap.TotalColumns;
             var shuffledColumns = Enumerable.Range(0, availableColumns).OrderBy(_ => rng.Next()).ToList();
 
-            if (Randomizer.Value == RandomizationType.Notes)
+            switch (Randomizer.Value)
             {
-                double[] columnEndTimes = new double[availableColumns];
-                double lastStartTime = -1;
-                var availableColumnsList = new List<int>();
-
-                const double release_buffer = 1.5; // Minimum gap to avoid conflict at end of HoldNote
-
-                foreach (var h in beatmap.HitObjects.OfType<ManiaHitObject>())
+                case RandomizationType.Notes:
                 {
-                    double currentStartTime = h.StartTime;
+                    double[] columnEndTimes = new double[availableColumns];
+                    double? lastStartTime = null;
+                    var availableColumnsList = new List<int>();
 
-                    if (currentStartTime != lastStartTime)
+                    const double release_buffer = 1.5; // Minimum gap to avoid conflict at end of HoldNote
+
+                    foreach (var h in beatmap.HitObjects.OfType<ManiaHitObject>())
                     {
-                        availableColumnsList = Enumerable.Range(0, availableColumns)
-                                                         .Where(i => columnEndTimes[i] < currentStartTime - release_buffer)
-                                                         .ToList();
+                        double currentStartTime = h.StartTime;
+
+                        if (currentStartTime != lastStartTime)
+                        {
+                            availableColumnsList = Enumerable.Range(0, availableColumns)
+                                                             .Where(i => columnEndTimes[i] < currentStartTime - release_buffer)
+                                                             .ToList();
+                        }
+
+                        if (availableColumnsList.Count == 0)
+                            continue; // Skip if no free columns for aspire maps
+
+                        int randomIndex = rng.Next(availableColumnsList.Count);
+                        int randomColumn = availableColumnsList[randomIndex];
+
+                        h.Column = randomColumn;
+                        availableColumnsList.Remove(randomColumn);
+
+                        if (h is HoldNote hold)
+                            columnEndTimes[randomColumn] = hold.GetEndTime();
+
+                        lastStartTime = currentStartTime;
                     }
 
-                    if (availableColumnsList.Count == 0)
-                        continue; // Skip if no free columns for aspire maps
-
-                    int randomIndex = rng.Next(availableColumnsList.Count);
-                    int randomColumn = availableColumnsList[randomIndex];
-
-                    h.Column = randomColumn;
-                    availableColumnsList.Remove(randomColumn);
-
-                    if (h is HoldNote hold)
-                        columnEndTimes[randomColumn] = hold.GetEndTime();
-
-                    lastStartTime = currentStartTime;
+                    maniaBeatmap.HitObjects = maniaBeatmap.HitObjects.OrderBy(h => h.StartTime).ToList();
+                    break;
                 }
 
-                maniaBeatmap.HitObjects = maniaBeatmap.HitObjects.OrderBy(h => h.StartTime).ToList();
-            }
-
-            if (Randomizer.Value == RandomizationType.Columns)
-            {
-                beatmap.HitObjects.OfType<ManiaHitObject>().ForEach(h => h.Column = shuffledColumns[h.Column]);
+                case RandomizationType.Columns:
+                    beatmap.HitObjects.OfType<ManiaHitObject>().ForEach(h => h.Column = shuffledColumns[h.Column]);
+                    break;
             }
         }
 
