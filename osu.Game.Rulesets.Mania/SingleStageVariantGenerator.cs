@@ -10,9 +10,7 @@ namespace osu.Game.Rulesets.Mania
     {
         private readonly int variant;
         private readonly InputKey[] leftKeys;
-        private readonly InputKey[] secondaryLeftKeys;
         private readonly InputKey[] rightKeys;
-        private readonly InputKey[] secondaryRightKeys;
 
         public SingleStageVariantGenerator(int variant)
         {
@@ -23,26 +21,19 @@ namespace osu.Game.Rulesets.Mania
             {
                 leftKeys = new[] { InputKey.A, InputKey.S, InputKey.D, InputKey.F, InputKey.V };
                 rightKeys = new[] { InputKey.N, InputKey.J, InputKey.K, InputKey.L, InputKey.Semicolon };
-                secondaryLeftKeys = new[] { InputKey.None, InputKey.None, InputKey.None, InputKey.None, InputKey.None };
-                secondaryRightKeys = new[] { InputKey.None, InputKey.None, InputKey.None, InputKey.None, InputKey.None };
             }
             else
             {
                 leftKeys = new[] { InputKey.A, InputKey.S, InputKey.D, InputKey.F };
                 rightKeys = new[] { InputKey.J, InputKey.K, InputKey.L, InputKey.Semicolon };
-                secondaryLeftKeys = new[] { InputKey.None, InputKey.None, InputKey.None, InputKey.None };
-                secondaryRightKeys = new[] { InputKey.None, InputKey.None, InputKey.None, InputKey.None };
             }
         }
 
         public IEnumerable<KeyBinding> GenerateMappings() => new VariantMappingGenerator
         {
             LeftKeys = leftKeys,
-            SecondaryLeftKeys = secondaryLeftKeys,
             RightKeys = rightKeys,
-            SecondaryRightKeys = secondaryRightKeys,
             SpecialKey = InputKey.Space,
-            SecondarySpecialKey = InputKey.None
         }.GenerateKeyBindingsFor(variant);
     }
 }
