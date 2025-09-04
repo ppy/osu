@@ -29,7 +29,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
         [Test]
         public void TestBasic()
         {
-            AddUntilStep("wait for queue screen", () => queueScreen != null);
+            AddUntilStep("wait for queue screen", () => queueScreen?.IsLoaded == true);
 
             AddStep("set users", () =>
             {
