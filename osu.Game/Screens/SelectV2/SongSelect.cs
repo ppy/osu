@@ -12,6 +12,7 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
+using osu.Framework.Development;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -383,7 +384,8 @@ namespace osu.Game.Screens.SelectV2
                 new Dimension(GridSizeMode.Relative, 0.5f, minSize: 500, maxSize: 700 + widescreenBonusWidth * 300),
             };
 
-            updateDebounce();
+            if (this.IsCurrentScreen())
+                updateDebounce();
         }
 
         #region Selection debounce
@@ -401,8 +403,13 @@ namespace osu.Game.Screens.SelectV2
         {
             if (debounceQueuedSelection == null) return;
 
+            double elapsed = Clock.ElapsedFrameTime;
+
             // avoid debounce running early if there's a single long frame.
-            debounceElapsedTime += Math.Min(1000 / Clock.FramesPerSecond, Clock.ElapsedFrameTime);
+            if (!DebugUtils.IsNUnitRunning && Clock.FramesPerSecond > 0)
+                elapsed = Math.Min(1000 / Clock.FramesPerSecond, elapsed);
+
+            debounceElapsedTime += elapsed;
 
             if (debounceElapsedTime >= SELECTION_DEBOUNCE)
                 performDebounceSelection();
