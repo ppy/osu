@@ -221,7 +221,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             {
                 gridLinesRotationSlider.ContractedLabelText = $"R: {rotation.NewValue:#,0.##}";
                 gridLinesRotationSlider.ExpandedLabelText = $"Rotation: {rotation.NewValue:#,0.##}";
-                editorBeatmap.GridRotation = (int)rotation.NewValue;
+                if (GridType.Value != PositionSnapGridType.Circle) editorBeatmap.GridRotation = (int)rotation.NewValue;
             }, true);
 
             GridType.BindValueChanged(v =>
