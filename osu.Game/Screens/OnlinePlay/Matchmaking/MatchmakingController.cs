@@ -102,9 +102,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
             }
         });
 
-        private void onMatchmakingRoomReady(long roomId) => Scheduler.Add(() =>
+        private void onMatchmakingRoomReady(long roomId, string password) => Scheduler.Add(() =>
         {
-            client.JoinRoom(new Room { RoomID = roomId })
+            client.JoinRoom(new Room { RoomID = roomId }, password)
                   .FireAndForget(() => Scheduler.Add(() =>
                   {
                       CurrentState.Value = MatchmakingQueueScreen.MatchmakingScreenState.InRoom;
