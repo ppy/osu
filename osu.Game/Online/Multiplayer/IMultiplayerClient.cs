@@ -6,7 +6,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using osu.Game.Online.API;
-using osu.Game.Online.Matchmaking;
 using osu.Game.Online.Rooms;
 
 namespace osu.Game.Online.Multiplayer
@@ -14,7 +13,7 @@ namespace osu.Game.Online.Multiplayer
     /// <summary>
     /// An interface defining a multiplayer client instance.
     /// </summary>
-    public interface IMultiplayerClient : IStatefulUserHubClient, IMatchmakingClient
+    public interface IMultiplayerClient : IStatefulUserHubClient
     {
         /// <summary>
         /// Signals that the room has changed state.
