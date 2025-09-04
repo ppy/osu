@@ -120,6 +120,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 if (!isClassic)
                     hiddenBonus *= 0.2;
 
+                // A penalty is applied to classic easy+hidden scores, as this combo works differently than expected and makes fast reading easier.
+                if (score.Mods.Any(m => m is ModEasy) && isClassic)
+                    hiddenBonus *= 0.5;
+
                 difficultyValue *= 1 + hiddenBonus;
             }
 
