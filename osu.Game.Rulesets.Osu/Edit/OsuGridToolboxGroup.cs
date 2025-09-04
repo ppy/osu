@@ -83,7 +83,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         /// </summary>
         public Bindable<Vector2> SpacingVector { get; } = new Bindable<Vector2>();
 
-        public Bindable<OsuGame.PositionSnapGridType> GridType { get; } = new Bindable<OsuGame.PositionSnapGridType>();
+        public Bindable<PositionSnapGridType> GridType { get; } = new Bindable<PositionSnapGridType>();
 
         private ExpandableSlider<float> startPositionXSlider = null!;
         private ExpandableSlider<float> startPositionYSlider = null!;
@@ -156,13 +156,13 @@ namespace osu.Game.Rulesets.Osu.Edit
                             Items = new[]
                             {
                                 new RadioButton("Square",
-                                    () => GridType.Value = OsuGame.PositionSnapGridType.Square,
+                                    () => GridType.Value = PositionSnapGridType.Square,
                                     () => new SpriteIcon { Icon = FontAwesome.Regular.Square }),
                                 new RadioButton("Triangle",
-                                    () => GridType.Value = OsuGame.PositionSnapGridType.Triangle,
+                                    () => GridType.Value = PositionSnapGridType.Triangle,
                                     () => new OutlineTriangle(true, 20)),
                                 new RadioButton("Circle",
-                                    () => GridType.Value = OsuGame.PositionSnapGridType.Circle,
+                                    () => GridType.Value = PositionSnapGridType.Circle,
                                     () => new SpriteIcon { Icon = FontAwesome.Regular.Circle }),
                             }
                         },
@@ -226,20 +226,20 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             GridType.BindValueChanged(v =>
             {
-                GridLinesRotation.Disabled = v.NewValue == OsuGame.PositionSnapGridType.Circle;
+                GridLinesRotation.Disabled = v.NewValue == PositionSnapGridType.Circle;
 
                 gridTypeButtons.Items[(int)v.NewValue].Select();
                 editorBeatmap.GridType = v.NewValue;
 
                 switch (v.NewValue)
                 {
-                    case OsuGame.PositionSnapGridType.Square:
+                    case PositionSnapGridType.Square:
                         GridLinesRotation.Value = normalizeRotation(GridLinesRotation.Value, 90);
                         GridLinesRotation.MinValue = -45;
                         GridLinesRotation.MaxValue = 45;
                         break;
 
-                    case OsuGame.PositionSnapGridType.Triangle:
+                    case PositionSnapGridType.Triangle:
                         GridLinesRotation.Value = normalizeRotation(GridLinesRotation.Value, 60);
                         GridLinesRotation.MinValue = -30;
                         GridLinesRotation.MaxValue = 30;
@@ -268,7 +268,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                     return true;
 
                 case GlobalAction.EditorCycleGridType:
-                    GridType.Value = (OsuGame.PositionSnapGridType)(((int)GridType.Value + 1) % Enum.GetValues<OsuGame.PositionSnapGridType>().Length);
+                    GridType.Value = (PositionSnapGridType)(((int)GridType.Value + 1) % Enum.GetValues<PositionSnapGridType>().Length);
                     return true;
             }
 

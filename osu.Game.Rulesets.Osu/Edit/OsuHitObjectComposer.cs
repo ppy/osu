@@ -123,14 +123,14 @@ namespace osu.Game.Rulesets.Osu.Edit
             );
         }
 
-        private void updatePositionSnapGrid(ValueChangedEvent<OsuGame.PositionSnapGridType> obj)
+        private void updatePositionSnapGrid(ValueChangedEvent<PositionSnapGridType> obj)
         {
             if (positionSnapGrid != null)
                 LayerBelowRuleset.Remove(positionSnapGrid, true);
 
             switch (obj.NewValue)
             {
-                case OsuGame.PositionSnapGridType.Square:
+                case PositionSnapGridType.Square:
                     var rectangularPositionSnapGrid = new RectangularPositionSnapGrid();
 
                     rectangularPositionSnapGrid.Spacing.BindTo(OsuGridToolboxGroup.SpacingVector);
@@ -139,7 +139,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                     positionSnapGrid = rectangularPositionSnapGrid;
                     break;
 
-                case OsuGame.PositionSnapGridType.Triangle:
+                case PositionSnapGridType.Triangle:
                     var triangularPositionSnapGrid = new TriangularPositionSnapGrid();
 
                     triangularPositionSnapGrid.Spacing.BindTo(OsuGridToolboxGroup.Spacing);
@@ -148,7 +148,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                     positionSnapGrid = triangularPositionSnapGrid;
                     break;
 
-                case OsuGame.PositionSnapGridType.Circle:
+                case PositionSnapGridType.Circle:
                     var circularPositionSnapGrid = new CircularPositionSnapGrid();
 
                     circularPositionSnapGrid.Spacing.BindTo(OsuGridToolboxGroup.Spacing);
