@@ -122,7 +122,7 @@ namespace osu.Game.Online.Multiplayer
         public event Action? MatchmakingQueueJoined;
         public event Action? MatchmakingQueueLeft;
         public event Action? MatchmakingRoomInvited;
-        public event Action<long>? MatchmakingRoomReady;
+        public event Action<long, string>? MatchmakingRoomReady;
         public event Action<MatchmakingLobbyStatus>? MatchmakingLobbyStatusChanged;
         public event Action<MatchmakingQueueStatus>? MatchmakingQueueStatusChanged;
         public event Action<int, long>? MatchmakingItemSelected;
@@ -1051,9 +1051,9 @@ namespace osu.Game.Online.Multiplayer
             return Task.CompletedTask;
         }
 
-        Task IMatchmakingClient.MatchmakingRoomReady(long roomId)
+        Task IMatchmakingClient.MatchmakingRoomReady(long roomId, string password)
         {
-            Scheduler.Add(() => MatchmakingRoomReady?.Invoke(roomId));
+            Scheduler.Add(() => MatchmakingRoomReady?.Invoke(roomId, password));
             return Task.CompletedTask;
         }
 
