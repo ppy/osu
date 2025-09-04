@@ -61,6 +61,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens
         private IBindable<RulesetInfo> ruleset { get; set; } = null!;
 
         private readonly IBindable<MatchmakingScreenState> currentState = new Bindable<MatchmakingScreenState>();
+        private readonly Bindable<MatchmakingSettings> currentSettings = new Bindable<MatchmakingSettings>(new MatchmakingSettings());
+
         private CancellationTokenSource userLookupCancellation = new CancellationTokenSource();
 
         protected override void LoadComplete()
@@ -116,6 +118,18 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens
 
             currentState.BindTo(controller.CurrentState);
             currentState.BindValueChanged(s => SetState(s.NewValue));
+
+            // Pull current ruleset from the global select ruleset, if able.
+            currentSettings.Value = new MatchmakingSettings
+            {
+                RulesetId = ruleset.Value.CreateInstance() is ILegacyRuleset legacy ? legacy.LegacyID : 0
+            };
+
+            // Default mania to 4K.
+            if (currentSettings.Value.RulesetId == 3)
+                currentSettings.Value.Variant = 4;
+
+            currentSettings.BindValueChanged(_ => client.MatchmakingLeaveQueue().FireAndForget());
 
             client.MatchmakingLobbyStatusChanged += onMatchmakingLobbyStatusChanged;
         }
@@ -216,16 +230,22 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens
                         Origin = Anchor.Centre,
                         AutoSizeAxes = Axes.Both,
                         Direction = FillDirection.Vertical,
-                        Spacing = new Vector2(20),
+                        Spacing = new Vector2(10),
                         Children = new Drawable[]
                         {
+                            new MatchmakingRulesetSelector
+                            {
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.TopCentre,
+                                SelectedSettings = { BindTarget = currentSettings }
+                            },
                             new ShearedButton(200)
                             {
                                 DarkerColour = colours.Blue2,
                                 LighterColour = colours.Blue1,
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                Action = () => client.MatchmakingJoinQueue(new MatchmakingSettings { RulesetId = ruleset.Value.OnlineID }).FireAndForget(),
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.TopCentre,
+                                Action = () => client.MatchmakingJoinQueue(currentSettings.Value).FireAndForget(),
                                 Text = "Begin queueing",
                             }
                         }
