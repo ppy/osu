@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Localisation;
 using osu.Game.Extensions;
 using osu.Game.Graphics;
 
@@ -14,7 +15,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         {
         }
 
-        protected override string Format()
+        protected override LocalisableString Format()
             => Date.ToShortRelativeTime(TimeSpan.FromHours(1));
     }
 }
