@@ -9,7 +9,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
-using osu.Game.Models;
 using osu.Game.Online.API;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Rulesets;
@@ -78,12 +77,9 @@ namespace osu.Game.Screens.SelectV2
                 return;
 
             scoreSubscription = realm.RegisterForNotifications(r =>
-                    r.All<ScoreInfo>()
-                     .Filter($"{nameof(ScoreInfo.User)}.{nameof(RealmUser.OnlineID)} == $0"
-                             + $" && {nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.ID)} == $1"
-                             + $" && {nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.Hash)} == {nameof(ScoreInfo.BeatmapHash)}"
-                             + $" && {nameof(ScoreInfo.Ruleset)}.{nameof(RulesetInfo.ShortName)} == $2"
-                             + $" && {nameof(ScoreInfo.DeletePending)} == false", api.LocalUser.Value.Id, beatmap.ID, ruleset.Value.ShortName),
+                    r.GetAllLocalScoresForUser(api.LocalUser.Value.Id)
+                     .Filter($@"{nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.ID)} == $0"
+                             + $" && {nameof(ScoreInfo.Ruleset)}.{nameof(RulesetInfo.ShortName)} == $1", beatmap.ID, ruleset.Value.ShortName),
                 localScoresChanged);
         }
 

@@ -19,7 +19,6 @@ using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Models;
 using osu.Game.Online.API;
 using osu.Game.Online.Placeholders;
 using osu.Game.Scoring;
@@ -246,11 +245,8 @@ namespace osu.Game.Screens.Ranking.Statistics
                 // We may want to iterate on the following conditions further in the future
 
                 var localUserScore = AchievedScore ?? realm.Run(r =>
-                    r.All<ScoreInfo>()
-                     .Filter($@"{nameof(ScoreInfo.User)}.{nameof(RealmUser.OnlineID)} == $0"
-                             + $@" && {nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.ID)} == $1"
-                             + $@" && {nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.Hash)} == {nameof(ScoreInfo.BeatmapHash)}"
-                             + $@" && {nameof(ScoreInfo.DeletePending)} == false", api.LocalUser.Value.Id, newScore.BeatmapInfo.ID, newScore.BeatmapInfo.Ruleset.ShortName)
+                    r.GetAllLocalScoresForUser(api.LocalUser.Value.Id)
+                     .Filter($@"{nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.ID)} == $0", newScore.BeatmapInfo.ID)
                      .AsEnumerable()
                      .OrderByDescending(score => score.Ruleset.MatchesOnlineID(newScore.BeatmapInfo.Ruleset))
                      .ThenByDescending(score => score.Rank)

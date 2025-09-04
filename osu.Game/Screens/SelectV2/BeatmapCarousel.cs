@@ -25,7 +25,6 @@ using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Carousel;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Models;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
 using osu.Game.Screens.Select;
@@ -758,11 +757,8 @@ namespace osu.Game.Screens.SelectV2
         {
             var topRankMapping = new Dictionary<Guid, ScoreRank>();
 
-            var allLocalScores = r.All<ScoreInfo>()
-                                  .Filter($"{nameof(ScoreInfo.User)}.{nameof(RealmUser.OnlineID)} == $0"
-                                          + $" && {nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.Hash)} == {nameof(ScoreInfo.BeatmapHash)}"
-                                          + $" && {nameof(ScoreInfo.Ruleset)}.{nameof(RulesetInfo.ShortName)} == $1"
-                                          + $" && {nameof(ScoreInfo.DeletePending)} == false", criteria.LocalUserId, criteria.Ruleset?.ShortName)
+            var allLocalScores = r.GetAllLocalScoresForUser(criteria.LocalUserId)
+                                  .Filter($@"{nameof(ScoreInfo.Ruleset)}.{nameof(RulesetInfo.ShortName)} == $0", criteria.Ruleset?.ShortName)
                                   .OrderByDescending(s => s.TotalScore)
                                   .ThenBy(s => s.Date);
 
