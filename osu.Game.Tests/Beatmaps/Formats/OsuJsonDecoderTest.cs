@@ -12,6 +12,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.IO;
 using osu.Game.IO.Serialization;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Beatmaps;
@@ -80,7 +81,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             Assert.AreEqual(4, beatmapInfo.BeatDivisor);
             Assert.AreEqual(4, beatmap.GridSize);
             Assert.AreEqual(0, beatmap.GridType);
-            Assert.AreEqual(0, beatmap.GridRotation);
+            Assert.AreEqual(PositionSnapGridType.Square, beatmap.GridRotation);
             Assert.AreEqual(new Vector2(256, 192), beatmap.GridOffset);
             Assert.AreEqual(2, beatmap.TimelineZoom);
         }
