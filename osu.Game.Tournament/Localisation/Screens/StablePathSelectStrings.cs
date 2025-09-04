@@ -44,7 +44,7 @@ namespace osu.Game.Tournament.Localisation.Screens
         /// "An osu! stable cutting-edge installation could not be detected. Please try and manually point to the directory."
         /// </summary>
         public static LocalisableString DetectFailureText => new TranslatableString(getKey(@"detect_failure_text"),
-            "An osu! stable cutting-edge installation could not be detected.\nPlease try and manually point to the directory.");
+            "An osu! stable cutting-edge installation could not be detected. Please try and manually point to the directory.");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

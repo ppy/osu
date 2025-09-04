@@ -52,18 +52,18 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                         showFirstTeamButton = new TourneyButton
                         {
                             RelativeSizeAxes = Axes.X,
-                            Text = SeedingScreenStrings.ShowFirstTeam,
+                            Text = SeedingStrings.ShowFirstTeam,
                             Action = () => currentTeam.Value = CurrentMatch.Value?.Team1.Value,
                         },
                         showSecondTeamButton = new TourneyButton
                         {
                             RelativeSizeAxes = Axes.X,
-                            Text = SeedingScreenStrings.ShowSecondTeam,
+                            Text = SeedingStrings.ShowSecondTeam,
                             Action = () => currentTeam.Value = CurrentMatch.Value?.Team2.Value,
                         },
                         new SettingsTeamDropdown(LadderInfo.Teams)
                         {
-                            LabelText = SeedingScreenStrings.ShowSpecificTeam,
+                            LabelText = SeedingStrings.ShowSpecificTeam,
                             Current = currentTeam,
                         }
                     }
@@ -168,7 +168,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                             Children = new Drawable[]
                             {
                                 new TournamentSpriteText { Text = beatmap.Beatmap.Metadata.Title, Colour = TournamentGame.TEXT_COLOUR, },
-                                new TournamentSpriteText { Text = SeedingScreenStrings.By, Colour = TournamentGame.TEXT_COLOUR, Font = OsuFont.Torus.With(weight: FontWeight.Regular) },
+                                new TournamentSpriteText { Text = SeedingStrings.By, Colour = TournamentGame.TEXT_COLOUR, Font = OsuFont.Torus.With(weight: FontWeight.Regular) },
                                 new TournamentSpriteText { Text = beatmap.Beatmap.Metadata.Artist, Colour = TournamentGame.TEXT_COLOUR, Font = OsuFont.Torus.With(weight: FontWeight.Regular) },
                             }
                         },
@@ -274,9 +274,9 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                         Children = new Drawable[]
                         {
                             new TeamDisplay(team) { Margin = new MarginPadding { Bottom = 30 } },
-                            new RowDisplay(SeedingScreenStrings.AverageRank, $"#{team.AverageRank:#,0}"),
-                            new RowDisplay(SeedingScreenStrings.Seed, team.Seed.Value),
-                            new RowDisplay(SeedingScreenStrings.LastYearsPlacing, team.LastYearPlacing.Value > 0 ? $"#{team.LastYearPlacing:#,0}" : "N/A"),
+                            new RowDisplay(SeedingStrings.AverageRank, $"#{team.AverageRank:#,0}"),
+                            new RowDisplay(SeedingStrings.Seed, team.Seed.Value),
+                            new RowDisplay(SeedingStrings.LastYearsPlacing, team.LastYearPlacing.Value > 0 ? $"#{team.LastYearPlacing:#,0}" : "N/A"),
                             new Container { Margin = new MarginPadding { Bottom = 30 } },
                         }
                     },

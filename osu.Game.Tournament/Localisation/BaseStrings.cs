@@ -106,9 +106,29 @@ namespace osu.Game.Tournament.Localisation
         public static LocalisableString TeamBlue => new TranslatableString(getKey(@"team_blue"), @"Team Blue");
 
         /// <summary>
+        /// "Unknown"
+        /// </summary>
+        public static LocalisableString Unknown => new TranslatableString(getKey(@"unknown"), @"Unknown");
+
+        /// <summary>
         /// "Unknown Round"
         /// </summary>
         public static LocalisableString UnknownRound => new TranslatableString(getKey(@"unknown_round"), @"Unknown Round");
+
+        /// <summary>
+        /// "Length"
+        /// </summary>
+        public static LocalisableString BeatmapLength => new TranslatableString(getKey(@"beatmap_length"), @"Length");
+
+        /// <summary>
+        /// "mapper"
+        /// </summary>
+        public static LocalisableString Mapper => new TranslatableString(getKey(@"mapper"), @"mapper");
+
+        /// <summary>
+        /// "difficulty"
+        /// </summary>
+        public static LocalisableString Difficulty => new TranslatableString(getKey(@"difficulty"), @"difficulty");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

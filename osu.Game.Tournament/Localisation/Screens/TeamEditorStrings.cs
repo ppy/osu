@@ -10,11 +10,6 @@ namespace osu.Game.Tournament.Localisation.Screens
         private const string prefix = @"osu.Game.Resources.Localisation.Tournament.Screens.TeamEditor";
 
         /// <summary>
-        /// "Team Information"
-        /// </summary>
-        public static LocalisableString TeamInfoHeader => new TranslatableString(getKey(@"team_info_header"), @"Team Information");
-
-        /// <summary>
         /// "Name"
         /// </summary>
         public static LocalisableString TeamName => new TranslatableString(getKey(@"team_name"), @"Name");
@@ -43,11 +38,6 @@ namespace osu.Game.Tournament.Localisation.Screens
         /// "Edit seeding results"
         /// </summary>
         public static LocalisableString EditSeedingResults => new TranslatableString(getKey(@"edit_seeding_results"), @"Edit seeding results");
-
-        /// <summary>
-        /// "Player List"
-        /// </summary>
-        public static LocalisableString PlayerListHeader => new TranslatableString(getKey(@"player_list_header"), @"Player List");
 
         /// <summary>
         /// "Add player"

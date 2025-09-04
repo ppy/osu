@@ -10,11 +10,6 @@ namespace osu.Game.Tournament.Localisation.Screens
         private const string prefix = @"osu.Game.Resources.Localisation.Tournament.Screens.RoundEditor";
 
         /// <summary>
-        /// "Round Information"
-        /// </summary>
-        public static LocalisableString RoundInfoHeader => new TranslatableString(getKey(@"round_info_header"), @"Round Information");
-
-        /// <summary>
         /// "Name"
         /// </summary>
         public static LocalisableString RoundName => new TranslatableString(getKey(@"round_name"), @"Name");

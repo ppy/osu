@@ -5,9 +5,9 @@ using osu.Framework.Localisation;
 
 namespace osu.Game.Tournament.Localisation.Screens
 {
-    public class GameplayScreenStrings
+    public class GameplayStrings
     {
-        private const string prefix = @"osu.Game.Resources.Localisation.Tournament.Screens.GameplayScreen";
+        private const string prefix = @"osu.Game.Resources.Localisation.Tournament.Screens.Gameplay";
 
         /// <summary>
         /// "Warmup"

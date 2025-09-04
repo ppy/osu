@@ -5,9 +5,9 @@ using osu.Framework.Localisation;
 
 namespace osu.Game.Tournament.Localisation.Screens
 {
-    public class SeedingScreenStrings
+    public class SeedingStrings
     {
-        private const string prefix = @"osu.Game.Resources.Localisation.Tournament.Screens.SeedingScreen";
+        private const string prefix = @"osu.Game.Resources.Localisation.Tournament.Screens.Seeding";
 
         /// <summary>
         /// "Show first team"

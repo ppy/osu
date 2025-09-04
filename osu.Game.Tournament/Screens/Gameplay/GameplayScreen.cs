@@ -99,22 +99,22 @@ namespace osu.Game.Tournament.Screens.Gameplay
                     {
                         new LabelledSwitchButton
                         {
-                            Label = GameplayScreenStrings.Warmup,
+                            Label = GameplayStrings.Warmup,
                             Current = warmup,
                         },
                         chatToggle = new LabelledSwitchButton
                         {
-                            Label = GameplayScreenStrings.ShowChat,
+                            Label = GameplayStrings.ShowChat,
                         },
                         new SettingsSlider<int>
                         {
-                            LabelText = GameplayScreenStrings.ChromaWidth,
+                            LabelText = GameplayStrings.ChromaWidth,
                             Current = LadderInfo.ChromaKeyWidth,
                             KeyboardStep = 1,
                         },
                         new SettingsSlider<int>
                         {
-                            LabelText = GameplayScreenStrings.PlayersPerTeam,
+                            LabelText = GameplayStrings.PlayersPerTeam,
                             Current = LadderInfo.PlayersPerTeam,
                             KeyboardStep = 1,
                         },

@@ -12,6 +12,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Localisation;
+using osu.Game.Tournament.Localisation.Screens;
 using osu.Game.Tournament.Models;
 using osu.Game.Tournament.Screens.Gameplay;
 using osu.Game.Tournament.Screens.Gameplay.Components;
@@ -66,30 +67,30 @@ namespace osu.Game.Tournament.Screens.MapPool
                     {
                         new TournamentSpriteText
                         {
-                            Text = "Current Mode"
+                            Text = MappoolStrings.CurrentMode
                         },
                         buttonRedBan = new TourneyButton
                         {
                             RelativeSizeAxes = Axes.X,
-                            Text = "Red Ban",
+                            Text = MappoolStrings.RedBan,
                             Action = () => setMode(TeamColour.Red, ChoiceType.Ban)
                         },
                         buttonBlueBan = new TourneyButton
                         {
                             RelativeSizeAxes = Axes.X,
-                            Text = "Blue Ban",
+                            Text = MappoolStrings.BlueBan,
                             Action = () => setMode(TeamColour.Blue, ChoiceType.Ban)
                         },
                         buttonRedPick = new TourneyButton
                         {
                             RelativeSizeAxes = Axes.X,
-                            Text = "Red Pick",
+                            Text = MappoolStrings.RedPick,
                             Action = () => setMode(TeamColour.Red, ChoiceType.Pick)
                         },
                         buttonBluePick = new TourneyButton
                         {
                             RelativeSizeAxes = Axes.X,
-                            Text = "Blue Pick",
+                            Text = MappoolStrings.BluePick,
                             Action = () => setMode(TeamColour.Blue, ChoiceType.Pick)
                         },
                         new ControlPanel.Spacer(),
@@ -102,7 +103,7 @@ namespace osu.Game.Tournament.Screens.MapPool
                         new ControlPanel.Spacer(),
                         new OsuCheckbox
                         {
-                            LabelText = "Split display by mods",
+                            LabelText = MappoolStrings.SplitDisplayByMods,
                             Current = LadderInfo.SplitMapPoolByMods,
                         },
                     },
