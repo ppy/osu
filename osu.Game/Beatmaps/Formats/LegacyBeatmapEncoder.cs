@@ -119,7 +119,6 @@ namespace osu.Game.Beatmaps.Formats
             if (beatmap.GridRotation > 0)
                 writer.WriteLine(FormattableString.Invariant($"GridRotation: {beatmap.GridRotation}"));
             writer.WriteLine(FormattableString.Invariant($"GridOffset: {beatmap.GridOffset.X},{beatmap.GridOffset.Y}"));
-            // writer.WriteLine(FormattableString.Invariant($"GridOffset: {beatmap.GridOffset.X},{beatmap.GridOffset.Y}"));
             writer.WriteLine(FormattableString.Invariant($"TimelineZoom: {beatmap.TimelineZoom}"));
         }
 
