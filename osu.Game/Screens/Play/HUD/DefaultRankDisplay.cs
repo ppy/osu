@@ -33,11 +33,11 @@ namespace osu.Game.Screens.Play.HUD
         private SkinnableSound rankUpSample = null!;
 
         private Bindable<double?> lastSamplePlayback = null!;
-        private double lastRankUpdate;
+        private double timeSinceChange;
 
-        private ScoreRank displayedRank;
+        private ScoreRank? displayedRank;
 
-        private const int minimum_update_rate = 3000;
+        private const int time_before_commit = 1500;
 
         public DefaultRankDisplay()
         {
@@ -69,13 +69,14 @@ namespace osu.Game.Screens.Play.HUD
 
             var currentRank = scoreProcessor.Rank.Value;
 
-            if (currentRank != displayedRank)
+            if (currentRank == displayedRank)
             {
-                bool enoughTimeElapsed = Time.Current - lastRankUpdate >= minimum_update_rate;
-
-                if (enoughTimeElapsed || currentRank == ScoreRank.F)
-                    updateRank(currentRank);
+                timeSinceChange = 0;
+                return;
             }
+
+            if ((timeSinceChange += Time.Elapsed) >= time_before_commit || scoreProcessor.HasCompleted.Value)
+                updateRank(currentRank);
         }
 
         private void updateRank(ScoreRank rank)
@@ -86,7 +87,7 @@ namespace osu.Game.Screens.Play.HUD
             bool enoughSampleTimeElapsed = !lastSamplePlayback.Value.HasValue || Time.Current - lastSamplePlayback.Value >= OsuGameBase.SAMPLE_DEBOUNCE_TIME;
 
             // Also don't play rank-down sfx on quit/retry/initial update.
-            if (rank != displayedRank && rank > ScoreRank.F && PlaySamples.Value && enoughSampleTimeElapsed && lastRankUpdate > 0)
+            if (rank != displayedRank && rank > ScoreRank.F && PlaySamples.Value && enoughSampleTimeElapsed && displayedRank != null)
             {
                 if (rank > displayedRank)
                     rankUpSample.Play();
@@ -97,7 +98,7 @@ namespace osu.Game.Screens.Play.HUD
             }
 
             displayedRank = rank;
-            lastRankUpdate = Time.Current;
+            timeSinceChange = 0;
         }
     }
 }
