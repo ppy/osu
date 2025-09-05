@@ -320,6 +320,15 @@ namespace osu.Game.Online.Multiplayer
             return connector.Disconnect();
         }
 
+        public override Task<MatchmakingPool[]> GetMatchmakingPools()
+        {
+            if (!IsConnected.Value)
+                return Task.FromResult(Array.Empty<MatchmakingPool>());
+
+            Debug.Assert(connection != null);
+            return connection.InvokeAsync<MatchmakingPool[]>(nameof(IMatchmakingServer.GetMatchmakingPools));
+        }
+
         public override Task MatchmakingJoinLobby()
         {
             if (!IsConnected.Value)
@@ -338,13 +347,13 @@ namespace osu.Game.Online.Multiplayer
             return connection.InvokeAsync(nameof(IMatchmakingServer.MatchmakingLeaveLobby));
         }
 
-        public override Task MatchmakingJoinQueue(MatchmakingSettings settings)
+        public override Task MatchmakingJoinQueue(int poolId)
         {
             if (!IsConnected.Value)
                 return Task.CompletedTask;
 
             Debug.Assert(connection != null);
-            return connection.InvokeAsync(nameof(IMatchmakingServer.MatchmakingJoinQueue), settings);
+            return connection.InvokeAsync(nameof(IMatchmakingServer.MatchmakingJoinQueue), poolId);
         }
 
         public override Task MatchmakingLeaveQueue()
