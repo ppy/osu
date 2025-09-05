@@ -63,6 +63,13 @@ namespace osu.Game.Screens.Play.HUD
             lastSamplePlayback = statics.GetBindable<double?>(Static.LastRankChangeSamplePlaybackTime);
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            updateRank(scoreProcessor.Rank.Value);
+        }
+
         protected override void Update()
         {
             base.Update();
@@ -75,7 +82,7 @@ namespace osu.Game.Screens.Play.HUD
                 return;
             }
 
-            if ((timeSinceChange += Time.Elapsed) >= time_before_commit || scoreProcessor.HasCompleted.Value)
+            if ((timeSinceChange += Time.Elapsed) >= time_before_commit || scoreProcessor.HasCompleted.Value || currentRank == ScoreRank.F)
                 updateRank(currentRank);
         }
 
@@ -87,7 +94,7 @@ namespace osu.Game.Screens.Play.HUD
             bool enoughSampleTimeElapsed = !lastSamplePlayback.Value.HasValue || Time.Current - lastSamplePlayback.Value >= OsuGameBase.SAMPLE_DEBOUNCE_TIME;
 
             // Also don't play rank-down sfx on quit/retry/initial update.
-            if (rank != displayedRank && rank > ScoreRank.F && PlaySamples.Value && enoughSampleTimeElapsed && displayedRank != null)
+            if (displayedRank != null && rank > ScoreRank.F && PlaySamples.Value && enoughSampleTimeElapsed)
             {
                 if (rank > displayedRank)
                     rankUpSample.Play();
