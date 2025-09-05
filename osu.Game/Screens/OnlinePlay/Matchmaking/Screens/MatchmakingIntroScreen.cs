@@ -131,8 +131,19 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens
         {
             ValidForResume = false;
 
+            duckOperation?.Dispose();
+
             this.FadeOut(800, Easing.OutQuint);
             base.OnSuspending(e);
+        }
+
+        public override bool OnExiting(ScreenExitEvent e)
+        {
+            if (base.OnExiting(e))
+                return true;
+
+            duckOperation?.Dispose();
+            return false;
         }
 
         private void updateAnimationState()
@@ -168,14 +179,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens
                             RestoreDuration = 1500f,
                         });
                     });
-
-                    using (BeginDelayedSequence(2750))
-                    {
-                        Schedule(() =>
-                        {
-                            duckOperation?.Dispose();
-                        });
-                    }
                 }
 
                 using (BeginDelayedSequence(1000))
