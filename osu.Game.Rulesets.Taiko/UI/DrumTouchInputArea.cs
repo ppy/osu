@@ -68,6 +68,8 @@ namespace osu.Game.Rulesets.Taiko.UI
                     {
                         mainContent = new Container
                         {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
                             RelativeSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
