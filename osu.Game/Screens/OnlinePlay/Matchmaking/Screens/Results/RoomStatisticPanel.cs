@@ -2,11 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Database;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Online.Multiplayer;
+using osu.Game.Online.API.Requests.Responses;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Results
@@ -16,19 +18,22 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Results
         private readonly Color4 backgroundColour = Color4.SaddleBrown;
 
         private readonly string text;
-        private readonly MultiplayerRoomUser user;
+        private readonly int userId;
 
-        public RoomStatisticPanel(string text, MultiplayerRoomUser user)
+        public RoomStatisticPanel(string text, int userId)
         {
             this.text = text;
-            this.user = user;
+            this.userId = userId;
 
             AutoSizeAxes = Axes.Both;
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(UserLookupCache userLookupCache)
         {
+            // Should be cached by this point.
+            APIUser? user = userLookupCache.GetUserAsync(userId).GetResultSafely();
+
             InternalChild = new CircularContainer
             {
                 AutoSizeAxes = Axes.Both,
@@ -43,7 +48,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Results
                     new OsuSpriteText
                     {
                         Margin = new MarginPadding(10),
-                        Text = $"{text}: {user.User?.Username}"
+                        Text = $"{text}: {user?.Username}"
                     }
                 }
             };
