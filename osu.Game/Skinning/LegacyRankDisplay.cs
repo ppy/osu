@@ -67,6 +67,13 @@ namespace osu.Game.Skinning
             lastSamplePlayback = statics.GetBindable<double?>(Static.LastRankChangeSamplePlaybackTime);
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            updateRank(scoreProcessor.Rank.Value);
+        }
+
         protected override void Update()
         {
             base.Update();
@@ -79,7 +86,7 @@ namespace osu.Game.Skinning
                 return;
             }
 
-            if ((timeSinceChange += Time.Elapsed) >= time_before_commit || scoreProcessor.HasCompleted.Value)
+            if ((timeSinceChange += Time.Elapsed) >= time_before_commit || scoreProcessor.HasCompleted.Value || currentRank == ScoreRank.F)
                 updateRank(currentRank);
         }
 
@@ -89,7 +96,7 @@ namespace osu.Game.Skinning
 
             rankDisplay.Texture = texture;
 
-            if (texture != null)
+            if (texture != null && displayedRank != null)
             {
                 var transientRank = new Sprite
                 {
@@ -111,7 +118,7 @@ namespace osu.Game.Skinning
             bool enoughSampleTimeElapsed = !lastSamplePlayback.Value.HasValue || Time.Current - lastSamplePlayback.Value >= OsuGameBase.SAMPLE_DEBOUNCE_TIME;
 
             // Also don't play rank-down sfx on quit/retry/initial update.
-            if (rank != displayedRank && rank > ScoreRank.F && PlaySamples.Value && enoughSampleTimeElapsed && displayedRank != null)
+            if (displayedRank != null && rank > ScoreRank.F && PlaySamples.Value && enoughSampleTimeElapsed)
             {
                 if (rank > displayedRank)
                     rankUpSample.Play();
