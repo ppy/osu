@@ -8,9 +8,12 @@ using System.Diagnostics;
 using System.Linq;
 using Microsoft.Toolkit.HighPerformance;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Transforms;
+using osu.Framework.Utils;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
@@ -42,6 +45,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Pick
 
         private bool allowSelection = true;
 
+        private readonly Sample[] rouletteSamples = new Sample[8];
+        private Sample? rouletteResultSample;
+        private Sample? swooshSample;
+        private double? lastSamplePlayback;
+
         public BeatmapSelectionGrid()
         {
             InternalChildren = new Drawable[]
@@ -64,6 +72,21 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Pick
                     Masking = true,
                 },
             };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audio)
+        {
+            rouletteSamples[0] = audio.Samples.Get(@"Multiplayer/Matchmaking/roulette-0");
+            rouletteSamples[1] = audio.Samples.Get(@"Multiplayer/Matchmaking/roulette-1");
+            rouletteSamples[2] = audio.Samples.Get(@"Multiplayer/Matchmaking/roulette-2");
+            rouletteSamples[3] = audio.Samples.Get(@"Multiplayer/Matchmaking/roulette-3");
+            rouletteSamples[4] = audio.Samples.Get(@"Multiplayer/Matchmaking/roulette-4");
+            rouletteSamples[5] = audio.Samples.Get(@"Multiplayer/Matchmaking/roulette-2");
+            rouletteSamples[6] = audio.Samples.Get(@"Multiplayer/Matchmaking/roulette-3");
+            rouletteSamples[7] = audio.Samples.Get(@"Multiplayer/Matchmaking/roulette-4");
+            rouletteResultSample = audio.Samples.Get(@"Multiplayer/Matchmaking/roulette-result");
+            swooshSample = audio.Samples.Get(@"SongSelect/options-pop-out");
         }
 
         protected override void LoadComplete()
@@ -200,6 +223,15 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Pick
                 var position = positions[i] * (BeatmapPanel.SIZE + new Vector2(panel_spacing));
 
                 panel.MoveTo(position, duration + stagger * i, new SplitEasingFunction(Easing.InCubic, Easing.OutExpo, 0.3f));
+
+                Scheduler.AddDelayed(() =>
+                {
+                    var chan = swooshSample?.GetChannel();
+                    if (chan == null) return;
+
+                    chan.Frequency.Value = 1.25f - RNG.NextDouble(0.5f);
+                    chan.Play();
+                }, stagger * i);
             }
         }
 
@@ -266,10 +298,18 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Pick
                 double delay = Math.Pow(progress, 2.5) * duration;
                 var panel = rollContainer.Children[i % rollContainer.Children.Count];
 
+                int ii = i;
                 Scheduler.AddDelayed(() =>
                 {
                     lastPanel?.HideBorder();
                     panel.ShowBorder();
+
+                    if (lastSamplePlayback == null || Time.Current - lastSamplePlayback > OsuGameBase.SAMPLE_DEBOUNCE_TIME)
+                    {
+                        int sampleIdx = ii % (rouletteSamples.Length);
+                        rouletteSamples[sampleIdx].Play();
+                        lastSamplePlayback = Time.Current;
+                    }
 
                     lastPanel = panel;
                 }, delay);
@@ -297,6 +337,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Pick
                     panel.ShowBorder();
                     panel.MoveTo(Vector2.Zero, 1000, Easing.OutExpo)
                          .ScaleTo(1.5f, 1000, Easing.OutExpo);
+
+                    rouletteResultSample?.Play();
                 });
             }
         }

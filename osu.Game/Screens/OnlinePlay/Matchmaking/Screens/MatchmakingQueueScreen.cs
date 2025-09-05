@@ -7,6 +7,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.ObjectExtensions;
@@ -68,6 +70,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens
         private readonly Bindable<MatchmakingPool?> selectedPool = new Bindable<MatchmakingPool?>();
 
         private CancellationTokenSource userLookupCancellation = new CancellationTokenSource();
+
+        private Sample? matchFoundSample;
 
         protected override void LoadComplete()
         {
@@ -139,6 +143,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens
                 // Default to the user's ruleset for the initial pool selection.
                 selectedPool.Value = pools.FirstOrDefault(p => p.RulesetId == ruleset.Value.OnlineID) ?? pools.FirstOrDefault();
             });
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audio)
+        {
+            matchFoundSample = audio.Samples.Get(@"Multiplayer/matchmaking/match-found");
         }
 
         private void onMatchmakingLobbyStatusChanged(MatchmakingLobbyStatus status) => Scheduler.Add(() =>
@@ -349,6 +359,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens
                             }
                         }
                     };
+                    matchFoundSample?.Play();
                     break;
 
                 case MatchmakingScreenState.AcceptedWaitingForRoom:
