@@ -1091,11 +1091,13 @@ namespace osu.Game.Online.Multiplayer
             return Task.CompletedTask;
         }
 
+        public abstract Task<MatchmakingPool[]> GetMatchmakingPools();
+
         public abstract Task MatchmakingJoinLobby();
 
         public abstract Task MatchmakingLeaveLobby();
 
-        public abstract Task MatchmakingJoinQueue(MatchmakingSettings settings);
+        public abstract Task MatchmakingJoinQueue(int poolId);
 
         public abstract Task MatchmakingLeaveQueue();
 

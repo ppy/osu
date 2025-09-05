@@ -9,11 +9,12 @@ using osu.Framework.Utils;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Screens.OnlinePlay.Matchmaking;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Screens;
+using osu.Game.Tests.Visual.Multiplayer;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Matchmaking
 {
-    public partial class TestSceneMatchmakingQueueScreen : ScreenTestScene
+    public partial class TestSceneMatchmakingQueueScreen : MultiplayerTestScene
     {
         [Cached]
         private readonly MatchmakingController controller = new MatchmakingController();
@@ -23,6 +24,8 @@ namespace osu.Game.Tests.Visual.Matchmaking
         [SetUpSteps]
         public override void SetUpSteps()
         {
+            base.SetUpSteps();
+
             AddStep("load screen", () => LoadScreen(new MatchmakingIntroScreen()));
         }
 

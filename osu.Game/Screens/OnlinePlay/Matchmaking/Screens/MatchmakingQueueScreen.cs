@@ -2,8 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
@@ -61,7 +63,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens
         private IBindable<RulesetInfo> ruleset { get; set; } = null!;
 
         private readonly IBindable<MatchmakingScreenState> currentState = new Bindable<MatchmakingScreenState>();
-        private readonly Bindable<MatchmakingSettings> currentSettings = new Bindable<MatchmakingSettings>(new MatchmakingSettings());
+
+        private readonly Bindable<MatchmakingPool[]> availablePools = new Bindable<MatchmakingPool[]>();
+        private readonly Bindable<MatchmakingPool?> selectedPool = new Bindable<MatchmakingPool?>();
 
         private CancellationTokenSource userLookupCancellation = new CancellationTokenSource();
 
@@ -119,19 +123,22 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens
             currentState.BindTo(controller.CurrentState);
             currentState.BindValueChanged(s => SetState(s.NewValue));
 
-            // Pull current ruleset from the global select ruleset, if able.
-            currentSettings.Value = new MatchmakingSettings
-            {
-                RulesetId = ruleset.Value.CreateInstance() is ILegacyRuleset legacy ? legacy.LegacyID : 0
-            };
-
-            // Default mania to 4K.
-            if (currentSettings.Value.RulesetId == 3)
-                currentSettings.Value.Variant = 4;
-
-            currentSettings.BindValueChanged(_ => client.MatchmakingLeaveQueue().FireAndForget());
-
             client.MatchmakingLobbyStatusChanged += onMatchmakingLobbyStatusChanged;
+
+            populateAvailablePools().FireAndForget();
+        }
+
+        private async Task populateAvailablePools()
+        {
+            MatchmakingPool[] pools = await client.GetMatchmakingPools().ConfigureAwait(false);
+
+            Schedule(() =>
+            {
+                availablePools.Value = pools;
+
+                // Default to the user's ruleset for the initial pool selection.
+                selectedPool.Value = pools.FirstOrDefault(p => p.RulesetId == ruleset.Value.OnlineID) ?? pools.FirstOrDefault();
+            });
         }
 
         private void onMatchmakingLobbyStatusChanged(MatchmakingLobbyStatus status) => Scheduler.Add(() =>
@@ -233,19 +240,25 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens
                         Spacing = new Vector2(10),
                         Children = new Drawable[]
                         {
-                            new MatchmakingRulesetSelector
+                            new MatchmakingPoolSelector
                             {
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
-                                SelectedSettings = { BindTarget = currentSettings }
+                                AvailablePools = { BindTarget = availablePools },
+                                SelectedPool = { BindTarget = selectedPool }
                             },
-                            new ShearedButton(200)
+                            new BeginQueueingButton(200)
                             {
                                 DarkerColour = colours.Blue2,
                                 LighterColour = colours.Blue1,
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
-                                Action = () => client.MatchmakingJoinQueue(currentSettings.Value).FireAndForget(),
+                                SelectedPool = { BindTarget = selectedPool },
+                                Action = () =>
+                                {
+                                    Debug.Assert(selectedPool.Value != null);
+                                    client.MatchmakingJoinQueue(selectedPool.Value.Id).FireAndForget();
+                                },
                                 Text = "Begin queueing",
                             }
                         }
@@ -408,6 +421,23 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens
             PendingAccept,
             AcceptedWaitingForRoom,
             InRoom
+        }
+
+        private partial class BeginQueueingButton : ShearedButton
+        {
+            public readonly IBindable<MatchmakingPool?> SelectedPool = new Bindable<MatchmakingPool?>();
+
+            public BeginQueueingButton(float? width = null)
+                : base(width)
+            {
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                SelectedPool.BindValueChanged(p => Enabled.Value = p.NewValue != null, true);
+            }
         }
     }
 }
