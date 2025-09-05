@@ -8,6 +8,11 @@ namespace osu.Game.Online.Matchmaking
     public interface IMatchmakingServer
     {
         /// <summary>
+        /// Retrieves all active matchmaking pools.
+        /// </summary>
+        Task<MatchmakingPool[]> GetMatchmakingPools();
+
+        /// <summary>
         /// Joins the matchmaking lobby, allowing the local user to receive status updates.
         /// </summary>
         Task MatchmakingJoinLobby();
