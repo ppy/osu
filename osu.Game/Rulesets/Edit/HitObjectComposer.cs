@@ -19,7 +19,6 @@ using osu.Framework.Logging;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
-using osu.Game.Graphics;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Edit.Tools;
@@ -162,16 +161,18 @@ namespace osu.Game.Rulesets.Edit
                             Colour = colourProvider.Background5,
                             RelativeSizeAxes = Axes.Both,
                         },
-                        LeftToolbox = new ExpandingToolboxContainer(TOOLBOX_CONTRACTED_SIZE_LEFT, 200)
+                        LeftToolbox = new ExpandingToolboxContainer(TOOLBOX_CONTRACTED_SIZE_LEFT, 170)
                         {
                             Children = new Drawable[]
                             {
                                 new EditorToolboxGroup("toolbox (1-9)")
                                 {
-                                    Child = toolboxCollection = new EditorRadioButtonCollection { RelativeSizeAxes = Axes.X }
+                                    ContentPadding = new MarginPadding(TOOLBAR_PADDING),
+                                    Child = toolboxCollection = new EditorRadioButtonCollection { RelativeSizeAxes = Axes.X },
                                 },
                                 new EditorToolboxGroup("toggles (Q~P)")
                                 {
+                                    ContentPadding = new MarginPadding(TOOLBAR_PADDING),
                                     Child = togglesCollection = new FillFlowContainer
                                     {
                                         RelativeSizeAxes = Axes.X,
@@ -182,6 +183,7 @@ namespace osu.Game.Rulesets.Edit
                                 },
                                 new EditorToolboxGroup("bank (Shift/Alt-Q~R)")
                                 {
+                                    ContentPadding = new MarginPadding(TOOLBAR_PADDING),
                                     Child = new FillFlowContainer
                                     {
                                         RelativeSizeAxes = Axes.X,
@@ -205,7 +207,7 @@ namespace osu.Game.Rulesets.Edit
                                                         X = 0.25f,
                                                         Origin = Anchor.TopCentre,
                                                         Anchor = Anchor.TopLeft,
-                                                        Font = OsuFont.GetFont(weight: FontWeight.Regular, size: 17),
+                                                        Font = Editor.Fonts.Default,
                                                     },
                                                     new ExpandableSpriteText
                                                     {
@@ -216,7 +218,7 @@ namespace osu.Game.Rulesets.Edit
                                                         X = 0.75f,
                                                         Origin = Anchor.TopCentre,
                                                         Anchor = Anchor.TopLeft,
-                                                        Font = OsuFont.GetFont(weight: FontWeight.Regular, size: 17),
+                                                        Font = Editor.Fonts.Default,
                                                     },
                                                 }
                                             },
@@ -247,7 +249,7 @@ namespace osu.Game.Rulesets.Edit
                             Colour = colourProvider.Background5,
                             RelativeSizeAxes = Axes.Both,
                         },
-                        RightToolbox = new ExpandingToolboxContainer(TOOLBOX_CONTRACTED_SIZE_RIGHT, 250)
+                        RightToolbox = new ExpandingToolboxContainer(TOOLBOX_CONTRACTED_SIZE_RIGHT, 180)
                         {
                             Child = new EditorToolboxGroup("inspector")
                             {
@@ -576,8 +578,9 @@ namespace osu.Game.Rulesets.Edit
     [Cached]
     public abstract partial class HitObjectComposer : CompositeDrawable
     {
-        public const float TOOLBOX_CONTRACTED_SIZE_LEFT = 60;
-        public const float TOOLBOX_CONTRACTED_SIZE_RIGHT = 120;
+        public const float TOOLBAR_PADDING = 5;
+        public const float TOOLBOX_CONTRACTED_SIZE_LEFT = Editor.BUTTON_HEIGHT + TOOLBAR_PADDING * 2;
+        public const float TOOLBOX_CONTRACTED_SIZE_RIGHT = 100;
 
         public readonly Ruleset Ruleset;
 
