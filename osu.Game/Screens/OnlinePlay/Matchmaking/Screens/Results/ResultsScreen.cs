@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.ObjectExtensions;
@@ -321,12 +320,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Results
 
             void addStatistic(int userId, string text)
             {
-                MultiplayerRoomUser? user = client.Room?.Users.FirstOrDefault(u => u.UserID == userId);
-
-                if (user == null)
-                    throw new InvalidOperationException($"User not found in room: {userId}");
-
-                roomStatistics.Add(new RoomStatisticPanel(text, user)
+                roomStatistics.Add(new RoomStatisticPanel(text, userId)
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre
