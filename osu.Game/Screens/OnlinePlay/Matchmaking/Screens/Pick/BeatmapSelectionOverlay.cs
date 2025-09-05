@@ -2,6 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Online.API.Requests.Responses;
@@ -14,6 +17,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Pick
         private readonly Dictionary<int, SelectionAvatar> avatars = new Dictionary<int, SelectionAvatar>();
 
         private readonly Container<SelectionAvatar> avatarContainer;
+
+        private Sample? userAddedSample;
+        private double? lastSamplePlayback;
 
         public new Axes AutoSizeAxes
         {
@@ -40,6 +46,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Pick
             avatarContainer.RelativeSizeAxes = RelativeSizeAxes;
         }
 
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audio)
+        {
+            userAddedSample = audio.Samples.Get(@"Multiplayer/player-ready");
+        }
+
         public bool AddUser(APIUser user, bool isOwnUser)
         {
             if (avatars.ContainsKey(user.Id))
@@ -52,6 +64,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Pick
             };
 
             avatarContainer.Add(avatars[user.Id] = avatar);
+
+            if (lastSamplePlayback == null || Time.Current - lastSamplePlayback > OsuGameBase.SAMPLE_DEBOUNCE_TIME)
+            {
+                userAddedSample?.Play();
+                lastSamplePlayback = Time.Current;
+            }
 
             updateLayout();
 

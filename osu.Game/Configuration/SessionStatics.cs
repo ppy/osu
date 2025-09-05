@@ -8,6 +8,7 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osu.Game.Scoring;
+using osu.Game.Screens.OnlinePlay.Matchmaking;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Skinning;
 using osu.Game.Users;
@@ -28,6 +29,7 @@ namespace osu.Game.Configuration
             SetDefault(Static.LastHoverSoundPlaybackTime, (double?)null);
             SetDefault(Static.LastModSelectPanelSamplePlaybackTime, (double?)null);
             SetDefault(Static.LastRankChangeSamplePlaybackTime, (double?)null);
+            SetDefault(Static.LastMatchmakingCloudSamplePlaybackTime, (double?)null);
             SetDefault<APISeasonalBackgrounds?>(Static.SeasonalBackgrounds, null);
             SetDefault(Static.TouchInputActive, RuntimeInfo.IsMobile);
             SetDefault<ScoreInfo?>(Static.LastLocalUserScore, null);
@@ -80,6 +82,12 @@ namespace osu.Game.Configuration
         /// Used to debounce rank change sounds game-wide to avoid potential volume saturation from multiple simultaneous playback.
         /// </summary>
         LastRankChangeSamplePlaybackTime,
+
+        /// <summary>
+        /// The last playback time in milliseconds for the 'user appear' sample in <see cref="MatchmakingCloud"/>.
+        /// Used to debounce sample playback to avoid volume saturation from multiple simultaneous playback.
+        /// </summary>
+        LastMatchmakingCloudSamplePlaybackTime,
 
         /// <summary>
         /// Whether the last positional input received was a touch input.

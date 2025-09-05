@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Utils;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
@@ -90,7 +91,10 @@ namespace osu.Game.Tests.Visual.Matchmaking
                     var item = items[Random.Shared.Next(items.Length)];
                     selectedItems.Add(item.ID);
 
-                    MultiplayerClient.MatchmakingToggleUserSelection(user.Id, item.ID).FireAndForget();
+                    Scheduler.AddDelayed(() =>
+                    {
+                        MultiplayerClient.MatchmakingToggleUserSelection(user.Id, item.ID).FireAndForget();
+                    }, RNG.NextDouble(10, 1000));
                 }
             });
 
