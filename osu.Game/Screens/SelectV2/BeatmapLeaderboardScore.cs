@@ -652,7 +652,7 @@ namespace osu.Game.Screens.SelectV2
                 Font = OsuFont.Style.Caption1.With(weight: FontWeight.SemiBold);
             }
 
-            protected override string Format() => Date.ToShortRelativeTime(TimeSpan.FromSeconds(30));
+            protected override LocalisableString Format() => Date.ToShortRelativeTime(TimeSpan.FromSeconds(30));
         }
 
         private partial class ScoreComponentLabel : Container

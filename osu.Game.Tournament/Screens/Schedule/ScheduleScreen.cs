@@ -9,6 +9,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Models;
@@ -264,7 +265,7 @@ namespace osu.Game.Tournament.Screens.Schedule
             {
             }
 
-            protected override string Format() => Date < DateTimeOffset.Now
+            protected override LocalisableString Format() => Date < DateTimeOffset.Now
                 ? $"Started {base.Format()}"
                 : $"Starting {base.Format()}";
         }
