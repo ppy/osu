@@ -13,11 +13,13 @@ using osu.Game.Beatmaps.Legacy;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.IO;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Screens.Edit;
 using osu.Game.Utils;
+using osuTK;
 
 namespace osu.Game.Beatmaps.Formats
 {
@@ -331,6 +333,23 @@ namespace osu.Game.Beatmaps.Formats
 
                 case @"GridSize":
                     beatmap.GridSize = Parsing.ParseInt(pair.Value);
+                    break;
+
+                case @"GridType":
+                    beatmap.GridType = Enum.Parse<PositionSnapGridType>(pair.Value);
+                    break;
+
+                case @"GridRotation":
+                    beatmap.GridRotation = Parsing.ParseInt(pair.Value);
+                    break;
+
+                case @"GridOffset":
+                    float[] position = pair.Value.Split(',').Select(v =>
+                    {
+                        bool result = float.TryParse(v, out float val);
+                        return new { result, val };
+                    }).Where(p => p.result).Select(p => p.val).ToArray();
+                    beatmap.GridOffset = new Vector2(position[0], position[1]);
                     break;
 
                 case @"TimelineZoom":
