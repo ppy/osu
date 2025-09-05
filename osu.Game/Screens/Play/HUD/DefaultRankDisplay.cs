@@ -19,26 +19,23 @@ namespace osu.Game.Screens.Play.HUD
 {
     public partial class DefaultRankDisplay : CompositeDrawable, ISerialisableDrawable
     {
+        public bool UsesFixedAnchor { get; set; }
+
         [Resolved]
         private ScoreProcessor scoreProcessor { get; set; } = null!;
 
         [SettingSource(typeof(DefaultRankDisplayStrings), nameof(DefaultRankDisplayStrings.PlaySamplesOnRankChange))]
         public BindableBool PlaySamples { get; set; } = new BindableBool(true);
 
-        public bool UsesFixedAnchor { get; set; }
-
         private UpdateableRank rankDisplay = null!;
 
         private SkinnableSound rankDownSample = null!;
         private SkinnableSound rankUpSample = null!;
 
-        private Bindable<double?> lastSamplePlaybackTime = null!;
+        private Bindable<double?> lastSamplePlayback = null!;
+        private double lastRankUpdate;
 
-        private readonly Bindable<double?> lastRankChangeTime = new Bindable<double?>();
-
-        private IBindable<ScoreRank> rank = null!;
-
-        private ScoreRank lastRank;
+        private ScoreRank displayedRank;
 
         private const int minimum_update_rate = 3000;
 
@@ -63,44 +60,44 @@ namespace osu.Game.Screens.Play.HUD
             if (skinEditor != null)
                 PlaySamples.Value = false;
 
-            lastSamplePlaybackTime = statics.GetBindable<double?>(Static.LastRankChangeSamplePlaybackTime);
+            lastSamplePlayback = statics.GetBindable<double?>(Static.LastRankChangeSamplePlaybackTime);
         }
 
-        protected override void LoadComplete()
+        protected override void Update()
         {
-            base.LoadComplete();
+            base.Update();
 
-            rank = scoreProcessor.Rank.GetBoundCopy();
-            rank.BindValueChanged(r =>
+            var currentRank = scoreProcessor.Rank.Value;
+
+            if (currentRank != displayedRank)
             {
-                bool enoughTimeElapsed = !lastRankChangeTime.Value.HasValue || Time.Current - lastSamplePlaybackTime.Value >= minimum_update_rate;
+                bool enoughTimeElapsed = Time.Current - lastRankUpdate >= minimum_update_rate;
 
-                Scheduler.CancelDelayedTasks();
-                if (enoughTimeElapsed || r.NewValue == ScoreRank.F)
-                    onRankChange(r);
-                else
-                    Scheduler.AddDelayed(onRankChange, r, (double)lastRankChangeTime.Value! - Time.Current + minimum_update_rate);
-            }, true);
+                if (enoughTimeElapsed || currentRank == ScoreRank.F)
+                    updateRank(currentRank);
+            }
         }
 
-        private void onRankChange(ValueChangedEvent<ScoreRank> r)
+        private void updateRank(ScoreRank rank)
         {
-            bool enoughSampleTimeElapsed = !lastSamplePlaybackTime.Value.HasValue || Time.Current - lastSamplePlaybackTime.Value >= OsuGameBase.SAMPLE_DEBOUNCE_TIME;
+            rankDisplay.Rank = rank;
 
-            // Don't play rank-down sfx on quit/retry and entering
-            if (r.NewValue != lastRank && r.NewValue > ScoreRank.F && PlaySamples.Value && enoughSampleTimeElapsed && lastRankChangeTime.Value.HasValue)
+            // Check sample time separately to ensure two copies of the rank display don't both play samples on a change.
+            bool enoughSampleTimeElapsed = !lastSamplePlayback.Value.HasValue || Time.Current - lastSamplePlayback.Value >= OsuGameBase.SAMPLE_DEBOUNCE_TIME;
+
+            // Also don't play rank-down sfx on quit/retry/initial update.
+            if (rank != displayedRank && rank > ScoreRank.F && PlaySamples.Value && enoughSampleTimeElapsed && lastRankUpdate > 0)
             {
-                if (r.NewValue > lastRank)
+                if (rank > displayedRank)
                     rankUpSample.Play();
                 else
                     rankDownSample.Play();
 
-                lastSamplePlaybackTime.Value = Time.Current;
+                lastSamplePlayback.Value = Time.Current;
             }
 
-            rankDisplay.Rank = r.NewValue;
-            lastRank = r.NewValue;
-            lastRankChangeTime.Value = Time.Current;
+            displayedRank = rank;
+            lastRankUpdate = Time.Current;
         }
     }
 }
