@@ -281,6 +281,10 @@ namespace osu.Game.Beatmaps.Formats
                     beatmap.LetterboxInBreaks = Parsing.ParseInt(pair.Value) == 1;
                     break;
 
+                case @"StoryFireInFront":
+                    beatmap.ComboFireInFrontOfStoryboard = Parsing.ParseInt(pair.Value) == 1;
+                    break;
+
                 case @"SpecialStyle":
                     beatmap.SpecialStyle = Parsing.ParseInt(pair.Value) == 1;
                     break;
