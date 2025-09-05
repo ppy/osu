@@ -101,13 +101,15 @@ namespace osu.Game.Screens.SelectV2
             // Ctrl+Enter should start map with autoplay enabled.
             if (GetContainingInputManager()?.CurrentState?.Keyboard.ControlPressed == true)
             {
-                var autoInstance = getAutoplayMod();
+                // But Ctrl+Shift+Enter should start map with cinema instead
+                bool cinema = GetContainingInputManager()?.CurrentState?.Keyboard.ShiftPressed == true;
+                var autoInstance = cinema ? getCinemaMod() : getAutoplayMod();
 
                 if (autoInstance == null)
                 {
                     notifications?.Post(new SimpleNotification
                     {
-                        Text = NotificationsStrings.NoAutoplayMod
+                        Text = cinema ? NotificationsStrings.NoCinemaMod : NotificationsStrings.NoAutoplayMod
                     });
                     return;
                 }
@@ -167,6 +169,8 @@ namespace osu.Game.Screens.SelectV2
         }
 
         private ModAutoplay? getAutoplayMod() => Ruleset.Value.CreateInstance().GetAutoplayMod();
+
+        private ModCinema? getCinemaMod() => Ruleset.Value.CreateInstance().GetCinemaMod();
 
         private void revertMods()
         {
