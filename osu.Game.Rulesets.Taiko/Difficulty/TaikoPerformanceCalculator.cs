@@ -109,7 +109,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             difficultyValue *= lengthBonus;
 
             // Scales miss penalty by the total difficult hits of a map, making misses more punishing on maps with less total difficulty.
-            double missPenalty = Math.Pow(0.5, 30.0 / totalDifficultHits);
+            double missPenalty = 0.97 + 0.03 * totalDifficultHits / (totalDifficultHits + 1500);
             difficultyValue *= Math.Pow(missPenalty, countMiss);
 
             if (score.Mods.Any(m => m is ModHidden))
@@ -151,7 +151,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 accuracyValue *= 1.075;
 
             // Applies a bonus to maps with more total difficulty, calculating this with a map's total hits and consistency factor.
-            accuracyValue *= 1 + 0.4 * totalDifficultHits / (totalDifficultHits + 4000);
+            accuracyValue *= 1 + 0.3 * totalDifficultHits / (totalDifficultHits + 4000);
 
             // Applies a bonus to maps with more total memory required with HDFL.
             double memoryLengthBonus = Math.Min(1.15, Math.Pow(totalHits / 1500.0, 0.3));
