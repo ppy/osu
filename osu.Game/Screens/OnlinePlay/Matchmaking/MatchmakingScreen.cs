@@ -20,7 +20,6 @@ using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Online;
 using osu.Game.Online.Multiplayer;
-using osu.Game.Online.Multiplayer.MatchTypes.Matchmaking;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Dialog;
@@ -217,12 +216,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
 
         private void updateGameplayState()
         {
-            if (client.Room?.MatchState is not MatchmakingRoomState matchmakingState)
-                return;
-
-            if (matchmakingState.Stage != MatchmakingStage.WaitingForClientsBeatmapDownload)
-                return;
-
             MultiplayerPlaylistItem item = client.Room!.CurrentPlaylistItem;
             RulesetInfo ruleset = rulesets.GetRuleset(item.RulesetID)!;
             Ruleset rulesetInstance = ruleset.CreateInstance();
