@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
@@ -92,9 +93,9 @@ namespace osu.Game.Screens.Play.HUD
             }
         }
 
-        protected override void PopIn() => this.FadeIn(500, Easing.OutQuint);
+        protected override void PopIn() => Content.Children.ForEach(d => d.FadeIn(500, Easing.OutQuint));
 
-        protected override void PopOut() => this.FadeOut(100);
+        protected override void PopOut() => Content.Children.ForEach(d => d.FadeOut(100));
 
         protected override void Update()
         {
