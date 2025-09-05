@@ -8,6 +8,7 @@ using NUnit.Framework;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -30,7 +31,12 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             RemoveAllBeatmaps();
             CreateCarousel();
             WaitForFiltering();
-            AddBeatmaps(1, 3);
+            AddStep("add beatmap", () =>
+            {
+                var beatmap = CreateTestBeatmapSetInfo(3, false);
+                Realm.Write(r => r.Add(beatmap, update: true));
+                BeatmapSets.Add(beatmap.Detach());
+            });
             WaitForFiltering();
             AddStep("generate and add test beatmap", () =>
             {
@@ -44,7 +50,9 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
                 foreach (var b in baseTestBeatmap.Beatmaps)
                     b.Metadata = metadata;
-                BeatmapSets.Add(baseTestBeatmap);
+
+                Realm.Write(r => r.Add(baseTestBeatmap, update: true));
+                BeatmapSets.Add(baseTestBeatmap.Detach());
             });
             WaitForFiltering();
 
@@ -269,14 +277,17 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             updateBeatmap(null, bs =>
             {
                 string selectedName = bs.Beatmaps[0].DifficultyName;
+                Realm.Write(r => r.Remove(r.Find<BeatmapInfo>(bs.Beatmaps[0].ID)!));
                 bs.Beatmaps.RemoveAt(0);
 
                 var newBeatmap = createBeatmap(bs);
+                newBeatmap.ID = Guid.NewGuid();
                 newBeatmap.DifficultyName = selectedName;
                 newBeatmap.OnlineID = -1;
                 bs.Beatmaps.Add(newBeatmap);
 
                 newBeatmap = createBeatmap(bs);
+                newBeatmap.ID = Guid.NewGuid();
                 newBeatmap.DifficultyName = selectedName;
                 newBeatmap.OnlineID = -1;
                 bs.Beatmaps.Add(newBeatmap);
@@ -284,8 +295,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             WaitForFiltering();
 
-            AddAssert("selection is updateable beatmap", () => Carousel.CurrentBeatmap, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
-            AddAssert("visible panel is updateable beatmap", () => (GetSelectedPanel()?.Item?.Model as GroupedBeatmap)?.Beatmap, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
+            AddAssert("selection is updateable beatmap", () => Carousel.CurrentBeatmap, () => Is.EqualTo(BeatmapSets[1].Beatmaps[2]));
+            AddAssert("visible panel is updateable beatmap", () => (GetSelectedPanel()?.Item?.Model as GroupedBeatmap)?.Beatmap, () => Is.EqualTo(BeatmapSets[1].Beatmaps[2]));
         }
 
         /// <summary>
@@ -439,7 +450,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
                 int originalIndex = BeatmapSets.IndexOf(baseTestBeatmap);
 
-                BeatmapSets.ReplaceRange(originalIndex, 1, [updatedSet]);
+                Realm.Write(r => r.Add(updatedSet, update: true));
+                BeatmapSets.ReplaceRange(originalIndex, 1, [updatedSet.Detach()]);
             });
         }
 
