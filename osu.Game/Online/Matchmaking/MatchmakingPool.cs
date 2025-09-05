@@ -9,23 +9,31 @@ namespace osu.Game.Online.Matchmaking
 {
     [MessagePackObject]
     [Serializable]
-    public class MatchmakingSettings : IEquatable<MatchmakingSettings>
+    public class MatchmakingPool : IEquatable<MatchmakingPool>
     {
         [Key(0)]
-        public int RulesetId { get; set; }
+        public int Id { get; set; }
 
         [Key(1)]
+        public int RulesetId { get; set; }
+
+        [Key(2)]
         public int Variant { get; set; }
 
-        public bool Equals(MatchmakingSettings? other)
+        [Key(3)]
+        public string Name { get; set; } = string.Empty;
+
+        public bool Equals(MatchmakingPool? other)
             => other != null
+               && Id == other.Id
                && RulesetId == other.RulesetId
-               && Variant == other.Variant;
+               && Variant == other.Variant
+               && Name == other.Name;
 
         public override bool Equals(object? obj)
-            => obj is MatchmakingSettings other && Equals(other);
+            => obj is MatchmakingPool other && Equals(other);
 
         [SuppressMessage("ReSharper", "NonReadonlyMemberInGetHashCode")]
-        public override int GetHashCode() => HashCode.Combine(RulesetId, Variant);
+        public override int GetHashCode() => HashCode.Combine(Id, RulesetId, Variant, Name);
     }
 }
