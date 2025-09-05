@@ -109,7 +109,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
             config.BindWith(TaikoRulesetSetting.TouchControlScheme, configTouchControlScheme);
             config.BindWith(TaikoRulesetSetting.DrumTouchSize, configDrumTouchSize);
-            
+
             configTouchControlScheme.BindValueChanged(scheme =>
             {
                 var actions = getOrderedActionsForScheme(scheme.NewValue);
@@ -119,7 +119,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                 rightCentre.Action = actions[2];
                 rightRim.Action = actions[3];
             }, true);
-            
+
             configDrumTouchSize.BindValueChanged(size =>
             {
                 mainContent.Scale = new Vector2(size.NewValue);

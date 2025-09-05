@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
             AddStep("change scheme (kddk)", () => controlScheme.Value = TaikoTouchControlScheme.KDDK);
             AddStep("change scheme (kkdd)", () => controlScheme.Value = TaikoTouchControlScheme.KKDD);
             AddStep("change scheme (ddkk)", () => controlScheme.Value = TaikoTouchControlScheme.DDKK);
-            
+
             AddStep("set drum size (small)", () => drumSize.Value = 0.5f);
             AddStep("set drum size (normal)", () => drumSize.Value = 1.0f);
             AddStep("set drum size (large)", () => drumSize.Value = 1.5f);
