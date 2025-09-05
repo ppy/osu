@@ -2,8 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
-using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Results;
 using osu.Game.Tests.Visual.Multiplayer;
 
@@ -15,14 +13,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
         {
             base.SetUpSteps();
 
-            AddStep("add statistic", () => Child = new RoomStatisticPanel("Statistic description", new MultiplayerRoomUser(1)
-            {
-                User = new APIUser
-                {
-                    Id = 1,
-                    Username = "peppy"
-                }
-            })
+            AddStep("add statistic", () => Child = new RoomStatisticPanel("Statistic description", 1)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre
