@@ -51,7 +51,7 @@ namespace osu.Game.Screens.Play.HUD
             {
                 rankDownSample = new SkinnableSound(new SampleInfo("Gameplay/rank-down")),
                 rankUpSample = new SkinnableSound(new SampleInfo("Gameplay/rank-up")),
-                rankDisplay = new UpdateableRank(ScoreRank.X)
+                rankDisplay = new UpdateableRank
                 {
                     RelativeSizeAxes = Axes.Both
                 },
