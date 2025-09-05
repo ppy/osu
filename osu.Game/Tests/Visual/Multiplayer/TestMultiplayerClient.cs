@@ -750,6 +750,18 @@ namespace osu.Game.Tests.Visual.Multiplayer
             await ((IMultiplayerClient)this).MatchRoomStateChanged(clone(ServerRoom.MatchState)).ConfigureAwait(false);
         }
 
+        public override Task<MatchmakingPool[]> GetMatchmakingPools()
+        {
+            return Task.FromResult<MatchmakingPool[]>(
+            [
+                new MatchmakingPool { Id = 0, RulesetId = 0 },
+                new MatchmakingPool { Id = 1, RulesetId = 1 },
+                new MatchmakingPool { Id = 2, RulesetId = 2 },
+                new MatchmakingPool { Id = 3, RulesetId = 3, Variant = 4 },
+                new MatchmakingPool { Id = 4, RulesetId = 3, Variant = 7 },
+            ]);
+        }
+
         public override Task MatchmakingJoinLobby()
         {
             return Task.CompletedTask;
@@ -760,7 +772,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             return Task.CompletedTask;
         }
 
-        public override async Task MatchmakingJoinQueue(MatchmakingSettings settings)
+        public override async Task MatchmakingJoinQueue(int poolId)
         {
             await ((IMatchmakingClient)this).MatchmakingQueueJoined().ConfigureAwait(false);
             await ((IMatchmakingClient)this).MatchmakingQueueStatusChanged(new MatchmakingQueueStatus.Searching()).ConfigureAwait(false);
