@@ -30,6 +30,13 @@ namespace osu.Game.Rulesets.Taiko
                 {
                     LabelText = RulesetSettingsStrings.TouchControlScheme,
                     Current = config.GetBindable<TaikoTouchControlScheme>(TaikoRulesetSetting.TouchControlScheme)
+                },
+                new SettingsSlider<float>
+                {
+                    LabelText = RulesetSettingsStrings.DrumTouchSize,
+                    Current = config.GetBindable<float>(TaikoRulesetSetting.DrumTouchSize),
+                    KeyboardStep = 0.1f,
+                    DisplayAsPercentage = true
                 }
             };
         }
