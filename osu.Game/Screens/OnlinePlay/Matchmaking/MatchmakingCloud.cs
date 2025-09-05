@@ -3,9 +3,14 @@
 
 using System;
 using System.Linq;
+using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Utils;
+using osu.Game.Configuration;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Screens.Ranking;
 using osuTK;
@@ -64,6 +69,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
             private float targetScale;
             private float targetAlpha;
 
+            private Bindable<double?> lastSamplePlaybackTime = null!;
+
+            private Sample? playerAppearSample;
+
             public MovingAvatar(APIUser apiUser)
                 : base(apiUser)
             {
@@ -71,6 +80,13 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
                 Scale = new Vector2(2);
 
                 Origin = Anchor.Centre;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(AudioManager audio, SessionStatics statics)
+            {
+                playerAppearSample = audio.Samples.Get(@"UI/toolbar-hover");
+                lastSamplePlaybackTime = statics.GetBindable<double?>(Static.LastMatchmakingCloudSamplePlaybackTime);
             }
 
             protected override void LoadComplete()
@@ -85,7 +101,22 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
                 Scale = new Vector2(targetScale);
 
                 Hide();
-                this.Delay(RNG.Next(0, 1000)).FadeTo(targetAlpha, 2000, Easing.OutQuint);
+                int appearDelay = RNG.Next(0, 1000);
+                this.Delay(appearDelay).FadeTo(targetAlpha, 2000, Easing.OutQuint);
+                Scheduler.AddDelayed(() =>
+                {
+                    bool enoughTimeElapsed = !lastSamplePlaybackTime.Value.HasValue || Time.Current - lastSamplePlaybackTime.Value >= OsuGameBase.SAMPLE_DEBOUNCE_TIME;
+                    if (!enoughTimeElapsed) return;
+
+                    var chan = playerAppearSample?.GetChannel();
+
+                    if (chan == null) return;
+
+                    chan.Frequency.Value = 1f + RNG.NextDouble(0.25f);
+                    chan.Play();
+
+                    lastSamplePlaybackTime.Value = Time.Current;
+                }, appearDelay);
             }
 
             private void updateParams()
