@@ -13,6 +13,7 @@ using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
+using osu.Game.Tournament.Localisation;
 using osu.Game.Tournament.Models;
 using osuTK.Graphics;
 
@@ -82,25 +83,25 @@ namespace osu.Game.Tournament.Components
                             {
                                 new TournamentSpriteText
                                 {
-                                    Text = "mapper",
+                                    Text = BaseStrings.Mapper,
                                     Padding = new MarginPadding { Right = 5 },
                                     Font = OsuFont.Torus.With(weight: FontWeight.Regular, size: 14)
                                 },
                                 new TournamentSpriteText
                                 {
-                                    Text = Beatmap?.Metadata.Author.Username ?? "unknown",
+                                    Text = Beatmap?.Metadata.Author.Username ?? BaseStrings.Unknown,
                                     Padding = new MarginPadding { Right = 20 },
                                     Font = OsuFont.Torus.With(weight: FontWeight.Bold, size: 14)
                                 },
                                 new TournamentSpriteText
                                 {
-                                    Text = "difficulty",
+                                    Text = BaseStrings.Difficulty,
                                     Padding = new MarginPadding { Right = 5 },
                                     Font = OsuFont.Torus.With(weight: FontWeight.Regular, size: 14)
                                 },
                                 new TournamentSpriteText
                                 {
-                                    Text = Beatmap?.DifficultyName ?? "unknown",
+                                    Text = Beatmap?.DifficultyName ?? BaseStrings.Unknown,
                                     Font = OsuFont.Torus.With(weight: FontWeight.Bold, size: 14)
                                 },
                             }

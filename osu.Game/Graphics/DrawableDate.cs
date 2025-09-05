@@ -5,6 +5,7 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Localisation;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Utils;
 
@@ -71,7 +72,7 @@ namespace osu.Game.Graphics
             Scheduler.AddDelayed(updateTimeWithReschedule, timeUntilNextUpdate);
         }
 
-        protected virtual string Format() => HumanizerUtils.Humanize(Date);
+        protected virtual LocalisableString Format() => HumanizerUtils.Humanize(Date);
 
         private void updateTime() => Text = Format();
 

@@ -15,6 +15,7 @@ using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.IPC;
+using osu.Game.Tournament.Localisation.Screens;
 using osuTK;
 
 namespace osu.Game.Tournament.Screens.Setup
@@ -73,7 +74,7 @@ namespace osu.Game.Tournament.Screens.Setup
                                     {
                                         Anchor = Anchor.Centre,
                                         Origin = Anchor.Centre,
-                                        Text = "Please select a new location",
+                                        Text = StablePathSelectStrings.PathSelectTitle,
                                         Font = OsuFont.Default.With(size: 40)
                                     },
                                 },
@@ -99,7 +100,7 @@ namespace osu.Game.Tournament.Screens.Setup
                                                 Anchor = Anchor.Centre,
                                                 Origin = Anchor.Centre,
                                                 Width = 300,
-                                                Text = "Select stable path",
+                                                Text = StablePathSelectStrings.SelectStablePath,
                                                 Action = ChangePath
                                             },
                                             new RoundedButton
@@ -107,7 +108,7 @@ namespace osu.Game.Tournament.Screens.Setup
                                                 Anchor = Anchor.Centre,
                                                 Origin = Anchor.Centre,
                                                 Width = 300,
-                                                Text = "Auto detect",
+                                                Text = StablePathSelectStrings.AutoDetect,
                                                 Action = AutoDetect
                                             },
                                         }
@@ -136,7 +137,7 @@ namespace osu.Game.Tournament.Screens.Setup
             if (!fileBasedIpc?.SetIPCLocation(target) ?? true)
             {
                 overlay = new DialogOverlay();
-                overlay.Push(new IPCErrorDialog("This is an invalid IPC Directory", "Select a directory that contains an osu! stable cutting edge installation and make sure it has an empty ipc.txt file in it."));
+                overlay.Push(new IPCErrorDialog(StablePathSelectStrings.InvalidDirectoryTitle, StablePathSelectStrings.InvalidDirectoryText));
                 AddInternal(overlay);
                 Logger.Log("Folder is not an osu! stable CE directory");
                 return;
@@ -152,7 +153,7 @@ namespace osu.Game.Tournament.Screens.Setup
             if (!fileBasedIpc?.AutoDetectIPCLocation() ?? true)
             {
                 overlay = new DialogOverlay();
-                overlay.Push(new IPCErrorDialog("Failed to auto detect", "An osu! stable cutting-edge installation could not be auto detected.\nPlease try and manually point to the directory."));
+                overlay.Push(new IPCErrorDialog(StablePathSelectStrings.DetectFailureTitle, StablePathSelectStrings.DetectFailureText));
                 AddInternal(overlay);
             }
             else

@@ -5,6 +5,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
+using osu.Game.Tournament.Localisation;
 using osuTK;
 using osuTK.Graphics;
 
@@ -22,6 +23,7 @@ namespace osu.Game.Tournament.Components
 
         public ControlPanel()
         {
+            Name = "Control Panel Sidebar";
             RelativeSizeAxes = Axes.Y;
             AlwaysPresent = true;
             Width = TournamentSceneManager.CONTROL_AREA_WIDTH;
@@ -38,7 +40,7 @@ namespace osu.Game.Tournament.Components
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
-                    Text = "Control Panel",
+                    Text = BaseStrings.ControlPanel,
                     Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 22)
                 },
                 buttons = new FillFlowContainer

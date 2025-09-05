@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Bindables;
+using osu.Game.Tournament.Localisation;
 using osu.Game.Tournament.Models;
 
 namespace osu.Game.Tournament.Screens
@@ -23,7 +24,7 @@ namespace osu.Game.Tournament.Screens
         {
             if (match.NewValue == null)
             {
-                AddInternal(noMatchWarning = new WarningBox("Choose a match first from the brackets screen"));
+                AddInternal(noMatchWarning = new WarningBox(BaseStrings.NoMatchWarning));
                 return;
             }
 

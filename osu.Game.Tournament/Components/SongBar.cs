@@ -8,13 +8,16 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Models;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Menu;
+using osu.Game.Tournament.Localisation;
 using osu.Game.Utils;
 using osuTK;
 using osuTK.Graphics;
@@ -147,12 +150,12 @@ namespace osu.Game.Tournament.Components
                 srExtra = "*";
             }
 
-            (string heading, string content)[] stats;
+            (LocalisableString heading, LocalisableString content)[] stats;
 
             switch (ruleset.Value.OnlineID)
             {
                 default:
-                    stats = new (string heading, string content)[]
+                    stats = new (LocalisableString heading, LocalisableString content)[]
                     {
                         ("CS", $"{beatmap.Difficulty.CircleSize:0.#}{hardRockExtra}"),
                         ("AR", $"{ar:0.#}{hardRockExtra}"),
@@ -162,7 +165,7 @@ namespace osu.Game.Tournament.Components
 
                 case 1:
                 case 3:
-                    stats = new (string heading, string content)[]
+                    stats = new (LocalisableString heading, LocalisableString content)[]
                     {
                         ("OD", $"{beatmap.Difficulty.OverallDifficulty:0.#}{hardRockExtra}"),
                         ("HP", $"{beatmap.Difficulty.DrainRate:0.#}{hardRockExtra}")
@@ -170,7 +173,7 @@ namespace osu.Game.Tournament.Components
                     break;
 
                 case 2:
-                    stats = new (string heading, string content)[]
+                    stats = new (LocalisableString heading, LocalisableString content)[]
                     {
                         ("CS", $"{beatmap.Difficulty.CircleSize:0.#}{hardRockExtra}"),
                         ("AR", $"{ar:0.#}"),
@@ -208,7 +211,7 @@ namespace osu.Game.Tournament.Components
                                         Children = new Drawable[]
                                         {
                                             new DiffPiece(stats),
-                                            new DiffPiece(("Star Rating", $"{beatmap.StarRating.FormatStarRating()}{srExtra}"))
+                                            new DiffPiece((BeatmapsetsStrings.ShowStatsStars, $"{beatmap.StarRating.FormatStarRating()}{srExtra}"))
                                         }
                                     },
                                     new FillFlowContainer
@@ -220,8 +223,8 @@ namespace osu.Game.Tournament.Components
                                         Direction = FillDirection.Vertical,
                                         Children = new Drawable[]
                                         {
-                                            new DiffPiece(("Length", length.ToFormattedDuration().ToString())),
-                                            new DiffPiece(("BPM", $"{bpm:0.#}")),
+                                            new DiffPiece((BaseStrings.BeatmapLength, length.ToFormattedDuration().ToString())),
+                                            new DiffPiece((BeatmapsetsStrings.ShowStatsBpm, $"{bpm:0.#}")),
                                         }
                                     },
                                     new Container
@@ -264,7 +267,7 @@ namespace osu.Game.Tournament.Components
 
         public partial class DiffPiece : TextFlowContainer
         {
-            public DiffPiece(params (string heading, string content)[] tuples)
+            public DiffPiece(params (LocalisableString heading, LocalisableString content)[] tuples)
             {
                 Margin = new MarginPadding { Horizontal = 15, Vertical = 1 };
                 AutoSizeAxes = Axes.Both;
@@ -276,7 +279,7 @@ namespace osu.Game.Tournament.Components
 
                 for (int i = 0; i < tuples.Length; i++)
                 {
-                    (string heading, string content) = tuples[i];
+                    (LocalisableString heading, LocalisableString content) = tuples[i];
 
                     if (i > 0)
                     {

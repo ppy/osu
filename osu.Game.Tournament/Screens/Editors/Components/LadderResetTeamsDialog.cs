@@ -4,6 +4,7 @@
 using System;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Overlays.Dialog;
+using osu.Game.Tournament.Localisation;
 
 namespace osu.Game.Tournament.Screens.Editors.Components
 {
@@ -11,7 +12,7 @@ namespace osu.Game.Tournament.Screens.Editors.Components
     {
         public LadderResetTeamsDialog(Action action)
         {
-            HeaderText = @"Reset teams?";
+            HeaderText = DialogStrings.ResetTeamsPrompt;
             Icon = FontAwesome.Solid.Undo;
             DangerousAction = action;
         }

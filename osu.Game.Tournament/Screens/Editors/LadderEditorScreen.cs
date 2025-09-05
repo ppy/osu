@@ -15,6 +15,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Edit.Compose.Components;
 using osu.Game.Tournament.Components;
 using osu.Game.Overlays;
+using osu.Game.Tournament.Localisation.Screens;
 using osu.Game.Tournament.Models;
 using osu.Game.Tournament.Screens.Editors.Components;
 using osu.Game.Tournament.Screens.Ladder;
@@ -49,7 +50,7 @@ namespace osu.Game.Tournament.Screens.Editors
                 Child = new LadderEditorSettings(),
             });
 
-            AddInternal(rightClickMessage = new WarningBox("Right click to place and link matches"));
+            AddInternal(rightClickMessage = new WarningBox(BracketEditorStrings.EmptyBracketPrompt));
 
             ScrollContent.Add(grid = new RectangularPositionSnapGrid
             {
@@ -94,7 +95,7 @@ namespace osu.Game.Tournament.Screens.Editors
         public MenuItem[] ContextMenuItems =>
             new MenuItem[]
             {
-                new OsuMenuItem("Create new match", MenuItemType.Highlighted, () =>
+                new OsuMenuItem(BracketEditorStrings.CreateNewMatch, MenuItemType.Highlighted, () =>
                 {
                     Vector2 pos = MatchesContainer.Count == 0 ? Vector2.Zero : lastMatchesContainerMouseDownPosition;
 
@@ -104,7 +105,7 @@ namespace osu.Game.Tournament.Screens.Editors
 
                     editorInfo.Selected.Value = newMatch;
                 }),
-                new OsuMenuItem("Reset teams", MenuItemType.Destructive, () =>
+                new OsuMenuItem(BracketEditorStrings.ResetTeams, MenuItemType.Destructive, () =>
                 {
                     dialogOverlay?.Push(new LadderResetTeamsDialog(() =>
                     {

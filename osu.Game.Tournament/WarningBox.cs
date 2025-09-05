@@ -4,6 +4,7 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osuTK.Graphics;
 
@@ -11,7 +12,7 @@ namespace osu.Game.Tournament
 {
     internal partial class WarningBox : Container
     {
-        public WarningBox(string text)
+        public WarningBox(LocalisableString text)
         {
             Masking = true;
             CornerRadius = 5;

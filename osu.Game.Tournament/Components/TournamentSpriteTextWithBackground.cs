@@ -4,6 +4,7 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 
 namespace osu.Game.Tournament.Components
@@ -14,7 +15,7 @@ namespace osu.Game.Tournament.Components
 
         protected readonly Box Background;
 
-        public TournamentSpriteTextWithBackground(string text = "")
+        public TournamentSpriteTextWithBackground(LocalisableString? text = null)
         {
             AutoSizeAxes = Axes.Both;
 
@@ -30,7 +31,7 @@ namespace osu.Game.Tournament.Components
                     Colour = TournamentGame.ELEMENT_FOREGROUND_COLOUR,
                     Font = OsuFont.Torus.With(weight: FontWeight.SemiBold, size: 50),
                     Padding = new MarginPadding { Left = 10, Right = 20 },
-                    Text = text,
+                    Text = text ?? "",
                 }
             };
         }

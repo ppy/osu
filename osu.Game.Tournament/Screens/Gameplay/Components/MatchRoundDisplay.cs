@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Tournament.Components;
+using osu.Game.Tournament.Localisation;
 using osu.Game.Tournament.Models;
 
 namespace osu.Game.Tournament.Screens.Gameplay.Components
@@ -20,6 +21,6 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
         }
 
         private void matchChanged(ValueChangedEvent<TournamentMatch?> match) =>
-            Text.Text = match.NewValue?.Round.Value?.Name.Value ?? "Unknown Round";
+            Text.Text = match.NewValue?.Round.Value?.Name.Value ?? BaseStrings.UnknownRound;
     }
 }

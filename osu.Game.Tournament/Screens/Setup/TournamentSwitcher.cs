@@ -6,6 +6,8 @@ using osu.Framework.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Tournament.IO;
+using osu.Game.Tournament.Localisation;
+using osu.Game.Tournament.Localisation.Screens;
 
 namespace osu.Game.Tournament.Screens.Setup
 {
@@ -36,7 +38,7 @@ namespace osu.Game.Tournament.Screens.Setup
             };
             folderButton.Action = () => storage.PresentExternally();
 
-            ButtonText = "Close osu!";
+            ButtonText = SetupStrings.CloseOsu;
         }
 
         protected override Drawable CreateComponent()
@@ -45,13 +47,13 @@ namespace osu.Game.Tournament.Screens.Setup
 
             FlowContainer.Insert(-1, folderButton = new RoundedButton
             {
-                Text = "Open folder",
+                Text = SetupStrings.OpenFolder,
                 Width = BUTTON_SIZE
             });
 
             FlowContainer.Insert(-2, reloadTournamentsButton = new RoundedButton
             {
-                Text = "Refresh",
+                Text = BaseStrings.Refresh,
                 Width = BUTTON_SIZE
             });
 

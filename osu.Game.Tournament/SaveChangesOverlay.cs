@@ -12,6 +12,7 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Tournament.Localisation;
 using osuTK;
 
 namespace osu.Game.Tournament
@@ -44,7 +45,7 @@ namespace osu.Game.Tournament
                     },
                     saveChangesButton = new TourneyButton
                     {
-                        Text = "Save Changes",
+                        Text = BaseStrings.SaveChanges,
                         RelativeSizeAxes = Axes.None,
                         Width = 140,
                         Height = 50,

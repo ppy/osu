@@ -2,13 +2,15 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Game.Overlays.Dialog;
+using osu.Game.Tournament.Localisation;
 
 namespace osu.Game.Tournament.Components
 {
     public partial class IPCErrorDialog : PopupDialog
     {
-        public IPCErrorDialog(string headerText, string bodyText)
+        public IPCErrorDialog(LocalisableString headerText, LocalisableString bodyText)
         {
             Icon = FontAwesome.Regular.SadTear;
             HeaderText = headerText;
@@ -17,7 +19,7 @@ namespace osu.Game.Tournament.Components
             {
                 new PopupDialogOkButton
                 {
-                    Text = @"Alright.",
+                    Text = BaseStrings.Okay,
                     Action = () => Expire()
                 }
             };

@@ -6,6 +6,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
+using osu.Game.Tournament.Localisation.Screens;
 using osu.Game.Tournament.Models;
 
 namespace osu.Game.Tournament.Screens.Ladder.Components
@@ -46,8 +47,9 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                 }
             };
 
+            // For i18n purposes, the upper conversion is unavailable now.
             name = round.Name.GetBoundCopy();
-            name.BindValueChanged(_ => textName.Text = ((losers ? "Losers " : "") + round.Name).ToUpperInvariant(), true);
+            name.BindValueChanged(_ => textName.Text = losers ? BracketEditorStrings.LosersRound(name.Value) : name.Value, true);
 
             description = round.Description.GetBoundCopy();
             description.BindValueChanged(_ => textDescription.Text = round.Description.Value?.ToUpperInvariant() ?? string.Empty, true);
