@@ -1,7 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Mania.Beatmaps;
@@ -35,13 +35,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
 
                     for (int column = 0; column < columnCount; column++)
                     {
-                        var columnObjects = new List<ManiaHitObject>();
-
-                        foreach (var obj in beatmap.HitObjects)
-                        {
-                            if (obj.Column == column)
-                                columnObjects.Add(obj);
-                        }
+                        var columnObjects = beatmap.HitObjects.Where(obj => obj.Column == column).ToList();
 
                         columnObjects.Sort((a, b) => a.StartTime.CompareTo(b.StartTime));
 
