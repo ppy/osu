@@ -42,13 +42,22 @@ namespace osu.Game.Rulesets.Mania
             var bindings = new List<KeyBinding>();
 
             for (int i = LeftKeys.Length - columns / 2; i < LeftKeys.Length; i++)
-                bindings.Add(new KeyBinding(LeftKeys[i], currentAction++));
+            {
+                bindings.Add(new KeyBinding(LeftKeys[i], currentAction));
+                bindings.Add(new KeyBinding(InputKey.None, currentAction++));
+            }
 
             if (columns % 2 == 1)
-                bindings.Add(new KeyBinding(SpecialKey, currentAction++));
+            {
+                bindings.Add(new KeyBinding(SpecialKey, currentAction));
+                bindings.Add(new KeyBinding(InputKey.None, currentAction++));
+            }
 
             for (int i = 0; i < columns / 2; i++)
-                bindings.Add(new KeyBinding(RightKeys[i], currentAction++));
+            {
+                bindings.Add(new KeyBinding(RightKeys[i], currentAction));
+                bindings.Add(new KeyBinding(InputKey.None, currentAction++));
+            }
 
             return bindings;
         }

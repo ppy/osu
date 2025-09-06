@@ -118,7 +118,7 @@ namespace osu.Game.Screens.Menu
                 .FadeOutFromOne(2000, Easing.OutQuint);
         }
 
-        private const int available_tips = 29;
+        private const int available_tips = 30;
 
         private LocalisableString getRandomTip()
         {
@@ -216,6 +216,9 @@ namespace osu.Game.Screens.Menu
 
                 case 28:
                     return MenuTipStrings.RightMouseAbsoluteScroll;
+
+                case 29:
+                    return MenuTipStrings.ShiftClickInBeatmapOverlay;
             }
 
             return string.Empty;

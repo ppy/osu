@@ -1019,6 +1019,49 @@ namespace osu.Game.Tests.Database
         }
 
         [Test]
+        public void TestBeatmapFilesInNestedDirectoriesAreIgnored()
+        {
+            RunTestWithRealmAsync(async (realm, storage) =>
+            {
+                var importer = new BeatmapImporter(storage, realm);
+                using var store = new RealmRulesetStore(realm, storage);
+
+                string? temp = TestResources.GetTestBeatmapForImport();
+
+                string extractedFolder = $"{temp}_extracted";
+                Directory.CreateDirectory(extractedFolder);
+
+                try
+                {
+                    using (var zip = ZipArchive.Open(temp))
+                        zip.WriteToDirectory(extractedFolder);
+
+                    var subdirectory = Directory.CreateDirectory(Path.Combine(extractedFolder, "subdir"));
+                    string modifiedCopyPath = Path.Combine(subdirectory.FullName, "duplicate.osu");
+                    File.Copy(Directory.GetFiles(extractedFolder, "*.osu").First(), modifiedCopyPath);
+
+                    using (var stream = File.OpenWrite(modifiedCopyPath))
+                    using (var textWriter = new StreamWriter(stream))
+                        await textWriter.WriteLineAsync("# adding a comment so that the hashes are different");
+
+                    using (var zip = ZipArchive.Create())
+                    {
+                        zip.AddAllFromDirectory(extractedFolder);
+                        zip.SaveTo(temp, new ZipWriterOptions(CompressionType.Deflate));
+                    }
+
+                    await importer.Import(temp);
+
+                    EnsureLoaded(realm.Realm);
+                }
+                finally
+                {
+                    Directory.Delete(extractedFolder, true);
+                }
+            });
+        }
+
+        [Test]
         public void TestImportNestedStructure()
         {
             RunTestWithRealmAsync(async (realm, storage) =>

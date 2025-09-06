@@ -3,8 +3,10 @@
 
 using System;
 using System.Collections.Generic;
+using osu.Game.Online.Matchmaking;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.Countdown;
+using osu.Game.Online.Multiplayer.MatchTypes.Matchmaking;
 using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
 using osu.Game.Users;
 
@@ -45,6 +47,13 @@ namespace osu.Game.Online
             (typeof(UserActivity.TestingBeatmap), typeof(UserActivity)),
             (typeof(UserActivity.InDailyChallengeLobby), typeof(UserActivity)),
             (typeof(UserActivity.PlayingDailyChallenge), typeof(UserActivity)),
+
+            // matchmaking
+            (typeof(MatchmakingQueueStatus.Searching), typeof(MatchmakingQueueStatus)),
+            (typeof(MatchmakingQueueStatus.MatchFound), typeof(MatchmakingQueueStatus)),
+            (typeof(MatchmakingQueueStatus.JoiningMatch), typeof(MatchmakingQueueStatus)),
+            (typeof(MatchmakingRoomState), typeof(MatchRoomState)),
+            (typeof(MatchmakingStageCountdown), typeof(MultiplayerCountdown))
         };
     }
 }

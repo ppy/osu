@@ -183,7 +183,7 @@ namespace osu.Game.Screens.Play
         {
             if (this.GetChildScreen() is SpectatorPlayerLoader loader)
             {
-                if (loader.GetChildScreen() is SpectatorPlayer player)
+                if (loader.GetChildScreen() is SoloSpectatorPlayer player)
                 {
                     player.AllowFail();
                     resetStartState();

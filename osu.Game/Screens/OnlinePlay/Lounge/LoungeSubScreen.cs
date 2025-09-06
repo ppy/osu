@@ -173,7 +173,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                                         {
                                             d.Anchor = Anchor.BottomLeft;
                                             d.Origin = Anchor.BottomLeft;
-                                            d.Size = new Vector2(150, 37.5f);
+                                            d.Size = new Vector2(150, 30f);
                                             d.Action = () => Open();
                                         })),
                                         new FillFlowContainer
