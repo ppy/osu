@@ -15,8 +15,6 @@ namespace osu.Game.Beatmaps.Formats
 
         public const double MAX_PARSE_VALUE = int.MaxValue;
 
-        public const string VECTOR_PATTERN = @"\((.+)\; (.+)\)";
-
         public static float ParseFloat(string input, float parseLimit = (float)MAX_PARSE_VALUE, bool allowNaN = false)
         {
             float output = float.Parse(input, CultureInfo.InvariantCulture);
