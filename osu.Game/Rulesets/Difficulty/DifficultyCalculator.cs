@@ -399,7 +399,7 @@ namespace osu.Game.Rulesets.Difficulty
                 set => baseBeatmap.DistanceSpacing = value;
             }
 
-            public int GridSize
+            public float GridSize
             {
                 get => baseBeatmap.GridSize;
                 set => baseBeatmap.GridSize = value;
@@ -411,7 +411,7 @@ namespace osu.Game.Rulesets.Difficulty
                 set => baseBeatmap.GridType = value;
             }
 
-            public int GridRotation
+            public float GridRotation
             {
                 get => baseBeatmap.GridRotation;
                 set => baseBeatmap.GridRotation = value;

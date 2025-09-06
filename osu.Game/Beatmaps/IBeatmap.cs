@@ -97,11 +97,11 @@ namespace osu.Game.Beatmaps
         /// </remarks>
         double DistanceSpacing { get; internal set; }
 
-        int GridSize { get; internal set; }
+        float GridSize { get; internal set; }
 
         PositionSnapGridType GridType { get; internal set; }
 
-        int GridRotation { get; internal set; }
+        float GridRotation { get; internal set; }
 
         Vector2 GridOffset { get; internal set; }
 

@@ -332,7 +332,7 @@ namespace osu.Game.Beatmaps.Formats
                     break;
 
                 case @"GridSize":
-                    beatmap.GridSize = Parsing.ParseInt(pair.Value);
+                    beatmap.GridSize = Parsing.ParseFloat(pair.Value);
                     break;
 
                 case @"GridType":
@@ -340,7 +340,7 @@ namespace osu.Game.Beatmaps.Formats
                     break;
 
                 case @"GridRotation":
-                    beatmap.GridRotation = Parsing.ParseInt(pair.Value);
+                    beatmap.GridRotation = Parsing.ParseFloat(pair.Value);
                     break;
 
                 case @"GridOffset":

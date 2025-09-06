@@ -258,7 +258,7 @@ namespace osu.Game.Screens.Edit
             set => PlayableBeatmap.DistanceSpacing = value;
         }
 
-        public int GridSize
+        public float GridSize
         {
             get => PlayableBeatmap.GridSize;
             set => PlayableBeatmap.GridSize = value;
@@ -270,7 +270,7 @@ namespace osu.Game.Screens.Edit
             set => PlayableBeatmap.GridType = value;
         }
 
-        public int GridRotation
+        public float GridRotation
         {
             get => PlayableBeatmap.GridRotation;
             set => PlayableBeatmap.GridRotation = value;
