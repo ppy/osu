@@ -142,14 +142,15 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         /// Ensures that difficulty sorting still works and that any other sort mode will sort first by
         /// itself then by the starrating
         /// </summary>
-        [Test]
-        public async Task TestSeparateAllDifficultySort()
+        [TestCase(5, 4)]
+        [TestCase(6, 5)]
+        [TestCase(7, 7)]
+        [TestCase(8, 8)]
+        public async Task TestSeparateAllDifficultySort(int amountOfSets, int amountOfBeatmaps)
         {
             List<BeatmapSetInfo> beatmapSets = new List<BeatmapSetInfo>();
-            const int amountofsets = 4;
-            const int amountofbeatmaps = 2;
 
-            for (int i = 0; i < amountofsets; i++)
+            for (int i = 0; i < amountOfSets; i++)
             {
                 int numberMetadata = (i - i % 2) / 2;
                 DateTimeOffset dateTimeOffset = new DateTimeOffset(2000, 1, 1, 12, 1, numberMetadata, new TimeSpan());
@@ -162,7 +163,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                     DateSubmitted = dateTimeOffset,
                 };
 
-                for (int j = 0; j < amountofbeatmaps; j++)
+                for (int j = 0; j < amountOfBeatmaps; j++)
                 {
                     var metadata = new BeatmapMetadata
                     {
@@ -174,8 +175,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
                     double starRating = 0;
                     //Creates a stable pattern of "unsorted" starratings (0, n-1, 2, n-3, 4, n-5)
-                    int odd = amountofbeatmaps % 2 == 1 ? 1 : 0;
-                    starRating = j % 2 == 0 ? j : amountofbeatmaps - odd - j;
+                    int odd = amountOfBeatmaps % 2 == 1 ? 1 : 0;
+                    starRating = j % 2 == 0 ? j : amountOfBeatmaps - odd - j;
                     double bpm = numberMetadata * 30;
                     double length = numberMetadata * 20;
 
@@ -203,21 +204,21 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
                 var sortModeResults = await runSorting(sortMode, true, beatmapSets);
 
-                Assert.That(sortModeResults.Count(), Is.EqualTo(amountofsets * amountofbeatmaps));
+                Assert.That(sortModeResults.Count(), Is.EqualTo(amountOfSets * amountOfBeatmaps));
 
-                for (int i = 0; i < amountofsets * amountofbeatmaps; ++i)
+                for (int i = 0; i < amountOfSets * amountOfBeatmaps; ++i)
                 {
-                    Assert.That(sortModeResults.Skip(i).First().StarRating, Is.EqualTo(i % amountofbeatmaps), () => $"{sortMode} incorrectly sorts.");
+                    Assert.That(sortModeResults.Skip(i).First().StarRating, Is.EqualTo(i % amountOfBeatmaps), () => $"{sortMode} incorrectly sorts.");
                 }
             }
 
             var difficultyResults = await runSorting(SortMode.Difficulty, true, beatmapSets);
 
-            Assert.That(difficultyResults.Count(), Is.EqualTo(amountofsets * amountofbeatmaps));
+            Assert.That(difficultyResults.Count(), Is.EqualTo(amountOfSets * amountOfBeatmaps));
 
-            for (int i = 0; i < amountofsets * amountofbeatmaps; ++i)
+            for (int i = 0; i < amountOfSets * amountOfBeatmaps; ++i)
             {
-                double correctStarRating = (i - (i % amountofsets)) / (double)amountofsets;
+                double correctStarRating = (i - (i % amountOfSets)) / (double)amountOfSets;
                 Assert.That(difficultyResults.Skip(i).First().StarRating, Is.EqualTo(correctStarRating), () => $"{SortMode.Difficulty} incorrectly sorts.");
             }
         }
