@@ -217,7 +217,9 @@ namespace osu.Game.Database
                 // to prevent this bricking external edit, strip invalid characters on external edit.
                 // the presumption here is that whatever produced the mangled archive is primarily at fault here, and we're just trying to trudge on locally as best as possible.
                 // if there are further troubles related to similar issues, reevaluate moving this sort of check to the import side instead (sanitising filenames on import from archive).
-                string destinationPath = Path.Join(mountedPath, realmFile.Filename.GetValidFilename());
+                string destinationPath = mountedPath;
+                foreach (string piece in realmFile.Filename.Split('/').Select(f => f.GetValidFilename()))
+                    destinationPath = Path.Combine(destinationPath, piece);
 
                 Directory.CreateDirectory(Path.GetDirectoryName(destinationPath)!);
 
