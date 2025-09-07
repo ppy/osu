@@ -231,6 +231,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
                 client.ChangeState(MultiplayerUserState.Idle).FireAndForget();
             else
                 client.ChangeState(MultiplayerUserState.Ready).FireAndForget();
+
+            client.ChangeBeatmapAvailability(beatmapAvailabilityTracker.Availability.Value).FireAndForget();
         }
 
         private void onLoadRequested() => Scheduler.Add(() =>
