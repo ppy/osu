@@ -44,7 +44,7 @@ namespace osu.Game.Screens.SelectV2
                 }
             }
 
-            public Action<string>? Action;
+            public Action<string>? PerformSearch { get; set; }
 
             [Resolved]
             private OverlayColourProvider colourProvider { get; set; } = null!;
@@ -103,7 +103,7 @@ namespace osu.Game.Screens.SelectV2
                 ChildrenEnumerable = tags.Select(t => new OsuHoverContainer
                 {
                     AutoSizeAxes = Axes.Both,
-                    Action = () => Action?.Invoke(t),
+                    Action = () => PerformSearch?.Invoke(t),
                     IdleColour = colourProvider.Light2,
                     AlwaysPresent = true,
                     Alpha = 0f,
@@ -117,6 +117,7 @@ namespace osu.Game.Screens.SelectV2
                 Add(overflowButton = new TagsOverflowButton(tags)
                 {
                     Alpha = 0f,
+                    PerformSearch = s => PerformSearch?.Invoke(s),
                 });
 
                 drawSizeLayout.Invalidate();
@@ -132,10 +133,9 @@ namespace osu.Game.Screens.SelectV2
                 [Resolved]
                 private OverlayColourProvider colourProvider { get; set; } = null!;
 
-                [Resolved]
-                private ISongSelect? songSelect { get; set; }
-
                 public float LineBaseHeight => text.LineBaseHeight;
+
+                public Action<string>? PerformSearch { get; init; }
 
                 public TagsOverflowButton(string[] tags)
                 {
@@ -188,18 +188,18 @@ namespace osu.Game.Screens.SelectV2
                     return true;
                 }
 
-                public Popover GetPopover() => new TagsOverflowPopover(tags, songSelect);
+                public Popover GetPopover() => new TagsOverflowPopover(tags, PerformSearch);
             }
 
             public partial class TagsOverflowPopover : OsuPopover
             {
                 private readonly string[] tags;
-                private readonly ISongSelect? songSelect;
+                private readonly Action<string>? performSearch;
 
-                public TagsOverflowPopover(string[] tags, ISongSelect? songSelect)
+                public TagsOverflowPopover(string[] tags, Action<string>? performSearchAction)
                 {
                     this.tags = tags;
-                    this.songSelect = songSelect;
+                    performSearch = performSearchAction;
                 }
 
                 [BackgroundDependencyLoader]
@@ -215,7 +215,7 @@ namespace osu.Game.Screens.SelectV2
 
                     foreach (string tag in tags)
                     {
-                        textFlow.AddLink(tag, () => songSelect?.Search(tag));
+                        textFlow.AddLink(tag, () => performSearch?.Invoke(tag));
                         textFlow.AddText(" ");
                     }
                 }

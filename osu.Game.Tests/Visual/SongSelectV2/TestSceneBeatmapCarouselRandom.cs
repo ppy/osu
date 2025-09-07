@@ -50,12 +50,12 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             nextRandom();
             ensureRandomDidNotRepeat();
 
-            AddStep("store selection", () => originalSelected = (BeatmapInfo)Carousel.CurrentSelection!);
+            AddStep("store selection", () => originalSelected = Carousel.CurrentBeatmap!);
 
             SortAndGroupBy(SortMode.Artist, GroupMode.Difficulty);
             WaitForFiltering();
 
-            AddAssert("selection not changed", () => Carousel.CurrentSelection, () => Is.EqualTo(originalSelected));
+            AddAssert("selection not changed", () => Carousel.CurrentBeatmap, () => Is.EqualTo(originalSelected));
 
             storeExpandedGroup();
 
@@ -248,17 +248,41 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         }
 
         [Test]
+        public void TestRewindOverGroupingModeChange()
+        {
+            const int local_set_count = 3;
+
+            SortAndGroupBy(SortMode.Artist, GroupMode.Artist);
+            AddBeatmaps(local_set_count, 3);
+            WaitForDrawablePanels();
+
+            SelectNextSet();
+
+            for (int i = 0; i < local_set_count; i++)
+                nextRandom();
+
+            SortAndGroupBy(SortMode.Title, GroupMode.LastPlayed);
+            WaitForDrawablePanels();
+
+            for (int i = 0; i < local_set_count; i++)
+            {
+                prevRandomSet();
+                checkRewindCorrectSet();
+            }
+        }
+
+        [Test]
         public void TestRandomThenRewindSameFrame()
         {
             AddBeatmaps(10, 3, true);
             WaitForDrawablePanels();
 
-            BeatmapInfo? originalSelected = null;
+            GroupedBeatmap? originalSelected = null;
 
             nextRandom();
 
             CheckHasSelection();
-            AddStep("store selection", () => originalSelected = (BeatmapInfo)Carousel.CurrentSelection!);
+            AddStep("store selection", () => originalSelected = Carousel.CurrentGroupedBeatmap!);
 
             AddStep("random then rewind", () =>
             {
@@ -266,7 +290,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 Carousel.PreviousRandom();
             });
 
-            AddAssert("selection not changed", () => Carousel.CurrentSelection, () => Is.EqualTo(originalSelected));
+            AddAssert("selection not changed", () => Carousel.CurrentGroupedBeatmap, () => Is.EqualTo(originalSelected));
         }
 
         [Test]
@@ -275,26 +299,26 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddBeatmaps(10, 3, true);
             WaitForDrawablePanels();
 
-            BeatmapInfo? originalSelected = null;
-            BeatmapInfo? postRandomSelection = null;
+            GroupedBeatmap? originalSelected = null;
+            GroupedBeatmap? postRandomSelection = null;
 
             nextRandom();
 
             CheckHasSelection();
-            AddStep("store selection", () => originalSelected = (BeatmapInfo)Carousel.CurrentSelection!);
+            AddStep("store selection", () => originalSelected = Carousel.CurrentGroupedBeatmap!);
 
             nextRandom();
-            AddStep("store selection", () => postRandomSelection = (BeatmapInfo)Carousel.CurrentSelection!);
+            AddStep("store selection", () => postRandomSelection = Carousel.CurrentGroupedBeatmap!);
 
             AddAssert("selection changed", () => originalSelected, () => Is.Not.SameAs(postRandomSelection));
 
-            AddStep("delete previous selection beatmaps", () => BeatmapSets.Remove(originalSelected!.BeatmapSet!));
+            AddStep("delete previous selection beatmaps", () => BeatmapSets.Remove(originalSelected!.Beatmap.BeatmapSet!));
             WaitForFiltering();
 
-            AddAssert("selection not changed", () => Carousel.CurrentSelection, () => Is.EqualTo(postRandomSelection));
+            AddAssert("selection not changed", () => Carousel.CurrentGroupedBeatmap, () => Is.EqualTo(postRandomSelection));
 
             prevRandomSet();
-            AddAssert("selection not changed", () => Carousel.CurrentSelection, () => Is.EqualTo(postRandomSelection));
+            AddAssert("selection not changed", () => Carousel.CurrentGroupedBeatmap, () => Is.EqualTo(postRandomSelection));
         }
 
         private void nextRandom() =>

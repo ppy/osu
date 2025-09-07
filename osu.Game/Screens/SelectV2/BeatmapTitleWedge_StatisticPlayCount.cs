@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osuTK;
 using osuTK.Graphics;
@@ -102,7 +103,7 @@ namespace osu.Game.Screens.SelectV2
                                         {
                                             Colour = colourProvider.Content2,
                                             Font = OsuFont.Style.Caption1.With(weight: FontWeight.SemiBold),
-                                            Text = "Total Plays",
+                                            Text = SongSelectStrings.TotalPlays,
                                         },
                                         totalPlaysText = new OsuSpriteText
                                         {
@@ -121,7 +122,7 @@ namespace osu.Game.Screens.SelectV2
                                         {
                                             Colour = colourProvider.Content2,
                                             Font = OsuFont.Style.Caption1.With(weight: FontWeight.SemiBold),
-                                            Text = "Personal Plays",
+                                            Text = SongSelectStrings.PersonalPlays,
                                         },
                                         personalPlaysText = new OsuSpriteText
                                         {

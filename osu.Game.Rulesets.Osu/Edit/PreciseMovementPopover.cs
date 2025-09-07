@@ -176,6 +176,11 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         private void applyPosition()
         {
+            // can happen if popover is dismissed by a keyboard key press while dragging UI controls
+            // it doesn't cause a crash, but it looks wrong
+            if (!editorBeatmap.TransactionActive)
+                return;
+
             editorBeatmap.PerformOnSelection(ho =>
             {
                 if (!initialPositions.TryGetValue(ho, out var initialPosition))
