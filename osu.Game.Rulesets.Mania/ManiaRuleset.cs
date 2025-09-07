@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
@@ -12,6 +13,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
+using osu.Game.Localisation;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Difficulty;
@@ -413,6 +415,70 @@ namespace osu.Game.Rulesets.Mania
                 new UnstableRate(score.HitEvents)
             }), true)
         };
+
+        /// <seealso cref="ManiaHitWindows"/>
+        public override BeatmapDifficulty GetAdjustedDisplayDifficulty(IBeatmapInfo beatmapInfo, IReadOnlyCollection<Mod> mods)
+        {
+            BeatmapDifficulty adjustedDifficulty = base.GetAdjustedDisplayDifficulty(beatmapInfo, mods);
+
+            // notably, in mania, hit windows are designed to be independent of track playback rate (see `ManiaHitWindows.SpeedMultiplier`).
+            // *however*, to not make matters *too* simple, mania Hard Rock and Easy differ from all other rulesets
+            // in that they apply multipliers *to hit window durations directly* rather than to the Overall Difficulty attribute itself.
+            // because the duration of hit window durations as a function of OD is not a linear function,
+            // this means that multiplying the OD is *not* the same thing as multiplying the hit window duration.
+            // in fact, the second operation is *much* harsher and will produce values much farther outside of normal operating range
+            // (even negative in the case of Easy).
+            // stable handles this wrong on song select and just assumes that it can handle mania EZ / HR the same way as all other rulesets.
+
+            double perfectHitWindow = IBeatmapDifficultyInfo.DifficultyRange(adjustedDifficulty.OverallDifficulty, ManiaHitWindows.PERFECT_WINDOW_RANGE);
+
+            if (mods.Any(m => m is ManiaModHardRock))
+                perfectHitWindow /= ManiaModHardRock.HIT_WINDOW_DIFFICULTY_MULTIPLIER;
+            else if (mods.Any(m => m is ManiaModEasy))
+                perfectHitWindow /= ManiaModEasy.HIT_WINDOW_DIFFICULTY_MULTIPLIER;
+
+            adjustedDifficulty.OverallDifficulty = (float)IBeatmapDifficultyInfo.InverseDifficultyRange(perfectHitWindow, ManiaHitWindows.PERFECT_WINDOW_RANGE);
+            adjustedDifficulty.CircleSize = ManiaBeatmapConverter.GetColumnCount(LegacyBeatmapConversionDifficultyInfo.FromBeatmapInfo(beatmapInfo), mods);
+
+            return adjustedDifficulty;
+        }
+
+        public override IEnumerable<RulesetBeatmapAttribute> GetBeatmapAttributesForDisplay(IBeatmapInfo beatmapInfo, IReadOnlyCollection<Mod> mods)
+        {
+            // a special touch-up of key count is required to the original difficulty, since key conversion mods are not `IApplicableToDifficulty`
+            var originalDifficulty = new BeatmapDifficulty(beatmapInfo.Difficulty)
+            {
+                CircleSize = ManiaBeatmapConverter.GetColumnCount(LegacyBeatmapConversionDifficultyInfo.FromBeatmapInfo(beatmapInfo), [])
+            };
+            var adjustedDifficulty = GetAdjustedDisplayDifficulty(beatmapInfo, mods);
+            var colours = new OsuColour();
+
+            yield return new RulesetBeatmapAttribute(SongSelectStrings.KeyCount, @"KC", originalDifficulty.CircleSize, adjustedDifficulty.CircleSize, 18)
+            {
+                Description = "Affects the number of key columns on the playfield."
+            };
+
+            var hitWindows = new ManiaHitWindows();
+            hitWindows.SetDifficulty(adjustedDifficulty.OverallDifficulty);
+            hitWindows.IsConvert = !beatmapInfo.Ruleset.Equals(RulesetInfo);
+            hitWindows.ClassicModActive = mods.Any(m => m is ManiaModClassic);
+            yield return new RulesetBeatmapAttribute(SongSelectStrings.Accuracy, @"OD", originalDifficulty.OverallDifficulty, adjustedDifficulty.OverallDifficulty, 10)
+            {
+                Description = "Affects timing requirements for notes.",
+                AdditionalMetrics = hitWindows.GetAllAvailableWindows()
+                                              .Reverse()
+                                              .Select(window => new RulesetBeatmapAttribute.AdditionalMetric(
+                                                  $"{window.result.GetDescription().ToUpperInvariant()} hit window",
+                                                  LocalisableString.Interpolate($@"±{hitWindows.WindowFor(window.result):0.##} ms"),
+                                                  colours.ForHitResult(window.result)
+                                              )).ToArray()
+            };
+
+            yield return new RulesetBeatmapAttribute(SongSelectStrings.HPDrain, @"HP", originalDifficulty.DrainRate, adjustedDifficulty.DrainRate, 10)
+            {
+                Description = "Affects the harshness of health drain and the health penalties for missing."
+            };
+        }
 
         public override IRulesetFilterCriteria CreateRulesetFilterCriteria()
         {

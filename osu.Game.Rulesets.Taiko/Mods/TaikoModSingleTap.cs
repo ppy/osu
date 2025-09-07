@@ -6,9 +6,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps.Timing;
+using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Taiko.Objects;
@@ -24,6 +26,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
     {
         public override string Name => @"Single Tap";
         public override string Acronym => @"SG";
+        public override IconUsage? Icon => OsuIcon.ModSingleTap;
         public override LocalisableString Description => @"One key for dons, one key for kats.";
 
         public override double ScoreMultiplier => 1.0;

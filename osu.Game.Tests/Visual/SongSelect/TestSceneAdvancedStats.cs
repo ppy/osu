@@ -8,11 +8,10 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.ObjectExtensions;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Testing;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
-using osu.Game.Resources.Localisation.Web;
+using osu.Game.Localisation;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Mods;
@@ -42,7 +41,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private BeatmapInfo exampleBeatmapInfo => new BeatmapInfo
         {
-            Ruleset = rulesets.AvailableRulesets.First(),
+            Ruleset = rulesets.GetRuleset(0)!,
             Difficulty = new BeatmapDifficulty
             {
                 CircleSize = 7.2f,
@@ -56,30 +55,39 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestNoMod()
         {
-            AddStep("set beatmap", () => advancedStats.BeatmapInfo = exampleBeatmapInfo);
+            AddStep("set beatmap and ruleset", () =>
+            {
+                advancedStats.BeatmapInfo = exampleBeatmapInfo;
+                advancedStats.Ruleset.Value = exampleBeatmapInfo.Ruleset;
+            });
 
             AddStep("no mods selected", () => SelectedMods.Value = Array.Empty<Mod>());
 
-            AddAssert("first bar text is correct", () => advancedStats.ChildrenOfType<SpriteText>().First().Text == BeatmapsetsStrings.ShowStatsCs);
-            AddAssert("circle size bar is white", () => barIsWhite(advancedStats.FirstValue));
-            AddAssert("HP drain bar is white", () => barIsWhite(advancedStats.HpDrain));
-            AddAssert("accuracy bar is white", () => barIsWhite(advancedStats.Accuracy));
-            AddAssert("approach rate bar is white", () => barIsWhite(advancedStats.ApproachRate));
+            AddAssert("first bar text is correct", () => advancedStats.GetStatistic(SongSelectStrings.CircleSize), () => Is.Not.Null);
+            AddAssert("circle size bar is white", () => barIsWhite(advancedStats.GetStatistic(SongSelectStrings.CircleSize)));
+            AddAssert("HP drain bar is white", () => barIsWhite(advancedStats.GetStatistic(SongSelectStrings.HPDrain)));
+            AddAssert("accuracy bar is white", () => barIsWhite(advancedStats.GetStatistic(SongSelectStrings.Accuracy)));
+            AddAssert("approach rate bar is white", () => barIsWhite(advancedStats.GetStatistic(SongSelectStrings.ApproachRate)));
         }
 
         [Test]
         public void TestFirstBarText()
         {
+            AddStep("set beatmap", () => advancedStats.BeatmapInfo = exampleBeatmapInfo);
             AddStep("set ruleset to mania", () => advancedStats.Ruleset.Value = new ManiaRuleset().RulesetInfo);
-            AddAssert("first bar text is correct", () => advancedStats.ChildrenOfType<SpriteText>().First().Text == BeatmapsetsStrings.ShowStatsCsMania);
+            AddAssert("first bar text is correct", () => advancedStats.GetStatistic(SongSelectStrings.KeyCount), () => Is.Not.Null);
             AddStep("set ruleset to osu", () => advancedStats.Ruleset.Value = new OsuRuleset().RulesetInfo);
-            AddAssert("first bar text is correct", () => advancedStats.ChildrenOfType<SpriteText>().First().Text == BeatmapsetsStrings.ShowStatsCs);
+            AddAssert("first bar text is correct", () => advancedStats.GetStatistic(SongSelectStrings.CircleSize), () => Is.Not.Null);
         }
 
         [Test]
         public void TestEasyMod()
         {
-            AddStep("set beatmap", () => advancedStats.BeatmapInfo = exampleBeatmapInfo);
+            AddStep("set beatmap and ruleset", () =>
+            {
+                advancedStats.BeatmapInfo = exampleBeatmapInfo;
+                advancedStats.Ruleset.Value = exampleBeatmapInfo.Ruleset;
+            });
 
             AddStep("select EZ mod", () =>
             {
@@ -87,16 +95,20 @@ namespace osu.Game.Tests.Visual.SongSelect
                 advancedStats.Mods.Value = new[] { ruleset.CreateMod<ModEasy>() };
             });
 
-            AddAssert("circle size bar is blue", () => barIsBlue(advancedStats.FirstValue));
-            AddAssert("HP drain bar is blue", () => barIsBlue(advancedStats.HpDrain));
-            AddAssert("accuracy bar is blue", () => barIsBlue(advancedStats.Accuracy));
-            AddAssert("approach rate bar is blue", () => barIsBlue(advancedStats.ApproachRate));
+            AddAssert("circle size bar is blue", () => barIsBlue(advancedStats.GetStatistic(SongSelectStrings.CircleSize)));
+            AddAssert("HP drain bar is blue", () => barIsBlue(advancedStats.GetStatistic(SongSelectStrings.HPDrain)));
+            AddAssert("accuracy bar is blue", () => barIsBlue(advancedStats.GetStatistic(SongSelectStrings.Accuracy)));
+            AddAssert("approach rate bar is blue", () => barIsBlue(advancedStats.GetStatistic(SongSelectStrings.ApproachRate)));
         }
 
         [Test]
         public void TestHardRockMod()
         {
-            AddStep("set beatmap", () => advancedStats.BeatmapInfo = exampleBeatmapInfo);
+            AddStep("set beatmap and ruleset", () =>
+            {
+                advancedStats.BeatmapInfo = exampleBeatmapInfo;
+                advancedStats.Ruleset.Value = exampleBeatmapInfo.Ruleset;
+            });
 
             AddStep("select HR mod", () =>
             {
@@ -104,16 +116,20 @@ namespace osu.Game.Tests.Visual.SongSelect
                 advancedStats.Mods.Value = new[] { ruleset.CreateMod<ModHardRock>() };
             });
 
-            AddAssert("circle size bar is red", () => barIsRed(advancedStats.FirstValue));
-            AddAssert("HP drain bar is red", () => barIsRed(advancedStats.HpDrain));
-            AddAssert("accuracy bar is red", () => barIsRed(advancedStats.Accuracy));
-            AddAssert("approach rate bar is red", () => barIsRed(advancedStats.ApproachRate));
+            AddAssert("circle size bar is red", () => barIsRed(advancedStats.GetStatistic(SongSelectStrings.CircleSize)));
+            AddAssert("HP drain bar is red", () => barIsRed(advancedStats.GetStatistic(SongSelectStrings.HPDrain)));
+            AddAssert("accuracy bar is red", () => barIsRed(advancedStats.GetStatistic(SongSelectStrings.Accuracy)));
+            AddAssert("approach rate bar is red", () => barIsRed(advancedStats.GetStatistic(SongSelectStrings.ApproachRate)));
         }
 
         [Test]
         public void TestUnchangedDifficultyAdjustMod()
         {
-            AddStep("set beatmap", () => advancedStats.BeatmapInfo = exampleBeatmapInfo);
+            AddStep("set beatmap and ruleset", () =>
+            {
+                advancedStats.BeatmapInfo = exampleBeatmapInfo;
+                advancedStats.Ruleset.Value = exampleBeatmapInfo.Ruleset;
+            });
 
             AddStep("select unchanged Difficulty Adjust mod", () =>
             {
@@ -122,16 +138,20 @@ namespace osu.Game.Tests.Visual.SongSelect
                 advancedStats.Mods.Value = new[] { difficultyAdjustMod };
             });
 
-            AddAssert("circle size bar is white", () => barIsWhite(advancedStats.FirstValue));
-            AddAssert("HP drain bar is white", () => barIsWhite(advancedStats.HpDrain));
-            AddAssert("accuracy bar is white", () => barIsWhite(advancedStats.Accuracy));
-            AddAssert("approach rate bar is white", () => barIsWhite(advancedStats.ApproachRate));
+            AddAssert("circle size bar is white", () => barIsWhite(advancedStats.GetStatistic(SongSelectStrings.CircleSize)));
+            AddAssert("HP drain bar is white", () => barIsWhite(advancedStats.GetStatistic(SongSelectStrings.HPDrain)));
+            AddAssert("accuracy bar is white", () => barIsWhite(advancedStats.GetStatistic(SongSelectStrings.Accuracy)));
+            AddAssert("approach rate bar is white", () => barIsWhite(advancedStats.GetStatistic(SongSelectStrings.ApproachRate)));
         }
 
         [Test]
         public void TestChangedDifficultyAdjustMod()
         {
-            AddStep("set beatmap", () => advancedStats.BeatmapInfo = exampleBeatmapInfo);
+            AddStep("set beatmap and ruleset", () =>
+            {
+                advancedStats.BeatmapInfo = exampleBeatmapInfo;
+                advancedStats.Ruleset.Value = exampleBeatmapInfo.Ruleset;
+            });
 
             AddStep("select changed Difficulty Adjust mod", () =>
             {
@@ -144,10 +164,10 @@ namespace osu.Game.Tests.Visual.SongSelect
                 advancedStats.Mods.Value = new[] { difficultyAdjustMod };
             });
 
-            AddAssert("circle size bar is white", () => barIsWhite(advancedStats.FirstValue));
-            AddAssert("drain rate bar is blue", () => barIsBlue(advancedStats.HpDrain));
-            AddAssert("accuracy bar is white", () => barIsWhite(advancedStats.Accuracy));
-            AddAssert("approach rate bar is red", () => barIsRed(advancedStats.ApproachRate));
+            AddAssert("circle size bar is white", () => barIsWhite(advancedStats.GetStatistic(SongSelectStrings.CircleSize)));
+            AddAssert("drain rate bar is blue", () => barIsBlue(advancedStats.GetStatistic(SongSelectStrings.HPDrain)));
+            AddAssert("accuracy bar is white", () => barIsWhite(advancedStats.GetStatistic(SongSelectStrings.Accuracy)));
+            AddAssert("approach rate bar is red", () => barIsRed(advancedStats.GetStatistic(SongSelectStrings.ApproachRate)));
         }
 
         private bool barIsWhite(AdvancedStats.StatisticRow row) => row.ModBar.AccentColour == Color4.White;
@@ -156,10 +176,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private partial class TestAdvancedStats : AdvancedStats
         {
-            public new StatisticRow FirstValue => base.FirstValue;
-            public new StatisticRow HpDrain => base.HpDrain;
-            public new StatisticRow Accuracy => base.Accuracy;
-            public new StatisticRow ApproachRate => base.ApproachRate;
+            public StatisticRow GetStatistic(LocalisableString title) => Flow.OfType<StatisticRow>().SingleOrDefault(row => row.Title == title);
         }
     }
 }

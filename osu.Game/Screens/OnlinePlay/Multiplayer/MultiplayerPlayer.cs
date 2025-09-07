@@ -56,7 +56,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             {
                 AllowPause = false,
                 AllowRestart = false,
-                AllowFailAnimation = false,
                 AllowSkipping = room.AutoSkip,
                 AutomaticallySkipIntro = room.AutoSkip,
                 ShowLeaderboard = true,
@@ -71,6 +70,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             if (!LoadedBeatmapSuccessfully)
                 return;
 
+            // also applied in `MultiSpectatorPlayer.load()`
             ScoreProcessor.ApplyNewJudgementsWhenFailed = true;
 
             LoadComponentAsync(new FillFlowContainer
@@ -167,6 +167,16 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             // This will pause the clock, pending the gameplay started callback from the server.
             GameplayClockContainer.Reset();
         }
+
+        protected override void PerformFail()
+        {
+            // base logic intentionally suppressed - failing in multiplayer only marks the score with F rank
+            // see also: `MultiSpectatorPlayer.PerformFail()`
+            ScoreProcessor.FailScore(Score.ScoreInfo);
+        }
+
+        protected override void ConcludeFailedScore(Score score)
+            => throw new NotSupportedException($"{nameof(MultiplayerPlayer)} should never be calling {nameof(ConcludeFailedScore)}. Failing in multiplayer only marks the score with F rank.");
 
         private void failAndBail(string? message = null)
         {

@@ -69,6 +69,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             pauseViaBackAction();
             pauseViaBackAction();
             confirmPausedWithNoOverlay();
+            AddAssert("pause recorded", () => Player.Score.ScoreInfo.Pauses, () => Has.Count.EqualTo(1));
         }
 
         [Test]
@@ -77,17 +78,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             pauseViaPauseGameplayAction();
             pauseViaPauseGameplayAction();
             confirmPausedWithNoOverlay();
-        }
-
-        [Test]
-        public void TestForwardPlaybackGuarantee()
-        {
-            hookForwardPlaybackCheck();
-
-            AddUntilStep("wait for forward playback", () => Player.GameplayClockContainer.CurrentTime > 1000);
-            AddStep("seek before gameplay", () => Player.GameplayClockContainer.Seek(-5000));
-
-            checkForwardPlayback();
+            AddAssert("pause recorded", () => Player.Score.ScoreInfo.Pauses, () => Has.Count.EqualTo(1));
         }
 
         [Test]

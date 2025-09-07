@@ -12,11 +12,15 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Game.Collections;
 using osu.Game.Configuration;
+using osu.Game.Database;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Select;
@@ -49,6 +53,11 @@ namespace osu.Game.Screens.SelectV2
         [Resolved]
         private OsuConfigManager config { get; set; } = null!;
 
+        [Resolved]
+        private RealmAccess realm { get; set; } = null!;
+
+        private IBindable<APIUser> localUser = null!;
+
         public LocalisableString StatusText
         {
             get => searchTextBox.StatusText;
@@ -59,8 +68,10 @@ namespace osu.Game.Screens.SelectV2
 
         private FilterCriteria currentCriteria = null!;
 
+        private IDisposable? collectionsSubscription;
+
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(IAPIProvider api)
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -151,14 +162,13 @@ namespace osu.Game.Screens.SelectV2
                             {
                                 new[]
                                 {
-                                    sortDropdown = new ShearedDropdown<SortMode>("Sort")
+                                    sortDropdown = new ShearedDropdown<SortMode>(SongSelectStrings.Sort)
                                     {
                                         RelativeSizeAxes = Axes.X,
                                         Items = Enum.GetValues<SortMode>(),
                                     },
                                     Empty(),
-                                    // todo: pending localisation
-                                    groupDropdown = new ShearedDropdown<GroupMode>("Group")
+                                    groupDropdown = new ShearedDropdown<GroupMode>(SongSelectStrings.Group)
                                     {
                                         RelativeSizeAxes = Axes.X,
                                         Items = Enum.GetValues<GroupMode>(),
@@ -174,6 +184,8 @@ namespace osu.Game.Screens.SelectV2
                     },
                 }
             };
+
+            localUser = api.LocalUser.GetBoundCopy();
         }
 
         protected override void LoadComplete()
@@ -209,8 +221,30 @@ namespace osu.Game.Screens.SelectV2
             showConvertedBeatmapsButton.Active.BindValueChanged(_ => updateCriteria());
             sortDropdown.Current.BindValueChanged(_ => updateCriteria());
             groupDropdown.Current.BindValueChanged(_ => updateCriteria());
-            collectionDropdown.Current.BindValueChanged(_ => updateCriteria());
+            collectionDropdown.Current.BindValueChanged(v =>
+            {
+                // The hope would be that this never arrives here, but due to bindings receiving changes before
+                // local ValueChanged events, that's not the case (see https://github.com/ppy/osu-framework/pull/1545).
+                if (v.NewValue is ManageCollectionsFilterMenuItem || v.OldValue is ManageCollectionsFilterMenuItem)
+                    return;
+
+                updateCriteria();
+            });
+            collectionsSubscription = realm.RegisterForNotifications(r => r.All<BeatmapCollection>(), (collections, changeSet) =>
+            {
+                if (changeSet != null && groupDropdown.Current.Value == GroupMode.Collections)
+                    updateCriteria();
+            });
+
+            localUser.BindValueChanged(_ => updateCriteria());
+
             updateCriteria();
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            collectionsSubscription?.Dispose();
         }
 
         /// <summary>
@@ -219,6 +253,7 @@ namespace osu.Game.Screens.SelectV2
         public FilterCriteria CreateCriteria()
         {
             string query = searchTextBox.Current.Value;
+            bool isValidUser = localUser.Value.Id > 1;
 
             var criteria = new FilterCriteria
             {
@@ -227,7 +262,9 @@ namespace osu.Game.Screens.SelectV2
                 AllowConvertedBeatmaps = showConvertedBeatmapsButton.Active.Value,
                 Ruleset = ruleset.Value,
                 Mods = mods.Value,
-                CollectionBeatmapMD5Hashes = collectionDropdown.Current.Value?.Collection?.PerformRead(c => c.BeatmapMD5Hashes).ToImmutableHashSet()
+                CollectionBeatmapMD5Hashes = collectionDropdown.Current.Value?.Collection?.PerformRead(c => c.BeatmapMD5Hashes).ToImmutableHashSet(),
+                LocalUserId = isValidUser ? localUser.Value.Id : null,
+                LocalUserUsername = isValidUser ? localUser.Value.Username : null,
             };
 
             if (!difficultyRangeSlider.LowerBound.IsDefault)

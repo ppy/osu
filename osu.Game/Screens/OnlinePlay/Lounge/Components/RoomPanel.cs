@@ -31,7 +31,6 @@ using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Screens.OnlinePlay.Components;
 using osuTK;
-using osuTK.Graphics;
 using Container = osu.Framework.Graphics.Containers.Container;
 
 namespace osu.Game.Screens.OnlinePlay.Lounge.Components
@@ -39,7 +38,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
     public abstract partial class RoomPanel : CompositeDrawable, IHasContextMenu
     {
         protected const float CORNER_RADIUS = 10;
-        private const float height = 100;
+        private const float height = 80;
 
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
@@ -59,7 +58,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         private DrawableRoomParticipantsList? drawableRoomParticipantsList;
         private RoomSpecialCategoryPill? specialCategoryPill;
-        private PasswordProtectedIcon? passwordIcon;
+        private CornerIcon? passwordIcon;
+        private CornerIcon? pinnedIcon;
         private EndDateInfo? endDateInfo;
         private RoomNameLine? roomName;
         private DelayedLoadWrapper wrapper = null!;
@@ -79,16 +79,10 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
             Masking = true;
             CornerRadius = CORNER_RADIUS;
-            EdgeEffect = new EdgeEffectParameters
-            {
-                Type = EdgeEffectType.Shadow,
-                Colour = Color4.Black.Opacity(40),
-                Radius = 5,
-            };
         }
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colours)
+        private void load(OverlayColourProvider colourProvider, OsuColour colours)
         {
             ButtonsContainer = new Container
             {
@@ -98,13 +92,20 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 AutoSizeAxes = Axes.X
             };
 
+            EdgeEffect = new EdgeEffectParameters
+            {
+                Type = EdgeEffectType.Shadow,
+                Colour = colourProvider.Background6.Opacity(0.4f),
+                Radius = 4,
+            };
+
             InternalChildren = new Drawable[]
             {
                 // This resolves internal 1px gaps due to applying the (parenting) corner radius and masking across multiple filling background sprites.
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colours.Background5,
+                    Colour = colourProvider.Background5,
                 },
                 CreateBackground().With(d =>
                 {
@@ -117,7 +118,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                         Name = @"Room content",
                         RelativeSizeAxes = Axes.Both,
                         // This negative padding resolves 1px gaps between this background and the background above.
-                        Padding = new MarginPadding { Left = 20, Vertical = -0.5f },
+                        Padding = new MarginPadding { Left = 10, Vertical = -0.5f },
                         Child = new Container
                         {
                             RelativeSizeAxes = Axes.Both,
@@ -128,7 +129,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                 new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Colour = colours.Background5,
+                                    Colour = colourProvider.Background5,
                                     Width = 0.2f,
                                 },
                                 new Box
@@ -136,7 +137,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                     Anchor = Anchor.TopRight,
                                     Origin = Anchor.TopRight,
                                     RelativeSizeAxes = Axes.Both,
-                                    Colour = ColourInfo.GradientHorizontal(colours.Background5, colours.Background5.Opacity(0.3f)),
+                                    Colour = ColourInfo.GradientHorizontal(colourProvider.Background5, colourProvider.Background5.Opacity(0.3f)),
                                     Width = 0.8f,
                                 },
                                 new GridContainer
@@ -157,8 +158,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                                 RelativeSizeAxes = Axes.Both,
                                                 Padding = new MarginPadding
                                                 {
-                                                    Left = 20,
-                                                    Right = DrawableRoomParticipantsList.SHEAR_WIDTH,
+                                                    Left = 10,
+                                                    Right = 10,
                                                     Vertical = 5
                                                 },
                                                 Children = new Drawable[]
@@ -254,7 +255,28 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                         }
                                     }
                                 },
-                                passwordIcon = new PasswordProtectedIcon { Alpha = 0 }
+                                passwordIcon = new CornerIcon
+                                {
+                                    Alpha = 0,
+                                    Background = { Colour = colours.Gray8, },
+                                    Icon =
+                                    {
+                                        Icon = FontAwesome.Solid.Lock,
+                                        Colour = colours.Gray3,
+                                        Rotation = 45,
+                                    },
+                                },
+                                pinnedIcon = new CornerIcon
+                                {
+                                    Alpha = 0,
+                                    Background = { Colour = colours.Orange2 },
+                                    Icon =
+                                    {
+                                        Icon = FontAwesome.Solid.Thumbtack,
+                                        Colour = colours.Gray3,
+                                        Rotation = 45,
+                                    },
+                                }
                             },
                         },
                     }, 0)
@@ -283,6 +305,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 updateRoomCategory();
                 updateRoomType();
                 updateRoomHasPassword();
+                updateRoomPinned();
             };
 
             SelectedItem.BindValueChanged(onSelectedItemChanged, true);
@@ -310,6 +333,10 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
                 case nameof(Room.HasPassword):
                     updateRoomHasPassword();
+                    break;
+
+                case nameof(Room.Pinned):
+                    updateRoomPinned();
                     break;
             }
         }
@@ -369,6 +396,12 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         {
             if (passwordIcon != null)
                 passwordIcon.Alpha = Room.HasPassword ? 1 : 0;
+        }
+
+        private void updateRoomPinned()
+        {
+            if (pinnedIcon != null)
+                pinnedIcon.Alpha = Room.Pinned ? 1 : 0;
         }
 
         private int numberOfAvatars = 7;
@@ -483,12 +516,12 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                         {
                             statusText = new OsuSpriteText
                             {
-                                Font = OsuFont.Default.With(size: 16),
+                                Font = OsuFont.Style.Caption2,
                                 Colour = colours.Lime1
                             },
                             beatmapText = new LinkFlowContainer(s =>
                             {
-                                s.Font = OsuFont.Default.With(size: 16);
+                                s.Font = OsuFont.Style.Caption2;
                                 s.Colour = colours.Lime1;
                             })
                             {
@@ -534,10 +567,12 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             }
         }
 
-        public partial class PasswordProtectedIcon : CompositeDrawable
+        public partial class CornerIcon : CompositeDrawable
         {
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            public SpriteIcon Icon { get; }
+            public Box Background { get; }
+
+            public CornerIcon()
             {
                 Anchor = Anchor.TopRight;
                 Origin = Anchor.TopRight;
@@ -546,20 +581,19 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
                 InternalChildren = new Drawable[]
                 {
-                    new Box
+                    Background = new Box
                     {
                         Anchor = Anchor.TopRight,
                         Origin = Anchor.TopCentre,
-                        Colour = colours.Gray5,
                         Rotation = 45,
                         RelativeSizeAxes = Axes.Both,
                         Width = 2,
                     },
-                    new SpriteIcon
+                    Icon = new SpriteIcon
                     {
-                        Icon = FontAwesome.Solid.Lock,
                         Anchor = Anchor.TopRight,
-                        Origin = Anchor.TopRight,
+                        Origin = Anchor.Centre,
+                        Position = new Vector2(-13, 13),
                         Margin = new MarginPadding(6),
                         Size = new Vector2(14),
                     }
@@ -602,7 +636,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                     {
                         Anchor = Anchor.BottomLeft,
                         Origin = Anchor.BottomLeft,
-                        Font = OsuFont.GetFont(size: 28),
+                        Font = OsuFont.Style.Heading2,
                     },
                     linkButton = new ExternalLinkButton
                     {

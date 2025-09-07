@@ -10,6 +10,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Input.Bindings;
+using osu.Game.Localisation;
 using osu.Game.Screens.Footer;
 using osuTK;
 using osuTK.Input;
@@ -46,7 +47,7 @@ namespace osu.Game.Screens.SelectV2
                         AlwaysPresent = true,
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
-                        Text = "Random",
+                        Text = SongSelectStrings.Random,
                     },
                     rewindSpriteText = new OsuSpriteText
                     {
@@ -54,7 +55,7 @@ namespace osu.Game.Screens.SelectV2
                         AlwaysPresent = true,
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
-                        Text = "Rewind",
+                        Text = SongSelectStrings.Rewind,
                         Alpha = 0f,
                     }
                 }
@@ -121,7 +122,7 @@ namespace osu.Game.Screens.SelectV2
 
         protected override void OnMouseUp(MouseUpEvent e)
         {
-            if (e.Button == MouseButton.Right)
+            if (e.Button == MouseButton.Right && IsHovered)
             {
                 rewindSearch = true;
                 TriggerClick();

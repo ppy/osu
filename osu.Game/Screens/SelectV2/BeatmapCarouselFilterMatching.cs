@@ -17,9 +17,6 @@ namespace osu.Game.Screens.SelectV2
     {
         private readonly Func<FilterCriteria> getCriteria;
 
-        /// <summary>
-        /// The total number of beatmap difficulties displayed post filter.
-        /// </summary>
         public int BeatmapItemsCount { get; private set; }
 
         public BeatmapCarouselFilterMatching(Func<FilterCriteria> getCriteria)
@@ -105,6 +102,20 @@ namespace osu.Game.Screens.SelectV2
                      criteria.Title.Matches(beatmap.Metadata.TitleUnicode);
             match &= !criteria.DifficultyName.HasFilter || criteria.DifficultyName.Matches(beatmap.DifficultyName);
             match &= !criteria.Source.HasFilter || criteria.Source.Matches(beatmap.Metadata.Source);
+
+            if (criteria.UserTags.Any())
+            {
+                foreach (var tagFilter in criteria.UserTags)
+                {
+                    bool anyTagMatched = false;
+
+                    foreach (string tag in beatmap.Metadata.UserTags)
+                        anyTagMatched |= tagFilter.Matches(tag);
+
+                    match &= anyTagMatched;
+                }
+            }
+
             match &= !criteria.UserStarDifficulty.HasFilter || criteria.UserStarDifficulty.IsInRange(beatmap.StarRating);
 
             if (!match) return false;

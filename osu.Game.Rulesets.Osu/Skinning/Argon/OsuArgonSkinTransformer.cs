@@ -29,6 +29,10 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
 
                     switch (result)
                     {
+                        case HitResult.LargeTickHit:
+                        case HitResult.SliderTailHit:
+                            return null;
+
                         case HitResult.IgnoreMiss:
                         case HitResult.LargeTickMiss:
                             return new ArgonJudgementPieceSliderTickMiss(result);

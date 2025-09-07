@@ -2,19 +2,20 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.Graphics.Containers;
 using osu.Game.Localisation;
 using osu.Game.Online;
 using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Resources.Localisation.Web;
 using osuTK;
@@ -49,7 +50,13 @@ namespace osu.Game.Screens.SelectV2
         private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
 
         [Resolved]
+        private IBindable<SongSelect.BeatmapSetLookupResult> onlineLookupResult { get; set; } = null!;
+
+        [Resolved]
         private IAPIProvider api { get; set; } = null!;
+
+        [Resolved]
+        private RealmAccess realm { get; set; } = null!;
 
         private IBindable<APIState> apiState = null!;
 
@@ -59,8 +66,11 @@ namespace osu.Game.Screens.SelectV2
         [Resolved]
         private ISongSelect? songSelect { get; set; }
 
+        private Sample? wedgeAppearSample;
+        private Sample? wedgeHideSample;
+
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(AudioManager audio)
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -230,12 +240,16 @@ namespace osu.Game.Screens.SelectV2
                     }),
                 }
             };
+
+            wedgeAppearSample = audio.Samples.Get(@"SongSelect/metadata-wedge-pop-in");
+            wedgeHideSample = audio.Samples.Get(@"SongSelect/metadata-wedge-pop-out");
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
             beatmap.BindValueChanged(_ => updateDisplay());
+            onlineLookupResult.BindValueChanged(_ => updateDisplay());
 
             apiState = api.State.GetBoundCopy();
             apiState.BindValueChanged(_ => Scheduler.AddOnce(updateDisplay), true);
@@ -265,10 +279,14 @@ namespace osu.Game.Screens.SelectV2
             // Needs some experimentation on what looks good.
 
             var beatmapInfo = beatmap.Value.BeatmapInfo;
-            var currentOnlineBeatmap = currentOnlineBeatmapSet?.Beatmaps.SingleOrDefault(b => b.OnlineID == beatmapInfo.OnlineID);
+            var currentOnlineBeatmap = onlineLookupResult.Value?.Result?.Beatmaps.SingleOrDefault(b => b.OnlineID == beatmapInfo.OnlineID);
 
             if (State.Value == Visibility.Visible && currentOnlineBeatmap != null)
             {
+                // play show sounds only if the wedges were previously hidden
+                if (ratingsWedge.Alpha < 1)
+                    playWedgeAppearSound();
+
                 ratingsWedge.FadeIn(transition_duration, Easing.OutQuint)
                             .MoveToX(0, transition_duration, Easing.OutQuint);
 
@@ -278,6 +296,10 @@ namespace osu.Game.Screens.SelectV2
             }
             else
             {
+                // play hide sounds only if the wedges were previously visible
+                if (ratingsWedge.Alpha > 0)
+                    playWedgeHideSound();
+
                 failRetryWedge.FadeOut(transition_duration, Easing.OutQuint)
                               .MoveToX(-50, transition_duration, Easing.OutQuint);
 
@@ -285,6 +307,38 @@ namespace osu.Game.Screens.SelectV2
                             .FadeOut(transition_duration, Easing.OutQuint)
                             .MoveToX(-50, transition_duration, Easing.OutQuint);
             }
+        }
+
+        private void playWedgeAppearSound()
+        {
+            var wedgeAppearChannel1 = wedgeAppearSample?.GetChannel();
+            if (wedgeAppearChannel1 == null)
+                return;
+
+            wedgeAppearChannel1.Balance.Value = -OsuGameBase.SFX_STEREO_STRENGTH / 2;
+            wedgeAppearChannel1.Frequency.Value = 0.98f + RNG.NextDouble(0.04f);
+            wedgeAppearChannel1.Play();
+
+            Scheduler.AddDelayed(() =>
+            {
+                var wedgeAppearChannel2 = wedgeAppearSample?.GetChannel();
+                if (wedgeAppearChannel2 == null)
+                    return;
+
+                wedgeAppearChannel2.Balance.Value = -OsuGameBase.SFX_STEREO_STRENGTH / 2;
+                wedgeAppearChannel2.Frequency.Value = 0.90f + RNG.NextDouble(0.05f);
+                wedgeAppearChannel2.Play();
+            }, 100);
+        }
+
+        private void playWedgeHideSound()
+        {
+            var wedgeHideChannel = wedgeHideSample?.GetChannel();
+            if (wedgeHideChannel == null)
+                return;
+
+            wedgeHideChannel.Balance.Value = -OsuGameBase.SFX_STEREO_STRENGTH / 2;
+            wedgeHideChannel.Play();
         }
 
         private void updateDisplay()
@@ -307,41 +361,12 @@ namespace osu.Game.Screens.SelectV2
             submitted.Date = beatmapSetInfo.DateSubmitted;
             ranked.Date = beatmapSetInfo.DateRanked;
 
-            if (currentOnlineBeatmapSet == null || currentOnlineBeatmapSet.OnlineID != beatmapSetInfo.OnlineID)
-                refetchBeatmapSet();
-
             updateOnlineDisplay();
-        }
-
-        private APIBeatmapSet? currentOnlineBeatmapSet;
-        private GetBeatmapSetRequest? currentRequest;
-
-        private void refetchBeatmapSet()
-        {
-            var beatmapSetInfo = beatmap.Value.BeatmapSetInfo;
-
-            currentRequest?.Cancel();
-            currentRequest = null;
-            currentOnlineBeatmapSet = null;
-
-            if (beatmapSetInfo.OnlineID >= 1)
-            {
-                // todo: consider introducing a BeatmapSetLookupCache for caching benefits.
-                currentRequest = new GetBeatmapSetRequest(beatmapSetInfo.OnlineID);
-                currentRequest.Failure += _ => updateOnlineDisplay();
-                currentRequest.Success += s =>
-                {
-                    currentOnlineBeatmapSet = s;
-                    updateOnlineDisplay();
-                };
-
-                api.Queue(currentRequest);
-            }
         }
 
         private void updateOnlineDisplay()
         {
-            if (currentRequest?.CompletionState == APIRequestCompletionState.Waiting)
+            if (onlineLookupResult.Value?.Status != SongSelect.BeatmapSetLookupStatus.Completed)
             {
                 genre.Data = null;
                 language.Data = null;
@@ -349,7 +374,7 @@ namespace osu.Game.Screens.SelectV2
                 return;
             }
 
-            if (currentOnlineBeatmapSet == null)
+            if (onlineLookupResult.Value.Result == null)
             {
                 genre.Data = ("-", null);
                 language.Data = ("-", null);
@@ -358,7 +383,7 @@ namespace osu.Game.Screens.SelectV2
             {
                 var beatmapInfo = beatmap.Value.BeatmapInfo;
 
-                var onlineBeatmapSet = currentOnlineBeatmapSet;
+                var onlineBeatmapSet = onlineLookupResult.Value.Result;
                 var onlineBeatmap = onlineBeatmapSet.Beatmaps.SingleOrDefault(b => b.OnlineID == beatmapInfo.OnlineID);
 
                 genre.Data = (onlineBeatmapSet.Genre.Name, () => songSelect?.Search(onlineBeatmapSet.Genre.Name));
@@ -379,28 +404,22 @@ namespace osu.Game.Screens.SelectV2
 
         private void updateUserTags()
         {
-            var beatmapInfo = beatmap.Value.BeatmapInfo;
-            var onlineBeatmapSet = currentOnlineBeatmapSet;
-            var onlineBeatmap = onlineBeatmapSet?.Beatmaps.SingleOrDefault(b => b.OnlineID == beatmapInfo.OnlineID);
+            string[] tags = realm.Run(r =>
+            {
+                // need to refetch because `beatmap.Value.BeatmapInfo` is not going to have the latest tags
+                r.Refresh();
+                var refetchedBeatmap = r.Find<BeatmapInfo>(beatmap.Value.BeatmapInfo.ID);
+                return refetchedBeatmap?.Metadata.UserTags.ToArray() ?? [];
+            });
 
-            if (onlineBeatmap?.TopTags == null || onlineBeatmap.TopTags.Length == 0 || onlineBeatmapSet?.RelatedTags == null)
+            if (tags.Length == 0)
             {
                 userTags.FadeOut(transition_duration, Easing.OutQuint);
                 return;
             }
 
-            var tagsById = onlineBeatmapSet.RelatedTags.ToDictionary(t => t.Id);
-            string[] userTagsArray = onlineBeatmap.TopTags
-                                                  .Select(t => (topTag: t, relatedTag: tagsById.GetValueOrDefault(t.TagId)))
-                                                  .Where(t => t.relatedTag != null)
-                                                  // see https://github.com/ppy/osu-web/blob/bb3bd2e7c6f84f26066df5ea20a81c77ec9bb60a/resources/js/beatmapsets-show/controller.ts#L103-L106 for sort criteria
-                                                  .OrderByDescending(t => t.topTag.VoteCount)
-                                                  .ThenBy(t => t.relatedTag!.Name)
-                                                  .Select(t => t.relatedTag!.Name)
-                                                  .ToArray();
-
             userTags.FadeIn(transition_duration, Easing.OutQuint);
-            userTags.Tags = (userTagsArray, t => songSelect?.Search(t));
+            userTags.Tags = (tags, t => songSelect?.Search($@"tag=""{t}""!"));
         }
     }
 }

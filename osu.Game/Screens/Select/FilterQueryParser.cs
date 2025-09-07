@@ -16,7 +16,7 @@ namespace osu.Game.Screens.Select
     public static class FilterQueryParser
     {
         private static readonly Regex query_syntax_regex = new Regex(
-            @"\b(?<key>\w+)(?<op>(!?(:|=)|(>|<)(:|=)?))(?<value>("".*""[!]?)|(\S*))",
+            @"\b(?<key>\w+)(?<op>(!?(:|=)|(>|<)(:|=)?))(?<value>("".*?""[!]?)|(\S*))",
             RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         internal static void ApplyQueries(FilterCriteria criteria, string query)
@@ -76,6 +76,8 @@ namespace osu.Game.Screens.Select
                         return false;
 
                     // Unplayed beatmaps are filtered on DateTimeOffset.MinValue.
+                    if (op == Operator.NotEqual)
+                        played = !played;
 
                     if (played)
                     {
@@ -115,6 +117,12 @@ namespace osu.Game.Screens.Select
 
                 case "source":
                     return TryUpdateCriteriaText(ref criteria.Source, op, value);
+
+                case "tag":
+                    var tagFilter = new FilterCriteria.OptionalTextFilter();
+                    TryUpdateCriteriaText(ref tagFilter, op, value);
+                    criteria.UserTags.Add(tagFilter);
+                    return true;
 
                 default:
                     return criteria.RulesetCriteria?.TryParseCustomKeywordCriteria(key, op, value) ?? false;
@@ -226,6 +234,10 @@ namespace osu.Game.Screens.Select
         {
             switch (op)
             {
+                case Operator.NotEqual:
+                    textFilter.ExcludeTerm = true;
+                    goto case Operator.Equal;
+
                 case Operator.Equal:
                     textFilter.SearchTerm = value;
                     return true;
@@ -253,14 +265,22 @@ namespace osu.Game.Screens.Select
 
         private static bool tryUpdateCriteriaRange(ref FilterCriteria.OptionalRange<float> range, Operator op, float value, float tolerance = 0.05f)
         {
+            range.InvertRange = false;
+
             switch (op)
             {
                 default:
                     return false;
 
+                case Operator.NotEqual:
+                    range.InvertRange = true;
+                    goto case Operator.Equal;
+
                 case Operator.Equal:
                     range.Min = value - tolerance;
                     range.Max = value + tolerance;
+                    if (tolerance == 0)
+                        range.IsLowerInclusive = range.IsUpperInclusive = true;
                     break;
 
                 case Operator.Greater:
@@ -301,10 +321,16 @@ namespace osu.Game.Screens.Select
 
         private static bool tryUpdateCriteriaRange(ref FilterCriteria.OptionalRange<double> range, Operator op, double value, double tolerance = 0.05)
         {
+            range.InvertRange = false;
+
             switch (op)
             {
                 default:
                     return false;
+
+                case Operator.NotEqual:
+                    range.InvertRange = true;
+                    goto case Operator.Equal;
 
                 case Operator.Equal:
                     range.Min = value - tolerance;
@@ -374,17 +400,30 @@ namespace osu.Game.Screens.Select
         {
             var matchingValues = new HashSet<T>();
 
-            if (op == Operator.Equal && filterValue.Contains(','))
+            if (filterValue.Contains(','))
             {
                 string[] splitValues = filterValue.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                HashSet<T> parsedValues = new HashSet<T>();
 
                 foreach (string splitValue in splitValues)
                 {
                     if (!tryParseEnum<T>(splitValue, out var parsedValue))
                         return false;
 
-                    matchingValues.Add(parsedValue);
+                    parsedValues.Add(parsedValue);
                 }
+
+                if (op == Operator.Equal)
+                {
+                    matchingValues.UnionWith(parsedValues);
+                }
+                else if (op == Operator.NotEqual)
+                {
+                    matchingValues.UnionWith(Enum.GetValues<T>());
+                    matchingValues.ExceptWith(parsedValues);
+                }
+                else
+                    return false;
             }
             else
             {
@@ -419,6 +458,10 @@ namespace osu.Game.Screens.Select
                             if (compareResult > 0) matchingValues.Add(val);
                             break;
 
+                        case Operator.NotEqual:
+                            if (compareResult != 0) matchingValues.Add(val);
+                            break;
+
                         default:
                             return false;
                     }
@@ -436,6 +479,10 @@ namespace osu.Game.Screens.Select
             {
                 default:
                     return false;
+
+                case Operator.NotEqual:
+                    range.InvertRange = true;
+                    goto case Operator.Equal;
 
                 case Operator.Equal:
                     range.IsLowerInclusive = range.IsUpperInclusive = true;
@@ -517,13 +564,15 @@ namespace osu.Game.Screens.Select
         {
             switch (op)
             {
+                case Operator.NotEqual:
                 case Operator.Equal:
-                    // an equality filter is difficult to define for support here.
+                    // an equality or inequality filter is difficult to define for support here.
                     // if "3 months 2 days ago" means a single concrete time instant, such a filter is basically useless.
                     // if it means a range of 24 hours, then that is annoying to write and also comes with its own implications
                     // (does it mean "time instant 3 months 2 days ago, within 12 hours of tolerance either direction"?
                     // does it mean "the full calendar day, from midnight to midnight, 3 months 2 days ago"?)
                     // as such, for simplicity, just refuse to support this.
+                    // same applies to inequality, but instead 24 hours would be need to be left out
                     return false;
 
                 // for the remaining operators, since the value provided to this function is an "ago" type value
@@ -676,6 +725,7 @@ namespace osu.Game.Screens.Select
             try
             {
                 DateTimeOffset dateTimeOffset;
+                dateRange.InvertRange = false;
 
                 switch (op)
                 {
@@ -730,6 +780,11 @@ namespace osu.Game.Screens.Select
 
                         dateTimeOffset = dateTimeOffsetFromDateOnly(year.Value, month.Value, day.Value).AddDays(1);
                         return tryUpdateCriteriaRange(ref dateRange, Operator.GreaterOrEqual, dateTimeOffset);
+
+                    case Operator.NotEqual:
+
+                        dateRange.InvertRange = true;
+                        goto case Operator.Equal;
 
                     case Operator.Equal:
 

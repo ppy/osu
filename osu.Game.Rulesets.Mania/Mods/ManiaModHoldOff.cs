@@ -9,6 +9,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Framework.Graphics.Sprites;
 using System.Collections.Generic;
 using osu.Framework.Localisation;
+using osu.Game.Graphics;
 using osu.Game.Rulesets.Mania.Beatmaps;
 
 namespace osu.Game.Rulesets.Mania.Mods
@@ -23,7 +24,7 @@ namespace osu.Game.Rulesets.Mania.Mods
 
         public override LocalisableString Description => @"Replaces all hold notes with normal notes.";
 
-        public override IconUsage? Icon => FontAwesome.Solid.DotCircle;
+        public override IconUsage? Icon => OsuIcon.ModHoldOff;
 
         public override ModType Type => ModType.Conversion;
 
