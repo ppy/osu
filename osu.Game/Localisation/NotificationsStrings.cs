@@ -84,16 +84,6 @@ Please try changing your audio device to a working setting.");
         public static LocalisableString LinkTypeNotSupported => new TranslatableString(getKey(@"unsupported_link_type"), @"This link type is not yet supported!");
 
         /// <summary>
-        /// "You received a private message from &#39;{0}&#39;. Click to read it!"
-        /// </summary>
-        public static LocalisableString PrivateMessageReceived(string username) => new TranslatableString(getKey(@"private_message_received"), @"You received a private message from '{0}'. Click to read it!", username);
-
-        /// <summary>
-        /// "Your name was mentioned in chat by &#39;{0}&#39;. Click to find out why!"
-        /// </summary>
-        public static LocalisableString YourNameWasMentioned(string username) => new TranslatableString(getKey(@"your_name_was_mentioned"), @"Your name was mentioned in chat by '{0}'. Click to find out why!", username);
-
-        /// <summary>
         /// "{0} invited you to the multiplayer match &quot;{1}&quot;! Click to join."
         /// </summary>
         public static LocalisableString InvitedYouToTheMultiplayer(string username, string roomName) => new TranslatableString(getKey(@"invited_you_to_the_multiplayer"), @"{0} invited you to the multiplayer match ""{1}""! Click to join.", username, roomName);
@@ -139,6 +129,11 @@ Click to see what's new!", version);
         /// "This multiplayer room has ended. Click to display room results."
         /// </summary>
         public static LocalisableString MultiplayerRoomEnded => new TranslatableString(getKey(@"multiplayer_room_ended"), @"This multiplayer room has ended. Click to display room results.");
+
+        /// <summary>
+        /// "Mention"
+        /// </summary>
+        public static LocalisableString Mention => new TranslatableString(getKey(@"mention"), @"Mention");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

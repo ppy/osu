@@ -3,9 +3,11 @@
 
 using System;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Configuration;
+using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Mods;
@@ -21,6 +23,7 @@ namespace osu.Game.Rulesets.Osu.Mods
     {
         public override string Name => "Bloom";
         public override string Acronym => "BM";
+        public override IconUsage? Icon => OsuIcon.ModBloom;
         public override ModType Type => ModType.Fun;
         public override LocalisableString Description => "The cursor blooms into.. a larger cursor!";
         public override double ScoreMultiplier => 1;

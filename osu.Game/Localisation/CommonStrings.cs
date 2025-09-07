@@ -184,6 +184,16 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString CopyLink => new TranslatableString(getKey(@"copy_link"), @"Copy link");
 
+        /// <summary>
+        /// "Manage..."
+        /// </summary>
+        public static LocalisableString Manage => new TranslatableString(getKey(@"manage"), @"Manage...");
+
+        /// <summary>
+        /// "Details..."
+        /// </summary>
+        public static LocalisableString Details => new TranslatableString(getKey(@"details"), @"Details...");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

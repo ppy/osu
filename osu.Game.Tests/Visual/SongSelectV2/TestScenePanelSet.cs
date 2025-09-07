@@ -75,21 +75,21 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                     {
                         new PanelBeatmapSet
                         {
-                            Item = new CarouselItem(beatmapSet)
+                            Item = new CarouselItem(new GroupedBeatmapSet(null, beatmapSet))
                         },
                         new PanelBeatmapSet
                         {
-                            Item = new CarouselItem(beatmapSet),
+                            Item = new CarouselItem(new GroupedBeatmapSet(null, beatmapSet)),
                             KeyboardSelected = { Value = true }
                         },
                         new PanelBeatmapSet
                         {
-                            Item = new CarouselItem(beatmapSet),
+                            Item = new CarouselItem(new GroupedBeatmapSet(null, beatmapSet)),
                             Expanded = { Value = true }
                         },
                         new PanelBeatmapSet
                         {
-                            Item = new CarouselItem(beatmapSet),
+                            Item = new CarouselItem(new GroupedBeatmapSet(null, beatmapSet)),
                             KeyboardSelected = { Value = true },
                             Expanded = { Value = true }
                         },
