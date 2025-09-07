@@ -34,35 +34,43 @@ namespace osu.Game.Screens.Select.Leaderboards
         [BackgroundDependencyLoader]
         private void load(IAPIProvider api, GameplayState? gameplayState)
         {
-            var scoresRequest = new IndexPlaylistScoresRequest(room.RoomID!.Value, playlistItem.ID);
-            scoresRequest.Success += response =>
-            {
-                var newScores = new List<GameplayLeaderboardScore>();
+            var scoresToShow = new List<GameplayLeaderboardScore>();
 
+            var scoresRequest = new IndexPlaylistScoresRequest(room.RoomID!.Value, playlistItem.ID);
+            api.Perform(scoresRequest);
+
+            var response = scoresRequest.Response;
+
+            if (response != null)
+            {
                 isPartial = response.Scores.Count < response.TotalScores;
 
                 for (int i = 0; i < response.Scores.Count; i++)
                 {
                     var score = response.Scores[i];
                     score.Position = i + 1;
-                    newScores.Add(new GameplayLeaderboardScore(score, tracked: false, GameplayLeaderboardScore.ComboDisplayMode.Highest));
+                    scoresToShow.Add(new GameplayLeaderboardScore(score, tracked: false, GameplayLeaderboardScore.ComboDisplayMode.Highest));
                 }
 
                 if (response.UserScore != null && response.Scores.All(s => s.ID != response.UserScore.ID))
-                    newScores.Add(new GameplayLeaderboardScore(response.UserScore, tracked: false, GameplayLeaderboardScore.ComboDisplayMode.Highest));
-
-                scores.AddRange(newScores);
-            };
-            api.Perform(scoresRequest);
+                    scoresToShow.Add(new GameplayLeaderboardScore(response.UserScore, tracked: false, GameplayLeaderboardScore.ComboDisplayMode.Highest));
+            }
 
             if (gameplayState != null)
             {
                 var localScore = new GameplayLeaderboardScore(gameplayState, tracked: true, GameplayLeaderboardScore.ComboDisplayMode.Highest);
                 localScore.TotalScore.BindValueChanged(_ => sorting.Invalidate());
-                scores.Add(localScore);
+                scoresToShow.Add(localScore);
             }
 
-            Scheduler.AddDelayed(sort, 1000, true);
+            // touching the public bindable must happen on the update thread for general thread safety,
+            // since we may have external subscribers bound already
+            Schedule(() =>
+            {
+                scores.AddRange(scoresToShow);
+                sort();
+                Scheduler.AddDelayed(sort, 1000, true);
+            });
         }
 
         // logic shared with SoloGameplayLeaderboardProvider

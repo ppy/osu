@@ -48,6 +48,13 @@ namespace osu.Game.Tests.NonVisual
             AddUntilStep("no check pending", () => !manager.IsPending);
         }
 
+        [TearDownSteps]
+        public void TeardownSteps()
+        {
+            // Importantly, this immediately saves the config, which cancels any pending background save.
+            AddStep("dispose config manager", () => config.Dispose());
+        }
+
         /// <summary>
         /// Updates should be checked when the release stream is changed.
         /// </summary>
@@ -136,13 +143,38 @@ namespace osu.Game.Tests.NonVisual
             AddUntilStep("no check pending", () => !manager.IsPending);
         }
 
+        [Test]
+        public void TestFixedReleaseStreamWrittenToConfig()
+        {
+            AddStep("add manager", () =>
+            {
+                config = new OsuConfigManager(LocalStorage);
+                config.SetValue(OsuSetting.ReleaseStream, ReleaseStream.Lazer);
+
+                Child = new DependencyProvidingContainer
+                {
+                    CachedDependencies = [(typeof(OsuConfigManager), config)],
+                    Child = manager = new TestUpdateManager(ReleaseStream.Tachyon)
+                };
+            });
+
+            AddAssert("release stream set to tachyon", () => config.Get<ReleaseStream>(OsuSetting.ReleaseStream), () => Is.EqualTo(ReleaseStream.Tachyon));
+        }
+
         private partial class TestUpdateManager : UpdateManager
         {
+            public override ReleaseStream? FixedReleaseStream { get; }
+
             public bool IsPending { get; private set; }
             public int Invocations { get; private set; }
             public int Completions { get; private set; }
 
             private TaskCompletionSource<bool>? pendingCheck;
+
+            public TestUpdateManager(ReleaseStream? fixedReleaseStream = null)
+            {
+                FixedReleaseStream = fixedReleaseStream;
+            }
 
             protected override async Task<bool> PerformUpdateCheck(CancellationToken cancellationToken)
             {

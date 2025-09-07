@@ -83,6 +83,20 @@ namespace osu.Game.Screens.Select.Carousel
                      criteria.Title.Matches(BeatmapInfo.Metadata.TitleUnicode);
             match &= !criteria.DifficultyName.HasFilter || criteria.DifficultyName.Matches(BeatmapInfo.DifficultyName);
             match &= !criteria.Source.HasFilter || criteria.Source.Matches(BeatmapInfo.Metadata.Source);
+
+            if (criteria.UserTags.Any())
+            {
+                foreach (var tagFilter in criteria.UserTags)
+                {
+                    bool anyTagMatched = false;
+
+                    foreach (string tag in BeatmapInfo.Metadata.UserTags)
+                        anyTagMatched |= tagFilter.Matches(tag);
+
+                    match &= anyTagMatched;
+                }
+            }
+
             match &= !criteria.UserStarDifficulty.HasFilter || criteria.UserStarDifficulty.IsInRange(BeatmapInfo.StarRating);
 
             if (!match) return false;

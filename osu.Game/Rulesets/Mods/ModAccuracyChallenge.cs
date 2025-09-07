@@ -6,8 +6,10 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.LocalisationExtensions;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
+using osu.Game.Graphics;
 using osu.Game.Localisation.HUD;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Scoring;
@@ -23,6 +25,8 @@ namespace osu.Game.Rulesets.Mods
         public override string Acronym => "AC";
 
         public override LocalisableString Description => "Fail if your accuracy drops too low!";
+
+        public override IconUsage? Icon => OsuIcon.ModAccuracyChallenge;
 
         public override ModType Type => ModType.DifficultyIncrease;
 
