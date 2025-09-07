@@ -119,6 +119,54 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         }
 
         [Test]
+        public void TestSeparateAllDifficulties()
+        {
+            AddStep("add single difficulty set", () =>
+            {
+                var set = TestResources.CreateTestBeatmapSetInfo(1);
+                set.Beatmaps.Clear();
+                set.Beatmaps.Add(new BeatmapInfo(new OsuRuleset().RulesetInfo, new BeatmapDifficulty(), new BeatmapMetadata())
+                {
+                    BeatmapSet = set,
+                    DifficultyName = "Stars: 1",
+                    StarRating = 1,
+                });
+
+                BeatmapSets.Add(set);
+            });
+
+            WaitForDrawablePanels();
+
+            foreach (var sortMode in Enum.GetValues<SortMode>())
+            {
+                foreach (var groupMode in Enum.GetValues<GroupMode>())
+                {
+                    if (groupMode == GroupMode.MyMaps)
+                        continue;
+
+                    ApplyToFilterAndWaitForFilter("separate all difficulties", c =>
+                    {
+                        c.Sort = sortMode;
+                        c.Group = groupMode;
+                        c.SeparateAllDifficulties = true;
+                    });
+
+                    WaitForDrawablePanels();
+
+                    int expectedAmount = 1;
+
+                    if (groupMode != GroupMode.None)
+                        expectedAmount = 2;
+
+                    //TODO: Fix it so that it actually represents the sum of visible group panels, beatmapset panels
+                    // and beatmap panels which should be one when GroupMode is None and two when it is anything else
+                    int count = GetVisiblePanels<PanelBeatmap>().Count();
+                    Assert.IsTrue(count == expectedAmount, $"{sortMode} sort, {groupMode} group mode ({count})");
+                }
+            }
+        }
+
+        [Test]
         public void TestCarouselRemembersSelection()
         {
             Guid selectedID = Guid.Empty;

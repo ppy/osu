@@ -95,6 +95,11 @@ namespace osu.Game.Localisation
         public static LocalisableString ShowConvertedBeatmaps => new TranslatableString(getKey(@"show_converted_beatmaps"), @"Show converted beatmaps");
 
         /// <summary>
+        /// "Separate all difficulties"
+        /// </summary>
+        public static LocalisableString SeparateAllDifficulties => new TranslatableString(getKey(@"separate_all_difficulties"), @"Separate all difficulties");
+
+        /// <summary>
         /// "Display beatmaps from"
         /// </summary>
         public static LocalisableString StarsMinimum => new TranslatableString(getKey(@"stars_minimum"), @"Display beatmaps from");
