@@ -173,10 +173,9 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                         Source = $"{numberMetadata}. source",
                     };
 
-                    double starRating = 0;
                     //Creates a stable pattern of "unsorted" starratings (0, n-1, 2, n-3, 4, n-5)
                     int odd = amountOfBeatmaps % 2 == 1 ? 1 : 0;
-                    starRating = j % 2 == 0 ? j : amountOfBeatmaps - odd - j;
+                    double starRating = j % 2 == 0 ? j : amountOfBeatmaps - odd - j;
                     double bpm = numberMetadata * 30;
                     double length = numberMetadata * 20;
 
