@@ -96,7 +96,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 estimatedUnstableRate.Value,
                 midpointOffset: (rhythmExpectedUnstableRate + rhythmMaximumUnstableRate) / 2,
                 multiplier: 10 / (rhythmMaximumUnstableRate - rhythmExpectedUnstableRate),
-                maxValue: 0.25 * Math.Pow(rhythmFactor, 2)
+                maxValue: 0.25 * Math.Pow(rhythmFactor, 3)
             );
 
             double baseDifficulty = 5 * Math.Max(1.0, attributes.StarRating * rhythmPenalty / 0.110) - 4.0;
@@ -145,7 +145,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             double accuracyValue = 470 * Math.Pow(0.9885, estimatedUnstableRate.Value);
 
             // Scales up the bonus for lower unstable rate as star rating increases.
-            accuracyValue *= 1 + Math.Pow(50 / estimatedUnstableRate.Value, 2) * Math.Pow(attributes.StarRating, 2) / 125;
+            accuracyValue *= 1 + Math.Pow(50 / estimatedUnstableRate.Value, 2) * Math.Pow(attributes.StarRating, 2.8) / 600;
 
             if (score.Mods.Any(m => m is ModHidden) && !isConvert)
                 accuracyValue *= 1.075;
