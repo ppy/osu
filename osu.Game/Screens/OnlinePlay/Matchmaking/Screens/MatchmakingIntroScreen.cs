@@ -96,7 +96,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens
                                         {
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.Centre,
-                                            Text = "Matchmaking",
+                                            Text = "Quick Play",
                                             Margin = new MarginPadding { Horizontal = 10f, Vertical = 5f },
                                             Shear = -OsuGame.SHEAR,
                                             Font = OsuFont.GetFont(size: 32, weight: FontWeight.Light, typeface: Typeface.TorusAlternate),
