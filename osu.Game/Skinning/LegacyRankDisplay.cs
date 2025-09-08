@@ -35,11 +35,11 @@ namespace osu.Game.Skinning
         private SkinnableSound rankUpSample = null!;
 
         private Bindable<double?> lastSamplePlayback = null!;
-        private double timeSinceChange;
+        private double lastChangeTime;
 
         private ScoreRank? displayedRank;
 
-        private const int time_before_commit = 1500;
+        private const int time_between_changes = 1500;
 
         public LegacyRankDisplay()
         {
@@ -81,12 +81,9 @@ namespace osu.Game.Skinning
             var currentRank = scoreProcessor.Rank.Value;
 
             if (currentRank == displayedRank)
-            {
-                timeSinceChange = 0;
                 return;
-            }
 
-            if ((timeSinceChange += Time.Elapsed) >= time_before_commit || scoreProcessor.HasCompleted.Value || currentRank == ScoreRank.F)
+            if (Time.Current - lastChangeTime >= time_between_changes || scoreProcessor.HasCompleted.Value || currentRank == ScoreRank.F)
                 updateRank(currentRank);
         }
 
@@ -129,7 +126,7 @@ namespace osu.Game.Skinning
             }
 
             displayedRank = rank;
-            timeSinceChange = 0;
+            lastChangeTime = Time.Current;
         }
     }
 }
