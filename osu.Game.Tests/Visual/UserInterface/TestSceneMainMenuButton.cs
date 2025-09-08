@@ -177,28 +177,5 @@ namespace osu.Game.Tests.Visual.UserInterface
             }));
             AddAssert("no notification posted", () => notificationOverlay.AllNotifications.Count(), () => Is.Zero);
         }
-
-        [Test]
-        public void TestMatchmaking()
-        {
-            AddStep("add content", () =>
-            {
-                Children = new Drawable[]
-                {
-                    new DependencyProvidingContainer
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        AutoSizeAxes = Axes.Both,
-                        Child = new MatchmakingButton(@"button-default-select", new Color4(102, 68, 204, 255), (_, _) => { }, 0, Key.D)
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            ButtonSystemState = ButtonSystemState.TopLevel,
-                        },
-                    },
-                };
-            });
-        }
     }
 }

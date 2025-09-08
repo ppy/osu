@@ -13,6 +13,7 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Logging;
@@ -85,6 +86,7 @@ namespace osu.Game.Screens.Menu
 
         private readonly List<MainMenuButton> buttonsTopLevel = new List<MainMenuButton>();
         private readonly List<MainMenuButton> buttonsPlay = new List<MainMenuButton>();
+        private readonly List<MainMenuButton> buttonsMulti = new List<MainMenuButton>();
         private readonly List<MainMenuButton> buttonsEdit = new List<MainMenuButton>();
 
         private Sample? sampleBackToLogo;
@@ -110,7 +112,19 @@ namespace osu.Game.Screens.Menu
                 {
                     Padding = new MarginPadding { Right = WEDGE_WIDTH },
                 },
-                backButton = new MainMenuButton(ButtonSystemStrings.Back, @"back-to-top", OsuIcon.PrevCircle, new Color4(51, 58, 94, 255), (_, _) => State = ButtonSystemState.TopLevel)
+                backButton = new MainMenuButton(ButtonSystemStrings.Back, @"back-to-top", OsuIcon.PrevCircle, new Color4(51, 58, 94, 255), (_, _) =>
+                {
+                    switch (State)
+                    {
+                        case ButtonSystemState.Multi:
+                            State = ButtonSystemState.Play;
+                            break;
+
+                        default:
+                            State = ButtonSystemState.TopLevel;
+                            break;
+                    }
+                })
                 {
                     Padding = new MarginPadding { Right = WEDGE_WIDTH },
                     VisibleStateMin = ButtonSystemState.Play,
@@ -138,11 +152,17 @@ namespace osu.Game.Screens.Menu
             {
                 Padding = new MarginPadding { Left = WEDGE_WIDTH },
             });
-            buttonsPlay.Add(new MainMenuButton(ButtonSystemStrings.Multi, @"button-default-select", OsuIcon.Online, new Color4(94, 63, 186, 255), onMultiplayer, Key.M));
-            buttonsPlay.Add(new MatchmakingButton(@"button-default-select", new Color4(94, 63, 186, 255), onMatchmaking, Key.N));
+            buttonsPlay.Add(new MainMenuButton(ButtonSystemStrings.Multi, @"button-default-select", OsuIcon.Online, new Color4(94, 63, 186, 255), (_, _) => State = ButtonSystemState.Multi, Key.M));
             buttonsPlay.Add(new MainMenuButton(ButtonSystemStrings.Playlists, @"button-default-select", OsuIcon.Tournament, new Color4(94, 63, 186, 255), onPlaylists, Key.L));
             buttonsPlay.Add(new DailyChallengeButton(@"button-daily-select", new Color4(94, 63, 186, 255), onDailyChallenge, Key.D));
             buttonsPlay.ForEach(b => b.VisibleState = ButtonSystemState.Play);
+
+            buttonsMulti.Add(new MainMenuButton("lounge", @"button-default-select", FontAwesome.Solid.Couch, new Color4(94, 63, 186, 255), onMultiplayer, Key.B)
+            {
+                Padding = new MarginPadding { Left = WEDGE_WIDTH }
+            });
+            buttonsMulti.Add(new MainMenuButton("quick play", @"button-default-select", FontAwesome.Solid.Bolt, new Color4(94, 63, 186, 255), onMatchmaking, Key.Q));
+            buttonsMulti.ForEach(b => b.VisibleState = ButtonSystemState.Multi);
 
             buttonsEdit.Add(new MainMenuButton(EditorStrings.BeatmapEditor.ToLower(), @"button-default-select", OsuIcon.Beatmap, new Color4(238, 170, 0, 255), (_, _) => OnEditBeatmap?.Invoke(), Key.B,
                 Key.E)
@@ -164,6 +184,7 @@ namespace osu.Game.Screens.Menu
             if (host.CanExit)
                 buttonsTopLevel.Add(new MainMenuButton(ButtonSystemStrings.Exit, string.Empty, OsuIcon.CrossCircle, new Color4(238, 51, 153, 255), (_, e) => OnExit?.Invoke(e), Key.Q));
 
+            buttonArea.AddRange(buttonsMulti);
             buttonArea.AddRange(buttonsPlay);
             buttonArea.AddRange(buttonsEdit);
             buttonArea.AddRange(buttonsTopLevel);
@@ -331,6 +352,7 @@ namespace osu.Game.Screens.Menu
 
                 case ButtonSystemState.Edit:
                 case ButtonSystemState.Play:
+                case ButtonSystemState.Multi:
                     StopSamplePlayback();
                     backButton.TriggerClick();
                     return true;
@@ -343,6 +365,7 @@ namespace osu.Game.Screens.Menu
         public void StopSamplePlayback()
         {
             buttonsPlay.ForEach(button => button.StopSamplePlayback());
+            buttonsMulti.ForEach(button => button.StopSamplePlayback());
             buttonsTopLevel.ForEach(button => button.StopSamplePlayback());
             logo?.StopSamplePlayback();
         }
@@ -363,6 +386,10 @@ namespace osu.Game.Screens.Menu
                     return false;
 
                 case ButtonSystemState.Play:
+                    buttonsPlay.First().TriggerClick();
+                    return false;
+
+                case ButtonSystemState.Multi:
                     buttonsPlay.First().TriggerClick();
                     return false;
 
@@ -487,6 +514,7 @@ namespace osu.Game.Screens.Menu
         Initial,
         TopLevel,
         Play,
+        Multi,
         Edit,
         EnteringMode,
     }
