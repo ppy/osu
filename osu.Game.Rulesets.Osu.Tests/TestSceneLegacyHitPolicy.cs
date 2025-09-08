@@ -475,7 +475,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             performTest(hitObjects, new List<ReplayFrame>
             {
                 new OsuReplayFrame { Time = time_stack_start - 450, Position = new Vector2(55), Actions = { OsuAction.LeftButton } },
-            });
+            }, extraMods: [new OsuModNoFail()]);
 
             addClickActionAssert(0, ClickAction.Ignore);
         }

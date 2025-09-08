@@ -23,6 +23,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             new CheckTimeDistanceEquality(),
             new CheckLowDiffOverlaps(),
             new CheckTooShortSliders(),
+            new CheckOsuLowestDiffDrainTime(),
 
             // Settings
             new CheckOsuAbnormalDifficultySettings(),

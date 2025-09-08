@@ -232,10 +232,47 @@ namespace osu.Game.Rulesets.Osu.Statistics
             if (pointGrid.Content.Count == 0)
                 return;
 
-            double angle1 = Math.Atan2(end.Y - hitPoint.Y, hitPoint.X - end.X); // Angle between the end point and the hit point.
-            double angle2 = Math.Atan2(end.Y - start.Y, start.X - end.X); // Angle between the end point and the start point.
+            Vector2 relativePosition = FindRelativeHitPosition(start, end, hitPoint, radius, rotation);
+
+            var localCentre = new Vector2(points_per_dimension - 1) / 2;
+            float localRadius = localCentre.X * inner_portion;
+            var localPoint = localCentre + localRadius * relativePosition;
+
+            // Find the most relevant hit point.
+            int r = (int)Math.Round(localPoint.Y);
+            int c = (int)Math.Round(localPoint.X);
+
+            if (r < 0 || r >= points_per_dimension || c < 0 || c >= points_per_dimension)
+                return;
+
+            PeakValue = Math.Max(PeakValue, ((GridPoint)pointGrid.Content[r][c]).Increment());
+
+            bufferedGrid.ForceRedraw();
+        }
+
+        /// <summary>
+        /// Normalises the position of a hit on a circle such that it is relative to the movement that was performed to arrive at said circle.
+        /// </summary>
+        /// <param name="previousObjectPosition">The position of the object prior to the one getting hit.</param>
+        /// <param name="nextObjectPosition">The position of the object which is getting hit.</param>
+        /// <param name="hitPoint">The point at which the user hit.</param>
+        /// <param name="objectRadius">The radius of <paramref name="previousObjectPosition"/> and <paramref name="nextObjectPosition"/>.</param>
+        /// <param name="rotation">
+        /// The rotation of the axis which is to be considered in the same direction as the vector
+        /// leading from <paramref name="previousObjectPosition"/> to <paramref name="nextObjectPosition"/>.
+        /// </param>
+        /// <returns>
+        /// A 2D vector representing the <paramref name="hitPoint"/> as relative to the movement between <paramref name="previousObjectPosition"/> and <paramref name="nextObjectPosition"/>
+        /// and relative to the <paramref name="objectRadius"/>.
+        /// If the object was hit perfectly in the middle, the return value will be <see cref="Vector2.Zero"/>.
+        /// If the object was hit perfectly at its edge, the returned vector will have a magnitude of 1.
+        /// </returns>
+        public static Vector2 FindRelativeHitPosition(Vector2 previousObjectPosition, Vector2 nextObjectPosition, Vector2 hitPoint, float objectRadius, float rotation)
+        {
+            double angle1 = Math.Atan2(nextObjectPosition.Y - hitPoint.Y, hitPoint.X - nextObjectPosition.X); // Angle between the end point and the hit point.
+            double angle2 = Math.Atan2(nextObjectPosition.Y - previousObjectPosition.Y, previousObjectPosition.X - nextObjectPosition.X); // Angle between the end point and the start point.
             double finalAngle = angle2 - angle1; // Angle between start, end, and hit points.
-            float normalisedDistance = Vector2.Distance(hitPoint, end) / radius;
+            float normalisedDistance = Vector2.Distance(hitPoint, nextObjectPosition) / objectRadius; // Distance between the hit point and the end point.
 
             // Consider two objects placed horizontally, with the start on the left and the end on the right.
             // The above calculated the angle between {end, start}, and the angle between {end, hitPoint}, in the form:
@@ -254,22 +291,7 @@ namespace osu.Game.Rulesets.Osu.Statistics
             //
             // We also need to apply the anti-clockwise rotation.
             double rotatedAngle = finalAngle - float.DegreesToRadians(rotation);
-            var rotatedCoordinate = -1 * new Vector2((float)Math.Cos(rotatedAngle), (float)Math.Sin(rotatedAngle));
-
-            Vector2 localCentre = new Vector2(points_per_dimension - 1) / 2;
-            float localRadius = localCentre.X * inner_portion * normalisedDistance;
-            Vector2 localPoint = localCentre + localRadius * rotatedCoordinate;
-
-            // Find the most relevant hit point.
-            int r = (int)Math.Round(localPoint.Y);
-            int c = (int)Math.Round(localPoint.X);
-
-            if (r < 0 || r >= points_per_dimension || c < 0 || c >= points_per_dimension)
-                return;
-
-            PeakValue = Math.Max(PeakValue, ((GridPoint)pointGrid.Content[r][c]).Increment());
-
-            bufferedGrid.ForceRedraw();
+            return -normalisedDistance * new Vector2((float)Math.Cos(rotatedAngle), (float)Math.Sin(rotatedAngle));
         }
 
         private abstract partial class GridPoint : CompositeDrawable
