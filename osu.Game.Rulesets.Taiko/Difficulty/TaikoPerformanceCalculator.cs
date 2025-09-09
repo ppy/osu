@@ -116,13 +116,17 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             {
                 double hiddenBonus = isConvert ? 0.025 : 0.1;
 
-                // A penalty is applied to the bonus for hidden on non-classic scores, as the playfield can be made wider to make fast reading easier.
-                if (!isClassic)
-                    hiddenBonus *= 0.2;
+                // Hidden+flashlight plays are excluded from reading-based penalties to hidden.
+                if (!score.Mods.Any(m => m is ModFlashlight))
+                {
+                    // A penalty is applied to the bonus for hidden on non-classic scores, as the playfield can be made wider to make fast reading easier.
+                    if (!isClassic)
+                        hiddenBonus *= 0.2;
 
-                // A penalty is applied to classic easy+hidden scores, as this combo works differently than expected and makes fast reading easier.
-                if (score.Mods.Any(m => m is ModEasy) && isClassic)
-                    hiddenBonus *= 0.5;
+                    // A penalty is applied to classic easy+hidden scores, as notes disappear later making fast reading easier.
+                    if (score.Mods.Any(m => m is ModEasy) && isClassic)
+                        hiddenBonus *= 0.5;
+                }
 
                 difficultyValue *= 1 + hiddenBonus;
             }
