@@ -103,8 +103,13 @@ namespace osu.Game.Skinning.Components
 
         private void updateWireframeDigits()
         {
+            var visibleCounters = CounterFlow.Children.Where(counter => counter.State.Value == Visibility.Visible).ToArray();
+
+            if (visibleCounters.Length == 0)
+                return;
+
             wireframeDigits.Value = FlowDirection.Value == Direction.Vertical
-                ? Math.Max(2, CounterFlow.Children.Where(counter => counter.State.Value == Visibility.Visible).Max(counter => counter.Result.ResultCount.Value).ToString().Length)
+                ? Math.Max(2, visibleCounters.Max(counter => counter.Result.ResultCount.Value).ToString().Length)
                 : null;
         }
 
