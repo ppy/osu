@@ -80,7 +80,7 @@ namespace osu.Game.Screens.SelectV2
         /// <summary>
         /// Interval for periodic favorites cache refresh in milliseconds (5 minutes).
         /// </summary>
-        private const double PERIODIC_REFRESH_INTERVAL = 300000;
+        private const double PeriodicRefreshInterval = 300000;
 
         public LocalisableString StatusText
         {
@@ -495,7 +495,7 @@ namespace osu.Game.Screens.SelectV2
             base.Update();
 
             // Check for periodic favorites refresh
-            if (Time.Current - lastPeriodicCheck >= PERIODIC_REFRESH_INTERVAL)
+            if (Time.Current - lastPeriodicCheck >= PeriodicRefreshInterval)
             {
                 lastPeriodicCheck = Time.Current;
                 periodicFavoritesRefresh();

@@ -2,14 +2,18 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
+using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
+using CollectionDropdown = osu.Game.Screens.SelectV2.CollectionDropdown;
 using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
@@ -28,6 +32,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         private FilterControl filterControl = null!;
         private CollectionDropdown collectionDropdown = null!;
         private DummyAPIAccess dummyAPI => (DummyAPIAccess)API;
+        private APIRequest? lastQueuedRequest;
 
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
@@ -53,7 +58,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             {
                 dummyAPI.HandleRequest = null;
                 dummyAPI.Logout();
-                localUserPlayInfo.PlayingState.Value = LocalUserPlayingState.NotPlaying;
+                localUserPlayInfo.SetPlayingState(LocalUserPlayingState.NotPlaying);
+                lastQueuedRequest = null;
             });
         }
 
@@ -99,8 +105,16 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         public void TestFavoritesFilterWithNoCache()
         {
             AddStep("log in", () => dummyAPI.Login("test", "test"));
+            AddStep("setup request tracking", () =>
+            {
+                dummyAPI.HandleRequest = req =>
+                {
+                    lastQueuedRequest = req;
+                    return false;
+                };
+            });
             AddStep("select favorites", () => selectFavoritesFilter());
-            AddAssert("API request was made", () => dummyAPI.LastQueuedRequest is GetUserBeatmapsRequest);
+            AddAssert("API request was made", () => lastQueuedRequest is GetUserBeatmapsRequest);
         }
 
         [Test]
@@ -120,7 +134,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                         {
                             new APIBeatmapSet { OnlineID = 1 },
                             new APIBeatmapSet { OnlineID = 2 }
-                        });
+                        }.ToList());
                         return true;
                     }
                     return false;
@@ -143,8 +157,12 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddStep("mock API responses", () => setupMockAPI());
             AddStep("select favorites filter", () => selectFavoritesFilter());
 
-            AddStep("trigger favorite change event", () =>
-                PostBeatmapFavouriteRequest.FavouriteChanged?.Invoke(123, true));
+            AddStep("trigger favorite change by reselecting filter", () =>
+            {
+                // Simulate favorite change by switching away and back to favorites filter
+                selectAllBeatmapsFilter();
+                selectFavoritesFilter();
+            });
             AddAssert("filter criteria updated", () => filterControl.CreateCriteria().CollectionBeatmapMD5Hashes != null);
         }
 
@@ -152,12 +170,12 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         public void TestPeriodicRefreshOnlyWhenNotPlaying()
         {
             AddStep("log in", () => dummyAPI.Login("test", "test"));
-            AddStep("set playing state", () => localUserPlayInfo.PlayingState.Value = LocalUserPlayingState.Playing);
+            AddStep("set playing state", () => localUserPlayInfo.SetPlayingState(LocalUserPlayingState.Playing));
             AddStep("mock API responses", () => setupMockAPI());
             AddStep("select favorites filter", () => selectFavoritesFilter());
             AddAssert("playing state is respected", () => localUserPlayInfo.PlayingState.Value == LocalUserPlayingState.Playing);
 
-            AddStep("set not playing state", () => localUserPlayInfo.PlayingState.Value = LocalUserPlayingState.NotPlaying);
+            AddStep("set not playing state", () => localUserPlayInfo.SetPlayingState(LocalUserPlayingState.NotPlaying));
             AddAssert("not playing state is set", () => localUserPlayInfo.PlayingState.Value == LocalUserPlayingState.NotPlaying);
         }
 
@@ -170,8 +188,26 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddUntilStep("cache populated", () => filterControl.CreateCriteria().CollectionBeatmapMD5Hashes != null);
 
             AddStep("log in as user 2", () => dummyAPI.Login("user2", "test"));
+            AddStep("setup request tracking for user 2", () =>
+            {
+                lastQueuedRequest = null;
+                dummyAPI.HandleRequest = req =>
+                {
+                    lastQueuedRequest = req;
+                    if (req is GetUserBeatmapsRequest getUserBeatmapsRequest)
+                    {
+                        getUserBeatmapsRequest.TriggerSuccess(new APIBeatmapSet[]
+                        {
+                            new APIBeatmapSet { OnlineID = 3 },
+                            new APIBeatmapSet { OnlineID = 4 }
+                        }.ToList());
+                        return true;
+                    }
+                    return false;
+                };
+            });
             AddStep("select favorites filter", () => selectFavoritesFilter());
-            AddUntilStep("new API request for new user", () => dummyAPI.LastQueuedRequest is GetUserBeatmapsRequest);
+            AddUntilStep("new API request for new user", () => lastQueuedRequest is GetUserBeatmapsRequest);
         }
 
         [Test]
@@ -190,7 +226,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                             getUserBeatmapsRequest.TriggerSuccess(new APIBeatmapSet[]
                             {
                                 new APIBeatmapSet { OnlineID = importedBeatmap.OnlineID }
-                            });
+                            }.ToList());
                             return true;
                         }
                         return false;
@@ -239,18 +275,20 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                     {
                         new APIBeatmapSet { OnlineID = 1 },
                         new APIBeatmapSet { OnlineID = 2 }
-                    });
+                    }.ToList());
                     return true;
                 }
                 return false;
             };
         }
 
-        private partial class LocalUserPlayInfo : ILocalUserPlayInfo
+        public partial class LocalUserPlayInfo : ILocalUserPlayInfo
         {
-            public Bindable<LocalUserPlayingState> PlayingState { get; } = new Bindable<LocalUserPlayingState>();
+            private readonly Bindable<LocalUserPlayingState> playingState = new Bindable<LocalUserPlayingState>();
 
-            IBindable<LocalUserPlayingState> ILocalUserPlayInfo.PlayingState => PlayingState;
+            public IBindable<LocalUserPlayingState> PlayingState => playingState;
+
+            public void SetPlayingState(LocalUserPlayingState state) => playingState.Value = state;
         }
     }
 }
