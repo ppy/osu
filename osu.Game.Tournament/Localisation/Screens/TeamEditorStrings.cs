@@ -1,0 +1,76 @@
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
+using osu.Framework.Localisation;
+
+namespace osu.Game.Tournament.Localisation.Screens
+{
+    public class TeamEditorStrings
+    {
+        private const string prefix = @"osu.Game.Resources.Localisation.Tournament.Screens.TeamEditor";
+
+        /// <summary>
+        /// "Name"
+        /// </summary>
+        public static LocalisableString TeamName => new TranslatableString(getKey(@"team_name"), @"Name");
+
+        /// <summary>
+        /// "Acronym"
+        /// </summary>
+        public static LocalisableString TeamAcronym => new TranslatableString(getKey(@"team_acronym"), @"Acronym");
+
+        /// <summary>
+        /// "Flag"
+        /// </summary>
+        public static LocalisableString TeamFlag => new TranslatableString(getKey(@"team_flag"), @"Flag");
+
+        /// <summary>
+        /// "Seed"
+        /// </summary>
+        public static LocalisableString TeamSeed => new TranslatableString(getKey(@"team_seed"), @"Seed");
+
+        /// <summary>
+        /// "Last Year Placement"
+        /// </summary>
+        public static LocalisableString LastYearPlacement => new TranslatableString(getKey(@"last_year_placement"), @"Last Year Placement");
+
+        /// <summary>
+        /// "Edit seeding results"
+        /// </summary>
+        public static LocalisableString EditSeedingResults => new TranslatableString(getKey(@"edit_seeding_results"), @"Edit seeding results");
+
+        /// <summary>
+        /// "Add player"
+        /// </summary>
+        public static LocalisableString AddPlayer => new TranslatableString(getKey(@"add_player"), @"Add player");
+
+        /// <summary>
+        /// "Delete Team"
+        /// </summary>
+        public static LocalisableString DeleteTeam => new TranslatableString(getKey(@"delete_team"), @"Delete Team");
+
+        /// <summary>
+        /// "Delete Player"
+        /// </summary>
+        public static LocalisableString DeletePlayer => new TranslatableString(getKey(@"delete_player"), @"Delete Player");
+
+        /// <summary>
+        /// "User ID"
+        /// </summary>
+        public static LocalisableString UserId => new TranslatableString(getKey(@"user_id"), @"User ID");
+
+        /// <summary>
+        /// "Add all countries"
+        /// </summary>
+        public static LocalisableString AddAllCountries => new TranslatableString(getKey(@"add_all_countries"), @"Add all countries");
+
+        /// <summary>
+        /// "Acronym '{0}' is already in use by team(s): {1}"
+        /// </summary>
+        public static LocalisableString AcronymOccupiedPrompt(string acronym, string teams) => new TranslatableString(getKey(@"acronym_occupied_prompt"),
+            @"Acronym '{0}' is already in use by team(s): {1}", acronym, teams);
+
+        private static string getKey(string key) => $@"{prefix}:{key}";
+    }
+}
+

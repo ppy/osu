@@ -14,6 +14,8 @@ using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Tournament.Components;
+using osu.Game.Tournament.Localisation;
+using osu.Game.Tournament.Localisation.Screens;
 using osu.Game.Tournament.Models;
 using osu.Game.Tournament.Screens.Editors;
 using osuTK;
@@ -195,10 +197,10 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
                 return new MenuItem[]
                 {
-                    new OsuMenuItem("Set as current", MenuItemType.Standard, setCurrent),
-                    new OsuMenuItem("Join with", MenuItemType.Standard, () => ladderEditor.BeginJoin(match, false)),
-                    new OsuMenuItem("Join with (loser)", MenuItemType.Standard, () => ladderEditor.BeginJoin(match, true)),
-                    new OsuMenuItem("Remove", MenuItemType.Destructive, () => ladderEditor.Remove(match)),
+                    new OsuMenuItem(BracketEditorStrings.SetAsCurrent, MenuItemType.Standard, setCurrent),
+                    new OsuMenuItem(BracketEditorStrings.JoinWith, MenuItemType.Standard, () => ladderEditor.BeginJoin(match, false)),
+                    new OsuMenuItem(BracketEditorStrings.JoinWithLoser, MenuItemType.Standard, () => ladderEditor.BeginJoin(match, true)),
+                    new OsuMenuItem(BaseStrings.Remove, MenuItemType.Destructive, () => ladderEditor.Remove(match)),
                 };
             }
         }

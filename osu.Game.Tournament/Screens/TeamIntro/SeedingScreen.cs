@@ -9,9 +9,11 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Tournament.Components;
+using osu.Game.Tournament.Localisation.Screens;
 using osu.Game.Tournament.Models;
 using osu.Game.Tournament.Screens.Ladder.Components;
 using osuTK;
@@ -50,18 +52,18 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                         showFirstTeamButton = new TourneyButton
                         {
                             RelativeSizeAxes = Axes.X,
-                            Text = "Show first team",
+                            Text = SeedingStrings.ShowFirstTeam,
                             Action = () => currentTeam.Value = CurrentMatch.Value?.Team1.Value,
                         },
                         showSecondTeamButton = new TourneyButton
                         {
                             RelativeSizeAxes = Axes.X,
-                            Text = "Show second team",
+                            Text = SeedingStrings.ShowSecondTeam,
                             Action = () => currentTeam.Value = CurrentMatch.Value?.Team2.Value,
                         },
                         new SettingsTeamDropdown(LadderInfo.Teams)
                         {
-                            LabelText = "Show specific team",
+                            LabelText = SeedingStrings.ShowSpecificTeam,
                             Current = currentTeam,
                         }
                     }
@@ -166,7 +168,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                             Children = new Drawable[]
                             {
                                 new TournamentSpriteText { Text = beatmap.Beatmap.Metadata.Title, Colour = TournamentGame.TEXT_COLOUR, },
-                                new TournamentSpriteText { Text = "by", Colour = TournamentGame.TEXT_COLOUR, Font = OsuFont.Torus.With(weight: FontWeight.Regular) },
+                                new TournamentSpriteText { Text = SeedingStrings.By, Colour = TournamentGame.TEXT_COLOUR, Font = OsuFont.Torus.With(weight: FontWeight.Regular) },
                                 new TournamentSpriteText { Text = beatmap.Beatmap.Metadata.Artist, Colour = TournamentGame.TEXT_COLOUR, Font = OsuFont.Torus.With(weight: FontWeight.Regular) },
                             }
                         },
@@ -272,9 +274,9 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                         Children = new Drawable[]
                         {
                             new TeamDisplay(team) { Margin = new MarginPadding { Bottom = 30 } },
-                            new RowDisplay("Average Rank:", $"#{team.AverageRank:#,0}"),
-                            new RowDisplay("Seed:", team.Seed.Value),
-                            new RowDisplay("Last year's placing:", team.LastYearPlacing.Value > 0 ? $"#{team.LastYearPlacing:#,0}" : "N/A"),
+                            new RowDisplay(SeedingStrings.AverageRank, $"#{team.AverageRank:#,0}"),
+                            new RowDisplay(SeedingStrings.Seed, team.Seed.Value),
+                            new RowDisplay(SeedingStrings.LastYearsPlacing, team.LastYearPlacing.Value > 0 ? $"#{team.LastYearPlacing:#,0}" : "N/A"),
                             new Container { Margin = new MarginPadding { Bottom = 30 } },
                         }
                     },
@@ -286,7 +288,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
 
             internal partial class RowDisplay : CompositeDrawable
             {
-                public RowDisplay(string left, string right)
+                public RowDisplay(LocalisableString left, LocalisableString right)
                 {
                     AutoSizeAxes = Axes.Y;
                     RelativeSizeAxes = Axes.X;

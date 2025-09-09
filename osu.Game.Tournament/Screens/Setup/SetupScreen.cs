@@ -11,11 +11,13 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Tournament.IPC;
+using osu.Game.Tournament.Localisation.Screens;
 using osu.Game.Tournament.Models;
 using osuTK;
 
@@ -83,20 +85,23 @@ namespace osu.Game.Tournament.Screens.Setup
             var fileBasedIpc = ipc as FileBasedIPC;
             fillFlow.Children = new Drawable[]
             {
-                new ActionableInfo
+                new LanguageSwitcher
                 {
-                    Label = "Current IPC source",
-                    ButtonText = "Change source",
-                    Action = () => sceneManager?.SetScreen(new StablePathSelectScreen()),
-                    Value = fileBasedIpc?.IPCStorage?.GetFullPath(string.Empty) ?? "Not found",
-                    Failing = fileBasedIpc?.IPCStorage == null,
-                    Description =
-                        "The osu!stable installation which is currently being used as a data source. If a source is not found, make sure you have created an empty ipc.txt in your stable cutting-edge installation."
+                    Label = GeneralSettingsStrings.LanguageDropdown,
                 },
                 new ActionableInfo
                 {
-                    Label = "Current user",
-                    ButtonText = "Change sign-in",
+                    Label = SetupStrings.CurrentIPCSource,
+                    ButtonText = SetupStrings.ChangeIPCSource,
+                    Action = () => sceneManager?.SetScreen(new StablePathSelectScreen()),
+                    Value = fileBasedIpc?.IPCStorage?.GetFullPath(string.Empty) ?? SetupStrings.NotFound,
+                    Failing = fileBasedIpc?.IPCStorage == null,
+                    Description = SetupStrings.IPCSourceDescription,
+                },
+                new ActionableInfo
+                {
+                    Label = SetupStrings.CurrentUser,
+                    ButtonText = SetupStrings.ChangeSignin,
                     Action = () =>
                     {
                         api.Logout();
@@ -114,24 +119,24 @@ namespace osu.Game.Tournament.Screens.Setup
                     },
                     Value = api.LocalUser.Value.Username,
                     Failing = api.IsLoggedIn != true,
-                    Description = "In order to access the API and display metadata, signing in is required."
+                    Description = SetupStrings.CurrentUserDescription,
                 },
                 new LabelledDropdown<RulesetInfo?>
                 {
-                    Label = "Ruleset",
-                    Description = "Decides what stats are displayed and which ranks are retrieved for players. This requires a restart to reload data for an existing bracket.",
+                    Label = SetupStrings.Ruleset,
+                    Description = SetupStrings.RulesetDescription,
                     Items = rulesets.AvailableRulesets,
                     Current = LadderInfo.Ruleset,
                 },
                 new TournamentSwitcher
                 {
-                    Label = "Current tournament",
-                    Description = "Changes the background videos and bracket to match the selected tournament. This requires a restart to apply changes.",
+                    Label = SetupStrings.CurrentTournament,
+                    Description = SetupStrings.CurrentTournamentDescription,
                 },
                 resolution = new ResolutionSelector
                 {
-                    Label = "Stream area resolution",
-                    ButtonText = "Set height",
+                    Label = SetupStrings.Resolution,
+                    ButtonText = SetupStrings.SetResolution,
                     Action = height =>
                     {
                         windowSize.Value = new Size((int)(height * aspect_ratio / TournamentSceneManager.STREAM_AREA_WIDTH * TournamentSceneManager.REQUIRED_WIDTH), height);
@@ -139,14 +144,14 @@ namespace osu.Game.Tournament.Screens.Setup
                 },
                 new LabelledSwitchButton
                 {
-                    Label = "Auto advance screens",
-                    Description = "Screens will progress automatically from gameplay -> results -> map pool",
+                    Label = SetupStrings.AutoAdvanceScreens,
+                    Description = SetupStrings.AutoAdvanceScreensDescription,
                     Current = LadderInfo.AutoProgressScreens,
                 },
                 new LabelledSwitchButton
                 {
-                    Label = "Display team seeds",
-                    Description = "Team seeds will display alongside each team at the top in gameplay/map pool screens.",
+                    Label = SetupStrings.DisplaySeeds,
+                    Description = SetupStrings.DisplaySeedsDescription,
                     Current = LadderInfo.DisplayTeamSeeds,
                 },
             };

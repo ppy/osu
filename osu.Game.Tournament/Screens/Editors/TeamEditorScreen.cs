@@ -15,6 +15,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Settings;
+using osu.Game.Tournament.Localisation.Screens;
 using osu.Game.Tournament.Models;
 using osu.Game.Tournament.Screens.Editors.Components;
 using osu.Game.Tournament.Screens.Drawings.Components;
@@ -33,7 +34,7 @@ namespace osu.Game.Tournament.Screens.Editors
             ControlPanel.Add(new TourneyButton
             {
                 RelativeSizeAxes = Axes.X,
-                Text = "Add all countries",
+                Text = TeamEditorStrings.AddAllCountries,
                 Action = addAllCountries
             });
         }
@@ -110,31 +111,31 @@ namespace osu.Game.Tournament.Screens.Editors
                         {
                             new SettingsTextBox
                             {
-                                LabelText = "Name",
+                                LabelText = TeamEditorStrings.TeamName,
                                 Width = 0.2f,
                                 Current = Model.FullName
                             },
                             acronymTextBox = new SettingsTextBox
                             {
-                                LabelText = "Acronym",
+                                LabelText = TeamEditorStrings.TeamAcronym,
                                 Width = 0.2f,
                                 Current = Model.Acronym
                             },
                             new SettingsTextBox
                             {
-                                LabelText = "Flag",
+                                LabelText = TeamEditorStrings.TeamFlag,
                                 Width = 0.2f,
                                 Current = Model.FlagName
                             },
                             new SettingsTextBox
                             {
-                                LabelText = "Seed",
+                                LabelText = TeamEditorStrings.TeamSeed,
                                 Width = 0.2f,
                                 Current = Model.Seed
                             },
                             new SettingsSlider<int, LastYearPlacementSlider>
                             {
-                                LabelText = "Last Year Placement",
+                                LabelText = TeamEditorStrings.LastYearPlacement,
                                 Width = 0.33f,
                                 Current = Model.LastYearPlacing
                             },
@@ -142,7 +143,7 @@ namespace osu.Game.Tournament.Screens.Editors
                             {
                                 Width = 0.2f,
                                 Margin = new MarginPadding(10),
-                                Text = "Edit seeding results",
+                                Text = TeamEditorStrings.EditSeedingResults,
                                 Action = () =>
                                 {
                                     sceneManager?.SetScreen(new SeedingEditorScreen(team, parent));
@@ -151,7 +152,7 @@ namespace osu.Game.Tournament.Screens.Editors
                             playerEditor,
                             new SettingsButton
                             {
-                                Text = "Add player",
+                                Text = TeamEditorStrings.AddPlayer,
                                 Action = () => playerEditor.CreateNew()
                             },
                             new Container
@@ -163,7 +164,7 @@ namespace osu.Game.Tournament.Screens.Editors
                                     new DangerousSettingsButton
                                     {
                                         Width = 0.2f,
-                                        Text = "Delete Team",
+                                        Text = TeamEditorStrings.DeleteTeam,
                                         Anchor = Anchor.TopRight,
                                         Origin = Anchor.TopRight,
                                         Action = () => dialogOverlay?.Push(new DeleteTeamDialog(Model, () =>
@@ -191,9 +192,7 @@ namespace osu.Game.Tournament.Screens.Editors
 
                     if (teamsWithSameAcronym.Count > 0)
                     {
-                        acronymTextBox.SetNoticeText(
-                            $"Acronym '{acronym.NewValue}' is already in use by team{(teamsWithSameAcronym.Count > 1 ? "s" : "")}:\n"
-                            + $"{string.Join(",\n", teamsWithSameAcronym)}", true);
+                        acronymTextBox.SetNoticeText(TeamEditorStrings.AcronymOccupiedPrompt(acronym.NewValue, string.Join(",\n", teamsWithSameAcronym)), true);
                     }
                     else
                         acronymTextBox.ClearNoticeText();
@@ -275,7 +274,7 @@ namespace osu.Game.Tournament.Screens.Editors
                                 {
                                     new SettingsNumberBox
                                     {
-                                        LabelText = "User ID",
+                                        LabelText = TeamEditorStrings.UserId,
                                         RelativeSizeAxes = Axes.None,
                                         Width = 200,
                                         Current = playerId,
@@ -293,7 +292,7 @@ namespace osu.Game.Tournament.Screens.Editors
                                 Origin = Anchor.CentreRight,
                                 RelativeSizeAxes = Axes.None,
                                 Width = 150,
-                                Text = "Delete Player",
+                                Text = TeamEditorStrings.DeletePlayer,
                                 Action = () =>
                                 {
                                     Expire();

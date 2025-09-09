@@ -4,6 +4,7 @@
 using System;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Overlays.Dialog;
+using osu.Game.Tournament.Localisation;
 
 namespace osu.Game.Tournament.Screens.Editors.Components
 {
@@ -11,7 +12,7 @@ namespace osu.Game.Tournament.Screens.Editors.Components
     {
         public TournamentClearAllDialog(Action action)
         {
-            HeaderText = @"Clear all?";
+            HeaderText = DialogStrings.ClearAllPrompt;
             Icon = FontAwesome.Solid.Trash;
             DangerousAction = action;
         }

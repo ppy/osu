@@ -15,6 +15,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
 using osu.Game.Tournament.Components;
+using osu.Game.Tournament.Localisation;
 using osu.Game.Tournament.Screens.Editors.Components;
 using osuTK;
 
@@ -76,14 +77,14 @@ namespace osu.Game.Tournament.Screens.Editors
                         new TourneyButton
                         {
                             RelativeSizeAxes = Axes.X,
-                            Text = "Add new",
+                            Text = BaseStrings.AddNew,
                             Action = () => Storage.Add(new TModel())
                         },
                         new TourneyButton
                         {
                             RelativeSizeAxes = Axes.X,
                             BackgroundColour = colours.DangerousButtonColour,
-                            Text = "Clear all",
+                            Text = BaseStrings.Clear,
                             Action = () =>
                             {
                                 dialogOverlay?.Push(new TournamentClearAllDialog(() => Storage.Clear()));
