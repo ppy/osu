@@ -361,7 +361,7 @@ namespace osu.Game.Screens.SelectV2
 
             isFetchingFavorites = true;
 
-            var userId = api.LocalUser.Value.Id;
+            var userId = api.LocalUser.Value!.Id;
             var request = new GetUserBeatmapsRequest(userId, BeatmapSetType.Favourite, new PaginationParameters(0, 200));
 
             request.Success += response =>
