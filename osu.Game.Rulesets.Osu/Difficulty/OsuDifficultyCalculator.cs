@@ -151,7 +151,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return attributes;
         }
 
-        private static double calculateStarRating(double basePerformance, double multiplier)
+        private double calculateStarRating(double basePerformance)
         {
             if (basePerformance <= 0.00001)
                 return 0;
