@@ -19,6 +19,8 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osuTK;
 using Realms;
 
@@ -42,9 +44,13 @@ namespace osu.Game.Screens.SelectV2
         [Resolved]
         private RealmAccess realm { get; set; } = null!;
 
+        [Resolved]
+        private IAPIProvider api { get; set; } = null!;
+
         private IDisposable? realmSubscription;
 
         private readonly CollectionFilterMenuItem allBeatmapsItem = new AllBeatmapsCollectionFilterMenuItem();
+        private readonly CollectionFilterMenuItem favoriteBeatmapsItem = new FavoriteBeatmapsCollectionFilterMenuItem();
 
         public CollectionDropdown()
             : base(CollectionsStrings.Collection)
@@ -60,6 +66,7 @@ namespace osu.Game.Screens.SelectV2
             base.LoadComplete();
 
             realmSubscription = realm.RegisterForNotifications(r => r.All<BeatmapCollection>().OrderBy(c => c.Name), collectionsChanged);
+            api.LocalUser.BindValueChanged(userChanged, true);
 
             Current.BindValueChanged(selectionChanged);
         }
@@ -68,19 +75,20 @@ namespace osu.Game.Screens.SelectV2
         {
             if (changes == null)
             {
-                filters.Clear();
-                filters.Add(allBeatmapsItem);
-                filters.AddRange(collections.Select(c => new CollectionFilterMenuItem(c.ToLive(realm))));
-                if (ShowManageCollectionsItem)
-                    filters.Add(new ManageCollectionsFilterMenuItem());
+                updateItems(collections);
             }
             else
             {
+                int offset = getUserBasedOffset();
+
                 foreach (int i in changes.DeletedIndices.OrderDescending())
-                    filters.RemoveAt(i + 1);
+                    filters.RemoveAt(i + offset);
 
                 foreach (int i in changes.InsertedIndices)
-                    filters.Insert(i + 1, new CollectionFilterMenuItem(collections[i].ToLive(realm)));
+                    filters.Insert(i + offset, new CollectionFilterMenuItem(collections[i].ToLive(realm)));
+
+                foreach (int i in changes.NewModifiedIndices)
+                    filters[i + offset] = new CollectionFilterMenuItem(collections[i].ToLive(realm));
 
                 var selectedItem = SelectedItem?.Value;
 
@@ -90,8 +98,8 @@ namespace osu.Game.Screens.SelectV2
 
                     // This is responsible for updating the state of the +/- button and the collection's name.
                     // TODO: we can probably make the menu items update with changes to avoid this.
-                    filters.RemoveAt(i + 1);
-                    filters.Insert(i + 1, new CollectionFilterMenuItem(updatedItem.ToLive(realm)));
+                    filters.RemoveAt(i + offset);
+                    filters.Insert(i + offset, new CollectionFilterMenuItem(updatedItem.ToLive(realm)));
 
                     if (updatedItem.ID == selectedItem?.Collection?.ID)
                     {
@@ -112,6 +120,46 @@ namespace osu.Game.Screens.SelectV2
                     }
                 }
             }
+        }
+
+        private void updateItems(IRealmCollection<BeatmapCollection>? collections = null)
+        {
+            filters.Clear();
+            filters.Add(allBeatmapsItem);
+
+            // Only add favorites option if user is signed in
+            if (api.LocalUser.Value?.Id > 1)
+                filters.Add(favoriteBeatmapsItem);
+
+            if (collections != null)
+            {
+                foreach (var collection in collections)
+                    filters.Add(new CollectionFilterMenuItem(collection.ToLive(realm)));
+            }
+            else
+            {
+                var orderedCollections = realm.Realm.All<BeatmapCollection>().OrderBy(c => c.Name).ToList();
+                foreach (var collection in orderedCollections)
+                    filters.Add(new CollectionFilterMenuItem(collection.ToLive(realm)));
+            }
+
+            if (ShowManageCollectionsItem)
+                filters.Add(new ManageCollectionsFilterMenuItem());
+        }
+
+        private int getUserBasedOffset()
+        {
+            // Offset depends on whether favorites item is shown
+            return api.LocalUser.Value?.Id > 1 ? 2 : 1;
+        }
+
+        private void userChanged(ValueChangedEvent<APIUser> user)
+        {
+            // If user logged out and favorites is selected, switch to all beatmaps
+            if (user.NewValue?.Id <= 1 && Current.Value is FavoriteBeatmapsCollectionFilterMenuItem)
+                Current.Value = allBeatmapsItem;
+
+            updateItems();
         }
 
         private void selectionChanged(ValueChangedEvent<CollectionFilterMenuItem> filter)

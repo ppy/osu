@@ -25,6 +25,11 @@ namespace osu.Game.Localisation
         public static LocalisableString AllBeatmaps => new TranslatableString(getKey(@"all_beatmaps"), @"All beatmaps");
 
         /// <summary>
+        /// "Favorite beatmaps"
+        /// </summary>
+        public static LocalisableString FavoriteBeatmaps => new TranslatableString(getKey(@"favorite_beatmaps"), @"Favorite beatmaps");
+
+        /// <summary>
         /// "Manage collections..."
         /// </summary>
         public static LocalisableString ManageCollections => new TranslatableString(getKey(@"manage_collections"), @"Manage collections...");

@@ -64,6 +64,18 @@ namespace osu.Game.Collections
         public override int GetHashCode() => 1;
     }
 
+    public class FavoriteBeatmapsCollectionFilterMenuItem : CollectionFilterMenuItem
+    {
+        public FavoriteBeatmapsCollectionFilterMenuItem()
+            : base(CollectionsStrings.FavoriteBeatmaps)
+        {
+        }
+
+        public override bool Equals(CollectionFilterMenuItem? other) => other is FavoriteBeatmapsCollectionFilterMenuItem;
+
+        public override int GetHashCode() => 3;
+    }
+
     public class ManageCollectionsFilterMenuItem : CollectionFilterMenuItem
     {
         public ManageCollectionsFilterMenuItem()

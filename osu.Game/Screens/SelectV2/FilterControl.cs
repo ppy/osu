@@ -20,9 +20,12 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Screens.Play;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
 using osuTK;
@@ -56,7 +59,28 @@ namespace osu.Game.Screens.SelectV2
         [Resolved]
         private RealmAccess realm { get; set; } = null!;
 
+        [Resolved]
+        private IAPIProvider api { get; set; } = null!;
+
+        [Resolved]
+        private BeatmapManager beatmapManager { get; set; } = null!;
+
+        [Resolved]
+        private ILocalUserPlayInfo localUserPlayInfo { get; set; } = null!;
+
         private IBindable<APIUser> localUser = null!;
+
+        private ImmutableHashSet<string>? cachedFavoriteMD5Hashes;
+        private bool isFetchingFavorites;
+        private int? lastFetchedUserId;
+        private DateTimeOffset? cacheTime;
+
+        private double lastPeriodicCheck;
+
+        /// <summary>
+        /// Interval for periodic favorites cache refresh in milliseconds (5 minutes).
+        /// </summary>
+        private const double PERIODIC_REFRESH_INTERVAL = 300000;
 
         public LocalisableString StatusText
         {
@@ -228,6 +252,16 @@ namespace osu.Game.Screens.SelectV2
                 if (v.NewValue is ManageCollectionsFilterMenuItem || v.OldValue is ManageCollectionsFilterMenuItem)
                     return;
 
+                // If switching to favorites, only fetch if no cache exists
+                if (v.NewValue is FavoriteBeatmapsCollectionFilterMenuItem)
+                {
+                    // Only fetch if we don't have cached data
+                    if (cachedFavoriteMD5Hashes == null)
+                    {
+                        fetchFavoritesAsync();
+                    }
+                }
+
                 updateCriteria();
             });
             collectionsSubscription = realm.RegisterForNotifications(r => r.All<BeatmapCollection>(), (collections, changeSet) =>
@@ -236,15 +270,36 @@ namespace osu.Game.Screens.SelectV2
                     updateCriteria();
             });
 
-            localUser.BindValueChanged(_ => updateCriteria());
+            api.LocalUser.BindValueChanged(user =>
+            {
+                // Clear cache when user changes
+                if (user.NewValue?.Id != lastFetchedUserId)
+                {
+                    cachedFavoriteMD5Hashes = null;
+                    lastFetchedUserId = user.NewValue?.Id;
+                    cacheTime = null;
+                }
+                updateCriteria();
+            });
+
 
             updateCriteria();
+
+            // Pre-load favorites cache on startup
+            if (api.LocalUser.Value?.Id > 1)
+            {
+                fetchFavoritesAsync();
+            }
+
+            // Subscribe to favorite change events
+            PostBeatmapFavouriteRequest.FavouriteChanged += onFavouriteChanged;
         }
 
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
             collectionsSubscription?.Dispose();
+            PostBeatmapFavouriteRequest.FavouriteChanged -= onFavouriteChanged;
         }
 
         /// <summary>
@@ -262,7 +317,7 @@ namespace osu.Game.Screens.SelectV2
                 AllowConvertedBeatmaps = showConvertedBeatmapsButton.Active.Value,
                 Ruleset = ruleset.Value,
                 Mods = mods.Value,
-                CollectionBeatmapMD5Hashes = collectionDropdown.Current.Value?.Collection?.PerformRead(c => c.BeatmapMD5Hashes).ToImmutableHashSet(),
+                CollectionBeatmapMD5Hashes = GetCollectionHashes(collectionDropdown.Current.Value),
                 LocalUserId = isValidUser ? localUser.Value.Id : null,
                 LocalUserUsername = isValidUser ? localUser.Value.Username : null,
             };
@@ -277,6 +332,192 @@ namespace osu.Game.Screens.SelectV2
 
             FilterQueryParser.ApplyQueries(criteria, query);
             return criteria;
+        }
+
+        private ImmutableHashSet<string>? GetCollectionHashes(CollectionFilterMenuItem? item)
+        {
+            if (item is FavoriteBeatmapsCollectionFilterMenuItem)
+            {
+                return GetFavoriteBeatmapHashes();
+            }
+
+            return item?.Collection?.PerformRead(c => c.BeatmapMD5Hashes).ToImmutableHashSet();
+        }
+
+        private ImmutableHashSet<string>? GetFavoriteBeatmapHashes()
+        {
+            // Check if user is logged in and API is available
+            if (api.LocalUser.Value?.Id <= 1 || api.State.Value != APIState.Online)
+                return null;
+
+            // Return cached result if available (no expiry check - we refresh on selection)
+            return cachedFavoriteMD5Hashes;
+        }
+
+        private void fetchFavoritesAsync()
+        {
+            if (isFetchingFavorites || api.LocalUser.Value?.Id <= 1)
+                return;
+
+            isFetchingFavorites = true;
+
+            var userId = api.LocalUser.Value.Id;
+            var request = new GetUserBeatmapsRequest(userId, BeatmapSetType.Favourite, new PaginationParameters(0, 200));
+
+            request.Success += response =>
+            {
+                Schedule(() =>
+                {
+                    try
+                    {
+                        var favoriteMD5Hashes = new HashSet<string>();
+
+                        if (response?.Count > 0)
+                        {
+                            var favoriteOnlineIds = response.Select(set => set.OnlineID).Where(id => id > 0).ToHashSet();
+
+                            if (favoriteOnlineIds.Count > 0)
+                            {
+                                // Get all local beatmap sets
+                                var localBeatmapSets = beatmapManager.GetAllUsableBeatmapSets();
+
+                                // Find local beatmaps that match the favorite online IDs
+                                foreach (var localSet in localBeatmapSets)
+                                {
+                                    if (localSet.OnlineID > 0 && favoriteOnlineIds.Contains(localSet.OnlineID))
+                                    {
+                                        foreach (var beatmap in localSet.Beatmaps)
+                                        {
+                                            if (!string.IsNullOrEmpty(beatmap.MD5Hash))
+                                                favoriteMD5Hashes.Add(beatmap.MD5Hash);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        cachedFavoriteMD5Hashes = favoriteMD5Hashes.ToImmutableHashSet();
+                        cacheTime = DateTimeOffset.Now;
+                        isFetchingFavorites = false;
+
+                        // Update criteria to apply the new filter if favorites is currently selected
+                        if (collectionDropdown.Current.Value is FavoriteBeatmapsCollectionFilterMenuItem)
+                        {
+                            updateCriteria();
+                        }
+                    }
+                    catch
+                    {
+                        // On error, cache empty set and allow retry later
+                        cachedFavoriteMD5Hashes = ImmutableHashSet<string>.Empty;
+                        cacheTime = DateTimeOffset.Now;
+                        isFetchingFavorites = false;
+                    }
+                });
+            };
+
+            request.Failure += _ =>
+            {
+                Schedule(() =>
+                {
+                    // On failure, cache null (show all beatmaps) and allow retry later
+                    cachedFavoriteMD5Hashes = null;
+                    isFetchingFavorites = false;
+                });
+            };
+
+            api.Queue(request);
+        }
+
+        private void onFavouriteChanged(int beatmapSetId, bool favourited)
+        {
+            // If we don't have cached favorites yet, just trigger a full fetch
+            if (cachedFavoriteMD5Hashes == null)
+            {
+                if (collectionDropdown.Current.Value is FavoriteBeatmapsCollectionFilterMenuItem)
+                {
+                    fetchFavoritesAsync();
+                }
+                return;
+            }
+
+            // Update cache directly with the changed beatmap set
+            updateCacheForBeatmapSet(beatmapSetId, favourited);
+
+            // If favorites filter is currently active, update the criteria
+            if (collectionDropdown.Current.Value is FavoriteBeatmapsCollectionFilterMenuItem)
+            {
+                updateCriteria();
+            }
+        }
+
+        private void updateCacheForBeatmapSet(int beatmapSetId, bool favourited)
+        {
+            // Find the local beatmap set that matches this online ID
+            var localBeatmapSets = beatmapManager.GetAllUsableBeatmapSets();
+            var matchingSet = localBeatmapSets.FirstOrDefault(set => set.OnlineID == beatmapSetId);
+
+            if (matchingSet == null)
+                return;
+
+            // Get all MD5 hashes for this beatmap set
+            var setMD5Hashes = matchingSet.Beatmaps
+                .Where(beatmap => !string.IsNullOrEmpty(beatmap.MD5Hash))
+                .Select(beatmap => beatmap.MD5Hash)
+                .ToHashSet();
+
+            if (setMD5Hashes.Count == 0)
+                return;
+
+            // Update the cached set based on favorite status
+            var currentHashes = cachedFavoriteMD5Hashes?.ToHashSet() ?? new HashSet<string>();
+
+            if (favourited)
+            {
+                // Add hashes to favorites
+                foreach (var hash in setMD5Hashes)
+                    currentHashes.Add(hash);
+            }
+            else
+            {
+                // Remove hashes from favorites
+                foreach (var hash in setMD5Hashes)
+                    currentHashes.Remove(hash);
+            }
+
+            // Update the cache
+            cachedFavoriteMD5Hashes = currentHashes.ToImmutableHashSet();
+            cacheTime = DateTimeOffset.Now;
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            // Check for periodic favorites refresh
+            if (Time.Current - lastPeriodicCheck >= PERIODIC_REFRESH_INTERVAL)
+            {
+                lastPeriodicCheck = Time.Current;
+                periodicFavoritesRefresh();
+            }
+        }
+
+        private void periodicFavoritesRefresh()
+        {
+            // Only refresh if user is not playing
+            if (localUserPlayInfo.PlayingState.Value != LocalUserPlayingState.NotPlaying)
+                return;
+
+            // Only refresh if user is logged in
+            if (api.LocalUser.Value?.Id <= 1)
+                return;
+
+            // Only refresh if we have existing cache
+            if (cachedFavoriteMD5Hashes == null || !cacheTime.HasValue)
+                return;
+
+            // Refresh the cache to catch external changes
+            fetchFavoritesAsync();
         }
 
         private void updateCriteria()
