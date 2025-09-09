@@ -172,14 +172,8 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             Spacing.Value = editorBeatmap.GridSize;
             GridLinesRotation.Value = editorBeatmap.GridRotation;
-
-            // Only changing offset, if we're finding one in metadata
-
-            if (editorBeatmap.GridOffset != Vector2.Zero)
-            {
-                StartPositionX.Value = editorBeatmap.GridOffset.X;
-                StartPositionY.Value = editorBeatmap.GridOffset.Y;
-            }
+            StartPositionX.Value = editorBeatmap.GridOffset.X;
+            StartPositionY.Value = editorBeatmap.GridOffset.Y;
         }
 
         protected override void LoadComplete()
@@ -221,7 +215,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             {
                 gridLinesRotationSlider.ContractedLabelText = $"R: {rotation.NewValue:#,0.##}";
                 gridLinesRotationSlider.ExpandedLabelText = $"Rotation: {rotation.NewValue:#,0.##}";
-                if (GridType.Value != PositionSnapGridType.Circle) editorBeatmap.GridRotation = rotation.NewValue;
+                editorBeatmap.GridRotation = rotation.NewValue;
             }, true);
 
             GridType.BindValueChanged(v =>
