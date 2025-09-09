@@ -169,6 +169,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens
         {
             base.OnEntering(e);
 
+            controller.SearchInForeground();
+
             client.MatchmakingJoinLobby().FireAndForget();
 
             using (BeginDelayedSequence(800))
