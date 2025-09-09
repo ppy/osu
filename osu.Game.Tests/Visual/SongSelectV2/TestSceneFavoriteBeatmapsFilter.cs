@@ -111,7 +111,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                     return false;
                 };
             });
-            AddStep("select favorites", () => selectFavoritesFilter());
+            AddStep("select favorites", selectFavoritesFilter);
             AddAssert("API request was made", () => lastQueuedRequest is GetUserBeatmapsRequest);
         }
 

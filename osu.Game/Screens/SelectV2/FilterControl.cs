@@ -279,9 +279,9 @@ namespace osu.Game.Screens.SelectV2
                     lastFetchedUserId = user.NewValue?.Id;
                     cacheTime = null;
                 }
+
                 updateCriteria();
             });
-
 
             updateCriteria();
 
@@ -361,7 +361,7 @@ namespace osu.Game.Screens.SelectV2
 
             isFetchingFavorites = true;
 
-            var userId = api.LocalUser.Value!.Id;
+            int userId = api.LocalUser.Value!.Id;
             var request = new GetUserBeatmapsRequest(userId, BeatmapSetType.Favourite, new PaginationParameters(0, 200));
 
             request.Success += response =>
@@ -372,7 +372,7 @@ namespace osu.Game.Screens.SelectV2
                     {
                         var favoriteMD5Hashes = new HashSet<string>();
 
-                        if (response?.Count > 0)
+                        if (response.Count > 0)
                         {
                             var favoriteOnlineIds = response.Select(set => set.OnlineID).Where(id => id > 0).ToHashSet();
 
@@ -441,6 +441,7 @@ namespace osu.Game.Screens.SelectV2
                 return;
             }
 
+
             // Update cache directly with the changed beatmap set
             updateCacheForBeatmapSet(beatmapSetId, favourited);
 
@@ -462,9 +463,9 @@ namespace osu.Game.Screens.SelectV2
 
             // Get all MD5 hashes for this beatmap set
             var setMD5Hashes = matchingSet.Beatmaps
-                .Where(beatmap => !string.IsNullOrEmpty(beatmap.MD5Hash))
-                .Select(beatmap => beatmap.MD5Hash)
-                .ToHashSet();
+                                          .Where(beatmap => !string.IsNullOrEmpty(beatmap.MD5Hash))
+                                          .Select(beatmap => beatmap.MD5Hash)
+                                          .ToHashSet();
 
             if (setMD5Hashes.Count == 0)
                 return;
@@ -475,13 +476,13 @@ namespace osu.Game.Screens.SelectV2
             if (favourited)
             {
                 // Add hashes to favorites
-                foreach (var hash in setMD5Hashes)
+                foreach (string hash in setMD5Hashes)
                     currentHashes.Add(hash);
             }
             else
             {
                 // Remove hashes from favorites
-                foreach (var hash in setMD5Hashes)
+                foreach (string hash in setMD5Hashes)
                     currentHashes.Remove(hash);
             }
 

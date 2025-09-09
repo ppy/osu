@@ -156,7 +156,7 @@ namespace osu.Game.Screens.SelectV2
         private void userChanged(ValueChangedEvent<APIUser> user)
         {
             // If user logged out and favorites is selected, switch to all beatmaps
-            if (user.NewValue?.Id <= 1 && Current.Value is FavoriteBeatmapsCollectionFilterMenuItem)
+            if (user.NewValue.Id <= 1 && Current.Value is FavoriteBeatmapsCollectionFilterMenuItem)
                 Current.Value = allBeatmapsItem;
 
             updateItems();
