@@ -86,7 +86,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             double rhythmExpectedUnstableRate = computeDeviationUpperBound(1.0) * 10;
 
             // The unstable rate at which it can be assumed all rhythm difficulty has been ignored.
-            double rhythmMaximumUnstableRate = computeDeviationUpperBound(0.8) * 10; // 0.8 great hits / total hits, or 90% accuracy
+            // 0.8 represents 80% of total hits being greats, or 90% accuracy in-game
+            double rhythmMaximumUnstableRate = computeDeviationUpperBound(0.8) * 10;
 
             // The fraction of star rating made up by rhythm difficulty, normalised to represent rhythm's perceived contribution to star rating.
             double rhythmFactor = DifficultyCalculationUtils.ReverseLerp(attributes.RhythmDifficulty / attributes.StarRating, 0.15, 0.4);
