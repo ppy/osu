@@ -344,12 +344,11 @@ namespace osu.Game.Beatmaps.Formats
                     break;
 
                 case @"GridOffset":
-                    float[] position = pair.Value.Split(',').Select(v =>
-                    {
-                        bool result = float.TryParse(v, out float val);
-                        return new { result, val };
-                    }).Where(p => p.result).Select(p => p.val).ToArray();
-                    beatmap.GridOffset = new Vector2(position[0], position[1]);
+                    string[] values = pair.Value.Split(',');
+                    if (values.Length != 2)
+                        throw new FormatException($"Failed to parse GridOffset. Expected format: <float>,<float> but got \"{pair.Value}\"");
+
+                    beatmap.GridOffset = new Vector2(Parsing.ParseFloat(values[0]), Parsing.ParseFloat(values[1]));
                     break;
 
                 case @"TimelineZoom":
