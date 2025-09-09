@@ -80,7 +80,7 @@ namespace osu.Game.Screens.SelectV2
         /// <summary>
         /// Interval for periodic favorites cache refresh in milliseconds (5 minutes).
         /// </summary>
-        private const double PeriodicRefreshInterval = 300000;
+        private const double periodic_refresh_interval = 300000;
 
         public LocalisableString StatusText
         {
@@ -338,13 +338,13 @@ namespace osu.Game.Screens.SelectV2
         {
             if (item is FavoriteBeatmapsCollectionFilterMenuItem)
             {
-                return GetFavoriteBeatmapHashes();
+                return getFavoriteBeatmapHashes();
             }
 
             return item?.Collection?.PerformRead(c => c.BeatmapMD5Hashes).ToImmutableHashSet();
         }
 
-        private ImmutableHashSet<string>? GetFavoriteBeatmapHashes()
+        private ImmutableHashSet<string>? getFavoriteBeatmapHashes()
         {
             // Check if user is logged in and API is available
             if (api.LocalUser.Value?.Id <= 1 || api.State.Value != APIState.Online)
@@ -495,7 +495,7 @@ namespace osu.Game.Screens.SelectV2
             base.Update();
 
             // Check for periodic favorites refresh
-            if (Time.Current - lastPeriodicCheck >= PeriodicRefreshInterval)
+            if (Time.Current - lastPeriodicCheck >= periodic_refresh_interval)
             {
                 lastPeriodicCheck = Time.Current;
                 periodicFavoritesRefresh();
