@@ -317,7 +317,7 @@ namespace osu.Game.Screens.SelectV2
                 AllowConvertedBeatmaps = showConvertedBeatmapsButton.Active.Value,
                 Ruleset = ruleset.Value,
                 Mods = mods.Value,
-                CollectionBeatmapMD5Hashes = GetCollectionHashes(collectionDropdown.Current.Value),
+                CollectionBeatmapMD5Hashes = getCollectionHashes(collectionDropdown.Current.Value),
                 LocalUserId = isValidUser ? localUser.Value.Id : null,
                 LocalUserUsername = isValidUser ? localUser.Value.Username : null,
             };
@@ -334,7 +334,7 @@ namespace osu.Game.Screens.SelectV2
             return criteria;
         }
 
-        private ImmutableHashSet<string>? GetCollectionHashes(CollectionFilterMenuItem? item)
+        private ImmutableHashSet<string>? getCollectionHashes(CollectionFilterMenuItem? item)
         {
             if (item is FavoriteBeatmapsCollectionFilterMenuItem)
             {
