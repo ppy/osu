@@ -391,10 +391,10 @@ namespace osu.Game.Overlays.SkinEditor
                 return;
             }
 
-            if (skinComponentsContainer.IsLoaded)
+            if (skinComponentsContainer.ComponentsLoaded)
                 bindChangeHandler(skinComponentsContainer);
             else
-                skinComponentsContainer.OnLoadComplete += d => Schedule(() => bindChangeHandler((SkinnableContainer)d));
+                skinComponentsContainer.OnComponentsLoaded += onComponentsLoaded;
 
             content.Child = new SkinBlueprintContainer(skinComponentsContainer);
 
@@ -427,6 +427,13 @@ namespace osu.Game.Overlays.SkinEditor
             {
                 RequestPlacement = requestPlacement
             });
+
+            void onComponentsLoaded(Drawable d)
+            {
+                SkinnableContainer container = (SkinnableContainer)d;
+                container.OnComponentsLoaded -= onComponentsLoaded;
+                Schedule(() => bindChangeHandler(container));
+            }
 
             void requestPlacement(Type type)
             {
