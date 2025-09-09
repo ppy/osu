@@ -68,9 +68,9 @@ namespace osu.Game.Screens.SelectV2
         /// A debounce that governs how long after a panel is selected before the rest of song select (and the game at large)
         /// updates to show that selection.
         ///
-        /// This is intentionally slightly higher than key repeat, but low enough to not impede user experience.
+        /// This is intentionally slightly higher than initial key repeat, but low enough to not impede user experience.
         /// </summary>
-        public const int SELECTION_DEBOUNCE = 150;
+        public const int SELECTION_DEBOUNCE = 260;
 
         /// <summary>
         /// A general "global" debounce to be applied to anything aggressive difficulty calculation at song select,
