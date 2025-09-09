@@ -19,7 +19,6 @@ using osu.Game.Rulesets;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.SelectV2;
 using osu.Game.Tests.Resources;
-using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.SongSelectV2
 {
@@ -45,6 +44,17 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             Dependencies.Cache(localUserPlayInfo);
 
             beatmapManager.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
+        }
+
+        [SetUpSteps]
+        public void SetUpSteps()
+        {
+            AddStep("reset API state", () =>
+            {
+                dummyAPI.HandleRequest = null;
+                dummyAPI.Logout();
+                localUserPlayInfo.PlayingState.Value = LocalUserPlayingState.NotPlaying;
+            });
         }
 
         [SetUp]
