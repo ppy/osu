@@ -71,7 +71,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 var diffToNow = Date.Subtract(DateTimeOffset.Now);
 
                 if (diffToNow.TotalSeconds < -5)
-                    return $"Closed {base.Format()}";
+                    return LocalisableString.Interpolate($"Closed {base.Format()}");
 
                 if (diffToNow.TotalSeconds < 0)
                     return "Closed";
@@ -79,7 +79,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 if (diffToNow.TotalSeconds < 5)
                     return "Closing soon";
 
-                return $"Closing {base.Format()}";
+                return LocalisableString.Interpolate($"Closing {base.Format()}");
             }
 
             protected override void Dispose(bool isDisposing)

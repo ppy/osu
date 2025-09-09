@@ -266,8 +266,8 @@ namespace osu.Game.Tournament.Screens.Schedule
             }
 
             protected override LocalisableString Format() => Date < DateTimeOffset.Now
-                ? $"Started {base.Format()}"
-                : $"Starting {base.Format()}";
+                ? LocalisableString.Interpolate($"Started {base.Format()}")
+                : LocalisableString.Interpolate($"Starting {base.Format()}");
         }
 
         public partial class ScheduleContainer : Container
