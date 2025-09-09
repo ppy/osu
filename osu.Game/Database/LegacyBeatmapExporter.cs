@@ -75,7 +75,7 @@ namespace osu.Game.Database
 
         protected virtual void MutateBeatmap(BeatmapSetInfo beatmapSet, IBeatmap playableBeatmap)
         {
-            //Convert editor's grid size to the understandable stable's integer values
+            // Stable expects GridSize to be an integer value
             playableBeatmap.GridSize = (int)Math.Round(playableBeatmap.GridSize);
 
             // Convert beatmap elements to be compatible with legacy format
