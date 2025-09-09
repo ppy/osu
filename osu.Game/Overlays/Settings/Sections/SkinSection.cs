@@ -310,11 +310,11 @@ namespace osu.Game.Overlays.Settings.Sections
                 base.PopIn();
             }
 
-            private void rename() => skins.CurrentSkinInfo.Value.PerformWrite(skin =>
+            private void rename()
             {
-                skin.Name = textBox.Text;
+                skins.Rename(skins.CurrentSkinInfo.Value, textBox.Text);
                 PopOut();
-            });
+            }
         }
     }
 }

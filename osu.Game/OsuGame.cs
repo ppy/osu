@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Humanizer;
@@ -112,6 +111,9 @@ namespace osu.Game
         /// For elements placed close to the screen edge, this is the margin to leave to the edge.
         /// </summary>
         public const float SCREEN_EDGE_MARGIN = 12f;
+
+        private const double general_log_debounce = 60000;
+        private const string tablet_log_prefix = @"[Tablet] ";
 
         public Toolbar Toolbar { get; private set; }
 
@@ -241,12 +243,26 @@ namespace osu.Game
         /// </summary>
         public virtual bool HideUnlicensedContent => false;
 
+        private bool tabletLogNotifyOnWarning = true;
+        private bool tabletLogNotifyOnError = true;
+        private int generalLogRecentCount;
+
         public OsuGame(string[] args = null)
         {
             this.args = args;
 
-            forwardGeneralLogsToNotifications();
-            forwardTabletLogsToNotifications();
+            Logger.NewEntry += forwardGeneralLogToNotifications;
+            Logger.NewEntry += forwardTabletLogToNotifications;
+
+            Schedule(() =>
+            {
+                ITabletHandler tablet = Host.AvailableInputHandlers.OfType<ITabletHandler>().SingleOrDefault();
+                tablet?.Tablet.BindValueChanged(_ =>
+                {
+                    tabletLogNotifyOnWarning = true;
+                    tabletLogNotifyOnError = true;
+                }, true);
+            });
         }
 
         #region IOverlayManager
@@ -347,40 +363,42 @@ namespace osu.Game
             if (host.Window != null)
             {
                 host.Window.CursorState |= CursorState.Hidden;
-                host.Window.DragDrop += path =>
-                {
-                    // on macOS/iOS, URL associations are handled via SDL_DROPFILE events.
-                    if (path.StartsWith(OSU_PROTOCOL, StringComparison.Ordinal))
-                    {
-                        HandleLink(path);
-                        return;
-                    }
-
-                    lock (dragDropFiles)
-                    {
-                        dragDropFiles.Add(path);
-
-                        Logger.Log($@"Adding ""{Path.GetFileName(path)}"" for import");
-
-                        // File drag drop operations can potentially trigger hundreds or thousands of these calls on some platforms.
-                        // In order to avoid spawning multiple import tasks for a single drop operation, debounce a touch.
-                        dragDropImportSchedule?.Cancel();
-                        dragDropImportSchedule = Scheduler.AddDelayed(handlePendingDragDropImports, 100);
-                    }
-                };
+                host.Window.DragDrop += onWindowDragDrop;
             }
         }
 
-        private void handlePendingDragDropImports()
+        private void onWindowDragDrop(string path)
         {
+            // on macOS/iOS, URL associations are handled via SDL_DROPFILE events.
+            if (path.StartsWith(OSU_PROTOCOL, StringComparison.Ordinal))
+            {
+                HandleLink(path);
+                return;
+            }
+
             lock (dragDropFiles)
             {
-                Logger.Log($"Handling batch import of {dragDropFiles.Count} files");
+                dragDropFiles.Add(path);
 
-                string[] paths = dragDropFiles.ToArray();
-                dragDropFiles.Clear();
+                Logger.Log($@"Adding ""{Path.GetFileName(path)}"" for import");
 
-                Task.Factory.StartNew(() => Import(paths), TaskCreationOptions.LongRunning);
+                // File drag drop operations can potentially trigger hundreds or thousands of these calls on some platforms.
+                // In order to avoid spawning multiple import tasks for a single drop operation, debounce a touch.
+                dragDropImportSchedule?.Cancel();
+                dragDropImportSchedule = Scheduler.AddDelayed(handlePendingDragDropImports, 100);
+            }
+
+            void handlePendingDragDropImports()
+            {
+                lock (dragDropFiles)
+                {
+                    Logger.Log($"Handling batch import of {dragDropFiles.Count} files");
+
+                    string[] paths = dragDropFiles.ToArray();
+                    dragDropFiles.Clear();
+
+                    Task.Factory.StartNew(() => Import(paths), TaskCreationOptions.LongRunning);
+                }
             }
         }
 
@@ -1009,7 +1027,14 @@ namespace osu.Game
             detachedBeatmapStore?.Dispose();
 
             base.Dispose(isDisposing);
+
             SentryLogger.Dispose();
+
+            if (Host?.Window != null)
+                Host.Window.DragDrop -= onWindowDragDrop;
+
+            Logger.NewEntry -= forwardGeneralLogToNotifications;
+            Logger.NewEntry -= forwardTabletLogToNotifications;
         }
 
         protected override IDictionary<FrameworkSetting, object> GetFrameworkConfigDefaults()
@@ -1028,13 +1053,6 @@ namespace osu.Game
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            if (RuntimeInfo.EntryAssembly.GetCustomAttribute<OfficialBuildAttribute>() == null)
-                Logger.Log(NotificationsStrings.NotOfficialBuild.ToString());
-
-            // Make sure the release stream setting matches the build which was just run.
-            if (Enum.TryParse<ReleaseStream>(Version.Split('-').Last(), true, out var releaseStream))
-                LocalConfig.SetValue(OsuSetting.ReleaseStream, releaseStream);
 
             var languages = Enum.GetValues<Language>();
 
@@ -1365,115 +1383,90 @@ namespace osu.Game
                 overlay.Depth = (float)-Clock.CurrentTime;
         }
 
-        private void forwardGeneralLogsToNotifications()
+        private void forwardGeneralLogToNotifications(LogEntry entry)
         {
-            int recentLogCount = 0;
+            if (entry.Level < LogLevel.Important || entry.Target > LoggingTarget.Database || entry.Target == null) return;
 
-            const double debounce = 60000;
+            if (entry.Exception is SentryOnlyDiagnosticsException)
+                return;
 
-            Logger.NewEntry += entry =>
+            const int short_term_display_limit = 3;
+
+            if (generalLogRecentCount < short_term_display_limit)
             {
-                if (entry.Level < LogLevel.Important || entry.Target > LoggingTarget.Database || entry.Target == null) return;
-
-                if (entry.Exception is SentryOnlyDiagnosticsException)
-                    return;
-
-                const int short_term_display_limit = 3;
-
-                if (recentLogCount < short_term_display_limit)
+                Schedule(() => Notifications.Post(new SimpleErrorNotification
                 {
-                    Schedule(() => Notifications.Post(new SimpleErrorNotification
-                    {
-                        Icon = entry.Level == LogLevel.Important ? FontAwesome.Solid.ExclamationCircle : FontAwesome.Solid.Bomb,
-                        Text = entry.Message.Truncate(256) + (entry.Exception != null && IsDeployedBuild ? "\n\nThis error has been automatically reported to the devs." : string.Empty),
-                    }));
-                }
-                else if (recentLogCount == short_term_display_limit)
+                    Icon = entry.Level == LogLevel.Important ? FontAwesome.Solid.ExclamationCircle : FontAwesome.Solid.Bomb,
+                    Text = entry.Message.Truncate(256) + (entry.Exception != null && IsDeployedBuild ? "\n\nThis error has been automatically reported to the devs." : string.Empty),
+                }));
+            }
+            else if (generalLogRecentCount == short_term_display_limit)
+            {
+                string logFile = Logger.GetLogger(entry.Target.Value).Filename;
+
+                Schedule(() => Notifications.Post(new SimpleNotification
                 {
-                    string logFile = Logger.GetLogger(entry.Target.Value).Filename;
-
-                    Schedule(() => Notifications.Post(new SimpleNotification
+                    Icon = FontAwesome.Solid.EllipsisH,
+                    Text = NotificationsStrings.SubsequentMessagesLogged,
+                    Activated = () =>
                     {
-                        Icon = FontAwesome.Solid.EllipsisH,
-                        Text = NotificationsStrings.SubsequentMessagesLogged,
-                        Activated = () =>
-                        {
-                            Logger.Storage.PresentFileExternally(logFile);
-                            return true;
-                        }
-                    }));
-                }
+                        Logger.Storage.PresentFileExternally(logFile);
+                        return true;
+                    }
+                }));
+            }
 
-                Interlocked.Increment(ref recentLogCount);
-                Scheduler.AddDelayed(() => Interlocked.Decrement(ref recentLogCount), debounce);
-            };
+            Interlocked.Increment(ref generalLogRecentCount);
+            Scheduler.AddDelayed(() => Interlocked.Decrement(ref generalLogRecentCount), general_log_debounce);
         }
 
-        private void forwardTabletLogsToNotifications()
+        private void forwardTabletLogToNotifications(LogEntry entry)
         {
-            const string tablet_prefix = @"[Tablet] ";
+            if (entry.Level < LogLevel.Important || entry.Target != LoggingTarget.Input || !entry.Message.StartsWith(tablet_log_prefix, StringComparison.OrdinalIgnoreCase))
+                return;
 
-            bool notifyOnWarning = true;
-            bool notifyOnError = true;
+            string message = entry.Message.Replace(tablet_log_prefix, string.Empty);
 
-            Logger.NewEntry += entry =>
+            if (entry.Level == LogLevel.Error)
             {
-                if (entry.Level < LogLevel.Important || entry.Target != LoggingTarget.Input || !entry.Message.StartsWith(tablet_prefix, StringComparison.OrdinalIgnoreCase))
+                if (!tabletLogNotifyOnError)
                     return;
 
-                string message = entry.Message.Replace(tablet_prefix, string.Empty);
+                tabletLogNotifyOnError = false;
 
-                if (entry.Level == LogLevel.Error)
+                Schedule(() =>
                 {
-                    if (!notifyOnError)
-                        return;
-
-                    notifyOnError = false;
-
-                    Schedule(() =>
+                    Notifications.Post(new SimpleNotification
                     {
-                        Notifications.Post(new SimpleNotification
-                        {
-                            Text = NotificationsStrings.TabletSupportDisabledDueToError(message),
-                            Icon = FontAwesome.Solid.PenSquare,
-                            IconColour = Colours.RedDark,
-                        });
-
-                        // We only have one tablet handler currently.
-                        // The loop here is weakly guarding against a future where more than one is added.
-                        // If this is ever the case, this logic needs adjustment as it should probably only
-                        // disable the relevant tablet handler rather than all.
-                        foreach (var tabletHandler in Host.AvailableInputHandlers.OfType<ITabletHandler>())
-                            tabletHandler.Enabled.Value = false;
-                    });
-                }
-                else if (notifyOnWarning)
-                {
-                    Schedule(() => Notifications.Post(new SimpleNotification
-                    {
-                        Text = NotificationsStrings.EncounteredTabletWarning,
+                        Text = NotificationsStrings.TabletSupportDisabledDueToError(message),
                         Icon = FontAwesome.Solid.PenSquare,
-                        IconColour = Colours.YellowDark,
-                        Activated = () =>
-                        {
-                            OpenUrlExternally("https://opentabletdriver.net/Tablets", LinkWarnMode.NeverWarn);
-                            return true;
-                        }
-                    }));
+                        IconColour = Colours.RedDark,
+                    });
 
-                    notifyOnWarning = false;
-                }
-            };
-
-            Schedule(() =>
+                    // We only have one tablet handler currently.
+                    // The loop here is weakly guarding against a future where more than one is added.
+                    // If this is ever the case, this logic needs adjustment as it should probably only
+                    // disable the relevant tablet handler rather than all.
+                    foreach (var tabletHandler in Host.AvailableInputHandlers.OfType<ITabletHandler>())
+                        tabletHandler.Enabled.Value = false;
+                });
+            }
+            else if (tabletLogNotifyOnWarning)
             {
-                ITabletHandler tablet = Host.AvailableInputHandlers.OfType<ITabletHandler>().SingleOrDefault();
-                tablet?.Tablet.BindValueChanged(_ =>
+                Schedule(() => Notifications.Post(new SimpleNotification
                 {
-                    notifyOnWarning = true;
-                    notifyOnError = true;
-                }, true);
-            });
+                    Text = NotificationsStrings.EncounteredTabletWarning,
+                    Icon = FontAwesome.Solid.PenSquare,
+                    IconColour = Colours.YellowDark,
+                    Activated = () =>
+                    {
+                        OpenUrlExternally("https://opentabletdriver.net/Tablets", LinkWarnMode.NeverWarn);
+                        return true;
+                    }
+                }));
+
+                tabletLogNotifyOnWarning = false;
+            }
         }
 
         private Task asyncLoadStream;

@@ -10,6 +10,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
 using osu.Game.Screens.Select.Carousel;
@@ -160,6 +162,54 @@ namespace osu.Game.Tests.Visual.SongSelect
             });
 
             AddUntilStep("SS rank displayed", () => topLocalRank.DisplayedRank == ScoreRank.X);
+        }
+
+        [Test]
+        public void TestGuestScore()
+        {
+            AddStep("Add score for guest user", () =>
+            {
+                var testScoreInfo = TestResources.CreateTestScoreInfo(importedBeatmap);
+
+                testScoreInfo.User = new GuestUser();
+                testScoreInfo.Rank = ScoreRank.B;
+
+                scoreManager.Import(testScoreInfo);
+            });
+
+            AddUntilStep("B rank displayed", () => topLocalRank.DisplayedRank, () => Is.EqualTo(ScoreRank.B));
+        }
+
+        [Test]
+        public void TestUnknownUserScore()
+        {
+            AddStep("Add score for unknown user", () =>
+            {
+                var testScoreInfo = TestResources.CreateTestScoreInfo(importedBeatmap);
+
+                testScoreInfo.User = new APIUser { Username = "AAA", };
+                testScoreInfo.Rank = ScoreRank.S;
+
+                scoreManager.Import(testScoreInfo);
+            });
+
+            AddUntilStep("S rank displayed", () => topLocalRank.DisplayedRank, () => Is.EqualTo(ScoreRank.S));
+        }
+
+        [Test]
+        public void TestAnotherUserScore()
+        {
+            AddStep("Add score for not-current user", () =>
+            {
+                var testScoreInfo = TestResources.CreateTestScoreInfo(importedBeatmap);
+
+                testScoreInfo.User = new APIUser { Username = "notme", Id = 43, };
+                testScoreInfo.Rank = ScoreRank.S;
+
+                scoreManager.Import(testScoreInfo);
+            });
+
+            AddUntilStep("No rank displayed", () => topLocalRank.DisplayedRank, () => Is.Null);
         }
     }
 }
