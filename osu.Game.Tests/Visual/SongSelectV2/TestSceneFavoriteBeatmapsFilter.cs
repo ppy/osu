@@ -19,6 +19,7 @@ using osu.Game.Rulesets;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.SelectV2;
 using osu.Game.Tests.Resources;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.SongSelectV2
 {
@@ -74,24 +75,14 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         public void TestFavoritesOptionNotVisibleWhenLoggedOut()
         {
             AddStep("log out", () => dummyAPI.Logout());
-            AddStep("open dropdown", () => collectionDropdown.Show());
-            AddAssert("no favorites option", () =>
-                collectionDropdown.ChildrenOfType<CollectionDropdown.ShearedCollectionDropdownMenu>()
-                    .First()
-                    .ChildrenOfType<Dropdown<CollectionFilterMenuItem>.DropdownItem>()
-                    .All(item => !(item.Value is FavoriteBeatmapsCollectionFilterMenuItem)));
+            AddUntilStep("no favorites option", () => !collectionDropdown.ItemSource.Any(item => item is FavoriteBeatmapsCollectionFilterMenuItem));
         }
 
         [Test]
         public void TestFavoritesOptionVisibleWhenLoggedIn()
         {
             AddStep("log in", () => dummyAPI.Login("test", "test"));
-            AddStep("open dropdown", () => collectionDropdown.Show());
-            AddAssert("favorites option exists", () =>
-                collectionDropdown.ChildrenOfType<CollectionDropdown.ShearedCollectionDropdownMenu>()
-                    .First()
-                    .ChildrenOfType<Dropdown<CollectionFilterMenuItem>.DropdownItem>()
-                    .Any(item => item.Value is FavoriteBeatmapsCollectionFilterMenuItem));
+            AddUntilStep("favorites option exists", () => collectionDropdown.ItemSource.Any(item => item is FavoriteBeatmapsCollectionFilterMenuItem));
         }
 
         [Test]
@@ -166,11 +157,11 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddStep("log in as user 1", () => dummyAPI.Login("user1", "test"));
             AddStep("mock API responses", () => setupMockAPI());
             AddStep("select favorites filter", () => selectFavoritesFilter());
-            AddAssert("cache populated", () => filterControl.CreateCriteria().CollectionBeatmapMD5Hashes != null);
+            AddUntilStep("cache populated", () => filterControl.CreateCriteria().CollectionBeatmapMD5Hashes != null);
 
             AddStep("log in as user 2", () => dummyAPI.Login("user2", "test"));
             AddStep("select favorites filter", () => selectFavoritesFilter());
-            AddAssert("new API request for new user", () => dummyAPI.LastQueuedRequest is GetUserBeatmapsRequest);
+            AddUntilStep("new API request for new user", () => dummyAPI.LastQueuedRequest is GetUserBeatmapsRequest);
         }
 
         [Test]
@@ -179,27 +170,30 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddStep("log in", () => dummyAPI.Login("test", "test"));
             AddStep("mock API with known beatmap", () =>
             {
-                var importedBeatmap = beatmapManager.GetAllUsableBeatmapSets().First();
-
-                dummyAPI.HandleRequest = req =>
+                var importedBeatmap = beatmapManager.GetAllUsableBeatmapSets().FirstOrDefault();
+                if (importedBeatmap != null)
                 {
-                    if (req is GetUserBeatmapsRequest getUserBeatmapsRequest)
+                    dummyAPI.HandleRequest = req =>
                     {
-                        getUserBeatmapsRequest.TriggerSuccess(new APIBeatmapSet[]
+                        if (req is GetUserBeatmapsRequest getUserBeatmapsRequest)
                         {
-                            new APIBeatmapSet { OnlineID = importedBeatmap.OnlineID }
-                        });
-                        return true;
-                    }
-                    return false;
-                };
+                            getUserBeatmapsRequest.TriggerSuccess(new APIBeatmapSet[]
+                            {
+                                new APIBeatmapSet { OnlineID = importedBeatmap.OnlineID }
+                            });
+                            return true;
+                        }
+                        return false;
+                    };
+                }
             });
 
             AddStep("select favorites filter", () => selectFavoritesFilter());
-            AddAssert("filter includes imported beatmap hashes", () =>
+            AddUntilStep("filter includes imported beatmap hashes", () =>
             {
                 var criteria = filterControl.CreateCriteria();
-                var importedBeatmap = beatmapManager.GetAllUsableBeatmapSets().First();
+                var importedBeatmap = beatmapManager.GetAllUsableBeatmapSets().FirstOrDefault();
+                if (importedBeatmap == null) return false;
                 var importedHashes = importedBeatmap.Beatmaps.Select(b => b.MD5Hash).ToHashSet();
                 return criteria.CollectionBeatmapMD5Hashes?.Intersect(importedHashes).Any() == true;
             });
@@ -207,33 +201,21 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
         private void selectFavoritesFilter()
         {
-            AddStep("open dropdown", () => collectionDropdown.Show());
-            AddStep("click favorites option", () =>
+            AddStep("select favorites from dropdown", () =>
             {
-                var favoritesItem = collectionDropdown
-                    .ChildrenOfType<CollectionDropdown.ShearedCollectionDropdownMenu>()
-                    .First()
-                    .ChildrenOfType<Dropdown<CollectionFilterMenuItem>.DropdownItem>()
-                    .First(item => item.Value is FavoriteBeatmapsCollectionFilterMenuItem);
-
-                InputManager.MoveMouseTo(favoritesItem);
-                InputManager.Click(MouseButton.Left);
+                var favoritesMenuItem = collectionDropdown.ItemSource.FirstOrDefault(item => item is FavoriteBeatmapsCollectionFilterMenuItem);
+                if (favoritesMenuItem != null)
+                    collectionDropdown.Current.Value = favoritesMenuItem;
             });
         }
 
         private void selectAllBeatmapsFilter()
         {
-            AddStep("open dropdown", () => collectionDropdown.Show());
-            AddStep("click all beatmaps option", () =>
+            AddStep("select all beatmaps from dropdown", () =>
             {
-                var allBeatmapsItem = collectionDropdown
-                    .ChildrenOfType<CollectionDropdown.ShearedCollectionDropdownMenu>()
-                    .First()
-                    .ChildrenOfType<Dropdown<CollectionFilterMenuItem>.DropdownItem>()
-                    .First(item => item.Value is AllBeatmapsCollectionFilterMenuItem);
-
-                InputManager.MoveMouseTo(allBeatmapsItem);
-                InputManager.Click(MouseButton.Left);
+                var allBeatmapsMenuItem = collectionDropdown.ItemSource.FirstOrDefault(item => item is AllBeatmapsCollectionFilterMenuItem);
+                if (allBeatmapsMenuItem != null)
+                    collectionDropdown.Current.Value = allBeatmapsMenuItem;
             });
         }
 

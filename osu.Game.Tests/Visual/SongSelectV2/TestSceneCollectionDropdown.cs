@@ -87,11 +87,11 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddStep("add collection", () => writeAndRefresh(r => r.Add(new BeatmapCollection(name: "2"))));
             AddStep("add collection", () => writeAndRefresh(r => r.Add(new BeatmapCollection(name: "3"))));
 
-            AddAssert("check count 5", () => dropdown.ChildrenOfType<CollectionDropdown>().Single().ChildrenOfType<Menu.DrawableMenuItem>().Count(), () => Is.EqualTo(5));
+            AddAssert("check count 6", () => dropdown.ChildrenOfType<CollectionDropdown>().Single().ChildrenOfType<Menu.DrawableMenuItem>().Count(), () => Is.EqualTo(6));
 
             AddStep("delete all collections", () => writeAndRefresh(r => r.RemoveAll<BeatmapCollection>()));
 
-            AddAssert("check count 2", () => dropdown.ChildrenOfType<CollectionDropdown>().Single().ChildrenOfType<Menu.DrawableMenuItem>().Count(), () => Is.EqualTo(2));
+            AddAssert("check count 3", () => dropdown.ChildrenOfType<CollectionDropdown>().Single().ChildrenOfType<Menu.DrawableMenuItem>().Count(), () => Is.EqualTo(3));
         }
 
         [Test]
@@ -112,7 +112,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         {
             AddStep("add collection", () => writeAndRefresh(r => r.Add(new BeatmapCollection(name: "1"))));
             assertCollectionDropdownContains("1");
-            AddStep("select collection", () => dropdown.Current.Value = dropdown.ItemSource.ElementAt(1));
+            AddStep("select collection", () => dropdown.Current.Value = dropdown.ItemSource.ElementAt(2));
 
             addExpandHeaderStep();
 
@@ -136,8 +136,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             addExpandHeaderStep();
             AddStep("add collection", () => writeAndRefresh(r => r.Add(new BeatmapCollection(name: "1"))));
             assertCollectionDropdownContains("1");
-            AddStep("hover collection", () => InputManager.MoveMouseTo(getAddOrRemoveButton(1)));
-            AddAssert("collection has add button", () => getAddOrRemoveButton(1).IsPresent);
+            AddStep("hover collection", () => InputManager.MoveMouseTo(getAddOrRemoveButton(2)));
+            AddAssert("collection has add button", () => getAddOrRemoveButton(2).IsPresent);
         }
 
         [Test]
@@ -149,10 +149,10 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             assertCollectionDropdownContains("1");
 
             AddStep("select available beatmap", () => Beatmap.Value = beatmapManager.GetWorkingBeatmap(beatmapManager.GetAllUsableBeatmapSets().First().Beatmaps[0]));
-            AddAssert("button enabled", () => getAddOrRemoveButton(1).Enabled.Value);
+            AddAssert("button enabled", () => getAddOrRemoveButton(2).Enabled.Value);
 
             AddStep("set dummy beatmap", () => Beatmap.SetDefault());
-            AddAssert("button disabled", () => !getAddOrRemoveButton(1).Enabled.Value);
+            AddAssert("button disabled", () => !getAddOrRemoveButton(2).Enabled.Value);
         }
 
         [Test]
@@ -185,11 +185,11 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             assertCollectionDropdownContains("1");
             assertFirstButtonIs(FontAwesome.Solid.PlusSquare);
 
-            addClickAddOrRemoveButtonStep(1);
+            addClickAddOrRemoveButtonStep(2);
             AddAssert("collection contains beatmap", () => getFirstCollection().BeatmapMD5Hashes.Contains(Beatmap.Value.BeatmapInfo.MD5Hash));
             assertFirstButtonIs(FontAwesome.Solid.MinusSquare);
 
-            addClickAddOrRemoveButtonStep(1);
+            addClickAddOrRemoveButtonStep(2);
             AddAssert("collection does not contain beatmap", () => !getFirstCollection().BeatmapMD5Hashes.Contains(Beatmap.Value.BeatmapInfo.MD5Hash));
             assertFirstButtonIs(FontAwesome.Solid.PlusSquare);
         }
@@ -204,7 +204,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             AddStep("select collection", () =>
             {
-                InputManager.MoveMouseTo(getCollectionDropdownItemAt(1));
+                InputManager.MoveMouseTo(getCollectionDropdownItemAt(2));
                 InputManager.Click(MouseButton.Left);
             });
 
@@ -232,7 +232,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             => AddUntilStep($"collection dropdown header displays '{collectionName}'",
                 () => shouldDisplay == dropdown.ChildrenOfType<CollectionDropdown.ShearedDropdownHeader>().Any(h => h.ChildrenOfType<SpriteText>().Any(t => t.Text == collectionName)));
 
-        private void assertFirstButtonIs(IconUsage icon) => AddUntilStep($"button is {icon.Icon.ToString()}", () => getAddOrRemoveButton(1).Icon.Equals(icon));
+        private void assertFirstButtonIs(IconUsage icon) => AddUntilStep($"button is {icon.Icon.ToString()}", () => getAddOrRemoveButton(2).Icon.Equals(icon));
 
         private void assertCollectionDropdownContains(LocalisableString collectionName, bool shouldContain = true) =>
             AddUntilStep($"collection dropdown {(shouldContain ? "contains" : "does not contain")} '{collectionName}'",
