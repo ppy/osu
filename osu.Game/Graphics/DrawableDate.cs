@@ -72,12 +72,33 @@ namespace osu.Game.Graphics
             Scheduler.AddDelayed(updateTimeWithReschedule, timeUntilNextUpdate);
         }
 
-        protected virtual LocalisableString Format() => HumanizerUtils.Humanize(Date);
+        protected virtual LocalisableString Format() => new LocalisableString(new HumanisedLocalisableDate(Date));
 
         private void updateTime() => Text = Format();
 
         public ITooltip<DateTimeOffset> GetCustomTooltip() => new DateTooltip();
 
         public DateTimeOffset TooltipContent => Date;
+
+        private class HumanisedLocalisableDate : IEquatable<HumanisedLocalisableDate>, ILocalisableStringData
+        {
+            public readonly DateTimeOffset Date;
+
+            public HumanisedLocalisableDate(DateTimeOffset date)
+            {
+                Date = date;
+            }
+
+            public bool Equals(HumanisedLocalisableDate? other)
+                => other?.Date != null && Date.Equals(other.Date);
+
+            public bool Equals(ILocalisableStringData? other)
+                => other is HumanisedLocalisableDate otherDate && Equals(otherDate);
+
+            public string GetLocalised(LocalisationParameters parameters) => HumanizerUtils.Humanize(Date);
+
+            // Override for default string interpolations
+            public override string ToString() => HumanizerUtils.Humanize(Date);
+        }
     }
 }
