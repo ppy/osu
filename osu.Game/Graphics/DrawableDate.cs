@@ -97,8 +97,7 @@ namespace osu.Game.Graphics
 
             public string GetLocalised(LocalisationParameters parameters) => HumanizerUtils.Humanize(Date);
 
-            // Override for default string interpolations
-            public override string ToString() => HumanizerUtils.Humanize(Date);
+            public override string ToString() => GetLocalised(LocalisationParameters.DEFAULT);
         }
     }
 }
