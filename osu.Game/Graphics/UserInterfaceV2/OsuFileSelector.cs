@@ -29,7 +29,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
         {
-            AddInternal(new Box
+            TopLevelContent.Add(new Box
             {
                 RelativeSizeAxes = Axes.Both,
                 Colour = colourProvider.Background5,
