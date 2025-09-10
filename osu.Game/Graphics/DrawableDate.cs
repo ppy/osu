@@ -72,7 +72,7 @@ namespace osu.Game.Graphics
             Scheduler.AddDelayed(updateTimeWithReschedule, timeUntilNextUpdate);
         }
 
-        protected virtual LocalisableString Format() => new LocalisableString(new HumanisedLocalisableDate(Date));
+        protected virtual LocalisableString Format() => new LocalisableString(new HumanisedDate(Date));
 
         private void updateTime() => Text = Format();
 
@@ -80,20 +80,20 @@ namespace osu.Game.Graphics
 
         public DateTimeOffset TooltipContent => Date;
 
-        private class HumanisedLocalisableDate : IEquatable<HumanisedLocalisableDate>, ILocalisableStringData
+        private class HumanisedDate : IEquatable<HumanisedDate>, ILocalisableStringData
         {
             public readonly DateTimeOffset Date;
 
-            public HumanisedLocalisableDate(DateTimeOffset date)
+            public HumanisedDate(DateTimeOffset date)
             {
                 Date = date;
             }
 
-            public bool Equals(HumanisedLocalisableDate? other)
+            public bool Equals(HumanisedDate? other)
                 => other?.Date != null && Date.Equals(other.Date);
 
             public bool Equals(ILocalisableStringData? other)
-                => other is HumanisedLocalisableDate otherDate && Equals(otherDate);
+                => other is HumanisedDate otherDate && Equals(otherDate);
 
             public string GetLocalised(LocalisationParameters parameters) => HumanizerUtils.Humanize(Date);
 
