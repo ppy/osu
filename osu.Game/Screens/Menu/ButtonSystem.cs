@@ -157,7 +157,7 @@ namespace osu.Game.Screens.Menu
             buttonsPlay.Add(new DailyChallengeButton(@"button-daily-select", new Color4(94, 63, 186, 255), onDailyChallenge, Key.D));
             buttonsPlay.ForEach(b => b.VisibleState = ButtonSystemState.Play);
 
-            buttonsMulti.Add(new MainMenuButton("lounge", @"button-default-select", FontAwesome.Solid.Couch, new Color4(94, 63, 186, 255), onMultiplayer, Key.B)
+            buttonsMulti.Add(new MainMenuButton("lounge", @"button-default-select", FontAwesome.Solid.Couch, new Color4(94, 63, 186, 255), onMultiplayer, Key.L, Key.M)
             {
                 Padding = new MarginPadding { Left = WEDGE_WIDTH }
             });
