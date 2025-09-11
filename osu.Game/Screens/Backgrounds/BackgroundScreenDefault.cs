@@ -163,6 +163,7 @@ namespace osu.Game.Screens.Backgrounds
                             case TrianglesSkin:
                             case ArgonSkin:
                             case DefaultLegacySkin:
+                            case RetroSkin:
                                 // default skins should use the default background rotation, which won't be the case if a SkinBackground is created for them.
                                 break;
 

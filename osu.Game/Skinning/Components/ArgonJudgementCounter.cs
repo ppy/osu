@@ -60,7 +60,7 @@ namespace osu.Game.Skinning.Components
 
             var result = Result.Types.First();
             textComponent.LabelColour.Value = getJudgementColor(result);
-            textComponent.ShowLabel.BindValueChanged(v => textComponent.TextColour.Value = !v.NewValue ? getJudgementColor(result) : Color4.White);
+            textComponent.ShowLabel.BindValueChanged(v => textComponent.TextColour.Value = !v.NewValue ? getJudgementColor(result) : Color4.White, true);
         }
 
         private Color4 getJudgementColor(HitResult result)

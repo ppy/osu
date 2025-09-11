@@ -429,7 +429,7 @@ namespace osu.Game.Online.Leaderboards
                 Font = OsuFont.GetFont(size: 16, weight: FontWeight.Bold);
             }
 
-            protected override string Format() => Date.ToShortRelativeTime(TimeSpan.FromSeconds(30));
+            protected override LocalisableString Format() => Date.ToShortRelativeTime(TimeSpan.FromSeconds(30));
         }
 
         public class LeaderboardScoreStatistic
