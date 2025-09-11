@@ -115,8 +115,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private void applyDim(Drawable piece)
         {
             piece.FadeColour(new Color4(195, 195, 195, 255));
-            using (piece.BeginDelayedSequence(InitialLifetimeOffset - OsuHitWindows.MISS_WINDOW))
-                piece.FadeColour(Color4.White, 100);
+            piece.FadeColour(Color4.White, Math.Max(0, InitialLifetimeOffset - OsuHitWindows.MISS_WINDOW), Easing.InQuint);
         }
 
         private void applyDimToDrawableHitObject(DrawableHitObject dho, ArmedState _) => applyDim(dho);
