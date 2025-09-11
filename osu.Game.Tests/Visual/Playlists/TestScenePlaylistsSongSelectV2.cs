@@ -11,6 +11,7 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
+using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
 using osu.Game.Screens.OnlinePlay.Playlists;
@@ -61,7 +62,7 @@ namespace osu.Game.Tests.Visual.Playlists
 
             ImportBeatmapForRuleset(0);
 
-            AddStep("load screen", () => LoadScreen(songSelect = new PlaylistsSongSelectV2()));
+            AddStep("load screen", () => LoadScreen(songSelect = new PlaylistsSongSelectV2(new Room())));
             AddUntilStep("wait for load", () => Stack.CurrentScreen == songSelect && songSelect.IsLoaded);
             AddUntilStep("wait for filtering", () => !Carousel.IsFiltering);
         }
