@@ -261,9 +261,10 @@ namespace osu.Game.Screens.SelectV2
                             // TODO: should this exist in song select instead of here?
                             // we need to ensure the global beatmap is also updated alongside changes.
                             if (CurrentBeatmap != null && beatmap.Equals(CurrentBeatmap))
-                                // we don't know in which group the matching new beatmap is, but that's fine - we can leave it null for now.
-                                // we are about to modify `Items`, which will trigger a re-filter, which will pick a correct group - if one is present - via `HandleFilterCompleted()`.
-                                RequestSelection(new GroupedBeatmap(null, matchingNewBeatmap));
+                                // we don't know in which group the matching new beatmap is, but that's fine - we can keep the previous one for now.
+                                // we are about to modify `Items`, which - if required - will trigger a re-filter,
+                                // which will pick a correct group - if one is present - via `HandleFilterCompleted()`.
+                                RequestSelection(new GroupedBeatmap(CurrentGroupedBeatmap?.Group, matchingNewBeatmap));
 
                             Items.ReplaceRange(previousIndex, 1, [matchingNewBeatmap]);
                             newSetBeatmaps.Remove(matchingNewBeatmap);
