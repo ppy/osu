@@ -20,14 +20,14 @@ indent_size = 4
 trim_trailing_whitespace = true
 
 #license header
-file_header_template = Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.\nSee the LICENCE file in the repository root for full licence text.
+file_header_template = Copyright (c) ppy Pty Ltd <contact@ppy.sh>.Licensed under the MIT Licence.\nSee the LICENCE file in the repository root for full licence text.
 
 #Roslyn naming styles
 
 #PascalCase for public and protected members
 dotnet_naming_style.pascalcase.capitalization = pascal_case
-dotnet_naming_symbols.public_members.applicable_accessibilities = public,internal,protected,protected_internal,private_protected
-dotnet_naming_symbols.public_members.applicable_kinds = property,method,field,event
+dotnet_naming_symbols.public_members.applicable_accessibilities = public, internal, protected, protected_internal, private_protected
+dotnet_naming_symbols.public_members.applicable_kinds = property, method, field, event
 dotnet_naming_rule.public_members_pascalcase.severity = error
 dotnet_naming_rule.public_members_pascalcase.symbols = public_members
 dotnet_naming_rule.public_members_pascalcase.style = pascalcase
@@ -36,7 +36,7 @@ dotnet_naming_rule.public_members_pascalcase.style = pascalcase
 dotnet_naming_style.camelcase.capitalization = camel_case
 
 dotnet_naming_symbols.private_members.applicable_accessibilities = private
-dotnet_naming_symbols.private_members.applicable_kinds = property,method,field,event
+dotnet_naming_symbols.private_members.applicable_kinds = property, method, field, event
 dotnet_naming_rule.private_members_camelcase.severity = warning
 dotnet_naming_rule.private_members_camelcase.symbols = private_members
 dotnet_naming_rule.private_members_camelcase.style = camelcase
@@ -58,7 +58,7 @@ dotnet_naming_rule.private_const_all_lower.symbols = private_constants
 dotnet_naming_rule.private_const_all_lower.style = all_lower
 
 dotnet_naming_symbols.private_static_readonly.applicable_accessibilities = private
-dotnet_naming_symbols.private_static_readonly.required_modifiers = static,readonly
+dotnet_naming_symbols.private_static_readonly.required_modifiers = static, readonly
 dotnet_naming_symbols.private_static_readonly.applicable_kinds = field
 dotnet_naming_rule.private_static_readonly_all_lower.severity = warning
 dotnet_naming_rule.private_static_readonly_all_lower.symbols = private_static_readonly
@@ -74,15 +74,15 @@ dotnet_naming_rule.local_const_all_lower.style = all_lower
 dotnet_naming_style.all_upper.capitalization = all_upper
 dotnet_naming_style.all_upper.word_separator = _
 
-dotnet_naming_symbols.public_constants.applicable_accessibilities = public,internal,protected,protected_internal,private_protected
+dotnet_naming_symbols.public_constants.applicable_accessibilities = public, internal, protected, protected_internal, private_protected
 dotnet_naming_symbols.public_constants.required_modifiers = const
 dotnet_naming_symbols.public_constants.applicable_kinds = field
 dotnet_naming_rule.public_const_all_upper.severity = warning
 dotnet_naming_rule.public_const_all_upper.symbols = public_constants
 dotnet_naming_rule.public_const_all_upper.style = all_upper
 
-dotnet_naming_symbols.public_static_readonly.applicable_accessibilities = public,internal,protected,protected_internal,private_protected
-dotnet_naming_symbols.public_static_readonly.required_modifiers = static,readonly
+dotnet_naming_symbols.public_static_readonly.applicable_accessibilities = public, internal, protected, protected_internal, private_protected
+dotnet_naming_symbols.public_static_readonly.required_modifiers = static, readonly
 dotnet_naming_symbols.public_static_readonly.applicable_kinds = field
 dotnet_naming_rule.public_static_readonly_all_upper.severity = warning
 dotnet_naming_rule.public_static_readonly_all_upper.symbols = public_static_readonly
@@ -140,7 +140,7 @@ csharp_style_var_elsewhere = true:silent
 
 #Style - modifiers
 dotnet_style_require_accessibility_modifiers = for_non_interface_members:warning
-csharp_preferred_modifier_order = public,private,protected,internal,new,abstract,virtual,sealed,override,static,readonly,extern,unsafe,volatile,async:warning
+csharp_preferred_modifier_order = public, private, protected, internal, new, abstract, virtual, sealed, override, static, readonly, extern, unsafe, volatile, async:warning
 
 #Style - parentheses
 # Skipped because roslyn cannot separate +-*/ with << >>
@@ -206,4 +206,5 @@ indent_size = 2
 trim_trailing_whitespace = true
 
 dotnet_diagnostic.OLOC001.words_in_name = 5
-dotnet_diagnostic.OLOC001.license_header = // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.\n// See the LICENCE file in the repository root for full licence text.
+dotnet_diagnostic.OLOC001.license_header =
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>.Licensed under the MIT Licence.\n// See the LICENCE file in the repository root for full licence text.
