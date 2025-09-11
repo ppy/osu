@@ -21,6 +21,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Input.StateChanges;
@@ -68,9 +69,9 @@ namespace osu.Game.Screens.SelectV2
         /// A debounce that governs how long after a panel is selected before the rest of song select (and the game at large)
         /// updates to show that selection.
         ///
-        /// This is intentionally slightly higher than initial key repeat, but low enough to not impede user experience.
+        /// This is intentionally slightly higher than key repeat, but low enough to not impede user experience.
         /// </summary>
-        public const int SELECTION_DEBOUNCE = 260;
+        public const int SELECTION_DEBOUNCE = 150;
 
         /// <summary>
         /// A general "global" debounce to be applied to anything aggressive difficulty calculation at song select,
@@ -148,6 +149,8 @@ namespace osu.Game.Screens.SelectV2
 
         [Resolved]
         private IDialogOverlay? dialogOverlay { get; set; }
+
+        private InputManager inputManager = null!;
 
         private readonly RealmPopulatingOnlineLookupSource onlineLookupSource = new RealmPopulatingOnlineLookupSource();
 
@@ -345,6 +348,8 @@ namespace osu.Game.Screens.SelectV2
         {
             base.LoadComplete();
 
+            inputManager = GetContainingInputManager()!;
+
             filterControl.CriteriaChanged += criteriaChanged;
 
             modSelectOverlay.State.BindValueChanged(v =>
@@ -405,13 +410,17 @@ namespace osu.Game.Screens.SelectV2
 
             double elapsed = Clock.ElapsedFrameTime;
 
+            // When a key is being held, assume the user is traversing the carousel using key repeat.
+            // We want to change panels less often in this state (basically making debounce longer than initial key repeat, at least).
+            double debounceInterval = inputManager.CurrentState.Keyboard.Keys.HasAnyButtonPressed ? SELECTION_DEBOUNCE * 2 : SELECTION_DEBOUNCE;
+
             // avoid debounce running early if there's a single long frame.
             if (!DebugUtils.IsNUnitRunning && Clock.FramesPerSecond > 0)
                 elapsed = Math.Min(1000 / Clock.FramesPerSecond, elapsed);
 
             debounceElapsedTime += elapsed;
 
-            if (debounceElapsedTime >= SELECTION_DEBOUNCE)
+            if (debounceElapsedTime >= debounceInterval)
                 performDebounceSelection();
         }
 
