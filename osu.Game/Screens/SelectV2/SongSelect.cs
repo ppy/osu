@@ -94,13 +94,7 @@ namespace osu.Game.Screens.SelectV2
         /// </summary>
         protected bool ControlGlobalMusic { get; init; } = true;
 
-        // Colour scheme for mod overlay is left as default (green) to match mods button.
-        // Not sure about this, but we'll iterate based on feedback.
-        private readonly ModSelectOverlay modSelectOverlay = new UserModSelectOverlay
-        {
-            ShowPresets = true,
-        };
-
+        private ModSelectOverlay modSelectOverlay = null!;
         private ModSpeedHotkeyHandler modSpeedHotkeyHandler = null!;
 
         // Blue is the most neutral choice, so I'm using that for now.
@@ -297,7 +291,7 @@ namespace osu.Game.Screens.SelectV2
                     RelativeSizeAxes = Axes.Both,
                 },
                 modSpeedHotkeyHandler = new ModSpeedHotkeyHandler(),
-                modSelectOverlay,
+                modSelectOverlay = CreateModSelectOverlay(),
             });
 
             configBackgroundBlur = config.GetBindable<bool>(OsuSetting.SongSelectBackgroundBlur);
@@ -311,6 +305,13 @@ namespace osu.Game.Screens.SelectV2
 
             showConvertedBeatmaps = config.GetBindable<bool>(OsuSetting.ShowConvertedBeatmaps);
         }
+
+        // Colour scheme for mod overlay is left as default (green) to match mods button.
+        // Not sure about this, but we'll iterate based on feedback.
+        protected virtual ModSelectOverlay CreateModSelectOverlay() => new UserModSelectOverlay
+        {
+            ShowPresets = true,
+        };
 
         private void requestRecommendedSelection(IEnumerable<GroupedBeatmap> groupedBeatmaps)
         {
