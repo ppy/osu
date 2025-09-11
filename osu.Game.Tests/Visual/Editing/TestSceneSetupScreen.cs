@@ -22,6 +22,7 @@ namespace osu.Game.Tests.Visual.Editing
     {
         [Cached(typeof(EditorBeatmap))]
         [Cached(typeof(IBeatSnapProvider))]
+        [Cached(typeof(IBeatmapEditorChangeHandler))]
         private readonly EditorBeatmap editorBeatmap;
 
         [Cached]
