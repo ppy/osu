@@ -65,6 +65,21 @@ namespace osu.Game.Localisation.SkinComponents
         public static LocalisableString CollapseDuringGameplay => new TranslatableString(getKey(@"collapse_during_gameplay"), @"Collapse during gameplay");
 
         /// <summary>
+        /// "Icon"
+        /// </summary>
+        public static LocalisableString Icon => new TranslatableString(getKey(@"icon"), @"Icon");
+
+        /// <summary>
+        /// "Icon colour"
+        /// </summary>
+        public static LocalisableString IconColour => new TranslatableString(getKey(@"icon_colour"), @"Icon colour");
+
+        /// <summary>
+        /// "The colour of the icon."
+        /// </summary>
+        public static LocalisableString IconColourDescription => new TranslatableString(getKey(@"icon_colour_description"), @"The colour of the icon.");
+
+        /// <summary>
         /// "If enabled, the leaderboard will become more compact during active gameplay."
         /// </summary>
         public static LocalisableString CollapseDuringGameplayDescription =>
