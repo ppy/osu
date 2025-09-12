@@ -5,7 +5,9 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Screens;
 using osu.Game.Localisation;
+using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
@@ -104,6 +106,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
         protected override void OnStart()
         {
+            room.Playlist = [createNewItem()];
+            this.Exit();
         }
 
         public override IReadOnlyList<ScreenFooterButton> CreateFooterButtons()
@@ -111,6 +115,11 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             var buttons = base.CreateFooterButtons().ToList();
 
             buttons.Single(i => i is FooterButtonMods).TooltipText = MultiplayerMatchStrings.RequiredModsButtonTooltip;
+
+            buttons.Insert(0, new FooterButtonPlaylistV2(room)
+            {
+                CreateNewItem = () => room.Playlist = room.Playlist.Append(createNewItem()).ToArray()
+            });
 
             buttons.InsertRange(buttons.FindIndex(b => b is FooterButtonMods) + 1,
             [
@@ -131,6 +140,15 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         protected override ModSelectOverlay CreateModSelectOverlay() => modSelect = new UserModSelectOverlay(OverlayColourScheme.Plum)
         {
             IsValidMod = isValidRequiredMod
+        };
+
+        private PlaylistItem createNewItem() => new PlaylistItem(Beatmap.Value.BeatmapInfo)
+        {
+            ID = room.Playlist.Count == 0 ? 0 : room.Playlist.Max(p => p.ID) + 1,
+            RulesetID = Ruleset.Value.OnlineID,
+            RequiredMods = Mods.Value.Select(m => new APIMod(m)).ToArray(),
+            AllowedMods = freeMods.Value.Select(m => new APIMod(m)).ToArray(),
+            Freestyle = freestyle.Value
         };
 
         /// <summary>
