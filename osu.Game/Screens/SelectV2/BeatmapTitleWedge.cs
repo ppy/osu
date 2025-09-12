@@ -8,20 +8,17 @@ using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Configuration;
+using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -43,6 +40,9 @@ namespace osu.Game.Screens.SelectV2
         [Resolved]
         private IBindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
 
+        [Resolved]
+        private IBindable<SongSelect.BeatmapSetLookupResult?> onlineLookupResult { get; set; } = null!;
+
         protected override bool StartHidden => true;
 
         private ModSettingChangeTracker? settingChangeTracker;
@@ -59,7 +59,7 @@ namespace osu.Game.Screens.SelectV2
         internal string DisplayedArtist => artistLabel.Text.ToString();
 
         private StatisticPlayCount playCount = null!;
-        private Statistic favouritesStatistic = null!;
+        private FavouriteButton favouriteButton = null!;
         private Statistic lengthStatistic = null!;
         private Statistic bpmStatistic = null!;
 
@@ -70,10 +70,7 @@ namespace osu.Game.Screens.SelectV2
         private LocalisationManager localisation { get; set; } = null!;
 
         [Resolved]
-        private IAPIProvider api { get; set; } = null!;
-
-        private APIBeatmapSet? currentOnlineBeatmapSet;
-        private GetBeatmapSetRequest? currentRequest;
+        private RealmAccess realm { get; set; } = null!;
 
         private FillFlowContainer statisticsFlow = null!;
 
@@ -157,10 +154,7 @@ namespace osu.Game.Screens.SelectV2
                                 {
                                     Margin = new MarginPadding { Left = -SongSelect.WEDGE_CONTENT_MARGIN },
                                 },
-                                favouritesStatistic = new Statistic(OsuIcon.Heart, background: true, minSize: 25f)
-                                {
-                                    TooltipText = BeatmapsStrings.StatusFavourites,
-                                },
+                                favouriteButton = new FavouriteButton(),
                                 lengthStatistic = new Statistic(OsuIcon.Clock),
                                 bpmStatistic = new Statistic(OsuIcon.Metronome)
                                 {
@@ -189,6 +183,7 @@ namespace osu.Game.Screens.SelectV2
 
             working.BindValueChanged(_ => updateDisplay());
             ruleset.BindValueChanged(_ => updateDisplay());
+            onlineLookupResult.BindValueChanged(_ => updateDisplay());
 
             mods.BindValueChanged(m =>
             {
@@ -229,7 +224,6 @@ namespace osu.Game.Screens.SelectV2
         {
             var metadata = working.Value.Metadata;
             var beatmapInfo = working.Value.BeatmapInfo;
-            var beatmapSetInfo = working.Value.BeatmapSetInfo;
 
             statusPill.Status = beatmapInfo.Status;
 
@@ -242,10 +236,6 @@ namespace osu.Game.Screens.SelectV2
             artistLink.Action = () => songSelect?.Search(artistText.GetPreferred(localisation.CurrentParameters.Value.PreferOriginalScript));
 
             updateLengthAndBpmStatistics();
-
-            if (currentOnlineBeatmapSet == null || currentOnlineBeatmapSet.OnlineID != beatmapSetInfo.OnlineID)
-                refetchBeatmapSet();
-
             updateOnlineDisplay();
         }
 
@@ -288,48 +278,33 @@ namespace osu.Game.Screens.SelectV2
             }, token);
         }
 
-        private void refetchBeatmapSet()
-        {
-            var beatmapSetInfo = working.Value.BeatmapSetInfo;
-
-            currentRequest?.Cancel();
-            currentRequest = null;
-            currentOnlineBeatmapSet = null;
-
-            if (beatmapSetInfo.OnlineID >= 1)
-            {
-                // todo: consider introducing a BeatmapSetLookupCache for caching benefits.
-                currentRequest = new GetBeatmapSetRequest(beatmapSetInfo.OnlineID);
-                currentRequest.Failure += _ => updateOnlineDisplay();
-                currentRequest.Success += s =>
-                {
-                    currentOnlineBeatmapSet = s;
-                    updateOnlineDisplay();
-                };
-
-                api.Queue(currentRequest);
-            }
-        }
-
         private void updateOnlineDisplay()
         {
-            if (currentRequest?.CompletionState == APIRequestCompletionState.Waiting)
+            if (onlineLookupResult.Value?.Status != SongSelect.BeatmapSetLookupStatus.Completed)
             {
                 playCount.Value = null;
-                favouritesStatistic.Text = null;
-            }
-            else if (currentOnlineBeatmapSet == null)
-            {
-                playCount.Value = new StatisticPlayCount.Data(-1, -1);
-                favouritesStatistic.Text = "-";
+                favouriteButton.SetLoading();
             }
             else
             {
-                var onlineBeatmapSet = currentOnlineBeatmapSet;
-                var onlineBeatmap = currentOnlineBeatmapSet.Beatmaps.SingleOrDefault(b => b.OnlineID == working.Value.BeatmapInfo.OnlineID);
-
+                var onlineBeatmap = onlineLookupResult.Value.Result?.Beatmaps.SingleOrDefault(b => b.OnlineID == working.Value.BeatmapInfo.OnlineID);
                 playCount.Value = new StatisticPlayCount.Data(onlineBeatmap?.PlayCount ?? -1, onlineBeatmap?.UserPlayCount ?? -1);
-                favouritesStatistic.Text = onlineBeatmapSet.FavouriteCount.ToLocalisableString(@"N0");
+                favouriteButton.SetBeatmapSet(onlineLookupResult.Value.Result);
+
+                // the online fetch may have also updated the beatmap's status.
+                // this needs to be checked against the *local* beatmap model rather than the online one, because it's not known here whether the status change has occurred or not
+                // (think scenarios like the beatmap being locally modified).
+                // it also has to be handled explicitly like this because the working beatmap's `BeatmapInfo` will not receive these updates due to being detached
+                // (and because of https://github.com/ppy/osu/blob/4b73afd1957a9161e2956fc4191c8114d9958372/osu.Game/Screens/SelectV2/SongSelect.cs#L487-L488
+                // which prevents working beatmap refetches caused by changes to the realm model of perceived low importance).
+                var status = realm.Run(r =>
+                {
+                    r.Refresh();
+                    var refetchedBeatmap = r.Find<BeatmapInfo>(working.Value.BeatmapInfo.ID);
+                    return refetchedBeatmap?.Status;
+                });
+                if (status != null)
+                    statusPill.Status = status.Value;
             }
         }
     }

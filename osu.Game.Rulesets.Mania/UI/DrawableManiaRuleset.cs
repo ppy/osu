@@ -59,6 +59,7 @@ namespace osu.Game.Rulesets.Mania.UI
         private readonly Bindable<ManiaScrollingDirection> configDirection = new Bindable<ManiaScrollingDirection>();
         private readonly BindableDouble configScrollSpeed = new BindableDouble();
         private readonly Bindable<ManiaMobileLayout> mobileLayout = new Bindable<ManiaMobileLayout>();
+        private readonly Bindable<bool> touchOverlay = new Bindable<bool>();
 
         public double TargetTimeRange { get; protected set; }
 
@@ -122,24 +123,23 @@ namespace osu.Game.Rulesets.Mania.UI
 
             Config.BindWith(ManiaRulesetSetting.MobileLayout, mobileLayout);
             mobileLayout.BindValueChanged(_ => updateMobileLayout(), true);
+
+            Config.BindWith(ManiaRulesetSetting.TouchOverlay, touchOverlay);
+            touchOverlay.BindValueChanged(_ => updateMobileLayout(), true);
         }
 
         private ManiaTouchInputArea? touchInputArea;
 
         private void updateMobileLayout()
         {
-            switch (mobileLayout.Value)
+            if (touchOverlay.Value)
+                KeyBindingInputManager.Add(touchInputArea = new ManiaTouchInputArea(this));
+            else
             {
-                case ManiaMobileLayout.LandscapeWithOverlay:
-                    KeyBindingInputManager.Add(touchInputArea = new ManiaTouchInputArea(this));
-                    break;
+                if (touchInputArea != null)
+                    KeyBindingInputManager.Remove(touchInputArea, true);
 
-                default:
-                    if (touchInputArea != null)
-                        KeyBindingInputManager.Remove(touchInputArea, true);
-
-                    touchInputArea = null;
-                    break;
+                touchInputArea = null;
             }
         }
 

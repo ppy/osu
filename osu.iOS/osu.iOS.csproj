@@ -4,8 +4,12 @@
     <SupportedOSPlatformVersion>13.4</SupportedOSPlatformVersion>
     <OutputType>Exe</OutputType>
     <Version>0.1.0</Version>
-    <ApplicationVersion Condition=" '$(ApplicationVersion)' == '' ">$(Version)</ApplicationVersion>
-    <ApplicationDisplayVersion Condition=" '$(ApplicationDisplayVersion)' == '' ">$(Version)</ApplicationDisplayVersion>
+
+    <!-- Incoming version string will be e.g. 2025.723.0-tachyon -->
+    <VersionNoSuffix>$([System.String]::Copy('$(Version)').Split('-')[0])</VersionNoSuffix>
+
+    <ApplicationVersion Condition=" '$(ApplicationVersion)' == '' ">$(VersionNoSuffix)</ApplicationVersion>
+    <ApplicationDisplayVersion Condition=" '$(ApplicationDisplayVersion)' == '' ">$(VersionNoSuffix)</ApplicationDisplayVersion>
   </PropertyGroup>
   <Import Project="..\osu.iOS.props" />
   <ItemGroup>
@@ -18,4 +22,14 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Maui.Essentials" Version="8.0.3" />
   </ItemGroup>
+  <!-- https://github.com/dotnet/macios/blob/eabcdee2ac43a0cc8324396a1bf75f8797d71810/msbuild/Xamarin.Shared/Xamarin.Shared.targets#L1328 -->
+  <Target Name="AddOsuVersionToBundle" AfterTargets="_CreateAppBundle">
+    <PropertyGroup>
+      <PlistFilePath>$(AppBundleDir)/Info.plist</PlistFilePath>
+      <OsuVersionKey>OsuVersion</OsuVersionKey>
+    </PropertyGroup>
+    <Exec Command="bash -c &quot;(/usr/libexec/PlistBuddy -c 'Print :$(OsuVersionKey)' '$(PlistFilePath)' &gt;/dev/null 2&gt;&amp;1 \
+                                 &amp;&amp; /usr/libexec/PlistBuddy -c 'Set :$(OsuVersionKey) $(Version)' '$(PlistFilePath)') \
+                                 || /usr/libexec/PlistBuddy -c 'Add :$(OsuVersionKey) string $(Version)' '$(PlistFilePath)'&quot;"/>
+  </Target>
 </Project>

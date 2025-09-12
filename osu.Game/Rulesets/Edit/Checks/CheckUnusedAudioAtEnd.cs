@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit.Checks.Components;
-using osu.Game.Storyboards;
 
 namespace osu.Game.Rulesets.Edit.Checks
 {
@@ -22,8 +21,8 @@ namespace osu.Game.Rulesets.Edit.Checks
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
-            double mappedLength = context.Beatmap.HitObjects.Any() ? context.Beatmap.GetLastObjectTime() : 0;
-            double trackLength = context.WorkingBeatmap.Track.Length;
+            double mappedLength = context.CurrentDifficulty.Playable.HitObjects.Any() ? context.CurrentDifficulty.Playable.GetLastObjectTime() : 0;
+            double trackLength = context.CurrentDifficulty.Working.Track.Length;
 
             double mappedPercentage = Math.Round(mappedLength / trackLength * 100);
 
@@ -31,7 +30,7 @@ namespace osu.Game.Rulesets.Edit.Checks
             {
                 double percentageLeft = Math.Abs(mappedPercentage - 100);
 
-                bool storyboardIsPresent = isAnyStoryboardElementPresent(context.WorkingBeatmap.Storyboard);
+                bool storyboardIsPresent = ResourcesCheckUtils.HasAnyStoryboardElementPresent(context.CurrentDifficulty.Working);
 
                 if (storyboardIsPresent)
                 {
@@ -42,19 +41,6 @@ namespace osu.Game.Rulesets.Edit.Checks
                     yield return new IssueTemplateUnusedAudioAtEnd(this).Create(percentageLeft);
                 }
             }
-        }
-
-        private bool isAnyStoryboardElementPresent(Storyboard storyboard)
-        {
-            foreach (var layer in storyboard.Layers)
-            {
-                foreach (var _ in layer.Elements)
-                {
-                    return true;
-                }
-            }
-
-            return false;
         }
 
         public class IssueTemplateUnusedAudioAtEnd : IssueTemplate

@@ -15,6 +15,7 @@ using osu.Framework.Text;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play.HUD
 {
@@ -26,6 +27,8 @@ namespace osu.Game.Screens.Play.HUD
 
         public IBindable<float> WireframeOpacity { get; } = new BindableFloat();
         public Bindable<bool> ShowLabel { get; } = new BindableBool();
+        public Bindable<Color4> LabelColour { get; } = new Bindable<Color4>(Color4.White);
+        public Bindable<Color4> TextColour { get; } = new Bindable<Color4>(Color4.White);
 
         public Container NumberContainer { get; private set; }
 
@@ -58,7 +61,6 @@ namespace osu.Game.Screens.Play.HUD
                 labelText = new OsuSpriteText
                 {
                     Alpha = 0,
-                    BypassAutoSizeAxes = Axes.X,
                     Text = label.GetValueOrDefault(),
                     Font = OsuFont.Torus.With(size: 12, weight: FontWeight.Bold),
                     Margin = new MarginPadding { Left = 2.5f },
@@ -110,7 +112,7 @@ namespace osu.Game.Screens.Play.HUD
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            labelText.Colour = colours.Blue0;
+            LabelColour.Value = colours.Blue0;
         }
 
         protected override void LoadComplete()
@@ -121,6 +123,12 @@ namespace osu.Game.Screens.Play.HUD
             {
                 labelText.Alpha = s.NewValue ? 1 : 0;
                 NumberContainer.Y = s.NewValue ? 12 : 0;
+            }, true);
+            LabelColour.BindValueChanged(c => labelText.Colour = c.NewValue, true);
+            TextColour.BindValueChanged(c =>
+            {
+                textPart.Colour = c.NewValue;
+                wireframesPart.Colour = c.NewValue;
             }, true);
         }
 
