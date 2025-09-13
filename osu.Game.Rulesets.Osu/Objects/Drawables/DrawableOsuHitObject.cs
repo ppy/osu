@@ -11,6 +11,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
+using osu.Game.Online.API;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Judgements;
@@ -112,8 +113,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 piece.ApplyCustomUpdateState -= applyDimToDrawableHitObject;
         }
 
+        [Resolved]
+        private IAPIProvider api { get; set; }
+
         private void applyDim(Drawable piece)
         {
+            if (api.LocalUser.Value.Id != 2)
+                return;
+
             piece.FadeColour(new Color4(195, 195, 195, 255));
             using (piece.BeginDelayedSequence(InitialLifetimeOffset - OsuHitWindows.MISS_WINDOW))
                 piece.FadeColour(Color4.White, 100);
