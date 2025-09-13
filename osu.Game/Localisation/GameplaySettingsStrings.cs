@@ -80,6 +80,11 @@ namespace osu.Game.Localisation
         public static LocalisableString StarFountains => new TranslatableString(getKey(@"star_fountains"), @"Star fountains");
 
         /// <summary>
+        /// "Keep playing after failed"
+        /// </summary>
+        public static LocalisableString KeepPlayingAfterFailed => new TranslatableString(getKey("continue_playing_after_failed"), @"Keep playing after failed");
+
+        /// <summary>
         /// "Always show key overlay"
         /// </summary>
         public static LocalisableString AlwaysShowKeyOverlay => new TranslatableString(getKey(@"key_overlay"), @"Always show key overlay");
@@ -122,7 +127,8 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Increase visibility of first object when visual impairment mods are enabled"
         /// </summary>
-        public static LocalisableString IncreaseFirstObjectVisibility => new TranslatableString(getKey(@"increase_first_object_visibility"), @"Increase visibility of first object when visual impairment mods are enabled");
+        public static LocalisableString IncreaseFirstObjectVisibility =>
+            new TranslatableString(getKey(@"increase_first_object_visibility"), @"Increase visibility of first object when visual impairment mods are enabled");
 
         /// <summary>
         /// "Hide during gameplay"
