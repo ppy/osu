@@ -3,6 +3,8 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
@@ -31,6 +33,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
         private DateTimeOffset countdownStartTime;
         private DateTimeOffset countdownEndTime;
 
+        private Sample? stageProgressSample;
+        private double? lastSamplePlayback;
+
         public StageBubble(MatchmakingStage stage, LocalisableString displayText)
         {
             this.stage = stage;
@@ -40,7 +45,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(AudioManager audio)
         {
             InternalChild = new CircularContainer
             {
@@ -68,6 +73,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
                     }
                 }
             };
+
+            stageProgressSample = audio.Samples.Get(@"Multiplayer/countdown-tick");
         }
 
         protected override void LoadComplete()
@@ -98,6 +105,13 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
             {
                 TimeSpan elapsed = DateTimeOffset.Now - countdownStartTime;
                 progressBar.Width = (float)(elapsed.TotalMilliseconds / duration.TotalMilliseconds);
+
+                bool enoughTimeElapsed = lastSamplePlayback == null || Time.Current - lastSamplePlayback >= 1000f;
+                if (elapsed.TotalMilliseconds < 1000f || !enoughTimeElapsed || elapsed.TotalMilliseconds >= duration.TotalMilliseconds)
+                    return;
+
+                stageProgressSample?.Play();
+                lastSamplePlayback = Time.Current;
             }
         }
 

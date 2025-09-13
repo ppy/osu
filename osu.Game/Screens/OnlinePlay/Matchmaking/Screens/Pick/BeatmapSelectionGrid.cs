@@ -45,8 +45,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Pick
 
         private bool allowSelection = true;
 
-        private readonly Sample[] rouletteSamples = new Sample[8];
-        private Sample? rouletteResultSample;
+        private readonly Sample?[] spinSamples = new Sample?[5];
+        private static readonly int[] spin_sample_sequence = [0, 1, 2, 3, 4, 2, 3, 4];
+        private Sample? resultSample;
         private Sample? swooshSample;
         private double? lastSamplePlayback;
 
@@ -77,15 +78,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Pick
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            rouletteSamples[0] = audio.Samples.Get(@"Multiplayer/Matchmaking/roulette-0");
-            rouletteSamples[1] = audio.Samples.Get(@"Multiplayer/Matchmaking/roulette-1");
-            rouletteSamples[2] = audio.Samples.Get(@"Multiplayer/Matchmaking/roulette-2");
-            rouletteSamples[3] = audio.Samples.Get(@"Multiplayer/Matchmaking/roulette-3");
-            rouletteSamples[4] = audio.Samples.Get(@"Multiplayer/Matchmaking/roulette-4");
-            rouletteSamples[5] = audio.Samples.Get(@"Multiplayer/Matchmaking/roulette-2");
-            rouletteSamples[6] = audio.Samples.Get(@"Multiplayer/Matchmaking/roulette-3");
-            rouletteSamples[7] = audio.Samples.Get(@"Multiplayer/Matchmaking/roulette-4");
-            rouletteResultSample = audio.Samples.Get(@"Multiplayer/Matchmaking/roulette-result");
+            for (int i = 0; i < spinSamples.Length; i++)
+                spinSamples[i] = audio.Samples.Get($@"Multiplayer/Matchmaking/Selection/roulette-{i}");
+
+            resultSample = audio.Samples.Get(@"Multiplayer/Matchmaking/Selection/roulette-result");
             swooshSample = audio.Samples.Get(@"SongSelect/options-pop-out");
         }
 
@@ -306,8 +302,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Pick
 
                     if (lastSamplePlayback == null || Time.Current - lastSamplePlayback > OsuGameBase.SAMPLE_DEBOUNCE_TIME)
                     {
-                        int sampleIdx = ii % (rouletteSamples.Length);
-                        rouletteSamples[sampleIdx].Play();
+                        int sequenceIdx = ii % spin_sample_sequence.Length;
+                        spinSamples[spin_sample_sequence[sequenceIdx]]?.Play();
                         lastSamplePlayback = Time.Current;
                     }
 
@@ -338,7 +334,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Pick
                     panel.MoveTo(Vector2.Zero, 1000, Easing.OutExpo)
                          .ScaleTo(1.5f, 1000, Easing.OutExpo);
 
-                    rouletteResultSample?.Play();
+                    resultSample?.Play();
                 });
             }
         }
