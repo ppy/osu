@@ -20,6 +20,10 @@ namespace osu.Game.Beatmaps
 
         public virtual void PreProcess()
         {
+        }
+
+        public virtual void PostProcess()
+        {
             IHasComboInformation? lastObj = null;
 
             foreach (var obj in Beatmap.HitObjects.OfType<IHasComboInformation>())
@@ -27,10 +31,6 @@ namespace osu.Game.Beatmaps
                 obj.UpdateComboInformation(lastObj);
                 lastObj = obj;
             }
-        }
-
-        public virtual void PostProcess()
-        {
         }
     }
 }
