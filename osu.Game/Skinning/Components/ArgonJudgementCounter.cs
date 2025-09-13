@@ -37,7 +37,7 @@ namespace osu.Game.Skinning.Components
             Result = result;
 
             AutoSizeAxes = Axes.Both;
-            AddInternal(textComponent = new ArgonCounterTextComponent(Anchor.TopRight, result.DisplayName.ToUpper()));
+            AddInternal(textComponent = new ArgonCounterTextComponent(Anchor.TopLeft, result.DisplayName.ToUpper()));
         }
 
         private void updateWireframe()
