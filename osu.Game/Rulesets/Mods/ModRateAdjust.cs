@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Localisation;
@@ -32,7 +33,7 @@ namespace osu.Game.Rulesets.Mods
             get
             {
                 if (!SpeedChange.IsDefault)
-                    yield return ("Speed change", $"{SpeedChange.Value:N2}x");
+                    yield return ("Speed change", $"{SpeedChange.Value.ToString("N2", CultureInfo.InvariantCulture)}x");
             }
         }
 
