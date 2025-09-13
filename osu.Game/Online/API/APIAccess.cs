@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Development;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.ExceptionExtensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
@@ -51,6 +52,8 @@ namespace osu.Game.Online.API
         public Exception LastLoginError { get; private set; }
 
         public string ProvidedUsername { get; private set; }
+
+        public SessionVerificationMethod? SessionVerificationMethod { get; set; }
 
         public string SecondFactorCode { get; private set; }
 
@@ -292,7 +295,17 @@ namespace osu.Game.Online.API
                     verificationRequest.Failure += ex =>
                     {
                         state.Value = APIState.RequiresSecondFactorAuth;
-                        LastLoginError = ex;
+
+                        if (verificationRequest.RequiredVerificationMethod != null)
+                        {
+                            SessionVerificationMethod = verificationRequest.RequiredVerificationMethod;
+                            LastLoginError = new APIException($"Must use {SessionVerificationMethod.GetDescription().ToLowerInvariant()} to complete verification.", ex);
+                        }
+                        else
+                        {
+                            LastLoginError = ex;
+                        }
+
                         SecondFactorCode = null;
                     };
 
@@ -337,7 +350,8 @@ namespace osu.Game.Online.API
 
                         localUser.Value = me;
                         configSupporter.Value = me.IsSupporter;
-                        state.Value = me.SessionVerified ? APIState.Online : APIState.RequiresSecondFactorAuth;
+                        SessionVerificationMethod = me.SessionVerificationMethod;
+                        state.Value = SessionVerificationMethod == null ? APIState.Online : APIState.RequiresSecondFactorAuth;
                         failureCount = 0;
                     };
 
