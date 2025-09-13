@@ -63,8 +63,8 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         private UprightAspectMaintainingContainer labelEarly = null!;
         private UprightAspectMaintainingContainer labelLate = null!;
 
-        private Container colourBarsEarly = null!;
-        private Container colourBarsLate = null!;
+        private BufferedContainer colourBarsEarly = null!;
+        private BufferedContainer colourBarsLate = null!;
 
         private Container judgementsContainer = null!;
 
@@ -107,7 +107,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                         RelativeSizeAxes = Axes.Y,
                         Children = new Drawable[]
                         {
-                            colourBarsEarly = new Container
+                            colourBarsEarly = new BufferedContainer(cachedFrameBuffer: true)
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.TopCentre,
@@ -117,7 +117,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                                 Height = 0.5f,
                                 Scale = new Vector2(1, -1),
                             },
-                            colourBarsLate = new Container
+                            colourBarsLate = new BufferedContainer(cachedFrameBuffer: true)
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.TopCentre,
