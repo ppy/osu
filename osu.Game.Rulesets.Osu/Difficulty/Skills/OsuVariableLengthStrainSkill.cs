@@ -33,7 +33,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         public override double DifficultyValue()
         {
             double difficulty = 0;
-            double decayWeightIntegral = (DecayWeight - 1) / Math.Log(DecayWeight) * (1.0 / (1 - DecayWeight));
 
             // Sections with 0 strain are excluded to avoid worst-case time complexity of the following sort (e.g. /b/2351871).
             // These sections will not contribute to the difficulty.
@@ -72,7 +71,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             // Difficulty is a continuous weighted sum of the sorted strains
             foreach (StrainPeak strain in strains.OrderByDescending(s => s.Value))
             {
-                double weight = Math.Pow(DecayWeight, time) * (decayWeightIntegral - decayWeightIntegral * Math.Pow(DecayWeight, strain.SectionLength / MaxSectionLength));
+                /* Weighting function:
+                        a+b
+                        ∫ 0.9^x dx
+                        a
+                    where a = startTime and b = strain.SectionLength */
+                double weight = Math.Pow(DecayWeight, time) * (DecayWeightIntegral - DecayWeightIntegral * Math.Pow(DecayWeight, strain.SectionLength / MaxSectionLength));
                 difficulty += strain.Value * weight;
                 time += strain.SectionLength / MaxSectionLength;
             }
