@@ -10,6 +10,7 @@ using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
+using osuTK;
 
 namespace osu.Game.Beatmaps
 {
@@ -96,7 +97,13 @@ namespace osu.Game.Beatmaps
         /// </remarks>
         double DistanceSpacing { get; internal set; }
 
-        int GridSize { get; internal set; }
+        float GridSize { get; internal set; }
+
+        PositionSnapGridType GridType { get; internal set; }
+
+        float GridRotation { get; internal set; }
+
+        Vector2 GridOffset { get; internal set; }
 
         double TimelineZoom { get; internal set; }
 
