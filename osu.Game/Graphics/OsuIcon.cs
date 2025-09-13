@@ -16,77 +16,73 @@ namespace osu.Game.Graphics
 {
     public static class OsuIcon
     {
-        #region Legacy spritesheet-based icons
-
-        private static IconUsage get(int icon) => new IconUsage((char)icon, @"osuFont");
-
-        // ruleset icons in circles
-        public static IconUsage RulesetOsu => get(0xe000);
-        public static IconUsage RulesetMania => get(0xe001);
-        public static IconUsage RulesetCatch => get(0xe002);
-        public static IconUsage RulesetTaiko => get(0xe003);
-
-        // ruleset icons without circles
-        public static IconUsage FilledCircle => get(0xe004);
-        public static IconUsage Logo => get(0xe006);
-        public static IconUsage ChevronDownCircle => get(0xe007);
-        public static IconUsage EditCircle => get(0xe033);
-        public static IconUsage LeftCircle => get(0xe034);
-        public static IconUsage RightCircle => get(0xe035);
-        public static IconUsage Charts => get(0xe036);
-        public static IconUsage Solo => get(0xe037);
-        public static IconUsage Multi => get(0xe038);
-        public static IconUsage Gear => get(0xe039);
-
-        // misc icons
-        public static IconUsage Bat => get(0xe008);
-        public static IconUsage Bubble => get(0xe009);
-        public static IconUsage BubblePop => get(0xe02e);
-        public static IconUsage Dice => get(0xe011);
-        public static IconUsage HeartBreak => get(0xe030);
-        public static IconUsage Hot => get(0xe031);
-        public static IconUsage ListSearch => get(0xe032);
-
-        //osu! playstyles
-        public static IconUsage PlayStyleTablet => get(0xe02a);
-        public static IconUsage PlayStyleMouse => get(0xe029);
-        public static IconUsage PlayStyleKeyboard => get(0xe02b);
-        public static IconUsage PlayStyleTouch => get(0xe02c);
-
-        // osu! difficulties
-        public static IconUsage EasyOsu => get(0xe015);
-        public static IconUsage NormalOsu => get(0xe016);
-        public static IconUsage HardOsu => get(0xe017);
-        public static IconUsage InsaneOsu => get(0xe018);
-        public static IconUsage ExpertOsu => get(0xe019);
-
-        // taiko difficulties
-        public static IconUsage EasyTaiko => get(0xe01a);
-        public static IconUsage NormalTaiko => get(0xe01b);
-        public static IconUsage HardTaiko => get(0xe01c);
-        public static IconUsage InsaneTaiko => get(0xe01d);
-        public static IconUsage ExpertTaiko => get(0xe01e);
-
-        // fruits difficulties
-        public static IconUsage EasyFruits => get(0xe01f);
-        public static IconUsage NormalFruits => get(0xe020);
-        public static IconUsage HardFruits => get(0xe021);
-        public static IconUsage InsaneFruits => get(0xe022);
-        public static IconUsage ExpertFruits => get(0xe023);
-
-        // mania difficulties
-        public static IconUsage EasyMania => get(0xe024);
-        public static IconUsage NormalMania => get(0xe025);
-        public static IconUsage HardMania => get(0xe026);
-        public static IconUsage InsaneMania => get(0xe027);
-        public static IconUsage ExpertMania => get(0xe028);
-
-        #endregion
 
         #region New single-file-based icons
 
         public const string FONT_NAME = @"Icons";
 
+        // ruleset icons in circles
+        public static IconUsage RulesetOsu => get(OsuIconMapping.RulesetOsu);
+        public static IconUsage RulesetMania => get(OsuIconMapping.RulesetMania);
+        public static IconUsage RulesetCatch => get(OsuIconMapping.RulesetCatch);
+        public static IconUsage RulesetTaiko => get(OsuIconMapping.RulesetTaiko);
+
+        // ruleset icons without circles
+        public static IconUsage FilledCircle => get(OsuIconMapping.FilledCircle);
+        public static IconUsage Logo => get(OsuIconMapping.Logo);
+        public static IconUsage ChevronDownCircle => get(OsuIconMapping.ChevronDownCircle);
+        public static IconUsage EditCircle => get(OsuIconMapping.EditCircle);
+        public static IconUsage LeftCircle => get(OsuIconMapping.LeftCircle);
+        public static IconUsage RightCircle => get(OsuIconMapping.RightCircle);
+        public static IconUsage Charts => get(OsuIconMapping.Charts);
+        public static IconUsage Solo => get(OsuIconMapping.Solo);
+        public static IconUsage Multi => get(OsuIconMapping.Multi);
+        public static IconUsage Gear => get(OsuIconMapping.Gear);
+
+        // misc icons
+        public static IconUsage Bat => get(OsuIconMapping.Bat);
+        public static IconUsage Bubble => get(OsuIconMapping.Bubble);
+        public static IconUsage BubblePop => get(OsuIconMapping.BubblePop);
+        public static IconUsage Dice => get(OsuIconMapping.Dice);
+        public static IconUsage HeartBreak => get(OsuIconMapping.HeartBreak);
+        public static IconUsage Hot => get(OsuIconMapping.Hot);
+        public static IconUsage ListSearch => get(OsuIconMapping.ListSearch);
+
+        // osu! playstyles
+        public static IconUsage PlayStyleTablet => get(OsuIconMapping.PlayStyleTablet);
+        public static IconUsage PlayStyleMouse => get(OsuIconMapping.PlayStyleMouse);
+        public static IconUsage PlayStyleKeyboard => get(OsuIconMapping.PlayStyleKeyboard);
+        public static IconUsage PlayStyleTouch => get(OsuIconMapping.PlayStyleTouch);
+
+        // osu! difficulties
+        public static IconUsage EasyOsu => get(OsuIconMapping.EasyOsu);
+        public static IconUsage NormalOsu => get(OsuIconMapping.NormalOsu);
+        public static IconUsage HardOsu => get(OsuIconMapping.HardOsu);
+        public static IconUsage InsaneOsu => get(OsuIconMapping.InsaneOsu);
+        public static IconUsage ExpertOsu => get(OsuIconMapping.ExpertOsu);
+
+        // taiko difficulties
+        public static IconUsage EasyTaiko => get(OsuIconMapping.EasyTaiko);
+        public static IconUsage NormalTaiko => get(OsuIconMapping.NormalTaiko);
+        public static IconUsage HardTaiko => get(OsuIconMapping.HardTaiko);
+        public static IconUsage InsaneTaiko => get(OsuIconMapping.InsaneTaiko);
+        public static IconUsage ExpertTaiko => get(OsuIconMapping.ExpertTaiko);
+
+        // fruits difficulties
+        public static IconUsage EasyFruits => get(OsuIconMapping.EasyFruits);
+        public static IconUsage NormalFruits => get(OsuIconMapping.NormalFruits);
+        public static IconUsage HardFruits => get(OsuIconMapping.HardFruits);
+        public static IconUsage InsaneFruits => get(OsuIconMapping.InsaneFruits);
+        public static IconUsage ExpertFruits => get(OsuIconMapping.ExpertFruits);
+
+        // mania difficulties
+        public static IconUsage EasyMania => get(OsuIconMapping.EasyMania);
+        public static IconUsage NormalMania => get(OsuIconMapping.NormalMania);
+        public static IconUsage HardMania => get(OsuIconMapping.HardMania);
+        public static IconUsage InsaneMania => get(OsuIconMapping.InsaneMania);
+        public static IconUsage ExpertMania => get(OsuIconMapping.ExpertMania);
+
+        // icons
         public static IconUsage Audio => get(OsuIconMapping.Audio);
         public static IconUsage Beatmap => get(OsuIconMapping.Beatmap);
         public static IconUsage Calendar => get(OsuIconMapping.Calendar);
@@ -246,6 +242,141 @@ namespace osu.Game.Graphics
 
         private enum OsuIconMapping
         {
+            [Description(@"Logo")]
+            Logo,
+
+            [Description(@"RulesetOsu")]
+            RulesetOsu,
+
+            [Description(@"RulesetMania")]
+            RulesetMania,
+
+            [Description(@"RulesetCatch")]
+            RulesetCatch,
+
+            [Description(@"RulesetTaiko")]
+            RulesetTaiko,
+
+            [Description(@"FilledCircle")]
+            FilledCircle,
+
+            [Description(@"ChevronDownCircle")]
+            ChevronDownCircle,
+
+            [Description(@"EditCircle")]
+            EditCircle,
+
+            [Description(@"LeftCircle")]
+            LeftCircle,
+
+            [Description(@"RightCircle")]
+            RightCircle,
+
+            [Description(@"Charts")]
+            Charts,
+
+            [Description(@"Solo")]
+            Solo,
+
+            [Description(@"Multi")]
+            Multi,
+
+            [Description(@"Gear")]
+            Gear,
+
+            [Description(@"Bat")]
+            Bat,
+
+            [Description(@"Bubble")]
+            Bubble,
+
+            [Description(@"BubblePop")]
+            BubblePop,
+
+            [Description(@"Dice")]
+            Dice,
+
+            [Description(@"HeartBreak")]
+            HeartBreak,
+
+            [Description(@"Hot")]
+            Hot,
+
+            [Description(@"ListSearch")]
+            ListSearch,
+
+            [Description(@"PlayStyleTablet")]
+            PlayStyleTablet,
+
+            [Description(@"PlayStyleMouse")]
+            PlayStyleMouse,
+
+            [Description(@"PlayStyleKeyboard")]
+            PlayStyleKeyboard,
+
+            [Description(@"PlayStyleTouch")]
+            PlayStyleTouch,
+
+            [Description(@"EasyOsu")]
+            EasyOsu,
+
+            [Description(@"NormalOsu")]
+            NormalOsu,
+
+            [Description(@"HardOsu")]
+            HardOsu,
+
+            [Description(@"InsaneOsu")]
+            InsaneOsu,
+
+            [Description(@"ExpertOsu")]
+            ExpertOsu,
+
+            [Description(@"EasyTaiko")]
+            EasyTaiko,
+
+            [Description(@"NormalTaiko")]
+            NormalTaiko,
+
+            [Description(@"HardTaiko")]
+            HardTaiko,
+
+            [Description(@"InsaneTaiko")]
+            InsaneTaiko,
+
+            [Description(@"ExpertTaiko")]
+            ExpertTaiko,
+
+            [Description(@"EasyFruits")]
+            EasyFruits,
+
+            [Description(@"NormalFruits")]
+            NormalFruits,
+
+            [Description(@"HardFruits")]
+            HardFruits,
+
+            [Description(@"InsaneFruits")]
+            InsaneFruits,
+
+            [Description(@"ExpertFruits")]
+            ExpertFruits,
+
+            [Description(@"EasyMania")]
+            EasyMania,
+
+            [Description(@"NormalMania")]
+            NormalMania,
+
+            [Description(@"HardMania")]
+            HardMania,
+
+            [Description(@"InsaneMania")]
+            InsaneMania,
+
+            [Description(@"ExpertMania")]
+            ExpertMania,
+
             [Description(@"audio")]
             Audio,
 
