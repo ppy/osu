@@ -110,6 +110,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// </summary>
         public double SmallCircleBonus { get; private set; }
 
+        public double? VectorAngle { get; private set; }
+
         private readonly OsuDifficultyHitObject? lastLastDifficultyObject;
         private readonly OsuDifficultyHitObject? lastDifficultyObject;
 
@@ -237,12 +239,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 MinimumJumpDistance = Math.Max(0, Math.Min(LazyJumpDistance - (maximum_slider_radius - assumed_slider_radius), tailJumpDistance - maximum_slider_radius));
             }
 
+            Vector2 v2 = BaseObject.StackedPosition - lastCursorPosition;
+            VectorAngle = Math.Atan2(Math.Abs(v2.Y), Math.Abs(v2.X));
+
             if (lastLastDifficultyObject != null && lastLastDifficultyObject.BaseObject is not Spinner)
             {
                 Vector2 lastLastCursorPosition = getEndCursorPosition(lastLastDifficultyObject);
 
                 Vector2 v1 = lastLastCursorPosition - LastObject.StackedPosition;
-                Vector2 v2 = BaseObject.StackedPosition - lastCursorPosition;
 
                 float dot = Vector2.Dot(v1, v2);
                 float det = v1.X * v2.Y - v1.Y * v2.X;
