@@ -11,6 +11,7 @@ using osu.Game.Localisation;
 using osu.Game.Overlays.Settings;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components;
+using osu.Game.Skinning;
 using osuTK;
 
 namespace osu.Game.Overlays.SkinEditor
@@ -22,7 +23,7 @@ namespace osu.Game.Overlays.SkinEditor
 
         protected override Container<Drawable> Content { get; }
 
-        private readonly Drawable component;
+        private readonly ISerialisableDrawable component;
 
         /// <summary>
         /// Default setting for all skin HUD components
@@ -34,7 +35,7 @@ namespace osu.Game.Overlays.SkinEditor
             Precision = 0.01f,
         };
 
-        public SkinSettingsToolbox(Drawable component)
+        public SkinSettingsToolbox(ISerialisableDrawable component)
             : base(SkinEditorStrings.Settings(component.GetType().Name))
         {
             this.component = component;
@@ -52,14 +53,18 @@ namespace osu.Game.Overlays.SkinEditor
         [BackgroundDependencyLoader]
         private void load()
         {
-            var controls = component.CreateSettingsControls().ToArray().Append(
-                new SettingsSlider<float>
-                {
-                    LabelText = "Alpha",
-                    TooltipText = "Object visibility",
-                    Current = alpha,
-                    KeyboardStep = 0.1f,
-                });
+            var controls = component.CreateSettingsControls()
+                                    .Concat(component.IsAlphaAdjustable ? new Drawable[]
+                                    {
+                                        new SettingsSlider<float>
+                                        {
+                                            LabelText = "Alpha",
+                                            TooltipText = "Object visibility",
+                                            Current = alpha,
+                                            KeyboardStep = 0.1f,
+                                        }
+                                    } : Enumerable.Empty<Drawable>())
+                                    .ToArray();
 
             Content.AddRange(controls);
 
@@ -76,7 +81,10 @@ namespace osu.Game.Overlays.SkinEditor
         {
             base.LoadComplete();
 
-            alpha.BindValueChanged(a => component.Alpha = a.NewValue);
+            alpha.BindValueChanged(a =>
+            {
+                ((Drawable)component).Alpha = a.NewValue;
+            });
         }
     }
 }

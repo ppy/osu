@@ -530,7 +530,7 @@ namespace osu.Game.Overlays.SkinEditor
         {
             settingsSidebar.Clear();
 
-            foreach (var component in SelectedComponents.OfType<Drawable>())
+            foreach (var component in SelectedComponents.OfType<Drawable>().Cast<ISerialisableDrawable>())
                 settingsSidebar.Add(new SkinSettingsToolbox(component));
         }
 

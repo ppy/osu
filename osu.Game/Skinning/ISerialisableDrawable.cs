@@ -34,6 +34,11 @@ namespace osu.Game.Skinning
         /// </summary>
         bool UsesFixedAnchor { get; set; }
 
+        /// <summary>
+        /// Whether this component should have <see cref="Drawable.Alpha"/> editing by an end user
+        /// </summary>
+        bool IsAlphaAdjustable => true;
+
         void CopyAdjustedSetting(IBindable target, object source)
         {
             if (source is IBindable sourceBindable)
