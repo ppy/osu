@@ -2,6 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -20,13 +22,16 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
 
         private OsuSpriteText text = null!;
 
+        private Sample? textChangedSample;
+        private double? lastSamplePlayback;
+
         public StageText()
         {
             AutoSizeAxes = Axes.Both;
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(AudioManager audio)
         {
             InternalChild = text = new OsuSpriteText
             {
@@ -34,6 +39,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
                 Font = OsuFont.Default,
                 AlwaysPresent = true,
             };
+
+            textChangedSample = audio.Samples.Get(@"Multiplayer/Matchmaking/stage-message");
         }
 
         protected override void LoadComplete()
@@ -50,6 +57,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
                 return;
 
             text.Text = getTextForStatus(matchmakingState.Stage);
+
+            if (text.Text == string.Empty || (lastSamplePlayback != null && Time.Current - lastSamplePlayback < OsuGameBase.SAMPLE_DEBOUNCE_TIME))
+                return;
+
+            textChangedSample?.Play();
+            lastSamplePlayback = Time.Current;
         });
 
         private LocalisableString getTextForStatus(MatchmakingStage status)
