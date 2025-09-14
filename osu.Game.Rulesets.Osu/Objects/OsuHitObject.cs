@@ -208,7 +208,10 @@ namespace osu.Game.Rulesets.Osu.Objects
             ComboIndex = index;
             ComboIndexWithOffsets = indexWithOffsets;
             IndexInCurrentCombo = inCurrentCombo;
+        }
 
+        public override void UpdateNoteDensity(HitObject? lastObj)
+        {
             if (lastObj is OsuHitObject lastHitObj)
             {
                 // this is an estimate of how many notes have disappeared, it will smooth out with time
@@ -221,6 +224,8 @@ namespace osu.Game.Rulesets.Osu.Objects
             }
 
             NoteDensity += 1.0;
+
+            base.UpdateNoteDensity(lastObj);
         }
 
         protected override HitWindows CreateHitWindows() => new OsuHitWindows();
