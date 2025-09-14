@@ -12,12 +12,13 @@ using osu.Game.Configuration;
 using osu.Game.Localisation.SkinComponents;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public partial class ArgonComboCounter : ComboCounter
+    public partial class ArgonComboCounter : ComboCounter, ISerialisableDrawable
     {
         protected ArgonCounterTextComponent Text = null!;
 
@@ -35,6 +36,8 @@ namespace osu.Game.Screens.Play.HUD
 
         [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.ShowLabel))]
         public Bindable<bool> ShowLabel { get; } = new BindableBool(true);
+
+        public bool IsAlphaAdjustable => false;
 
         [BackgroundDependencyLoader]
         private void load(ScoreProcessor scoreProcessor)

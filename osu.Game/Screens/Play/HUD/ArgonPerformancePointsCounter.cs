@@ -32,6 +32,8 @@ namespace osu.Game.Screens.Play.HUD
         [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.ShowLabel))]
         public Bindable<bool> ShowLabel { get; } = new BindableBool(true);
 
+        public bool IsAlphaAdjustable => false;
+
         public override bool IsValid
         {
             get => base.IsValid;

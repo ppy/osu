@@ -11,7 +11,7 @@ using osuTK;
 
 namespace osu.Game.Skinning
 {
-    public partial class LegacySongProgress : SongProgress
+    public partial class LegacySongProgress : SongProgress, ISerialisableDrawable
     {
         private CircularProgress circularProgress = null!;
 
@@ -25,6 +25,8 @@ namespace osu.Game.Skinning
             // handle stretched cases well.
             AutoSizeAxes = Axes.Both;
         }
+
+        public bool IsAlphaAdjustable => false;
 
         [BackgroundDependencyLoader]
         private void load()

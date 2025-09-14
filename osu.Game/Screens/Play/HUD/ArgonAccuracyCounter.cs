@@ -32,6 +32,8 @@ namespace osu.Game.Screens.Play.HUD
 
         public bool UsesFixedAnchor { get; set; }
 
+        public bool IsAlphaAdjustable => false;
+
         protected override IHasText CreateText() => new ArgonAccuracyTextComponent
         {
             WireframeOpacity = { BindTarget = WireframeOpacity },

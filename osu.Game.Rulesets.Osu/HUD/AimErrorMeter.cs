@@ -23,6 +23,7 @@ using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Statistics;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play.HUD.HitErrorMeters;
+using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
 using Container = osu.Framework.Graphics.Containers.Container;
@@ -30,7 +31,7 @@ using Container = osu.Framework.Graphics.Containers.Container;
 namespace osu.Game.Rulesets.Osu.HUD
 {
     [Cached]
-    public partial class AimErrorMeter : HitErrorMeter
+    public partial class AimErrorMeter : HitErrorMeter, ISerialisableDrawable
     {
         [SettingSource(typeof(AimErrorMeterStrings), nameof(AimErrorMeterStrings.HitMarkerSize), nameof(AimErrorMeterStrings.HitMarkerSizeDescription))]
         public BindableNumber<float> HitMarkerSize { get; } = new BindableNumber<float>(7f)
@@ -56,6 +57,8 @@ namespace osu.Game.Rulesets.Osu.HUD
 
         [SettingSource(typeof(AimErrorMeterStrings), nameof(AimErrorMeterStrings.PositionDisplayStyle), nameof(AimErrorMeterStrings.PositionDisplayStyleDescription))]
         public Bindable<PositionDisplay> PositionDisplayStyle { get; } = new Bindable<PositionDisplay>();
+
+        public bool IsAlphaAdjustable => false;
 
         // used for calculate relative position.
         private Vector2? lastObjectPosition;

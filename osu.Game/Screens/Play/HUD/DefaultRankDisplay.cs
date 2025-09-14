@@ -27,6 +27,8 @@ namespace osu.Game.Screens.Play.HUD
 
         public bool UsesFixedAnchor { get; set; }
 
+        public bool IsAlphaAdjustable => false;
+
         private UpdateableRank rankDisplay = null!;
 
         private SkinnableSound rankDownSample = null!;
