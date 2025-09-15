@@ -208,7 +208,18 @@ namespace osu.Game.Database
             foreach (var realmFile in model.Files)
             {
                 string sourcePath = Files.Storage.GetFullPath(realmFile.File.GetStoragePath());
-                string destinationPath = Path.Join(mountedPath, realmFile.Filename);
+                // there are edge cases where externalising an imported model to the filesystem could fail due to invalid filenames.
+                // one scenario where this happens goes something like this:
+                // - stable user exports an archive, which contains filenames that get mangled by stable's default zip encoding codepage (Shift-JIS)
+                // - said archive is imported to lazer, but the invalid filename is not actually an issue due to lazer file store structure
+                //   (the file is stored under a filename correspondent to its SHA instead, and its real filename is only stored in realm)
+                // - however attempts to externally edit the model fail as the external edit attempts and fails to produce the file's "real" filename in the mounted path
+                // to prevent this bricking external edit, strip invalid characters on external edit.
+                // the presumption here is that whatever produced the mangled archive is primarily at fault here, and we're just trying to trudge on locally as best as possible.
+                // if there are further troubles related to similar issues, reevaluate moving this sort of check to the import side instead (sanitising filenames on import from archive).
+                string destinationPath = mountedPath;
+                foreach (string piece in realmFile.Filename.Split('/').Select(f => f.GetValidFilename()))
+                    destinationPath = Path.Combine(destinationPath, piece);
 
                 Directory.CreateDirectory(Path.GetDirectoryName(destinationPath)!);
 

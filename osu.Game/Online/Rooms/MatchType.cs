@@ -17,5 +17,7 @@ namespace osu.Game.Online.Rooms
 
         [LocalisableDescription(typeof(MatchesStrings), nameof(MatchesStrings.MatchTeamTypesTeamVersus))]
         TeamVersus,
+
+        Matchmaking
     }
 }
