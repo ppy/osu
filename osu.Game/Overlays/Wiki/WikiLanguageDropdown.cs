@@ -23,6 +23,19 @@ namespace osu.Game.Overlays.Wiki
             ItemSource = availableLanguages;
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            Current.BindValueChanged(l =>
+            {
+                if (Header is WikiLanguageDropdownHeader wikiHeader)
+                {
+                    wikiHeader.Language = l.NewValue;
+                }
+            }, true);
+        }
+
         public void UpdateDropdown(string[] availableLocales)
         {
             availableLanguages.Clear();
@@ -39,6 +52,53 @@ namespace osu.Game.Overlays.Wiki
         }
 
         protected override DropdownMenu CreateMenu() => new WikiLanguageDropdownMenu();
+
+        protected override DropdownHeader CreateHeader() => new WikiLanguageDropdownHeader();
+
+        private partial class WikiLanguageDropdownHeader : OsuDropdownHeader
+        {
+            private Language? language;
+
+            public Language? Language
+            {
+                get => language;
+                set
+                {
+                    if (language == value)
+                        return;
+
+                    language = value;
+
+                    if (language == null)
+                    {
+                        flagContainer.Clear();
+                        return;
+                    }
+
+                    flagContainer.Child = new DrawableFlag(language.Value.ToCountryCode())
+                    {
+                        Origin = Anchor.CentreLeft,
+                        Anchor = Anchor.CentreLeft,
+                        FillMode = FillMode.Fit,
+                        RelativeSizeAxes = Axes.Both
+                    };
+                }
+            }
+
+            private readonly Container flagContainer;
+
+            public WikiLanguageDropdownHeader()
+            {
+                Foreground.Add(flagContainer = new Container
+                {
+                    Origin = Anchor.CentreLeft,
+                    Anchor = Anchor.CentreLeft,
+                    RelativeSizeAxes = Axes.Both,
+                });
+
+                Text.Padding = new MarginPadding { Left = 30f };
+            }
+        }
 
         private partial class WikiLanguageDropdownMenu : OsuDropdownMenu
         {
