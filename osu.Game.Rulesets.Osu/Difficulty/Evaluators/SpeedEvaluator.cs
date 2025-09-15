@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             double strainTime = osuCurrObj.StrainTime;
 
-            // Nerf doubletappable doubles.
+            // Nerf gallopable or doubletappable doubles.
             double currDeltaTime = Math.Max(1, osuCurrObj.DeltaTime);
 
             // It's easier to gallop if you have more time between doubles
