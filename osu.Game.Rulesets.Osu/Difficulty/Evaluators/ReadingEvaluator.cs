@@ -15,6 +15,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
     public static class ReadingEvaluator
     {
         private const double reading_window_size = 3000; // 3 seconds
+        private const double distance_influence_threshold = OsuDifficultyHitObject.NORMALISED_DIAMETER * 1.35; // 1.35 circles distance between centers
         private const double hidden_multiplier = 0.85;
         private const double density_multiplier = 0.8;
         private const double density_difficulty_base = 3.0;
@@ -37,7 +38,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double loopDifficulty = currObj.OpacityAt(loopObj.BaseObject.StartTime, false);
 
                 // Small distances means objects may be cheesed, so it doesn't matter whether they are arranged confusingly.
-                loopDifficulty *= DifficultyCalculationUtils.Logistic(-(loopObj.LazyJumpDistance - 75) / 15);
+                loopDifficulty *= DifficultyCalculationUtils.Smootherstep(loopObj.LazyJumpDistance, 15, distance_influence_threshold);
 
                 // Account less for objects close to the max reading window
                 double timeBetweenCurrAndLoopObj = currObj.StartTime - loopObj.StartTime;
