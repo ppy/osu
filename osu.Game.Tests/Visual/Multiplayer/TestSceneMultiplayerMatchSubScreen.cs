@@ -13,6 +13,7 @@ using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
@@ -53,15 +54,25 @@ namespace osu.Game.Tests.Visual.Multiplayer
             Dependencies.Cache(new RealmRulesetStore(Realm));
             Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, Realm, null, audio, Resources, host, Beatmap.Default));
             Dependencies.Cache(Realm);
+            Dependencies.CacheAs<BeatmapStore>(new RealmDetachedBeatmapStore());
 
             beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
 
             importedSet = beatmaps.GetAllUsableBeatmapSets().First();
+
+            Realm.Write(r =>
+            {
+                foreach (var beatmapInfo in r.All<BeatmapInfo>())
+                    beatmapInfo.OnlineMD5Hash = beatmapInfo.MD5Hash;
+            });
         }
 
-        [SetUpSteps]
-        public void SetupSteps()
+        public override void SetUpSteps()
         {
+            base.SetUpSteps();
+
+            AddUntilStep("wait for mod select removed", () => this.ChildrenOfType<MultiplayerUserModSelectOverlay>().Count(), () => Is.Zero);
+
             AddStep("load match", () =>
             {
                 room = new Room { Name = "Test Room" };
@@ -305,7 +316,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("wait for join", () => RoomJoined);
 
             ClickButtonWhenEnabled<UserModSelectButton>();
-            AddAssert("mod select shows unranked", () => this.ChildrenOfType<RankingInformationDisplay>().Single().Ranked.Value == false);
+            AddUntilStep("mod select shows unranked", () => this.ChildrenOfType<RankingInformationDisplay>().Single().Ranked.Value == false);
             AddAssert("score multiplier = 1.20", () => this.ChildrenOfType<RankingInformationDisplay>().Single().ModMultiplier.Value, () => Is.EqualTo(1.2).Within(0.01));
 
             AddStep("select flashlight", () => this.ChildrenOfType<MultiplayerUserModSelectOverlay>().Single().ChildrenOfType<ModPanel>().Single(m => m.Mod is ModFlashlight).TriggerClick());

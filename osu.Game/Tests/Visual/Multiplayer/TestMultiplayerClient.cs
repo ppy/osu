@@ -508,7 +508,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             if (item == null)
                 throw new InvalidOperationException("Item does not exist in the room.");
 
-            if (item == currentItem)
+            if (item.Equals(currentItem))
                 throw new InvalidOperationException("The room's current item cannot be removed.");
 
             if (item.OwnerID != userId)

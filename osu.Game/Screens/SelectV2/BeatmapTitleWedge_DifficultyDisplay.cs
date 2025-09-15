@@ -11,7 +11,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
@@ -23,11 +22,8 @@ using osu.Game.Localisation;
 using osu.Game.Online;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays;
-using osu.Game.Overlays.Mods;
-using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Utils;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.SelectV2
@@ -64,7 +60,7 @@ namespace osu.Game.Screens.SelectV2
 
             private GridContainer ratingAndNameContainer = null!;
             private DifficultyStatisticsDisplay countStatisticsDisplay = null!;
-            private AdjustableDifficultyStatisticsDisplay difficultyStatisticsDisplay = null!;
+            private DifficultyStatisticsDisplay difficultyStatisticsDisplay = null!;
 
             private CancellationTokenSource? cancellationSource;
 
@@ -96,7 +92,7 @@ namespace osu.Game.Screens.SelectV2
                                 Shear = -OsuGame.SHEAR,
                                 AlwaysPresent = true,
                                 RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y,
+                                Height = 20,
                                 Margin = new MarginPadding { Vertical = 5f },
                                 Padding = new MarginPadding { Left = SongSelect.WEDGE_CONTENT_MARGIN },
                                 RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
@@ -159,7 +155,7 @@ namespace osu.Game.Screens.SelectV2
                             {
                                 Shear = -OsuGame.SHEAR,
                                 RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y,
+                                Height = 53,
                                 Padding = new MarginPadding { Bottom = border_weight, Right = border_weight },
                                 Child = new Container
                                 {
@@ -197,7 +193,7 @@ namespace osu.Game.Screens.SelectV2
                                                         RelativeSizeAxes = Axes.X,
                                                     },
                                                     Empty(),
-                                                    difficultyStatisticsDisplay = new AdjustableDifficultyStatisticsDisplay(autoSize: true),
+                                                    difficultyStatisticsDisplay = new DifficultyStatisticsDisplay(autoSize: true),
                                                 }
                                             },
                                         }
@@ -243,7 +239,7 @@ namespace osu.Game.Screens.SelectV2
                 if (beatmap.IsDefault)
                 {
                     ratingAndNameContainer.FadeOut(300, Easing.OutQuint);
-                    countStatisticsDisplay.Statistics = Array.Empty<StatisticDifficulty.Data>();
+                    countStatisticsDisplay.FadeOut(300, Easing.OutQuint);
                 }
                 else
                 {
@@ -253,7 +249,7 @@ namespace osu.Game.Screens.SelectV2
                     mapperText.Text = beatmap.Value.Metadata.Author.Username;
                 }
 
-                starRatingDisplay.Current = (Bindable<StarDifficulty>)difficultyCache.GetBindableDifficulty(beatmap.Value.BeatmapInfo, cancellationSource.Token, SongSelect.SELECTION_DEBOUNCE);
+                starRatingDisplay.Current = (Bindable<StarDifficulty>)difficultyCache.GetBindableDifficulty(beatmap.Value.BeatmapInfo, cancellationSource.Token, SongSelect.DIFFICULTY_CALCULATION_DEBOUNCE);
 
                 updateCountStatistics(cancellationSource.Token);
                 updateDifficultyStatistics();
@@ -263,7 +259,7 @@ namespace osu.Game.Screens.SelectV2
             {
                 if (beatmap.IsDefault)
                 {
-                    countStatisticsDisplay.Statistics = Array.Empty<StatisticDifficulty.Data>();
+                    countStatisticsDisplay.FadeOut(300, Easing.OutQuint);
                     return;
                 }
 
@@ -281,6 +277,7 @@ namespace osu.Game.Screens.SelectV2
                         if (cancellationToken.IsCancellationRequested)
                             return;
 
+                        countStatisticsDisplay.FadeIn(200, Easing.OutQuint);
                         countStatisticsDisplay.Statistics = statistics;
                     });
                 }, cancellationToken);
@@ -290,53 +287,14 @@ namespace osu.Game.Screens.SelectV2
             {
                 if (beatmap.IsDefault || ruleset.Value == null)
                 {
-                    difficultyStatisticsDisplay.TooltipContent = null;
                     difficultyStatisticsDisplay.Statistics = Array.Empty<StatisticDifficulty.Data>();
                     return;
                 }
 
-                BeatmapDifficulty originalDifficulty = beatmap.Value.BeatmapInfo.Difficulty;
-                BeatmapDifficulty adjustedDifficulty = new BeatmapDifficulty(originalDifficulty);
-
-                foreach (var mod in mods.Value.OfType<IApplicableToDifficulty>())
-                    mod.ApplyToDifficulty(adjustedDifficulty);
-
                 Ruleset rulesetInstance = ruleset.Value.CreateInstance();
 
-                double rate = ModUtils.CalculateRateWithMods(mods.Value);
-
-                adjustedDifficulty = rulesetInstance.GetRateAdjustedDisplayDifficulty(adjustedDifficulty, rate);
-                difficultyStatisticsDisplay.TooltipContent = new AdjustedAttributesTooltip.Data(originalDifficulty, adjustedDifficulty);
-
-                StatisticDifficulty.Data firstStatistic;
-
-                switch (ruleset.Value.OnlineID)
-                {
-                    case 3:
-                        // Account for mania differences locally for now.
-                        // Eventually this should be handled in a more modular way, allowing rulesets to return arbitrary difficulty attributes.
-                        ILegacyRuleset legacyRuleset = (ILegacyRuleset)rulesetInstance;
-
-                        // For the time being, the key count is static no matter what, because:
-                        // - The method doesn't have knowledge of the active keymods. Doing so may require considerations for filtering.
-                        // - Using the difficulty adjustment mod to adjust OD doesn't have an effect on conversion.
-                        int keyCount = legacyRuleset.GetKeyCount(beatmap.Value.BeatmapInfo, mods.Value);
-
-                        firstStatistic = new StatisticDifficulty.Data(BeatmapsetsStrings.ShowStatsCsMania, keyCount, keyCount, 10);
-                        break;
-
-                    default:
-                        firstStatistic = new StatisticDifficulty.Data(BeatmapsetsStrings.ShowStatsCs, originalDifficulty.CircleSize, adjustedDifficulty.CircleSize, 10);
-                        break;
-                }
-
-                difficultyStatisticsDisplay.Statistics = new[]
-                {
-                    firstStatistic,
-                    new StatisticDifficulty.Data(BeatmapsetsStrings.ShowStatsAr, originalDifficulty.ApproachRate, adjustedDifficulty.ApproachRate, 10),
-                    new StatisticDifficulty.Data(BeatmapsetsStrings.ShowStatsAccuracy, originalDifficulty.OverallDifficulty, adjustedDifficulty.OverallDifficulty, 10),
-                    new StatisticDifficulty.Data(BeatmapsetsStrings.ShowStatsDrain, originalDifficulty.DrainRate, adjustedDifficulty.DrainRate, 10),
-                };
+                var displayAttributes = rulesetInstance.GetBeatmapAttributesForDisplay(beatmap.Value.BeatmapInfo, mods.Value).ToList();
+                difficultyStatisticsDisplay.Statistics = displayAttributes.Select(a => new StatisticDifficulty.Data(a)).ToList();
             });
 
             protected override void Update()
@@ -361,21 +319,6 @@ namespace osu.Game.Screens.SelectV2
                 {
                     TooltipText = ContextMenuStrings.ViewProfile;
                     IdleColour = overlayColourProvider?.Light2 ?? colours.Blue;
-                }
-            }
-
-            private partial class AdjustableDifficultyStatisticsDisplay : DifficultyStatisticsDisplay, IHasCustomTooltip<AdjustedAttributesTooltip.Data>
-            {
-                [Resolved]
-                private OverlayColourProvider colourProvider { get; set; } = null!;
-
-                public ITooltip<AdjustedAttributesTooltip.Data> GetCustomTooltip() => new AdjustedAttributesTooltip(colourProvider);
-
-                public AdjustedAttributesTooltip.Data? TooltipContent { get; set; }
-
-                public AdjustableDifficultyStatisticsDisplay(bool autoSize)
-                    : base(autoSize)
-                {
                 }
             }
         }

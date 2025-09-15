@@ -5,13 +5,13 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics;
 using osu.Game.Overlays;
 
 namespace osu.Game.Screens.SelectV2
 {
-    internal partial class WedgeBackground : CompositeDrawable
+    internal sealed partial class WedgeBackground : InputBlockingContainer
     {
         public float StartAlpha { get; init; } = 0.9f;
 
