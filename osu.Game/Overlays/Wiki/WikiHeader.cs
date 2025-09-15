@@ -22,8 +22,6 @@ namespace osu.Game.Overlays.Wiki
 
         public readonly Bindable<APIWikiPage> WikiPageData = new Bindable<APIWikiPage>();
 
-        public readonly Bindable<Language> CurrentLanguage = new Bindable<Language>();
-
         public WikiLanguageDropdown LanguageDropdown;
 
         public Action ShowIndexPage;
