@@ -76,7 +76,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double currAngle = osuCurrObj.Angle.Value;
                 double lastAngle = osuLastObj.Angle.Value;
 
-                // Console.Out.WriteLine(getConstantAngleNerfFactor(osuCurrObj));
+                // Console.Out.WriteLine(angleVectorRepetition(osuCurrObj));
                 // Console.Out.WriteLine(osuCurrObj.VectorAngle.Value);
 
                 // Rewarding angles, take the smaller velocity as base.
@@ -87,7 +87,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     acuteAngleBonus = calcAcuteAngleBonus(currAngle);
 
                     // Penalize angle repetition.
-                    acuteAngleBonus *= 0.08 + 0.92 * (1 - Math.Min(acuteAngleBonus, Math.Pow(calcAcuteAngleBonus(lastAngle), angleVectorRepetition(osuCurrObj))));
+                    acuteAngleBonus *= 0.08 + 0.92 * (1 - Math.Min(acuteAngleBonus, Math.Pow(calcAcuteAngleBonus(lastAngle), 6 - angleVectorRepetition(osuCurrObj))));
+
+                    // Console.Out.WriteLine(1 - Math.Min(acuteAngleBonus, Math.Pow(calcAcuteAngleBonus(lastAngle), 3)) + ", " + (1 - Math.Min(acuteAngleBonus, Math.Pow(calcAcuteAngleBonus(lastAngle), 6 - angleVectorRepetition(osuCurrObj)))));
 
                     // Apply acute angle bonus for BPM above 300 1/2 and distance more than one diameter
                     acuteAngleBonus *= angleBonus *
