@@ -70,6 +70,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             if (!LoadedBeatmapSuccessfully)
                 return;
 
+            // also applied in `MultiSpectatorPlayer.load()`
             ScoreProcessor.ApplyNewJudgementsWhenFailed = true;
 
             LoadComponentAsync(new FillFlowContainer
@@ -170,6 +171,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         protected override void PerformFail()
         {
             // base logic intentionally suppressed - failing in multiplayer only marks the score with F rank
+            // see also: `MultiSpectatorPlayer.PerformFail()`
             ScoreProcessor.FailScore(Score.ScoreInfo);
         }
 

@@ -63,6 +63,9 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         private readonly FramedClock framedClock;
 
+        [Resolved]
+        private OsuGame? game { get; set; }
+
         private readonly Stopwatch stopwatch = new Stopwatch();
 
         /// <summary>
@@ -161,7 +164,9 @@ namespace osu.Game.Rulesets.UI
             //
             // In testing this triggers *very* rarely even when set to super low values (10 ms). The cases we're worried about involve multi-second jumps.
             // A difference of more than 500 ms seems like a sane number we should never exceed.
-            if (!allowReferenceClockSeeks && Math.Abs(proposedTime - referenceClock.CurrentTime) > 1500)
+            //
+            // Double-checking against the parent clock ensures we don't accidentally freeze time when the game stutters due to a long running frame.
+            if (!allowReferenceClockSeeks && Math.Abs(proposedTime - referenceClock.CurrentTime) > 500 && game?.Clock.ElapsedFrameTime <= 500)
             {
                 if (invalidBassTimeLogCount < 10)
                 {

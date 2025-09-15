@@ -5,6 +5,7 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Localisation;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Utils;
 
@@ -71,12 +72,32 @@ namespace osu.Game.Graphics
             Scheduler.AddDelayed(updateTimeWithReschedule, timeUntilNextUpdate);
         }
 
-        protected virtual string Format() => HumanizerUtils.Humanize(Date);
+        protected virtual LocalisableString Format() => new LocalisableString(new HumanisedDate(Date));
 
         private void updateTime() => Text = Format();
 
         public ITooltip<DateTimeOffset> GetCustomTooltip() => new DateTooltip();
 
         public DateTimeOffset TooltipContent => Date;
+
+        private class HumanisedDate : IEquatable<HumanisedDate>, ILocalisableStringData
+        {
+            public readonly DateTimeOffset Date;
+
+            public HumanisedDate(DateTimeOffset date)
+            {
+                Date = date;
+            }
+
+            public bool Equals(HumanisedDate? other)
+                => other?.Date != null && Date.Equals(other.Date);
+
+            public bool Equals(ILocalisableStringData? other)
+                => other is HumanisedDate otherDate && Equals(otherDate);
+
+            public string GetLocalised(LocalisationParameters parameters) => HumanizerUtils.Humanize(Date);
+
+            public override string ToString() => GetLocalised(LocalisationParameters.DEFAULT);
+        }
     }
 }

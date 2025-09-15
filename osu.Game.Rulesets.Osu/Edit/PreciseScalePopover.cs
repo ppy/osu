@@ -220,6 +220,10 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             scaleInfo.BindValueChanged(scale =>
             {
+                // can happen if the popover is dismissed by a keyboard key press while dragging UI controls
+                if (!scaleHandler.OperationInProgress.Value)
+                    return;
+
                 var newScale = new Vector2(scale.NewValue.Scale, scale.NewValue.Scale);
                 scaleHandler.Update(newScale, getOriginPosition(scale.NewValue), getAdjustAxis(scale.NewValue), getRotation(scale.NewValue));
             });
