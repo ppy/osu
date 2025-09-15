@@ -98,7 +98,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 wideAngleBonus = calcWideAngleBonus(currAngle);
 
                 // Penalize angle repetition.
-                wideAngleBonus *= 1 - Math.Min(wideAngleBonus, Math.Pow(calcWideAngleBonus(lastAngle), 6 - getConstantAngleNerfFactor(osuCurrObj)));
+                wideAngleBonus *= 1 - Math.Min(wideAngleBonus, Math.Pow(calcWideAngleBonus(lastAngle), getConstantAngleNerfFactor(osuCurrObj)));
 
                 // Apply full wide angle bonus for distance more than one diameter
                 wideAngleBonus *= angleBonus * DifficultyCalculationUtils.Smootherstep(osuCurrObj.LazyJumpDistance, 0, diameter);
@@ -198,7 +198,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 index++;
             }
 
-            return 1 / Math.Clamp(Math.Pow(1.5 / constantAngleCount, 2), 0.2, 1);
+            return 1 / Math.Clamp(Math.Pow(1 / constantAngleCount, 2), 0.2, 1);
         }
 
         private static double calcWideAngleBonus(double angle) => DifficultyCalculationUtils.Smoothstep(angle, double.DegreesToRadians(40), double.DegreesToRadians(140));
