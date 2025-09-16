@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             // derive strainTime for calculation
             var osuCurrObj = (OsuDifficultyHitObject)current;
 
-            double strainTime = osuCurrObj.StrainTime;
+            double strainTime = osuCurrObj.AdjustedDeltaTime;
             double doubletapness = 1.0 - osuCurrObj.GetDoubletapness((OsuDifficultyHitObject?)osuCurrObj.Next(0));
 
             // Cap deltatime to the OD 300 hitwindow.
