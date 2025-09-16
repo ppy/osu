@@ -22,7 +22,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 {
     public class ManiaDifficultyCalculator : DifficultyCalculator
     {
-        //private const double difficulty_multiplier = .9890041063;
+        // Maybe .97 is good?
+        private const double difficulty_multiplier = .97;//1.029
 
         private readonly bool isForCurrentRuleset;
 
@@ -39,9 +40,10 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             if (beatmap.HitObjects.Count == 0)
                 return new ManiaDifficultyAttributes { Mods = mods };
 
+            SunnyStrain strain = (SunnyStrain)skills[0];
             ManiaDifficultyAttributes attributes = new ManiaDifficultyAttributes
             {
-                StarRating = skills.OfType<CustomStrain>().Single().DifficultyValue(),// * difficulty_multiplier,
+                StarRating = strain.DifficultyValue() /*skills.OfType<SunnyStrain>().Single().DifficultyValue()*/ * difficulty_multiplier,
                 Mods = mods,
                 MaxCombo = beatmap.HitObjects.Sum(maxComboForObject),
             };
@@ -75,11 +77,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
         protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, double clockRate) => new Skill[]
         {
-
-               new CustomStrain(mods, ((ManiaBeatmap)Beatmap).TotalColumns,
-                CreateDifficultyHitObjects(beatmap, clockRate).Cast<ManiaDifficultyHitObject>().ToList(),
-                beatmap.Difficulty.OverallDifficulty)
-
+            new SunnyStrain(mods, CreateDifficultyHitObjects(beatmap, clockRate), (ManiaBeatmap)Beatmap, new FormulaConfig())
         };
 
         protected override Mod[] DifficultyAdjustmentMods
