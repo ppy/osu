@@ -6,8 +6,10 @@
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Configuration;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Users.Drawables;
 using osuTK;
@@ -25,6 +27,8 @@ namespace osu.Game.Screens.Ranking.Expanded
 
         private readonly bool playAppearanceSound;
 
+        private Bindable<double?> lastSamplePlayback = null!;
+
         /// <summary>
         /// Creates a new <see cref="ExpandedPanelTopContent"/>.
         /// </summary>
@@ -41,7 +45,7 @@ namespace osu.Game.Screens.Ranking.Expanded
         }
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        private void load(AudioManager audio, SessionStatics statics)
         {
             appearanceSample = audio.Samples.Get(@"Results/score-panel-top-appear");
 
@@ -67,14 +71,21 @@ namespace osu.Game.Screens.Ranking.Expanded
                     }
                 }
             };
+
+            lastSamplePlayback = statics.GetBindable<double?>(Static.LastResultsScreenSamplePlaybackTime);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            if (playAppearanceSound)
+            bool enoughSampleTimeElapsed = !lastSamplePlayback.Value.HasValue || Time.Current - lastSamplePlayback.Value >= OsuGameBase.SAMPLE_DEBOUNCE_TIME;
+
+            if (playAppearanceSound && enoughSampleTimeElapsed)
+            {
                 appearanceSample?.Play();
+                lastSamplePlayback.Value = Time.Current;
+            }
         }
     }
 }

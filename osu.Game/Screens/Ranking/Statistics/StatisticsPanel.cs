@@ -14,6 +14,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.Graphics;
@@ -60,6 +61,8 @@ namespace osu.Game.Screens.Ranking.Statistics
         private Sample? popOutSample;
         private CancellationTokenSource? loadCancellation;
 
+        private Bindable<double?> lastSamplePlayback = null!;
+
         public StatisticsPanel()
         {
             InternalChild = new Container
@@ -81,12 +84,14 @@ namespace osu.Game.Screens.Ranking.Statistics
         }
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        private void load(AudioManager audio, SessionStatics statics)
         {
             Score.BindValueChanged(populateStatistics, true);
 
             popInSample = audio.Samples.Get(@"Results/statistics-panel-pop-in");
             popOutSample = audio.Samples.Get(@"Results/statistics-panel-pop-out");
+
+            lastSamplePlayback = statics.GetBindable<double?>(Static.LastResultsScreenSamplePlaybackTime);
         }
 
         private void populateStatistics(ValueChangedEvent<ScoreInfo?> score)
@@ -311,7 +316,14 @@ namespace osu.Game.Screens.Ranking.Statistics
         {
             this.FadeIn(350, Easing.OutQuint);
 
-            popInSample?.Play();
+            bool enoughSampleTimeElapsed = !lastSamplePlayback.Value.HasValue || Time.Current - lastSamplePlayback.Value >= OsuGameBase.SAMPLE_DEBOUNCE_TIME;
+
+            if (enoughSampleTimeElapsed)
+            {
+                popInSample?.Play();
+                lastSamplePlayback.Value = Time.Current;
+            }
+
             wasOpened = true;
         }
 
@@ -321,6 +333,14 @@ namespace osu.Game.Screens.Ranking.Statistics
 
             if (wasOpened)
             {
+                bool enoughSampleTimeElapsed = !lastSamplePlayback.Value.HasValue || Time.Current - lastSamplePlayback.Value >= OsuGameBase.SAMPLE_DEBOUNCE_TIME;
+
+                if (enoughSampleTimeElapsed)
+                {
+                    popInSample?.Play();
+                    lastSamplePlayback.Value = Time.Current;
+                }
+
                 popOutSample?.Play();
                 this.HidePopover(); // targeted at the user tag control
             }
