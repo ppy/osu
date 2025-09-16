@@ -12,8 +12,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
         /// <summary>
         /// Evaluates the unevenness difficulty at a specific time point.
         /// </summary>
-        /// <param name="time">The time to evaluate at</param>
-        /// <param name="data">The strain data containing all difficulty information</param>
         public static double EvaluateDifficultyAt(double time, SunnyStrainData data)
         {
             return data.SampleFeatureAtTime(time, data.Unevenness);
@@ -23,7 +21,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
         /// Computes the unevenness values across all time points.
         /// This measures how irregular the timing patterns are between adjacent columns.
         /// </summary>
-        /// <param name="data">The strain data to process</param>
         public static double[] ComputeUnevenness(SunnyStrainData data)
         {
             bool[][] keyUsagePatterns = CrossColumnEvaluator.ComputeKeyUsage(data);
@@ -43,7 +40,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
         /// Computes timing deltas (time between consecutive notes) for each column.
         /// This is used to analyze timing irregularities.
         /// </summary>
-        /// <param name="data">The strain data to process</param>
         private static double[][] computeTimingDeltasByColumn(SunnyStrainData data)
         {
             int timePointCount = data.CornerData.BaseTimeCorners.Length;
@@ -184,13 +180,13 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
         {
             if (timingDifference < 0.02)
             {
-                // Very small differences - mild penalty with timing component
+                // Very small differences => mild penalty with timing component
                 return Math.Min(0.75 + 0.5 * Math.Max(leftDelta, rightDelta), 1.0);
             }
 
             if (timingDifference < 0.07)
             {
-                // Moderate differences - variable penalty
+                // Moderate differences => variable penalty
                 return Math.Min(0.65 + 5.0 * timingDifference + 0.5 * Math.Max(leftDelta, rightDelta), 1.0);
             }
 

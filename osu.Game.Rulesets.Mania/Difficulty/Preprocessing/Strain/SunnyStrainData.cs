@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Strain
         /// <summary>All notes in the beatmap, sorted by start time</summary>
         public SunnyPreprocessor.Note[] AllNotes { get; set; }
 
-        /// <summary>Notes organized by column for efficient column-specific processing</summary>
+        /// <summary>Notes organized by column</summary>
         public SunnyPreprocessor.Note[][] NotesByColumn { get; set; }
 
         /// <summary>All long notes in the beatmap</summary>
@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Strain
         /// <summary>Maximum time value in the beatmap</summary>
         public int MaxTime { get; set; }
 
-        /// <summary>Difficulty from same-column patterns (jacks, stairs)</summary>
+        /// <summary>Difficulty from same-column patterns (jacks)</summary>
         public double[] SameColumnPressure { get; set; }
 
         /// <summary>Difficulty from cross-column coordination patterns</summary>

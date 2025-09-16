@@ -13,8 +13,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
         /// <summary>
         /// Evaluates the release timing difficulty at a specific time point.
         /// </summary>
-        /// <param name="time">The time to evaluate at</param>
-        /// <param name="data">The strain data containing all difficulty information</param>
         public static double EvaluateDifficultyAt(double time, SunnyStrainData data)
         {
             return data.SampleFeatureAtTime(time, data.ReleaseFactor);
