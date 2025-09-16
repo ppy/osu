@@ -207,7 +207,10 @@ namespace osu.Game.Overlays.Dashboard.Friends
                 }
             }
 
-            bool IFilterable.FilteringActive { set { } }
+            bool IFilterable.FilteringActive
+            {
+                set { }
+            }
         }
     }
 }

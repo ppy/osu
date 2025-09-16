@@ -70,6 +70,11 @@ namespace osu.Game.Localisation
         public static LocalisableString SuggestedOffsetNote => new TranslatableString(getKey(@"suggested_offset_note"), @"Play a few beatmaps to receive a suggested offset!");
 
         /// <summary>
+        /// "Based on the last {0} play(s), your offset is set correctly!"
+        /// </summary>
+        public static LocalisableString SuggestedOffsetCorrect(int plays) => new TranslatableString(getKey(@"suggested_offset_correct"), @"Based on the last {0} play(s), your offset is set correctly!", plays);
+
+        /// <summary>
         /// "Based on the last {0} play(s), the suggested offset is {1} ms."
         /// </summary>
         public static LocalisableString SuggestedOffsetValueReceived(int plays, LocalisableString value) => new TranslatableString(getKey(@"suggested_offset_value_received"), @"Based on the last {0} play(s), the suggested offset is {1} ms.", plays, value);
@@ -83,6 +88,16 @@ namespace osu.Game.Localisation
         /// "Offset wizard"
         /// </summary>
         public static LocalisableString OffsetWizard => new TranslatableString(getKey(@"offset_wizard"), @"Offset wizard");
+
+        /// <summary>
+        /// "Adjust beatmap offset automatically"
+        /// </summary>
+        public static LocalisableString AdjustBeatmapOffsetAutomatically => new TranslatableString(getKey(@"adjust_beatmap_offset_automatically"), @"Adjust beatmap offset automatically");
+
+        /// <summary>
+        /// "If enabled, the offset suggested from last play on a beatmap is automatically applied."
+        /// </summary>
+        public static LocalisableString AdjustBeatmapOffsetAutomaticallyTooltip => new TranslatableString(getKey(@"adjust_beatmap_offset_automatically_tooltip"), @"If enabled, the offset suggested from last play on a beatmap is automatically applied.");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

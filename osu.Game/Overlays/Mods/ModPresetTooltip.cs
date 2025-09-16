@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
@@ -14,6 +15,9 @@ namespace osu.Game.Overlays.Mods
 {
     public partial class ModPresetTooltip : VisibilityContainer, ITooltip<ModPreset>
     {
+        [Cached]
+        private readonly OverlayColourProvider colourProvider;
+
         protected override Container<Drawable> Content { get; }
 
         private const double transition_duration = 200;
@@ -22,6 +26,8 @@ namespace osu.Game.Overlays.Mods
 
         public ModPresetTooltip(OverlayColourProvider colourProvider)
         {
+            this.colourProvider = colourProvider;
+
             Width = 250;
             AutoSizeAxes = Axes.Y;
 
@@ -39,7 +45,7 @@ namespace osu.Game.Overlays.Mods
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Padding = new MarginPadding { Left = 10, Right = 10, Top = 5, Bottom = 5 },
+                    Padding = new MarginPadding(10f),
                     Spacing = new Vector2(7),
                     Children = new[]
                     {
@@ -51,6 +57,7 @@ namespace osu.Game.Overlays.Mods
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
+                            Margin = new MarginPadding { Bottom = 5f },
                         }
                     }
                 }
@@ -64,7 +71,13 @@ namespace osu.Game.Overlays.Mods
             if (ReferenceEquals(preset, lastPreset))
                 return;
 
-            descriptionText.Text = preset.Description;
+            if (!string.IsNullOrEmpty(preset.Description))
+            {
+                descriptionText.Show();
+                descriptionText.Text = preset.Description;
+            }
+            else
+                descriptionText.Hide();
 
             lastPreset = preset;
 

@@ -1003,6 +1003,35 @@ namespace osu.Game.Tests.Visual.UserInterface
                 AddAssert("search still not focused", () => !this.ChildrenOfType<ShearedSearchTextBox>().Single().HasFocus);
         }
 
+        /// <summary>
+        /// Tests that recreating the mod panels (by setting the global available mods) also refreshes the active states.
+        /// </summary>
+        [Test]
+        public void TestActiveStatesRefreshedOnPanelsCreated()
+        {
+            createScreen();
+            changeRuleset(0);
+
+            Bindable<IReadOnlyList<Mod>> selectedMods = null!;
+
+            AddStep("bind mods to local bindable", () =>
+            {
+                selectedMods = new Bindable<IReadOnlyList<Mod>>([]);
+
+                modSelectOverlay.SelectedMods.UnbindFrom(SelectedMods);
+                modSelectOverlay.SelectedMods.BindTo(selectedMods);
+            });
+
+            AddStep("activate PF", () => selectedMods.Value = [new OsuModPerfect()]);
+            AddAssert("OsuModPerfect panel active", () => getPanelForMod(typeof(OsuModPerfect)).Active.Value);
+
+            changeRuleset(1);
+            AddAssert("TaikoModPerfect panel not active", () => !getPanelForMod(typeof(TaikoModPerfect)).Active.Value);
+
+            changeRuleset(0);
+            AddAssert("OsuModPerfect panel active", () => getPanelForMod(typeof(OsuModPerfect)).Active.Value);
+        }
+
         private void waitForColumnLoad() => AddUntilStep("all column content loaded", () =>
             modSelectOverlay.ChildrenOfType<ModColumn>().Any()
             && modSelectOverlay.ChildrenOfType<ModColumn>().All(column => column.IsLoaded && column.ItemsLoaded)

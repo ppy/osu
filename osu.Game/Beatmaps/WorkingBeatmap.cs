@@ -124,18 +124,16 @@ namespace osu.Game.Beatmaps
             Track.Looping = looping;
             Track.RestartPoint = Metadata.PreviewTime;
 
-            if (Track.RestartPoint == -1)
+            if (!Track.IsLoaded)
             {
-                if (!Track.IsLoaded)
-                {
-                    // force length to be populated (https://github.com/ppy/osu-framework/issues/4202)
-                    Track.Seek(Track.CurrentTime);
-                }
-
-                Track.RestartPoint = 0.4f * Track.Length;
+                // force length to be populated (https://github.com/ppy/osu-framework/issues/4202)
+                Track.Seek(Track.CurrentTime);
             }
 
-            Track.RestartPoint += offsetFromPreviewPoint;
+            if (Track.RestartPoint < 0 || Track.RestartPoint > Track.Length)
+                Track.RestartPoint = 0.4f * Track.Length;
+
+            Track.RestartPoint = Math.Clamp(Track.RestartPoint + offsetFromPreviewPoint, 0, Track.Length);
         }
 
         /// <summary>
@@ -213,12 +211,12 @@ namespace osu.Game.Beatmaps
                     if (ae.InnerExceptions.FirstOrDefault() is TaskCanceledException)
                         return null;
 
-                    Logger.Error(ae, "Beatmap failed to load");
+                    Logger.Error(ae, $"Beatmap failed to load ({BeatmapInfo})");
                     return null;
                 }
                 catch (Exception e)
                 {
-                    Logger.Error(e, "Beatmap failed to load");
+                    Logger.Error(e, $"Beatmap failed to load ({BeatmapInfo})");
                     return null;
                 }
             }

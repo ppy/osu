@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -68,7 +69,7 @@ namespace osu.Game.Rulesets.Catch.UI
                 // needs to be scaled down to remain playable.
                 const float base_aspect_ratio = 1024f / 768f;
                 float aspectRatio = osuGame.ScalingContainerTargetDrawSize.X / osuGame.ScalingContainerTargetDrawSize.Y;
-                scaleContainer.Scale = new Vector2(base_aspect_ratio / aspectRatio);
+                scaleContainer.Scale = new Vector2(Math.Min(1, base_aspect_ratio / aspectRatio));
             }
         }
 

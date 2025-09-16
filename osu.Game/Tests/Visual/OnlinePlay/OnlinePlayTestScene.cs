@@ -22,7 +22,6 @@ namespace osu.Game.Tests.Visual.OnlinePlay
     public abstract partial class OnlinePlayTestScene : ScreenTestScene, IOnlinePlayTestSceneDependencies
     {
         public OngoingOperationTracker OngoingOperationTracker => OnlinePlayDependencies.OngoingOperationTracker;
-        public OnlinePlayBeatmapAvailabilityTracker AvailabilityTracker => OnlinePlayDependencies.AvailabilityTracker;
         public TestUserLookupCache UserLookupCache => OnlinePlayDependencies.UserLookupCache;
         public BeatmapLookupCache BeatmapLookupCache => OnlinePlayDependencies.BeatmapLookupCache;
 
@@ -96,7 +95,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
         /// </remarks>
         protected virtual OnlinePlayTestSceneDependencies CreateOnlinePlayDependencies() => new OnlinePlayTestSceneDependencies();
 
-        protected Room[] GenerateRooms(int count, RulesetInfo? ruleset = null, bool withPassword = false, bool withSpotlightRooms = false)
+        protected Room[] GenerateRooms(int count, RulesetInfo? ruleset = null, bool withPassword = false, bool withPinnedRooms = false)
         {
             Room[] rooms = new Room[count];
 
@@ -111,10 +110,10 @@ namespace osu.Game.Tests.Visual.OnlinePlay
                     Name = $@"Room {currentRoomId}",
                     Host = new APIUser { Username = @"Host" },
                     Duration = TimeSpan.FromSeconds(10),
-                    Category = withSpotlightRooms && i % 2 == 0 ? RoomCategory.Spotlight : RoomCategory.Normal,
                     Password = withPassword ? @"password" : null,
                     PlaylistItemStats = new Room.RoomPlaylistItemStats { RulesetIDs = [ruleset.OnlineID] },
-                    Playlist = [new PlaylistItem(new BeatmapInfo { Metadata = new BeatmapMetadata() }) { RulesetID = ruleset.OnlineID }]
+                    Playlist = [new PlaylistItem(new BeatmapInfo { Metadata = new BeatmapMetadata() }) { RulesetID = ruleset.OnlineID }],
+                    Pinned = withPinnedRooms && i % 2 == 0,
                 };
             }
 

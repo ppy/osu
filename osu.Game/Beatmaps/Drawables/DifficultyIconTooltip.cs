@@ -23,10 +23,6 @@ namespace osu.Game.Beatmaps.Drawables
     {
         private OsuSpriteText difficultyName = null!;
         private StarRatingDisplay starRating = null!;
-        private OsuSpriteText overallDifficulty = null!;
-        private OsuSpriteText drainRate = null!;
-        private OsuSpriteText circleSize = null!;
-        private OsuSpriteText approachRate = null!;
         private OsuSpriteText bpm = null!;
         private OsuSpriteText length = null!;
 
@@ -76,13 +72,6 @@ namespace osu.Game.Beatmaps.Drawables
                             AutoSizeAxes = Axes.Both,
                             Direction = FillDirection.Horizontal,
                             Spacing = new Vector2(5),
-                            Children = new Drawable[]
-                            {
-                                circleSize = new OsuSpriteText { Font = OsuFont.GetFont(size: 14) },
-                                drainRate = new OsuSpriteText { Font = OsuFont.GetFont(size: 14) },
-                                overallDifficulty = new OsuSpriteText { Font = OsuFont.GetFont(size: 14) },
-                                approachRate = new OsuSpriteText { Font = OsuFont.GetFont(size: 14) },
-                            }
                         },
                         miscFillFlowContainer = new FillFlowContainer
                         {
@@ -131,21 +120,16 @@ namespace osu.Game.Beatmaps.Drawables
 
             double bpmAdjusted = displayedContent.BeatmapInfo.BPM * rate;
 
-            BeatmapDifficulty originalDifficulty = new BeatmapDifficulty(displayedContent.BeatmapInfo.Difficulty);
-
-            if (displayedContent.Mods != null)
-            {
-                foreach (var mod in displayedContent.Mods.OfType<IApplicableToDifficulty>())
-                    mod.ApplyToDifficulty(originalDifficulty);
-            }
-
             Ruleset ruleset = displayedContent.Ruleset.CreateInstance();
-            BeatmapDifficulty adjustedDifficulty = ruleset.GetRateAdjustedDisplayDifficulty(originalDifficulty, rate);
+            var beatmapAttributes = ruleset.GetBeatmapAttributesForDisplay(displayedContent.BeatmapInfo, displayedContent.Mods ?? [])
+                                           .Select(attr => new OsuSpriteText
+                                           {
+                                               Font = OsuFont.Style.Caption1,
+                                               Text = $@"{attr.Acronym}: {attr.AdjustedValue:0.##}"
+                                           });
 
-            circleSize.Text = @"CS: " + adjustedDifficulty.CircleSize.ToString(@"0.##");
-            drainRate.Text = @" HP: " + adjustedDifficulty.DrainRate.ToString(@"0.##");
-            approachRate.Text = @" AR: " + adjustedDifficulty.ApproachRate.ToString(@"0.##");
-            overallDifficulty.Text = @" OD: " + adjustedDifficulty.OverallDifficulty.ToString(@"0.##");
+            difficultyFillFlowContainer.Clear();
+            difficultyFillFlowContainer.AddRange(beatmapAttributes);
 
             TimeSpan lengthTimeSpan = TimeSpan.FromMilliseconds(displayedContent.BeatmapInfo.Length / rate);
             length.Text = "Length: " + lengthTimeSpan.ToFormattedDuration();

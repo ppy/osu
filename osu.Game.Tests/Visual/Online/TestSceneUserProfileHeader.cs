@@ -18,6 +18,7 @@ using osu.Game.Overlays;
 using osu.Game.Overlays.Profile;
 using osu.Game.Overlays.Profile.Header.Components;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Tests.Resources;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Online
@@ -136,7 +137,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 Id = 727,
                 Username = "SomeoneIndecisive",
-                CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c1.jpg",
+                CoverUrl = TestResources.COVER_IMAGE_1,
                 Groups = new[]
                 {
                     new APIUserGroup { Colour = "#EB47D0", ShortName = "DEV", Name = "Developers" },
@@ -162,7 +163,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 Id = 728,
                 Username = "Certain Guy",
-                CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c2.jpg",
+                CoverUrl = TestResources.COVER_IMAGE_2,
                 Statistics = new UserStatistics
                 {
                     IsRanked = false,

@@ -47,7 +47,10 @@ namespace osu.Game.Overlays
                 Spacing = new Vector2(0, 20),
                 Children = new Drawable[]
                 {
-                    info = new Info(),
+                    info = new Info
+                    {
+                        Beatmap = { BindTarget = Header.HeaderContent.Picker.Beatmap }
+                    },
                     new ScoresContainer
                     {
                         Beatmap = { BindTarget = Header.HeaderContent.Picker.Beatmap }
@@ -60,11 +63,7 @@ namespace osu.Game.Overlays
             info.BeatmapSet.BindTo(beatmapSet);
             comments.BeatmapSet.BindTo(beatmapSet);
 
-            Header.HeaderContent.Picker.Beatmap.ValueChanged += b =>
-            {
-                info.BeatmapInfo = b.NewValue;
-                ScrollFlow.ScrollToStart();
-            };
+            Header.HeaderContent.Picker.Beatmap.ValueChanged += b => ScrollFlow.ScrollToStart();
         }
 
         [BackgroundDependencyLoader]

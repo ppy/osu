@@ -41,7 +41,7 @@ namespace osu.Game.Database
         /// When editing is completed, call Finish() on the returned operation class to begin the import-and-update process.
         /// </remarks>
         /// <param name="model">The model to mount.</param>
-        public Task<ExternalEditOperation<TModel>> BeginExternalEditing(TModel model);
+        Task<ExternalEditOperation<TModel>> BeginExternalEditing(TModel model);
 
         /// <summary>
         /// A user displayable name for the model type associated with this manager.
@@ -51,6 +51,6 @@ namespace osu.Game.Database
         /// <summary>
         /// Fired when the user requests to view the resulting import.
         /// </summary>
-        public Action<IEnumerable<Live<TModel>>>? PresentImport { set; }
+        Action<IEnumerable<Live<TModel>>>? PresentImport { set; }
     }
 }

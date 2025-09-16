@@ -275,6 +275,13 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             else
             {
                 double minDistance = distanceSnapProvider?.GetBeatSnapDistance() * oldVelocityMultiplier ?? 1;
+                // do not allow the slider to extend beyond the path's calculated distance.
+                // this can happen in two specific circumstances:
+                // - floating point issues (`minDistance` is just ever so slightly larger than the calculated distance)
+                // - the slider was placed with a higher beat snap active than the current one,
+                //   therefore snapping it to the current beat snap distance would mean extrapolating it beyond its actual shape as defined by its control points
+                minDistance = Math.Min(minDistance, HitObject.Path.CalculatedDistance);
+
                 // Add a small amount to the proposed distance to make it easier to snap to the full length of the slider.
                 proposedDistance = distanceSnapProvider?.FindSnappedDistance((float)proposedDistance + 1, HitObject.StartTime, HitObject) ?? proposedDistance;
                 proposedDistance = Math.Clamp(proposedDistance, minDistance, HitObject.Path.CalculatedDistance);
