@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             // Calculate the velocity to the current hitobject, which starts with a base distance / time assuming the last object is a hitcircle.
             double currDistance = adjustSnapDistance(osuCurrObj.LazyJumpDistance, osuCurrObj, osuLastObj);
-            double currVelocity = currDistance / osuCurrObj.StrainTime;
+            double currVelocity = currDistance / osuCurrObj.AdjustedDeltaTime;
             double sliderlessCurrVelocity = currVelocity;
 
             // But if the last object is a slider, then we extend the travel velocity through the slider into the current object.
@@ -213,9 +213,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double angleSnapDifficultyBonus = 0;
             double deltaTimeThreshold = DifficultyCalculationUtils.BPMToMilliseconds(180, 2);
 
-            if (osuCurrObj.StrainTime < deltaTimeThreshold)
+            if (osuCurrObj.AdjustedDeltaTime < deltaTimeThreshold)
             {
-                double bpmFactor = Math.Pow((deltaTimeThreshold - osuCurrObj.StrainTime) * 0.015, 2.5);
+                double bpmFactor = Math.Pow((deltaTimeThreshold - osuCurrObj.AdjustedDeltaTime) * 0.015, 2.5);
 
                 angleSnapDifficultyBonus = OsuDifficultyHitObject.NORMALISED_DIAMETER * bpmFactor;
 
@@ -226,7 +226,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 angleSnapDifficultyBonus *= DifficultyCalculationUtils.Smoothstep(osuCurrObj.Angle ?? 0, Math.PI / 3 + highSpacingAdjust, Math.PI / 2 + highSpacingAdjust);
             }
 
-            double bpm = DifficultyCalculationUtils.BPMToMilliseconds(osuCurrObj.StrainTime, 2);
+            double bpm = DifficultyCalculationUtils.BPMToMilliseconds(osuCurrObj.AdjustedDeltaTime, 2);
             double snapThreshold = diameter * (1 + 1.3 * DifficultyCalculationUtils.ReverseLerp(bpm, 200, 250));
 
             // Jumps need to have some spacing to be snapped
@@ -242,7 +242,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double bigDistanceDifferenceFactor = DifficultyCalculationUtils.ReverseLerp(osuLastObj.LazyJumpDistance, notOverlappingAdjust + diameter, notOverlappingAdjust + diameter * 2);
 
             // And don't nerf bursts with this
-            bigDistanceDifferenceFactor *= DifficultyCalculationUtils.ReverseLerpTwoDirectional(osuCurrObj.StrainTime, osuLastObj.StrainTime, 1.95, 1.5);
+            bigDistanceDifferenceFactor *= DifficultyCalculationUtils.ReverseLerpTwoDirectional(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime, 1.95, 1.5);
 
             double totalBonus = result + angleSnapDifficultyBonus - currDistance;
             return currDistance + totalBonus * (1 - bigDistanceDifferenceFactor);

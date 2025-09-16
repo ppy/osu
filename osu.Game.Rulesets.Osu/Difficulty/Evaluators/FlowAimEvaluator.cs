@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             const int diameter = OsuDifficultyHitObject.NORMALISED_DIAMETER;
 
             // Start with velocity
-            double velocity = osuCurrObj.LazyJumpDistance / osuCurrObj.StrainTime;
+            double velocity = osuCurrObj.LazyJumpDistance / osuCurrObj.AdjustedDeltaTime;
 
             if (osuLast0Obj.BaseObject is Slider && withSliderTravelDistance)
             {
@@ -67,14 +67,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double multiplier = base_speedflow_multiplier / bpmFactorMultiplierAtBase;
 
             // Start from base of the bonus
-            double speeflowBonus = multiplier * diameter / osuCurrObj.StrainTime;
+            double speeflowBonus = multiplier * diameter / osuCurrObj.AdjustedDeltaTime;
 
             // Spacing factor, reward up to 1 radius. The reason why we're doing this is because we want to be close live speedflow
             // If we won't do this - it will be similar to multiplicative speed and distance bonuses, not additive
             speeflowBonus *= DifficultyCalculationUtils.Smoothstep(osuCurrObj.LazyJumpDistance, -radius, radius);
 
             // Bpm factor
-            speeflowBonus *= (osuCurrObj.StrainTime / (osuCurrObj.StrainTime - bpm_factor) - 1);
+            speeflowBonus *= (osuCurrObj.AdjustedDeltaTime / (osuCurrObj.AdjustedDeltaTime - bpm_factor) - 1);
 
             flowDifficulty += speeflowBonus;
 
@@ -105,11 +105,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     * DifficultyCalculationUtils.Smoothstep(Math.Abs(angleChangePrev1 - angleChangePrev), 0.2, 0.1);
 
                 // Assume the angle change is consistent if some of the notes are slower
-                double strainTimeDifferenceFactor = calculateSlowerNoteFactor(osuCurrObj, osuLast0Obj);
-                strainTimeDifferenceFactor *= calculateSlowerNoteFactor(osuLast0Obj, osuLast1Obj);
-                strainTimeDifferenceFactor *= calculateSlowerNoteFactor(osuLast1Obj, osuLast2Obj);
-                strainTimeDifferenceFactor *= calculateSlowerNoteFactor(osuLast2Obj, osuLast3Obj);
-                angleChangeConsistencyFactor = 1 - strainTimeDifferenceFactor * (1 - angleChangeConsistencyFactor);
+                double deltaTimeDifferenceFactor = calculateSlowerNoteFactor(osuCurrObj, osuLast0Obj);
+                deltaTimeDifferenceFactor *= calculateSlowerNoteFactor(osuLast0Obj, osuLast1Obj);
+                deltaTimeDifferenceFactor *= calculateSlowerNoteFactor(osuLast1Obj, osuLast2Obj);
+                deltaTimeDifferenceFactor *= calculateSlowerNoteFactor(osuLast2Obj, osuLast3Obj);
+                angleChangeConsistencyFactor = 1 - deltaTimeDifferenceFactor * (1 - angleChangeConsistencyFactor);
 
                 double largerBonus = Math.Max(angleChangeBonus, acuteAngleBonus);
                 double summedBonus = angleChangeBonus + acuteAngleBonus;
@@ -164,13 +164,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double currAngleBonus = AimEvaluator.CalcAcuteAngleBonus(currAngle);
             double prevAngleBonus = AimEvaluator.CalcAcuteAngleBonus(last2Angle);
 
-            double currVelocity = osuCurrObj.LazyJumpDistance / osuCurrObj.StrainTime;
+            double currVelocity = osuCurrObj.LazyJumpDistance / osuCurrObj.AdjustedDeltaTime;
             double acuteAngleBonus = currVelocity * currAngleBonus;
 
             // Nerf acute angle if previous notes were slower
             // IMPORTANT INFORMATION: removing this limitation buffs many alt maps
             // BUT it also  buffs ReLief. So it's should be explored how to keep this buff for actually hard patterns but not for ReLief
-            acuteAngleBonus *= DifficultyCalculationUtils.ReverseLerp(osuCurrObj.StrainTime, osuLast0Obj.StrainTime * 0.55, osuLast0Obj.StrainTime * 0.75);
+            acuteAngleBonus *= DifficultyCalculationUtils.ReverseLerp(osuCurrObj.AdjustedDeltaTime, osuLast0Obj.AdjustedDeltaTime * 0.55, osuLast0Obj.AdjustedDeltaTime * 0.75);
 
             // Decrease angle bonus if angle changes are slower than 1 in 4 notes
             double deltaAngle = Math.Abs(last1Angle - last2Angle);
@@ -199,8 +199,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             if (osuCurrObj.AngleSigned == null || osuLast0Obj.AngleSigned == null)
                 return 0;
 
-            double currVelocity = osuCurrObj.LazyJumpDistance / osuCurrObj.StrainTime;
-            double prevVelocity = osuLast0Obj.LazyJumpDistance / osuLast0Obj.StrainTime;
+            double currVelocity = osuCurrObj.LazyJumpDistance / osuCurrObj.AdjustedDeltaTime;
+            double prevVelocity = osuLast0Obj.LazyJumpDistance / osuLast0Obj.AdjustedDeltaTime;
 
             double currAngle = osuCurrObj.AngleSigned.Value;
             double lastAngle = osuLast0Obj.AngleSigned.Value;
@@ -212,8 +212,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             // Remove angle change if previous 2 notes were slower
             // IMPORTANT INFORMATION: removing this limitation significantly buffs almost all tech, alt, underweight maps in general
             // BUT it also very significantly buffs ReLief. So it's should be explored how to keep this buff for actually hard patterns but not for ReLief
-            angleChangeBonus *= DifficultyCalculationUtils.ReverseLerp(osuCurrObj.StrainTime, osuLast0Obj.StrainTime * 0.55, osuLast0Obj.StrainTime * 0.75);
-            angleChangeBonus *= DifficultyCalculationUtils.ReverseLerp(osuCurrObj.StrainTime, osuLast1Obj.StrainTime * 0.55, osuLast1Obj.StrainTime * 0.75);
+            angleChangeBonus *= DifficultyCalculationUtils.ReverseLerp(osuCurrObj.AdjustedDeltaTime, osuLast0Obj.AdjustedDeltaTime * 0.55, osuLast0Obj.AdjustedDeltaTime * 0.75);
+            angleChangeBonus *= DifficultyCalculationUtils.ReverseLerp(osuCurrObj.AdjustedDeltaTime, osuLast1Obj.AdjustedDeltaTime * 0.55, osuLast1Obj.AdjustedDeltaTime * 0.75);
 
             double last1Angle = osuLast1Obj.Angle ?? 0;
             double last2Angle = osuLast2Obj?.Angle ?? 0;
@@ -245,8 +245,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             const int radius = OsuDifficultyHitObject.NORMALISED_RADIUS;
             const int diameter = OsuDifficultyHitObject.NORMALISED_DIAMETER;
 
-            double currVelocity = osuCurrObj.LazyJumpDistance / osuCurrObj.StrainTime;
-            double prevVelocity = osuLast0Obj.LazyJumpDistance / osuLast0Obj.StrainTime;
+            double currVelocity = osuCurrObj.LazyJumpDistance / osuCurrObj.AdjustedDeltaTime;
+            double prevVelocity = osuLast0Obj.LazyJumpDistance / osuLast0Obj.AdjustedDeltaTime;
 
             double minVelocity = Math.Min(currVelocity, prevVelocity);
             double maxVelocity = Math.Max(currVelocity, prevVelocity);
@@ -258,7 +258,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             // Don't buff velocity increase if previous note was slower
             if (currVelocity > prevVelocity)
-                deltaVelocity *= DifficultyCalculationUtils.Smoothstep(osuCurrObj.StrainTime, osuLast0Obj.StrainTime * 0.55, osuLast0Obj.StrainTime * 0.75);
+                deltaVelocity *= DifficultyCalculationUtils.Smoothstep(osuCurrObj.AdjustedDeltaTime, osuLast0Obj.AdjustedDeltaTime * 0.55, osuLast0Obj.AdjustedDeltaTime * 0.75);
 
             double currDistance = osuCurrObj.LazyJumpDistance;
             double prevDistance = osuLast0Obj.LazyJumpDistance;
@@ -301,7 +301,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             deltaVelocity *= 1 - distanceSimilarity1 * distanceSimilarity2 * directionFactor;
 
             // Penalize rhythm change
-            deltaVelocity *= DifficultyCalculationUtils.ReverseLerp(osuLast0Obj.StrainTime, osuCurrObj.StrainTime * 0.55, osuCurrObj.StrainTime * 0.75);
+            deltaVelocity *= DifficultyCalculationUtils.ReverseLerp(osuLast0Obj.AdjustedDeltaTime, osuCurrObj.AdjustedDeltaTime * 0.55, osuCurrObj.AdjustedDeltaTime * 0.75);
 
             // Don't reward very big differences too much
             if (deltaVelocity > minVelocity * 2)
@@ -332,9 +332,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double prevAngle = osuLast1Obj.AngleSigned ?? 0;
             double prevAngleChange = 0;
 
-            double prev2Velocity = osuLast3Obj != null ? osuLast3Obj.LazyJumpDistance / osuLast3Obj.StrainTime : double.NaN;
-            double prev1Velocity = osuLast2Obj != null ? osuLast2Obj.LazyJumpDistance / osuLast2Obj.StrainTime : double.NaN;
-            double prevVelocity = osuLast1Obj.LazyJumpDistance / osuLast1Obj.StrainTime;
+            double prev2Velocity = osuLast3Obj != null ? osuLast3Obj.LazyJumpDistance / osuLast3Obj.AdjustedDeltaTime : double.NaN;
+            double prev1Velocity = osuLast2Obj != null ? osuLast2Obj.LazyJumpDistance / osuLast2Obj.AdjustedDeltaTime : double.NaN;
+            double prevVelocity = osuLast1Obj.LazyJumpDistance / osuLast1Obj.AdjustedDeltaTime;
 
             double prevVelocityChange = prevVelocity / prev1Velocity;
             double prev1VelocityChange = prev1Velocity / prev2Velocity;
@@ -378,7 +378,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     angleChangeLeniency -= usedLeniency;
                 }
 
-                double currVelocity = relevantObj.LazyJumpDistance / relevantObj.StrainTime;
+                double currVelocity = relevantObj.LazyJumpDistance / relevantObj.AdjustedDeltaTime;
                 double currVelocityChange = currVelocity / prevVelocity;
                 double normalizedVelocityChange = normalizeVelocityChange(currVelocityChange);
                 double accelerationChange = Math.Abs(currVelocityChange - prevVelocityChange);
@@ -415,7 +415,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             if (osuCurrObj == null || osuPrevObj == null)
                 return 0;
 
-            return DifficultyCalculationUtils.Smoothstep(osuCurrObj.StrainTime, osuPrevObj.StrainTime * 0.75, osuPrevObj.StrainTime * 0.95);
+            return DifficultyCalculationUtils.Smoothstep(osuCurrObj.AdjustedDeltaTime, osuPrevObj.AdjustedDeltaTime * 0.75, osuPrevObj.AdjustedDeltaTime * 0.95);
         }
         private static double normalizeVelocityChange(double velocityChange) => double.IsNaN(velocityChange) ? 1.0 : velocityChange >= 1 ? velocityChange : 1.0 / velocityChange;
     }

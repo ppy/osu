@@ -27,25 +27,25 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             if (current.BaseObject is Spinner)
                 return 0;
 
-            // derive strainTime for calculation
+            // derive AdjustedDeltaTime for calculation
             var osuCurrObj = (OsuDifficultyHitObject)current;
 
-            double strainTime = osuCurrObj.AdjustedDeltaTime;
+            double relevantDeltaTime = osuCurrObj.AdjustedDeltaTime;
             double doubletapness = 1.0 - osuCurrObj.GetDoubletapness((OsuDifficultyHitObject?)osuCurrObj.Next(0));
 
             // Cap deltatime to the OD 300 hitwindow.
             // 0.93 is derived from making sure 260bpm OD8 streams aren't nerfed harshly, whilst 0.92 limits the effect of the cap.
-            strainTime /= Math.Clamp((strainTime / osuCurrObj.HitWindowGreat) / 0.93, 0.92, 1);
+            relevantDeltaTime /= Math.Clamp((relevantDeltaTime / osuCurrObj.HitWindowGreat) / 0.93, 0.92, 1);
 
             // speedBonus will be 0.0 for BPM < 200
             double speedBonus = 0.0;
 
             // Add additional scaling bonus for streams/bursts higher than 200bpm
-            if (DifficultyCalculationUtils.MillisecondsToBPM(strainTime) > min_speed_bonus)
-                speedBonus = 0.75 * Math.Pow((DifficultyCalculationUtils.BPMToMilliseconds(min_speed_bonus) - strainTime) / speed_balancing_factor, 2);
+            if (DifficultyCalculationUtils.MillisecondsToBPM(relevantDeltaTime) > min_speed_bonus)
+                speedBonus = 0.75 * Math.Pow((DifficultyCalculationUtils.BPMToMilliseconds(min_speed_bonus) - relevantDeltaTime) / speed_balancing_factor, 2);
 
             // Base difficulty with all bonuses
-            double difficulty = (1 + speedBonus) * 1000 / strainTime;
+            double difficulty = (1 + speedBonus) * 1000 / relevantDeltaTime;
 
             // Apply penalty if there's doubletappable doubles
             return difficulty * doubletapness;
