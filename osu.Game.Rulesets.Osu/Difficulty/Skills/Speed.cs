@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         public override void Process(DifficultyHitObject current)
         {
-            currentDifficulty *= strainDecay(((OsuDifficultyHitObject)current).StrainTime);
+            currentDifficulty *= strainDecay(((OsuDifficultyHitObject)current).AdjustedDeltaTime);
 
             currentDifficulty += SpeedEvaluator.EvaluateDifficultyOf(current, Mods) * RhythmEvaluator.EvaluateDifficultyOf(current) * skillMultiplier;
 
