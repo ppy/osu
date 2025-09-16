@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             var osuPrevObj = current.Index > 0 ? (OsuDifficultyHitObject)current.Previous(0) : null;
             var osuNextObj = (OsuDifficultyHitObject?)osuCurrObj.Next(0);
 
-            double strainTime = osuCurrObj.StrainTime;
+            double relevantDeltaTime = osuCurrObj.AdjustedDeltaTime;
 
             // Nerf gallopable or doubletappable doubles.
             double currDeltaTime = Math.Max(1, osuCurrObj.DeltaTime);
@@ -61,18 +61,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             if (windowRatio < halfPoint)
                 windowRatio *= windowRatio / halfPoint;
 
-            double doubletapness = Math.Pow(speedRatio, distanceFactor * (1 - windowRatio));
+            double cheesability = Math.Pow(speedRatio, distanceFactor * (1 - windowRatio));
 
             // Cap deltatime to the OD 300 hitwindow.
             // 0.93 is derived from making sure 260bpm OD8 streams aren't nerfed harshly, whilst 0.92 limits the effect of the cap.
-            strainTime /= Math.Clamp((strainTime / osuCurrObj.HitWindowGreat) / 0.93, 0.92, 1);
+            relevantDeltaTime /= Math.Clamp((relevantDeltaTime / osuCurrObj.HitWindowGreat) / 0.93, 0.92, 1);
 
             // speedBonus will be 0.0 for BPM < 200
             double speedBonus = 0.0;
 
             // Add additional scaling bonus for streams/bursts higher than 200bpm
-            if (DifficultyCalculationUtils.MillisecondsToBPM(strainTime) > min_speed_bonus)
-                speedBonus = 0.75 * Math.Pow((DifficultyCalculationUtils.BPMToMilliseconds(min_speed_bonus) - strainTime) / speed_balancing_factor, 2);
+            if (DifficultyCalculationUtils.MillisecondsToBPM(relevantDeltaTime) > min_speed_bonus)
+                speedBonus = 0.75 * Math.Pow((DifficultyCalculationUtils.BPMToMilliseconds(min_speed_bonus) - relevantDeltaTime) / speed_balancing_factor, 2);
 
             double travelDistance = osuPrevObj?.TravelDistance ?? 0;
             double distance = travelDistance + osuCurrObj.MinimumJumpDistance;
@@ -90,10 +90,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 distanceBonus = 0;
 
             // Base difficulty with all bonuses
-            double difficulty = (1 + speedBonus + distanceBonus) * 1000 / strainTime;
+            double difficulty = (1 + speedBonus + distanceBonus) * 1000 / relevantDeltaTime;
 
-            // Apply penalty if there's doubletappable doubles
-            return difficulty * doubletapness;
+            // Apply penalty if there's doubletappable or gallopable doubles
+            return difficulty * cheesability;
         }
 
         private static double getSpeedRatio(OsuDifficultyHitObject current, OsuDifficultyHitObject? other)
