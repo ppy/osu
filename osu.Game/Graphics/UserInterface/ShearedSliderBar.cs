@@ -193,8 +193,13 @@ namespace osu.Game.Graphics.UserInterface
         {
             base.UpdateAfterChildren();
 
-            LeftBox.Size = new Vector2(Math.Clamp(RangePadding + Nub.DrawPosition.X - Nub.DrawWidth / 2f + ShearedNub.CORNER_RADIUS - 0.5f, 0, Math.Max(0, DrawWidth)), 1);
-            RightBox.Size = new Vector2(Math.Clamp(DrawWidth - RangePadding - Nub.DrawPosition.X - Nub.DrawWidth / 2f + ShearedNub.CORNER_RADIUS - 0.5f, 0, Math.Max(0, DrawWidth)), 1);
+            float nubOriginOffset = Nub.OriginPosition.X - Nub.DrawWidth / 2f;
+            float nubPosition = Nub.DrawPosition.X - nubOriginOffset;
+            LeftBox.Size = new Vector2(
+                Math.Clamp(RangePadding + nubPosition - Nub.DrawWidth / 2f + ShearedNub.CORNER_RADIUS - 0.5f, 0, Math.Max(0, DrawWidth)), 1);
+            RightBox.Size = new Vector2(
+                Math.Clamp(DrawWidth - RangePadding - nubPosition - Nub.DrawWidth / 2f + ShearedNub.CORNER_RADIUS - 0.5f, 0,
+                    Math.Max(0, DrawWidth)), 1);
         }
 
         protected override void UpdateValue(float value)

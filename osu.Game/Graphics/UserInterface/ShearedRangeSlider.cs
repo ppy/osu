@@ -75,10 +75,10 @@ namespace osu.Game.Graphics.UserInterface
         {
             get
             {
-                var lowerSS = LowerBoundSlider.Nub.ScreenSpaceDrawQuad.TopLeft;
+                var lowerSS = LowerBoundSlider.Nub.ScreenSpaceDrawQuad.TopRight;
                 var upperSS = UpperBoundSlider.Nub.ScreenSpaceDrawQuad.TopLeft;
 
-                return lowerSS + (upperSS - lowerSS) / 2;
+                return lowerSS + (upperSS - lowerSS) / 2 - new Vector2(ShearedNub.CORNER_RADIUS / 2, 0);
             }
         }
 
@@ -208,8 +208,8 @@ namespace osu.Game.Graphics.UserInterface
             private void load(OverlayColourProvider colourProvider)
             {
                 Nub.Width = NubWidth;
-                RangePadding = Nub.Width / 2;
-
+                RangePadding = Nub.Width;
+                Nub.Origin = isUpper ? Anchor.TopLeft : Anchor.TopRight;
                 Nub.Add(NubText = new OsuSpriteText
                 {
                     Anchor = Anchor.Centre,
