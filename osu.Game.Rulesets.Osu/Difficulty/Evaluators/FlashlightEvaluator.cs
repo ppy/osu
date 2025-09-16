@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 var currentObj = (OsuDifficultyHitObject)current.Previous(i);
                 var currentHitObject = (OsuHitObject)(currentObj.BaseObject);
 
-                cumulativeStrainTime += lastObj.StrainTime;
+                cumulativeStrainTime += lastObj.AdjustedDeltaTime;
 
                 if (!(currentObj.BaseObject is Spinner))
                 {
