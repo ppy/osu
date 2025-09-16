@@ -46,6 +46,8 @@ namespace osu.Game.Rulesets.Osu.Objects
         /// </summary>
         public const double PREEMPT_MAX = 1800;
 
+        public static readonly DifficultyRange PREEMPT_RANGE = new DifficultyRange(PREEMPT_MAX, PREEMPT_MID, PREEMPT_MIN);
+
         public double TimePreempt { get; set; } = 600;
         public double TimeFadeIn = 400;
 
@@ -169,7 +171,7 @@ namespace osu.Game.Rulesets.Osu.Objects
         {
             base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
-            TimePreempt = (float)IBeatmapDifficultyInfo.DifficultyRange(difficulty.ApproachRate, PREEMPT_MAX, PREEMPT_MID, PREEMPT_MIN);
+            TimePreempt = (float)IBeatmapDifficultyInfo.DifficultyRange(difficulty.ApproachRate, PREEMPT_RANGE);
 
             // Preempt time can go below 450ms. Normally, this is achieved via the DT mod which uniformly speeds up all animations game wide regardless of AR.
             // This uniform speedup is hard to match 1:1, however we can at least make AR>10 (via mods) feel good by extending the upper linear function above.

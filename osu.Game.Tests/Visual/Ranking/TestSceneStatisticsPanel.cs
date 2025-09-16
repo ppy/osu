@@ -256,6 +256,7 @@ namespace osu.Game.Tests.Visual.Ranking
             var score = TestResources.CreateTestScoreInfo();
             score.Rank = ScoreRank.D;
 
+            setUpTaggingRequests(() => score.BeatmapInfo);
             AddStep("load panel", () =>
             {
                 Child = new PopoverContainer
@@ -278,6 +279,7 @@ namespace osu.Game.Tests.Visual.Ranking
             var score = TestResources.CreateTestScoreInfo();
             score.Ruleset = new ManiaRuleset().RulesetInfo;
 
+            setUpTaggingRequests(() => score.BeatmapInfo);
             AddStep("load panel", () =>
             {
                 Child = new PopoverContainer

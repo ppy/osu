@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -21,8 +22,6 @@ using osu.Game.Overlays.Toolbar;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
-using osu.Game.Screens;
-using osu.Game.Screens.Footer;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Select.Filter;
 using osu.Game.Screens.SelectV2;
@@ -41,9 +40,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
         protected Screens.SelectV2.SongSelect SongSelect { get; private set; } = null!;
         protected BeatmapCarousel Carousel => SongSelect.ChildrenOfType<BeatmapCarousel>().Single();
-
-        [Cached]
-        protected readonly ScreenFooter Footer;
 
         [Cached]
         private readonly OsuLogo logo;
@@ -70,10 +66,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                         new Toolbar
                         {
                             State = { Value = Visibility.Visible },
-                        },
-                        Footer = new ScreenFooter
-                        {
-                            BackButtonPressed = () => Stack.CurrentScreen.Exit(),
                         },
                         logo = new OsuLogo
                         {
@@ -110,14 +102,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             Add(beatmapStore);
         }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            Stack.ScreenPushed += updateFooter;
-            Stack.ScreenExited += updateFooter;
-        }
-
         public override void SetUpSteps()
         {
             base.SetUpSteps();
@@ -145,14 +129,34 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddUntilStep("wait for filtering", () => !Carousel.IsFiltering);
         }
 
-        protected void ImportBeatmapForRuleset(int rulesetId)
+        protected void SortBy(SortMode mode) => AddStep($"sort by {mode.GetDescription().ToLowerInvariant()}", () => Config.SetValue(OsuSetting.SongSelectSortingMode, mode));
+
+        protected void GroupBy(GroupMode mode) => AddStep($"group by {mode.GetDescription().ToLowerInvariant()}", () => Config.SetValue(OsuSetting.SongSelectGroupMode, mode));
+
+        protected void SortAndGroupBy(SortMode sort, GroupMode group)
+        {
+            AddStep($"sort by {sort.GetDescription().ToLowerInvariant()} & group by {group.GetDescription().ToLowerInvariant()}", () =>
+            {
+                Config.SetValue(OsuSetting.SongSelectSortingMode, sort);
+                Config.SetValue(OsuSetting.SongSelectGroupMode, group);
+            });
+        }
+
+        protected void WaitForFiltering() => AddUntilStep("wait for filtering", () => !SongSelect.IsFiltering);
+
+        protected void ImportBeatmapForRuleset(params int[] rulesetIds) => ImportBeatmapForRuleset(_ => { }, 3, rulesetIds);
+
+        protected void ImportBeatmapForRuleset(Action<BeatmapSetInfo> applyToBeatmap, int difficultyCount, params int[] rulesetIds)
         {
             int beatmapsCount = 0;
 
-            AddStep($"import test map for ruleset {rulesetId}", () =>
+            AddStep($"import test map for ruleset {rulesetIds}", () =>
             {
                 beatmapsCount = SongSelect.IsNull() ? 0 : Carousel.Filters.OfType<BeatmapCarouselFilterGrouping>().Single().SetItems.Count;
-                Beatmaps.Import(TestResources.CreateTestBeatmapSetInfo(3, Rulesets.AvailableRulesets.Where(r => r.OnlineID == rulesetId).ToArray()));
+
+                var beatmapSet = TestResources.CreateTestBeatmapSetInfo(difficultyCount, Rulesets.AvailableRulesets.Where(r => rulesetIds.Contains(r.OnlineID)).ToArray());
+                applyToBeatmap(beatmapSet);
+                Beatmaps.Import(beatmapSet);
             });
 
             // This is specifically for cases where the add is happening post song select load.
@@ -186,38 +190,5 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         }
 
         protected void WaitForSuspension() => AddUntilStep("wait for not current", () => !SongSelect.AsNonNull().IsCurrentScreen());
-
-        private void updateFooter(IScreen? _, IScreen? newScreen)
-        {
-            if (newScreen is OsuScreen osuScreen && osuScreen.ShowFooter)
-            {
-                Footer.Show();
-
-                if (osuScreen.IsLoaded)
-                    updateFooterButtons();
-                else
-                {
-                    // ensure the current buttons are immediately disabled on screen change (so they can't be pressed).
-                    Footer.SetButtons(Array.Empty<ScreenFooterButton>());
-
-                    osuScreen.OnLoadComplete += _ => updateFooterButtons();
-                }
-
-                void updateFooterButtons()
-                {
-                    var buttons = osuScreen.CreateFooterButtons();
-
-                    osuScreen.LoadComponentsAgainstScreenDependencies(buttons);
-
-                    Footer.SetButtons(buttons);
-                    Footer.Show();
-                }
-            }
-            else
-            {
-                Footer.Hide();
-                Footer.SetButtons(Array.Empty<ScreenFooterButton>());
-            }
-        }
     }
 }

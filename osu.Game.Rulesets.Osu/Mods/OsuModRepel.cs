@@ -4,10 +4,12 @@
 using System;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Framework.Timing;
 using osu.Framework.Utils;
 using osu.Game.Configuration;
+using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
@@ -19,10 +21,11 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    internal class OsuModRepel : Mod, IUpdatableByPlayfield, IApplicableToDrawableRuleset<OsuHitObject>
+    public class OsuModRepel : Mod, IUpdatableByPlayfield, IApplicableToDrawableRuleset<OsuHitObject>
     {
         public override string Name => "Repel";
         public override string Acronym => "RP";
+        public override IconUsage? Icon => OsuIcon.ModRepel;
         public override ModType Type => ModType.Fun;
         public override LocalisableString Description => "Hit objects run away!";
         public override double ScoreMultiplier => 1;

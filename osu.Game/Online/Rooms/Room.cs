@@ -263,6 +263,12 @@ namespace osu.Game.Online.Rooms
             set => SetField(ref availability, value);
         }
 
+        public bool Pinned
+        {
+            get => pinned;
+            set => SetField(ref pinned, value);
+        }
+
         [JsonProperty("id")]
         private long? roomId;
 
@@ -338,6 +344,9 @@ namespace osu.Game.Online.Rooms
         [JsonProperty("status")]
         [JsonConverter(typeof(SnakeCaseStringEnumConverter))]
         private RoomStatus status;
+
+        [JsonProperty("pinned")]
+        private bool pinned;
 
         // Not yet serialised (not implemented).
         private RoomAvailability availability;

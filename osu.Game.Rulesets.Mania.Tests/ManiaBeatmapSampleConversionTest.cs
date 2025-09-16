@@ -22,6 +22,7 @@ namespace osu.Game.Rulesets.Mania.Tests
 
         [TestCase("convert-samples")]
         [TestCase("mania-samples")]
+        [TestCase("mania-slider")] // e.g. second and fourth notes of https://osu.ppy.sh/beatmapsets/73883#mania/216407
         [TestCase("slider-convert-samples")]
         public void Test(string name) => base.Test(name);
 
@@ -32,6 +33,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 StartTime = hitObject.StartTime,
                 EndTime = hitObject.GetEndTime(),
                 Column = ((ManiaHitObject)hitObject).Column,
+                PlaySlidingSamples = hitObject is HoldNote holdNote && holdNote.PlaySlidingSamples,
                 Samples = getSampleNames(hitObject.Samples),
                 NodeSamples = getNodeSampleNames((hitObject as HoldNote)?.NodeSamples)
             };
@@ -57,12 +59,14 @@ namespace osu.Game.Rulesets.Mania.Tests
         public double StartTime;
         public double EndTime;
         public int Column;
+        public bool PlaySlidingSamples;
         public IList<string> Samples;
         public IList<IList<string>> NodeSamples;
 
         public bool Equals(SampleConvertValue other)
             => Precision.AlmostEquals(StartTime, other.StartTime, conversion_lenience)
                && Precision.AlmostEquals(EndTime, other.EndTime, conversion_lenience)
+               && PlaySlidingSamples == other.PlaySlidingSamples
                && samplesEqual(Samples, other.Samples)
                && nodeSamplesEqual(NodeSamples, other.NodeSamples);
 

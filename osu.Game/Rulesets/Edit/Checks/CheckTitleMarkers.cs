@@ -10,7 +10,7 @@ namespace osu.Game.Rulesets.Edit.Checks
 {
     public class CheckTitleMarkers : ICheck
     {
-        public CheckMetadata Metadata => new CheckMetadata(CheckCategory.Metadata, "Checks for incorrect formats of (TV Size) / (Game Ver.) / (Short Ver.) / (Cut Ver.) / (Sped Up Ver.) / etc in title.");
+        public CheckMetadata Metadata => new CheckMetadata(CheckCategory.Metadata, "Checks for incorrect formats of (TV Size) / (Game Ver.) / (Short Ver.) / (Cut Ver.) / (Sped Up Ver.) / etc in title.", CheckScope.BeatmapSet);
 
         public IEnumerable<IssueTemplate> PossibleTemplates => new IssueTemplate[]
         {
@@ -31,8 +31,8 @@ namespace osu.Game.Rulesets.Edit.Checks
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
-            string romanisedTitle = context.Beatmap.Metadata.Title;
-            string unicodeTitle = context.Beatmap.Metadata.TitleUnicode;
+            string romanisedTitle = context.CurrentDifficulty.Playable.Metadata.Title;
+            string unicodeTitle = context.CurrentDifficulty.Playable.Metadata.TitleUnicode;
 
             foreach (var check in markerChecks)
             {

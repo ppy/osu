@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
     public class TaikoDifficultyCalculator : DifficultyCalculator
     {
         private const double difficulty_multiplier = 0.084375;
-        private const double rhythm_skill_multiplier = 0.65 * difficulty_multiplier;
+        private const double rhythm_skill_multiplier = 0.750 * difficulty_multiplier;
         private const double reading_skill_multiplier = 0.100 * difficulty_multiplier;
         private const double colour_skill_multiplier = 0.375 * difficulty_multiplier;
         private const double stamina_skill_multiplier = 0.445 * difficulty_multiplier;
@@ -168,6 +168,12 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 stamina.GetCurrentStrainPeaks().ToList()
             );
 
+            if (peaks.Count == 0)
+            {
+                consistencyFactor = 0;
+                return 0;
+            }
+
             double difficulty = 0;
             double weight = 1;
 
@@ -183,6 +189,12 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 colour.GetObjectStrains().ToList(),
                 stamina.GetObjectStrains().ToList()
             );
+
+            if (hitObjectStrainPeaks.Count == 0)
+            {
+                consistencyFactor = 0;
+                return 0;
+            }
 
             // The average of the top 5% of strain peaks from hit objects.
             double topAverageHitObjectStrain = hitObjectStrainPeaks.OrderDescending().Take(1 + hitObjectStrainPeaks.Count / 20).Average();

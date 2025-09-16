@@ -99,8 +99,10 @@ namespace osu.Game.Database
         /// 47   2025-01-21    Remove right mouse button binding for absolute scroll. Never use mouse buttons (or scroll) for global actions.
         /// 48   2025-03-19    Clear online status for all qualified beatmaps (some were stuck in a qualified state due to local caching issues).
         /// 49   2025-06-10    Reset the LegacyOnlineID to -1 for all scores that have it set to 0 (which is semantically the same) for consistency of handling with OnlineID.
+        /// 50   2025-07-11    Add UserTags to BeatmapMetadata.
+        /// 51   2025-07-22    Add ScoreInfo.Pauses.
         /// </summary>
-        private const int schema_version = 49;
+        private const int schema_version = 51;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking realm retrieval during blocking periods.

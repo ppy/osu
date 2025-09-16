@@ -89,6 +89,16 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString OffsetWizard => new TranslatableString(getKey(@"offset_wizard"), @"Offset wizard");
 
+        /// <summary>
+        /// "Adjust beatmap offset automatically"
+        /// </summary>
+        public static LocalisableString AdjustBeatmapOffsetAutomatically => new TranslatableString(getKey(@"adjust_beatmap_offset_automatically"), @"Adjust beatmap offset automatically");
+
+        /// <summary>
+        /// "If enabled, the offset suggested from last play on a beatmap is automatically applied."
+        /// </summary>
+        public static LocalisableString AdjustBeatmapOffsetAutomaticallyTooltip => new TranslatableString(getKey(@"adjust_beatmap_offset_automatically_tooltip"), @"If enabled, the offset suggested from last play on a beatmap is automatically applied.");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
