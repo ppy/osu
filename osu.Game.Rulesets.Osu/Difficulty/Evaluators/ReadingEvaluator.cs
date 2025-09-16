@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             var currObj = (OsuDifficultyHitObject)current;
             double constantAngleNerfFactor = getConstantAngleNerfFactor(currObj);
-            double velocity = Math.Max(1, currObj.MinimumJumpDistance / currObj.StrainTime); // Only allow velocity to buff
+            double velocity = Math.Max(1, currObj.MinimumJumpDistance / currObj.AdjustedDeltaTime); // Only allow velocity to buff
 
             double pastObjectDifficultyInfluence = 0.0;
 
@@ -81,7 +81,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 var previousObj = currObj.Previous(0);
                 // Buff perfect stacks only if current note is completely invisible at the time you click the previous note.
                 if (currObj.LazyJumpDistance == 0 && currObj.OpacityAt(previousObj.BaseObject.StartTime + preempt, hidden) == 0 && previousObj.StartTime + preempt > currObj.StartTime)
-                    hiddenDifficulty += hidden_multiplier * 1303 / Math.Pow(currObj.StrainTime, 1.5); // Perfect stacks are harder the less time between notes
+                    hiddenDifficulty += hidden_multiplier * 1303 / Math.Pow(currObj.AdjustedDeltaTime, 1.5); // Perfect stacks are harder the less time between notes
             }
 
             double preemptDifficulty = 0.0;
@@ -167,7 +167,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     break;
 
                 // Account less for objects that are close to the time limit.
-                double longIntervalFactor = Math.Clamp(1 - (loopObj.StrainTime - time_limit_low) / (time_limit - time_limit_low), 0, 1);
+                double longIntervalFactor = Math.Clamp(1 - (loopObj.AdjustedDeltaTime - time_limit_low) / (time_limit - time_limit_low), 0, 1);
 
                 if (loopObj.Angle.IsNotNull() && current.Angle.IsNotNull())
                 {
