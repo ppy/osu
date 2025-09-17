@@ -25,12 +25,16 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
 
         private readonly SunnyStrainData strainData;
         private double currentStrain;
+        private double currentNoteCount;
+        private double currentLongNoteWeight;
 
         public SunnyStrain(Mod[] mods, IEnumerable<DifficultyHitObject> difficultyHitObjects, ManiaBeatmap beatmap, FormulaConfig config)
             : base(mods: mods)
         {
             var preprocessor = new SunnyPreprocessor(difficultyHitObjects, beatmap, config);
             strainData = preprocessor.Process();
+            currentNoteCount = 0;
+            currentLongNoteWeight = 0;
         }
 
         private double strainDecay(double ms) => Math.Pow(strain_decay_base, ms / 1000);
@@ -78,6 +82,14 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
             double twistPow = twistAll > 0.0 ? twistAll * Math.Sqrt(twistAll) : 0.0;
             double combinedStrain = 2.7 * sqrtStrainAll * twistPow + strainAll * 0.27;
 
+            currentNoteCount++;
+
+            if (maniaCurrent.EndTime > maniaCurrent.StartTime)
+            {
+                double dur = Math.Min(maniaCurrent.EndTime - maniaCurrent.StartTime, 1000.0);
+                currentLongNoteWeight += 0.5 * dur / 200.0;
+            }
+
             currentStrain = combinedStrain;
             return combinedStrain;
         }
@@ -102,6 +114,23 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
         private double applyFinalScaling(double rawDifficulty)
         {
             double scaled = rawDifficulty;
+
+            // Progressive note count for potential pp counter fix (regular notes + long note weight)
+            double totalCurrentNotes = currentNoteCount + currentLongNoteWeight;
+            scaled *= totalCurrentNotes / (totalCurrentNotes + 60.0);
+
+            if (scaled > strainData.Config.rescaleHighThreshold)
+            {
+                scaled = strainData.Config.rescaleHighThreshold + (scaled - strainData.Config.rescaleHighThreshold) / strainData.Config.rescaleHighFactor;
+            }
+
+            return scaled * final_scaling_factor;
+        }
+
+        /*
+         private double applyFinalScaling(double rawDifficulty)
+         {
+            double scaled = rawDifficulty;
             double totalNotes = strainData.AllNotes.Length;
 
             for (int i = 0; i < strainData.LongNotes.Length; i++)
@@ -119,7 +148,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
             }
 
             return scaled * final_scaling_factor;
-        }
+         }
+         */
     }
 
     // TEMPORARY ONLY FOR TESTING
