@@ -68,6 +68,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double sliderBonus = 0;
             double velocityChangeBonus = 0;
             double wiggleBonus = 0;
+            double angleRepetitionNerf = 1;
 
             double aimStrain = currVelocity; // Start strain with regular velocity.
 
@@ -75,6 +76,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             {
                 double currAngle = osuCurrObj.Angle.Value;
                 double lastAngle = osuLastObj.Angle.Value;
+
+                double baseFactor = 1 - 0.15 * angleDifference(currAngle, lastAngle);
+
+                // Penalize angle repetition.
+                angleRepetitionNerf = Math.Pow(baseFactor + (1 - baseFactor) * 0.95 * angleVectorRepetition(osuCurrObj), 2);
 
                 // Rewarding angles, take the smaller velocity as base.
                 double angleBonus = Math.Min(currVelocity, prevVelocity);
@@ -155,6 +161,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             // Add in acute angle bonus or wide angle bonus, whichever is larger.
             aimStrain += Math.Max(acuteAngleBonus * acute_angle_multiplier, wideAngleBonus * wide_angle_multiplier);
+
+            aimStrain *= angleRepetitionNerf;
 
             // Apply high circle size bonus
             aimStrain *= osuCurrObj.SmallCircleBonus;
