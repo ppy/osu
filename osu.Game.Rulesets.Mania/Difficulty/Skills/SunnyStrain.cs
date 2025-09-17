@@ -52,46 +52,48 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
         protected override double StrainValueAt(DifficultyHitObject current)
         {
             ManiaDifficultyHitObject maniaCurrent = (ManiaDifficultyHitObject)current;
-            double time = maniaCurrent.StartTime;
+            double currentTime = maniaCurrent.StartTime;
 
-            double sameColumnValue = SameColumnEvaluator.EvaluateDifficultyAt(time, strainData);
-            double crossColumnValue = CrossColumnEvaluator.EvaluateDifficultyAt(time, strainData);
-            double pressingValue = PressingIntensityEvaluator.EvaluateDifficultyAt(time, strainData);
-            double unevennessValue = UnevennessEvaluator.EvaluateDifficultyAt(time, strainData);
-            double releaseValue = ReleaseFactorEvaluator.EvaluateDifficultyAt(time, strainData);
+            double sameColumnDifficulty = SameColumnEvaluator.EvaluateDifficultyAt(currentTime, strainData);
+            double crossColumnDifficulty = CrossColumnEvaluator.EvaluateDifficultyAt(currentTime, strainData);
+            double pressingIntensityDifficulty = PressingIntensityEvaluator.EvaluateDifficultyAt(currentTime, strainData);
+            double unevennessDifficulty = UnevennessEvaluator.EvaluateDifficultyAt(currentTime, strainData);
+            double releaseDifficulty = ReleaseFactorEvaluator.EvaluateDifficultyAt(currentTime, strainData);
 
-            double noteCount = strainData.SampleFeatureAtTime(time, strainData.LocalNoteCount);
-            double activeKeyValue = strainData.SampleFeatureAtTime(time, strainData.ActiveKeyCount);
+            double localNoteCount = strainData.SampleFeatureAtTime(currentTime, strainData.LocalNoteCount);
+            double activeKeyCount = strainData.SampleFeatureAtTime(currentTime, strainData.ActiveKeyCount);
 
-            double sameColumnClamped = Math.Min(sameColumnValue, 8.0 + 0.85 * sameColumnValue);
+            double clampedSameColumnDifficulty = Math.Min(sameColumnDifficulty, 8.0 + 0.85 * sameColumnDifficulty);
 
-            double unevennessPowKey = 1.0;
-            if (unevennessValue > 0.0 && activeKeyValue > 0.0)
-                unevennessPowKey = Math.Pow(unevennessValue, 3.0 / activeKeyValue);
+            double unevennessKeyAdjustment = 1.0;
+            if (unevennessDifficulty > 0.0 && activeKeyCount > 0.0)
+                unevennessKeyAdjustment = Math.Pow(unevennessDifficulty, 3.0 / activeKeyCount);
 
-            double unevennessSameColumnTerm = unevennessPowKey * sameColumnClamped;
-            double strain1 = 0.4 * Math.Pow(unevennessSameColumnTerm, 1.5);
+            double unevennessSameColumnComponent = unevennessKeyAdjustment * clampedSameColumnDifficulty;
+            double firstStrainComponent = 0.4 * Math.Pow(unevennessSameColumnComponent, 1.5);
 
-            double unevennessPressingReleaseTerm = Math.Pow(unevennessValue, 2.0 / 3.0) * (0.8 * pressingValue + releaseValue * 35.0 / (noteCount + 8.0));
-            double strain2 = 0.6 * Math.Pow(unevennessPressingReleaseTerm, 1.5);
+            double unevennessPressingReleaseComponent = Math.Pow(unevennessDifficulty, 2.0 / 3.0) * (0.8 * pressingIntensityDifficulty + releaseDifficulty * 35.0 / (localNoteCount + 8.0));
+            double secondStrainComponent = 0.6 * Math.Pow(unevennessPressingReleaseComponent, 1.5);
 
-            double strainAll = Math.Pow(strain1 + strain2, 2.0 / 3.0);
-            double twistAll = (unevennessPowKey * crossColumnValue) / (crossColumnValue + strainAll + 1.0);
+            double totalStrainDifficulty = Math.Pow(firstStrainComponent + secondStrainComponent, 2.0 / 3.0);
 
-            double sqrtStrainAll = Math.Sqrt(strainAll);
-            double twistPow = twistAll > 0.0 ? twistAll * Math.Sqrt(twistAll) : 0.0;
-            double combinedStrain = 2.7 * sqrtStrainAll * twistPow + strainAll * 0.27;
+            double twistComponent = (unevennessKeyAdjustment * crossColumnDifficulty) / (crossColumnDifficulty + totalStrainDifficulty + 1.0);
+
+            double poweredTwistComponent = twistComponent > 0.0 ? twistComponent * Math.Sqrt(twistComponent) : 0.0;
+            double finalCombinedStrain = 2.7 * Math.Sqrt(totalStrainDifficulty) * poweredTwistComponent + totalStrainDifficulty * 0.27;
 
             currentNoteCount++;
 
             if (maniaCurrent.EndTime > maniaCurrent.StartTime)
             {
-                double dur = Math.Min(maniaCurrent.EndTime - maniaCurrent.StartTime, 1000.0);
-                currentLongNoteWeight += 0.5 * dur / 200.0;
+                double longNoteDuration = Math.Min(maniaCurrent.EndTime - maniaCurrent.StartTime, 1000.0);
+                currentLongNoteWeight += 0.5 * longNoteDuration / 200.0;
             }
 
-            currentStrain = combinedStrain;
-            return combinedStrain;
+            currentStrain = finalCombinedStrain;
+
+            //Console.WriteLine($"SR: {DifficultyValue()} Time: {current.StartTime} Current Strain: {currentStrain}");
+            return finalCombinedStrain;
         }
 
         public override double DifficultyValue()
