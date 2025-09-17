@@ -145,8 +145,8 @@ namespace osu.Game.Skinning
                     return SkinUtils.As<TValue>(new Bindable<float>(existing.ColumnWidth[maniaLookup.ColumnIndex.Value]));
 
                 case LegacyManiaSkinConfigurationLookups.WidthForNoteHeightScale:
-                    Debug.Assert(maniaLookup.ColumnIndex != null);
-                    return SkinUtils.As<TValue>(new Bindable<float>(existing.WidthForNoteHeightScale));
+                    var bindable = new Bindable<Single>(existing.WidthForNoteHeightScale);
+                    return bindable.Value == 0 ? null : SkinUtils.As<TValue>(bindable);
 
                 case LegacyManiaSkinConfigurationLookups.HitPosition:
                     return SkinUtils.As<TValue>(new Bindable<float>(existing.HitPosition));
