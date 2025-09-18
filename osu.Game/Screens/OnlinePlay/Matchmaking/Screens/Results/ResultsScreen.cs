@@ -11,7 +11,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.Matchmaking;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Idle;
 using osu.Game.Utils;
 using osuTK;
 
