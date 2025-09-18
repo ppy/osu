@@ -3,7 +3,6 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
-using osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Idle;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens
 {

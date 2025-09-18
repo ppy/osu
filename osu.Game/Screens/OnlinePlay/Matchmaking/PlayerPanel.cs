@@ -14,7 +14,7 @@ using osu.Game.Online.Multiplayer.MatchTypes.Matchmaking;
 using osu.Game.Users;
 using osuTK;
 
-namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Idle
+namespace osu.Game.Screens.OnlinePlay.Matchmaking
 {
     public partial class PlayerPanel : UserPanel
     {

@@ -12,7 +12,7 @@ using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.Matchmaking;
 using osuTK;
 
-namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Idle
+namespace osu.Game.Screens.OnlinePlay.Matchmaking
 {
     public partial class PlayerPanelList : CompositeDrawable
     {

@@ -8,7 +8,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
-using osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Idle;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Pick
 {
