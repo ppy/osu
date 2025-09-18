@@ -3,12 +3,16 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
+using osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Idle;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens
 {
-    public partial class MatchmakingSubScreen : Screen
+    public abstract partial class MatchmakingSubScreen : Screen
     {
-        public MatchmakingSubScreen()
+        public abstract PlayerPanelList.PanelDisplayStyle PlayersDisplayStyle { get; }
+        public abstract Drawable? PlayersDisplayArea { get; }
+
+        protected MatchmakingSubScreen()
         {
             RelativePositionAxes = Axes.X;
         }
@@ -16,19 +20,19 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens
         public override void OnEntering(ScreenTransitionEvent e)
         {
             base.OnEntering(e);
-            this.MoveToX(1).MoveToX(0, 200);
+            this.FadeInFromZero(200);
         }
 
         public override void OnSuspending(ScreenTransitionEvent e)
         {
             base.OnSuspending(e);
-            this.MoveToX(-1, 200);
+            this.FadeOutFromOne(200);
         }
 
         public override void OnResuming(ScreenTransitionEvent e)
         {
             base.OnResuming(e);
-            this.MoveToX(0, 200);
+            this.FadeInFromZero(200);
         }
 
         public override bool OnExiting(ScreenExitEvent e)
@@ -36,7 +40,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens
             if (base.OnExiting(e))
                 return true;
 
-            this.MoveToX(1, 200);
+            this.FadeOutFromOne(200);
             return false;
         }
     }

@@ -18,6 +18,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Idle
 {
     public partial class PlayerPanel : UserPanel
     {
+        public static readonly Vector2 SIZE_HORIZONTAL = new Vector2(250, 100);
+        public static readonly Vector2 SIZE_VERTICAL = new Vector2(150, 200);
+
         public readonly MultiplayerRoomUser RoomUser;
 
         [Resolved]
@@ -141,7 +144,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Idle
             double duration = instant ? 0 : 1000;
 
             avatar.MoveTo(avatarPosition, duration, Easing.OutPow10);
-            this.ResizeTo(horizontal ? new Vector2(250, 100) : new Vector2(150, 200), duration, Easing.OutPow10);
+            this.ResizeTo(horizontal ? SIZE_HORIZONTAL : SIZE_VERTICAL, duration, Easing.OutPow10);
 
             rankText.MoveTo(horizontal ? new Vector2(-40, -10) : new Vector2(-70, 0), duration, Easing.OutPow10);
             username.MoveTo(horizontal ? new Vector2(0, -46) : new Vector2(0, -86), duration, Easing.OutPow10);

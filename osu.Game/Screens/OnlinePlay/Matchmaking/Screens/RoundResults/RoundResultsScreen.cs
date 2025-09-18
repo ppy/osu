@@ -21,6 +21,7 @@ using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
+using osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Idle;
 using osu.Game.Screens.Ranking;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens.RoundResults
@@ -28,6 +29,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens.RoundResults
     public partial class RoundResultsScreen : MatchmakingSubScreen
     {
         private const int panel_spacing = 5;
+
+        public override PlayerPanelList.PanelDisplayStyle PlayersDisplayStyle => PlayerPanelList.PanelDisplayStyle.Hidden;
+        public override Drawable? PlayersDisplayArea => null;
 
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
