@@ -642,7 +642,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
             // Skip the first control point because it is already covered by the slider head
             // Skip the last control point because its always either not on the slider body or exactly on the slider end
-            foreach (var controlPoint in DrawableObject.HitObject.Path.ControlPoints.Skip(0).SkipLast(1))
+            foreach (var controlPoint in DrawableObject.HitObject.Path.ControlPoints.Skip(1).SkipLast(1))
             {
                 if (controlPoint.Type is null && currentPathType != PathType.LINEAR)
                     continue;
