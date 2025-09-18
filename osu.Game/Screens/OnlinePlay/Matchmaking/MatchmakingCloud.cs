@@ -10,7 +10,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Utils;
-using osu.Game.Configuration;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Screens.Ranking;
 using osuTK;
@@ -22,6 +21,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
         private APIUser[] users = [];
         private Container usersContainer = null!;
 
+        private readonly Bindable<double?> lastSamplePlayback = new Bindable<double?>();
+
         public APIUser[] Users
         {
             get => users;
@@ -32,7 +33,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
                 foreach (var u in usersContainer)
                     u.Delay(RNG.Next(0, 1000)).FadeOut(500).Expire();
 
-                LoadComponentsAsync(users.Select(u => new MovingAvatar(u)), avatars =>
+                LoadComponentsAsync(users.Select(u => new MovingAvatar(u, lastSamplePlayback)), avatars =>
                 {
                     if (usersContainer.Count == 0)
                     {
@@ -69,24 +70,25 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
             private float targetScale;
             private float targetAlpha;
 
-            private Bindable<double?> lastSamplePlaybackTime = null!;
+            private readonly Bindable<double?> lastSamplePlayback = new Bindable<double?>();
 
+            private const int num_appear_samples = 6;
             private Sample? playerAppearSample;
 
-            public MovingAvatar(APIUser apiUser)
+            public MovingAvatar(APIUser apiUser, Bindable<double?> lastSamplePlayback)
                 : base(apiUser)
             {
                 RelativePositionAxes = Axes.Both;
                 Scale = new Vector2(2);
 
                 Origin = Anchor.Centre;
+                this.lastSamplePlayback.BindTo(lastSamplePlayback);
             }
 
             [BackgroundDependencyLoader]
-            private void load(AudioManager audio, SessionStatics statics)
+            private void load(AudioManager audio)
             {
-                playerAppearSample = audio.Samples.Get(@"UI/toolbar-hover");
-                lastSamplePlaybackTime = statics.GetBindable<double?>(Static.LastMatchmakingCloudSamplePlaybackTime);
+                playerAppearSample = audio.Samples.Get($@"Multiplayer/Matchmaking/Cloud/appear-{RNG.Next(0, num_appear_samples)}");
             }
 
             protected override void LoadComplete()
@@ -103,20 +105,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
                 Hide();
                 int appearDelay = RNG.Next(0, 1000);
                 this.Delay(appearDelay).FadeTo(targetAlpha, 2000, Easing.OutQuint);
-                Scheduler.AddDelayed(() =>
-                {
-                    bool enoughTimeElapsed = !lastSamplePlaybackTime.Value.HasValue || Time.Current - lastSamplePlaybackTime.Value >= OsuGameBase.SAMPLE_DEBOUNCE_TIME;
-                    if (!enoughTimeElapsed) return;
-
-                    var chan = playerAppearSample?.GetChannel();
-
-                    if (chan == null) return;
-
-                    chan.Frequency.Value = 1f + RNG.NextDouble(0.25f);
-                    chan.Play();
-
-                    lastSamplePlaybackTime.Value = Time.Current;
-                }, appearDelay);
+                Scheduler.AddDelayed(playAppearSample, appearDelay);
             }
 
             private void updateParams()
@@ -126,6 +115,21 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
                 targetAlpha = RNG.NextSingle(0.5f, 1f);
 
                 Scheduler.AddDelayed(updateParams, RNG.Next(500, 5000));
+            }
+
+            private void playAppearSample()
+            {
+                bool enoughTimeElapsed = !lastSamplePlayback.Value.HasValue || Time.Current - lastSamplePlayback.Value >= OsuGameBase.SAMPLE_DEBOUNCE_TIME;
+                if (!enoughTimeElapsed) return;
+
+                var chan = playerAppearSample?.GetChannel();
+                if (chan == null) return;
+
+                chan.Frequency.Value = 0.5f + RNG.NextDouble(1.5f);
+                chan.Balance.Value = MathF.Cos(angle) * OsuGameBase.SFX_STEREO_STRENGTH;
+                chan.Play();
+
+                lastSamplePlayback.Value = Time.Current;
             }
 
             protected override void Update()

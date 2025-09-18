@@ -217,6 +217,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
         private void updateGameplayState()
         {
             MultiplayerPlaylistItem item = client.Room!.CurrentPlaylistItem;
+
+            if (item.Expired)
+                return;
+
             RulesetInfo ruleset = rulesets.GetRuleset(item.RulesetID)!;
             Ruleset rulesetInstance = ruleset.CreateInstance();
 
@@ -228,9 +232,15 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
             Mods.Value = item.RequiredMods.Select(m => m.ToMod(rulesetInstance)).ToArray();
 
             if (Beatmap.Value is DummyWorkingBeatmap)
-                client.ChangeState(MultiplayerUserState.Idle).FireAndForget();
+            {
+                if (client.LocalUser!.State == MultiplayerUserState.Ready)
+                    client.ChangeState(MultiplayerUserState.Idle).FireAndForget();
+            }
             else
-                client.ChangeState(MultiplayerUserState.Ready).FireAndForget();
+            {
+                if (client.LocalUser!.State == MultiplayerUserState.Idle)
+                    client.ChangeState(MultiplayerUserState.Ready).FireAndForget();
+            }
 
             client.ChangeBeatmapAvailability(beatmapAvailabilityTracker.Availability.Value).FireAndForget();
         }
