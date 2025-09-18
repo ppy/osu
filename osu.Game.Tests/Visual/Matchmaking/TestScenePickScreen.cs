@@ -80,7 +80,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
 
             PickScreen screen = null!;
 
-            AddStep("add screen", () => LoadScreen(screen = new PickScreen()));
+            AddStep("add screen", () => Child = screen = new PickScreen());
 
             AddStep("select maps", () =>
             {
