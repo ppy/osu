@@ -77,7 +77,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double currAngle = osuCurrObj.Angle.Value;
                 double lastAngle = osuLastObj.Angle.Value;
 
-                double baseFactor = 1 - 0.15 * angleDifference(currAngle, lastAngle);
+                double baseFactor = 1 - 0.15 * DifficultyCalculationUtils.Smoothstep(lastAngle, double.DegreesToRadians(90), double.DegreesToRadians(40)) * angleDifference(currAngle, lastAngle);
 
                 // Penalize angle repetition.
                 angleRepetitionNerf = Math.Pow(baseFactor + (1 - baseFactor) * 0.95 * angleVectorRepetition(osuCurrObj), 2);
@@ -160,7 +160,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             aimStrain += velocityChangeBonus * velocity_change_multiplier;
 
             // Add in acute angle bonus or wide angle bonus, whichever is larger.
-            aimStrain += Math.Max(acuteAngleBonus * acute_angle_multiplier, wideAngleBonus * wide_angle_multiplier);
+            aimStrain += Math.Max(acuteAngleBonus * acute_angle_multiplier, wideAngleBonus * 0.8);
 
             aimStrain *= angleRepetitionNerf;
 
