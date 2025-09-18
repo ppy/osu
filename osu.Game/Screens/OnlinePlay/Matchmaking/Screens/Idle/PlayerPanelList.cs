@@ -110,6 +110,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Idle
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
+                Scale = new Vector2(0.8f)
             });
 
             updateDisplay();

@@ -35,6 +35,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Idle
         private MatchmakingAvatar avatar = null!;
         private OsuSpriteText username = null!;
 
+        private Container scaleContainer = null!;
         private Container mainContent = null!;
 
         public bool Horizontal
@@ -62,41 +63,47 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Idle
             Masking = true;
             CornerRadius = 10;
 
-            Add(mainContent = new Container
+            Add(scaleContainer = new Container
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 RelativeSizeAxes = Axes.Both,
-                Children = new Drawable[]
+                Child = mainContent = new Container
                 {
-                    avatar = new MatchmakingAvatar(User, isOwnUser: User.Id == api.LocalUser.Value.Id)
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Both,
+                    Children = new Drawable[]
                     {
-                        Anchor = Anchor.TopLeft,
-                        Origin = Anchor.Centre,
-                        Size = new Vector2(80),
-                    },
-                    rankText = new OsuSpriteText
-                    {
-                        Anchor = Anchor.BottomRight,
-                        Origin = Anchor.BottomCentre,
-                        Blending = BlendingParameters.Additive,
-                        Margin = new MarginPadding(4),
-                        Font = OsuFont.Style.Title.With(size: 70),
-                    },
-                    username = new OsuSpriteText
-                    {
-                        Anchor = Anchor.BottomCentre,
-                        Origin = Anchor.BottomCentre,
-                        Text = User.Username,
-                        Font = OsuFont.Style.Heading1,
-                    },
-                    scoreText = new OsuSpriteText
-                    {
-                        Margin = new MarginPadding(10),
-                        Anchor = Anchor.BottomCentre,
-                        Origin = Anchor.BottomCentre,
-                        Font = OsuFont.Style.Heading2,
-                        Text = "0 pts"
+                        avatar = new MatchmakingAvatar(User, isOwnUser: User.Id == api.LocalUser.Value.Id)
+                        {
+                            Anchor = Anchor.TopLeft,
+                            Origin = Anchor.Centre,
+                            Size = new Vector2(80),
+                        },
+                        rankText = new OsuSpriteText
+                        {
+                            Anchor = Anchor.BottomRight,
+                            Origin = Anchor.BottomCentre,
+                            Blending = BlendingParameters.Additive,
+                            Margin = new MarginPadding(4),
+                            Font = OsuFont.Style.Title.With(size: 70),
+                        },
+                        username = new OsuSpriteText
+                        {
+                            Anchor = Anchor.BottomCentre,
+                            Origin = Anchor.BottomCentre,
+                            Text = User.Username,
+                            Font = OsuFont.Style.Heading1,
+                        },
+                        scoreText = new OsuSpriteText
+                        {
+                            Margin = new MarginPadding(10),
+                            Anchor = Anchor.BottomCentre,
+                            Origin = Anchor.BottomCentre,
+                            Font = OsuFont.Style.Heading2,
+                            Text = "0 pts"
+                        }
                     }
                 }
             });
@@ -153,14 +160,14 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Idle
 
         protected override bool OnHover(HoverEvent e)
         {
-            this.ScaleTo(1.02f, 1000, Easing.OutQuint);
+            scaleContainer.ScaleTo(1.02f, 1000, Easing.OutQuint);
             mainContent.ScaleTo(1.03f, 1000, Easing.OutQuint);
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            this.ScaleTo(1f, 500, Easing.OutQuint);
+            scaleContainer.ScaleTo(1f, 500, Easing.OutQuint);
             mainContent.ScaleTo(1, 500, Easing.OutQuint);
 
             mainContent.MoveTo(Vector2.Zero, 500, Easing.OutElasticHalf);
