@@ -60,6 +60,10 @@ namespace osu.Game.Rulesets.Mania.Tests
         public void Test11(double expectedStarRating, int expectedMaxCombo, string name)
             => base.Test(expectedStarRating, expectedMaxCombo, name);
 
+        [TestCase(8.82, 6165, "azure")]
+        public void TestAzure(double expectedStarRating, int expectedMaxCombo, string name)
+            => base.Test(expectedStarRating, expectedMaxCombo, name);
+
         [TestCase(8.5859968966934961, 6165, "weeny")]
         public void TestWeenyDT(double expectedStarRating, int expectedMaxCombo, string name)
             => Test(expectedStarRating, expectedMaxCombo, name, new ManiaModDoubleTime());

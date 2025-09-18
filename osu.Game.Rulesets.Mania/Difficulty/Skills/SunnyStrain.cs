@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
     public class SunnyStrain : StrainSkill
     {
         private const double final_scaling_factor = 0.975;
-        private const double strain_decay_base = .21961997538380362;
+        private const double strain_decay_base = .20143474157245744;
 
         private readonly double[] difficultyPercentilesHigh = { 0.945, 0.935, 0.925, 0.915 };
         private readonly double[] difficultyPercentilesMid = { 0.845, 0.835, 0.825, 0.815 };
@@ -157,20 +157,20 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
     // TEMPORARY ONLY FOR TESTING
     public class FormulaConfig
     {
-        public double rescaleHighThreshold = 9.080318931478196;
-        public double rescaleHighFactor = 1.3276270825877536;
-        public double hitLeniencyBase = 0.3645051554705115;
-        public double hitLeniencyOdMultiplier = 3.5246842251528054;
-        public double hitLeniencyOdBase = 56.56596897139995;
-        public double smoothingWindowMs = 570.8536620240726;
-        public double accuracySmoothingWindowMs = 453.97171661313587;
-        public double columnActivityWindowMs = 83.62480391692215;
-        public double keyUsageWindowMs = 338.6299547206798;
-        public double jackNerfCoefficient = 0.7147442967828707;
-        public double jackNerfBase = 3.606794925409644;
-        public double jackNerfPower = -2.3810559991711413;
-        public double streamBoostMinRatio = 172.4455803487851;
-        public double streamBoostMaxRatio = 282.44785133399847;
-        public double streamBoostCoefficient = 9.072350572502293E-7;
+        public double rescaleHighThreshold = 10.01191947310021;
+        public double rescaleHighFactor = 1.4413495576620445;
+        public double hitLeniencyBase = 0.3274102106755597;
+        public double hitLeniencyOdMultiplier = 3.4089356422856554;
+        public double hitLeniencyOdBase = 55.07787194224247;
+        public double smoothingWindowMs = 493.6941401846966;
+        public double accuracySmoothingWindowMs = 500.0;
+        public double columnActivityWindowMs = 246.75167259941304;
+        public double keyUsageWindowMs =  323.9887868867879;
+        public double jackNerfCoefficient = 0.46404885543338015;
+        public double jackNerfBase = 18.414285011810225;
+        public double jackNerfPower = -34.692933993910664;
+        public double streamBoostMinRatio = 169.97179025061487;
+        public double streamBoostMaxRatio = 382.02728653035257;
+        public double streamBoostCoefficient = 8.090697350532603E-8;
     }
 }

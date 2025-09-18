@@ -345,7 +345,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
             // Pre-calculated coefficient matrices for different key counts (1K to 10K)
             double[][] crossMatrix =
             {
-                new[] { -1.0 }, // none
                 new[] { 0.075, 0.075 }, // 1K
                 new[] { 0.125, 0.05, 0.125 }, // 2K
                 new[] { 0.125, 0.125, 0.125, 0.125 }, // 3K

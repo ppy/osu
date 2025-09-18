@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Utils
             try
             {
                 // Build cumulative sum for efficient window queries
-                buildCumulativeSum(cumulativeSum, timePoints, values, pointCount);
+                BuildCumulativeSum(cumulativeSum, timePoints, values, 0, pointCount);
 
                 double[] smoothedResults = new double[pointCount];
                 int lastStartIndex = 0, lastEndIndex = 0;
@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Utils
                     double windowEnd = Math.Min(centerTime + windowSizeMs, timePoints[pointCount - 1]);
 
                     // Calculate sum within the window using progressive queries
-                    double windowSum = QueryCumulativeSumProgressive(windowEnd, timePoints, cumulativeSum, values, ref lastEndIndex) - QueryCumulativeSumProgressive(windowStart, timePoints, cumulativeSum, values, ref lastStartIndex);
+                    double windowSum = QueryCumulativeSumProgressive(windowEnd, timePoints, cumulativeSum, values, 0, ref lastEndIndex) - QueryCumulativeSumProgressive(windowStart, timePoints, cumulativeSum, values, 0, ref lastStartIndex);
 
                     // Apply the appropriate smoothing mode
                     smoothedResults[pointIndex] = applySmoothingMode(windowSum, windowStart, windowEnd, scale, mode);
@@ -52,16 +52,57 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Utils
 
         /// <summary>
         /// Builds a cumulative sum array for efficient range query operations.
+        /// This is the consolidated version that can handle both regular arrays and offset-based arrays.
         /// </summary>
-        private static void buildCumulativeSum(double[] cumulativeSum, double[] timePoints, double[] values, int pointCount)
+        /// <param name="cumulativeSum">Output array for cumulative sums</param>
+        /// <param name="timePoints">Time coordinates</param>
+        /// <param name="values">Values to accumulate</param>
+        /// <param name="valuesOffset">Offset into values array (for column-based data)</param>
+        /// <param name="pointCount">Number of points to process</param>
+        public static void BuildCumulativeSum(double[] cumulativeSum, double[] timePoints, double[] values, int valuesOffset, int pointCount)
         {
             cumulativeSum[0] = 0.0;
 
             for (int i = 1; i < pointCount; i++)
             {
                 double timeSpan = timePoints[i] - timePoints[i - 1];
-                double valueContribution = values[i - 1] * timeSpan;
+                double valueContribution = values[valuesOffset + i - 1] * timeSpan;
                 cumulativeSum[i] = cumulativeSum[i - 1] + valueContribution;
+            }
+        }
+
+        /// <summary>
+        /// Applies smoothing to a single column's intensity values using the consolidated cumulative sum logic.
+        /// This replaces the duplicate logic that was in SameColumnEvaluator.
+        /// </summary>
+        public static void ApplySmoothingToColumn(double[] intensityBuffer, double[] smoothedBuffer, double[] baseTimeCorners, int columnOffset, int timePointCount, double smoothingWindow)
+        {
+            var arrayPool = ArrayPool<double>.Shared;
+            double[] cumulativeSum = arrayPool.Rent(timePointCount);
+
+            try
+            {
+                // Build cumulative sum using the consolidated function
+                BuildCumulativeSum(cumulativeSum, baseTimeCorners, intensityBuffer, columnOffset, timePointCount);
+
+                int lastStartIndex = 0, lastEndIndex = 0;
+
+                // Apply smoothing using sliding window
+                for (int i = 0; i < timePointCount; i++)
+                {
+                    double centerTime = baseTimeCorners[i];
+                    double windowStart = Math.Max(centerTime - smoothingWindow, baseTimeCorners[0]);
+                    double windowEnd = Math.Min(centerTime + smoothingWindow, baseTimeCorners[timePointCount - 1]);
+
+                    // Use progressive search for better performance
+                    double windowSum = QueryCumulativeSumProgressive(windowEnd, baseTimeCorners, cumulativeSum, intensityBuffer, columnOffset, ref lastEndIndex) - QueryCumulativeSumProgressive(windowStart, baseTimeCorners, cumulativeSum, intensityBuffer, columnOffset, ref lastStartIndex);
+
+                    smoothedBuffer[columnOffset + i] = 0.001 * windowSum;
+                }
+            }
+            finally
+            {
+                arrayPool.Return(cumulativeSum, clearArray: true);
             }
         }
 
@@ -75,10 +116,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Utils
                 double windowLength = windowEnd - windowStart;
                 return windowLength > 0.0 ? windowSum / windowLength : 0.0;
             }
-            else
-            {
-                return scale * windowSum;
-            }
+
+            return scale * windowSum;
         }
 
         /// <summary>
@@ -89,40 +128,10 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Utils
         /// <param name="timeArray">Sorted array of time coordinates</param>
         /// <param name="cumulativeSum">Precomputed cumulative sum array</param>
         /// <param name="values">Original values array</param>
+        /// <param name="valuesOffset">Starting index offset into the values array (used for column-based data stored in flat arrays)</param>
         /// <param name="lastIndex">Search state - index of last query (modified by reference)</param>
-        public static double QueryCumulativeSumProgressive(double queryPoint, double[] timeArray, double[] cumulativeSum, double[] values, ref int lastIndex)
-        {
-            // Handle boundary cases
-            if (queryPoint <= timeArray[0]) return 0.0;
-
-            int lastArrayIndex = timeArray.Length - 1;
-            if (queryPoint >= timeArray[lastArrayIndex]) return cumulativeSum[lastArrayIndex];
-
-            // Progressive search from last position
-            int currentIndex = Math.Max(0, lastIndex);
-            while (currentIndex < lastArrayIndex && timeArray[currentIndex] <= queryPoint)
-                currentIndex++;
-            lastIndex = currentIndex;
-
-            if (timeArray[currentIndex] == queryPoint) return cumulativeSum[currentIndex];
-
-            // Interpolate between adjacent points
-            int leftIndex = currentIndex - 1;
-            if (leftIndex < 0) return 0.0;
-
-            double timeDifference = queryPoint - timeArray[leftIndex];
-            double valueContribution = values[leftIndex] * timeDifference;
-
-            return cumulativeSum[leftIndex] + valueContribution;
-        }
-
-        /// <summary>
-        /// Overloaded version for use with offset-based value arrays (used in column-based smoothing).
-        /// This is optimized for cases where values are stored in a large flat array with column offsets.
-        /// </summary>
         public static double QueryCumulativeSumProgressive(double queryPoint, double[] timeArray, double[] cumulativeSum, double[] values, int valuesOffset, ref int lastIndex)
         {
-            // Handle boundary cases
             if (queryPoint <= timeArray[0]) return 0.0;
 
             int lastArrayIndex = timeArray.Length - 1;
@@ -194,7 +203,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Utils
 
                 if (timeDenominator == 0.0)
                 {
-                    // Avoid division by zero - use left value
+                    // Avoid division by zero
                     interpolatedResults[targetIndex] = sourceValues[sourceIndex];
                 }
                 else

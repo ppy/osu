@@ -4,6 +4,7 @@
 using System;
 using System.Buffers;
 using osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Strain;
+using osu.Game.Rulesets.Mania.Difficulty.Skills;
 using osu.Game.Rulesets.Mania.Difficulty.Utils;
 
 namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
@@ -119,7 +120,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
         /// Calculates the jack nerf factor based on timing relative to optimal jack speed.
         /// Jacks (rapid same-column presses) have an optimal timing that's hardest to execute.
         /// </summary>
-        private static double calculateJackNerf(double deltaTimeSeconds, dynamic config)
+        private static double calculateJackNerf(double deltaTimeSeconds, FormulaConfig config)
         {
             double timingDeviation = Math.Abs(deltaTimeSeconds - 0.08);
             double nerfBase = config.jackNerfBase + timingDeviation;
@@ -129,7 +130,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
         }
 
         /// <summary>
-        /// Applies smoothing to each column's intensity values independently.
+        /// Applies smoothing to each column's intensity values independently using the consolidated utility.
         /// This creates more stable difficulty curves.
         /// </summary>
         private static void applyColumnSmoothing(SunnyStrainData data, double[] intensityBuffer, double[] baseTimeCorners, int keyCount, int timePointCount, int arraySliceSize)
@@ -143,60 +144,16 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
                 for (int column = 0; column < keyCount; column++)
                 {
                     int columnOffset = column * timePointCount;
-                    applySmoothingToColumn(data, intensityBuffer, smoothedBuffer, baseTimeCorners,
-                        columnOffset, timePointCount);
+
+                    StrainArrayUtils.ApplySmoothingToColumn(intensityBuffer, smoothedBuffer, baseTimeCorners,
+                        columnOffset, timePointCount, data.Config.smoothingWindowMs);
                 }
 
-                // Copy smoothed values back
                 Array.Copy(smoothedBuffer, 0, intensityBuffer, 0, keyCount * timePointCount);
             }
             finally
             {
                 arrayPool.Return(smoothedBuffer, clearArray: true);
-            }
-        }
-
-        /// <summary>
-        /// Applies smoothing to a single column's intensity values.
-        /// Uses cumulative sum technique for efficient window-based smoothing.
-        /// </summary>
-        private static void applySmoothingToColumn(SunnyStrainData data, double[] intensityBuffer, double[] smoothedBuffer, double[] baseTimeCorners, int columnOffset, int timePointCount)
-        {
-            var arrayPool = ArrayPool<double>.Shared;
-            double[] cumulativeSum = arrayPool.Rent(timePointCount);
-
-            try
-            {
-                // Build cumulative sum for efficient range queries
-                cumulativeSum[0] = 0.0;
-
-                for (int i = 1; i < timePointCount; i++)
-                {
-                    double timeSpan = baseTimeCorners[i] - baseTimeCorners[i - 1];
-                    double intensityContribution = intensityBuffer[columnOffset + i - 1] * timeSpan;
-                    cumulativeSum[i] = cumulativeSum[i - 1] + intensityContribution;
-                }
-
-                double smoothingWindow = data.Config.smoothingWindowMs;
-                int lastStartIndex = 0, lastEndIndex = 0;
-
-                // Apply smoothing using sliding window
-                for (int i = 0; i < timePointCount; i++)
-                {
-                    double centerTime = baseTimeCorners[i];
-                    double windowStart = Math.Max(centerTime - smoothingWindow, baseTimeCorners[0]);
-                    double windowEnd = Math.Min(centerTime + smoothingWindow, baseTimeCorners[timePointCount - 1]);
-
-                    // Use progressive search for better performance
-                    double windowSum = StrainArrayUtils.QueryCumulativeSumProgressive(windowEnd, baseTimeCorners, cumulativeSum, intensityBuffer, columnOffset, ref lastEndIndex) - StrainArrayUtils.QueryCumulativeSumProgressive(
-                        windowStart, baseTimeCorners, cumulativeSum, intensityBuffer, columnOffset, ref lastStartIndex);
-
-                    smoothedBuffer[columnOffset + i] = 0.001 * windowSum;
-                }
-            }
-            finally
-            {
-                arrayPool.Return(cumulativeSum, clearArray: true);
             }
         }
 
