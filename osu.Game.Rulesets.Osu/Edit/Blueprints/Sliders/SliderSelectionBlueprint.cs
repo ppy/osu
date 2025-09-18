@@ -632,16 +632,15 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         private IEnumerable<Vector2> getScreenSpaceControlPointNodes()
         {
-            // Return all control point positions which are noticeable on the slider body
-            // This excludes inherited control points which don't sit on the slider body: Bezier and B-Spline
-            // And inherited control points which are smooth: Perfect and Catmull
+            // Returns the positions of control points that produce visible kinks on the slider's path
+            // This excludes inherited control points from Bezier, B-Spline, Perfect, and Catmull curves
             if (DrawableObject.SliderBody == null)
                 yield break;
 
             PathType? currentPathType = DrawableObject.HitObject.Path.ControlPoints.FirstOrDefault()?.Type;
 
             // Skip the first control point because it is already covered by the slider head
-            // Skip the last control point because its always either not on the slider body or exactly on the slider end
+            // Skip the last control point because its always either not on the slider path or exactly on the slider end
             foreach (var controlPoint in DrawableObject.HitObject.Path.ControlPoints.Skip(1).SkipLast(1))
             {
                 if (controlPoint.Type is null && currentPathType != PathType.LINEAR)
