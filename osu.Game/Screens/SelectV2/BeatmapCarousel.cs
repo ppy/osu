@@ -49,7 +49,7 @@ namespace osu.Game.Screens.SelectV2
 
         public const float SPACING = 3f;
 
-        private FilterControl filterControl { get; set; } = null!;
+        private FilterControl? filterControl { get; set; }
 
         private IBindableList<BeatmapSetInfo> detachedBeatmaps = null!;
 

@@ -302,7 +302,7 @@ namespace osu.Game.Screens.SelectV2
         ///
         public void UpdateToInclude(BeatmapInfo? beatmap)
         {
-            if (beatmap == null || currentCriteria == null) return;
+            if (beatmap == null) return;
 
             if (!currentCriteria.CollectionBeatmapMD5Hashes?.Contains(beatmap.MD5Hash) ?? false)
             {
