@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Configuration;
 using osu.Game.Database;
@@ -292,6 +293,34 @@ namespace osu.Game.Screens.SelectV2
         public void Search(string query)
         {
             searchTextBox.Current.Value = query;
+        }
+
+        /// <summary>
+        /// Updates the needed filters to include the specified beatmap.
+        /// </summary>
+        /// <param name="beatmap"></param>
+        ///
+        public void UpdateToInclude(BeatmapInfo? beatmap)
+        {
+            if (beatmap == null || currentCriteria == null) return;
+
+            if (!currentCriteria.CollectionBeatmapMD5Hashes?.Contains(beatmap.MD5Hash) ?? false)
+            {
+                collectionDropdown.Current.Value = collectionDropdown.Items.OfType<AllBeatmapsCollectionFilterMenuItem>().First();
+            }
+
+            if (beatmap.StarRating < currentCriteria.UserStarDifficulty.Min)
+            {
+                double precision = difficultyRangeSlider.LowerBound is BindableNumberWithCurrent<double> n ? n.Precision : 0.1;
+                difficultyRangeSlider.LowerBound.Value = Math.Floor(beatmap.StarRating / precision) * precision;
+            }
+            else if (beatmap.StarRating > currentCriteria.UserStarDifficulty.Max)
+            {
+                double precision = difficultyRangeSlider.UpperBound is BindableNumberWithCurrent<double> n ? n.Precision : 0.1;
+                difficultyRangeSlider.UpperBound.Value = Math.Ceiling(beatmap.StarRating / precision) * precision;
+            }
+
+            // TODO: Check if it needs to remove the search query too.
         }
 
         protected override void PopIn()
