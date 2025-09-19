@@ -122,7 +122,7 @@ namespace osu.Game.Screens.SelectV2
 
         public override bool? ApplyModTrackAdjustments => true;
 
-        public override bool ShowFooter => true;
+        public override IBindable<bool> ShowFooter { get; } = new Bindable<bool>(true);
 
         private Sample? errorSample;
 

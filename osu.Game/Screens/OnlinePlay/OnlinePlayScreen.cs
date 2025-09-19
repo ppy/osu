@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -10,6 +11,7 @@ using osu.Framework.Screens;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
+using osu.Game.Screens.Footer;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.OnlinePlay.Lounge;
 using osu.Game.Users;
@@ -207,10 +209,25 @@ namespace osu.Game.Screens.OnlinePlay
         private void subScreenChanged(IScreen lastScreen, IScreen newScreen)
         {
             if (lastScreen is IOsuScreen lastOsuScreen)
+            {
                 Activity.UnbindFrom(lastOsuScreen.Activity);
+                ShowFooter.UnbindFrom(lastOsuScreen.ShowFooter);
+            }
 
             if (newScreen is IOsuScreen newOsuScreen)
+            {
                 ((IBindable<UserActivity>)Activity).BindTo(newOsuScreen.Activity);
+                ShowFooter.BindTo(newOsuScreen.ShowFooter);
+            }
+        }
+
+        public override IReadOnlyList<ScreenFooterButton> CreateFooterButtons() => (CurrentSubScreen as IOnlinePlaySubScreen)?.CreateFooterButtons() ?? [];
+
+        internal override void LoadComponentsAgainstScreenDependencies(IEnumerable<Drawable> components)
+        {
+            if (CurrentSubScreen is OsuScreen osuScreen)
+                osuScreen.LoadComponentsAgainstScreenDependencies(components);
+            base.LoadComponentsAgainstScreenDependencies(components);
         }
 
         protected abstract string ScreenTitle { get; }

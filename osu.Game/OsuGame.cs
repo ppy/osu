@@ -193,6 +193,8 @@ namespace osu.Game
         /// </summary>
         private readonly IBindable<bool> backButtonVisibility = new BindableBool();
 
+        private readonly IBindable<bool> showFooter = new Bindable<bool>();
+
         IBindable<LocalUserPlayingState> ILocalUserPlayInfo.PlayingState => UserPlayingState;
 
         protected readonly Bindable<LocalUserPlayingState> UserPlayingState = new Bindable<LocalUserPlayingState>();
@@ -456,6 +458,7 @@ namespace osu.Game
             SelectedMods.BindValueChanged(modsChanged);
             Beatmap.BindValueChanged(beatmapChanged, true);
             configUserActivity.BindValueChanged(_ => updateWindowTitle());
+            showFooter.BindValueChanged(_ => updateFooterVisibility());
 
             applySafeAreaConsiderations = LocalConfig.GetBindable<bool>(OsuSetting.SafeAreaConsiderations);
             applySafeAreaConsiderations.BindValueChanged(apply => SafeAreaContainer.SafeAreaOverrideEdges = apply.NewValue ? SafeAreaOverrideEdges : Edges.All, true);
@@ -1725,6 +1728,7 @@ namespace osu.Game
                 backButtonVisibility.UnbindFrom(current.BackButtonVisibility);
                 OverlayActivationMode.UnbindFrom(current.OverlayActivationMode);
                 configUserActivity.UnbindFrom(current.Activity);
+                showFooter.UnbindFrom(current.ShowFooter);
             }
 
             // Bind to new screen.
@@ -1732,6 +1736,7 @@ namespace osu.Game
             {
                 OverlayActivationMode.BindTo(newScreen.OverlayActivationMode);
                 configUserActivity.BindTo(newScreen.Activity);
+                showFooter.BindTo(newScreen.ShowFooter);
 
                 // Handle various configuration updates based on new screen settings.
                 GlobalCursorDisplay.MenuCursor.HideCursorOnNonMouseInput = newScreen.HideMenuCursorOnNonMouseInput;
@@ -1741,46 +1746,56 @@ namespace osu.Game
                 else
                     Toolbar.Show();
 
-                var newOsuScreen = (OsuScreen)newScreen;
+                skinEditor.SetTarget((OsuScreen)newScreen);
+            }
+        }
 
-                if (newScreen.ShowFooter)
-                {
-                    // the legacy back button should never display while the new footer is in use, as it
-                    // contains its own local back button.
-                    ((BindableBool)backButtonVisibility).Value = false;
+        private void updateFooterVisibility()
+        {
+            ScreenStack screenStack = ScreenStack;
 
-                    BackButton.Hide();
-                    ScreenFooter.Show();
+            while (screenStack.CurrentScreen is IHasSubScreenStack subScreen)
+                screenStack = subScreen.SubScreenStack;
 
-                    if (newOsuScreen.IsLoaded)
-                        updateFooterButtons();
-                    else
-                    {
-                        // ensure the current buttons are immediately disabled on screen change (so they can't be pressed).
-                        ScreenFooter.SetButtons(Array.Empty<ScreenFooterButton>());
+            if (screenStack.CurrentScreen is not OsuScreen newOsuScreen)
+                return;
 
-                        newOsuScreen.OnLoadComplete += _ => updateFooterButtons();
-                    }
+            if (showFooter.Value)
+            {
+                // the legacy back button should never display while the new footer is in use, as it
+                // contains its own local back button.
+                ((BindableBool)backButtonVisibility).Value = false;
 
-                    void updateFooterButtons()
-                    {
-                        var buttons = newScreen.CreateFooterButtons();
+                BackButton.Hide();
+                ScreenFooter.Show();
 
-                        newOsuScreen.LoadComponentsAgainstScreenDependencies(buttons);
-
-                        ScreenFooter.SetButtons(buttons);
-                        ScreenFooter.Show();
-                    }
-                }
+                if (newOsuScreen.IsLoaded)
+                    updateFooterButtons();
                 else
                 {
-                    backButtonVisibility.BindTo(newScreen.BackButtonVisibility);
-
+                    // ensure the current buttons are immediately disabled on screen change (so they can't be pressed).
                     ScreenFooter.SetButtons(Array.Empty<ScreenFooterButton>());
-                    ScreenFooter.Hide();
+
+                    newOsuScreen.OnLoadComplete += _ => updateFooterButtons();
                 }
 
-                skinEditor.SetTarget(newOsuScreen);
+                void updateFooterButtons()
+                {
+                    var buttons = newOsuScreen.CreateFooterButtons();
+
+                    newOsuScreen.LoadComponentsAgainstScreenDependencies(buttons);
+
+                    ScreenFooter.SetButtons(buttons);
+                    ScreenFooter.Show();
+                }
+            }
+            else
+            {
+                backButtonVisibility.UnbindFrom(newOsuScreen.BackButtonVisibility);
+                backButtonVisibility.BindTo(newOsuScreen.BackButtonVisibility);
+
+                ScreenFooter.SetButtons(Array.Empty<ScreenFooterButton>());
+                ScreenFooter.Hide();
             }
         }
 
