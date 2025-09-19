@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Mods
 
         public double ApplyToRate(double time, double rate) => rate * SpeedChange.Value;
 
-        public override Type[] IncompatibleMods => new[] { typeof(ModTimeRamp), typeof(ModAdaptiveSpeed), typeof(ModRateAdjust) };
+        public override Type[] IncompatibleMods => new[] { typeof(ModTimeRamp), typeof(ModAdaptiveSpeed), typeof(ModRateAdjust), typeof(ModPitchUp), typeof(ModPitchDown) };
 
         public override IEnumerable<(LocalisableString setting, LocalisableString value)> SettingDescription
         {
