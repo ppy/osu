@@ -18,7 +18,9 @@ namespace osu.Game.Graphics
     {
         #region Legacy spritesheet-based icons
 
-        private static IconUsage get(int icon) => new IconUsage((char)icon, @"osuFont");
+        public const string LEGACY_FONT_NAME = @"osuFont";
+
+        private static IconUsage get(int icon) => new IconUsage((char)icon, LEGACY_FONT_NAME);
 
         // ruleset icons in circles
         public static IconUsage RulesetOsu => get(0xe000);
