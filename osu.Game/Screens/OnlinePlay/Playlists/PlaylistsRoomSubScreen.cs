@@ -404,7 +404,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                     EditPlaylist = () =>
                                     {
                                         if (this.IsCurrentScreen())
-                                            this.Push(new PlaylistsSongSelect(room));
+                                            this.Push(new PlaylistsSongSelectV2(room));
                                     }
                                 }
                             }

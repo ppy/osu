@@ -14,6 +14,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Online.Rooms;
+using osu.Game.Overlays;
 using osu.Game.Screens.Footer;
 using osu.Game.Screens.OnlinePlay.Playlists;
 using osuTK;
@@ -53,6 +54,9 @@ namespace osu.Game.Screens.OnlinePlay
 
             private readonly Room room;
             private PlaylistsRoomSettingsPlaylist playlist = null!;
+
+            [Cached]
+            private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Plum);
 
             public PlaylistPopover(Room room)
             {
