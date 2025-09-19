@@ -11,7 +11,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.Matchmaking;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Idle;
 using osu.Game.Utils;
 using osuTK;
 
@@ -21,15 +20,17 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Results
     {
         private const float grid_spacing = 5;
 
+        public override PlayerPanelList.PanelDisplayStyle PlayersDisplayStyle => PlayerPanelList.PanelDisplayStyle.Grid;
+        public override Drawable PlayersDisplayArea { get; }
+
         [Resolved]
         private MultiplayerClient client { get; set; } = null!;
 
-        private OsuSpriteText placementText = null!;
-        private FillFlowContainer<UserStatisticPanel> userStatistics = null!;
-        private FillFlowContainer<RoomStatisticPanel> roomStatistics = null!;
+        private readonly OsuSpriteText placementText;
+        private readonly FillFlowContainer<UserStatisticPanel> userStatistics;
+        private readonly FillFlowContainer<RoomStatisticPanel> roomStatistics;
 
-        [BackgroundDependencyLoader]
-        private void load()
+        public ResultsScreen()
         {
             InternalChild = new GridContainer
             {
@@ -113,10 +114,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Results
                                         }
                                     },
                                     null,
-                                    new PlayerPanelList
+                                    PlayersDisplayArea = Empty().With(d =>
                                     {
-                                        RelativeSizeAxes = Axes.Both
-                                    }
+                                        d.RelativeSizeAxes = Axes.Both;
+                                    })
                                 ]
                             }
                         }
