@@ -117,7 +117,6 @@ namespace osu.Game.Beatmaps.Formats
             writer.WriteLine(FormattableString.Invariant($"GridSize: {beatmap.GridSize}"));
             writer.WriteLine(FormattableString.Invariant($"GridType: {(int)beatmap.GridType}"));
             writer.WriteLine(FormattableString.Invariant($"GridRotation: {beatmap.GridRotation}"));
-            writer.WriteLine(FormattableString.Invariant($"GridOffset: {beatmap.GridOffset.X},{beatmap.GridOffset.Y}"));
             writer.WriteLine(FormattableString.Invariant($"TimelineZoom: {beatmap.TimelineZoom}"));
         }
 

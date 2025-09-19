@@ -117,7 +117,6 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual(4, beatmap.GridSize);
                 Assert.AreEqual(PositionSnapGridType.Square, beatmap.GridType);
                 Assert.AreEqual(0, beatmap.GridRotation);
-                Assert.AreEqual(null, beatmap.GridOffset);
                 Assert.AreEqual(2, beatmap.TimelineZoom);
             }
         }

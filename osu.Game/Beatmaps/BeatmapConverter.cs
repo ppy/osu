@@ -84,7 +84,6 @@ namespace osu.Game.Beatmaps
             beatmap.GridSize = original.GridSize;
             beatmap.GridType = original.GridType;
             beatmap.GridRotation = original.GridRotation;
-            beatmap.GridOffset = original.GridOffset;
             beatmap.TimelineZoom = original.TimelineZoom;
             beatmap.Countdown = original.Countdown;
             beatmap.CountdownOffset = original.CountdownOffset;

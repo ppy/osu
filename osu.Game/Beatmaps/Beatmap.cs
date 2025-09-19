@@ -140,7 +140,7 @@ namespace osu.Game.Beatmaps
 
         public float GridRotation { get; set; }
 
-        public Vector2 GridOffset { get; set; }
+        public Vector2? GridOffset { get; set; }
 
         public double TimelineZoom { get; set; } = 1.0;
 
