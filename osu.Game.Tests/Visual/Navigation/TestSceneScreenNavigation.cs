@@ -92,7 +92,7 @@ namespace osu.Game.Tests.Visual.Navigation
 
                 AddStep("edit playlist", () => InputManager.Key(Key.Enter));
 
-                AddUntilStep("wait for song select", () => (playlistScreen.CurrentSubScreen as PlaylistsSongSelect)?.BeatmapSetsLoaded == true);
+                AddUntilStep("wait for song select", () => playlistScreen.CurrentSubScreen is PlaylistsSongSelectV2 songSelect && songSelect.IsLoaded && !songSelect.IsFiltering);
 
                 AddUntilStep("wait for selection", () => !Game.Beatmap.IsDefault);
 
@@ -106,7 +106,7 @@ namespace osu.Game.Tests.Visual.Navigation
                     InputManager.Click(MouseButton.Left);
                 });
 
-                AddUntilStep("wait for song select", () => (playlistScreen.CurrentSubScreen as PlaylistsSongSelect)?.BeatmapSetsLoaded == true);
+                AddUntilStep("wait for song select", () => playlistScreen.CurrentSubScreen is PlaylistsSongSelectV2 songSelect && songSelect.IsLoaded && !songSelect.IsFiltering);
 
                 AddStep("press home button", () =>
                 {
