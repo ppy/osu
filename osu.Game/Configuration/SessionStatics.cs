@@ -9,6 +9,10 @@ using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play.HUD;
+using osu.Game.Screens.Ranking;
+using osu.Game.Screens.Ranking.Expanded;
+using osu.Game.Screens.Ranking.Statistics;
+using osu.Game.Screens.OnlinePlay.Multiplayer.Spectate;
 using osu.Game.Skinning;
 using osu.Game.Users;
 
@@ -28,6 +32,7 @@ namespace osu.Game.Configuration
             SetDefault(Static.LastHoverSoundPlaybackTime, (double?)null);
             SetDefault(Static.LastModSelectPanelSamplePlaybackTime, (double?)null);
             SetDefault(Static.LastRankChangeSamplePlaybackTime, (double?)null);
+            SetDefault(Static.LastResultsScreenSamplePlaybackTime, (double?)null);
             SetDefault<APISeasonalBackgrounds?>(Static.SeasonalBackgrounds, null);
             SetDefault(Static.TouchInputActive, RuntimeInfo.IsMobile);
             SetDefault<ScoreInfo?>(Static.LastLocalUserScore, null);
@@ -80,6 +85,12 @@ namespace osu.Game.Configuration
         /// Used to debounce rank change sounds game-wide to avoid potential volume saturation from multiple simultaneous playback.
         /// </summary>
         LastRankChangeSamplePlaybackTime,
+
+        /// <summary>
+        /// The last playback in milliseconds of an UI samples (in <see cref="ScorePanel"/>, <see cref="ExpandedPanelTopContent"/> and <see cref="StatisticsPanel"/>).
+        /// Used to debounce UI samples in <see cref="MultiSpectatorResultsScreen"/> with many players in the room.
+        /// </summary>
+        LastResultsScreenSamplePlaybackTime,
 
         /// <summary>
         /// Whether the last positional input received was a touch input.
