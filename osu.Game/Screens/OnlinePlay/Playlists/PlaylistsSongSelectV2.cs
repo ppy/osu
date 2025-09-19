@@ -21,8 +21,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 {
     public class PlaylistsSongSelectV2 : SongSelect
     {
+        protected readonly Bindable<bool> Freestyle = new Bindable<bool>(true);
         private readonly Bindable<IReadOnlyList<Mod>> freeMods = new Bindable<IReadOnlyList<Mod>>([]);
-        private readonly Bindable<bool> freestyle = new Bindable<bool>(true);
 
         private readonly Room room;
         private ModSelectOverlay modSelect = null!;
@@ -49,9 +49,14 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
             Mods.BindValueChanged(onGlobalModsChanged);
             Ruleset.BindValueChanged(onRulesetChanged);
-            freestyle.BindValueChanged(onFreestyleChanged);
+            Freestyle.BindValueChanged(onFreestyleChanged);
 
             updateValidMods();
+        }
+
+        public void AddNewItem()
+        {
+            room.Playlist = room.Playlist.Append(createItem()).ToArray();
         }
 
         private void onGlobalModsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
@@ -106,7 +111,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
         protected override void OnStart()
         {
-            room.Playlist = [createNewItem()];
+            room.Playlist = [createItem()];
             this.Exit();
         }
 
@@ -118,7 +123,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
             buttons.Insert(0, new FooterButtonPlaylistV2(room)
             {
-                CreateNewItem = () => room.Playlist = room.Playlist.Append(createNewItem()).ToArray()
+                CreateNewItem = AddNewItem
             });
 
             buttons.InsertRange(buttons.FindIndex(b => b is FooterButtonMods) + 1,
@@ -126,11 +131,11 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 new FooterButtonFreeModsV2(freeModSelect)
                 {
                     FreeMods = { BindTarget = freeMods },
-                    Freestyle = { BindTarget = freestyle }
+                    Freestyle = { BindTarget = Freestyle }
                 },
                 new FooterButtonFreestyleV2
                 {
-                    Freestyle = { BindTarget = freestyle }
+                    Freestyle = { BindTarget = Freestyle }
                 }
             ]);
 
@@ -142,26 +147,26 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             IsValidMod = isValidRequiredMod
         };
 
-        private PlaylistItem createNewItem() => new PlaylistItem(Beatmap.Value.BeatmapInfo)
+        private PlaylistItem createItem() => new PlaylistItem(Beatmap.Value.BeatmapInfo)
         {
             ID = room.Playlist.Count == 0 ? 0 : room.Playlist.Max(p => p.ID) + 1,
             RulesetID = Ruleset.Value.OnlineID,
             RequiredMods = Mods.Value.Select(m => new APIMod(m)).ToArray(),
             AllowedMods = freeMods.Value.Select(m => new APIMod(m)).ToArray(),
-            Freestyle = freestyle.Value
+            Freestyle = Freestyle.Value
         };
 
         /// <summary>
         /// Checks whether a given <see cref="Mod"/> is valid to be selected as a required mod.
         /// </summary>
         /// <param name="mod">The <see cref="Mod"/> to check.</param>
-        private bool isValidRequiredMod(Mod mod) => ModUtils.IsValidModForMatch(mod, true, room.Type, freestyle.Value);
+        private bool isValidRequiredMod(Mod mod) => ModUtils.IsValidModForMatch(mod, true, room.Type, Freestyle.Value);
 
         /// <summary>
         /// Checks whether a given <see cref="Mod"/> is valid to be selected as an allowed mod.
         /// </summary>
         /// <param name="mod">The <see cref="Mod"/> to check.</param>
-        private bool isValidAllowedMod(Mod mod) => ModUtils.IsValidModForMatch(mod, false, room.Type, freestyle.Value)
+        private bool isValidAllowedMod(Mod mod) => ModUtils.IsValidModForMatch(mod, false, room.Type, Freestyle.Value)
                                                    // Mod must not be contained in the required mods.
                                                    && Mods.Value.All(m => m.Acronym != mod.Acronym)
                                                    // Mod must be compatible with all the required mods.
