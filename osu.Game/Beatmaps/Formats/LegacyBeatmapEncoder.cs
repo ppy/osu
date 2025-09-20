@@ -117,6 +117,9 @@ namespace osu.Game.Beatmaps.Formats
             writer.WriteLine(FormattableString.Invariant($"GridSize: {beatmap.GridSize}"));
             writer.WriteLine(FormattableString.Invariant($"GridType: {(int)beatmap.GridType}"));
             writer.WriteLine(FormattableString.Invariant($"GridRotation: {beatmap.GridRotation}"));
+            // Without this check, game throws an exception, stating that "Nullable object should have a value"
+            if (beatmap.GridOffset.HasValue)
+                writer.WriteLine(FormattableString.Invariant($"GridOffset: {beatmap.GridOffset.Value.X},{beatmap.GridOffset.Value.Y}"));
             writer.WriteLine(FormattableString.Invariant($"TimelineZoom: {beatmap.TimelineZoom}"));
         }
 
