@@ -156,6 +156,8 @@ namespace osu.Game.Screens.SelectV2
 
         private Bindable<bool> configBackgroundBlur = null!;
 
+        private DependencyContainer dependencies = null!;
+
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, OsuConfigManager config)
         {
@@ -294,6 +296,8 @@ namespace osu.Game.Screens.SelectV2
                 modSelectOverlay,
             });
 
+            dependencies.Cache(filterControl);
+
             configBackgroundBlur = config.GetBindable<bool>(OsuSetting.SongSelectBackgroundBlur);
             configBackgroundBlur.BindValueChanged(e =>
             {
@@ -303,6 +307,9 @@ namespace osu.Game.Screens.SelectV2
                 updateBackgroundDim();
             });
         }
+
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
+            dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
         private void requestRecommendedSelection(IEnumerable<GroupedBeatmap> groupedBeatmaps)
         {
