@@ -20,7 +20,6 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Screens.Edit;
 using osu.Game.Utils;
 using osuTK;
-using Vortice.DXGI;
 
 namespace osu.Game.Beatmaps.Formats
 {
