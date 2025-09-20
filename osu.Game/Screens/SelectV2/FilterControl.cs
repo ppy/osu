@@ -304,17 +304,17 @@ namespace osu.Game.Screens.SelectV2
         {
             if (beatmap == null) return;
 
-            if (!currentCriteria.CollectionBeatmapMD5Hashes?.Contains(beatmap.MD5Hash) ?? false)
+            if (!currentCriteria?.CollectionBeatmapMD5Hashes?.Contains(beatmap.MD5Hash) ?? false)
             {
                 collectionDropdown.Current.Value = collectionDropdown.Items.OfType<AllBeatmapsCollectionFilterMenuItem>().First();
             }
 
-            if (beatmap.StarRating < currentCriteria.UserStarDifficulty.Min)
+            if (beatmap.StarRating < currentCriteria?.UserStarDifficulty.Min)
             {
                 double precision = difficultyRangeSlider.LowerBound is BindableNumberWithCurrent<double> n ? n.Precision : 0.1;
                 difficultyRangeSlider.LowerBound.Value = Math.Floor(beatmap.StarRating / precision) * precision;
             }
-            else if (beatmap.StarRating > currentCriteria.UserStarDifficulty.Max)
+            else if (beatmap.StarRating > currentCriteria?.UserStarDifficulty.Max)
             {
                 double precision = difficultyRangeSlider.UpperBound is BindableNumberWithCurrent<double> n ? n.Precision : 0.1;
                 difficultyRangeSlider.UpperBound.Value = Math.Ceiling(beatmap.StarRating / precision) * precision;
