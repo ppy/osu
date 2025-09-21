@@ -47,7 +47,7 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.ShowConvertedBeatmaps, true);
             SetDefault(OsuSetting.DisplayStarsMinimum, 0.0, 0, 10, 0.1);
-            SetDefault(OsuSetting.DisplayStarsMaximum, 10.1, 0, 10.1, 0.1);
+            SetDefault(OsuSetting.DisplayStarsMaximum, 10.1, 0.1, 10.1, 0.1);
 
             SetDefault(OsuSetting.SongSelectGroupMode, GroupMode.None);
             SetDefault(OsuSetting.SongSelectSortingMode, SortMode.Title);
