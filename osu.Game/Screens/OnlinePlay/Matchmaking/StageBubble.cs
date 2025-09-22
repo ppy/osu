@@ -5,9 +5,9 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
@@ -16,19 +16,17 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Matchmaking;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.Matchmaking;
+using osu.Game.Overlays;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking
 {
     internal partial class StageBubble : CompositeDrawable
     {
-        private readonly Color4 backgroundColour = Color4.Salmon;
-
         [Resolved]
         private MultiplayerClient client { get; set; } = null!;
 
-        private readonly int? round;
+        public readonly int? Round;
 
         private readonly MatchmakingStage stage;
 
@@ -44,9 +42,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
 
         public bool Active { get; private set; }
 
+        public float Progress => progressBar.Width;
+
         public StageBubble(int? round, MatchmakingStage stage, LocalisableString displayText)
         {
-            this.round = round;
+            Round = round;
             this.stage = stage;
             this.displayText = displayText;
 
@@ -54,7 +54,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
         }
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        private void load(AudioManager audio, OverlayColourProvider colourProvider)
         {
             InternalChild = new FillFlowContainer
             {
@@ -72,23 +72,32 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
                         Icon = FontAwesome.Solid.ArrowRight,
                         Margin = new MarginPadding { Horizontal = 10 }
                     },
-                    new CircularContainer
+                    new Container
                     {
+                        Masking = true,
+                        CornerRadius = 5,
+                        CornerExponent = 10,
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
                         AutoSizeAxes = Axes.Both,
-                        Masking = true,
                         Children = new[]
                         {
                             new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Colour = backgroundColour.Darken(0.2f)
+                                Colour =
+                                    ColourInfo.GradientVertical(
+                                        colourProvider.Dark2,
+                                        colourProvider.Dark1
+                                    ),
                             },
                             progressBar = new Box
                             {
+                                Blending = BlendingParameters.Additive,
+                                EdgeSmoothness = new Vector2(1),
                                 RelativeSizeAxes = Axes.Both,
-                                Colour = backgroundColour
+                                Width = 0,
+                                Colour = colourProvider.Dark3,
                             },
                             new OsuSpriteText
                             {
@@ -138,7 +147,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
                 return;
             }
 
-            progressBar.Width = (float)(elapsed.TotalMilliseconds / total.TotalMilliseconds);
+            progressBar.Width = (float)Math.Clamp(elapsed.TotalMilliseconds / total.TotalMilliseconds, 0, 1);
 
             int secondsRemaining = Math.Max(0, (int)Math.Ceiling((total.TotalMilliseconds - elapsed.TotalMilliseconds) / 1000));
 
@@ -152,15 +161,20 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
 
         private void onMatchRoomStateChanged(MatchRoomState? state) => Scheduler.Add(() =>
         {
+            bool wasActive = Active;
+
             Active = false;
 
             if (state is not MatchmakingRoomState roomState)
                 return;
 
-            if (round != null && roomState.CurrentRound != round)
+            if (Round != null && roomState.CurrentRound != Round)
                 return;
 
             Active = stage == roomState.Stage;
+
+            if (wasActive)
+                progressBar.Width = 1;
 
             bool isPreparing =
                 (stage == MatchmakingStage.RoundWarmupTime && roomState.Stage == MatchmakingStage.WaitingForClientsJoin) ||
@@ -181,13 +195,14 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
             if (!Active)
                 return;
 
-            if (countdown is not MatchmakingStageCountdown matchmakingState)
+            if (countdown is not MatchmakingStageCountdown)
                 return;
 
             countdownStartTime = DateTimeOffset.Now;
             countdownEndTime = countdownStartTime + countdown.TimeRemaining;
             arrow.FadeIn(500, Easing.OutQuint);
-            this.FadeTo(1, 200);
+
+            this.FadeIn(200);
         });
 
         private void onCountdownStopped(MultiplayerCountdown countdown) => Scheduler.Add(() =>

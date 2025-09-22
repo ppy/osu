@@ -79,6 +79,15 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
 
             text.FadeInFromZero(500, Easing.OutQuint);
 
+            using (text.BeginDelayedSequence(500))
+            {
+                text
+                    .FadeTo(0.6f, 400, Easing.In)
+                    .Then()
+                    .FadeTo(1, 400, Easing.Out)
+                    .Loop();
+            }
+
             text.ScaleTo(0.3f)
                 .ScaleTo(1, 500, Easing.OutQuint);
 

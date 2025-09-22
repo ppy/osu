@@ -3,17 +3,30 @@
 
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.UserInterface;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Multiplayer.MatchTypes.Matchmaking;
+using osu.Game.Overlays;
+using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking
 {
     public partial class StageDisplay : CompositeDrawable
     {
+        // TODO: get this from somewhere?
+        private const int round_count = 5;
+
         private OsuScrollContainer scroll = null!;
         private FillFlowContainer flow = null!;
+
+        private CurrentRoundDisplay roundDisplay = null!;
 
         public StageDisplay()
         {
@@ -22,11 +35,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OverlayColourProvider colourProvider)
         {
-            // TODO: get this from somewhere?
-            const int round_count = 5;
-
             InternalChildren = new Drawable[]
             {
                 scroll = new OsuScrollContainer(Direction.Horizontal)
@@ -46,7 +56,22 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
                     Margin = new MarginPadding { Top = 36 + 5, Bottom = 5 },
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre
-                }
+                },
+                new Box
+                {
+                    X = -2,
+                    Y = -14,
+                    Colour = ColourInfo.GradientHorizontal(
+                        colourProvider.Dark3,
+                        colourProvider.Dark3.Opacity(0)
+                    ),
+                    RelativeSizeAxes = Axes.Y,
+                    Width = 40,
+                },
+                roundDisplay = new CurrentRoundDisplay
+                {
+                    Y = -14,
+                },
             };
 
             flow.Add(new StageBubble(null, MatchmakingStage.WaitingForClientsJoin, "Waiting for other users"));
@@ -65,9 +90,119 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
         protected override void Update()
         {
             base.Update();
-            var drawable = flow.FirstOrDefault(d => d is StageBubble b && b.Active);
-            if (drawable != null)
-                scroll.ScrollTo(drawable);
+            var bubble = flow.OfType<StageBubble>().FirstOrDefault(b => b.Active);
+
+            if (bubble != null)
+            {
+                scroll.ScrollTo(bubble.X + bubble.Progress * bubble.DrawWidth - scroll.DrawWidth / 2);
+                roundDisplay.Round = bubble.Round;
+            }
+        }
+
+        private class CurrentRoundDisplay : CompositeDrawable
+        {
+            private OsuSpriteText text = null!;
+
+            private Circle innerCircle = null!;
+            private CircularProgress progress = null!;
+
+            [BackgroundDependencyLoader]
+            private void load(OverlayColourProvider colours)
+            {
+                Size = new Vector2(62);
+
+                InternalChildren = new Drawable[]
+                {
+                    new Circle
+                    {
+                        Colour = ColourInfo.GradientVertical(
+                            colours.Dark2,
+                            colours.Dark4
+                        ),
+                        RelativeSizeAxes = Axes.Both,
+                    },
+                    progress = new CircularProgress
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Colour = ColourInfo.GradientVertical(
+                            colours.Dark1,
+                            colours.Dark2
+                        ),
+                        InnerRadius = 0.1f,
+                        RelativeSizeAxes = Axes.Both,
+                    },
+                    innerCircle = new Circle
+                    {
+                        Alpha = 0.2f,
+                        Blending = BlendingParameters.Additive,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Colour = ColourInfo.GradientVertical(
+                            colours.Dark1,
+                            colours.Dark2
+                        ),
+                        Scale = new Vector2(0.9f),
+                        RelativeSizeAxes = Axes.Both,
+                    },
+                    new OsuSpriteText
+                    {
+                        Y = 8,
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
+                        Font = OsuFont.Style.Caption2,
+                        Text = "Round",
+                    },
+                    text = new OsuSpriteText
+                    {
+                        Font = OsuFont.Style.Heading1,
+                        Position = new Vector2(-8, -3),
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Text = "1"
+                    },
+                    new OsuSpriteText
+                    {
+                        Font = OsuFont.Style.Heading2,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Y = 4,
+                        Text = "/"
+                    },
+                    new OsuSpriteText
+                    {
+                        Font = OsuFont.Style.Heading1,
+                        Position = new Vector2(10, 11),
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Text = $"{round_count}"
+                    },
+                };
+            }
+
+            private int round;
+
+            public int? Round
+            {
+                set
+                {
+                    value ??= 1;
+
+                    if (round == value)
+                        return;
+
+                    round = value.Value;
+
+                    innerCircle
+                        .FadeTo(1, 250, Easing.OutQuint)
+                        .Then()
+                        .FadeTo(0.2f, 5000, Easing.OutQuint);
+
+                    progress.ProgressTo((float)round / round_count, 1500, Easing.OutQuint);
+
+                    text.Text = $"{round}";
+                }
+            }
         }
     }
 }
