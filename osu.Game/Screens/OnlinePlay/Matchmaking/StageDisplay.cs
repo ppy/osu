@@ -39,7 +39,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
         {
             InternalChildren = new Drawable[]
             {
-                scroll = new OsuScrollContainer(Direction.Horizontal)
+                scroll = new StageScrollContainer
                 {
                     ScrollbarOverlapsContent = false,
                     ScrollbarVisible = false,
@@ -99,7 +99,18 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
             }
         }
 
-        private class CurrentRoundDisplay : CompositeDrawable
+        private partial class StageScrollContainer : OsuScrollContainer
+        {
+            public override bool HandlePositionalInput => false;
+            public override bool HandleNonPositionalInput => false;
+
+            public StageScrollContainer()
+                : base(Direction.Horizontal)
+            {
+            }
+        }
+
+        private partial class CurrentRoundDisplay : CompositeDrawable
         {
             private OsuSpriteText text = null!;
 
