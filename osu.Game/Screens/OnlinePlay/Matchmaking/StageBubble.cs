@@ -39,7 +39,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
         private DateTimeOffset countdownEndTime;
         private SpriteIcon arrow = null!;
 
-        private Sample? stageProgressSample;
+        private Sample? countdownTickSample;
         private double? lastSamplePlayback;
 
         public bool Active { get; private set; }
@@ -102,8 +102,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
                 }
             };
 
-            stageProgressSample = audio.Samples.Get(@"Multiplayer/countdown-tick");
             Alpha = 0.5f;
+            countdownTickSample = audio.Samples.Get(@"Multiplayer/countdown-tick");
         }
 
         protected override void LoadComplete()
@@ -126,21 +126,27 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
         {
             base.Update();
 
-            TimeSpan duration = countdownEndTime - countdownStartTime;
+            if (!Active)
+                return;
 
-            if (duration.TotalMilliseconds == 0)
-                progressBar.Width = 0;
-            else
+            TimeSpan total = countdownEndTime - countdownStartTime;
+            TimeSpan elapsed = DateTimeOffset.Now - countdownStartTime;
+
+            if (total.TotalMilliseconds <= 0)
             {
-                TimeSpan elapsed = DateTimeOffset.Now - countdownStartTime;
-                progressBar.Width = (float)(elapsed.TotalMilliseconds / duration.TotalMilliseconds);
+                progressBar.Width = 0;
+                return;
+            }
 
-                bool enoughTimeElapsed = lastSamplePlayback == null || Time.Current - lastSamplePlayback >= 1000f;
-                if (elapsed.TotalMilliseconds < 1000f || !enoughTimeElapsed || elapsed.TotalMilliseconds >= duration.TotalMilliseconds)
-                    return;
+            progressBar.Width = (float)(elapsed.TotalMilliseconds / total.TotalMilliseconds);
 
-                stageProgressSample?.Play();
-                lastSamplePlayback = Time.Current;
+            int secondsRemaining = Math.Max(0, (int)Math.Ceiling((total.TotalMilliseconds - elapsed.TotalMilliseconds) / 1000));
+
+            if (total.TotalMilliseconds - elapsed.TotalMilliseconds <= 3000
+                && lastSamplePlayback != secondsRemaining)
+            {
+                countdownTickSample?.Play();
+                lastSamplePlayback = secondsRemaining;
             }
         }
 
