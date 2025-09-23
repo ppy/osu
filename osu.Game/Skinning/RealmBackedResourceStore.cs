@@ -53,13 +53,8 @@ namespace osu.Game.Skinning
             }
         }
 
-        private string? getPathForFile(string filename)
-        {
-            if (fileToStoragePathMapping.Value.TryGetValue(filename.ToLowerInvariant(), out string? path))
-                return path;
-
-            return null;
-        }
+        private string? getPathForFile(string filename) =>
+            fileToStoragePathMapping.Value.GetValueOrDefault(filename.ToLowerInvariant());
 
         private void invalidateCache() => fileToStoragePathMapping = new Lazy<Dictionary<string, string>>(initialiseFileCache);
 
