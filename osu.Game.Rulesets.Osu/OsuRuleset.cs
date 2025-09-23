@@ -221,7 +221,7 @@ namespace osu.Game.Rulesets.Osu
                         new OsuModSynesthesia(),
                         new OsuModDepth(),
                         new OsuModBloom(),
-                        new MultiMod(new ModPitchUp(), new ModPitchDown())
+                        new ModPitchAdjust()
                     };
 
                 case ModType.System:

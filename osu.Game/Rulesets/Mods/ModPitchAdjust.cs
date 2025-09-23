@@ -11,34 +11,37 @@ using osu.Game.Graphics;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public class ModPitchUp : Mod, IApplicableToTrack
+    public class ModPitchAdjust : Mod, IApplicableToTrack
     {
-        public override string Name => "Pitch Up";
-        public override string Acronym => "PU";
+        public override string Name => "Pitch Adjust";
+        public override string Acronym => "PA";
         public override IconUsage? Icon => OsuIcon.ModNightcore; // Temporary Icon
         public override ModType Type => ModType.Fun;
-        public override LocalisableString Description => "Increases pitch without affecting playback speed.";
+        public override LocalisableString Description => "Adjust pitch without affecting playback speed.";
         public override double ScoreMultiplier => 1;
         public override bool ValidForFreestyleAsRequiredMod => true;
-        public override Type[] IncompatibleMods => new[] { typeof(ModRateAdjust), typeof(ModAdaptiveSpeed), typeof(ModTimeRamp), typeof(ModPitchDown) };
+        public override bool Ranked => true;
+        public override Type[] IncompatibleMods => new[] { typeof(ModRateAdjust), typeof(ModAdaptiveSpeed), typeof(ModTimeRamp) };
 
-        [SettingSource("Pitch multiplier", "Adjusts pitch while speed remains constant.")]
-        public BindableNumber<double> PitchMultiplier { get; } = new BindableDouble(1.5)
+        [SettingSource("Semitones", "Adjusts pitch in semitone steps.")]
+        public BindableNumber<double> Semitones { get; } = new BindableDouble(0)
         {
-            MinValue = 1.01,
-            MaxValue = 2.0,
-            Precision = 0.01,
+            MinValue = -12,
+            MaxValue = 12,
+            Precision = 1,
         };
 
         private readonly BindableNumber<double> tempoAdjust = new BindableDouble(1);
         private readonly BindableNumber<double> freqAdjust = new BindableDouble(1);
 
-        public ModPitchUp()
+        public ModPitchAdjust()
         {
-            PitchMultiplier.BindValueChanged(val =>
+            Semitones.BindValueChanged(val =>
             {
-                freqAdjust.Value = val.NewValue;
-                tempoAdjust.Value = 1 / val.NewValue;
+                double multiplier = Math.Pow(2, val.NewValue / 12.0);
+
+                freqAdjust.Value = multiplier;
+                tempoAdjust.Value = 1 / multiplier;
             }, true);
         }
 
