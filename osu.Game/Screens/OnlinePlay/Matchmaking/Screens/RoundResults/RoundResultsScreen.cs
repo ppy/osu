@@ -29,6 +29,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens.RoundResults
     {
         private const int panel_spacing = 5;
 
+        public override PlayerPanelList.PanelDisplayStyle PlayersDisplayStyle => PlayerPanelList.PanelDisplayStyle.Hidden;
+        public override Drawable? PlayersDisplayArea => null;
+
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
 

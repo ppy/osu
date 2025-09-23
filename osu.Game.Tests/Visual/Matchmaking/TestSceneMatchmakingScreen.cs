@@ -53,6 +53,20 @@ namespace osu.Game.Tests.Visual.Matchmaking
 
             WaitForJoined();
 
+            AddStep("join users", () =>
+            {
+                for (int i = 0; i < 7; i++)
+                {
+                    MultiplayerClient.AddUser(new MultiplayerRoomUser(i)
+                    {
+                        User = new APIUser
+                        {
+                            Username = $"User {i}"
+                        }
+                    });
+                }
+            });
+
             setupRequestHandler();
 
             AddStep("load match", () =>
