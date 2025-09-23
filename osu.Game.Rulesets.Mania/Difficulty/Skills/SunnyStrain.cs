@@ -81,18 +81,24 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
 
             double clampedSameColumnDifficulty = Math.Min(sameColumnDifficulty, 8.0 + 0.85 * sameColumnDifficulty);
 
+            // Adjust unevenness impact based on how many keys are active
+            // More keys = unevenness matters less per key
             double unevennessKeyAdjustment = 1.0;
             if (unevennessDifficulty > 0.0 && activeKeyCount > 0.0)
                 unevennessKeyAdjustment = Math.Pow(unevennessDifficulty, 3.0 / activeKeyCount);
 
+            // Combine unevenness with same-column difficulty (how uneven jacks/streams are)
             double unevennessSameColumnComponent = unevennessKeyAdjustment * clampedSameColumnDifficulty;
             double firstStrainComponent = 0.4 * Math.Pow(unevennessSameColumnComponent, 1.5);
 
+            // Combine unevenness with pressing intensity and release difficulty
             double unevennessPressingReleaseComponent = Math.Pow(unevennessDifficulty, 2.0 / 3.0) * (0.8 * pressingIntensityDifficulty + releaseDifficulty * 35.0 / (localNoteCount + 8.0));
             double secondStrainComponent = 0.6 * Math.Pow(unevennessPressingReleaseComponent, 1.5);
 
+            // Main strain difficulty combining both components
             double totalStrainDifficulty = Math.Pow(firstStrainComponent + secondStrainComponent, 2.0 / 3.0);
 
+            // How much cross-column coordination adds to the difficulty
             double twistComponent = (unevennessKeyAdjustment * crossColumnDifficulty) / (crossColumnDifficulty + totalStrainDifficulty + 1.0);
 
             double poweredTwistComponent = twistComponent > 0.0 ? twistComponent * Math.Sqrt(twistComponent) : 0.0;
