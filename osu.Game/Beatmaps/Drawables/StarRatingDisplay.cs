@@ -7,6 +7,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
@@ -22,12 +23,13 @@ namespace osu.Game.Beatmaps.Drawables
     /// <summary>
     /// A pill that displays the star rating of a beatmap.
     /// </summary>
-    public partial class StarRatingDisplay : CompositeDrawable, IHasCurrentValue<StarDifficulty>
+    public partial class StarRatingDisplay : CompositeDrawable, IHasCurrentValue<StarDifficulty>, IHasCustomTooltip<StarDifficulty>
     {
         private readonly bool animated;
         private readonly Box background;
         private readonly SpriteIcon starIcon;
         private readonly OsuSpriteText starsText;
+        private readonly SpriteIcon valueIcon;
 
         private readonly BindableWithCurrent<StarDifficulty> current = new BindableWithCurrent<StarDifficulty>();
 
@@ -109,6 +111,8 @@ namespace osu.Game.Beatmaps.Drawables
                             new Dimension(GridSizeMode.AutoSize),
                             new Dimension(GridSizeMode.Absolute, 3f),
                             new Dimension(GridSizeMode.AutoSize, minSize: 25f),
+                            new Dimension(GridSizeMode.Absolute, 2f),
+                            new Dimension(GridSizeMode.AutoSize),
                         },
                         RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
                         Content = new[]
@@ -131,6 +135,17 @@ namespace osu.Game.Beatmaps.Drawables
                                     Spacing = new Vector2(-1.4f),
                                     Font = OsuFont.Torus.With(size: 14.4f, weight: FontWeight.Bold, fixedWidth: true),
                                     Shadow = false,
+                                },
+                                Empty(),
+                                valueIcon = new SpriteIcon
+                                {
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
+                                    Margin = new MarginPadding
+                                    {
+                                        Top = -1f,
+                                    },
+                                    Size = new Vector2(8),
                                 },
                             }
                         }
@@ -162,8 +177,32 @@ namespace osu.Game.Beatmaps.Drawables
 
                 starIcon.Colour = s.NewValue >= OsuColour.STAR_DIFFICULTY_DEFINED_COLOUR_CUTOFF ? colours.Orange1 : colourProvider?.Background5 ?? Color4Extensions.FromHex("303d47");
                 starsText.Colour = s.NewValue >= OsuColour.STAR_DIFFICULTY_DEFINED_COLOUR_CUTOFF ? colours.Orange1 : colourProvider?.Background5 ?? Color4.Black.Opacity(0.75f);
+
+                updateDisplay();
             }, true);
+            updateDisplay();
         }
+
+        private void updateDisplay()
+        {
+            if (Current.Value.Stars == Current.Value.NoModStars)
+            {
+                valueIcon.ScaleTo(0, 300, Easing.OutQuint).OnComplete(_ =>
+                {
+                    valueIcon.Hide();
+                });
+            }
+            else
+            {
+                valueIcon.Colour = starIcon.Colour;
+                valueIcon.Icon = Current.Value.Stars > Current.Value.NoModStars ? FontAwesome.Solid.SortUp : FontAwesome.Solid.SortDown;
+                valueIcon.ScaleTo(1, 300, Easing.OutQuint);
+                valueIcon.Show();
+            }
+        }
+
+        public ITooltip<StarDifficulty> GetCustomTooltip() => new StarRatingDisplayTooltip();
+        public StarDifficulty TooltipContent => Current.Value;
     }
 
     public enum StarRatingDisplaySize
