@@ -4,6 +4,8 @@
 using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
@@ -67,8 +69,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
         [Resolved]
         private IDialogOverlay dialogOverlay { get; set; } = null!;
 
+        [Resolved]
+        private AudioManager audio { get; set; } = null!;
+
         private readonly MultiplayerRoom room;
 
+        private Sample? sampleStart;
         private CancellationTokenSource? downloadCheckCancellation;
         private int? lastDownloadCheckedBeatmapId;
 
@@ -83,6 +89,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
         [BackgroundDependencyLoader]
         private void load()
         {
+            sampleStart = audio.Samples.Get(@"SongSelect/confirm-selection");
+
             InternalChild = new OsuContextMenuContainer
             {
                 RelativeSizeAxes = Axes.Both,
@@ -248,6 +256,15 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
         private void onLoadRequested() => Scheduler.Add(() =>
         {
             updateGameplayState();
+
+            if (Beatmap.IsDefault)
+            {
+                Logger.Log("Aborting gameplay start - beatmap not downloaded.");
+                return;
+            }
+
+            sampleStart?.Play();
+
             this.Push(new MultiplayerPlayerLoader(() => new MatchmakingPlayer(new Room(room), new PlaylistItem(client.Room!.CurrentPlaylistItem), room.Users.ToArray())));
         });
 
