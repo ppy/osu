@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Mods
         public override Type[] IncompatibleMods => new[] { typeof(ModRateAdjust), typeof(ModAdaptiveSpeed), typeof(ModTimeRamp) };
 
         [SettingSource("Semitones", "Adjusts pitch in semitone steps.")]
-        public BindableNumber<double> Semitones { get; } = new BindableDouble(0)
+        public BindableNumber<int> Semitones { get; } = new BindableInt(0)
         {
             MinValue = -12,
             MaxValue = 12,
