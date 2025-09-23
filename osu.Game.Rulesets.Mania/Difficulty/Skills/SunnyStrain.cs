@@ -31,6 +31,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
         public SunnyStrain(Mod[] mods, IEnumerable<DifficultyHitObject> difficultyHitObjects, ManiaBeatmap beatmap, FormulaConfig config)
             : base(mods: mods)
         {
+            // Process arrays here
             var preprocessor = new SunnyPreprocessor(difficultyHitObjects, beatmap, config);
             strainData = preprocessor.Process();
             currentNoteCount = 0;
@@ -52,6 +53,22 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
         protected override double StrainValueAt(DifficultyHitObject current)
         {
             ManiaDifficultyHitObject maniaCurrent = (ManiaDifficultyHitObject)current;
+            ManiaDifficultyHitObject prev = (ManiaDifficultyHitObject)current.Previous(0);
+
+            currentNoteCount++;
+
+            if (maniaCurrent.EndTime > maniaCurrent.StartTime)
+            {
+                double longNoteDuration = Math.Min(maniaCurrent.EndTime - maniaCurrent.StartTime, 1000.0);
+                currentLongNoteWeight += 0.5 * longNoteDuration / 200.0;
+            }
+
+            // If this note shares the same StartTime as the previous (basically a chord) then we'll reuse the currentStrain
+            if (prev != null && prev.StartTime == maniaCurrent.StartTime)
+            {
+                return currentStrain;
+            }
+
             double currentTime = maniaCurrent.StartTime;
 
             double sameColumnDifficulty = SameColumnEvaluator.EvaluateDifficultyAt(currentTime, strainData);
@@ -81,14 +98,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
 
             double poweredTwistComponent = twistComponent > 0.0 ? twistComponent * Math.Sqrt(twistComponent) : 0.0;
             double finalCombinedStrain = 2.7 * Math.Sqrt(totalStrainDifficulty) * poweredTwistComponent + totalStrainDifficulty * 0.27;
-
-            currentNoteCount++;
-
-            if (maniaCurrent.EndTime > maniaCurrent.StartTime)
-            {
-                double longNoteDuration = Math.Min(maniaCurrent.EndTime - maniaCurrent.StartTime, 1000.0);
-                currentLongNoteWeight += 0.5 * longNoteDuration / 200.0;
-            }
 
             currentStrain = finalCombinedStrain;
 
