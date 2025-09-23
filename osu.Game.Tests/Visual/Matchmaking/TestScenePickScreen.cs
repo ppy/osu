@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Screens;
 using osu.Framework.Utils;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
@@ -80,7 +81,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
 
             PickScreen screen = null!;
 
-            AddStep("add screen", () => Child = screen = new PickScreen());
+            AddStep("add screen", () => Child = new ScreenStack(screen = new PickScreen()));
 
             AddStep("select maps", () =>
             {
