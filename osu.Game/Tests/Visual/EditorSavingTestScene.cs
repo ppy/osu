@@ -77,7 +77,7 @@ namespace osu.Game.Tests.Visual
             SoloSongSelect songSelect = null;
 
             PushAndConfirm(() => songSelect = new SoloSongSelect());
-            AddUntilStep("wait for carousel load", () => songSelect.CarouselItemsPresented);
+            AddUntilStep("wait for carousel load", () => songSelect.CarouselItemsPresented && !songSelect.IsFiltering);
 
             AddStep("Present same beatmap", () => Game.PresentBeatmap(Game.BeatmapManager.QueryBeatmapSet(set => set.ID == beatmapSetGuid)!.Value, beatmap => beatmap.ID == beatmapGuid));
             AddUntilStep("Wait for beatmap selected", () => Game.Beatmap.Value.BeatmapInfo.ID == beatmapGuid);
