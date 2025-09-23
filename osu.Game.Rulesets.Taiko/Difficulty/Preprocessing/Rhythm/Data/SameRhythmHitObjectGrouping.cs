@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Rhythm.Data
         public readonly double HitObjectIntervalRatio;
 
         /// <inheritdoc/>
-        public double Interval { get; }
+        public double Interval { get; } = double.PositiveInfinity;
 
         public SameRhythmHitObjectGrouping(SameRhythmHitObjectGrouping? previous, List<TaikoDifficultyHitObject> hitObjects)
         {
@@ -66,11 +66,13 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Rhythm.Data
                 : 0;
 
             // Calculate the average interval between hitobjects.
-            HitObjectInterval = normalisedHitObjectDeltaTime.Count > 0
-                ? previous?.HitObjectInterval is double previousDelta && Math.Abs(modalDelta - previousDelta) <= snap_tolerance
-                    ? previousDelta
-                    : modalDelta
-                : null;
+            if (normalisedHitObjectDeltaTime.Count > 0)
+            {
+                if (previous?.HitObjectInterval is double previousDelta && Math.Abs(modalDelta - previousDelta) <= snap_tolerance)
+                    HitObjectInterval = previousDelta;
+                else
+                    HitObjectInterval = modalDelta;
+            }
 
             // Calculate the ratio between this group's interval and the previous group's interval
             HitObjectIntervalRatio = previous?.HitObjectInterval is double previousInterval && HitObjectInterval is double currentInterval
@@ -78,11 +80,13 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Rhythm.Data
                 : 1.0;
 
             // Calculate the interval from the previous group's start time
-            Interval = previous == null
-                ? double.PositiveInfinity
-                : Math.Abs(StartTime - previous.StartTime) <= snap_tolerance
-                    ? 0
-                    : StartTime - previous.StartTime;
+            if (previous != null)
+            {
+                if (Math.Abs(StartTime - previous.StartTime) <= snap_tolerance)
+                    Interval = 0;
+                else
+                    Interval = StartTime - previous.StartTime;
+            }
         }
     }
 }
