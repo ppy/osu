@@ -43,7 +43,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
         protected override double CalculateInitialStrain(double time, DifficultyHitObject current)
         {
             ManiaDifficultyHitObject prev = (ManiaDifficultyHitObject)current.Previous(0);
-            if (prev == null) return 0.0;
 
             double prevTime = prev.StartTime;
             double deltaMs = Math.Max(0.0, time - prevTime);
