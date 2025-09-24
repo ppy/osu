@@ -35,8 +35,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
 
             AddStep("join room", () =>
             {
-                var room = CreateDefaultRoom();
-                room.Type = MatchType.Matchmaking;
+                var room = CreateDefaultRoom(MatchType.Matchmaking);
                 room.Playlist = Enumerable.Range(1, 50).Select(i => new PlaylistItem(new MultiplayerPlaylistItem
                 {
                     ID = i,

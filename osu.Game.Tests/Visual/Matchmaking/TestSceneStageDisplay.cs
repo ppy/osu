@@ -6,6 +6,7 @@ using NUnit.Framework;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Game.Online.Multiplayer.MatchTypes.Matchmaking;
+using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Matchmaking;
 using osu.Game.Tests.Visual.Multiplayer;
 
@@ -17,7 +18,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
         {
             base.SetUpSteps();
 
-            AddStep("join room", () => JoinRoom(CreateDefaultRoom()));
+            AddStep("join room", () => JoinRoom(CreateDefaultRoom(MatchType.Matchmaking)));
             WaitForJoined();
 
             AddStep("add bubble", () => Child = new StageDisplay

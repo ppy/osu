@@ -59,7 +59,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
 
             AddStep("join room", () =>
             {
-                var room = CreateDefaultRoom();
+                var room = CreateDefaultRoom(MatchType.Matchmaking);
                 room.Playlist = items;
 
                 JoinRoom(room);
