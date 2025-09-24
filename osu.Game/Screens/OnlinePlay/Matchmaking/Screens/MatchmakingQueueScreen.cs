@@ -148,7 +148,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            matchFoundSample = audio.Samples.Get(@"Multiplayer/matchmaking/match-found");
+            matchFoundSample = audio.Samples.Get(@"Multiplayer/Matchmaking/match-found");
         }
 
         private void onMatchmakingLobbyStatusChanged(MatchmakingLobbyStatus status) => Scheduler.Add(() =>
