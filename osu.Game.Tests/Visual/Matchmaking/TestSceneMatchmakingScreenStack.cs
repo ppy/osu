@@ -65,55 +65,49 @@ namespace osu.Game.Tests.Visual.Matchmaking
         }
 
         [Test]
-        public void TestStatus()
+        public void TestChangeStage()
         {
-            AddWaitStep("wait for scroll", 5);
-            AddStep("pick", () => MultiplayerClient.ChangeMatchRoomState(new MatchmakingRoomState
+            for (int round = 1; round <= 2; round++)
             {
-                Stage = MatchmakingStage.UserBeatmapSelect
-            }).WaitSafely());
+                AddLabel($"Round {round}");
 
-            AddWaitStep("wait for scroll", 5);
-            AddStep("selection", () =>
+                int r = round;
+                changeStage(MatchmakingStage.RoundWarmupTime, state => state.CurrentRound = r);
+                changeStage(MatchmakingStage.UserBeatmapSelect);
+                changeStage(MatchmakingStage.ServerBeatmapFinalised, state =>
+                {
+                    MultiplayerPlaylistItem[] beatmaps = Enumerable.Range(1, 50).Select(i => new MultiplayerPlaylistItem
+                    {
+                        ID = i,
+                        BeatmapID = i,
+                        StarRating = i / 10.0,
+                    }).ToArray();
+
+                    state.CandidateItems = beatmaps.Select(b => b.ID).ToArray();
+                    state.CandidateItem = beatmaps[0].ID;
+                }, waitTime: 35);
+
+                changeStage(MatchmakingStage.WaitingForClientsBeatmapDownload);
+                changeStage(MatchmakingStage.GameplayWarmupTime);
+                changeStage(MatchmakingStage.Gameplay);
+                changeStage(MatchmakingStage.ResultsDisplaying);
+            }
+
+            changeStage(MatchmakingStage.Ended, state =>
             {
-                MultiplayerPlaylistItem[] beatmaps = Enumerable.Range(1, 50).Select(i => new MultiplayerPlaylistItem
-                {
-                    ID = i,
-                    BeatmapID = i,
-                    StarRating = i / 10.0,
-                }).ToArray();
-
-                beatmaps = Random.Shared.GetItems(beatmaps, 8);
-
-                MultiplayerClient.ChangeMatchRoomState(new MatchmakingRoomState
-                {
-                    Stage = MatchmakingStage.ServerBeatmapFinalised,
-                    CandidateItems = beatmaps.Select(b => b.ID).ToArray(),
-                    CandidateItem = beatmaps[0].ID
-                }).WaitSafely();
-            });
-
-            AddWaitStep("wait for scroll", 35);
-            AddStep("room end", () =>
-            {
-                var state = new MatchmakingRoomState
-                {
-                    CurrentRound = 1,
-                    Stage = MatchmakingStage.Ended
-                };
-
                 int localUserId = API.LocalUser.Value.OnlineID;
 
                 state.Users[localUserId].Placement = 1;
                 state.Users[localUserId].Rounds[1].Placement = 1;
                 state.Users[localUserId].Rounds[1].TotalScore = 1;
                 state.Users[localUserId].Rounds[1].Statistics[HitResult.LargeBonus] = 1;
-
-                state.Users[1].Placement = 2;
-                state.Users[1].Rounds[1].Placement = 2;
-
-                MultiplayerClient.ChangeMatchRoomState(state).WaitSafely();
             });
+        }
+
+        private void changeStage(MatchmakingStage stage, Action<MatchmakingRoomState>? prepare = null, int waitTime = 5)
+        {
+            AddStep($"stage: {stage}", () => MultiplayerClient.MatchmakingChangeStage(stage, prepare).WaitSafely());
+            AddWaitStep("wait", waitTime);
         }
     }
 }

@@ -824,6 +824,25 @@ namespace osu.Game.Tests.Visual.Multiplayer
             await ((IMatchmakingClient)this).MatchmakingItemSelected(clone(userId), clone(playlistItemId)).ConfigureAwait(false);
         }
 
+        public async Task MatchmakingChangeStage(MatchmakingStage stage, Action<MatchmakingRoomState>? prepare = null)
+        {
+            MatchmakingRoomState state = clone((MatchmakingRoomState)ServerRoom!.MatchState!);
+
+            state.Stage = stage;
+
+            if (stage == MatchmakingStage.RoundWarmupTime)
+                state.CurrentRound++;
+
+            prepare?.Invoke(state);
+
+            await ChangeMatchRoomState(state).ConfigureAwait(false);
+            await StartCountdown(new MatchmakingStageCountdown
+            {
+                Stage = stage,
+                TimeRemaining = TimeSpan.FromSeconds(10)
+            }).ConfigureAwait(false);
+        }
+
         #region API Room Handling
 
         public IReadOnlyList<Room> ServerSideRooms
