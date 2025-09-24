@@ -155,14 +155,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
                                                     RelativeSizeAxes = Axes.Both,
                                                 }
                                             },
-                                            new RoundedButton
-                                            {
-                                                Anchor = Anchor.BottomRight,
-                                                Origin = Anchor.BottomRight,
-                                                Text = "Don't click me",
-                                                Size = new Vector2(100, 30),
-                                                Action = () => client.MatchmakingSkipToNextStage()
-                                            }
                                         }
                                     }
                                 ]
