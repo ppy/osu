@@ -396,11 +396,13 @@ namespace osu.Game.Screens.SelectV2
         #region Selection debounce
 
         private BeatmapInfo? debounceQueuedSelection;
+        private BeatmapInfo? selectedBeatmapWhenQueueStarted;
         private double debounceElapsedTime;
 
         private void debounceQueueSelection(BeatmapInfo beatmap)
         {
             debounceQueuedSelection = beatmap;
+            selectedBeatmapWhenQueueStarted = Beatmap.Value.BeatmapInfo;
             debounceElapsedTime = 0;
         }
 
@@ -433,6 +435,13 @@ namespace osu.Game.Screens.SelectV2
                 if (Beatmap.Value.BeatmapInfo.Equals(debounceQueuedSelection))
                     return;
 
+                // If the currently selected beatmap is different than the value at the time the debounced selection was first queued,
+                // then that means a non-debounced selection was made since.
+                // We don't want to overwrite that value with our older selection.
+                // Just cancel the debounced selection if this is the case.
+                if (!Beatmap.Value.BeatmapInfo.Equals(selectedBeatmapWhenQueueStarted))
+                    return;
+
                 Beatmap.Value = beatmaps.GetWorkingBeatmap(debounceQueuedSelection);
             }
             finally
@@ -444,6 +453,7 @@ namespace osu.Game.Screens.SelectV2
         private void cancelDebounceSelection()
         {
             debounceQueuedSelection = null;
+            selectedBeatmapWhenQueueStarted = null;
             debounceElapsedTime = 0;
         }
 
