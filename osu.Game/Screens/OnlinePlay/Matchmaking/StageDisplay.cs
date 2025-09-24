@@ -43,10 +43,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
                 {
                     ScrollbarOverlapsContent = false,
                     ScrollbarVisible = false,
+                    ClampExtension = 0,
                     RelativeSizeAxes = Axes.X,
                     Height = 36,
                     Child = flow = new FillFlowContainer
                     {
+                        Padding = new MarginPadding { Horizontal = 2000 },
                         AutoSizeAxes = Axes.Both,
                         Direction = FillDirection.Horizontal,
                     },
@@ -94,7 +96,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
 
             if (bubble != null)
             {
-                scroll.ScrollTo(bubble.X + bubble.Progress * bubble.DrawWidth - scroll.DrawWidth / 2);
+                scroll.ScrollTo(flow.Padding.Left + bubble.X + bubble.Progress * bubble.DrawWidth - scroll.DrawWidth / 2);
                 roundDisplay.Round = bubble.Round;
             }
         }
