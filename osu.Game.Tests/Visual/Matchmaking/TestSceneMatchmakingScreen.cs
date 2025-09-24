@@ -92,7 +92,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
         [Test]
         public void TestGameplayFlow()
         {
-            for (int round = 1; round <= 2; round++)
+            for (int round = 1; round <= 3; round++)
             {
                 AddLabel($"Round {round}");
 

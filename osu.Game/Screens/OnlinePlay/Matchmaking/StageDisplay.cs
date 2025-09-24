@@ -221,14 +221,25 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
 
                     round = value.Value;
 
-                    innerCircle
-                        .FadeTo(1, 250, Easing.OutQuint)
+                    this.ScaleTo(6, 500, Easing.OutQuart)
+                        .MoveToY(-300, 500, Easing.OutQuart)
                         .Then()
-                        .FadeTo(0.2f, 5000, Easing.OutQuint);
+                        .MoveToY(0, 500, Easing.InQuart)
+                        .ScaleTo(1, 500, Easing.InQuart);
 
-                    progress.ProgressTo((float)round / round_count, 1500, Easing.OutQuint);
+                    Scheduler.AddDelayed(() =>
+                    {
+                        progress.ProgressTo((float)round / round_count, 500, Easing.InOutQuart);
+                        Scheduler.AddDelayed(() =>
+                        {
+                            innerCircle
+                                .FadeTo(1, 250, Easing.OutQuint)
+                                .Then()
+                                .FadeTo(0.2f, 5000, Easing.OutQuint);
 
-                    text.Text = $"{round}";
+                            text.Text = $"{round}";
+                        }, 150);
+                    }, 250);
                 }
             }
         }

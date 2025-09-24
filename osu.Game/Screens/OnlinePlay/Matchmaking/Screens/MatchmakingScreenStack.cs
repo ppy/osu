@@ -31,34 +31,24 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens
 
             InternalChildren = new Drawable[]
             {
-                new GridContainer
+                new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    RowDimensions = new[] { new Dimension(), new Dimension(GridSizeMode.AutoSize) },
-                    Content = new Drawable[][]
+                    Padding = new MarginPadding(10),
+                    Children = new Drawable[]
                     {
-                        [
-                            new Container
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Padding = new MarginPadding(10),
-                                Children = new Drawable[]
-                                {
-                                    screenStack = new ScreenStack(),
-                                }
-                            },
-                        ],
-                        [
-                            new StageDisplay
-                            {
-                                RelativeSizeAxes = Axes.X
-                            }
-                        ]
+                        screenStack = new ScreenStack(),
                     }
                 },
                 playersList = new PlayerPanelList
                 {
                     DisplayArea = this
+                },
+                new StageDisplay
+                {
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                    RelativeSizeAxes = Axes.X
                 }
             };
         }
