@@ -24,7 +24,6 @@ using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Rulesets;
-using osu.Game.Screens.Footer;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Screens;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
@@ -75,6 +74,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
         private CancellationTokenSource? downloadCheckCancellation;
         private int? lastDownloadCheckedBeatmapId;
 
+        private MatchChatDisplay chat = null!;
+
         public MatchmakingScreen(MultiplayerRoom room)
         {
             this.room = room;
@@ -104,7 +105,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
                             Padding = new MarginPadding
                             {
                                 Horizontal = WaveOverlayContainer.WIDTH_PADDING,
-                                Bottom = ScreenFooter.HEIGHT + 20
+                                Top = row_padding,
                             },
                             RowDimensions = new[]
                             {
@@ -135,19 +136,14 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
                                 [
                                     new Container
                                     {
-                                        RelativeSizeAxes = Axes.X,
-                                        AutoSizeAxes = Axes.Y,
-                                        Children = new Drawable[]
+                                        Anchor = Anchor.TopRight,
+                                        Origin = Anchor.TopRight,
+                                        Width = 700,
+                                        Height = 130,
+                                        Padding = new MarginPadding { Bottom = row_padding },
+                                        Child = chat = new MatchChatDisplay(new Room(room))
                                         {
-                                            new Container
-                                            {
-                                                RelativeSizeAxes = Axes.X,
-                                                Height = 100,
-                                                Child = new MatchChatDisplay(new Room(room))
-                                                {
-                                                    RelativeSizeAxes = Axes.Both,
-                                                }
-                                            },
+                                            RelativeSizeAxes = Axes.Both,
                                         }
                                     }
                                 ]
@@ -168,6 +164,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
             client.LoadRequested += onLoadRequested;
 
             beatmapAvailabilityTracker.Availability.BindValueChanged(onBeatmapAvailabilityChanged, true);
+
+            Footer!.Add(chat.CreateProxy());
         }
 
         private void onRoomUpdated()
