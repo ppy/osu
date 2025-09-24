@@ -39,40 +39,55 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
         {
             InternalChildren = new Drawable[]
             {
-                scroll = new StageScrollContainer
-                {
-                    ScrollbarOverlapsContent = false,
-                    ScrollbarVisible = false,
-                    ClampExtension = 0,
-                    RelativeSizeAxes = Axes.X,
-                    Height = 36,
-                    Child = flow = new FillFlowContainer
-                    {
-                        Padding = new MarginPadding { Horizontal = 2000 },
-                        AutoSizeAxes = Axes.Both,
-                        Direction = FillDirection.Horizontal,
-                    },
-                },
-                new StageText
-                {
-                    Margin = new MarginPadding { Top = 36 + 5, Bottom = 5 },
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre
-                },
                 new Box
                 {
-                    X = -2,
-                    Y = -14,
-                    Colour = ColourInfo.GradientHorizontal(
-                        colourProvider.Dark3,
-                        colourProvider.Dark3.Opacity(0)
-                    ),
-                    RelativeSizeAxes = Axes.Y,
-                    Width = 40,
+                    Colour = colourProvider.Dark6,
+                    RelativeSizeAxes = Axes.Both,
                 },
-                roundDisplay = new CurrentRoundDisplay
+                new Container
                 {
-                    Y = -14,
+                    RelativeSizeAxes = Axes.X,
+                    Height = 96,
+                    Children = new Drawable[]
+                    {
+                        scroll = new StageScrollContainer
+                        {
+                            ScrollbarOverlapsContent = false,
+                            ScrollbarVisible = false,
+                            ClampExtension = 0,
+                            RelativeSizeAxes = Axes.X,
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Height = 36,
+                            Child = flow = new FillFlowContainer
+                            {
+                                Padding = new MarginPadding { Horizontal = 2000 },
+                                AutoSizeAxes = Axes.Both,
+                                Direction = FillDirection.Horizontal,
+                            },
+                        },
+                        new StageText
+                        {
+                            Y = 32,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre
+                        },
+                        new Box
+                        {
+                            Colour = ColourInfo.GradientHorizontal(
+                                colourProvider.Dark4,
+                                colourProvider.Dark5.Opacity(0)
+                            ),
+                            RelativeSizeAxes = Axes.Y,
+                            Width = 240,
+                        },
+                        roundDisplay = new CurrentRoundDisplay
+                        {
+                            X = 12,
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                        },
+                    }
                 },
             };
 
@@ -122,7 +137,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
             [BackgroundDependencyLoader]
             private void load(OverlayColourProvider colours)
             {
-                Size = new Vector2(62);
+                Size = new Vector2(76);
 
                 InternalChildren = new Drawable[]
                 {
@@ -139,7 +154,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Colour = ColourInfo.GradientVertical(
-                            colours.Dark1,
+                            colours.Light1,
                             colours.Dark2
                         ),
                         InnerRadius = 0.1f,
@@ -160,7 +175,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
                     },
                     new OsuSpriteText
                     {
-                        Y = 8,
+                        Y = 10,
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
                         Font = OsuFont.Style.Caption2,

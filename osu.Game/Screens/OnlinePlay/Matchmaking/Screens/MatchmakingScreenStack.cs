@@ -28,7 +28,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens
         private void load()
         {
             RelativeSizeAxes = Axes.Both;
-            Padding = new MarginPadding(10);
 
             InternalChildren = new Drawable[]
             {
@@ -39,7 +38,15 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens
                     Content = new Drawable[][]
                     {
                         [
-                            screenStack = new ScreenStack(),
+                            new Container
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Padding = new MarginPadding(10),
+                                Children = new Drawable[]
+                                {
+                                    screenStack = new ScreenStack(),
+                                }
+                            },
                         ],
                         [
                             new StageDisplay

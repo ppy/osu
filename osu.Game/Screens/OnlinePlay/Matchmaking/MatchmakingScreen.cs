@@ -8,7 +8,6 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -19,7 +18,6 @@ using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Graphics.Cursor;
-using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Online;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
@@ -31,7 +29,6 @@ using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Screens;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Users;
-using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking
 {
@@ -87,7 +84,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OverlayColourProvider colourProvider)
         {
             sampleStart = audio.Samples.Get(@"SongSelect/confirm-selection");
 
@@ -128,7 +125,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
                                             new Box
                                             {
                                                 RelativeSizeAxes = Axes.Both,
-                                                Colour = Color4Extensions.FromHex(@"3e3a44") // Temporary.
+                                                Colour = colourProvider.Background6,
                                             },
                                             new MatchmakingScreenStack(),
                                         }
@@ -146,10 +143,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
                                             {
                                                 RelativeSizeAxes = Axes.X,
                                                 Height = 100,
-                                                Padding = new MarginPadding
-                                                {
-                                                    Horizontal = 200,
-                                                },
                                                 Child = new MatchChatDisplay(new Room(room))
                                                 {
                                                     RelativeSizeAxes = Axes.Both,
