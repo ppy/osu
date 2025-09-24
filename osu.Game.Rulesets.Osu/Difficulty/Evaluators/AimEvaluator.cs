@@ -181,33 +181,29 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
         private static double angleVectorRepetition(OsuDifficultyHitObject current)
         {
-            const double time_limit = 2000; // 2 seconds
-            const double time_limit_low = 200;
             const double note_limit = 6;
 
             double constantAngleCount = 0;
             int index = 0;
-            double currentTimeGap = 0;
             double notesProcessed = 0;
 
-            while (notesProcessed < note_limit && currentTimeGap < time_limit)
+            while (notesProcessed < note_limit)
             {
                 var loopObj = (OsuDifficultyHitObject)current.Previous(index);
 
                 if (loopObj.IsNull())
                     break;
 
-                // Account less for objects that are close to the time limit.
-                double longIntervalFactor = Math.Clamp(1 - (loopObj.AdjustedDeltaTime - time_limit_low) / (time_limit - time_limit_low), 0, 1);
+                if (Math.Abs(current.DeltaTime - loopObj.DeltaTime) > 25)
+                    break;
 
                 if (loopObj.NormalisedVectorAngle.IsNotNull() && current.NormalisedVectorAngle.IsNotNull())
                 {
                     double angleDifference = Math.Abs(current.NormalisedVectorAngle.Value - loopObj.NormalisedVectorAngle.Value);
-                    constantAngleCount += Math.Cos(8 * Math.Min(Math.PI / 16, angleDifference)) * longIntervalFactor;
+                    constantAngleCount += Math.Cos(8 * Math.Min(Math.PI / 16, angleDifference));
                 }
 
                 notesProcessed++;
-                currentTimeGap = current.StartTime - loopObj.StartTime;
                 index++;
             }
 
