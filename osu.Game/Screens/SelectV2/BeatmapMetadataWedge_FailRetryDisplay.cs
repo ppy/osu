@@ -8,6 +8,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Rendering;
+using osu.Framework.Graphics.Rendering.Vertices;
+using osu.Framework.Graphics.Shaders;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
@@ -95,6 +97,14 @@ namespace osu.Game.Screens.SelectV2
                     }
                 }
 
+                private IShader shader = null!;
+
+                [BackgroundDependencyLoader]
+                private void load(ShaderManager shaders)
+                {
+                    shader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, "FastCircle");
+                }
+
                 protected override void Update()
                 {
                     base.Update();
@@ -123,6 +133,8 @@ namespace osu.Game.Screens.SelectV2
 
                     private Vector2 drawSize;
                     private float[] displayedData = null!;
+                    private IShader shader = null!;
+                    private IVertexBatch<TexturedVertex2D>? quadBatch;
 
                     public GraphDrawNode(GraphDrawable source)
                         : base(source)
@@ -136,6 +148,7 @@ namespace osu.Game.Screens.SelectV2
 
                         drawSize = source.DrawSize;
                         displayedData = source.displayedData;
+                        shader = source.shader;
                     }
 
                     protected override void Draw(IRenderer renderer)
@@ -150,6 +163,9 @@ namespace osu.Game.Screens.SelectV2
                         float totalSpacing = drawSize.X - barWidth * displayedData.Length;
                         float spacing = totalSpacing / (displayedData.Length - 1);
 
+                        quadBatch ??= renderer.CreateQuadBatch<TexturedVertex2D>(displayedData.Length * 4, 1);
+                        shader.Bind();
+
                         for (int i = 0; i < displayedData.Length; i++)
                         {
                             float barHeight = MathF.Max(drawSize.Y * displayedData[i], barWidth);
@@ -158,35 +174,61 @@ namespace osu.Game.Screens.SelectV2
 
                             position += barWidth + spacing;
                         }
+
+                        shader.Unbind();
                     }
 
                     private void drawBar(IRenderer renderer, float position, float width, float height)
                     {
-                        float cornerRadius = width / 2f;
-
-                        Vector3 scale = DrawInfo.MatrixInverse.ExtractScale();
-                        float blendRange = (scale.X + scale.Y) / 2;
+                        // Since bars have corner radius, to avoid masking usage and draw all bars in a single draw call
+                        // we are using FastCircle implementation.
+                        // Not using FastCircle directly to minimize drawable count.
 
                         RectangleF drawRectangle = new RectangleF(new Vector2(position, drawSize.Y - height), new Vector2(width, height));
+                        Vector4 textureRectangle = new Vector4(0, 0, drawRectangle.Width, drawRectangle.Height);
                         Quad screenSpaceDrawQuad = Quad.FromRectangle(drawRectangle) * DrawInfo.Matrix;
 
-                        renderer.PushMaskingInfo(new MaskingInfo
-                        {
-                            ScreenSpaceAABB = screenSpaceDrawQuad.AABB,
-                            MaskingRect = drawRectangle.Normalize(),
-                            ConservativeScreenSpaceQuad = screenSpaceDrawQuad,
-                            ToMaskingSpace = DrawInfo.MatrixInverse,
-                            CornerRadius = cornerRadius,
-                            CornerExponent = 2f,
-                            // We are setting the linear blend range to the approximate size of a _pixel_ here.
-                            // This results in the optimal trade-off between crispness and smoothness of the
-                            // edges of the masked region according to sampling theory.
-                            BlendRange = blendRange,
-                            AlphaExponent = 1,
-                        });
+                        var blend = new Vector2(Math.Min(drawRectangle.Width, drawRectangle.Height) / Math.Min(screenSpaceDrawQuad.Width, screenSpaceDrawQuad.Height));
 
-                        renderer.DrawQuad(renderer.WhitePixel, screenSpaceDrawQuad, DrawColourInfo.Colour);
-                        renderer.PopMaskingInfo();
+                        quadBatch?.AddAction(new TexturedVertex2D(renderer)
+                        {
+                            Position = screenSpaceDrawQuad.BottomLeft,
+                            TexturePosition = new Vector2(0, drawRectangle.Height),
+                            TextureRect = textureRectangle,
+                            BlendRange = blend,
+                            Colour = DrawColourInfo.Colour.BottomLeft.SRGB,
+                        });
+                        quadBatch?.AddAction(new TexturedVertex2D(renderer)
+                        {
+                            Position = screenSpaceDrawQuad.BottomRight,
+                            TexturePosition = new Vector2(drawRectangle.Width, drawRectangle.Height),
+                            TextureRect = textureRectangle,
+                            BlendRange = blend,
+                            Colour = DrawColourInfo.Colour.BottomRight.SRGB,
+                        });
+                        quadBatch?.AddAction(new TexturedVertex2D(renderer)
+                        {
+                            Position = screenSpaceDrawQuad.TopRight,
+                            TexturePosition = new Vector2(drawRectangle.Width, 0),
+                            TextureRect = textureRectangle,
+                            BlendRange = blend,
+                            Colour = DrawColourInfo.Colour.TopRight.SRGB,
+                        });
+                        quadBatch?.AddAction(new TexturedVertex2D(renderer)
+                        {
+                            Position = screenSpaceDrawQuad.TopLeft,
+                            TexturePosition = Vector2.Zero,
+                            TextureRect = textureRectangle,
+                            BlendRange = blend,
+                            Colour = DrawColourInfo.Colour.TopLeft.SRGB,
+                        });
+                    }
+
+                    protected override void Dispose(bool isDisposing)
+                    {
+                        base.Dispose(isDisposing);
+
+                        quadBatch?.Dispose();
                     }
                 }
             }
