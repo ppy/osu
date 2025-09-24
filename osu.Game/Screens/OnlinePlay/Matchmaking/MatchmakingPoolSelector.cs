@@ -1,11 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -13,6 +15,7 @@ using osu.Game.Online.Matchmaking;
 using osu.Game.Rulesets;
 using osuTK;
 using osuTK.Graphics;
+using osuTK.Input;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking
 {
@@ -24,6 +27,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
         public readonly Bindable<MatchmakingPool?> SelectedPool = new Bindable<MatchmakingPool?>();
 
         private FillFlowContainer<SelectorButton> poolFlow = null!;
+        private HoverClickSounds clickSounds = null!;
 
         public MatchmakingPoolSelector()
         {
@@ -33,11 +37,19 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChild = poolFlow = new FillFlowContainer<SelectorButton>
+            InternalChildren = new Drawable[]
             {
-                AutoSizeAxes = Axes.Both,
-                Direction = FillDirection.Horizontal,
-                Spacing = new Vector2(3)
+                poolFlow = new FillFlowContainer<SelectorButton>
+                {
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Horizontal,
+                    Spacing = new Vector2(3)
+                },
+                clickSounds = new HoverClickSounds(HoverSampleSet.TabSelect)
+                {
+                    // Click samples are played manually
+                    Alpha = 0
+                }
             };
         }
 
@@ -51,6 +63,37 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
                 foreach (var p in pools.NewValue)
                     poolFlow.Add(new SelectorButton(p) { SelectedPool = { BindTarget = SelectedPool } });
             }, true);
+        }
+
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            if (e.Key != Key.Left && e.Key != Key.Right)
+                return false;
+
+            clickSounds.PlayClickSample();
+
+            if (SelectedPool.Value == null)
+            {
+                SelectedPool.Value = AvailablePools.Value[0];
+                return true;
+            }
+
+            int currentPoolIndex = Array.IndexOf(AvailablePools.Value, SelectedPool.Value);
+
+            switch (e.Key)
+            {
+                case Key.Left:
+                    SelectedPool.Value = currentPoolIndex == 0
+                        ? AvailablePools.Value[^1]
+                        : AvailablePools.Value[(currentPoolIndex - 1) % AvailablePools.Value.Length];
+                    break;
+
+                case Key.Right:
+                    SelectedPool.Value = AvailablePools.Value[(currentPoolIndex + 1) % AvailablePools.Value.Length];
+                    break;
+            }
+
+            return true;
         }
 
         private partial class SelectorButton : CompositeDrawable
