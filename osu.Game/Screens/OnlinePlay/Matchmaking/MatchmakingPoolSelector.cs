@@ -27,6 +27,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
         public readonly Bindable<MatchmakingPool?> SelectedPool = new Bindable<MatchmakingPool?>();
 
         private FillFlowContainer<SelectorButton> poolFlow = null!;
+        private HoverClickSounds clickSounds = null!;
 
         public MatchmakingPoolSelector()
         {
@@ -36,11 +37,19 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChild = poolFlow = new FillFlowContainer<SelectorButton>
+            InternalChildren = new Drawable[]
             {
-                AutoSizeAxes = Axes.Both,
-                Direction = FillDirection.Horizontal,
-                Spacing = new Vector2(3)
+                poolFlow = new FillFlowContainer<SelectorButton>
+                {
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Horizontal,
+                    Spacing = new Vector2(3)
+                },
+                clickSounds = new HoverClickSounds(HoverSampleSet.TabSelect)
+                {
+                    // Click samples are played manually
+                    Alpha = 0
+                }
             };
         }
 
@@ -60,6 +69,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
         {
             if (e.Key != Key.Left && e.Key != Key.Right)
                 return false;
+
+            clickSounds.PlayClickSample();
 
             if (SelectedPool.Value == null)
             {
