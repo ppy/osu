@@ -25,7 +25,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
         {
             base.SetUpSteps();
 
-            AddStep("join room", () => JoinRoom(CreateDefaultRoom()));
+            AddStep("join room", () => JoinRoom(CreateDefaultRoom(MatchType.Matchmaking)));
             WaitForJoined();
 
             setupRequestHandler();

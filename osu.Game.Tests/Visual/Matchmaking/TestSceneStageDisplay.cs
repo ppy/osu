@@ -5,8 +5,8 @@ using System;
 using NUnit.Framework;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
-using osu.Game.Online.Matchmaking;
 using osu.Game.Online.Multiplayer.MatchTypes.Matchmaking;
+using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Matchmaking;
 using osu.Game.Tests.Visual.Multiplayer;
 
@@ -18,7 +18,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
         {
             base.SetUpSteps();
 
-            AddStep("join room", () => JoinRoom(CreateDefaultRoom()));
+            AddStep("join room", () => JoinRoom(CreateDefaultRoom(MatchType.Matchmaking)));
             WaitForJoined();
 
             AddStep("add bubble", () => Child = new StageDisplay
@@ -31,24 +31,11 @@ namespace osu.Game.Tests.Visual.Matchmaking
         }
 
         [Test]
-        public void TestStartCountdown()
+        public void TestChangeStage()
         {
-            foreach (var status in Enum.GetValues<MatchmakingStage>())
+            foreach (var stage in Enum.GetValues<MatchmakingStage>())
             {
-                AddStep($"{status}", () =>
-                {
-                    MultiplayerClient.ChangeMatchRoomState(new MatchmakingRoomState
-                    {
-                        Stage = status
-                    }).WaitSafely();
-
-                    MultiplayerClient.StartCountdown(new MatchmakingStageCountdown
-                    {
-                        Stage = status,
-                        TimeRemaining = TimeSpan.FromSeconds(5)
-                    }).WaitSafely();
-                });
-
+                AddStep($"{stage}", () => MultiplayerClient.MatchmakingChangeStage(stage).WaitSafely());
                 AddWaitStep("wait a bit", 10);
             }
         }
