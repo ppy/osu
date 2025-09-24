@@ -76,7 +76,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
                 changeStage(MatchmakingStage.UserBeatmapSelect);
                 changeStage(MatchmakingStage.ServerBeatmapFinalised, state =>
                 {
-                    MultiplayerPlaylistItem[] beatmaps = Enumerable.Range(1, 50).Select(i => new MultiplayerPlaylistItem
+                    MultiplayerPlaylistItem[] beatmaps = Enumerable.Range(1, 8).Select(i => new MultiplayerPlaylistItem
                     {
                         ID = i,
                         BeatmapID = i,
