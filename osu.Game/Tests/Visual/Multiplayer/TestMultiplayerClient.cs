@@ -17,6 +17,7 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Matchmaking;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.Countdown;
+using osu.Game.Online.Multiplayer.MatchTypes.Matchmaking;
 using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Mods;
@@ -248,6 +249,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 Host = localUser
             };
 
+            await changeMatchType(ServerRoom.Settings.MatchType).ConfigureAwait(false);
             await updatePlaylistOrder(ServerRoom).ConfigureAwait(false);
             await updateCurrentItem(ServerRoom, false).ConfigureAwait(false);
 
@@ -260,10 +262,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
         protected override void OnRoomJoined()
         {
             Debug.Assert(ServerRoom != null);
-
-            // emulate the server sending this after the join room. scheduler required to make sure the join room event is fired first (in Join).
-            changeMatchType(ServerRoom.Settings.MatchType).WaitSafely();
-
             RoomJoined = true;
         }
 
@@ -589,6 +587,18 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     foreach (var user in ServerRoom.Users)
                     {
                         user.MatchState = new TeamVersusUserState();
+                        await ((IMultiplayerClient)this).MatchUserStateChanged(clone(user.UserID), clone(user.MatchState)).ConfigureAwait(false);
+                    }
+
+                    break;
+
+                case MatchType.Matchmaking:
+                    ServerRoom.MatchState = new MatchmakingRoomState();
+                    await ((IMultiplayerClient)this).MatchRoomStateChanged(clone(ServerRoom.MatchState)).ConfigureAwait(false);
+
+                    foreach (var user in ServerRoom.Users)
+                    {
+                        user.MatchState = null;
                         await ((IMultiplayerClient)this).MatchUserStateChanged(clone(user.UserID), clone(user.MatchState)).ConfigureAwait(false);
                     }
 
