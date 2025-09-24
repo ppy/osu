@@ -6,9 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Extensions;
-using osu.Framework.Graphics.Primitives;
 using osu.Framework.Screens;
-using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
@@ -19,10 +17,7 @@ using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.OnlinePlay.Matchmaking;
-using osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Pick;
 using osu.Game.Tests.Visual.Multiplayer;
-using osuTK;
-using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Matchmaking
 {
@@ -41,6 +36,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
             AddStep("join room", () =>
             {
                 var room = CreateDefaultRoom();
+                room.Type = MatchType.Matchmaking;
                 room.Playlist = Enumerable.Range(1, 50).Select(i => new PlaylistItem(new MultiplayerPlaylistItem
                 {
                     ID = i,
@@ -97,104 +93,47 @@ namespace osu.Game.Tests.Visual.Matchmaking
         [Test]
         public void TestGameplayFlow()
         {
-            // Initial "ready" status of the room".
-            AddWaitStep("wait", 5);
-
-            AddStep("round start", () => MultiplayerClient.ChangeMatchRoomState(new MatchmakingRoomState
+            for (int round = 1; round <= 2; round++)
             {
-                Stage = MatchmakingStage.RoundWarmupTime
-            }).WaitSafely());
+                AddLabel($"Round {round}");
 
-            // Next round starts with picks.
-            AddWaitStep("wait", 5);
-
-            AddStep("pick", () => MultiplayerClient.ChangeMatchRoomState(new MatchmakingRoomState
-            {
-                Stage = MatchmakingStage.UserBeatmapSelect
-            }).WaitSafely());
-
-            // Make some selections
-            AddWaitStep("wait", 5);
-
-            for (int i = 0; i < 3; i++)
-            {
-                int j = i * 2;
-                AddStep("click a beatmap", () =>
+                int r = round;
+                changeStage(MatchmakingStage.RoundWarmupTime, state => state.CurrentRound = r);
+                changeStage(MatchmakingStage.UserBeatmapSelect);
+                changeStage(MatchmakingStage.ServerBeatmapFinalised, state =>
                 {
-                    Quad panelQuad = this.ChildrenOfType<BeatmapPanel>().ElementAt(j).ScreenSpaceDrawQuad;
+                    MultiplayerPlaylistItem[] beatmaps = Enumerable.Range(1, 50).Select(i => new MultiplayerPlaylistItem
+                    {
+                        ID = i,
+                        BeatmapID = i,
+                        StarRating = i / 10.0,
+                    }).ToArray();
 
-                    InputManager.MoveMouseTo(new Vector2(panelQuad.Centre.X, panelQuad.TopLeft.Y + 5));
-                    InputManager.Click(MouseButton.Left);
-                });
+                    state.CandidateItems = beatmaps.Select(b => b.ID).ToArray();
+                    state.CandidateItem = beatmaps[0].ID;
+                }, waitTime: 35);
 
-                AddWaitStep("wait", 2);
+                changeStage(MatchmakingStage.WaitingForClientsBeatmapDownload);
+                changeStage(MatchmakingStage.GameplayWarmupTime);
+                changeStage(MatchmakingStage.Gameplay);
+                changeStage(MatchmakingStage.ResultsDisplaying);
             }
 
-            // Lock in the gameplay beatmap
-
-            AddStep("selection", () =>
+            changeStage(MatchmakingStage.Ended, state =>
             {
-                MultiplayerPlaylistItem[] beatmaps = Enumerable.Range(1, 50).Select(i => new MultiplayerPlaylistItem
-                {
-                    ID = i,
-                    BeatmapID = i,
-                    StarRating = i / 10.0,
-                }).ToArray();
-
-                MultiplayerClient.ChangeMatchRoomState(new MatchmakingRoomState
-                {
-                    Stage = MatchmakingStage.ServerBeatmapFinalised,
-                    CandidateItems = beatmaps.Select(b => b.ID).ToArray(),
-                    CandidateItem = beatmaps[0].ID
-                }).WaitSafely();
-            });
-
-            // Prepare gameplay.
-            AddWaitStep("wait", 25);
-
-            AddStep("prepare gameplay", () => MultiplayerClient.ChangeMatchRoomState(new MatchmakingRoomState
-            {
-                Stage = MatchmakingStage.GameplayWarmupTime
-            }).WaitSafely());
-
-            // Start gameplay.
-            AddWaitStep("wait", 5);
-
-            AddStep("gameplay", () => MultiplayerClient.ChangeMatchRoomState(new MatchmakingRoomState
-            {
-                Stage = MatchmakingStage.Gameplay
-            }).WaitSafely());
-
-            AddStep("start gameplay", () => MultiplayerClient.StartMatch().WaitSafely());
-            // AddUntilStep("wait for player", () => (Stack.CurrentScreen as Player)?.IsLoaded == true);
-
-            // Finish gameplay.
-            AddWaitStep("wait", 5);
-
-            AddStep("round end", () => MultiplayerClient.ChangeMatchRoomState(new MatchmakingRoomState
-            {
-                Stage = MatchmakingStage.ResultsDisplaying
-            }).WaitSafely());
-
-            AddWaitStep("wait", 10);
-
-            AddStep("room end", () =>
-            {
-                MatchmakingRoomState state = new MatchmakingRoomState
-                {
-                    CurrentRound = 1,
-                    Stage = MatchmakingStage.Ended
-                };
-
                 int localUserId = API.LocalUser.Value.OnlineID;
 
                 state.Users[localUserId].Placement = 1;
                 state.Users[localUserId].Rounds[1].Placement = 1;
                 state.Users[localUserId].Rounds[1].TotalScore = 1;
                 state.Users[localUserId].Rounds[1].Statistics[HitResult.LargeBonus] = 1;
-
-                MultiplayerClient.ChangeMatchRoomState(state).WaitSafely();
             });
+        }
+
+        private void changeStage(MatchmakingStage stage, Action<MatchmakingRoomState>? prepare = null, int waitTime = 5)
+        {
+            AddStep($"stage: {stage}", () => MultiplayerClient.MatchmakingChangeStage(stage, prepare).WaitSafely());
+            AddWaitStep("wait", waitTime);
         }
 
         private void setupRequestHandler()

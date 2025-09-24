@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using NUnit.Framework;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
@@ -26,18 +27,14 @@ namespace osu.Game.Tests.Visual.Matchmaking
             });
         }
 
-        [TestCase(MatchmakingStage.WaitingForClientsJoin)]
-        [TestCase(MatchmakingStage.RoundWarmupTime)]
-        [TestCase(MatchmakingStage.UserBeatmapSelect)]
-        [TestCase(MatchmakingStage.ServerBeatmapFinalised)]
-        [TestCase(MatchmakingStage.WaitingForClientsBeatmapDownload)]
-        [TestCase(MatchmakingStage.GameplayWarmupTime)]
-        [TestCase(MatchmakingStage.Gameplay)]
-        [TestCase(MatchmakingStage.ResultsDisplaying)]
-        [TestCase(MatchmakingStage.Ended)]
-        public void TestStatus(MatchmakingStage status)
+        [Test]
+        public void TestChangeStage()
         {
-            AddStep("set status", () => MultiplayerClient.ChangeMatchRoomState(new MatchmakingRoomState { Stage = status }).WaitSafely());
+            foreach (var stage in Enum.GetValues<MatchmakingStage>())
+            {
+                AddStep($"{stage}", () => MultiplayerClient.MatchmakingChangeStage(stage).WaitSafely());
+                AddWaitStep("wait a bit", 10);
+            }
         }
     }
 }
