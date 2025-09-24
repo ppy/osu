@@ -244,8 +244,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
 
             public void ReleasePanels()
             {
-                foreach (var panel in Children)
-                    panel.ReleasePanel();
+                // Matches the schedule in AcquirePanels.
+                ScheduleAfterChildren(() =>
+                {
+                    foreach (var panel in Children)
+                        panel.ReleasePanel();
+                });
             }
         }
 
