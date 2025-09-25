@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -20,8 +21,12 @@ using osu.Game.Utils;
 
 namespace osu.Game.Screens.OnlinePlay.Playlists
 {
-    public class PlaylistsSongSelectV2 : SongSelect
+    public class PlaylistsSongSelectV2 : SongSelect, IOnlinePlaySubScreen
     {
+        public string ShortTitle => "song selection";
+
+        public override string Title => ShortTitle.Humanize();
+
         protected readonly Bindable<bool> Freestyle = new Bindable<bool>(true);
         private readonly Bindable<IReadOnlyList<Mod>> freeMods = new Bindable<IReadOnlyList<Mod>>([]);
 
