@@ -266,7 +266,7 @@ namespace osu.Game.Rulesets.Edit
             {
                 item.Selected.DisabledChanged += isDisabled =>
                 {
-                    item.TooltipText = isDisabled ? "Add at least one timing point first!" : ((HitObjectCompositionToolButton)item).TooltipText;
+                    item.TooltipText = isDisabled ? "Add at least one timing point first!" : ((HitObjectCompositionToolButton)item).Tool.TooltipText;
                 };
             }
 
