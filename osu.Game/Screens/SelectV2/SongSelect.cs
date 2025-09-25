@@ -94,6 +94,8 @@ namespace osu.Game.Screens.SelectV2
         /// </summary>
         protected bool ControlGlobalMusic { get; init; } = true;
 
+        protected MarginPadding LeftPadding { get; init; }
+
         private ModSelectOverlay modSelectOverlay = null!;
         private ModSpeedHotkeyHandler modSpeedHotkeyHandler = null!;
 
@@ -222,6 +224,7 @@ namespace osu.Game.Screens.SelectV2
                                                         RelativeSizeAxes = Axes.Both,
                                                         Spacing = new Vector2(0f, 4f),
                                                         Direction = FillDirection.Vertical,
+                                                        Padding = LeftPadding,
                                                         Children = new Drawable[]
                                                         {
                                                             new ShearAligningWrapper(titleWedge = new BeatmapTitleWedge()),
