@@ -15,7 +15,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Pick
 {
@@ -58,35 +57,23 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Pick
 
             InternalChildren = new Drawable[]
             {
-                new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider.Background3
-                },
-                cover = new UpdateableOnlineBeatmapSetCover(BeatmapSetCoverType.Card, timeBeforeLoad: 0)
+                cover = new UpdateableOnlineBeatmapSetCover(BeatmapSetCoverType.Card, timeBeforeLoad: 0, timeBeforeUnload: 10000)
                 {
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Colour = ColourInfo.GradientVertical(Color4.White.Opacity(0.1f), Color4.White.Opacity(0.3f))
+                },
+                new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = ColourInfo.GradientHorizontal(
+                        colourProvider.Background4.Opacity(0.7f),
+                        colourProvider.Background4.Opacity(0.4f)
+                    )
                 },
                 content = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                },
-                new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Masking = true,
-                    CornerRadius = 6,
-                    BorderThickness = 2,
-                    BorderColour = ColourInfo.GradientVertical(colourProvider.Background1, colourProvider.Background1.Opacity(0)),
-                    Child = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Alpha = 0,
-                        AlwaysPresent = true,
-                    },
                 },
                 OverlayLayer,
             };
@@ -146,12 +133,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Pick
                         {
                             Text = new RomanisableString(beatmap.Metadata.TitleUnicode, beatmap.Metadata.TitleUnicode),
                             Font = OsuFont.Default.With(size: 19, weight: FontWeight.SemiBold),
-                            Shadow = false,
                             RelativeSizeAxes = Axes.X,
                         },
                         new TextFlowContainer(s =>
                         {
-                            s.Shadow = false;
                             s.Font = OsuFont.GetFont(size: 16, weight: FontWeight.SemiBold);
                         }).With(d =>
                         {
@@ -178,7 +163,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Pick
                                 {
                                     Text = beatmap.DifficultyName,
                                     Font = OsuFont.Default.With(size: 16, weight: FontWeight.SemiBold),
-                                    Shadow = false,
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
                                 },

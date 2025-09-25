@@ -12,7 +12,6 @@ using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
-using osuTK.Graphics;
 using osuTK.Input;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Pick
@@ -29,7 +28,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Pick
         private readonly BeatmapSelectionOverlay selectionOverlay;
         private readonly Container border;
         private readonly Box flash;
-        private readonly Container shadow;
 
         public bool AllowSelection;
 
@@ -54,24 +52,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Pick
                     Origin = Anchor.Centre,
                     Children = new Drawable[]
                     {
-                        shadow = new Container
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Padding = new MarginPadding(4),
-                            Y = 8,
-                            Child = new Container
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Masking = true,
-                                CornerRadius = 7,
-                                Child = new Box
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Colour = Color4.Black,
-                                    Alpha = 0.15f,
-                                }
-                            }
-                        },
                         new Container
                         {
                             RelativeSizeAxes = Axes.Both,
@@ -94,6 +74,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Pick
                                 {
                                     flash = new Box
                                     {
+                                        Blending = BlendingParameters.Additive,
                                         RelativeSizeAxes = Axes.Both,
                                         Alpha = 0,
                                     },
@@ -154,8 +135,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Pick
             if (e.Button == MouseButton.Left)
             {
                 scaleContainer.ScaleTo(0.95f, 400, Easing.OutExpo);
-                shadow.MoveToY(4, 400, Easing.OutExpo)
-                      .TransformTo(nameof(Padding), new MarginPadding(2), 400, Easing.OutExpo);
                 return true;
             }
 
@@ -169,8 +148,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Pick
             if (e.Button == MouseButton.Left)
             {
                 scaleContainer.ScaleTo(1f, 500, Easing.OutElasticHalf);
-                shadow.MoveToY(8, 500, Easing.OutElasticHalf)
-                      .TransformTo(nameof(Padding), new MarginPadding(4), 400, Easing.OutExpo);
             }
         }
 

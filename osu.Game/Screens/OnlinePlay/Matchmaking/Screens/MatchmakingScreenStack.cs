@@ -28,30 +28,30 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens
         private void load()
         {
             RelativeSizeAxes = Axes.Both;
-            Padding = new MarginPadding(10);
 
             InternalChildren = new Drawable[]
             {
-                new GridContainer
+                new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    RowDimensions = new[] { new Dimension(), new Dimension(GridSizeMode.AutoSize) },
-                    Content = new Drawable[][]
+                    Padding = new MarginPadding(10)
                     {
-                        [
-                            screenStack = new ScreenStack(),
-                        ],
-                        [
-                            new StageDisplay
-                            {
-                                RelativeSizeAxes = Axes.X
-                            }
-                        ]
+                        Bottom = StageDisplay.HEIGHT,
+                    },
+                    Children = new Drawable[]
+                    {
+                        screenStack = new ScreenStack(),
                     }
                 },
                 playersList = new PlayerPanelList
                 {
                     DisplayArea = this
+                },
+                new StageDisplay
+                {
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                    RelativeSizeAxes = Axes.X
                 }
             };
         }

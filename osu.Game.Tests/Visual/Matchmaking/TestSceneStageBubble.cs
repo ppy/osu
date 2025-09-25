@@ -23,11 +23,10 @@ namespace osu.Game.Tests.Visual.Matchmaking
             AddStep("join room", () => JoinRoom(CreateDefaultRoom(MatchType.Matchmaking)));
             WaitForJoined();
 
-            AddStep("add bubble", () => Child = new StageBubble(MatchmakingStage.RoundWarmupTime, "Next Round")
+            AddStep("add bubble", () => Child = new StageBubble(null, MatchmakingStage.RoundWarmupTime, "Next Round")
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Width = 100
             });
         }
 

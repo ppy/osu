@@ -5,76 +5,114 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Matchmaking;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.Matchmaking;
-using osuTK.Graphics;
+using osu.Game.Overlays;
+using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking
 {
     internal partial class StageBubble : CompositeDrawable
     {
-        private readonly Color4 backgroundColour = Color4.Salmon;
-
         [Resolved]
         private MultiplayerClient client { get; set; } = null!;
 
+        public readonly int? Round;
+
         private readonly MatchmakingStage stage;
+
         private readonly LocalisableString displayText;
         private Drawable progressBar = null!;
 
         private DateTimeOffset countdownStartTime;
         private DateTimeOffset countdownEndTime;
+        private SpriteIcon arrow = null!;
 
-        private Sample? stageProgressSample;
+        private Sample? countdownTickSample;
         private double? lastSamplePlayback;
 
-        public StageBubble(MatchmakingStage stage, LocalisableString displayText)
+        public bool Active { get; private set; }
+
+        public float Progress => progressBar.Width;
+
+        public StageBubble(int? round, MatchmakingStage stage, LocalisableString displayText)
         {
+            Round = round;
             this.stage = stage;
             this.displayText = displayText;
 
-            AutoSizeAxes = Axes.Y;
+            AutoSizeAxes = Axes.Both;
         }
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        private void load(AudioManager audio, OverlayColourProvider colourProvider)
         {
-            InternalChild = new CircularContainer
+            InternalChild = new FillFlowContainer
             {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-                Masking = true,
-                Children = new[]
+                AutoSizeAxes = Axes.Both,
+                Direction = FillDirection.Horizontal,
+                Spacing = new Vector2(5),
+                Children = new Drawable[]
                 {
-                    new Box
+                    arrow = new SpriteIcon
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = backgroundColour.Darken(0.2f)
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
+                        Alpha = 0.5f,
+                        Size = new Vector2(16),
+                        Icon = FontAwesome.Solid.ArrowRight,
+                        Margin = new MarginPadding { Horizontal = 10 }
                     },
-                    progressBar = new Box
+                    new Container
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = backgroundColour
-                    },
-                    new OsuSpriteText
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Text = displayText,
-                        Padding = new MarginPadding(10)
+                        Masking = true,
+                        CornerRadius = 5,
+                        CornerExponent = 10,
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
+                        AutoSizeAxes = Axes.Both,
+                        Children = new[]
+                        {
+                            new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Colour =
+                                    ColourInfo.GradientVertical(
+                                        colourProvider.Dark2,
+                                        colourProvider.Dark1
+                                    ),
+                            },
+                            progressBar = new Box
+                            {
+                                Blending = BlendingParameters.Additive,
+                                EdgeSmoothness = new Vector2(1),
+                                RelativeSizeAxes = Axes.Both,
+                                Width = 0,
+                                Colour = colourProvider.Dark3,
+                            },
+                            new OsuSpriteText
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Text = displayText,
+                                Padding = new MarginPadding(10)
+                            }
+                        }
                     }
                 }
             };
 
-            stageProgressSample = audio.Samples.Get(@"Multiplayer/countdown-tick");
+            Alpha = 0.5f;
+            countdownTickSample = audio.Samples.Get(@"Multiplayer/countdown-tick");
         }
 
         protected override void LoadComplete()
@@ -97,64 +135,86 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
         {
             base.Update();
 
-            TimeSpan duration = countdownEndTime - countdownStartTime;
+            if (!Active)
+                return;
 
-            if (duration.TotalMilliseconds == 0)
-                progressBar.Width = 0;
-            else
+            TimeSpan total = countdownEndTime - countdownStartTime;
+            TimeSpan elapsed = DateTimeOffset.Now - countdownStartTime;
+
+            if (total.TotalMilliseconds <= 0)
             {
-                TimeSpan elapsed = DateTimeOffset.Now - countdownStartTime;
-                progressBar.Width = (float)(elapsed.TotalMilliseconds / duration.TotalMilliseconds);
+                progressBar.Width = 0;
+                return;
+            }
 
-                bool enoughTimeElapsed = lastSamplePlayback == null || Time.Current - lastSamplePlayback >= 1000f;
-                if (elapsed.TotalMilliseconds < 1000f || !enoughTimeElapsed || elapsed.TotalMilliseconds >= duration.TotalMilliseconds)
-                    return;
+            progressBar.Width = (float)Math.Clamp(elapsed.TotalMilliseconds / total.TotalMilliseconds, 0, 1);
 
-                stageProgressSample?.Play();
-                lastSamplePlayback = Time.Current;
+            int secondsRemaining = Math.Max(0, (int)Math.Ceiling((total.TotalMilliseconds - elapsed.TotalMilliseconds) / 1000));
+
+            if (total.TotalMilliseconds - elapsed.TotalMilliseconds <= 3000
+                && lastSamplePlayback != secondsRemaining)
+            {
+                countdownTickSample?.Play();
+                lastSamplePlayback = secondsRemaining;
             }
         }
 
         private void onMatchRoomStateChanged(MatchRoomState? state) => Scheduler.Add(() =>
         {
-            if (state is not MatchmakingRoomState matchmakingState)
+            bool wasActive = Active;
+
+            Active = false;
+
+            if (state is not MatchmakingRoomState roomState)
                 return;
 
-            if (matchmakingState.Stage == MatchmakingStage.RoundWarmupTime)
+            if (Round != null && roomState.CurrentRound != Round)
+                return;
+
+            Active = stage == roomState.Stage;
+
+            if (wasActive)
+                progressBar.Width = 1;
+
+            bool isPreparing =
+                (stage == MatchmakingStage.RoundWarmupTime && roomState.Stage == MatchmakingStage.WaitingForClientsJoin) ||
+                (stage == MatchmakingStage.GameplayWarmupTime && roomState.Stage == MatchmakingStage.WaitingForClientsBeatmapDownload) ||
+                (stage == MatchmakingStage.ResultsDisplaying && roomState.Stage == MatchmakingStage.Gameplay);
+
+            if (isPreparing)
             {
-                countdownStartTime = countdownEndTime = DateTimeOffset.Now;
-                activate();
+                arrow.FadeTo(1, 500)
+                     .Then()
+                     .FadeTo(0.5f, 500)
+                     .Loop();
             }
         });
 
         private void onCountdownStarted(MultiplayerCountdown countdown) => Scheduler.Add(() =>
         {
-            if (countdown is not MatchmakingStageCountdown matchmakingStatusCountdown || matchmakingStatusCountdown.Stage != stage)
+            if (!Active)
+                return;
+
+            if (countdown is not MatchmakingStageCountdown)
                 return;
 
             countdownStartTime = DateTimeOffset.Now;
             countdownEndTime = countdownStartTime + countdown.TimeRemaining;
-            activate();
+            arrow.FadeIn(500, Easing.OutQuint);
+
+            this.FadeIn(200);
         });
 
         private void onCountdownStopped(MultiplayerCountdown countdown) => Scheduler.Add(() =>
         {
-            if (countdown is not MatchmakingStageCountdown matchmakingStatusCountdown || matchmakingStatusCountdown.Stage != stage)
+            if (!Active)
+                return;
+
+            if (countdown is not MatchmakingStageCountdown)
                 return;
 
             countdownEndTime = DateTimeOffset.Now;
-            deactivate();
         });
-
-        private void activate()
-        {
-            this.FadeTo(1, 200);
-        }
-
-        private void deactivate()
-        {
-            this.FadeTo(0.5f, 200);
-        }
 
         protected override void Dispose(bool isDisposing)
         {

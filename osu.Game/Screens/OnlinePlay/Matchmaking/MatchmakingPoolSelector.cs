@@ -6,10 +6,12 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Matchmaking;
+using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osuTK;
 using osuTK.Graphics;
@@ -18,7 +20,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
 {
     public partial class MatchmakingPoolSelector : CompositeDrawable
     {
-        private const float icon_size = 36;
+        private const float icon_size = 48;
 
         public readonly Bindable<MatchmakingPool[]> AvailablePools = new Bindable<MatchmakingPool[]>();
         public readonly Bindable<MatchmakingPool?> SelectedPool = new Bindable<MatchmakingPool?>();
@@ -35,9 +37,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
         {
             InternalChild = poolFlow = new FillFlowContainer<SelectorButton>
             {
-                AutoSizeAxes = Axes.Both,
+                AutoSizeAxes = Axes.X,
+                Height = icon_size * 1.2f,
                 Direction = FillDirection.Horizontal,
-                Spacing = new Vector2(3)
+                Spacing = new Vector2(5),
             };
         }
 
@@ -48,12 +51,20 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
             AvailablePools.BindValueChanged(pools =>
             {
                 poolFlow.Clear();
+
                 foreach (var p in pools.NewValue)
-                    poolFlow.Add(new SelectorButton(p) { SelectedPool = { BindTarget = SelectedPool } });
+                {
+                    poolFlow.Add(new SelectorButton(p)
+                    {
+                        SelectedPool = { BindTarget = SelectedPool },
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                    });
+                }
             }, true);
         }
 
-        private partial class SelectorButton : CompositeDrawable
+        private partial class SelectorButton : OsuAnimatedButton
         {
             public readonly Bindable<MatchmakingPool?> SelectedPool = new Bindable<MatchmakingPool?>();
 
@@ -63,6 +74,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
             private readonly MatchmakingPool pool;
             private Drawable iconSprite = null!;
 
+            private Box flashLayer = null!;
+
             public SelectorButton(MatchmakingPool pool)
             {
                 this.pool = pool;
@@ -71,14 +84,39 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
             }
 
             [BackgroundDependencyLoader]
-            private void load()
+            private void load(OverlayColourProvider colourProvider)
             {
-                InternalChild = new OsuAnimatedButton
+                Content.Masking = true;
+                Content.CornerRadius = 20;
+                Content.CornerExponent = 10;
+
+                Children = new Drawable[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Child = iconSprite = createIcon(),
-                    Action = () => SelectedPool.Value = pool
+                    new Box
+                    {
+                        Colour = colourProvider.Background2,
+                        Alpha = 0.4f,
+                        RelativeSizeAxes = Axes.Both,
+                    },
+                    flashLayer = new Box
+                    {
+                        Colour = Color4.White,
+                        Blending = BlendingParameters.Additive,
+                        Alpha = 0,
+                        RelativeSizeAxes = Axes.Both,
+                    },
+                    new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Padding = new MarginPadding(10),
+                        Children = new[]
+                        {
+                            iconSprite = createIcon(),
+                        }
+                    },
                 };
+
+                Action = () => SelectedPool.Value = pool;
             }
 
             protected override void LoadComplete()
@@ -89,12 +127,36 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
                 FinishTransforms(true);
             }
 
+            protected override bool OnHover(HoverEvent e)
+            {
+                if (!isSelected)
+                    flashLayer.FadeTo(0.05f, 200, Easing.OutQuint);
+                return base.OnHover(e);
+            }
+
+            protected override void OnHoverLost(HoverLostEvent e)
+            {
+                if (!isSelected)
+                    flashLayer.FadeTo(0f, 200, Easing.OutQuint);
+                base.OnHoverLost(e);
+            }
+
+            private bool isSelected => SelectedPool.Value?.Equals(pool) == true;
+
             private void onSelectionChanged(ValueChangedEvent<MatchmakingPool?> selection)
             {
-                if (selection.NewValue?.Equals(pool) == true)
+                if (isSelected)
+                {
+                    this.ScaleTo(1.2f, 200, Easing.OutQuint);
                     iconSprite.FadeColour(Color4.Gold, 100, Easing.OutQuint);
+                    flashLayer.FadeTo(0.1f, 200, Easing.OutQuint);
+                }
                 else
+                {
+                    this.ScaleTo(1f, 200, Easing.OutQuint);
                     iconSprite.FadeColour(OsuColour.Gray(0.5f), 100);
+                    flashLayer.FadeOut(200, Easing.OutQuint);
+                }
             }
 
             private Drawable createIcon()
@@ -108,7 +170,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
                 if (pool.Variant == 0)
                     return icon;
 
-                return new BufferedContainer
+                return new BufferedContainer(pixelSnapping: true)
                 {
                     RelativeSizeAxes = Axes.Both,
                     Children = new[]
@@ -118,7 +180,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
                         {
                             Anchor = Anchor.BottomRight,
                             Origin = Anchor.BottomRight,
-                            Size = new Vector2(14, 10),
+                            Size = icon_size * new Vector2(0.4f, 0.28f),
                             Children = new Drawable[]
                             {
                                 new Box
@@ -130,7 +192,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
                                     Text = $"{pool.Variant}K",
-                                    Font = OsuFont.Default.With(size: 8, fixedWidth: true, weight: FontWeight.Bold),
+                                    Font = OsuFont.Default.With(size: icon_size * 0.3f, weight: FontWeight.Bold),
                                     UseFullGlyphHeight = false,
                                     Blending = new BlendingParameters
                                     {
