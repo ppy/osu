@@ -34,7 +34,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding(10),
+                    Padding = new MarginPadding(10)
+                    {
+                        Bottom = StageDisplay.HEIGHT,
+                    },
                     Children = new Drawable[]
                     {
                         screenStack = new ScreenStack(),

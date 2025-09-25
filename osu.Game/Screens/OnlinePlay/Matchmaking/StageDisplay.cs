@@ -20,6 +20,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
 {
     public partial class StageDisplay : CompositeDrawable
     {
+        public const float HEIGHT = 96;
+
         // TODO: get this from somewhere?
         private const int round_count = 5;
 
@@ -47,7 +49,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
                 new Container
                 {
                     RelativeSizeAxes = Axes.X,
-                    Height = 96,
+                    Height = HEIGHT,
                     Children = new Drawable[]
                     {
                         scroll = new StageScrollContainer
