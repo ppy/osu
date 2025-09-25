@@ -27,8 +27,8 @@ namespace osu.Game.Screens.OnlinePlay
     {
         private const float bar_height = 30f;
 
-        public readonly Bindable<IReadOnlyList<Mod>> FreeMods = new Bindable<IReadOnlyList<Mod>>();
-        public readonly IBindable<bool> Freestyle = new Bindable<bool>();
+        public readonly Bindable<IReadOnlyList<Mod>> FreeMods = new Bindable<IReadOnlyList<Mod>>([]);
+        public readonly Bindable<bool> Freestyle = new Bindable<bool>();
 
         public new Action Action
         {
@@ -104,7 +104,11 @@ namespace osu.Game.Screens.OnlinePlay
                                     Current = { BindTarget = FreeMods },
                                     ExpansionMode = ExpansionMode.AlwaysContracted,
                                 },
-                                overflowModCountDisplay = new ModCountText { Mods = { BindTarget = FreeMods }, },
+                                overflowModCountDisplay = new ModCountText
+                                {
+                                    Mods = { BindTarget = FreeMods },
+                                    Freestyle = { BindTarget = Freestyle }
+                                },
                             }
                         },
                     }
@@ -135,6 +139,7 @@ namespace osu.Game.Screens.OnlinePlay
         private partial class ModCountText : CompositeDrawable
         {
             public readonly Bindable<IReadOnlyList<Mod>> Mods = new Bindable<IReadOnlyList<Mod>>();
+            public readonly Bindable<bool> Freestyle = new Bindable<bool>();
 
             private OsuSpriteText text = null!;
 
@@ -164,7 +169,18 @@ namespace osu.Game.Screens.OnlinePlay
                     }
                 };
 
-                Mods.BindValueChanged(v => text.Text = ModSelectOverlayStrings.Mods(v.NewValue.Count).ToUpper(), true);
+                Mods.BindValueChanged(_ => updateText());
+                Freestyle.BindValueChanged(_ => updateText());
+
+                updateText();
+            }
+
+            private void updateText()
+            {
+                if (Freestyle.Value)
+                    text.Text = "ALL MODS";
+                else
+                    text.Text = ModSelectOverlayStrings.Mods(Mods.Value.Count).ToUpper();
             }
         }
     }
