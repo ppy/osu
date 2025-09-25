@@ -46,7 +46,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
 
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 
-        public override bool ShowFooter => true;
+        public override IBindable<bool> ShowFooter { get; } = new Bindable<bool>(true);
 
         [Cached(typeof(OnlinePlayBeatmapAvailabilityTracker))]
         private readonly OnlinePlayBeatmapAvailabilityTracker beatmapAvailabilityTracker = new MultiplayerBeatmapAvailabilityTracker();

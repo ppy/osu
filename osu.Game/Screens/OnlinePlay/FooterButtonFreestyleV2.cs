@@ -18,7 +18,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay
 {
-    public class FooterButtonFreestyleV2 : ScreenFooterButton
+    public partial class FooterButtonFreestyleV2 : ScreenFooterButton
     {
         private const float bar_height = 30f;
 
