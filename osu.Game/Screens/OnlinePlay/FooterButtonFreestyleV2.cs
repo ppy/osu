@@ -14,6 +14,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using osu.Game.Screens.Footer;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay
 {
@@ -33,6 +34,9 @@ namespace osu.Game.Screens.OnlinePlay
 
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
+
+        private Drawable statusBackground = null!;
+        private OsuSpriteText statusText = null!;
 
         public FooterButtonFreestyleV2()
         {
@@ -66,56 +70,44 @@ namespace osu.Game.Screens.OnlinePlay
                         Colour = Colour4.Black.Opacity(0.25f),
                         Offset = new Vector2(0, 2),
                     },
-                    Children = new Drawable[]
+                    Children = new[]
                     {
-                        new Box
+                        statusBackground = new Box
                         {
                             Colour = colourProvider.Background3,
                             RelativeSizeAxes = Axes.Both,
                         },
-                        new StatusText { Freestyle = { BindTarget = Freestyle } }
+                        statusText = new OsuSpriteText
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Font = OsuFont.Torus.With(size: 14f, weight: FontWeight.Bold),
+                            Shear = -OsuGame.SHEAR,
+                        },
                     }
                 },
             });
         }
 
-        private partial class StatusText : CompositeDrawable
+        protected override void LoadComplete()
         {
-            public readonly Bindable<bool> Freestyle = new Bindable<bool>();
+            base.LoadComplete();
 
-            private OsuSpriteText text = null!;
-
-            [Resolved]
-            private OverlayColourProvider colourProvider { get; set; } = null!;
-
-            protected override void LoadComplete()
+            Freestyle.BindValueChanged(v =>
             {
-                base.LoadComplete();
-
-                RelativeSizeAxes = Axes.Both;
-
-                InternalChildren = new Drawable[]
+                if (v.NewValue)
                 {
-                    new Box
-                    {
-                        Colour = colourProvider.Background3,
-                        Alpha = 0.8f,
-                        RelativeSizeAxes = Axes.Both,
-                    },
-                    text = new OsuSpriteText
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Font = OsuFont.Torus.With(size: 14f, weight: FontWeight.Bold),
-                        Shear = -OsuGame.SHEAR,
-                    }
-                };
-
-                Freestyle.BindValueChanged(v =>
+                    statusBackground.Colour = colours.Yellow;
+                    statusText.Text = "ON";
+                    statusText.Colour = Color4.Black;
+                }
+                else
                 {
-                    text.Text = v.NewValue ? "ON" : "OFF";
-                }, true);
-            }
+                    statusBackground.Colour = colourProvider.Background3;
+                    statusText.Text = "OFF";
+                    statusText.Colour = Color4.White;
+                }
+            }, true);
         }
     }
 }
