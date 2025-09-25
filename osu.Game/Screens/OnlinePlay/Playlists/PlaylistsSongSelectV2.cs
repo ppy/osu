@@ -120,7 +120,9 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
         protected override void OnStart()
         {
-            room.Playlist = [createItem()];
+            if (room.Playlist.Count <= 1)
+                room.Playlist = [createItem()];
+
             this.Exit();
         }
 
