@@ -13,7 +13,6 @@ using osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Idle;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Pick;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Results;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Screens.RoundResults;
-using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens
 {
@@ -23,47 +22,36 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens
         private MultiplayerClient client { get; set; } = null!;
 
         private ScreenStack screenStack = null!;
+        private PlayerPanelList playersList = null!;
 
         [BackgroundDependencyLoader]
         private void load()
         {
             RelativeSizeAxes = Axes.Both;
-            Padding = new MarginPadding(10);
 
-            InternalChild = new GridContainer
+            InternalChildren = new Drawable[]
             {
-                RelativeSizeAxes = Axes.Both,
-                RowDimensions = new[] { new Dimension(), new Dimension(GridSizeMode.AutoSize) },
-                Content = new Drawable[][]
+                new Container
                 {
-                    [
-                        new GridContainer
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            ColumnDimensions = new[] { new Dimension(), new Dimension(GridSizeMode.Absolute, 20), new Dimension(GridSizeMode.AutoSize) },
-                            Padding = new MarginPadding { Bottom = 20 },
-                            Content = new Drawable?[][]
-                            {
-                                [
-                                    screenStack = new ScreenStack(),
-                                    null,
-                                    new PlayerPanelList
-                                    {
-                                        Horizontal = true,
-                                        RelativeSizeAxes = Axes.Y,
-                                        Width = 250,
-                                        Scale = new Vector2(0.8f),
-                                    }
-                                ]
-                            }
-                        }
-                    ],
-                    [
-                        new StageDisplay
-                        {
-                            RelativeSizeAxes = Axes.X
-                        }
-                    ]
+                    RelativeSizeAxes = Axes.Both,
+                    Padding = new MarginPadding(10)
+                    {
+                        Bottom = StageDisplay.HEIGHT,
+                    },
+                    Children = new Drawable[]
+                    {
+                        screenStack = new ScreenStack(),
+                    }
+                },
+                playersList = new PlayerPanelList
+                {
+                    DisplayArea = this
+                },
+                new StageDisplay
+                {
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                    RelativeSizeAxes = Axes.X
                 }
             };
         }
@@ -72,10 +60,31 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens
         {
             base.LoadComplete();
 
+            screenStack.ScreenPushed += onScreenPushed;
+            screenStack.ScreenExited += onScreenExited;
+
             screenStack.Push(new IdleScreen());
 
             client.MatchRoomStateChanged += onMatchRoomStateChanged;
             onMatchRoomStateChanged(client.Room!.MatchState);
+        }
+
+        private void onScreenPushed(IScreen lastScreen, IScreen newScreen)
+        {
+            if (newScreen is not MatchmakingSubScreen matchmakingSubScreen)
+                return;
+
+            playersList.DisplayStyle = matchmakingSubScreen.PlayersDisplayStyle;
+            playersList.DisplayArea = matchmakingSubScreen.PlayersDisplayArea;
+        }
+
+        private void onScreenExited(IScreen lastScreen, IScreen newScreen)
+        {
+            if (newScreen is not MatchmakingSubScreen matchmakingSubScreen)
+                return;
+
+            playersList.DisplayStyle = matchmakingSubScreen.PlayersDisplayStyle;
+            playersList.DisplayArea = matchmakingSubScreen.PlayersDisplayArea;
         }
 
         private void onMatchRoomStateChanged(MatchRoomState? state) => Scheduler.Add(() =>

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Screens;
 using osu.Framework.Utils;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
@@ -58,7 +59,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
 
             AddStep("join room", () =>
             {
-                var room = CreateDefaultRoom();
+                var room = CreateDefaultRoom(MatchType.Matchmaking);
                 room.Playlist = items;
 
                 JoinRoom(room);
@@ -80,7 +81,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
 
             PickScreen screen = null!;
 
-            AddStep("add screen", () => LoadScreen(screen = new PickScreen()));
+            AddStep("add screen", () => Child = new ScreenStack(screen = new PickScreen()));
 
             AddStep("select maps", () =>
             {

@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Game.Online.Matchmaking;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.Matchmaking;
+using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Matchmaking;
 using osu.Game.Tests.Visual.Multiplayer;
 
@@ -19,14 +20,13 @@ namespace osu.Game.Tests.Visual.Matchmaking
         {
             base.SetUpSteps();
 
-            AddStep("join room", () => JoinRoom(CreateDefaultRoom()));
+            AddStep("join room", () => JoinRoom(CreateDefaultRoom(MatchType.Matchmaking)));
             WaitForJoined();
 
-            AddStep("add bubble", () => Child = new StageBubble(MatchmakingStage.RoundWarmupTime, "Next Round")
+            AddStep("add bubble", () => Child = new StageBubble(null, MatchmakingStage.RoundWarmupTime, "Next Round")
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Width = 100
             });
         }
 

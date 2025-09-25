@@ -76,6 +76,15 @@ namespace osu.Game.Tests.Visual.Matchmaking
         }
 
         [Test]
+        public void TestBasic()
+        {
+            AddStep("do nothing", () =>
+            {
+                // test scene is weird.
+            });
+        }
+
+        [Test]
         public void TestCompleteRollAnimation()
         {
             AddStep("play animation", () =>

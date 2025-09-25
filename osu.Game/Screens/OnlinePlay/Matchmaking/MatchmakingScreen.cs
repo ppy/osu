@@ -4,9 +4,10 @@
 using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -17,19 +18,16 @@ using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Graphics.Cursor;
-using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Online;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Rulesets;
-using osu.Game.Screens.Footer;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Screens;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Users;
-using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking
 {
@@ -67,10 +65,16 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
         [Resolved]
         private IDialogOverlay dialogOverlay { get; set; } = null!;
 
+        [Resolved]
+        private AudioManager audio { get; set; } = null!;
+
         private readonly MultiplayerRoom room;
 
+        private Sample? sampleStart;
         private CancellationTokenSource? downloadCheckCancellation;
         private int? lastDownloadCheckedBeatmapId;
+
+        private MatchChatDisplay chat = null!;
 
         public MatchmakingScreen(MultiplayerRoom room)
         {
@@ -81,8 +85,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OverlayColourProvider colourProvider)
         {
+            sampleStart = audio.Samples.Get(@"SongSelect/confirm-selection");
+
             InternalChild = new OsuContextMenuContainer
             {
                 RelativeSizeAxes = Axes.Both,
@@ -99,7 +105,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
                             Padding = new MarginPadding
                             {
                                 Horizontal = WaveOverlayContainer.WIDTH_PADDING,
-                                Bottom = ScreenFooter.HEIGHT + 20
+                                Top = row_padding,
                             },
                             RowDimensions = new[]
                             {
@@ -120,7 +126,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
                                             new Box
                                             {
                                                 RelativeSizeAxes = Axes.Both,
-                                                Colour = Color4Extensions.FromHex(@"3e3a44") // Temporary.
+                                                Colour = colourProvider.Background6,
                                             },
                                             new MatchmakingScreenStack(),
                                         }
@@ -130,31 +136,14 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
                                 [
                                     new Container
                                     {
-                                        RelativeSizeAxes = Axes.X,
-                                        AutoSizeAxes = Axes.Y,
-                                        Children = new Drawable[]
+                                        Anchor = Anchor.TopRight,
+                                        Origin = Anchor.TopRight,
+                                        Width = 700,
+                                        Height = 130,
+                                        Padding = new MarginPadding { Bottom = row_padding },
+                                        Child = chat = new MatchChatDisplay(new Room(room))
                                         {
-                                            new Container
-                                            {
-                                                RelativeSizeAxes = Axes.X,
-                                                Height = 100,
-                                                Padding = new MarginPadding
-                                                {
-                                                    Horizontal = 200,
-                                                },
-                                                Child = new MatchChatDisplay(new Room(room))
-                                                {
-                                                    RelativeSizeAxes = Axes.Both,
-                                                }
-                                            },
-                                            new RoundedButton
-                                            {
-                                                Anchor = Anchor.BottomRight,
-                                                Origin = Anchor.BottomRight,
-                                                Text = "Don't click me",
-                                                Size = new Vector2(100, 30),
-                                                Action = () => client.MatchmakingSkipToNextStage()
-                                            }
+                                            RelativeSizeAxes = Axes.Both,
                                         }
                                     }
                                 ]
@@ -175,6 +164,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
             client.LoadRequested += onLoadRequested;
 
             beatmapAvailabilityTracker.Availability.BindValueChanged(onBeatmapAvailabilityChanged, true);
+
+            Footer!.Add(chat.CreateProxy());
         }
 
         private void onRoomUpdated()
@@ -248,6 +239,15 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
         private void onLoadRequested() => Scheduler.Add(() =>
         {
             updateGameplayState();
+
+            if (Beatmap.IsDefault)
+            {
+                Logger.Log("Aborting gameplay start - beatmap not downloaded.");
+                return;
+            }
+
+            sampleStart?.Play();
+
             this.Push(new MultiplayerPlayerLoader(() => new MatchmakingPlayer(new Room(room), new PlaylistItem(client.Room!.CurrentPlaylistItem), room.Users.ToArray())));
         });
 
