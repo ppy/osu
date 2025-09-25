@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
 using osu.Framework.Screens;
 using osu.Game.Localisation;
 using osu.Game.Online.API;
@@ -31,6 +32,9 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         public PlaylistsSongSelectV2(Room room)
         {
             this.room = room;
+
+            Padding = new MarginPadding { Horizontal = HORIZONTAL_OVERFLOW_PADDING };
+            LeftPadding = new MarginPadding { Top = CORNER_RADIUS_HIDE_OFFSET + Header.HEIGHT };
         }
 
         [BackgroundDependencyLoader]
