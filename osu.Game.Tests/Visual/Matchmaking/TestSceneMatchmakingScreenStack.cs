@@ -11,7 +11,7 @@ using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.Matchmaking;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Screens.OnlinePlay.Matchmaking.Screens;
+using osu.Game.Screens.OnlinePlay.Matchmaking.Match;
 using osu.Game.Tests.Visual.Multiplayer;
 
 namespace osu.Game.Tests.Visual.Matchmaking
@@ -41,7 +41,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
 
             AddStep("add carousel", () =>
             {
-                Child = new MatchmakingScreenStack
+                Child = new ScreenMatchmaking.ScreenStack
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
