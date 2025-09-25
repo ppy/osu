@@ -38,7 +38,7 @@ namespace osu.Game.Screens
         /// Temporarily, the footer's own back button is shown regardless of whether <see cref="BackButtonVisibility"/> is set to hidden.
         /// This will be corrected as the footer becomes used more commonly.
         /// </remarks>
-        bool ShowFooter { get; }
+        IBindable<bool> ShowFooter { get; }
 
         /// <summary>
         /// Whether a top-level component should be allowed to exit the current screen to, for example,

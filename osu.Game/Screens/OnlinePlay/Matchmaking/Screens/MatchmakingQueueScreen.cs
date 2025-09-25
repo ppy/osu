@@ -33,7 +33,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens
 {
     public partial class MatchmakingQueueScreen : OsuScreen
     {
-        public override bool ShowFooter => true;
+        public override IBindable<bool> ShowFooter { get; } = new Bindable<bool>(true);
 
         private Container mainContent = null!;
 

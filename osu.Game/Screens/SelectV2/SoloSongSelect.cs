@@ -7,6 +7,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Screens;
@@ -178,11 +179,12 @@ namespace osu.Game.Screens.SelectV2
 
         private partial class PlayerLoader : Play.PlayerLoader
         {
-            public override bool ShowFooter => !QuickRestart;
+            public override IBindable<bool> ShowFooter { get; }
 
             public PlayerLoader(Func<Player> createPlayer)
                 : base(createPlayer)
             {
+                ShowFooter = new Bindable<bool>(!QuickRestart);
             }
         }
     }

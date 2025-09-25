@@ -5,6 +5,7 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -23,7 +24,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Screens
 
         public override bool? ApplyModTrackAdjustments => true;
 
-        public override bool ShowFooter => true;
+        public override IBindable<bool> ShowFooter { get; } = new Bindable<bool>(true);
 
         private Container introContent = null!;
 

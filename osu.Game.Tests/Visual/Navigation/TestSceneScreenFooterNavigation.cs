@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Game.Overlays;
@@ -56,7 +57,7 @@ namespace osu.Game.Tests.Visual.Navigation
 
         private partial class TestScreenOne : OsuScreen
         {
-            public override bool ShowFooter => true;
+            public override IBindable<bool> ShowFooter { get; } = new Bindable<bool>(true);
 
             [Cached]
             private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
@@ -69,7 +70,7 @@ namespace osu.Game.Tests.Visual.Navigation
 
         private partial class TestScreenTwo : OsuScreen
         {
-            public override bool ShowFooter => true;
+            public override IBindable<bool> ShowFooter { get; } = new Bindable<bool>(true);
 
             [Cached]
             private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
@@ -82,11 +83,11 @@ namespace osu.Game.Tests.Visual.Navigation
 
         private partial class TestScreen : OsuScreen
         {
-            public override bool ShowFooter { get; }
+            public override IBindable<bool> ShowFooter { get; }
 
             public TestScreen(bool footer)
             {
-                ShowFooter = footer;
+                ShowFooter = new Bindable<bool>(footer);
             }
         }
     }

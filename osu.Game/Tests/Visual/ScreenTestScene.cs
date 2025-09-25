@@ -98,7 +98,7 @@ namespace osu.Game.Tests.Visual
 
         private void updateFooter(IScreen? _, IScreen? newScreen)
         {
-            if (newScreen is OsuScreen osuScreen && osuScreen.ShowFooter)
+            if (newScreen is OsuScreen osuScreen && osuScreen.ShowFooter.Value)
             {
                 Footer.Show();
 

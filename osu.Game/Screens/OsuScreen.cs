@@ -39,7 +39,7 @@ namespace osu.Game.Screens
 
         public virtual bool AllowUserExit => true;
 
-        public virtual bool ShowFooter => false;
+        public virtual IBindable<bool> ShowFooter { get; } = new Bindable<bool>();
 
         public virtual bool AllowExternalScreenChange => false;
 
@@ -117,7 +117,7 @@ namespace osu.Game.Screens
 
         internal void CreateLeasedDependencies(IReadOnlyDependencyContainer dependencies) => createDependencies(dependencies);
 
-        internal void LoadComponentsAgainstScreenDependencies(IEnumerable<Drawable> components) => LoadComponents(components);
+        internal virtual void LoadComponentsAgainstScreenDependencies(IEnumerable<Drawable> components) => LoadComponents(components);
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
