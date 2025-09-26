@@ -75,6 +75,9 @@ namespace osu.Game.Database
 
         protected virtual void MutateBeatmap(BeatmapSetInfo beatmapSet, IBeatmap playableBeatmap)
         {
+            // Stable expects GridSize to be an integer value
+            playableBeatmap.GridSize = (int)Math.Round(playableBeatmap.GridSize);
+
             // Convert beatmap elements to be compatible with legacy format
             // So we truncate time and position values to integers, and convert paths with multiple segments to Bézier curves
 

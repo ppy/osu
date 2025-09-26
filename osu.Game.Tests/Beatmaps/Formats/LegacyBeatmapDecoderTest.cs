@@ -15,6 +15,7 @@ using osu.Game.IO;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Catch.Beatmaps;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
@@ -114,6 +115,9 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual(1.8, beatmap.DistanceSpacing);
                 Assert.AreEqual(4, beatmap.BeatmapInfo.BeatDivisor);
                 Assert.AreEqual(4, beatmap.GridSize);
+                Assert.AreEqual(PositionSnapGridType.Square, beatmap.GridType);
+                Assert.AreEqual(0, beatmap.GridRotation);
+                Assert.AreEqual(null, beatmap.GridOffset);
                 Assert.AreEqual(2, beatmap.TimelineZoom);
             }
         }
