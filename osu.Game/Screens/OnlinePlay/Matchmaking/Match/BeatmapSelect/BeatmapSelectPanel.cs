@@ -47,11 +47,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
         private const float border_width = 3;
 
         private Container scaleContainer = null!;
-        private BeatmapPanel beatmapPanel = null!;
         private AvatarOverlay selectionOverlay = null!;
         private Drawable lighting = null!;
 
         private Container border = null!;
+        private Container mainContent = null!;
 
         public override bool PropagatePositionalInputSubTree => AllowSelection;
 
@@ -71,7 +71,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                 Origin = Anchor.Centre,
                 Children = new[]
                 {
-                    new Container
+                    mainContent = new Container
                     {
                         Masking = true,
                         CornerRadius = corner_radius,
@@ -80,7 +80,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                         Children = new[]
                         {
                             new HoverClickSounds(),
-                            beatmapPanel = new BeatmapPanel { RelativeSizeAxes = Axes.Both },
                             lighting = new Box
                             {
                                 Blending = BlendingParameters.Additive,
@@ -128,7 +127,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
             {
                 var beatmap = b.GetResultSafely()!;
                 beatmap.StarRating = Item.StarRating;
-                beatmapPanel.Beatmap = beatmap;
+
+                mainContent.Add(new BeatmapPanel(beatmap)
+                {
+                    Depth = float.MaxValue,
+                    RelativeSizeAxes = Axes.Both
+                });
             }));
         }
 
@@ -224,26 +228,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
         // TODO: combine following two classes with above implementation for simplicity?
         private partial class BeatmapPanel : CompositeDrawable, IHasContextMenu
         {
-            public APIBeatmap? Beatmap
-            {
-                set
-                {
-                    if (beatmap?.OnlineID == value?.OnlineID)
-                        return;
-
-                    beatmap = value;
-
-                    if (IsLoaded)
-                        updateContent();
-                }
-            }
-
-            private APIBeatmap? beatmap;
+            private readonly APIBeatmap beatmap;
 
             private Container content = null!;
             private UpdateableOnlineBeatmapSetCover cover = null!;
 
-            public BeatmapPanel(APIBeatmap? beatmap = null)
+            public BeatmapPanel(APIBeatmap beatmap)
             {
                 this.beatmap = beatmap;
             }
@@ -291,41 +281,28 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                 foreach (var child in content.Children)
                     child.FadeOut(300).Expire();
 
-                cover.OnlineInfo = beatmap?.BeatmapSet;
+                cover.OnlineInfo = beatmap.BeatmapSet;
 
-                if (beatmap != null)
+                var panelContent = new BeatmapPanelContent(beatmap)
                 {
-                    var panelContent = new BeatmapPanelContent(beatmap)
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                    };
+                    RelativeSizeAxes = Axes.Both,
+                };
 
-                    content.Add(panelContent);
+                content.Add(panelContent);
 
-                    panelContent.FadeInFromZero(300);
-                }
+                panelContent.FadeInFromZero(300);
             }
 
             [Resolved]
             private BeatmapSetOverlay? beatmapSetOverlay { get; set; }
 
-            public MenuItem[] ContextMenuItems
+            public MenuItem[] ContextMenuItems => new MenuItem[]
             {
-                get
+                new OsuMenuItem(ContextMenuStrings.ViewBeatmap, MenuItemType.Highlighted, () =>
                 {
-                    // this is very weird, but the beatmap may be null while loading because reasons.
-                    if (beatmap == null)
-                        return [];
-
-                    return new MenuItem[]
-                    {
-                        new OsuMenuItem(ContextMenuStrings.ViewBeatmap, MenuItemType.Highlighted, () =>
-                        {
-                            beatmapSetOverlay?.FetchAndShowBeatmapSet(beatmap.BeatmapSet!.OnlineID);
-                        }),
-                    };
-                }
-            }
+                    beatmapSetOverlay?.FetchAndShowBeatmapSet(beatmap.BeatmapSet!.OnlineID);
+                }),
+            };
 
             private partial class BeatmapPanelContent : CompositeDrawable
             {
