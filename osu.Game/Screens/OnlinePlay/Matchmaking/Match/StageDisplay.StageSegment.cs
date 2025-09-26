@@ -42,6 +42,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
             private Sample? countdownTickSample;
             private double? lastSamplePlayback;
 
+            private Container mainContent = null!;
+
             public bool Active { get; private set; }
 
             public float Progress => progressBar.Width;
@@ -49,10 +51,14 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
             public StageSegment(int? round, MatchmakingStage stage, LocalisableString displayText)
             {
                 Round = round;
+
                 this.stage = stage;
                 this.displayText = displayText;
 
                 AutoSizeAxes = Axes.Both;
+
+                Anchor = Anchor.CentreLeft;
+                Origin = Anchor.CentreLeft;
             }
 
             [BackgroundDependencyLoader]
@@ -74,7 +80,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                             Icon = FontAwesome.Solid.ArrowRight,
                             Margin = new MarginPadding { Horizontal = 10 }
                         },
-                        new Container
+                        mainContent = new Container
                         {
                             Masking = true,
                             CornerRadius = 5,
@@ -177,6 +183,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
 
                 if (wasActive)
                     progressBar.Width = 1;
+
+                mainContent.ScaleTo(Active ? 1.3f : 1, 500, Easing.OutQuint);
 
                 bool isPreparing =
                     (stage == MatchmakingStage.RoundWarmupTime && roomState.Stage == MatchmakingStage.WaitingForClientsJoin) ||

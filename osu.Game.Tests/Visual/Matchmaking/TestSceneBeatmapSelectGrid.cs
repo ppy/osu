@@ -10,6 +10,7 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect;
 using osu.Game.Tests.Visual.OnlinePlay;
@@ -17,11 +18,11 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Matchmaking
 {
-    public partial class TestSceneSelectionGrid : OnlinePlayTestScene
+    public partial class TestSceneBeatmapSelectGrid : OnlinePlayTestScene
     {
         private MultiplayerPlaylistItem[] items = null!;
 
-        private SelectionGrid grid = null!;
+        private BeatmapSelectGrid grid = null!;
 
         [Resolved]
         private BeatmapManager beatmapManager { get; set; } = null!;
@@ -58,7 +59,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
         {
             base.SetUpSteps();
 
-            AddStep("add grid", () => Child = grid = new SelectionGrid
+            AddStep("add grid", () => Child = grid = new BeatmapSelectGrid
             {
                 RelativeSizeAxes = Axes.Both,
                 Anchor = Anchor.Centre,
@@ -82,6 +83,22 @@ namespace osu.Game.Tests.Visual.Matchmaking
             {
                 // test scene is weird.
             });
+
+            AddStep("add selection 1", () => grid.ChildrenOfType<BeatmapSelectPanel>().First().AddUser(new APIUser
+            {
+                Id = 6411631,
+                Username = "Maarvin",
+            }, isOwnUser: true));
+            AddStep("add selection 2", () => grid.ChildrenOfType<BeatmapSelectPanel>().Skip(5).First().AddUser(new APIUser
+            {
+                Id = 2,
+                Username = "peppy",
+            }));
+            AddStep("add selection 3", () => grid.ChildrenOfType<BeatmapSelectPanel>().Skip(10).First().AddUser(new APIUser
+            {
+                Id = 1040328,
+                Username = "smoogipoo",
+            }));
         }
 
         [Test]
@@ -154,7 +171,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
                 var (candidateItems, _) = pickRandomItems(count);
 
                 grid.TransferCandidatePanelsToRollContainer(candidateItems);
-                grid.Delay(SelectionGrid.ARRANGE_DELAY)
+                grid.Delay(BeatmapSelectGrid.ARRANGE_DELAY)
                     .Schedule(() => grid.ArrangeItemsForRollAnimation());
             });
 
@@ -162,7 +179,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
 
             AddStep("display roll order", () =>
             {
-                var panels = grid.ChildrenOfType<SelectionPanel>().ToArray();
+                var panels = grid.ChildrenOfType<BeatmapSelectPanel>().ToArray();
 
                 for (int i = 0; i < panels.Length; i++)
                 {

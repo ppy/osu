@@ -24,7 +24,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
             private MultiplayerClient client { get; set; } = null!;
 
             private Framework.Screens.ScreenStack screenStack = null!;
-            private UserPanelOverlay playersList = null!;
+            private PlayerPanelOverlay playersList = null!;
 
             [BackgroundDependencyLoader]
             private void load()
@@ -45,7 +45,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                             screenStack = new Framework.Screens.ScreenStack(),
                         }
                     },
-                    playersList = new UserPanelOverlay
+                    playersList = new PlayerPanelOverlay
                     {
                         DisplayArea = this
                     },

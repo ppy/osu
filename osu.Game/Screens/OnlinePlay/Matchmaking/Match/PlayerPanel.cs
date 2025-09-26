@@ -20,7 +20,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
     /// A panel used throughout matchmaking to represent a user, including local information like their
     /// rank and high level statistics in the matchmaking system.
     /// </summary>
-    public partial class MatchmakingUserPanel : UserPanel
+    public partial class PlayerPanel : UserPanel
     {
         public static readonly Vector2 SIZE_HORIZONTAL = new Vector2(250, 100);
         public static readonly Vector2 SIZE_VERTICAL = new Vector2(150, 200);
@@ -55,7 +55,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
 
         private bool horizontal;
 
-        public MatchmakingUserPanel(MultiplayerRoomUser user)
+        public PlayerPanel(MultiplayerRoomUser user)
             : base(user.User!)
         {
             RoomUser = user;
@@ -66,6 +66,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
         {
             Masking = true;
             CornerRadius = 10;
+            CornerExponent = 10;
 
             Add(scaleContainer = new Container
             {

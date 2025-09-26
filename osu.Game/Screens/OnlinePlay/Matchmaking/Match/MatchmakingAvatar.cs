@@ -15,7 +15,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
 {
     /// <summary>
     /// A circular player avatar used in matchmaking displays.
-    /// Is part of a <see cref="MatchmakingUserPanel"/> but can also be used in isolation for a more ambient/decorative user display.
+    /// Is part of a <see cref="PlayerPanel"/> but can also be used in isolation for a more ambient/decorative user display.
     /// </summary>
     public partial class MatchmakingAvatar : CompositeDrawable
     {
