@@ -66,7 +66,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
-        public CollapsibleButtonContainer(APIBeatmapSet beatmapSet, bool allowNavigationToBeatmap = true)
+        public CollapsibleButtonContainer(APIBeatmapSet beatmapSet, bool allowNavigationToBeatmap = true, bool keepBackgroundLoaded = false)
         {
             downloadTracker = new BeatmapDownloadTracker(beatmapSet);
 
@@ -126,7 +126,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                     Masking = true,
                     Children = new Drawable[]
                     {
-                        new BeatmapCardContentBackground(beatmapSet)
+                        new BeatmapCardContentBackground(beatmapSet, keepBackgroundLoaded)
                         {
                             RelativeSizeAxes = Axes.Both,
                             Dimmed = { BindTarget = ShowDetails }
