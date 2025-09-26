@@ -225,8 +225,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
 
                     round = value.Value;
 
-                    this.ScaleTo(6, 500, Easing.OutQuart)
-                        .MoveToY(-300, 500, Easing.OutQuart)
+                    this.ScaleTo(6, 1000, Easing.OutPow10)
+                        .MoveToY(-300, 1000, Easing.OutPow10)
                         .Then()
                         .MoveToY(0, 500, Easing.InQuart)
                         .ScaleTo(1, 500, Easing.InQuart);
