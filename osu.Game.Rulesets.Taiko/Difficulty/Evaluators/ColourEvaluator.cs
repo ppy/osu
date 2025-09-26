@@ -2,6 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing;
@@ -24,7 +26,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             int consistentRatioCount = 0;
             double totalRatioCount = 0.0;
 
+            List<double> recentRatios = new List<double>();
             TaikoDifficultyHitObject current = hitObject;
+            var previousHitObject = (TaikoDifficultyHitObject)current.Previous(1);
 
             for (int i = 0; i < maxObjectsToCheck; i++)
             {
@@ -32,10 +36,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
                 if (current.Index <= 1)
                     break;
 
-                var previousHitObject = (TaikoDifficultyHitObject)current.Previous(1);
-
                 double currentRatio = current.RhythmData.Ratio;
                 double previousRatio = previousHitObject.RhythmData.Ratio;
+
+                recentRatios.Add(currentRatio);
 
                 // A consistent interval is defined as the percentage difference between the two rhythmic ratios with the margin of error.
                 if (Math.Abs(1 - currentRatio / previousRatio) <= threshold)
@@ -45,14 +49,21 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
                     break;
                 }
 
-                // Move to the previous object
                 current = previousHitObject;
             }
 
             // Ensure no division by zero
-            double ratioPenalty = 1 - totalRatioCount / (consistentRatioCount + 1) * 0.80;
+            if (consistentRatioCount > 0)
+                return 1 - totalRatioCount / (consistentRatioCount + 1) * 0.80;
 
-            return ratioPenalty;
+            if (recentRatios.Count <= 1) return 1.0;
+
+            // As a fallback, calculate the maximum deviation from the average of the recent ratios to ensure slightly off-snapped objects don't bypass the penalty.
+            double maxRatioDeviation = recentRatios.Max(r => Math.Abs(r - recentRatios.Average()));
+
+            double consistentRatioPenalty = 0.7 + 0.3 * DifficultyCalculationUtils.Smootherstep(maxRatioDeviation, 0.0, 1.0);
+
+            return consistentRatioPenalty;
         }
 
         /// <summary>
