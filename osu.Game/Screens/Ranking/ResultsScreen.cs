@@ -139,6 +139,14 @@ namespace osu.Game.Screens.Ranking
                                         {
                                             RelativeSizeAxes = Axes.Both
                                         },
+                                        new OfflineUsernameInput
+                                        {
+                                            Score = { BindTarget = SelectedScore },
+                                            AchievedScore = IsLocalPlay && Score != null ? Score : null,
+                                            Anchor = Anchor.TopRight,
+                                            Origin = Anchor.TopRight,
+                                            Margin = new MarginPadding { Top = 20, Right = 20 },
+                                        },
                                     }
                                 }
                             },
