@@ -16,7 +16,7 @@ using osu.Game.Online.Multiplayer.MatchTypes.Matchmaking;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
-using osu.Game.Screens.OnlinePlay.Matchmaking;
+using osu.Game.Screens.OnlinePlay.Matchmaking.Match;
 using osu.Game.Tests.Visual.Multiplayer;
 
 namespace osu.Game.Tests.Visual.Matchmaking
@@ -27,7 +27,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
         private const int beatmap_count = 50;
 
         private MultiplayerRoomUser[] users = null!;
-        private MatchmakingScreen screen = null!;
+        private ScreenMatchmaking screen = null!;
 
         public override void SetUpSteps()
         {
@@ -80,7 +80,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
                     StarRating = i / 10.0
                 }).ToArray();
 
-                LoadScreen(screen = new MatchmakingScreen(new MultiplayerRoom(0)
+                LoadScreen(screen = new ScreenMatchmaking(new MultiplayerRoom(0)
                 {
                     Users = users,
                     Playlist = beatmaps

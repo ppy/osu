@@ -37,7 +37,6 @@ using osu.Game.Rulesets;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.OnlinePlay.DailyChallenge;
-using osu.Game.Screens.OnlinePlay.Matchmaking.Screens;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.OnlinePlay.Playlists;
 using osu.Game.Screens.SelectV2;
@@ -483,7 +482,7 @@ namespace osu.Game.Screens.Menu
 
         private void loadSongSelect() => this.Push(new SoloSongSelect());
 
-        private void joinOrLeaveMatchmakingQueue() => this.Push(new MatchmakingIntroScreen());
+        private void joinOrLeaveMatchmakingQueue() => this.Push(new OnlinePlay.Matchmaking.Intro.IntroScreen());
 
         private partial class MobileDisclaimerDialog : PopupDialog
         {

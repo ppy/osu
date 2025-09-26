@@ -8,7 +8,7 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.Matchmaking;
 using osu.Game.Online.Rooms;
-using osu.Game.Screens.OnlinePlay.Matchmaking;
+using osu.Game.Screens.OnlinePlay.Matchmaking.Match;
 using osu.Game.Tests.Visual.Multiplayer;
 using osu.Game.Users;
 
@@ -16,7 +16,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
 {
     public partial class TestScenePlayerPanel : MultiplayerTestScene
     {
-        private PlayerPanel panel = null!;
+        private MatchmakingUserPanel panel = null!;
 
         public override void SetUpSteps()
         {
@@ -25,7 +25,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
             AddStep("join room", () => JoinRoom(CreateDefaultRoom(MatchType.Matchmaking)));
             WaitForJoined();
 
-            AddStep("add panel", () => Child = panel = new PlayerPanel(new MultiplayerRoomUser(1)
+            AddStep("add panel", () => Child = panel = new MatchmakingUserPanel(new MultiplayerRoomUser(1)
             {
                 User = new APIUser
                 {

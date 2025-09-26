@@ -3,7 +3,7 @@
 
 using osu.Framework.Graphics;
 using osu.Game.Online.Matchmaking;
-using osu.Game.Screens.OnlinePlay.Matchmaking;
+using osu.Game.Screens.OnlinePlay.Matchmaking.Queue;
 using osu.Game.Tests.Visual.Multiplayer;
 
 namespace osu.Game.Tests.Visual.Matchmaking
@@ -14,7 +14,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
         {
             base.SetUpSteps();
 
-            AddStep("add selector", () => Child = new MatchmakingPoolSelector
+            AddStep("add selector", () => Child = new PoolSelector
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
