@@ -626,10 +626,33 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         public override Vector2 ScreenSpaceSelectionPoint => DrawableObject.SliderBody?.ToScreenSpace(DrawableObject.SliderBody.PathOffset)
                                                              ?? BodyPiece.ToScreenSpace(BodyPiece.PathStartLocation);
 
-        protected override Vector2[] ScreenSpaceAdditionalNodes => new[]
-        {
+        protected override Vector2[] ScreenSpaceAdditionalNodes => getScreenSpaceControlPointNodes().Prepend(
             DrawableObject.SliderBody?.ToScreenSpace(DrawableObject.SliderBody.PathEndOffset) ?? BodyPiece.ToScreenSpace(BodyPiece.PathEndLocation)
-        };
+        ).ToArray();
+
+        private IEnumerable<Vector2> getScreenSpaceControlPointNodes()
+        {
+            // Returns the positions of control points that produce visible kinks on the slider's path
+            // This excludes inherited control points from Bezier, B-Spline, Perfect, and Catmull curves
+            if (DrawableObject.SliderBody == null)
+                yield break;
+
+            PathType? currentPathType = DrawableObject.HitObject.Path.ControlPoints.FirstOrDefault()?.Type;
+
+            // Skip the first control point because it is already covered by the slider head
+            // Skip the last control point because its always either not on the slider path or exactly on the slider end
+            foreach (var controlPoint in DrawableObject.HitObject.Path.ControlPoints.Skip(1).SkipLast(1))
+            {
+                if (controlPoint.Type is null && currentPathType != PathType.LINEAR)
+                    continue;
+
+                if (controlPoint.Type is not null)
+                    currentPathType = controlPoint.Type;
+
+                var screenSpacePosition = DrawableObject.SliderBody.ToScreenSpace(DrawableObject.SliderBody.PathOffset + controlPoint.Position);
+                yield return screenSpacePosition;
+            }
+        }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
         {
