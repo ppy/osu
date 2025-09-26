@@ -57,17 +57,16 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                     {
                         scroll = new StageScrollContainer
                         {
-                            ScrollbarOverlapsContent = false,
                             ScrollbarVisible = false,
                             ClampExtension = 0,
                             RelativeSizeAxes = Axes.X,
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
-                            Height = 36,
+                            Height = HEIGHT,
                             Child = flow = new FillFlowContainer
                             {
                                 Padding = new MarginPadding { Horizontal = 2000 },
                                 AutoSizeAxes = Axes.Both,
+                                Anchor = Anchor.CentreLeft,
+                                Origin = Anchor.CentreLeft,
                                 Direction = FillDirection.Horizontal,
                             },
                         },
