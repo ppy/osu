@@ -11,7 +11,9 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
@@ -20,6 +22,7 @@ using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
@@ -196,7 +199,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
         }
 
         // TODO: combine following two classes with above implementation for simplicity?
-        private partial class BeatmapPanel : CompositeDrawable
+        private partial class BeatmapPanel : CompositeDrawable, IHasContextMenu
         {
             public readonly Container OverlayLayer = new Container { RelativeSizeAxes = Axes.Both };
 
@@ -280,6 +283,27 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                     content.Add(panelContent);
 
                     panelContent.FadeInFromZero(300);
+                }
+            }
+
+            [Resolved]
+            private BeatmapSetOverlay? beatmapSetOverlay { get; set; }
+
+            public MenuItem[] ContextMenuItems
+            {
+                get
+                {
+                    // this is very weird, but the beatmap may be null while loading because reasons.
+                    if (beatmap == null)
+                        return [];
+
+                    return new MenuItem[]
+                    {
+                        new OsuMenuItem(ContextMenuStrings.ViewBeatmap, MenuItemType.Highlighted, () =>
+                        {
+                            beatmapSetOverlay?.FetchAndShowBeatmapSet(beatmap.BeatmapSet!.OnlineID);
+                        }),
+                    };
                 }
             }
 
@@ -400,7 +424,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                     lastSamplePlayback = Time.Current;
                 }
 
-                updateLayout();
+                updateAvatarLayout();
 
                 avatar.FinishTransforms();
 
@@ -415,12 +439,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                 avatar.PopOutAndExpire();
                 avatars.ChangeChildDepth(avatar, float.MaxValue);
 
-                updateLayout();
+                updateAvatarLayout();
 
                 return true;
             }
 
-            private void updateLayout()
+            private void updateAvatarLayout()
             {
                 const double stagger = 30;
                 const float spacing = 4;
