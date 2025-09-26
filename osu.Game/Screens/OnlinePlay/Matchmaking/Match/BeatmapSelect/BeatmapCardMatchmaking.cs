@@ -74,7 +74,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        thumbnail = new BeatmapCardThumbnail(BeatmapSet, BeatmapSet)
+                        thumbnail = new BeatmapCardThumbnail(BeatmapSet, BeatmapSet, keepLoaded: true)
                         {
                             Name = @"Left (icon) area",
                             Size = new Vector2(HEIGHT),
@@ -87,7 +87,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                                 Spacing = new Vector2(1)
                             }
                         },
-                        buttonContainer = new CollapsibleButtonContainer(BeatmapSet, allowNavigationToBeatmap: false)
+                        buttonContainer = new CollapsibleButtonContainer(BeatmapSet, allowNavigationToBeatmap: false, keepBackgroundLoaded: true)
                         {
                             X = HEIGHT - CORNER_RADIUS,
                             Width = WIDTH - HEIGHT + CORNER_RADIUS,
