@@ -65,7 +65,7 @@ namespace osu.Game.Online.Leaderboards
             };
         }
 
-        public static string GetRankName(ScoreRank rank) => rank.GetDescription().TrimEnd('+');
+        public static string GetRankName(ScoreRank rank) => rank.GetDescription().Replace("Silver ", "");
 
         /// <summary>
         ///  Retrieves the grade text colour.

@@ -390,7 +390,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             var groupModel = (GroupDefinition)groupItem.Model;
 
-            Assert.That(groupModel.Title, Is.EqualTo(expectedTitle));
+            Assert.That(groupModel.Title.ToString(), Is.EqualTo(expectedTitle));
             Assert.That(itemsInGroup.Select(i => i.Model).OfType<GroupedBeatmap>().Select(gb => gb.Beatmap), Is.EquivalentTo(expectedBeatmaps));
 
             totalItems += itemsInGroup.Count() + 1;
