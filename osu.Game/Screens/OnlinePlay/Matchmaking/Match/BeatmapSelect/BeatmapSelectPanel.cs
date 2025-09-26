@@ -28,7 +28,7 @@ using osuTK.Input;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
 {
-    public partial class SelectionPanel : Container
+    public partial class BeatmapSelectPanel : Container
     {
         public static readonly Vector2 SIZE = new Vector2(300, 70);
 
@@ -52,7 +52,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
 
         public override bool PropagatePositionalInputSubTree => AllowSelection;
 
-        public SelectionPanel(MultiplayerPlaylistItem item)
+        public BeatmapSelectPanel(MultiplayerPlaylistItem item)
         {
             Item = item;
             Size = SIZE;
