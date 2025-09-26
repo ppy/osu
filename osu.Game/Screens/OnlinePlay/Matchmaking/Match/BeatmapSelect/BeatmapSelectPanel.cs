@@ -44,14 +44,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
         private readonly BeatmapPanel beatmapPanel;
         private readonly AvatarOverlay selectionOverlay;
         private readonly Container border;
-        private readonly Box flash;
+
+        private readonly Drawable lighting;
 
         public bool AllowSelection;
 
         public Action<MultiplayerPlaylistItem>? Action;
-
-        [Resolved]
-        private BeatmapLookupCache beatmapLookupCache { get; set; } = null!;
 
         public override bool PropagatePositionalInputSubTree => AllowSelection;
 
@@ -60,76 +58,64 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
             Item = item;
             Size = SIZE;
 
-            InternalChildren = new Drawable[]
+            InternalChild = scaleContainer = new Container
             {
-                scaleContainer = new Container
+                Masking = true,
+                CornerRadius = 6,
+                RelativeSizeAxes = Axes.Both,
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Children = new[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Children = new Drawable[]
+                    new HoverClickSounds(),
+                    new Container
                     {
-                        new Container
+                        RelativeSizeAxes = Axes.Both,
+                        Padding = new MarginPadding(-border_width),
+                        Child = border = new Container
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Padding = new MarginPadding(-border_width),
-                            Child = border = new Container
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Masking = true,
-                                CornerRadius = corner_radius + border_width,
-                                Alpha = 0,
-                                Child = new Box { RelativeSizeAxes = Axes.Both },
-                            }
-                        },
-                        beatmapPanel = new BeatmapPanel
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            OverlayLayer =
-                            {
-                                Children = new[]
-                                {
-                                    flash = new Box
-                                    {
-                                        Blending = BlendingParameters.Additive,
-                                        RelativeSizeAxes = Axes.Both,
-                                        Alpha = 0,
-                                    },
-                                }
-                            }
-                        },
-                        selectionOverlay = new AvatarOverlay()
+                            Masking = true,
+                            CornerRadius = corner_radius + border_width,
+                            Alpha = 0,
+                            Child = new Box { RelativeSizeAxes = Axes.Both },
+                        }
+                    },
+                    beatmapPanel = new BeatmapPanel { RelativeSizeAxes = Axes.Both },
+                    lighting = new Box
+                    {
+                        Blending = BlendingParameters.Additive,
+                        RelativeSizeAxes = Axes.Both,
+                        Alpha = 0,
+                    },
+                    selectionOverlay = new AvatarOverlay
+                    {
+                        Anchor = Anchor.TopRight,
+                        Origin = Anchor.TopRight,
                     }
-                },
-                new HoverClickSounds(),
+                }
             };
         }
 
-        protected override void LoadComplete()
+        [BackgroundDependencyLoader]
+        private void load(BeatmapLookupCache lookupCache)
         {
-            base.LoadComplete();
-
-            beatmapLookupCache.GetBeatmapAsync(Item.BeatmapID).ContinueWith(b => Schedule(() =>
+            lookupCache.GetBeatmapAsync(Item.BeatmapID).ContinueWith(b => Schedule(() =>
             {
                 var beatmap = b.GetResultSafely()!;
-
                 beatmap.StarRating = Item.StarRating;
-
                 beatmapPanel.Beatmap = beatmap;
             }));
         }
 
         public bool AddUser(APIUser user, bool isOwnUser = false) => selectionOverlay.AddUser(user, isOwnUser);
-
-        public bool RemoveUser(int userId) => selectionOverlay.RemoveUser(userId);
-
-        public bool RemoveUser(APIUser user) => RemoveUser(user.Id);
+        public bool RemoveUser(APIUser user) => selectionOverlay.RemoveUser(user.Id);
 
         protected override bool OnHover(HoverEvent e)
         {
-            flash.FadeTo(0.2f, 50)
-                 .Then()
-                 .FadeTo(0.1f, 300);
+            lighting.FadeTo(0.2f, 50)
+                    .Then()
+                    .FadeTo(0.1f, 300);
 
             return true;
         }
@@ -138,7 +124,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
         {
             base.OnHoverLost(e);
 
-            flash.FadeOut(200);
+            lighting.FadeOut(200);
         }
 
         protected override bool OnMouseDown(MouseDownEvent e)
@@ -166,9 +152,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
         {
             Action?.Invoke(Item);
 
-            flash.FadeTo(0.5f, 50)
-                 .Then()
-                 .FadeTo(0.1f, 400);
+            lighting.FadeTo(0.5f, 50)
+                    .Then()
+                    .FadeTo(0.1f, 400);
 
             return true;
         }
@@ -201,11 +187,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
         // TODO: combine following two classes with above implementation for simplicity?
         private partial class BeatmapPanel : CompositeDrawable, IHasContextMenu
         {
-            public readonly Container OverlayLayer = new Container { RelativeSizeAxes = Axes.Both };
-
             public APIBeatmap? Beatmap
             {
-                get => beatmap;
                 set
                 {
                     if (beatmap?.OnlineID == value?.OnlineID)
@@ -233,6 +216,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
             {
                 Masking = true;
                 CornerRadius = 6;
+                CornerExponent = 10;
 
                 InternalChildren = new Drawable[]
                 {
@@ -254,7 +238,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                     {
                         RelativeSizeAxes = Axes.Both,
                     },
-                    OverlayLayer,
                 };
             }
 
@@ -383,20 +366,15 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
 
             public AvatarOverlay()
             {
-                InternalChild = avatars = new Container<SelectionAvatar>();
+                AutoSizeAxes = Axes.Both;
+
+                InternalChild = avatars = new Container<SelectionAvatar>
+                {
+                    AutoSizeAxes = Axes.X,
+                    Height = SelectionAvatar.AVATAR_SIZE,
+                };
 
                 Padding = new MarginPadding(5);
-
-                RelativeSizeAxes = Axes.X;
-                AutoSizeAxes = Axes.Y;
-            }
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-
-                avatars.RelativeSizeAxes = Axes.X;
-                avatars.AutoSizeAxes = Axes.Y;
             }
 
             [BackgroundDependencyLoader]
@@ -410,11 +388,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                 if (avatars.Any(a => a.User.Id == user.Id))
                     return false;
 
-                var avatar = new SelectionAvatar(user, isOwnUser)
-                {
-                    Anchor = Anchor.CentreRight,
-                    Origin = Anchor.CentreRight,
-                };
+                var avatar = new SelectionAvatar(user, isOwnUser);
 
                 avatars.Add(avatar);
 
@@ -469,26 +443,23 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
 
             public partial class SelectionAvatar : CompositeDrawable
             {
+                public const float AVATAR_SIZE = 30;
+
                 public APIUser User { get; }
 
                 public bool Expired { get; private set; }
 
-                private readonly Container content;
+                private readonly MatchmakingAvatar avatar;
 
                 public SelectionAvatar(APIUser user, bool isOwnUser)
                 {
                     User = user;
-                    Size = new Vector2(30);
+                    Size = new Vector2(AVATAR_SIZE);
 
-                    InternalChildren = new Drawable[]
+                    InternalChild = avatar = new MatchmakingAvatar(user, isOwnUser)
                     {
-                        content = new Container
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Child = new MatchmakingAvatar(user, isOwnUser)
-                        }
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
                     };
                 }
 
@@ -496,14 +467,14 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                 {
                     base.LoadComplete();
 
-                    content.ScaleTo(0)
-                           .ScaleTo(1, 500, Easing.OutElasticHalf)
-                           .FadeIn(200);
+                    avatar.ScaleTo(0)
+                          .ScaleTo(1, 500, Easing.OutElasticHalf)
+                          .FadeIn(200);
                 }
 
                 public void PopOutAndExpire()
                 {
-                    content.ScaleTo(0, 400, Easing.OutExpo);
+                    avatar.ScaleTo(0, 400, Easing.OutExpo);
 
                     this.FadeOut(100).Expire();
                     Expired = true;
